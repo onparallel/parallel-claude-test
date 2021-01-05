@@ -33,13 +33,14 @@ export class OrganizationRepository extends BaseRepository {
       search?: string | null;
       excludeIds?: number[] | null;
       sortBy?: SortBy<keyof User>[];
+      includeInactive?: boolean | null;
     } & PageOpts
   ) {
     return await this.loadPageAndCount(
       this.from("user")
         .where({ org_id: orgId, deleted_at: null })
         .mmodify((q) => {
-          const { search, excludeIds, sortBy } = opts;
+          const { search, excludeIds, sortBy, includeInactive } = opts;
           if (search) {
             q.andWhere((q2) => {
               q2.whereIlike(
@@ -66,6 +67,9 @@ export class OrganizationRepository extends BaseRepository {
                 })
                 .join(", ")
             );
+          }
+          if (!includeInactive) {
+            q.where("status", "ACTIVE");
           }
         })
         .orderBy("id")

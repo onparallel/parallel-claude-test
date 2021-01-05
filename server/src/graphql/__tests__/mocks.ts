@@ -3,6 +3,8 @@ import { IAnalyticsService } from "../../services/analytics";
 import { IRedis } from "../../services/redis";
 import { IAuth } from "../../services/auth";
 import { IEmailsService } from "../../services/emails";
+import { IAws } from "../../services/aws";
+import { SQS } from "aws-sdk";
 
 export const userCognitoId = "test-cognito-id";
 
@@ -49,4 +51,17 @@ export class MockEmailsService implements IEmailsService {
   async sendPetitionClosedEmail() {}
   async sendPetitionMessageBouncedEmail() {}
   async sendContactAuthenticationRequestEmail() {}
+}
+
+@injectable()
+export class MockAwsService implements IAws {
+  get sqs() {
+    return new SQS();
+  }
+  async enqueueMessages() {}
+  async createCognitoUser() {
+    return "";
+  }
+  async enableCognitoUser() {}
+  async disableCognitoUser() {}
 }

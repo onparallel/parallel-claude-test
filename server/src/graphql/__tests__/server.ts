@@ -7,6 +7,7 @@ import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";
 import { ANALYTICS, IAnalyticsService } from "../../services/analytics";
 import { AUTH, IAuth } from "../../services/auth";
+import { AWS_SERVICE, IAws } from "../../services/aws";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { IRedis, REDIS } from "../../services/redis";
 import { deleteAllData } from "../../util/knexUtils";
@@ -15,6 +16,7 @@ import { schema } from "./../../schema";
 import {
   MockAnalyticsService,
   MockAuth,
+  MockAwsService,
   MockEmailsService,
   MockRedis,
 } from "./mocks";
@@ -30,6 +32,7 @@ export const initServer = async () => {
     .rebind<IEmailsService>(EMAILS)
     .to(MockEmailsService)
     .inSingletonScope();
+  container.rebind<IAws>(AWS_SERVICE).to(MockAwsService).inSingletonScope();
 
   const stack: any[] = [];
   const server = new ApolloServer({

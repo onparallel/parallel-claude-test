@@ -423,5 +423,34 @@ describe("GraphQL/Users", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
+
+    it("sends error when trying to transfer petitions to the same user that will be set as inactive", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $userIds: [GID!]!
+            $status: UserStatus!
+            $transferToUserId: GID
+          ) {
+            updateUserStatus(
+              userIds: $userIds
+              status: $status
+              transferToUserId: $transferToUserId
+            ) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          userIds: [toGlobalId("User", activeUsers[0].id)],
+          status: "INACTIVE",
+          transferToUserId: toGlobalId("User", activeUsers[0].id),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
   });
 });

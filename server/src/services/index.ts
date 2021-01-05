@@ -1,6 +1,6 @@
 import { ContainerModule } from "inversify";
 import { AUTH, Auth, IAuth } from "./auth";
-import { Aws } from "./aws";
+import { Aws, IAws, AWS_SERVICE } from "./aws";
 import { Cognito } from "./cognito";
 import { IRedis, REDIS, Redis } from "./redis";
 import { Smtp } from "./smtp";
@@ -15,7 +15,7 @@ import { Storage, StorageFactory, STORAGE_FACTORY } from "./storage";
 export const servicesModule = new ContainerModule((bind) => {
   bind<Logger>(LOGGER).toDynamicValue(createLogger).inSingletonScope();
   bind<IAuth>(AUTH).to(Auth);
-  bind<Aws>(Aws).toSelf().inSingletonScope();
+  bind<IAws>(AWS_SERVICE).to(Aws).inSingletonScope();
   bind<Cognito>(Cognito).toSelf();
   bind<IEmailsService>(EMAILS).to(EmailsService);
   bind<IAnalyticsService>(ANALYTICS).to(AnalyticsService).inSingletonScope();

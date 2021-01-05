@@ -1,4 +1,11 @@
-import { arg, enumType, list, nonNull, objectType } from "@nexus/schema";
+import {
+  arg,
+  booleanArg,
+  enumType,
+  list,
+  nonNull,
+  objectType,
+} from "@nexus/schema";
 import { titleize } from "../../util/strings";
 import { userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -90,10 +97,11 @@ export const Organization = objectType({
       authorize: isOwnOrgOrSuperAdmin(),
       additionalArgs: {
         exclude: list(nonNull(globalIdArg("User"))),
+        includeInactive: booleanArg(),
       },
       resolve: async (
         root,
-        { offset, limit, search, sortBy, exclude },
+        { offset, limit, search, sortBy, exclude, includeInactive },
         ctx
       ) => {
         const columnMap = {
@@ -108,6 +116,7 @@ export const Organization = objectType({
           limit,
           search,
           excludeIds: exclude,
+          includeInactive,
           sortBy: (sortBy || ["createdAt_ASC"]).map((value) => {
             const [field, order] = parseSortBy(value);
             return { column: columnMap[field], order };

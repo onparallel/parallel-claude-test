@@ -3,7 +3,7 @@ import { Consumer } from "sqs-consumer";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
-import { Aws } from "../../services/aws";
+import { AWS_SERVICE, IAws } from "../../services/aws";
 import { LOGGER, Logger } from "../../services/logger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
@@ -60,7 +60,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
       () => {},
       () => {
         const logger = container.get<Logger>(LOGGER);
-        const aws = container.get<Aws>(Aws);
+        const aws = container.get<IAws>(AWS_SERVICE);
         const consumer = Consumer.create({
           queueUrl: config.queueWorkers[name].endpoint,
           batchSize: 10,

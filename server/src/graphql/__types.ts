@@ -2138,6 +2138,7 @@ export interface NexusGenArgTypes {
     users: {
       // args
       exclude?: NexusGenScalars["GID"][] | null; // [GID!]
+      includeInactive?: boolean | null; // Boolean
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String

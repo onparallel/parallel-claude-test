@@ -7,8 +7,27 @@ import { createHash } from "crypto";
 import { Memoize } from "typescript-memoize";
 import { Storage, STORAGE_FACTORY } from "./storage";
 
+export interface IAws {
+  sqs: AWS.SQS;
+  enqueueMessages(
+    queue: keyof Config["queueWorkers"],
+    messages:
+      | { id: string; body: any; groupId: string }[]
+      | { body: any; groupId: string }
+  ): Promise<void>;
+  createCognitoUser(
+    email: string,
+    password?: string,
+    sendEmail?: boolean
+  ): Promise<string | undefined>;
+  enableCognitoUser(email: string): Promise<void>;
+  disableCognitoUser(email: string): Promise<void>;
+}
+
+export const AWS_SERVICE = Symbol.for("AWS_SERVICE");
+
 @injectable()
-export class Aws {
+export class Aws implements IAws {
   @Memoize() public get s3() {
     return new AWS.S3({
       signatureVersion: "v4",
@@ -124,5 +143,23 @@ export class Aws {
       })
       .promise();
     return res.User!.Username;
+  }
+
+  async disableCognitoUser(email: string) {
+    await this.cognitoIdP
+      .adminDisableUser({
+        UserPoolId: this.config.cognito.defaultPoolId,
+        Username: email,
+      })
+      .promise();
+  }
+
+  async enableCognitoUser(email: string) {
+    await this.cognitoIdP
+      .adminEnableUser({
+        UserPoolId: this.config.cognito.defaultPoolId,
+        Username: email,
+      })
+      .promise();
   }
 }

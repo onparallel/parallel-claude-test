@@ -655,7 +655,7 @@ type Mutation {
   ): [PetitionAccess!]!
 
   """
-  Transfers petition ownership to a given user
+  Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.
   """
   transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [Petition!]!
 
@@ -819,6 +819,7 @@ type Organization implements Timestamps {
   """
   users(
     exclude: [GID!]
+    includeInactive: Boolean
 
     """
     Number of elements to take from the list.

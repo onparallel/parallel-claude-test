@@ -10,7 +10,7 @@ import { ReportingRepository } from "./db/repositories/ReportingRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, PetitionAccess, User } from "./db/__types";
 import { AUTH, Auth } from "./services/auth";
-import { Aws } from "./services/aws";
+import { Aws, AWS_SERVICE } from "./services/aws";
 import { Cognito } from "./services/cognito";
 import { EMAILS, EmailsService } from "./services/emails";
 import { LOGGER, Logger } from "./services/logger";
@@ -37,8 +37,8 @@ export class ApiContext {
     @inject(SECURITY) public readonly security: SecurityService,
     @inject(SIGNATURE) public readonly signature: SignatureService,
     @inject(PRINTER) public readonly printer: Printer,
+    @inject(AWS_SERVICE) public readonly aws: Aws,
 
-    public readonly aws: Aws,
     public readonly cognito: Cognito,
     // Repositories
     public readonly contacts: ContactRepository,
@@ -58,7 +58,7 @@ export class WorkerContext {
     @inject(CONFIG) public config: Config,
     @inject(LOGGER) public logger: Logger,
     // Services
-    public readonly aws: Aws,
+    @inject(AWS_SERVICE) public readonly aws: Aws,
     public readonly smtp: Smtp,
     @inject(EMAILS) public readonly emails: EmailsService,
     @inject(ANALYTICS) public readonly analytics: AnalyticsService,

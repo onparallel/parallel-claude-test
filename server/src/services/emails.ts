@@ -1,7 +1,7 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { unMaybeArray } from "../util/arrays";
 import { MaybeArray, Maybe } from "../util/types";
-import { Aws } from "./aws";
+import { Aws, AWS_SERVICE } from "./aws";
 import { EmailPayload } from "../workers/email-sender";
 
 export interface IEmailsService {
@@ -50,7 +50,7 @@ export const EMAILS = Symbol.for("EMAILS");
 
 @injectable()
 export class EmailsService implements IEmailsService {
-  constructor(private aws: Aws) {}
+  constructor(@inject(AWS_SERVICE) private aws: Aws) {}
 
   private async enqueueEmail<T extends keyof EmailPayload>(
     type: T,

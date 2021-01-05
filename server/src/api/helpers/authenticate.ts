@@ -14,7 +14,7 @@ export function authenticate(): Handler {
         throw new Error("Invalid session");
       }
       const user = await ctx.users.loadSessionUser(cognitoId);
-      if (!user) {
+      if (!user || user.status === "INACTIVE") {
         throw new Error("User not found");
       }
       ctx.user = user;

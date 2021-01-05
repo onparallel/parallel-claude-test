@@ -180,6 +180,14 @@ export const UpdateUserStatus = mutationField("updateUserStatus", {
         );
       }
 
+      if (userIds.includes(transferToUserId)) {
+        throw new ArgValidationError(
+          info,
+          "transferToUserId",
+          "Can't transfer to a user that will be disabled."
+        );
+      }
+
       const userToTransfer = await ctx.users.loadUser(transferToUserId);
 
       if (
@@ -241,15 +249,34 @@ export const UpdateUserStatus = mutationField("updateUserStatus", {
           })
         );
 
-        return await ctx.users.updateUserById(
+        const disabledUsers = await ctx.users.updateUserById(
+          userIds,
+          { status: "INACTIVE" },
+          ctx.user!,
+          t
+        );
+
+        await Promise.all(
+          disabledUsers.map((u) => ctx.aws.disableCognitoUser(u.email))
+        );
+
+        return disabledUsers;
+      });
+    } else {
+      return await ctx.petitions.withTransaction(async (t) => {
+        const enabledUsers = await ctx.users.updateUserById(
           userIds,
           { status },
           ctx.user!,
           t
         );
+
+        await Promise.all(
+          enabledUsers.map((u) => ctx.aws.enableCognitoUser(u.email))
+        );
+
+        return enabledUsers;
       });
-    } else {
-      return await ctx.users.updateUserById(userIds, { status }, ctx.user!);
     }
   },
 });
