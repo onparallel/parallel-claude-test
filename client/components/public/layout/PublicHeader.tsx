@@ -25,26 +25,30 @@ export interface PublicHeaderProps extends BoxProps {
 
 export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
   const { isOpen, onToggle } = useDisclosure();
-  const breakpoint = "lg" as const;
+  const bp = "lg" as const;
 
   return (
     <PublicContainer
       wrapper={{
         as: "header",
         backgroundColor: "white",
-        boxShadow: isThin || isOpen ? "md" : "none",
+        boxShadow: isThin
+          ? "md"
+          : isOpen
+          ? { base: "md", [bp]: "none" }
+          : "none",
         ...props,
       }}
     >
       <Flex
-        direction={{ base: "column", lg: "row" }}
-        alignItems={{ base: "stretch", lg: "center" }}
+        direction={{ base: "column", [bp]: "row" }}
+        alignItems={{ base: "stretch", [bp]: "center" }}
       >
         <Flex
           alignSelf="stretch"
           alignItems="center"
           flex="1"
-          minHeight={{ base: 16, lg: isThin ? 16 : 20 }}
+          minHeight={{ base: 16, [bp]: isThin ? 16 : 20 }}
           transition="min-height 300ms"
         >
           <NakedLink href="/">
@@ -61,22 +65,22 @@ export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
           <Spacer />
           <BurgerButton
             isOpen={isOpen}
-            display={{ base: "block", [breakpoint]: "none" }}
+            display={{ base: "block", [bp]: "none" }}
             onClick={onToggle}
           />
         </Flex>
         <Box
-          height={{ base: isOpen ? "auto" : 0, lg: "auto" }}
-          opacity={{ base: isOpen ? 1 : 0, lg: 1 }}
+          height={{ base: isOpen ? "auto" : 0, [bp]: "auto" }}
+          opacity={{ base: isOpen ? 1 : 0, [bp]: 1 }}
           overflow="hidden"
           transition="opacity 500ms"
-          padding={2}
-          paddingBottom={{ base: isOpen ? 4 : 2, lg: 2 }}
+          padding={{ base: 0, [bp]: 2 }}
+          paddingBottom={{ base: isOpen ? 4 : 2, [bp]: 2 }}
         >
           <PublicHeaderMenu
-            direction={{ base: "column", lg: "row" }}
-            spacing={{ base: 2, lg: 4 }}
-            alignItems={{ base: "stretch", lg: "center" }}
+            direction={{ base: "column", [bp]: "row" }}
+            spacing={{ base: 2, [bp]: 4 }}
+            alignItems={{ base: "stretch", [bp]: "center" }}
           />
         </Box>
       </Flex>

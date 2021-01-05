@@ -4,7 +4,7 @@ import { resolveUrl } from "@parallel/utils/next";
 import { useWindowScroll } from "beautiful-react-hooks";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { CookieConsent } from "./CookieConsent";
 import { PublicFooter } from "./PublicFooter";
@@ -27,17 +27,13 @@ export function PublicLayout({
 }: PublicLayoutProps) {
   const { query, pathname } = useRouter();
   const intl = useIntl();
-  let headerIsThin = false;
-  if (process.browser) {
-    const [_headerIsThin, setThinHeader] = useState(false);
-    headerIsThin = _headerIsThin;
-    useWindowScroll(() => {
-      if (headerIsThin && window.scrollY <= 20) {
-        setThinHeader(false);
-      } else if (!headerIsThin && window.scrollY > 20) {
-        setThinHeader(true);
-      }
-    });
+
+  const [headerIsThin, setThinHeader] = useState(false);
+  useWindowScroll(checkWindowScroll);
+  useEffect(checkWindowScroll, []);
+
+  function checkWindowScroll() {
+    setThinHeader(window.scrollY > 20);
   }
 
   return (
@@ -70,15 +66,14 @@ export function PublicLayout({
       </Head>
       <Flex direction="column" minHeight="100vh">
         {hideHeader ? null : (
-          <PublicHeader position="fixed" zIndex={2} isThin={headerIsThin} />
+          <PublicHeader
+            position="sticky"
+            top={0}
+            zIndex={1}
+            isThin={headerIsThin}
+          />
         )}
-        <Flex
-          as="main"
-          marginTop={hideHeader ? 0 : headerIsThin ? 16 : 20}
-          flex="1"
-          direction="column"
-          zIndex={1}
-        >
+        <Flex as="main" flex="1" direction="column">
           {children}
         </Flex>
         {hideFooter ? null : <PublicFooter marginTop={8} />}
