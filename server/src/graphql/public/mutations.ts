@@ -1,5 +1,4 @@
 import {
-  arg,
   booleanArg,
   idArg,
   inputObjectType,
