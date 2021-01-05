@@ -9,6 +9,8 @@ import { mode } from "@chakra-ui/theme-tools";
 import { styles } from "./styles";
 
 export const theme = extendTheme({
+  useSystemColorMode: false,
+  initialColorMode: "light",
   styles,
   fonts: {
     body: "'IBM Plex Sans', sans-serif",
