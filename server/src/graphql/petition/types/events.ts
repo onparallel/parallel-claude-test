@@ -398,6 +398,14 @@ export const OwnershipTransferredEvent = createPetitionEvent(
         return await ctx.users.loadUser(root.data.owner_id);
       },
     });
+    t.nullable.field("previousOwner", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return data.previous_owner_id
+          ? await ctx.users.loadUser(data.previous_owner_id)
+          : null;
+      },
+    });
   }
 );
 

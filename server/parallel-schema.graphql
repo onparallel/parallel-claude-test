@@ -925,6 +925,7 @@ type OwnershipTransferredEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   owner: User
+  previousOwner: User
   user: User
 }
 

@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 import { Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
-import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -30,9 +29,11 @@ export function TimelineOwnershipTransferredEvent({
     >
       <FormattedMessage
         id="timeline.ownership-transferred-description"
-        defaultMessage="{same, select, true {You} other {{user}}} transferred the ownership of this petition to {owner} {timeAgo}"
+        defaultMessage="{same, select, true {You} other {{user}}} transferred the ownership of this petition {hasPreviousOwner, select, true {from {previousOwner} } other {}}to {owner} {timeAgo}"
         values={{
           same: userId === event.user?.id,
+          hasPreviousOwner: !!event.previousOwner,
+          previousOwner: <UserReference user={event.previousOwner!} />,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
           owner: <UserReference user={event.owner} />,
@@ -58,9 +59,11 @@ TimelineOwnershipTransferredEvent.fragments = {
       owner {
         ...UserReference_User
       }
+      previousOwner {
+        ...UserReference_User
+      }
       createdAt
     }
     ${UserReference.fragments.User}
-    ${ContactLink.fragments.Contact}
   `,
 };

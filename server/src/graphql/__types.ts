@@ -610,6 +610,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     owner: NexusGenRootTypes["User"] | null; // User
+    previousOwner: NexusGenRootTypes["User"] | null; // User
     user: NexusGenRootTypes["User"] | null; // User
   };
   Petition: {
@@ -1277,6 +1278,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
     owner: "User";
+    previousOwner: "User";
     user: "User";
   };
   Petition: {

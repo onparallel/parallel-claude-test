@@ -54,6 +54,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   OWNERSHIP_TRANSFERRED: {
     user_id: number;
     owner_id: number;
+    previous_owner_id?: number; // optional for retrocompatibility.
   };
   PETITION_CLOSED: {
     user_id: number;

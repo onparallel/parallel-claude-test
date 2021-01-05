@@ -235,6 +235,7 @@ export const UpdateUserStatus = mutationField("updateUserStatus", {
                   data: {
                     user_id: ctx.user!.id,
                     owner_id: transferToUserId,
+                    previous_owner_id: p.user_id,
                   },
                 })),
                 t

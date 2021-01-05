@@ -59,6 +59,7 @@ export const transferPetitionOwnership = mutationField(
             type: "OWNERSHIP_TRANSFERRED",
             data: {
               user_id: ctx.user!.id,
+              previous_owner_id: ctx.user!.id,
               owner_id: args.userId,
             },
           })),
