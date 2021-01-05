@@ -280,6 +280,7 @@ export const PetitionField = objectType({
     });
     t.jsonObject("options", {
       description: "The options of the petition field.",
+      resolve: (o) => o.options,
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",

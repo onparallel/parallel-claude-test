@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { RecipientViewPetitionField_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -12,14 +13,18 @@ import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText
 export interface RecipientViewPetitionFieldProps
   extends Omit<RecipientViewPetitionFieldCardProps, "children"> {
   keycode: string;
-  canReply: boolean;
+  access: RecipientViewPetitionField_PublicPetitionAccessFragment;
+  isDisabled: boolean;
 }
 
 export const RecipientViewPetitionField = Object.assign(
   chakraForwardRef<"header" | "section", RecipientViewPetitionFieldProps>(
     function RecipientViewPetitionField(props, ref) {
       return props.field.type === "HEADING" ? (
-        <RecipientViewPetitionFieldHeading ref={ref as any} {...props} />
+        <RecipientViewPetitionFieldHeading
+          ref={ref as any}
+          field={props.field}
+        />
       ) : props.field.type === "TEXT" ? (
         <RecipientViewPetitionFieldText ref={ref as any} {...props} />
       ) : props.field.type === "SELECT" ? (
@@ -31,6 +36,12 @@ export const RecipientViewPetitionField = Object.assign(
   ),
   {
     fragments: {
+      PublicPetitionAccess: gql`
+        fragment RecipientViewPetitionField_PublicPetitionAccess on PublicPetitionAccess {
+          ...RecipientViewPetitionFieldCard_PublicPetitionAccess
+        }
+        ${RecipientViewPetitionFieldCard.fragments.PublicPetitionAccess}
+      `,
       PublicPetitionField: gql`
         fragment RecipientViewPetitionField_PublicPetitionField on PublicPetitionField {
           ...RecipientViewPetitionFieldCard_PublicPetitionField

@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   Alert,
   AlertDescription,
@@ -26,35 +26,26 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
 import { RecipientViewContactCard } from "@parallel/components/recipient-view/RecipientViewContactCard";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
-import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
-import { RecipientViewPetitionFieldCommentsDialog } from "@parallel/components/recipient-view/RecipientViewPetitionFieldCommentsDialog";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
 import {
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
-  RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment,
-  RecipientView_createPetitionFieldCommentMutationVariables,
-  RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment,
-  RecipientView_deletePetitionFieldCommentMutationVariables,
-  RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment,
   RecipientView_PublicContactFragment,
   RecipientView_PublicPetitionFieldFragment,
-  RecipientView_updatePetitionFieldCommentMutationVariables,
+  RecipientView_PublicPetitionFragment,
   usePublicPetitionQuery,
-  useRecipientView_createPetitionFieldCommentMutation,
-  useRecipientView_deletePetitionFieldCommentMutation,
-  useRecipientView_markPetitionFieldCommentsAsReadMutation,
   useRecipientView_publicCompletePetitionMutation,
   useRecipientView_submitUnpublishedCommentsMutation,
-  useRecipientView_updatePetitionFieldCommentMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compose } from "@parallel/utils/compose";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
@@ -144,41 +135,6 @@ function RecipientView({
     [petition.fields, granter, router.query]
   );
 
-  const [selectedFieldId, setSelectedFieldId] = useState<Maybe<string>>(null);
-  const selectedField =
-    petition.fields.find((f) => f.id === selectedFieldId) ?? null;
-
-  const createPetitionFieldComment = useCreatePetitionFieldComment();
-  async function handleAddComment(content: string) {
-    await createPetitionFieldComment({
-      keycode,
-      petitionFieldId: selectedFieldId!,
-      content,
-    });
-  }
-
-  const updatePetitionFieldComment = useUpdatePetitionFieldComment();
-  async function handleUpdateComment(
-    petitionFieldCommentId: string,
-    content: string
-  ) {
-    await updatePetitionFieldComment({
-      keycode,
-      petitionFieldId: selectedFieldId!,
-      petitionFieldCommentId,
-      content,
-    });
-  }
-
-  const deletePetitionFieldComment = useDeletePetitionFieldComment();
-  async function handleDeleteComment(petitionFieldCommentId: string) {
-    await deletePetitionFieldComment({
-      keycode,
-      petitionFieldId: selectedFieldId!,
-      petitionFieldCommentId,
-    });
-  }
-
   const [
     submitUnpublishedComments,
     { loading: isSubmitting },
@@ -186,11 +142,28 @@ function RecipientView({
   async function handleSubmitUnpublished() {
     await submitUnpublishedComments({
       variables: { keycode },
+      update(client, { data }) {
+        if (data) {
+          updateFragment<RecipientView_PublicPetitionFragment>(client, {
+            fragment: RecipientView.fragments.PublicPetition,
+            fragmentName: "RecipientView_PublicPetition",
+            id: petition.id,
+            data: (cached) => ({
+              ...cached!,
+              fields: cached!.fields.map((field) =>
+                field.unpublishedCommentCount
+                  ? { ...field, unpublishedCommentCount: 0 }
+                  : field
+              ),
+            }),
+          });
+        }
+      },
     });
   }
 
   const pendingComments = petition.fields.reduce(
-    (acc, f) => acc + countBy(f.comments, (c) => !c.publishedAt),
+    (acc, f) => acc + f.unpublishedCommentCount,
     0
   );
 
@@ -205,25 +178,6 @@ function RecipientView({
       event.preventDefault();
     }
   }, [pendingComments]);
-
-  const [
-    markPetitionFieldCommentsAsRead,
-  ] = useRecipientView_markPetitionFieldCommentsAsReadMutation();
-  useEffect(() => {
-    if (selectedFieldId) {
-      const timeout = setTimeout(async () => {
-        const petitionFieldCommentIds = selectedField!.comments
-          .filter((c) => c.isUnread)
-          .map((c) => c.id);
-        if (petitionFieldCommentIds.length > 0) {
-          await markPetitionFieldCommentsAsRead({
-            variables: { keycode, petitionFieldCommentIds },
-          });
-        }
-      }, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [selectedFieldId]);
 
   const [sidebarTop, setSidebarTop] = useState(0);
   const readjustHeight = useCallback(function (rect: DOMRect) {
@@ -383,17 +337,16 @@ function RecipientView({
             <Stack spacing={4}>
               {fields.map((field) => (
                 <RecipientViewPetitionField
-                  keycode={keycode}
-                  canReply={!field.validated && petition.status !== "CLOSED"}
                   key={field.id}
                   id={`field-${field.id}`}
+                  keycode={keycode}
+                  access={access!}
                   field={field}
+                  isDisabled={field.validated || petition.status === "CLOSED"}
                   isInvalid={
                     finalized && field.replies.length === 0 && !field.optional
                   }
                   hasCommentsEnabled={petition.hasCommentsEnabled}
-                  contactId={contact.id}
-                  onOpenCommentsClick={() => setSelectedFieldId(field.id)}
                 />
               ))}
             </Stack>
@@ -416,27 +369,15 @@ function RecipientView({
           />
         )}
       </Flex>
-      {selectedField && (
-        <RecipientViewPetitionFieldCommentsDialog
-          isOpen={Boolean(selectedField)}
-          onClose={() => setSelectedFieldId(null)}
-          field={selectedField}
-          contactId={contact.id}
-          granterName={granter.fullName}
-          onAddComment={handleAddComment}
-          onDeleteComment={handleDeleteComment}
-          onUpdateComment={handleUpdateComment}
-        />
-      )}
       <RecipientViewHelpModal {...helpModal} />
     </>
   );
 }
 
-type ConfirmStartSignatureProcessProps = {
+interface ConfirmStartSignatureProcessProps {
   signers: Maybe<RecipientView_PublicContactFragment>[];
   contactId: string;
-};
+}
 
 function ConfirmStartSignatureProcess({
   signers,
@@ -506,10 +447,12 @@ RecipientView.fragments = {
         contact {
           ...RecipientViewContactCard_PublicContact
         }
+        ...RecipientViewPetitionField_PublicPetitionAccess
       }
       ${this.PublicPetition}
       ${this.PublicUser}
       ${RecipientViewContactCard.fragments.PublicContact}
+      ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
     `;
   },
   get PublicPetition() {
@@ -550,12 +493,10 @@ RecipientView.fragments = {
       fragment RecipientView_PublicPetitionField on PublicPetitionField {
         id
         ...RecipientViewPetitionField_PublicPetitionField
-        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
         ...RecipientViewContentsCard_PublicPetitionField
         ...RecipientViewProgressFooter_PublicPetitionField
       }
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
-      ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
       ${RecipientViewContentsCard.fragments.PublicPetitionField}
       ${RecipientViewProgressFooter.fragments.PublicPetitionField}
     `;
@@ -582,55 +523,6 @@ RecipientView.mutations = [
     }
   `,
   gql`
-    mutation RecipientView_createPetitionFieldComment(
-      $keycode: ID!
-      $petitionFieldId: GID!
-      $content: String!
-    ) {
-      publicCreatePetitionFieldComment(
-        keycode: $keycode
-        petitionFieldId: $petitionFieldId
-        content: $content
-      ) {
-        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
-      }
-    }
-    ${RecipientViewPetitionFieldCommentsDialog.fragments
-      .PublicPetitionFieldComment}
-  `,
-  gql`
-    mutation RecipientView_updatePetitionFieldComment(
-      $keycode: ID!
-      $petitionFieldId: GID!
-      $petitionFieldCommentId: GID!
-      $content: String!
-    ) {
-      publicUpdatePetitionFieldComment(
-        keycode: $keycode
-        petitionFieldId: $petitionFieldId
-        petitionFieldCommentId: $petitionFieldCommentId
-        content: $content
-      ) {
-        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
-      }
-    }
-    ${RecipientViewPetitionFieldCommentsDialog.fragments
-      .PublicPetitionFieldComment}
-  `,
-  gql`
-    mutation RecipientView_deletePetitionFieldComment(
-      $keycode: ID!
-      $petitionFieldId: GID!
-      $petitionFieldCommentId: GID!
-    ) {
-      publicDeletePetitionFieldComment(
-        keycode: $keycode
-        petitionFieldId: $petitionFieldId
-        petitionFieldCommentId: $petitionFieldCommentId
-      )
-    }
-  `,
-  gql`
     mutation RecipientView_submitUnpublishedComments($keycode: ID!) {
       publicSubmitUnpublishedComments(keycode: $keycode) {
         id
@@ -638,149 +530,7 @@ RecipientView.mutations = [
       }
     }
   `,
-  gql`
-    mutation RecipientView_markPetitionFieldCommentsAsRead(
-      $keycode: ID!
-      $petitionFieldCommentIds: [GID!]!
-    ) {
-      publicMarkPetitionFieldCommentsAsRead(
-        keycode: $keycode
-        petitionFieldCommentIds: $petitionFieldCommentIds
-      ) {
-        id
-        isUnread
-      }
-    }
-  `,
 ];
-
-function useCreatePetitionFieldComment() {
-  const [
-    createPetitionFieldComment,
-  ] = useRecipientView_createPetitionFieldCommentMutation();
-  return useCallback(
-    async (
-      variables: RecipientView_createPetitionFieldCommentMutationVariables
-    ) => {
-      await createPetitionFieldComment({
-        variables,
-        update(client, { data }) {
-          if (!data) {
-            return;
-          }
-          const options = {
-            fragment: gql`
-              fragment RecipientView_createPetitionFieldComment_PublicPetitionField on PublicPetitionField {
-                comments {
-                  ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
-                }
-              }
-              ${RecipientViewPetitionFieldCommentsDialog.fragments
-                .PublicPetitionFieldComment}
-            `,
-            fragmentName:
-              "RecipientView_createPetitionFieldComment_PublicPetitionField",
-            id: variables.petitionFieldId,
-          };
-          const field = client.readFragment<
-            RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment
-          >(options);
-          client.writeFragment<
-            RecipientView_createPetitionFieldComment_PublicPetitionFieldFragment
-          >({
-            ...options,
-            data: {
-              ...field,
-              comments: [
-                ...field!.comments,
-                data!.publicCreatePetitionFieldComment,
-              ],
-            },
-          });
-        },
-      });
-    },
-    [createPetitionFieldComment]
-  );
-}
-
-function useUpdatePetitionFieldComment() {
-  const [
-    updatePetitionFieldComment,
-  ] = useRecipientView_updatePetitionFieldCommentMutation();
-  const apollo = useApolloClient();
-  return useCallback(
-    async (
-      variables: RecipientView_updatePetitionFieldCommentMutationVariables
-    ) => {
-      await updatePetitionFieldComment({
-        variables,
-        optimisticResponse: () => {
-          const comment = apollo.readFragment<
-            RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment
-          >({
-            fragment:
-              RecipientViewPetitionFieldCommentsDialog.fragments
-                .PublicPetitionFieldComment,
-            id: variables.petitionFieldCommentId,
-          });
-          return {
-            publicUpdatePetitionFieldComment: {
-              ...comment!,
-              content: variables.content,
-            },
-          };
-        },
-      });
-    },
-    [updatePetitionFieldComment]
-  );
-}
-
-function useDeletePetitionFieldComment() {
-  const [
-    deletePetitionFieldComment,
-  ] = useRecipientView_deletePetitionFieldCommentMutation();
-  return useCallback(
-    async (
-      variables: RecipientView_deletePetitionFieldCommentMutationVariables
-    ) => {
-      await deletePetitionFieldComment({
-        variables,
-        update(client, { data }) {
-          if (!data) {
-            return;
-          }
-          const options = {
-            fragment: gql`
-              fragment RecipientView_deletePetitionFieldComment_PublicPetitionField on PublicPetitionField {
-                comments {
-                  id
-                }
-              }
-            `,
-            id: variables.petitionFieldId,
-          };
-          const field = client.readFragment<
-            RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment
-          >(options);
-          client.writeFragment<
-            RecipientView_deletePetitionFieldComment_PublicPetitionFieldFragment
-          >({
-            ...options,
-            data: {
-              ...field,
-              comments: field!.comments.filter(
-                (c) => c.id !== variables.petitionFieldCommentId
-              ),
-            },
-          });
-        },
-      });
-    },
-    [deletePetitionFieldComment]
-  );
-}
 
 function useGetPageFields(
   fields: RecipientView_PublicPetitionFieldFragment[],
@@ -805,10 +555,8 @@ function useHelpModal() {
 }
 
 RecipientView.getInitialProps = async ({
-  req,
   query,
   pathname,
-  apollo,
   fetchQuery,
 }: WithApolloDataContext) => {
   const keycode = query.keycode as string;

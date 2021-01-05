@@ -102,6 +102,7 @@ export const PublicPetitionField = objectType({
     });
     t.jsonObject("options", {
       description: "The options of the petition field.",
+      resolve: (o) => o.options,
     });
     t.boolean("optional", {
       description: "Determines if this field is optional.",
@@ -133,6 +134,39 @@ export const PublicPetitionField = objectType({
           petitionId: root.petition_id,
           petitionFieldId: root.id,
         });
+      },
+    });
+    t.nonNull.int("commentCount", {
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldCommentCountForFieldAndAccess(
+          {
+            accessId: ctx.access!.id,
+            petitionId: root.petition_id,
+            petitionFieldId: root.id,
+          }
+        );
+      },
+    });
+    t.nonNull.int("unreadCommentCount", {
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldUnreadCommentCountForFieldAndAccess(
+          {
+            accessId: ctx.access!.id,
+            petitionId: root.petition_id,
+            petitionFieldId: root.id,
+          }
+        );
+      },
+    });
+    t.nonNull.int("unpublishedCommentCount", {
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadPetitionFieldUnpublishedCommentCountForFieldAndAccess(
+          {
+            accessId: ctx.access!.id,
+            petitionId: root.petition_id,
+            petitionFieldId: root.id,
+          }
+        );
       },
     });
   },

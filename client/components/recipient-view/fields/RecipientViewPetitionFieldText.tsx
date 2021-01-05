@@ -36,7 +36,7 @@ import { RecipientViewPetitionFieldReplySavingIndicator } from "./RecipientViewP
 export interface RecipientViewPetitionFieldTextProps
   extends Omit<RecipientViewPetitionFieldCardProps, "children"> {
   keycode: string;
-  canReply: boolean;
+  isDisabled: boolean;
 }
 
 export const RecipientViewPetitionFieldText = chakraForwardRef<
@@ -45,11 +45,11 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
 >(function RecipientViewPetitionFieldText(
   {
     keycode,
-    canReply,
+    access,
     field,
+    isDisabled,
     isInvalid,
     hasCommentsEnabled,
-    onOpenCommentsClick,
     ...props
   },
   ref
@@ -59,10 +59,11 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
   return (
     <RecipientViewPetitionFieldCard
       ref={ref}
+      keycode={keycode}
+      access={access}
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
-      onOpenCommentsClick={onOpenCommentsClick}
       {...props}
     >
       {field.replies.length ? (
@@ -87,7 +88,7 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
       ) : null}
       <Box marginTop={2}>
         <TextReplyForm
-          canReply={canReply}
+          canReply={!isDisabled}
           field={field}
           onCreateReply={(content) =>
             createSimpleReply({

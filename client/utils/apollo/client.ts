@@ -87,6 +87,13 @@ export function createApolloClient(
       dataIdFromObject: (o) => o.id as string,
       possibleTypes: fragmentMatcher.possibleTypes,
       typePolicies: {
+        Query: {
+          fields: {
+            petitionFieldComments: {
+              merge: false,
+            },
+          },
+        },
         Petition: {
           fields: {
             fields: {

@@ -2019,6 +2019,8 @@ type PublicPetitionAccess {
 A field within a petition.
 """
 type PublicPetitionField {
+  commentCount: Int!
+
   """
   The comments for this field.
   """
@@ -2068,6 +2070,8 @@ type PublicPetitionField {
   The type of the petition field.
   """
   type: PetitionFieldType!
+  unpublishedCommentCount: Int!
+  unreadCommentCount: Int!
 
   """
   Determines if the content of this field has been validated.
@@ -2267,6 +2271,14 @@ type Query {
   ): OrganizationPagination!
   petition(id: GID!): PetitionBase
   petitionAuthToken(token: String!): Petition
+
+  """
+  The comments for this field.
+  """
+  petitionFieldComments(
+    keycode: ID!
+    petitionFieldId: GID!
+  ): [PublicPetitionFieldComment!]!
 
   """
   The petitions of the user

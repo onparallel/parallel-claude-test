@@ -110,8 +110,8 @@ export function useReactSelectProps<
           borderRadius: radii[SIZES[size].borderRadius] as any,
         } as Theme),
       components: {
-        IndicatorSeparator: memo(() => <></>),
-        ClearIndicator: memo(({ innerProps }) => (
+        IndicatorSeparator: () => null,
+        ClearIndicator: ({ innerProps }) => (
           <CloseButton
             tabIndex={-1}
             title={labels.clear}
@@ -119,8 +119,8 @@ export function useReactSelectProps<
             size="sm"
             {...innerProps}
           />
-        )),
-        DropdownIndicator: memo(({ isFocused }) => (
+        ),
+        DropdownIndicator: ({ isFocused }) => (
           <Box
             paddingX={2}
             color={isFocused ? "gray.600" : "gray.300"}
@@ -130,16 +130,16 @@ export function useReactSelectProps<
           >
             <ChevronDownIcon display="block" />
           </Box>
-        )),
-        NoOptionsMessage: memo(() => (
+        ),
+        NoOptionsMessage: () => (
           <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
             <FormattedMessage
               id="component.react-select.no-options"
               defaultMessage="No options"
             />
           </Text>
-        )),
-        MultiValueRemove: memo(({ innerProps, ...props }) => {
+        ),
+        MultiValueRemove: ({ innerProps, ...props }) => {
           const intl = useIntl();
           return (
             <components.MultiValueRemove
@@ -155,15 +155,15 @@ export function useReactSelectProps<
               <CloseIcon boxSize="10px" marginX={1} />
             </components.MultiValueRemove>
           );
-        }),
-        LoadingMessage: memo(() => (
+        },
+        LoadingMessage: () => (
           <Text as="div" color="gray.400" textAlign="center" paddingY={2}>
             <FormattedMessage
               id="component.react-select.loading"
               defaultMessage="Loading..."
             />
           </Text>
-        )),
+        ),
       },
       styles: {
         control: (styles, { isDisabled, isFocused, theme }: any) => {

@@ -95,7 +95,7 @@ export function RecipientViewContentsCard({
                 spacing={1}
                 paddingLeft={pages.length > 1 ? 4 : 0}
               >
-                {fields.map(({ field, ...badge }) => (
+                {fields.map((field) => (
                   <ListItem key={field.id} position="relative">
                     <Text
                       as={field.type === "HEADING" ? "h3" : "div"}
@@ -106,7 +106,10 @@ export function RecipientViewContentsCard({
                     >
                       {hasCommentsEnabled ? (
                         <RecipientViewCommentsBadge
-                          {...badge}
+                          hasUnpublishedComments={
+                            field.unpublishedCommentCount > 0
+                          }
+                          hasUnreadComments={field.unreadCommentCount > 0}
                           position="absolute"
                           left="0"
                           top="50%"
@@ -168,11 +171,7 @@ function getPagesAndFields(
     hasUnreadComments?: boolean;
     fake?: boolean;
   }[] = [];
-  const _fields: {
-    field: RecipientViewContentsCard_PublicPetitionFieldFragment;
-    hasUnpublishedComments?: boolean;
-    hasUnreadComments?: boolean;
-  }[] = [];
+  const _fields: RecipientViewContentsCard_PublicPetitionFieldFragment[] = [];
   for (const [index, field] of Array.from(fields.entries())) {
     if (
       field.type === "HEADING" &&
@@ -181,20 +180,18 @@ function getPagesAndFields(
       pages.push({ title: field.title ?? null });
       page -= 1;
     }
-    const hasUnreadComments = field.comments.some((c) => c.isUnread);
-    const hasUnpublishedComments = field.comments.some((c) => !c.publishedAt);
     let currentPage = pages[pages.length - 1];
     if (!currentPage) {
       currentPage = { title: null, fake: true };
       pages.push(currentPage);
     }
     currentPage.hasUnreadComments =
-      currentPage.hasUnreadComments || hasUnreadComments;
+      currentPage.hasUnreadComments || field.unreadCommentCount > 0;
     currentPage.hasUnpublishedComments =
-      currentPage.hasUnpublishedComments || hasUnpublishedComments;
+      currentPage.hasUnpublishedComments || field.unpublishedCommentCount > 0;
     if (page === 0) {
       if (field.type !== "HEADING" || _fields.length !== 0) {
-        _fields.push({ field, hasUnreadComments, hasUnpublishedComments });
+        _fields.push(field);
       }
     } else {
       continue;
@@ -234,11 +231,9 @@ RecipientViewContentsCard.fragments = {
         replies {
           id
         }
-        comments {
-          id
-          isUnread
-          publishedAt
-        }
+        commentCount
+        unpublishedCommentCount
+        unreadCommentCount
       }
     `;
   },

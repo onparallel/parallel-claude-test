@@ -11,17 +11,25 @@ import {
 import { CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
-import { RecipientViewPetitionFieldCard_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
+import {
+  RecipientViewPetitionFieldCard_PublicPetitionAccessFragment,
+  RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
+} from "@parallel/graphql/__types";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../../common/BreakLines";
 import { RecipientViewCommentsBadge } from "../RecipientViewCommentsBadge";
+import {
+  RecipientViewPetitionFieldCommentsDialog,
+  usePetitionFieldCommentsDialog,
+} from "./RecipientViewPetitionFieldCommentsDialog";
 
 export interface RecipientViewPetitionFieldCardProps {
+  keycode: string;
+  access: RecipientViewPetitionFieldCard_PublicPetitionAccessFragment;
   field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
   isInvalid: boolean;
   hasCommentsEnabled: boolean;
-  onOpenCommentsClick: () => void;
   children: ReactNode;
 }
 
@@ -29,10 +37,11 @@ export const RecipientViewPetitionFieldCard = Object.assign(
   chakraForwardRef<"section", RecipientViewPetitionFieldCardProps>(
     function RecipientViewPetitionFieldCard(
       {
+        keycode,
         field,
+        access,
         isInvalid,
         hasCommentsEnabled,
-        onOpenCommentsClick,
         children,
         ...props
       },
@@ -41,6 +50,17 @@ export const RecipientViewPetitionFieldCard = Object.assign(
       const intl = useIntl();
 
       const isTextLikeType = ["TEXT", "SELECT"].includes(field.type);
+
+      const showFieldComments = usePetitionFieldCommentsDialog();
+      async function handleCommentsButtonClick() {
+        try {
+          await showFieldComments({
+            keycode,
+            access,
+            field,
+          });
+        } catch {}
+      }
 
       return (
         <Card
@@ -100,12 +120,10 @@ export const RecipientViewPetitionFieldCard = Object.assign(
             </Box>
             {hasCommentsEnabled ? (
               <CommentsButton
-                commentCount={field.comments.length}
-                hasUnreadComments={field.comments.some((c) => c.isUnread)}
-                hasUnpublishedComments={field.comments.some(
-                  (c) => !c.publishedAt
-                )}
-                onClick={onOpenCommentsClick}
+                commentCount={field.commentCount}
+                hasUnreadComments={field.unreadCommentCount > 0}
+                hasUnpublishedComments={field.unpublishedCommentCount > 0}
+                onClick={handleCommentsButtonClick}
               />
             ) : null}
           </Flex>
@@ -143,6 +161,15 @@ export const RecipientViewPetitionFieldCard = Object.assign(
   ),
   {
     fragments: {
+      get PublicPetitionAccess() {
+        return gql`
+          fragment RecipientViewPetitionFieldCard_PublicPetitionAccess on PublicPetitionAccess {
+            ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccess
+          }
+          ${RecipientViewPetitionFieldCommentsDialog.fragments
+            .PublicPetitionAccess}
+        `;
+      },
       get PublicPetitionField() {
         return gql`
           fragment RecipientViewPetitionFieldCard_PublicPetitionField on PublicPetitionField {
@@ -157,13 +184,14 @@ export const RecipientViewPetitionFieldCard = Object.assign(
             replies {
               ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
             }
-            comments {
-              id
-              isUnread
-              publishedAt
-            }
+            commentCount
+            unpublishedCommentCount
+            unreadCommentCount
+            ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
           }
           ${this.PublicPetitionFieldReply}
+          ${RecipientViewPetitionFieldCommentsDialog.fragments
+            .PublicPetitionField}
         `;
       },
       get PublicPetitionFieldReply() {

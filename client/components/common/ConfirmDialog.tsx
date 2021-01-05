@@ -1,39 +1,32 @@
 import {
   Button,
-  Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalContentProps,
   ModalFooter,
   ModalHeader,
-  ModalOverlay,
-  ModalProps,
   Stack,
 } from "@chakra-ui/react";
-import { ReactNode, RefObject, useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { DialogProps } from "./DialogProvider";
+import { BaseDialog, BaseDialogProps } from "./BaseDialog";
 
-export type ConfirmDialogProps<TResult> = {
+export interface ConfirmDialogProps<TResult>
+  extends Omit<BaseDialogProps<TResult>, "children"> {
   header: ReactNode;
   body: ReactNode;
   confirm: ReactNode;
   cancel?: ReactNode;
-  initialFocusRef?: RefObject<any>;
   content?: ModalContentProps;
   hasCloseButton?: boolean;
-} & DialogProps<{}, TResult> &
-  Omit<ModalProps, "children" | "isOpen" | "initialFocusRef" | "onClose">;
+}
 
 export function ConfirmDialog<TResult = void>({
   header,
   body,
   confirm,
   cancel,
-  initialFocusRef,
-  onResolve,
-  onReject,
   content,
   hasCloseButton,
   ...props
@@ -41,37 +34,30 @@ export function ConfirmDialog<TResult = void>({
   const intl = useIntl();
   const cancelRef = useRef<HTMLButtonElement>(null);
   return (
-    <Modal
-      isOpen={true}
-      initialFocusRef={initialFocusRef ?? cancelRef}
-      onClose={() => onReject({ reason: "CLOSE" })}
-      {...props}
-    >
-      <ModalOverlay>
-        <ModalContent borderRadius="md" {...content}>
-          {hasCloseButton ? (
-            <ModalCloseButton
-              aria-label={intl.formatMessage({
-                id: "generic.close",
-                defaultMessage: "Close",
-              })}
-            />
-          ) : null}
-          <ModalHeader>{header}</ModalHeader>
-          <ModalBody>{body}</ModalBody>
-          <ModalFooter as={Stack} direction="row">
-            {cancel ?? (
-              <Button
-                ref={cancelRef}
-                onClick={() => onReject({ reason: "CANCEL" })}
-              >
-                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-              </Button>
-            )}
-            {confirm}
-          </ModalFooter>
-        </ModalContent>
-      </ModalOverlay>
-    </Modal>
+    <BaseDialog {...props}>
+      <ModalContent borderRadius="md" {...content}>
+        {hasCloseButton ? (
+          <ModalCloseButton
+            aria-label={intl.formatMessage({
+              id: "generic.close",
+              defaultMessage: "Close",
+            })}
+          />
+        ) : null}
+        <ModalHeader>{header}</ModalHeader>
+        <ModalBody>{body}</ModalBody>
+        <ModalFooter as={Stack} direction="row">
+          {cancel ?? (
+            <Button
+              ref={cancelRef}
+              onClick={() => props.onReject({ reason: "CANCEL" })}
+            >
+              <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
+            </Button>
+          )}
+          {confirm}
+        </ModalFooter>
+      </ModalContent>
+    </BaseDialog>
   );
 }

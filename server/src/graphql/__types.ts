@@ -882,6 +882,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPetitionField: {
     // field return type
+    commentCount: number; // Int!
     comments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     description: string | null; // String
     id: NexusGenScalars["GID"]; // GID!
@@ -892,6 +893,8 @@ export interface NexusGenFieldTypes {
     replies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
+    unpublishedCommentCount: number; // Int!
+    unreadCommentCount: number; // Int!
     validated: boolean; // Boolean!
   };
   PublicPetitionFieldComment: {
@@ -933,6 +936,7 @@ export interface NexusGenFieldTypes {
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
+    petitionFieldComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     publicOrgLogoUrl: string | null; // String
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
@@ -1549,6 +1553,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetitionField: {
     // field return type name
+    commentCount: "Int";
     comments: "PublicPetitionFieldComment";
     description: "String";
     id: "GID";
@@ -1559,6 +1564,8 @@ export interface NexusGenFieldTypeNames {
     replies: "PublicPetitionFieldReply";
     title: "String";
     type: "PetitionFieldType";
+    unpublishedCommentCount: "Int";
+    unreadCommentCount: "Int";
     validated: "Boolean";
   };
   PublicPetitionFieldComment: {
@@ -1600,6 +1607,7 @@ export interface NexusGenFieldTypeNames {
     organizations: "OrganizationPagination";
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
+    petitionFieldComments: "PublicPetitionFieldComment";
     petitions: "PetitionBasePagination";
     publicOrgLogoUrl: "String";
     publicTemplates: "PetitionTemplatePagination";
@@ -2213,6 +2221,11 @@ export interface NexusGenArgTypes {
     petitionAuthToken: {
       // args
       token: string; // String!
+    };
+    petitionFieldComments: {
+      // args
+      keycode: string; // ID!
+      petitionFieldId: NexusGenScalars["GID"]; // GID!
     };
     petitions: {
       // args

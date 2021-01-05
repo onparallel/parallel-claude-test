@@ -1628,6 +1628,179 @@ export class PetitionRepository extends BaseRepository {
     )
   );
 
+  readonly loadPetitionFieldCommentCountForFieldAndAccess = fromDataLoader(
+    new DataLoader<
+      { accessId: number; petitionId: number; petitionFieldId: number },
+      number,
+      string
+    >(
+      async (ids) => {
+        const rows = await this.raw<{
+          petition_field_id: number;
+          petition_access_id: number;
+          is_published: boolean;
+        }>(
+          /* sql */ `
+          select
+            pfc.petition_field_id,
+            pfc.petition_access_id,
+            pfc.published_at is not null as is_published
+          from petition_field_comment pfc
+          where (
+            ${ids
+              .map(
+                () => /* sql */ `(
+                  pfc.petition_id = ?
+                  and pfc.petition_field_id = ?
+                  and (pfc.petition_access_id = ? or pfc.published_at is not null)
+                )`
+              )
+              .join(" or ")}
+            )
+            and pfc.deleted_at is null
+            and pfc.is_internal = false
+          `,
+          ids.flatMap((x) => [x.petitionId, x.petitionFieldId, x.accessId])
+        );
+
+        const byPetitionFieldId = groupBy(rows, (r) => r.petition_field_id);
+
+        return ids.map(({ petitionFieldId, accessId }) => {
+          let count = 0;
+          for (const comment of byPetitionFieldId[petitionFieldId] ?? []) {
+            if (
+              comment.is_published ||
+              comment.petition_access_id === accessId
+            ) {
+              count++;
+            }
+          }
+          return count;
+        });
+      },
+      {
+        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
+      }
+    )
+  );
+
+  readonly loadPetitionFieldUnpublishedCommentCountForFieldAndAccess = fromDataLoader(
+    new DataLoader<
+      { accessId: number; petitionId: number; petitionFieldId: number },
+      number,
+      string
+    >(
+      async (ids) => {
+        const rows = await this.raw<{
+          petition_id: number;
+          petition_field_id: number;
+          petition_access_id: number;
+          unpublished_count: number;
+        }>(
+          /* sql */ `
+          select
+            pfc.petition_id,
+            pfc.petition_field_id,
+            pfc.petition_access_id,
+            count(*)::int as unpublished_count
+          from petition_field_comment pfc
+          where (
+            ${ids
+              .map(
+                () => /* sql */ `(
+                  pfc.petition_id = ?
+                  and pfc.petition_field_id = ?
+                  and pfc.petition_access_id = ?
+                )`
+              )
+              .join(" or ")}
+            )
+            and pfc.published_at is null
+            and pfc.deleted_at is null
+            and pfc.is_internal = false
+          group by
+            pfc.petition_id,
+            pfc.petition_field_id,
+            pfc.petition_access_id
+          `,
+          ids.flatMap((x) => [x.petitionId, x.petitionFieldId, x.accessId])
+        );
+
+        const rowsById = indexBy(
+          rows,
+          keyBuilder(["petition_id", "petition_field_id", "petition_access_id"])
+        );
+
+        return ids
+          .map(keyBuilder(["petitionId", "petitionFieldId", "accessId"]))
+          .map((key) => {
+            return rowsById[key]?.unpublished_count ?? 0;
+          });
+      },
+      {
+        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
+      }
+    )
+  );
+
+  readonly loadPetitionFieldUnreadCommentCountForFieldAndAccess = fromDataLoader(
+    new DataLoader<
+      { accessId: number; petitionId: number; petitionFieldId: number },
+      number,
+      string
+    >(
+      async (ids) => {
+        const rows = await this.raw<{
+          petition_id: number;
+          petition_field_id: number;
+          petition_access_id: number;
+          unread_count: number;
+        }>(
+          /* sql */ `
+          select
+            pcn.petition_id,
+            (pcn.data ->> 'petition_field_id')::int as petition_field_id,
+            pcn.petition_access_id,
+            count(*)::int as unread_count
+          from petition_contact_notification pcn
+          where (
+            ${ids
+              .map(
+                () => /* sql */ `(
+                  pcn.petition_id = ?
+                  and pcn.petition_access_id = ?
+                  and (pcn.data ->> 'petition_field_id')::int = ?
+                )`
+              )
+              .join(" or ")}
+            )
+            and pcn.is_read = false
+          group by
+            pcn.petition_id,
+            (pcn.data ->> 'petition_field_id')::int,
+            pcn.petition_access_id
+
+        `,
+          [...ids.flatMap((x) => [x.petitionId, x.accessId, x.petitionFieldId])]
+        );
+
+        const rowsById = indexBy(
+          rows,
+          keyBuilder(["petition_id", "petition_field_id", "petition_access_id"])
+        );
+
+        return ids
+          .map(keyBuilder(["petitionId", "petitionFieldId", "accessId"]))
+          .map((key) => {
+            return rowsById[key]?.unread_count ?? 0;
+          });
+      },
+      {
+        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
+      }
+    )
+  );
+
   private sortComments(comments: PetitionFieldComment[]) {
     return comments.slice(0).sort((a, b) => {
       if (a.published_at && !b.published_at) {
