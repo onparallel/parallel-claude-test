@@ -14,8 +14,8 @@ function ConfirmActivateUsersDialog({
     <ConfirmDialog
       header={
         <FormattedMessage
-          id="organization.confirm-activate-user-dialog.header"
-          defaultMessage="Activate {count, plural, =1{user} other{users}}"
+          id="organization-users.activate"
+          defaultMessage="Activate {count, plural, =1{user} other {users}}"
           values={{ count }}
         />
       }
@@ -23,7 +23,7 @@ function ConfirmActivateUsersDialog({
         <>
           <FormattedMessage
             id="organization.confirm-activate-user-dialog.body"
-            defaultMessage="Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other{users}}?"
+            defaultMessage="Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
             values={{
               b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               count,
@@ -34,8 +34,8 @@ function ConfirmActivateUsersDialog({
       confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="petition.confirm-activate-user.confirm"
-            defaultMessage="Yes, activate {count, plural, =1{user} other{users}}"
+            id="organization-users.activate"
+            defaultMessage="Activate {count, plural, =1{user} other {users}}"
             values={{ count }}
           />
         </Button>

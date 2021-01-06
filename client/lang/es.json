@@ -1135,6 +1135,11 @@
     "context": "Confirm password"
   },
   {
+    "term": "generic.forms.email-already-registered-error",
+    "definition": "Este email ya está registrado",
+    "context": "This email is already registered"
+  },
+  {
     "term": "generic.forms.email-label",
     "definition": "Correo electrónico",
     "context": "Email"
@@ -1170,6 +1175,16 @@
     "context": "Old password is incorrect"
   },
   {
+    "term": "generic.forms.invalid-user-first-name-error",
+    "definition": "Por favor, introduzca el nombre del usuario",
+    "context": "Please, enter the user first name"
+  },
+  {
+    "term": "generic.forms.invalid-user-last-name-error",
+    "definition": "Por favor, introduzca el apellido del usuario",
+    "context": "Please, enter the user last name"
+  },
+  {
     "term": "generic.forms.invalid-verification-code",
     "definition": "El código de verificación es inválido",
     "context": "The verification code is invalid"
@@ -1193,6 +1208,11 @@
     "term": "generic.forms.old-password-label",
     "definition": "Contraseña antigua",
     "context": "Old password"
+  },
+  {
+    "term": "generic.forms.organization-role-label",
+    "definition": "Rol en la organización",
+    "context": "Organization role"
   },
   {
     "term": "generic.forms.password-label",
@@ -1258,6 +1278,11 @@
     "term": "generic.i-understand",
     "definition": "Ok, entiendo",
     "context": "I understand"
+  },
+  {
+    "term": "generic.inactive-user.tooltip",
+    "definition": "Este usuario está inactivo",
+    "context": "This user is inactive"
   },
   {
     "term": "generic.last-active-at",
@@ -1428,6 +1453,11 @@
     "term": "generic.subscribed",
     "definition": "Subscrito",
     "context": "Subscribed"
+  },
+  {
+    "term": "generic.success",
+    "definition": "Éxito",
+    "context": "Success"
   },
   {
     "term": "generic.template",
@@ -1620,6 +1650,21 @@
     "context": "New petition"
   },
   {
+    "term": "organization-users.activate",
+    "definition": "Activar {count, plural, =1{usuario} other {usuarios}}",
+    "context": "Activate {count, plural, =1{user} other {users}}"
+  },
+  {
+    "term": "organization-users.deactivate",
+    "definition": "Desactivar {count, plural, =1{usuario} other {usuarios}}",
+    "context": "Deactivate {count, plural, =1{user} other {users}}"
+  },
+  {
+    "term": "organization-users.header.user-active",
+    "definition": "Activo",
+    "context": "Active"
+  },
+  {
     "term": "organization-users.header.user-email",
     "definition": "Email",
     "context": "Email"
@@ -1628,6 +1673,11 @@
     "term": "organization-users.header.user-firstname",
     "definition": "Nombre",
     "context": "First name"
+  },
+  {
+    "term": "organization-users.header.user-inactive",
+    "definition": "Inactivo",
+    "context": "Inactive"
   },
   {
     "term": "organization-users.header.user-lastname",
@@ -1640,9 +1690,74 @@
     "context": "Role"
   },
   {
+    "term": "organization-users.header.user-status",
+    "definition": "Estado",
+    "context": "Status"
+  },
+  {
+    "term": "organization-users.update-user-status.error",
+    "definition": "No puedes desactivar a tu propio usuario. Por favor, quítalo de la selección e inténtalo nuevamente.",
+    "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
+  },
+  {
+    "term": "organization.confirm-activate-user-dialog.body",
+    "definition": "Estás seguro que quieres <b>activar</b> {count, plural, =1{el usuario seleccionado} other{los usuarios seleccionados}}?",
+    "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
+  },
+  {
+    "term": "organization.confirm-deactivate-user-dialog.body",
+    "definition": "Estás seguro que quieres <b>desactivar</b> {count, plural, =1{el usuario seleccionado} other{los usuarios seleccionados}}?",
+    "context": "Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
+  },
+  {
+    "term": "organization.confirm-deactivate-user-dialog.body-2",
+    "definition": "Los usuarios inactivos no podrán acceder ni utilizar Parallel de ninguna manera.",
+    "context": "Inactive users won't be able to login or use Parallel in any way."
+  },
+  {
+    "term": "organization.confirm-deactivate-user-dialog.transfer-to-user",
+    "definition": "Para continuar, debes seleccionar un usuario en tu organización para transferirle todas las peticiones de{count, plural, =1{l usuario} other { los usuarios}} a desactivar.",
+    "context": "To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
+  },
+  {
+    "term": "organization.confirm-deactivate.user-select.input-placeholder",
+    "definition": "Selecciona un usuario en tu organización",
+    "context": "Select a user from your organization"
+  },
+  {
+    "term": "organization.create-user",
+    "definition": "Crear usuario",
+    "context": "Create user"
+  },
+  {
+    "term": "organization.role.admin",
+    "definition": "Administrador",
+    "context": "Administrator"
+  },
+  {
+    "term": "organization.role.normal",
+    "definition": "Normal",
+    "context": "Normal"
+  },
+  {
     "term": "organization.title",
     "definition": "Organización",
     "context": "Organization"
+  },
+  {
+    "term": "organization.user-created-success.toast-description",
+    "definition": "Hemos enviado un email a {email} con instrucciones para registrarse en Parallel.",
+    "context": "We have sent an email to {email} with instructions to register in Parallel."
+  },
+  {
+    "term": "organization.user-created-success.toast-title",
+    "definition": "Usuario creado con éxito.",
+    "context": "User created successfully."
+  },
+  {
+    "term": "organization.user-updated-success.toast-title",
+    "definition": "Usuario actualizado con éxito.",
+    "context": "User updated successfully."
   },
   {
     "term": "organization.users.title",
@@ -2123,6 +2238,11 @@
     "term": "petition.confirm-deactivate-access-message.header",
     "definition": "Revocar acceso a contacto",
     "context": "Remove contact access"
+  },
+  {
+    "term": "petition.confirm-deactivate-users.confirm",
+    "definition": "Desactivar y transferir peticiones",
+    "context": "Deactivate and transfer petitions"
   },
   {
     "term": "petition.confirm-delete-field.body",
@@ -3956,12 +4076,12 @@
   },
   {
     "term": "timeline.add-user-permission-description",
-    "definition": "{same, select, true {Tú compartiste} other {{user} compartió}} esta petición con {other} como {permissionType} {timeAgo}",
+    "definition": "{same, select, true {Compartiste} other {{user} compartió}} esta petición con {other} como {permissionType} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.comment-deleted",
-    "definition": "{same, select, true {Tú eliminaste} other {{someone} eliminó}} un comentario en el campo {field} {timeAgo}",
+    "definition": "{same, select, true {Eliminaste} other {{someone} eliminó}} un comentario en el campo {field} {timeAgo}",
     "context": "{same, select, true {You} other {{someone}}} deleted a comment on field {field} {timeAgo}"
   },
   {
@@ -3971,12 +4091,12 @@
   },
   {
     "term": "timeline.comment-published-description",
-    "definition": "{same, select, true {Tú comentaste} other {{author} comentó}} en el campo {field} {timeAgo}",
+    "definition": "{same, select, true {Comentaste} other {{author} comentó}} en el campo {field} {timeAgo}",
     "context": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
   },
   {
     "term": "timeline.edit-user-permission-description",
-    "definition": "{same, select, true {Tú actualizaste} other {{user} actualizó}} el permiso de {other} a {permissionType} {timeAgo}",
+    "definition": "{same, select, true {Actualizaste} other {{user} actualizó}} el permiso de {other} a {permissionType} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} updated {other}'s permission to {permissionType} {timeAgo}"
   },
   {
@@ -4011,8 +4131,8 @@
   },
   {
     "term": "timeline.ownership-transferred-description",
-    "definition": "{same, select, true {Tú transferiste} other {{user} transfirió}} la propiedad de esta petición a {owner} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition to {owner} {timeAgo}"
+    "definition": "{same, select, true {Transferiste} other {{user} transfirió}} la propiedad de esta petición {hasPreviousOwner, select, true {de {previousOwner} } other {}}a {owner} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition {hasPreviousOwner, select, true {from {previousOwner} } other {}}to {owner} {timeAgo}"
   },
   {
     "term": "timeline.petition-closed-description",
@@ -4046,12 +4166,12 @@
   },
   {
     "term": "timeline.reminder-sent-description-manual",
-    "definition": "{same, select, true {Tú enviaste} other {{user} envió}} un recordatorio manual a {contact} {timeAgo}",
+    "definition": "{same, select, true {Enviaste} other {{user} envió}} un recordatorio manual a {contact} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
   },
   {
     "term": "timeline.remove-user-permission-description",
-    "definition": "{same, select, true {Tú dejaste} other {{user} dejó}} de compartir esta petición con {other} {timeAgo}",
+    "definition": "{same, select, true {Dejaste} other {{user} dejó}} de compartir esta petición con {other} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}"
   },
   {

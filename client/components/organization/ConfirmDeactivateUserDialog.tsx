@@ -53,8 +53,8 @@ function ConfirmDeactivateUserDialog({
       }}
       header={
         <FormattedMessage
-          id="organization.confirm-deactivate-user-dialog.header"
-          defaultMessage="Deactivate {count, plural, =1{user} other{users}}"
+          id="organization-users.deactivate"
+          defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
           values={{ count: selected.length }}
         />
       }
@@ -62,7 +62,7 @@ function ConfirmDeactivateUserDialog({
         <>
           <FormattedMessage
             id="organization.confirm-deactivate-user-dialog.body"
-            defaultMessage="Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other{users}}?"
+            defaultMessage="Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
             values={{
               b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               count: selected.length,
@@ -80,7 +80,7 @@ function ConfirmDeactivateUserDialog({
           <br />
           <FormattedMessage
             id="organization.confirm-deactivate-user-dialog.transfer-to-user"
-            defaultMessage="To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other{users}} to deactivate."
+            defaultMessage="To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
             values={{
               b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               count: selected.length,

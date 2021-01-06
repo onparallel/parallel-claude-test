@@ -1135,6 +1135,11 @@
     "context": "Confirm password"
   },
   {
+    "term": "generic.forms.email-already-registered-error",
+    "definition": "This email is already registered",
+    "context": "This email is already registered"
+  },
+  {
     "term": "generic.forms.email-label",
     "definition": "Email",
     "context": "Email"
@@ -1170,6 +1175,16 @@
     "context": "Old password is incorrect"
   },
   {
+    "term": "generic.forms.invalid-user-first-name-error",
+    "definition": "Please, enter the user first name",
+    "context": "Please, enter the user first name"
+  },
+  {
+    "term": "generic.forms.invalid-user-last-name-error",
+    "definition": "Please, enter the user last name",
+    "context": "Please, enter the user last name"
+  },
+  {
     "term": "generic.forms.invalid-verification-code",
     "definition": "The verification code is invalid",
     "context": "The verification code is invalid"
@@ -1193,6 +1208,11 @@
     "term": "generic.forms.old-password-label",
     "definition": "Old password",
     "context": "Old password"
+  },
+  {
+    "term": "generic.forms.organization-role-label",
+    "definition": "Organization role",
+    "context": "Organization role"
   },
   {
     "term": "generic.forms.password-label",
@@ -1258,6 +1278,11 @@
     "term": "generic.i-understand",
     "definition": "I understand",
     "context": "I understand"
+  },
+  {
+    "term": "generic.inactive-user.tooltip",
+    "definition": "This user is inactive",
+    "context": "This user is inactive"
   },
   {
     "term": "generic.last-active-at",
@@ -1428,6 +1453,11 @@
     "term": "generic.subscribed",
     "definition": "Subscribed",
     "context": "Subscribed"
+  },
+  {
+    "term": "generic.success",
+    "definition": "Success",
+    "context": "Success"
   },
   {
     "term": "generic.template",
@@ -1620,6 +1650,21 @@
     "context": "New petition"
   },
   {
+    "term": "organization-users.activate",
+    "definition": "Activate {count, plural, =1{user} other {users}}",
+    "context": "Activate {count, plural, =1{user} other {users}}"
+  },
+  {
+    "term": "organization-users.deactivate",
+    "definition": "Deactivate {count, plural, =1{user} other {users}}",
+    "context": "Deactivate {count, plural, =1{user} other {users}}"
+  },
+  {
+    "term": "organization-users.header.user-active",
+    "definition": "Active",
+    "context": "Active"
+  },
+  {
     "term": "organization-users.header.user-email",
     "definition": "Email",
     "context": "Email"
@@ -1628,6 +1673,11 @@
     "term": "organization-users.header.user-firstname",
     "definition": "First name",
     "context": "First name"
+  },
+  {
+    "term": "organization-users.header.user-inactive",
+    "definition": "Inactive",
+    "context": "Inactive"
   },
   {
     "term": "organization-users.header.user-lastname",
@@ -1640,9 +1690,74 @@
     "context": "Role"
   },
   {
+    "term": "organization-users.header.user-status",
+    "definition": "Status",
+    "context": "Status"
+  },
+  {
+    "term": "organization-users.update-user-status.error",
+    "definition": "You can't deactivate your own user. Please, remove it from the selection and try again.",
+    "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
+  },
+  {
+    "term": "organization.confirm-activate-user-dialog.body",
+    "definition": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?",
+    "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
+  },
+  {
+    "term": "organization.confirm-deactivate-user-dialog.body",
+    "definition": "Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?",
+    "context": "Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
+  },
+  {
+    "term": "organization.confirm-deactivate-user-dialog.body-2",
+    "definition": "Inactive users won't be able to login or use Parallel in any way.",
+    "context": "Inactive users won't be able to login or use Parallel in any way."
+  },
+  {
+    "term": "organization.confirm-deactivate-user-dialog.transfer-to-user",
+    "definition": "To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate.",
+    "context": "To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
+  },
+  {
+    "term": "organization.confirm-deactivate.user-select.input-placeholder",
+    "definition": "Select a user from your organization",
+    "context": "Select a user from your organization"
+  },
+  {
+    "term": "organization.create-user",
+    "definition": "Create user",
+    "context": "Create user"
+  },
+  {
+    "term": "organization.role.admin",
+    "definition": "Administrator",
+    "context": "Administrator"
+  },
+  {
+    "term": "organization.role.normal",
+    "definition": "Normal",
+    "context": "Normal"
+  },
+  {
     "term": "organization.title",
     "definition": "Organization",
     "context": "Organization"
+  },
+  {
+    "term": "organization.user-created-success.toast-description",
+    "definition": "We have sent an email to {email} with instructions to register in Parallel.",
+    "context": "We have sent an email to {email} with instructions to register in Parallel."
+  },
+  {
+    "term": "organization.user-created-success.toast-title",
+    "definition": "User created successfully.",
+    "context": "User created successfully."
+  },
+  {
+    "term": "organization.user-updated-success.toast-title",
+    "definition": "User updated successfully.",
+    "context": "User updated successfully."
   },
   {
     "term": "organization.users.title",
@@ -2123,6 +2238,11 @@
     "term": "petition.confirm-deactivate-access-message.header",
     "definition": "Remove contact access",
     "context": "Remove contact access"
+  },
+  {
+    "term": "petition.confirm-deactivate-users.confirm",
+    "definition": "Deactivate and transfer petitions",
+    "context": "Deactivate and transfer petitions"
   },
   {
     "term": "petition.confirm-delete-field.body",
@@ -4011,8 +4131,8 @@
   },
   {
     "term": "timeline.ownership-transferred-description",
-    "definition": "{same, select, true {You} other {{user}}} transferred the ownership of this petition to {owner} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition to {owner} {timeAgo}"
+    "definition": "{same, select, true {You} other {{user}}} transferred the ownership of this petition {hasPreviousOwner, select, true {from {previousOwner} } other {}}to {owner} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition {hasPreviousOwner, select, true {from {previousOwner} } other {}}to {owner} {timeAgo}"
   },
   {
     "term": "timeline.petition-closed-description",

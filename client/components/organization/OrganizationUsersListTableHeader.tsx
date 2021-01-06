@@ -155,7 +155,7 @@ export function OrganizationUsersListTableHeader({
         onClick={onCreateUser}
       >
         {intl.formatMessage({
-          id: "organization.create-user-button",
+          id: "organization.create-user",
           defaultMessage: "Create user",
         })}
       </Button>

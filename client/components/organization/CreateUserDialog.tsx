@@ -102,7 +102,7 @@ export function CreateUserDialog({
       initialFocusRef={emailRef}
       header={
         <FormattedMessage
-          id="organization.create-user-dialog.header"
+          id="organization.create-user"
           defaultMessage="Create user"
         />
       }
@@ -219,7 +219,7 @@ export function CreateUserDialog({
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
           <FormattedMessage
-            id="organization.create-user-dialog.confirm"
+            id="organization.create-user"
             defaultMessage="Create user"
           />
         </Button>
