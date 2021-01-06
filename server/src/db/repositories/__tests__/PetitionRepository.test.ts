@@ -352,7 +352,8 @@ describe("repositories/PetitionRepository", () => {
       [petitionAccess] = await mocks.createPetitionAccess(
         petition.id,
         user.id,
-        [contact.id]
+        [contact.id],
+        user.id
       );
     });
 

@@ -49,9 +49,12 @@ describe("GraphQL/Public", () => {
           { type: "FILE_UPLOAD" },
         ][i] as Partial<PetitionField>
     );
-    [access] = await mocks.createPetitionAccess(petition.id, user.id, [
-      contact.id,
-    ]);
+    [access] = await mocks.createPetitionAccess(
+      petition.id,
+      user.id,
+      [contact.id],
+      user.id
+    );
   });
 
   afterAll(async () => {

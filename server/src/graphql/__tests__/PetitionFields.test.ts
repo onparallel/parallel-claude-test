@@ -547,7 +547,8 @@ describe("GraphQL/Petition Fields", () => {
       const [contactAccess] = await mocks.createPetitionAccess(
         userPetition.id,
         user.id,
-        [contact.id]
+        [contact.id],
+        user.id
       );
 
       await mocks.createRandomTextReply(fields[1].id, contactAccess.id);
@@ -1419,7 +1420,8 @@ describe("GraphQL/Petition Fields", () => {
       const [access] = await mocks.createPetitionAccess(
         userPetition.id,
         user.id,
-        [contact.id]
+        [contact.id],
+        user.id
       );
 
       await mocks.createRandomTextReply(fieldWithReply.id, access.id);
@@ -1784,9 +1786,12 @@ describe("GraphQL/Petition Fields", () => {
       );
 
       [contact] = await mocks.createRandomContacts(organization.id, 1);
-      [access] = await mocks.createPetitionAccess(petition.id, user.id, [
-        contact.id,
-      ]);
+      [access] = await mocks.createPetitionAccess(
+        petition.id,
+        user.id,
+        [contact.id],
+        user.id
+      );
 
       fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
         type: "TEXT",
@@ -2191,9 +2196,12 @@ describe("GraphQL/Petition Fields", () => {
       );
 
       [contact] = await mocks.createRandomContacts(organization.id, 1);
-      [access] = await mocks.createPetitionAccess(petition.id, user.id, [
-        contact.id,
-      ]);
+      [access] = await mocks.createPetitionAccess(
+        petition.id,
+        user.id,
+        [contact.id],
+        user.id
+      );
 
       fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
         type: "TEXT",

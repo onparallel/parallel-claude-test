@@ -1,6 +1,8 @@
 import { FieldValidateArgsResolver } from "./validateArgsPlugin";
 import { ValidatorOrConditionError } from "./errors";
 import { Maybe } from "../../util/types";
+import { Arg } from "./authorize";
+import { ArgsValue } from "@nexus/schema/dist/core";
 
 export function validateAnd<TypeName extends string, FieldName extends string>(
   ...validators: FieldValidateArgsResolver<TypeName, FieldName>[]
@@ -31,6 +33,22 @@ export function validateOr<TypeName extends string, FieldName extends string>(
     if (results.every((r) => r !== null)) {
       const errorMessage = results.filter((r) => r !== null).join("; ");
       throw new ValidatorOrConditionError(info, errorMessage);
+    }
+  }) as FieldValidateArgsResolver<TypeName, FieldName>;
+}
+
+export function validateIf<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName>
+>(
+  argName: TArg,
+  expectedValue: ArgsValue<TypeName, FieldName>[TArg],
+  validator: FieldValidateArgsResolver<TypeName, FieldName>
+) {
+  return (async (root, args, ctx, info) => {
+    if (args[argName] === expectedValue) {
+      await validator(root, args, ctx, info);
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

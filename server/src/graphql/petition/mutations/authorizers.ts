@@ -24,6 +24,26 @@ export function userHasAccessToUsers<
   };
 }
 
+export function argUserHasActiveStatus<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argNameUserId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const userIds = unMaybeArray(args[argNameUserId] as MaybeArray<number>);
+      if (userIds.length === 0) {
+        return true;
+      }
+
+      return (await ctx.users.loadUser(userIds)).every(
+        (u) => isDefined(u) && u.status === "ACTIVE"
+      );
+    } catch {}
+    return false;
+  };
+}
+
 export function userIsCommentAuthor<
   TypeName extends string,
   FieldName extends string,

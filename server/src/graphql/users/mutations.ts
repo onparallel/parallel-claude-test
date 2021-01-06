@@ -7,23 +7,29 @@ import {
   nonNull,
   list,
 } from "@nexus/schema";
-import { isDefined, removeNotDefined } from "../../util/remedaExtensions";
+import { removeNotDefined } from "../../util/remedaExtensions";
 import {
+  and,
   argIsContextUserId,
   authenticate,
   authenticateAnd,
   chain,
+  ifArgDefined,
 } from "../helpers/authorize";
-import { validateAnd } from "../helpers/validateArgs";
+import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { contextUserIsAdmin } from "./authorizers";
 import { validEmail } from "../helpers/validators/validEmail";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
-import { userHasAccessToUsers } from "../petition/mutations/authorizers";
+import {
+  argUserHasActiveStatus,
+  userHasAccessToUsers,
+} from "../petition/mutations/authorizers";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
 import { ArgValidationError } from "../helpers/errors";
+import { validIsDefined } from "../helpers/validators/validIsDefined";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -157,48 +163,42 @@ export const UpdateUserStatus = mutationField("updateUserStatus", {
   type: list("User"),
   authorize: authenticateAnd(
     contextUserIsAdmin(),
-    userHasAccessToUsers("userIds")
+    userHasAccessToUsers("userIds"),
+    ifArgDefined(
+      "transferToUserId",
+      and(
+        userHasAccessToUsers("transferToUserId" as any),
+        argUserHasActiveStatus("transferToUserId" as any)
+      )
+    )
   ),
   validateArgs: validateAnd(
     notEmptyArray((args) => args.userIds, "userIds"),
-    userIdNotIncludedInArray((args) => args.userIds, "userIds")
+    userIdNotIncludedInArray((args) => args.userIds, "userIds"),
+    validateIf(
+      "status",
+      "INACTIVE",
+      validIsDefined((args) => args.transferToUserId, "transferToUserId")
+    )
   ),
   args: {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
     status: nonNull(arg({ type: "UserStatus" })),
     transferToUserId: globalIdArg("User"),
   },
-  resolve: async (_, { userIds, status, transferToUserId }, ctx, info) => {
-    // if status is INACTIVE, check that transferToUserId is defined
-    // and refers to an active user in the same org as the context user
+  resolve: async (
+    _,
+    { userIds, status, transferToUserId: _transferToUserId },
+    ctx,
+    info
+  ) => {
     if (status === "INACTIVE") {
-      if (!isDefined(transferToUserId)) {
-        throw new ArgValidationError(
-          info,
-          "transferToUserId",
-          "Value must be defined"
-        );
-      }
-
+      const transferToUserId = _transferToUserId!;
       if (userIds.includes(transferToUserId)) {
         throw new ArgValidationError(
           info,
           "transferToUserId",
           "Can't transfer to a user that will be disabled."
-        );
-      }
-
-      const userToTransfer = await ctx.users.loadUser(transferToUserId);
-
-      if (
-        !userToTransfer ||
-        userToTransfer.status !== "ACTIVE" ||
-        userToTransfer.org_id !== ctx.user!.org_id
-      ) {
-        throw new ArgValidationError(
-          info,
-          "transferToUserId",
-          "User to transfer must exist and have ACTIVE status"
         );
       }
 
