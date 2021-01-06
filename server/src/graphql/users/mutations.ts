@@ -228,21 +228,31 @@ export const UpdateUserStatus = mutationField("updateUserStatus", {
 
             // transfer OWNER permissions to new user
             if (ownedPermissions.length > 0) {
-              await ctx.petitions.createEvent(
-                ownedPermissions.map((p) => ({
-                  petitionId: p.petition_id,
-                  type: "OWNERSHIP_TRANSFERRED",
-                  data: {
-                    user_id: ctx.user!.id,
-                    owner_id: transferToUserId,
-                    previous_owner_id: p.user_id,
-                  },
-                })),
-                t
-              );
-              return await ctx.petitions.updatePetitionOwner(
+              await Promise.all([
+                ctx.petitions.transferOwnership(
+                  ownedPermissions.map((p) => p.petition_id),
+                  transferToUserId,
+                  ctx.user!,
+                  t
+                ),
+                ctx.petitions.createEvent(
+                  ownedPermissions.map((p) => ({
+                    petitionId: p.petition_id,
+                    type: "OWNERSHIP_TRANSFERRED",
+                    data: {
+                      user_id: ctx.user!.id,
+                      owner_id: transferToUserId,
+                      previous_owner_id: p.user_id,
+                    },
+                  })),
+                  t
+                ),
+              ]);
+
+              // remove the WRITE permissions set to the original owner in ctx.petitions.transferOwnership()
+              await ctx.petitions.removePetitionUserPermissions(
                 ownedPermissions.map((p) => p.petition_id),
-                transferToUserId,
+                [ownedPermissions[0].user_id],
                 ctx.user!,
                 t
               );

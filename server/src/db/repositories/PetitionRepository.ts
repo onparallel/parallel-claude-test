@@ -2246,7 +2246,8 @@ export class PetitionRepository extends BaseRepository {
   async removePetitionUserPermissions(
     petitionIds: number[],
     userIds: number[],
-    user: User
+    user: User,
+    t?: Transaction
   ) {
     return this.withTransaction(async (t) => {
       const removedPermissions = await this.from("petition_user", t)
@@ -2281,51 +2282,71 @@ export class PetitionRepository extends BaseRepository {
         .whereNull("deleted_at")
         .whereIn("id", petitionIds)
         .returning("*");
-    });
+    }, t);
   }
 
   /**
    * sets new OWNER of petitions to @param toUserId.
-   * Original owner loses its access to the petitions.
+   * original owner gets a WRITE permission.
    */
-  async updatePetitionOwner(
+  async transferOwnership(
     petitionIds: number[],
-    newOwnerId: number,
+    toUserId: number,
     updatedBy: User,
     t?: Transaction
   ) {
     return await this.withTransaction(async (t) => {
-      // first, remove possible READ or WRITE access to newOwnerId, as it will now be OWNER.
+      // change permission of original owner to WRITE
       await this.from("petition_user", t)
-        .whereIn("petition_id", petitionIds)
-        .whereIn("permission_type", ["READ", "WRITE"])
-        .where({
-          user_id: newOwnerId,
-          deleted_at: null,
-        })
-        .update({
-          deleted_at: this.now(),
-          deleted_by: `User:${updatedBy}`,
-        });
-
-      const permissions = await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
         .where({
           deleted_at: null,
           permission_type: "OWNER",
         })
         .update({
-          user_id: newOwnerId,
+          permission_type: "WRITE",
           updated_at: this.now(),
           updated_by: `User:${updatedBy.id}`,
-        })
-        .returning("*");
+        });
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissions.dataloader.clear(petitionId);
       }
 
-      return permissions;
+      // UPSERT for new petition owner. Try to insert a new OWNER permission.
+      // If conflict, the new owner already has READ or WRITE access to the petition,
+      // so we have to update the conflicting row to have OWNER permission
+      await t.raw<{ rows: PetitionUser[] }>(
+        /* sql */ `
+        ? ON CONFLICT (user_id, petition_id) WHERE deleted_at IS NULL
+          DO UPDATE SET
+          permission_type = ?,
+          updated_by = ?,
+          updated_at = ?,
+          deleted_by = null,
+          deleted_at = null
+        RETURNING *;`,
+        [
+          this.from("petition_user").insert(
+            petitionIds.map((petitionId) => ({
+              created_by: `User:${updatedBy.id}`,
+              updated_by: `User:${updatedBy.id}`,
+              updated_at: this.now(),
+              permission_type: "OWNER",
+              user_id: toUserId,
+              petition_id: petitionId,
+            }))
+          ),
+          "OWNER",
+          `User:${updatedBy.id}`,
+          this.now(),
+        ]
+      );
+
+      return await this.from("petition", t)
+        .whereNull("deleted_at")
+        .whereIn("id", petitionIds)
+        .returning("*");
     }, t);
   }
 

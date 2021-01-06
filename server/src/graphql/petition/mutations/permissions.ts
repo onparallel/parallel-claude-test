@@ -38,33 +38,26 @@ export const transferPetitionOwnership = mutationField(
     ),
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.withTransaction(async (t) => {
-        await ctx.petitions.updatePetitionOwner(
-          args.petitionIds,
-          args.userId,
-          ctx.user!,
-          t
-        );
-
-        const { petitions } = await ctx.petitions.addPetitionUserPermissions(
-          args.petitionIds,
-          [ctx.user!.id],
-          "WRITE",
-          ctx.user!,
-          t
-        );
-
-        await ctx.petitions.createEvent(
-          args.petitionIds.map((petitionId) => ({
-            petitionId,
-            type: "OWNERSHIP_TRANSFERRED",
-            data: {
-              user_id: ctx.user!.id,
-              previous_owner_id: ctx.user!.id,
-              owner_id: args.userId,
-            },
-          })),
-          t
-        );
+        const [petitions] = await Promise.all([
+          ctx.petitions.transferOwnership(
+            args.petitionIds,
+            args.userId,
+            ctx.user!,
+            t
+          ),
+          ctx.petitions.createEvent(
+            args.petitionIds.map((petitionId) => ({
+              petitionId,
+              type: "OWNERSHIP_TRANSFERRED",
+              data: {
+                user_id: ctx.user!.id,
+                previous_owner_id: ctx.user!.id,
+                owner_id: args.userId,
+              },
+            })),
+            t
+          ),
+        ]);
 
         return petitions;
       });
