@@ -172,7 +172,8 @@ export class Mocks {
   async createPetitionAccess(
     petitionId: number,
     ownerId: number,
-    contactIds: number[]
+    contactIds: number[],
+    createdByUserId: number
   ) {
     return await this.knex<PetitionAccess>("petition_access")
       .insert(
@@ -183,6 +184,7 @@ export class Mocks {
           status: "ACTIVE",
           keycode: random(16),
           reminders_left: 10,
+          created_by: `User:${createdByUserId}`,
         }))
       )
       .returning("*");

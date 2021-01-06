@@ -226,12 +226,21 @@ export const UpdateUserStatus = mutationField("updateUserStatus", {
               (p) => p.permission_type === "OWNER"
             );
 
-            // transfer OWNER permissions to new user
             if (ownedPermissions.length > 0) {
               await Promise.all([
+                // transfer OWNER permissions to new user
                 ctx.petitions.transferOwnership(
                   ownedPermissions.map((p) => p.petition_id),
                   transferToUserId,
+                  ctx.user!,
+                  t
+                ),
+                // update petition_access to have new granter
+                ctx.petitions.updatePetitionAccessByPetitionId(
+                  ownedPermissions.map((p) => p.petition_id),
+                  {
+                    granter_id: transferToUserId,
+                  },
                   ctx.user!,
                   t
                 ),

@@ -376,6 +376,22 @@ export class PetitionRepository extends BaseRepository {
     "email_log_id"
   );
 
+  async updatePetitionAccessByPetitionId(
+    petitionIds: number[],
+    data: Partial<CreatePetitionAccess>,
+    updatedBy: User,
+    t?: Transaction
+  ) {
+    return await this.from("petition_access", t)
+      .whereIn("petition_id", petitionIds)
+      .update({
+        ...data,
+        updated_at: this.now(),
+        updated_by: `User:${updatedBy.id}`,
+      })
+      .returning("*");
+  }
+
   async createMessages(
     petitionId: number,
     scheduledAt: Date | null,

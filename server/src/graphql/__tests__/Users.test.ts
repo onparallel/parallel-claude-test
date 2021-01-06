@@ -1,6 +1,6 @@
 import { initServer, TestClient } from "./server";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, Petition, PetitionUser, User } from "../../db/__types";
+import { Contact, Organization, Petition, User } from "../../db/__types";
 import { userCognitoId } from "./mocks";
 import { toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
@@ -99,6 +99,8 @@ describe("GraphQL/Users", () => {
     let otherOrg: Organization;
     let otherOrgUser: User;
 
+    let contact: Contact;
+
     beforeEach(async () => {
       activeUsers = await mocks.createRandomUsers(organization.id, 3, () => ({
         status: "ACTIVE",
@@ -123,6 +125,8 @@ describe("GraphQL/Users", () => {
         activeUsers[1].id,
         3
       );
+
+      [contact] = await mocks.createRandomContacts(organization.id, 1);
 
       [otherOrg] = await mocks.createRandomOrganizations(1);
       [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1, () => ({
@@ -299,6 +303,66 @@ describe("GraphQL/Users", () => {
           permission_type: "OWNER",
           user_id: activeUsers[2].id,
           updated_by: `User:${sessionUser.id}`,
+        },
+      ]);
+    });
+
+    it("transfers petition with active access to new user, updates granter_id and preserves the original access keycode", async () => {
+      // first, set an access on the petition to transfer
+      const [originalAccess] = await mocks.createPetitionAccess(
+        user0Petition.id,
+        activeUsers[0].id,
+        [contact.id],
+        sessionUser.id
+      );
+
+      const { data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $userIds: [GID!]!
+            $status: UserStatus!
+            $transferToUserId: GID
+          ) {
+            updateUserStatus(
+              userIds: $userIds
+              status: $status
+              transferToUserId: $transferToUserId
+            ) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          userIds: [toGlobalId("User", activeUsers[0].id)],
+          status: "INACTIVE",
+          transferToUserId: sessionUserGID,
+        },
+      });
+
+      expect(data!.updateUserStatus).toEqual([
+        {
+          id: toGlobalId("User", activeUsers[0].id),
+          status: "INACTIVE",
+        },
+      ]);
+
+      // query petition_access to make sure it's is correctly set.
+      // as keycode is not exposed in graphql, read it from database.
+      const { rows: accesses } = await mocks.knex.raw(
+        /* sql */ `
+        select granter_id, keycode, status, created_by
+        from petition_access 
+        where petition_id = ?`,
+        [user0Petition.id]
+      );
+
+      expect(accesses).toEqual([
+        {
+          granter_id: sessionUser.id,
+          keycode: originalAccess.keycode,
+          status: "ACTIVE",
+          created_by: `User:${sessionUser.id}`,
         },
       ]);
     });
