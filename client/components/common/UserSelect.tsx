@@ -3,7 +3,7 @@ import { Image, Stack, Text } from "@chakra-ui/react";
 import { UserSelect_UserFragment } from "@parallel/graphql/__types";
 import {
   useReactSelectProps,
-  UserReactSelectProps,
+  UseReactSelectProps,
 } from "@parallel/utils/useReactSelectProps";
 import { forwardRef, memo, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
@@ -25,7 +25,7 @@ type AsyncUserSelectProps<IsMulti extends boolean> = AsyncSelectProps<
 
 interface UserSelectProps<IsMulti extends boolean>
   extends Omit<AsyncUserSelectProps<IsMulti>, "value" | "onChange">,
-    UserReactSelectProps {
+    UseReactSelectProps {
   value?: IsMulti extends true ? UserSelectSelection[] : UserSelectSelection;
   onChange?: IsMulti extends true
     ? (users: UserSelectSelection[]) => void
@@ -89,7 +89,7 @@ export const UserMultiSelect = Object.assign(userSelect(true), { fragments });
 export const UserSingleSelect = Object.assign(userSelect(false), { fragments });
 
 function useUserSelectReactSelectProps<IsMulti extends boolean>(
-  props: UserReactSelectProps
+  props: UseReactSelectProps
 ) {
   const reactSelectProps = useReactSelectProps<UserSelectSelection>(props);
   return useMemo(

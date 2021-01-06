@@ -6,7 +6,7 @@ import {
   useTheme,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
-import { memo, useMemo } from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   components,
@@ -54,7 +54,7 @@ export const SIZES = {
   },
 };
 
-export type UserReactSelectProps = {
+export type UseReactSelectProps = {
   size?: keyof typeof SIZES;
   id?: string;
   isDisabled?: boolean;
@@ -65,7 +65,7 @@ export type UserReactSelectProps = {
  */
 export function useReactSelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string }
->({ size = "md", ...props }: UserReactSelectProps) {
+>({ size = "md", ...props }: UseReactSelectProps) {
   const intl = useIntl();
   const { colors, radii, sizes } = useTheme();
 
@@ -166,13 +166,17 @@ export function useReactSelectProps<
         ),
       },
       styles: {
+        container: (styles, { isDisabled }) => ({
+          ...styles,
+          cursor: isDisabled ? "not-allowed" : "default",
+          pointerEvents: undefined,
+        }),
         control: (styles, { isDisabled, isFocused, theme }: any) => {
           return {
             ...styles,
             alignItems: "stretch",
-            borderColor: isDisabled
-              ? colors.gray[100]
-              : isInvalid
+            opacity: isDisabled ? 0.4 : 1,
+            borderColor: isInvalid
               ? colors.red[500]
               : isFocused
               ? colors.blue[500]
@@ -189,6 +193,7 @@ export function useReactSelectProps<
                 ? theme.colors.primary
                 : colors.gray[300],
             },
+            pointerEvents: isDisabled ? "none" : undefined,
           };
         },
         placeholder: (styles) => ({
@@ -210,6 +215,10 @@ export function useReactSelectProps<
         menuList: (styles) => ({
           ...styles,
           padding: "0.5rem 0",
+        }),
+        singleValue: (styles, props) => ({
+          ...styles,
+          color: "unset",
         }),
         multiValue: (styles, { data }) => ({
           ...styles,

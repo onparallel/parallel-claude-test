@@ -1,46 +1,40 @@
-import {
-  Box,
-  BoxProps,
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  List,
-  ListItem,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Center, List, ListItem, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import {
-  RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
-  RecipientViewPetitionField_PublicPetitionFieldFragment,
-  useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
-} from "@parallel/graphql/__types";
+import { UserSelectInstance } from "@parallel/components/common/UserSelect";
+import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { useReactSelectProps } from "@parallel/utils/useReactSelectProps";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+  UseReactSelectProps,
+  useReactSelectProps,
+} from "@parallel/utils/useReactSelectProps";
+import { forwardRef, useMemo, useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import Select from "react-select";
-import { useCreateSimpleReply, useDeletePetitionReply } from "./mutations";
+import {
+  useCreateSimpleReply,
+  useDeletePetitionReply,
+  useUpdateSimpleReply,
+} from "./mutations";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
-import { RecipientViewPetitionFieldReplySavingIndicator } from "./RecipientViewPetitionFieldReplySavingIndicator";
+import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
 
 export interface RecipientViewPetitionFieldSelectProps
-  extends Omit<RecipientViewPetitionFieldCardProps, "children"> {
+  extends Omit<
+    RecipientViewPetitionFieldCardProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
   keycode: string;
   isDisabled: boolean;
 }
+
+type SelectInstance = Select<{ label: string; value: string }, false>;
 
 export const RecipientViewPetitionFieldSelect = chakraForwardRef<
   "section",
@@ -57,8 +51,78 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
   },
   ref
 ) {
-  const deletePetitionReply = useDeletePetitionReply();
+  const intl = useIntl();
+
+  const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
+  const [value, setValue] = useState(toSelectOption(null));
+  const [isSaving, setIsSaving] = useState(false);
+
+  const newReplyRef = useRef<UserSelectInstance>(null);
+  const replyRefs = useMultipleRefs<SelectInstance>();
+
+  const options = field.options as FieldOptions["SELECT"];
+
+  const updateSimpleReply = useUpdateSimpleReply();
+
+  const handleUpdate = useMemoFactory(
+    (replyId: string) => async (content: string) => {
+      await updateSimpleReply({ replyId, keycode, content });
+    },
+    [keycode, updateSimpleReply]
+  );
+  const deleteReply = useDeletePetitionReply();
+  const handleDelete = useMemoFactory(
+    (replyId: string) => async () => {
+      await deleteReply({ fieldId: field.id, replyId, keycode });
+      if (field.replies.length === 1) {
+        setShowNewReply(true);
+      }
+    },
+    [keycode, field.id, field.replies, deleteReply]
+  );
+
   const createSimpleReply = useCreateSimpleReply();
+
+  async function handleOnChange(value: any) {
+    setValue(value);
+    setIsSaving(true);
+    try {
+      const reply = await createSimpleReply({
+        keycode,
+        fieldId: field.id,
+        content: value.value,
+      });
+      if (reply) {
+        setShowNewReply(false);
+        setValue(null);
+        setTimeout(() => {
+          const instance = replyRefs[reply.id].current!;
+          instance.focus();
+        });
+      }
+    } catch {}
+    setIsSaving(false);
+  }
+
+  function handleAddNewReply() {
+    setShowNewReply(true);
+    setTimeout(() => newReplyRef.current!.focus());
+  }
+
+  const reactSelectProps = useFieldSelectReactSelectProps(
+    useMemo(
+      () => ({
+        id: `reply-${field.id}-new`,
+        isDisabled,
+      }),
+      [isDisabled]
+    )
+  );
+
+  const values = useMemo(() => options.values.map(toSelectOption), [
+    options.values,
+  ]);
+
   return (
     <RecipientViewPetitionFieldCard
       ref={ref}
@@ -67,6 +131,8 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
+      showAddNewReply={!isDisabled && !showNewReply && field.multiple}
+      onAddNewReply={handleAddNewReply}
       {...props}
     >
       {field.replies.length ? (
@@ -74,143 +140,24 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
           {field.replies.map((reply) => (
             <ListItem key={reply.id}>
               <RecipientViewPetitionFieldReplySelect
-                keycode={keycode}
+                ref={replyRefs[reply.id]}
+                field={field}
                 reply={reply}
-                options={field.options as FieldOptions["SELECT"]}
-                onRemove={() =>
-                  deletePetitionReply({
-                    keycode,
-                    fieldId: field.id,
-                    replyId: reply.id,
-                  })
-                }
+                isDisabled={isDisabled}
+                onUpdate={handleUpdate(reply.id)}
+                onDelete={handleDelete(reply.id)}
               />
             </ListItem>
           ))}
         </List>
       ) : null}
-      <Box marginTop={2}>
-        <OptionSelectReplyForm
-          field={field}
-          canReply={!isDisabled}
-          onCreateReply={(content) =>
-            createSimpleReply({
-              keycode,
-              fieldId: field.id,
-              content,
-            })
-          }
-        />
-      </Box>
-    </RecipientViewPetitionFieldCard>
-  );
-});
-
-interface RecipientViewPetitionFieldReplySelectProps {
-  keycode: string;
-  options: FieldOptions["SELECT"];
-  reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-  onRemove: () => void;
-}
-
-// This context is used to pass some properties to react-select subcomponents
-const RecipientViewPetitionFieldReplySelectContext = createContext<{
-  isUpdating: boolean;
-  reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-}>(null as any);
-
-export function RecipientViewPetitionFieldReplySelect({
-  keycode,
-  options,
-  reply,
-  onRemove,
-}: RecipientViewPetitionFieldReplySelectProps) {
-  const intl = useIntl();
-  const [
-    updateReply,
-    { loading: isUpdating },
-  ] = useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation();
-  const [value, setValue] = useState(toSelectOption(reply.content.text));
-
-  const _reactSelectProps = useReactSelectProps({
-    id: `petition-field-reply-select-${reply.id}`,
-    isDisabled: false,
-  });
-
-  const reactSelectProps = useMemo(
-    () =>
-      ({
-        ..._reactSelectProps,
-        styles: {
-          ..._reactSelectProps.styles,
-          menu: (styles) => ({
-            ...styles,
-            zIndex: 100,
-          }),
-        },
-        components: {
-          ..._reactSelectProps.components,
-          ValueContainer: (props) => {
-            const { children, getStyles } = props;
-            const { reply, isUpdating } = useContext(
-              RecipientViewPetitionFieldReplySelectContext
-            );
-            return (
-              <Box
-                sx={{ ...getStyles("valueContainer", props), paddingRight: 8 }}
-                position="relative"
-              >
-                {children}
-                <Center
-                  width={8}
-                  paddingLeft={3}
-                  paddingRight={1}
-                  height="100%"
-                  position="absolute"
-                  right={0}
-                  top={0}
-                >
-                  <RecipientViewPetitionFieldReplySavingIndicator
-                    isSaving={isUpdating}
-                    reply={reply}
-                  />
-                </Center>
-              </Box>
-            );
-          },
-        },
-      } as typeof _reactSelectProps),
-    [_reactSelectProps]
-  );
-
-  const values = useMemo(() => options.values.map(toSelectOption), [
-    options.values,
-  ]);
-
-  const contextValue = useMemo(() => ({ reply, isUpdating }), [
-    reply,
-    isUpdating,
-  ]);
-
-  return (
-    <Stack direction="row">
-      <Box flex="1" position="relative">
-        <RecipientViewPetitionFieldReplySelectContext.Provider
-          value={contextValue}
-        >
+      {showNewReply ? (
+        <Box flex="1" position="relative" marginTop={2}>
           <Select
+            ref={newReplyRef as any}
             value={value}
-            options={values}
-            onChange={(value) => {
-              setValue(value as any);
-              updateReply({
-                variables: {
-                  keycode,
-                  replyId: reply.id,
-                  reply: value!.value,
-                },
-              });
-            }}
+            options={values as any}
+            onChange={handleOnChange}
             placeholder={
               options.placeholder ??
               intl.formatMessage({
@@ -221,10 +168,91 @@ export function RecipientViewPetitionFieldReplySelect({
             }
             {...reactSelectProps}
           />
-        </RecipientViewPetitionFieldReplySelectContext.Provider>
+          <Center height="100%" position="absolute" right={9} top={0}>
+            <RecipientViewPetitionFieldReplyStatusIndicator
+              isSaving={isSaving}
+            />
+          </Center>
+        </Box>
+      ) : null}
+    </RecipientViewPetitionFieldCard>
+  );
+});
+
+interface RecipientViewPetitionFieldReplySelectProps {
+  field: RecipientViewPetitionFieldSelectProps["field"];
+  reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+  isDisabled: boolean;
+  onUpdate: (content: string) => Promise<void>;
+  onDelete: () => void;
+}
+
+export const RecipientViewPetitionFieldReplySelect = forwardRef<
+  SelectInstance,
+  RecipientViewPetitionFieldReplySelectProps
+>(function RecipientViewPetitionFieldReplySelect(
+  { field, reply, isDisabled, onUpdate, onDelete },
+  ref
+) {
+  const intl = useIntl();
+  const [value, setValue] = useState(toSelectOption(reply.content.text));
+  const [isSaving, setIsSaving] = useState(false);
+
+  const options = field.options as FieldOptions["SELECT"];
+  const reactSelectProps = useFieldSelectReactSelectProps(
+    useMemo(
+      () => ({
+        id: `reply-${field.id}-${reply.id}`,
+        isDisabled: isDisabled || reply.status === "APPROVED",
+        isInvalid: reply.status === "REJECTED",
+      }),
+      [isDisabled, reply.status]
+    )
+  );
+
+  const values = useMemo(() => options.values.map(toSelectOption), [
+    options.values,
+  ]);
+
+  async function handleOnChange(value: any) {
+    setValue(value);
+    setIsSaving(true);
+    try {
+      await onUpdate(value.value);
+    } catch {}
+    setIsSaving(false);
+  }
+
+  return (
+    <Stack direction="row">
+      <Box flex="1" position="relative">
+        <Box position="relative">
+          <Select
+            ref={ref}
+            value={value}
+            options={values as any}
+            onChange={handleOnChange}
+            placeholder={
+              options.placeholder ??
+              intl.formatMessage({
+                id:
+                  "component.recipient-view-petition-field-reply.select-placeholder",
+                defaultMessage: "Select an option",
+              })
+            }
+            {...reactSelectProps}
+          />
+          <Center height="100%" position="absolute" right={9} top={0}>
+            <RecipientViewPetitionFieldReplyStatusIndicator
+              reply={reply}
+              isSaving={isSaving}
+            />
+          </Center>
+        </Box>
       </Box>
       <IconButtonWithTooltip
-        onClick={onRemove}
+        isDisabled={isDisabled}
+        onClick={() => onDelete()}
         variant="ghost"
         icon={<DeleteIcon />}
         size="md"
@@ -237,34 +265,15 @@ export function RecipientViewPetitionFieldReplySelect({
       />
     </Stack>
   );
+});
+
+function toSelectOption(value: string | null) {
+  return value === null ? null : { value, label: value };
 }
 
-interface OptionSelectReplyFormProps extends BoxProps {
-  canReply: boolean;
-  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
-  onCreateReply: (content: string) => void;
-}
-
-function OptionSelectReplyForm({
-  field,
-  canReply,
-  onCreateReply,
-  ...props
-}: OptionSelectReplyFormProps) {
-  const intl = useIntl();
-
-  const { values, placeholder } = field.options as FieldOptions["SELECT"];
-  const [selection, setSelection] = useState<string | null>();
-  const [showError, setShowError] = useState(false);
-  const disabled = !field.multiple && field.replies.length > 0;
-
-  const _reactSelectProps = useReactSelectProps({
-    id: `field-select-option-${field.id}`,
-    isDisabled: disabled || !canReply,
-    isInvalid: showError,
-  });
-
-  const reactSelectProps = useMemo(
+function useFieldSelectReactSelectProps(props: UseReactSelectProps) {
+  const _reactSelectProps = useReactSelectProps(props);
+  return useMemo(
     () =>
       ({
         ..._reactSelectProps,
@@ -272,73 +281,16 @@ function OptionSelectReplyForm({
           ..._reactSelectProps.styles,
           menu: (styles) => ({
             ...styles,
-            zIndex: 1000,
+            ..._reactSelectProps.styles!.menu?.(styles, props),
+            zIndex: 100,
+          }),
+          valueContainer: (styles, props) => ({
+            ...styles,
+            ..._reactSelectProps.styles!.valueContainer?.(styles, props),
+            paddingRight: 32,
           }),
         },
       } as typeof _reactSelectProps),
     [_reactSelectProps]
   );
-
-  const availableOptions = useMemo(() => {
-    return values.map((value) => ({ value, label: value }));
-  }, []);
-
-  const handleSubmit = useCallback(() => {
-    if (selection) {
-      onCreateReply(selection);
-      setTimeout(() => setSelection(null));
-    } else {
-      setShowError(true);
-    }
-  }, [selection]);
-
-  return (
-    <Flex flexDirection={{ base: "column", sm: "row" }} {...props}>
-      <FormControl flex="1" isInvalid={showError} isDisabled={disabled}>
-        <Select
-          value={selection ? { value: selection, label: selection } : null}
-          options={availableOptions}
-          onChange={({ value }: any) => {
-            setSelection(value as any);
-            setShowError(false);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSubmit();
-            }
-          }}
-          placeholder={
-            placeholder ??
-            intl.formatMessage({
-              id: "recipient-view.select-placeholder",
-              defaultMessage: "Select an option",
-            })
-          }
-          {...reactSelectProps}
-        />
-        {showError && (
-          <FormErrorMessage>
-            <FormattedMessage
-              id="generic.forms.required-field-error"
-              defaultMessage="A value is required"
-            />
-          </FormErrorMessage>
-        )}
-      </FormControl>
-      <Button
-        type="submit"
-        variant="outline"
-        isDisabled={disabled || !canReply}
-        marginTop={{ base: 2, sm: 0 }}
-        marginLeft={{ base: 0, sm: 4 }}
-        onClick={handleSubmit}
-      >
-        <FormattedMessage id="generic.save" defaultMessage="Save" />
-      </Button>
-    </Flex>
-  );
-}
-
-function toSelectOption(value: string) {
-  return { value, label: value };
 }

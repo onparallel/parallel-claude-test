@@ -1,16 +1,19 @@
 import { gql } from "@apollo/client";
 import {
+  Badge,
   Box,
   Button,
   ButtonProps,
+  Center,
   Flex,
   Heading,
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { CommentIcon } from "@parallel/chakra/icons";
+import { AddIcon, CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
   RecipientViewPetitionFieldCard_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
@@ -30,7 +33,9 @@ export interface RecipientViewPetitionFieldCardProps {
   field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
   isInvalid: boolean;
   hasCommentsEnabled: boolean;
+  showAddNewReply?: boolean;
   children: ReactNode;
+  onAddNewReply?: () => void;
 }
 
 export const RecipientViewPetitionFieldCard = Object.assign(
@@ -42,6 +47,8 @@ export const RecipientViewPetitionFieldCard = Object.assign(
         access,
         isInvalid,
         hasCommentsEnabled,
+        showAddNewReply,
+        onAddNewReply,
         children,
         ...props
       },
@@ -142,19 +149,34 @@ export const RecipientViewPetitionFieldCard = Object.assign(
           <Text fontSize="sm" color="gray.500">
             {isTextLikeType ? (
               <FormattedMessage
-                id="recipient-view.replies-submitted"
+                id="component.recipient-view-petition-field-card.replies-submitted"
                 defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
                 values={{ count: field.replies.length }}
               />
             ) : field.type === "FILE_UPLOAD" ? (
               <FormattedMessage
-                id="recipient-view.files-uploaded"
+                id="component.recipient-view-petition-field-card.files-uploaded"
                 defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
                 values={{ count: field.replies.length }}
               />
             ) : null}
           </Text>
           {children}
+          {showAddNewReply ? (
+            <Center marginTop={2}>
+              <IconButtonWithTooltip
+                icon={<AddIcon />}
+                variant="outline"
+                isRound
+                label={intl.formatMessage({
+                  id:
+                    "component.recipient-view-petition-field-card.add-another-reply",
+                  defaultMessage: "Add another reply",
+                })}
+                onClick={onAddNewReply}
+              />
+            </Center>
+          ) : null}
         </Card>
       );
     }

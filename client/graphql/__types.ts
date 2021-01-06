@@ -3277,7 +3277,7 @@ export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation 
 } & {
   publicUpdateSimpleReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
     PublicPetitionFieldReply,
-    "id" | "content" | "updatedAt"
+    "id" | "content" | "status" | "updatedAt"
   >;
 };
 
@@ -7510,6 +7510,7 @@ export const RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument
     ) {
       id
       content
+      status
       updatedAt
     }
   }

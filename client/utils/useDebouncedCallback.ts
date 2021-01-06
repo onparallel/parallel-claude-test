@@ -1,6 +1,12 @@
 import { DependencyList, useCallback, useEffect, useRef } from "react";
 import { UnwrapPromise } from "./types";
 
+type VoidableAsyncFunction<T extends (...args: any[]) => void> = (
+  ...args: Parameters<T>
+) => ReturnType<T> extends Promise<any>
+  ? Promise<UnwrapPromise<ReturnType<T>> | void>
+  : ReturnType<T> | void;
+
 /**
  * Same as useCallback but returns a debounced version of the callback
  */
@@ -10,11 +16,8 @@ export function useDebouncedCallback<T extends (...args: any[]) => void>(
   deps: DependencyList | undefined
 ): T & {
   immediate: T;
-  immediateIfPending: (
-    ...args: Parameters<T>
-  ) => ReturnType<T> extends Promise<any>
-    ? Promise<UnwrapPromise<ReturnType<T>> | void>
-    : ReturnType<T> | void;
+  immediateIfPending: VoidableAsyncFunction<T>;
+  clear: () => void;
 } {
   const timeout = useRef<any>(null);
   const pending = useRef<boolean>(false);
@@ -58,6 +61,12 @@ export function useDebouncedCallback<T extends (...args: any[]) => void>(
             return callback(...args);
           }
         } as any,
+        [...(deps ?? []), ms]
+      ),
+      clear: useCallback(
+        function () {
+          clearTimeout(timeout.current);
+        },
         [...(deps ?? []), ms]
       ),
     }

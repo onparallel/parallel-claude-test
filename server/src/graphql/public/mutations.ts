@@ -424,7 +424,7 @@ export const publicUpdateSimpleReply = mutationField(
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.updatePetitionFieldReply(
         args.replyId,
-        { content: { text: args.reply } },
+        { content: { text: args.reply }, status: "PENDING" },
         ctx.contact!
       );
     },

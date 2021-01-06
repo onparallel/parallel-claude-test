@@ -1,16 +1,22 @@
 import { gql } from "@apollo/client";
 import {
-  Center,
-  Text,
   Box,
   BoxProps,
+  Center,
   Flex,
   List,
   ListItem,
-  Stack,
   Progress,
+  Stack,
+  Text,
+  Tooltip,
 } from "@chakra-ui/react";
-import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
+import {
+  CheckIcon,
+  CloseIcon,
+  DeleteIcon,
+  DownloadIcon,
+} from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { FileName } from "@parallel/components/common/FileName";
@@ -35,7 +41,10 @@ import {
 } from "./RecipientViewPetitionFieldCard";
 
 export interface RecipientViewPetitionFieldFileUploadProps
-  extends Omit<RecipientViewPetitionFieldCardProps, "children"> {
+  extends Omit<
+    RecipientViewPetitionFieldCardProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
   keycode: string;
   isDisabled: boolean;
 }
@@ -106,6 +115,7 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
                 keycode={keycode}
                 options={field.options as FieldOptions["FILE_UPLOAD"]}
                 reply={reply}
+                isDisabled={isDisabled}
                 onRemove={() =>
                   handleDeletePetitionReply({
                     keycode,
@@ -119,8 +129,8 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
         </List>
       ) : null}
       <Box marginTop={2}>
-        <FileUploadReplyForm
-          canReply={!isDisabled}
+        <PetitionFieldFileUploadDropzone
+          isDisabled={isDisabled}
           field={field}
           onCreateReply={handleCreateReply}
         />
@@ -133,12 +143,14 @@ interface RecipientViewPetitionFieldReplyFileUploadProps {
   keycode: string;
   options: FieldOptions["FILE_UPLOAD"];
   reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+  isDisabled: boolean;
   onRemove: () => void;
 }
 
 export function RecipientViewPetitionFieldReplyFileUpload({
   keycode,
   reply,
+  isDisabled,
   onRemove,
 }: RecipientViewPetitionFieldReplyFileUploadProps) {
   const intl = useIntl();
@@ -211,6 +223,31 @@ export function RecipientViewPetitionFieldReplyFileUpload({
           </Text>
         )}
       </Box>
+      {reply.status !== "PENDING" ? (
+        <Center boxSize={10}>
+          {reply.status === "APPROVED" ? (
+            <Tooltip
+              label={intl.formatMessage({
+                id:
+                  "component.recipient-view-petition-field-reply.approved-file",
+                defaultMessage: "This file has been approved",
+              })}
+            >
+              <CheckIcon color="green.600" />
+            </Tooltip>
+          ) : (
+            <Tooltip
+              label={intl.formatMessage({
+                id:
+                  "component.recipient-view-petition-field-reply.rejected-file",
+                defaultMessage: "This file has been rejected",
+              })}
+            >
+              <CloseIcon fontSize="14px" color="red.500" />
+            </Tooltip>
+          )}
+        </Center>
+      ) : null}
       <IconButtonWithTooltip
         onClick={handleDownloadClick}
         variant="ghost"
@@ -223,6 +260,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         })}
       />
       <IconButtonWithTooltip
+        isDisabled={isDisabled || reply.status === "APPROVED"}
         onClick={onRemove}
         variant="ghost"
         icon={<DeleteIcon />}
@@ -238,18 +276,18 @@ export function RecipientViewPetitionFieldReplyFileUpload({
   );
 }
 
-interface FileUploadReplyFormProps extends BoxProps {
-  canReply: boolean;
+interface PetitionFieldFileUploadDropzoneProps extends BoxProps {
+  isDisabled: boolean;
   field: RecipientViewPetitionField_PublicPetitionFieldFragment;
   onCreateReply: (files: File[]) => void;
 }
 
-function FileUploadReplyForm({
+function PetitionFieldFileUploadDropzone({
   field,
-  canReply,
+  isDisabled,
   onCreateReply,
   ...props
-}: FileUploadReplyFormProps) {
+}: PetitionFieldFileUploadDropzoneProps) {
   const { accepts } = field.options as FieldOptions["FILE_UPLOAD"];
   const accept = accepts
     ? accepts.flatMap((type) => {
@@ -271,7 +309,8 @@ function FileUploadReplyForm({
         }
       })
     : undefined;
-  const isDisabled = !field.multiple && field.replies.length > 0;
+  const _isDisabled =
+    isDisabled || (!field.multiple && field.replies.length > 0);
   const {
     getRootProps,
     getInputProps,
@@ -299,7 +338,7 @@ function FileUploadReplyForm({
       minHeight="100px"
       padding={4}
       textAlign="center"
-      {...(isDisabled || !canReply
+      {...(_isDisabled
         ? {
             opacity: 0.4,
             cursor: "not-allowed",
@@ -316,7 +355,7 @@ function FileUploadReplyForm({
       {...props}
       {...getRootProps()}
     >
-      <input disabled={!canReply} {...getInputProps()} />
+      <input disabled={isDisabled} {...getInputProps()} />
       <Box pointerEvents="none">
         {isDragActive && isDragReject ? (
           <>

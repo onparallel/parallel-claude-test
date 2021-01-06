@@ -6,6 +6,7 @@ import {
   useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation,
   useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation,
   useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
+  useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { MutableRefObject, useCallback } from "react";
@@ -37,10 +38,6 @@ export function useDeletePetitionReply() {
       replyId: string;
       keycode: string;
     }) {
-      // if (uploads.current[replyId]) {
-      //   uploads.current[replyId].abort();
-      //   delete uploads.current[replyId];
-      // }
       await deletePetitionReply({
         variables: { replyId, keycode },
         update(cache) {
@@ -68,10 +65,40 @@ const _publicUpdateSimpleReply = gql`
     ) {
       id
       content
+      status
       updatedAt
     }
   }
 `;
+
+export function useUpdateSimpleReply() {
+  const [
+    updateSimpleReply,
+  ] = useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation();
+  return useCallback(
+    async function _UpdateSimpleReply({
+      replyId,
+      keycode,
+      content,
+    }: {
+      replyId: string;
+      keycode: string;
+      content: string;
+    }) {
+      await updateSimpleReply({
+        variables: {
+          keycode,
+          replyId,
+          reply: content,
+        },
+        update(cache, { data }) {
+          // TODO: update petition status COMPLETED -> PENDING
+        },
+      });
+    },
+    [updateSimpleReply]
+  );
+}
 
 const _publicCreateSimpleReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateSimpleReply(
@@ -104,7 +131,7 @@ export function useCreateSimpleReply() {
       keycode: string;
       content: string;
     }) {
-      await createSimpleReply({
+      const { data } = await createSimpleReply({
         variables: {
           keycode,
           fieldId,
@@ -118,6 +145,7 @@ export function useCreateSimpleReply() {
           // TODO: update petition status COMPLETED -> PENDING
         },
       });
+      return data?.publicCreateSimpleReply;
     },
     [createSimpleReply]
   );
@@ -235,19 +263,20 @@ function updateFieldReplies(
     cached: RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment["replies"]
   ) => RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment["replies"]
 ) {
-  updateFragment<
-    RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment
-  >(proxy, {
-    id: fieldId,
-    fragment: gql`
-      fragment RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionField on PublicPetitionField {
-        replies {
-          id
+  updateFragment<RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment>(
+    proxy,
+    {
+      id: fieldId,
+      fragment: gql`
+        fragment RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionField on PublicPetitionField {
+          replies {
+            id
+          }
         }
-      }
-    `,
-    data: (cached) => ({ ...cached, replies: updateFn(cached!.replies) }),
-  });
+      `,
+      data: (cached) => ({ ...cached, replies: updateFn(cached!.replies) }),
+    }
+  );
 }
 
 function updateReplyContent(
@@ -257,18 +286,19 @@ function updateReplyContent(
     cached: RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment["content"]
   ) => RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment["content"]
 ) {
-  updateFragment<
-    RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment
-  >(proxy, {
-    fragment: gql`
-      fragment RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReply on PublicPetitionFieldReply {
-        content
-      }
-    `,
-    id: replyId,
-    data: (cached) => ({
-      ...cached,
-      content: updateFn(cached!.content),
-    }),
-  });
+  updateFragment<RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment>(
+    proxy,
+    {
+      fragment: gql`
+        fragment RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReply on PublicPetitionFieldReply {
+          content
+        }
+      `,
+      id: replyId,
+      data: (cached) => ({
+        ...cached,
+        content: updateFn(cached!.content),
+      }),
+    }
+  );
 }

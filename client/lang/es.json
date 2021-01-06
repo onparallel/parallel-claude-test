@@ -635,6 +635,66 @@
     "context": "No options"
   },
   {
+    "term": "component.recipient-view-petition-field-card.add-another-reply",
+    "definition": "Añadir otra respuesta",
+    "context": "Add another reply"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.files-uploaded",
+    "definition": "{count, plural, =0 {No se han subido archivos todavía} =1 {1 archivo subido} other {# archivos subidos}}",
+    "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted",
+    "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviada} other {# respuestas enviadas}}",
+    "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.approved-file",
+    "definition": "Este archivo ha sido aprobado",
+    "context": "This file has been approved"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.approved-reply",
+    "definition": "Esta respuesta ha sido aprobada",
+    "context": "This reply has been approved"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.download-label",
+    "definition": "Descargar archivo",
+    "context": "Download file"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.rejected-file",
+    "definition": "Este archivo ha sido rechazado",
+    "context": "This file has been rejected"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.rejected-reply",
+    "definition": "Esta respuesta ha sido rechazada",
+    "context": "This reply has been rejected"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.remove-reply-label",
+    "definition": "Borrar respuesta",
+    "context": "Remove reply"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.reply-saved-on",
+    "definition": "Repuesta guardada el {date}",
+    "context": "Reply saved on {date}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.select-placeholder",
+    "definition": "Escoge una opción",
+    "context": "Select an option"
+  },
+  {
+    "term": "component.recipient-view-petition-field-reply.text-placeholder",
+    "definition": "Su respuesta",
+    "context": "Enter your answer"
+  },
+  {
     "term": "component.search-input.placeholder",
     "definition": "Buscar...",
     "context": "Search..."
@@ -1228,11 +1288,6 @@
     "term": "generic.forms.passwords-must-match",
     "definition": "Las contraseñas deben coincidir",
     "context": "Passwords must match"
-  },
-  {
-    "term": "generic.forms.required-field-error",
-    "definition": "Se requiere un valor",
-    "context": "A value is required"
   },
   {
     "term": "generic.forms.required-first-name-error",
@@ -3675,11 +3730,6 @@
     "context": "Who trust us"
   },
   {
-    "term": "recipient-view.approved-reply",
-    "definition": "Esta respuesta ha sido aprobada",
-    "context": "This reply has been approved"
-  },
-  {
     "term": "recipient-view.completed-petition.toast-description",
     "definition": "Hemos notificado a {name} para que proceda a su revisión.",
     "context": "{name} will be notified for its revision."
@@ -3753,11 +3803,6 @@
     "term": "recipient-view.field-comments.placeholder",
     "definition": "Escriba aquí sus dudas y preguntas",
     "context": "Ask here your questions and doubts"
-  },
-  {
-    "term": "recipient-view.files-uploaded",
-    "definition": "{count, plural, =0 {No se han subido archivos todavía} =1 {1 archivo subido} other {# archivos subidos}}",
-    "context": "{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
   },
   {
     "term": "recipient-view.first-time.claim-1",
@@ -3835,34 +3880,14 @@
     "context": "Questions?"
   },
   {
-    "term": "recipient-view.rejected-reply",
-    "definition": "Esta respuesta ha sido rechazada",
-    "context": "This reply has been rejected"
-  },
-  {
     "term": "recipient-view.remaining-attempts",
     "definition": "Tiene {attempts, plural, =1{un intento más} other{# intentos más}}",
     "context": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
   },
   {
-    "term": "recipient-view.remove-reply-label",
-    "definition": "Eliminar respuesta",
-    "context": "Remove reply"
-  },
-  {
-    "term": "recipient-view.replies-submitted",
-    "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviada} other {# respuestas enviadas}}",
-    "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
-  },
-  {
     "term": "recipient-view.security-link",
     "definition": "Seguridad",
     "context": "About security"
-  },
-  {
-    "term": "recipient-view.select-placeholder",
-    "definition": "Seleccione una opción",
-    "context": "Select an option"
   },
   {
     "term": "recipient-view.send-code",
@@ -3898,16 +3923,6 @@
     "term": "recipient-view.submit-unpublished-comments-text",
     "definition": "Tiene comentarios pendientes. Envíelos todos de una vez y notificaremos a {sender} en un solo email.",
     "context": "You have some pending comments. Submit them at once to notify {sender} in a single email."
-  },
-  {
-    "term": "recipient-view.text-placeholder",
-    "definition": "Su respuesta",
-    "context": "Enter your answer"
-  },
-  {
-    "term": "recipient-view.text-reply",
-    "definition": "Respuesta añadida el {date}",
-    "context": "Reply added on {date}"
   },
   {
     "term": "recipient-view.unpublished-comments",

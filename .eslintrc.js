@@ -38,6 +38,7 @@ module.exports = {
       {
         argsIgnorePattern: "^_",
         vars: "all",
+        varsIgnorePattern: "^_",
         args: "none",
         ignoreRestSiblings: false,
       },

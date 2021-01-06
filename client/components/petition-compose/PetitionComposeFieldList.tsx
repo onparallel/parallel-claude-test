@@ -26,14 +26,8 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import {
-  createRef,
-  memo,
-  RefObject,
-  useCallback,
-  useRef,
-  useState,
-} from "react";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { memo, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, pick } from "remeda";
 
@@ -103,9 +97,7 @@ export const PetitionComposeFieldList = Object.assign(
       [onUpdateFieldPositions]
     );
 
-    const fieldRefs = useRef<
-      Record<string, RefObject<PetitionComposeFieldRef>>
-    >({});
+    const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
 
     // Memoize field callbacks
     const fieldProps = useMemoFactory(
@@ -142,14 +134,14 @@ export const PetitionComposeFieldList = Object.assign(
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index > 0) {
             const prevId = fields[index - 1].id;
-            fieldRefs.current![prevId].current!.focusFromNext();
+            fieldRefs[prevId].current!.focusFromNext();
           }
         },
         onFocusNextField: () => {
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index < fields.length - 1) {
             const nextId = fields[index + 1].id;
-            fieldRefs.current![nextId].current!.focusFromPrevious();
+            fieldRefs[nextId].current!.focusFromPrevious();
           }
         },
         onAddField: () => {
@@ -201,10 +193,7 @@ export const PetitionComposeFieldList = Object.assign(
                   />
                 ) : null}
                 <PetitionComposeField
-                  ref={
-                    fieldRefs.current[fieldId] ??
-                    (fieldRefs.current[fieldId] = createRef())
-                  }
+                  ref={fieldRefs[fieldId]}
                   onMove={handleFieldMove}
                   field={field}
                   fieldRelativeIndex={fieldIndexValues[index]}

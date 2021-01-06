@@ -5,7 +5,7 @@ import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import {
   useReactSelectProps,
-  UserReactSelectProps,
+  UseReactSelectProps,
 } from "@parallel/utils/useReactSelectProps";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
@@ -37,7 +37,7 @@ export type ContactSelectSelection = ContactSelect_ContactFragment & {
 };
 
 export interface ContactSelectProps
-  extends UserReactSelectProps,
+  extends UseReactSelectProps,
     Omit<
       AsyncCreatableSelectProps<ContactSelectSelection, true>,
       "value" | "onChange"
@@ -191,7 +191,7 @@ export const ContactSelect = Object.assign(
 );
 
 function useContactSelectReactSelectProps(
-  props: UserReactSelectProps,
+  props: UseReactSelectProps,
   handleCreateContact: (email: string) => any
 ) {
   const reactSelectProps = useReactSelectProps<ContactSelectSelection>(props);

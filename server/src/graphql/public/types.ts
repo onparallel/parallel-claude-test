@@ -307,9 +307,7 @@ export const PublicUserOrContact = unionType({
   },
   resolveType: (o) => {
     if (["User", "Contact"].includes(o.__type)) {
-      return `Public${o.__type}` as core.AbstractResolveReturn<
-        "PublicUserOrContact"
-      >;
+      return `Public${o.__type}` as core.AbstractResolveReturn<"PublicUserOrContact">;
     }
     throw new Error("Missing __type on PublicUserOrContact");
   },

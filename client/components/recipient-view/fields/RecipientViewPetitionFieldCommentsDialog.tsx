@@ -52,7 +52,6 @@ import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import {
   ChangeEvent,
-  Fragment,
   KeyboardEvent,
   useCallback,
   useEffect,
@@ -654,14 +653,14 @@ function useUpdatePetitionFieldComment() {
       await updatePetitionFieldComment({
         variables,
         optimisticResponse: () => {
-          const comment = apollo.readFragment<
-            RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment
-          >({
-            fragment:
-              RecipientViewPetitionFieldCommentsDialog.fragments
-                .PublicPetitionFieldComment,
-            id: variables.petitionFieldCommentId,
-          });
+          const comment = apollo.readFragment<RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment>(
+            {
+              fragment:
+                RecipientViewPetitionFieldCommentsDialog.fragments
+                  .PublicPetitionFieldComment,
+              id: variables.petitionFieldCommentId,
+            }
+          );
           return {
             publicUpdatePetitionFieldComment: {
               ...comment!,
@@ -761,17 +760,18 @@ function updatePetitionFieldCommentCounts(
     cached: RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment
   ) => RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment
 ) {
-  return updateFragment<
-    RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment
-  >(proxy, {
-    fragment: gql`
-      fragment RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts on PublicPetitionField {
-        commentCount
-        unpublishedCommentCount
-        unreadCommentCount
-      }
-    `,
-    id: petitionFieldId,
-    data: (field) => updateFn(field!),
-  });
+  return updateFragment<RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment>(
+    proxy,
+    {
+      fragment: gql`
+        fragment RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts on PublicPetitionField {
+          commentCount
+          unpublishedCommentCount
+          unreadCommentCount
+        }
+      `,
+      id: petitionFieldId,
+      data: (field) => updateFn(field!),
+    }
+  );
 }

@@ -1,40 +1,40 @@
-import {
-  Box,
-  BoxProps,
-  Button,
-  Center,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  Input,
-  List,
-  ListItem,
-  Stack,
-  Textarea,
-} from "@chakra-ui/react";
+import { Center, Flex, Input, List, ListItem, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import {
-  RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
-  RecipientViewPetitionField_PublicPetitionFieldFragment,
-  useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
-} from "@parallel/graphql/__types";
+import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FormattedMessage, useIntl } from "react-intl";
-import { useCreateSimpleReply, useDeletePetitionReply } from "./mutations";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import {
+  ChangeEvent,
+  forwardRef,
+  KeyboardEvent,
+  useRef,
+  useState,
+} from "react";
+import { useIntl } from "react-intl";
+import { pick } from "remeda";
+import {
+  useCreateSimpleReply,
+  useDeletePetitionReply,
+  useUpdateSimpleReply,
+} from "./mutations";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
-import { RecipientViewPetitionFieldReplySavingIndicator } from "./RecipientViewPetitionFieldReplySavingIndicator";
+import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+
+type AnyInputElement = HTMLInputElement | HTMLTextAreaElement;
 
 export interface RecipientViewPetitionFieldTextProps
-  extends Omit<RecipientViewPetitionFieldCardProps, "children"> {
+  extends Omit<
+    RecipientViewPetitionFieldCardProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
   keycode: string;
   isDisabled: boolean;
 }
@@ -54,8 +54,126 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
   },
   ref
 ) {
-  const deletePetitionReply = useDeletePetitionReply();
+  const intl = useIntl();
+
+  const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
+  const [value, setValue] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const newReplyRef = useRef<AnyInputElement>(null);
+  const replyRefs = useMultipleRefs<AnyInputElement>();
+
+  const options = field.options as FieldOptions["TEXT"];
+
+  const updateSimpleReply = useUpdateSimpleReply();
+  const handleUpdate = useMemoFactory(
+    (replyId: string) => async (content: string) => {
+      await updateSimpleReply({ replyId, keycode, content });
+    },
+    [keycode, updateSimpleReply]
+  );
+  const deleteReply = useDeletePetitionReply();
+  const handleDelete = useMemoFactory(
+    (replyId: string) => async (focusPrev?: boolean) => {
+      await deleteReply({ fieldId: field.id, replyId, keycode });
+      if (focusPrev) {
+        const index = field.replies.findIndex((r) => r.id === replyId);
+        if (index > 0) {
+          const prevId = field.replies[index - 1].id;
+          replyRefs[prevId].current!.focus();
+        }
+      }
+      if (field.replies.length === 1) {
+        handleAddNewReply();
+      }
+    },
+    [keycode, field.id, field.replies, deleteReply]
+  );
+
   const createSimpleReply = useCreateSimpleReply();
+  const debouncedOnChange = useDebouncedCallback(
+    async (content: string) => {
+      if (!content) {
+        return;
+      }
+      setIsSaving(true);
+      try {
+        const reply = await createSimpleReply({
+          keycode,
+          fieldId: field.id,
+          content,
+        });
+        if (reply) {
+          const selection = pick(newReplyRef.current!, [
+            "selectionStart",
+            "selectionEnd",
+          ]);
+          setShowNewReply(false);
+          setValue("");
+          setTimeout(() => {
+            const newReplyElement = replyRefs[reply.id].current!;
+            if (newReplyElement) {
+              Object.assign(newReplyElement, selection);
+              newReplyElement.focus();
+            }
+          });
+        }
+      } catch {}
+      setIsSaving(false);
+    },
+    1000,
+    [keycode, field.id, createSimpleReply]
+  );
+
+  function handleAddNewReply() {
+    setShowNewReply(true);
+    setTimeout(() => newReplyRef.current!.focus());
+  }
+
+  const inputProps = {
+    id: `reply-${field.id}-new`,
+    ref: newReplyRef as any,
+    paddingRight: 10,
+    isDisabled: isDisabled,
+    value,
+    onKeyDown: async (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "Enter": {
+          if (field.multiple && event.metaKey) {
+            await debouncedOnChange.immediate(value);
+            handleAddNewReply();
+          }
+          break;
+        }
+        case "Backspace": {
+          if (value === "") {
+            if (field.replies.length > 0) {
+              event.preventDefault();
+              setShowNewReply(false);
+              const lastReplyId = field.replies[field.replies.length - 1].id;
+              replyRefs[lastReplyId].current!.focus();
+            }
+          }
+          break;
+        }
+      }
+    },
+    onBlur: () => {
+      if (!value && field.replies.length > 0) {
+        setShowNewReply(false);
+      }
+    },
+    onChange: (event: ChangeEvent<AnyInputElement>) => {
+      setValue(event.target.value);
+      debouncedOnChange(event.target.value);
+    },
+    placeholder:
+      options.placeholder ??
+      intl.formatMessage({
+        id: "component.recipient-view-petition-field-reply.text-placeholder",
+        defaultMessage: "Enter your answer",
+      }),
+  };
   return (
     <RecipientViewPetitionFieldCard
       ref={ref}
@@ -64,80 +182,110 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
+      showAddNewReply={!isDisabled && !showNewReply && field.multiple}
+      onAddNewReply={handleAddNewReply}
       {...props}
     >
       {field.replies.length ? (
-        <List as={Stack} marginTop={1}>
+        <List as={Stack} marginTop={2}>
           {field.replies.map((reply) => (
             <ListItem key={reply.id}>
               <RecipientViewPetitionFieldReplyText
-                keycode={keycode}
+                ref={replyRefs[reply.id]}
+                field={field}
                 reply={reply}
-                options={field.options as FieldOptions["TEXT"]}
-                onRemove={() =>
-                  deletePetitionReply({
-                    keycode,
-                    fieldId: field.id,
-                    replyId: reply.id,
-                  })
-                }
+                isDisabled={isDisabled}
+                onUpdate={handleUpdate(reply.id)}
+                onDelete={handleDelete(reply.id)}
+                onAddNewReply={handleAddNewReply}
               />
             </ListItem>
           ))}
         </List>
       ) : null}
-      <Box marginTop={2}>
-        <TextReplyForm
-          canReply={!isDisabled}
-          field={field}
-          onCreateReply={(content) =>
-            createSimpleReply({
-              keycode,
-              fieldId: field.id,
-              content,
-            })
-          }
-        />
-      </Box>
+      {showNewReply ? (
+        <Flex flex="1" position="relative" marginTop={2}>
+          {field.options.multiline ? (
+            <GrowingTextarea {...inputProps} />
+          ) : (
+            <Input {...inputProps} />
+          )}
+          <Center boxSize={10} position="absolute" right={0} bottom={0}>
+            <RecipientViewPetitionFieldReplyStatusIndicator
+              isSaving={isSaving}
+            />
+          </Center>
+        </Flex>
+      ) : null}
     </RecipientViewPetitionFieldCard>
   );
 });
 
 interface RecipientViewPetitionFieldReplyTextProps {
-  keycode: string;
-  options: FieldOptions["TEXT"];
+  field: RecipientViewPetitionFieldTextProps["field"];
   reply: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-  onRemove: () => void;
+  isDisabled: boolean;
+  onUpdate: (content: string) => Promise<void>;
+  onDelete: (focusPrev?: boolean) => void;
+  onAddNewReply: () => void;
 }
 
-export function RecipientViewPetitionFieldReplyText({
-  keycode,
-  options,
-  reply,
-  onRemove,
-}: RecipientViewPetitionFieldReplyTextProps) {
+export const RecipientViewPetitionFieldReplyText = forwardRef<
+  AnyInputElement,
+  RecipientViewPetitionFieldReplyTextProps
+>(function RecipientViewPetitionFieldReplyText(
+  { field, reply, isDisabled, onUpdate, onDelete, onAddNewReply },
+  ref
+) {
   const intl = useIntl();
-  const [
-    updateReply,
-    { loading: isUpdating },
-  ] = useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation();
-  const [value, setValue] = useState(reply.content.text);
+  const [value, setValue] = useState(reply.content.text ?? "");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const options = field.options as FieldOptions["TEXT"];
   const debouncedUpdateReply = useDebouncedCallback(
-    async (value: string) =>
-      await updateReply({
-        variables: { keycode, replyId: reply.id, reply: value },
-      }),
+    async (value: string) => {
+      setIsSaving(true);
+      try {
+        await onUpdate(value.trim());
+      } catch {}
+      setIsSaving(false);
+    },
     1000,
-    [updateReply, keycode, reply.id]
+    [onUpdate]
   );
   const props = {
+    id: `reply-${field.id}-${reply.id}`,
+    ref: ref as any,
     paddingRight: 10,
     value,
-    onChange: (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    isDisabled: isDisabled || reply.status === "APPROVED",
+    isInvalid: reply.status === "REJECTED",
+    onKeyDown: async (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "Enter": {
+          if (field.multiple && event.metaKey) {
+            await debouncedUpdateReply.immediate(value);
+            onAddNewReply();
+          }
+          break;
+        }
+        case "Backspace": {
+          if (value === "") {
+            event.preventDefault();
+            debouncedUpdateReply.clear();
+            onDelete(true);
+          }
+          break;
+        }
+      }
+    },
+    onBlur: async () => {
+      await debouncedUpdateReply.immediateIfPending(value);
+    },
+    onChange: (event: ChangeEvent<AnyInputElement>) => {
       setValue(event.target.value);
       debouncedUpdateReply(event.target.value);
     },
-    onBlur: () => debouncedUpdateReply.immediateIfPending(value),
     placeholder:
       options.placeholder ??
       intl.formatMessage({
@@ -154,14 +302,15 @@ export function RecipientViewPetitionFieldReplyText({
           <Input {...props} />
         )}
         <Center boxSize={10} position="absolute" right={0} bottom={0}>
-          <RecipientViewPetitionFieldReplySavingIndicator
-            isSaving={isUpdating}
+          <RecipientViewPetitionFieldReplyStatusIndicator
+            isSaving={isSaving}
             reply={reply}
           />
         </Center>
       </Flex>
       <IconButtonWithTooltip
-        onClick={onRemove}
+        isDisabled={reply.status === "APPROVED"}
+        onClick={() => onDelete()}
         variant="ghost"
         icon={<DeleteIcon />}
         size="md"
@@ -174,88 +323,4 @@ export function RecipientViewPetitionFieldReplyText({
       />
     </Stack>
   );
-}
-
-interface TextReplyFormProps extends BoxProps {
-  field: RecipientViewPetitionField_PublicPetitionFieldFragment;
-  canReply: boolean;
-  onCreateReply: (content: string) => void;
-}
-
-function TextReplyForm({
-  field,
-  canReply,
-  onCreateReply,
-  ...props
-}: TextReplyFormProps) {
-  const intl = useIntl();
-  const { placeholder, multiline } = field.options as FieldOptions["TEXT"];
-  const { handleSubmit, register, reset, errors } = useForm<{
-    content: string;
-  }>({ mode: "onSubmit" });
-  const disabled = !field.multiple && field.replies.length > 0;
-  return (
-    <Flex
-      as="form"
-      flexDirection={{ base: "column", sm: "row" }}
-      onSubmit={handleSubmit(({ content }) => {
-        onCreateReply(content);
-        setTimeout(() => reset({ content: "" }));
-      })}
-      {...props}
-    >
-      <FormControl flex="1" isInvalid={!!errors.content} isDisabled={disabled}>
-        {multiline ? (
-          <Textarea
-            isDisabled={!canReply}
-            name="content"
-            ref={register({
-              required: true,
-              validate: (val) => val.trim().length > 0,
-            })}
-            placeholder={
-              placeholder ??
-              intl.formatMessage({
-                id: "recipient-view.text-placeholder",
-                defaultMessage: "Enter your answer",
-              })
-            }
-          />
-        ) : (
-          <Input
-            name="content"
-            isDisabled={!canReply}
-            ref={register({
-              required: true,
-              validate: (val) => val.trim().length > 0,
-            })}
-            placeholder={
-              placeholder ??
-              intl.formatMessage({
-                id: "recipient-view.text-placeholder",
-                defaultMessage: "Enter your answer",
-              })
-            }
-          />
-        )}
-        {errors.content && (
-          <FormErrorMessage>
-            <FormattedMessage
-              id="generic.forms.required-field-error"
-              defaultMessage="A value is required"
-            />
-          </FormErrorMessage>
-        )}
-      </FormControl>
-      <Button
-        type="submit"
-        variant="outline"
-        isDisabled={disabled || !canReply}
-        marginTop={{ base: 2, sm: 0 }}
-        marginLeft={{ base: 0, sm: 4 }}
-      >
-        <FormattedMessage id="generic.save" defaultMessage="Save" />
-      </Button>
-    </Flex>
-  );
-}
+});
