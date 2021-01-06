@@ -25,7 +25,7 @@ describe("GraphQL/Public", () => {
   let access: PetitionAccess;
   let fields: PetitionField[];
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     testClient = await initServer();
     knex = testClient.container.get<Knex>(KNEX);
     contactRepository = testClient.container.get<ContactRepository>(
@@ -52,12 +52,10 @@ describe("GraphQL/Public", () => {
     [access] = await mocks.createPetitionAccess(petition.id, user.id, [
       contact.id,
     ]);
-    done();
   });
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await testClient.stop();
-    done();
   });
 
   it("allows access on the first time and gives cookie required for subsequent times", async () => {

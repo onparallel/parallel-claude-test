@@ -26,7 +26,7 @@ describe("GraphQL/Petition Fields", () => {
   let privatePetition: Petition;
   let privateField: PetitionField;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
@@ -53,18 +53,15 @@ describe("GraphQL/Petition Fields", () => {
       privatePetition.id,
       1
     );
-
-    done();
   });
 
-  afterAll((done) => {
-    testClient.stop();
-    done();
+  afterAll(async () => {
+    await testClient.stop();
   });
 
   describe("createPetitionField", () => {
     let userPetition: Petition;
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
       [userPetition] = await mocks.createRandomPetitions(
         organization.id,
@@ -74,7 +71,6 @@ describe("GraphQL/Petition Fields", () => {
           status: "DRAFT",
         })
       );
-      done();
     });
 
     it("creates an empty Text field with default options", async () => {
@@ -430,7 +426,7 @@ describe("GraphQL/Petition Fields", () => {
   describe("clonePetitionField", () => {
     let userPetition: Petition;
     let fields: PetitionField[];
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
       [userPetition] = await mocks.createRandomPetitions(
         organization.id,
@@ -438,7 +434,6 @@ describe("GraphQL/Petition Fields", () => {
         1
       );
       fields = await mocks.createRandomPetitionFields(userPetition.id, 5);
-      done();
     });
 
     it("clones a field and sets the new one after it", async () => {
@@ -527,7 +522,7 @@ describe("GraphQL/Petition Fields", () => {
   describe("deletePetitionField", () => {
     let userPetition: Petition;
     let fields: PetitionField[];
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
       [userPetition] = await mocks.createRandomPetitions(
         organization.id,
@@ -556,8 +551,6 @@ describe("GraphQL/Petition Fields", () => {
       );
 
       await mocks.createRandomTextReply(fields[1].id, contactAccess.id);
-
-      done();
     });
 
     it("deletes a field and updates the position of the remaining fields", async () => {
@@ -800,7 +793,7 @@ describe("GraphQL/Petition Fields", () => {
     let fields: PetitionField[];
     let fieldGIDs: string[];
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
       [userPetition] = await mocks.createRandomPetitions(
         organization.id,
@@ -817,7 +810,6 @@ describe("GraphQL/Petition Fields", () => {
       );
 
       fieldGIDs = fields.map((f) => toGlobalId("PetitionField", f.id));
-      done();
     });
 
     it("updates the position of the fields", async () => {
@@ -930,7 +922,7 @@ describe("GraphQL/Petition Fields", () => {
     let fields: PetitionField[];
     let fieldGIDs: string[];
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
       [userPetition] = await mocks.createRandomPetitions(
         organization.id,
@@ -952,7 +944,6 @@ describe("GraphQL/Petition Fields", () => {
       );
 
       fieldGIDs = fields.map((f) => toGlobalId("PetitionField", f.id));
-      done();
     });
 
     it("updates the petition field with given values", async () => {
@@ -1386,7 +1377,7 @@ describe("GraphQL/Petition Fields", () => {
     let fixedHeadingField: PetitionField;
     let fieldWithReply: PetitionField;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       // reset the petition before each test to be able to reuse it
       [userPetition] = await mocks.createRandomPetitions(
         organization.id,
@@ -1432,8 +1423,6 @@ describe("GraphQL/Petition Fields", () => {
       );
 
       await mocks.createRandomTextReply(fieldWithReply.id, access.id);
-
-      done();
     });
 
     it("changes field type to TEXT and sets its default options", async () => {
@@ -1787,7 +1776,7 @@ describe("GraphQL/Petition Fields", () => {
     let fields: PetitionField[];
     let field2Reply: PetitionFieldReply;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       [petition] = await mocks.createRandomPetitions(
         organization.id,
         user.id,
@@ -1814,7 +1803,6 @@ describe("GraphQL/Petition Fields", () => {
         1,
         () => ({ status: "PENDING" })
       );
-      done();
     });
 
     it("validates a field without a reply", async () => {
@@ -2195,7 +2183,7 @@ describe("GraphQL/Petition Fields", () => {
     let fields: PetitionField[];
     let field2Replies: PetitionFieldReply[];
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       [petition] = await mocks.createRandomPetitions(
         organization.id,
         user.id,
@@ -2222,7 +2210,6 @@ describe("GraphQL/Petition Fields", () => {
         2,
         () => ({ status: "PENDING" })
       );
-      done();
     });
 
     it("updates status of a petition field reply", async () => {

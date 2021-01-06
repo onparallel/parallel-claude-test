@@ -14,7 +14,7 @@ describe("GraphQL/Users", () => {
   let sessionUser: User;
   let sessionUserGID: string;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
@@ -33,12 +33,10 @@ describe("GraphQL/Users", () => {
     }));
 
     sessionUserGID = toGlobalId("User", sessionUser.id);
-    done();
   });
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await testClient.stop();
-    done();
   });
 
   it("fetches session user", async () => {
@@ -101,7 +99,7 @@ describe("GraphQL/Users", () => {
     let otherOrg: Organization;
     let otherOrgUser: User;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       activeUsers = await mocks.createRandomUsers(organization.id, 3, () => ({
         status: "ACTIVE",
       }));
@@ -130,8 +128,6 @@ describe("GraphQL/Users", () => {
       [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1, () => ({
         status: "ACTIVE",
       }));
-
-      done();
     });
 
     it("updates user status to inactive and transfers petition to session user", async () => {

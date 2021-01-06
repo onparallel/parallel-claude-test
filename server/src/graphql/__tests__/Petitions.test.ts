@@ -35,7 +35,7 @@ describe("GraphQL/Petitions", () => {
 
   let publicTemplate: Petition;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     const mocks = new Mocks(knex);
@@ -100,13 +100,10 @@ describe("GraphQL/Petitions", () => {
       otherUser.id,
       1
     );
-
-    done();
   });
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await testClient.stop();
-    done();
   });
 
   describe("Queries", () => {

@@ -19,7 +19,7 @@ describe("GraphQL/User Permissions", () => {
   let userPetition: Petition;
   let otherPetition: Petition;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
@@ -40,10 +40,9 @@ describe("GraphQL/User Permissions", () => {
 
     orgUsers = await mocks.createRandomUsers(organization.id, 3);
     [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1);
-    done();
   });
 
-  beforeEach(async (done) => {
+  beforeEach(async () => {
     [userPetition] = await mocks.createRandomPetitions(
       organization.id,
       loggedUser.id,
@@ -54,19 +53,15 @@ describe("GraphQL/User Permissions", () => {
       orgUsers[1].id,
       1
     );
-
-    done();
   });
 
-  afterEach(async (done) => {
+  afterEach(async () => {
     await mocks.clearSharedPetitions();
     jest.resetAllMocks();
-    done();
   });
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await testClient.stop();
-    done();
   });
 
   describe("transferPetitionOwnership", () => {
@@ -451,19 +446,17 @@ describe("GraphQL/User Permissions", () => {
   });
 
   describe("editPetitionUserPermission", () => {
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       await mocks.knex.raw(/* sql */ `
       INSERT INTO petition_user(petition_id, user_id, permission_type)
       VALUES 
         (${userPetition.id}, ${orgUsers[1].id}, 'READ'),
         (${userPetition.id}, ${orgUsers[2].id}, 'READ')
     `);
-      done();
     });
 
-    afterEach(async (done) => {
+    afterEach(async () => {
       await mocks.clearSharedPetitions();
-      done();
     });
 
     it("changes permission type for given set of petitions and users", async () => {
@@ -696,19 +689,17 @@ describe("GraphQL/User Permissions", () => {
   });
 
   describe("removePetitionUserPermission", () => {
-    beforeEach(async (done) => {
+    beforeEach(async () => {
       await mocks.knex.raw(/* sql */ `
       INSERT INTO petition_user(petition_id, user_id, permission_type)
       VALUES 
         (${userPetition.id}, ${orgUsers[1].id}, 'READ'),
         (${userPetition.id}, ${orgUsers[2].id}, 'READ')
     `);
-      done();
     });
 
-    afterEach(async (done) => {
+    afterEach(async () => {
       await mocks.clearSharedPetitions();
-      done();
     });
 
     it("removes permissions for given set of petitions and users", async () => {

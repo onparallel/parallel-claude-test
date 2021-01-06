@@ -15,7 +15,7 @@ describe("GraphQL/Contacts", () => {
   let userContacts: Contact[];
   let mocks: Mocks;
 
-  beforeAll(async (done) => {
+  beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
@@ -44,12 +44,10 @@ describe("GraphQL/Contacts", () => {
             : faker.internet.email().toLowerCase(),
       })
     );
-    done();
   });
 
-  afterAll(async (done) => {
+  afterAll(async () => {
     await testClient.stop();
-    done();
   });
 
   it("fetches all user contacts", async () => {
