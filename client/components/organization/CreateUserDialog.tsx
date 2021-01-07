@@ -100,7 +100,7 @@ export function CreateUserDialog({
       initialFocusRef={emailRef}
       header={
         <FormattedMessage
-          id="organization.create-user"
+          id="organization-users.create-user"
           defaultMessage="Create user"
         />
       }
@@ -142,21 +142,23 @@ export function CreateUserDialog({
                 </InputRightElement>
               ) : null}
             </InputGroup>
-            {errors.email?.type === "emailIsAvailable" ? (
-              <Text color="red.500" fontSize="sm" marginTop={2}>
-                <FormattedMessage
-                  id="generic.forms.email-already-registered-error"
-                  defaultMessage="This email is already registered"
-                />
-              </Text>
-            ) : (
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.invalid-email-error"
-                  defaultMessage="Please, enter a valid email"
-                />
-              </FormErrorMessage>
-            )}
+            {errors.email?.message !== "DEBOUNCED" ? (
+              errors.email?.type === "emailIsAvailable" ? (
+                <Text color="red.500" fontSize="sm" marginTop={2}>
+                  <FormattedMessage
+                    id="generic.forms.email-already-registered-error"
+                    defaultMessage="This email is already registered"
+                  />
+                </Text>
+              ) : (
+                <FormErrorMessage>
+                  <FormattedMessage
+                    id="generic.forms.invalid-email-error"
+                    defaultMessage="Please, enter a valid email"
+                  />
+                </FormErrorMessage>
+              )
+            ) : null}
           </FormControl>
           <FormControl
             id="create-user-firstname"
@@ -218,7 +220,7 @@ export function CreateUserDialog({
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
           <FormattedMessage
-            id="organization.create-user"
+            id="organization-users.create-user"
             defaultMessage="Create user"
           />
         </Button>

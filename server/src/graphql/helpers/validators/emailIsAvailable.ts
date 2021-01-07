@@ -18,7 +18,7 @@ export function emailIsAvailable<
       throw new ArgValidationError(
         info,
         argName,
-        `Email is not available for register.`
+        "Email is already registered."
       );
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

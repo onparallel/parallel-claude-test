@@ -62,6 +62,4 @@ export class MockAwsService implements IAws {
   async createCognitoUser() {
     return "";
   }
-  async enableCognitoUser() {}
-  async disableCognitoUser() {}
 }

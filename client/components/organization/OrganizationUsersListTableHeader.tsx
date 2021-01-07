@@ -1,4 +1,3 @@
-import { useApolloClient } from "@apollo/client";
 import {
   Box,
   Button,
@@ -19,10 +18,9 @@ import {
 import {
   AppLayout_UserFragment,
   OrganizationUsers_UserFragment,
-  OrganizationUsers_UserFragmentDoc,
   UserStatus,
 } from "@parallel/graphql/__types";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useErrorDialog } from "../common/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -32,7 +30,7 @@ import { Spacer } from "../common/Spacer";
 export type OrganizationUsersListTableHeaderProps = {
   me: AppLayout_UserFragment;
   search: string | null;
-  selected: string[];
+  selectedUsers: OrganizationUsers_UserFragment[];
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onCreateUser: () => void;
@@ -41,43 +39,22 @@ export type OrganizationUsersListTableHeaderProps = {
 
 export function OrganizationUsersListTableHeader({
   me,
-  search: _search,
-  selected,
+  search,
+  selectedUsers,
   onSearchChange,
   onReload,
   onCreateUser,
   onUpdateUserStatus,
 }: OrganizationUsersListTableHeaderProps) {
   const intl = useIntl();
-  const [search, setSearch] = useState(_search ?? "");
 
-  const handleSearchChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
-      setSearch(value);
-      onSearchChange(value);
-    },
-    [onSearchChange]
-  );
+  const showActions = selectedUsers.length > 0;
+  const userIds = useMemo(() => {
+    return selectedUsers.map((u) => u.id);
+  }, [selectedUsers]);
 
-  const apolloCache = useApolloClient();
-  const selectedUsers = useMemo<OrganizationUsers_UserFragment[]>(
-    () =>
-      selected.map((userId) =>
-        apolloCache.readFragment({
-          fragment: OrganizationUsers_UserFragmentDoc,
-          id: userId,
-        })
-      ) as any[],
-    [selected]
-  );
-
-  const showActions = selected.length > 0;
   const showErrorDialog = useErrorDialog();
-  const handleUpdateUserStatus = async (
-    userIds: string[],
-    newStatus: UserStatus
-  ) => {
+  const handleUpdateSelectedUsersStatus = async (newStatus: UserStatus) => {
     if (userIds.includes(me.id)) {
       try {
         await showErrorDialog({
@@ -96,7 +73,10 @@ export function OrganizationUsersListTableHeader({
   return (
     <Stack direction="row" padding={2}>
       <Box flex="0 1 400px">
-        <SearchInput value={search ?? ""} onChange={handleSearchChange} />
+        <SearchInput
+          value={search ?? ""}
+          onChange={(e) => onSearchChange(e.target.value)}
+        />
       </Box>
       <IconButtonWithTooltip
         onClick={onReload}
@@ -125,24 +105,24 @@ export function OrganizationUsersListTableHeader({
             <MenuList minWidth="160px">
               <MenuItem
                 isDisabled={selectedUsers.every((u) => u.status === "ACTIVE")}
-                onClick={() => handleUpdateUserStatus(selected, "ACTIVE")}
+                onClick={() => handleUpdateSelectedUsersStatus("ACTIVE")}
               >
                 <UserCheckIcon marginRight={2} />
                 <FormattedMessage
                   id="organization-users.activate"
                   defaultMessage="Activate {count, plural, =1{user} other {users}}"
-                  values={{ count: selected.length }}
+                  values={{ count: selectedUsers.length }}
                 />
               </MenuItem>
               <MenuItem
                 isDisabled={selectedUsers.every((u) => u.status === "INACTIVE")}
-                onClick={() => handleUpdateUserStatus(selected, "INACTIVE")}
+                onClick={() => handleUpdateSelectedUsersStatus("INACTIVE")}
               >
                 <UserXIcon marginRight={2} />
                 <FormattedMessage
                   id="organization-users.deactivate"
                   defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
-                  values={{ count: selected.length }}
+                  values={{ count: selectedUsers.length }}
                 />
               </MenuItem>
             </MenuList>
@@ -154,10 +134,10 @@ export function OrganizationUsersListTableHeader({
         leftIcon={<UserPlusIcon fontSize="18px" />}
         onClick={onCreateUser}
       >
-        {intl.formatMessage({
-          id: "organization.create-user",
-          defaultMessage: "Create user",
-        })}
+        <FormattedMessage
+          id="organization-users.create-user"
+          defaultMessage="Create user"
+        />
       </Button>
     </Stack>
   );

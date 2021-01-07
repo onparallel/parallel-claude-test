@@ -1655,6 +1655,11 @@
     "context": "Activate {count, plural, =1{user} other {users}}"
   },
   {
+    "term": "organization-users.create-user",
+    "definition": "Crear usuario",
+    "context": "Create user"
+  },
+  {
     "term": "organization-users.deactivate",
     "definition": "Desactivar {count, plural, =1{usuario} other {usuarios}}",
     "context": "Deactivate {count, plural, =1{user} other {users}}"
@@ -1723,11 +1728,6 @@
     "term": "organization.confirm-deactivate.user-select.input-placeholder",
     "definition": "Selecciona un usuario en tu organización",
     "context": "Select a user from your organization"
-  },
-  {
-    "term": "organization.create-user",
-    "definition": "Crear usuario",
-    "context": "Create user"
   },
   {
     "term": "organization.role.admin",
@@ -4131,8 +4131,8 @@
   },
   {
     "term": "timeline.ownership-transferred-description",
-    "definition": "{same, select, true {Transferiste} other {{user} transfirió}} la propiedad de esta petición {hasPreviousOwner, select, true {de {previousOwner} } other {}}a {owner} {timeAgo}",
-    "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition {hasPreviousOwner, select, true {from {previousOwner} } other {}}to {owner} {timeAgo}"
+    "definition": "{same, select, true {Transferiste} other {{user} transfirió}} la propiedad de esta petición {previousOwner, select, null {} other {de {previousOwner} }}a {owner} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
   },
   {
     "term": "timeline.petition-closed-description",

@@ -4,6 +4,7 @@ import morgan from "morgan";
 import { ApiContext } from "../context";
 import { LOGGER, Logger } from "../services/logger";
 import { downloads } from "./downloads";
+import { authorize } from "./helpers/authorize";
 import { webhooks } from "./webhooks";
 
 export function api(container: Container) {
@@ -32,6 +33,7 @@ export function api(container: Container) {
     .use(
       "/auth",
       Router()
+        .use(authorize())
         .post("/login", (req, res, next) =>
           req.context.auth.login(req, res, next)
         )

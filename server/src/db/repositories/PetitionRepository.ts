@@ -376,22 +376,6 @@ export class PetitionRepository extends BaseRepository {
     "email_log_id"
   );
 
-  async updatePetitionAccessByPetitionId(
-    petitionIds: number[],
-    data: Partial<CreatePetitionAccess>,
-    updatedBy: User,
-    t?: Transaction
-  ) {
-    return await this.from("petition_access", t)
-      .whereIn("petition_id", petitionIds)
-      .update({
-        ...data,
-        updated_at: this.now(),
-        updated_by: `User:${updatedBy.id}`,
-      })
-      .returning("*");
-  }
-
   async createMessages(
     petitionId: number,
     scheduledAt: Date | null,
@@ -2301,6 +2285,38 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
+  async removePetitionUserPermissionsById(
+    petitionUserPermissionIds: number[],
+    deletedBy: User,
+    t?: Transaction
+  ) {
+    return this.withTransaction(async (t) => {
+      const removedPermissions = await this.from("petition_user", t)
+        .whereIn("id", petitionUserPermissionIds)
+        .update(
+          {
+            deleted_at: this.now(),
+            deleted_by: `User:${deletedBy.id}`,
+          },
+          "*"
+        );
+
+      await this.createEvent(
+        removedPermissions.map((p) => ({
+          petitionId: p.petition_id,
+          type: "USER_PERMISSION_REMOVED",
+          data: {
+            user_id: deletedBy.id,
+            permission_user_id: p.user_id,
+          },
+        })),
+        t
+      );
+
+      return removedPermissions;
+    }, t);
+  }
+
   /**
    * sets new OWNER of petitions to @param toUserId.
    * original owner gets a WRITE permission.
@@ -2308,12 +2324,13 @@ export class PetitionRepository extends BaseRepository {
   async transferOwnership(
     petitionIds: number[],
     toUserId: number,
+    keepOriginalPermissions: boolean,
     updatedBy: User,
     t?: Transaction
   ) {
     return await this.withTransaction(async (t) => {
       // change permission of original owner to WRITE
-      await this.from("petition_user", t)
+      const previousOwnerPermissions = await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
         .where({
           deleted_at: null,
@@ -2323,7 +2340,8 @@ export class PetitionRepository extends BaseRepository {
           permission_type: "WRITE",
           updated_at: this.now(),
           updated_by: `User:${updatedBy.id}`,
-        });
+        })
+        .returning("*");
 
       for (const petitionId of petitionIds) {
         this.loadUserPermissions.dataloader.clear(petitionId);
@@ -2358,6 +2376,27 @@ export class PetitionRepository extends BaseRepository {
           this.now(),
         ]
       );
+
+      await this.createEvent(
+        previousOwnerPermissions.map((p) => ({
+          petitionId: p.petition_id,
+          type: "OWNERSHIP_TRANSFERRED",
+          data: {
+            user_id: updatedBy.id,
+            previous_owner_id: p.user_id,
+            owner_id: toUserId,
+          },
+        })),
+        t
+      );
+
+      if (!keepOriginalPermissions) {
+        await this.removePetitionUserPermissionsById(
+          previousOwnerPermissions.map((p) => p.id),
+          updatedBy,
+          t
+        );
+      }
 
       return await this.from("petition", t)
         .whereNull("deleted_at")

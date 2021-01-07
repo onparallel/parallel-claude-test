@@ -495,6 +495,9 @@ describe("repositories/PetitionRepository", () => {
       await deleteAllData(knex);
       [org] = await mocks.createRandomOrganizations(1);
       users = await mocks.createRandomUsers(org.id, 5);
+    });
+
+    beforeEach(async () => {
       user0Petitions = await mocks.createRandomPetitions(
         org.id,
         users[0].id,
@@ -831,7 +834,13 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user without access to the petition", async () => {
         const petitionId = user0Petitions[1].id;
 
-        await petitions.transferOwnership([petitionId], users[2].id, users[0]);
+        await petitions.transferOwnership(
+          [petitionId],
+          users[2].id,
+          true,
+          users[0]
+        );
+
         const newPermissions = await petitions.loadUserPermissions(petitionId);
         expect(newPermissions).toMatchObject([
           {
@@ -847,6 +856,26 @@ describe("repositories/PetitionRepository", () => {
         ]);
       });
 
+      it("should transfer ownership to a user without access to the petition and remove original permissions", async () => {
+        const petitionId = user0Petitions[1].id;
+
+        await petitions.transferOwnership(
+          [petitionId],
+          users[2].id,
+          false,
+          users[0]
+        );
+
+        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        expect(newPermissions).toMatchObject([
+          {
+            petition_id: petitionId,
+            permission_type: "OWNER",
+            user_id: users[2].id,
+          },
+        ]);
+      });
+
       it("should transfer ownership to a user with READ or WRITE access", async () => {
         const petitionId = user0Petitions[2].id;
         const userId = users[2].id;
@@ -857,7 +886,7 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        await petitions.transferOwnership([petitionId], userId, users[0]);
+        await petitions.transferOwnership([petitionId], userId, true, users[0]);
         const newPermissions = await petitions.loadUserPermissions(petitionId);
         expect(newPermissions).toMatchObject([
           {
@@ -869,6 +898,33 @@ describe("repositories/PetitionRepository", () => {
             petition_id: petitionId,
             permission_type: "WRITE",
             user_id: users[0].id,
+          },
+        ]);
+      });
+
+      it("should transfer ownership to a user with READ or WRITE access and remove original permissions", async () => {
+        const petitionId = user0Petitions[2].id;
+        const userId = users[2].id;
+        await petitions.addPetitionUserPermissions(
+          [petitionId],
+          [userId],
+          "READ",
+          users[0]
+        );
+
+        await petitions.transferOwnership(
+          [petitionId],
+          userId,
+          false,
+          users[0]
+        );
+
+        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        expect(newPermissions).toMatchObject([
+          {
+            petition_id: petitionId,
+            permission_type: "OWNER",
+            user_id: userId,
           },
         ]);
       });

@@ -82,10 +82,15 @@ function OrganizationUsers() {
     })
   );
 
-  const [selected, setSelected] = useState<string[]>([]);
-  const [search, setSearch] = useState(state.search);
-
   const userList = me.organization.users;
+
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const selectedUsers = selected.map(
+    (userId) => userList.items.find((u) => u.id === userId)!
+  );
+
+  const [search, setSearch] = useState(state.search);
 
   const sections = useOrganizationSections();
 
@@ -224,7 +229,7 @@ function OrganizationUsers() {
             <OrganizationUsersListTableHeader
               me={me}
               search={search}
-              selected={selected}
+              selectedUsers={selectedUsers}
               onCreateUser={handleCreateUser}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}

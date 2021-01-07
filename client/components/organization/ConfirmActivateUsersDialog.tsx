@@ -20,16 +20,14 @@ function ConfirmActivateUsersDialog({
         />
       }
       body={
-        <>
-          <FormattedMessage
-            id="organization.confirm-activate-user-dialog.body"
-            defaultMessage="Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
-            values={{
-              b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              count,
-            }}
-          />
-        </>
+        <FormattedMessage
+          id="organization.confirm-activate-user-dialog.body"
+          defaultMessage="Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
+          values={{
+            b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+            count,
+          }}
+        />
       }
       confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve()}>

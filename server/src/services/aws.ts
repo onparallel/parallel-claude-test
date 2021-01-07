@@ -20,8 +20,6 @@ export interface IAws {
     password?: string,
     sendEmail?: boolean
   ): Promise<string | undefined>;
-  enableCognitoUser(email: string): Promise<void>;
-  disableCognitoUser(email: string): Promise<void>;
 }
 
 export const AWS_SERVICE = Symbol.for("AWS_SERVICE");
@@ -143,23 +141,5 @@ export class Aws implements IAws {
       })
       .promise();
     return res.User!.Username;
-  }
-
-  async disableCognitoUser(email: string) {
-    await this.cognitoIdP
-      .adminDisableUser({
-        UserPoolId: this.config.cognito.defaultPoolId,
-        Username: email,
-      })
-      .promise();
-  }
-
-  async enableCognitoUser(email: string) {
-    await this.cognitoIdP
-      .adminEnableUser({
-        UserPoolId: this.config.cognito.defaultPoolId,
-        Username: email,
-      })
-      .promise();
   }
 }

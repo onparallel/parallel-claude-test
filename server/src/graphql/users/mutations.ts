@@ -157,7 +157,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
   },
 });
 
-export const UpdateUserStatus = mutationField("updateUserStatus", {
+export const updateUserStatus = mutationField("updateUserStatus", {
   description:
     "Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org.",
   type: list("User"),
@@ -192,111 +192,53 @@ export const UpdateUserStatus = mutationField("updateUserStatus", {
     ctx,
     info
   ) => {
-    if (status === "INACTIVE") {
-      const transferToUserId = _transferToUserId!;
-      if (userIds.includes(transferToUserId)) {
-        throw new ArgValidationError(
-          info,
-          "transferToUserId",
-          "Can't transfer to a user that will be disabled."
+    return await ctx.petitions.withTransaction(async (t) => {
+      if (status === "INACTIVE") {
+        const transferToUserId = _transferToUserId!;
+        if (userIds.includes(transferToUserId)) {
+          throw new ArgValidationError(
+            info,
+            "transferToUserId",
+            "Can't transfer to a user that will be disabled."
+          );
+        }
+
+        const permissionsGroupedByUser = await ctx.petitions.loadUserPermissionsByUserId(
+          userIds
         );
+
+        for (const userPermissions of permissionsGroupedByUser) {
+          const notOwnedPermissions = userPermissions.filter(
+            (p) => p.permission_type !== "OWNER"
+          );
+          // delete permissions with type !== OWNER
+          if (notOwnedPermissions.length > 0) {
+            await ctx.petitions.deleteUserPermissions(
+              notOwnedPermissions.map((p) => p.petition_id),
+              notOwnedPermissions[0].user_id,
+              ctx.user!,
+              t
+            );
+          }
+
+          const ownedPermissions = userPermissions.filter(
+            (p) => p.permission_type === "OWNER"
+          );
+
+          if (ownedPermissions.length > 0) {
+            // transfer OWNER permissions to new user and remove original permissions
+            await ctx.petitions.transferOwnership(
+              ownedPermissions.map((p) => p.petition_id),
+              transferToUserId,
+              false,
+              ctx.user!,
+              t
+            );
+          }
+        }
       }
 
-      const permissionsGroupedByUser = await ctx.petitions.loadUserPermissionsByUserId(
-        userIds
-      );
-
-      return await ctx.petitions.withTransaction(async (t) => {
-        await Promise.all(
-          permissionsGroupedByUser.map(async (userPermissions) => {
-            const notOwnedPermissions = userPermissions.filter(
-              (p) => p.permission_type !== "OWNER"
-            );
-            // delete permissions with type !== OWNER
-            if (notOwnedPermissions.length > 0) {
-              await ctx.petitions.deleteUserPermissions(
-                notOwnedPermissions.map((p) => p.petition_id),
-                notOwnedPermissions[0].user_id,
-                ctx.user!,
-                t
-              );
-            }
-
-            const ownedPermissions = userPermissions.filter(
-              (p) => p.permission_type === "OWNER"
-            );
-
-            if (ownedPermissions.length > 0) {
-              await Promise.all([
-                // transfer OWNER permissions to new user
-                ctx.petitions.transferOwnership(
-                  ownedPermissions.map((p) => p.petition_id),
-                  transferToUserId,
-                  ctx.user!,
-                  t
-                ),
-                // update petition_access to have new granter
-                ctx.petitions.updatePetitionAccessByPetitionId(
-                  ownedPermissions.map((p) => p.petition_id),
-                  {
-                    granter_id: transferToUserId,
-                  },
-                  ctx.user!,
-                  t
-                ),
-                ctx.petitions.createEvent(
-                  ownedPermissions.map((p) => ({
-                    petitionId: p.petition_id,
-                    type: "OWNERSHIP_TRANSFERRED",
-                    data: {
-                      user_id: ctx.user!.id,
-                      owner_id: transferToUserId,
-                      previous_owner_id: p.user_id,
-                    },
-                  })),
-                  t
-                ),
-              ]);
-
-              // remove the WRITE permissions set to the original owner in ctx.petitions.transferOwnership()
-              await ctx.petitions.removePetitionUserPermissions(
-                ownedPermissions.map((p) => p.petition_id),
-                [ownedPermissions[0].user_id],
-                ctx.user!,
-                t
-              );
-            }
-          })
-        );
-
-        const disabledUsers = await ctx.users.updateUserById(
-          userIds,
-          { status: "INACTIVE" },
-          ctx.user!,
-          t
-        );
-
-        await Promise.all(
-          disabledUsers.map((u) => ctx.aws.disableCognitoUser(u.email))
-        );
-
-        return disabledUsers;
-      });
-    } else {
-      return await ctx.petitions.withTransaction(async (t) => {
-        const enabledUsers = await ctx.users.updateUserById(
-          userIds,
-          { status },
-          ctx.user!,
-          t
-        );
-
-        await Promise.all(
-          enabledUsers.map((u) => ctx.aws.enableCognitoUser(u.email))
-        );
-
-        return enabledUsers;
-      });
-    }
+      return await ctx.users.updateUserById(userIds, { status }, ctx.user!, t);
+    });
   },
 });

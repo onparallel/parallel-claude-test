@@ -307,66 +307,6 @@ describe("GraphQL/Users", () => {
       ]);
     });
 
-    it("transfers petition with active access to new user, updates granter_id and preserves the original access keycode", async () => {
-      // first, set an access on the petition to transfer
-      const [originalAccess] = await mocks.createPetitionAccess(
-        user0Petition.id,
-        activeUsers[0].id,
-        [contact.id],
-        sessionUser.id
-      );
-
-      const { data } = await testClient.mutate({
-        mutation: gql`
-          mutation(
-            $userIds: [GID!]!
-            $status: UserStatus!
-            $transferToUserId: GID
-          ) {
-            updateUserStatus(
-              userIds: $userIds
-              status: $status
-              transferToUserId: $transferToUserId
-            ) {
-              id
-              status
-            }
-          }
-        `,
-        variables: {
-          userIds: [toGlobalId("User", activeUsers[0].id)],
-          status: "INACTIVE",
-          transferToUserId: sessionUserGID,
-        },
-      });
-
-      expect(data!.updateUserStatus).toEqual([
-        {
-          id: toGlobalId("User", activeUsers[0].id),
-          status: "INACTIVE",
-        },
-      ]);
-
-      // query petition_access to make sure it's is correctly set.
-      // as keycode is not exposed in graphql, read it from database.
-      const { rows: accesses } = await mocks.knex.raw(
-        /* sql */ `
-        select granter_id, keycode, status, created_by
-        from petition_access 
-        where petition_id = ?`,
-        [user0Petition.id]
-      );
-
-      expect(accesses).toEqual([
-        {
-          granter_id: sessionUser.id,
-          keycode: originalAccess.keycode,
-          status: "ACTIVE",
-          created_by: `User:${sessionUser.id}`,
-        },
-      ]);
-    });
-
     it("sends error when trying to update status of a user in another organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
