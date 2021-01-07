@@ -19,7 +19,7 @@ export function useDebouncedAsync<
       return new Promise<TReturn>((resolve, reject) => {
         if (timeout.current) {
           clearTimeout(timeout.current);
-          promise.current!.reject("debounced");
+          promise.current!.reject("DEBOUNCED");
         }
         promise.current = { reject };
         timeout.current = setTimeout(async () => {

@@ -45,7 +45,7 @@ export function CreateUserDialog({
     handleSubmit,
     register,
     errors,
-    watch,
+    formState,
   } = useForm<CreateUserDialogData>({
     mode: "onChange",
     defaultValues: {
@@ -54,7 +54,6 @@ export function CreateUserDialog({
     },
   });
 
-  const email = watch("email");
   const emailRef = useRef<HTMLInputElement>(null);
 
   const apollo = useApolloClient();
@@ -82,13 +81,12 @@ export function CreateUserDialog({
     try {
       return await debouncedEmailIsAvailable(value);
     } catch (e) {
-      /**
-       * "debounced" error means the search was cancelled because user is typing
-       * in that case, return true to give positive feedback.
-       * This can also result in a false positive, closing the dialog
-       * (user submits twice in less than the debounce timeout)
-       */
-      return e === "debounced";
+      // "DEBOUNCED" error means the search was cancelled because user kept typing
+      if (e === "DEBOUNCED") {
+        return "DEBOUNCED";
+      } else {
+        throw e;
+      }
     }
   };
 
@@ -131,14 +129,15 @@ export function CreateUserDialog({
                   defaultMessage: "name@example.com",
                 })}
               />
-              {email?.match(EMAIL_REGEX) ? (
+              {formState.dirtyFields.email && !formState.isValidating ? (
                 <InputRightElement>
                   <Center>
-                    {errors.email?.type === "emailIsAvailable" ? (
+                    {errors.email?.type === "emailIsAvailable" &&
+                    errors.email.message !== "DEBOUNCED" ? (
                       <CloseIcon color="red.500" fontSize="sm" />
-                    ) : (
+                    ) : errors.email === undefined ? (
                       <CheckIcon color="green.500" />
-                    )}
+                    ) : null}
                   </Center>
                 </InputRightElement>
               ) : null}

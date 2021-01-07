@@ -1,4 +1,4 @@
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Button, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -6,7 +6,7 @@ import {
 } from "@parallel/components/common/DialogProvider";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
@@ -25,13 +25,16 @@ function ConfirmDeactivateUserDialog({
 >) {
   const intl = useIntl();
 
-  const { control, handleSubmit } = useForm<{ user: UserSelectSelection }>({
-    mode: "onChange",
+  const { control, errors, handleSubmit } = useForm<{
+    user: UserSelectSelection | null;
+  }>({
+    mode: "all",
+    defaultValues: {
+      user: null,
+    },
   });
 
   const userSelectRef = useRef<UserSelectInstance<false>>(null);
-
-  const [hasSelection, setHasSelection] = useState(false);
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
@@ -48,7 +51,7 @@ function ConfirmDeactivateUserDialog({
       content={{
         as: "form",
         onSubmit: handleSubmit(({ user }) => {
-          props.onResolve(user);
+          props.onResolve(user!);
         }),
       }}
       header={
@@ -59,61 +62,58 @@ function ConfirmDeactivateUserDialog({
         />
       }
       body={
-        <>
-          <FormattedMessage
-            id="organization.confirm-deactivate-user-dialog.body"
-            defaultMessage="Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
-            values={{
-              b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              count: selected.length,
-            }}
-          />
-          <br />
-          <FormattedMessage
-            id="organization.confirm-deactivate-user-dialog.body-2"
-            defaultMessage="Inactive users won't be able to login or use Parallel in any way."
-            values={{
-              b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-            }}
-          />
-          <br />
-          <br />
-          <FormattedMessage
-            id="organization.confirm-deactivate-user-dialog.transfer-to-user"
-            defaultMessage="To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
-            values={{
-              b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              count: selected.length,
-            }}
-          />
-          <Box flex="1" marginTop={2}>
-            <Controller
-              name="user"
-              control={control}
-              rules={{ required: true }}
-              render={({ onChange, onBlur, value }) => (
-                <UserSingleSelect
-                  ref={userSelectRef}
-                  value={value}
-                  onChange={(user: UserSelectSelection) => {
-                    onChange(user);
-                    setHasSelection(true);
-                  }}
-                  onBlur={onBlur}
-                  onSearchUsers={handleSearchUsers}
-                  placeholder={intl.formatMessage({
-                    id:
-                      "organization.confirm-deactivate.user-select.input-placeholder",
-                    defaultMessage: "Select a user from your organization",
-                  })}
-                />
-              )}
+        <Stack spacing={4}>
+          <Text>
+            <FormattedMessage
+              id="organization.confirm-deactivate-user-dialog.body"
+              defaultMessage="Are you sure you want to <b>deactivate</b> the selected {count, plural, =1{user} other {users}}?"
+              values={{
+                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+                count: selected.length,
+              }}
             />
-          </Box>
-        </>
+            <br />
+            <FormattedMessage
+              id="organization.confirm-deactivate-user-dialog.body-2"
+              defaultMessage="Inactive users won't be able to login or use Parallel in any way."
+            />
+          </Text>
+          <Text>
+            <FormattedMessage
+              id="organization.confirm-deactivate-user-dialog.transfer-to-user"
+              defaultMessage="To continue, you must select a user from your organization to transfer all the petitions of the {count, plural, =1{user} other {users}} to deactivate."
+              values={{
+                count: selected.length,
+              }}
+            />
+          </Text>
+          <Controller
+            name="user"
+            control={control}
+            rules={{ required: true }}
+            render={({ onChange, onBlur, value }) => (
+              <UserSingleSelect
+                ref={userSelectRef}
+                value={value}
+                onChange={onChange}
+                onBlur={onBlur}
+                onSearchUsers={handleSearchUsers}
+                placeholder={intl.formatMessage({
+                  id:
+                    "organization.confirm-deactivate.user-select.input-placeholder",
+                  defaultMessage: "Select a user from your organization",
+                })}
+              />
+            )}
+          />
+        </Stack>
       }
       confirm={
-        <Button type="submit" colorScheme="red" disabled={!hasSelection}>
+        <Button
+          type="submit"
+          colorScheme="red"
+          isDisabled={Boolean(errors.user)}
+        >
           <FormattedMessage
             id="petition.confirm-deactivate-users.confirm"
             defaultMessage="Deactivate and transfer petitions"
