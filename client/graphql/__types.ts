@@ -3342,6 +3342,10 @@ export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitio
   __typename?: "PublicPetitionFieldReply";
 } & Pick<PublicPetitionFieldReply, "content">;
 
+export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
 export type Admin_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
@@ -4908,6 +4912,11 @@ export const RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetiti
 export const RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragmentDoc = gql`
   fragment RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReply on PublicPetitionFieldReply {
     content
+  }
+`;
+export const RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragmentDoc = gql`
+  fragment RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetition on PublicPetition {
+    status
   }
 `;
 export const Admin_UserFragmentDoc = gql`

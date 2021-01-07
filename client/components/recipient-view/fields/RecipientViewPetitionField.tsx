@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { RecipientViewPetitionField_PublicPetitionAccessFragment } from "@parallel/graphql/__types";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -11,9 +10,11 @@ import { RecipientViewPetitionFieldSelect } from "./RecipientViewPetitionFieldSe
 import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText";
 
 export interface RecipientViewPetitionFieldProps
-  extends Omit<RecipientViewPetitionFieldCardProps, "children"> {
-  keycode: string;
-  access: RecipientViewPetitionField_PublicPetitionAccessFragment;
+  extends Omit<
+    RecipientViewPetitionFieldCardProps,
+    "children" | "showAddNewReply" | "onAddNewReply"
+  > {
+  petitionId: string;
   isDisabled: boolean;
 }
 

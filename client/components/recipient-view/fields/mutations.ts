@@ -1,6 +1,7 @@
 import { DataProxy, gql, useApolloClient } from "@apollo/client";
 import {
   RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment,
+  RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment,
   RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment,
   useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation,
   useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation,
@@ -30,13 +31,15 @@ export function useDeletePetitionReply() {
   });
   return useCallback(
     async function _deletePetitionReply({
+      petitionId,
+      keycode,
       fieldId,
       replyId,
-      keycode,
     }: {
+      petitionId: string;
+      keycode: string;
       fieldId: string;
       replyId: string;
-      keycode: string;
     }) {
       await deletePetitionReply({
         variables: { replyId, keycode },
@@ -44,7 +47,7 @@ export function useDeletePetitionReply() {
           updateFieldReplies(cache, fieldId, (replies) =>
             replies.filter(({ id }) => id !== replyId)
           );
-          // TODO: update petition status COMPLETED -> PENDING
+          updatePetitionStatus(cache, petitionId);
         },
       });
     },
@@ -76,13 +79,15 @@ export function useUpdateSimpleReply() {
     updateSimpleReply,
   ] = useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation();
   return useCallback(
-    async function _UpdateSimpleReply({
-      replyId,
+    async function _updateSimpleReply({
+      petitionId,
       keycode,
+      replyId,
       content,
     }: {
-      replyId: string;
+      petitionId: string;
       keycode: string;
+      replyId: string;
       content: string;
     }) {
       await updateSimpleReply({
@@ -92,7 +97,9 @@ export function useUpdateSimpleReply() {
           reply: content,
         },
         update(cache, { data }) {
-          // TODO: update petition status COMPLETED -> PENDING
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
         },
       });
     },
@@ -123,12 +130,14 @@ export function useCreateSimpleReply() {
   ] = useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation();
   return useCallback(
     async function _createSimpleReply({
-      fieldId,
+      petitionId,
       keycode,
+      fieldId,
       content,
     }: {
-      fieldId: string;
+      petitionId: string;
       keycode: string;
+      fieldId: string;
       content: string;
     }) {
       const { data } = await createSimpleReply({
@@ -142,7 +151,9 @@ export function useCreateSimpleReply() {
             ...replies,
             pick(data!.publicCreateSimpleReply, ["id", "__typename"]),
           ]);
-          // TODO: update petition status COMPLETED -> PENDING
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
         },
       });
       return data?.publicCreateSimpleReply;
@@ -195,12 +206,14 @@ export function useCreateFileUploadReply(
 
   return useCallback(
     async function _createFileUploadReply({
-      fieldId,
+      petitionId,
       keycode,
+      fieldId,
       content,
     }: {
-      fieldId: string;
+      petitionId: string;
       keycode: string;
+      fieldId: string;
       content: File[];
     }) {
       for (const file of content) {
@@ -224,7 +237,9 @@ export function useCreateFileUploadReply(
               ...content,
               progress: 0,
             }));
-            // TODO: update petition status COMPLETED -> PENDING
+            if (data) {
+              updatePetitionStatus(cache, petitionId);
+            }
           },
         });
         const { reply, endpoint } = data!.publicCreateFileUploadReply;
@@ -298,6 +313,24 @@ function updateReplyContent(
       data: (cached) => ({
         ...cached,
         content: updateFn(cached!.content),
+      }),
+    }
+  );
+}
+
+function updatePetitionStatus(proxy: DataProxy, petitionId: string) {
+  updateFragment<RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment>(
+    proxy,
+    {
+      fragment: gql`
+        fragment RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetition on PublicPetition {
+          status
+        }
+      `,
+      id: petitionId,
+      data: (cached) => ({
+        ...cached,
+        status: cached!.status === "COMPLETED" ? "PENDING" : cached!.status,
       }),
     }
   );

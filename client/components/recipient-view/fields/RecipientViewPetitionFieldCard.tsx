@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Badge,
   Box,
   Button,
   ButtonProps,

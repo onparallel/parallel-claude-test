@@ -30,7 +30,7 @@ export interface RecipientViewPetitionFieldSelectProps
     RecipientViewPetitionFieldCardProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
-  keycode: string;
+  petitionId: string;
   isDisabled: boolean;
 }
 
@@ -41,6 +41,7 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
   RecipientViewPetitionFieldSelectProps
 >(function RecipientViewPetitionField(
   {
+    petitionId,
     keycode,
     access,
     field,
@@ -66,14 +67,14 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
 
   const handleUpdate = useMemoFactory(
     (replyId: string) => async (content: string) => {
-      await updateSimpleReply({ replyId, keycode, content });
+      await updateSimpleReply({ petitionId, replyId, keycode, content });
     },
     [keycode, updateSimpleReply]
   );
   const deleteReply = useDeletePetitionReply();
   const handleDelete = useMemoFactory(
     (replyId: string) => async () => {
-      await deleteReply({ fieldId: field.id, replyId, keycode });
+      await deleteReply({ petitionId, fieldId: field.id, replyId, keycode });
       if (field.replies.length === 1) {
         setShowNewReply(true);
       }
@@ -88,6 +89,7 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
     setIsSaving(true);
     try {
       const reply = await createSimpleReply({
+        petitionId,
         keycode,
         fieldId: field.id,
         content: value.value,
@@ -251,7 +253,7 @@ export const RecipientViewPetitionFieldReplySelect = forwardRef<
         </Box>
       </Box>
       <IconButtonWithTooltip
-        isDisabled={isDisabled}
+        isDisabled={isDisabled || reply.status === "APPROVED"}
         onClick={() => onDelete()}
         variant="ghost"
         icon={<DeleteIcon />}

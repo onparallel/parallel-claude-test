@@ -45,7 +45,7 @@ export interface RecipientViewPetitionFieldFileUploadProps
     RecipientViewPetitionFieldCardProps,
     "children" | "showAddNewReply" | "onAddNewReply"
   > {
-  keycode: string;
+  petitionId: string;
   isDisabled: boolean;
 }
 
@@ -54,6 +54,7 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
   RecipientViewPetitionFieldFileUploadProps
 >(function RecipientViewPetitionFieldFileUpload(
   {
+    petitionId,
     keycode,
     access,
     field,
@@ -81,7 +82,7 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
         uploads.current[replyId].abort();
         delete uploads.current[replyId];
       }
-      await deletePetitionReply({ fieldId, replyId, keycode });
+      await deletePetitionReply({ petitionId, fieldId, replyId, keycode });
     },
     [deletePetitionReply, uploads]
   );
@@ -90,6 +91,7 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
   const handleCreateReply = useCallback(
     (content: File[]) =>
       createFileUploadReply({
+        petitionId,
         keycode,
         fieldId: field.id,
         content,
