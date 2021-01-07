@@ -158,6 +158,10 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
       }
     },
     onChange: (event: ChangeEvent<AnyInputElement>) => {
+      if (isSaving) {
+        // prevent creating 2 replies
+        return;
+      }
       setValue(event.target.value);
       debouncedOnChange(event.target.value);
     },

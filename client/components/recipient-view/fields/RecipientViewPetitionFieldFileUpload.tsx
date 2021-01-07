@@ -193,7 +193,9 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         fontWeight="bold"
         textTransform="uppercase"
       >
-        {reply.content.extension ?? <HelpOutlineIcon fontSize="18px" />}
+        {reply.content.extension ?? (
+          <HelpOutlineIcon fontSize="18px" opacity={0.4} />
+        )}
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">
         <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
