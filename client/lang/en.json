@@ -4200,6 +4200,11 @@
     "context": "{contact} deleted a reply to the field {field} {timeAgo}"
   },
   {
+    "term": "timeline.reply-updated-description",
+    "definition": "{contact} updated a reply to the field {field} {timeAgo}",
+    "context": "{contact} updated a reply to the field {field} {timeAgo}"
+  },
+  {
     "term": "timeline.signature-cancelled-description",
     "definition": "{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} cancelled the eSignature process {timeAgo}"

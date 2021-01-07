@@ -1616,6 +1616,15 @@ export type ReplyDeletedEvent = PetitionEvent & {
   id: Scalars["GID"];
 };
 
+export type ReplyUpdatedEvent = PetitionEvent & {
+  __typename?: "ReplyUpdatedEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  field?: Maybe<PetitionField>;
+  id: Scalars["GID"];
+  reply?: Maybe<PetitionFieldReply>;
+};
+
 /** Represents the result of an operation. */
 export type Result = "FAILURE" | "SUCCESS";
 
@@ -2140,6 +2149,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "ReplyDeletedEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment)
       | ({
+          __typename?: "ReplyUpdatedEvent";
+        } & PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment)
+      | ({
           __typename?: "SignatureCancelledEvent";
         } & PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment)
       | ({
@@ -2252,6 +2264,11 @@ export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = 
 } & Pick<ReplyDeletedEvent, "id"> &
   TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = {
+  __typename?: "ReplyUpdatedEvent";
+} & Pick<ReplyUpdatedEvent, "id"> &
+  TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
+
 export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
   __typename?: "SignatureCancelledEvent";
 } & Pick<SignatureCancelledEvent, "id"> &
@@ -2301,6 +2318,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment
@@ -2521,6 +2539,19 @@ export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
 export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
   __typename?: "ReplyDeletedEvent";
 } & Pick<ReplyDeletedEvent, "createdAt"> & {
+    field?: Maybe<
+      {
+        __typename?: "PetitionField";
+      } & PetitionFieldReference_PetitionFieldFragment
+    >;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  };
+
+export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
+  __typename?: "ReplyUpdatedEvent";
+} & Pick<ReplyUpdatedEvent, "createdAt"> & {
     field?: Maybe<
       {
         __typename?: "PetitionField";
@@ -5342,6 +5373,21 @@ export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
+export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
+  fragment TimelineReplyUpdatedEvent_ReplyUpdatedEvent on ReplyUpdatedEvent {
+    field {
+      ...PetitionFieldReference_PetitionField
+    }
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
   fragment TimelineReplyDeletedEvent_ReplyDeletedEvent on ReplyDeletedEvent {
     field {
@@ -5566,6 +5612,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on ReplyCreatedEvent {
       ...TimelineReplyCreatedEvent_ReplyCreatedEvent
     }
+    ... on ReplyUpdatedEvent {
+      ...TimelineReplyUpdatedEvent_ReplyUpdatedEvent
+    }
     ... on ReplyDeletedEvent {
       ...TimelineReplyDeletedEvent_ReplyDeletedEvent
     }
@@ -5619,6 +5668,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineMessageSentEvent_MessageSentEventFragmentDoc}
   ${TimelineReminderSentEvent_ReminderSentEventFragmentDoc}
   ${TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc}
+  ${TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc}
   ${TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc}
   ${TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc}
   ${TimelineCommentDeletedEvent_CommentDeletedEventFragmentDoc}

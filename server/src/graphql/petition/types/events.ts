@@ -32,6 +32,8 @@ export const PetitionEvent = interfaceType({
         return "ReminderSentEvent";
       case "REPLY_CREATED":
         return "ReplyCreatedEvent";
+      case "REPLY_UPDATED":
+        return "ReplyUpdatedEvent";
       case "REPLY_DELETED":
         return "ReplyDeletedEvent";
       case "COMMENT_PUBLISHED":
@@ -228,6 +230,32 @@ export const ReminderSentEvent = createPetitionEvent(
 
 export const ReplyCreatedEvent = createPetitionEvent(
   "ReplyCreatedEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+    t.nullable.field("field", {
+      type: "PetitionField",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadField(root.data.petition_field_id);
+      },
+    });
+    t.nullable.field("reply", {
+      type: "PetitionFieldReply",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadFieldReply(
+          root.data.petition_field_reply_id
+        );
+      },
+    });
+  }
+);
+
+export const ReplyUpdatedEvent = createPetitionEvent(
+  "ReplyUpdatedEvent",
   (t) => {
     t.field("access", {
       type: "PetitionAccess",

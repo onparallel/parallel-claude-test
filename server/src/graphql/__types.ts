@@ -353,6 +353,7 @@ export interface NexusGenObjects {
   };
   ReplyCreatedEvent: events.ReplyCreatedEvent;
   ReplyDeletedEvent: events.ReplyDeletedEvent;
+  ReplyUpdatedEvent: events.ReplyUpdatedEvent;
   SendPetitionResult: {
     // root type
     accesses?: NexusGenRootTypes["PetitionAccess"][] | null; // [PetitionAccess!]
@@ -968,6 +969,14 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
+  };
+  ReplyUpdatedEvent: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
+    id: NexusGenScalars["GID"]; // GID!
+    reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
   };
   SendPetitionResult: {
     // field return type
@@ -1640,6 +1649,14 @@ export interface NexusGenFieldTypeNames {
     field: "PetitionField";
     id: "GID";
   };
+  ReplyUpdatedEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    field: "PetitionField";
+    id: "GID";
+    reply: "PetitionFieldReply";
+  };
   SendPetitionResult: {
     // field return type name
     accesses: "PetitionAccess";
@@ -2282,6 +2299,7 @@ export interface NexusGenAbstractTypeMembers {
     | "ReminderSentEvent"
     | "ReplyCreatedEvent"
     | "ReplyDeletedEvent"
+    | "ReplyUpdatedEvent"
     | "SignatureCancelledEvent"
     | "SignatureCompletedEvent"
     | "SignatureStartedEvent"
@@ -2333,6 +2351,7 @@ export interface NexusGenTypeInterfaces {
   ReminderSentEvent: "PetitionEvent";
   ReplyCreatedEvent: "PetitionEvent";
   ReplyDeletedEvent: "PetitionEvent";
+  ReplyUpdatedEvent: "PetitionEvent";
   SignatureCancelledEvent: "PetitionEvent";
   SignatureCompletedEvent: "PetitionEvent";
   SignatureStartedEvent: "PetitionEvent";

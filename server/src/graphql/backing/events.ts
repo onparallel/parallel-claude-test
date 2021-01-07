@@ -3,6 +3,7 @@ import {
   PetitionSignatureCancelReason,
   PetitionUserPermissionType,
 } from "../../db/__types";
+
 export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_CREATED: { user_id: number };
   PETITION_COMPLETED: { petition_access_id: number };
@@ -18,6 +19,11 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   MESSAGE_SENT: { petition_message_id: number };
   REMINDER_SENT: { petition_reminder_id: number };
   REPLY_CREATED: {
+    petition_access_id: number;
+    petition_field_id: number;
+    petition_field_reply_id: number;
+  };
+  REPLY_UPDATED: {
     petition_access_id: number;
     petition_field_id: number;
     petition_field_reply_id: number;
@@ -101,6 +107,7 @@ export type MessageCancelledEvent = GenericPetitionEvent<"MESSAGE_CANCELLED">;
 export type MessageSentEvent = GenericPetitionEvent<"MESSAGE_SENT">;
 export type ReminderSentEvent = GenericPetitionEvent<"REMINDER_SENT">;
 export type ReplyCreatedEvent = GenericPetitionEvent<"REPLY_CREATED">;
+export type ReplyUpdatedEvent = GenericPetitionEvent<"REPLY_UPDATED">;
 export type ReplyDeletedEvent = GenericPetitionEvent<"REPLY_DELETED">;
 export type CommentPublishedEvent = GenericPetitionEvent<"COMMENT_PUBLISHED">;
 export type CommentDeletedEvent = GenericPetitionEvent<"COMMENT_DELETED">;
@@ -128,6 +135,7 @@ export type PetitionEvent =
   | MessageSentEvent
   | ReminderSentEvent
   | ReplyCreatedEvent
+  | ReplyUpdatedEvent
   | ReplyDeletedEvent
   | CommentPublishedEvent
   | CommentDeletedEvent

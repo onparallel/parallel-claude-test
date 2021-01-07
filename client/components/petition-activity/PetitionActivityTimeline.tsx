@@ -16,6 +16,7 @@ import { TimelinePetitionCreatedEvent } from "./timeline/TimelinePetitionCreated
 import { TimelinePetitionClosedEvent } from "./timeline/TimelinePetitionClosedEvent";
 import { TimelineReminderSentEvent } from "./timeline/TimelineReminderSentEvent";
 import { TimelineReplyCreatedEvent } from "./timeline/TimelineReplyCreatedEvent";
+import { TimelineReplyUpdatedEvent } from "./timeline/TimelineReplyUpdatedEvent";
 import { TimelineReplyDeletedEvent } from "./timeline/TimelineReplyDeletedEvent";
 import { TimelineUserPermissionAddedEvent } from "./timeline/TimelineUserPermissionAddedEvent";
 import { TimelineUserPermissionEditedEvent } from "./timeline/TimelineUserPermissionEditedEvent";
@@ -74,6 +75,8 @@ export function PetitionActivityTimeline({
               <TimelineReminderSentEvent event={event} userId={userId} />
             ) : event.__typename === "ReplyCreatedEvent" ? (
               <TimelineReplyCreatedEvent event={event} />
+            ) : event.__typename === "ReplyUpdatedEvent" ? (
+              <TimelineReplyUpdatedEvent event={event} />
             ) : event.__typename === "ReplyDeletedEvent" ? (
               <TimelineReplyDeletedEvent event={event} />
             ) : event.__typename === "CommentPublishedEvent" ? (
@@ -168,6 +171,9 @@ PetitionActivityTimeline.fragments = {
       ... on ReplyCreatedEvent {
         ...TimelineReplyCreatedEvent_ReplyCreatedEvent
       }
+      ... on ReplyUpdatedEvent {
+        ...TimelineReplyUpdatedEvent_ReplyUpdatedEvent
+      }
       ... on ReplyDeletedEvent {
         ...TimelineReplyDeletedEvent_ReplyDeletedEvent
       }
@@ -221,6 +227,7 @@ PetitionActivityTimeline.fragments = {
     ${TimelineMessageCancelledEvent.fragments.MessageCancelledEvent}
     ${TimelineReminderSentEvent.fragments.ReminderSentEvent}
     ${TimelineReplyCreatedEvent.fragments.ReplyCreatedEvent}
+    ${TimelineReplyUpdatedEvent.fragments.ReplyUpdatedEvent}
     ${TimelineReplyDeletedEvent.fragments.ReplyDeletedEvent}
     ${TimelineCommentPublishedEvent.fragments.CommentPublishedEvent}
     ${TimelineCommentDeletedEvent.fragments.CommentDeletedEvent}

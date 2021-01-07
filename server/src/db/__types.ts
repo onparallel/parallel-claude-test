@@ -9,59 +9,60 @@ type PartialProps<T, K extends keyof T = never> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
 export type FeatureFlagName =
-  | "PETITION_SIGNATURE"
+  | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
-  | "HIDE_RECIPIENT_VIEW_CONTENTS"
+  | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
 export type IntegrationType = "SIGNATURE";
 
-export type OrganizationStatus = "DEV" | "DEMO" | "ACTIVE" | "CHURNED";
+export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV";
 
 export type PetitionAccessStatus = "ACTIVE" | "INACTIVE";
 
 export type PetitionContactNotificationType = "COMMENT_CREATED";
 
 export type PetitionEventType =
-  | "PETITION_CREATED"
-  | "PETITION_COMPLETED"
   | "ACCESS_ACTIVATED"
   | "ACCESS_DEACTIVATED"
+  | "ACCESS_DELEGATED"
   | "ACCESS_OPENED"
-  | "MESSAGE_SCHEDULED"
-  | "MESSAGE_CANCELLED"
-  | "MESSAGE_SENT"
-  | "REMINDER_SENT"
-  | "REPLY_CREATED"
-  | "REPLY_DELETED"
-  | "COMMENT_PUBLISHED"
   | "COMMENT_DELETED"
-  | "USER_PERMISSION_ADDED"
-  | "USER_PERMISSION_REMOVED"
-  | "USER_PERMISSION_EDITED"
+  | "COMMENT_PUBLISHED"
+  | "MESSAGE_CANCELLED"
+  | "MESSAGE_SCHEDULED"
+  | "MESSAGE_SENT"
   | "OWNERSHIP_TRANSFERRED"
   | "PETITION_CLOSED"
   | "PETITION_CLOSED_NOTIFIED"
+  | "PETITION_COMPLETED"
+  | "PETITION_CREATED"
   | "PETITION_REOPENED"
-  | "SIGNATURE_STARTED"
-  | "SIGNATURE_COMPLETED"
+  | "REMINDER_SENT"
+  | "REPLY_CREATED"
+  | "REPLY_DELETED"
+  | "REPLY_UPDATED"
   | "SIGNATURE_CANCELLED"
-  | "ACCESS_DELEGATED";
+  | "SIGNATURE_COMPLETED"
+  | "SIGNATURE_STARTED"
+  | "USER_PERMISSION_ADDED"
+  | "USER_PERMISSION_EDITED"
+  | "USER_PERMISSION_REMOVED";
 
-export type PetitionFieldReplyStatus = "PENDING" | "REJECTED" | "APPROVED";
+export type PetitionFieldReplyStatus = "APPROVED" | "PENDING" | "REJECTED";
 
-export type PetitionFieldType = "TEXT" | "FILE_UPLOAD" | "HEADING" | "SELECT";
+export type PetitionFieldType = "FILE_UPLOAD" | "HEADING" | "SELECT" | "TEXT";
 
 export type PetitionMessageStatus =
-  | "SCHEDULED"
   | "CANCELLED"
+  | "PROCESSED"
   | "PROCESSING"
-  | "PROCESSED";
+  | "SCHEDULED";
 
-export type PetitionReminderStatus = "PROCESSING" | "PROCESSED" | "ERROR";
+export type PetitionReminderStatus = "ERROR" | "PROCESSED" | "PROCESSING";
 
-export type PetitionReminderType = "MANUAL" | "AUTOMATIC";
+export type PetitionReminderType = "AUTOMATIC" | "MANUAL";
 
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
@@ -69,18 +70,18 @@ export type PetitionSignatureCancelReason =
   | "REQUEST_ERROR";
 
 export type PetitionSignatureStatus =
-  | "ENQUEUED"
-  | "PROCESSING"
   | "CANCELLED"
-  | "COMPLETED";
+  | "COMPLETED"
+  | "ENQUEUED"
+  | "PROCESSING";
 
-export type PetitionStatus = "DRAFT" | "PENDING" | "COMPLETED" | "CLOSED";
+export type PetitionStatus = "CLOSED" | "COMPLETED" | "DRAFT" | "PENDING";
 
 export type PetitionUserNotificationType = "COMMENT_CREATED";
 
-export type PetitionUserPermissionType = "OWNER" | "WRITE" | "READ";
+export type PetitionUserPermissionType = "OWNER" | "READ" | "WRITE";
 
-export type UserOrganizationRole = "NORMAL" | "ADMIN";
+export type UserOrganizationRole = "ADMIN" | "NORMAL";
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
 

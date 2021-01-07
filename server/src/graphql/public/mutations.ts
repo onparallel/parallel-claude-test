@@ -8,6 +8,7 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
+import { differenceInSeconds } from "date-fns";
 import { prop } from "remeda";
 import { getClientIp } from "request-ip";
 import { toGlobalId } from "../../util/globalId";
@@ -422,11 +423,33 @@ export const publicUpdateSimpleReply = mutationField(
       }
     },
     resolve: async (_, args, ctx) => {
-      return await ctx.petitions.updatePetitionFieldReply(
-        args.replyId,
-        { content: { text: args.reply }, status: "PENDING" },
-        ctx.contact!
-      );
+      const petitionId = ctx.access!.petition_id;
+      const [reply, event] = await Promise.all([
+        ctx.petitions.updatePetitionFieldReply(
+          args.replyId,
+          { content: { text: args.reply }, status: "PENDING" },
+          ctx.contact!
+        ),
+        ctx.petitions.getLastEventForPetitionId(petitionId),
+      ]);
+      if (
+        (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
+        event.data.petition_field_reply_id === args.replyId &&
+        differenceInSeconds(new Date(), event.created_at) < 60
+      ) {
+        await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
+      } else {
+        await ctx.petitions.createEvent({
+          type: "REPLY_UPDATED",
+          petitionId,
+          data: {
+            petition_access_id: reply.petition_access_id,
+            petition_field_id: reply.petition_field_id,
+            petition_field_reply_id: reply.id,
+          },
+        });
+      }
+      return reply;
     },
   }
 );

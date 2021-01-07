@@ -2440,6 +2440,14 @@ type ReplyDeletedEvent implements PetitionEvent {
   id: GID!
 }
 
+type ReplyUpdatedEvent implements PetitionEvent {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  field: PetitionField
+  id: GID!
+  reply: PetitionFieldReply
+}
+
 """
 Represents the result of an operation.
 """

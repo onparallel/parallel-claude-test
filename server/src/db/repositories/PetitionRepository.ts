@@ -45,6 +45,7 @@ import {
   PetitionUser,
   PetitionUserNotification,
   PetitionUserPermissionType,
+  PetitionEvent,
 } from "../__types";
 
 type PetitionType = "PETITION" | "TEMPLATE";
@@ -1549,6 +1550,24 @@ export class PetitionRepository extends BaseRepository {
       })),
       t
     );
+  }
+
+  async getLastEventForPetitionId(petitionId: number) {
+    const [event] = await this.raw<PetitionEvent>(
+      /* sql */ `
+      select * from petition_event where id in (
+        select max(id) from petition_event where petition_id = ? 
+      )`,
+      [petitionId]
+    );
+    return event;
+  }
+
+  async updateEvent(eventId: number, data: Partial<PetitionEvent>) {
+    const [event] = await this.from("petition_event")
+      .where("id", eventId)
+      .update(data, "*");
+    return event;
   }
 
   readonly loadPetitionFieldCommentsForFieldAndUser = fromDataLoader(
