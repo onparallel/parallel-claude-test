@@ -48,6 +48,7 @@ import {
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { updateQuery } from "@parallel/utils/apollo/updateQuery";
 import { FORMATS } from "@parallel/utils/dates";
+import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import {
@@ -117,7 +118,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
   async function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === "Enter" && event.metaKey) {
+    if (isMetaReturn(event)) {
       event.preventDefault();
       try {
         await createPetitionFieldComment({
@@ -324,7 +325,7 @@ function FieldComment({
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === "Enter" && event.metaKey) {
+    if (isMetaReturn(event)) {
       event.preventDefault();
       setIsEditing(false);
       onEdit(content);

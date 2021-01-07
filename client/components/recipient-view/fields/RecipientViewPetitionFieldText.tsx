@@ -4,6 +4,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
+import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -139,24 +140,15 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
     isDisabled: isDisabled,
     value,
     onKeyDown: async (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "Enter": {
-          if (field.multiple && event.metaKey) {
-            await debouncedOnChange.immediate(value);
-            handleAddNewReply();
-          }
-          break;
-        }
-        case "Backspace": {
-          if (value === "") {
-            if (field.replies.length > 0) {
-              event.preventDefault();
-              setShowNewReply(false);
-              const lastReplyId = field.replies[field.replies.length - 1].id;
-              replyRefs[lastReplyId].current!.focus();
-            }
-          }
-          break;
+      if (isMetaReturn(event) && field.multiple) {
+        await debouncedOnChange.immediate(value);
+        handleAddNewReply();
+      } else if (event.key === "Backspace" && value === "") {
+        if (field.replies.length > 0) {
+          event.preventDefault();
+          setShowNewReply(false);
+          const lastReplyId = field.replies[field.replies.length - 1].id;
+          replyRefs[lastReplyId].current!.focus();
         }
       }
     },
@@ -263,22 +255,13 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
     isDisabled: isDisabled || reply.status === "APPROVED",
     isInvalid: reply.status === "REJECTED",
     onKeyDown: async (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "Enter": {
-          if (field.multiple && event.metaKey) {
-            await debouncedUpdateReply.immediate(value);
-            onAddNewReply();
-          }
-          break;
-        }
-        case "Backspace": {
-          if (value === "") {
-            event.preventDefault();
-            debouncedUpdateReply.clear();
-            onDelete(true);
-          }
-          break;
-        }
+      if (isMetaReturn(event) && field.multiple) {
+        await debouncedUpdateReply.immediate(value);
+        onAddNewReply();
+      } else if (event.key === "Backspace" && value === "") {
+        event.preventDefault();
+        debouncedUpdateReply.clear();
+        onDelete(true);
       }
     },
     onBlur: async () => {

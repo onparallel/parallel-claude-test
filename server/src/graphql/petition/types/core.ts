@@ -519,7 +519,7 @@ export const PetitionFieldReply = objectType({
                   filename: file.filename,
                   size: file.size,
                   contentType: file.content_type,
-                  extension: extension(file.content_type),
+                  extension: extension(file.content_type) || null,
                 }
               : {};
           }

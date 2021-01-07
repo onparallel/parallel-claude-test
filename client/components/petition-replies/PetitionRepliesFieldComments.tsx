@@ -28,6 +28,7 @@ import {
   PetitionReplies_UserFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { usePreviousValue } from "beautiful-react-hooks";
@@ -95,7 +96,7 @@ export function PetitionRepliesFieldComments({
   }, [field.comments.length, previousCommentCount]);
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === "Enter" && event.metaKey) {
+    if (isMetaReturn(event)) {
       event.preventDefault();
       onAddComment(draft, isInternalComment);
       setNativeValue(textareaRef.current!, "");
@@ -294,7 +295,7 @@ function FieldComment({
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === "Enter" && event.metaKey) {
+    if (isMetaReturn(event)) {
       event.preventDefault();
       setIsEditing(false);
       onEdit(content);

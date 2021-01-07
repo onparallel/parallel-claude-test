@@ -16,6 +16,7 @@ import {
   CloseIcon,
   DeleteIcon,
   DownloadIcon,
+  HelpOutlineIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -192,7 +193,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         fontWeight="bold"
         textTransform="uppercase"
       >
-        {reply.content.extension || null}
+        {reply.content.extension ?? <HelpOutlineIcon fontSize="18px" />}
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">
         <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
