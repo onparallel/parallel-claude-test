@@ -32,7 +32,8 @@ import {
 import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { useCallback, useRef } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useCreateFileUploadReply, useDeletePetitionReply } from "./mutations";
@@ -68,6 +69,10 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
 ) {
   const uploads = useRef<Record<string, XMLHttpRequest>>({});
 
+  const [isDeletingReply, setIsDeletingReply] = useState<
+    Record<string, boolean>
+  >({});
+
   const deletePetitionReply = useDeletePetitionReply();
   const handleDeletePetitionReply = useCallback(
     async function handleDeletePetitionReply({
@@ -83,7 +88,9 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
         uploads.current[replyId].abort();
         delete uploads.current[replyId];
       }
+      setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       await deletePetitionReply({ petitionId, fieldId, replyId, keycode });
+      setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
     },
     [deletePetitionReply, uploads]
   );
@@ -108,27 +115,36 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
+      overflow="hidden"
       {...props}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>
-          {field.replies.map((reply) => (
-            <ListItem key={reply.id}>
-              <RecipientViewPetitionFieldReplyFileUpload
-                keycode={keycode}
-                options={field.options as FieldOptions["FILE_UPLOAD"]}
-                reply={reply}
-                isDisabled={isDisabled}
-                onRemove={() =>
-                  handleDeletePetitionReply({
-                    keycode,
-                    fieldId: field.id,
-                    replyId: reply.id,
-                  })
-                }
-              />
-            </ListItem>
-          ))}
+          <AnimatePresence initial={false}>
+            {field.replies.map((reply) => (
+              <motion.li
+                key={reply.id}
+                layout
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0, transition: { ease: "easeOut" } }}
+                exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
+              >
+                <RecipientViewPetitionFieldReplyFileUpload
+                  keycode={keycode}
+                  options={field.options as FieldOptions["FILE_UPLOAD"]}
+                  reply={reply}
+                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  onRemove={() =>
+                    handleDeletePetitionReply({
+                      keycode,
+                      fieldId: field.id,
+                      replyId: reply.id,
+                    })
+                  }
+                />
+              </motion.li>
+            ))}
+          </AnimatePresence>
         </List>
       ) : null}
       <Box marginTop={2}>
@@ -181,7 +197,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
     }
   }
   return (
-    <Stack direction="row" alignItems="center">
+    <Stack direction="row" alignItems="center" backgroundColor="white">
       <Center
         boxSize={10}
         borderRadius="md"
@@ -325,7 +341,7 @@ function PetitionFieldFileUploadDropzone({
     accept,
     onDrop: onCreateReply,
     multiple: field.multiple,
-    disabled: isDisabled,
+    disabled: _isDisabled,
   });
   return (
     <Flex
@@ -360,7 +376,7 @@ function PetitionFieldFileUploadDropzone({
       {...props}
       {...getRootProps()}
     >
-      <input disabled={isDisabled} {...getInputProps()} />
+      <input disabled={_isDisabled} {...getInputProps()} />
       <Box pointerEvents="none">
         {isDragActive && isDragReject ? (
           <>

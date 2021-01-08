@@ -1,4 +1,4 @@
-import { Box, Center, List, ListItem, Stack } from "@chakra-ui/react";
+import { Box, Center, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -11,6 +11,7 @@ import {
   UseReactSelectProps,
   useReactSelectProps,
 } from "@parallel/utils/useReactSelectProps";
+import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
@@ -60,6 +61,9 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
 
   const newReplyRef = useRef<UserSelectInstance>(null);
   const replyRefs = useMultipleRefs<SelectInstance>();
+  const [isDeletingReply, setIsDeletingReply] = useState<
+    Record<string, boolean>
+  >({});
 
   const options = field.options as FieldOptions["SELECT"];
 
@@ -74,7 +78,9 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
   const deleteReply = useDeletePetitionReply();
   const handleDelete = useMemoFactory(
     (replyId: string) => async () => {
+      setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       await deleteReply({ petitionId, fieldId: field.id, replyId, keycode });
+      setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
       if (field.replies.length === 1) {
         setShowNewReply(true);
       }
@@ -139,18 +145,25 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>
-          {field.replies.map((reply) => (
-            <ListItem key={reply.id}>
-              <RecipientViewPetitionFieldReplySelect
-                ref={replyRefs[reply.id]}
-                field={field}
-                reply={reply}
-                isDisabled={isDisabled}
-                onUpdate={handleUpdate(reply.id)}
-                onDelete={handleDelete(reply.id)}
-              />
-            </ListItem>
-          ))}
+          <AnimatePresence initial={false}>
+            {field.replies.map((reply) => (
+              <motion.li
+                key={reply.id}
+                layout
+                animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
+              >
+                <RecipientViewPetitionFieldReplySelect
+                  ref={replyRefs[reply.id]}
+                  field={field}
+                  reply={reply}
+                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  onUpdate={handleUpdate(reply.id)}
+                  onDelete={handleDelete(reply.id)}
+                />
+              </motion.li>
+            ))}
+          </AnimatePresence>
         </List>
       ) : null}
       {showNewReply ? (

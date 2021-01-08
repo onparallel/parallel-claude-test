@@ -96,9 +96,10 @@ export function PetitionRepliesFieldComments({
   }, [field.comments.length, previousCommentCount]);
 
   function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (isMetaReturn(event)) {
+    const content = draft.trim();
+    if (isMetaReturn(event) && content) {
       event.preventDefault();
-      onAddComment(draft, isInternalComment);
+      onAddComment(content, isInternalComment);
       setNativeValue(textareaRef.current!, "");
     }
   }

@@ -118,13 +118,14 @@ export function RecipientViewPetitionFieldCommentsDialog({
 
   const createPetitionFieldComment = useCreatePetitionFieldComment();
   async function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (isMetaReturn(event)) {
+    const content = draft.trim();
+    if (isMetaReturn(event) && content) {
       event.preventDefault();
       try {
         await createPetitionFieldComment({
           keycode,
           petitionFieldId: field.id,
-          content: draft.trim(),
+          content,
         });
       } catch {}
       setNativeValue(textareaRef.current!, "");

@@ -1,4 +1,4 @@
-import { Center, Flex, Input, List, ListItem, Stack } from "@chakra-ui/react";
+import { Center, Flex, Input, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
@@ -9,6 +9,7 @@ import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ChangeEvent,
   forwardRef,
@@ -61,6 +62,10 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const isDeletingReplyRef = useRef<Record<string, boolean>>({});
+  const [isDeletingReply, setIsDeletingReply] = useState<
+    Record<string, boolean>
+  >({});
 
   const newReplyRef = useRef<AnyInputElement>(null);
   const replyRefs = useMultipleRefs<AnyInputElement>();
@@ -75,16 +80,28 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
     [keycode, updateSimpleReply]
   );
   const deleteReply = useDeletePetitionReply();
+
   const handleDelete = useMemoFactory(
     (replyId: string) => async (focusPrev?: boolean) => {
-      await deleteReply({ petitionId, fieldId: field.id, replyId, keycode });
+      if (isDeletingReplyRef.current[replyId]) {
+        // avoid double delete when backspace + blur
+        return;
+      }
+      isDeletingReplyRef.current[replyId] = true;
+      setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       if (focusPrev) {
         const index = field.replies.findIndex((r) => r.id === replyId);
         if (index > 0) {
           const prevId = field.replies[index - 1].id;
+          replyRefs[prevId].current!.selectionStart = replyRefs[
+            prevId
+          ].current!.value.length;
           replyRefs[prevId].current!.focus();
         }
       }
+      await deleteReply({ petitionId, fieldId: field.id, replyId, keycode });
+      delete isDeletingReplyRef.current[replyId];
+      setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
       if (field.replies.length === 1) {
         handleAddNewReply();
       }
@@ -94,7 +111,7 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
 
   const createSimpleReply = useCreateSimpleReply();
   const debouncedOnChange = useDebouncedCallback(
-    async (content: string) => {
+    async (content: string, focusCreatedReply: boolean) => {
       if (!content) {
         return;
       }
@@ -111,15 +128,17 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
             "selectionStart",
             "selectionEnd",
           ]);
-          setShowNewReply(false);
           setValue("");
-          setTimeout(() => {
-            const newReplyElement = replyRefs[reply.id].current!;
-            if (newReplyElement) {
-              Object.assign(newReplyElement, selection);
-              newReplyElement.focus();
-            }
-          });
+          if (focusCreatedReply) {
+            setShowNewReply(false);
+            setTimeout(() => {
+              const newReplyElement = replyRefs[reply.id].current!;
+              if (newReplyElement) {
+                Object.assign(newReplyElement, selection);
+                newReplyElement.focus();
+              }
+            });
+          }
         }
       } catch {}
       setIsSaving(false);
@@ -141,8 +160,7 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
     value,
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
-        await debouncedOnChange.immediate(value);
-        handleAddNewReply();
+        await debouncedOnChange.immediateIfPending(value, false);
       } else if (event.key === "Backspace" && value === "") {
         if (field.replies.length > 0) {
           event.preventDefault();
@@ -152,8 +170,11 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
         }
       }
     },
-    onBlur: () => {
-      if (!value && field.replies.length > 0) {
+    onBlur: async () => {
+      if (value) {
+        await debouncedOnChange.immediateIfPending(value, false);
+        setShowNewReply(false);
+      } else if (!value && field.replies.length > 0) {
         setShowNewReply(false);
       }
     },
@@ -163,7 +184,7 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
         return;
       }
       setValue(event.target.value);
-      debouncedOnChange(event.target.value);
+      debouncedOnChange(event.target.value, true);
     },
     placeholder:
       options.placeholder ??
@@ -182,23 +203,31 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
       hasCommentsEnabled={hasCommentsEnabled}
       showAddNewReply={!isDisabled && !showNewReply && field.multiple}
       onAddNewReply={handleAddNewReply}
+      overflow="hidden"
       {...props}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={2}>
-          {field.replies.map((reply) => (
-            <ListItem key={reply.id}>
-              <RecipientViewPetitionFieldReplyText
-                ref={replyRefs[reply.id]}
-                field={field}
-                reply={reply}
-                isDisabled={isDisabled}
-                onUpdate={handleUpdate(reply.id)}
-                onDelete={handleDelete(reply.id)}
-                onAddNewReply={handleAddNewReply}
-              />
-            </ListItem>
-          ))}
+          <AnimatePresence initial={false}>
+            {field.replies.map((reply) => (
+              <motion.li
+                key={reply.id}
+                layout
+                animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
+              >
+                <RecipientViewPetitionFieldReplyText
+                  ref={replyRefs[reply.id]}
+                  field={field}
+                  reply={reply}
+                  isDisabled={isDisabled || isDeletingReply[reply.id]}
+                  onUpdate={handleUpdate(reply.id)}
+                  onDelete={handleDelete(reply.id)}
+                  onAddNewReply={handleAddNewReply}
+                />
+              </motion.li>
+            ))}
+          </AnimatePresence>
         </List>
       ) : null}
       {showNewReply ? (
@@ -260,7 +289,6 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
     isInvalid: reply.status === "REJECTED",
     onKeyDown: async (event: KeyboardEvent) => {
       if (isMetaReturn(event) && field.multiple) {
-        await debouncedUpdateReply.immediate(value);
         onAddNewReply();
       } else if (event.key === "Backspace" && value === "") {
         event.preventDefault();
@@ -269,7 +297,12 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
       }
     },
     onBlur: async () => {
-      await debouncedUpdateReply.immediateIfPending(value);
+      if (value) {
+        await debouncedUpdateReply.immediateIfPending(value);
+      } else {
+        debouncedUpdateReply.clear();
+        onDelete();
+      }
     },
     onChange: (event: ChangeEvent<AnyInputElement>) => {
       setValue(event.target.value);
@@ -299,7 +332,10 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
       </Flex>
       <IconButtonWithTooltip
         isDisabled={isDisabled || reply.status === "APPROVED"}
-        onClick={() => onDelete()}
+        onClick={() => {
+          debouncedUpdateReply.clear();
+          onDelete();
+        }}
         variant="ghost"
         icon={<DeleteIcon />}
         size="md"
