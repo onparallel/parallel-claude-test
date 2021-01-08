@@ -20,7 +20,6 @@ import {
   OrganizationUsers_UserFragment,
   UserStatus,
 } from "@parallel/graphql/__types";
-import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useErrorDialog } from "../common/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";

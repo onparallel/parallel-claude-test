@@ -253,17 +253,6 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
           defaultMessage: "Name",
         }),
         CellContent: ({ row }) => {
-          const label =
-            row.status === "ACTIVE"
-              ? intl.formatMessage({
-                  id: "organization-users.header.user-active",
-                  defaultMessage: "Active",
-                })
-              : intl.formatMessage({
-                  id: "organization-users.header.user-inactive",
-                  defaultMessage: "Inactive",
-                });
-
           return (
             <Text
               as="span"
