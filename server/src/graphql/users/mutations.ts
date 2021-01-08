@@ -178,7 +178,18 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     validateIf(
       "status",
       "INACTIVE",
-      validIsDefined((args) => args.transferToUserId, "transferToUserId")
+      validateAnd(
+        validIsDefined((args) => args.transferToUserId, "transferToUserId"),
+        (_, { userIds, transferToUserId }, ctx, info) => {
+          if (transferToUserId && userIds.includes(transferToUserId)) {
+            throw new ArgValidationError(
+              info,
+              "transferToUserId",
+              "Can't transfer to a user that will be disabled."
+            );
+          }
+        }
+      )
     )
   ),
   args: {
@@ -186,23 +197,9 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     status: nonNull(arg({ type: "UserStatus" })),
     transferToUserId: globalIdArg("User"),
   },
-  resolve: async (
-    _,
-    { userIds, status, transferToUserId: _transferToUserId },
-    ctx,
-    info
-  ) => {
+  resolve: async (_, { userIds, status, transferToUserId }, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
       if (status === "INACTIVE") {
-        const transferToUserId = _transferToUserId!;
-        if (userIds.includes(transferToUserId)) {
-          throw new ArgValidationError(
-            info,
-            "transferToUserId",
-            "Can't transfer to a user that will be disabled."
-          );
-        }
-
         const permissionsGroupedByUser = await ctx.petitions.loadUserPermissionsByUserId(
           userIds
         );
@@ -229,7 +226,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
             // transfer OWNER permissions to new user and remove original permissions
             await ctx.petitions.transferOwnership(
               ownedPermissions.map((p) => p.petition_id),
-              transferToUserId,
+              transferToUserId!,
               false,
               ctx.user!,
               t
