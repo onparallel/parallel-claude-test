@@ -1710,6 +1710,11 @@
     "context": "Activate {count, plural, =1{user} other {users}}"
   },
   {
+    "term": "organization-users.admin-role",
+    "definition": "Administrador",
+    "context": "Admin"
+  },
+  {
     "term": "organization-users.create-user",
     "definition": "Crear usuario",
     "context": "Create user"
@@ -1730,24 +1735,19 @@
     "context": "Name"
   },
   {
-    "term": "organization-users.header.user-active",
-    "definition": "Activo",
-    "context": "Active"
-  },
-  {
     "term": "organization-users.header.user-email",
     "definition": "Email",
     "context": "Email"
   },
   {
-    "term": "organization-users.header.user-inactive",
-    "definition": "Inactivo",
-    "context": "Inactive"
-  },
-  {
     "term": "organization-users.header.user-role",
     "definition": "Rol",
     "context": "Role"
+  },
+  {
+    "term": "organization-users.normal-role",
+    "definition": "Normal",
+    "context": "Normal"
   },
   {
     "term": "organization-users.update-user-status.error",

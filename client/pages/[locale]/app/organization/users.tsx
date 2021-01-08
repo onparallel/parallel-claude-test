@@ -310,7 +310,6 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
         },
         CellContent: ({ row }) => (
           <Badge
-            aria-label={row.role}
             colorScheme={
               ({
                 ADMIN: "green",
@@ -318,7 +317,17 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
               } as Record<OrganizationRole, string>)[row.role]
             }
           >
-            {row.role}
+            {row.role === "ADMIN" ? (
+              <FormattedMessage
+                id="organization-users.admin-role"
+                defaultMessage="Admin"
+              />
+            ) : (
+              <FormattedMessage
+                id="organization-users.normal-role"
+                defaultMessage="Normal"
+              />
+            )}
           </Badge>
         ),
       },
