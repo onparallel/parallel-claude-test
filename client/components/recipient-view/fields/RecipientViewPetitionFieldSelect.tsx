@@ -2,7 +2,6 @@ import { Box, Center, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { UserSelectInstance } from "@parallel/components/common/UserSelect";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -59,7 +58,7 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
   const [value, setValue] = useState(toSelectOption(null));
   const [isSaving, setIsSaving] = useState(false);
 
-  const newReplyRef = useRef<UserSelectInstance>(null);
+  const newReplyRef = useRef<SelectInstance>(null);
   const replyRefs = useMultipleRefs<SelectInstance>();
   const [isDeletingReply, setIsDeletingReply] = useState<
     Record<string, boolean>
@@ -294,7 +293,7 @@ function useFieldSelectReactSelectProps(props: UseReactSelectProps) {
         ..._reactSelectProps,
         styles: {
           ..._reactSelectProps.styles,
-          menu: (styles) => ({
+          menu: (styles, props) => ({
             ...styles,
             ..._reactSelectProps.styles!.menu?.(styles, props),
             zIndex: 100,
