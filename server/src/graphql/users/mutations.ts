@@ -1,12 +1,16 @@
 import {
+  arg,
   enumType,
   inputObjectType,
-  mutationField,
-  stringArg,
-  arg,
-  nonNull,
   list,
+  mutationField,
+  nonNull,
+  stringArg,
 } from "@nexus/schema";
+import { mapSeries } from "async";
+import { zip } from "remeda";
+import { PetitionUser, User } from "../../db/__types";
+import { partition } from "../../util/arrays";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import {
   and,
@@ -16,23 +20,20 @@ import {
   chain,
   ifArgDefined,
 } from "../helpers/authorize";
-import { validateAnd, validateIf } from "../helpers/validateArgs";
-import { maxLength } from "../helpers/validators/maxLength";
+import { ArgValidationError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
-import { contextUserIsAdmin } from "./authorizers";
-import { validEmail } from "../helpers/validators/validEmail";
+import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
+import { maxLength } from "../helpers/validators/maxLength";
+import { notEmptyArray } from "../helpers/validators/notEmptyArray";
+import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
+import { validEmail } from "../helpers/validators/validEmail";
+import { validIsDefined } from "../helpers/validators/validIsDefined";
 import {
   argUserHasActiveStatus,
   userHasAccessToUsers,
 } from "../petition/mutations/authorizers";
-import { notEmptyArray } from "../helpers/validators/notEmptyArray";
-import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
-import { ArgValidationError } from "../helpers/errors";
-import { validIsDefined } from "../helpers/validators/validIsDefined";
-import { mapSeries } from "async";
-import { partition } from "../../util/arrays";
-import { PetitionUser, User } from "../../db/__types";
+import { contextUserIsAdmin } from "./authorizers";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -204,29 +205,24 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     if (status === "ACTIVE") {
       return await ctx.users.updateUserById(userIds, { status }, ctx.user!);
     } else {
-      const permissionsGroupedByUser = await ctx.petitions.loadUserPermissionsByUserId(
+      const permissionsByUserId = await ctx.petitions.loadUserPermissionsByUserId(
         userIds
       );
-      return await mapSeries<PetitionUser[], User>(
-        permissionsGroupedByUser,
-        async (userPermissions) => {
+      return await mapSeries<[number, PetitionUser[]], User>(
+        zip(userIds, permissionsByUserId),
+        async ([userId, userPermissions]) => {
           return await ctx.petitions.withTransaction(async (t) => {
             const [ownedPermissions, notOwnedPermissions] = partition(
               userPermissions,
               (p) => p.permission_type === "OWNER"
             );
             const [[user]] = await Promise.all([
-              ctx.users.updateUserById(
-                notOwnedPermissions[0].user_id,
-                { status },
-                ctx.user!,
-                t
-              ),
+              ctx.users.updateUserById(userId, { status }, ctx.user!, t),
               // delete permissions with type !== OWNER
               notOwnedPermissions.length > 0
                 ? ctx.petitions.deleteUserPermissions(
                     notOwnedPermissions.map((p) => p.petition_id),
-                    notOwnedPermissions[0].user_id,
+                    userId,
                     ctx.user!,
                     t
                   )
