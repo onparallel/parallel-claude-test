@@ -46,7 +46,6 @@ async function extractTerms(input: string) {
     execSync(
       `formatjs extract \
        --extract-source-location \
-       --extract-from-format-message-call \
        --throws \
        --out-file ${tmpFileName} \
       ${isWindows ? input : `'${input}'`}`,

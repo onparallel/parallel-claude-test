@@ -31,7 +31,6 @@ async function extractTerms(input) {
         const tmpFileName = "lang_tmp.json";
         child_process_1.execSync(`formatjs extract \
        --extract-source-location \
-       --extract-from-format-message-call \
        --throws \
        --out-file ${tmpFileName} \
       ${isWindows ? input : `'${input}'`}`, { encoding: "utf-8" });
