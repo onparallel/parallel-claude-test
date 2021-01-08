@@ -3314,14 +3314,7 @@ export type OrganizationSettingsQuery = { __typename?: "Query" } & {
 
 export type OrganizationUsers_UserFragment = { __typename?: "User" } & Pick<
   User,
-  | "id"
-  | "firstName"
-  | "lastName"
-  | "email"
-  | "role"
-  | "createdAt"
-  | "lastActiveAt"
-  | "status"
+  "id" | "fullName" | "email" | "role" | "createdAt" | "lastActiveAt" | "status"
 >;
 
 export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
@@ -5000,8 +4993,7 @@ export const Contacts_UserFragmentDoc = gql`
 export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
     id
-    firstName
-    lastName
+    fullName
     email
     role
     createdAt

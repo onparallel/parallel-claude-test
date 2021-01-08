@@ -90,6 +90,7 @@ export const Organization = objectType({
       sortableBy: [
         "firstName",
         "lastName",
+        "fullName",
         "email",
         "createdAt",
         "lastActiveAt",
@@ -107,6 +108,7 @@ export const Organization = objectType({
         const columnMap = {
           firstName: "first_name",
           lastName: "last_name",
+          fullName: "full_name",
           email: "email",
           createdAt: "created_at",
           lastActiveAt: "last_active_at",

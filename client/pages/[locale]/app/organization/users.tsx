@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Text, useToast } from "@chakra-ui/react";
+import { Badge, Box, Text, Tooltip, useToast } from "@chakra-ui/react";
+import { ForbiddenIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -44,13 +45,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 const PAGE_SIZE = 10;
 
-const SORTING = [
-  "firstName",
-  "lastName",
-  "email",
-  "createdAt",
-  "lastActiveAt",
-] as const;
+const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -86,8 +81,12 @@ function OrganizationUsers() {
 
   const [selected, setSelected] = useState<string[]>([]);
 
-  const selectedUsers = selected.map(
-    (userId) => userList.items.find((u) => u.id === userId)!
+  const selectedUsers = useMemo(
+    () =>
+      selected
+        .map((userId) => userList.items.find((u) => u.id === userId)!)
+        .filter((u) => u !== undefined),
+    [selected.join(","), userList.items]
   );
 
   const [search, setSearch] = useState(state.search);
@@ -247,22 +246,59 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
   return useMemo(
     () => [
       {
-        key: "firstName",
+        key: "fullName",
         isSortable: true,
         header: intl.formatMessage({
-          id: "organization-users.header.user-firstname",
-          defaultMessage: "First name",
+          id: "organization-users.header.name",
+          defaultMessage: "Name",
         }),
-        CellContent: ({ row }) => <>{row.firstName}</>,
-      },
-      {
-        key: "lastName",
-        isSortable: true,
-        header: intl.formatMessage({
-          id: "organization-users.header.user-lastname",
-          defaultMessage: "Last name",
-        }),
-        CellContent: ({ row }) => <>{row.lastName}</>,
+        CellContent: ({ row }) => {
+          const label =
+            row.status === "ACTIVE"
+              ? intl.formatMessage({
+                  id: "organization-users.header.user-active",
+                  defaultMessage: "Active",
+                })
+              : intl.formatMessage({
+                  id: "organization-users.header.user-inactive",
+                  defaultMessage: "Inactive",
+                });
+
+          return (
+            <Text
+              as="span"
+              display="inline-flex"
+              whiteSpace="nowrap"
+              alignItems="center"
+            >
+              <Text
+                as="span"
+                textDecoration={
+                  row.status === "INACTIVE" ? "line-through" : "none"
+                }
+              >
+                {row.fullName}
+              </Text>
+              {row.status === "INACTIVE" ? (
+                <Tooltip
+                  label={intl.formatMessage({
+                    id: "organization-users.header.inactive-user",
+                    defaultMessage: "Inactive user",
+                  })}
+                >
+                  <ForbiddenIcon
+                    marginLeft={2}
+                    color="red.300"
+                    aria-label={intl.formatMessage({
+                      id: "organization-users.header.inactive-user",
+                      defaultMessage: "Inactive user",
+                    })}
+                  />
+                </Tooltip>
+              ) : null}
+            </Text>
+          );
+        },
       },
       {
         key: "email",
@@ -296,38 +332,6 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
             {row.role}
           </Badge>
         ),
-      },
-      {
-        key: "status",
-        header: intl.formatMessage({
-          id: "organization-users.header.user-status",
-          defaultMessage: "Status",
-        }),
-        cellProps: {
-          width: "1px",
-          textAlign: "center",
-        },
-        CellContent: ({ row }) => {
-          const label =
-            row.status === "ACTIVE"
-              ? intl.formatMessage({
-                  id: "organization-users.header.user-active",
-                  defaultMessage: "Active",
-                })
-              : intl.formatMessage({
-                  id: "organization-users.header.user-inactive",
-                  defaultMessage: "Inactive",
-                });
-
-          return (
-            <Badge
-              aria-label={label}
-              colorScheme={row.status === "ACTIVE" ? "gray" : "red"}
-            >
-              {label}
-            </Badge>
-          );
-        },
       },
       {
         key: "lastActiveAt",
@@ -382,8 +386,7 @@ OrganizationUsers.fragments = {
     return gql`
       fragment OrganizationUsers_User on User {
         id
-        firstName
-        lastName
+        fullName
         email
         role
         createdAt

@@ -49,13 +49,10 @@ export function OrganizationUsersListTableHeader({
   const intl = useIntl();
 
   const showActions = selectedUsers.length > 0;
-  const userIds = useMemo(() => {
-    return selectedUsers.map((u) => u.id);
-  }, [selectedUsers]);
 
   const showErrorDialog = useErrorDialog();
   const handleUpdateSelectedUsersStatus = async (newStatus: UserStatus) => {
-    if (userIds.includes(me.id)) {
+    if (selectedUsers.some((u) => u.id === me.id)) {
       try {
         await showErrorDialog({
           message: intl.formatMessage({
@@ -66,7 +63,10 @@ export function OrganizationUsersListTableHeader({
         });
       } catch {}
     } else {
-      onUpdateUserStatus(userIds, newStatus);
+      onUpdateUserStatus(
+        selectedUsers.map((u) => u.id),
+        newStatus
+      );
     }
   };
 

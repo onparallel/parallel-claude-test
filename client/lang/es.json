@@ -1665,6 +1665,16 @@
     "context": "Deactivate {count, plural, =1{user} other {users}}"
   },
   {
+    "term": "organization-users.header.inactive-user",
+    "definition": "Usuario inactivo",
+    "context": "Inactive user"
+  },
+  {
+    "term": "organization-users.header.name",
+    "definition": "Nombre",
+    "context": "Name"
+  },
+  {
     "term": "organization-users.header.user-active",
     "definition": "Activo",
     "context": "Active"
@@ -1675,29 +1685,14 @@
     "context": "Email"
   },
   {
-    "term": "organization-users.header.user-firstname",
-    "definition": "Nombre",
-    "context": "First name"
-  },
-  {
     "term": "organization-users.header.user-inactive",
     "definition": "Inactivo",
     "context": "Inactive"
   },
   {
-    "term": "organization-users.header.user-lastname",
-    "definition": "Apellidos",
-    "context": "Last name"
-  },
-  {
     "term": "organization-users.header.user-role",
     "definition": "Rol",
     "context": "Role"
-  },
-  {
-    "term": "organization-users.header.user-status",
-    "definition": "Estado",
-    "context": "Status"
   },
   {
     "term": "organization-users.update-user-status.error",

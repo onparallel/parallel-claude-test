@@ -166,6 +166,8 @@ export interface NexusGenEnums {
     | "email_DESC"
     | "firstName_ASC"
     | "firstName_DESC"
+    | "fullName_ASC"
+    | "fullName_DESC"
     | "lastActiveAt_ASC"
     | "lastActiveAt_DESC"
     | "lastName_ASC"

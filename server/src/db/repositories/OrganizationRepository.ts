@@ -32,7 +32,7 @@ export class OrganizationRepository extends BaseRepository {
     opts: {
       search?: string | null;
       excludeIds?: number[] | null;
-      sortBy?: SortBy<keyof User>[];
+      sortBy?: SortBy<keyof User | "full_name">[];
       includeInactive?: boolean | null;
     } & PageOpts
   ) {
@@ -61,6 +61,9 @@ export class OrganizationRepository extends BaseRepository {
                   if (["last_active_at"].includes(s.column)) {
                     const nulls = s.order === "asc" ? "FIRST" : "LAST";
                     return `${s.column} ${s.order} NULLS ${nulls}`;
+                  } else if (s.column === "full_name") {
+                    const nulls = s.order === "asc" ? "FIRST" : "LAST";
+                    return `first_name ${s.order} NULLS ${nulls}, last_name ${s.order} NULLS ${nulls}`;
                   } else {
                     return `${s.column} ${s.order}`;
                   }
