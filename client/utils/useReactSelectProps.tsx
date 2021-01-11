@@ -139,7 +139,7 @@ export function useReactSelectProps<
             />
           </Text>
         ),
-        MultiValueRemove: ({ innerProps, ...props }) => {
+        MultiValueRemove: ({ innerProps }) => {
           const intl = useIntl();
           return (
             <components.MultiValueRemove

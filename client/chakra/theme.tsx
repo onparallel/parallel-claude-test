@@ -4,8 +4,10 @@ import {
   Popover,
   Tooltip,
   theme as base,
+  Select,
 } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
+import { ChevronDownIcon } from "./icons";
 import { styles } from "./styles";
 
 export const theme = extendTheme({
@@ -169,3 +171,7 @@ Popover.defaultProps = {
   openDelay: 250,
   isLazy: true,
 } as any;
+
+Select.defaultProps = {
+  icon: <ChevronDownIcon />,
+};
