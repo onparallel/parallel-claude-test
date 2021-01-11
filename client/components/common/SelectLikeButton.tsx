@@ -49,7 +49,7 @@ export const SelectLikeButton = chakraForwardRef<"div", SelectProps>(
           pointerEvents="none"
           top="50%"
           transform="translateY(-50%)"
-          sx={styles.icon}
+          sx={omit(styles.icon, ["position"]) as any}
         >
           <ChevronDownIcon />
         </Box>
