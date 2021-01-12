@@ -705,6 +705,16 @@
     "context": "Schedule send"
   },
   {
+    "term": "component.sent-petition-message-dialog.message-scheduled",
+    "definition": "Mensaje programado para {recipient} el {date}",
+    "context": "Message scheduled to be sent to {recipient} on {date}"
+  },
+  {
+    "term": "component.sent-petition-message-dialog.message-sent",
+    "definition": "Mensaje enviado a {recipient} el {date}",
+    "context": "Message sent to {recipient} on {date}"
+  },
+  {
     "term": "component.share-button.petition-not-shared",
     "definition": "Esta petición no se ha compartido todavía.",
     "context": "This petition has not been shared yet."
@@ -1523,11 +1533,6 @@
     "term": "generic.thanks",
     "definition": "Gracias",
     "context": "Thanks"
-  },
-  {
-    "term": "generic.to",
-    "definition": "Para {recipient}",
-    "context": "To {recipient}"
   },
   {
     "term": "generic.today-at",

@@ -40,7 +40,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
         </>
       ) : null}
       <I18nProvider {...props}>
-        <ChakraProvider theme={theme} resetCSS>
+        <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
           <DndProvider backend={HTML5Backend}>
             <Component {...pageProps} />
           </DndProvider>

@@ -11,7 +11,6 @@ import {
   Stack,
   Text,
   UnorderedList,
-  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
@@ -30,7 +29,7 @@ import { RecipientViewPetitionField } from "@parallel/components/recipient-view/
 import { RecipientViewContactCard } from "@parallel/components/recipient-view/RecipientViewContactCard";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
-import { RecipientViewHelpModal } from "@parallel/components/recipient-view/RecipientViewHelpModal";
+import { useRecipientViewHelpDialog } from "@parallel/components/recipient-view/RecipientViewHelpModal";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
 import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
@@ -183,7 +182,7 @@ function RecipientView({
     setSidebarTop(rect.height + 16);
   }, []);
 
-  const { onOpen: handleOpenHelp, ...helpModal } = useHelpModal();
+  const handleHelpClick = useHelpModal();
 
   const breakpoint = "md";
   return (
@@ -324,7 +323,7 @@ function RecipientView({
                   display={{ base: "none", [breakpoint]: "flex" }}
                 />
               )}
-              <Button variant="outline" onClick={handleOpenHelp}>
+              <Button variant="outline" onClick={handleHelpClick}>
                 <FormattedMessage
                   id="recipient-view.need-help"
                   defaultMessage="Help"
@@ -369,7 +368,6 @@ function RecipientView({
           />
         )}
       </Flex>
-      <RecipientViewHelpModal {...helpModal} />
     </>
   );
 }
@@ -543,15 +541,34 @@ function useGetPageFields(
 }
 
 function useHelpModal() {
-  const { isOpen, onClose, onOpen } = useDisclosure();
+  const showRecipientViewHelpDialog = useRecipientViewHelpDialog();
   useEffect(() => {
-    const key = "recipient-first-time-check";
-    if (!window.localStorage.getItem(key)) {
-      onOpen();
-      window.localStorage.setItem(key, "check");
-    }
+    showHelp();
   }, []);
-  return { isOpen, onClose, onOpen };
+
+  async function showHelp() {
+    const key = "recipient-first-time-check";
+    if (isLocalStorageAvailable() && !localStorage.getItem(key)) {
+      try {
+        await showRecipientViewHelpDialog({});
+        localStorage.setItem(key, "check");
+      } catch {}
+    }
+  }
+  return async function () {
+    try {
+      await showRecipientViewHelpDialog({});
+    } catch {}
+  };
+}
+
+function isLocalStorageAvailable() {
+  try {
+    localStorage.getItem("");
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 RecipientView.getInitialProps = async ({

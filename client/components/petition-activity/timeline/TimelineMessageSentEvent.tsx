@@ -1,14 +1,17 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { MessageEventsIndicator } from "@parallel/components/petition-activity/MessageEventsIndicator";
-import { MessageSentEventModal } from "@parallel/components/petition-activity/MessageSentEventModal";
 import { TimelineMessageSentEvent_MessageSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
+import {
+  SentPetitionMessageDialog,
+  useSentPetitionMessageDialog,
+} from "../SentPetitionMessageDialog";
 import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
@@ -21,8 +24,12 @@ export function TimelineMessageSentEvent({
   event: { message, createdAt },
   userId,
 }: TimelineMessageSentEventProps) {
-  const { isOpen, onClose, onOpen } = useDisclosure();
-
+  const showSentPetitionMessage = useSentPetitionMessageDialog();
+  async function handleSeeMessageClick() {
+    try {
+      await showSentPetitionMessage({ message });
+    } catch {}
+  }
   return (
     <TimelineItem
       icon={
@@ -84,18 +91,18 @@ export function TimelineMessageSentEvent({
           )}
           <MessageEventsIndicator message={message} marginLeft={2} />
         </Box>
-        <Button onClick={onOpen} size="sm" variant="outline" marginLeft={4}>
+        <Button
+          onClick={handleSeeMessageClick}
+          size="sm"
+          variant="outline"
+          marginLeft={4}
+        >
           <FormattedMessage
             id="timeline.message-sent-see-message"
             defaultMessage="See message"
           />
         </Button>
       </Flex>
-      <MessageSentEventModal
-        message={message}
-        isOpen={isOpen}
-        onClose={onClose}
-      />
     </TimelineItem>
   );
 }
@@ -108,7 +115,6 @@ TimelineMessageSentEvent.fragments = {
           ...UserReference_User
         }
         emailSubject
-        emailBody
         scheduledAt
         access {
           contact {
@@ -116,13 +122,13 @@ TimelineMessageSentEvent.fragments = {
           }
         }
         ...MessageEventsIndicator_PetitionMessage
-        ...MessageSentEventModal_PetitionMessage
+        ...SentPetitionMessageDialog_PetitionMessage
       }
       createdAt
     }
     ${UserReference.fragments.User}
     ${ContactLink.fragments.Contact}
     ${MessageEventsIndicator.fragments.PetitionMessage}
-    ${MessageSentEventModal.fragments.PetitionMessage}
+    ${SentPetitionMessageDialog.fragments.PetitionMessage}
   `,
 };
