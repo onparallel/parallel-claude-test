@@ -174,8 +174,10 @@ export function RichTextEditor({
   const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
   const inputStyles = {
     ...omit(inputStyleConfig as any, [
+      "px",
       "pl",
       "pr",
+      "paddingX",
       "paddingRight",
       "paddingLeft",
       "paddingY",
