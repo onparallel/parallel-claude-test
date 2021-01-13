@@ -1,4 +1,3 @@
-import { scrypt } from "crypto";
 import DataLoader from "dataloader";
 import { addMinutes } from "date-fns";
 import { inject, injectable } from "inversify";
@@ -7,7 +6,7 @@ import { groupBy, indexBy, mapValues, pipe, toPairs } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
-import { random } from "../../util/token";
+import { hash, random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";
@@ -19,18 +18,6 @@ import {
   PetitionAccess,
   User,
 } from "../__types";
-
-async function hash(password: string, salt: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    scrypt(password, salt, 64, (err, key) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(key.toString("hex"));
-      }
-    });
-  });
-}
 
 @injectable()
 export class ContactRepository extends BaseRepository {

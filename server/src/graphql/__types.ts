@@ -251,6 +251,11 @@ export interface NexusGenObjects {
     result: NexusGenEnums["Result"]; // Result!
     url?: string | null; // String
   };
+  GenerateUserAuthTokenResponse: {
+    // root type
+    apiKey: string; // String!
+    userAuthToken: NexusGenRootTypes["UserAuthenticationToken"]; // UserAuthenticationToken!
+  };
   MessageCancelledEvent: events.MessageCancelledEvent;
   MessageScheduledEvent: events.MessageScheduledEvent;
   MessageSentEvent: events.MessageSentEvent;
@@ -375,6 +380,7 @@ export interface NexusGenObjects {
     result: NexusGenEnums["Result"]; // Result!
   };
   User: db.User;
+  UserAuthenticationToken: db.UserAuthenticationToken;
   UserPagination: {
     // root type
     items: NexusGenRootTypes["User"][]; // [User!]!
@@ -497,6 +503,11 @@ export interface NexusGenFieldTypes {
     result: NexusGenEnums["Result"]; // Result!
     url: string | null; // String
   };
+  GenerateUserAuthTokenResponse: {
+    // field return type
+    apiKey: string; // String!
+    userAuthToken: NexusGenRootTypes["UserAuthenticationToken"]; // UserAuthenticationToken!
+  };
   MessageCancelledEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -541,6 +552,7 @@ export interface NexusGenFieldTypes {
     deletePetitions: NexusGenEnums["Result"]; // Result!
     editPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
+    generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     presendPetitionClosedNotification: NexusGenEnums["Result"]; // Result!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
@@ -562,6 +574,7 @@ export interface NexusGenFieldTypes {
     removePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
@@ -1017,6 +1030,7 @@ export interface NexusGenFieldTypes {
   };
   User: {
     // field return type
+    authenticationTokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     email: string; // String!
     firstName: string | null; // String
@@ -1031,6 +1045,12 @@ export interface NexusGenFieldTypes {
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  UserAuthenticationToken: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    tokenName: string; // String!
   };
   UserPagination: {
     // field return type
@@ -1178,6 +1198,11 @@ export interface NexusGenFieldTypeNames {
     result: "Result";
     url: "String";
   };
+  GenerateUserAuthTokenResponse: {
+    // field return type name
+    apiKey: "String";
+    userAuthToken: "UserAuthenticationToken";
+  };
   MessageCancelledEvent: {
     // field return type name
     createdAt: "DateTime";
@@ -1222,6 +1247,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitions: "Result";
     editPetitionUserPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
+    generateUserAuthToken: "GenerateUserAuthTokenResponse";
     markPetitionFieldCommentsAsRead: "PetitionFieldComment";
     presendPetitionClosedNotification: "Result";
     publicCheckVerificationCode: "VerificationCodeCheck";
@@ -1243,6 +1269,7 @@ export interface NexusGenFieldTypeNames {
     removePetitionUserPermission: "Petition";
     reopenPetition: "Petition";
     resetSignaturitOrganizationBranding: "SupportMethodResponse";
+    revokeUserAuthToken: "Result";
     sendMessages: "Result";
     sendPetition: "SendPetitionResult";
     sendPetitionClosedNotification: "Petition";
@@ -1696,6 +1723,7 @@ export interface NexusGenFieldTypeNames {
   };
   User: {
     // field return type name
+    authenticationTokens: "UserAuthenticationToken";
     createdAt: "DateTime";
     email: "String";
     firstName: "String";
@@ -1710,6 +1738,12 @@ export interface NexusGenFieldTypeNames {
     role: "OrganizationRole";
     status: "UserStatus";
     updatedAt: "DateTime";
+  };
+  UserAuthenticationToken: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    tokenName: "String";
   };
   UserPagination: {
     // field return type name
@@ -1930,6 +1964,10 @@ export interface NexusGenArgTypes {
       preview?: boolean | null; // Boolean
       replyId: NexusGenScalars["GID"]; // GID!
     };
+    generateUserAuthToken: {
+      // args
+      tokenName: string; // String!
+    };
     markPetitionFieldCommentsAsRead: {
       // args
       petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -2040,6 +2078,10 @@ export interface NexusGenArgTypes {
     resetSignaturitOrganizationBranding: {
       // args
       orgId: number; // Int!
+    };
+    revokeUserAuthToken: {
+      // args
+      authTokenIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     sendMessages: {
       // args
@@ -2277,7 +2319,7 @@ export interface NexusGenArgTypes {
 export interface NexusGenAbstractTypeMembers {
   PublicUserOrContact: "PublicContact" | "PublicUser";
   UserOrPetitionAccess: "PetitionAccess" | "User";
-  CreatedAt: "PetitionMessage" | "PetitionReminder";
+  CreatedAt: "PetitionMessage" | "PetitionReminder" | "UserAuthenticationToken";
   PetitionBase: "Petition" | "PetitionTemplate";
   PetitionBaseAndField: "PetitionAndField" | "PetitionTemplateAndField";
   PetitionEvent:
@@ -2356,6 +2398,7 @@ export interface NexusGenTypeInterfaces {
   SignatureCompletedEvent: "PetitionEvent";
   SignatureStartedEvent: "PetitionEvent";
   User: "Timestamps";
+  UserAuthenticationToken: "CreatedAt";
   UserPermissionAddedEvent: "PetitionEvent";
   UserPermissionEditedEvent: "PetitionEvent";
   UserPermissionRemovedEvent: "PetitionEvent";

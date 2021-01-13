@@ -111,6 +111,7 @@ export interface TableTypes {
   petition_user_notification: PetitionUserNotification;
   temporary_file: TemporaryFile;
   user: User;
+  user_authentication_token: UserAuthenticationToken;
 }
 
 export interface TableCreateTypes {
@@ -139,6 +140,7 @@ export interface TableCreateTypes {
   petition_user_notification: CreatePetitionUserNotification;
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
+  user_authentication_token: CreateUserAuthenticationToken;
 }
 
 export interface TablePrimaryKeys {
@@ -167,6 +169,7 @@ export interface TablePrimaryKeys {
   petition_user_notification: "id";
   temporary_file: "id";
   user: "id";
+  user_authentication_token: "id";
 }
 
 export interface Contact {
@@ -722,4 +725,20 @@ export type CreateUser = PartialProps<
   | "last_active_at"
   | "onboarding_status"
   | "status"
+>;
+
+export interface UserAuthenticationToken {
+  id: number;
+  user_id: number;
+  token_name: string;
+  token_hash: string;
+  created_at: Date;
+  created_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export type CreateUserAuthenticationToken = PartialProps<
+  Omit<UserAuthenticationToken, "id">,
+  "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;

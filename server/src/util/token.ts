@@ -1,4 +1,4 @@
-import { randomBytes } from "crypto";
+import { randomBytes, scrypt } from "crypto";
 
 const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
   .split("")
@@ -87,4 +87,16 @@ export function decode(value: string) {
 export function random(length: number) {
   const buffer = randomBytes(length);
   return encode(buffer);
+}
+
+export async function hash(password: string, salt: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    scrypt(password, salt, 64, (err, key) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(key.toString("hex"));
+      }
+    });
+  });
 }

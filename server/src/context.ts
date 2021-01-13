@@ -21,6 +21,7 @@ import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { SIGNATURE, SignatureService } from "./services/signature";
 import { SECURITY, SecurityService } from "./services/security";
+import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
 
 @injectable()
 export class ApiContext {
@@ -48,7 +49,8 @@ export class ApiContext {
     public readonly integrations: IntegrationRepository,
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
-    public readonly petitions: PetitionRepository
+    public readonly petitions: PetitionRepository,
+    public readonly userAuthentication: UserAuthenticationRepository
   ) {}
 }
 

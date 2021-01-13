@@ -25,3 +25,6 @@ export * from "./public/mutations";
 export * from "./support/types";
 export * from "./support/mutations";
 export * from "./support/queries";
+
+export * from "./user-auth-token/mutations";
+export * from "./user-auth-token/types";

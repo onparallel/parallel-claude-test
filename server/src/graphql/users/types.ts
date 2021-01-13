@@ -1,4 +1,4 @@
-import { arg, enumType, nonNull, objectType } from "@nexus/schema";
+import { arg, enumType, list, nonNull, objectType } from "@nexus/schema";
 import { rootIsContextUser } from "./authorizers";
 import { fullName } from "../../util/fullName";
 
@@ -90,6 +90,16 @@ export const User = objectType({
     t.field("status", {
       type: "UserStatus",
       resolve: (o) => o.status,
+    });
+    t.field("authenticationTokens", {
+      description: "Lists every auth token of the user",
+      type: list(nonNull("UserAuthenticationToken")),
+      authorize: rootIsContextUser(),
+      resolve: async (root, _, ctx) => {
+        return await ctx.userAuthentication.loadUserAuthenticationTokens(
+          root.id
+        );
+      },
     });
   },
 });

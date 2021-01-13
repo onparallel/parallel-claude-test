@@ -18,8 +18,9 @@ import {
   PetitionUser,
   PetitionFieldReply,
   CreatePetitionFieldReply,
+  UserAuthenticationToken,
 } from "../../__types";
-import { random } from "../../../util/token";
+import { hash, random } from "../../../util/token";
 
 export class Mocks {
   constructor(public knex: Knex) {}
@@ -215,6 +216,24 @@ export class Mocks {
     return await this.knex<PetitionUser>("petition_user")
       .whereNot("permission_type", "OWNER")
       .delete();
+  }
+
+  async createUserAuthToken(tokenName: string, userId: number) {
+    const apiKey = random(48);
+    return await this.knex<UserAuthenticationToken>("user_authentication_token")
+      .insert({
+        token_name: tokenName,
+        token_hash: await hash(apiKey, ""),
+        user_id: userId,
+        created_by: `User:${userId}`,
+      })
+      .returning("*");
+  }
+
+  async clearUserAuthTokens() {
+    return await this.knex<UserAuthenticationToken>(
+      "user_authentication_token"
+    ).delete();
   }
 }
 

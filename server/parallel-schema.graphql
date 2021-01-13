@@ -167,6 +167,11 @@ type FileUploadReplyDownloadLinkResult {
   url: String
 }
 
+type GenerateUserAuthTokenResponse {
+  apiKey: String!
+  userAuthToken: UserAuthenticationToken!
+}
+
 scalar GID
 
 """
@@ -445,6 +450,11 @@ type Mutation {
   ): FileUploadReplyDownloadLinkResult!
 
   """
+  Generates a new API token for the context user
+  """
+  generateUserAuthToken(tokenName: String!): GenerateUserAuthTokenResponse!
+
+  """
   Marks the specified comments as read.
   """
   markPetitionFieldCommentsAsRead(
@@ -595,6 +605,11 @@ type Mutation {
   Removes the Signaturit Branding Ids of selected organization.
   """
   resetSignaturitOrganizationBranding(orgId: Int!): SupportMethodResponse!
+
+  """
+  Soft-deletes a given auth token, making it permanently unusable.
+  """
+  revokeUserAuthToken(authTokenIds: [GID!]!): Result!
 
   """
   Sends a petition message to the specified contacts.
@@ -2593,6 +2608,11 @@ A user in the system.
 """
 type User implements Timestamps {
   """
+  Lists every auth token of the user
+  """
+  authenticationTokens: [UserAuthenticationToken!]!
+
+  """
   Time when the resource was created.
   """
   createdAt: DateTime!
@@ -2637,6 +2657,15 @@ type User implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+type UserAuthenticationToken implements CreatedAt {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  id: GID!
+  tokenName: String!
 }
 
 union UserOrPetitionAccess = PetitionAccess | User
