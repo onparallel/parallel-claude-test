@@ -1,6 +1,7 @@
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
 import { Response } from "express";
 import { ResponseWrapper, RestResponses } from "./core";
-import Ajv from "ajv";
 
 export class RestResponseWrapper<T> implements ResponseWrapper<T> {
   __type?: T;
@@ -26,6 +27,7 @@ export class RestResponseWrapper<T> implements ResponseWrapper<T> {
     const schema = responses?.[this.status]?.schema;
     if (schema) {
       const ajv = new Ajv({ strict: false });
+      addFormats(ajv, ["date-time"]);
       const validate = ajv.compile(schema as any);
       const valid = validate(this.body);
       if (!valid) {

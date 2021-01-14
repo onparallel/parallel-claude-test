@@ -1,19 +1,18 @@
+import { ClientError, gql, GraphQLClient } from "graphql-request";
 import { outdent } from "outdent";
 import { RestApi } from "../rest/core";
-import { paginationParams, sortByParam, Success } from "./helpers";
+import { UnauthorizedError } from "../rest/errors";
 import { idParam } from "../rest/params";
 import { CreatedResponse, OkResponse } from "../rest/responses";
+import { PetitionFragment } from "./fragments";
+import { paginationParams, sortByParam, Success } from "./helpers";
 import { PaginatedPetitions, Petition } from "./schemas";
-import { ClientError, gql, GraphQLClient } from "graphql-request";
 import {
   petitionQuery,
   petitionQueryVariables,
   petitionsQuery,
   petitionsQueryVariables,
 } from "./__types";
-import { PetitionFragment } from "./fragments";
-import { pick } from "remeda";
-import { UnauthorizedError } from "../rest/errors";
 
 export const api = new RestApi({
   openapi: "3.0.2",

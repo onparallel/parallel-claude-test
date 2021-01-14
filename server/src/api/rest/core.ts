@@ -10,9 +10,10 @@ import {
 } from "./errors";
 import { ParseError } from "./params";
 import { JSONSchemaFor } from "./schemas";
-import Ajv from "ajv";
+import Ajv, { ValidateFunction } from "ajv";
 import { Memoize } from "typescript-memoize";
 import { omit } from "remeda";
+import addFormats from "ajv-formats";
 
 export type RestMethod =
   | "get"
@@ -253,9 +254,12 @@ const _PathResolver: any = (function () {
           )
         );
       }
-      const validate = operationOptions.body?.schema
-        ? new Ajv({ strict: false }).compile(operationOptions.body?.schema)
-        : null;
+      let validate: ValidateFunction<TBody> | null = null;
+      if (operationOptions.body?.schema) {
+        const ajv = new Ajv({ strict: false });
+        addFormats(ajv, ["date-time"]);
+        validate = ajv.compile<TBody>(operationOptions.body?.schema);
+      }
       this.router[method](this.path, async (req, res, next) => {
         const response: ResponseWrapper<any> = await (async () => {
           try {
