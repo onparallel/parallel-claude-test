@@ -113,6 +113,7 @@ export class OrganizationRepository extends BaseRepository {
           "themillandpartners",
           "targetglobal",
           "adplegal",
+          "altamar",
         ].includes(org.identifier)
           ? `${this.config.misc.assetsUrl}/static/logos/${org.identifier}.png`
           : null
