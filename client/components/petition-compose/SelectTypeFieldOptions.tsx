@@ -119,7 +119,7 @@ export const SelectTypeFieldOptions = Object.assign(
                   .map((n) => (n.children as any)[0].text.trim())
                   .filter((option) => option !== "");
                 onFieldEdit({ options: { values } });
-                onChange(valuesToSlateNodes(values));
+                setTimeout(() => onChange(valuesToSlateNodes(values)));
               }}
               {...props}
             />
