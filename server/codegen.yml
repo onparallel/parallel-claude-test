@@ -1,0 +1,26 @@
+schema:
+  - parallel-schema.graphql
+documents:
+  - "src/api/public/**/*.ts"
+generates:
+  ./src/api/public/__types.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+    config:
+      skipTypename: true
+      avoidOptionals: 
+        field: true
+        inputValue: false
+        object: false
+        defaultValue: false
+      namingConvention: keep
+      exportFragmentSpreadSubTypes: true
+      enumsAsTypes: true
+      scalars:
+        DateTime: string
+        JSONObject: "{ [key: string]: any }"
+        GID: string
+hooks:
+  afterAllFileWrite:
+    - yarn prettier --write

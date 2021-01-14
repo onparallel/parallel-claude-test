@@ -21,7 +21,7 @@ export const Link = chakraForwardRef<"a", LinkProps>(function Link(
   const { query } = useRouter();
   return (
     <NextLink
-      href={`/${query.locale}/${href.toString().replace(/^\//, "")}`}
+      href={`/${query.locale ?? "en"}/${href.toString().replace(/^\//, "")}`}
       {...next}
       passHref
     >
@@ -40,7 +40,7 @@ export function NakedLink({ href, children, ...props }: NakedLinkProps) {
   const { query } = useRouter();
   return (
     <NextLink
-      href={`/${query.locale}/${href.toString().replace(/^\//, "")}`}
+      href={`/${query.locale ?? "en"}/${href.toString().replace(/^\//, "")}`}
       {...props}
       passHref
     >

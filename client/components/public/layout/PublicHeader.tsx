@@ -16,17 +16,22 @@ import { BurgerButton } from "@parallel/components/common/BurgerButton";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
+import { useWindowScroll } from "beautiful-react-hooks";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
 
-export interface PublicHeaderProps extends BoxProps {
-  isThin?: boolean;
-}
+export function PublicHeader(props: BoxProps) {
+  const [isThin, setIsThin] = useState(false);
+  useWindowScroll(checkWindowScroll);
+  useEffect(checkWindowScroll, []);
 
-export function PublicHeader({ isThin, ...props }: PublicHeaderProps) {
   const { isOpen, onToggle } = useDisclosure();
   const bp = "lg" as const;
 
+  function checkWindowScroll() {
+    setIsThin(window.scrollY > 20);
+  }
   return (
     <PublicContainer
       wrapper={{

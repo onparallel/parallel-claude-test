@@ -5,6 +5,7 @@ import { ApiContext } from "../context";
 import { LOGGER, Logger } from "../services/logger";
 import { downloads } from "./downloads";
 import { authorize } from "./helpers/authorize";
+import { api as publicApi } from "./public";
 import { webhooks } from "./webhooks";
 
 export function api(container: Container) {
@@ -51,5 +52,7 @@ export function api(container: Container) {
         )
     )
     .use("/downloads", downloads)
-    .use("/webhooks", webhooks);
+    .use("/webhooks", webhooks)
+    .use("/v1", publicApi.handler())
+    .use("/docs", publicApi.spec());
 }

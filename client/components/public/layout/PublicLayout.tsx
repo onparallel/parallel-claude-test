@@ -1,10 +1,9 @@
 import { Flex } from "@chakra-ui/react";
 import languages from "@parallel/lang/languages.json";
 import { resolveUrl } from "@parallel/utils/next";
-import { useWindowScroll } from "beautiful-react-hooks";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { CookieConsent } from "./CookieConsent";
 import { PublicFooter } from "./PublicFooter";
@@ -27,14 +26,6 @@ export function PublicLayout({
 }: PublicLayoutProps) {
   const { query, pathname } = useRouter();
   const intl = useIntl();
-
-  const [headerIsThin, setThinHeader] = useState(false);
-  useWindowScroll(checkWindowScroll);
-  useEffect(checkWindowScroll, []);
-
-  function checkWindowScroll() {
-    setThinHeader(window.scrollY > 20);
-  }
 
   return (
     <>
@@ -66,12 +57,7 @@ export function PublicLayout({
       </Head>
       <Flex direction="column" minHeight="100vh">
         {hideHeader ? null : (
-          <PublicHeader
-            position="sticky"
-            top={0}
-            zIndex={1}
-            isThin={headerIsThin}
-          />
+          <PublicHeader position="sticky" top={0} zIndex={1} />
         )}
         <Flex as="main" flex="1" direction="column">
           {children}
