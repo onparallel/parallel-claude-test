@@ -1752,7 +1752,7 @@ export type UpdateUserInput = {
 export type User = Timestamps & {
   __typename?: "User";
   /** Lists every auth token of the user */
-  authenticationTokens: Array<UserAuthenticationToken>;
+  authenticationTokens: UserAuthenticationTokenPagination;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The email of the user. */
@@ -1778,6 +1778,14 @@ export type User = Timestamps & {
 };
 
 /** A user in the system. */
+export type UserauthenticationTokensArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<UserAuthenticationTokens_OrderBy>>;
+};
+
+/** A user in the system. */
 export type UserhasFeatureFlagArgs = {
   featureFlag: FeatureFlag;
 };
@@ -1787,8 +1795,26 @@ export type UserAuthenticationToken = CreatedAt & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  lastUsedAt?: Maybe<Scalars["DateTime"]>;
   tokenName: Scalars["String"];
 };
+
+export type UserAuthenticationTokenPagination = {
+  __typename?: "UserAuthenticationTokenPagination";
+  /** The requested slice of items. */
+  items: Array<UserAuthenticationToken>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
+/** Order to use on User.authenticationTokens */
+export type UserAuthenticationTokens_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "lastUsedAt_ASC"
+  | "lastUsedAt_DESC"
+  | "tokenName_ASC"
+  | "tokenName_DESC";
 
 export type UserOrPetitionAccess = PetitionAccess | User;
 
@@ -4477,7 +4503,10 @@ export type SecurityQuery = { __typename?: "Query" } & {
 
 export type Tokens_UserAuthenticationTokenFragment = {
   __typename?: "UserAuthenticationToken";
-} & Pick<UserAuthenticationToken, "id" | "tokenName" | "createdAt">;
+} & Pick<
+  UserAuthenticationToken,
+  "id" | "tokenName" | "createdAt" | "lastUsedAt"
+>;
 
 export type RevokeUserAuthTokenMutationVariables = Exact<{
   authTokenIds: Array<Scalars["GID"]>;
@@ -4502,15 +4531,24 @@ export type GenerateUserAuthTokenMutation = { __typename?: "Mutation" } & {
     };
 };
 
-export type TokensQueryVariables = Exact<{ [key: string]: never }>;
+export type TokensQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<UserAuthenticationTokens_OrderBy>>;
+}>;
 
 export type TokensQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "id"> & {
-      authenticationTokens: Array<
-        {
-          __typename?: "UserAuthenticationToken";
-        } & Tokens_UserAuthenticationTokenFragment
-      >;
+      authenticationTokens: {
+        __typename?: "UserAuthenticationTokenPagination";
+      } & Pick<UserAuthenticationTokenPagination, "totalCount"> & {
+          items: Array<
+            {
+              __typename?: "UserAuthenticationToken";
+            } & Tokens_UserAuthenticationTokenFragment
+          >;
+        };
     } & SettingsLayout_UserFragment;
 };
 
@@ -6243,6 +6281,7 @@ export const Tokens_UserAuthenticationTokenFragmentDoc = gql`
     id
     tokenName
     createdAt
+    lastUsedAt
   }
 `;
 export const Login_UserFragmentDoc = gql`
@@ -10962,12 +11001,25 @@ export type GenerateUserAuthTokenMutationHookResult = ReturnType<
   typeof useGenerateUserAuthTokenMutation
 >;
 export const TokensDocument = gql`
-  query Tokens {
+  query Tokens(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [UserAuthenticationTokens_OrderBy!]
+  ) {
     me {
       id
       ...SettingsLayout_User
-      authenticationTokens {
-        ...Tokens_UserAuthenticationToken
+      authenticationTokens(
+        limit: $limit
+        offset: $offset
+        search: $search
+        sortBy: $sortBy
+      ) {
+        totalCount
+        items {
+          ...Tokens_UserAuthenticationToken
+        }
       }
     }
   }
@@ -10987,11 +11039,15 @@ export const TokensDocument = gql`
  * @example
  * const { data, loading, error } = useTokensQuery({
  *   variables: {
+ *      offset: // value for 'offset'
+ *      limit: // value for 'limit'
+ *      search: // value for 'search'
+ *      sortBy: // value for 'sortBy'
  *   },
  * });
  */
 export function useTokensQuery(
-  baseOptions?: Apollo.QueryHookOptions<TokensQuery, TokensQueryVariables>
+  baseOptions: Apollo.QueryHookOptions<TokensQuery, TokensQueryVariables>
 ) {
   return Apollo.useQuery<TokensQuery, TokensQueryVariables>(
     TokensDocument,

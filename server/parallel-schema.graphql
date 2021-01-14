@@ -2610,7 +2610,27 @@ type User implements Timestamps {
   """
   Lists every auth token of the user
   """
-  authenticationTokens: [UserAuthenticationToken!]!
+  authenticationTokens(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+
+    """
+    Sorting to use on the collection
+    """
+    sortBy: [UserAuthenticationTokens_OrderBy!]
+  ): UserAuthenticationTokenPagination!
 
   """
   Time when the resource was created.
@@ -2665,7 +2685,32 @@ type UserAuthenticationToken implements CreatedAt {
   """
   createdAt: DateTime!
   id: GID!
+  lastUsedAt: DateTime
   tokenName: String!
+}
+
+type UserAuthenticationTokenPagination {
+  """
+  The requested slice of items.
+  """
+  items: [UserAuthenticationToken!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
+"""
+Order to use on User.authenticationTokens
+"""
+enum UserAuthenticationTokens_OrderBy {
+  createdAt_ASC
+  createdAt_DESC
+  lastUsedAt_ASC
+  lastUsedAt_DESC
+  tokenName_ASC
+  tokenName_DESC
 }
 
 union UserOrPetitionAccess = PetitionAccess | User

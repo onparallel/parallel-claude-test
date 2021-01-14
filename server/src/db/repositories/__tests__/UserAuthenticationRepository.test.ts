@@ -57,8 +57,11 @@ describe("repositories/UserAuthenticationRepository", () => {
   });
 
   it("loads all available user auth tokens", async () => {
-    const userTokens = await userAuth.loadUserAuthenticationTokens(user.id);
-    expect(userTokens).toEqual(authTokens);
+    const userTokens = await userAuth.loadUserAuthenticationTokens(user.id, {
+      limit: 10,
+      offset: 0,
+    });
+    expect(userTokens.items).toEqual(authTokens);
   });
 
   it("deletes an user auth token by its id", async () => {
@@ -69,11 +72,11 @@ describe("repositories/UserAuthenticationRepository", () => {
 
     const availableTokens = await userAuth.loadUserAuthenticationTokens(
       user.id,
-      { cache: false }
+      { limit: 10, offset: 0 }
     );
 
     expect(deletedToken.id).toEqual(authTokens[0].id);
-    expect(availableTokens).toEqual([authTokens[1]]);
+    expect(availableTokens.items).toEqual([authTokens[1]]);
   });
 
   it("should throw error when trying to create a token with a taken name", async () => {

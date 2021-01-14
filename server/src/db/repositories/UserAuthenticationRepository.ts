@@ -1,10 +1,8 @@
-import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
-import { groupBy } from "remeda";
-import { fromDataLoader } from "../../util/fromDataLoader";
 import { hash, random } from "../../util/token";
-import { BaseRepository } from "../helpers/BaseRepository";
+import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
+import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import { User, UserAuthenticationToken } from "../__types";
 
@@ -12,6 +10,24 @@ import { User, UserAuthenticationToken } from "../__types";
 export class UserAuthenticationRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex) {
     super(knex);
+  }
+
+  async validateApiKey(apiKey: string): Promise<string | null> {
+    const [userId] = await this.from("user_authentication_token")
+      .where({
+        deleted_at: null,
+        token_hash: await hash(apiKey, ""),
+      })
+      .update({ last_used_at: this.now() })
+      .returning("user_id");
+
+    if (!userId) return null;
+
+    const [user] = await this.from("user")
+      .where({ deleted_at: null, id: userId })
+      .select("cognito_id");
+
+    return user?.cognito_id;
   }
 
   async userHasAccessToAuthTokens(ids: number[], userId: number) {
@@ -26,18 +42,46 @@ export class UserAuthenticationRepository extends BaseRepository {
     return count === new Set(ids).size;
   }
 
-  readonly loadUserAuthenticationTokens = fromDataLoader(
-    new DataLoader<number, UserAuthenticationToken[]>(async (userIds) => {
-      const rows = await this.from("user_authentication_token")
-        .whereNull("deleted_at")
-        .whereIn("user_id", userIds)
-        .orderBy("created_at", "desc")
-        .select("*");
-
-      const byUserId = groupBy(rows, (r) => r.user_id);
-      return userIds.map((id) => byUserId[id] ?? []);
-    })
-  );
+  async loadUserAuthenticationTokens(
+    userId: number,
+    opts: {
+      search?: string | null;
+      sortBy?: SortBy<keyof UserAuthenticationToken>[];
+    } & PageOpts
+  ) {
+    return await this.loadPageAndCount(
+      this.from("user_authentication_token")
+        .where({
+          user_id: userId,
+          deleted_at: null,
+        })
+        .mmodify((q) => {
+          const { search, sortBy } = opts;
+          if (search) {
+            q.whereIlike("token_name", `%${escapeLike(search, "\\")}%`, "\\");
+          }
+          if (sortBy) {
+            q.orderByRaw(
+              sortBy
+                .map((s) => {
+                  // nullable column
+                  if (["last_used_at"].includes(s.column)) {
+                    return `${s.column} ${s.order} NULLS ${
+                      s.order === "asc" ? "FIRST" : "LAST"
+                    }`;
+                  } else {
+                    return `${s.column} ${s.order}`;
+                  }
+                })
+                .join(", ")
+            );
+          }
+        })
+        .orderBy("id")
+        .select("*"),
+      opts
+    );
+  }
 
   async createUserAuthenticationToken(tokenName: string, user: User) {
     const apiKey = random(32);

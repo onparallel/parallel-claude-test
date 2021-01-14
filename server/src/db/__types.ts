@@ -732,6 +732,7 @@ export interface UserAuthenticationToken {
   user_id: number;
   token_name: string;
   token_hash: string;
+  last_used_at: Maybe<Date>;
   created_at: Date;
   created_by: Maybe<string>;
   deleted_at: Maybe<Date>;
@@ -740,5 +741,5 @@ export interface UserAuthenticationToken {
 
 export type CreateUserAuthenticationToken = PartialProps<
   Omit<UserAuthenticationToken, "id">,
-  "created_at" | "created_by" | "deleted_at" | "deleted_by"
+  "last_used_at" | "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;

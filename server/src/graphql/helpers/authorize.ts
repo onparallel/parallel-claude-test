@@ -17,7 +17,9 @@ export function authenticate<
     if (!token) {
       throw new AuthenticationError("Invalid session");
     }
-    const cognitoId = await ctx.auth.validateSession(token);
+    const cognitoId =
+      (await ctx.auth.validateSession(token)) ??
+      (await ctx.userAuthentication.validateApiKey(token));
     if (!cognitoId) {
       throw new AuthenticationError("Invalid session");
     }

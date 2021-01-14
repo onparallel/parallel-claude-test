@@ -7,10 +7,15 @@ export async function up(knex: Knex): Promise<void> {
     t.integer("user_id").notNullable().references("user.id");
     t.string("token_name").notNullable();
     t.string("token_hash").notNullable();
+    t.timestamp("last_used_at");
     timestamps(t, { updated: false });
   }).raw(/* sql */ `
     create index "user_authentication_token__user_id" 
     on "user_authentication_token" ("user_id") 
+    where deleted_at is null;
+  `).raw(/* sql */ `
+    create index "user_authentication_token__token_hash" 
+    on "user_authentication_token" ("token_hash") 
     where deleted_at is null;
   `).raw(/* sql */ `
       create unique index "user_authentication_token__token_name_user_id" 

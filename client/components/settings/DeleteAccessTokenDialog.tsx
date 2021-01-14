@@ -6,13 +6,17 @@ import {
 } from "@parallel/components/common/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
-export function DeleteAccessTokenDialog(props: DialogProps) {
+export function DeleteAccessTokenDialog({
+  plural,
+  ...props
+}: DialogProps & { plural: boolean }) {
   return (
     <ConfirmDialog
       header={
         <FormattedMessage
           id="settings.api-tokens.confirm-delete-token-dialog.header"
-          defaultMessage="Delete access token"
+          defaultMessage="Revoke access {plural, select, true {tokens} other {token}}"
+          values={{ plural }}
         />
       }
       body={
@@ -20,14 +24,15 @@ export function DeleteAccessTokenDialog(props: DialogProps) {
           <Box>
             <FormattedMessage
               id="settings.api-tokens.confirm-delete-token-dialog.body-1"
-              defaultMessage="Are you sure you want to delete this token?"
+              defaultMessage="Are you sure you want to delete this {plural, select, true {tokens} other {token}}?"
+              values={{ plural }}
             />
           </Box>
           <Box>
             <FormattedMessage
               id="settings.api-tokens.confirm-delete-tokens-dialog.body-warning"
               defaultMessage="Any applications or scripts using this {plural, select, true {tokens} other {token}} will no longer be able to access the Parallel API. You cannot undo this action."
-              values={{ plural: false }}
+              values={{ plural }}
             />
           </Box>
         </Stack>
@@ -35,8 +40,8 @@ export function DeleteAccessTokenDialog(props: DialogProps) {
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="settings.api-tokens.confirm-delete-token-dialog.confirm-button"
-            defaultMessage="Yes, delete token"
+            id="generic.confirm-delete-button"
+            defaultMessage="Yes, delete"
           />
         </Button>
       }

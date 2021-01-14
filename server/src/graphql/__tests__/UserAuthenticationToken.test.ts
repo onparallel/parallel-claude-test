@@ -33,11 +33,17 @@ describe("GraphQL/UserAuthenticationToken", () => {
   describe("Queries", () => {
     let authTokens: UserAuthenticationToken[];
     beforeEach(async () => {
-      authTokens = await Promise.all([
-        mocks.createUserAuthToken("My First Token", user.id).then((t) => t[0]),
-        mocks.createUserAuthToken("My Second Token", user.id).then((t) => t[0]),
-        mocks.createUserAuthToken("My Third Token", user.id).then((t) => t[0]),
-      ]);
+      authTokens = [
+        await mocks
+          .createUserAuthToken("My First Token", user.id)
+          .then((t) => t[0]),
+        await mocks
+          .createUserAuthToken("My Second Token", user.id)
+          .then((t) => t[0]),
+        await mocks
+          .createUserAuthToken("My Third Token", user.id)
+          .then((t) => t[0]),
+      ];
     });
 
     afterEach(async () => {
@@ -49,8 +55,11 @@ describe("GraphQL/UserAuthenticationToken", () => {
         query: gql`
           query me {
             me {
-              authenticationTokens {
-                tokenName
+              authenticationTokens(limit: 10, offset: 0) {
+                totalCount
+                items {
+                  tokenName
+                }
               }
             }
           }
@@ -59,11 +68,14 @@ describe("GraphQL/UserAuthenticationToken", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.me).toEqual({
-        authenticationTokens: [
-          { tokenName: "My First Token" },
-          { tokenName: "My Second Token" },
-          { tokenName: "My Third Token" },
-        ],
+        authenticationTokens: {
+          totalCount: 3,
+          items: [
+            { tokenName: "My Third Token" },
+            { tokenName: "My Second Token" },
+            { tokenName: "My First Token" },
+          ],
+        },
       });
     });
 
@@ -85,8 +97,11 @@ describe("GraphQL/UserAuthenticationToken", () => {
         query: gql`
           query me {
             me {
-              authenticationTokens {
-                tokenName
+              authenticationTokens(limit: 10, offset: 0) {
+                totalCount
+                items {
+                  tokenName
+                }
               }
             }
           }
@@ -95,10 +110,13 @@ describe("GraphQL/UserAuthenticationToken", () => {
 
       expect(errors).toBeUndefined();
       expect(data!.me).toEqual({
-        authenticationTokens: [
-          { tokenName: "My First Token" },
-          { tokenName: "My Third Token" },
-        ],
+        authenticationTokens: {
+          totalCount: 2,
+          items: [
+            { tokenName: "My Third Token" },
+            { tokenName: "My First Token" },
+          ],
+        },
       });
     });
   });

@@ -212,6 +212,13 @@ export interface NexusGenEnums {
     | "name_ASC"
     | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
+  UserAuthenticationTokens_OrderBy:
+    | "createdAt_ASC"
+    | "createdAt_DESC"
+    | "lastUsedAt_ASC"
+    | "lastUsedAt_DESC"
+    | "tokenName_ASC"
+    | "tokenName_DESC";
   UserStatus: db.UserStatus;
 }
 
@@ -381,6 +388,11 @@ export interface NexusGenObjects {
   };
   User: db.User;
   UserAuthenticationToken: db.UserAuthenticationToken;
+  UserAuthenticationTokenPagination: {
+    // root type
+    items: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
+    totalCount: number; // Int!
+  };
   UserPagination: {
     // root type
     items: NexusGenRootTypes["User"][]; // [User!]!
@@ -1030,7 +1042,7 @@ export interface NexusGenFieldTypes {
   };
   User: {
     // field return type
-    authenticationTokens: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
+    authenticationTokens: NexusGenRootTypes["UserAuthenticationTokenPagination"]; // UserAuthenticationTokenPagination!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     email: string; // String!
     firstName: string | null; // String
@@ -1050,7 +1062,13 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    lastUsedAt: NexusGenScalars["DateTime"] | null; // DateTime
     tokenName: string; // String!
+  };
+  UserAuthenticationTokenPagination: {
+    // field return type
+    items: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
+    totalCount: number; // Int!
   };
   UserPagination: {
     // field return type
@@ -1723,7 +1741,7 @@ export interface NexusGenFieldTypeNames {
   };
   User: {
     // field return type name
-    authenticationTokens: "UserAuthenticationToken";
+    authenticationTokens: "UserAuthenticationTokenPagination";
     createdAt: "DateTime";
     email: "String";
     firstName: "String";
@@ -1743,7 +1761,13 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    lastUsedAt: "DateTime";
     tokenName: "String";
+  };
+  UserAuthenticationTokenPagination: {
+    // field return type name
+    items: "UserAuthenticationToken";
+    totalCount: "Int";
   };
   UserPagination: {
     // field return type name
@@ -2309,6 +2333,13 @@ export interface NexusGenArgTypes {
     };
   };
   User: {
+    authenticationTokens: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      search?: string | null; // String
+      sortBy?: NexusGenEnums["UserAuthenticationTokens_OrderBy"][] | null; // [UserAuthenticationTokens_OrderBy!]
+    };
     hasFeatureFlag: {
       // args
       featureFlag: NexusGenEnums["FeatureFlag"]; // FeatureFlag!

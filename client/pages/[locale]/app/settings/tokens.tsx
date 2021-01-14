@@ -1,9 +1,15 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
-import { CheckIcon } from "@parallel/chakra/icons";
+import { Box, Button, Stack, Text } from "@chakra-ui/react";
+import { RepeatIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
+import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { SearchInput } from "@parallel/components/common/SearchInput";
+import { Spacer } from "@parallel/components/common/Spacer";
+import { TableColumn } from "@parallel/components/common/Table";
+import { TablePage } from "@parallel/components/common/TablePage";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -11,57 +17,92 @@ import {
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useDeleteAccessTokenDialog } from "@parallel/components/settings/DeleteAccessTokenDialog";
 import { useGenerateNewTokenDialog } from "@parallel/components/settings/GenerateNewTokenDialog";
-import { useRevokeAllAccessTokensDialog } from "@parallel/components/settings/RevokeAllAccessTokensDialog";
 import {
   TokensQuery,
   Tokens_UserAuthenticationTokenFragment,
   useGenerateUserAuthTokenMutation,
+  UserAuthenticationTokens_OrderBy,
   useRevokeUserAuthTokenMutation,
   useTokensQuery,
 } from "@parallel/graphql/__types";
-import { assertQuery } from "@parallel/utils/apollo/assertQuery";
+import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import {
+  integer,
+  parseQuery,
+  sorting,
+  string,
+  useQueryState,
+} from "@parallel/utils/queryState";
+import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
-import { useState } from "react";
-import { FormattedDate, FormattedMessage, useIntl } from "react-intl";
+import { useCallback, useMemo, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
+const PAGE_SIZE = 10;
+const SORTING = ["tokenName", "createdAt", "lastUsedAt"] as const;
+const QUERY_STATE = {
+  page: integer({ min: 1 }).orDefault(1),
+  search: string(),
+  sort: sorting(SORTING).orDefault({
+    field: "createdAt",
+    direction: "DESC",
+  }),
+};
 
 function Tokens() {
   const intl = useIntl();
+  const [state, setQueryState] = useQueryState(QUERY_STATE);
+
   const {
     data: { me },
+    loading,
     refetch,
-  } = assertQuery(useTokensQuery());
+  } = useAssertQueryOrPreviousData(
+    useTokensQuery({
+      variables: {
+        offset: PAGE_SIZE * (state.page - 1),
+        limit: PAGE_SIZE,
+        search: state.search,
+        sortBy: [
+          `${state.sort.field}_${state.sort.direction}` as UserAuthenticationTokens_OrderBy,
+        ],
+      },
+    })
+  );
   const sections = useSettingsSections();
-
   const authTokens = me.authenticationTokens;
 
-  const showRevokeAllTokensDialog = useRevokeAllAccessTokensDialog();
-  const [revokeTokens] = useRevokeUserAuthTokenMutation();
-  const handleRevokeAllTokens = async () => {
-    try {
-      await showRevokeAllTokensDialog({});
-      await revokeTokens({
-        variables: {
-          authTokenIds: authTokens.map((t) => t.id),
-        },
-      });
-      await handleTokenRevoked();
-    } catch {}
-  };
-
-  const handleTokenRevoked = async () => {
-    await refetch();
-    setApiKey("");
-  };
-
   const [apiKey, setApiKey] = useState("");
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const [search, setSearch] = useState(state.search);
+  const debouncedOnSearchChange = useDebouncedCallback(
+    (value) => {
+      setQueryState((current) => ({
+        ...current,
+        search: value,
+        page: 1,
+      }));
+    },
+    300,
+    [setQueryState]
+  );
+  const handleSearchChange = useCallback(
+    (value: string | null) => {
+      setSearch(value);
+      debouncedOnSearchChange(value || null);
+    },
+    [debouncedOnSearchChange]
+  );
+
   const showGenerateNewTokenDialog = useGenerateNewTokenDialog();
   const [generateToken] = useGenerateUserAuthTokenMutation();
   const handleGenerateNewToken = async () => {
     try {
       const tokenName = await showGenerateNewTokenDialog({
-        usedTokenNames: authTokens.map((t) => t.tokenName),
+        usedTokenNames: authTokens.items.map((t) => t.tokenName),
       });
       const { data } = await generateToken({
         variables: { tokenName },
@@ -70,6 +111,24 @@ function Tokens() {
       setApiKey(data!.generateUserAuthToken.apiKey);
     } catch {}
   };
+
+  const showRevokeAccessToken = useDeleteAccessTokenDialog();
+  const [revokeTokens] = useRevokeUserAuthTokenMutation();
+  const handleRevokeTokens = async (tokenIds: string[]) => {
+    try {
+      await showRevokeAccessToken({ plural: tokenIds.length > 1 });
+      await revokeTokens({
+        variables: {
+          authTokenIds: tokenIds,
+        },
+      });
+
+      await refetch();
+      setApiKey("");
+    } catch {}
+  };
+
+  const columns = useAuthTokensTableColumns();
 
   return (
     <SettingsLayout
@@ -90,111 +149,164 @@ function Tokens() {
         />
       }
     >
-      <Box padding={4}>
-        <Text marginBottom={2}>
-          <FormattedMessage
-            id="settings.api-tokens.explainer"
-            defaultMessage="Personal Access Tokens can be used to access the Parallel API."
-          />
-        </Text>
-        <Flex marginBottom={2}>
-          <Button
-            colorScheme="purple"
-            onClick={handleGenerateNewToken}
-            marginRight={2}
-          >
-            <FormattedMessage
-              id="settings.api-tokens.generate-new-token"
-              defaultMessage="Generate new token"
-            />
-          </Button>
-          {authTokens.length > 0 && (
-            <Button onClick={handleRevokeAllTokens}>
-              <Text color="red.500">
-                <FormattedMessage
-                  id="settings.api-tokens.revoke-all"
-                  defaultMessage="Revoke all"
+      <Box flex="1" padding={4}>
+        <FormattedMessage
+          id="settings.api-tokens.explainer"
+          defaultMessage="Personal Access Tokens can be used to access the Parallel API."
+        />
+
+        {apiKey && (
+          <Card bgColor="green.100" padding={4} marginTop={2} marginBottom={2}>
+            <Text>
+              <FormattedMessage
+                id="settings.api-tokens.your-token-is"
+                defaultMessage="Your access token is"
+              />
+              :{" "}
+              <Text fontWeight="bold">
+                {apiKey}{" "}
+                <CopyToClipboardButton
+                  colorScheme="green"
+                  size="xs"
+                  text={apiKey}
                 />
               </Text>
-            </Button>
-          )}
-        </Flex>
-        <Stack maxWidth="450px">
-          {apiKey && (
-            <Card bgColor="green.100" padding={2}>
-              <FormattedMessage
-                id="settings.api-tokens.make-sure-to-copy.card"
-                defaultMessage="Make sure to copy your new personal access token now. You won’t be able to see it again."
-              />
-            </Card>
-          )}
-          {authTokens.map((token, i) => (
-            <AccessTokenCard
-              key={token.id}
-              apiKey={i === 0 ? apiKey : undefined}
-              accessToken={token}
-              onTokenRevoked={handleTokenRevoked}
+            </Text>
+            <FormattedMessage
+              id="settings.api-tokens.make-sure-to-copy.card"
+              defaultMessage="Make sure to copy your new personal access token now. You won’t be able to see it again."
             />
-          ))}
-        </Stack>
+          </Card>
+        )}
+        <TablePage
+          isSelectable
+          isHighlightable
+          columns={columns}
+          rows={authTokens.items}
+          rowKeyProp="id"
+          loading={loading}
+          page={state.page}
+          pageSize={PAGE_SIZE}
+          totalCount={authTokens.totalCount}
+          sort={state.sort}
+          onSelectionChange={setSelected}
+          onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+          onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          header={
+            <Stack direction="row" padding={2}>
+              <Box flex="0 1 400px">
+                <SearchInput
+                  value={search ?? ""}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                />
+              </Box>
+              <IconButtonWithTooltip
+                onClick={() => refetch()}
+                icon={<RepeatIcon />}
+                placement="bottom"
+                variant="outline"
+                label={intl.formatMessage({
+                  id: "generic.reload-data",
+                  defaultMessage: "Reload",
+                })}
+              />
+              <Spacer />
+
+              <Button
+                isDisabled={selected.length === 0}
+                onClick={() => handleRevokeTokens(selected)}
+              >
+                <Text color="red.500">
+                  <FormattedMessage
+                    id="settings.api-tokens.delete-selected"
+                    defaultMessage="Delete selected tokens"
+                  />
+                </Text>
+              </Button>
+
+              <Button colorScheme="purple" onClick={handleGenerateNewToken}>
+                <FormattedMessage
+                  id="settings.api-tokens.generate-new-token"
+                  defaultMessage="Generate new token"
+                />
+              </Button>
+            </Stack>
+          }
+        />
       </Box>
     </SettingsLayout>
   );
 }
 
-function AccessTokenCard({
-  apiKey,
-  accessToken,
-  onTokenRevoked,
-}: {
-  apiKey?: string;
-  accessToken: Tokens_UserAuthenticationTokenFragment;
-  onTokenRevoked: () => void;
-}) {
-  const showConfirmDeleteTokenDialog = useDeleteAccessTokenDialog();
-
-  const [revokeToken] = useRevokeUserAuthTokenMutation();
-
-  const handleDeleteToken = async () => {
-    try {
-      await showConfirmDeleteTokenDialog({});
-      await revokeToken({
-        variables: {
-          authTokenIds: [accessToken.id],
+function useAuthTokensTableColumns(): TableColumn<Tokens_UserAuthenticationTokenFragment>[] {
+  const intl = useIntl();
+  return useMemo(
+    () => [
+      {
+        key: "tokenName",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "settings.api-tokens.header.token-name",
+          defaultMessage: "Token name",
+        }),
+        CellContent: ({ row }) => {
+          return (
+            <Text
+              as="span"
+              display="inline-flex"
+              whiteSpace="nowrap"
+              alignItems="center"
+            >
+              {row.tokenName}
+            </Text>
+          );
         },
-      });
-      await onTokenRevoked();
-    } catch {}
-  };
-
-  return (
-    <Card padding={2}>
-      <Stack>
-        <Flex justifyContent="space-between">
-          <Text fontWeight="bold" wordBreak="break-all" flex={0.9}>
-            {accessToken.tokenName}
-          </Text>
-          <Button size="sm" colorScheme="red" onClick={handleDeleteToken}>
-            <FormattedMessage id="generic.delete" defaultMessage="Delete" />
-          </Button>
-        </Flex>
-        {apiKey && (
-          <Text fontFamily="monospace" wordBreak="break-all">
-            <CheckIcon color="green.600" marginRight={1} />
-            {apiKey}
-            <CopyToClipboardButton size="xs" text={apiKey} marginLeft={1} />
-          </Text>
-        )}
-        <Text fontSize="sm">
-          <FormattedMessage
-            id="generic.created-at"
-            defaultMessage="Created at"
+      },
+      {
+        key: "lastUsedAt",
+        header: intl.formatMessage({
+          id: "generic.last-used-at",
+          defaultMessage: "Last used at",
+        }),
+        isSortable: true,
+        CellContent: ({ row }) =>
+          row.lastUsedAt ? (
+            <DateTime
+              value={row.lastUsedAt}
+              format={FORMATS.LLL}
+              useRelativeTime
+              whiteSpace="nowrap"
+            />
+          ) : (
+            <Text textStyle="hint">
+              <FormattedMessage
+                id="generic.never-used"
+                defaultMessage="Never used"
+              />
+            </Text>
+          ),
+      },
+      {
+        key: "createdAt",
+        isSortable: true,
+        header: intl.formatMessage({
+          id: "generic.created-at",
+          defaultMessage: "Created at",
+        }),
+        cellProps: {
+          width: "1px",
+        },
+        CellContent: ({ row }) => (
+          <DateTime
+            value={row.createdAt}
+            format={FORMATS.LLL}
+            useRelativeTime
+            whiteSpace="nowrap"
           />
-          :&nbsp;
-          <FormattedDate value={accessToken.createdAt} {...FORMATS.LL} />
-        </Text>
-      </Stack>
-    </Card>
+        ),
+      },
+    ],
+    [intl.locale]
   );
 }
 
@@ -204,6 +316,7 @@ Tokens.fragments = {
       id
       tokenName
       createdAt
+      lastUsedAt
     }
   `,
 };
@@ -227,20 +340,50 @@ Tokens.mutations = [
   `,
 ];
 
-Tokens.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
-  await fetchQuery<TokensQuery>(gql`
-    query Tokens {
-      me {
-        id
-        ...SettingsLayout_User
-        authenticationTokens {
-          ...Tokens_UserAuthenticationToken
+Tokens.getInitialProps = async ({
+  fetchQuery,
+  ...context
+}: WithApolloDataContext) => {
+  const { page, search, sort } = parseQuery(context.query, QUERY_STATE);
+
+  await fetchQuery<TokensQuery>(
+    gql`
+      query Tokens(
+        $offset: Int!
+        $limit: Int!
+        $search: String
+        $sortBy: [UserAuthenticationTokens_OrderBy!]
+      ) {
+        me {
+          id
+          ...SettingsLayout_User
+          authenticationTokens(
+            limit: $limit
+            offset: $offset
+            search: $search
+            sortBy: $sortBy
+          ) {
+            totalCount
+            items {
+              ...Tokens_UserAuthenticationToken
+            }
+          }
         }
       }
+      ${SettingsLayout.fragments.User}
+      ${Tokens.fragments.UserAuthenticationToken}
+    `,
+    {
+      variables: {
+        offset: PAGE_SIZE * (page - 1),
+        limit: PAGE_SIZE,
+        search,
+        sortBy: [
+          `${sort.field}_${sort.direction}` as UserAuthenticationTokens_OrderBy,
+        ],
+      },
     }
-    ${SettingsLayout.fragments.User}
-    ${Tokens.fragments.UserAuthenticationToken}
-  `);
+  );
 };
 
 export default compose(withDialogs, withApolloData)(Tokens);

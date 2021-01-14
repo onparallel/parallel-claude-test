@@ -1,6 +1,7 @@
-import { arg, enumType, list, nonNull, objectType } from "@nexus/schema";
+import { arg, enumType, nonNull, objectType } from "@nexus/schema";
 import { rootIsContextUser } from "./authorizers";
 import { fullName } from "../../util/fullName";
+import { parseSortBy } from "../helpers/paginationPlugin";
 
 export const OrganizationRole = enumType({
   name: "OrganizationRole",
@@ -91,13 +92,29 @@ export const User = objectType({
       type: "UserStatus",
       resolve: (o) => o.status,
     });
-    t.field("authenticationTokens", {
-      description: "Lists every auth token of the user",
-      type: list(nonNull("UserAuthenticationToken")),
+    t.paginationField("authenticationTokens", {
       authorize: rootIsContextUser(),
-      resolve: async (root, _, ctx) => {
+      description: "Lists every auth token of the user",
+      type: "UserAuthenticationToken",
+      searchable: true,
+      sortableBy: ["createdAt", "tokenName", "lastUsedAt"],
+      resolve: async (root, { offset, limit, search, sortBy }, ctx) => {
+        const columnMap = {
+          tokenName: "token_name",
+          createdAt: "created_at",
+          lastUsedAt: "last_used_at",
+        } as const;
         return await ctx.userAuthentication.loadUserAuthenticationTokens(
-          root.id
+          root.id,
+          {
+            offset,
+            limit,
+            search,
+            sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
+              const [field, order] = parseSortBy(value);
+              return { column: columnMap[field], order };
+            }),
+          }
         );
       },
     });
