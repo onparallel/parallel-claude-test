@@ -152,6 +152,12 @@ export type FileUploadReplyDownloadLinkResult = {
   url?: Maybe<Scalars["String"]>;
 };
 
+export type GenerateUserAuthTokenResponse = {
+  __typename?: "GenerateUserAuthTokenResponse";
+  apiKey: Scalars["String"];
+  userAuthToken: UserAuthenticationToken;
+};
+
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE";
 
@@ -224,6 +230,8 @@ export type Mutation = {
   editPetitionUserPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
+  /** Generates a new API token for the context user */
+  generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Marks the specified comments as read. */
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
   /** Checks if a PetitionClosedNotification was already sent or not */
@@ -264,6 +272,8 @@ export type Mutation = {
   reopenPetition: Petition;
   /** Removes the Signaturit Branding Ids of selected organization. */
   resetSignaturitOrganizationBranding: SupportMethodResponse;
+  /** Soft-deletes a given auth token, making it permanently unusable. */
+  revokeUserAuthToken: Result;
   /** Sends a petition message to the specified contacts. */
   sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -438,6 +448,10 @@ export type MutationfileUploadReplyDownloadLinkArgs = {
   replyId: Scalars["GID"];
 };
 
+export type MutationgenerateUserAuthTokenArgs = {
+  tokenName: Scalars["String"];
+};
+
 export type MutationmarkPetitionFieldCommentsAsReadArgs = {
   petitionFieldCommentIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -547,6 +561,10 @@ export type MutationreopenPetitionArgs = {
 
 export type MutationresetSignaturitOrganizationBrandingArgs = {
   orgId: Scalars["Int"];
+};
+
+export type MutationrevokeUserAuthTokenArgs = {
+  authTokenIds: Array<Scalars["GID"]>;
 };
 
 export type MutationsendMessagesArgs = {
@@ -1733,6 +1751,8 @@ export type UpdateUserInput = {
 /** A user in the system. */
 export type User = Timestamps & {
   __typename?: "User";
+  /** Lists every auth token of the user */
+  authenticationTokens: Array<UserAuthenticationToken>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The email of the user. */
@@ -1760,6 +1780,14 @@ export type User = Timestamps & {
 /** A user in the system. */
 export type UserhasFeatureFlagArgs = {
   featureFlag: FeatureFlag;
+};
+
+export type UserAuthenticationToken = CreatedAt & {
+  __typename?: "UserAuthenticationToken";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  tokenName: Scalars["String"];
 };
 
 export type UserOrPetitionAccess = PetitionAccess | User;
@@ -4447,6 +4475,45 @@ export type SecurityQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "id"> & AppLayout_UserFragment;
 };
 
+export type Tokens_UserAuthenticationTokenFragment = {
+  __typename?: "UserAuthenticationToken";
+} & Pick<UserAuthenticationToken, "id" | "tokenName" | "createdAt">;
+
+export type RevokeUserAuthTokenMutationVariables = Exact<{
+  authTokenIds: Array<Scalars["GID"]>;
+}>;
+
+export type RevokeUserAuthTokenMutation = { __typename?: "Mutation" } & Pick<
+  Mutation,
+  "revokeUserAuthToken"
+>;
+
+export type GenerateUserAuthTokenMutationVariables = Exact<{
+  tokenName: Scalars["String"];
+}>;
+
+export type GenerateUserAuthTokenMutation = { __typename?: "Mutation" } & {
+  generateUserAuthToken: {
+    __typename?: "GenerateUserAuthTokenResponse";
+  } & Pick<GenerateUserAuthTokenResponse, "apiKey"> & {
+      userAuthToken: {
+        __typename?: "UserAuthenticationToken";
+      } & Tokens_UserAuthenticationTokenFragment;
+    };
+};
+
+export type TokensQueryVariables = Exact<{ [key: string]: never }>;
+
+export type TokensQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "id"> & {
+      authenticationTokens: Array<
+        {
+          __typename?: "UserAuthenticationToken";
+        } & Tokens_UserAuthenticationTokenFragment
+      >;
+    } & SettingsLayout_UserFragment;
+};
+
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CurrentUserQuery = { __typename?: "Query" } & {
@@ -6170,6 +6237,13 @@ export const Settings_UserFragmentDoc = gql`
     ...AppLayout_User
   }
   ${AppLayout_UserFragmentDoc}
+`;
+export const Tokens_UserAuthenticationTokenFragmentDoc = gql`
+  fragment Tokens_UserAuthenticationToken on UserAuthenticationToken {
+    id
+    tokenName
+    createdAt
+  }
 `;
 export const Login_UserFragmentDoc = gql`
   fragment Login_User on User {
@@ -10807,6 +10881,133 @@ export type SecurityQueryHookResult = ReturnType<typeof useSecurityQuery>;
 export type SecurityLazyQueryHookResult = ReturnType<
   typeof useSecurityLazyQuery
 >;
+export const RevokeUserAuthTokenDocument = gql`
+  mutation RevokeUserAuthToken($authTokenIds: [GID!]!) {
+    revokeUserAuthToken(authTokenIds: $authTokenIds)
+  }
+`;
+
+/**
+ * __useRevokeUserAuthTokenMutation__
+ *
+ * To run a mutation, you first call `useRevokeUserAuthTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRevokeUserAuthTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [revokeUserAuthTokenMutation, { data, loading, error }] = useRevokeUserAuthTokenMutation({
+ *   variables: {
+ *      authTokenIds: // value for 'authTokenIds'
+ *   },
+ * });
+ */
+export function useRevokeUserAuthTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RevokeUserAuthTokenMutation,
+    RevokeUserAuthTokenMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    RevokeUserAuthTokenMutation,
+    RevokeUserAuthTokenMutationVariables
+  >(RevokeUserAuthTokenDocument, baseOptions);
+}
+export type RevokeUserAuthTokenMutationHookResult = ReturnType<
+  typeof useRevokeUserAuthTokenMutation
+>;
+export const GenerateUserAuthTokenDocument = gql`
+  mutation GenerateUserAuthToken($tokenName: String!) {
+    generateUserAuthToken(tokenName: $tokenName) {
+      apiKey
+      userAuthToken {
+        ...Tokens_UserAuthenticationToken
+      }
+    }
+  }
+  ${Tokens_UserAuthenticationTokenFragmentDoc}
+`;
+
+/**
+ * __useGenerateUserAuthTokenMutation__
+ *
+ * To run a mutation, you first call `useGenerateUserAuthTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateUserAuthTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateUserAuthTokenMutation, { data, loading, error }] = useGenerateUserAuthTokenMutation({
+ *   variables: {
+ *      tokenName: // value for 'tokenName'
+ *   },
+ * });
+ */
+export function useGenerateUserAuthTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GenerateUserAuthTokenMutation,
+    GenerateUserAuthTokenMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    GenerateUserAuthTokenMutation,
+    GenerateUserAuthTokenMutationVariables
+  >(GenerateUserAuthTokenDocument, baseOptions);
+}
+export type GenerateUserAuthTokenMutationHookResult = ReturnType<
+  typeof useGenerateUserAuthTokenMutation
+>;
+export const TokensDocument = gql`
+  query Tokens {
+    me {
+      id
+      ...SettingsLayout_User
+      authenticationTokens {
+        ...Tokens_UserAuthenticationToken
+      }
+    }
+  }
+  ${SettingsLayout_UserFragmentDoc}
+  ${Tokens_UserAuthenticationTokenFragmentDoc}
+`;
+
+/**
+ * __useTokensQuery__
+ *
+ * To run a query within a React component, call `useTokensQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTokensQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTokensQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useTokensQuery(
+  baseOptions?: Apollo.QueryHookOptions<TokensQuery, TokensQueryVariables>
+) {
+  return Apollo.useQuery<TokensQuery, TokensQueryVariables>(
+    TokensDocument,
+    baseOptions
+  );
+}
+export function useTokensLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<TokensQuery, TokensQueryVariables>
+) {
+  return Apollo.useLazyQuery<TokensQuery, TokensQueryVariables>(
+    TokensDocument,
+    baseOptions
+  );
+}
+export type TokensQueryHookResult = ReturnType<typeof useTokensQuery>;
+export type TokensLazyQueryHookResult = ReturnType<typeof useTokensLazyQuery>;
 export const CurrentUserDocument = gql`
   query CurrentUser {
     me {

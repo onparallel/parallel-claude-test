@@ -132,6 +132,11 @@ export function createApolloClient(
             users: { merge: false },
           },
         },
+        User: {
+          fields: {
+            authenticationTokens: { merge: false },
+          },
+        },
       },
     }).restore(initialState ?? {}),
     typeDefs,

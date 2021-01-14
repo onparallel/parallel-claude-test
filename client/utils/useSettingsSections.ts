@@ -19,6 +19,13 @@ export function useSettingsSections() {
         }),
         path: "/app/settings/security",
       },
+      {
+        title: intl.formatMessage({
+          id: "settings.api-tokens",
+          defaultMessage: "Personal access tokens",
+        }),
+        path: "/app/settings/tokens",
+      },
     ],
     [intl.locale]
   );

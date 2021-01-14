@@ -5,7 +5,11 @@ export interface PossibleTypesResultData {
 }
 const result: PossibleTypesResultData = {
   possibleTypes: {
-    CreatedAt: ["PetitionMessage", "PetitionReminder"],
+    CreatedAt: [
+      "PetitionMessage",
+      "PetitionReminder",
+      "UserAuthenticationToken",
+    ],
     PetitionBase: ["Petition", "PetitionTemplate"],
     PetitionBaseAndField: ["PetitionAndField", "PetitionTemplateAndField"],
     PetitionEvent: [

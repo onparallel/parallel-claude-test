@@ -31,6 +31,7 @@ export class UserAuthenticationRepository extends BaseRepository {
       const rows = await this.from("user_authentication_token")
         .whereNull("deleted_at")
         .whereIn("user_id", userIds)
+        .orderBy("created_at", "desc")
         .select("*");
 
       const byUserId = groupBy(rows, (r) => r.user_id);
@@ -39,7 +40,7 @@ export class UserAuthenticationRepository extends BaseRepository {
   );
 
   async createUserAuthenticationToken(tokenName: string, user: User) {
-    const apiKey = random(48);
+    const apiKey = random(32);
     const [userAuthToken] = await this.insert("user_authentication_token", {
       token_name: tokenName,
       token_hash: await hash(apiKey, ""),
