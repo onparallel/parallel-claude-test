@@ -43,6 +43,11 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   id: "petitions.header.template-name",
                   defaultMessage: "Template name",
                 }),
+          cellProps: {
+            isTruncated: true,
+            maxWidth: 0,
+            minWidth: "30%",
+          },
           CellContent: ({ row }) => (
             <>
               {row.name ? (
@@ -152,6 +157,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   defaultMessage: "Description",
                 }),
                 align: "left",
+                cellProps: {
+                  isTruncated: true,
+                  maxWidth: 0,
+                },
                 CellContent: ({ row }) => {
                   return (
                     <>{row.description && ellipsis(row.description!, 80)}</>
