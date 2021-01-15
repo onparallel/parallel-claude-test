@@ -33,7 +33,7 @@ export function redirect(context: NextPageContext, location: string) {
   } else {
     context.res!.writeHead(302, { Location: location }).end();
   }
-  return null;
+  return { __redirect: location };
 }
 
 export function withApolloData<P = {}>(

@@ -15,8 +15,7 @@ Redirect.getInitialProps = async (context: NextPageContext) => {
     languages.map((l) => l.locale),
     languages.find((l) => l.default)!.locale
   );
-  redirect(context, `/${locale}`);
-  return {};
+  return redirect(context, `/${locale}`);
 };
 
 export default Redirect;
