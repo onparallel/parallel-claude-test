@@ -248,7 +248,8 @@ export class PetitionRepository extends BaseRepository {
                 .join(", ")
             );
           } else if (opts.sortBy?.length) {
-            q.orderBy(opts.sortBy);
+            // last_used_at is only for templates
+            q.orderBy(opts.sortBy.filter((o) => o.column !== "last_used_at"));
           }
         })
         // default order by to ensure result consistency
