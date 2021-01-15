@@ -4031,8 +4031,8 @@
   },
   {
     "term": "settings.api-tokens.explainer",
-    "definition": "Personal Access Tokens can be used to access the Parallel API.",
-    "context": "Personal Access Tokens can be used to access the Parallel API."
+    "definition": "Personal Access Tokens can be used to access the <a>Parallel API</a>.",
+    "context": "Personal Access Tokens can be used to access the <a>Parallel API</a>."
   },
   {
     "term": "settings.api-tokens.generate-new-token",

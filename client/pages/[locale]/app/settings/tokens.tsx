@@ -6,6 +6,7 @@ import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboa
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { NormalLink } from "@parallel/components/common/Link";
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
@@ -152,7 +153,14 @@ function Tokens() {
       <Box flex="1" padding={4}>
         <FormattedMessage
           id="settings.api-tokens.explainer"
-          defaultMessage="Personal Access Tokens can be used to access the Parallel API."
+          defaultMessage="Personal Access Tokens can be used to access the <a>Parallel API</a>."
+          values={{
+            a: (chunks: any[]) => (
+              <NormalLink href="/developers/api" target="_blank">
+                {chunks}
+              </NormalLink>
+            ),
+          }}
         />
 
         {apiKey && (

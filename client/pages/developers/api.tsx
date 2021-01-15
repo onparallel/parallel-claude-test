@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { InferGetServerSidePropsType } from "next";
 import { default as nodeFetch } from "node-fetch";
 import SwaggerUI from "swagger-ui-react";

@@ -4031,8 +4031,8 @@
   },
   {
     "term": "settings.api-tokens.explainer",
-    "definition": "Las claves de acceso personal pueden ser utilizadas para acceder a la API de Parallel.",
-    "context": "Personal Access Tokens can be used to access the Parallel API."
+    "definition": "Las claves de acceso personal pueden ser utilizadas para acceder a la <a>API de Parallel</a>.",
+    "context": "Personal Access Tokens can be used to access the <a>Parallel API</a>."
   },
   {
     "term": "settings.api-tokens.generate-new-token",
