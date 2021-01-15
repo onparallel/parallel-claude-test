@@ -1,9 +1,11 @@
+import { gql } from "@apollo/client";
 import {
   Button,
   FormControl,
   FormErrorMessage,
-  FormLabel,
   Input,
+  InputGroup,
+  InputRightElement,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -12,81 +14,159 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
+import { useGenerateNewTokenDialog_generateUserAuthTokenMutation } from "@parallel/graphql/__types";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 
-export function GenerateNewTokenDialog(
-  props: DialogProps<{ usedTokenNames: string[] }, string>
-) {
-  const { handleSubmit, register, errors } = useForm<{ tokenName: string }>({
+export function GenerateNewTokenDialog(props: DialogProps) {
+  const intl = useIntl();
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const { handleSubmit, register, errors, setError } = useForm<{
+    tokenName: string;
+  }>({
     mode: "onChange",
     defaultValues: {
       tokenName: "",
     },
   });
 
-  const tokenNameIsUnique = (value: string) => {
-    return !props.usedTokenNames.includes(value.trim());
-  };
+  const [
+    generateUserAuthToken,
+    { loading },
+  ] = useGenerateNewTokenDialog_generateUserAuthTokenMutation();
+
+  async function submit({ tokenName }: { tokenName: string }) {
+    try {
+      const { data } = await generateUserAuthToken({
+        variables: { tokenName },
+      });
+      if (data) {
+        setApiKey(data.generateUserAuthToken.apiKey);
+      }
+    } catch (e) {
+      setError("tokenName", { type: "unavailable" });
+    }
+  }
 
   return (
     <ConfirmDialog
+      size="lg"
+      closeOnEsc={!apiKey}
+      closeOnOverlayClick={!apiKey}
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ tokenName }) => props.onResolve(tokenName)),
+        onSubmit: handleSubmit(submit),
       }}
       header={
         <FormattedMessage
-          id="settings.api-tokens.generate-new-token"
+          id="component.generate-new-token-dialog.title"
           defaultMessage="Generate new token"
         />
       }
       body={
-        <Stack>
-          <FormControl isInvalid={!!errors.tokenName}>
-            <FormLabel>
+        apiKey ? (
+          <Stack>
+            <Text>
               <FormattedMessage
-                id="settings.api-tokens.generate-new-token.input-label"
-                defaultMessage="Token name"
+                id="component.generate-new-token-dialog.created-explanation"
+                defaultMessage="Your access token is now created. Make sure to copy it as you won't be able to see it again."
               />
-            </FormLabel>
-            <Input
-              name="tokenName"
-              ref={register({
-                required: true,
-                validate: { tokenNameIsUnique },
-              })}
-            />
-            <FormErrorMessage>
-              {errors.tokenName?.type === "tokenNameIsUnique" ? (
-                <Text color="red.500" fontSize="sm">
+            </Text>
+            <Stack direction="row">
+              <Input
+                isReadOnly
+                value={apiKey}
+                aria-label={intl.formatMessage({
+                  id: "component.generate-new-token-dialog.api-key-label",
+                  defaultMessage: "API token",
+                })}
+              />
+              <CopyToClipboardButton size="md" text={apiKey} />
+            </Stack>
+          </Stack>
+        ) : (
+          <Stack>
+            <Text>
+              <FormattedMessage
+                id="component.generate-new-token-dialog.explanation"
+                defaultMessage="Please enter a unique identifying name for this access token."
+              />
+            </Text>
+            <Text fontStyle="italic" fontSize="sm">
+              <FormattedMessage
+                id="component.generate-new-token-dialog.disclaimer"
+                defaultMessage="You won't be able to change it after creating it."
+              />
+            </Text>
+            <FormControl isInvalid={!!errors.tokenName}>
+              <Input
+                name="tokenName"
+                aria-label={intl.formatMessage({
+                  id: "component.generate-new-token-dialog.token-name-label",
+                  defaultMessage: "Token name",
+                })}
+                placeholder={intl.formatMessage({
+                  id: "component.generate-new-token-dialog.token-name-label",
+                  defaultMessage: "Token name",
+                })}
+                ref={register({ required: true })}
+              />
+              <FormErrorMessage>
+                {errors.tokenName?.type === "unavailable" ? (
+                  <Text color="red.500" fontSize="sm">
+                    <FormattedMessage
+                      id="component.generate-new-token-dialog.token-name-used"
+                      defaultMessage="You already have a token with this name"
+                    />
+                  </Text>
+                ) : (
                   <FormattedMessage
-                    id="generic.forms.token-name-already-used-error"
-                    defaultMessage="You already have a token with this name"
+                    id="component.generate-new-token-dialog.invalid-token-name-error"
+                    defaultMessage="Please, enter a name for your token"
                   />
-                </Text>
-              ) : (
-                <FormattedMessage
-                  id="generic.forms.invalid-token-name-error"
-                  defaultMessage="Please, enter a name for your token"
-                />
-              )}
-            </FormErrorMessage>
-          </FormControl>
-        </Stack>
+                )}
+              </FormErrorMessage>
+            </FormControl>
+          </Stack>
+        )
       }
       confirm={
-        <Button colorScheme="purple" type="submit">
-          <FormattedMessage
-            id="settings.api-tokens.generate-new-token"
-            defaultMessage="Generate new token"
-          />
-        </Button>
+        apiKey ? (
+          <Button colorScheme="purple" onClick={() => props.onResolve()}>
+            <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+          </Button>
+        ) : (
+          <Button colorScheme="purple" type="submit" isLoading={loading}>
+            <FormattedMessage
+              id="settings.api-tokens.generate-new-token"
+              defaultMessage="Create token"
+            />
+          </Button>
+        )
       }
+      cancel={apiKey ? <></> : undefined}
       {...props}
     />
   );
 }
+
+GenerateNewTokenDialog.mutations = [
+  gql`
+    mutation GenerateNewTokenDialog_generateUserAuthToken($tokenName: String!) {
+      generateUserAuthToken(tokenName: $tokenName) {
+        apiKey
+        userAuthToken {
+          id
+          tokenName
+          createdAt
+          lastUsedAt
+        }
+      }
+    }
+  `,
+];
 
 export function useGenerateNewTokenDialog() {
   return useDialog(GenerateNewTokenDialog);

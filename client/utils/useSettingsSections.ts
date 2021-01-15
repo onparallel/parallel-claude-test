@@ -22,7 +22,7 @@ export function useSettingsSections() {
       {
         title: intl.formatMessage({
           id: "settings.api-tokens",
-          defaultMessage: "Personal access tokens",
+          defaultMessage: "API Tokens",
         }),
         path: "/app/settings/tokens",
       },

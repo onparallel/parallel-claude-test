@@ -3436,6 +3436,23 @@ export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetit
   __typename?: "PublicPetition";
 } & Pick<PublicPetition, "status">;
 
+export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
+  tokenName: Scalars["String"];
+}>;
+
+export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
+  __typename?: "Mutation";
+} & {
+  generateUserAuthToken: {
+    __typename?: "GenerateUserAuthTokenResponse";
+  } & Pick<GenerateUserAuthTokenResponse, "apiKey"> & {
+      userAuthToken: { __typename?: "UserAuthenticationToken" } & Pick<
+        UserAuthenticationToken,
+        "id" | "tokenName" | "createdAt" | "lastUsedAt"
+      >;
+    };
+};
+
 export type Admin_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
@@ -4509,7 +4526,7 @@ export type Tokens_UserAuthenticationTokenFragment = {
 >;
 
 export type RevokeUserAuthTokenMutationVariables = Exact<{
-  authTokenIds: Array<Scalars["GID"]>;
+  authTokenIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type RevokeUserAuthTokenMutation = { __typename?: "Mutation" } & Pick<
@@ -4535,7 +4552,9 @@ export type TokensQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<UserAuthenticationTokens_OrderBy>>;
+  sortBy?: Maybe<
+    Array<UserAuthenticationTokens_OrderBy> | UserAuthenticationTokens_OrderBy
+  >;
 }>;
 
 export type TokensQuery = { __typename?: "Query" } & {
@@ -7888,6 +7907,51 @@ export function useRecipientViewPetitionFieldMutations_publicFileUploadReplyComp
 }
 export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationHookResult = ReturnType<
   typeof useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation
+>;
+export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
+  mutation GenerateNewTokenDialog_generateUserAuthToken($tokenName: String!) {
+    generateUserAuthToken(tokenName: $tokenName) {
+      apiKey
+      userAuthToken {
+        id
+        tokenName
+        createdAt
+        lastUsedAt
+      }
+    }
+  }
+`;
+
+/**
+ * __useGenerateNewTokenDialog_generateUserAuthTokenMutation__
+ *
+ * To run a mutation, you first call `useGenerateNewTokenDialog_generateUserAuthTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useGenerateNewTokenDialog_generateUserAuthTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [generateNewTokenDialogGenerateUserAuthTokenMutation, { data, loading, error }] = useGenerateNewTokenDialog_generateUserAuthTokenMutation({
+ *   variables: {
+ *      tokenName: // value for 'tokenName'
+ *   },
+ * });
+ */
+export function useGenerateNewTokenDialog_generateUserAuthTokenMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    GenerateNewTokenDialog_generateUserAuthTokenMutation,
+    GenerateNewTokenDialog_generateUserAuthTokenMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    GenerateNewTokenDialog_generateUserAuthTokenMutation,
+    GenerateNewTokenDialog_generateUserAuthTokenMutationVariables
+  >(GenerateNewTokenDialog_generateUserAuthTokenDocument, baseOptions);
+}
+export type GenerateNewTokenDialog_generateUserAuthTokenMutationHookResult = ReturnType<
+  typeof useGenerateNewTokenDialog_generateUserAuthTokenMutation
 >;
 export const AdminDocument = gql`
   query Admin {

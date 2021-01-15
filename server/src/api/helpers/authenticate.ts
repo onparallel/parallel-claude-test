@@ -1,26 +1,13 @@
 import { Handler } from "express";
-import { getTokenFromRequest } from "../../util/getTokenFromRequest";
+import { authenticateFromRequest } from "../../util/authenticateFromRequest";
 
 export function authenticate(): Handler {
   return async (req, res, next) => {
     try {
-      const ctx = req.context;
-      const token = getTokenFromRequest(req);
-      if (!token) {
-        throw new Error("Not authorized");
-      }
-      const cognitoId = await ctx.auth.validateSession(token);
-      if (!cognitoId) {
-        throw new Error("Invalid session");
-      }
-      const user = await ctx.users.loadSessionUser(cognitoId);
-      if (!user || user.status === "INACTIVE") {
-        throw new Error("User not found");
-      }
-      ctx.user = user;
+      await authenticateFromRequest(req, req.context);
       next();
     } catch (error) {
-      next(error);
+      next(new Error("Invalid session"));
     }
   };
 }

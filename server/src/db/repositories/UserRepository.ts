@@ -20,6 +20,7 @@ export class UserRepository extends BaseRepository {
       const rows = await this.from("user")
         .update({ last_active_at: this.now() })
         .whereIn("cognito_id", cognitoIds)
+        .where("status", "=", "ACTIVE")
         .whereNull("deleted_at")
         .returning("*");
       const byCognitoId = indexBy(rows, (r) => r.cognito_id);

@@ -4,7 +4,7 @@ import { AuthenticationError } from "apollo-server-express";
 import pEvery from "p-every";
 import { ApiContext } from "../../context";
 import { UserOrganizationRole } from "../../db/__types";
-import { getTokenFromRequest } from "../../util/getTokenFromRequest";
+import { authenticateFromRequest } from "../../util/authenticateFromRequest";
 import { isDefined } from "../../util/remedaExtensions";
 import { KeysOfType, MaybeArray } from "../../util/types";
 
@@ -13,22 +13,12 @@ export function authenticate<
   FieldName extends string
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, _, ctx) => {
-    const token = getTokenFromRequest(ctx.req);
-    if (!token) {
+    try {
+      await authenticateFromRequest(ctx.req, ctx);
+      return true;
+    } catch {
       throw new AuthenticationError("Invalid session");
     }
-    const cognitoId =
-      (await ctx.auth.validateSession(token)) ??
-      (await ctx.userAuthentication.validateApiKey(token));
-    if (!cognitoId) {
-      throw new AuthenticationError("Invalid session");
-    }
-    const user = await ctx.users.loadSessionUser(cognitoId);
-    if (!user || user.status === "INACTIVE") {
-      throw new AuthenticationError("User not found");
-    }
-    ctx.user = user;
-    return true;
   };
 }
 

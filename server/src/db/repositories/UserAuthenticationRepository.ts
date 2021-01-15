@@ -12,22 +12,30 @@ export class UserAuthenticationRepository extends BaseRepository {
     super(knex);
   }
 
-  async validateApiKey(apiKey: string): Promise<string | null> {
-    const [userId] = await this.from("user_authentication_token")
-      .where({
-        deleted_at: null,
-        token_hash: await hash(apiKey, ""),
-      })
-      .update({ last_used_at: this.now() })
-      .returning("user_id");
+  async validateApiKey(apiKey: string) {
+    const tokenHash = await hash(apiKey, "");
+    return await this.withTransaction(async (t) => {
+      const [userId] = await this.from("user_authentication_token", t)
+        .where({
+          deleted_at: null,
+          token_hash: tokenHash,
+        })
+        .update({ last_used_at: this.now() })
+        .returning("user_id");
 
-    if (!userId) return null;
+      if (!userId) return null;
 
-    const [user] = await this.from("user")
-      .where({ deleted_at: null, id: userId })
-      .select("cognito_id");
+      const [user] = await this.from("user")
+        .where({ deleted_at: null, id: userId })
+        .select();
 
-    return user?.cognito_id;
+      if (!user) {
+        await t.rollback();
+        return null;
+      }
+
+      return user;
+    });
   }
 
   async userHasAccessToAuthTokens(ids: number[], userId: number) {

@@ -75,7 +75,7 @@ function Tokens() {
   const sections = useSettingsSections();
   const authTokens = me.authenticationTokens;
 
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState("aa");
   const [selected, setSelected] = useState<string[]>([]);
 
   const [search, setSearch] = useState(state.search);
@@ -99,17 +99,10 @@ function Tokens() {
   );
 
   const showGenerateNewTokenDialog = useGenerateNewTokenDialog();
-  const [generateToken] = useGenerateUserAuthTokenMutation();
   const handleGenerateNewToken = async () => {
     try {
-      const tokenName = await showGenerateNewTokenDialog({
-        usedTokenNames: authTokens.items.map((t) => t.tokenName),
-      });
-      const { data } = await generateToken({
-        variables: { tokenName },
-      });
+      await showGenerateNewTokenDialog({});
       await refetch();
-      setApiKey(data!.generateUserAuthToken.apiKey);
     } catch {}
   };
 
@@ -135,7 +128,7 @@ function Tokens() {
     <SettingsLayout
       title={intl.formatMessage({
         id: "settings.api-tokens",
-        defaultMessage: "Personal access tokens",
+        defaultMessage: "API Tokens",
       })}
       basePath="/app/settings"
       sections={sections}
@@ -146,46 +139,24 @@ function Tokens() {
       header={
         <FormattedMessage
           id="settings.api-tokens"
-          defaultMessage="Personal access tokens"
+          defaultMessage="API Tokens"
         />
       }
     >
       <Box flex="1" padding={4}>
-        <FormattedMessage
-          id="settings.api-tokens.explainer"
-          defaultMessage="Personal Access Tokens can be used to access the <a>Parallel API</a>."
-          values={{
-            a: (chunks: any[]) => (
-              <NormalLink href="/developers/api" target="_blank">
-                {chunks}
-              </NormalLink>
-            ),
-          }}
-        />
-
-        {apiKey && (
-          <Card bgColor="green.100" padding={4} marginTop={2} marginBottom={2}>
-            <Text>
-              <FormattedMessage
-                id="settings.api-tokens.your-token-is"
-                defaultMessage="Your access token is"
-              />
-              :{" "}
-              <Text fontWeight="bold">
-                {apiKey}{" "}
-                <CopyToClipboardButton
-                  colorScheme="green"
-                  size="xs"
-                  text={apiKey}
-                />
-              </Text>
-            </Text>
-            <FormattedMessage
-              id="settings.api-tokens.make-sure-to-copy.card"
-              defaultMessage="Make sure to copy your new personal access token now. You won’t be able to see it again."
-            />
-          </Card>
-        )}
+        <Text marginBottom={4}>
+          <FormattedMessage
+            id="settings.api-tokens.explainer"
+            defaultMessage="Personal Access Tokens can be used to access the <a>Parallel API</a>."
+            values={{
+              a: (chunks: any[]) => (
+                <NormalLink href="/developers/api" target="_blank">
+                  {chunks}
+                </NormalLink>
+              ),
+            }}
+          />
+        </Text>
         <TablePage
           isSelectable
           isHighlightable
@@ -226,8 +197,8 @@ function Tokens() {
               >
                 <Text color="red.500">
                   <FormattedMessage
-                    id="settings.api-tokens.delete-selected"
-                    defaultMessage="Delete selected tokens"
+                    id="generic.delete"
+                    defaultMessage="Delete"
                   />
                 </Text>
               </Button>
@@ -235,7 +206,7 @@ function Tokens() {
               <Button colorScheme="purple" onClick={handleGenerateNewToken}>
                 <FormattedMessage
                   id="settings.api-tokens.generate-new-token"
-                  defaultMessage="Generate new token"
+                  defaultMessage="Create token"
                 />
               </Button>
             </Stack>
@@ -255,7 +226,7 @@ function useAuthTokensTableColumns(): TableColumn<Tokens_UserAuthenticationToken
         isSortable: true,
         header: intl.formatMessage({
           id: "settings.api-tokens.header.token-name",
-          defaultMessage: "Token name",
+          defaultMessage: "Name",
         }),
         CellContent: ({ row }) => {
           return (
@@ -276,6 +247,9 @@ function useAuthTokensTableColumns(): TableColumn<Tokens_UserAuthenticationToken
           id: "generic.last-used-at",
           defaultMessage: "Last used at",
         }),
+        cellProps: {
+          width: "1px",
+        },
         isSortable: true,
         CellContent: ({ row }) =>
           row.lastUsedAt ? (
@@ -334,17 +308,6 @@ Tokens.mutations = [
     mutation RevokeUserAuthToken($authTokenIds: [GID!]!) {
       revokeUserAuthToken(authTokenIds: $authTokenIds)
     }
-  `,
-  gql`
-    mutation GenerateUserAuthToken($tokenName: String!) {
-      generateUserAuthToken(tokenName: $tokenName) {
-        apiKey
-        userAuthToken {
-          ...Tokens_UserAuthenticationToken
-        }
-      }
-    }
-    ${Tokens.fragments.UserAuthenticationToken}
   `,
 ];
 

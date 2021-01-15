@@ -34,20 +34,19 @@ export function api(container: Container) {
     .use(
       "/auth",
       Router()
-        .use(authorize())
-        .post("/login", (req, res, next) =>
+        .post("/login", authorize(), (req, res, next) =>
           req.context.auth.login(req, res, next)
         )
         .post("/logout", (req, res, next) =>
           req.context.auth.logout(req, res, next)
         )
-        .post("/new-password", (req, res, next) =>
+        .post("/new-password", authorize(), (req, res, next) =>
           req.context.auth.newPassword(req, res, next)
         )
-        .post("/forgot-password", (req, res, next) =>
+        .post("/forgot-password", authorize(), (req, res, next) =>
           req.context.auth.forgotPassword(req, res, next)
         )
-        .post("/confirm-forgot-password", (req, res, next) =>
+        .post("/confirm-forgot-password", authorize(), (req, res, next) =>
           req.context.auth.confirmForgotPassword(req, res, next)
         )
     )
