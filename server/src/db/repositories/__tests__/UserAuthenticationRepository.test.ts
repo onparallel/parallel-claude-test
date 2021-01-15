@@ -30,14 +30,13 @@ describe("repositories/UserAuthenticationRepository", () => {
   });
 
   beforeEach(async () => {
-    authTokens = await Promise.all([
-      userAuth
-        .createUserAuthenticationToken("My Token 1", user)
-        .then((t) => t.userAuthToken),
-      userAuth
-        .createUserAuthenticationToken("My Token 2", user)
-        .then((t) => t.userAuthToken),
-    ]);
+    // run in series to ensure default order
+    authTokens = [
+      (await userAuth.createUserAuthenticationToken("My Token 1", user))
+        .userAuthToken,
+      (await userAuth.createUserAuthenticationToken("My Token 2", user))
+        .userAuthToken,
+    ];
   });
 
   afterEach(async () => {
