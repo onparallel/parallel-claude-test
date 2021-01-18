@@ -4,6 +4,19 @@ export const PetitionFragment = gql`
   fragment Petition on Petition {
     id
     name
+    status
+    deadline
+    locale
+    createdAt
+  }
+`;
+
+export const TemplateFragment = gql`
+  fragment Template on PetitionTemplate {
+    id
+    name
+    description
+    locale
     createdAt
   }
 `;

@@ -2,34 +2,50 @@ import { ClientError, gql, GraphQLClient } from "graphql-request";
 import { outdent } from "outdent";
 import { RestApi } from "../rest/core";
 import { UnauthorizedError } from "../rest/errors";
-import { idParam } from "../rest/params";
+import { booleanParam, enumParam, idParam } from "../rest/params";
 import {
   CreatedResponse,
   NoContentResponse,
   OkResponse,
 } from "../rest/responses";
-import { PetitionAccessFragment, PetitionFragment } from "./fragments";
+import {
+  ContactFragment,
+  PetitionAccessFragment,
+  PetitionFragment,
+  TemplateFragment,
+} from "./fragments";
 import { paginationParams, sortByParam, Success } from "./helpers";
 import {
+  Contact,
   CreatePetition,
   ListOfPetitionAccesses,
+  PaginatedContacts,
   PaginatedPetitions,
+  PaginatedTemplates,
   Petition,
-  PetitionAccess,
+  Template,
 } from "./schemas";
 import {
-  GetPetition_PetitionQuery,
-  GetPetition_PetitionQueryVariables,
-  GetPetitions_PetitionsQuery,
-  GetPetitions_PetitionsQueryVariables,
-  templatesQuery,
-  templatesQueryVariables,
   CreatePetition_PetitionMutation,
   CreatePetition_PetitionMutationVariables,
-  GetPetitionRecipients_PetitionAccessesQuery,
-  GetPetitionRecipients_PetitionAccessesQueryVariables,
   DeletePetition_deletePetitionsMutation,
   DeletePetition_deletePetitionsMutationVariables,
+  DeleteTemplate_deletePetitionsMutation,
+  DeleteTemplate_deletePetitionsMutationVariables,
+  GetContacts_ContactsQuery,
+  GetContacts_ContactsQueryVariables,
+  GetContact_ContactQuery,
+  GetContact_ContactQueryVariables,
+  GetPetitionRecipients_PetitionAccessesQuery,
+  GetPetitionRecipients_PetitionAccessesQueryVariables,
+  GetPetitions_PetitionsQuery,
+  GetPetitions_PetitionsQueryVariables,
+  GetPetition_PetitionQuery,
+  GetPetition_PetitionQueryVariables,
+  GetTemplates_TemplatesQuery,
+  GetTemplates_TemplatesQueryVariables,
+  GetTemplate_TemplateQuery,
+  GetTemplate_TemplateQueryVariables,
 } from "./__types";
 
 export const api = new RestApi({
@@ -99,6 +115,11 @@ api
       query: {
         ...paginationParams(),
         ...sortByParam(["createdAt", "name"]),
+        status: enumParam({
+          description: "Optionally filter petitions by their status",
+          required: false,
+          values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
+        }),
       },
       responses: { 200: Success(PaginatedPetitions) },
       tags: ["Petitions"],
@@ -112,12 +133,14 @@ api
           query GetPetitions_Petitions(
             $offset: Int!
             $limit: Int!
+            $status: PetitionStatus
             $sortBy: [QueryPetitions_OrderBy!]
           ) {
             petitions(
               offset: $offset
               limit: $limit
               sortBy: $sortBy
+              status: $status
               type: PETITION
             ) {
               items {
@@ -201,24 +224,31 @@ api
     {
       operationId: "DeletePetition",
       summary: "Deletes the specified petition",
-      responses: {
-        204: Success(),
+      query: {
+        force: booleanParam({
+          required: false,
+          description:
+            "If the petition is shared with other users this method will fail unless passing `true` to this parameter",
+        }),
       },
+      responses: { 204: Success() },
       tags: ["Petitions"],
     },
-    async ({ client, params }) => {
-      // TODO check force
+    async ({ client, params, query }) => {
       await client.request<
         DeletePetition_deletePetitionsMutation,
         DeletePetition_deletePetitionsMutationVariables
       >(
         gql`
-          mutation DeletePetition_deletePetitions($petitionId: GID!) {
-            deletePetitions(ids: [$petitionId])
+          mutation DeletePetition_deletePetitions(
+            $petitionId: GID!
+            $force: Boolean!
+          ) {
+            deletePetitions(ids: [$petitionId], force: $force)
           }
           ${PetitionFragment}
         `,
-        { petitionId: params.petitionId }
+        { petitionId: params.petitionId, force: query.force ?? false }
       );
       return NoContentResponse();
     }
@@ -268,6 +298,7 @@ api
       responses: {
         200: Success(ListOfPetitionAccesses),
       },
+      deprecated: true,
       tags: ["Petitions"],
     },
     async ({ client, params }) => {
@@ -283,38 +314,182 @@ api.path("/templates").get(
       ...paginationParams(),
       ...sortByParam(["createdAt", "name", "lastUsedAt"]),
     },
-    responses: {
-      200: Success(PaginatedPetitions),
-    },
+    responses: { 200: Success(PaginatedTemplates) },
     tags: ["Templates"],
   },
   async ({ client, query }) => {
     const result = await client.request<
-      templatesQuery,
-      templatesQueryVariables
+      GetTemplates_TemplatesQuery,
+      GetTemplates_TemplatesQueryVariables
     >(
       gql`
-        query templates(
+        query GetTemplates_Templates(
           $offset: Int!
           $limit: Int!
           $sortBy: [QueryPetitions_OrderBy!]
         ) {
-          petitions(
+          templates: petitions(
             offset: $offset
             limit: $limit
             sortBy: $sortBy
             type: TEMPLATE
           ) {
             items {
-              ...Petition
+              ...Template
             }
             totalCount
           }
         }
-        ${PetitionFragment}
+        ${TemplateFragment}
       `,
       query
     );
-    return OkResponse(result.petitions);
+    return OkResponse(result.templates);
   }
 );
+
+api
+  .path("/templates/:templateId", {
+    params: {
+      templateId: idParam({
+        type: "Petition",
+        description: "The ID of the template",
+      }),
+    },
+  })
+  .get(
+    {
+      operationId: "GetTemplate",
+      summary: "Returns the specified template",
+      responses: { 200: Success(Template) },
+      tags: ["Templates"],
+    },
+    async ({ client, params }) => {
+      const result = await client.request<
+        GetTemplate_TemplateQuery,
+        GetTemplate_TemplateQueryVariables
+      >(
+        gql`
+          query GetTemplate_Template($templateId: GID!) {
+            template: petition(id: $templateId) {
+              ...Template
+            }
+          }
+          ${TemplateFragment}
+        `,
+        { templateId: params.templateId }
+      );
+      return OkResponse(result.template!);
+    }
+  )
+  .delete(
+    {
+      operationId: "DeleteTemplate",
+      summary: "Deletes the specified template",
+      query: {
+        force: booleanParam({
+          required: false,
+          description:
+            "If the template is shared with other users this method will fail unless passing `true` to this parameter",
+        }),
+      },
+      responses: { 204: Success() },
+      tags: ["Templates"],
+    },
+    async ({ client, params, query }) => {
+      await client.request<
+        DeleteTemplate_deletePetitionsMutation,
+        DeleteTemplate_deletePetitionsMutationVariables
+      >(
+        gql`
+          mutation DeleteTemplate_deletePetitions(
+            $templateId: GID!
+            $force: Boolean!
+          ) {
+            deletePetitions(ids: [$templateId], force: $force)
+          }
+          ${PetitionFragment}
+        `,
+        { templateId: params.templateId, force: query.force ?? false }
+      );
+      return NoContentResponse();
+    }
+  );
+
+api.path("/contacts").get(
+  {
+    operationId: "GetContact",
+    summary: "Returns a paginated list of contacts",
+    query: {
+      ...paginationParams(),
+      ...sortByParam([
+        "firstName",
+        "lastName",
+        "fullName",
+        "email",
+        "createdAt",
+      ]),
+    },
+    responses: { 200: Success(PaginatedContacts) },
+    tags: ["Contacts"],
+  },
+  async ({ client, query }) => {
+    const result = await client.request<
+      GetContacts_ContactsQuery,
+      GetContacts_ContactsQueryVariables
+    >(
+      gql`
+        query GetContacts_Contacts(
+          $offset: Int!
+          $limit: Int!
+          $sortBy: [QueryContacts_OrderBy!]
+        ) {
+          contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
+            items {
+              ...Contact
+            }
+            totalCount
+          }
+        }
+        ${ContactFragment}
+      `,
+      query
+    );
+    return OkResponse(result.contacts);
+  }
+);
+
+api
+  .path("/contacts/:contactId", {
+    params: {
+      contactId: idParam({
+        type: "Contact",
+        description: "The ID of the contact",
+      }),
+    },
+  })
+  .get(
+    {
+      operationId: "GetContact",
+      summary: "Returns the specified contact",
+      responses: { 200: Success(Contact) },
+      tags: ["Contacts"],
+    },
+    async ({ client, params }) => {
+      const result = await client.request<
+        GetContact_ContactQuery,
+        GetContact_ContactQueryVariables
+      >(
+        gql`
+          query GetContact_Contact($contactId: GID!) {
+            contact(id: $contactId) {
+              ...Contact
+            }
+          }
+          ${ContactFragment}
+        `,
+        { contactId: params.contactId }
+      );
+      return OkResponse(result.contact!);
+    }
+  );

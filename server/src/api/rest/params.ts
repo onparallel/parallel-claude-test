@@ -326,3 +326,25 @@ export function idParam<
     }),
   };
 }
+
+export function booleanParam<
+  TRequired extends boolean = true,
+  TArray extends boolean | undefined = undefined,
+  TDefaultValue extends ArrayIfTrue<boolean, TArray> | undefined = undefined
+>(
+  options: ParameterOptions<boolean, TRequired, TArray, TDefaultValue>
+): RestParameter<
+  GeneratedParameterType<boolean, TRequired, TArray, TDefaultValue>
+> {
+  return {
+    parse: buildParse(options, (value: string) => {
+      if (!["true", "false"].includes(value)) {
+        throw new ParseError(value, `Value must be "true" or "false"`);
+      }
+      return value === "true";
+    }),
+    definition: buildDefinition(options, {
+      type: "string",
+    }),
+  };
+}

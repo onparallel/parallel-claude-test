@@ -1791,7 +1791,15 @@ export type VerificationCodeRequest = {
   token: Scalars["ID"];
 };
 
-export type PetitionFragment = Pick<Petition, "id" | "name" | "createdAt">;
+export type PetitionFragment = Pick<
+  Petition,
+  "id" | "name" | "status" | "deadline" | "locale" | "createdAt"
+>;
+
+export type TemplateFragment = Pick<
+  PetitionTemplate,
+  "id" | "name" | "description" | "locale" | "createdAt"
+>;
 
 export type UserFragment = Pick<
   User,
@@ -1823,6 +1831,7 @@ export type PetitionAccessFragment = Pick<
 export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
+  status?: Maybe<PetitionStatus>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
 }>;
 
@@ -1849,6 +1858,7 @@ export type GetPetition_PetitionQuery = { petition: Maybe<PetitionFragment> };
 
 export type DeletePetition_deletePetitionsMutationVariables = Exact<{
   petitionId: Scalars["GID"];
+  force: Scalars["Boolean"];
 }>;
 
 export type DeletePetition_deletePetitionsMutation = Pick<
@@ -1864,14 +1874,48 @@ export type GetPetitionRecipients_PetitionAccessesQuery = {
   petition: Maybe<{ accesses: Array<PetitionAccessFragment> }>;
 };
 
-export type templatesQueryVariables = Exact<{
+export type GetTemplates_TemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
 }>;
 
-export type templatesQuery = {
-  petitions: Pick<PetitionBasePagination, "totalCount"> & {
-    items: Array<PetitionFragment>;
+export type GetTemplates_TemplatesQuery = {
+  templates: Pick<PetitionBasePagination, "totalCount"> & {
+    items: Array<TemplateFragment>;
   };
 };
+
+export type GetTemplate_TemplateQueryVariables = Exact<{
+  templateId: Scalars["GID"];
+}>;
+
+export type GetTemplate_TemplateQuery = { template: Maybe<TemplateFragment> };
+
+export type DeleteTemplate_deletePetitionsMutationVariables = Exact<{
+  templateId: Scalars["GID"];
+  force: Scalars["Boolean"];
+}>;
+
+export type DeleteTemplate_deletePetitionsMutation = Pick<
+  Mutation,
+  "deletePetitions"
+>;
+
+export type GetContacts_ContactsQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  sortBy?: Maybe<Array<QueryContacts_OrderBy> | QueryContacts_OrderBy>;
+}>;
+
+export type GetContacts_ContactsQuery = {
+  contacts: Pick<ContactPagination, "totalCount"> & {
+    items: Array<ContactFragment>;
+  };
+};
+
+export type GetContact_ContactQueryVariables = Exact<{
+  contactId: Scalars["GID"];
+}>;
+
+export type GetContact_ContactQuery = { contact: Maybe<ContactFragment> };
