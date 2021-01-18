@@ -5,7 +5,7 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, User } from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
-import { userCognitoId } from "./mocks";
+import { userCognitoId } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/User Permissions", () => {

@@ -1,6 +1,5 @@
 import { Container } from "inversify";
 import Knex from "knex";
-import { createContainer } from "../../../container";
 import { deleteAllData } from "../../../util/knexUtils";
 import { KNEX } from "../../knex";
 import { Organization, User } from "../../__types";
@@ -8,6 +7,7 @@ import { OrganizationRepository } from "../OrganizationRepository";
 import { Mocks } from "./mocks";
 import { pick } from "remeda";
 import * as faker from "faker";
+import { createTestContainer } from "../../../../test/testContainer";
 
 describe("repositories/OrganizationRepository", () => {
   let container: Container;
@@ -16,7 +16,7 @@ describe("repositories/OrganizationRepository", () => {
   let organizations: OrganizationRepository;
 
   beforeAll(() => {
-    container = createContainer();
+    container = createTestContainer();
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
     organizations = container.get(OrganizationRepository);

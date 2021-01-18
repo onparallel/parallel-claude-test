@@ -2,6 +2,7 @@ import { ApolloServer } from "apollo-server-express";
 import { createTestClient } from "apollo-server-testing";
 import { serialize as serializeCookie } from "cookie";
 import Knex from "knex";
+import { createTestContainer } from "../../../test/testContainer";
 import { createContainer } from "../../container";
 import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";
@@ -19,21 +20,12 @@ import {
   MockAwsService,
   MockEmailsService,
   MockRedis,
-} from "./mocks";
+} from "../../../test/mocks";
 
 export type TestClient = UnwrapPromise<ReturnType<typeof initServer>>;
 
 export const initServer = async () => {
-  const container = createContainer();
-  container.rebind<IAuth>(AUTH).to(MockAuth);
-  container.rebind<IRedis>(REDIS).to(MockRedis);
-  container.rebind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService);
-  container
-    .rebind<IEmailsService>(EMAILS)
-    .to(MockEmailsService)
-    .inSingletonScope();
-  container.rebind<IAws>(AWS_SERVICE).to(MockAwsService).inSingletonScope();
-
+  const container = createTestContainer();
   const stack: any[] = [];
   const server = new ApolloServer({
     schema,

@@ -1,9 +1,9 @@
 import { injectable } from "inversify";
-import { IAnalyticsService } from "../../services/analytics";
-import { IAuth } from "../../services/auth";
-import { IAws } from "../../services/aws";
-import { IEmailsService } from "../../services/emails";
-import { IRedis } from "../../services/redis";
+import { IAnalyticsService } from "../src/services/analytics";
+import { IAuth } from "../src/services/auth";
+import { IAws } from "../src/services/aws";
+import { IEmailsService } from "../src/services/emails";
+import { IRedis } from "../src/services/redis";
 
 export const userCognitoId = "test-cognito-id";
 

@@ -12,7 +12,7 @@ import {
   User,
 } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { userCognitoId } from "./mocks";
+import { userCognitoId } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
 import Knex from "knex";
 import { KNEX } from "../../db/knex";

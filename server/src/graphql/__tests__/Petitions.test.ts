@@ -1,7 +1,7 @@
 import { initServer, TestClient } from "./server";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, User, Petition } from "../../db/__types";
-import { userCognitoId } from "./mocks";
+import { userCognitoId } from "../../../test/mocks";
 import { toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
 import Knex from "knex";

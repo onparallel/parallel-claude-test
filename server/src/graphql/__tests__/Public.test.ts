@@ -1,16 +1,7 @@
 import gql from "graphql-tag";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import {
-  Contact,
-  Organization,
-  PetitionAccess,
-  PetitionField,
-  User,
-} from "../../db/__types";
-import { userCognitoId } from "./mocks";
-import faker from "faker";
+import { PetitionAccess, PetitionField } from "../../db/__types";
 import { initServer, TestClient } from "./server";
-import { toGlobalId } from "../../util/globalId";
 import Knex from "knex";
 import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";

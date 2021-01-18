@@ -1,11 +1,11 @@
 import { Container } from "inversify";
 import Knex from "knex";
-import { createContainer } from "../../../container";
 import { KNEX } from "../../knex";
 import { Mocks } from "./mocks";
 import { UserAuthenticationRepository } from "../UserAuthenticationRepository";
 import { User, UserAuthenticationToken } from "../../__types";
 import { hash } from "../../../util/token";
+import { createTestContainer } from "../../../../test/testContainer";
 
 describe("repositories/UserAuthenticationRepository", () => {
   let container: Container;
@@ -16,7 +16,7 @@ describe("repositories/UserAuthenticationRepository", () => {
   let authTokens: UserAuthenticationToken[];
 
   beforeAll(async () => {
-    container = createContainer();
+    container = createTestContainer();
     knex = container.get(KNEX);
     mocks = new Mocks(knex);
     userAuth = container.get(UserAuthenticationRepository);

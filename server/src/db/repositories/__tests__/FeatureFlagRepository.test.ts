@@ -1,6 +1,6 @@
 import { Container } from "inversify";
 import Knex from "knex";
-import { createContainer } from "../../../container";
+import { createTestContainer } from "../../../../test/testContainer";
 import { deleteAllData } from "../../../util/knexUtils";
 import { KNEX } from "../../knex";
 import { Organization, User } from "../../__types";
@@ -17,7 +17,7 @@ describe("repositories/FeatureFlagRepository", () => {
   let user2: User;
 
   beforeAll(async () => {
-    container = createContainer();
+    container = createTestContainer();
     knex = container.get<Knex>(KNEX);
     ff = container.get(FeatureFlagRepository);
 
