@@ -24,6 +24,7 @@ import { isDefined } from "../../../util/remedaExtensions";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import {
   and,
+  argIsDefined,
   authenticate,
   chain,
   ifArgDefined,
@@ -72,12 +73,13 @@ export const createPetition = mutationField("createPetition", {
       or(
         userHasAccessToPetitions("petitionId" as never),
         petitionsArePublicTemplates("petitionId" as never)
-      )
+      ),
+      argIsDefined("locale")
     )
   ),
   args: {
     name: stringArg(),
-    locale: nonNull(arg({ type: "PetitionLocale" })),
+    locale: arg({ type: "PetitionLocale" }),
     petitionId: globalIdArg("Petition", {
       description: "GID of petition to base from",
     }),

@@ -4534,20 +4534,6 @@ export type RevokeUserAuthTokenMutation = { __typename?: "Mutation" } & Pick<
   "revokeUserAuthToken"
 >;
 
-export type GenerateUserAuthTokenMutationVariables = Exact<{
-  tokenName: Scalars["String"];
-}>;
-
-export type GenerateUserAuthTokenMutation = { __typename?: "Mutation" } & {
-  generateUserAuthToken: {
-    __typename?: "GenerateUserAuthTokenResponse";
-  } & Pick<GenerateUserAuthTokenResponse, "apiKey"> & {
-      userAuthToken: {
-        __typename?: "UserAuthenticationToken";
-      } & Tokens_UserAuthenticationTokenFragment;
-    };
-};
-
 export type TokensQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -11020,49 +11006,6 @@ export function useRevokeUserAuthTokenMutation(
 }
 export type RevokeUserAuthTokenMutationHookResult = ReturnType<
   typeof useRevokeUserAuthTokenMutation
->;
-export const GenerateUserAuthTokenDocument = gql`
-  mutation GenerateUserAuthToken($tokenName: String!) {
-    generateUserAuthToken(tokenName: $tokenName) {
-      apiKey
-      userAuthToken {
-        ...Tokens_UserAuthenticationToken
-      }
-    }
-  }
-  ${Tokens_UserAuthenticationTokenFragmentDoc}
-`;
-
-/**
- * __useGenerateUserAuthTokenMutation__
- *
- * To run a mutation, you first call `useGenerateUserAuthTokenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useGenerateUserAuthTokenMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [generateUserAuthTokenMutation, { data, loading, error }] = useGenerateUserAuthTokenMutation({
- *   variables: {
- *      tokenName: // value for 'tokenName'
- *   },
- * });
- */
-export function useGenerateUserAuthTokenMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    GenerateUserAuthTokenMutation,
-    GenerateUserAuthTokenMutationVariables
-  >
-) {
-  return Apollo.useMutation<
-    GenerateUserAuthTokenMutation,
-    GenerateUserAuthTokenMutationVariables
-  >(GenerateUserAuthTokenDocument, baseOptions);
-}
-export type GenerateUserAuthTokenMutationHookResult = ReturnType<
-  typeof useGenerateUserAuthTokenMutation
 >;
 export const TokensDocument = gql`
   query Tokens(

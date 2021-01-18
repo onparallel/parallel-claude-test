@@ -315,7 +315,7 @@ type Mutation {
   Create petition.
   """
   createPetition(
-    locale: PetitionLocale!
+    locale: PetitionLocale
     name: String
 
     """

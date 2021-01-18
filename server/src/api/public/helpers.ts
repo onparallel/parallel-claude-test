@@ -18,10 +18,10 @@ export function paginationParams() {
   };
 }
 
-export function sortByParam<T extends string>(options: T[]) {
+export function sortByParam<T extends string>(values: T[]) {
   return {
     sortBy: enumParam({
-      values: options.flatMap((option) => [
+      values: values.flatMap((option) => [
         `${option}_ASC`,
         `${option}_DESC`,
       ]) as `${T}_${"ASC" | "DESC"}`[],
@@ -31,7 +31,7 @@ export function sortByParam<T extends string>(options: T[]) {
   };
 }
 
-export function Success<T>(schema: JSONSchemaFor<T>): RestResponse<T> {
+export function Success<T>(schema?: JSONSchemaFor<T>): RestResponse<T> {
   return {
     description: "Successful operation",
     schema,

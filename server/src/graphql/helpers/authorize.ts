@@ -109,17 +109,21 @@ export function or<TypeName extends string, FieldName extends string>(
     return false;
   };
 }
+
 export function ifArgDefined<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName>
 >(
   argName: TArg,
-  authorizer: FieldAuthorizeResolver<TypeName, FieldName>
+  thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
+  elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     if (isDefined(args[argName])) {
-      return await authorizer(root, args, ctx, info);
+      return await thenAuthorizer(root, args, ctx, info);
+    } else if (elseAuthorizer) {
+      return await elseAuthorizer(root, args, ctx, info);
     }
     return true;
   };
@@ -132,13 +136,26 @@ export function ifArgEquals<
 >(
   argName: TArg,
   expectedValue: core.ArgsValue<TypeName, FieldName>[TArg],
-  authorizer: FieldAuthorizeResolver<TypeName, FieldName>
+  thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
+  elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
     if (args[argName] === expectedValue) {
-      return await authorizer(root, args, ctx, info);
+      return await thenAuthorizer(root, args, ctx, info);
+    } else if (elseAuthorizer) {
+      return await elseAuthorizer(root, args, ctx, info);
     }
     return true;
+  };
+}
+
+export function argIsDefined<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    return isDefined(args[argName]);
   };
 }
 

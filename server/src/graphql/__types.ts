@@ -1918,7 +1918,7 @@ export interface NexusGenArgTypes {
     };
     createPetition: {
       // args
-      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+      locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
       name?: string | null; // String
       petitionId?: NexusGenScalars["GID"] | null; // GID
       type: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType

@@ -140,6 +140,11 @@ export type FileUploadReplyDownloadLinkResult = {
   url: Maybe<Scalars["String"]>;
 };
 
+export type GenerateUserAuthTokenResponse = {
+  apiKey: Scalars["String"];
+  userAuthToken: UserAuthenticationToken;
+};
+
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE";
 
@@ -208,6 +213,8 @@ export type Mutation = {
   editPetitionUserPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
+  /** Generates a new API token for the context user */
+  generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Marks the specified comments as read. */
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
   /** Checks if a PetitionClosedNotification was already sent or not */
@@ -248,6 +255,8 @@ export type Mutation = {
   reopenPetition: Petition;
   /** Removes the Signaturit Branding Ids of selected organization. */
   resetSignaturitOrganizationBranding: SupportMethodResponse;
+  /** Soft-deletes a given auth token, making it permanently unusable. */
+  revokeUserAuthToken: Result;
   /** Sends a petition message to the specified contacts. */
   sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -351,7 +360,7 @@ export type MutationcreateOrganizationUserArgs = {
 };
 
 export type MutationcreatePetitionArgs = {
-  locale: PetitionLocale;
+  locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   petitionId?: Maybe<Scalars["GID"]>;
   type?: Maybe<PetitionBaseType>;
@@ -420,6 +429,10 @@ export type MutationfileUploadReplyDownloadLinkArgs = {
   petitionId: Scalars["GID"];
   preview?: Maybe<Scalars["Boolean"]>;
   replyId: Scalars["GID"];
+};
+
+export type MutationgenerateUserAuthTokenArgs = {
+  tokenName: Scalars["String"];
 };
 
 export type MutationmarkPetitionFieldCommentsAsReadArgs = {
@@ -531,6 +544,10 @@ export type MutationreopenPetitionArgs = {
 
 export type MutationresetSignaturitOrganizationBrandingArgs = {
   orgId: Scalars["Int"];
+};
+
+export type MutationrevokeUserAuthTokenArgs = {
+  authTokenIds: Array<Scalars["GID"]>;
 };
 
 export type MutationsendMessagesArgs = {
@@ -1666,6 +1683,8 @@ export type UpdateUserInput = {
 
 /** A user in the system. */
 export type User = Timestamps & {
+  /** Lists every auth token of the user */
+  authenticationTokens: UserAuthenticationTokenPagination;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The email of the user. */
@@ -1691,9 +1710,41 @@ export type User = Timestamps & {
 };
 
 /** A user in the system. */
+export type UserauthenticationTokensArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<UserAuthenticationTokens_OrderBy>>;
+};
+
+/** A user in the system. */
 export type UserhasFeatureFlagArgs = {
   featureFlag: FeatureFlag;
 };
+
+export type UserAuthenticationToken = CreatedAt & {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  lastUsedAt: Maybe<Scalars["DateTime"]>;
+  tokenName: Scalars["String"];
+};
+
+export type UserAuthenticationTokenPagination = {
+  /** The requested slice of items. */
+  items: Array<UserAuthenticationToken>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
+/** Order to use on User.authenticationTokens */
+export type UserAuthenticationTokens_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "lastUsedAt_ASC"
+  | "lastUsedAt_DESC"
+  | "tokenName_ASC"
+  | "tokenName_DESC";
 
 export type UserOrPetitionAccess = PetitionAccess | User;
 
@@ -1742,20 +1793,85 @@ export type VerificationCodeRequest = {
 
 export type PetitionFragment = Pick<Petition, "id" | "name" | "createdAt">;
 
-export type petitionsQueryVariables = Exact<{
+export type UserFragment = Pick<
+  User,
+  "id" | "fullName" | "firstName" | "lastName"
+>;
+
+export type ContactFragment = Pick<
+  Contact,
+  | "id"
+  | "email"
+  | "fullName"
+  | "firstName"
+  | "lastName"
+  | "createdAt"
+  | "updatedAt"
+>;
+
+export type PetitionAccessFragment = Pick<
+  PetitionAccess,
+  | "id"
+  | "status"
+  | "reminderCount"
+  | "remindersLeft"
+  | "remindersActive"
+  | "nextReminderAt"
+  | "createdAt"
+> & { contact: Maybe<ContactFragment>; granter: Maybe<UserFragment> };
+
+export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
 }>;
 
-export type petitionsQuery = {
+export type GetPetitions_PetitionsQuery = {
   petitions: Pick<PetitionBasePagination, "totalCount"> & {
     items: Array<PetitionFragment>;
   };
 };
 
-export type petitionQueryVariables = Exact<{
+export type CreatePetition_PetitionMutationVariables = Exact<{
+  name?: Maybe<Scalars["String"]>;
+  templateId?: Maybe<Scalars["GID"]>;
+}>;
+
+export type CreatePetition_PetitionMutation = {
+  createPetition: PetitionFragment;
+};
+
+export type GetPetition_PetitionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
-export type petitionQuery = { petition: Maybe<PetitionFragment> };
+export type GetPetition_PetitionQuery = { petition: Maybe<PetitionFragment> };
+
+export type DeletePetition_deletePetitionsMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type DeletePetition_deletePetitionsMutation = Pick<
+  Mutation,
+  "deletePetitions"
+>;
+
+export type GetPetitionRecipients_PetitionAccessesQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type GetPetitionRecipients_PetitionAccessesQuery = {
+  petition: Maybe<{ accesses: Array<PetitionAccessFragment> }>;
+};
+
+export type templatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+}>;
+
+export type templatesQuery = {
+  petitions: Pick<PetitionBasePagination, "totalCount"> & {
+    items: Array<PetitionFragment>;
+  };
+};
