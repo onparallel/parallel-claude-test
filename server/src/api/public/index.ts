@@ -76,7 +76,22 @@ export const api = new RestApi({
       },
     },
   },
-  tags: [{ name: "Petitions" }, { name: "Templates" }],
+  tags: [
+    {
+      name: "Petitions",
+      description: "Petitions are the main entities in Parallel",
+    },
+    {
+      name: "Templates",
+      description:
+        "Use templates to quickly create new petitions for repetitive workflows",
+    },
+    {
+      name: "Contacts",
+      description:
+        "Contacts are the entities that represent the recipients of petitions",
+    },
+  ],
   context: ({ req }) => {
     const authorization = req.header("authorization");
     if (!authorization) {
