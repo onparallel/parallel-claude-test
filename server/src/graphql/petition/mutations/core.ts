@@ -228,16 +228,30 @@ export const deletePetitions = mutationField("deletePetitions", {
     }
 
     await ctx.petitions.withTransaction(async (t) => {
-      // delete all permissions to the petitions
-      const ownedPetitionIds = await ctx.petitions.deleteUserPermissions(
+      // delete my permissions to the petitions
+      const deletedPermissions = await ctx.petitions.deleteUserPermissions(
         args.ids,
         ctx.user!.id,
         ctx.user!,
         t
       );
 
-      // delete only petitions OWNED by me
-      await ctx.petitions.deletePetitionById(ownedPetitionIds, ctx.user!, t);
+      const ownerPermissions = deletedPermissions.filter(
+        (p) => p.permission_type === "OWNER"
+      );
+
+      // make sure to also remove every remaining permission on deleted owned petitions
+      await ctx.petitions.deleteAllPermissions(
+        ownerPermissions.map((p) => p.petition_id),
+        ctx.user!,
+        t
+      );
+      //finally, delete only petitions OWNED by me
+      await ctx.petitions.deletePetitionById(
+        ownerPermissions.map((p) => p.petition_id),
+        ctx.user!,
+        t
+      );
     });
 
     return RESULT.SUCCESS;

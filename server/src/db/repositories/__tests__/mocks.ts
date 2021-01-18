@@ -24,6 +24,27 @@ import { random } from "../../../util/token";
 export class Mocks {
   constructor(public knex: Knex) {}
 
+  async loadUserPermissionsByPetitionId(id: number): Promise<PetitionUser[]> {
+    const {
+      rows: permissions,
+    } = await this.knex.raw(
+      /* sql */ `SELECT * from petition_user where petition_id = ? and deleted_at is null`,
+      [id]
+    );
+
+    return permissions;
+  }
+
+  async loadPetition(id: number): Promise<Petition> {
+    const {
+      rows: [petition],
+    } = await this.knex.raw(
+      /* sql */ `SELECT * from petition where id = ? and deleted_at is null`,
+      [id]
+    );
+    return petition;
+  }
+
   async createRandomOrganizations(
     amount: number,
     builder?: (index: number) => Partial<Organization>

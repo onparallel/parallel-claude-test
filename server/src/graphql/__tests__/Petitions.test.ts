@@ -35,10 +35,12 @@ describe("GraphQL/Petitions", () => {
 
   let publicTemplate: Petition;
 
+  let mocks: Mocks;
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
-    const mocks = new Mocks(knex);
+    mocks = new Mocks(knex);
 
     // main organization
     [organization] = await mocks.createRandomOrganizations(1, () => ({
@@ -863,6 +865,25 @@ describe("GraphQL/Petitions", () => {
   });
 
   describe("deletePetitions", () => {
+    let petitionsToDelete: Petition[];
+    beforeEach(async () => {
+      petitionsToDelete = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        2,
+        petitionsBuilder(organization.id)
+      );
+
+      await mocks.knex.raw(/* sql */ `
+      INSERT INTO petition_user(petition_id, user_id, permission_type)
+      VALUES 
+        (${petitionsToDelete[0].id}, ${sameOrgUser.id}, 'WRITE')
+      `);
+    });
+    afterEach(async () => {
+      await mocks.clearSharedPetitions();
+    });
+
     it("deletes a user petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -870,7 +891,7 @@ describe("GraphQL/Petitions", () => {
             deletePetitions(ids: $ids, force: $force)
           }
         `,
-        variables: { ids: [toGlobalId("Petition", petitions[2].id)] },
+        variables: { ids: [toGlobalId("Petition", petitionsToDelete[1].id)] },
       });
 
       expect(errors).toBeUndefined();
@@ -878,17 +899,90 @@ describe("GraphQL/Petitions", () => {
     });
 
     it("deletes an owned shared petition when passing the force flag", async () => {
-      const shared = petitions[0];
+      const sharedByMe = petitionsToDelete[0];
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation($ids: [GID!]!, $force: Boolean) {
             deletePetitions(ids: $ids, force: $force)
           }
         `,
-        variables: { ids: [toGlobalId("Petition", shared.id)], force: true },
+        variables: {
+          ids: [toGlobalId("Petition", sharedByMe.id)],
+          force: true,
+        },
       });
       expect(errors).toBeUndefined();
       expect(data!.deletePetitions).toBe("SUCCESS");
+    });
+
+    it("removes the petition and every permission when deleting an owned shared petition", async () => {
+      const sharedByMe = petitionsToDelete[0];
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($ids: [GID!]!, $force: Boolean) {
+            deletePetitions(ids: $ids, force: $force)
+          }
+        `,
+        variables: {
+          ids: [toGlobalId("Petition", sharedByMe.id)],
+          force: true,
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.deletePetitions).toBe("SUCCESS");
+
+      // make sure that nobody has access to a force-deleted petition owned by me
+      const permissions = await mocks.loadUserPermissionsByPetitionId(
+        sharedByMe.id
+      );
+      const petition = await mocks.loadPetition(sharedByMe.id);
+
+      expect(permissions).toEqual([]);
+      expect(petition).toBeUndefined();
+    });
+
+    it("removes only my permission when deleting a petition shared to me", async () => {
+      const [sharedToMe] = await mocks.createRandomPetitions(
+        organization.id,
+        sameOrgUser.id,
+        1,
+        petitionsBuilder(organization.id)
+      );
+
+      //share the petition with the logged user
+      await mocks.knex.raw(/* sql */ `
+        INSERT INTO petition_user(petition_id, user_id, permission_type)
+        VALUES
+        (${sharedToMe.id}, ${sessionUser.id}, 'WRITE')
+      `);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($ids: [GID!]!, $force: Boolean) {
+            deletePetitions(ids: $ids, force: $force)
+          }
+        `,
+        variables: {
+          ids: [toGlobalId("Petition", sharedToMe.id)],
+          force: true,
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.deletePetitions).toBe("SUCCESS");
+
+      const userPermissions = await mocks.loadUserPermissionsByPetitionId(
+        sharedToMe.id
+      );
+      expect(userPermissions).toEqual([
+        {
+          ...userPermissions[0],
+          permission_type: "OWNER",
+          user_id: sameOrgUser.id,
+        },
+      ]);
+
+      const petition = await mocks.loadPetition(sharedToMe.id);
+      expect(petition).toBeDefined();
     });
 
     it("sends error when trying to delete a private petition", async () => {
@@ -921,7 +1015,7 @@ describe("GraphQL/Petitions", () => {
     });
 
     it("sends error when trying to delete an owned shared petition without force flag", async () => {
-      const shared = petitions[1];
+      const shared = petitionsToDelete[0];
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation($ids: [GID!]!, $force: Boolean) {
