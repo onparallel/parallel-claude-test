@@ -1404,6 +1404,7 @@ export type PublicUserOrContact = PublicContact | PublicUser;
 export type Query = {
   access: Maybe<PublicPetitionAccess>;
   contact: Maybe<Contact>;
+  contactByEmail: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
@@ -1433,6 +1434,10 @@ export type QueryaccessArgs = {
 
 export type QuerycontactArgs = {
   id: Scalars["GID"];
+};
+
+export type QuerycontactByEmailArgs = {
+  email: Scalars["String"];
 };
 
 export type QuerycontactsArgs = {
@@ -1872,6 +1877,44 @@ export type GetPetitionRecipients_PetitionAccessesQueryVariables = Exact<{
 
 export type GetPetitionRecipients_PetitionAccessesQuery = {
   petition: Maybe<{ accesses: Array<PetitionAccessFragment> }>;
+};
+
+export type CreatePetitionRecipients_ContactQueryVariables = Exact<{
+  email: Scalars["String"];
+}>;
+
+export type CreatePetitionRecipients_ContactQuery = {
+  contact: Maybe<Pick<Contact, "id" | "firstName" | "lastName">>;
+};
+
+export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{
+  contactId: Scalars["GID"];
+  data: UpdateContactInput;
+}>;
+
+export type CreatePetitionRecipients_updateContactMutation = {
+  updateContact: Pick<Contact, "id">;
+};
+
+export type CreatePetitionRecipients_createContactMutationVariables = Exact<{
+  data: CreateContactInput;
+}>;
+
+export type CreatePetitionRecipients_createContactMutation = {
+  createContact: Pick<Contact, "id">;
+};
+
+export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  contactIds: Array<Scalars["GID"]> | Scalars["GID"];
+  subject: Scalars["String"];
+  body: Scalars["JSON"];
+  scheduledAt?: Maybe<Scalars["DateTime"]>;
+  remindersConfig?: Maybe<RemindersConfigInput>;
+}>;
+
+export type CreatePetitionRecipients_sendPetitionMutation = {
+  sendPetition: { accesses: Maybe<Array<PetitionAccessFragment>> };
 };
 
 export type GetTemplates_TemplatesQueryVariables = Exact<{

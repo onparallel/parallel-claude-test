@@ -27,6 +27,14 @@ import {
   Template,
 } from "./schemas";
 import {
+  CreatePetitionRecipients_ContactQuery,
+  CreatePetitionRecipients_ContactQueryVariables,
+  CreatePetitionRecipients_createContactMutation,
+  CreatePetitionRecipients_createContactMutationVariables,
+  CreatePetitionRecipients_sendPetitionMutation,
+  CreatePetitionRecipients_sendPetitionMutationVariables,
+  CreatePetitionRecipients_updateContactMutation,
+  CreatePetitionRecipients_updateContactMutationVariables,
   CreatePetition_PetitionMutation,
   CreatePetition_PetitionMutationVariables,
   DeletePetition_deletePetitionsMutation,
@@ -49,6 +57,7 @@ import {
   GetTemplate_TemplateQueryVariables,
 } from "./__types";
 import pMap from "p-map";
+import { pick } from "remeda";
 
 export const api = new RestApi({
   openapi: "3.0.2",
@@ -300,19 +309,125 @@ api
   )
   .post(
     {
+      operationId: "CreatePetitionRecipients",
       summary: "Sends the specified petition to the specified recipients",
       body: {
         schema: SendPetition,
       },
       responses: { 200: Success(ListOfPetitionAccesses) },
-      deprecated: true,
       tags: ["Petitions"],
     },
     async ({ client, params, body }) => {
-      const contactIds = pMap(body.contacts, async (item) => {}, {
-        concurrency: 3,
-      });
-      return OkResponse([]);
+      const contactIds = await pMap(
+        body.contacts,
+        async (item) => {
+          if ("contactId" in item) {
+            return item.contactId;
+          } else {
+            const { email, ...data } = item;
+            const { contact } = await client.request<
+              CreatePetitionRecipients_ContactQuery,
+              CreatePetitionRecipients_ContactQueryVariables
+            >(
+              gql`
+                query CreatePetitionRecipients_Contact($email: String!) {
+                  contact: contactByEmail(email: $email) {
+                    id
+                    firstName
+                    lastName
+                  }
+                }
+              `,
+              { email }
+            );
+            if (contact) {
+              if (
+                contact.firstName !== data.firstName ||
+                contact.lastName !== data.lastName
+              ) {
+                await client.request<
+                  CreatePetitionRecipients_updateContactMutation,
+                  CreatePetitionRecipients_updateContactMutationVariables
+                >(
+                  gql`
+                    mutation CreatePetitionRecipients_updateContact(
+                      $contactId: GID!
+                      $data: UpdateContactInput!
+                    ) {
+                      updateContact(id: $contactId, data: $data) {
+                        id
+                      }
+                    }
+                  `,
+                  { contactId: contact.id, data }
+                );
+              }
+              return contact.id;
+            } else {
+              const result = await client.request<
+                CreatePetitionRecipients_createContactMutation,
+                CreatePetitionRecipients_createContactMutationVariables
+              >(
+                gql`
+                  mutation CreatePetitionRecipients_createContact(
+                    $data: CreateContactInput!
+                  ) {
+                    createContact(data: $data) {
+                      id
+                    }
+                  }
+                `,
+                { data: item }
+              );
+              return result.createContact.id;
+            }
+          }
+        },
+        { concurrency: 3 }
+      );
+      const message =
+        body.message.format === "PLAIN_TEXT"
+          ? body.message.content
+              .split("\n")
+              .map((line) => ({ children: [{ text: line }] }))
+          : [{ children: [{ text: "" }] }];
+
+      const result = await client.request<
+        CreatePetitionRecipients_sendPetitionMutation,
+        CreatePetitionRecipients_sendPetitionMutationVariables
+      >(
+        gql`
+          mutation CreatePetitionRecipients_sendPetition(
+            $petitionId: GID!
+            $contactIds: [GID!]!
+            $subject: String!
+            $body: JSON!
+            $scheduledAt: DateTime
+            $remindersConfig: RemindersConfigInput
+          ) {
+            sendPetition(
+              petitionId: $petitionId
+              contactIds: $contactIds
+              subject: $subject
+              body: $body
+              scheduledAt: $scheduledAt
+              remindersConfig: $remindersConfig
+            ) {
+              accesses {
+                ...PetitionAccess
+              }
+            }
+          }
+          ${PetitionAccessFragment}
+        `,
+        {
+          petitionId: params.petitionId,
+          contactIds,
+          body: message,
+          ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
+        }
+      );
+      return OkResponse(result.sendPetition.accesses!);
     }
   );
 

@@ -272,6 +272,7 @@ const _MessageBody = {
       additionalProperties: false,
       properties: {
         format: {
+          type: "string",
           const: "PLAIN_TEXT",
           example: "PLAIN_TEXT",
         },
@@ -284,7 +285,7 @@ const _MessageBody = {
       },
     },
   ],
-};
+} as const;
 
 export const Petition = schema(_Petition);
 export const CreatePetition = schema({
@@ -314,7 +315,7 @@ export const Contact = schema(_Contact);
 export const PaginatedContacts = PaginatedListOf(_Contact);
 export const SendPetition = schema({
   type: "object",
-  required: ["contacts"],
+  required: ["contacts", "message", "subject"],
   additionalProperties: false,
   properties: {
     contacts: {
@@ -330,8 +331,10 @@ export const SendPetition = schema({
               contactId: {
                 title: "The ID of the contact to send this petition to",
                 type: "string",
-                example: toGlobalId("Contact", 42),
               },
+            },
+            example: {
+              id: toGlobalId("Contact", 42),
             },
           },
           {
@@ -341,18 +344,22 @@ export const SendPetition = schema({
               email: {
                 title: "The email of the contact to send this petition to",
                 type: "string",
-                example: toGlobalId("Contact", 42),
               },
               firstName: {
                 title: "The first name of the contact",
                 type: ["string", "null"],
-                example: "Tyrion",
+                maxLength: 255,
               },
               lastName: {
                 title: "The last name of the contact",
                 type: ["string", "null"],
-                example: "Lannister",
+                maxLength: 255,
               },
+            },
+            example: {
+              email: "tyrion@casterlyrock.wes",
+              firstName: "Tyrion",
+              lastName: "Lannister",
             },
           },
         ],
@@ -371,6 +378,12 @@ export const SendPetition = schema({
     remindersConfig: {
       ..._RemindersConfig,
       type: [_RemindersConfig.type, "null"],
+    },
+    scheduledAt: {
+      title: "Optional date at which to send the email",
+      type: ["string", "null"],
+      formate: "date-time",
+      example: new Date(2020, 2, 15).toISOString(),
     },
   },
 } as const);
