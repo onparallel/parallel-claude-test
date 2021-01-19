@@ -10,6 +10,12 @@ export class PetitionEventSubscriptionRepository extends BaseRepository {
     super(knex);
   }
 
+  readonly loadSubscription = this.buildLoadById(
+    "petition_event_subscription",
+    "id",
+    (q) => q.whereNull("deleted_at")
+  );
+
   readonly loadSubscriptionsByPetitionId = this.buildLoadMultipleBy(
     "petition_event_subscription",
     "petition_id",

@@ -30,6 +30,21 @@
     "context": "Regards,"
   },
   {
+    "term": "developer.webhook-error-email.subject",
+    "definition": "Error: Event hook",
+    "context": "Error: Event hook"
+  },
+  {
+    "term": "developer.webhook-error-email.text",
+    "definition": "Hemos detectado un error en tu subscripción {subscriptionId}.",
+    "context": "We found an error regarding your event subscription {subscriptionId}."
+  },
+  {
+    "term": "developer.webhook-error-email.tip",
+    "definition": "Por favor, asegúrate que la configuración de tu subscripción es correcta y la URL es válida y acepta llamados.",
+    "context": "Please, make sure your subscription configuration is correct and the URL is valid and accepts requests."
+  },
+  {
     "term": "disclaimer",
     "definition": "Este es un correo enviado mediante Parallel de la cuenta verificada {email}",
     "context": "This is an email sent via Parallel from the verified account {email}"

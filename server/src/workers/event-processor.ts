@@ -12,16 +12,20 @@ createQueueWorker(
     );
 
     if (subscriptions.length > 0) {
-      const eventData = EventParser.parse(event);
+      const body = JSON.stringify(EventParser.parse(event));
       await mapSeries(subscriptions, async (s) => {
         try {
           await fetch(s.endpoint, {
             method: "POST",
-            body: JSON.stringify(eventData),
+            body,
             headers: { "Content-Type": "application/json" },
           });
         } catch (e) {
-          // notify error to user owner of the petition
+          await ctx.emails.sendDeveloperWebhookFailedEmail(
+            s.id,
+            e.message ?? "",
+            body
+          );
         }
       });
     }

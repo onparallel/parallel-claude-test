@@ -1,0 +1,41 @@
+{
+  "title": "Developer Webhook Failed Email",
+  "stories": [
+    {
+      "name": "Developer Webhook Failed Email",
+      "parameters": {
+        "server": {
+          "id": "DeveloperWebhookFailedEmail"
+        }
+      },
+      "args": {
+        "senderName": "Santi",
+        "endpoint": "https://example.site/abcd",
+        "errorMessage": "request to https://example.site/abcd failed, reason: getaddrinfo ENOTFOUND example.site",
+        "subscriptionId": "ABCDEFG",
+        "postBody": {
+          "id": "12313123",
+          "petitionId": "1234567890",
+          "type": "PETITION_COMPLETED",
+          "data": { "petitionAccessId": "12313123" },
+          "createdAt": "2021-01-19T16:59:13.952Z"
+        },
+        "parallelUrl": "https://www.parallel.so",
+        "assetsUrl": "https://static.parallel.so",
+        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "logoAlt": "Parallel"
+      },
+      "argsTypes": {
+        "senderName": { "control": { "type": "text" } },
+        "endpoint": { "control": { "type": "text" } },
+        "errorCode": { "control": { "type": "text" } },
+        "subscriptionId": { "control": { "type": "text" } },
+        "postBody": { "control": { "type": "object" } },
+        "parallelUrl": { "control": { "type": "text" } },
+        "assetsUrl": { "control": { "type": "text" } },
+        "logoUrl": { "control": { "type": "text" } },
+        "logoAlt": { "control": { "type": "text" } }
+      }
+    }
+  ]
+}

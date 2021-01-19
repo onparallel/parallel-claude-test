@@ -216,4 +216,17 @@ export class EmailsService implements IEmailsService {
       message_body: messageBody,
     });
   }
+
+  async sendDeveloperWebhookFailedEmail(
+    subscriptionId: number,
+    errorMessage: string,
+    postBody: any
+  ) {
+    return await this.enqueueEmail("developer-webhook-failed", {
+      id: this.buildQueueId("DeveloperWebhookFailed", subscriptionId),
+      petition_subscription_id: subscriptionId,
+      error_message: errorMessage,
+      post_body: postBody,
+    });
+  }
 }

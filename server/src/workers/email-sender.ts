@@ -10,6 +10,7 @@ import { petitionMessageBounced } from "./emails/petition-message-bounced";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 import { contactAuthenticationRequest } from "./emails/contact-authentication-request";
 import { petitionAccessDelegated } from "./emails/petition-access-delegated";
+import { developerWebhookFailed } from "./emails/developer-webhook-failed";
 
 const builders = {
   "petition-completed": petitionCompleted,
@@ -22,6 +23,7 @@ const builders = {
   "petition-message-bounced": petitionMessageBounced,
   "contact-authentication-request": contactAuthenticationRequest,
   "petition-access-delegated": petitionAccessDelegated,
+  "developer-webhook-failed": developerWebhookFailed,
 };
 
 export type EmailType = keyof typeof builders;
