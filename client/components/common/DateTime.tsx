@@ -1,5 +1,4 @@
 import { Text, TextProps } from "@chakra-ui/react";
-import { selectUnit } from "@formatjs/intl-utils";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTimeFormatOptions } from "@parallel/utils/dates";
 import { useForceUpdate } from "@parallel/utils/useForceUpdate";
@@ -17,22 +16,38 @@ export interface DateTimeProps extends TextProps {
   useRelativeTime?: boolean | "always";
 }
 
-type Unit = ReturnType<typeof selectUnit>["unit"];
+type Unit = "second" | "minute" | "hour" | "day" | "month" | "year";
 
 function isSmallRelativeTime(unit: Unit): unit is "second" | "minute" | "hour" {
   return ["second", "minute", "hour"].includes(unit);
+}
+
+const units: { threshold: number; seconds: number; unit: Unit }[] = [
+  { threshold: 60, seconds: 60, unit: "minute" },
+  { threshold: 60 * 60, seconds: 60 * 60, unit: "hour" },
+  { threshold: 60 * 60 * 24, seconds: 60 * 60 * 24, unit: "day" },
+  { threshold: 60 * 60 * 24 * 60, seconds: 60 * 60 * 24 * 30, unit: "month" },
+  { threshold: 60 * 60 * 24 * 365, seconds: 60 * 60 * 24 * 365, unit: "year" },
+];
+
+function selectUnit(from: Date | number, to: Date | number) {
+  const diff = (new Date(from).valueOf() - new Date(to).valueOf()) / 1000;
+  let unit: Unit = "second";
+  let value = diff;
+  for (const { threshold, seconds, unit: _unit } of units) {
+    if (Math.abs(diff) > threshold) {
+      unit = _unit;
+      value = diff < 0 ? Math.ceil(diff / seconds) : Math.floor(diff / seconds);
+    }
+  }
+  return { value, unit };
 }
 
 export const DateTime = chakraForwardRef<"time", DateTimeProps>(
   function DateTime({ value, format, useRelativeTime, ...props }, ref) {
     const intl = useIntl();
     const date = new Date(value);
-    const { value: _value, unit } = selectUnit(date, Date.now(), {
-      second: 60,
-      minute: 60,
-      hour: 24,
-      day: 60,
-    });
+    const { value: _value, unit } = selectUnit(date, Date.now());
     const forceUpdate = useForceUpdate();
     useEffect(() => {
       if (useRelativeTime && isSmallRelativeTime(unit)) {
