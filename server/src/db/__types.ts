@@ -101,6 +101,7 @@ export interface TableTypes {
   petition_access: PetitionAccess;
   petition_contact_notification: PetitionContactNotification;
   petition_event: PetitionEvent;
+  petition_event_subscription: PetitionEventSubscription;
   petition_field: PetitionField;
   petition_field_comment: PetitionFieldComment;
   petition_field_reply: PetitionFieldReply;
@@ -112,7 +113,6 @@ export interface TableTypes {
   temporary_file: TemporaryFile;
   user: User;
   user_authentication_token: UserAuthenticationToken;
-  user_event_subscription: UserEventSubscription;
 }
 
 export interface TableCreateTypes {
@@ -131,6 +131,7 @@ export interface TableCreateTypes {
   petition_access: CreatePetitionAccess;
   petition_contact_notification: CreatePetitionContactNotification;
   petition_event: CreatePetitionEvent;
+  petition_event_subscription: CreatePetitionEventSubscription;
   petition_field: CreatePetitionField;
   petition_field_comment: CreatePetitionFieldComment;
   petition_field_reply: CreatePetitionFieldReply;
@@ -142,7 +143,6 @@ export interface TableCreateTypes {
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
   user_authentication_token: CreateUserAuthenticationToken;
-  user_event_subscription: CreateUserEventSubscription;
 }
 
 export interface TablePrimaryKeys {
@@ -161,6 +161,7 @@ export interface TablePrimaryKeys {
   petition_access: "id";
   petition_contact_notification: "id";
   petition_event: "id";
+  petition_event_subscription: "id";
   petition_field: "id";
   petition_field_comment: "id";
   petition_field_reply: "id";
@@ -172,7 +173,6 @@ export interface TablePrimaryKeys {
   temporary_file: "id";
   user: "id";
   user_authentication_token: "id";
-  user_event_subscription: "id";
 }
 
 export interface Contact {
@@ -475,6 +475,28 @@ export type CreatePetitionEvent = PartialProps<
   "data" | "created_at"
 >;
 
+export interface PetitionEventSubscription {
+  id: number;
+  petition_id: number;
+  endpoint: string;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export type CreatePetitionEventSubscription = PartialProps<
+  Omit<PetitionEventSubscription, "id">,
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
 export interface PetitionField {
   id: number;
   petition_id: number;
@@ -745,28 +767,4 @@ export interface UserAuthenticationToken {
 export type CreateUserAuthenticationToken = PartialProps<
   Omit<UserAuthenticationToken, "id">,
   "last_used_at" | "created_at" | "created_by" | "deleted_at" | "deleted_by"
->;
-
-export interface UserEventSubscription {
-  id: number;
-  user_id: number;
-  petition_id: number;
-  petition_event: PetitionEventType;
-  endpoint: string;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
-}
-
-export type CreateUserEventSubscription = PartialProps<
-  Omit<UserEventSubscription, "id">,
-  | "created_at"
-  | "created_by"
-  | "updated_at"
-  | "updated_by"
-  | "deleted_at"
-  | "deleted_by"
 >;
