@@ -14,7 +14,12 @@ import {
   PetitionFragment,
   TemplateFragment,
 } from "./fragments";
-import { paginationParams, sortByParam, Success } from "./helpers";
+import {
+  paginationParams,
+  schemaToTable,
+  sortByParam,
+  Success,
+} from "./helpers";
 import {
   Contact,
   CreatePetition,
@@ -153,6 +158,10 @@ api
     {
       operationId: "GetPetitions",
       summary: "Returns a paginated list of petitions",
+      description: outdent`
+        This endpoint returns a paginated list of all petitions the user has
+        access to.
+      `,
       query: {
         ...paginationParams(),
         ...sortByParam(["createdAt", "name"]),
@@ -362,6 +371,9 @@ api
       The two methods can also be mixed if necessary.
       `,
       body: {
+        description: outdent`
+        ${schemaToTable(SendPetition)}
+        `,
         schema: SendPetition,
       },
       responses: { 200: Success(ListOfPetitionAccesses) },

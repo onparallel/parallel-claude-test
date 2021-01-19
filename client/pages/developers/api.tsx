@@ -17,6 +17,28 @@ function DeveloperApi({
       />
       <PublicHeader position="sticky" top={0} zIndex={1} />
       <SwaggerUI spec={spec} />
+      <style jsx global>
+        {
+          /* css */ `
+            .response-col_description .renderedMarkdown p:first-child {
+              margin-top: 0;
+            }
+            .swagger-ui table tbody tr td,
+            .swagger-ui table thead tr th {
+              padding-left: 0.25rem !important;
+              padding-right: 0.25rem !important;
+            }
+            .swagger-ui .renderedMarkdown code {
+              color: #444;
+            }
+            .swagger-ui .opblock-description-wrapper,
+            .swagger-ui .opblock-external-docs-wrapper,
+            .swagger-ui .opblock-title_normal {
+              font-size: 14px;
+            }
+          `
+        }
+      </style>
     </>
   );
 }
