@@ -1,6 +1,8 @@
 import { Request, RequestHandler, Response, Router } from "express";
 import { OpenAPIV3 } from "openapi-types";
+import { omit } from "remeda";
 import { ParseUrlParams } from "typed-url-params";
+import { Memoize } from "typescript-memoize";
 import { MaybePromise } from "../../util/types";
 import {
   HttpError,
@@ -9,11 +11,7 @@ import {
   UnknownError,
 } from "./errors";
 import { ParseError } from "./params";
-import { JSONSchemaFor } from "./schemas";
-import Ajv, { ValidateFunction } from "ajv";
-import { Memoize } from "typescript-memoize";
-import { omit } from "remeda";
-import addFormats from "ajv-formats";
+import { buildValidateSchema, JSONSchemaFor } from "./schemas";
 
 export type RestMethod =
   | "get"
@@ -254,12 +252,9 @@ const _PathResolver: any = (function () {
           )
         );
       }
-      let validate: ValidateFunction<TBody> | null = null;
-      if (operationOptions.body?.schema) {
-        const ajv = new Ajv({ strict: false });
-        addFormats(ajv, ["date-time"]);
-        validate = ajv.compile<TBody>(operationOptions.body?.schema);
-      }
+      const validate = operationOptions.body?.schema
+        ? buildValidateSchema<TBody>(operationOptions.body?.schema)
+        : null;
       this.router[method](this.path, async (req, res, next) => {
         const response: ResponseWrapper<any> = await (async () => {
           try {

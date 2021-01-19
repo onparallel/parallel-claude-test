@@ -2199,6 +2199,7 @@ union PublicUserOrContact = PublicContact | PublicUser
 type Query {
   access(keycode: ID!): PublicPetitionAccess
   contact(id: GID!): Contact
+  contactByEmail(email: String!): Contact
 
   """
   The contacts of the user

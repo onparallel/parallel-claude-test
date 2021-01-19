@@ -953,6 +953,7 @@ export interface NexusGenFieldTypes {
     // field return type
     access: NexusGenRootTypes["PublicPetitionAccess"] | null; // PublicPetitionAccess
     contact: NexusGenRootTypes["Contact"] | null; // Contact
+    contactByEmail: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     emailIsAvailable: boolean; // Boolean!
     globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -1652,6 +1653,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     access: "PublicPetitionAccess";
     contact: "Contact";
+    contactByEmail: "Contact";
     contacts: "ContactPagination";
     emailIsAvailable: "Boolean";
     globalIdDecode: "SupportMethodResponse";
@@ -2263,6 +2265,10 @@ export interface NexusGenArgTypes {
     contact: {
       // args
       id: NexusGenScalars["GID"]; // GID!
+    };
+    contactByEmail: {
+      // args
+      email: string; // String!
     };
     contacts: {
       // args

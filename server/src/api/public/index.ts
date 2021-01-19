@@ -23,6 +23,7 @@ import {
   PaginatedPetitions,
   PaginatedTemplates,
   Petition,
+  SendPetition,
   Template,
 } from "./schemas";
 import {
@@ -47,6 +48,7 @@ import {
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
 } from "./__types";
+import pMap from "p-map";
 
 export const api = new RestApi({
   openapi: "3.0.2",
@@ -199,22 +201,18 @@ api
     }
   );
 
+const petitionId = idParam({
+  type: "Petition",
+  description: "The ID of the petition",
+});
+
 api
-  .path("/petitions/:petitionId", {
-    params: {
-      petitionId: idParam({
-        type: "Petition",
-        description: "The ID of the petition",
-      }),
-    },
-  })
+  .path("/petitions/:petitionId", { params: { petitionId } })
   .get(
     {
       operationId: "GetPetition",
       summary: "Returns the specified petition",
-      responses: {
-        200: Success(Petition),
-      },
+      responses: { 200: Success(Petition) },
       tags: ["Petitions"],
     },
     async ({ client, params }) => {
@@ -270,14 +268,7 @@ api
   );
 
 api
-  .path("/petitions/:petitionId/recipients", {
-    params: {
-      petitionId: idParam({
-        type: "Petition",
-        description: "The ID of the petition",
-      }),
-    },
-  })
+  .path("/petitions/:petitionId/recipients", { params: { petitionId } })
   .get(
     {
       operationId: "GetPetitionRecipients",
@@ -310,14 +301,18 @@ api
   .post(
     {
       summary: "Sends the specified petition to the specified recipients",
-      responses: {
-        200: Success(ListOfPetitionAccesses),
+      body: {
+        schema: SendPetition,
       },
+      responses: { 200: Success(ListOfPetitionAccesses) },
       deprecated: true,
       tags: ["Petitions"],
     },
-    async ({ client, params }) => {
-      // return OkResponse(null);
+    async ({ client, params, body }) => {
+      const contactIds = pMap(body.contacts, async (item) => {}, {
+        concurrency: 3,
+      });
+      return OkResponse([]);
     }
   );
 

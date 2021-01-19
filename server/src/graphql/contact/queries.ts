@@ -1,9 +1,10 @@
-import { list, nonNull, queryField } from "@nexus/schema";
+import { list, nonNull, queryField, stringArg } from "@nexus/schema";
 import { SortBy } from "../../db/helpers/utils";
 import { Contact } from "../../db/__types";
 import { authenticate, chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
+import { validEmail } from "../helpers/validators/validEmail";
 import { userHasAccessToContacts } from "./authorizers";
 
 export const contactQueries = queryField((t) => {
@@ -60,6 +61,32 @@ export const contactQueries = queryField((t) => {
     authorize: chain(authenticate(), userHasAccessToContacts("id")),
     resolve: async (root, args, ctx) => {
       return await ctx.contacts.loadContact(args.id);
+    },
+  });
+
+  t.nullable.field("contact", {
+    type: "Contact",
+    args: {
+      id: nonNull(globalIdArg()),
+    },
+    authorize: chain(authenticate(), userHasAccessToContacts("id")),
+    resolve: async (root, args, ctx) => {
+      return await ctx.contacts.loadContact(args.id);
+    },
+  });
+
+  t.nullable.field("contactByEmail", {
+    type: "Contact",
+    args: {
+      email: nonNull(stringArg()),
+    },
+    validateArgs: validEmail((args) => args.email, "email"),
+    authorize: chain(authenticate()),
+    resolve: async (root, args, ctx) => {
+      return await ctx.contacts.loadContactByEmail({
+        orgId: ctx.user!.org_id,
+        email: args.email,
+      });
     },
   });
 });
