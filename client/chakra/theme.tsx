@@ -173,5 +173,5 @@ Popover.defaultProps = {
 } as any;
 
 Select.defaultProps = {
-  icon: <ChevronDownIcon />,
+  icon: <ChevronDownIcon fontSize="16px" />,
 };

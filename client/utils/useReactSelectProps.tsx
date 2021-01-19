@@ -1,12 +1,12 @@
 import {
-  Box,
+  Center,
   CloseButton,
   Text,
   useFormControl,
   useTheme,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   components,
@@ -120,16 +120,10 @@ export function useReactSelectProps<
             {...innerProps}
           />
         ),
-        DropdownIndicator: ({ isFocused }) => (
-          <Box
-            paddingX={2}
-            color={isFocused ? "gray.600" : "gray.300"}
-            _hover={{
-              color: "gray.600",
-            }}
-          >
+        DropdownIndicator: () => (
+          <Center marginRight={2} width={6} color="gray.600">
             <ChevronDownIcon display="block" />
-          </Box>
+          </Center>
         ),
         NoOptionsMessage: () => (
           <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
