@@ -58,6 +58,7 @@ import {
 } from "./__types";
 import pMap from "p-map";
 import { pick } from "remeda";
+import { toGlobalId } from "../../util/globalId";
 
 export const api = new RestApi({
   openapi: "3.0.2",
@@ -65,8 +66,22 @@ export const api = new RestApi({
     title: "Parallel API",
     description: outdent`
       Loren Ipsum
+      # Authentication
+      In order to authenticate your requests, first, you need generate a token
+      on the [API tokens](https://www.parallel.so/en/app/settings/tokens)
+      section of your account settings.
+
+      When you make any requests to the Parallel API pass the generated token
+      in the \`Authorization\` header as follows:
+      ~~~
+      Authorization: Bearer QrUV6NYDk2KcXg96KrHCQTTuKyt5oU8ETHueF5awWZe6
+      ~~~
+      
+
       # Support
-      In case you need any help with your integration, please drop an email to [devs@onparallel.com](mailto:devs@onparallel.com?subject=Parallel%20API%20support). We will be pleased to help you with any problem.
+      In case you need any help with your integration, please drop an email to
+      [devs@onparallel.com](mailto:devs@onparallel.com?subject=Parallel%20API%20support).
+      We will be pleased to help you with any problem.
     `,
     version: "1.0.0",
   },
@@ -311,6 +326,41 @@ api
     {
       operationId: "CreatePetitionRecipients",
       summary: "Sends the specified petition to the specified recipients",
+      description: outdent`
+      Use this endpoint to send a petition. You can send a petition to multiple
+      people at once so they can fill the petition collaboratively.
+
+      There are two ways of specifying the recipients of the petition.
+
+      One way is to pass a list of contact IDs if you know them beforehand:
+      ~~~json
+      {
+        ...
+        "contacts": [
+          "${toGlobalId("Contact", 12)}",
+          "${toGlobalId("Contact", 13)}"
+        ]
+        ...
+      }
+      ~~~
+      The other way is passing an object with the information needed to create
+      a contact. If the contact already exists it will also be updated with the
+      information provided.
+      ~~~json
+      {
+        ...
+        "contacts": [
+          {
+            "email": "tyrion@casterlyrock.wes",
+            "firstName": "Tyrion",
+            "lastName": "Lannister"
+          }
+        ]
+        ...
+      }
+      ~~~
+      The two methods can also be mixed if necessary.
+      `,
       body: {
         schema: SendPetition,
       },
@@ -321,8 +371,8 @@ api
       const contactIds = await pMap(
         body.contacts,
         async (item) => {
-          if ("contactId" in item) {
-            return item.contactId;
+          if (typeof item === "string") {
+            return item;
           } else {
             const { email, ...data } = item;
             const { contact } = await client.request<

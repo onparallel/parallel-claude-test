@@ -322,22 +322,14 @@ export const SendPetition = schema({
       title: "A list of recipients to send this petition to",
       type: "array",
       items: {
-        type: "object",
         oneOf: [
           {
-            additionalProperties: false,
-            required: ["contactId"],
-            properties: {
-              contactId: {
-                title: "The ID of the contact to send this petition to",
-                type: "string",
-              },
-            },
-            example: {
-              id: toGlobalId("Contact", 42),
-            },
+            title: "The ID of the contact to send this petition to",
+            type: "string",
+            example: toGlobalId("Contact", 42),
           },
           {
+            type: "object",
             additionalProperties: false,
             required: ["email"],
             properties: {
