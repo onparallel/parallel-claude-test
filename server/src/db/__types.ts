@@ -112,6 +112,7 @@ export interface TableTypes {
   temporary_file: TemporaryFile;
   user: User;
   user_authentication_token: UserAuthenticationToken;
+  user_event_subscription: UserEventSubscription;
 }
 
 export interface TableCreateTypes {
@@ -141,6 +142,7 @@ export interface TableCreateTypes {
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
   user_authentication_token: CreateUserAuthenticationToken;
+  user_event_subscription: CreateUserEventSubscription;
 }
 
 export interface TablePrimaryKeys {
@@ -170,6 +172,7 @@ export interface TablePrimaryKeys {
   temporary_file: "id";
   user: "id";
   user_authentication_token: "id";
+  user_event_subscription: "id";
 }
 
 export interface Contact {
@@ -742,4 +745,28 @@ export interface UserAuthenticationToken {
 export type CreateUserAuthenticationToken = PartialProps<
   Omit<UserAuthenticationToken, "id">,
   "last_used_at" | "created_at" | "created_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface UserEventSubscription {
+  id: number;
+  user_id: number;
+  petition_id: number;
+  petition_event: PetitionEventType;
+  endpoint: string;
+  created_at: Date;
+  created_by: Maybe<string>;
+  updated_at: Date;
+  updated_by: Maybe<string>;
+  deleted_at: Maybe<Date>;
+  deleted_by: Maybe<string>;
+}
+
+export type CreateUserEventSubscription = PartialProps<
+  Omit<UserEventSubscription, "id">,
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;

@@ -22,6 +22,7 @@ import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { SIGNATURE, SignatureService } from "./services/signature";
 import { SECURITY, SecurityService } from "./services/security";
 import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
+import { UserEventSubscriptionRepository } from "./db/repositories/UserEventSubscriptionRepository";
 
 @injectable()
 export class ApiContext {
@@ -50,7 +51,8 @@ export class ApiContext {
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository,
-    public readonly userAuthentication: UserAuthenticationRepository
+    public readonly userAuthentication: UserAuthenticationRepository,
+    public readonly userSubscriptions: UserEventSubscriptionRepository
   ) {}
 }
 
@@ -75,6 +77,7 @@ export class WorkerContext {
     public readonly users: UserRepository,
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository,
-    public readonly reporting: ReportingRepository
+    public readonly reporting: ReportingRepository,
+    public readonly userSubscriptions: UserEventSubscriptionRepository
   ) {}
 }

@@ -4,6 +4,7 @@ import Knex, { QueryBuilder, Transaction } from "knex";
 import { outdent } from "outdent";
 import { countBy, groupBy, indexBy, maxBy, omit, sortBy, uniq } from "remeda";
 import { PetitionEventPayload } from "../../graphql/backing/events";
+import { Aws, AWS_SERVICE } from "../../services/aws";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -51,7 +52,7 @@ import {
 type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
 export class PetitionRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex) {
+  constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: Aws) {
     super(knex);
   }
 
@@ -1536,15 +1537,29 @@ export class PetitionRepository extends BaseRepository {
     }>,
     t?: Transaction<any, any>
   ) {
-    return await this.insert(
+    const eventsArray = unMaybeArray(events);
+    if (eventsArray.length === 0) return [];
+
+    const petitionEvents = await this.insert(
       "petition_event",
-      unMaybeArray(events).map(({ petitionId, type, data }) => ({
+      eventsArray.map(({ petitionId, type, data }) => ({
         petition_id: petitionId,
         type,
         data,
       })),
       t
     );
+
+    await this.aws.enqueueMessages(
+      "event-processor",
+      petitionEvents.map((event) => ({
+        id: `event-processor-${event.id}`,
+        groupId: `event-processor-${event.id}`,
+        body: { event },
+      }))
+    );
+
+    return petitionEvents;
   }
 
   async getLastEventForPetitionId(petitionId: number) {
