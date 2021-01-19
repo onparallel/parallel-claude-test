@@ -5,3 +5,4 @@ export * from "./events";
 export * from "./comments";
 export * from "./permissions";
 export * from "./signature-request";
+export * from "./subscriptions";

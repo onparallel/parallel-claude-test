@@ -55,6 +55,26 @@ export function userHasAccessToSignatureRequest<
   };
 }
 
+export function userHasAccessToSubscriptions<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const subscriptionIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      if (subscriptionIds.length === 0) {
+        return true;
+      }
+      return await ctx.subscriptions.userHasAccessToSubscriptions(
+        ctx.user!.id,
+        subscriptionIds
+      );
+    } catch {}
+    return false;
+  };
+}
+
 export function petitionsArePublicTemplates<
   TypeName extends string,
   FieldName extends string,

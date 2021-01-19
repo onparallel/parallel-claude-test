@@ -350,6 +350,17 @@ type Mutation {
   ): PetitionFieldComment!
 
   """
+  Creates a new subscription on a petition
+  """
+  createPetitionSubscription(
+    """
+    URL to receive POST requests with the petition events data
+    """
+    endpoint: String!
+    petitionId: GID!
+  ): Subscription!
+
+  """
   Creates a new user in the specified organization.
   """
   createUser(
@@ -426,6 +437,7 @@ type Mutation {
   Delete petitions.
   """
   deletePetitions(force: Boolean = false, ids: [GID!]!): Result!
+  deletePetitionSubscription(subscriptionId: GID!): Result!
 
   """
   Edits permissions on given petitions and users
@@ -731,6 +743,14 @@ type Mutation {
     petitionId: GID!
     status: PetitionFieldReplyStatus!
   ): PetitionWithFieldAndReplies!
+
+  """
+  Updates the endpoint of a subscription
+  """
+  updatePetitionSubscription(
+    endpoint: String!
+    subscriptionId: GID!
+  ): Subscription!
 
   """
   Updates the subscription flag on a PetitionUser
@@ -2323,6 +2343,11 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
+
+  """
+  The subscriptions linked to the petition
+  """
+  petitionSubscriptions(petitionId: GID!): [Subscription!]!
   publicOrgLogoUrl(id: GID!): String
 
   """
@@ -2545,6 +2570,21 @@ input SignatureConfigInput {
 type SignatureStartedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+}
+
+type Subscription implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  endpoint: String!
+  id: GID!
+  petition: Petition!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
 }
 
 """
