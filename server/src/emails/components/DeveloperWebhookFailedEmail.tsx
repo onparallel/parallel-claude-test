@@ -10,7 +10,6 @@ import { closing, greeting, renderSlateText } from "../common/texts";
 
 export type DeveloperWebhookFailedEmailProps = {
   senderName: string | null;
-  endpoint: string;
   errorMessage: string;
   subscriptionId: string;
   postBody: any;
@@ -33,7 +32,6 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
     {
       senderName,
       subscriptionId,
-      endpoint,
       errorMessage,
       postBody,
     }: DeveloperWebhookFailedEmailProps,
@@ -80,7 +78,6 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
   html({
     senderName,
     subscriptionId,
-    endpoint,
     errorMessage,
     postBody,
     parallelUrl,

@@ -47,7 +47,6 @@ export async function developerWebhookFailed(
     DeveloperWebhookFailedEmail,
     {
       senderName: fullName(owner.first_name, owner.last_name)!,
-      endpoint: subscription.endpoint,
       errorMessage: payload.error_message,
       subscriptionId: toGlobalId("Subscription", subscription.id),
       postBody: payload.post_body,

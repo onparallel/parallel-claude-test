@@ -12,19 +12,19 @@ createQueueWorker(
     );
 
     if (subscriptions.length > 0) {
-      const body = JSON.stringify(EventParser.parse(event));
+      const parsedEvent = EventParser.parse(event);
       await mapSeries(subscriptions, async (s) => {
         try {
           await fetch(s.endpoint, {
             method: "POST",
-            body,
+            body: JSON.stringify(parsedEvent),
             headers: { "Content-Type": "application/json" },
           });
         } catch (e) {
           await ctx.emails.sendDeveloperWebhookFailedEmail(
             s.id,
             e.message ?? "",
-            body
+            parsedEvent
           );
         }
       });

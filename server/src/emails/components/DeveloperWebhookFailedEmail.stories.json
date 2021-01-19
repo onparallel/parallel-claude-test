@@ -10,7 +10,6 @@
       },
       "args": {
         "senderName": "Santi",
-        "endpoint": "https://example.site/abcd",
         "errorMessage": "request to https://example.site/abcd failed, reason: getaddrinfo ENOTFOUND example.site",
         "subscriptionId": "ABCDEFG",
         "postBody": {
@@ -27,8 +26,7 @@
       },
       "argsTypes": {
         "senderName": { "control": { "type": "text" } },
-        "endpoint": { "control": { "type": "text" } },
-        "errorCode": { "control": { "type": "text" } },
+        "errorMessage": { "control": { "type": "text" } },
         "subscriptionId": { "control": { "type": "text" } },
         "postBody": { "control": { "type": "object" } },
         "parallelUrl": { "control": { "type": "text" } },
