@@ -49,7 +49,7 @@ export function ClosePetitionDialog(
         />
       }
       body={
-        <Box>
+        <Box as="form">
           <Text marginBottom={4}>
             <FormattedMessage
               id="petition-replies.close-petition.dialog-subheading"
@@ -58,7 +58,12 @@ export function ClosePetitionDialog(
           </Text>
           <RadioGroup onChange={setValue as any} value={value}>
             <Stack>
-              <Radio value="APPROVE" size="lg" styleConfig={radioStyleConfig}>
+              <Radio
+                value="APPROVE"
+                isChecked={value === "APPROVE"}
+                size="lg"
+                styleConfig={radioStyleConfig}
+              >
                 <Button
                   as="div"
                   width="100%"
@@ -82,7 +87,12 @@ export function ClosePetitionDialog(
                   />
                 </Button>
               </Radio>
-              <Radio value="REJECT" size="lg" styleConfig={radioStyleConfig}>
+              <Radio
+                value="REJECT"
+                isChecked={value === "REJECT"}
+                size="lg"
+                styleConfig={radioStyleConfig}
+              >
                 <Button
                   as="div"
                   width="100%"
