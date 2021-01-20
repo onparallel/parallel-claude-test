@@ -51,6 +51,8 @@ import {
   CreatePetitionRecipients_updateContactMutationVariables,
   CreatePetition_PetitionMutation,
   CreatePetition_PetitionMutationVariables,
+  CreateSubscription_createPetitionSubscriptionMutation,
+  CreateSubscription_createPetitionSubscriptionMutationVariables,
   DeletePetition_deletePetitionsMutation,
   DeletePetition_deletePetitionsMutationVariables,
   DeleteSubscription_deletePetitionSubscriptionMutation,
@@ -573,7 +575,7 @@ api
         `,
         { petitionId: params.petitionId }
       );
-      return Ok(result.petitionSubscriptions!);
+      return Ok(result.petitionSubscriptions);
     }
   )
   .post(
@@ -591,7 +593,10 @@ api
       tags: ["Petitions"],
     },
     async ({ client, params, body }) => {
-      const result = await client.request(
+      const result = await client.request<
+        CreateSubscription_createPetitionSubscriptionMutation,
+        CreateSubscription_createPetitionSubscriptionMutationVariables
+      >(
         gql`
           mutation CreateSubscription_createPetitionSubscription(
             $petitionId: GID!
@@ -612,7 +617,7 @@ api
         }
       );
 
-      return Created(result.createPetitionSubscription!);
+      return Created(result.createPetitionSubscription);
     }
   );
 
