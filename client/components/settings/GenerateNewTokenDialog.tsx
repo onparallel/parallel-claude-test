@@ -4,8 +4,6 @@ import {
   FormControl,
   FormErrorMessage,
   Input,
-  InputGroup,
-  InputRightElement,
   Stack,
   Text,
 } from "@chakra-ui/react";
