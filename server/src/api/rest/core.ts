@@ -4,14 +4,8 @@ import { omit } from "remeda";
 import { ParseUrlParams } from "typed-url-params";
 import { Memoize } from "typescript-memoize";
 import { MaybePromise } from "../../util/types";
-import {
-  HttpError,
-  InvalidParameterError,
-  InvalidRequestBodyError,
-  UnknownError,
-} from "./errors";
+import { HttpError, InvalidParameterError, UnknownError } from "./errors";
 import { ParseError } from "./params";
-import { buildValidateSchema, JSONSchemaFor } from "./schemas";
 
 export type RestMethod =
   | "get"
@@ -29,7 +23,7 @@ export type RestParameters<T> = {
 
 export interface RestParameter<T> {
   parse(value?: string): MaybePromise<T>;
-  definition: OpenAPIV3.ParameterBaseObject;
+  spec: OpenAPIV3.ParameterBaseObject;
 }
 
 type PathParameters<TPath extends string> = {
@@ -37,8 +31,9 @@ type PathParameters<TPath extends string> = {
 };
 
 export interface RestBody<T> {
-  description?: string;
-  schema?: JSONSchemaFor<T>;
+  _type?: T;
+  spec: OpenAPIV3.RequestBodyObject;
+  validate?: (value?: any) => void;
 }
 
 export interface RestPathOptions {
@@ -74,15 +69,13 @@ export type RestResponses<T> = {
   [status: number]: RestResponse<T>;
 };
 
-export interface RestResponse<T> {
-  description?: string;
-  schema?: JSONSchemaFor<T>;
+export interface RestResponse<T> extends OpenAPIV3.ResponseObject {
+  _type?: T;
 }
 
 export interface ResponseWrapper<T> {
   __type?: T;
   apply(res: Response<T>): void;
-  validate?(responses: RestResponses<any> | undefined): void | Promise<void>;
 }
 
 export interface OperationHandler<TContext, TParams, TQuery, TReturn, TBody> {
@@ -122,11 +115,7 @@ export interface OperationResolver<
 
 type RestResponseReturnType<
   TResponses extends RestResponses<any>
-> = TResponses[keyof TResponses] extends {
-  schema?: JSONSchemaFor<infer U>;
-}
-  ? U
-  : never;
+> = TResponses[keyof TResponses] extends RestResponse<infer U> ? U : never;
 
 const methods: RestMethod[] = [
   "get",
@@ -172,7 +161,7 @@ const _PathResolver: any = (function () {
       ).map(([name, parameter]) => ({
         name,
         in: "path",
-        ...parameter.definition,
+        ...parameter.spec,
       }));
     } else {
       this.spec = {};
@@ -216,45 +205,20 @@ const _PathResolver: any = (function () {
           tags,
           operationId,
         };
-        if (body) {
-          const { description, schema } = body;
-          this.spec[method]!.requestBody = {
-            description,
-            required: true,
-            content: {
-              "application/json": {
-                schema: schema as any,
-              },
-            },
-          };
+        if (body?.spec) {
+          this.spec[method]!.requestBody = body?.spec;
         }
         this.spec[method]!.parameters = Object.entries<RestParameter<any>>(
           query ?? {}
         ).map(([name, parameter]) => ({
           name,
           in: "query",
-          ...parameter.definition,
+          ...parameter.spec,
         }));
-        this.spec[method]!.responses = Object.fromEntries(
-          Object.entries<RestResponse<any>>(responses ?? {}).map(
-            ([status, response]) => {
-              const { description, schema } = response;
-              return [
-                status,
-                {
-                  description: description!,
-                  content: {
-                    "application/json": { schema: schema as any },
-                  },
-                },
-              ];
-            }
-          )
-        );
+        if (responses) {
+          this.spec[method]!.responses = responses;
+        }
       }
-      const validate = operationOptions.body?.schema
-        ? buildValidateSchema<TBody>(operationOptions.body?.schema)
-        : null;
       this.router[method](this.path, async (req, res, next) => {
         const response: ResponseWrapper<any> = await (async () => {
           try {
@@ -316,34 +280,21 @@ const _PathResolver: any = (function () {
                 })
               )
             );
+            if (body?.validate) {
+              body?.validate(req.body);
+            }
             context.body = req.body;
-            if (validate) {
-              if (!req.body) {
-                throw new InvalidRequestBodyError(
-                  "Body is missing but it is required"
-                );
-              }
-              const valid = validate(req.body);
-              if (!valid) {
-                const error = validate.errors![0];
-                throw new InvalidRequestBodyError(
-                  `Property at ${error.dataPath} ${error.message}`
-                );
-              }
-            }
-            const response = await resolver(context);
-            if (process.env.NODE_ENV === "development" && response.validate) {
-              response.validate(operationOptions.responses);
-            }
-            return response;
+            return await resolver(context);
           } catch (error) {
-            console.log(error, error instanceof HttpError);
             if (error instanceof HttpError) {
               return error;
             } else if (this.apiOptions.errorHandler) {
               try {
                 return await this.apiOptions.errorHandler(error);
               } catch (error) {
+                if (error instanceof HttpError) {
+                  return error;
+                }
                 return new UnknownError(error);
               }
             } else {

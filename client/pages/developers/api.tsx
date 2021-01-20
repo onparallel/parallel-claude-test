@@ -36,6 +36,9 @@ function DeveloperApi({
             .swagger-ui .opblock-title_normal {
               font-size: 14px;
             }
+            .swagger-ui .response-col_description table {
+              font-size: 14px;
+            }
           `
         }
       </style>

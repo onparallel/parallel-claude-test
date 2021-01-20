@@ -1,25 +1,20 @@
 import { ClientError, gql, GraphQLClient } from "graphql-request";
 import { outdent } from "outdent";
+import pMap from "p-map";
+import { pick } from "remeda";
+import { toGlobalId } from "../../util/globalId";
+import { JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
 import { UnauthorizedError } from "../rest/errors";
 import { booleanParam, enumParam, idParam } from "../rest/params";
-import {
-  CreatedResponse,
-  NoContentResponse,
-  OkResponse,
-} from "../rest/responses";
+import { Created, NoContent, Ok, SuccessResponse } from "../rest/responses";
 import {
   ContactFragment,
   PetitionAccessFragment,
   PetitionFragment,
   TemplateFragment,
 } from "./fragments";
-import {
-  paginationParams,
-  schemaToTable,
-  sortByParam,
-  Success,
-} from "./helpers";
+import { paginationParams, sortByParam } from "./helpers";
 import {
   Contact,
   CreatePetition,
@@ -61,9 +56,6 @@ import {
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
 } from "./__types";
-import pMap from "p-map";
-import { pick } from "remeda";
-import { toGlobalId } from "../../util/globalId";
 
 export const api = new RestApi({
   openapi: "3.0.2",
@@ -139,11 +131,9 @@ export const api = new RestApi({
       const code = (error.response.errors![0] as any).extensions.code as string;
       switch (code) {
         case "UNAUTHENTICATED":
-          return new UnauthorizedError("API token is invalid");
+          throw new UnauthorizedError("API token is invalid");
         case "FORBIDDEN":
-          return new UnauthorizedError(
-            "You don't have access to this resource"
-          );
+          throw new UnauthorizedError("You don't have access to this resource");
         default:
           console.log({ code, error });
       }
@@ -171,7 +161,7 @@ api
           values: ["DRAFT", "PENDING", "COMPLETED", "CLOSED"],
         }),
       },
-      responses: { 200: Success(PaginatedPetitions) },
+      responses: { 200: SuccessResponse(PaginatedPetitions) },
       tags: ["Petitions"],
     },
     async ({ client, query }) => {
@@ -203,15 +193,15 @@ api
         `,
         query
       );
-      return OkResponse(result.petitions);
+      return Ok(result.petitions);
     }
   )
   .post(
     {
       operationId: "CreatePetition",
       summary: "Creates a petition from a template",
-      body: { schema: CreatePetition },
-      responses: { 201: Success(Petition) },
+      body: JsonBody(CreatePetition),
+      responses: { 201: SuccessResponse(Petition) },
       tags: ["Petitions"],
     },
     async ({ client, body }) => {
@@ -230,7 +220,7 @@ api
         body
       );
 
-      return CreatedResponse(result.createPetition);
+      return Created(result.createPetition);
     }
   );
 
@@ -245,7 +235,7 @@ api
     {
       operationId: "GetPetition",
       summary: "Returns the specified petition",
-      responses: { 200: Success(Petition) },
+      responses: { 200: SuccessResponse(Petition) },
       tags: ["Petitions"],
     },
     async ({ client, params }) => {
@@ -263,7 +253,7 @@ api
         `,
         { petitionId: params.petitionId }
       );
-      return OkResponse(result.petition!);
+      return Ok(result.petition!);
     }
   )
   .delete(
@@ -277,7 +267,7 @@ api
             "If the petition is shared with other users this method will fail unless passing `true` to this parameter",
         }),
       },
-      responses: { 204: Success() },
+      responses: { 204: SuccessResponse() },
       tags: ["Petitions"],
     },
     async ({ client, params, query }) => {
@@ -296,7 +286,7 @@ api
         `,
         { petitionId: params.petitionId, force: query.force ?? false }
       );
-      return NoContentResponse();
+      return NoContent();
     }
   );
 
@@ -306,7 +296,7 @@ api
     {
       operationId: "GetPetitionRecipients",
       summary: "Returns the recipients of this petition",
-      responses: { 200: Success(ListOfPetitionAccesses) },
+      responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
       tags: ["Petitions"],
     },
     async ({ client, params }) => {
@@ -328,7 +318,7 @@ api
         `,
         { petitionId: params.petitionId }
       );
-      return OkResponse(result.petition!.accesses);
+      return Ok(result.petition!.accesses);
     }
   )
   .post(
@@ -370,13 +360,8 @@ api
       ~~~
       The two methods can also be mixed if necessary.
       `,
-      body: {
-        description: outdent`
-        ${schemaToTable(SendPetition)}
-        `,
-        schema: SendPetition,
-      },
-      responses: { 200: Success(ListOfPetitionAccesses) },
+      body: JsonBody(SendPetition),
+      responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
       tags: ["Petitions"],
     },
     async ({ client, params, body }) => {
@@ -489,7 +474,7 @@ api
           ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
         }
       );
-      return OkResponse(result.sendPetition.accesses!);
+      return Ok(result.sendPetition.accesses!);
     }
   );
 
@@ -501,7 +486,7 @@ api.path("/templates").get(
       ...paginationParams(),
       ...sortByParam(["createdAt", "name", "lastUsedAt"]),
     },
-    responses: { 200: Success(PaginatedTemplates) },
+    responses: { 200: SuccessResponse(PaginatedTemplates) },
     tags: ["Templates"],
   },
   async ({ client, query }) => {
@@ -531,7 +516,7 @@ api.path("/templates").get(
       `,
       query
     );
-    return OkResponse(result.templates);
+    return Ok(result.templates);
   }
 );
 
@@ -548,7 +533,7 @@ api
     {
       operationId: "GetTemplate",
       summary: "Returns the specified template",
-      responses: { 200: Success(Template) },
+      responses: { 200: SuccessResponse(Template) },
       tags: ["Templates"],
     },
     async ({ client, params }) => {
@@ -566,7 +551,7 @@ api
         `,
         { templateId: params.templateId }
       );
-      return OkResponse(result.template!);
+      return Ok(result.template!);
     }
   )
   .delete(
@@ -580,7 +565,7 @@ api
             "If the template is shared with other users this method will fail unless passing `true` to this parameter",
         }),
       },
-      responses: { 204: Success() },
+      responses: { 204: SuccessResponse() },
       tags: ["Templates"],
     },
     async ({ client, params, query }) => {
@@ -599,7 +584,7 @@ api
         `,
         { templateId: params.templateId, force: query.force ?? false }
       );
-      return NoContentResponse();
+      return NoContent();
     }
   );
 
@@ -617,7 +602,7 @@ api.path("/contacts").get(
         "createdAt",
       ]),
     },
-    responses: { 200: Success(PaginatedContacts) },
+    responses: { 200: SuccessResponse(PaginatedContacts) },
     tags: ["Contacts"],
   },
   async ({ client, query }) => {
@@ -642,7 +627,7 @@ api.path("/contacts").get(
       `,
       query
     );
-    return OkResponse(result.contacts);
+    return Ok(result.contacts);
   }
 );
 
@@ -659,7 +644,7 @@ api
     {
       operationId: "GetContact",
       summary: "Returns the specified contact",
-      responses: { 200: Success(Contact) },
+      responses: { 200: SuccessResponse(Contact) },
       tags: ["Contacts"],
     },
     async ({ client, params }) => {
@@ -677,6 +662,6 @@ api
         `,
         { contactId: params.contactId }
       );
-      return OkResponse(result.contact!);
+      return Ok(result.contact!);
     }
   );

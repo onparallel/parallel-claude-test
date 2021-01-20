@@ -2,7 +2,7 @@ import { OpenAPIV3 } from "openapi-types";
 import { fromGlobalId } from "../../util/globalId";
 import { MaybePromise } from "../../util/types";
 import { RestParameter } from "./core";
-import { JSONSchema } from "./schemas";
+import { JsonSchema } from "./schemas";
 
 export class ParseError extends Error {
   constructor(public readonly value: string | undefined, message: string) {
@@ -100,7 +100,7 @@ export function buildDefinition<
   TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
 >(
   options: ParameterOptions<T, TRequired, TArray, TDefaultValue>,
-  schema: JSONSchema
+  schema: JsonSchema
 ): OpenAPIV3.ParameterBaseObject {
   const { required = true, array = false, deprecated, description } = options;
   return {
@@ -193,7 +193,7 @@ function _numberParam(integer: boolean) {
         }
         return result;
       }),
-      definition: buildDefinition(options, {
+      spec: buildDefinition(options, {
         type: integer ? "integer" : "number",
         minimum,
         exclusiveMinimum,
@@ -250,7 +250,7 @@ export function stringParam<
       }
       return value;
     }),
-    definition: buildDefinition(options, {
+    spec: buildDefinition(options, {
       type: "string",
       pattern: pattern?.toString(),
       minLength,
@@ -289,7 +289,7 @@ export function enumParam<
       }
       return value as T;
     }),
-    definition: buildDefinition(options, {
+    spec: buildDefinition(options, {
       type: "string",
       enum: values,
     }),
@@ -306,7 +306,9 @@ export type IdParameterOptions<
 export function idParam<
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined
->(options: IdParameterOptions<TRequired, TArray>) {
+>(
+  options: IdParameterOptions<TRequired, TArray>
+): RestParameter<GeneratedParameterType<string, TRequired, TArray>> {
   // ignore defaultValue
   delete options.defaultValue;
   const { type } = options;
@@ -321,7 +323,7 @@ export function idParam<
       }
       return value;
     }),
-    definition: buildDefinition(options, {
+    spec: buildDefinition(options, {
       type: "string",
     }),
   };
@@ -343,7 +345,7 @@ export function booleanParam<
       }
       return value === "true";
     }),
-    definition: buildDefinition(options, {
+    spec: buildDefinition(options, {
       type: "string",
     }),
   };

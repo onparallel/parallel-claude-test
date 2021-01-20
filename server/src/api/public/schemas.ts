@@ -1,5 +1,5 @@
 import { toGlobalId } from "../../util/globalId";
-import { JSONSchema, schema } from "../rest/schemas";
+import { JsonSchema, schema } from "../rest/schemas";
 
 const _Petition = {
   type: "object",
@@ -48,29 +48,29 @@ const _Template = {
   required: ["id", "name", "description", "locale", "createdAt"],
   properties: {
     id: {
-      description: "The ID of the petition",
+      description: "The ID of the template",
       type: "string",
       example: toGlobalId("Petition", 42),
     },
     name: {
-      description: "The name of the petition",
+      description: "The name of the template",
       type: ["string", "null"],
       example: "My petition",
     },
     description: {
-      description: "The description of the petition",
+      description: "The description of the template",
       type: ["string", "null"],
       example:
         "Lorem ipsum dolor sit amet consectetur adipiscing elit magnis porttitor tempor, imperdiet class neque purus ornare justo aptent orci sed pellentesque, natoque laoreet tincidunt volutpat ultricies suscipit iaculis hendrerit inceptos.",
     },
     locale: {
-      description: "The locale of the petition",
+      description: "The locale of the template",
       type: "string",
       enum: ["en", "es"],
       example: "en",
     },
     createdAt: {
-      description: "Creation date of the petition",
+      description: "Creation date of the template",
       type: "string",
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
@@ -381,7 +381,7 @@ export const SendPetition = schema({
   },
 } as const);
 
-function PaginatedListOf<T extends Exclude<JSONSchema, boolean>>(item: T) {
+function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
   return schema({
     type: "object",
     description: "Paginated resource",
@@ -404,7 +404,7 @@ function PaginatedListOf<T extends Exclude<JSONSchema, boolean>>(item: T) {
   } as const);
 }
 
-function ListOf<T extends JSONSchema>(item: T) {
+function ListOf<T extends JsonSchema>(item: T) {
   return schema({
     type: "array",
     items: item,

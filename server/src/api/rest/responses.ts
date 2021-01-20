@@ -1,6 +1,7 @@
 import { Response } from "express";
-import { ResponseWrapper, RestResponses } from "./core";
-import { buildValidateSchema } from "./schemas";
+import { outdent } from "outdent";
+import { ResponseWrapper, RestResponse } from "./core";
+import { JsonSchemaFor, schemaToTable } from "./schemas";
 
 export class RestResponseWrapper<T> implements ResponseWrapper<T> {
   __type?: T;
@@ -22,30 +23,63 @@ export class RestResponseWrapper<T> implements ResponseWrapper<T> {
       res.send();
     }
   }
-  validate(responses: RestResponses<any> | undefined): void | Promise<void> {
-    const schema = responses?.[this.status]?.schema;
-    if (schema) {
-      const validate = buildValidateSchema(schema);
-      const valid = validate(this.body);
-      if (!valid) {
-        const error = validate.errors![0];
-        throw new Error(`${error.dataPath} ${error.message}`);
-      }
-    }
-  }
 }
 
-export function OkResponse<T>(value: T): ResponseWrapper<T> {
+export function Ok<T>(value: T): ResponseWrapper<T> {
   return new RestResponseWrapper(200, value);
 }
 
-export function CreatedResponse<T>(
-  value: T,
-  location?: string
-): ResponseWrapper<T> {
+export function Created<T>(value: T, location?: string): ResponseWrapper<T> {
   return new RestResponseWrapper(201, value, location ? { location } : {});
 }
 
-export function NoContentResponse(): ResponseWrapper<void> {
+export function NoContent(): ResponseWrapper<void> {
   return new RestResponseWrapper(204, undefined);
+}
+
+export interface JsonResponseOptions<T> {
+  description: string;
+  schema?: JsonSchemaFor<T>;
+}
+
+export function JsonResponse<T = any>({
+  description,
+  schema,
+}: JsonResponseOptions<T>): RestResponse<T> {
+  return {
+    description,
+    content: {
+      "application/json": {
+        schema: schema as any,
+      },
+    },
+  };
+}
+
+export interface NoContentResponseOptions {
+  description: string;
+}
+
+export function NoContentResponse({
+  description,
+}: NoContentResponseOptions): RestResponse<void> {
+  return {
+    description,
+  };
+}
+
+export function SuccessResponse<T = void>(
+  schema?: JsonSchemaFor<T>
+): RestResponse<T> {
+  return schema
+    ? JsonResponse({
+        description: outdent`
+          Successful operation
+          ${schema ? schemaToTable(schema) : ""}
+        `,
+        schema,
+      })
+    : (NoContentResponse({
+        description: "Successful operation",
+      }) as RestResponse<T>);
 }

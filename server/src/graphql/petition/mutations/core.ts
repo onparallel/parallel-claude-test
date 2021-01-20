@@ -129,7 +129,7 @@ export const createPetition = mutationField("createPetition", {
       const newPetition = await ctx.petitions.createPetition(
         {
           name,
-          locale,
+          locale: locale!,
           email_subject: name,
           is_template: isTemplate,
         },
