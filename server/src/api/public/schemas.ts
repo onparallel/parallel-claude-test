@@ -273,13 +273,15 @@ const _RemindersConfig = {
 const _MessageBody = {
   oneOf: [
     {
-      title: "PlainTextMessageBody",
+      title: "PlainTextMessage",
       type: "object",
       required: ["format", "content"],
       additionalProperties: false,
       properties: {
         format: {
           type: "string",
+          description:
+            "Const value indicating that the content is in plain text format",
           const: "PLAIN_TEXT",
           example: "PLAIN_TEXT",
         },
@@ -322,6 +324,7 @@ export const PaginatedTemplates = PaginatedListOf(_Template);
 export const Contact = schema(_Contact);
 export const PaginatedContacts = PaginatedListOf(_Contact);
 export const SendPetition = schema({
+  title: "SendPetition",
   type: "object",
   required: ["contacts", "message", "subject"],
   additionalProperties: false,
@@ -337,6 +340,7 @@ export const SendPetition = schema({
             example: toGlobalId("Contact", 42),
           },
           {
+            title: "CreateOrUpdateContact",
             type: "object",
             additionalProperties: false,
             required: ["email"],
@@ -383,7 +387,7 @@ export const SendPetition = schema({
     scheduledAt: {
       description: "Optional date at which to send the email",
       type: ["string", "null"],
-      formate: "date-time",
+      format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
     },
   },

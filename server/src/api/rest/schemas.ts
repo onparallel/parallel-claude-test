@@ -1,5 +1,6 @@
 import Ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
+import escapeHTML from "escape-html";
 import { JSONSchema6, JSONSchema6TypeName } from "json-schema";
 import { FromSchema, JSONSchema as _JSONSchema } from "json-schema-to-ts";
 import { outdent } from "outdent";
@@ -30,55 +31,73 @@ export function buildValidateSchema<T = any>(schema: JsonSchema) {
 }
 
 export function documentSchema(schema: JsonSchema) {
-  return schemaToTable(schema);
+  return schemasToTables([schema]);
 }
 
-function schemaToTable(schema: JsonSchema) {
-  const header = outdent`
-    ### \`${schema.title ? schema.title : "missing title"}\`
-    | Field | Type | Format | Description |
-    |-------|------|--------|-------------|
-  `;
-
-  return [header].concat(schemaToRows(schema)).join("\n");
-}
-
-function schemaToRows(schema: JsonSchema, name?: string): string[] {
-  switch (schema.type) {
-    case "array":
-      return schemaToRows(schema.items as any, `${name ?? "$"}[]`);
-    case "object":
-      if (schema.properties) {
-        return Object.entries(
-          schema.properties
-        ).flatMap(([propName, propSchema]) =>
-          schemaToRows(
-            propSchema as any,
-            name ? `${name}.${propName}` : propName
-          )
-        );
+function schemasToTables(schemas: JsonSchema[]): string {
+  const result: string[] = [];
+  let schema;
+  const seen = new Set<string>();
+  while ((schema = schemas.pop())) {
+    if (schema.type === "object") {
+      const name = getType(schema, []);
+      if (seen.has(name)) {
+        continue;
       }
-      return [];
-    default:
-      const field = name;
-      const type = getType(schema);
-      const format = getFormat(schema);
-      const description = schema.description ?? "";
-      return [`| ${field} | ${type} | ${format} | ${description} |`];
+      result.push(outdent`
+        ### ${escapeHTML(name)}
+        | Field | Type | Format | Description |
+        |-------|------|--------|-------------|
+      `);
+      result.push(...schemaToRows(schema, schemas));
+      result.push("----");
+      seen.add(name);
+    }
+    if (schema.type === "array") {
+      schemas.push(schema.items as any);
+    }
   }
+  return result.join("\n");
 }
 
-function getType(schema: JsonSchema) {
-  const type = schema.type;
-  if (type === undefined) {
-    return "";
-  } else if (typeof type === "string") {
-    return typeToString(type, schema as any);
-  } else {
-    return (type as JSONSchema6TypeName[])
-      .map((t) => typeToString(t, schema as any))
-      .join(" &#124; ");
+function schemaToRows(schema: JsonSchema, schemas: JsonSchema[]): string[] {
+  return Object.entries<JsonSchema>((schema.properties ?? {}) as any).map(
+    ([name, prop]) => {
+      const type = getType(prop, schemas).replace(/\|/g, "&#124;");
+      const format = getFormat(prop);
+      const description = prop.description ?? "";
+      return `| ${name}${
+        schema.required?.includes(name) ? "" : " `OPTIONAL`"
+      } | ${type} | ${format} | ${description} |`;
+    }
+  );
+}
+
+function getType(schema: JsonSchema, schemas: JsonSchema[]): string {
+  if (schema.type === "object") {
+    schemas.push(schema);
+    return schema.title ?? "*unknown*";
+  } else if (schema.type === "array") {
+    const type = getType(schema.items as any, schemas);
+    return `${type.includes("|") ? `(${type})` : type}[]`;
+  } else if (typeof schema.type === "string") {
+    return typeToString(schema.type, schema as any);
+  } else if (schema.type) {
+    return (schema.type as JSONSchema6TypeName[])
+      .map((type) => {
+        if (type === "object" || type === "array") {
+          return getType({ ...schema, type }, schemas);
+        } else {
+          return typeToString(type, schema as any);
+        }
+      })
+      .join(" | ");
+  } else if (schema.oneOf) {
+    return (schema.oneOf as JsonSchema[])
+      .map((option) => getType(option, schemas))
+      .join(" | ");
   }
+  return "*unknown*";
 }
 
 function typeToString(type: JSONSchema6TypeName, schema: JSONSchema6) {
@@ -99,7 +118,10 @@ function typeToString(type: JSONSchema6TypeName, schema: JSONSchema6) {
       } else {
         return type;
       }
+    case "object":
+      return schema.title ?? "any";
   }
+  return "*unknown*";
 }
 
 function getFormat(schema: JsonSchema) {

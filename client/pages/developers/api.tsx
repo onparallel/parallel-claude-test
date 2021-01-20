@@ -79,15 +79,15 @@ function DeveloperApi({
             }
             .swagger-ui h1 {
               font-size: 1.5rem;
-              margin: 0.5rem 0;
+              margin: 1rem 0 0.5rem;
             }
             .swagger-ui h2 {
               font-size: 1.25rem;
-              margin: 0.375rem 0;
+              margin: 1rem 0 0.5rem;
             }
             .swagger-ui h3 {
               font-size: 1.125rem;
-              margin: 0.25rem 0;
+              margin: 1rem 0 0.5rem;
             }
           `
         }
