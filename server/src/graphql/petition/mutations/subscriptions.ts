@@ -34,28 +34,6 @@ export const createPetitionSubscription = mutationField(
   }
 );
 
-export const updatePetitionSubscription = mutationField(
-  "updatePetitionSubscription",
-  {
-    type: "Subscription",
-    description: "Updates the endpoint of a subscription",
-    authorize: authenticateAnd(userHasAccessToSubscriptions("subscriptionId")),
-    args: {
-      subscriptionId: nonNull(globalIdArg("Subscription")),
-      endpoint: nonNull(stringArg()),
-    },
-    resolve: async (_, { subscriptionId, endpoint }, ctx) => {
-      return await ctx.subscriptions.updateSubscription(
-        subscriptionId,
-        {
-          endpoint,
-        },
-        ctx.user!
-      );
-    },
-  }
-);
-
 export const deletePetitionSubscription = mutationField(
   "deletePetitionSubscription",
   {
@@ -65,11 +43,8 @@ export const deletePetitionSubscription = mutationField(
       subscriptionId: nonNull(globalIdArg("Subscription")),
     },
     resolve: async (_, { subscriptionId }, ctx) => {
-      try {
-        await ctx.subscriptions.deleteSubscription(subscriptionId, ctx.user!);
-        return RESULT.SUCCESS;
-      } catch {}
-      return RESULT.FAILURE;
+      await ctx.subscriptions.deleteSubscription(subscriptionId, ctx.user!);
+      return RESULT.SUCCESS;
     },
   }
 );

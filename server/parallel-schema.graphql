@@ -745,14 +745,6 @@ type Mutation {
   ): PetitionWithFieldAndReplies!
 
   """
-  Updates the endpoint of a subscription
-  """
-  updatePetitionSubscription(
-    endpoint: String!
-    subscriptionId: GID!
-  ): Subscription!
-
-  """
   Updates the subscription flag on a PetitionUser
   """
   updatePetitionUserSubscription(

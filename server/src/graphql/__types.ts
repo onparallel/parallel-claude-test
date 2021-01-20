@@ -606,7 +606,6 @@ export interface NexusGenFieldTypes {
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
-    updatePetitionSubscription: NexusGenRootTypes["Subscription"]; // Subscription!
     updatePetitionUserSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
@@ -1320,7 +1319,6 @@ export interface NexusGenFieldTypeNames {
     updatePetitionField: "PetitionBaseAndField";
     updatePetitionFieldComment: "PetitionFieldComment";
     updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
-    updatePetitionSubscription: "Subscription";
     updatePetitionUserSubscription: "Petition";
     updateUser: "User";
     updateUserStatus: "User";
@@ -2237,11 +2235,6 @@ export interface NexusGenArgTypes {
       petitionFieldReplyIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
-    };
-    updatePetitionSubscription: {
-      // args
-      endpoint: string; // String!
-      subscriptionId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionUserSubscription: {
       // args

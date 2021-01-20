@@ -61,3 +61,11 @@ export const PetitionAccessFragment = gql`
   ${ContactFragment}
   ${UserFragment}
 `;
+
+export const SubscriptionFragment = gql`
+  fragment Subscription on Subscription {
+    id
+    endpoint
+    createdAt
+  }
+`;

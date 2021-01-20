@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { PetitionEventSubscription, User } from "../__types";
+import { User } from "../__types";
 
 @injectable()
 export class PetitionEventSubscriptionRepository extends BaseRepository {
@@ -53,26 +53,6 @@ export class PetitionEventSubscriptionRepository extends BaseRepository {
       endpoint,
       created_by: `User:${user.id}`,
     });
-
-    return row;
-  }
-
-  async updateSubscription(
-    subscriptionId: number,
-    data: Partial<PetitionEventSubscription>,
-    user: User
-  ) {
-    const [row] = await this.from("petition_event_subscription")
-      .where("id", subscriptionId)
-      .whereNull("deleted_at")
-      .update(
-        {
-          ...data,
-          updated_at: this.now(),
-          updated_by: `User:${user.id}`,
-        },
-        "*"
-      );
 
     return row;
   }

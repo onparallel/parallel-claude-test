@@ -18,6 +18,7 @@ import {
   ContactFragment,
   PetitionAccessFragment,
   PetitionFragment,
+  SubscriptionFragment,
   TemplateFragment,
 } from "./fragments";
 import { paginationParams, sortByParam } from "./helpers";
@@ -25,12 +26,15 @@ import {
   Contact,
   CreateContact,
   CreatePetition,
+  CreateSubscription,
   ListOfPetitionAccesses,
+  ListOfSubscriptions,
   PaginatedContacts,
   PaginatedPetitions,
   PaginatedTemplates,
   Petition,
   SendPetition,
+  Subscription,
   Template,
   UpdatePetition,
 } from "./schemas";
@@ -49,6 +53,8 @@ import {
   CreatePetition_PetitionMutationVariables,
   DeletePetition_deletePetitionsMutation,
   DeletePetition_deletePetitionsMutationVariables,
+  DeleteSubscription_deletePetitionSubscriptionMutation,
+  DeleteSubscription_deletePetitionSubscriptionMutationVariables,
   DeleteTemplate_deletePetitionsMutation,
   DeleteTemplate_deletePetitionsMutationVariables,
   GetContacts_ContactsQuery,
@@ -61,6 +67,8 @@ import {
   GetPetitions_PetitionsQueryVariables,
   GetPetition_PetitionQuery,
   GetPetition_PetitionQueryVariables,
+  GetSubscriptions_SubscriptionQuery,
+  GetSubscriptions_SubscriptionQueryVariables,
   GetTemplates_TemplatesQuery,
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
@@ -530,6 +538,107 @@ api
         }
       );
       return Ok(result.sendPetition.accesses!);
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/subscriptions", { params: { petitionId } })
+  .get(
+    {
+      operationId: "GetSubscriptions",
+      summary: "Returns the subscriptions for the specified petition",
+      responses: { 200: SuccessResponse(ListOfSubscriptions) },
+      tags: ["Petitions"],
+    },
+    async ({ client, params }) => {
+      const result = await client.request<
+        GetSubscriptions_SubscriptionQuery,
+        GetSubscriptions_SubscriptionQueryVariables
+      >(
+        gql`
+          query GetSubscriptions_Subscription($petitionId: GID!) {
+            petitionSubscriptions(petitionId: $petitionId) {
+              ...Subscription
+            }
+          }
+          ${SubscriptionFragment}
+        `,
+        { petitionId: params.petitionId }
+      );
+      return Ok(result.petitionSubscriptions!);
+    }
+  )
+  .post(
+    {
+      operationId: "CreateSubscription",
+      summary: "Creates a new subscription on the petition.",
+      description: outdent`
+      You can create a subscription on a petition to receive
+      real-time event updates on a given URL.
+    `,
+      body: JsonBody(CreateSubscription),
+      responses: {
+        201: SuccessResponse(Subscription),
+      },
+      tags: ["Petitions"],
+    },
+    async ({ client, params, body }) => {
+      const result = await client.request(
+        gql`
+          mutation CreateSubscription_createPetitionSubscription(
+            $petitionId: GID!
+            $endpoint: String!
+          ) {
+            createPetitionSubscription(
+              petitionId: $petitionId
+              endpoint: $endpoint
+            ) {
+              ...Subscription
+            }
+          }
+          ${SubscriptionFragment}
+        `,
+        {
+          petitionId: params.petitionId,
+          endpoint: body.endpoint,
+        }
+      );
+
+      return Created(result.createPetitionSubscription!);
+    }
+  );
+
+const subscriptionId = idParam({
+  type: "Subscription",
+  description: "The ID of the subscription",
+});
+
+api
+  .path("/petitions/:petitionId/subscriptions/:subscriptionId", {
+    params: { petitionId, subscriptionId },
+  })
+  .delete(
+    {
+      operationId: "DeleteSubscription",
+      summary: "Deletes the specified subscription",
+      responses: { 204: SuccessResponse() },
+      tags: ["Petitions"],
+    },
+    async ({ client, params }) => {
+      await client.request<
+        DeleteSubscription_deletePetitionSubscriptionMutation,
+        DeleteSubscription_deletePetitionSubscriptionMutationVariables
+      >(
+        gql`
+          mutation DeleteSubscription_deletePetitionSubscription(
+            $subscriptionId: GID!
+          ) {
+            deletePetitionSubscription(subscriptionId: $subscriptionId)
+          }
+        `,
+        { subscriptionId: params.subscriptionId }
+      );
+      return NoContent();
     }
   );
 

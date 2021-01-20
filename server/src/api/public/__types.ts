@@ -195,6 +195,8 @@ export type Mutation = {
   createPetitionField: PetitionBaseAndField;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionFieldComment;
+  /** Creates a new subscription on a petition */
+  createPetitionSubscription: Subscription;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Deactivates the specified active petition accesses. */
@@ -209,6 +211,7 @@ export type Mutation = {
   deletePetitionFieldComment: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  deletePetitionSubscription: Result;
   /** Edits permissions on given petitions and users */
   editPetitionUserPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
@@ -380,6 +383,11 @@ export type MutationcreatePetitionFieldCommentArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationcreatePetitionSubscriptionArgs = {
+  endpoint: Scalars["String"];
+  petitionId: Scalars["GID"];
+};
+
 export type MutationcreateUserArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
@@ -417,6 +425,10 @@ export type MutationdeletePetitionFieldCommentArgs = {
 export type MutationdeletePetitionsArgs = {
   force?: Maybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
+};
+
+export type MutationdeletePetitionSubscriptionArgs = {
+  subscriptionId: Scalars["GID"];
 };
 
 export type MutationeditPetitionUserPermissionArgs = {
@@ -1423,6 +1435,8 @@ export type Query = {
   petitionFieldComments: Array<PublicPetitionFieldComment>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
+  /** The subscriptions linked to the petition */
+  petitionSubscriptions: Array<Subscription>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
@@ -1494,6 +1508,10 @@ export type QuerypetitionsArgs = {
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
+};
+
+export type QuerypetitionSubscriptionsArgs = {
+  petitionId: Scalars["GID"];
 };
 
 export type QuerypublicOrgLogoUrlArgs = {
@@ -1639,6 +1657,16 @@ export type SignatureConfigInput = {
 export type SignatureStartedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+};
+
+export type Subscription = Timestamps & {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  endpoint: Scalars["String"];
+  id: Scalars["GID"];
+  petition: Petition;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
 };
 
 /** Return type for all support methods */
@@ -1833,6 +1861,11 @@ export type PetitionAccessFragment = Pick<
   | "createdAt"
 > & { contact: Maybe<ContactFragment>; granter: Maybe<UserFragment> };
 
+export type SubscriptionFragment = Pick<
+  Subscription,
+  "id" | "endpoint" | "createdAt"
+>;
+
 export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -1925,6 +1958,32 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
 export type CreatePetitionRecipients_sendPetitionMutation = {
   sendPetition: { accesses: Maybe<Array<PetitionAccessFragment>> };
 };
+
+export type GetSubscriptions_SubscriptionQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type GetSubscriptions_SubscriptionQuery = {
+  petitionSubscriptions: Array<SubscriptionFragment>;
+};
+
+export type CreateSubscription_createPetitionSubscriptionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  endpoint: Scalars["String"];
+}>;
+
+export type CreateSubscription_createPetitionSubscriptionMutation = {
+  createPetitionSubscription: SubscriptionFragment;
+};
+
+export type DeleteSubscription_deletePetitionSubscriptionMutationVariables = Exact<{
+  subscriptionId: Scalars["GID"];
+}>;
+
+export type DeleteSubscription_deletePetitionSubscriptionMutation = Pick<
+  Mutation,
+  "deletePetitionSubscription"
+>;
 
 export type GetTemplates_TemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
