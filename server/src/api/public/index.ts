@@ -25,6 +25,7 @@ import {
   Petition,
   SendPetition,
   Template,
+  UpdatePetition,
 } from "./schemas";
 import {
   CreatePetitionRecipients_ContactQuery,
@@ -55,6 +56,8 @@ import {
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
+  UpdatePetition_PetitionMutation,
+  UpdatePetition_PetitionMutationVariables,
 } from "./__types";
 
 export const api = new RestApi({
@@ -254,6 +257,35 @@ api
         { petitionId: params.petitionId }
       );
       return Ok(result.petition!);
+    }
+  )
+  .put(
+    {
+      operationId: "UpdatePetition",
+      summary: "Updates the specified petition",
+      body: JsonBody(UpdatePetition),
+      responses: { 200: SuccessResponse(Petition) },
+      tags: ["Petitions"],
+    },
+    async ({ client, params, body }) => {
+      const result = await client.request<
+        UpdatePetition_PetitionMutation,
+        UpdatePetition_PetitionMutationVariables
+      >(
+        gql`
+          mutation UpdatePetition_Petition(
+            $petitionId: GID!
+            $data: UpdatePetitionInput!
+          ) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              ...Petition
+            }
+          }
+          ${PetitionFragment}
+        `,
+        { petitionId: params.petitionId, data: body }
+      );
+      return Ok(result.updatePetition!);
     }
   )
   .delete(

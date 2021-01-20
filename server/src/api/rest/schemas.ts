@@ -67,13 +67,13 @@ function schemaToRows(schema: JsonSchema, schemas: JsonSchema[]): string[] {
       const format = getFormat(prop);
       const description = prop.description ?? "";
       return `| ${name}${
-        schema.required?.includes(name) ? "" : " `OPTIONAL`"
+        schema.required?.includes(name) ? "" : ` *optional*`
       } | ${type} | ${format} | ${description} |`;
     }
   );
 }
 
-function getType(schema: JsonSchema, schemas: JsonSchema[]): string {
+export function getType(schema: JsonSchema, schemas: JsonSchema[]): string {
   if (schema.type === "object") {
     schemas.push(schema);
     return schema.title ?? "*unknown*";

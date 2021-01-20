@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { outdent } from "outdent";
 import { ResponseWrapper, RestResponse } from "./core";
-import { documentSchema, JsonSchemaFor } from "./schemas";
+import { documentSchema, getType, JsonSchemaFor } from "./schemas";
 
 export class RestResponseWrapper<T> implements ResponseWrapper<T> {
   __type?: T;
@@ -75,9 +75,7 @@ export function SuccessResponse<T = void>(
     ? JsonResponse({
         description: schema
           ? outdent`
-          Successful operation of \`${
-            schema.title ? schema.title : "missing title"
-          }\`
+          Successful operation of \`${getType(schema, [])}\`
           ${documentSchema(schema)}
         `
           : "Successful operation",

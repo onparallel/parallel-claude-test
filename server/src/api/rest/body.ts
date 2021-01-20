@@ -2,7 +2,12 @@ import { outdent } from "outdent";
 import { isDefined } from "../../util/remedaExtensions";
 import { RestBody } from "./core";
 import { InvalidRequestBodyError } from "./errors";
-import { buildValidateSchema, JsonSchemaFor, documentSchema } from "./schemas";
+import {
+  buildValidateSchema,
+  JsonSchemaFor,
+  documentSchema,
+  getType,
+} from "./schemas";
 
 export interface JsonBodyOptions {
   description?: string;
@@ -21,8 +26,14 @@ export function JsonBody<T>(
         ? outdent`
         ${description}
         ${documentSchema(schema)}
-      `
-        : documentSchema(schema),
+        `
+        : outdent`
+          ${
+            required ? "A required" : "An optional"
+          } JSON payload of  \`${getType(schema, [])}\`
+          
+          ${documentSchema(schema)}
+        `,
       required,
       content: {
         "application/json": { schema: schema as any },

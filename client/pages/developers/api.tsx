@@ -1,8 +1,23 @@
+import { PublicHeader } from "@parallel/components/public/layout/PublicHeader";
 import { InferGetServerSidePropsType } from "next";
 import { default as nodeFetch } from "node-fetch";
-import SwaggerUI from "swagger-ui-react";
+import { default as SwaggerUI } from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
-import { PublicHeader } from "@parallel/components/public/layout/PublicHeader";
+
+const plugins: any[] = [
+  {
+    components: {
+      ModelWrapper: (props: any) => {
+        const HighlightCode = props.getComponent("highlightCode");
+        return (
+          <HighlightCode
+            value={JSON.stringify(props.schema.toJS(), null, "  ")}
+          />
+        );
+      },
+    },
+  },
+];
 
 function DeveloperApi({
   spec,
@@ -16,7 +31,7 @@ function DeveloperApi({
         content="Integrate Parallel into your workflow"
       />
       <PublicHeader position="sticky" top={0} zIndex={1} />
-      <SwaggerUI spec={spec} />
+      <SwaggerUI spec={spec} plugins={plugins} />
       <style jsx global>
         {
           /* css */ `

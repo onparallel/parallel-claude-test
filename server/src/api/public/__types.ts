@@ -1861,6 +1861,15 @@ export type GetPetition_PetitionQueryVariables = Exact<{
 
 export type GetPetition_PetitionQuery = { petition: Maybe<PetitionFragment> };
 
+export type UpdatePetition_PetitionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  data: UpdatePetitionInput;
+}>;
+
+export type UpdatePetition_PetitionMutation = {
+  updatePetition: PetitionFragment;
+};
+
 export type DeletePetition_deletePetitionsMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   force: Scalars["Boolean"];

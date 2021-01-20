@@ -297,6 +297,31 @@ const _MessageBody = {
 } as const;
 
 export const Petition = schema(_Petition);
+export const UpdatePetition = schema({
+  title: "UpdatePetition",
+  type: "object",
+  additionalProperties: false,
+  minProperties: 1,
+  properties: {
+    name: {
+      description: "The name of the petition",
+      type: ["string", "null"],
+      example: "My petition",
+    },
+    deadline: {
+      description: "The deadline of the petition for informative purposes",
+      type: ["string", "null"],
+      format: "date-time",
+      example: new Date(2020, 2, 15).toISOString(),
+    },
+    locale: {
+      description: "The locale of the petition",
+      type: "string",
+      enum: ["en", "es"],
+      example: "en",
+    },
+  },
+} as const);
 export const CreatePetition = schema({
   title: "CreatePetition",
   type: "object",
@@ -399,19 +424,19 @@ function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
     type: "object",
     description: "Paginated resource",
     additionalProperties: false,
-    required: ["totalCount", "items"],
+    required: ["items", "totalCount"],
     properties: {
-      totalCount: {
-        description: "The total count of elements in this paginated resource",
-        type: "integer",
-        minimum: 0,
-        example: 42,
-      },
       items: {
         description:
           "The requested slice of items from this paginated resource",
         type: "array",
         items: item,
+      },
+      totalCount: {
+        description: "The total count of elements in this paginated resource",
+        type: "integer",
+        minimum: 0,
+        example: 42,
       },
     },
   } as const);
