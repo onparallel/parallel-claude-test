@@ -1966,6 +1966,12 @@ export type GetContacts_ContactsQuery = {
   };
 };
 
+export type CreateContact_ContactMutationVariables = Exact<{
+  data: CreateContactInput;
+}>;
+
+export type CreateContact_ContactMutation = { createContact: ContactFragment };
+
 export type GetContact_ContactQueryVariables = Exact<{
   contactId: Scalars["GID"];
 }>;

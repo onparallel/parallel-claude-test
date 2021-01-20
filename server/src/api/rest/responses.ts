@@ -56,6 +56,18 @@ export function JsonResponse<T = any>({
   };
 }
 
+export interface ErrorResponseOptions {
+  description: string;
+}
+
+export function ErrorResponse({
+  description,
+}: ErrorResponseOptions): JsonResponseOptions<never> {
+  return {
+    description,
+  };
+}
+
 export interface NoContentResponseOptions {
   description: string;
 }

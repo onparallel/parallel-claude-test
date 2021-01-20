@@ -126,34 +126,35 @@ const _Contact = {
   ],
   properties: {
     id: {
-      description: "The ID of the contact",
       type: "string",
+      description: "The ID of the contact",
     },
     email: {
-      description: "The email of the contact",
       type: "string",
+      format: "email",
+      description: "The email of the contact",
     },
     firstName: {
-      description: "The first name of the contact",
       type: ["string", "null"],
+      description: "The first name of the contact",
     },
     lastName: {
-      description: "The last name of the contact",
       type: ["string", "null"],
+      description: "The last name of the contact",
     },
     fullName: {
-      description: "The full name of the contact",
       type: ["string", "null"],
+      description: "The full name of the contact",
     },
     createdAt: {
-      description: "Creation date of the contact",
       type: "string",
       format: "date-time",
+      description: "Creation date of the contact",
     },
     updatedAt: {
-      description: "Last update date of the contact",
       type: "string",
       format: "date-time",
+      description: "Last update date of the contact",
     },
   },
   example: {
@@ -340,13 +341,40 @@ export const CreatePetition = schema({
     },
   },
 } as const);
-
 export const PaginatedPetitions = PaginatedListOf(_Petition);
 export const PetitionAccess = schema(_PetitionAccess);
 export const ListOfPetitionAccesses = ListOf(_PetitionAccess);
 export const Template = schema(_Template);
 export const PaginatedTemplates = PaginatedListOf(_Template);
 export const Contact = schema(_Contact);
+export const CreateContact = schema({
+  title: "CreateContact",
+  type: "object",
+  additionalProperties: false,
+  required: ["email"],
+  properties: {
+    email: {
+      type: "string",
+      format: "email",
+      description: "The email of the contact",
+    },
+    firstName: {
+      type: ["string", "null"],
+      maxLength: 255,
+      description: "The first name of the contact",
+    },
+    lastName: {
+      type: ["string", "null"],
+      maxLength: 255,
+      description: "The last name of the contact",
+    },
+  },
+  example: {
+    email: "tyrion@casterlyrock.wes",
+    firstName: "Tyrion",
+    lastName: "Lannister",
+  },
+} as const);
 export const PaginatedContacts = PaginatedListOf(_Contact);
 export const SendPetition = schema({
   title: "SendPetition",
@@ -371,18 +399,19 @@ export const SendPetition = schema({
             required: ["email"],
             properties: {
               email: {
+                type: "string",
+                format: "email",
                 description:
                   "The email of the contact to send this petition to",
-                type: "string",
               },
               firstName: {
-                description: "The first name of the contact",
                 type: ["string", "null"],
+                description: "The first name of the contact",
                 maxLength: 255,
               },
               lastName: {
-                description: "The last name of the contact",
                 type: ["string", "null"],
+                description: "The last name of the contact",
                 maxLength: 255,
               },
             },

@@ -5,9 +5,15 @@ import { pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
 import { JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
-import { UnauthorizedError } from "../rest/errors";
+import { ConflictError, UnauthorizedError } from "../rest/errors";
 import { booleanParam, enumParam, idParam } from "../rest/params";
-import { Created, NoContent, Ok, SuccessResponse } from "../rest/responses";
+import {
+  Created,
+  ErrorResponse,
+  NoContent,
+  Ok,
+  SuccessResponse,
+} from "../rest/responses";
 import {
   ContactFragment,
   PetitionAccessFragment,
@@ -17,6 +23,7 @@ import {
 import { paginationParams, sortByParam } from "./helpers";
 import {
   Contact,
+  CreateContact,
   CreatePetition,
   ListOfPetitionAccesses,
   PaginatedContacts,
@@ -28,6 +35,8 @@ import {
   UpdatePetition,
 } from "./schemas";
 import {
+  CreateContact_ContactMutation,
+  CreateContact_ContactMutationVariables,
   CreatePetitionRecipients_ContactQuery,
   CreatePetitionRecipients_ContactQueryVariables,
   CreatePetitionRecipients_createContactMutation,
@@ -620,48 +629,92 @@ api
     }
   );
 
-api.path("/contacts").get(
-  {
-    operationId: "GetContact",
-    summary: "Returns a paginated list of contacts",
-    query: {
-      ...paginationParams(),
-      ...sortByParam([
-        "firstName",
-        "lastName",
-        "fullName",
-        "email",
-        "createdAt",
-      ]),
+api
+  .path("/contacts")
+  .get(
+    {
+      operationId: "GetContact",
+      summary: "Returns a paginated list of contacts",
+      query: {
+        ...paginationParams(),
+        ...sortByParam([
+          "firstName",
+          "lastName",
+          "fullName",
+          "email",
+          "createdAt",
+        ]),
+      },
+      responses: { 200: SuccessResponse(PaginatedContacts) },
+      tags: ["Contacts"],
     },
-    responses: { 200: SuccessResponse(PaginatedContacts) },
-    tags: ["Contacts"],
-  },
-  async ({ client, query }) => {
-    const result = await client.request<
-      GetContacts_ContactsQuery,
-      GetContacts_ContactsQueryVariables
-    >(
-      gql`
-        query GetContacts_Contacts(
-          $offset: Int!
-          $limit: Int!
-          $sortBy: [QueryContacts_OrderBy!]
-        ) {
-          contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
-            items {
-              ...Contact
+    async ({ client, query }) => {
+      const result = await client.request<
+        GetContacts_ContactsQuery,
+        GetContacts_ContactsQueryVariables
+      >(
+        gql`
+          query GetContacts_Contacts(
+            $offset: Int!
+            $limit: Int!
+            $sortBy: [QueryContacts_OrderBy!]
+          ) {
+            contacts(offset: $offset, limit: $limit, sortBy: $sortBy) {
+              items {
+                ...Contact
+              }
+              totalCount
             }
-            totalCount
+          }
+          ${ContactFragment}
+        `,
+        query
+      );
+      return Ok(result.contacts);
+    }
+  )
+  .post(
+    {
+      operationId: "CreateContact",
+      summary: "Creates a contact with the specified details",
+      body: JsonBody(CreateContact),
+      responses: {
+        201: SuccessResponse(Contact),
+        409: ErrorResponse({
+          description: "A contact with this email already exists",
+        }),
+      },
+      tags: ["Contacts"],
+    },
+    async ({ client, body }) => {
+      try {
+        const result = await client.request<
+          CreateContact_ContactMutation,
+          CreateContact_ContactMutationVariables
+        >(
+          gql`
+            mutation CreateContact_Contact($data: CreateContactInput!) {
+              createContact(data: $data) {
+                ...Contact
+              }
+            }
+            ${ContactFragment}
+          `,
+          { data: body }
+        );
+        return Created(result.createContact!);
+      } catch (error) {
+        if (error instanceof ClientError) {
+          const code = (error.response.errors![0] as any).extensions
+            .code as string;
+          if (code === "EXISTING_CONTACT") {
+            throw new ConflictError("A contact with this email already exists");
           }
         }
-        ${ContactFragment}
-      `,
-      query
-    );
-    return Ok(result.contacts);
-  }
-);
+        throw error;
+      }
+    }
+  );
 
 api
   .path("/contacts/:contactId", {

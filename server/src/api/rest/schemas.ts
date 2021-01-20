@@ -24,7 +24,7 @@ export function buildValidateSchema<T = any>(
 ): ValidateFunction<T>;
 export function buildValidateSchema<T = any>(schema: JsonSchema) {
   const ajv = new Ajv({ strict: false });
-  addFormats(ajv, ["date-time"]);
+  addFormats(ajv, ["date-time", "email"]);
   ajv.addFormat("time-zone", isValidTimezone);
   ajv.addFormat("time", isValidTime);
   return ajv.compile<T>(schema);

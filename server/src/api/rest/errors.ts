@@ -28,6 +28,13 @@ export abstract class HttpError
   }
 }
 
+export class ConflictError extends HttpError {
+  static readonly code = "Conflict";
+  constructor(public message: string) {
+    super(409, ConflictError.code, message);
+  }
+}
+
 export class UnauthorizedError extends HttpError {
   static readonly code = "Unauthorized";
   constructor(public message: string) {
