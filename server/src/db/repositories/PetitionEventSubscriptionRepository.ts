@@ -38,13 +38,13 @@ export class PetitionEventSubscriptionRepository extends BaseRepository {
   readonly loadSubscription = this.buildLoadById(
     "petition_event_subscription",
     "id",
-    (q) => q.whereNull("deleted_at")
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")
   );
 
   readonly loadSubscriptionsByPetitionId = this.buildLoadMultipleBy(
     "petition_event_subscription",
     "petition_id",
-    (q) => q.whereNull("deleted_at")
+    (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")
   );
 
   async createSubscription(petitionId: number, endpoint: string, user: User) {

@@ -19,6 +19,8 @@ import {
   PetitionFieldReply,
   CreatePetitionFieldReply,
   UserAuthenticationToken,
+  PetitionUserPermissionType,
+  PetitionEventSubscription,
 } from "../../__types";
 import { hash, random } from "../../../util/token";
 
@@ -212,6 +214,22 @@ export class Mocks {
       .returning("*");
   }
 
+  async sharePetitions(
+    petitionIds: number[],
+    toUserId: number,
+    permissionType: PetitionUserPermissionType
+  ) {
+    return await this.knex<PetitionUser>("petition_user")
+      .insert(
+        petitionIds.map((petitionId) => ({
+          petition_id: petitionId,
+          user_id: toUserId,
+          permission_type: permissionType,
+        }))
+      )
+      .returning("*");
+  }
+
   async clearSharedPetitions() {
     return await this.knex<PetitionUser>("petition_user")
       .whereNot("permission_type", "OWNER")
@@ -234,6 +252,23 @@ export class Mocks {
     return await this.knex<UserAuthenticationToken>(
       "user_authentication_token"
     ).delete();
+  }
+
+  async createSubscriptions(petitionIds: number[], endpoint: string) {
+    return await this.knex<PetitionEventSubscription>(
+      "petition_event_subscription"
+    )
+      .insert(
+        petitionIds.map((petitionId) => ({
+          petition_id: petitionId,
+          endpoint,
+        }))
+      )
+      .returning("*");
+  }
+
+  async clearSubscriptions() {
+    await this.knex("petition_event_subscription").delete();
   }
 }
 

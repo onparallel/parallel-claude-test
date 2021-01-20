@@ -447,12 +447,8 @@ describe("GraphQL/User Permissions", () => {
 
   describe("editPetitionUserPermission", () => {
     beforeEach(async () => {
-      await mocks.knex.raw(/* sql */ `
-      INSERT INTO petition_user(petition_id, user_id, permission_type)
-      VALUES 
-        (${userPetition.id}, ${orgUsers[1].id}, 'READ'),
-        (${userPetition.id}, ${orgUsers[2].id}, 'READ')
-    `);
+      await mocks.sharePetitions([userPetition.id], orgUsers[1].id, "READ");
+      await mocks.sharePetitions([userPetition.id], orgUsers[2].id, "READ");
     });
 
     afterEach(async () => {
@@ -690,12 +686,8 @@ describe("GraphQL/User Permissions", () => {
 
   describe("removePetitionUserPermission", () => {
     beforeEach(async () => {
-      await mocks.knex.raw(/* sql */ `
-      INSERT INTO petition_user(petition_id, user_id, permission_type)
-      VALUES 
-        (${userPetition.id}, ${orgUsers[1].id}, 'READ'),
-        (${userPetition.id}, ${orgUsers[2].id}, 'READ')
-    `);
+      await mocks.sharePetitions([userPetition.id], orgUsers[1].id, "READ");
+      await mocks.sharePetitions([userPetition.id], orgUsers[2].id, "READ");
     });
 
     afterEach(async () => {

@@ -74,12 +74,11 @@ describe("GraphQL/Petitions", () => {
     );
 
     // petitions[0] and petitions[1] are shared to another user
-    await knex.raw(/* sql */ `
-      INSERT INTO petition_user(petition_id, user_id, permission_type)
-      VALUES 
-        (${petitions[0].id}, ${sameOrgUser.id}, 'WRITE'),
-        (${petitions[1].id}, ${sameOrgUser.id}, 'WRITE')
-    `);
+    await mocks.sharePetitions(
+      [petitions[0].id, petitions[1].id],
+      sameOrgUser.id,
+      "WRITE"
+    );
 
     // a public template from secondary organization
     [publicTemplate] = await mocks.createRandomPetitions(
@@ -874,11 +873,11 @@ describe("GraphQL/Petitions", () => {
         petitionsBuilder(organization.id)
       );
 
-      await mocks.knex.raw(/* sql */ `
-      INSERT INTO petition_user(petition_id, user_id, permission_type)
-      VALUES 
-        (${petitionsToDelete[0].id}, ${sameOrgUser.id}, 'WRITE')
-      `);
+      await mocks.sharePetitions(
+        [petitionsToDelete[0].id],
+        sameOrgUser.id,
+        "WRITE"
+      );
     });
     afterEach(async () => {
       await mocks.clearSharedPetitions();
@@ -950,11 +949,7 @@ describe("GraphQL/Petitions", () => {
       );
 
       //share the petition with the logged user
-      await mocks.knex.raw(/* sql */ `
-        INSERT INTO petition_user(petition_id, user_id, permission_type)
-        VALUES
-        (${sharedToMe.id}, ${sessionUser.id}, 'WRITE')
-      `);
+      await mocks.sharePetitions([sharedToMe.id], sessionUser.id, "WRITE");
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
