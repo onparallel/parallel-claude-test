@@ -42,12 +42,11 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import { UnwrapArray, UnwrapPromise } from "@parallel/utils/types";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import { differenceInMinutes } from "date-fns";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -365,32 +364,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     [petitionId, petition.accesses]
   );
 
-  // process events
-  const events = useMemo(() => {
-    const original = petition.events.items;
-    const result: typeof original = [];
-    let lastOpen: UnwrapArray<typeof original> | null = null;
-    for (const event of original) {
-      switch (event.__typename) {
-        case "AccessOpenedEvent": {
-          // Omit too consecutive open events
-          if (lastOpen) {
-            const difference = differenceInMinutes(
-              new Date(event.createdAt),
-              new Date(lastOpen.createdAt)
-            );
-            if (difference <= 30) {
-              continue;
-            }
-          }
-          lastOpen = event;
-        }
-      }
-      result.push(event);
-    }
-    return result;
-  }, [petition.events.items]);
-
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
     try {
@@ -436,7 +409,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           <PetitionActivityTimeline
             id="petition-activity-timeline"
             userId={me.id}
-            events={events}
+            events={petition.events.items}
             onCancelScheduledMessage={handleCancelScheduledMessage}
           />
         </Box>
