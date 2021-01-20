@@ -2,6 +2,7 @@ import { toGlobalId } from "../../util/globalId";
 import { JsonSchema, schema } from "../rest/schemas";
 
 const _Petition = {
+  title: "Petition",
   type: "object",
   additionalProperties: false,
   required: ["id", "name", "status", "deadline", "locale", "createdAt"],
@@ -43,6 +44,7 @@ const _Petition = {
 } as const;
 
 const _Template = {
+  title: "Template",
   type: "object",
   additionalProperties: false,
   required: ["id", "name", "description", "locale", "createdAt"],
@@ -79,6 +81,7 @@ const _Template = {
 } as const;
 
 const _User = {
+  title: "User",
   type: "object",
   additionalProperties: false,
   required: ["id", "firstName", "lastName", "fullName"],
@@ -109,6 +112,7 @@ const _User = {
 } as const;
 
 const _Contact = {
+  title: "Contact",
   type: "object",
   additionalProperties: false,
   required: [
@@ -164,6 +168,7 @@ const _Contact = {
 } as const;
 
 const _PetitionAccess = {
+  title: "PetitionAccess",
   type: "object",
   additionalProperties: false,
   required: [
@@ -230,6 +235,7 @@ const _PetitionAccess = {
 } as const;
 
 const _RemindersConfig = {
+  title: "RemindersConfig",
   description: "The configuration on when the reminders should be sent",
   type: "object",
   required: ["offset", "time", "timezone", "weekdaysOnly"],
@@ -265,9 +271,10 @@ const _RemindersConfig = {
 } as const;
 
 const _MessageBody = {
-  type: "object",
   oneOf: [
     {
+      title: "PlainTextMessageBody",
+      type: "object",
       required: ["format", "content"],
       additionalProperties: false,
       properties: {
@@ -289,6 +296,7 @@ const _MessageBody = {
 
 export const Petition = schema(_Petition);
 export const CreatePetition = schema({
+  title: "CreatePetition",
   type: "object",
   additionalProperties: false,
   required: ["templateId"],
@@ -383,6 +391,7 @@ export const SendPetition = schema({
 
 function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
   return schema({
+    title: `PaginatedList<${item.title ?? "*missing item title*"}>`,
     type: "object",
     description: "Paginated resource",
     additionalProperties: false,
@@ -406,6 +415,7 @@ function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
 
 function ListOf<T extends JsonSchema>(item: T) {
   return schema({
+    title: `${item.title ?? "any"}[]`,
     type: "array",
     items: item,
   } as const);

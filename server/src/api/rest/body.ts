@@ -2,7 +2,7 @@ import { outdent } from "outdent";
 import { isDefined } from "../../util/remedaExtensions";
 import { RestBody } from "./core";
 import { InvalidRequestBodyError } from "./errors";
-import { buildValidateSchema, JsonSchemaFor, schemaToTable } from "./schemas";
+import { buildValidateSchema, JsonSchemaFor, documentSchema } from "./schemas";
 
 export interface JsonBodyOptions {
   description?: string;
@@ -20,9 +20,9 @@ export function JsonBody<T>(
       description: description
         ? outdent`
         ${description}
-        ${schemaToTable(schema)}
+        ${documentSchema(schema)}
       `
-        : schemaToTable(schema),
+        : documentSchema(schema),
       required,
       content: {
         "application/json": { schema: schema as any },

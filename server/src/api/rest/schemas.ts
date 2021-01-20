@@ -2,6 +2,7 @@ import Ajv, { ValidateFunction } from "ajv";
 import addFormats from "ajv-formats";
 import { JSONSchema6, JSONSchema6TypeName } from "json-schema";
 import { FromSchema, JSONSchema as _JSONSchema } from "json-schema-to-ts";
+import { outdent } from "outdent";
 import { isValidTime, isValidTimezone } from "../../util/validators";
 
 export type JsonSchema = Exclude<_JSONSchema, boolean>;
@@ -28,13 +29,18 @@ export function buildValidateSchema<T = any>(schema: JsonSchema) {
   return ajv.compile<T>(schema);
 }
 
-export function schemaToTable(schema: JsonSchema) {
-  const rows = [
-    "| Field | Type | Format | Description |",
-    "|-------|------|--------|-------------|",
-  ];
+export function documentSchema(schema: JsonSchema) {
+  return schemaToTable(schema);
+}
 
-  return rows.concat(schemaToRows(schema)).join("\n");
+function schemaToTable(schema: JsonSchema) {
+  const header = outdent`
+    ### \`${schema.title ? schema.title : "missing title"}\`
+    | Field | Type | Format | Description |
+    |-------|------|--------|-------------|
+  `;
+
+  return [header].concat(schemaToRows(schema)).join("\n");
 }
 
 function schemaToRows(schema: JsonSchema, name?: string): string[] {
