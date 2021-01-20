@@ -315,6 +315,10 @@ type Mutation {
   Create petition.
   """
   createPetition(
+    """
+    URL to receive real-time events of this petition.
+    """
+    eventsUrl: String
     locale: PetitionLocale
     name: String
 

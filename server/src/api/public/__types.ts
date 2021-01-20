@@ -363,6 +363,7 @@ export type MutationcreateOrganizationUserArgs = {
 };
 
 export type MutationcreatePetitionArgs = {
+  eventsUrl?: Maybe<Scalars["String"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   petitionId?: Maybe<Scalars["GID"]>;
@@ -1882,6 +1883,7 @@ export type GetPetitions_PetitionsQuery = {
 export type CreatePetition_PetitionMutationVariables = Exact<{
   name?: Maybe<Scalars["String"]>;
   templateId?: Maybe<Scalars["GID"]>;
+  eventsUrl?: Maybe<Scalars["String"]>;
 }>;
 
 export type CreatePetition_PetitionMutation = {

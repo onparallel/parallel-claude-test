@@ -366,6 +366,11 @@ export const CreatePetition = schema({
       type: ["string", "null"],
       example: "My petition",
     },
+    eventsUrl: {
+      description: "URL to receive real-time events of this petition",
+      type: ["string", "null"],
+      example: "https://my.endpoint.com/parallel",
+    },
   },
 } as const);
 export const PaginatedPetitions = PaginatedListOf(_Petition);

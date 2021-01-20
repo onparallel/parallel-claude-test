@@ -1943,6 +1943,7 @@ export interface NexusGenArgTypes {
     };
     createPetition: {
       // args
+      eventsUrl?: string | null; // String
       locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
       name?: string | null; // String
       petitionId?: NexusGenScalars["GID"] | null; // GID

@@ -2,10 +2,11 @@ import { initServer, TestClient } from "./server";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, User, Petition } from "../../db/__types";
 import { userCognitoId } from "../../../test/mocks";
-import { toGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
 import Knex from "knex";
 import { KNEX } from "../../db/knex";
+import { omit } from "remeda";
 
 const petitionsBuilder = (orgId: number) => (
   index: number
@@ -647,6 +648,41 @@ describe("GraphQL/Petitions", () => {
         status: "DRAFT",
         __typename: "Petition",
       });
+    });
+
+    it("creates a petition and subscribes to its events with a given URL", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID, $eventsUrl: String) {
+            createPetition(petitionId: $petitionId, eventsUrl: $eventsUrl) {
+              id
+              owner {
+                id
+              }
+              __typename
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", publicTemplate.id),
+          eventsUrl: "https://example.url.com",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(omit(data!.createPetition, ["id"])).toEqual({
+        owner: { id: toGlobalId("User", sessionUser.id) },
+        __typename: "Petition",
+      });
+
+      const { rows: subscriptions } = await mocks.knex.raw(
+        /* sql */ `
+        select endpoint from petition_event_subscription
+        where petition_id = ? and deleted_at is null`,
+        [fromGlobalId(data!.createPetition.id, "Petition").id]
+      );
+
+      expect(subscriptions).toEqual([{ endpoint: "https://example.url.com" }]);
     });
 
     it("ignores name and locale parameters when creating a petition from a valid petitionId", async () => {

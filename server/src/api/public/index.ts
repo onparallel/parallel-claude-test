@@ -243,8 +243,16 @@ api
         CreatePetition_PetitionMutationVariables
       >(
         gql`
-          mutation CreatePetition_Petition($name: String, $templateId: GID) {
-            createPetition(name: $name, petitionId: $templateId) {
+          mutation CreatePetition_Petition(
+            $name: String
+            $templateId: GID
+            $eventsUrl: String
+          ) {
+            createPetition(
+              name: $name
+              petitionId: $templateId
+              eventsUrl: $eventsUrl
+            ) {
               ...Petition
             }
           }
