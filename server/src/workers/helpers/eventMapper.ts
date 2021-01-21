@@ -45,7 +45,7 @@ function mapEventPayload(event: PetitionEvent) {
       return {
         petitionAccessId: event.data.petition_access_id
           ? toGlobalId("PetitionAccess", event.data.petition_access_id)
-          : undefined,
+          : null,
         petitionFieldCommentId: toGlobalId(
           "PetitionFieldComment",
           event.data.petition_field_comment_id
@@ -56,7 +56,7 @@ function mapEventPayload(event: PetitionEvent) {
         ),
         userId: event.data.user_id
           ? toGlobalId("User", event.data.user_id)
-          : undefined,
+          : null,
       };
     }
     case "COMMENT_PUBLISHED": {
@@ -100,7 +100,7 @@ function mapEventPayload(event: PetitionEvent) {
       return {
         previousOwnerId: event.data.previous_owner_id
           ? toGlobalId("User", event.data.previous_owner_id)
-          : undefined,
+          : null,
         ownerId: toGlobalId("User", event.data.owner_id),
         userId: toGlobalId("User", event.data.user_id),
       };
@@ -203,12 +203,12 @@ function mapEventPayload(event: PetitionEvent) {
             event.data.cancel_data?.canceller_id &&
             event.data.cancel_reason === "CANCELLED_BY_USER"
               ? toGlobalId("User", event.data.cancel_data.canceller_id)
-              : undefined,
+              : null,
           contactId:
             event.data.cancel_data?.canceller_id &&
             event.data.cancel_reason === "DECLINED_BY_SIGNER"
               ? toGlobalId("Contact", event.data.cancel_data.canceller_id)
-              : undefined,
+              : null,
           reason: event.data.cancel_data?.canceller_reason,
         },
         cancelReason: event.data.cancel_reason,
@@ -263,6 +263,5 @@ export function mapEvent(event: PetitionEvent) {
     petitionId: toGlobalId("Petition", event.petition_id),
     type: event.type,
     data: mapEventPayload(event),
-    createdAt: event.created_at,
   };
 }

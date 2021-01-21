@@ -1,4 +1,5 @@
 import { toGlobalId } from "../../util/globalId";
+import { titleize } from "../../util/strings";
 import { JsonSchema, schema } from "../rest/schemas";
 
 const _Petition = {
@@ -272,7 +273,6 @@ const _RemindersConfig = {
 } as const;
 
 const _MessageBody = {
-  "x-extendedDiscriminator": "format",
   oneOf: [
     {
       title: "PlainTextMessage",
@@ -283,7 +283,7 @@ const _MessageBody = {
         format: {
           type: "string",
           description:
-            "Constant value indicating that the content is in plain text format",
+            "Constant value `PLAIN_TEXT` indicating that the content is in plain text format",
           const: "PLAIN_TEXT",
           example: "PLAIN_TEXT",
         },
@@ -486,9 +486,9 @@ export const CreateSubscription = schema({
   required: ["endpoint"],
   properties: {
     endpoint: {
-      description:
-        "The URL on which to receive POST requests with the petition events.",
+      description: "The URL on which to receive the petition events.",
       type: "string",
+      format: "uri",
       example: "https://my.endpoint.com/parallel",
     },
   },
@@ -527,3 +527,100 @@ function ListOf<T extends JsonSchema>(item: T) {
     items: item,
   } as const);
 }
+
+export const PetitionEvent = schema({
+  type: "object",
+  oneOf: Object.entries({
+    ACCESS_ACTIVATED: {
+      petitionAccessId: {
+        type: "string",
+        description: "The ID of the petition access",
+      },
+      userId: {
+        type: "string",
+        description: "The ID of the user",
+      },
+    },
+    ACCESS_DEACTIVATED: {
+      petitionAccessId: {
+        type: "string",
+        description: "The ID of the petition access",
+      },
+      userId: {
+        type: "string",
+        description: "The ID of the user",
+      },
+    },
+    ACCESS_DELEGATED: {
+      newPetitionAccessId: {
+        type: "string",
+        description: "The ID of the new petition access",
+      },
+      petitionAccessId: {
+        type: "string",
+        description: "The ID of the petition access",
+      },
+    },
+    ACCESS_OPENED: {
+      petitionAccessId: {
+        type: "string",
+        description: "The ID of the petition access",
+      },
+    },
+    COMMENT_DELETED: {
+      petitionAccessId: {
+        type: ["string", "null"],
+        description: "The ID of the petition access",
+      },
+      userId: {
+        type: ["string", "null"],
+        description: "The ID of the user",
+      },
+      petitionFieldCommentId: {
+        type: "string",
+        description: "The ID of the petition field comment",
+      },
+      petitionFieldId: {
+        type: "string",
+        description: "The ID of the petition field",
+      },
+    },
+    COMMENT_PUBLISHED: {
+      petitionFieldCommentId: {
+        type: "string",
+        description: "The ID of the petition field comment",
+      },
+      petitionFieldId: {
+        type: "string",
+        description: "The ID of the petition field",
+      },
+    },
+  }).map(([event, data]) => ({
+    type: "object",
+    title: titleize(event),
+    additionalProperties: false,
+    required: ["id", "type", "petitionId", "data"],
+    properties: {
+      id: {
+        type: "string",
+        description: "The ID of the petition event",
+      },
+      type: {
+        type: "string",
+        const: event,
+        description: `The type of event that occurred \`${event}\``,
+      },
+      petitionId: {
+        type: "string",
+        description: "The ID of the petition where this event occurred",
+      },
+      data: {
+        type: "object",
+        description: "The payload of the event",
+        additionalProperties: false,
+        required: Object.keys(data),
+        properties: data,
+      },
+    },
+  })),
+} as any);

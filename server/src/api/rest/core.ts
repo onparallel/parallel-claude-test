@@ -6,6 +6,7 @@ import { Memoize } from "typescript-memoize";
 import { MaybePromise } from "../../util/types";
 import { HttpError, InvalidParameterError, UnknownError } from "./errors";
 import { ParseError } from "./params";
+import pProps from "p-props";
 
 export type RestMethod =
   | "get"
@@ -63,6 +64,7 @@ export interface RestOperationOptions<
   query?: RestParameters<TQuery>;
   responses?: TResponses;
   excludeFromSpec?: boolean;
+  [x: string]: unknown;
 }
 
 export type RestResponses<T> = {
@@ -187,24 +189,14 @@ const _PathResolver: any = (function () {
       >
     ) {
       const {
-        description,
-        summary,
-        deprecated,
-        tags,
-        operationId,
         body,
         query,
         responses,
         excludeFromSpec,
+        ...spec
       } = operationOptions;
       if (!excludeFromSpec) {
-        this.spec[method] = {
-          description,
-          summary,
-          deprecated,
-          tags,
-          operationId,
-        };
+        this.spec[method] = spec;
         if (body?.spec) {
           this.spec[method]!.requestBody = body?.spec;
         }
@@ -222,63 +214,54 @@ const _PathResolver: any = (function () {
       this.router[method](this.path, async (req, res, next) => {
         const response: ResponseWrapper<any> = await (async () => {
           try {
-            const context: RestApiContext<
-              TContext,
-              any,
-              any,
-              any
-            > = ((await this.apiOptions.context?.({ req, res })) ?? {}) as any;
-            context.params = Object.fromEntries(
-              await Promise.all(
-                Object.entries<RestParameter<TParams>>(
-                  (this.pathOptions as any)?.params ?? {}
-                ).map(async ([name, parameter]) => {
-                  const value = req.params[name as string];
-                  try {
-                    return [name, await parameter.parse(value)];
-                  } catch (e) {
-                    if (e instanceof ParseError) {
-                      throw new InvalidParameterError(
-                        name as string,
-                        value,
-                        "path",
-                        e.message
-                      );
-                    }
-                    throw e;
-                  }
-                })
-              )
-            );
-            context.query = Object.fromEntries(
-              await Promise.all(
-                Object.entries<RestParameter<TParams>>(
-                  operationOptions.query ?? ({} as any)
-                ).map(async ([name, parameter]) => {
-                  const value = req.query[name as string];
-                  if (value !== undefined && typeof value !== "string") {
+            const context: RestApiContext<TContext> = ((await this.apiOptions.context?.(
+              { req, res }
+            )) ?? {}) as any;
+            context.params = await pProps(
+              this.pathOptions.params ?? ({} as RestParameters<any>),
+              async (param, name) => {
+                const value = req.params[name as string];
+                try {
+                  return await param.parse(req.params[name as string]);
+                } catch (e) {
+                  if (e instanceof ParseError) {
                     throw new InvalidParameterError(
                       name as string,
                       value,
                       "path",
-                      "Array or Object params are not supported"
+                      e.message
                     );
                   }
-                  try {
-                    return [name, await parameter.parse(value)];
-                  } catch (e) {
-                    if (e instanceof ParseError) {
-                      throw new InvalidParameterError(
-                        name as string,
-                        value,
-                        "path",
-                        e.message
-                      );
-                    }
-                    throw e;
+                  throw e;
+                }
+              }
+            );
+            context.query = await pProps(
+              operationOptions.query ?? ({} as RestParameters<any>),
+              async (param, name) => {
+                const value = req.query[name as string];
+                if (value !== undefined && typeof value !== "string") {
+                  throw new InvalidParameterError(
+                    name as string,
+                    value,
+                    "query",
+                    "Array or Object params are not supported"
+                  );
+                }
+                try {
+                  return await param.parse(value);
+                } catch (e) {
+                  if (e instanceof ParseError) {
+                    throw new InvalidParameterError(
+                      name as string,
+                      value,
+                      "query",
+                      e.message
+                    );
                   }
-                })
-              )
+                  throw e;
+                }
+              }
             );
             if (body?.validate) {
               body?.validate(req.body);
@@ -354,7 +337,12 @@ export interface RestApiOptions<TContext = {}> {
   errorHandler?: ErrorHandler;
 }
 
-export type RestApiContext<TContext, TParams, TQuery, TBody> = TContext & {
+export type RestApiContext<
+  TContext = {},
+  TParams = any,
+  TQuery = any,
+  TBody = any
+> = TContext & {
   params: TParams;
   query: TQuery;
   body: TBody;

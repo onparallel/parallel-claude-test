@@ -23,6 +23,7 @@ function DeveloperApi({
           expandResponses: "all",
           pathInMiddlePanel: true,
           jsonSampleExpandLevel: 3,
+          expandSingleSchemaField: true,
           showExtensions: false,
           theme: {
             logo: {

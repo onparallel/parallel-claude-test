@@ -33,6 +33,7 @@ import {
   PaginatedPetitions,
   PaginatedTemplates,
   Petition,
+  PetitionEvent,
   SendPetition,
   Subscription,
   Template,
@@ -235,6 +236,12 @@ api
     {
       operationId: "CreatePetition",
       summary: "Create petition",
+      description: outdent`
+        Create a new petition based of a template.
+        
+        You can optionally pass an \`eventsUrl\` parameter to subcribe to the
+        events in this petition. See more about petition events [here](#operation/CreateSubscription).
+      `,
       body: JsonBody(CreatePetition),
       responses: { 201: SuccessResponse(Petition) },
       tags: ["Petitions"],
@@ -556,7 +563,7 @@ api
   .get(
     {
       operationId: "GetSubscriptions",
-      summary: "Returns the subscriptions for the specified petition",
+      summary: "Get petition subscriptions",
       responses: { 200: SuccessResponse(ListOfSubscriptions) },
       tags: ["Petitions"],
     },
@@ -585,16 +592,47 @@ api
   .post(
     {
       operationId: "CreateSubscription",
-      summary: "Creates a new subscription on the petition.",
+      summary: "Subscribe to petition events",
       description: outdent`
-      You can create a subscription on a petition to receive
-      real-time event updates on a given URL.
+        You can create a subscription on a petition to receive real-time event
+        updates on a given URL.
     `,
       body: JsonBody(CreateSubscription),
       responses: {
         201: SuccessResponse(Subscription),
       },
       tags: ["Petitions"],
+      callbacks: {
+        PetitionEvent: {
+          "{endpoint}": {
+            post: {
+              summary: "Petition event",
+              description: outdent`
+                This subscription endpoint will be triggered every time there is
+                a petition event.
+              `,
+              requestBody: {
+                content: {
+                  "application/json": { schema: PetitionEvent },
+                },
+              },
+              responses: {
+                "2XX": {
+                  description: "Petition event processed correctly",
+                },
+                "4XX": {
+                  description:
+                    "Request failed, the petition owner will be notified via email",
+                },
+                "5XX": {
+                  description:
+                    "Request failed, the petition owner will be notified via email",
+                },
+              },
+            },
+          },
+        },
+      },
     },
     async ({ client, params, body }) => {
       const result = await client.request<
@@ -625,19 +663,20 @@ api
     }
   );
 
-const subscriptionId = idParam({
-  type: "Subscription",
-  description: "The ID of the subscription",
-});
-
 api
   .path("/petitions/:petitionId/subscriptions/:subscriptionId", {
-    params: { petitionId, subscriptionId },
+    params: {
+      petitionId,
+      subscriptionId: idParam({
+        type: "Subscription",
+        description: "The ID of the subscription",
+      }),
+    },
   })
   .delete(
     {
       operationId: "DeleteSubscription",
-      summary: "Deletes the specified subscription",
+      summary: "Stop petition subscription",
       responses: { 204: SuccessResponse() },
       tags: ["Petitions"],
     },
