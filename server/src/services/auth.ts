@@ -1,9 +1,9 @@
 import { CognitoUserSession } from "amazon-cognito-identity-js";
-import { map } from "async";
 import DataLoader from "dataloader";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { inject, injectable } from "inversify";
 import { decode } from "jsonwebtoken";
+import pMap from "p-map";
 import { ApiContext } from "../context";
 import { fromDataLoader } from "../util/fromDataLoader";
 import { toGlobalId } from "../util/globalId";
@@ -160,7 +160,7 @@ export class Auth implements IAuth {
 
   validateSession = fromDataLoader(
     new DataLoader<string, string | null>(async (tokens) => {
-      return await map(tokens as string[], async (token) => {
+      return await pMap(tokens as string[], async (token) => {
         try {
           const idToken = await this.redis.get(`session:${token}:idToken`);
           if (idToken === null) {

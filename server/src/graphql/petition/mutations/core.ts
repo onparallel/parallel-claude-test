@@ -10,7 +10,7 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
-import { mapSeries } from "async";
+import pMap from "p-map";
 import { countBy, pick } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import {
@@ -164,7 +164,7 @@ export const clonePetitions = mutationField("clonePetitions", {
   },
   validateArgs: notEmptyArray((args) => args.petitionIds, "petitionIds"),
   resolve: async (_, args, ctx) => {
-    return await mapSeries(
+    return await pMap(
       unMaybeArray(args.petitionIds),
       async (petitionId) => {
         const { name, locale } = (await ctx.petitions.loadPetition(
@@ -192,6 +192,9 @@ export const clonePetitions = mutationField("clonePetitions", {
         );
 
         return cloned;
+      },
+      {
+        concurrency: 1,
       }
     );
   },

@@ -7,9 +7,8 @@ import {
   nonNull,
   stringArg,
 } from "@nexus/schema";
-import { mapSeries } from "async";
+import pMap from "p-map";
 import { zip } from "remeda";
-import { PetitionUser, User } from "../../db/__types";
 import { partition } from "../../util/arrays";
 import { removeNotDefined } from "../../util/remedaExtensions";
 import {
@@ -208,7 +207,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
       const permissionsByUserId = await ctx.petitions.loadUserPermissionsByUserId(
         userIds
       );
-      return await mapSeries<[number, PetitionUser[]], User>(
+      return await pMap(
         zip(userIds, permissionsByUserId),
         async ([userId, userPermissions]) => {
           return await ctx.petitions.withTransaction(async (t) => {
@@ -240,7 +239,8 @@ export const updateUserStatus = mutationField("updateUserStatus", {
             ]);
             return user;
           });
-        }
+        },
+        { concurrency: 1 }
       );
     }
   },

@@ -1,10 +1,10 @@
-import async from "async";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
+import pMap from "p-map";
 import { chunk, indexBy, omit } from "remeda";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { Petition, PetitionAccess, PetitionField } from "../__types";
+import { PetitionAccess, PetitionField } from "../__types";
 
 @injectable()
 export class ReportingRepository extends BaseRepository {
@@ -31,11 +31,16 @@ export class ReportingRepository extends BaseRepository {
     const petitionIds = (
       await this.from("petition").whereNull("deleted_at").select("id")
     ).map((r) => r.id);
-    const petitions = await ((async.concatSeries(
-      chunk(petitionIds, 100),
-      async (batch) => {
-        const [petitions, fields, accesses, petitionOwners] = await Promise.all(
-          [
+    const petitions = (
+      await pMap(
+        chunk(petitionIds, 100),
+        async (batch) => {
+          const [
+            petitions,
+            fields,
+            accesses,
+            petitionOwners,
+          ] = await Promise.all([
             this.from("petition")
               .whereIn("id", batch)
               .select(
@@ -72,44 +77,36 @@ export class ReportingRepository extends BaseRepository {
                 permission_type: "OWNER",
               })
               .select("user_id as owner_id", "petition_id"),
-          ]
-        );
-        const fieldsByPetitionId = indexBy(
-          (fields as unknown) as (Pick<PetitionField, "petition_id"> & {
-            text_fields: number;
-            file_upload_fields: number;
-          })[],
-          (f) => f.petition_id
-        );
-        const accessesByPetitionId = indexBy(
-          (accesses as unknown) as (Pick<PetitionAccess, "petition_id"> & {
-            sent_at: Date;
-          })[],
-          (f) => f.petition_id
-        );
-        const ownersByPetitionId = indexBy(
-          petitionOwners as { owner_id: number; petition_id: number }[],
-          (f) => f.petition_id
-        );
-        return petitions.map((petition) => ({
-          ...omit(petition, ["updated_at"]),
-          completed_at:
-            petition.status === "COMPLETED" ? petition.updated_at : null,
-          ...omit(fieldsByPetitionId?.[petition.id] ?? {}, ["petition_id"]),
-          ...omit(accessesByPetitionId?.[petition.id] ?? {}, ["petition_id"]),
-          ...omit(ownersByPetitionId?.[petition.id] ?? {}, ["petition_id"]),
-        }));
-      }
-    ) as unknown) as Promise<
-      (Pick<
-        Petition,
-        "id" | "name" | "status" | "created_at" | "created_by"
-      > & {
-        owner_id: number;
-        sent_at: Date | null;
-        completed_at: Date | null;
-      })[]
-    >);
+          ]);
+          const fieldsByPetitionId = indexBy(
+            (fields as unknown) as (Pick<PetitionField, "petition_id"> & {
+              text_fields: number;
+              file_upload_fields: number;
+            })[],
+            (f) => f.petition_id
+          );
+          const accessesByPetitionId = indexBy(
+            (accesses as unknown) as (Pick<PetitionAccess, "petition_id"> & {
+              sent_at: Date;
+            })[],
+            (f) => f.petition_id
+          );
+          const ownersByPetitionId = indexBy(
+            petitionOwners as { owner_id: number; petition_id: number }[],
+            (f) => f.petition_id
+          );
+          return petitions.map((petition) => ({
+            ...omit(petition, ["updated_at"]),
+            completed_at:
+              petition.status === "COMPLETED" ? petition.updated_at : null,
+            ...omit(fieldsByPetitionId?.[petition.id] ?? {}, ["petition_id"]),
+            ...omit(accessesByPetitionId?.[petition.id] ?? {}, ["petition_id"]),
+            ...omit(ownersByPetitionId?.[petition.id] ?? {}, ["petition_id"]),
+          }));
+        },
+        { concurrency: 1 }
+      )
+    ).flat();
     return { organizations, users, petitions };
   }
 }

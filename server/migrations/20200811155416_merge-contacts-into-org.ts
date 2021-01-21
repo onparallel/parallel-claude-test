@@ -1,5 +1,5 @@
 import * as Knex from "knex";
-import { eachLimit } from "async";
+import pMap from "p-map";
 
 type Contact = {
   id: number;
@@ -97,7 +97,7 @@ export async function up(knex: Knex): Promise<void> {
     const duplicated = await getDuplicatedContacts(t);
 
     // merge and delete duplicated contacts
-    await eachLimit<Contact>(duplicated, 10, replaceContactId(t));
+    await pMap(duplicated, replaceContactId(t), { concurrency: 10 });
 
     await t.schema.alterTable("contact", (t) => {
       // drop old index

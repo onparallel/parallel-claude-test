@@ -1,8 +1,8 @@
 import { createCronWorker } from "./helpers/createCronWorker";
 import { groupBy } from "remeda";
-import { eachLimit } from "async";
 import { calculateNextReminder } from "../util/reminderUtils";
 import { toGlobalId } from "../util/globalId";
+import pMap from "p-map";
 
 createCronWorker("reminder-trigger", async (context) => {
   const accesses = await context.petitions.getRemindableAccesses();
@@ -10,12 +10,16 @@ createCronWorker("reminder-trigger", async (context) => {
     groupBy(accesses, (a) => a.petition_id)
   )) {
     // Update next reminders
-    await eachLimit(batch, 5, async (access) => {
-      await context.petitions.updatePetitionAccessNextReminder(
-        access.id,
-        calculateNextReminder(new Date(), access.reminders_config!)
-      );
-    });
+    await pMap(
+      batch,
+      async (access) => {
+        await context.petitions.updatePetitionAccessNextReminder(
+          access.id,
+          calculateNextReminder(new Date(), access.reminders_config!)
+        );
+      },
+      { concurrency: 5 }
+    );
     const reminders = await context.petitions.createReminders(
       batch[0].petition_id,
       batch.map((access) => ({

@@ -1,7 +1,7 @@
 import { core } from "@nexus/schema";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { AuthenticationError } from "apollo-server-express";
-import { every, everySeries } from "async";
+import pEvery from "p-every";
 import { ApiContext } from "../../context";
 import { UserOrganizationRole } from "../../db/__types";
 import { getTokenFromRequest } from "../../util/getTokenFromRequest";
@@ -84,10 +84,12 @@ export function chain<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    return ((await everySeries(
+    return await pEvery(
       resolvers,
-      async (resolver) => await resolver(root, args, ctx, info)
-    )) as unknown) as boolean;
+      async (resolver) =>
+        await (resolver(root, args, ctx, info) as Promise<boolean>),
+      { concurrency: 1 }
+    );
   };
 }
 
@@ -95,10 +97,11 @@ export function and<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    return ((await every(
+    return await pEvery(
       resolvers,
-      async (resolver) => await resolver(root, args, ctx, info)
-    )) as unknown) as boolean;
+      async (resolver) =>
+        await (resolver(root, args, ctx, info) as Promise<boolean>)
+    );
   };
 }
 
