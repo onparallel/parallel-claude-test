@@ -14,8 +14,8 @@ const _Petition = {
     },
     name: {
       description: "The name of the petition",
-      type: ["string", "null"],
       example: "My petition",
+      type: ["string", "null"],
     },
     status: {
       description: "The status of the petition",
@@ -272,6 +272,7 @@ const _RemindersConfig = {
 } as const;
 
 const _MessageBody = {
+  "x-extendedDiscriminator": "format",
   oneOf: [
     {
       title: "PlainTextMessage",
@@ -282,7 +283,7 @@ const _MessageBody = {
         format: {
           type: "string",
           description:
-            "Const value indicating that the content is in plain text format",
+            "Constant value indicating that the content is in plain text format",
           const: "PLAIN_TEXT",
           example: "PLAIN_TEXT",
         },

@@ -320,11 +320,36 @@ interface ExpressContext {
 
 type ErrorHandler = (error: Error) => MaybePromise<ResponseWrapper<any>>;
 
-export interface RestApiOptions<TContext = {}>
-  extends Pick<
-    OpenAPIV3.Document,
-    "openapi" | "info" | "security" | "components" | "tags" | "servers"
-  > {
+export interface RestApiOptions<TContext = {}> {
+  openapi: string;
+  info: OpenAPIV3.InfoObject & {
+    "x-logo": {
+      /**
+       * The URL pointing to the spec logo.
+       * MUST be in the format of a URL.
+       * It SHOULD be an absolute URL so your API definition is usable from any location
+       */
+      url?: string;
+      /**
+       * background color to be used.
+       * MUST be RGB color in [hexadecimal format] (https://en.wikipedia.org/wiki/Web_colors#Hex_triplet)
+       */
+      backgroundColor?: string;
+      /**
+       * Text to use for alt tag on the logo. Defaults to 'logo' if nothing is provided.
+       */
+      altText?: string;
+      /**
+       * The URL pointing to the contact page. Default to 'info.contact.url' field of the OAS.
+       */
+      href?: string;
+    };
+  };
+  servers?: OpenAPIV3.ServerObject[];
+  security?: OpenAPIV3.SecurityRequirementObject[];
+  tags?: OpenAPIV3.TagObject[];
+  "x-tagGroups"?: { name: string; tags: string[] }[];
+  components?: OpenAPIV3.ComponentsObject;
   context?: ContextFunction<TContext>;
   errorHandler?: ErrorHandler;
 }

@@ -22,18 +22,7 @@ export function JsonBody<T>(
   const validate = buildValidateSchema(schema);
   return {
     spec: {
-      description: description
-        ? outdent`
-        ${description}
-        ${documentSchema(schema)}
-        `
-        : outdent`
-          ${
-            required ? "A required" : "An optional"
-          } JSON payload of  \`${getType(schema, [])}\`
-          
-          ${documentSchema(schema)}
-        `,
+      description,
       required,
       content: {
         "application/json": { schema: schema as any },

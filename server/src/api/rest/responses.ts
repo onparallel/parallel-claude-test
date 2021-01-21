@@ -85,12 +85,7 @@ export function SuccessResponse<T = void>(
 ): RestResponse<T> {
   return schema
     ? JsonResponse({
-        description: schema
-          ? outdent`
-          Successful operation of \`${getType(schema, [])}\`
-          ${documentSchema(schema)}
-        `
-          : "Successful operation",
+        description: "Successful operation",
         schema,
       })
     : (NoContentResponse({

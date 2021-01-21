@@ -74,8 +74,10 @@ export const api = new RestApi({
   info: {
     title: "Parallel API",
     description: outdent`
+      ## Introduction
       Loren Ipsum
-      # Authentication
+      
+      ## Authentication
       In order to authenticate your requests, first, you need generate a token
       on the [API tokens](https://www.parallel.so/en/app/settings/tokens)
       section of your account settings.
@@ -85,14 +87,24 @@ export const api = new RestApi({
       ~~~
       Authorization: Bearer QrUV6NYDk2KcXg96KrHCQTTuKyt5oU8ETHueF5awWZe6
       ~~~
-      
+      <SecurityDefinitions />
 
-      # Support
+      ## Support
       In case you need any help with your integration, please drop an email to
       [devs@onparallel.com](mailto:devs@onparallel.com?subject=Parallel%20API%20support).
       We will be pleased to help you with any problem.
     `,
     version: "1.0.0",
+    contact: {
+      name: "API Support",
+      email: "devs@onparallel.com",
+      url: "https://www.parallel.so/developers/api",
+    },
+    "x-logo": {
+      url: "https://www.parallel.so/static/emails/logo.png",
+      altText: "Parallel",
+      href: "https://www.parallel.so",
+    },
   },
   servers: [
     {
@@ -105,12 +117,13 @@ export const api = new RestApi({
     securitySchemes: {
       API_TOKEN: {
         type: "http",
-        description:
-          "Get the API token from the the API tokens section in your account settings.",
         scheme: "bearer",
       },
     },
   },
+  "x-tagGroups": [
+    { name: "Endpoints", tags: ["Petitions", "Templates", "Contacts"] },
+  ],
   tags: [
     {
       name: "Petitions",
@@ -159,7 +172,7 @@ api
   .get(
     {
       operationId: "GetPetitions",
-      summary: "Returns a paginated list of petitions",
+      summary: "Get petitions list",
       description: outdent`
         This endpoint returns a paginated list of all petitions the user has
         access to.
@@ -211,7 +224,7 @@ api
   .post(
     {
       operationId: "CreatePetition",
-      summary: "Creates a petition from a template",
+      summary: "Create petition",
       body: JsonBody(CreatePetition),
       responses: { 201: SuccessResponse(Petition) },
       tags: ["Petitions"],
@@ -246,7 +259,7 @@ api
   .get(
     {
       operationId: "GetPetition",
-      summary: "Returns the specified petition",
+      summary: "Get petition",
       responses: { 200: SuccessResponse(Petition) },
       tags: ["Petitions"],
     },
@@ -271,7 +284,7 @@ api
   .put(
     {
       operationId: "UpdatePetition",
-      summary: "Updates the specified petition",
+      summary: "Update petition",
       body: JsonBody(UpdatePetition),
       responses: { 200: SuccessResponse(Petition) },
       tags: ["Petitions"],
@@ -300,7 +313,7 @@ api
   .delete(
     {
       operationId: "DeletePetition",
-      summary: "Deletes the specified petition",
+      summary: "Delete petition",
       query: {
         force: booleanParam({
           required: false,
@@ -336,7 +349,7 @@ api
   .get(
     {
       operationId: "GetPetitionRecipients",
-      summary: "Returns the recipients of this petition",
+      summary: "Get petition recipients",
       responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
       tags: ["Petitions"],
     },
@@ -365,41 +378,42 @@ api
   .post(
     {
       operationId: "CreatePetitionRecipients",
-      summary: "Sends the specified petition to the specified recipients",
+      summary: "Send petition",
       description: outdent`
-      Use this endpoint to send a petition. You can send a petition to multiple
-      people at once so they can fill the petition collaboratively.
-
-      There are two ways of specifying the recipients of the petition.
-
-      One way is to pass a list of contact IDs if you know them beforehand:
-      ~~~json
-      {
-        ...
-        "contacts": [
-          "${toGlobalId("Contact", 12)}",
-          "${toGlobalId("Contact", 13)}"
-        ]
-        ...
-      }
-      ~~~
-      The other way is passing an object with the information needed to create
-      a contact. If the contact already exists it will also be updated with the
-      information provided.
-      ~~~json
-      {
-        ...
-        "contacts": [
-          {
-            "email": "tyrion@casterlyrock.wes",
-            "firstName": "Tyrion",
-            "lastName": "Lannister"
-          }
-        ]
-        ...
-      }
-      ~~~
-      The two methods can also be mixed if necessary.
+        Use this endpoint to send a petition. You can send a petition to
+        multiple people at once so they can fill the petition
+        collaboratively.
+  
+        There are two ways of specifying the recipients of the petition.
+  
+        One way is to pass a list of contact IDs if you know them beforehand:
+        ~~~json
+        {
+          ...
+          "contacts": [
+            "${toGlobalId("Contact", 12)}",
+            "${toGlobalId("Contact", 13)}"
+          ]
+          ...
+        }
+        ~~~ 
+        The other way is passing an object with the information needed to
+        create a contact. If the contact already exists it will also be updated
+        with the information provided.
+        ~~~json
+        {
+          ...
+          "contacts": [
+            {
+              "email": "tyrion@casterlyrock.wes",
+              "firstName": "Tyrion",
+              "lastName": "Lannister"
+            }
+          ]
+          ...
+        }
+        ~~~
+        The two methods can also be mixed if necessary.
       `,
       body: JsonBody(SendPetition),
       responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
@@ -522,7 +536,7 @@ api
 api.path("/templates").get(
   {
     operationId: "GetTemplates",
-    summary: "Returns a paginated list of templates",
+    summary: "Get templates list",
     query: {
       ...paginationParams(),
       ...sortByParam(["createdAt", "name", "lastUsedAt"]),
@@ -573,7 +587,7 @@ api
   .get(
     {
       operationId: "GetTemplate",
-      summary: "Returns the specified template",
+      summary: "Get template",
       responses: { 200: SuccessResponse(Template) },
       tags: ["Templates"],
     },
@@ -598,7 +612,7 @@ api
   .delete(
     {
       operationId: "DeleteTemplate",
-      summary: "Deletes the specified template",
+      summary: "Delete template",
       query: {
         force: booleanParam({
           required: false,
@@ -633,8 +647,8 @@ api
   .path("/contacts")
   .get(
     {
-      operationId: "GetContact",
-      summary: "Returns a paginated list of contacts",
+      operationId: "GetContacts",
+      summary: "Get contacts list",
       query: {
         ...paginationParams(),
         ...sortByParam([
@@ -676,7 +690,7 @@ api
   .post(
     {
       operationId: "CreateContact",
-      summary: "Creates a contact with the specified details",
+      summary: "Create contact",
       body: JsonBody(CreateContact),
       responses: {
         201: SuccessResponse(Contact),
@@ -728,7 +742,7 @@ api
   .get(
     {
       operationId: "GetContact",
-      summary: "Returns the specified contact",
+      summary: "Get contact",
       responses: { 200: SuccessResponse(Contact) },
       tags: ["Contacts"],
     },
