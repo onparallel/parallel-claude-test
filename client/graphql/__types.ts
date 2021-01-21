@@ -377,7 +377,7 @@ export type MutationcreateOrganizationUserArgs = {
 };
 
 export type MutationcreatePetitionArgs = {
-  locale: PetitionLocale;
+  locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   petitionId?: Maybe<Scalars["GID"]>;
   type?: Maybe<PetitionBaseType>;
@@ -1460,6 +1460,7 @@ export type Query = {
   __typename?: "Query";
   access?: Maybe<PublicPetitionAccess>;
   contact?: Maybe<Contact>;
+  contactByEmail?: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
   /** Checks if the provided email is available to be registered as a user on Parallel */
@@ -1489,6 +1490,10 @@ export type QueryaccessArgs = {
 
 export type QuerycontactArgs = {
   id: Scalars["GID"];
+};
+
+export type QuerycontactByEmailArgs = {
+  email: Scalars["String"];
 };
 
 export type QuerycontactsArgs = {

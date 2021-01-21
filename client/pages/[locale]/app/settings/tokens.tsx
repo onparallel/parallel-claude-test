@@ -1,8 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
-import { Card } from "@parallel/components/common/Card";
-import { CopyToClipboardButton } from "@parallel/components/common/CopyToClipboardButton";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -21,7 +19,6 @@ import { useGenerateNewTokenDialog } from "@parallel/components/settings/Generat
 import {
   TokensQuery,
   Tokens_UserAuthenticationTokenFragment,
-  useGenerateUserAuthTokenMutation,
   UserAuthenticationTokens_OrderBy,
   useRevokeUserAuthTokenMutation,
   useTokensQuery,
@@ -75,7 +72,6 @@ function Tokens() {
   const sections = useSettingsSections();
   const authTokens = me.authenticationTokens;
 
-  const [apiKey, setApiKey] = useState("aa");
   const [selected, setSelected] = useState<string[]>([]);
 
   const [search, setSearch] = useState(state.search);
@@ -110,7 +106,7 @@ function Tokens() {
   const [revokeTokens] = useRevokeUserAuthTokenMutation();
   const handleRevokeTokens = async (tokenIds: string[]) => {
     try {
-      await showRevokeAccessToken({ plural: tokenIds.length > 1 });
+      await showRevokeAccessToken({ selectedCount: tokenIds.length });
       await revokeTokens({
         variables: {
           authTokenIds: tokenIds,
@@ -118,7 +114,6 @@ function Tokens() {
       });
 
       await refetch();
-      setApiKey("");
     } catch {}
   };
 
