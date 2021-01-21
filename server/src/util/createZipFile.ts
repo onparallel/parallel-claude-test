@@ -3,22 +3,39 @@ import { Readable } from "stream";
 
 export type ZipFileInput = { filename: string; stream: Readable };
 
-export async function createZipFile(files: AsyncGenerator<ZipFileInput>) {
-  const zip = archiver("zip");
-
-  let iterator: IteratorResult<ZipFileInput>;
-  while (!(iterator = await files.next()).done) {
-    try {
-      await new Promise((resolve, reject) => {
-        const { stream, filename } = iterator.value;
-        stream.on("end", resolve);
-        stream.on("error", reject);
-        zip.append(stream, { name: filename });
-      });
-    } catch (e) {
-      zip.emit("error", e);
-    }
+function eachSeries<T>(
+  iterator: AsyncGenerator<T>,
+  applyFn: (item: T, callback: (err?: Error) => void) => void,
+  doneCb: (err?: Error) => void
+) {
+  function processNext({ done, value }: IteratorResult<T>) {
+    if (done) return doneCb();
+    applyFn(value, (err) => {
+      if (err) return doneCb(err);
+      iterator.next().then(processNext);
+    });
   }
-  await zip.finalize();
+
+  iterator.next().then(processNext);
+}
+
+export function createZipFile(files: AsyncGenerator<ZipFileInput>) {
+  const zip = archiver("zip");
+  eachSeries(
+    files,
+    ({ filename, stream }, callback) => {
+      stream.on("end", callback);
+      stream.on("error", callback);
+      zip.append(stream, { name: filename });
+    },
+    (err) => {
+      if (err) {
+        zip.emit("error", err);
+      } else {
+        zip.finalize();
+      }
+    }
+  );
+
   return zip;
 }

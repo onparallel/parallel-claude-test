@@ -42,7 +42,7 @@ export const downloads = Router()
         "content-disposition",
         contentDisposition(sanitize(`${name}.zip`), { type: "attachment" })
       );
-      const zipFile = await createZipFile(
+      const zipFile = createZipFile(
         getPetitionFiles(ctx, petitionId, pattern, petition?.locale)
       );
       zipFile.pipe(res);
