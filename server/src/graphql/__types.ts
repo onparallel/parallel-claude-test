@@ -2128,7 +2128,8 @@ export interface NexusGenArgTypes {
     removePetitionUserPermission: {
       // args
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
-      userIds: NexusGenScalars["GID"][]; // [GID!]!
+      removeAll?: boolean | null; // Boolean
+      userIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     reopenPetition: {
       // args

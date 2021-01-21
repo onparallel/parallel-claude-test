@@ -212,6 +212,8 @@ export type Mutation = {
   createPetitionField: PetitionBaseAndField;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionFieldComment;
+  /** Creates a new subscription on a petition */
+  createPetitionSubscription: Subscription;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Deactivates the specified active petition accesses. */
@@ -226,6 +228,7 @@ export type Mutation = {
   deletePetitionFieldComment: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  deletePetitionSubscription: Result;
   /** Edits permissions on given petitions and users */
   editPetitionUserPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
@@ -377,6 +380,7 @@ export type MutationcreateOrganizationUserArgs = {
 };
 
 export type MutationcreatePetitionArgs = {
+  eventsUrl?: Maybe<Scalars["String"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   petitionId?: Maybe<Scalars["GID"]>;
@@ -394,6 +398,11 @@ export type MutationcreatePetitionFieldCommentArgs = {
   isInternal?: Maybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionFieldReplyId?: Maybe<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+};
+
+export type MutationcreatePetitionSubscriptionArgs = {
+  endpoint: Scalars["String"];
   petitionId: Scalars["GID"];
 };
 
@@ -434,6 +443,10 @@ export type MutationdeletePetitionFieldCommentArgs = {
 export type MutationdeletePetitionsArgs = {
   force?: Maybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
+};
+
+export type MutationdeletePetitionSubscriptionArgs = {
+  subscriptionId: Scalars["GID"];
 };
 
 export type MutationeditPetitionUserPermissionArgs = {
@@ -552,7 +565,8 @@ export type MutationreactivateAccessesArgs = {
 
 export type MutationremovePetitionUserPermissionArgs = {
   petitionIds: Array<Scalars["GID"]>;
-  userIds: Array<Scalars["GID"]>;
+  removeAll?: Maybe<Scalars["Boolean"]>;
+  userIds?: Maybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationreopenPetitionArgs = {
@@ -847,6 +861,8 @@ export type Petition = PetitionBase & {
   skipForwardSecurity: Scalars["Boolean"];
   /** The status of the petition. */
   status: PetitionStatus;
+  /** The subscriptions linked to the petition. */
+  subscriptions: Array<Subscription>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -1705,6 +1721,17 @@ export type SignatureStartedEvent = PetitionEvent & {
   __typename?: "SignatureStartedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+};
+
+export type Subscription = Timestamps & {
+  __typename?: "Subscription";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  endpoint: Scalars["String"];
+  id: Scalars["GID"];
+  petition: Petition;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
 };
 
 /** Return type for all support methods */

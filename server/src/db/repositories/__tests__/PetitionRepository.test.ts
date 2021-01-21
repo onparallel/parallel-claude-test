@@ -734,6 +734,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.removePetitionUserPermissions(
           [petitionId],
           [userId],
+          false,
           users[0]
         );
         const permissions = await petitions.loadUserPermissions(petitionId);
@@ -758,6 +759,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.removePetitionUserPermissions(
           [petitionId],
           [users[1].id, users[2].id],
+          false,
           users[0]
         );
         const permissions = await petitions.loadUserPermissions(petitionId);
@@ -788,11 +790,37 @@ describe("repositories/PetitionRepository", () => {
         await petitions.removePetitionUserPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [users[1].id],
+          false,
           users[0]
         );
 
         const permissions = await petitions.loadUserPermissions(petitionId);
         expect(permissions).toHaveLength(1);
+        expect(permissions).toMatchObject([
+          {
+            petition_id: petitionId,
+            user_id: users[0].id,
+            permission_type: "OWNER",
+          },
+        ]);
+      });
+
+      test("ignores the userIds array when passing removeAll = true arg", async () => {
+        await petitions.addPetitionUserPermissions(
+          [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
+          [users[1].id],
+          "WRITE",
+          users[0]
+        );
+
+        await petitions.removePetitionUserPermissions(
+          [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
+          [100, 123, 234234234, 2],
+          true,
+          users[0]
+        );
+
+        const permissions = await petitions.loadUserPermissions(petitionId);
         expect(permissions).toMatchObject([
           {
             petition_id: petitionId,
@@ -813,6 +841,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.removePetitionUserPermissions(
           [user0Petitions[0].id, user0Petitions[1].id],
           [users[1].id, users[2].id, users[3].id],
+          false,
           users[0]
         );
 

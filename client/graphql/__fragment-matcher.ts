@@ -49,6 +49,7 @@ const result: PossibleTypesResultData = {
       "PetitionUserPermission",
       "PublicPetition",
       "PublicPetitionFieldReply",
+      "Subscription",
       "User",
     ],
     UserOrPetitionAccess: ["PetitionAccess", "User"],

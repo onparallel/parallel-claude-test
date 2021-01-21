@@ -179,8 +179,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     notEmptyArray((args) => args.userIds, "userIds"),
     userIdNotIncludedInArray((args) => args.userIds, "userIds"),
     validateIf(
-      "status",
-      "INACTIVE",
+      (args) => args.status === "INACTIVE",
       validateAnd(
         validIsDefined((args) => args.transferToUserId, "transferToUserId"),
         (_, { userIds, transferToUserId }, ctx, info) => {

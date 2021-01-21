@@ -2498,14 +2498,20 @@ export class PetitionRepository extends BaseRepository {
   async removePetitionUserPermissions(
     petitionIds: number[],
     userIds: number[],
+    removeAll: boolean,
     user: User,
     t?: Transaction
   ) {
     return this.withTransaction(async (t) => {
       const removedPermissions = await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
-        .whereIn("user_id", userIds)
         .whereNull("deleted_at")
+        .whereNot("user_id", user.id)
+        .mmodify((q) => {
+          if (!removeAll) {
+            q.whereIn("user_id", userIds);
+          }
+        })
         .update(
           {
             deleted_at: this.now(),

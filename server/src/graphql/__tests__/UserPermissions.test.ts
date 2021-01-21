@@ -736,6 +736,61 @@ describe("GraphQL/User Permissions", () => {
       ]);
     });
 
+    it("removes all permissions on the petition when passing the removeAll param", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionIds: [GID!]!) {
+            removePetitionUserPermission(
+              petitionIds: $petitionIds
+              removeAll: true
+            ) {
+              id
+              userPermissions {
+                permissionType
+                user {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.removePetitionUserPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          userPermissions: [
+            {
+              permissionType: "OWNER",
+              user: { id: toGlobalId("User", loggedUser.id) },
+            },
+          ],
+        },
+      ]);
+    });
+
+    it("sends error if neither userIds nor removeAll arguments are defined", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionIds: [GID!]!) {
+            removePetitionUserPermission(petitionIds: $petitionIds) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+        },
+      });
+
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("sends error when trying to remove permissions for logged user", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`

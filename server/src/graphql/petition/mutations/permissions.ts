@@ -6,15 +6,22 @@ import {
   nonNull,
   list,
 } from "@nexus/schema";
-import { chain, and, authenticate } from "../../helpers/authorize";
+import {
+  chain,
+  and,
+  authenticate,
+  ifArgDefined,
+} from "../../helpers/authorize";
 import { userHasAccessToPetitions } from "../authorizers";
 import { userHasAccessToUsers } from "./authorizers";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
-import { validateAnd } from "../../helpers/validateArgs";
+import { validateAnd, validateIf } from "../../helpers/validateArgs";
 import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { WhitelistedError } from "../../helpers/errors";
+import { isDefined } from "../../../util/remedaExtensions";
+import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 
 export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
@@ -171,22 +178,36 @@ export const removePetitionUserPermission = mutationField(
       authenticate(),
       and(
         userHasAccessToPetitions("petitionIds", ["OWNER"]),
-        userHasAccessToUsers("userIds")
+        ifArgDefined("userIds", userHasAccessToUsers("userIds" as never))
       )
     ),
     args: {
       petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
-      userIds: nonNull(list(nonNull(globalIdArg("User")))),
+      userIds: list(nonNull(globalIdArg("User"))),
+      removeAll: booleanArg({
+        description:
+          "Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds",
+      }),
     },
     validateArgs: validateAnd(
       notEmptyArray((args) => args.petitionIds, "petitionIds"),
-      notEmptyArray((args) => args.userIds, "userIds"),
-      userIdNotIncludedInArray((args) => args.userIds, "userIds")
+      validateIf(
+        (args) => isDefined(args.userIds),
+        validateAnd(
+          notEmptyArray((args) => args.userIds, "userIds"),
+          userIdNotIncludedInArray((args) => args.userIds, "userIds")
+        )
+      ),
+      validateIf(
+        (args) => !isDefined(args.userIds),
+        validBooleanValue((args) => args.removeAll, "removeAll", true)
+      )
     ),
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.removePetitionUserPermissions(
         args.petitionIds,
-        args.userIds,
+        args.userIds ?? [],
+        args.removeAll ?? false,
         ctx.user!
       );
     },

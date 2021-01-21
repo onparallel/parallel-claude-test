@@ -251,9 +251,13 @@ describe("GraphQL/Petition Event Subscriptions", () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query petitionSubscriptions($petitionId: GID!) {
-            petitionSubscriptions(petitionId: $petitionId) {
-              id
-              endpoint
+            petition(id: $petitionId) {
+              ... on Petition {
+                subscriptions {
+                  id
+                  endpoint
+                }
+              }
             }
           }
         `,
@@ -263,7 +267,7 @@ describe("GraphQL/Petition Event Subscriptions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.petitionSubscriptions).toEqual([
+      expect(data!.petition.subscriptions).toEqual([
         {
           id: toGlobalId("Subscription", s3.id),
           endpoint: "https://third.com",
@@ -283,9 +287,13 @@ describe("GraphQL/Petition Event Subscriptions", () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query petitionSubscriptions($petitionId: GID!) {
-            petitionSubscriptions(petitionId: $petitionId) {
-              id
-              endpoint
+            petition(id: $petitionId) {
+              ... on Petition {
+                subscriptions {
+                  id
+                  endpoint
+                }
+              }
             }
           }
         `,
@@ -295,7 +303,7 @@ describe("GraphQL/Petition Event Subscriptions", () => {
       });
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
-      expect(data).toBeNull();
+      expect(data!.petition).toBeNull();
     });
   });
 });

@@ -609,7 +609,12 @@ type Mutation {
   """
   removePetitionUserPermission(
     petitionIds: [GID!]!
-    userIds: [GID!]!
+
+    """
+    Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds
+    """
+    removeAll: Boolean
+    userIds: [GID!]
   ): [Petition!]!
 
   """

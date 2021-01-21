@@ -200,7 +200,7 @@ export const Petition = objectType({
     t.list.field("subscriptions", {
       type: "Subscription",
       description: "The subscriptions linked to the petition.",
-      resolve: async (root, { petitionId }, ctx) => {
+      resolve: async (root, _, ctx) => {
         return await ctx.subscriptions.loadSubscriptionsByPetitionId(root.id);
       },
     });
