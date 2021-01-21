@@ -218,7 +218,7 @@ const _PathResolver: any = (function () {
               { req, res }
             )) ?? {}) as any;
             context.params = await pProps(
-              this.pathOptions.params ?? ({} as RestParameters<any>),
+              this.pathOptions?.params ?? ({} as RestParameters<any>),
               async (param, name) => {
                 const value = req.params[name as string];
                 try {

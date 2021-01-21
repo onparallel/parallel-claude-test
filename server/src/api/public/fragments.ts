@@ -69,3 +69,13 @@ export const SubscriptionFragment = gql`
     createdAt
   }
 `;
+
+export const PermissionFragment = gql`
+  fragment Permission on PetitionUserPermission {
+    user {
+      ...User
+    }
+    permissionType
+  }
+  ${UserFragment}
+`;

@@ -273,29 +273,25 @@ const _RemindersConfig = {
 } as const;
 
 const _MessageBody = {
-  oneOf: [
-    {
-      title: "PlainTextMessage",
-      type: "object",
-      required: ["format", "content"],
-      additionalProperties: false,
-      properties: {
-        format: {
-          type: "string",
-          description:
-            "Constant value `PLAIN_TEXT` indicating that the content is in plain text format",
-          const: "PLAIN_TEXT",
-          example: "PLAIN_TEXT",
-        },
-        content: {
-          description: "The content of the message",
-          type: "string",
-          example:
-            "Hi Daryl,\nPlease fill the following information\n\nRegards,\nRick",
-        },
-      },
+  title: "PlainTextMessage",
+  type: "object",
+  required: ["format", "content"],
+  additionalProperties: false,
+  properties: {
+    format: {
+      type: "string",
+      description:
+        "Constant value `PLAIN_TEXT` indicating that the content is in plain text format",
+      const: "PLAIN_TEXT",
+      example: "PLAIN_TEXT",
     },
-  ],
+    content: {
+      description: "The content of the message",
+      type: "string",
+      example:
+        "Hi Daryl,\nPlease fill the following information\n\nRegards,\nRick",
+    },
+  },
 } as const;
 
 const _Subscription = {
@@ -320,6 +316,25 @@ const _Subscription = {
       type: "string",
       format: "date-time",
       example: new Date(2020, 2, 15).toISOString(),
+    },
+  },
+} as const;
+
+const _Permission = {
+  title: "Permission",
+  type: "object",
+  additionalProperties: false,
+  required: ["user", "permissionType"],
+  properties: {
+    user: {
+      ..._User,
+      description: "The user linked to this permission",
+    },
+    permissionType: {
+      description: "The type of permission",
+      type: "string",
+      enum: ["OWNER", "READ", "WRITE"],
+      example: "OWNER",
     },
   },
 } as const;
@@ -495,6 +510,29 @@ export const CreateSubscription = schema({
 } as const);
 export const Subscription = schema(_Subscription);
 export const ListOfSubscriptions = ListOf(_Subscription);
+
+export const SharePetition = schema({
+  title: "SharePetition",
+  type: "object",
+  additionalProperties: false,
+  required: ["userIds", "permissionType"],
+  properties: {
+    userIds: {
+      description: "IDs of the users you want to share the petition with",
+      type: "array",
+      items: {
+        type: "string",
+        example: toGlobalId("User", 42),
+      },
+    },
+    permissionType: {
+      description: "The type of permission you want to assign to the users",
+      type: "string",
+      enum: ["READ", "WRITE"],
+    },
+  },
+} as const);
+export const ListOfPermissions = ListOf(_Permission);
 
 function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
   return schema({

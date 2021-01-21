@@ -548,7 +548,8 @@ export type MutationreactivateAccessesArgs = {
 
 export type MutationremovePetitionUserPermissionArgs = {
   petitionIds: Array<Scalars["GID"]>;
-  userIds: Array<Scalars["GID"]>;
+  removeAll?: Maybe<Scalars["Boolean"]>;
+  userIds?: Maybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationreopenPetitionArgs = {
@@ -1863,6 +1864,11 @@ export type SubscriptionFragment = Pick<
   "id" | "endpoint" | "createdAt"
 >;
 
+export type PermissionFragment = Pick<
+  PetitionUserPermission,
+  "permissionType"
+> & { user: UserFragment };
+
 export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -1955,6 +1961,46 @@ export type CreatePetitionRecipients_sendPetitionMutationVariables = Exact<{
 
 export type CreatePetitionRecipients_sendPetitionMutation = {
   sendPetition: { accesses: Maybe<Array<PetitionAccessFragment>> };
+};
+
+export type GetPermissions_PermissionsQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type GetPermissions_PermissionsQuery = {
+  petition: Maybe<
+    | { userPermissions: Array<PermissionFragment> }
+    | { userPermissions: Array<PermissionFragment> }
+  >;
+};
+
+export type SharePetition_addPetitionUserPermissionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
+  permissionType: PetitionUserPermissionTypeRW;
+}>;
+
+export type SharePetition_addPetitionUserPermissionMutation = {
+  addPetitionUserPermission: Array<{
+    userPermissions: Array<PermissionFragment>;
+  }>;
+};
+
+export type StopSharing_removePetitionUserPermissionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type StopSharing_removePetitionUserPermissionMutation = {
+  removePetitionUserPermission: Array<Pick<Petition, "id">>;
+};
+
+export type RemoveUserPermission_removePetitionUserPermissionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  userId: Scalars["GID"];
+}>;
+
+export type RemoveUserPermission_removePetitionUserPermissionMutation = {
+  removePetitionUserPermission: Array<Pick<Petition, "id">>;
 };
 
 export type GetSubscriptions_SubscriptionQueryVariables = Exact<{

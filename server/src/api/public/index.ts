@@ -16,6 +16,7 @@ import {
 } from "../rest/responses";
 import {
   ContactFragment,
+  PermissionFragment,
   PetitionAccessFragment,
   PetitionFragment,
   SubscriptionFragment,
@@ -27,6 +28,7 @@ import {
   CreateContact,
   CreatePetition,
   CreateSubscription,
+  ListOfPermissions,
   ListOfPetitionAccesses,
   ListOfSubscriptions,
   PaginatedContacts,
@@ -35,6 +37,7 @@ import {
   Petition,
   PetitionEvent,
   SendPetition,
+  SharePetition,
   Subscription,
   Template,
   UpdatePetition,
@@ -64,6 +67,8 @@ import {
   GetContacts_ContactsQueryVariables,
   GetContact_ContactQuery,
   GetContact_ContactQueryVariables,
+  GetPermissions_PermissionsQuery,
+  GetPermissions_PermissionsQueryVariables,
   GetPetitionRecipients_PetitionAccessesQuery,
   GetPetitionRecipients_PetitionAccessesQueryVariables,
   GetPetitions_PetitionsQuery,
@@ -76,6 +81,12 @@ import {
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
+  RemoveUserPermission_removePetitionUserPermissionMutation,
+  RemoveUserPermission_removePetitionUserPermissionMutationVariables,
+  SharePetition_addPetitionUserPermissionMutation,
+  SharePetition_addPetitionUserPermissionMutationVariables,
+  StopSharing_removePetitionUserPermissionMutation,
+  StopSharing_removePetitionUserPermissionMutationVariables,
   UpdatePetition_PetitionMutation,
   UpdatePetition_PetitionMutationVariables,
 } from "./__types";
@@ -133,12 +144,20 @@ export const api = new RestApi({
     },
   },
   "x-tagGroups": [
-    { name: "Endpoints", tags: ["Petitions", "Templates", "Contacts"] },
+    {
+      name: "Endpoints",
+      tags: ["Petitions", "Petition Sharing", "Templates", "Contacts"],
+    },
   ],
   tags: [
     {
       name: "Petitions",
       description: "Petitions are the main entities in Parallel",
+    },
+    {
+      name: "Petition Sharing",
+      description:
+        "You can share your petitions with members of your organization for collaborative work",
     },
     {
       name: "Templates",
@@ -555,6 +574,157 @@ api
         }
       );
       return Ok(result.sendPetition.accesses!);
+    }
+  );
+
+api
+  .path("/petitions/:petitionId/permissions", { params: { petitionId } })
+  .get(
+    {
+      operationId: "GetPermissions",
+      summary: "Get permissions list",
+      responses: { 200: SuccessResponse(ListOfPermissions) },
+      tags: ["Petition Sharing"],
+    },
+    async ({ client, params }) => {
+      const result = await client.request<
+        GetPermissions_PermissionsQuery,
+        GetPermissions_PermissionsQueryVariables
+      >(
+        gql`
+          query GetPermissions_Permissions($petitionId: GID!) {
+            petition(id: $petitionId) {
+              userPermissions {
+                ...Permission
+              }
+            }
+          }
+          ${PermissionFragment}
+        `,
+        params
+      );
+
+      return Ok(result.petition!.userPermissions);
+    }
+  )
+  .post(
+    {
+      operationId: "SharePetition",
+      summary: "Share the petition",
+      description: outdent`
+        You can share the petition with an user from your same organization.
+      `,
+      body: JsonBody(SharePetition),
+      responses: {
+        201: SuccessResponse(ListOfPermissions),
+      },
+      tags: ["Petition Sharing"],
+    },
+    async ({ client, params, body }) => {
+      const result = await client.request<
+        SharePetition_addPetitionUserPermissionMutation,
+        SharePetition_addPetitionUserPermissionMutationVariables
+      >(
+        gql`
+          mutation SharePetition_addPetitionUserPermission(
+            $petitionId: GID!
+            $userIds: [GID!]!
+            $permissionType: PetitionUserPermissionTypeRW!
+          ) {
+            addPetitionUserPermission(
+              petitionIds: [$petitionId]
+              userIds: $userIds
+              permissionType: $permissionType
+            ) {
+              userPermissions {
+                ...Permission
+              }
+            }
+          }
+          ${PermissionFragment}
+        `,
+        {
+          petitionId: params.petitionId,
+          permissionType: body.permissionType,
+          userIds: body.userIds,
+        }
+      );
+
+      return Ok(result.addPetitionUserPermission[0].userPermissions);
+    }
+  )
+  .delete(
+    {
+      operationId: "StopSharing",
+      summary: "Stop sharing the petition",
+      description: outdent`
+        Use this to stop sharing the petition with other users.
+      `,
+      tags: ["Petition Sharing"],
+      responses: { 204: SuccessResponse() },
+    },
+    async ({ client, params }) => {
+      await client.request<
+        StopSharing_removePetitionUserPermissionMutation,
+        StopSharing_removePetitionUserPermissionMutationVariables
+      >(
+        gql`
+          mutation StopSharing_removePetitionUserPermission($petitionId: GID!) {
+            removePetitionUserPermission(
+              petitionIds: [$petitionId]
+              removeAll: true
+            ) {
+              id
+            }
+          }
+        `,
+        { petitionId: params.petitionId }
+      );
+      return NoContent();
+    }
+  );
+
+const userId = idParam({
+  type: "User",
+  description: "The ID of the user",
+});
+
+api
+  .path("/petitions/:petitionId/permissions/:userId", {
+    params: { petitionId, userId },
+  })
+  .delete(
+    {
+      operationId: "RemoveUserPermission",
+      summary: "Delete a permission",
+      description: "Removes the permission of a given user on the petition",
+      tags: ["Petition Sharing"],
+      responses: { 204: SuccessResponse() },
+    },
+    async ({ client, params }) => {
+      await client.request<
+        RemoveUserPermission_removePetitionUserPermissionMutation,
+        RemoveUserPermission_removePetitionUserPermissionMutationVariables
+      >(
+        gql`
+          mutation RemoveUserPermission_removePetitionUserPermission(
+            $petitionId: GID!
+            $userId: GID!
+          ) {
+            removePetitionUserPermission(
+              petitionIds: [$petitionId]
+              userIds: [$userId]
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: params.petitionId,
+          userId: params.userId,
+        }
+      );
+      return NoContent();
     }
   );
 
