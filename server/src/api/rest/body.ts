@@ -1,13 +1,7 @@
-import { outdent } from "outdent";
 import { isDefined } from "../../util/remedaExtensions";
 import { RestBody } from "./core";
 import { InvalidRequestBodyError } from "./errors";
-import {
-  buildValidateSchema,
-  JsonSchemaFor,
-  documentSchema,
-  getType,
-} from "./schemas";
+import { buildValidateSchema, JsonSchemaFor } from "./schemas";
 
 export interface JsonBodyOptions {
   description?: string;

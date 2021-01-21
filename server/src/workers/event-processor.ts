@@ -1,7 +1,7 @@
 import { mapSeries } from "async";
 import fetch from "node-fetch";
-import { PetitionEvent } from "../db/__types";
-import { EventParser } from "./helpers/eventParser";
+import { PetitionEvent } from "../db/events";
+import { mapEvent } from "./helpers/eventMapper";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
 createQueueWorker(
@@ -12,19 +12,19 @@ createQueueWorker(
     );
 
     if (subscriptions.length > 0) {
-      const parsedEvent = EventParser.parse(event);
+      const mappedEvent = mapEvent(event);
       await mapSeries(subscriptions, async (s) => {
         try {
           await fetch(s.endpoint, {
             method: "POST",
-            body: JSON.stringify(parsedEvent),
+            body: JSON.stringify(mappedEvent),
             headers: { "Content-Type": "application/json" },
           });
         } catch (e) {
           await ctx.emails.sendDeveloperWebhookFailedEmail(
             s.id,
             e.message ?? "",
-            parsedEvent
+            mappedEvent
           );
         }
       });

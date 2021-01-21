@@ -2,7 +2,8 @@ import {
   PetitionEventType,
   PetitionSignatureCancelReason,
   PetitionUserPermissionType,
-} from "../../db/__types";
+  PetitionEvent as DbPetitionEvent,
+} from "./__types";
 
 export type PetitionEventPayload<TType extends PetitionEventType> = {
   PETITION_CREATED: { user_id: number };
@@ -89,11 +90,12 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
 }[TType];
 
-type GenericPetitionEvent<TType extends PetitionEventType> = {
-  id: number;
+type GenericPetitionEvent<TType extends PetitionEventType> = Omit<
+  DbPetitionEvent,
+  "type" | "data"
+> & {
   type: TType;
   data: PetitionEventPayload<TType>;
-  created_at: Date;
 };
 
 export type PetitionCreatedEvent = GenericPetitionEvent<"PETITION_CREATED">;

@@ -35,7 +35,7 @@ export const schema = makeSchema({
   typegenAutoConfig: {
     sources: [
       { source: resolve("./db/__types.ts"), alias: "db" },
-      { source: resolve("./graphql/backing/events.ts"), alias: "events" },
+      { source: resolve("./db/events.ts"), alias: "events" },
       { source: resolve("./context.ts"), alias: "ctx" },
     ],
     contextType: "ctx.ApiContext",

@@ -3,7 +3,7 @@ import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder, Transaction } from "knex";
 import { outdent } from "outdent";
 import { countBy, groupBy, indexBy, maxBy, omit, sortBy, uniq } from "remeda";
-import { PetitionEventPayload } from "../../graphql/backing/events";
+import { PetitionEventPayload } from "../events";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";

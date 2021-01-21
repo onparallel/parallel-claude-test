@@ -197,6 +197,13 @@ export const Petition = objectType({
         });
       },
     });
+    t.list.field("subscriptions", {
+      type: "Subscription",
+      description: "The subscriptions linked to the petition.",
+      resolve: async (root, { petitionId }, ctx) => {
+        return await ctx.subscriptions.loadSubscriptionsByPetitionId(root.id);
+      },
+    });
   },
 });
 

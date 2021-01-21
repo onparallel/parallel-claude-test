@@ -5,7 +5,6 @@ import {
   stringArg,
   nonNull,
   nullable,
-  list,
 } from "@nexus/schema";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import {
@@ -114,17 +113,5 @@ export const petitionAuthToken = queryField("petitionAuthToken", {
   resolve: async (_, { token }, ctx) => {
     const payload: any = decode(token);
     return await ctx.petitions.loadPetition(payload.petitionId);
-  },
-});
-
-export const petitionSubscriptionsQuery = queryField("petitionSubscriptions", {
-  type: list(nonNull("Subscription")),
-  description: "The subscriptions linked to the petition",
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-  },
-  authorize: authenticateAnd(userHasAccessToPetitions("petitionId")),
-  resolve: async (_, { petitionId }, ctx) => {
-    return await ctx.subscriptions.loadSubscriptionsByPetitionId(petitionId);
   },
 });

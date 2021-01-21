@@ -838,6 +838,8 @@ export type Petition = PetitionBase & {
   skipForwardSecurity: Scalars["Boolean"];
   /** The status of the petition. */
   status: PetitionStatus;
+  /** The subscriptions linked to the petition. */
+  subscriptions: Array<Subscription>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -1436,8 +1438,6 @@ export type Query = {
   petitionFieldComments: Array<PublicPetitionFieldComment>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
-  /** The subscriptions linked to the petition */
-  petitionSubscriptions: Array<Subscription>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
@@ -1509,10 +1509,6 @@ export type QuerypetitionsArgs = {
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
-};
-
-export type QuerypetitionSubscriptionsArgs = {
-  petitionId: Scalars["GID"];
 };
 
 export type QuerypublicOrgLogoUrlArgs = {
@@ -1966,7 +1962,7 @@ export type GetSubscriptions_SubscriptionQueryVariables = Exact<{
 }>;
 
 export type GetSubscriptions_SubscriptionQuery = {
-  petitionSubscriptions: Array<SubscriptionFragment>;
+  petition: Maybe<{ subscriptions: Array<SubscriptionFragment> }>;
 };
 
 export type CreateSubscription_createPetitionSubscriptionMutationVariables = Exact<{

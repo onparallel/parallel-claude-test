@@ -567,15 +567,19 @@ api
       >(
         gql`
           query GetSubscriptions_Subscription($petitionId: GID!) {
-            petitionSubscriptions(petitionId: $petitionId) {
-              ...Subscription
+            petition(id: $petitionId) {
+              ... on Petition {
+                subscriptions {
+                  ...Subscription
+                }
+              }
             }
           }
           ${SubscriptionFragment}
         `,
         { petitionId: params.petitionId }
       );
-      return Ok(result.petitionSubscriptions);
+      return Ok(result.petition!.subscriptions);
     }
   )
   .post(

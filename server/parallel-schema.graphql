@@ -1088,6 +1088,11 @@ type Petition implements PetitionBase {
   status: PetitionStatus!
 
   """
+  The subscriptions linked to the petition.
+  """
+  subscriptions: [Subscription!]!
+
+  """
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
@@ -2339,11 +2344,6 @@ type Query {
     status: PetitionStatus
     type: PetitionBaseType
   ): PetitionBasePagination!
-
-  """
-  The subscriptions linked to the petition
-  """
-  petitionSubscriptions(petitionId: GID!): [Subscription!]!
   publicOrgLogoUrl(id: GID!): String
 
   """

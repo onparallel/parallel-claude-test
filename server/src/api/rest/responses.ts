@@ -1,7 +1,6 @@
 import { Response } from "express";
-import { outdent } from "outdent";
 import { ResponseWrapper, RestResponse } from "./core";
-import { documentSchema, getType, JsonSchemaFor } from "./schemas";
+import { JsonSchemaFor } from "./schemas";
 
 export class RestResponseWrapper<T> implements ResponseWrapper<T> {
   __type?: T;
