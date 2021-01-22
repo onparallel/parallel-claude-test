@@ -40,6 +40,7 @@ import {
   SharePetition,
   Subscription,
   Template,
+  TransferPetition,
   UpdatePetition,
 } from "./schemas";
 import {
@@ -87,6 +88,8 @@ import {
   SharePetition_addPetitionUserPermissionMutationVariables,
   StopSharing_removePetitionUserPermissionMutation,
   StopSharing_removePetitionUserPermissionMutationVariables,
+  TransferPetition_transferPetitionOwnershipMutation,
+  TransferPetition_transferPetitionOwnershipMutationVariables,
   UpdatePetition_PetitionMutation,
   UpdatePetition_PetitionMutationVariables,
 } from "./__types";
@@ -135,7 +138,7 @@ export const api = new RestApi({
   },
   servers: [
     {
-      url: "/api/v1",
+      url: "https://www.parallel.so/api/v1",
       description: "Production server",
     },
   ],
@@ -732,6 +735,51 @@ api
       return NoContent();
     }
   );
+
+api.path("/petitions/:petitionId/transfer", { params: { petitionId } }).post(
+  {
+    operationId: "TransferPetition",
+    summary: "Transfer the petition",
+    description: outdent`
+      Transfers the petition ownership to another user in your organization.
+      You will still have WRITE access to the petition.
+    `,
+    body: JsonBody(TransferPetition),
+    responses: {
+      201: SuccessResponse(ListOfPermissions),
+    },
+    tags: ["Petition Sharing"],
+  },
+  async ({ client, params, body }) => {
+    const response = await client.request<
+      TransferPetition_transferPetitionOwnershipMutation,
+      TransferPetition_transferPetitionOwnershipMutationVariables
+    >(
+      gql`
+        mutation TransferPetition_transferPetitionOwnership(
+          $userId: GID!
+          $petitionId: GID!
+        ) {
+          transferPetitionOwnership(
+            petitionIds: [$petitionId]
+            userId: $userId
+          ) {
+            userPermissions {
+              ...Permission
+            }
+          }
+        }
+        ${PermissionFragment}
+      `,
+      {
+        petitionId: params.petitionId,
+        userId: body.userId,
+      }
+    );
+
+    return Ok(response.transferPetitionOwnership[0].userPermissions);
+  }
+);
 
 api
   .path("/petitions/:petitionId/subscriptions", { params: { petitionId } })

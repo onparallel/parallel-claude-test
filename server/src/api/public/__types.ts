@@ -2003,6 +2003,17 @@ export type RemoveUserPermission_removePetitionUserPermissionMutation = {
   removePetitionUserPermission: Array<Pick<Petition, "id">>;
 };
 
+export type TransferPetition_transferPetitionOwnershipMutationVariables = Exact<{
+  userId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}>;
+
+export type TransferPetition_transferPetitionOwnershipMutation = {
+  transferPetitionOwnership: Array<{
+    userPermissions: Array<PermissionFragment>;
+  }>;
+};
+
 export type GetSubscriptions_SubscriptionQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
