@@ -97,7 +97,12 @@ export const api = new RestApi({
     title: "Parallel API",
     description: outdent`
       ## Introduction
-      Loren Ipsum
+      Parallel is a document process solution that helps its users collect documents 
+      and information efficiently, giving them control over what their recipients have replied and
+      the launched processes' status.
+
+      By opening our API, we want to empower organizations with our technology. While organizations 
+      focus on their core business, we help them streamline their document workflows.
       
       ## Authentication
       In order to authenticate your requests, first, you need generate a token
@@ -256,7 +261,7 @@ api
       operationId: "CreatePetition",
       summary: "Create petition",
       description: outdent`
-        Create a new petition based of a template.
+        Create a new petition based on a template.
         
         You can optionally pass an \`eventsUrl\` parameter to subcribe to the
         events in this petition. See more about petition events [here](#operation/CreateSubscription).
