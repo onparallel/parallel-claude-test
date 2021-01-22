@@ -193,9 +193,7 @@ export const clonePetitions = mutationField("clonePetitions", {
 
         return cloned;
       },
-      {
-        concurrency: 1,
-      }
+      { concurrency: 1 }
     );
   },
 });
