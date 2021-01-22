@@ -2,6 +2,7 @@ import { Heading, Text } from "@chakra-ui/react";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
+import { PublicVideoShowcase } from "@parallel/components/public/PublicVideoShowcase";
 import languages from "@parallel/lang/languages.json";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -12,11 +13,11 @@ function Review() {
   return (
     <PublicLayout
       title={intl.formatMessage({
-        id: "public.product.review.title",
+        id: "public.product.review-files.title",
         defaultMessage: "Get control and order with Parallel",
       })}
       description={intl.formatMessage({
-        id: "public.product.review.meta-description",
+        id: "public.product.review-files.meta-description",
         defaultMessage:
           "Parallel simplifies the information review process while giving you control and order over your document workflows.",
       })}
@@ -25,38 +26,42 @@ function Review() {
         textAlign="center"
         wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
       >
-        <Heading as="h1" size="xl" fontWeight="bold" color="purple.600">
+        <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
-            id="public.product.review.hero-title"
+            id="public.product.review-files.hero-title"
             defaultMessage="Control the information received effortlessly and with an order never seen before"
           />
         </Heading>
         <Text marginTop={8} fontSize="lg">
           <FormattedMessage
-            id="public.product.review.simplify"
+            id="public.product.review-files.simplify"
             defaultMessage="Simplify the review processes in your workflows and prepare the files in a few steps."
           />
         </Text>
       </PublicContainer>
       <PublicContainer paddingY={8} maxWidth="container.lg">
-        <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-review-${query.locale}.svg`}
-          imageSize="350px"
-          maxWidth="container.lg"
+        <PublicVideoShowcase
+          videoSources={[
+            {
+              type: "video/mp4",
+              src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/videos/review-files-${query.locale}.mp4`,
+            },
+          ]}
+          videoSize="350px"
         >
           <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
             <FormattedMessage
-              id="public.product.review.approve"
+              id="public.product.review-files.approve"
               defaultMessage="Approve or reject the documents or the answers"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.review.obtain-control"
+              id="public.product.review-files.obtain-control"
               defaultMessage="Obtain control over what you have already reviewed to avoid double work, and keep your client informed after checking the information."
             />
           </Text>
-        </PublicShowcase>
+        </PublicVideoShowcase>
       </PublicContainer>
       <PublicContainer
         paddingY={8}
@@ -66,18 +71,17 @@ function Review() {
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-export-${query.locale}.svg`}
           imageSize="350px"
-          maxWidth="container.lg"
           isReversed
         >
           <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
             <FormattedMessage
-              id="public.product.review.rename"
+              id="public.product.review-files.rename"
               defaultMessage="Forget about renaming files one by one manually"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.review.organize-rename"
+              id="public.product.review-files.organize-rename"
               defaultMessage="Get all your documents organized and choose how you need to rename them in bulk so that you can store or work with them efficiently."
             />
           </Text>
@@ -91,18 +95,17 @@ function Review() {
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-activity-${query.locale}.svg`}
           imageSize="350px"
-          maxWidth="container.lg"
         >
           <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
             <FormattedMessage
-              id="public.product.review.activity-log"
+              id="public.product.review-files.activity-log"
               defaultMessage="Control better the timings with an activity log"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.review.improve-services"
-              defaultMessage="Control when things were delivered or done to improve the rendering of your services."
+              id="public.product.review-files.improve-services"
+              defaultMessage="See when things were delivered or done to improve the rendering of your services."
             />
           </Text>
         </PublicShowcase>

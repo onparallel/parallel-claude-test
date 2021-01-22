@@ -2,6 +2,7 @@ import { Heading, Text } from "@chakra-ui/react";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
+import { PublicVideoShowcase } from "@parallel/components/public/PublicVideoShowcase";
 import languages from "@parallel/lang/languages.json";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -12,11 +13,11 @@ function Collaborate() {
   return (
     <PublicLayout
       title={intl.formatMessage({
-        id: "public.product.collaborate.title",
+        id: "public.product.team-collaboration.title",
         defaultMessage: "Collaboration around document workflows with Parallel",
       })}
       description={intl.formatMessage({
-        id: "public.product.collaborate.meta-description",
+        id: "public.product.team-collaboration.meta-description",
         defaultMessage:
           "Parallel fosters and makes collaboration possible around document workflows and processes.",
       })}
@@ -25,44 +26,48 @@ function Collaborate() {
         textAlign="center"
         wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
       >
-        <Heading as="h1" size="xl" fontWeight="bold" color="purple.600">
+        <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
-            id="public.product.collaborate.hero-title"
+            id="public.product.team-collaboration.hero-title"
             defaultMessage="A collaborative environment to scale your processes"
           />
         </Heading>
         <Text marginTop={8} fontSize="lg">
           <FormattedMessage
-            id="public.product.collaborate.unify"
+            id="public.product.team-collaboration.unify"
             defaultMessage="Unify communication with workflows and improve your team's productivity."
           />
         </Text>
       </PublicContainer>
       <PublicContainer paddingY={8} maxWidth="container.lg">
-        <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-template-list-${query.locale}.png`}
-          imageSize="350px"
-          maxWidth="container.lg"
+        <PublicVideoShowcase
+          videoSources={[
+            {
+              type: "video/mp4",
+              src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/videos/team-collaboration-${query.locale}.mp4`,
+            },
+          ]}
+          videoSize="350px"
         >
           <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
             <FormattedMessage
-              id="public.product.collaborate.share"
+              id="public.product.team-collaboration.share"
               defaultMessage="Share templates to standardize workflows"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.collaborate.transform"
+              id="public.product.team-collaboration.transform"
               defaultMessage="Transform repetitive and tedious processes into something simple and easy to manage."
             />
           </Text>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.collaborate.flexible"
+              id="public.product.team-collaboration.flexible"
               defaultMessage="With a flexible tool such as Parallel, you can adapt every case as needed before launching a process."
             />
           </Text>
-        </PublicShowcase>
+        </PublicVideoShowcase>
       </PublicContainer>
       <PublicContainer
         paddingY={8}
@@ -72,18 +77,17 @@ function Collaborate() {
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-share-${query.locale}.png`}
           imageSize="350px"
-          maxWidth="container.lg"
           isReversed
         >
           <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
             <FormattedMessage
-              id="public.product.collaborate.team"
+              id="public.product.team-collaboration.team"
               defaultMessage="Include your team to the ongoing processes"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.collaborate.share-petition"
+              id="public.product.team-collaboration.share-petition"
               defaultMessage="Share a petition with your team to work together on it at any time."
             />
           </Text>
@@ -97,23 +101,22 @@ function Collaborate() {
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-internal-comments-${query.locale}.svg`}
           imageSize="350px"
-          maxWidth="container.lg"
         >
           <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
             <FormattedMessage
-              id="public.product.collaborate.centralize"
+              id="public.product.team-collaboration.centralize"
               defaultMessage="Centralize the revision and internal communication"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.collaborate.client-communication"
+              id="public.product.team-collaboration.client-communication"
               defaultMessage="Allow your team to stay up to date with the communications with your client."
             />
           </Text>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.collaborate.work-effectively"
+              id="public.product.team-collaboration.work-effectively"
               defaultMessage="Help them work more effectively, allowing them to review and sharing their thought around the information received."
             />
           </Text>

@@ -6,18 +6,22 @@ import {
   Menu,
   MenuButton,
   MenuItem,
+  MenuItemOptions,
   MenuList,
   Portal,
   Stack,
   StackProps,
   useDisclosure,
 } from "@chakra-ui/react";
+import { ChevronDownIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { BurgerButton } from "@parallel/components/common/BurgerButton";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { useWindowScroll } from "beautiful-react-hooks";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
 
@@ -93,60 +97,78 @@ export function PublicHeader(props: BoxProps) {
   );
 }
 
+interface MenuItemLinkProps extends MenuItemOptions {
+  href: string;
+}
+
+const MenuItemLink = chakraForwardRef<"a", MenuItemLinkProps>(
+  function MenuItemLink({ href, ...props }, ref) {
+    const router = useRouter();
+    const current = router.pathname.startsWith("/[locale]")
+      ? router.asPath.replace(/^\/[^\/]+/, "")
+      : router.asPath;
+    return (
+      <NakedLink href={href}>
+        <MenuItem
+          as="a"
+          ref={ref as any}
+          {...(current === href
+            ? {
+                fontWeight: "bold",
+                color: "purple.600",
+              }
+            : {})}
+          {...(props as any)}
+        />
+      </NakedLink>
+    );
+  }
+);
+
 function PublicHeaderMenu(props: StackProps) {
   return (
     <Stack {...props}>
       <Menu placement="bottom">
-        <MenuButton as={Button} variant="ghost">
+        <MenuButton as={Button} variant="ghost" rightIcon={<ChevronDownIcon />}>
           <FormattedMessage id="public.product-link" defaultMessage="Product" />
         </MenuButton>
         <Portal>
           <MenuList>
-            <NakedLink href="/product/request">
-              <MenuItem as="a">
-                <FormattedMessage
-                  id="public.request-link"
-                  defaultMessage="Request"
-                />
-              </MenuItem>
-            </NakedLink>
-            <NakedLink href="/product/follow">
-              <MenuItem as="a">
-                <FormattedMessage
-                  id="public.follow-link"
-                  defaultMessage="Follow"
-                />
-              </MenuItem>
-            </NakedLink>
-            <NakedLink href="/product/review">
-              <MenuItem as="a">
-                <FormattedMessage
-                  id="public.review-link"
-                  defaultMessage="Review"
-                />
-              </MenuItem>
-            </NakedLink>
-            <NakedLink href="/product/collaborate">
-              <MenuItem as="a">
-                <FormattedMessage
-                  id="public.collaborate-link"
-                  defaultMessage="Collaborate"
-                />
-              </MenuItem>
-            </NakedLink>
-            <NakedLink href="/security">
-              <MenuItem as="a">
-                <FormattedMessage
-                  id="public.security-link"
-                  defaultMessage="Security"
-                />
-              </MenuItem>
-            </NakedLink>
+            <MenuItemLink href="/product/request-information">
+              <FormattedMessage
+                id="public.product.request-information-link"
+                defaultMessage="Request information"
+              />
+            </MenuItemLink>
+            <MenuItemLink href="/product/monitor-progress">
+              <FormattedMessage
+                id="public.product.monitor-link"
+                defaultMessage="Monitor progress"
+              />
+            </MenuItemLink>
+            <MenuItemLink href="/product/review-files">
+              <FormattedMessage
+                id="public.product.review-files-link"
+                defaultMessage="Review your files"
+              />
+            </MenuItemLink>
+            <MenuItemLink href="/product/team-collaboration">
+              <FormattedMessage
+                id="public.product.team-collaboration-link"
+                defaultMessage="Collaborate with your team"
+              />
+            </MenuItemLink>
+            <MenuItemLink href="/security">
+              <FormattedMessage
+                id="public.product.security-link"
+                defaultMessage="A secure environment"
+              />
+            </MenuItemLink>
           </MenuList>
         </Portal>
       </Menu>
       <Menu placement="bottom">
-        <MenuButton as={Button} variant="ghost">
+        <MenuButton as={Button} variant="ghost" rightIcon={<ChevronDownIcon />}>
           <FormattedMessage
             id="public.persons-link"
             defaultMessage="For whom"
@@ -154,30 +176,24 @@ function PublicHeaderMenu(props: StackProps) {
         </MenuButton>
         <Portal>
           <MenuList>
-            <NakedLink href="/for-whom/people">
-              <MenuItem as="a">
-                <FormattedMessage
-                  id="public.for-whom.freelance"
-                  defaultMessage="Freelancers"
-                />
-              </MenuItem>
-            </NakedLink>
-            <NakedLink href="/for-whom/legal-industry">
-              <MenuItem as="a">
-                <FormattedMessage
-                  id="public.for-whom.legal"
-                  defaultMessage="Legal"
-                />
-              </MenuItem>
-            </NakedLink>
-            <NakedLink href="/for-whom/services">
-              <MenuItem as="a">
-                <FormattedMessage
-                  id="public.for-whom.services"
-                  defaultMessage="Professional Services"
-                />
-              </MenuItem>
-            </NakedLink>
+            <MenuItemLink href="/for-whom/people">
+              <FormattedMessage
+                id="public.for-whom.freelance"
+                defaultMessage="Freelancers"
+              />
+            </MenuItemLink>
+            <MenuItemLink href="/for-whom/legal-industry">
+              <FormattedMessage
+                id="public.for-whom.legal"
+                defaultMessage="Legal"
+              />
+            </MenuItemLink>
+            <MenuItemLink href="/for-whom/services">
+              <FormattedMessage
+                id="public.for-whom.services"
+                defaultMessage="Professional Services"
+              />
+            </MenuItemLink>
           </MenuList>
         </Portal>
       </Menu>

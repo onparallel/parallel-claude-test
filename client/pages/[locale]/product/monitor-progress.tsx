@@ -2,6 +2,7 @@ import { Heading, Text } from "@chakra-ui/react";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
+import { PublicVideoShowcase } from "@parallel/components/public/PublicVideoShowcase";
 import languages from "@parallel/lang/languages.json";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -16,7 +17,7 @@ function Follow() {
         defaultMessage: "Follow-ups made easy",
       })}
       description={intl.formatMessage({
-        id: "public.product.follow.meta-description",
+        id: "public.product.monitor-progress.meta-description",
         defaultMessage:
           "Parallel gives you a simple way to follow-up with your information requests so that you can focus on important tasks.",
       })}
@@ -25,38 +26,42 @@ function Follow() {
         textAlign="center"
         wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
       >
-        <Heading as="h1" size="xl" fontWeight="bold" color="purple.600">
+        <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
-            id="public.product.follow.hero-title"
+            id="public.product.monitor-progress.hero-title"
             defaultMessage="Following-up on your requests has never been so easy"
           />
         </Heading>
         <Text marginTop={8} fontSize="lg">
           <FormattedMessage
-            id="public.product.follow.space"
+            id="public.product.monitor-progress.space"
             defaultMessage="Parallel gives you a space to have everything under control and to follow-up with your recipients in a simple way."
           />
         </Text>
       </PublicContainer>
       <PublicContainer paddingY={8} maxWidth="container.lg">
-        <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-status-${query.locale}.svg`}
-          imageSize="350px"
-          maxWidth="container.lg"
+        <PublicVideoShowcase
+          videoSources={[
+            {
+              type: "video/mp4",
+              src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/videos/monitor-progress-${query.locale}.mp4`,
+            },
+          ]}
+          videoSize="350px"
         >
           <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
             <FormattedMessage
-              id="public.product.follow.control"
+              id="public.product.monitor-progress.control"
               defaultMessage="Control and follow your petitions in a simple and visual way"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.follow.interface"
+              id="public.product.monitor-progress.interface"
               defaultMessage="Parallel's interface helps you keep all the information under control and organized. You will know the status of your processes at a glance."
             />
           </Text>
-        </PublicShowcase>
+        </PublicVideoShowcase>
       </PublicContainer>
       <PublicContainer
         paddingY={8}
@@ -66,18 +71,17 @@ function Follow() {
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-reminder-${query.locale}.svg`}
           imageSize="350px"
-          maxWidth="container.lg"
           isReversed
         >
           <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
             <FormattedMessage
-              id="public.product.follow.reminders"
+              id="public.product.monitor-progress.reminders"
               defaultMessage="Set up intelligent reminders"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.follow.missing"
+              id="public.product.monitor-progress.missing"
               defaultMessage="Remind your recipients of the missing information and avoid checking, again and again, your checklists manually."
             />
           </Text>
@@ -91,23 +95,22 @@ function Follow() {
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-conversation-${query.locale}.svg`}
           imageSize="350px"
-          maxWidth="container.lg"
         >
           <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
             <FormattedMessage
-              id="public.product.follow.stress"
+              id="public.product.monitor-progress.stress"
               defaultMessage="Reduce the stress of the emails and simplify the conversation"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.follow.email-threads"
+              id="public.product.monitor-progress.email-threads"
               defaultMessage="Avoid endless email threads that difficult the conversation around questions and answers."
             />
           </Text>
           <Text marginBottom={2}>
             <FormattedMessage
-              id="public.product.follow.conversations"
+              id="public.product.monitor-progress.conversations"
               defaultMessage="Parallel centralizes and contextualizes all conversations around the information that you request."
             />
           </Text>
