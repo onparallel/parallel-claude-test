@@ -71,9 +71,7 @@ function userSelect<IsMulti extends boolean>(isMulti: IsMulti) {
         <AsyncSelect<UserSelectSelection, IsMulti>
           ref={ref}
           value={value}
-          onChange={(value) =>
-            onChange?.((value ?? (isMulti ? [] : null)) as any)
-          }
+          onChange={onChange as any}
           isMulti={isMulti}
           loadOptions={loadOptions}
           {...props}

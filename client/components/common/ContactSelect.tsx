@@ -165,7 +165,7 @@ export const ContactSelect = Object.assign(
         ref={useMergedRef(ref, innerRef)}
         value={value}
         isMulti
-        onChange={(value) => onChange((value as any) ?? [])}
+        onChange={onChange as any}
         inputValue={inputValue}
         onKeyDown={handleKeyDown}
         onInputChange={handleInputChange}

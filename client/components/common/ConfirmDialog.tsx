@@ -38,7 +38,6 @@ export function ConfirmDialog<TResult = void>({
       <ModalContent borderRadius="md" {...content}>
         {hasCloseButton ? (
           <ModalCloseButton
-            right={3} // This is fixed in next Chakra versions
             aria-label={intl.formatMessage({
               id: "generic.close",
               defaultMessage: "Close",
