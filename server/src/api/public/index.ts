@@ -134,38 +134,21 @@ export const api = new RestApi({
 
       ## Getting started
       To quick start on Parallel, we have prepared a brief tutorial that will guide you through the basics of our API.
-      Once completed, you should be able to manage your document workflows through our API.
-
+      Once completed, you should be able to manage your document workflows through our API.  
 
       - Create a new template with your Parallel account following these steps (link to support page explaining…).
       - Write down the newly created template templateId, which you can find in the URL: …/app/petitions/{templateId}/compose.
-      - Generate a token on the API tokens section under your account settings (Profile > Settings > API tokens).
+      - Generate a token on the [API tokens section](https://www.parallel.so/es/app/settings/tokens) under your account settings (Profile > Settings > API tokens).  
 
+      Once we have completed the steps above, we are going to **create and send our first petition**:
+      - Create a petition with the [POST /petitions](#operation/CreatePetition) endpoint, passing the templateId you saved before, and an optional title/name for your petition.
 
-      Once we have completed the steps above, we are going to create and send our first petition.
-
-      To do this we are going to create a petition with the [POST /petitions](#operation/CreatePetition) endpoint, passing the templateId you saved before, and an optional title/name for your petition.
-
-      Remember to add the authorization in the header!
+      > **Remember to add the authorization in the header!**
 
       If everything was fine, you should have received a **201 response**, which includes the petition’s id.
-
-      The response should be something like this:
-      ~~~json
-        {
-          "id": "aahCKgcCgSenHDC",
-          "name": "My petition",
-          "status": "DRAFT",
-          "deadline": "2020-03-15T03:00:00.000Z",
-          "locale": "en",
-          "createdAt": "2020-03-15T03:00:00.000Z"
-        }
-      ~~~
       
-
-      Now that we have created the petition, we are going to send it to the recipients we want to request the information to.
-
-      Use the Send petition endpoint [(POST /petitions/{petitionId}/recipients)](#operation/CreatePetitionRecipients), and send to an email you have access to test it.
+      Now that we have created the petition, we are going to **send it to the recipients** we want to request the information to.
+      - Use the Send petition endpoint [(POST /petitions/{petitionId}/recipients)](#operation/CreatePetitionRecipients), and send to an email you have access to test it.
 
       If everything went correctly, you should have received an email with your first petition. Congrats!
 
@@ -173,10 +156,11 @@ export const api = new RestApi({
 
       When creating the petition, you can pass an optional argument \`eventsUrl\` to subscribe to events in the petition.
       We will send real-time events of the petition on a POST request to the provided URL.
-      To learn more about this events and the data we will send to your URL, refer to the [Subscriptions documentation](#operation/CreateSubscription)
+      To learn more about this events and the data we will send to your URL, refer to the [Subscriptions documentation](#operation/CreateSubscription)  
 
-      [Download all]
+      Finally, you can list every submitted reply on the petition at any time using the [GET /petitions/{petitionId}/replies](#operation/PetitionReplies) endpoint.  
 
+      You can also download a single \`TEXT\` or \`FILE\` reply with the [GET /petitions/{petitionId}/replies/{replyId}/download](#operation/DownloadPetitionReply) endpoint.  
 
       ## Support
       In case you need any help with your integration, please drop an email to
