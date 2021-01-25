@@ -28,6 +28,12 @@ export abstract class HttpError
   }
 }
 
+export class FileNotFoundError extends HttpError {
+  static readonly code = "FileNotFound";
+  constructor(public message: string) {
+    super(404, FileNotFoundError.code, message);
+  }
+}
 export class ConflictError extends HttpError {
   static readonly code = "Conflict";
   constructor(public message: string) {

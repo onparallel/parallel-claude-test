@@ -2321,6 +2321,7 @@ type Query {
     keycode: ID!
     petitionFieldId: GID!
   ): [PublicPetitionFieldComment!]!
+  petitionReplyTextContent(petitionId: GID!, replyId: GID!): String
 
   """
   The petitions of the user

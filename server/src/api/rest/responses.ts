@@ -28,6 +28,12 @@ export function Ok<T>(value: T): ResponseWrapper<T> {
   return new RestResponseWrapper(200, value);
 }
 
+export function PlainText(value?: string | null): ResponseWrapper<string> {
+  return new RestResponseWrapper(200, value, {
+    "content-type": "text/plain",
+  });
+}
+
 export function Created<T>(value: T, location?: string): ResponseWrapper<T> {
   return new RestResponseWrapper(201, value, location ? { location } : {});
 }
@@ -90,4 +96,17 @@ export function SuccessResponse<T = void>(
     : (NoContentResponse({
         description: "Successful operation",
       }) as RestResponse<T>);
+}
+
+export function TextResponse(
+  schema: JsonSchemaFor<string>
+): RestResponse<string> {
+  return {
+    description: "Successful operation",
+    content: {
+      "text/plain": {
+        schema: schema as any,
+      },
+    },
+  };
 }

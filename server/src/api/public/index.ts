@@ -5,20 +5,27 @@ import { pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
 import { JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
-import { ConflictError, UnauthorizedError } from "../rest/errors";
+import {
+  ConflictError,
+  FileNotFoundError,
+  UnauthorizedError,
+} from "../rest/errors";
 import { booleanParam, enumParam, idParam } from "../rest/params";
 import {
   Created,
   ErrorResponse,
   NoContent,
   Ok,
+  PlainText,
   SuccessResponse,
+  TextResponse,
 } from "../rest/responses";
 import {
   ContactFragment,
   PermissionFragment,
   PetitionAccessFragment,
   PetitionFragment,
+  PetitionReplyFragment,
   SubscriptionFragment,
   TemplateFragment,
 } from "./fragments";
@@ -28,8 +35,10 @@ import {
   CreateContact,
   CreatePetition,
   CreateSubscription,
+  FieldReplyDownloadContent,
   ListOfPermissions,
   ListOfPetitionAccesses,
+  ListOfReplies,
   ListOfSubscriptions,
   PaginatedContacts,
   PaginatedPetitions,
@@ -64,6 +73,8 @@ import {
   DeleteSubscription_deletePetitionSubscriptionMutationVariables,
   DeleteTemplate_deletePetitionsMutation,
   DeleteTemplate_deletePetitionsMutationVariables,
+  DownloadPetitionReply_GetReplyContentQuery,
+  DownloadPetitionReply_GetReplyContentQueryVariables,
   GetContacts_ContactsQuery,
   GetContacts_ContactsQueryVariables,
   GetContact_ContactQuery,
@@ -82,6 +93,8 @@ import {
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
+  PetitionReplies_RepliesQuery,
+  PetitionReplies_RepliesQueryVariables,
   RemoveUserPermission_removePetitionUserPermissionMutation,
   RemoveUserPermission_removePetitionUserPermissionMutationVariables,
   SharePetition_addPetitionUserPermissionMutation,
@@ -154,7 +167,13 @@ export const api = new RestApi({
   "x-tagGroups": [
     {
       name: "Endpoints",
-      tags: ["Petitions", "Petition Sharing", "Templates", "Contacts"],
+      tags: [
+        "Petitions",
+        "Petition Sharing",
+        "Petition Replies",
+        "Templates",
+        "Contacts",
+      ],
     },
   ],
   tags: [
@@ -1150,5 +1169,120 @@ api
         { contactId: params.contactId }
       );
       return Ok(result.contact!);
+    }
+  );
+
+api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
+  {
+    operationId: "PetitionReplies",
+    summary: "Get petition replies",
+    description: outdent`
+      Returns a list of the submitted replies of the petition.
+    `,
+    tags: ["Petition Replies"],
+    responses: {
+      200: SuccessResponse(ListOfReplies),
+    },
+  },
+  async ({ client, params }) => {
+    const response = await client.request<
+      PetitionReplies_RepliesQuery,
+      PetitionReplies_RepliesQueryVariables
+    >(
+      gql`
+        query PetitionReplies_Replies($petitionId: GID!) {
+          petition(id: $petitionId) {
+            fields {
+              id
+              type
+              replies {
+                ...PetitionFieldReply
+              }
+            }
+          }
+        }
+        ${PetitionReplyFragment}
+      `,
+      {
+        petitionId: params.petitionId,
+      }
+    );
+    return Ok(
+      response.petition!.fields.flatMap((field) =>
+        field.replies.map((reply) => ({
+          id: reply.id,
+          type: (field.type === "FILE_UPLOAD" ? "FILE" : "TEXT") as any,
+          content: reply.content as any,
+          fieldId: field.id,
+          accessId: reply.access.id,
+          updatedAt: reply.updatedAt,
+          createdAt: reply.createdAt,
+        }))
+      )
+    );
+  }
+);
+
+const replyId = idParam({
+  type: "PetitionFieldReply",
+  description: "The ID of the reply",
+});
+
+api
+  .path("/petitions/:petitionId/replies/:replyId/download", {
+    params: { petitionId, replyId },
+  })
+  .get(
+    {
+      operationId: "DownloadPetitionReply",
+      summary: "Download a reply",
+      description: outdent`
+        Get a reply on the petition.
+
+        Returns a plain-text string for replies of type \`TEXT\`,
+        and a download URL for replies of type \`FILE\`.
+
+        Have in mind that the download URL's for \`FILE\` replies have an expiration time of 30 minutes.
+      `,
+      tags: ["Petition Replies"],
+      responses: {
+        200: TextResponse(FieldReplyDownloadContent),
+        404: ErrorResponse({
+          description: "Can't find a file for reply with id {replyId}",
+        }),
+      },
+    },
+    async ({ client, params }) => {
+      try {
+        const response = await client.request<
+          DownloadPetitionReply_GetReplyContentQuery,
+          DownloadPetitionReply_GetReplyContentQueryVariables
+        >(
+          gql`
+            query DownloadPetitionReply_GetReplyContent(
+              $petitionId: GID!
+              $replyId: GID!
+            ) {
+              petitionReplyTextContent(
+                petitionId: $petitionId
+                replyId: $replyId
+              )
+            }
+          `,
+          params
+        );
+        return PlainText(response.petitionReplyTextContent);
+      } catch (error) {
+        if (error instanceof ClientError) {
+          const code = (error.response.errors![0] as any).extensions
+            .code as string;
+          if (code === "FILE_NOT_FOUND") {
+            throw new FileNotFoundError(
+              `Can't find a file for reply with id ${params.replyId}`
+            );
+          }
+        }
+        throw error;
+      }
     }
   );

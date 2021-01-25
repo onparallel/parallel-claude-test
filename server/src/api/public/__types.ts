@@ -1437,6 +1437,7 @@ export type Query = {
   petitionAuthToken: Maybe<Petition>;
   /** The comments for this field. */
   petitionFieldComments: Array<PublicPetitionFieldComment>;
+  petitionReplyTextContent: Maybe<Scalars["String"]>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
@@ -1500,6 +1501,11 @@ export type QuerypetitionAuthTokenArgs = {
 export type QuerypetitionFieldCommentsArgs = {
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
+};
+
+export type QuerypetitionReplyTextContentArgs = {
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
 };
 
 export type QuerypetitionsArgs = {
@@ -1869,6 +1875,11 @@ export type PermissionFragment = Pick<
   "permissionType"
 > & { user: UserFragment };
 
+export type PetitionFieldReplyFragment = Pick<
+  PetitionFieldReply,
+  "id" | "content" | "createdAt" | "updatedAt"
+> & { access: Pick<PetitionAccess, "id"> };
+
 export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
@@ -2091,3 +2102,36 @@ export type GetContact_ContactQueryVariables = Exact<{
 }>;
 
 export type GetContact_ContactQuery = { contact: Maybe<ContactFragment> };
+
+export type PetitionReplies_RepliesQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionReplies_RepliesQuery = {
+  petition: Maybe<
+    | {
+        fields: Array<
+          Pick<PetitionField, "id" | "type"> & {
+            replies: Array<PetitionFieldReplyFragment>;
+          }
+        >;
+      }
+    | {
+        fields: Array<
+          Pick<PetitionField, "id" | "type"> & {
+            replies: Array<PetitionFieldReplyFragment>;
+          }
+        >;
+      }
+  >;
+};
+
+export type DownloadPetitionReply_GetReplyContentQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type DownloadPetitionReply_GetReplyContentQuery = Pick<
+  Query,
+  "petitionReplyTextContent"
+>;

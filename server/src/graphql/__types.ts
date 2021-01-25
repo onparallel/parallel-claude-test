@@ -968,6 +968,7 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["PetitionBase"] | null; // PetitionBase
     petitionAuthToken: NexusGenRootTypes["Petition"] | null; // Petition
     petitionFieldComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
+    petitionReplyTextContent: string | null; // String
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     publicOrgLogoUrl: string | null; // String
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
@@ -1679,6 +1680,7 @@ export interface NexusGenFieldTypeNames {
     petition: "PetitionBase";
     petitionAuthToken: "Petition";
     petitionFieldComments: "PublicPetitionFieldComment";
+    petitionReplyTextContent: "String";
     petitions: "PetitionBasePagination";
     publicOrgLogoUrl: "String";
     publicTemplates: "PetitionTemplatePagination";
@@ -2349,6 +2351,11 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
+    };
+    petitionReplyTextContent: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     petitions: {
       // args

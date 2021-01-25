@@ -339,6 +339,98 @@ const _Permission = {
   },
 } as const;
 
+const _PetitionFieldReply = {
+  title: "PetitionFieldReply",
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "id",
+    "type",
+    "content",
+    "fieldId",
+    "accessId",
+    "updatedAt",
+    "createdAt",
+  ],
+  properties: {
+    id: {
+      type: "string",
+      description: "The ID of the reply",
+      example: toGlobalId("PetitionFieldReply", 100),
+    },
+    type: {
+      type: "string",
+      enum: ["TEXT", "FILE"],
+      example: "TEXT",
+      // TODO implement discriminators to select content based on this prop
+      // https://redoc.ly/docs/resources/discriminator/
+    },
+    content: {
+      type: "object",
+      oneOf: [
+        {
+          title: "TEXT",
+          type: "object",
+          required: ["text"],
+          additionalProperties: false,
+          properties: {
+            text: {
+              type: "string",
+              description: "The text content of the reply",
+              example: "Robert Baratheon",
+            },
+          },
+        },
+        {
+          title: "FILE",
+          type: "object",
+          required: ["filename", "size", "contentType"],
+          additionalProperties: false,
+          properties: {
+            filename: {
+              type: "string",
+              description: "The name of the submitted file",
+              example: "Photo_ID.jpeg",
+            },
+            size: {
+              type: "integer",
+              description: "The size of the file in bytes",
+              example: 1928824,
+            },
+            contentType: {
+              type: "string",
+              description: "The content-type of the file",
+              example: "image/jpeg",
+            },
+          },
+        },
+      ],
+    },
+    fieldId: {
+      type: "string",
+      description: "The ID of the field this reply belongs to",
+      example: toGlobalId("PetitionField", 2),
+    },
+    accessId: {
+      type: "string",
+      description: "The ID of the access from which this reply was created",
+      example: toGlobalId("PetitionAccess", 42),
+    },
+    createdAt: {
+      type: "string",
+      format: "date-time",
+      description: "Creation date of the reply",
+      example: new Date(2020, 2, 15).toISOString(),
+    },
+    updatedAt: {
+      type: "string",
+      format: "date-time",
+      description: "Last time update of the reply",
+      example: new Date(2020, 2, 20).toISOString(),
+    },
+  },
+} as const;
+
 export const Petition = schema(_Petition);
 export const UpdatePetition = schema({
   title: "UpdatePetition",
@@ -546,6 +638,15 @@ export const TransferPetition = schema({
   },
 } as const);
 export const ListOfPermissions = ListOf(_Permission);
+
+export const ListOfReplies = ListOf(_PetitionFieldReply);
+
+export const FieldReplyDownloadContent = schema({
+  type: "string",
+  example: "Jon Snow",
+  description:
+    "The text-content of the reply, or a download URL for `FILE` replies",
+} as const);
 
 function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
   return schema({
