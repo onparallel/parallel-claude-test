@@ -2725,7 +2725,7 @@ export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
 
 export type PetitionSharingModal_addPetitionUserPermissionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  userIds: Array<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
   permissionType: PetitionUserPermissionTypeRW;
   notify?: Maybe<Scalars["Boolean"]>;
   message?: Maybe<Scalars["String"]>;
@@ -3219,7 +3219,7 @@ export type RecipientViewPetitionFieldCommentsQuery = {
 
 export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  petitionFieldCommentIds: Array<Scalars["GID"]>;
+  petitionFieldCommentIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation = {
@@ -3407,7 +3407,9 @@ export type AdminOrganizationsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryOrganizations_OrderBy>>;
+  sortBy?: Maybe<
+    Array<QueryOrganizations_OrderBy> | QueryOrganizations_OrderBy
+  >;
   status?: Maybe<OrganizationStatus>;
 }>;
 
@@ -3527,7 +3529,7 @@ export type Contacts_UserFragment = {
 } & AppLayout_UserFragment;
 
 export type Contacts_deleteContactsMutationVariables = Exact<{
-  ids: Array<Scalars["GID"]>;
+  ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type Contacts_deleteContactsMutation = {
@@ -3538,7 +3540,7 @@ export type ContactsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
+  sortBy?: Maybe<Array<QueryContacts_OrderBy> | QueryContacts_OrderBy>;
 }>;
 
 export type ContactsQuery = { __typename?: "Query" } & {
@@ -3582,7 +3584,7 @@ export type OrganizationUsers_createOrganizationUserMutation = {
 };
 
 export type OrganizationUsers_updateUserStatusMutationVariables = Exact<{
-  userIds: Array<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
   newStatus: UserStatus;
   transferToUserId?: Maybe<Scalars["GID"]>;
 }>;
@@ -3599,7 +3601,7 @@ export type OrganizationUsersQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<OrganizationUsers_OrderBy>>;
+  sortBy?: Maybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
 }>;
 
 export type OrganizationUsersQuery = { __typename?: "Query" } & {
@@ -3644,7 +3646,7 @@ export type PetitionActivity_updatePetitionMutation = {
 
 export type PetitionActivity_sendMessagesMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  accessIds: Array<Scalars["GID"]>;
+  accessIds: Array<Scalars["GID"]> | Scalars["GID"];
   subject: Scalars["String"];
   body: Scalars["JSON"];
   scheduledAt?: Maybe<Scalars["DateTime"]>;
@@ -3656,7 +3658,7 @@ export type PetitionActivity_sendMessagesMutation = {
 
 export type PetitionActivity_sendRemindersMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  accessIds: Array<Scalars["GID"]>;
+  accessIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type PetitionActivity_sendRemindersMutation = {
@@ -3665,7 +3667,7 @@ export type PetitionActivity_sendRemindersMutation = {
 
 export type PetitionActivity_deactivateAccessesMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  accessIds: Array<Scalars["GID"]>;
+  accessIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type PetitionActivity_deactivateAccessesMutation = {
@@ -3678,7 +3680,7 @@ export type PetitionActivity_deactivateAccessesMutation = {
 
 export type PetitionActivity_reactivateAccessesMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  accessIds: Array<Scalars["GID"]>;
+  accessIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type PetitionActivity_reactivateAccessesMutation = {
@@ -3704,7 +3706,7 @@ export type PetitionActivity_cancelScheduledMessageMutation = {
 
 export type PetitionsActivity_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  contactIds: Array<Scalars["GID"]>;
+  contactIds: Array<Scalars["GID"]> | Scalars["GID"];
   subject: Scalars["String"];
   body: Scalars["JSON"];
   remindersConfig?: Maybe<RemindersConfigInput>;
@@ -3723,7 +3725,7 @@ export type PetitionsActivity_sendPetitionMutation = {
 export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
   start: Scalars["Boolean"];
   petitionId: Scalars["GID"];
-  accessIds: Array<Scalars["GID"]>;
+  accessIds: Array<Scalars["GID"]> | Scalars["GID"];
   remindersConfig?: Maybe<RemindersConfigInput>;
 }>;
 
@@ -3821,7 +3823,7 @@ export type PetitionCompose_updatePetitionMutation = {
 
 export type PetitionCompose_updateFieldPositionsMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  fieldIds: Array<Scalars["GID"]>;
+  fieldIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type PetitionCompose_updateFieldPositionsMutation = {
@@ -3980,7 +3982,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
 
 export type PetitionCompose_sendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  contactIds: Array<Scalars["GID"]>;
+  contactIds: Array<Scalars["GID"]> | Scalars["GID"];
   subject: Scalars["String"];
   body: Scalars["JSON"];
   remindersConfig?: Maybe<RemindersConfigInput>;
@@ -4082,7 +4084,7 @@ export type PetitionReplies_updatePetitionMutation = {
 
 export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  fieldIds: Array<Scalars["GID"]>;
+  fieldIds: Array<Scalars["GID"]> | Scalars["GID"];
   value: Scalars["Boolean"];
   validateRepliesWith?: Maybe<PetitionFieldReplyStatus>;
 }>;
@@ -4182,7 +4184,7 @@ export type PetitionReplies_submitUnpublishedCommentsMutation = {
 
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  petitionFieldCommentIds: Array<Scalars["GID"]>;
+  petitionFieldCommentIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
@@ -4199,7 +4201,7 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
-  petitionFieldReplyIds: Array<Scalars["GID"]>;
+  petitionFieldReplyIds: Array<Scalars["GID"]> | Scalars["GID"];
   status: PetitionFieldReplyStatus;
 }>;
 
@@ -4323,7 +4325,7 @@ export type PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
+  sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
   status?: Maybe<PetitionStatus>;
   type?: Maybe<PetitionBaseType>;
   hasPetitionSignature: Scalars["Boolean"];
@@ -4657,7 +4659,7 @@ export type Thanks_PetitionLogoQuery = { __typename?: "Query" } & Pick<
 >;
 
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
-  petitionIds: Array<Scalars["GID"]>;
+  petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type useClonePetitions_clonePetitionsMutation = {
@@ -4698,7 +4700,7 @@ export type useCreatePetition_createPetitionMutation = {
 };
 
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
-  ids: Array<Scalars["GID"]>;
+  ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type useDeletePetitions_deletePetitionsMutation = {
@@ -4763,7 +4765,7 @@ export type usePetitionsTableColumns_UserFragment = {
 
 export type PetitionComposeSearchContactsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
-  exclude?: Maybe<Array<Scalars["GID"]>>;
+  exclude?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
 export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
@@ -4774,7 +4776,7 @@ export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
 
 export type SearchUsersQueryVariables = Exact<{
   search: Scalars["String"];
-  exclude: Array<Scalars["GID"]>;
+  exclude: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type SearchUsersQuery = { __typename?: "Query" } & {

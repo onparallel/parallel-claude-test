@@ -75,7 +75,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
-import { UnwrapPromise } from "@parallel/utils/types";
+import { unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -1078,7 +1078,7 @@ function useUpdatePetitionFieldRepliesStatus() {
               id: petitionFieldId,
               validated: optimisticValidated,
             },
-            replies: petitionFieldReplyIds.map((id) => ({
+            replies: unMaybeArray(petitionFieldReplyIds).map((id) => ({
               __typename: "PetitionFieldReply",
               id,
               status,
