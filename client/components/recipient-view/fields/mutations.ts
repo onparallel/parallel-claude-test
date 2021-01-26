@@ -244,9 +244,6 @@ export function useCreateFileUploadReply(
         });
         const { reply, endpoint } = data!.publicCreateFileUploadReply;
 
-        const form = new FormData();
-        form.append("file", file);
-
         const request = new XMLHttpRequest();
         request.open("PUT", endpoint);
         request.setRequestHeader("Content-Type", file.type);
@@ -264,7 +261,7 @@ export function useCreateFileUploadReply(
             variables: { keycode, replyId: reply.id },
           });
         });
-        request.send(form);
+        request.send(file);
       }
     },
     [uploads, createFileUploadReply, fileUploadReplyComplete]
