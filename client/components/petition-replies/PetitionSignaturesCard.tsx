@@ -427,7 +427,12 @@ function PetitionSignatureRequestStatusText({
           color="green.500"
         >
           <CheckIcon />
-          <Text>Completed</Text>
+          <Text>
+            <FormattedMessage
+              id="component.petition-sigatures-card.completed"
+              defaultMessage="Completed"
+            />
+          </Text>
         </Stack>
       );
   }

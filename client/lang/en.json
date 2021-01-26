@@ -555,6 +555,11 @@
     "context": "Cancelled"
   },
   {
+    "term": "component.petition-sigatures-card.completed",
+    "definition": "Completed",
+    "context": "Completed"
+  },
+  {
     "term": "component.petition-sigatures-card.not-started",
     "definition": "Not started",
     "context": "Not started"
