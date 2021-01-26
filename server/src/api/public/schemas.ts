@@ -687,9 +687,10 @@ type PetitionEventDefinitions = {
   [T in PetitionEventType]: {
     description: string;
     properties: {
-      [key in keyof PetitionEventPayload<T>]: {
+      [K in keyof PetitionEventPayload<T>]: {
         description: string;
         type: string;
+        example: string;
         enum?: string[];
         properties?: any;
       };
@@ -794,7 +795,7 @@ export const PetitionEvent = schema({
           type: "string",
         },
         user_id: {
-          description: "The ID of the user",
+          description: "The ID of the user that cancelled the message",
           type: "string",
         },
       },
@@ -951,11 +952,13 @@ export const PetitionEvent = schema({
         petition_signature_request_id: {
           description: "The ID of the eSignature request",
           type: "string",
+          example: toGlobalId("PetitionSignatureRequest", 1),
         },
         cancel_reason: {
           description: "The reason of the cancel.",
           type: "string",
           enum: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR"],
+          example: "CANCELLED_BY_USER",
         },
         cancel_data: {
           type: "object",
@@ -968,10 +971,12 @@ export const PetitionEvent = schema({
                 If \`DECLINED_BY_SIGNER\`, this is the ID of the recipient.  
                 If \`REQUEST_ERROR\`, this will not be set.
               `,
+              example: toGlobalId("User", 2),
             },
             cancel_reason: {
               type: "string",
               description: "Textual reason of the cancellation",
+              example: "The document is outdated. I will start a new request.",
             },
           },
         },
@@ -1059,15 +1064,18 @@ export const PetitionEvent = schema({
       id: {
         type: "string",
         description: "The ID of the petition event",
+        example: toGlobalId("PetitionEvent", 1),
       },
       type: {
         type: "string",
         const: event,
         description: `\`${event}\``,
+        example: event,
       },
       petitionId: {
         type: "string",
         description: "The ID of the petition where this event occurred",
+        example: toGlobalId("Petition", 42),
       },
       data: {
         type: "object",

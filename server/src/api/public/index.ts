@@ -199,6 +199,7 @@ export const api = new RestApi({
       name: "Endpoints",
       tags: [
         "Petitions",
+        "Petition Subscription",
         "Petition Sharing",
         "Petition Replies",
         "Templates",
@@ -212,9 +213,19 @@ export const api = new RestApi({
       description: "Petitions are the main entities in Parallel",
     },
     {
+      name: "Petition Subscription",
+      description:
+        "Subscribe to your petition to receive real-time event updates",
+    },
+    {
       name: "Petition Sharing",
       description:
-        "You can share your petitions with members of your organization for collaborative work",
+        "Share your petitions with members of your organization for collaborative work",
+    },
+    {
+      name: "Petition Replies",
+      description:
+        "List or download the replies of your petitions at any moment",
     },
     {
       name: "Templates",
@@ -837,7 +848,7 @@ api
       operationId: "GetSubscriptions",
       summary: "Get petition subscriptions",
       responses: { 200: SuccessResponse(ListOfSubscriptions) },
-      tags: ["Petitions"],
+      tags: ["Petition Subscription"],
     },
     async ({ client, params }) => {
       const result = await client.request<
@@ -873,7 +884,7 @@ api
       responses: {
         201: SuccessResponse(Subscription),
       },
-      tags: ["Petitions"],
+      tags: ["Petition Subscription"],
       callbacks: {
         PetitionEvent: {
           "{endpoint}": {
@@ -950,7 +961,7 @@ api
       operationId: "DeleteSubscription",
       summary: "Stop petition subscription",
       responses: { 204: SuccessResponse() },
-      tags: ["Petitions"],
+      tags: ["Petition Subscription"],
     },
     async ({ client, params }) => {
       await client.request<
@@ -1205,7 +1216,7 @@ api
 api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
   {
     operationId: "PetitionReplies",
-    summary: "Get petition replies",
+    summary: "List petition replies",
     description: outdent`
       Returns a list of the submitted replies of the petition.
     `,
