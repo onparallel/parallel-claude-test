@@ -477,6 +477,7 @@ export type CreatePetitionEvent = PartialProps<
 
 export interface PetitionEventSubscription {
   id: number;
+  user_id: number;
   petition_id: number;
   endpoint: string;
   created_at: Date;

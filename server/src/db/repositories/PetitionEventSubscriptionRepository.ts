@@ -50,6 +50,7 @@ export class PetitionEventSubscriptionRepository extends BaseRepository {
   async createSubscription(petitionId: number, endpoint: string, user: User) {
     const [row] = await this.insert("petition_event_subscription", {
       petition_id: petitionId,
+      user_id: user.id,
       endpoint,
       created_by: `User:${user.id}`,
     });

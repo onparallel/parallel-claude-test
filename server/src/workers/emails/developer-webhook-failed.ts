@@ -30,23 +30,25 @@ export async function developerWebhookFailed(
     );
   }
 
-  const owner = await context.petitions.loadPetitionOwners(petition.id);
-  if (!owner) {
-    throw new Error(`Owner user not found for petition with id ${petition.id}`);
+  const user = await context.users.loadUser(subscription.user_id);
+  if (!user) {
+    throw new Error(
+      `User not found for subscription.user_id ${subscription.user_id}`
+    );
   }
 
   const [org, logoUrl] = await Promise.all([
-    context.organizations.loadOrg(owner.org_id),
-    context.organizations.getOrgLogoUrl(owner.org_id),
+    context.organizations.loadOrg(user.org_id),
+    context.organizations.getOrgLogoUrl(user.org_id),
   ]);
   if (!org) {
-    throw new Error(`Organization with id ${owner.org_id} not found`);
+    throw new Error(`Organization with id ${user.org_id} not found`);
   }
 
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,
     {
-      senderName: fullName(owner.first_name, owner.last_name)!,
+      userName: fullName(user.first_name, user.last_name)!,
       errorMessage: payload.error_message,
       subscriptionId: toGlobalId("Subscription", subscription.id),
       postBody: payload.post_body,
@@ -61,7 +63,7 @@ export async function developerWebhookFailed(
 
   return await context.emailLogs.createEmail({
     from: buildFrom(from, context.config.misc.emailFrom),
-    to: owner.email,
+    to: user.email,
     subject,
     text,
     html,

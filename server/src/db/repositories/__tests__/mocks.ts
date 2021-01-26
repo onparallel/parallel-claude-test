@@ -254,13 +254,18 @@ export class Mocks {
     ).delete();
   }
 
-  async createSubscriptions(petitionIds: number[], endpoint: string) {
+  async createSubscriptions(
+    petitionIds: number[],
+    endpoint: string,
+    userId: number
+  ) {
     return await this.knex<PetitionEventSubscription>(
       "petition_event_subscription"
     )
       .insert(
         petitionIds.map((petitionId) => ({
           petition_id: petitionId,
+          user_id: userId,
           endpoint,
         }))
       )

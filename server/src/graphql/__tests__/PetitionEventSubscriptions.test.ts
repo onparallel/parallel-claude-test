@@ -171,7 +171,8 @@ describe("GraphQL/Petition Event Subscriptions", () => {
     beforeEach(async () => {
       subscriptions = await mocks.createSubscriptions(
         [userPetition.id, sharedToMe.id, privatePetition.id],
-        "https://my.endpoint.com"
+        "https://my.endpoint.com",
+        user.id
       );
     });
 
@@ -231,15 +232,18 @@ describe("GraphQL/Petition Event Subscriptions", () => {
     beforeEach(async () => {
       [s1] = await mocks.createSubscriptions(
         [userPetition.id],
-        "https://first.com"
+        "https://first.com",
+        user.id
       );
       [s2] = await mocks.createSubscriptions(
         [userPetition.id],
-        "https://second.com"
+        "https://second.com",
+        user.id
       );
       [s3] = await mocks.createSubscriptions(
         [userPetition.id],
-        "https://third.com"
+        "https://third.com",
+        user.id
       );
     });
 

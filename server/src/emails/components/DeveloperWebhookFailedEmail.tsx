@@ -9,7 +9,7 @@ import { RenderSlate } from "../common/RenderSlate";
 import { closing, greeting, renderSlateText } from "../common/texts";
 
 export type DeveloperWebhookFailedEmailProps = {
-  senderName: string | null;
+  userName: string | null;
   errorMessage: string;
   subscriptionId: string;
   postBody: any;
@@ -30,7 +30,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
   },
   text(
     {
-      senderName,
+      userName,
       subscriptionId,
       errorMessage,
       postBody,
@@ -38,7 +38,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
     intl: IntlShape
   ) {
     return outdent`
-    ${greeting({ name: senderName }, intl)}
+    ${greeting({ name: userName }, intl)}
 
     ${intl.formatMessage(
       {
@@ -76,7 +76,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
     `;
   },
   html({
-    senderName,
+    userName,
     subscriptionId,
     errorMessage,
     postBody,
@@ -94,7 +94,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
-            <Greeting name={senderName} />
+            <Greeting name={userName} />
             <MjmlText>
               <FormattedMessage
                 id="developer.webhook-error-email.text"
