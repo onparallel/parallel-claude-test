@@ -306,7 +306,7 @@ export interface FileUpload {
   id: number;
   path: string;
   filename: string;
-  size: number;
+  size: string;
   content_type: string;
   upload_complete: boolean;
   created_at: Date;
@@ -708,7 +708,7 @@ export interface TemporaryFile {
   id: number;
   path: string;
   filename: string;
-  size: number;
+  size: string;
   content_type: string;
   created_at: Date;
   created_by: Maybe<string>;

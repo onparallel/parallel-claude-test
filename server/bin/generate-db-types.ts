@@ -27,6 +27,7 @@ interface DbEnum {
 interface DbColumn {
   name: string;
   type: string;
+  realType: string;
   isNullable: boolean;
   hasDefault: boolean;
   position: number;
@@ -91,7 +92,9 @@ export interface ${table.name} {
   ${table.columns
     .sort((a, b) => a.position - b.position)
     .map((c) => {
-      return `${c.name}: ${c.isNullable ? `Maybe<${c.type}>` : c.type};`;
+      return `${c.name}: ${c.isNullable ? `Maybe<${c.type}>` : c.type}; // ${
+        c.realType
+      }`;
     })
     .join("\n  ")}
 }
@@ -200,6 +203,7 @@ async function getDefinedTables(tables: string[], enums: Map<string, DbEnum>) {
         tableName: tableName,
         columns: columns.map((column) => ({
           name: column.column_name,
+          realType: column.udt_name,
           type: getColumnType(column.udt_name, enums),
           isNullable: column.is_nullable === "YES",
           hasDefault: !!column.column_default,
@@ -231,13 +235,14 @@ function getColumnType(type: string, enums: Map<string, DbEnum>): string {
       return "string";
     case "int2":
     case "int4":
-    case "int8":
     case "float4":
-    case "float8":
-    case "numeric":
     case "money":
     case "oid":
       return "number";
+    case "int8":
+    case "float8":
+    case "numeric":
+      return "string";
     case "bool":
       return "boolean";
     case "json":

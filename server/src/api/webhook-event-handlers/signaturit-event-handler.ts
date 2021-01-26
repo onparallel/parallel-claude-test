@@ -164,7 +164,7 @@ async function documentCompleted(
       content_type: "application/pdf",
       filename,
       path,
-      size: Buffer.byteLength(buffer),
+      size: Buffer.byteLength(buffer).toString(),
       upload_complete: true,
     },
     `OrgIntegration:${signaturitIntegration.id}`

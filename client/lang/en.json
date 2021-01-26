@@ -305,6 +305,51 @@
     "context": "You already have a token with this name"
   },
   {
+    "term": "component.export-replies-dialog.download-files",
+    "definition": "Download files as a ZIP",
+    "context": "Download files as a ZIP"
+  },
+  {
+    "term": "component.export-replies-dialog.download-files-and-replies-description",
+    "definition": "Download all files including text replies in Excel format.",
+    "context": "Download all files including text replies in Excel format."
+  },
+  {
+    "term": "component.export-replies-dialog.export-cuatrecasas",
+    "definition": "Export to NetDocuments",
+    "context": "Export to NetDocuments"
+  },
+  {
+    "term": "component.export-replies-dialog.export-cuatrecasas-client-number",
+    "definition": "Client number",
+    "context": "Client number"
+  },
+  {
+    "term": "component.export-replies-dialog.export-cuatrecasas-client-number-error",
+    "definition": "Client ID must be a 6 digit code",
+    "context": "Client ID must be a 6 digit code"
+  },
+  {
+    "term": "component.export-replies-dialog.export-cuatrecasas-description",
+    "definition": "Export files to a folder in NetDocuments.",
+    "context": "Export files to a folder in NetDocuments."
+  },
+  {
+    "term": "component.export-replies-dialog.header",
+    "definition": "Export replies",
+    "context": "Export replies"
+  },
+  {
+    "term": "component.export-replies-dialog.rename",
+    "definition": "Rename files",
+    "context": "Rename files"
+  },
+  {
+    "term": "component.export-replies-dialog.text",
+    "definition": "Choose how you would like to export the replies:",
+    "context": "Choose how you would like to export the replies:"
+  },
+  {
     "term": "component.header-name-editable.change-name",
     "definition": "Change name",
     "context": "Change name"
@@ -748,6 +793,26 @@
     "term": "component.recipient-view-petition-field-reply.text-placeholder",
     "definition": "Enter your answer",
     "context": "Enter your answer"
+  },
+  {
+    "term": "component.reply-export-dialog.exported-header",
+    "definition": "Export finished successfully!",
+    "context": "Export finished successfully!"
+  },
+  {
+    "term": "component.reply-export-dialog.exported-text",
+    "definition": "Your files have been exported successfully",
+    "context": "Your files have been exported successfully"
+  },
+  {
+    "term": "component.reply-export-dialog.exporting-header",
+    "definition": "We are exporting your files...",
+    "context": "We are exporting your files..."
+  },
+  {
+    "term": "component.reply-export-dialog.exporting-text",
+    "definition": "Please wait a moment until the export is completed.",
+    "context": "Please wait a moment until the export is completed."
   },
   {
     "term": "component.search-input.placeholder",
@@ -1218,6 +1283,11 @@
     "term": "generic.expand",
     "definition": "Expand",
     "context": "Expand"
+  },
+  {
+    "term": "generic.export",
+    "definition": "Export",
+    "context": "Export"
   },
   {
     "term": "generic.file-name",
@@ -2045,9 +2115,9 @@
     "context": "This will be the name of the attached PDF file."
   },
   {
-    "term": "petition-replies.download-all",
-    "definition": "Download replies",
-    "context": "Download replies"
+    "term": "petition-replies.export-replies",
+    "definition": "Export replies",
+    "context": "Export replies"
   },
   {
     "term": "petition-replies.field-comments.disabled-comments-1",

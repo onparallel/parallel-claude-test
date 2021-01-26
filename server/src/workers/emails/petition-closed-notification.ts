@@ -103,7 +103,7 @@ export async function petitionClosedNotification(
           path,
           content_type: "application/pdf",
           filename: sanitize(`${payload.pdf_export_title ?? "_"}.pdf`),
-          size: buffer.byteLength,
+          size: buffer.byteLength.toString(),
         },
         `User:${sender.id}`
       );

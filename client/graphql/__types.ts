@@ -2987,7 +2987,7 @@ export type SelectTypeFieldOptions_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "options">;
 
-export type DownloadAllDialog_PetitionFieldFragment = {
+export type ExportRepliesDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "title" | "type"> & {
     replies: Array<
@@ -3136,6 +3136,49 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   __typename?: "Mutation";
 } & {
   signedPetitionDownloadLink: {
+    __typename?: "FileUploadReplyDownloadLinkResult";
+  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+};
+
+export type ExportRepliesProgressDialog_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id"> & {
+    fields: Array<
+      { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "type"> & {
+          replies: Array<
+            { __typename?: "PetitionFieldReply" } & Pick<
+              PetitionFieldReply,
+              "id" | "content"
+            >
+          >;
+        }
+    >;
+  };
+
+export type ExportRepliesProgressDialog_PetitionRepliesQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type ExportRepliesProgressDialog_PetitionRepliesQuery = {
+  __typename?: "Query";
+} & {
+  petition?: Maybe<
+    | ({
+        __typename?: "Petition";
+      } & ExportRepliesProgressDialog_PetitionFragment)
+    | { __typename?: "PetitionTemplate" }
+  >;
+};
+
+export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
+  __typename?: "Mutation";
+} & {
+  fileUploadReplyDownloadLink: {
     __typename?: "FileUploadReplyDownloadLinkResult";
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
 };
@@ -4171,7 +4214,7 @@ export type PetitionReplies_PetitionFieldFragment = {
   PetitionRepliesField_PetitionFieldFragment &
   PetitionFieldsIndex_PetitionFieldFragment &
   PetitionRepliesFieldComments_PetitionFieldFragment &
-  DownloadAllDialog_PetitionFieldFragment;
+  ExportRepliesDialog_PetitionFieldFragment;
 
 export type PetitionReplies_UserFragment = { __typename?: "User" } & {
   hasPetitionSignature: User["hasFeatureFlag"];
@@ -5042,6 +5085,19 @@ export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
     }
   }
   ${PetitionComposeField_PetitionFieldFragmentDoc}
+`;
+export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
+  fragment ExportRepliesProgressDialog_Petition on Petition {
+    id
+    fields {
+      id
+      type
+      replies {
+        id
+        content
+      }
+    }
+  }
 `;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment on PublicPetitionFieldComment {
@@ -6126,8 +6182,8 @@ export const PetitionRepliesFieldComments_PetitionFieldFragmentDoc = gql`
   ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
   ${PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc}
 `;
-export const DownloadAllDialog_PetitionFieldFragmentDoc = gql`
-  fragment DownloadAllDialog_PetitionField on PetitionField {
+export const ExportRepliesDialog_PetitionFieldFragmentDoc = gql`
+  fragment ExportRepliesDialog_PetitionField on PetitionField {
     title
     type
     replies {
@@ -6147,12 +6203,12 @@ export const PetitionReplies_PetitionFieldFragmentDoc = gql`
     ...PetitionRepliesField_PetitionField
     ...PetitionFieldsIndex_PetitionField
     ...PetitionRepliesFieldComments_PetitionField
-    ...DownloadAllDialog_PetitionField
+    ...ExportRepliesDialog_PetitionField
   }
   ${PetitionRepliesField_PetitionFieldFragmentDoc}
   ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
-  ${DownloadAllDialog_PetitionFieldFragmentDoc}
+  ${ExportRepliesDialog_PetitionFieldFragmentDoc}
 `;
 export const PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc = gql`
   fragment PetitionSignaturesCard_PetitionSignatureRequest on PetitionSignatureRequest {
@@ -7369,6 +7425,106 @@ export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
 }
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
+>;
+export const ExportRepliesProgressDialog_PetitionRepliesDocument = gql`
+  query ExportRepliesProgressDialog_PetitionReplies($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...ExportRepliesProgressDialog_Petition
+    }
+  }
+  ${ExportRepliesProgressDialog_PetitionFragmentDoc}
+`;
+
+/**
+ * __useExportRepliesProgressDialog_PetitionRepliesQuery__
+ *
+ * To run a query within a React component, call `useExportRepliesProgressDialog_PetitionRepliesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useExportRepliesProgressDialog_PetitionRepliesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useExportRepliesProgressDialog_PetitionRepliesQuery({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function useExportRepliesProgressDialog_PetitionRepliesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    ExportRepliesProgressDialog_PetitionRepliesQuery,
+    ExportRepliesProgressDialog_PetitionRepliesQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    ExportRepliesProgressDialog_PetitionRepliesQuery,
+    ExportRepliesProgressDialog_PetitionRepliesQueryVariables
+  >(ExportRepliesProgressDialog_PetitionRepliesDocument, baseOptions);
+}
+export function useExportRepliesProgressDialog_PetitionRepliesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    ExportRepliesProgressDialog_PetitionRepliesQuery,
+    ExportRepliesProgressDialog_PetitionRepliesQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    ExportRepliesProgressDialog_PetitionRepliesQuery,
+    ExportRepliesProgressDialog_PetitionRepliesQueryVariables
+  >(ExportRepliesProgressDialog_PetitionRepliesDocument, baseOptions);
+}
+export type ExportRepliesProgressDialog_PetitionRepliesQueryHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_PetitionRepliesQuery
+>;
+export type ExportRepliesProgressDialog_PetitionRepliesLazyQueryHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_PetitionRepliesLazyQuery
+>;
+export const ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument = gql`
+  mutation ExportRepliesProgressDialog_fileUploadReplyDownloadLink(
+    $petitionId: GID!
+    $replyId: GID!
+  ) {
+    fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
+      result
+      url
+    }
+  }
+`;
+
+/**
+ * __useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation__
+ *
+ * To run a mutation, you first call `useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [ExportRepliesProgressDialogFileUploadReplyDownloadLinkMutation, { data, loading, error }] = useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      replyId: // value for 'replyId'
+ *   },
+ * });
+ */
+export function useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation,
+    ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation,
+    ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables
+  >(
+    ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument,
+    baseOptions
+  );
+}
+export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation
 >;
 export const RecipientViewContactCard_publicDelegateAccessToContactDocument = gql`
   mutation RecipientViewContactCard_publicDelegateAccessToContact(

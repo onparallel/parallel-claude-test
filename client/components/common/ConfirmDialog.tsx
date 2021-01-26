@@ -35,7 +35,7 @@ export function ConfirmDialog<TResult = void>({
   const cancelRef = useRef<HTMLButtonElement>(null);
   return (
     <BaseDialog {...props}>
-      <ModalContent borderRadius="md" {...content}>
+      <ModalContent {...content}>
         {hasCloseButton ? (
           <ModalCloseButton
             aria-label={intl.formatMessage({

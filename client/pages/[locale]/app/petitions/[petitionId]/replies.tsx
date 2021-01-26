@@ -31,9 +31,9 @@ import { useClosePetitionDialog } from "@parallel/components/petition-replies/Cl
 import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 import {
-  DownloadAllDialog,
-  useDownloadAllDialog,
-} from "@parallel/components/petition-replies/DownloadAllDialog";
+  ExportRepliesDialog,
+  useExportRepliesDialog,
+} from "@parallel/components/petition-replies/ExportRepliesDialog";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
 import {
   PetitionRepliesField,
@@ -41,6 +41,7 @@ import {
 } from "@parallel/components/petition-replies/PetitionRepliesField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
+import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/ExportRepliesProgressDialog";
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
@@ -248,23 +249,28 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         break;
     }
   };
-  const downloadAllDialog = useDownloadAllDialog();
+  const showExportRepliesDialog = useExportRepliesDialog();
+  const showExportRepliesProgressDialog = useExportRepliesProgressDialog();
   const handleDownloadAllClick = useCallback(async () => {
+    const hasFiles = petition.fields.some(
+      (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
+    );
     try {
-      let pattern = "";
-      if (
-        petition.fields.some(
-          (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
-        )
-      ) {
-        pattern = await downloadAllDialog({ fields: petition.fields });
+      if (hasFiles) {
+        const res = await showExportRepliesDialog({ fields: petition.fields });
+        if (res.type === "DOWNLOAD_ZIP") {
+          window.open(
+            `/api/downloads/petition/${petitionId}/files?pattern=${encodeURIComponent(
+              res.pattern
+            )}`,
+            "_blank"
+          );
+        } else {
+          await showExportRepliesProgressDialog({ petitionId: petition.id });
+        }
+      } else {
+        window.open(`/api/downloads/petition/${petitionId}/files`, "_blank");
       }
-      window.open(
-        `/api/downloads/petition/${petitionId}/files?pattern=${encodeURIComponent(
-          pattern
-        )}`,
-        "_blank"
-      );
     } catch {}
   }, [petitionId, petition.fields]);
 
@@ -548,8 +554,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             id="download-all"
           >
             <FormattedMessage
-              id="petition-replies.download-all"
-              defaultMessage="Download replies"
+              id="petition-replies.export-replies"
+              defaultMessage="Export replies"
             />
           </Button>
         ) : null}
@@ -684,11 +690,11 @@ PetitionReplies.fragments = {
         ...PetitionRepliesField_PetitionField
         ...PetitionFieldsIndex_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
-        ...DownloadAllDialog_PetitionField
+        ...ExportRepliesDialog_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
-      ${DownloadAllDialog.fragments.PetitionField}
+      ${ExportRepliesDialog.fragments.PetitionField}
       ${PetitionFieldsIndex.fragments.PetitionField}
     `;
   },

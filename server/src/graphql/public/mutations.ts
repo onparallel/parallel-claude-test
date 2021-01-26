@@ -338,7 +338,7 @@ export const publicCreateFileUploadReply = mutationField(
         {
           path: key,
           filename,
-          size,
+          size: size.toString(),
           content_type: contentType,
         },
         `Contact:${ctx.contact!.id}`

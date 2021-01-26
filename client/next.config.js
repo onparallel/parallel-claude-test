@@ -108,6 +108,8 @@ const config = {
                       "*.hubapi.com",
                       "*.hsforms.com",
                       "hubspot-forms-static-embed.s3.amazonaws.com",
+                      // Cuatre
+                      "localhost:",
                     ],
                     styleSrc: [
                       "'self'",
