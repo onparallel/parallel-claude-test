@@ -263,5 +263,6 @@ export function mapEvent(event: PetitionEvent) {
     petitionId: toGlobalId("Petition", event.petition_id),
     type: event.type,
     data: mapEventPayload(event),
+    createdAt: event.created_at.toISOString(),
   };
 }

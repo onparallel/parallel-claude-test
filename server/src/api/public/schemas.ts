@@ -1059,7 +1059,7 @@ export const PetitionEvent = schema({
     title: titleize(event),
     description: data.description, // should be visible after merging https://github.com/Redocly/redoc/pull/1497
     additionalProperties: false,
-    required: ["id", "type", "petitionId", "data"],
+    required: ["id", "type", "petitionId", "data", "createdAt"],
     properties: {
       id: {
         type: "string",
@@ -1083,6 +1083,13 @@ export const PetitionEvent = schema({
         additionalProperties: false,
         required: Object.keys(data.properties),
         properties: data.properties,
+      },
+
+      createdAt: {
+        description: "Creation date of the event",
+        type: "string",
+        format: "date-time",
+        example: new Date(2020, 2, 15).toISOString(),
       },
     },
   })),
