@@ -1,4 +1,6 @@
 import { Response } from "express";
+import { ClientError } from "graphql-request";
+import { isDefined } from "../../util/remedaExtensions";
 import { ResponseWrapper } from "./core";
 
 interface ErrorBody {
@@ -25,6 +27,13 @@ export abstract class HttpError
       code: this.code,
       message: this.message,
     });
+  }
+}
+
+export class BadRequestError extends HttpError {
+  static readonly code = "BadRequestError";
+  constructor(public message: string) {
+    super(400, BadRequestError.code, message);
   }
 }
 
@@ -84,7 +93,7 @@ export class InvalidParameterError extends HttpError {
       InvalidParameterError.status,
       InvalidParameterError.code,
       `Invalid ${location} parameter ${JSON.stringify(name)} with value ${
-        value ? JSON.stringify(value) : "<missing parameter>"
+        isDefined(value) ? JSON.stringify(value) : "<missing parameter>"
       }: ${message}`
     );
   }
@@ -100,4 +109,10 @@ export class InvalidRequestBodyError extends HttpError {
       `Invalid request body: ${message}`
     );
   }
+}
+
+export function containsGraphQLError(error: ClientError, errorCode: string) {
+  return (
+    ((error.response.errors![0] as any).extensions.code as string) === errorCode
+  );
 }

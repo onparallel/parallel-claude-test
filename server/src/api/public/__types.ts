@@ -2135,3 +2135,19 @@ export type DownloadPetitionReply_GetReplyContentQuery = Pick<
   Query,
   "petitionReplyTextContent"
 >;
+
+export type GetOrganizationUsers_UsersQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  sortBy?: Maybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
+}>;
+
+export type GetOrganizationUsers_UsersQuery = {
+  me: {
+    organization: {
+      users: Pick<UserPagination, "totalCount"> & {
+        items: Array<UserFragment>;
+      };
+    };
+  };
+};

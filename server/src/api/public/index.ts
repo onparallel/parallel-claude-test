@@ -3,10 +3,13 @@ import { outdent } from "outdent";
 import pMap from "p-map";
 import { pick } from "remeda";
 import { toGlobalId } from "../../util/globalId";
+import { isDefined } from "../../util/remedaExtensions";
 import { JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
 import {
+  BadRequestError,
   ConflictError,
+  containsGraphQLError,
   FileNotFoundError,
   UnauthorizedError,
 } from "../rest/errors";
@@ -28,6 +31,7 @@ import {
   PetitionReplyFragment,
   SubscriptionFragment,
   TemplateFragment,
+  UserFragment,
 } from "./fragments";
 import { paginationParams, sortByParam } from "./helpers";
 import {
@@ -43,6 +47,7 @@ import {
   PaginatedContacts,
   PaginatedPetitions,
   PaginatedTemplates,
+  PaginatedUsers,
   Petition,
   PetitionEvent,
   SendPetition,
@@ -79,6 +84,8 @@ import {
   GetContacts_ContactsQueryVariables,
   GetContact_ContactQuery,
   GetContact_ContactQueryVariables,
+  GetOrganizationUsers_UsersQuery,
+  GetOrganizationUsers_UsersQueryVariables,
   GetPermissions_PermissionsQuery,
   GetPermissions_PermissionsQueryVariables,
   GetPetitionRecipients_PetitionAccessesQuery,
@@ -138,7 +145,7 @@ export const api = new RestApi({
 
       - Create a new template with your Parallel account following these steps (link to support page explaining…).
       - Write down the newly created template templateId, which you can find in the URL: …/app/petitions/{templateId}/compose.
-      - Generate a token on the [API tokens section](https://www.parallel.so/es/app/settings/tokens) under your account settings (Profile > Settings > API tokens).  
+      - Generate a token on the [API tokens section](https://www.parallel.so/en/app/settings/tokens) under your account settings (Profile > Settings > API tokens).  
 
       Once we have completed the steps above, we are going to **create and send our first petition**:
       - Create a petition with the [POST /petitions](#operation/CreatePetition) endpoint, passing the templateId you saved before, and an optional title/name for your petition.
@@ -204,6 +211,7 @@ export const api = new RestApi({
         "Petition Replies",
         "Templates",
         "Contacts",
+        "Users",
       ],
     },
   ],
@@ -236,6 +244,11 @@ export const api = new RestApi({
       name: "Contacts",
       description:
         "Contacts are the entities that represent the recipients of petitions",
+    },
+
+    {
+      name: "Users",
+      description: "Users are members of your organization",
     },
   ],
   context: ({ req }) => {
@@ -326,7 +339,7 @@ api
       description: outdent`
         Create a new petition based on a template.
         
-        You can optionally pass an \`eventsUrl\` parameter to subcribe to the
+        You can optionally pass an \`eventsUrl\` parameter to subscribe to the
         events in this petition. See more about petition events [here](#operation/CreateSubscription).
       `,
       body: JsonBody(CreatePetition),
@@ -433,26 +446,43 @@ api
             "If the petition is shared with other users this method will fail unless passing `true` to this parameter",
         }),
       },
-      responses: { 204: SuccessResponse() },
+      responses: {
+        204: SuccessResponse(),
+        400: ErrorResponse({
+          description:
+            "The petition is being shared with another user. Set force=true to delete.",
+        }),
+      },
       tags: ["Petitions"],
     },
     async ({ client, params, query }) => {
-      await client.request<
-        DeletePetition_deletePetitionsMutation,
-        DeletePetition_deletePetitionsMutationVariables
-      >(
-        gql`
-          mutation DeletePetition_deletePetitions(
-            $petitionId: GID!
-            $force: Boolean!
-          ) {
-            deletePetitions(ids: [$petitionId], force: $force)
-          }
-          ${PetitionFragment}
-        `,
-        { petitionId: params.petitionId, force: query.force ?? false }
-      );
-      return NoContent();
+      try {
+        await client.request<
+          DeletePetition_deletePetitionsMutation,
+          DeletePetition_deletePetitionsMutationVariables
+        >(
+          gql`
+            mutation DeletePetition_deletePetitions(
+              $petitionId: GID!
+              $force: Boolean!
+            ) {
+              deletePetitions(ids: [$petitionId], force: $force)
+            }
+          `,
+          { petitionId: params.petitionId, force: query.force ?? false }
+        );
+        return NoContent();
+      } catch (error) {
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")
+        ) {
+          throw new BadRequestError(
+            "The petition is being shared with another user. Set force=true to delete."
+          );
+        }
+        throw error;
+      }
     }
   );
 
@@ -528,7 +558,13 @@ api
         The two methods can also be mixed if necessary.
       `,
       body: JsonBody(SendPetition),
-      responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
+      responses: {
+        200: SuccessResponse(ListOfPetitionAccesses),
+        409: ErrorResponse({
+          description:
+            "The petition was already sent to some of the provided contacts",
+        }),
+      },
       tags: ["Petitions"],
     },
     async ({ client, params, body }) => {
@@ -556,8 +592,9 @@ api
             );
             if (contact) {
               if (
-                contact.firstName !== data.firstName ||
-                contact.lastName !== data.lastName
+                (contact.firstName !== data.firstName &&
+                  isDefined(data.firstName)) ||
+                (contact.lastName !== data.lastName && isDefined(data.lastName))
               ) {
                 await client.request<
                   CreatePetitionRecipients_updateContactMutation,
@@ -605,43 +642,54 @@ api
               .split("\n")
               .map((line) => ({ children: [{ text: line }] }))
           : [{ children: [{ text: "" }] }];
-
-      const result = await client.request<
-        CreatePetitionRecipients_sendPetitionMutation,
-        CreatePetitionRecipients_sendPetitionMutationVariables
-      >(
-        gql`
-          mutation CreatePetitionRecipients_sendPetition(
-            $petitionId: GID!
-            $contactIds: [GID!]!
-            $subject: String!
-            $body: JSON!
-            $scheduledAt: DateTime
-            $remindersConfig: RemindersConfigInput
-          ) {
-            sendPetition(
-              petitionId: $petitionId
-              contactIds: $contactIds
-              subject: $subject
-              body: $body
-              scheduledAt: $scheduledAt
-              remindersConfig: $remindersConfig
+      try {
+        const result = await client.request<
+          CreatePetitionRecipients_sendPetitionMutation,
+          CreatePetitionRecipients_sendPetitionMutationVariables
+        >(
+          gql`
+            mutation CreatePetitionRecipients_sendPetition(
+              $petitionId: GID!
+              $contactIds: [GID!]!
+              $subject: String!
+              $body: JSON!
+              $scheduledAt: DateTime
+              $remindersConfig: RemindersConfigInput
             ) {
-              accesses {
-                ...PetitionAccess
+              sendPetition(
+                petitionId: $petitionId
+                contactIds: $contactIds
+                subject: $subject
+                body: $body
+                scheduledAt: $scheduledAt
+                remindersConfig: $remindersConfig
+              ) {
+                accesses {
+                  ...PetitionAccess
+                }
               }
             }
+            ${PetitionAccessFragment}
+          `,
+          {
+            petitionId: params.petitionId,
+            contactIds,
+            body: message,
+            ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
           }
-          ${PetitionAccessFragment}
-        `,
-        {
-          petitionId: params.petitionId,
-          contactIds,
-          body: message,
-          ...pick(body, ["subject", "remindersConfig", "scheduledAt"]),
+        );
+        return Ok(result.sendPetition.accesses!);
+      } catch (error) {
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")
+        ) {
+          throw new ConflictError(
+            "The petition was already sent to some of the provided contacts"
+          );
         }
-      );
-      return Ok(result.sendPetition.accesses!);
+        throw error;
+      }
     }
   );
 
@@ -878,7 +926,9 @@ api
       summary: "Subscribe to petition events",
       description: outdent`
         You can create a subscription on a petition to receive real-time event
-        updates on a given URL.
+        updates on a given URL.  
+
+        You MUST be the owner of the petition in order to create a subscription.
     `,
       body: JsonBody(CreateSubscription),
       responses: {
@@ -960,6 +1010,12 @@ api
     {
       operationId: "DeleteSubscription",
       summary: "Stop petition subscription",
+      description: outdent`
+        You can remove a subscription on a petition to stop receiving real-time event
+        updates.  
+        
+        You MUST be the owner of the petition in order to delete a subscription.
+    `,
       responses: { 204: SuccessResponse() },
       tags: ["Petition Subscription"],
     },
@@ -1068,26 +1124,43 @@ api
             "If the template is shared with other users this method will fail unless passing `true` to this parameter",
         }),
       },
-      responses: { 204: SuccessResponse() },
+      responses: {
+        204: SuccessResponse(),
+        400: ErrorResponse({
+          description:
+            "The template is being shared with another user. Set force=true to delete.",
+        }),
+      },
       tags: ["Templates"],
     },
     async ({ client, params, query }) => {
-      await client.request<
-        DeleteTemplate_deletePetitionsMutation,
-        DeleteTemplate_deletePetitionsMutationVariables
-      >(
-        gql`
-          mutation DeleteTemplate_deletePetitions(
-            $templateId: GID!
-            $force: Boolean!
-          ) {
-            deletePetitions(ids: [$templateId], force: $force)
-          }
-          ${PetitionFragment}
-        `,
-        { templateId: params.templateId, force: query.force ?? false }
-      );
-      return NoContent();
+      try {
+        await client.request<
+          DeleteTemplate_deletePetitionsMutation,
+          DeleteTemplate_deletePetitionsMutationVariables
+        >(
+          gql`
+            mutation DeleteTemplate_deletePetitions(
+              $templateId: GID!
+              $force: Boolean!
+            ) {
+              deletePetitions(ids: [$templateId], force: $force)
+            }
+          `,
+          { templateId: params.templateId, force: query.force ?? false }
+        );
+        return NoContent();
+      } catch (error) {
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "DELETE_SHARED_PETITION_ERROR")
+        ) {
+          throw new BadRequestError(
+            "The template is being shared with another user. Set force=true to delete."
+          );
+        }
+        throw error;
+      }
     }
   );
 
@@ -1166,12 +1239,11 @@ api
         );
         return Created(result.createContact!);
       } catch (error) {
-        if (error instanceof ClientError) {
-          const code = (error.response.errors![0] as any).extensions
-            .code as string;
-          if (code === "EXISTING_CONTACT") {
-            throw new ConflictError("A contact with this email already exists");
-          }
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "EXISTING_CONTACT")
+        ) {
+          throw new ConflictError("A contact with this email already exists");
         }
         throw error;
       }
@@ -1314,16 +1386,59 @@ api
         );
         return PlainText(response.petitionReplyTextContent);
       } catch (error) {
-        if (error instanceof ClientError) {
-          const code = (error.response.errors![0] as any).extensions
-            .code as string;
-          if (code === "FILE_NOT_FOUND") {
-            throw new FileNotFoundError(
-              `Can't find a file for reply with id ${params.replyId}`
-            );
-          }
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "FILE_NOT_FOUND")
+        ) {
+          throw new FileNotFoundError(
+            `Can't find a file for reply with id ${params.replyId}`
+          );
         }
         throw error;
       }
     }
   );
+
+api.path("/users").get(
+  {
+    operationId: "GetUsers",
+    summary: "Get users list",
+    description: outdent`
+        This endpoint returns a paginated list of all the available members in your organization.
+      `,
+    query: {
+      ...paginationParams(),
+      ...sortByParam(["createdAt", "fullName"]),
+    },
+    responses: { 200: SuccessResponse(PaginatedUsers) },
+    tags: ["Users"],
+  },
+  async ({ client, query }) => {
+    const result = await client.request<
+      GetOrganizationUsers_UsersQuery,
+      GetOrganizationUsers_UsersQueryVariables
+    >(
+      gql`
+        query GetOrganizationUsers_Users(
+          $offset: Int!
+          $limit: Int!
+          $sortBy: [OrganizationUsers_OrderBy!]
+        ) {
+          me {
+            organization {
+              users(limit: $limit, offset: $offset, sortBy: $sortBy) {
+                totalCount
+                items {
+                  ...User
+                }
+              }
+            }
+          }
+        }
+        ${UserFragment}
+      `,
+      query
+    );
+    return Ok(result.me.organization.users);
+  }
+);

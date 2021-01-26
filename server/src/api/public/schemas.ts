@@ -484,6 +484,7 @@ export const CreatePetition = schema({
   },
 } as const);
 export const PaginatedPetitions = PaginatedListOf(_Petition);
+export const PaginatedUsers = PaginatedListOf(_User);
 export const PetitionAccess = schema(_PetitionAccess);
 export const ListOfPetitionAccesses = ListOf(_PetitionAccess);
 export const Template = schema(_Template);

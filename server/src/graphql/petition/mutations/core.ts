@@ -883,6 +883,12 @@ export const sendPetition = mutationField("sendPetition", {
       };
     } catch (error) {
       ctx.logger.error(error);
+      if (error.constraint === "petition_access__petition_id_contact_id") {
+        throw new WhitelistedError(
+          "This petition was already sent to some of the contacts",
+          "PETITION_ALREADY_SENT_ERROR"
+        );
+      }
       return {
         result: RESULT.FAILURE,
       };
