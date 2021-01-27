@@ -109,7 +109,7 @@ export const createPetition = mutationField("createPetition", {
             status: isTemplate ? null : "DRAFT",
             name:
               originalPetition.is_template && !isTemplate
-                ? null // don't copy original name if making a petition from a template
+                ? name
                 : originalPetition.name,
           }
         );
