@@ -369,23 +369,15 @@ const _PetitionFieldReply = {
       // https://redoc.ly/docs/resources/discriminator/
     },
     content: {
-      type: "object",
       oneOf: [
         {
-          title: "TEXT",
-          type: "object",
-          required: ["text"],
-          additionalProperties: false,
-          properties: {
-            text: {
-              type: "string",
-              description: "The text content of the reply",
-              example: "Robert Baratheon",
-            },
-          },
+          title: "Text reply",
+          type: "string",
+          description: "The text content of the reply",
+          example: "Robert Baratheon",
         },
         {
-          title: "FILE",
+          title: "File reply",
           type: "object",
           required: ["filename", "size", "contentType"],
           additionalProperties: false,
@@ -628,19 +620,7 @@ export const SharePetition = schema({
     },
   },
 } as const);
-export const TransferPetition = schema({
-  title: "TransferPetition",
-  type: "object",
-  additionalProperties: false,
-  required: ["userId"],
-  properties: {
-    userId: {
-      description: "ID of the user you want to transfer the petition to",
-      type: "string",
-      example: toGlobalId("User", 42),
-    },
-  },
-} as const);
+
 export const ListOfPermissions = ListOf(_Permission);
 
 export const ListOfReplies = ListOf(_PetitionFieldReply);

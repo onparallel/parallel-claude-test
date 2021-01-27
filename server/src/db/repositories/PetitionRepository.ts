@@ -1550,7 +1550,8 @@ export class PetitionRepository extends BaseRepository {
       t
     );
 
-    await this.aws.enqueueMessages(
+    // dont await this. we may be inside a transaction
+    this.aws.enqueueMessages(
       "event-processor",
       petitionEvents.map((event) => ({
         id: `event-processor-${event.id}`,

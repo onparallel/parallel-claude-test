@@ -9,20 +9,19 @@ import { RestApi } from "../rest/core";
 import {
   BadRequestError,
   ConflictError,
-  containsGraphQLError,
-  FileNotFoundError,
   UnauthorizedError,
 } from "../rest/errors";
-import { booleanParam, enumParam, idParam } from "../rest/params";
+import { booleanParam, enumParam } from "../rest/params";
 import {
   Created,
   ErrorResponse,
   NoContent,
   Ok,
-  PlainText,
+  Redirect,
+  RedirectResponse,
   SuccessResponse,
-  TextResponse,
 } from "../rest/responses";
+import { description } from "./description";
 import {
   ContactFragment,
   PermissionFragment,
@@ -33,13 +32,17 @@ import {
   TemplateFragment,
   UserFragment,
 } from "./fragments";
-import { paginationParams, sortByParam } from "./helpers";
+import {
+  containsGraphQLError,
+  idParam,
+  paginationParams,
+  sortByParam,
+} from "./helpers";
 import {
   Contact,
   CreateContact,
   CreatePetition,
   CreateSubscription,
-  FieldReplyDownloadContent,
   ListOfPermissions,
   ListOfPetitionAccesses,
   ListOfReplies,
@@ -54,7 +57,6 @@ import {
   SharePetition,
   Subscription,
   Template,
-  TransferPetition,
   UpdatePetition,
 } from "./schemas";
 import {
@@ -78,8 +80,8 @@ import {
   DeleteSubscription_deletePetitionSubscriptionMutationVariables,
   DeleteTemplate_deletePetitionsMutation,
   DeleteTemplate_deletePetitionsMutationVariables,
-  DownloadPetitionReply_GetReplyContentQuery,
-  DownloadPetitionReply_GetReplyContentQueryVariables,
+  DownloadFileReply_fileUploadReplyDownloadLinkMutation,
+  DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables,
   GetContacts_ContactsQuery,
   GetContacts_ContactsQueryVariables,
   GetContact_ContactQuery,
@@ -118,62 +120,7 @@ export const api = new RestApi({
   openapi: "3.0.2",
   info: {
     title: "Parallel API",
-    description: outdent`
-      ## Introduction
-      Parallel is a document process solution that helps its users collect documents 
-      and information efficiently, giving them control over what their recipients have replied and
-      the launched processes' status.
-
-      By opening our API, we want to empower organizations with our technology. While organizations 
-      focus on their core business, we help them streamline their document workflows.
-      
-      ## Authentication
-      In order to authenticate your requests, first, you need generate a token
-      on the [API tokens](https://www.parallel.so/en/app/settings/tokens)
-      section of your account settings.
-
-      When you make any requests to the Parallel API pass the generated token
-      in the \`Authorization\` header as follows:
-      ~~~
-      Authorization: Bearer QrUV6NYDk2KcXg96KrHCQTTuKyt5oU8ETHueF5awWZe6
-      ~~~
-      <SecurityDefinitions />
-
-      ## Getting started
-      To quick start on Parallel, we have prepared a brief tutorial that will guide you through the basics of our API.
-      Once completed, you should be able to manage your document workflows through our API.  
-
-      - Create a new template with your Parallel account following these steps (link to support page explaining…).
-      - Write down the newly created template templateId, which you can find in the URL: …/app/petitions/{templateId}/compose.
-      - Generate a token on the [API tokens section](https://www.parallel.so/en/app/settings/tokens) under your account settings (Profile > Settings > API tokens).  
-
-      Once we have completed the steps above, we are going to **create and send our first petition**:
-      - Create a petition with the [POST /petitions](#operation/CreatePetition) endpoint, passing the templateId you saved before, and an optional title/name for your petition.
-
-      > **Remember to add the authorization in the header!**
-
-      If everything was fine, you should have received a **201 response**, which includes the petition’s id.
-      
-      Now that we have created the petition, we are going to **send it to the recipients** we want to request the information to.
-      - Use the Send petition endpoint [(POST /petitions/{petitionId}/recipients)](#operation/CreatePetitionRecipients), and send to an email you have access to test it.
-
-      If everything went correctly, you should have received an email with your first petition. Congrats!
-
-      Fill out and complete the petition you sent yourself as a recipient would do.  
-
-      When creating the petition, you can pass an optional argument \`eventsUrl\` to subscribe to events in the petition.
-      We will send real-time events of the petition on a POST request to the provided URL.
-      To learn more about this events and the data we will send to your URL, refer to the [Subscriptions documentation](#operation/CreateSubscription)  
-
-      Finally, you can list every submitted reply on the petition at any time using the [GET /petitions/{petitionId}/replies](#operation/PetitionReplies) endpoint.  
-
-      You can also download a single \`TEXT\` or \`FILE\` reply with the [GET /petitions/{petitionId}/replies/{replyId}/download](#operation/DownloadPetitionReply) endpoint.  
-
-      ## Support
-      In case you need any help with your integration, please drop an email to
-      [devs@onparallel.com](mailto:devs@onparallel.com?subject=Parallel%20API%20support).
-      We will be pleased to help you with any problem.
-    `,
+    description,
     version: "1.0.0",
     contact: {
       name: "API Support",
@@ -208,7 +155,6 @@ export const api = new RestApi({
         "Petitions",
         "Petition Subscription",
         "Petition Sharing",
-        "Petition Replies",
         "Templates",
         "Contacts",
         "Users",
@@ -229,11 +175,6 @@ export const api = new RestApi({
       name: "Petition Sharing",
       description:
         "Share your petitions with members of your organization for collaborative work",
-    },
-    {
-      name: "Petition Replies",
-      description:
-        "List or download the replies of your petitions at any moment",
     },
     {
       name: "Templates",
@@ -285,8 +226,7 @@ api
       operationId: "GetPetitions",
       summary: "Get petitions list",
       description: outdent`
-        This endpoint returns a paginated list of all petitions the user has
-        access to.
+        Returns a paginated list of all petitions the user has access to.
       `,
       query: {
         ...paginationParams(),
@@ -385,6 +325,9 @@ api
     {
       operationId: "GetPetition",
       summary: "Get petition",
+      description: outdent`
+        Returns the specified petition.
+      `,
       responses: { 200: SuccessResponse(Petition) },
       tags: ["Petitions"],
     },
@@ -410,6 +353,9 @@ api
     {
       operationId: "UpdatePetition",
       summary: "Update petition",
+      description: outdent`
+        Update the specified petition.
+      `,
       body: JsonBody(UpdatePetition),
       responses: { 200: SuccessResponse(Petition) },
       tags: ["Petitions"],
@@ -442,10 +388,18 @@ api
       query: {
         force: booleanParam({
           required: false,
-          description:
-            "If the petition is shared with other users this method will fail unless passing `true` to this parameter",
+          description: outdent`
+            If the petition is shared with other users this method will fail
+            unless passing \`true\` to this parameter
+          `,
         }),
       },
+      description: outdent`
+        Delete the specified petition.
+
+        If the petition is shared with other users this method will fail unless
+        passing \`true\` to the \`force\` parameter"
+      `,
       responses: {
         204: SuccessResponse(),
         400: ErrorResponse({
@@ -492,6 +446,9 @@ api
     {
       operationId: "GetPetitionRecipients",
       summary: "Get petition recipients",
+      description: outdent`
+        Returns the list of recipients this petition has been sent to.
+      `,
       responses: { 200: SuccessResponse(ListOfPetitionAccesses) },
       tags: ["Petitions"],
     },
@@ -522,9 +479,8 @@ api
       operationId: "CreatePetitionRecipients",
       summary: "Send petition",
       description: outdent`
-        Use this endpoint to send a petition. You can send a petition to
-        multiple people at once so they can fill the petition
-        collaboratively.
+        Send a petition to a contact. You can send a petition to multiple
+        people at once so they can fill the petition collaboratively.
   
         There are two ways of specifying the recipients of the petition.
   
@@ -555,7 +511,7 @@ api
           ...
         }
         ~~~
-        The two methods can also be mixed if necessary.
+        The two options can also be mixed if necessary.
       `,
       body: JsonBody(SendPetition),
       responses: {
@@ -693,12 +649,151 @@ api
     }
   );
 
+api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
+  {
+    operationId: "PetitionReplies",
+    summary: "List petition replies",
+    description: outdent`
+      Returns a list of the submitted replies to the specified petition.
+    `,
+    tags: ["Petitions"],
+    responses: {
+      200: SuccessResponse(ListOfReplies),
+    },
+  },
+  async ({ client, params }) => {
+    const response = await client.request<
+      PetitionReplies_RepliesQuery,
+      PetitionReplies_RepliesQueryVariables
+    >(
+      gql`
+        query PetitionReplies_Replies($petitionId: GID!) {
+          petition(id: $petitionId) {
+            fields {
+              id
+              type
+              replies {
+                ...PetitionFieldReply
+              }
+            }
+          }
+        }
+        ${PetitionReplyFragment}
+      `,
+      {
+        petitionId: params.petitionId,
+      }
+    );
+    return Ok(
+      response.petition!.fields.flatMap((field) =>
+        field.replies.map((reply) => ({
+          id: reply.id,
+          ...(field.type === "FILE_UPLOAD"
+            ? {
+                type: "FILE" as const,
+                content: reply.content as {
+                  filename: string;
+                  contentType: string;
+                  size: number;
+                },
+              }
+            : {
+                type: "TEXT" as const,
+                content: reply.content.text as string,
+              }),
+          fieldId: field.id,
+          accessId: reply.access.id,
+          updatedAt: reply.updatedAt,
+          createdAt: reply.createdAt,
+        }))
+      )
+    );
+  }
+);
+
+const replyId = idParam({
+  type: "PetitionFieldReply",
+  description: "The ID of the reply",
+});
+
+api
+  .path("/petitions/:petitionId/replies/:replyId/download", {
+    params: { petitionId, replyId },
+  })
+  .get(
+    {
+      operationId: "DownloadFileReply",
+      summary: "Download a reply",
+      description: outdent`
+        Download the uploaded file.
+
+        ### Important
+        Note that *there will be a redirect* to a temporary download endpoint on
+        AWS S3 so make sure to configure your HTTP client to follow redirects.
+
+        For example if you were to use curl you would need to provide the
+        \`-L\` flag, e.g.:
+
+        ~~~bash
+        curl -s -L -XGET \\
+          -H 'Authorization: Bearer <your API token>' \\
+          'http://www.parallel.so/api/v1/petitions/{petitionId}/replies/{replyId}/download' \\
+          > image.png
+        ~~~
+      `,
+      tags: ["Petitions"],
+      responses: {
+        302: RedirectResponse("Redirect to the resource on AWS S3"),
+        400: ErrorResponse({
+          description: `Reply {replyId} is not of "FILE" type`,
+        }),
+      },
+    },
+    async ({ client, params }) => {
+      try {
+        const response = await client.request<
+          DownloadFileReply_fileUploadReplyDownloadLinkMutation,
+          DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables
+        >(
+          gql`
+            mutation DownloadFileReply_fileUploadReplyDownloadLink(
+              $petitionId: GID!
+              $replyId: GID!
+            ) {
+              fileUploadReplyDownloadLink(
+                petitionId: $petitionId
+                replyId: $replyId
+              ) {
+                url
+              }
+            }
+          `,
+          params
+        );
+        return Redirect(response.fileUploadReplyDownloadLink.url!);
+      } catch (error) {
+        if (
+          error instanceof ClientError &&
+          containsGraphQLError(error, "INVALID_FIELD_TYPE")
+        ) {
+          throw new BadRequestError(
+            `Reply "${params.replyId}" is not of "FILE" type`
+          );
+        }
+        throw error;
+      }
+    }
+  );
+
 api
   .path("/petitions/:petitionId/permissions", { params: { petitionId } })
   .get(
     {
       operationId: "GetPermissions",
       summary: "Get permissions list",
+      description: outdent`
+        Return a list of users this petition is shared with.
+      `,
       responses: { 200: SuccessResponse(ListOfPermissions) },
       tags: ["Petition Sharing"],
     },
@@ -728,7 +823,7 @@ api
       operationId: "SharePetition",
       summary: "Share the petition",
       description: outdent`
-        You can share the petition with an user from your same organization.
+        Share the specified petition with users from your organization.
       `,
       body: JsonBody(SharePetition),
       responses: {
@@ -774,7 +869,7 @@ api
       operationId: "StopSharing",
       summary: "Stop sharing the petition",
       description: outdent`
-        Use this to stop sharing the petition with other users.
+        Stop sharing the specified petition.
       `,
       tags: ["Petition Sharing"],
       responses: { 204: SuccessResponse() },
@@ -813,7 +908,9 @@ api
     {
       operationId: "RemoveUserPermission",
       summary: "Delete a permission",
-      description: "Removes the permission of a given user on the petition",
+      description: outdent`
+        Stop sharing the specified petition with the specified user.
+      `,
       tags: ["Petition Sharing"],
       responses: { 204: SuccessResponse() },
     },
@@ -844,57 +941,67 @@ api
     }
   );
 
-api.path("/petitions/:petitionId/transfer", { params: { petitionId } }).post(
-  {
-    operationId: "TransferPetition",
-    summary: "Transfer the petition",
-    description: outdent`
-      Transfers the petition ownership to another user in your organization.
-      You will still have WRITE access to the petition.
+api
+  .path("/petitions/:petitionId/transfer", {
+    params: { petitionId },
+  })
+  .post(
+    {
+      operationId: "TransferPetition",
+      summary: "Transfer the petition",
+      query: {
+        userId: idParam({ type: "User" }),
+      },
+      description: outdent`
+        Transfer the petition ownership to another user from your organization.
+
+        Note that you will still have \`WRITE\` access to the petition.
     `,
-    body: JsonBody(TransferPetition),
-    responses: {
-      201: SuccessResponse(ListOfPermissions),
+      responses: { 201: SuccessResponse(ListOfPermissions) },
+      tags: ["Petition Sharing"],
     },
-    tags: ["Petition Sharing"],
-  },
-  async ({ client, params, body }) => {
-    const response = await client.request<
-      TransferPetition_transferPetitionOwnershipMutation,
-      TransferPetition_transferPetitionOwnershipMutationVariables
-    >(
-      gql`
-        mutation TransferPetition_transferPetitionOwnership(
-          $userId: GID!
-          $petitionId: GID!
-        ) {
-          transferPetitionOwnership(
-            petitionIds: [$petitionId]
-            userId: $userId
+    async ({ client, params, query }) => {
+      const response = await client.request<
+        TransferPetition_transferPetitionOwnershipMutation,
+        TransferPetition_transferPetitionOwnershipMutationVariables
+      >(
+        gql`
+          mutation TransferPetition_transferPetitionOwnership(
+            $userId: GID!
+            $petitionId: GID!
           ) {
-            userPermissions {
-              ...Permission
+            transferPetitionOwnership(
+              petitionIds: [$petitionId]
+              userId: $userId
+            ) {
+              userPermissions {
+                ...Permission
+              }
             }
           }
+          ${PermissionFragment}
+        `,
+        {
+          petitionId: params.petitionId,
+          userId: query.userId,
         }
-        ${PermissionFragment}
-      `,
-      {
-        petitionId: params.petitionId,
-        userId: body.userId,
-      }
-    );
+      );
 
-    return Ok(response.transferPetitionOwnership[0].userPermissions);
-  }
-);
+      return Ok(response.transferPetitionOwnership[0].userPermissions);
+    }
+  );
 
 api
-  .path("/petitions/:petitionId/subscriptions", { params: { petitionId } })
+  .path("/petitions/:petitionId/subscriptions", {
+    params: { petitionId },
+  })
   .get(
     {
       operationId: "GetSubscriptions",
       summary: "Get petition subscriptions",
+      description: outdent`
+        Returns the list of subscribed endpoints to the specified petition.
+      `,
       responses: { 200: SuccessResponse(ListOfSubscriptions) },
       tags: ["Petition Subscription"],
     },
@@ -925,10 +1032,10 @@ api
       operationId: "CreateSubscription",
       summary: "Subscribe to petition events",
       description: outdent`
-        You can create a subscription on a petition to receive real-time event
-        updates on a given URL.  
+        Create a subscription to the specified petition in order to receive
+        real-time event updates on the given URL.  
 
-        You MUST be the owner of the petition in order to create a subscription.
+        You **must be the owner** of the petition in order to create a subscription.
     `,
       body: JsonBody(CreateSubscription),
       responses: {
@@ -1014,7 +1121,7 @@ api
         You can remove a subscription on a petition to stop receiving real-time event
         updates.  
         
-        You MUST be the owner of the petition in order to delete a subscription.
+        You **must be the owner** of the petition in order to delete a subscription.
     `,
       responses: { 204: SuccessResponse() },
       tags: ["Petition Subscription"],
@@ -1041,6 +1148,9 @@ api.path("/templates").get(
   {
     operationId: "GetTemplates",
     summary: "Get templates list",
+    description: outdent`
+      Returns a paginated list of all templates the user has access to.
+    `,
     query: {
       ...paginationParams(),
       ...sortByParam(["createdAt", "name", "lastUsedAt"]),
@@ -1092,6 +1202,9 @@ api
     {
       operationId: "GetTemplate",
       summary: "Get template",
+      description: outdent`
+        Returns the specified template.
+      `,
       responses: { 200: SuccessResponse(Template) },
       tags: ["Templates"],
     },
@@ -1170,6 +1283,9 @@ api
     {
       operationId: "GetContacts",
       summary: "Get contacts list",
+      description: outdent`
+        Returns a paginated list of all contacts in the organization.
+      `,
       query: {
         ...paginationParams(),
         ...sortByParam([
@@ -1212,6 +1328,9 @@ api
     {
       operationId: "CreateContact",
       summary: "Create contact",
+      description: outdent`
+        Creates a contact in the organization.
+      `,
       body: JsonBody(CreateContact),
       responses: {
         201: SuccessResponse(Contact),
@@ -1263,6 +1382,9 @@ api
     {
       operationId: "GetContact",
       summary: "Get contact",
+      description: outdent`
+        Returns the specified contact.
+      `,
       responses: { 200: SuccessResponse(Contact) },
       tags: ["Contacts"],
     },
@@ -1282,120 +1404,6 @@ api
         { contactId: params.contactId }
       );
       return Ok(result.contact!);
-    }
-  );
-
-api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
-  {
-    operationId: "PetitionReplies",
-    summary: "List petition replies",
-    description: outdent`
-      Returns a list of the submitted replies of the petition.
-    `,
-    tags: ["Petition Replies"],
-    responses: {
-      200: SuccessResponse(ListOfReplies),
-    },
-  },
-  async ({ client, params }) => {
-    const response = await client.request<
-      PetitionReplies_RepliesQuery,
-      PetitionReplies_RepliesQueryVariables
-    >(
-      gql`
-        query PetitionReplies_Replies($petitionId: GID!) {
-          petition(id: $petitionId) {
-            fields {
-              id
-              type
-              replies {
-                ...PetitionFieldReply
-              }
-            }
-          }
-        }
-        ${PetitionReplyFragment}
-      `,
-      {
-        petitionId: params.petitionId,
-      }
-    );
-    return Ok(
-      response.petition!.fields.flatMap((field) =>
-        field.replies.map((reply) => ({
-          id: reply.id,
-          type: (field.type === "FILE_UPLOAD" ? "FILE" : "TEXT") as any,
-          content: reply.content as any,
-          fieldId: field.id,
-          accessId: reply.access.id,
-          updatedAt: reply.updatedAt,
-          createdAt: reply.createdAt,
-        }))
-      )
-    );
-  }
-);
-
-const replyId = idParam({
-  type: "PetitionFieldReply",
-  description: "The ID of the reply",
-});
-
-api
-  .path("/petitions/:petitionId/replies/:replyId/download", {
-    params: { petitionId, replyId },
-  })
-  .get(
-    {
-      operationId: "DownloadPetitionReply",
-      summary: "Download a reply",
-      description: outdent`
-        Get a reply on the petition.
-
-        Returns a plain-text string for replies of type \`TEXT\`,
-        and a download URL for replies of type \`FILE\`.
-
-        Have in mind that the download URL's for \`FILE\` replies have an expiration time of 30 minutes.
-      `,
-      tags: ["Petition Replies"],
-      responses: {
-        200: TextResponse(FieldReplyDownloadContent),
-        404: ErrorResponse({
-          description: "Can't find a file for reply with id {replyId}",
-        }),
-      },
-    },
-    async ({ client, params }) => {
-      try {
-        const response = await client.request<
-          DownloadPetitionReply_GetReplyContentQuery,
-          DownloadPetitionReply_GetReplyContentQueryVariables
-        >(
-          gql`
-            query DownloadPetitionReply_GetReplyContent(
-              $petitionId: GID!
-              $replyId: GID!
-            ) {
-              petitionReplyTextContent(
-                petitionId: $petitionId
-                replyId: $replyId
-              )
-            }
-          `,
-          params
-        );
-        return PlainText(response.petitionReplyTextContent);
-      } catch (error) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "FILE_NOT_FOUND")
-        ) {
-          throw new FileNotFoundError(
-            `Can't find a file for reply with id ${params.replyId}`
-          );
-        }
-        throw error;
-      }
     }
   );
 

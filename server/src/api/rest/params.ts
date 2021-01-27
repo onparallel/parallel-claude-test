@@ -1,5 +1,4 @@
 import { OpenAPIV3 } from "openapi-types";
-import { fromGlobalId } from "../../util/globalId";
 import { MaybePromise } from "../../util/types";
 import { RestParameter } from "./core";
 import { JsonSchema } from "./schemas";
@@ -41,7 +40,7 @@ export type ParameterOptions<
 > = BaseParameterOptions<T, TRequired, TArray, TDefaultValue> &
   (TArray extends true ? ArrayParameterOptions : {});
 
-type GeneratedParameterType<
+export type GeneratedParameterType<
   T,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
@@ -52,7 +51,7 @@ type GeneratedParameterType<
   ? ArrayIfTrue<T, TArray> | undefined
   : ArrayIfTrue<T, TArray>;
 
-interface ParameterParser<
+export interface ParameterParser<
   T,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
@@ -302,32 +301,6 @@ export type IdParameterOptions<
 > = ParameterOptions<string, TRequired, TArray, undefined> & {
   type: string;
 };
-
-export function idParam<
-  TRequired extends boolean = true,
-  TArray extends boolean | undefined = undefined
->(
-  options: IdParameterOptions<TRequired, TArray>
-): RestParameter<GeneratedParameterType<string, TRequired, TArray>> {
-  // ignore defaultValue
-  delete options.defaultValue;
-  const { type } = options;
-  return {
-    parse: buildParse(options, (value) => {
-      try {
-        if (fromGlobalId(value).type !== type) {
-          throw new Error();
-        }
-      } catch {
-        throw new ParseError(value, `Value is not a valid ID`);
-      }
-      return value;
-    }),
-    spec: buildDefinition(options, {
-      type: "string",
-    }),
-  };
-}
 
 export function booleanParam<
   TRequired extends boolean = true,

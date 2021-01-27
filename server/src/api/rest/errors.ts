@@ -1,5 +1,4 @@
 import { Response } from "express";
-import { ClientError } from "graphql-request";
 import { isDefined } from "../../util/remedaExtensions";
 import { ResponseWrapper } from "./core";
 
@@ -37,12 +36,6 @@ export class BadRequestError extends HttpError {
   }
 }
 
-export class FileNotFoundError extends HttpError {
-  static readonly code = "FileNotFound";
-  constructor(public message: string) {
-    super(404, FileNotFoundError.code, message);
-  }
-}
 export class ConflictError extends HttpError {
   static readonly code = "Conflict";
   constructor(public message: string) {
@@ -109,10 +102,4 @@ export class InvalidRequestBodyError extends HttpError {
       `Invalid request body: ${message}`
     );
   }
-}
-
-export function containsGraphQLError(error: ClientError, errorCode: string) {
-  return (
-    ((error.response.errors![0] as any).extensions.code as string) === errorCode
-  );
 }

@@ -757,7 +757,10 @@ export const fileUploadReplyDownloadLink = mutationField(
       try {
         const reply = await ctx.petitions.loadFieldReply(args.replyId);
         if (reply!.type !== "FILE_UPLOAD") {
-          throw new Error("Invalid field type");
+          throw new WhitelistedError(
+            "Only FILE_UPLOAD replies can be downloaded",
+            "INVALID_FIELD_TYPE"
+          );
         }
         const file = await ctx.files.loadFileUpload(
           reply!.content["file_upload_id"]
@@ -774,7 +777,10 @@ export const fileUploadReplyDownloadLink = mutationField(
             args.preview ? "inline" : "attachment"
           ),
         };
-      } catch {
+      } catch (error) {
+        if (error instanceof WhitelistedError) {
+          throw error;
+        }
         return {
           result: RESULT.FAILURE,
         };

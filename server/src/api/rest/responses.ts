@@ -24,14 +24,25 @@ export class RestResponseWrapper<T> implements ResponseWrapper<T> {
   }
 }
 
-export function Ok<T>(value: T): ResponseWrapper<T> {
-  return new RestResponseWrapper(200, value);
+interface Redirect {
+  __type?: "REDIRECT";
+}
+export class RedirectResponseWrapper implements ResponseWrapper<Redirect> {
+  constructor(
+    public readonly status: number,
+    public readonly location: string
+  ) {}
+  apply(res: Response) {
+    res.redirect(this.status, this.location);
+  }
 }
 
-export function PlainText(value?: string | null): ResponseWrapper<string> {
-  return new RestResponseWrapper(200, value, {
-    "content-type": "text/plain",
-  });
+export function Redirect(location: string) {
+  return new RedirectResponseWrapper(302, location);
+}
+
+export function Ok<T>(value: T): ResponseWrapper<T> {
+  return new RestResponseWrapper(200, value);
 }
 
 export function Created<T>(value: T, location?: string): ResponseWrapper<T> {
@@ -98,15 +109,8 @@ export function SuccessResponse<T = void>(
       }) as RestResponse<T>);
 }
 
-export function TextResponse(
-  schema: JsonSchemaFor<string>
-): RestResponse<string> {
+export function RedirectResponse(description: string): RestResponse<Redirect> {
   return {
-    description: "Successful operation",
-    content: {
-      "text/plain": {
-        schema: schema as any,
-      },
-    },
+    description,
   };
 }

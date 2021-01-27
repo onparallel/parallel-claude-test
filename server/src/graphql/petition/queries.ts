@@ -10,13 +10,11 @@ import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import {
   userHasAccessToPetitions,
   petitionsArePublicTemplates,
-  repliesBelongsToPetition,
 } from "./authorizers";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { decode } from "jsonwebtoken";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validateAuthTokenPayload } from "./validations";
-import { WhitelistedError } from "../helpers/errors";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
@@ -115,41 +113,5 @@ export const petitionAuthToken = queryField("petitionAuthToken", {
   resolve: async (_, { token }, ctx) => {
     const payload: any = decode(token);
     return await ctx.petitions.loadPetition(payload.petitionId);
-  },
-});
-
-export const petitionReplyTextContent = queryField("petitionReplyTextContent", {
-  type: nullable("String"),
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    replyId: nonNull(globalIdArg("PetitionFieldReply")),
-  },
-  authorize: authenticateAnd(
-    userHasAccessToPetitions("petitionId"),
-    repliesBelongsToPetition("petitionId", "replyId")
-  ),
-  resolve: async (_, args, ctx) => {
-    const reply = await ctx.petitions.loadFieldReply(args.replyId);
-
-    if (reply?.type === "FILE_UPLOAD") {
-      const file = await ctx.files.loadFileUpload(
-        reply!.content["file_upload_id"]
-      );
-
-      if (file && file.upload_complete) {
-        return await ctx.aws.fileUploads.getSignedDownloadEndpoint(
-          file.path,
-          file.filename,
-          "inline"
-        );
-      } else {
-        throw new WhitelistedError(
-          "Can't find file for reply",
-          "FILE_NOT_FOUND"
-        );
-      }
-    } else {
-      return reply?.content.text;
-    }
   },
 });

@@ -1437,7 +1437,6 @@ export type Query = {
   petitionAuthToken: Maybe<Petition>;
   /** The comments for this field. */
   petitionFieldComments: Array<PublicPetitionFieldComment>;
-  petitionReplyTextContent: Maybe<Scalars["String"]>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
@@ -1501,11 +1500,6 @@ export type QuerypetitionAuthTokenArgs = {
 export type QuerypetitionFieldCommentsArgs = {
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
-};
-
-export type QuerypetitionReplyTextContentArgs = {
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
 };
 
 export type QuerypetitionsArgs = {
@@ -1974,6 +1968,38 @@ export type CreatePetitionRecipients_sendPetitionMutation = {
   sendPetition: { accesses: Maybe<Array<PetitionAccessFragment>> };
 };
 
+export type PetitionReplies_RepliesQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionReplies_RepliesQuery = {
+  petition: Maybe<
+    | {
+        fields: Array<
+          Pick<PetitionField, "id" | "type"> & {
+            replies: Array<PetitionFieldReplyFragment>;
+          }
+        >;
+      }
+    | {
+        fields: Array<
+          Pick<PetitionField, "id" | "type"> & {
+            replies: Array<PetitionFieldReplyFragment>;
+          }
+        >;
+      }
+  >;
+};
+
+export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
+  fileUploadReplyDownloadLink: Pick<FileUploadReplyDownloadLinkResult, "url">;
+};
+
 export type GetPermissions_PermissionsQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
@@ -2102,39 +2128,6 @@ export type GetContact_ContactQueryVariables = Exact<{
 }>;
 
 export type GetContact_ContactQuery = { contact: Maybe<ContactFragment> };
-
-export type PetitionReplies_RepliesQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type PetitionReplies_RepliesQuery = {
-  petition: Maybe<
-    | {
-        fields: Array<
-          Pick<PetitionField, "id" | "type"> & {
-            replies: Array<PetitionFieldReplyFragment>;
-          }
-        >;
-      }
-    | {
-        fields: Array<
-          Pick<PetitionField, "id" | "type"> & {
-            replies: Array<PetitionFieldReplyFragment>;
-          }
-        >;
-      }
-  >;
-};
-
-export type DownloadPetitionReply_GetReplyContentQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-}>;
-
-export type DownloadPetitionReply_GetReplyContentQuery = Pick<
-  Query,
-  "petitionReplyTextContent"
->;
 
 export type GetOrganizationUsers_UsersQueryVariables = Exact<{
   offset: Scalars["Int"];
