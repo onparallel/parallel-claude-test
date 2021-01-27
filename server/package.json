@@ -30,7 +30,6 @@
   },
   "dependencies": {
     "@nexus/schema": "^0.19.2",
-    "@types/mime-types": "^2.1.0",
     "amazon-cognito-identity-js": "^4.5.7",
     "analytics-node": "^3.5.0",
     "apollo-server-express": "^2.19.2",
@@ -96,7 +95,6 @@
     "@storybook/server": "^6.1.15",
     "@types/analytics-node": "^3.1.4",
     "@types/archiver": "^5.1.0",
-    "@types/async": "^3.2.5",
     "@types/body-parser": "^1.19.0",
     "@types/content-disposition": "^0.5.3",
     "@types/cookie": "^0.4.0",
@@ -112,6 +110,7 @@
     "@types/graphql-type-json": "^0.3.2",
     "@types/jest": "^26.0.20",
     "@types/localtunnel": "^2.0.0",
+    "@types/mime-types": "^2.1.0",
     "@types/mjml": "^4.7.0",
     "@types/mjml-react": "^1.0.6",
     "@types/morgan": "^1.9.2",
