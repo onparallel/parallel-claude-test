@@ -1145,7 +1145,7 @@ export class PetitionRepository extends BaseRepository {
       type: "REPLY_CREATED",
       petitionId: field.petition_id,
       data: {
-        petition_access_id: reply.petition_access_id,
+        petition_access_id: reply.petition_access_id!,
         petition_field_id: reply.petition_field_id,
         petition_field_reply_id: reply.id,
       },
@@ -1232,7 +1232,7 @@ export class PetitionRepository extends BaseRepository {
         type: "REPLY_DELETED",
         petitionId: field!.petition_id,
         data: {
-          petition_access_id: reply.petition_access_id,
+          petition_access_id: reply.petition_access_id!,
           petition_field_id: reply.petition_field_id,
           petition_field_reply_id: reply.id,
         },

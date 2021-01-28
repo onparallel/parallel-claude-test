@@ -443,7 +443,7 @@ export const publicUpdateSimpleReply = mutationField(
           type: "REPLY_UPDATED",
           petitionId,
           data: {
-            petition_access_id: reply.petition_access_id,
+            petition_access_id: reply.petition_access_id!,
             petition_field_id: reply.petition_field_id,
             petition_field_reply_id: reply.id,
           },

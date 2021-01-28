@@ -988,26 +988,26 @@ export interface NexusGenFieldTypes {
   };
   ReplyCreatedEvent: {
     // field return type
-    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    createdBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
     reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
   };
   ReplyDeletedEvent: {
     // field return type
-    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    deletedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
   };
   ReplyUpdatedEvent: {
     // field return type
-    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
     reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
+    updatedBy: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
   };
   SendPetitionResult: {
     // field return type
@@ -1700,26 +1700,26 @@ export interface NexusGenFieldTypeNames {
   };
   ReplyCreatedEvent: {
     // field return type name
-    access: "PetitionAccess";
     createdAt: "DateTime";
+    createdBy: "UserOrPetitionAccess";
     field: "PetitionField";
     id: "GID";
     reply: "PetitionFieldReply";
   };
   ReplyDeletedEvent: {
     // field return type name
-    access: "PetitionAccess";
     createdAt: "DateTime";
+    deletedBy: "UserOrPetitionAccess";
     field: "PetitionField";
     id: "GID";
   };
   ReplyUpdatedEvent: {
     // field return type name
-    access: "PetitionAccess";
     createdAt: "DateTime";
     field: "PetitionField";
     id: "GID";
     reply: "PetitionFieldReply";
+    updatedBy: "UserOrPetitionAccess";
   };
   SendPetitionResult: {
     // field return type name

@@ -7,14 +7,17 @@ import { TimelineReplyCreatedEvent_ReplyCreatedEventFragment } from "@parallel/g
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
 import { PetitionFieldReference } from "../PetitionFieldReference";
+import { UserReference } from "../UserReference";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
 export type TimelineReplyCreatedEventProps = {
   event: TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
+  userId: string;
 };
 
 export function TimelineReplyCreatedEvent({
-  event: { access, field, createdAt },
+  event: { createdBy, field, createdAt },
+  userId,
 }: TimelineReplyCreatedEventProps) {
   return (
     <TimelineItem
@@ -25,13 +28,21 @@ export function TimelineReplyCreatedEvent({
     >
       <FormattedMessage
         id="timeline.reply-created-description"
-        defaultMessage="{contact} replied to the field {field} {timeAgo}"
+        defaultMessage="{same, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
         values={{
-          contact: access.contact ? (
-            <ContactLink contact={access.contact} />
-          ) : (
-            <DeletedContact />
-          ),
+          same: createdBy?.__typename == "User" && createdBy.id === userId,
+          createdBy:
+            createdBy?.__typename === "PetitionAccess" ? (
+              createdBy.contact ? (
+                <ContactLink contact={createdBy.contact} />
+              ) : (
+                <DeletedContact />
+              )
+            ) : (
+              createdBy?.__typename === "User" && (
+                <UserReference user={createdBy} />
+              )
+            ),
           field: <PetitionFieldReference field={field} />,
           timeAgo: (
             <DateTime
@@ -52,14 +63,20 @@ TimelineReplyCreatedEvent.fragments = {
       field {
         ...PetitionFieldReference_PetitionField
       }
-      access {
-        contact {
-          ...ContactLink_Contact
+      createdBy {
+        ... on User {
+          ...UserReference_User
+        }
+        ... on PetitionAccess {
+          contact {
+            ...ContactLink_Contact
+          }
         }
       }
       createdAt
     }
     ${PetitionFieldReference.fragments.PetitionField}
+    ${UserReference.fragments.User}
     ${ContactLink.fragments.Contact}
   `,
 };

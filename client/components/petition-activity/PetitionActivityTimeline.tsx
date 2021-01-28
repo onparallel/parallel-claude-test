@@ -74,11 +74,11 @@ export function PetitionActivityTimeline({
             ) : event.__typename === "ReminderSentEvent" ? (
               <TimelineReminderSentEvent event={event} userId={userId} />
             ) : event.__typename === "ReplyCreatedEvent" ? (
-              <TimelineReplyCreatedEvent event={event} />
+              <TimelineReplyCreatedEvent event={event} userId={userId} />
             ) : event.__typename === "ReplyUpdatedEvent" ? (
-              <TimelineReplyUpdatedEvent event={event} />
+              <TimelineReplyUpdatedEvent event={event} userId={userId} />
             ) : event.__typename === "ReplyDeletedEvent" ? (
-              <TimelineReplyDeletedEvent event={event} />
+              <TimelineReplyDeletedEvent event={event} userId={userId} />
             ) : event.__typename === "CommentPublishedEvent" ? (
               <TimelineCommentPublishedEvent event={event} userId={userId} />
             ) : event.__typename === "CommentDeletedEvent" ? (

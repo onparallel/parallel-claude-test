@@ -2479,26 +2479,26 @@ input RemindersConfigInput {
 }
 
 type ReplyCreatedEvent implements PetitionEvent {
-  access: PetitionAccess!
   createdAt: DateTime!
+  createdBy: UserOrPetitionAccess
   field: PetitionField
   id: GID!
   reply: PetitionFieldReply
 }
 
 type ReplyDeletedEvent implements PetitionEvent {
-  access: PetitionAccess!
   createdAt: DateTime!
+  deletedBy: UserOrPetitionAccess
   field: PetitionField
   id: GID!
 }
 
 type ReplyUpdatedEvent implements PetitionEvent {
-  access: PetitionAccess!
   createdAt: DateTime!
   field: PetitionField
   id: GID!
   reply: PetitionFieldReply
+  updatedBy: UserOrPetitionAccess
 }
 
 """

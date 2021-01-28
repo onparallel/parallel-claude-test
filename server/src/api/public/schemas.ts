@@ -853,11 +853,18 @@ export const PetitionEvent = schema({
       },
     },
     REPLY_CREATED: {
-      description: "A recipient uploaded a reply on the petition",
+      description:
+        "A reply on the petition was submitted either by a recipient or an user.",
       properties: {
         petitionAccessId: {
-          description: "The ID of the petition access linked to the recipient",
-          type: "string",
+          description:
+            "The ID of the access. If set, the reply was submitted by the recipient linked to this access",
+          type: ["string", "null"],
+        },
+        userId: {
+          description:
+            "The ID of the user. If set, the reply was submitted by this user.",
+          type: ["string", "null"],
         },
         petitionFieldId: {
           description: "The ID of the field replied by the recipient",
@@ -870,11 +877,18 @@ export const PetitionEvent = schema({
       },
     },
     REPLY_DELETED: {
-      description: "A recipient deleted a reply on the petition",
+      description:
+        "A reply on the petition was deleted either by a recipient or an user.",
       properties: {
         petitionAccessId: {
-          description: "The ID of the petition access linked to the recipient",
-          type: "string",
+          description:
+            "The ID of the access. If set, the reply was deleted by the recipient linked to this access",
+          type: ["string", "null"],
+        },
+        userId: {
+          description:
+            "The ID of the user. If set, the reply was deleted by this user.",
+          type: ["string", "null"],
         },
         petitionFieldId: {
           description: "The ID of the field where the reply belongs",
@@ -887,11 +901,18 @@ export const PetitionEvent = schema({
       },
     },
     REPLY_UPDATED: {
-      description: "A recipient updated a reply on the petition",
+      description:
+        "A reply on the petition was updated either by a recipient or an user.",
       properties: {
         petitionAccessId: {
-          description: "The ID of the petition access linked to the recipient",
-          type: "string",
+          description:
+            "The ID of the access. If set, the reply was updated by the recipient linked to this access",
+          type: ["string", "null"],
+        },
+        userId: {
+          description:
+            "The ID of the user. If set, the reply was updated by this user.",
+          type: ["string", "null"],
         },
         petitionFieldId: {
           description: "The ID of the field where the reply belongs",

@@ -1,4 +1,26 @@
 import { core, interfaceType, objectType } from "@nexus/schema";
+import { ApiContext } from "../../../context";
+import { PetitionAccess, User } from "../../../db/__types";
+import { isDefined } from "../../../util/remedaExtensions";
+
+async function userOrPetitionAccessResolver(
+  root: { data: { user_id?: number; petition_access_id?: number } },
+  _: {},
+  ctx: ApiContext
+): Promise<
+  | (User & { __type: "User" })
+  | (PetitionAccess & { __type: "PetitionAccess" })
+  | null
+> {
+  if (isDefined(root.data.user_id)) {
+    const user = await ctx.users.loadUser(root.data.user_id);
+    return user && { __type: "User", ...user };
+  } else if (isDefined(root.data.petition_access_id)) {
+    const access = await ctx.petitions.loadAccess(root.data.petition_access_id);
+    return access && { __type: "PetitionAccess", ...access };
+  }
+  throw new Error(`Both "user_id" and "petition_access_id" are null`);
+}
 
 export const PetitionEvent = interfaceType({
   name: "PetitionEvent",
@@ -231,11 +253,9 @@ export const ReminderSentEvent = createPetitionEvent(
 export const ReplyCreatedEvent = createPetitionEvent(
   "ReplyCreatedEvent",
   (t) => {
-    t.field("access", {
-      type: "PetitionAccess",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
-      },
+    t.nullable.field("createdBy", {
+      type: "UserOrPetitionAccess",
+      resolve: userOrPetitionAccessResolver,
     });
     t.nullable.field("field", {
       type: "PetitionField",
@@ -257,11 +277,9 @@ export const ReplyCreatedEvent = createPetitionEvent(
 export const ReplyUpdatedEvent = createPetitionEvent(
   "ReplyUpdatedEvent",
   (t) => {
-    t.field("access", {
-      type: "PetitionAccess",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
-      },
+    t.nullable.field("updatedBy", {
+      type: "UserOrPetitionAccess",
+      resolve: userOrPetitionAccessResolver,
     });
     t.nullable.field("field", {
       type: "PetitionField",
@@ -283,11 +301,9 @@ export const ReplyUpdatedEvent = createPetitionEvent(
 export const ReplyDeletedEvent = createPetitionEvent(
   "ReplyDeletedEvent",
   (t) => {
-    t.field("access", {
-      type: "PetitionAccess",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
-      },
+    t.nullable.field("deletedBy", {
+      type: "UserOrPetitionAccess",
+      resolve: userOrPetitionAccessResolver,
     });
     t.nullable.field("field", {
       type: "PetitionField",
@@ -329,18 +345,7 @@ export const CommentDeletedEvent = createPetitionEvent(
     });
     t.nullable.field("deletedBy", {
       type: "UserOrPetitionAccess",
-      resolve: async (root, _, ctx) => {
-        if (root.data.user_id !== undefined) {
-          const user = await ctx.users.loadUser(root.data.user_id);
-          return user && { __type: "User", ...user };
-        } else if (root.data.petition_access_id !== undefined) {
-          const access = await ctx.petitions.loadAccess(
-            root.data.petition_access_id
-          );
-          return access && { __type: "PetitionAccess", ...access };
-        }
-        throw new Error(`Both "user_id" and "petition_access_id" are null`);
-      },
+      resolve: userOrPetitionAccessResolver,
     });
   }
 );

@@ -4376,18 +4376,18 @@
   },
   {
     "term": "timeline.reply-created-description",
-    "definition": "{contact} respondió al campo {field} {timeAgo}",
-    "context": "{contact} replied to the field {field} {timeAgo}"
+    "definition": "{same, select, true {Respondiste} other {{createdBy} respondió}} al campo {field} {timeAgo}",
+    "context": "{same, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
   },
   {
     "term": "timeline.reply-deleted-description",
-    "definition": "{contact} eliminó una respuesta al campo {field} {timeAgo}",
-    "context": "{contact} deleted a reply to the field {field} {timeAgo}"
+    "definition": "{same, select, true {Eliminaste} other {{deletedBy} eliminó}} una respuesta al campo {field} {timeAgo}",
+    "context": "{same, select, true {You} other {{deletedBy}}} deleted a reply to the field {field} {timeAgo}"
   },
   {
     "term": "timeline.reply-updated-description",
-    "definition": "{contact} actualizó una respuesta al campo {field} {timeAgo}",
-    "context": "{contact} updated a reply to the field {field} {timeAgo}"
+    "definition": "{same, select, true {Actualizaste} other {{updatedBy} actualizó}} una respuesta al campo {field} {timeAgo}",
+    "context": "{same, select, true {You} other {{updatedBy}}} updated a reply to the field {field} {timeAgo}"
   },
   {
     "term": "timeline.signature-cancelled-description",

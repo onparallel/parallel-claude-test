@@ -20,17 +20,20 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   MESSAGE_SENT: { petition_message_id: number };
   REMINDER_SENT: { petition_reminder_id: number };
   REPLY_CREATED: {
-    petition_access_id: number;
+    petition_access_id?: number;
+    user_id?: number;
     petition_field_id: number;
     petition_field_reply_id: number;
   };
   REPLY_UPDATED: {
-    petition_access_id: number;
+    petition_access_id?: number;
+    user_id?: number;
     petition_field_id: number;
     petition_field_reply_id: number;
   };
   REPLY_DELETED: {
-    petition_access_id: number;
+    petition_access_id?: number;
+    user_id?: number;
     petition_field_id: number;
     petition_field_reply_id: number;
   };

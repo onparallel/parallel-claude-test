@@ -1652,8 +1652,8 @@ export type RemindersConfigInput = {
 
 export type ReplyCreatedEvent = PetitionEvent & {
   __typename?: "ReplyCreatedEvent";
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  createdBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply?: Maybe<PetitionFieldReply>;
@@ -1661,19 +1661,19 @@ export type ReplyCreatedEvent = PetitionEvent & {
 
 export type ReplyDeletedEvent = PetitionEvent & {
   __typename?: "ReplyDeletedEvent";
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
 };
 
 export type ReplyUpdatedEvent = PetitionEvent & {
   __typename?: "ReplyUpdatedEvent";
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply?: Maybe<PetitionFieldReply>;
+  updatedBy?: Maybe<UserOrPetitionAccess>;
 };
 
 /** Represents the result of an operation. */
@@ -2642,9 +2642,14 @@ export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
         __typename?: "PetitionField";
       } & PetitionFieldReference_PetitionFieldFragment
     >;
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+    createdBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        })
+      | ({ __typename?: "User" } & UserReference_UserFragment)
+    >;
   };
 
 export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
@@ -2655,9 +2660,14 @@ export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
         __typename?: "PetitionField";
       } & PetitionFieldReference_PetitionFieldFragment
     >;
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+    deletedBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        })
+      | ({ __typename?: "User" } & UserReference_UserFragment)
+    >;
   };
 
 export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
@@ -2668,9 +2678,14 @@ export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
         __typename?: "PetitionField";
       } & PetitionFieldReference_PetitionFieldFragment
     >;
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+    updatedBy?: Maybe<
+      | ({ __typename?: "PetitionAccess" } & {
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        })
+      | ({ __typename?: "User" } & UserReference_UserFragment)
+    >;
   };
 
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
@@ -5638,14 +5653,20 @@ export const TimelineReplyCreatedEvent_ReplyCreatedEventFragmentDoc = gql`
     field {
       ...PetitionFieldReference_PetitionField
     }
-    access {
-      contact {
-        ...ContactLink_Contact
+    createdBy {
+      ... on User {
+        ...UserReference_User
+      }
+      ... on PetitionAccess {
+        contact {
+          ...ContactLink_Contact
+        }
       }
     }
     createdAt
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
@@ -5653,14 +5674,20 @@ export const TimelineReplyUpdatedEvent_ReplyUpdatedEventFragmentDoc = gql`
     field {
       ...PetitionFieldReference_PetitionField
     }
-    access {
-      contact {
-        ...ContactLink_Contact
+    updatedBy {
+      ... on User {
+        ...UserReference_User
+      }
+      ... on PetitionAccess {
+        contact {
+          ...ContactLink_Contact
+        }
       }
     }
     createdAt
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
@@ -5668,14 +5695,20 @@ export const TimelineReplyDeletedEvent_ReplyDeletedEventFragmentDoc = gql`
     field {
       ...PetitionFieldReference_PetitionField
     }
-    access {
-      contact {
-        ...ContactLink_Contact
+    deletedBy {
+      ... on User {
+        ...UserReference_User
+      }
+      ... on PetitionAccess {
+        contact {
+          ...ContactLink_Contact
+        }
       }
     }
     createdAt
   }
   ${PetitionFieldReference_PetitionFieldFragmentDoc}
+  ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
 export const TimelineCommentPublishedEvent_CommentPublishedEventFragmentDoc = gql`
