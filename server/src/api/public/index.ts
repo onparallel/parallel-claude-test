@@ -702,7 +702,6 @@ api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
                 content: reply.content.text as string,
               }),
           fieldId: field.id,
-          accessId: reply.access.id,
           updatedAt: reply.updatedAt,
           createdAt: reply.createdAt,
         }))

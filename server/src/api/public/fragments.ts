@@ -84,9 +84,6 @@ export const PetitionReplyFragment = gql`
   fragment PetitionFieldReply on PetitionFieldReply {
     id
     content
-    access {
-      id
-    }
     createdAt
     updatedAt
   }

@@ -350,15 +350,7 @@ const _PetitionFieldReply = {
   title: "PetitionFieldReply",
   type: "object",
   additionalProperties: false,
-  required: [
-    "id",
-    "type",
-    "content",
-    "fieldId",
-    "accessId",
-    "updatedAt",
-    "createdAt",
-  ],
+  required: ["id", "type", "content", "fieldId", "updatedAt", "createdAt"],
   properties: {
     id: {
       type: "string",
@@ -409,11 +401,6 @@ const _PetitionFieldReply = {
       type: "string",
       description: "The ID of the field this reply belongs to",
       example: toGlobalId("PetitionField", 2),
-    },
-    accessId: {
-      type: "string",
-      description: "The ID of the access from which this reply was created",
-      example: toGlobalId("PetitionAccess", 42),
     },
     createdAt: {
       type: "string",

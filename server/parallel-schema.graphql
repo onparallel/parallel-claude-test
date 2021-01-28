@@ -1473,11 +1473,6 @@ A reply to a petition field
 """
 type PetitionFieldReply implements Timestamps {
   """
-  The access from where this reply was made.
-  """
-  access: PetitionAccess!
-
-  """
   The content of the reply.
   """
   content: JSONObject!

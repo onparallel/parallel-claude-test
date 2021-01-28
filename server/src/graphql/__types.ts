@@ -770,7 +770,6 @@ export interface NexusGenFieldTypes {
   };
   PetitionFieldReply: {
     // field return type
-    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     content: NexusGenScalars["JSONObject"]; // JSONObject!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
@@ -1483,7 +1482,6 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionFieldReply: {
     // field return type name
-    access: "PetitionAccess";
     content: "JSONObject";
     createdAt: "DateTime";
     field: "PetitionField";

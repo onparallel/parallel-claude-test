@@ -109,11 +109,6 @@ export type CreateContactInput = {
   lastName?: Maybe<Scalars["String"]>;
 };
 
-export type CreatedAt = {
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-};
-
 export type CreateFileUploadReply = {
   /** Endpoint where to upload the file. */
   endpoint: Scalars["String"];
@@ -126,10 +121,16 @@ export type CreateFileUploadReplyInput = {
   size: Scalars["Int"];
 };
 
+export type CreatedAt = {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+};
+
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
   | "API_TOKENS"
+  | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
@@ -210,9 +211,9 @@ export type Mutation = {
   deletePetitionField: PetitionBase;
   /** Delete a petition field comment. */
   deletePetitionFieldComment: Result;
+  deletePetitionSubscription: Result;
   /** Delete petitions. */
   deletePetitions: Result;
-  deletePetitionSubscription: Result;
   /** Edits permissions on given petitions and users */
   editPetitionUserPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
@@ -292,6 +293,8 @@ export type Mutation = {
   updatePetitionFieldComment: PetitionFieldComment;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
+  /** Updates the metada of the specified petition field reply */
+  updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionUser */
   updatePetitionUserSubscription: Petition;
   /** Updates the user with the provided data. */
@@ -424,13 +427,13 @@ export type MutationdeletePetitionFieldCommentArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationdeletePetitionSubscriptionArgs = {
+  subscriptionId: Scalars["GID"];
+};
+
 export type MutationdeletePetitionsArgs = {
   force?: Maybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
-};
-
-export type MutationdeletePetitionSubscriptionArgs = {
-  subscriptionId: Scalars["GID"];
 };
 
 export type MutationeditPetitionUserPermissionArgs = {
@@ -660,6 +663,12 @@ export type MutationupdatePetitionFieldRepliesStatusArgs = {
   status: PetitionFieldReplyStatus;
 };
 
+export type MutationupdatePetitionFieldReplyMetadataArgs = {
+  metadata: Scalars["JSONObject"];
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+};
+
 export type MutationupdatePetitionUserSubscriptionArgs = {
   isSubscribed: Scalars["Boolean"];
   petitionId: Scalars["GID"];
@@ -693,12 +702,21 @@ export type MutationverifyPublicAccessArgs = {
 export type OnboardingKey =
   | "CONTACT_DETAILS"
   | "CONTACT_LIST"
+  | "PETITIONS_LIST"
   | "PETITION_ACTIVITY"
   | "PETITION_COMPOSE"
-  | "PETITION_REVIEW"
-  | "PETITIONS_LIST";
+  | "PETITION_REVIEW";
 
 export type OnboardingStatus = "FINISHED" | "SKIPPED";
+
+export type OrgIntegration = {
+  /** The name of the integration. */
+  name: Scalars["String"];
+  /** The provider used for this integration. */
+  provider: Scalars["String"];
+  /** The type of the integration. */
+  type: IntegrationType;
+};
 
 /** An organization in the system. */
 export type Organization = Timestamps & {
@@ -775,15 +793,6 @@ export type OrganizationUsers_OrderBy =
   | "lastActiveAt_DESC"
   | "lastName_ASC"
   | "lastName_DESC";
-
-export type OrgIntegration = {
-  /** The name of the integration. */
-  name: Scalars["String"];
-  /** The provider used for this integration. */
-  provider: Scalars["String"];
-  /** The type of the integration. */
-  type: IntegrationType;
-};
 
 export type OwnershipTransferredEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
@@ -1043,8 +1052,6 @@ export type PetitionFieldComment = {
 
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
-  /** The access from where this reply was made. */
-  access: PetitionAccess;
   /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
@@ -1053,6 +1060,8 @@ export type PetitionFieldReply = Timestamps & {
   field: Maybe<PetitionField>;
   /** The ID of the petition field reply. */
   id: Scalars["GID"];
+  /** Metadata for this reply. */
+  metadata: Scalars["JSONObject"];
   /** The status of the reply. */
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
@@ -1553,6 +1562,12 @@ export type QueryPetitions_OrderBy =
   | "name_ASC"
   | "name_DESC";
 
+export type ReminderSentEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  reminder: PetitionReminder;
+};
+
 /** The reminder settings of a petition */
 export type RemindersConfig = {
   /** The amount of days between reminders. */
@@ -1575,12 +1590,6 @@ export type RemindersConfigInput = {
   timezone: Scalars["String"];
   /** Whether to send reminders only from monday to friday. */
   weekdaysOnly: Scalars["Boolean"];
-};
-
-export type ReminderSentEvent = PetitionEvent & {
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  reminder: PetitionReminder;
 };
 
 export type ReplyCreatedEvent = PetitionEvent & {
@@ -1616,8 +1625,8 @@ export type SendPetitionResult = {
 };
 
 export type SignatureCancelledEvent = PetitionEvent & {
-  cancellerReason: Maybe<Scalars["String"]>;
   cancelType: PetitionSignatureCancelReason;
+  cancellerReason: Maybe<Scalars["String"]>;
   contact: Maybe<Contact>;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -1873,7 +1882,7 @@ export type PermissionFragment = Pick<
 export type PetitionFieldReplyFragment = Pick<
   PetitionFieldReply,
   "id" | "content" | "createdAt" | "updatedAt"
-> & { access: Pick<PetitionAccess, "id"> };
+>;
 
 export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];

@@ -1088,8 +1088,6 @@ export type PetitionFieldComment = {
 /** A reply to a petition field */
 export type PetitionFieldReply = Timestamps & {
   __typename?: "PetitionFieldReply";
-  /** The access from where this reply was made. */
-  access: PetitionAccess;
   /** The content of the reply. */
   content: Scalars["JSONObject"];
   /** Time when the resource was created. */
