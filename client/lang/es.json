@@ -61,7 +61,7 @@
   },
   {
     "term": "component.confirm-resend-completed-notification.confirm-button",
-    "definition": "Si, reenviar la notificación",
+    "definition": "Sí, reenviar la notificación",
     "context": "Yes, resend the notification"
   },
   {
@@ -1146,7 +1146,7 @@
   },
   {
     "term": "generic.confirm-delete-button",
-    "definition": "Si, eliminar",
+    "definition": "Sí, eliminar",
     "context": "Yes, delete"
   },
   {
@@ -2141,7 +2141,7 @@
   },
   {
     "term": "petition-sharing.confirm-remove.confirm-button",
-    "definition": "Si, quitar",
+    "definition": "Sí, quitar",
     "context": "Yes, remove"
   },
   {
@@ -2156,7 +2156,7 @@
   },
   {
     "term": "petition-sharing.confirm-transfer-ownership.confirm-button",
-    "definition": "Si, transferir",
+    "definition": "Sí, transferir",
     "context": "Yes, transfer"
   },
   {
@@ -2306,7 +2306,7 @@
   },
   {
     "term": "petition.confirm-activate-access-message.confirm",
-    "definition": "Si, activar acceso",
+    "definition": "Sí, activar acceso",
     "context": "Yes, activate access"
   },
   {
@@ -2326,7 +2326,7 @@
   },
   {
     "term": "petition.confirm-cancel-scheduled-message.confirm",
-    "definition": "Si, cancelar mensaje",
+    "definition": "Sí, cancelar mensaje",
     "context": "Yes, cancel message"
   },
   {
@@ -2356,7 +2356,7 @@
   },
   {
     "term": "petition.confirm-deactivate-access-message.confirm",
-    "definition": "Si, revocar acceso",
+    "definition": "Sí, revocar acceso",
     "context": "Yes, remove access"
   },
   {
@@ -2391,7 +2391,7 @@
   },
   {
     "term": "petition.confirm-send-reminder-message.confirm",
-    "definition": "Si, enviar",
+    "definition": "Sí, enviar",
     "context": "Yes, send"
   },
   {
@@ -2696,7 +2696,7 @@
   },
   {
     "term": "petition.reopen.confirm",
-    "definition": "Si, reabrir",
+    "definition": "Sí, reabrir",
     "context": "Yes, reopen"
   },
   {
