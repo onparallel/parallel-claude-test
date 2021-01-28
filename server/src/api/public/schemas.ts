@@ -1,5 +1,4 @@
 import { outdent } from "outdent";
-import { PetitionEventPayload } from "../../db/events";
 import { PetitionEventType } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { titleize } from "../../util/strings";
@@ -664,19 +663,18 @@ function ListOf<T extends JsonSchema>(item: T) {
   } as const);
 }
 
-type PetitionEventDefinitions = {
-  [T in PetitionEventType]: {
-    description: string;
-    properties: {
-      [K in keyof PetitionEventPayload<T>]: {
-        description: string;
-        type: string;
-        example: string;
-        enum?: string[];
-        properties?: any;
-      };
-    };
+type EventSchema = {
+  description: string;
+  type?: string | string[];
+  example?: string;
+  enum?: string[];
+  properties?: {
+    [key: string]: EventSchema;
   };
+};
+
+type PetitionEventSchemas = {
+  [T in PetitionEventType]: EventSchema;
 };
 
 export const PetitionEvent = schema({
@@ -685,11 +683,11 @@ export const PetitionEvent = schema({
     ACCESS_ACTIVATED: {
       description: "The user created or reactivated an access on the petition",
       properties: {
-        petition_access_id: {
+        petitionAccessId: {
           description: "The ID of the petition access",
           type: "string",
         },
-        user_id: {
+        userId: {
           description: "The ID of the user",
           type: "string",
         },
@@ -698,11 +696,11 @@ export const PetitionEvent = schema({
     ACCESS_DEACTIVATED: {
       description: "The user deactivated an access on the petition",
       properties: {
-        petition_access_id: {
+        petitionAccessId: {
           description: "The ID of the petition access",
           type: "string",
         },
-        user_id: {
+        userId: {
           description: "The ID of the user",
           type: "string",
         },
@@ -712,11 +710,11 @@ export const PetitionEvent = schema({
       description:
         "A recipient delegated their petition to another person, creating a new access on the petition",
       properties: {
-        new_petition_access_id: {
+        newPetitionAccessId: {
           description: "The ID of the new access created by the recipient",
           type: "string",
         },
-        petition_access_id: {
+        petitionAccessId: {
           description:
             "The ID of the original access where the delegation happened",
           type: "string",
@@ -726,7 +724,7 @@ export const PetitionEvent = schema({
     ACCESS_OPENED: {
       description: "A recipient opened their access to the petition",
       properties: {
-        petition_access_id: {
+        petitionAccessId: {
           description: "The ID of the petition access",
           type: "string",
         },
@@ -735,34 +733,34 @@ export const PetitionEvent = schema({
     COMMENT_DELETED: {
       description: "A comment was deleted either by a recipient or an user.",
       properties: {
-        petition_field_comment_id: {
+        petitionFieldCommentId: {
           description: "The ID of the comment",
           type: "string",
         },
-        petition_field_id: {
+        petitionFieldId: {
           description: "The ID of the field where the comment belongs",
           type: "string",
         },
-        petition_access_id: {
+        petitionAccessId: {
           description:
             "The ID of the access where the comment was deleted. If set, the comment was deleted by the recipient linked to this access",
-          type: "string",
+          type: ["string", "null"],
         },
-        user_id: {
+        userId: {
           description:
             "The ID of the user. If set, the comment was deleted by this user.",
-          type: "string",
+          type: ["string", "null"],
         },
       },
     },
     COMMENT_PUBLISHED: {
       description: "A comment was published on a petition field",
       properties: {
-        petition_field_comment_id: {
+        petitionFieldCommentId: {
           description: "The ID of the comment",
           type: "string",
         },
-        petition_field_id: {
+        petitionFieldId: {
           description: "The ID of the field where the comment belongs",
           type: "string",
         },
@@ -771,11 +769,11 @@ export const PetitionEvent = schema({
     MESSAGE_CANCELLED: {
       description: "A user cancelled a scheduled message",
       properties: {
-        petition_message_id: {
+        petitionMessageId: {
           description: "The ID of the cancelled message",
           type: "string",
         },
-        user_id: {
+        userId: {
           description: "The ID of the user that cancelled the message",
           type: "string",
         },
@@ -784,7 +782,7 @@ export const PetitionEvent = schema({
     MESSAGE_SCHEDULED: {
       description: "A user scheduled a message",
       properties: {
-        petition_message_id: {
+        petitionMessageId: {
           description: "The ID of the scheduled message",
           type: "string",
         },
@@ -793,7 +791,7 @@ export const PetitionEvent = schema({
     MESSAGE_SENT: {
       description: "A user sent a message",
       properties: {
-        petition_message_id: {
+        petitionMessageId: {
           description: "The ID of the message",
           type: "string",
         },
@@ -803,24 +801,24 @@ export const PetitionEvent = schema({
       description:
         "A user transferred the ownership of a petition to another user",
       properties: {
-        user_id: {
+        userId: {
           description: "The ID of the user that transferred the petition",
           type: "string",
         },
-        owner_id: {
+        ownerId: {
           description: "The ID of the new owner of the petition",
           type: "string",
         },
-        previous_owner_id: {
+        previousOwnerId: {
           description: "The ID of the previous owner of the petition",
-          type: "string",
+          type: ["string", "null"],
         },
       },
     },
     PETITION_CLOSED: {
       description: "A petition was marked as `closed` by an user",
       properties: {
-        user_id: {
+        userId: {
           description: "The ID of the user that closed the petition",
           type: "string",
         },
@@ -829,11 +827,11 @@ export const PetitionEvent = schema({
     PETITION_CLOSED_NOTIFIED: {
       description: "A user notified a recipient that the petition was closed",
       properties: {
-        user_id: {
+        userId: {
           description: "The ID of the user",
           type: "string",
         },
-        petition_access_id: {
+        petitionAccessId: {
           description: "The ID of the petition access",
           type: "string",
         },
@@ -842,7 +840,7 @@ export const PetitionEvent = schema({
     PETITION_COMPLETED: {
       description: "A petition was completed by the recipient",
       properties: {
-        petition_access_id: {
+        petitionAccessId: {
           description: "The ID of the petition access linked to the recipient",
           type: "string",
         },
@@ -851,7 +849,7 @@ export const PetitionEvent = schema({
     PETITION_CREATED: {
       description: "A petition was created",
       properties: {
-        user_id: {
+        userId: {
           description: "The ID of the user that created the petition",
           type: "string",
         },
@@ -860,7 +858,7 @@ export const PetitionEvent = schema({
     PETITION_REOPENED: {
       description: "A user reopened a closed petition",
       properties: {
-        user_id: {
+        userId: {
           description: "The ID of the user that reopened the petition",
           type: "string",
         },
@@ -870,7 +868,7 @@ export const PetitionEvent = schema({
       description:
         "A manual or automatic reminder was sent to the petition recipients",
       properties: {
-        petition_reminder_id: {
+        petitionReminderId: {
           description: "The ID of the reminder",
           type: "string",
         },
@@ -879,15 +877,15 @@ export const PetitionEvent = schema({
     REPLY_CREATED: {
       description: "A recipient uploaded a reply on the petition",
       properties: {
-        petition_access_id: {
+        petitionAccessId: {
           description: "The ID of the petition access linked to the recipient",
           type: "string",
         },
-        petition_field_id: {
+        petitionFieldId: {
           description: "The ID of the field replied by the recipient",
           type: "string",
         },
-        petition_field_reply_id: {
+        petitionFieldReplyId: {
           description: "The ID of the new reply",
           type: "string",
         },
@@ -896,15 +894,15 @@ export const PetitionEvent = schema({
     REPLY_DELETED: {
       description: "A recipient deleted a reply on the petition",
       properties: {
-        petition_access_id: {
+        petitionAccessId: {
           description: "The ID of the petition access linked to the recipient",
           type: "string",
         },
-        petition_field_id: {
+        petitionFieldId: {
           description: "The ID of the field where the reply belongs",
           type: "string",
         },
-        petition_field_reply_id: {
+        petitionFieldReplyId: {
           description: "The ID of the deleted reply",
           type: "string",
         },
@@ -913,15 +911,15 @@ export const PetitionEvent = schema({
     REPLY_UPDATED: {
       description: "A recipient updated a reply on the petition",
       properties: {
-        petition_access_id: {
+        petitionAccessId: {
           description: "The ID of the petition access linked to the recipient",
           type: "string",
         },
-        petition_field_id: {
+        petitionFieldId: {
           description: "The ID of the field where the reply belongs",
           type: "string",
         },
-        petition_field_reply_id: {
+        petitionFieldReplyId: {
           description: "The ID of the updated reply",
           type: "string",
         },
@@ -930,34 +928,42 @@ export const PetitionEvent = schema({
     SIGNATURE_CANCELLED: {
       description: "An eSignature request on the petition was cancelled.",
       properties: {
-        petition_signature_request_id: {
+        petitionSignatureRequestId: {
           description: "The ID of the eSignature request",
           type: "string",
           example: toGlobalId("PetitionSignatureRequest", 1),
         },
-        cancel_reason: {
+        cancelReason: {
           description: "The reason of the cancel.",
           type: "string",
           enum: ["CANCELLED_BY_USER", "DECLINED_BY_SIGNER", "REQUEST_ERROR"],
           example: "CANCELLED_BY_USER",
         },
-        cancel_data: {
+        cancelData: {
+          description:
+            "Information about who and why cancelled the eSignature request",
           type: "object",
           properties: {
-            canceller_id: {
-              type: "string",
+            userId: {
+              type: ["string", "null"],
               description: outdent`
-                The ID of the canceller.  
-                If \`CANCELLED_BY_USER\`, this is the ID of the user.  
-                If \`DECLINED_BY_SIGNER\`, this is the ID of the recipient.  
-                If \`REQUEST_ERROR\`, this will not be set.
+                The ID of the user that cancelled the request.  
+                Only set if cancelReason is \`CANCELLED_BY_USER\`.
               `,
               example: toGlobalId("User", 2),
             },
-            cancel_reason: {
-              type: "string",
-              description: "Textual reason of the cancellation",
-              example: "The document is outdated. I will start a new request.",
+            contactId: {
+              type: ["string", "null"],
+              description: outdent`
+                The ID of the contact that declined the signature.  
+                Only set if cancelReason is \`DECLINED_BY_SIGNER\`.
+              `,
+              example: toGlobalId("Contact", 2),
+            },
+            reason: {
+              type: ["string", "null"],
+              description: "Reason of cancellation",
+              example: "This document is outdated.",
             },
           },
         },
@@ -966,11 +972,11 @@ export const PetitionEvent = schema({
     SIGNATURE_COMPLETED: {
       description: "The eSignature request on the petition was completed",
       properties: {
-        file_upload_id: {
+        fileUploadId: {
           description: "The ID of the signed PDF file",
           type: "string",
         },
-        petition_signature_request_id: {
+        petitionSignatureRequestId: {
           description: "The ID of the eSignature request",
           type: "string",
         },
@@ -979,7 +985,7 @@ export const PetitionEvent = schema({
     SIGNATURE_STARTED: {
       description: "An eSignature request on the petition started",
       properties: {
-        petition_signature_request_id: {
+        petitionSignatureRequestId: {
           description: "The ID of the eSignature request",
           type: "string",
         },
@@ -988,16 +994,16 @@ export const PetitionEvent = schema({
     USER_PERMISSION_ADDED: {
       description: "The user shared their petition with another user",
       properties: {
-        permission_type: {
+        permissionType: {
           description: "The type of permission for the new user",
           type: "string",
-          enum: ["READ", "WRITE", "OWNER"],
+          enum: ["READ", "WRITE"],
         },
-        user_id: {
+        userId: {
           description: "The ID of the user that shared the petition",
           type: "string",
         },
-        permission_user_id: {
+        permissionUserId: {
           description: "The ID of the user linked to the new permission",
           type: "string",
         },
@@ -1007,16 +1013,16 @@ export const PetitionEvent = schema({
       description:
         "The user modified the type of permission on a shared petition",
       properties: {
-        permission_type: {
+        permissionType: {
           description: "The new permission for the user",
           type: "string",
-          enum: ["READ", "WRITE", "OWNER"],
+          enum: ["READ", "WRITE"],
         },
-        user_id: {
+        userId: {
           description: "The ID of the user that edited the permission",
           type: "string",
         },
-        permission_user_id: {
+        permissionUserId: {
           description: "The ID of the user linked to the modified permission",
           type: "string",
         },
@@ -1025,17 +1031,17 @@ export const PetitionEvent = schema({
     USER_PERMISSION_REMOVED: {
       description: "The user removed a permission on their petition",
       properties: {
-        permission_user_id: {
-          description: "The ID of the user that lost its permission",
+        userId: {
+          description: "The ID of the user that removed the permission",
           type: "string",
         },
-        user_id: {
-          description: "The ID of the user that removed the permission",
+        permissionUserId: {
+          description: "The ID of the user that lost its permission",
           type: "string",
         },
       },
     },
-  } as PetitionEventDefinitions).map(([event, data]) => ({
+  } as PetitionEventSchemas).map(([event, data]) => ({
     type: "object",
     title: titleize(event),
     description: data.description, // should be visible after merging https://github.com/Redocly/redoc/pull/1497
@@ -1062,10 +1068,9 @@ export const PetitionEvent = schema({
         type: "object",
         description: "The payload of the event",
         additionalProperties: false,
-        required: Object.keys(data.properties),
-        properties: data.properties,
+        required: Object.keys(data.properties!),
+        properties: data.properties!,
       },
-
       createdAt: {
         description: "Creation date of the event",
         type: "string",
