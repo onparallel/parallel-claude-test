@@ -588,7 +588,8 @@ export class PetitionRepository extends BaseRepository {
           },
           t
         ),
-        this.from("petition_field").insert(
+        this.insert(
+          "petition_field",
           ([
             "HEADING",
             "TEXT",
@@ -602,7 +603,8 @@ export class PetitionRepository extends BaseRepository {
             position: index,
             created_by: `User:${user.id}`,
             updated_by: `User:${user.id}`,
-          }))
+          })),
+          t
         ),
       ]);
 

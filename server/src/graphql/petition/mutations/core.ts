@@ -196,6 +196,12 @@ export const clonePetitions = mutationField("clonePetitions", {
           }
         );
 
+        await ctx.petitions.createEvent({
+          petitionId: cloned.id,
+          type: "PETITION_CREATED",
+          data: { user_id: ctx.user!.id },
+        });
+
         ctx.analytics.trackEvent(
           "PETITION_CLONED",
           {
