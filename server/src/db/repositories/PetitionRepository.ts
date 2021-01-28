@@ -565,7 +565,7 @@ export class PetitionRepository extends BaseRepository {
     user: User
   ) {
     return await this.withTransaction(async (t) => {
-      const [row] = await this.insert(
+      const [petition] = await this.insert(
         "petition",
         {
           org_id: user.org_id,
@@ -577,80 +577,35 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      await this.insert(
-        "petition_user",
-        {
-          petition_id: row.id,
-          user_id: user.id,
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-        },
-        t
-      );
-
-      await this.createPetitionFieldAtPosition(
-        row.id,
-        {
-          type: "HEADING",
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-          is_fixed: true,
-          ...defaultFieldOptions("HEADING"),
-        },
-        0,
-        user,
-        t
-      );
-
-      await this.createPetitionFieldAtPosition(
-        row.id,
-        {
-          type: "TEXT",
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-          ...defaultFieldOptions("TEXT"),
-        },
-        1,
-        user,
-        t
-      );
-
-      await this.createPetitionFieldAtPosition(
-        row.id,
-        {
-          type: "FILE_UPLOAD",
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-          ...defaultFieldOptions("FILE_UPLOAD"),
-        },
-        2,
-        user,
-        t
-      );
-
-      const { petition } = await this.createPetitionFieldAtPosition(
-        row.id,
-        {
-          type: "SELECT",
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-          ...defaultFieldOptions("SELECT"),
-        },
-        3,
-        user,
-        t
-      );
-
-      await this.createEvent(
-        {
-          petitionId: row.id,
-          type: "PETITION_CREATED",
-          data: {
+      await Promise.all([
+        this.insert(
+          "petition_user",
+          {
+            petition_id: petition.id,
             user_id: user.id,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`,
           },
-        },
-        t
-      );
+          t
+        ),
+        this.from("petition_field").insert(
+          ([
+            "HEADING",
+            "TEXT",
+            "FILE_UPLOAD",
+            "SELECT",
+          ] as PetitionFieldType[]).map((type, index) => ({
+            ...defaultFieldOptions(type),
+            petition_id: petition.id,
+            type,
+            is_fixed: type === "HEADING",
+            position: index,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`,
+          }))
+        ),
+      ]);
+
       return petition;
     });
   }
@@ -1375,43 +1330,36 @@ export class PetitionRepository extends BaseRepository {
         },
         t
       );
-      await this.createEvent(
-        {
-          petitionId: cloned.id,
-          type: "PETITION_CREATED",
-          data: { user_id: user.id },
-        },
-        t
-      );
 
       const fields = await this.loadFieldsForPetition(petitionId);
-      await this.insert(
-        "petition_field",
-        fields.map((field) => ({
-          ...omit(field, [
-            "id",
-            "petition_id",
-            "created_at",
-            "updated_at",
-            "validated",
-          ]),
-          petition_id: cloned.id,
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-        })),
-        t
-      );
-
-      await this.insert(
-        "petition_user",
-        {
-          petition_id: cloned.id,
-          user_id: user.id,
-          created_by: `User:${user.id}`,
-          updated_by: `User:${user.id}`,
-        },
-        t
-      );
+      await Promise.all([
+        this.insert(
+          "petition_field",
+          fields.map((field) => ({
+            ...omit(field, [
+              "id",
+              "petition_id",
+              "created_at",
+              "updated_at",
+              "validated",
+            ]),
+            petition_id: cloned.id,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`,
+          })),
+          t
+        ),
+        this.insert(
+          "petition_user",
+          {
+            petition_id: cloned.id,
+            user_id: user.id,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`,
+          },
+          t
+        ),
+      ]);
       return cloned;
     });
   }

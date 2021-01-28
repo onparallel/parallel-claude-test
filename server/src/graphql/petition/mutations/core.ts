@@ -95,81 +95,73 @@ export const createPetition = mutationField("createPetition", {
   },
   resolve: async (_, { name, locale, petitionId, type, eventsUrl }, ctx) => {
     const isTemplate = type === "TEMPLATE";
-    const newPetition = await new Promise<Petition>(async (resolve) => {
-      if (petitionId) {
-        const originalPetition = (await ctx.petitions.loadPetition(
-          petitionId
-        ))!;
+    let petition: Petition;
+    if (petitionId) {
+      const original = (await ctx.petitions.loadPetition(petitionId))!;
+      petition = await ctx.petitions.clonePetition(petitionId, ctx.user!, {
+        is_template: isTemplate,
+        status: isTemplate ? null : "DRAFT",
+        name: original.is_template && !isTemplate ? name : original.name,
+      });
 
-        const cloned = await ctx.petitions.clonePetition(
-          petitionId,
-          ctx.user!,
-          {
-            is_template: isTemplate,
-            status: isTemplate ? null : "DRAFT",
-            name:
-              originalPetition.is_template && !isTemplate
-                ? name
-                : originalPetition.name,
-          }
-        );
-
-        if (originalPetition.is_template && !isTemplate) {
-          ctx.analytics.trackEvent(
-            "TEMPLATE_USED",
-            {
-              template_id: petitionId,
-              user_id: ctx.user!.id,
-            },
-            toGlobalId("User", ctx.user!.id)
-          );
-        } else if (!originalPetition.is_template) {
-          ctx.analytics.trackEvent(
-            "PETITION_CLONED",
-            {
-              from_petition_id: petitionId,
-              petition_id: cloned.id,
-              user_id: ctx.user!.id,
-              type: cloned.is_template ? "TEMPLATE" : "PETITION",
-            },
-            toGlobalId("User", ctx.user!.id)
-          );
-        }
-        return resolve(cloned);
-      } else {
-        const newPetition = await ctx.petitions.createPetition(
-          {
-            name,
-            locale: locale!,
-            email_subject: name,
-            is_template: isTemplate,
-          },
-          ctx.user!
-        );
-
+      if (original.is_template && !isTemplate) {
         ctx.analytics.trackEvent(
-          "PETITION_CREATED",
+          "TEMPLATE_USED",
           {
-            petition_id: newPetition.id,
+            template_id: petitionId,
             user_id: ctx.user!.id,
-            type: isTemplate ? "TEMPLATE" : "PETITION",
           },
           toGlobalId("User", ctx.user!.id)
         );
-
-        return resolve(newPetition);
+      } else if (!original.is_template) {
+        ctx.analytics.trackEvent(
+          "PETITION_CLONED",
+          {
+            from_petition_id: petitionId,
+            petition_id: petition.id,
+            user_id: ctx.user!.id,
+            type: petition.is_template ? "TEMPLATE" : "PETITION",
+          },
+          toGlobalId("User", ctx.user!.id)
+        );
       }
-    });
+    } else {
+      petition = await ctx.petitions.createPetition(
+        {
+          name,
+          locale: locale!,
+          email_subject: name,
+          is_template: isTemplate,
+        },
+        ctx.user!
+      );
+
+      ctx.analytics.trackEvent(
+        "PETITION_CREATED",
+        {
+          petition_id: petition.id,
+          user_id: ctx.user!.id,
+          type: isTemplate ? "TEMPLATE" : "PETITION",
+        },
+        toGlobalId("User", ctx.user!.id)
+      );
+    }
 
     if (eventsUrl) {
       await ctx.subscriptions.createSubscription(
-        newPetition.id,
+        petition.id,
         eventsUrl,
         ctx.user!
       );
     }
-
-    return newPetition;
+    await ctx.petitions.createEvent({
+      petitionId: petition.id,
+      type: "PETITION_CREATED",
+      data: {
+        user_id: ctx.user!.id,
+      },
+    });
+    return petition;
   },
 });
 
