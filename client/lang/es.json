@@ -996,8 +996,8 @@
   },
   {
     "term": "field-settings.file-multiple-label",
-    "definition": "Permitir múltiples subidas de archivos",
-    "context": "Allow multiple file uploads"
+    "definition": "Permitir subir más de un archivo",
+    "context": "Allow uploading more than one file"
   },
   {
     "term": "field-settings.heading-page-break-description",
@@ -1016,8 +1016,8 @@
   },
   {
     "term": "field-settings.multiple-label",
-    "definition": "Permitir múltiples respuestas",
-    "context": "Allow multiple replies"
+    "definition": "Permitir más de una respuesta",
+    "context": "Allow more than one reply"
   },
   {
     "term": "field-settings.required-description",

@@ -120,12 +120,12 @@ export function PetitionComposeFieldSettings({
               field.type === "FILE_UPLOAD" ? (
                 <FormattedMessage
                   id="field-settings.file-multiple-label"
-                  defaultMessage="Allow multiple file uploads"
+                  defaultMessage="Allow uploading more than one file"
                 />
               ) : (
                 <FormattedMessage
                   id="field-settings.multiple-label"
-                  defaultMessage="Allow multiple replies"
+                  defaultMessage="Allow more than one reply"
                 />
               )
             }
