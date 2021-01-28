@@ -155,6 +155,7 @@ enum EntityType {
 }
 
 enum FeatureFlag {
+  API_TOKENS
   HIDE_RECIPIENT_VIEW_CONTENTS @deprecated(reason: "Don't use this")
   INTERNAL_COMMENTS
   PETITION_PDF_EXPORT

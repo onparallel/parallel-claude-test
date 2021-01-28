@@ -10,12 +10,12 @@ import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { FormattedMessage, useIntl } from "react-intl";
 
-function Settings() {
+export function Settings() {
   const intl = useIntl();
   const {
     data: { me },
   } = assertQuery(useSettingsQuery());
-  const sections = useSettingsSections();
+  const sections = useSettingsSections(me);
 
   return (
     <SettingsLayout
@@ -38,6 +38,7 @@ Settings.fragments = {
   User: gql`
     fragment Settings_User on User {
       ...AppLayout_User
+      hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
     }
     ${AppLayout.fragments.User}
   `,

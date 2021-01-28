@@ -5,10 +5,11 @@ import {
   objectType,
   stringArg,
 } from "@nexus/schema";
-import { authenticate, authenticateAnd } from "../helpers/authorize";
+import { authenticateAnd } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
+import { userHasFeatureFlag } from "../petition/authorizers";
 import { userHasAccessToAuthTokens } from "./authorizers";
 
 export const generateUserAuthToken = mutationField("generateUserAuthToken", {
@@ -22,7 +23,7 @@ export const generateUserAuthToken = mutationField("generateUserAuthToken", {
       },
     })
   ),
-  authorize: authenticate(),
+  authorize: authenticateAnd(userHasFeatureFlag("API_TOKENS")),
   args: {
     tokenName: nonNull(stringArg()),
   },
@@ -49,7 +50,10 @@ export const revokeUserAuthToken = mutationField("revokeUserAuthToken", {
   description:
     "Soft-deletes a given auth token, making it permanently unusable.",
   type: "Result",
-  authorize: authenticateAnd(userHasAccessToAuthTokens("authTokenIds")),
+  authorize: authenticateAnd(
+    userHasFeatureFlag("API_TOKENS"),
+    userHasAccessToAuthTokens("authTokenIds")
+  ),
   args: {
     authTokenIds: nonNull(
       list(nonNull(globalIdArg("UserAuthenticationToken")))

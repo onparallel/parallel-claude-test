@@ -140,6 +140,7 @@ export type CreateFileUploadReplyInput = {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
+  | "API_TOKENS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
@@ -1978,6 +1979,16 @@ export type WithAdminOrganizationRoleQueryVariables = Exact<{
 
 export type WithAdminOrganizationRoleQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "role">;
+};
+
+export type HasFeatureFlagQueryVariables = Exact<{
+  featureFlag: FeatureFlag;
+}>;
+
+export type HasFeatureFlagQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & Pick<User, "id"> & {
+      hasFeatureFlag: User["hasFeatureFlag"];
+    };
 };
 
 export type WithSuperAdminAccessQueryVariables = Exact<{
@@ -4505,7 +4516,8 @@ export type Account_UserFragment = { __typename?: "User" } & Pick<
   User,
   "firstName" | "lastName"
 > &
-  AppLayout_UserFragment;
+  AppLayout_UserFragment &
+  Settings_UserFragment;
 
 export type Account_updateAccountMutationVariables = Exact<{
   id: Scalars["GID"];
@@ -4525,8 +4537,8 @@ export type AccountQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "id"> & Account_UserFragment;
 };
 
-export type Settings_UserFragment = {
-  __typename?: "User";
+export type Settings_UserFragment = { __typename?: "User" } & {
+  hasApiTokens: User["hasFeatureFlag"];
 } & AppLayout_UserFragment;
 
 export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
@@ -4547,7 +4559,9 @@ export type Security_updatePasswordMutation = {
 export type SecurityQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SecurityQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> & AppLayout_UserFragment;
+  me: { __typename?: "User" } & Pick<User, "id"> &
+    AppLayout_UserFragment &
+    Settings_UserFragment;
 };
 
 export type Tokens_UserAuthenticationTokenFragment = {
@@ -4586,7 +4600,8 @@ export type TokensQuery = { __typename?: "Query" } & {
             } & Tokens_UserAuthenticationTokenFragment
           >;
         };
-    } & SettingsLayout_UserFragment;
+    } & SettingsLayout_UserFragment &
+    Settings_UserFragment;
 };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -6299,19 +6314,22 @@ export const NewPetition_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
 `;
+export const Settings_UserFragmentDoc = gql`
+  fragment Settings_User on User {
+    ...AppLayout_User
+    hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
 export const Account_UserFragmentDoc = gql`
   fragment Account_User on User {
     firstName
     lastName
     ...AppLayout_User
+    ...Settings_User
   }
   ${AppLayout_UserFragmentDoc}
-`;
-export const Settings_UserFragmentDoc = gql`
-  fragment Settings_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
+  ${Settings_UserFragmentDoc}
 `;
 export const Tokens_UserAuthenticationTokenFragmentDoc = gql`
   fragment Tokens_UserAuthenticationToken on UserAuthenticationToken {
@@ -6622,6 +6640,59 @@ export type WithAdminOrganizationRoleQueryHookResult = ReturnType<
 >;
 export type WithAdminOrganizationRoleLazyQueryHookResult = ReturnType<
   typeof useWithAdminOrganizationRoleLazyQuery
+>;
+export const HasFeatureFlagDocument = gql`
+  query HasFeatureFlag($featureFlag: FeatureFlag!) {
+    me {
+      id
+      hasFeatureFlag: hasFeatureFlag(featureFlag: $featureFlag)
+    }
+  }
+`;
+
+/**
+ * __useHasFeatureFlagQuery__
+ *
+ * To run a query within a React component, call `useHasFeatureFlagQuery` and pass it any options that fit your needs.
+ * When your component renders, `useHasFeatureFlagQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useHasFeatureFlagQuery({
+ *   variables: {
+ *      featureFlag: // value for 'featureFlag'
+ *   },
+ * });
+ */
+export function useHasFeatureFlagQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    HasFeatureFlagQuery,
+    HasFeatureFlagQueryVariables
+  >
+) {
+  return Apollo.useQuery<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>(
+    HasFeatureFlagDocument,
+    baseOptions
+  );
+}
+export function useHasFeatureFlagLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    HasFeatureFlagQuery,
+    HasFeatureFlagQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>(
+    HasFeatureFlagDocument,
+    baseOptions
+  );
+}
+export type HasFeatureFlagQueryHookResult = ReturnType<
+  typeof useHasFeatureFlagQuery
+>;
+export type HasFeatureFlagLazyQueryHookResult = ReturnType<
+  typeof useHasFeatureFlagLazyQuery
 >;
 export const WithSuperAdminAccessDocument = gql`
   query WithSuperAdminAccess {
@@ -10959,9 +11030,11 @@ export const SecurityDocument = gql`
     me {
       id
       ...AppLayout_User
+      ...Settings_User
     }
   }
   ${AppLayout_UserFragmentDoc}
+  ${Settings_UserFragmentDoc}
 `;
 
 /**
@@ -11049,6 +11122,7 @@ export const TokensDocument = gql`
     me {
       id
       ...SettingsLayout_User
+      ...Settings_User
       authenticationTokens(
         limit: $limit
         offset: $offset
@@ -11063,6 +11137,7 @@ export const TokensDocument = gql`
     }
   }
   ${SettingsLayout_UserFragmentDoc}
+  ${Settings_UserFragmentDoc}
   ${Tokens_UserAuthenticationTokenFragmentDoc}
 `;
 

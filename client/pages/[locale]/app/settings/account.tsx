@@ -27,6 +27,7 @@ import { compose } from "@parallel/utils/compose";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Settings } from ".";
 
 interface NameChangeFormData {
   firstName: string;
@@ -38,7 +39,7 @@ function Account() {
   const {
     data: { me },
   } = assertQuery(useAccountQuery());
-  const sections = useSettingsSections();
+  const sections = useSettingsSections(me);
 
   const { handleSubmit, register, errors } = useForm<NameChangeFormData>({
     defaultValues: {
@@ -142,8 +143,10 @@ Account.fragments = {
       firstName
       lastName
       ...AppLayout_User
+      ...Settings_User
     }
     ${AppLayout.fragments.User}
+    ${Settings.fragments.User}
   `,
 };
 

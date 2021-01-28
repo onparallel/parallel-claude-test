@@ -21,6 +21,7 @@ import {
   UserAuthenticationToken,
   PetitionUserPermissionType,
   PetitionEventSubscription,
+  CreateFeatureFlag,
 } from "../../__types";
 import { hash, random } from "../../../util/token";
 
@@ -89,10 +90,8 @@ export class Mocks {
       .returning("*");
   }
 
-  async createFeatureFlags() {
-    await this.knex
-      .into("feature_flag")
-      .insert([{ name: "PETITION_SIGNATURE", default_value: false }]);
+  async createFeatureFlags(featureFlags: CreateFeatureFlag[]) {
+    await this.knex.into("feature_flag").insert(featureFlags);
   }
 
   async createRandomContacts(

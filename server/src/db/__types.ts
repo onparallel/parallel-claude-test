@@ -9,6 +9,7 @@ type PartialProps<T, K extends keyof T = never> = Omit<T, K> &
   Partial<Pick<T, K>>;
 
 export type FeatureFlagName =
+  | "API_TOKENS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"

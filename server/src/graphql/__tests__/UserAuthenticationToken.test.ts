@@ -24,6 +24,10 @@ describe("GraphQL/UserAuthenticationToken", () => {
     [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
       cognito_id: userCognitoId,
     }));
+
+    await mocks.createFeatureFlags([
+      { name: "API_TOKENS", default_value: true },
+    ]);
   });
 
   afterAll(async () => {

@@ -13,6 +13,7 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useDeleteAccessTokenDialog } from "@parallel/components/settings/DeleteAccessTokenDialog";
 import { useGenerateNewTokenDialog } from "@parallel/components/settings/GenerateNewTokenDialog";
@@ -37,6 +38,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { Settings } from ".";
 
 const PAGE_SIZE = 10;
 const SORTING = ["tokenName", "createdAt", "lastUsedAt"] as const;
@@ -69,7 +71,7 @@ function Tokens() {
       },
     })
   );
-  const sections = useSettingsSections();
+  const sections = useSettingsSections(me);
   const authTokens = me.authenticationTokens;
 
   const [selected, setSelected] = useState<string[]>([]);
@@ -323,6 +325,7 @@ Tokens.getInitialProps = async ({
         me {
           id
           ...SettingsLayout_User
+          ...Settings_User
           authenticationTokens(
             limit: $limit
             offset: $offset
@@ -337,6 +340,7 @@ Tokens.getInitialProps = async ({
         }
       }
       ${SettingsLayout.fragments.User}
+      ${Settings.fragments.User}
       ${Tokens.fragments.UserAuthenticationToken}
     `,
     {
@@ -352,4 +356,8 @@ Tokens.getInitialProps = async ({
   );
 };
 
-export default compose(withDialogs, withApolloData)(Tokens);
+export default compose(
+  withDialogs,
+  withFeatureFlag("API_TOKENS"),
+  withApolloData
+)(Tokens);
