@@ -32,8 +32,8 @@ To start you will need the following:
 - An **API token**: You can generate one on the [API tokens section](https://www.parallel.so/en/app/settings/tokens)
   under your account settings.
 - At least **one Petition Template**. Make sure to write down the ID so we can
-  create a petition based on it. You can find this ID on the browser URL or by
-  using the [GET /templates](#operation/GetTemplates) endpoint.
+  create a petition based on it. You can find this ID on the [browser URL](https://support.parallel.so/hc/en-us/articles/360017297578-How-can-I-find-a-template-Id-)
+  or by using the [GET /templates](#operation/GetTemplates) endpoint.
 
 ### Step 1: Create the petition
 Create the petition with the [POST /petitions](#operation/CreatePetition)
