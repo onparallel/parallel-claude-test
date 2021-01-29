@@ -3,7 +3,6 @@ import { Text } from "@chakra-ui/react";
 import { ForbiddenIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineMessageCancelledEvent_MessageCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -37,11 +36,7 @@ export function TimelineMessageCancelledEvent({
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={user} />,
           subject: message.emailSubject,
-          contact: message.access.contact ? (
-            <ContactLink contact={message.access.contact} />
-          ) : (
-            <DeletedContact />
-          ),
+          contact: <ContactLink contact={message.access.contact} />,
           timeAgo: (
             <DateTime
               value={createdAt}

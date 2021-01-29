@@ -3,7 +3,6 @@ import { Text } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineAccessActivatedEvent_AccessActivatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -36,11 +35,7 @@ export function TimelineAccessActivatedEvent({
           same: userId === event.user?.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
-          contact: event.access.contact ? (
-            <ContactLink contact={event.access.contact} />
-          ) : (
-            <DeletedContact />
-          ),
+          contact: <ContactLink contact={event.access.contact} />,
           timeAgo: (
             <DateTime
               value={event.createdAt}

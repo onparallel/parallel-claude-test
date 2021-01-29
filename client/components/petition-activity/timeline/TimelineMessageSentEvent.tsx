@@ -3,7 +3,6 @@ import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { EmailSentIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { MessageEventsIndicator } from "@parallel/components/petition-activity/MessageEventsIndicator";
 import { TimelineMessageSentEvent_MessageSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -51,11 +50,7 @@ export function TimelineMessageSentEvent({
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 user: <UserReference user={message.sender} />,
                 subject: message.emailSubject,
-                contact: message.access.contact ? (
-                  <ContactLink contact={message.access.contact} />
-                ) : (
-                  <DeletedContact />
-                ),
+                contact: <ContactLink contact={message.access.contact} />,
                 timeAgo: (
                   <DateTime
                     value={createdAt}
@@ -74,11 +69,7 @@ export function TimelineMessageSentEvent({
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 user: message.sender!.fullName,
                 subject: message.emailSubject,
-                contact: message.access.contact ? (
-                  <ContactLink contact={message.access.contact} />
-                ) : (
-                  <DeletedContact />
-                ),
+                contact: <ContactLink contact={message.access.contact} />,
                 timeAgo: (
                   <DateTime
                     value={createdAt}

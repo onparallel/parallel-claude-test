@@ -3,7 +3,6 @@ import { ContactLink_ContactFragment, Maybe } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { ContactLink } from "../common/ContactLink";
-import { DeletedContact } from "../common/DeletedContact";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 
 export type DeclinedSignatureReasonDialogProps = {
@@ -23,7 +22,7 @@ export function DeclinedSignatureReasonDialog({
       {...props}
       header={
         <Heading size="md">
-          {contact ? <ContactLink contact={contact} /> : <DeletedContact />}
+          <ContactLink contact={contact} />
         </Heading>
       }
       body={

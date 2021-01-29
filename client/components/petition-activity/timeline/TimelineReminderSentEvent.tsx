@@ -3,7 +3,6 @@ import { Text } from "@chakra-ui/react";
 import { BellIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineReminderSentEvent_ReminderSentEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -37,11 +36,7 @@ export function TimelineReminderSentEvent({
             same: userId === reminder.sender?.id,
             b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
             user: <UserReference user={reminder.sender} />,
-            contact: reminder.access.contact ? (
-              <ContactLink contact={reminder.access.contact} />
-            ) : (
-              <DeletedContact />
-            ),
+            contact: <ContactLink contact={reminder.access.contact} />,
             timeAgo: (
               <DateTime
                 value={createdAt}
@@ -56,11 +51,7 @@ export function TimelineReminderSentEvent({
           id="timeline.reminder-sent-description-automatic"
           defaultMessage="An automatic reminder was sent to {contact} {timeAgo}"
           values={{
-            contact: reminder.access.contact ? (
-              <ContactLink contact={reminder.access.contact} />
-            ) : (
-              <DeletedContact />
-            ),
+            contact: <ContactLink contact={reminder.access.contact} />,
             timeAgo: (
               <DateTime
                 value={createdAt}

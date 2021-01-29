@@ -44,13 +44,13 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
-import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { HelpPopover } from "../common/HelpPopover";
 import { Link } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
+import { UserReference } from "../petition-activity/UserReference";
 
 export type PetitionRepliesFieldCommentsProps = {
   petitionId: string;
@@ -337,15 +337,9 @@ function FieldComment({
               <FormattedMessage id="generic.you" defaultMessage="You" />
             </Text>
           ) : author?.__typename === "PetitionAccess" ? (
-            author.contact ? (
-              <Text as="strong">
-                <ContactLink contact={author.contact!} />
-              </Text>
-            ) : (
-              <DeletedContact />
-            )
+            <ContactLink contact={author.contact} fontWeight="bold" />
           ) : author?.__typename === "User" ? (
-            <Text as="strong">{author.fullName}</Text>
+            <UserReference user={author} />
           ) : null}
         </Box>
         {isInternal && (
@@ -510,8 +504,7 @@ PetitionRepliesFieldComments.fragments = {
         id
         author {
           ... on User {
-            id
-            fullName
+            ...UserReference_User
           }
           ... on PetitionAccess {
             contact {
@@ -525,6 +518,7 @@ PetitionRepliesFieldComments.fragments = {
         isEdited
         isInternal @include(if: $hasInternalComments)
       }
+      ${UserReference.fragments.User}
       ${ContactLink.fragments.Contact}
     `;
   },

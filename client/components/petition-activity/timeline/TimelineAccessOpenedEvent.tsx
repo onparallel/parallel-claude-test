@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { EyeIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineAccessOpenedEvent_AccessOpenedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -29,11 +28,7 @@ export function TimelineAccessOpenedEvent({
         id="timeline.access-opened-description"
         defaultMessage="{contact} opened the petition {timeAgo}"
         values={{
-          contact: event.access.contact ? (
-            <ContactLink contact={event.access.contact} />
-          ) : (
-            <DeletedContact />
-          ),
+          contact: <ContactLink contact={event.access.contact} />,
           timeAgo: (
             <DateTime
               value={event.createdAt}

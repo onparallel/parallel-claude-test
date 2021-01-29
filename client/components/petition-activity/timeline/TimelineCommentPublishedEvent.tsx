@@ -4,7 +4,6 @@ import { CommentIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { Divider } from "@parallel/components/common/Divider";
 import { TimelineCommentPublishedEvent_CommentPublishedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -52,11 +51,7 @@ export function TimelineCommentPublishedEvent({
                 same: author?.__typename === "User" && author?.id === userId,
                 author:
                   author?.__typename === "PetitionAccess" ? (
-                    author.contact ? (
-                      <ContactLink contact={author.contact} />
-                    ) : (
-                      <DeletedContact />
-                    )
+                    <ContactLink contact={author.contact} />
                   ) : (
                     <UserReference user={author as any} />
                   ),

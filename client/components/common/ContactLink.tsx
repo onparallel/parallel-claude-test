@@ -1,23 +1,26 @@
 import { gql } from "@apollo/client";
-import { ContactLink_ContactFragment } from "@parallel/graphql/__types";
+import { ContactLink_ContactFragment, Maybe } from "@parallel/graphql/__types";
 import { Link, LinkProps } from "./Link";
 import { Tooltip } from "@chakra-ui/react";
+import { DeletedContact } from "./DeletedContact";
 
 export function ContactLink({
-  contact: { id, email, fullName },
+  contact,
   isFull,
   ...props
 }: {
-  contact: ContactLink_ContactFragment;
+  contact?: Maybe<ContactLink_ContactFragment>;
   isFull?: boolean;
 } & Omit<LinkProps, "href">) {
-  return (
-    <Tooltip isDisabled={!fullName && !isFull} label={email}>
-      <Link href={`/app/contacts/${id}`} {...props}>
-        {fullName || email}
-        {isFull && fullName ? `<${email}>` : null}
+  return contact ? (
+    <Tooltip isDisabled={!contact.fullName && !isFull} label={contact.email}>
+      <Link href={`/app/contacts/${contact.id}`} {...props}>
+        {contact.fullName || contact.email}
+        {isFull && contact.fullName ? `<${contact.email}>` : null}
       </Link>
     </Tooltip>
+  ) : (
+    <DeletedContact />
   );
 }
 

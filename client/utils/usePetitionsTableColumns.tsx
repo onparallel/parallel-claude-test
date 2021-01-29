@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { Link } from "@parallel/components/common/Link";
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
@@ -86,38 +85,35 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                     return null;
                   }
                   const [contact, ...rest] = recipients;
-                  if (contact) {
-                    return rest.length ? (
-                      <FormattedMessage
-                        id="petitions.recipients"
-                        defaultMessage="{contact} and <a>{more} more</a>"
-                        values={{
-                          contact: (
-                            <ContactLink
-                              contact={contact}
-                              onClick={(e: MouseEvent) => e.stopPropagation()}
-                            />
-                          ),
-                          more: rest.length,
-                          a: (chunks: any[]) => (
-                            <Link
-                              href={`/app/petitions/${row.id}/activity`}
-                              onClick={(e: MouseEvent) => e.stopPropagation()}
-                            >
-                              {chunks}
-                            </Link>
-                          ),
-                        }}
-                      />
-                    ) : (
-                      <ContactLink
-                        contact={contact}
-                        onClick={(e: MouseEvent) => e.stopPropagation()}
-                      />
-                    );
-                  } else {
-                    return <DeletedContact />;
-                  }
+
+                  return contact && rest.length ? (
+                    <FormattedMessage
+                      id="petitions.recipients"
+                      defaultMessage="{contact} and <a>{more} more</a>"
+                      values={{
+                        contact: (
+                          <ContactLink
+                            contact={contact}
+                            onClick={(e: MouseEvent) => e.stopPropagation()}
+                          />
+                        ),
+                        more: rest.length,
+                        a: (chunks: any[]) => (
+                          <Link
+                            href={`/app/petitions/${row.id}/activity`}
+                            onClick={(e: MouseEvent) => e.stopPropagation()}
+                          >
+                            {chunks}
+                          </Link>
+                        ),
+                      }}
+                    />
+                  ) : (
+                    <ContactLink
+                      contact={contact}
+                      onClick={(e: MouseEvent) => e.stopPropagation()}
+                    />
+                  );
                 },
               },
               {

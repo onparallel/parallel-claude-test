@@ -32,7 +32,6 @@ import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { Card } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
-import { DeletedContact } from "../common/DeletedContact";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
 import { Table, TableColumn } from "../common/Table";
@@ -200,8 +199,9 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.contact-header",
           defaultMessage: "Contact",
         }),
-        CellContent: ({ row: { contact } }) =>
-          contact ? <ContactLink contact={contact} /> : <DeletedContact />,
+        CellContent: ({ row: { contact } }) => (
+          <ContactLink contact={contact} />
+        ),
       },
       {
         key: "status",

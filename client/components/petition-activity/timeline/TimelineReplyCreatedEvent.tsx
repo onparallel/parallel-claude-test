@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { PlusCircleIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineReplyCreatedEvent_ReplyCreatedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -33,16 +32,10 @@ export function TimelineReplyCreatedEvent({
           same: createdBy?.__typename == "User" && createdBy.id === userId,
           createdBy:
             createdBy?.__typename === "PetitionAccess" ? (
-              createdBy.contact ? (
-                <ContactLink contact={createdBy.contact} />
-              ) : (
-                <DeletedContact />
-              )
-            ) : (
-              createdBy?.__typename === "User" && (
-                <UserReference user={createdBy} />
-              )
-            ),
+              <ContactLink contact={createdBy.contact} />
+            ) : createdBy?.__typename === "User" ? (
+              <UserReference user={createdBy} />
+            ) : null,
           field: <PetitionFieldReference field={field} />,
           timeAgo: (
             <DateTime

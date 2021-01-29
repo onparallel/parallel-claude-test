@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { CommentXIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineCommentDeletedEvent_CommentDeletedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -37,16 +36,10 @@ export function TimelineCommentDeletedEvent({
           same: deletedBy?.__typename === "User" && deletedBy?.id === userId,
           someone:
             deletedBy?.__typename === "PetitionAccess" ? (
-              deletedBy.contact ? (
-                <ContactLink contact={deletedBy.contact} />
-              ) : (
-                <DeletedContact />
-              )
+              <ContactLink contact={deletedBy.contact} />
             ) : deletedBy?.__typename === "User" ? (
               <UserReference user={deletedBy} />
-            ) : (
-              <DeletedContact />
-            ),
+            ) : null,
           field: <PetitionFieldReference field={field} />,
           timeAgo: (
             <DateTime

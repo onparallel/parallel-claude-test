@@ -27,7 +27,6 @@ import { useCallback } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { Card, CardHeader, CardProps } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
-import { DeletedContact } from "../common/DeletedContact";
 import { Divider } from "../common/Divider";
 import { Link } from "../common/Link";
 import { Spacer } from "../common/Spacer";
@@ -149,11 +148,7 @@ export function PetitionSignaturesCard({
                       <FormattedList
                         value={signature.signatureConfig.contacts.map(
                           (contact, i) => [
-                            contact ? (
-                              <ContactLink contact={contact} key={i} />
-                            ) : (
-                              <DeletedContact key={i} />
-                            ),
+                            <ContactLink contact={contact} key={i} />,
                           ]
                         )}
                       />
@@ -262,11 +257,7 @@ function CurrentSignatureRequestRow({
         </Heading>
         <FormattedList
           value={signatureRequest.signatureConfig.contacts.map((contact, i) => [
-            contact ? (
-              <ContactLink contact={contact} key={i} />
-            ) : (
-              <DeletedContact key={i} />
-            ),
+            <ContactLink contact={contact} key={i} />,
           ])}
         />
       </Box>
@@ -344,11 +335,7 @@ function NewSignatureRequestRow({
         </Heading>
         <FormattedList
           value={signatureConfig.contacts.map((contact, i) => [
-            contact ? (
-              <ContactLink contact={contact} key={i} />
-            ) : (
-              <DeletedContact key={i} />
-            ),
+            <ContactLink contact={contact} key={i} />,
           ])}
         />
       </Box>

@@ -3,7 +3,6 @@ import { Box, Button, Flex } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { DeletedContact } from "@parallel/components/common/DeletedContact";
 import { TimelineSignatureCancelledEvent_SignatureCancelledEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -64,11 +63,7 @@ export function TimelineSignatureCancelledEvent({
               id="timeline.signature-declined-description"
               defaultMessage="{contact} has declined the eSignature process {timeAgo}"
               values={{
-                contact: event.contact ? (
-                  <ContactLink contact={event.contact} />
-                ) : (
-                  <DeletedContact />
-                ),
+                contact: <ContactLink contact={event.contact} />,
                 timeAgo: (
                   <DateTime
                     value={event.createdAt}

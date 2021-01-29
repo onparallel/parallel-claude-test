@@ -32,7 +32,7 @@ export function TimelinePetitionClosedNotifiedEvent({
         defaultMessage="{same, select, true {You} other {{user}}} notified {contact} that the petition is correct {timeAgo}"
         values={{
           same: userId === event.user?.id,
-          contact: <ContactLink contact={event.access.contact!} />,
+          contact: <ContactLink contact={event.access.contact} />,
           user: <UserReference user={event.user} />,
           timeAgo: (
             <DateTime

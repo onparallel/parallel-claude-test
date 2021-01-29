@@ -32,7 +32,7 @@ export function SentPetitionMessageDialog({
                 defaultMessage="Message sent to {recipient} on {date}"
                 values={{
                   recipient: (
-                    <ContactLink isFull contact={message.access.contact!} />
+                    <ContactLink isFull contact={message.access.contact} />
                   ),
                   date: (
                     <DateTime value={message.sentAt} format={FORMATS["LLL"]} />
@@ -45,7 +45,7 @@ export function SentPetitionMessageDialog({
                 defaultMessage="Message scheduled to be sent to {recipient} on {date}"
                 values={{
                   recipient: (
-                    <ContactLink isFull contact={message.access.contact!} />
+                    <ContactLink isFull contact={message.access.contact} />
                   ),
                   date: (
                     <DateTime
