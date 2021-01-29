@@ -823,7 +823,7 @@ api
       operationId: "SharePetition",
       summary: "Share the petition",
       description: outdent`
-        Share the specified petition with users from your organization.
+        Share the specified petition with users from your organization, giving them \`WRITE\` permissions.
       `,
       body: JsonBody(SharePetition),
       responses: {
@@ -840,12 +840,11 @@ api
           mutation SharePetition_addPetitionUserPermission(
             $petitionId: GID!
             $userIds: [GID!]!
-            $permissionType: PetitionUserPermissionTypeRW!
           ) {
             addPetitionUserPermission(
               petitionIds: [$petitionId]
               userIds: $userIds
-              permissionType: $permissionType
+              permissionType: WRITE
             ) {
               userPermissions {
                 ...Permission
@@ -856,7 +855,6 @@ api
         `,
         {
           petitionId: params.petitionId,
-          permissionType: body.permissionType,
           userIds: body.userIds,
         }
       );

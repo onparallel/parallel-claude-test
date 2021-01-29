@@ -129,6 +129,7 @@ export type CreateFileUploadReplyInput = {
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
+  | "API_TOKENS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
@@ -2014,7 +2015,6 @@ export type GetPermissions_PermissionsQuery = {
 export type SharePetition_addPetitionUserPermissionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   userIds: Array<Scalars["GID"]> | Scalars["GID"];
-  permissionType: PetitionUserPermissionTypeRW;
 }>;
 
 export type SharePetition_addPetitionUserPermissionMutation = {

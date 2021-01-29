@@ -333,7 +333,12 @@ const _Permission = {
       description: "The user linked to this permission",
     },
     permissionType: {
-      description: "The type of permission",
+      description: outdent`
+        The type of permission.  
+        \`OWNER\`: Full access to the petition. There can only be one owner per petition.  
+        \`READ\`: Read-only access. Users with READ permission can't modify the petition in any way.  
+        \`WRITE\`: Same level of access as the owner.   
+      `,
       type: "string",
       enum: ["OWNER", "READ", "WRITE"],
       example: "OWNER",
@@ -602,7 +607,7 @@ export const SharePetition = schema({
   title: "SharePetition",
   type: "object",
   additionalProperties: false,
-  required: ["userIds", "permissionType"],
+  required: ["userIds" /*, "permissionType"*/],
   properties: {
     userIds: {
       description: "IDs of the users you want to share the petition with",
@@ -612,11 +617,11 @@ export const SharePetition = schema({
         example: toGlobalId("User", 42),
       },
     },
-    permissionType: {
-      description: "The type of permission you want to assign to the users",
-      type: "string",
-      enum: ["READ", "WRITE"],
-    },
+    // permissionType: {
+    //   description: "The type of permission you want to assign to the users",
+    //   type: "string",
+    //   enum: ["READ", "WRITE"],
+    // },
   },
 } as const);
 
