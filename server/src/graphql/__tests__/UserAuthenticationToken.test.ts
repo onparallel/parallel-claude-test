@@ -1,6 +1,11 @@
 import gql from "graphql-tag";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, User, UserAuthenticationToken } from "../../db/__types";
+import {
+  FeatureFlagOverride,
+  Organization,
+  User,
+  UserAuthenticationToken,
+} from "../../db/__types";
 import { userCognitoId } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
 import { toGlobalId } from "../../util/globalId";
@@ -19,15 +24,16 @@ describe("GraphQL/UserAuthenticationToken", () => {
     mocks = new Mocks(knex);
 
     [organization] = await mocks.createRandomOrganizations(1);
+    await knex.from<FeatureFlagOverride>("feature_flag_override").insert({
+      org_id: organization.id,
+      feature_flag_name: "API_TOKENS",
+      value: true,
+    });
 
     // logged user
     [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
       cognito_id: userCognitoId,
     }));
-
-    await mocks.createFeatureFlags([
-      { name: "API_TOKENS", default_value: true },
-    ]);
   });
 
   afterAll(async () => {
