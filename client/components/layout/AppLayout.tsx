@@ -94,12 +94,16 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
         status={user.onboardingStatus as any}
       />
       <style jsx global>
-        {`
-          body {
-            max-height: 100vh;
-            overflow: hidden;
-          }
-        `}
+        {
+          /* css */ `
+            /* https://github.com/chakra-ui/chakra-ui/issues/3201 */
+            html,
+            body {
+              max-height: 100vh;
+              overflow: hidden;
+            }
+          `
+        }
       </style>
     </>
   );
