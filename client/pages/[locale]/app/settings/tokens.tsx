@@ -335,9 +335,11 @@ Tokens.getInitialProps = async ({
             }
           }
           ...SettingsLayout_User
+          ...useSettingsSections_User
         }
       }
       ${SettingsLayout.fragments.User}
+      ${useSettingsSections.fragments.User}
       ${Tokens.fragments.UserAuthenticationToken}
     `,
     {

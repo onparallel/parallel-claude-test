@@ -14,7 +14,6 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   AccountQuery,
@@ -27,7 +26,6 @@ import { compose } from "@parallel/utils/compose";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Settings } from ".";
 
 interface NameChangeFormData {
   firstName: string;
@@ -142,11 +140,11 @@ Account.fragments = {
     fragment Account_User on User {
       firstName
       lastName
-      ...AppLayout_User
-      ...Settings_User
+      ...SettingsLayout_User
+      ...useSettingsSections_User
     }
-    ${AppLayout.fragments.User}
-    ${Settings.fragments.User}
+    ${SettingsLayout.fragments.User}
+    ${useSettingsSections.fragments.User}
   `,
 };
 

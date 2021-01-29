@@ -4516,8 +4516,8 @@ export type Account_UserFragment = { __typename?: "User" } & Pick<
   User,
   "firstName" | "lastName"
 > &
-  AppLayout_UserFragment &
-  Settings_UserFragment;
+  SettingsLayout_UserFragment &
+  useSettingsSections_UserFragment;
 
 export type Account_updateAccountMutationVariables = Exact<{
   id: Scalars["GID"];
@@ -4560,7 +4560,8 @@ export type Security_updatePasswordMutation = {
 export type SecurityQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SecurityQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & SettingsLayout_UserFragment;
+  me: { __typename?: "User" } & SettingsLayout_UserFragment &
+    useSettingsSections_UserFragment;
 };
 
 export type Tokens_UserAuthenticationTokenFragment = {
@@ -4599,7 +4600,8 @@ export type TokensQuery = { __typename?: "Query" } & {
             } & Tokens_UserAuthenticationTokenFragment
           >;
         };
-    } & SettingsLayout_UserFragment;
+    } & SettingsLayout_UserFragment &
+    useSettingsSections_UserFragment;
 };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -6321,6 +6323,16 @@ export const useSettingsSections_UserFragmentDoc = gql`
     hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
   }
 `;
+export const Account_UserFragmentDoc = gql`
+  fragment Account_User on User {
+    firstName
+    lastName
+    ...SettingsLayout_User
+    ...useSettingsSections_User
+  }
+  ${SettingsLayout_UserFragmentDoc}
+  ${useSettingsSections_UserFragmentDoc}
+`;
 export const Settings_UserFragmentDoc = gql`
   fragment Settings_User on User {
     ...SettingsLayout_User
@@ -6328,16 +6340,6 @@ export const Settings_UserFragmentDoc = gql`
   }
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
-`;
-export const Account_UserFragmentDoc = gql`
-  fragment Account_User on User {
-    firstName
-    lastName
-    ...AppLayout_User
-    ...Settings_User
-  }
-  ${AppLayout_UserFragmentDoc}
-  ${Settings_UserFragmentDoc}
 `;
 export const Tokens_UserAuthenticationTokenFragmentDoc = gql`
   fragment Tokens_UserAuthenticationToken on UserAuthenticationToken {
@@ -11037,9 +11039,11 @@ export const SecurityDocument = gql`
   query Security {
     me {
       ...SettingsLayout_User
+      ...useSettingsSections_User
     }
   }
   ${SettingsLayout_UserFragmentDoc}
+  ${useSettingsSections_UserFragmentDoc}
 `;
 
 /**
@@ -11138,10 +11142,12 @@ export const TokensDocument = gql`
         }
       }
       ...SettingsLayout_User
+      ...useSettingsSections_User
     }
   }
   ${Tokens_UserAuthenticationTokenFragmentDoc}
   ${SettingsLayout_UserFragmentDoc}
+  ${useSettingsSections_UserFragmentDoc}
 `;
 
 /**

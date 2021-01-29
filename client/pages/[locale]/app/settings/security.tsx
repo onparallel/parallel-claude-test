@@ -212,6 +212,7 @@ Security.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
     query Security {
       me {
         ...SettingsLayout_User
+        ...useSettingsSections_User
       }
     }
     ${SettingsLayout.fragments.User}
