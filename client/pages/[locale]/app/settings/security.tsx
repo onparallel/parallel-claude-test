@@ -15,7 +15,6 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   SecurityQuery,
@@ -28,7 +27,6 @@ import { compose } from "@parallel/utils/compose";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Settings } from ".";
 
 interface PasswordChangeFormData {
   password: string;
@@ -213,13 +211,11 @@ Security.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery<SecurityQuery>(gql`
     query Security {
       me {
-        id
-        ...AppLayout_User
-        ...Settings_User
+        ...SettingsLayout_User
       }
     }
-    ${AppLayout.fragments.User}
-    ${Settings.fragments.User}
+    ${SettingsLayout.fragments.User}
+    ${useSettingsSections.fragments.User}
   `);
 };
 

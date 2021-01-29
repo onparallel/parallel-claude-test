@@ -3,9 +3,8 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useSettingsQuery, SettingsQuery } from "@parallel/graphql/__types";
+import { SettingsQuery, useSettingsQuery } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -37,10 +36,11 @@ export function Settings() {
 Settings.fragments = {
   User: gql`
     fragment Settings_User on User {
-      ...AppLayout_User
-      hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
+      ...SettingsLayout_User
+      ...useSettingsSections_User
     }
-    ${AppLayout.fragments.User}
+    ${SettingsLayout.fragments.User}
+    ${useSettingsSections.fragments.User}
   `,
 };
 

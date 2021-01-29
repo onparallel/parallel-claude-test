@@ -663,20 +663,6 @@ function ListOf<T extends JsonSchema>(item: T) {
   } as const);
 }
 
-type EventSchema = {
-  description: string;
-  type?: string | string[];
-  example?: string;
-  enum?: string[];
-  properties?: {
-    [key: string]: EventSchema;
-  };
-};
-
-type PetitionEventSchemas = {
-  [T in PetitionEventType]: EventSchema;
-};
-
 export const PetitionEvent = schema({
   type: "object",
   oneOf: Object.entries({
@@ -1041,42 +1027,45 @@ export const PetitionEvent = schema({
         },
       },
     },
-  } as PetitionEventSchemas).map(([event, data]) => ({
-    type: "object",
-    title: titleize(event),
-    description: data.description, // should be visible after merging https://github.com/Redocly/redoc/pull/1497
-    additionalProperties: false,
-    required: ["id", "type", "petitionId", "data", "createdAt"],
-    properties: {
-      id: {
-        type: "string",
-        description: "The ID of the petition event",
-        example: toGlobalId("PetitionEvent", 1),
-      },
-      type: {
-        type: "string",
-        const: event,
-        description: `\`${event}\``,
-        example: event,
-      },
-      petitionId: {
-        type: "string",
-        description: "The ID of the petition where this event occurred",
-        example: toGlobalId("Petition", 42),
-      },
-      data: {
+  } as Record<PetitionEventType, JsonSchema>).map(
+    ([event, data]) =>
+      ({
         type: "object",
-        description: "The payload of the event",
+        title: titleize(event),
+        description: data.description, // should be visible after merging https://github.com/Redocly/redoc/pull/1497
         additionalProperties: false,
-        required: Object.keys(data.properties!),
-        properties: data.properties!,
-      },
-      createdAt: {
-        description: "Creation date of the event",
-        type: "string",
-        format: "date-time",
-        example: new Date(2020, 2, 15).toISOString(),
-      },
-    },
-  })),
+        required: ["id", "type", "petitionId", "data", "createdAt"],
+        properties: {
+          id: {
+            type: "string",
+            description: "The ID of the petition event",
+            example: toGlobalId("PetitionEvent", 1),
+          },
+          type: {
+            type: "string",
+            const: event,
+            description: `\`${event}\``,
+            example: event,
+          },
+          petitionId: {
+            type: "string",
+            description: "The ID of the petition where this event occurred",
+            example: toGlobalId("Petition", 42),
+          },
+          data: {
+            type: "object",
+            description: "The payload of the event",
+            additionalProperties: false,
+            required: Object.keys(data.properties!),
+            properties: data.properties!,
+          },
+          createdAt: {
+            description: "Creation date of the event",
+            type: "string",
+            format: "date-time",
+            example: new Date(2020, 2, 15).toISOString(),
+          },
+        },
+      } as JsonSchema)
+  ),
 } as any);

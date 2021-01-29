@@ -38,7 +38,6 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Settings } from ".";
 
 const PAGE_SIZE = 10;
 const SORTING = ["tokenName", "createdAt", "lastUsedAt"] as const;
@@ -324,8 +323,6 @@ Tokens.getInitialProps = async ({
       ) {
         me {
           id
-          ...SettingsLayout_User
-          ...Settings_User
           authenticationTokens(
             limit: $limit
             offset: $offset
@@ -337,10 +334,10 @@ Tokens.getInitialProps = async ({
               ...Tokens_UserAuthenticationToken
             }
           }
+          ...SettingsLayout_User
         }
       }
       ${SettingsLayout.fragments.User}
-      ${Settings.fragments.User}
       ${Tokens.fragments.UserAuthenticationToken}
     `,
     {

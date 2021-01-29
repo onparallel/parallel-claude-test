@@ -1,8 +1,9 @@
-import { Settings_UserFragment } from "@parallel/graphql/__types";
+import { gql } from "@apollo/client";
+import { useSettingsSections_UserFragment } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
-export function useSettingsSections(user: Settings_UserFragment) {
+export function useSettingsSections(user: useSettingsSections_UserFragment) {
   const intl = useIntl();
   return useMemo(() => {
     const sections = [
@@ -33,5 +34,13 @@ export function useSettingsSections(user: Settings_UserFragment) {
     }
 
     return sections;
-  }, [intl.locale]);
+  }, [user, intl.locale]);
 }
+
+useSettingsSections.fragments = {
+  User: gql`
+    fragment useSettingsSections_User on User {
+      hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
+    }
+  `,
+};

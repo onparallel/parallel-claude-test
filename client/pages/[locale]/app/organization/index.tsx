@@ -4,7 +4,6 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   OrganizationSettingsQuery,
@@ -50,10 +49,10 @@ OrganizationSettings.getInitialProps = async ({
     query OrganizationSettings {
       me {
         id
-        ...AppLayout_User
+        ...SettingsLayout_User
       }
     }
-    ${AppLayout.fragments.User}
+    ${SettingsLayout.fragments.User}
   `);
 };
 

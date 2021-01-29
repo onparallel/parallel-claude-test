@@ -3674,7 +3674,7 @@ export type OrganizationSettingsQueryVariables = Exact<{
 }>;
 
 export type OrganizationSettingsQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> & AppLayout_UserFragment;
+  me: { __typename?: "User" } & Pick<User, "id"> & SettingsLayout_UserFragment;
 };
 
 export type OrganizationUsers_UserFragment = { __typename?: "User" } & Pick<
@@ -3730,7 +3730,7 @@ export type OrganizationUsersQuery = { __typename?: "Query" } & {
             >;
           };
       };
-  } & AppLayout_UserFragment;
+  } & SettingsLayout_UserFragment;
 };
 
 export type PetitionActivity_PetitionFragment = {
@@ -4537,9 +4537,10 @@ export type AccountQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "id"> & Account_UserFragment;
 };
 
-export type Settings_UserFragment = { __typename?: "User" } & {
-  hasApiTokens: User["hasFeatureFlag"];
-} & AppLayout_UserFragment;
+export type Settings_UserFragment = {
+  __typename?: "User";
+} & SettingsLayout_UserFragment &
+  useSettingsSections_UserFragment;
 
 export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -4559,9 +4560,7 @@ export type Security_updatePasswordMutation = {
 export type SecurityQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SecurityQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> &
-    AppLayout_UserFragment &
-    Settings_UserFragment;
+  me: { __typename?: "User" } & SettingsLayout_UserFragment;
 };
 
 export type Tokens_UserAuthenticationTokenFragment = {
@@ -4600,8 +4599,7 @@ export type TokensQuery = { __typename?: "Query" } & {
             } & Tokens_UserAuthenticationTokenFragment
           >;
         };
-    } & SettingsLayout_UserFragment &
-    Settings_UserFragment;
+    } & SettingsLayout_UserFragment;
 };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -4948,43 +4946,14 @@ export type SearchUsersQuery = { __typename?: "Query" } & {
   };
 };
 
+export type useSettingsSections_UserFragment = { __typename?: "User" } & {
+  hasApiTokens: User["hasFeatureFlag"];
+};
+
 export const PetitionTemplateHeader_UserFragmentDoc = gql`
   fragment PetitionTemplateHeader_User on User {
     id
   }
-`;
-export const UserMenu_UserFragmentDoc = gql`
-  fragment UserMenu_User on User {
-    fullName
-    isSuperAdmin
-    role
-  }
-`;
-export const AppLayoutNavbar_UserFragmentDoc = gql`
-  fragment AppLayoutNavbar_User on User {
-    ...UserMenu_User
-  }
-  ${UserMenu_UserFragmentDoc}
-`;
-export const OnboardingTour_UserFragmentDoc = gql`
-  fragment OnboardingTour_User on User {
-    onboardingStatus
-  }
-`;
-export const AppLayout_UserFragmentDoc = gql`
-  fragment AppLayout_User on User {
-    id
-    ...AppLayoutNavbar_User
-    ...OnboardingTour_User
-  }
-  ${AppLayoutNavbar_UserFragmentDoc}
-  ${OnboardingTour_UserFragmentDoc}
-`;
-export const SettingsLayout_UserFragmentDoc = gql`
-  fragment SettingsLayout_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
 `;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
@@ -5113,6 +5082,33 @@ export const RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPeti
   fragment RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetition on PublicPetition {
     status
   }
+`;
+export const UserMenu_UserFragmentDoc = gql`
+  fragment UserMenu_User on User {
+    fullName
+    isSuperAdmin
+    role
+  }
+`;
+export const AppLayoutNavbar_UserFragmentDoc = gql`
+  fragment AppLayoutNavbar_User on User {
+    ...UserMenu_User
+  }
+  ${UserMenu_UserFragmentDoc}
+`;
+export const OnboardingTour_UserFragmentDoc = gql`
+  fragment OnboardingTour_User on User {
+    onboardingStatus
+  }
+`;
+export const AppLayout_UserFragmentDoc = gql`
+  fragment AppLayout_User on User {
+    id
+    ...AppLayoutNavbar_User
+    ...OnboardingTour_User
+  }
+  ${AppLayoutNavbar_UserFragmentDoc}
+  ${OnboardingTour_UserFragmentDoc}
 `;
 export const Admin_UserFragmentDoc = gql`
   fragment Admin_User on User {
@@ -6314,12 +6310,24 @@ export const NewPetition_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
 `;
-export const Settings_UserFragmentDoc = gql`
-  fragment Settings_User on User {
+export const SettingsLayout_UserFragmentDoc = gql`
+  fragment SettingsLayout_User on User {
     ...AppLayout_User
-    hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
   }
   ${AppLayout_UserFragmentDoc}
+`;
+export const useSettingsSections_UserFragmentDoc = gql`
+  fragment useSettingsSections_User on User {
+    hasApiTokens: hasFeatureFlag(featureFlag: API_TOKENS)
+  }
+`;
+export const Settings_UserFragmentDoc = gql`
+  fragment Settings_User on User {
+    ...SettingsLayout_User
+    ...useSettingsSections_User
+  }
+  ${SettingsLayout_UserFragmentDoc}
+  ${useSettingsSections_UserFragmentDoc}
 `;
 export const Account_UserFragmentDoc = gql`
   fragment Account_User on User {
@@ -8545,10 +8553,10 @@ export const OrganizationSettingsDocument = gql`
   query OrganizationSettings {
     me {
       id
-      ...AppLayout_User
+      ...SettingsLayout_User
     }
   }
-  ${AppLayout_UserFragmentDoc}
+  ${SettingsLayout_UserFragmentDoc}
 `;
 
 /**
@@ -8705,7 +8713,6 @@ export const OrganizationUsersDocument = gql`
     $sortBy: [OrganizationUsers_OrderBy!]
   ) {
     me {
-      ...AppLayout_User
       organization {
         id
         users(
@@ -8721,10 +8728,11 @@ export const OrganizationUsersDocument = gql`
           }
         }
       }
+      ...SettingsLayout_User
     }
   }
-  ${AppLayout_UserFragmentDoc}
   ${OrganizationUsers_UserFragmentDoc}
+  ${SettingsLayout_UserFragmentDoc}
 `;
 
 /**
@@ -11028,13 +11036,10 @@ export type Security_updatePasswordMutationHookResult = ReturnType<
 export const SecurityDocument = gql`
   query Security {
     me {
-      id
-      ...AppLayout_User
-      ...Settings_User
+      ...SettingsLayout_User
     }
   }
-  ${AppLayout_UserFragmentDoc}
-  ${Settings_UserFragmentDoc}
+  ${SettingsLayout_UserFragmentDoc}
 `;
 
 /**
@@ -11121,8 +11126,6 @@ export const TokensDocument = gql`
   ) {
     me {
       id
-      ...SettingsLayout_User
-      ...Settings_User
       authenticationTokens(
         limit: $limit
         offset: $offset
@@ -11134,11 +11137,11 @@ export const TokensDocument = gql`
           ...Tokens_UserAuthenticationToken
         }
       }
+      ...SettingsLayout_User
     }
   }
-  ${SettingsLayout_UserFragmentDoc}
-  ${Settings_UserFragmentDoc}
   ${Tokens_UserAuthenticationTokenFragmentDoc}
+  ${SettingsLayout_UserFragmentDoc}
 `;
 
 /**

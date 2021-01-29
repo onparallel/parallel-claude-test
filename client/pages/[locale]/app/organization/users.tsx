@@ -11,7 +11,6 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useConfirmActivateUsersDialog } from "@parallel/components/organization/ConfirmActivateUsersDialog";
 import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/ConfirmDeactivateUserDialog";
@@ -446,7 +445,6 @@ OrganizationUsers.getInitialProps = async ({
         $sortBy: [OrganizationUsers_OrderBy!]
       ) {
         me {
-          ...AppLayout_User
           organization {
             id
             users(
@@ -462,9 +460,10 @@ OrganizationUsers.getInitialProps = async ({
               }
             }
           }
+          ...SettingsLayout_User
         }
       }
-      ${AppLayout.fragments.User}
+      ${SettingsLayout.fragments.User}
       ${OrganizationUsers.fragments.User}
     `,
     {
