@@ -3610,6 +3610,11 @@
     "context": "Parallel helps professionals collect and organize the information from their clients with its email and checklists automation platform and form-like client portal."
   },
   {
+    "term": "public.monitor-progress.cta-title",
+    "definition": "All your requests in a single place",
+    "context": "All your requests in a single place"
+  },
+  {
     "term": "public.people.hero-title",
     "definition": "Laura now has more time to focus on the important work",
     "context": "Laura now has more time to focus on the important work"
@@ -3940,6 +3945,16 @@
     "context": "Help them work more effectively, allowing them to review and sharing their thought around the information received."
   },
   {
+    "term": "public.request-information.cta-title",
+    "definition": "Start streamlining your requests for information",
+    "context": "Start streamlining your requests for information"
+  },
+  {
+    "term": "public.review-files.cta-title",
+    "definition": "Do you want to see how it works? Try it now!",
+    "context": "Do you want to see how it works? Try it now!"
+  },
+  {
     "term": "public.security-link",
     "definition": "Security",
     "context": "Security"
@@ -4133,6 +4148,11 @@
     "term": "public.support.support-center",
     "definition": "Support center",
     "context": "Support center"
+  },
+  {
+    "term": "public.team-collaboration.cta-title",
+    "definition": "Do you want to see how it works? Try it now!",
+    "context": "Do you want to see how it works? Try it now!"
   },
   {
     "term": "public.terms.title",

@@ -1,4 +1,5 @@
-import { Heading, Text } from "@chakra-ui/react";
+import { Button, Flex, Heading, Text } from "@chakra-ui/react";
+import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
@@ -9,6 +10,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 function Follow() {
   const { query } = useRouter();
+  const breakpoint = "lg";
   const intl = useIntl();
   return (
     <PublicLayout
@@ -115,6 +117,34 @@ function Follow() {
             />
           </Text>
         </PublicShowcase>
+      </PublicContainer>
+      <PublicContainer
+        paddingY={8}
+        maxWidth="container.lg"
+        textAlign="center"
+        wrapper={{ paddingY: 8, backgroundColor: "#EFEEFE" }}
+      >
+        <Heading as="h2" size="xl" fontWeight="bold">
+          <FormattedMessage
+            id="public.monitor-progress.cta-title"
+            defaultMessage="All your requests in a single place"
+          />
+        </Heading>
+        <Flex marginTop={16} justifyContent="center">
+          <NakedLink href="/book-demo">
+            <Button
+              as="a"
+              colorScheme="purple"
+              marginBottom={{ base: 2, [breakpoint]: 0 }}
+              marginRight={{ base: 0, [breakpoint]: 2 }}
+            >
+              <FormattedMessage
+                id="public.book-demo-button"
+                defaultMessage="Book a demo"
+              />
+            </Button>
+          </NakedLink>
+        </Flex>
       </PublicContainer>
     </PublicLayout>
   );
