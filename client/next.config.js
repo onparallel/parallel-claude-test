@@ -72,6 +72,8 @@ const config = {
                 contentSecurityPolicy: {
                   directives: {
                     defaultSrc: ["'self'", "*.parallel.so"],
+                    // reDoc
+                    workerSrc: ["'self'", "blob:"],
                     scriptSrc: [
                       "'self'",
                       "*.parallel.so",
