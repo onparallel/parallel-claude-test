@@ -5,7 +5,6 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
-import { useId } from "@reach/auto-id";
 import { Ref } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
@@ -29,10 +28,9 @@ export function MessageEmailEditor({
   onBodyChange: (value: RichTextEditorContent) => void;
 }) {
   const intl = useIntl();
-  const subjectId = `subject-${useId()}`;
   return (
     <>
-      <FormControl id={subjectId} isInvalid={showErrors && !subject}>
+      <FormControl isInvalid={showErrors && !subject}>
         <FormLabel paddingBottom={0}>
           <FormattedMessage
             id="component.message-email-editor.subject-label"

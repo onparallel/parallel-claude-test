@@ -2,6 +2,7 @@ import {
   Box,
   Portal,
   Tooltip,
+  useId,
   useMultiStyleConfig,
   usePopper,
 } from "@chakra-ui/react";
@@ -19,7 +20,6 @@ import {
   useSingleLine,
   withSingleLine,
 } from "@parallel/utils/slate/withSingleLine";
-import { useId } from "@reach/auto-id";
 import { EditablePlugins } from "@udecode/slate-plugins";
 import { MouseEvent, useCallback, useEffect, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -101,8 +101,8 @@ export const PlaceholderInput = chakraForwardRef<
     [onChange, onChangePlaceholder, onChangeSelection]
   );
 
-  const placeholderMenuId = `placeholder-menu-${useId()}`;
-  const itemIdPrefix = `placeholder-menu-item-${useId()}`;
+  const placeholderMenuId = useId(undefined, "placeholder-menu");
+  const itemIdPrefix = useId(undefined, "placeholder-menu-item");
   const isOpen = Boolean(target && values.length > 0);
 
   const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);

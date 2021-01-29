@@ -6,11 +6,11 @@ import {
   CloseButton,
   Heading,
   Stack,
+  useId,
 } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { OnboardingKey, OnboardingStatus } from "@parallel/graphql/__types";
 import { NoSSR } from "@parallel/utils/NoSSR";
-import { useId } from "@reach/auto-id";
 import {
   ComponentType,
   createContext,
@@ -74,8 +74,8 @@ const TourStep = ({
   primaryProps,
   tooltipProps,
 }: TooltipRenderProps) => {
-  const headerId = `step-header-${useId()}`;
-  const bodyId = `step-body-${useId()}`;
+  const headerId = useId(undefined, "step-header");
+  const bodyId = useId(undefined, "step-body");
   return (
     <ChakraProvider theme={theme}>
       <Card
