@@ -124,18 +124,15 @@ export function PetitionRepliesField({
       display="flex"
       flexDirection="column"
       position="relative"
-      sx={{
-        "&[data-highlighted]": {
-          animation: (theme: Theme) =>
-            `${keyframes`
+      _highlighted={{
+        animation: ((theme: Theme) =>
+          `${keyframes`
             0% { background-color: white; }
             25% { background-color: ${theme.colors.gray[100]}; }
             50% { background-color: white }
             75% { background-color: ${theme.colors.gray[100]}; }
             100% { background-color: white; }
-          `} 500ms ease`,
-        },
-        animationIterationCount: 1,
+          `} 500ms ease`) as any,
       }}
       paddingY={4}
       paddingX={{ base: 4, md: 6 }}

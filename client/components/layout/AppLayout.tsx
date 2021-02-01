@@ -93,18 +93,6 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
         onUpdateTour={handleUpdateTour}
         status={user.onboardingStatus as any}
       />
-      <style jsx global>
-        {
-          /* css */ `
-            /* https://github.com/chakra-ui/chakra-ui/issues/3201 */
-            html,
-            body {
-              max-height: 100vh;
-              overflow: hidden;
-            }
-          `
-        }
-      </style>
     </>
   );
 }

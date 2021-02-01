@@ -247,7 +247,7 @@ function useContactSelectReactSelectProps(
             }) => {
               const { fullName, email, isDeleted } = data;
               return (
-                <components.MultiValueLabel {...props}>
+                <components.MultiValueLabel {...(props as any)}>
                   <Text as="span" marginLeft={1}>
                     {isDeleted ? (
                       <DeletedContact color="red.600" />

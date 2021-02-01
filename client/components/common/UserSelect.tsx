@@ -159,7 +159,7 @@ function useUserSelectReactSelectProps<IsMulti extends boolean>(
             }) => {
               const { fullName, email } = data;
               return (
-                <components.MultiValueLabel {...props}>
+                <components.MultiValueLabel {...(props as any)}>
                   <Text as="span" marginLeft={1}>
                     {fullName ? `${fullName} <${email}>` : email}
                   </Text>

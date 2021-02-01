@@ -446,7 +446,7 @@ export function DefaultHeader({
       _first={{ paddingLeft: 5 }}
       height="38px"
       fontSize="sm"
-      fontWeight={400}
+      fontWeight="normal"
       textTransform="uppercase"
       userSelect="none"
       whiteSpace="nowrap"

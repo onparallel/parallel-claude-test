@@ -51,7 +51,7 @@ export const Layout: FC<LayoutProps> = function Layout({
             name="button-primary"
             backgroundColor="#6059f7"
             color="#FFFFFF"
-            fontWeight={600}
+            fontWeight="600"
             borderRadius="4px"
             fontSize="16px"
           />

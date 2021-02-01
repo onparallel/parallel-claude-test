@@ -102,7 +102,7 @@ function AppLayoutNavbarLinkContent({
           transition: "transform 150ms ease",
         })}
       </Box>
-      <Text as="div" textTransform="uppercase" fontSize="xs" fontWeight={600}>
+      <Text as="div" textTransform="uppercase" fontSize="xs" fontWeight="600">
         {children}
       </Text>
     </Box>

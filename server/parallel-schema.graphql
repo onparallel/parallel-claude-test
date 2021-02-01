@@ -121,13 +121,6 @@ input CreateContactInput {
   lastName: String
 }
 
-interface CreatedAt {
-  """
-  Time when the resource was created.
-  """
-  createdAt: DateTime!
-}
-
 type CreateFileUploadReply {
   """
   Endpoint where to upload the file.
@@ -140,6 +133,13 @@ input CreateFileUploadReplyInput {
   contentType: String!
   filename: String!
   size: Int!
+}
+
+interface CreatedAt {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
 }
 
 """
@@ -168,12 +168,12 @@ type FileUploadReplyDownloadLinkResult {
   url: String
 }
 
+scalar GID
+
 type GenerateUserAuthTokenResponse {
   apiKey: String!
   userAuthToken: UserAuthenticationToken!
 }
-
-scalar GID
 
 """
 The types of integrations available.
@@ -437,12 +437,12 @@ type Mutation {
     petitionFieldId: GID!
     petitionId: GID!
   ): Result!
+  deletePetitionSubscription(subscriptionId: GID!): Result!
 
   """
   Delete petitions.
   """
   deletePetitions(force: Boolean = false, ids: [GID!]!): Result!
-  deletePetitionSubscription(subscriptionId: GID!): Result!
 
   """
   Edits permissions on given petitions and users
@@ -796,15 +796,32 @@ type Mutation {
 enum OnboardingKey {
   CONTACT_DETAILS
   CONTACT_LIST
+  PETITIONS_LIST
   PETITION_ACTIVITY
   PETITION_COMPOSE
   PETITION_REVIEW
-  PETITIONS_LIST
 }
 
 enum OnboardingStatus {
   FINISHED
   SKIPPED
+}
+
+type OrgIntegration {
+  """
+  The name of the integration.
+  """
+  name: String!
+
+  """
+  The provider used for this integration.
+  """
+  provider: String!
+
+  """
+  The type of the integration.
+  """
+  type: IntegrationType!
 }
 
 """
@@ -950,23 +967,6 @@ enum OrganizationUsers_OrderBy {
   lastActiveAt_DESC
   lastName_ASC
   lastName_DESC
-}
-
-type OrgIntegration {
-  """
-  The name of the integration.
-  """
-  name: String!
-
-  """
-  The provider used for this integration.
-  """
-  provider: String!
-
-  """
-  The type of the integration.
-  """
-  type: IntegrationType!
 }
 
 type OwnershipTransferredEvent implements PetitionEvent {
@@ -2412,6 +2412,12 @@ enum QueryPetitions_OrderBy {
   name_DESC
 }
 
+type ReminderSentEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  reminder: PetitionReminder!
+}
+
 """
 The reminder settings of a petition
 """
@@ -2462,12 +2468,6 @@ input RemindersConfigInput {
   weekdaysOnly: Boolean!
 }
 
-type ReminderSentEvent implements PetitionEvent {
-  createdAt: DateTime!
-  id: GID!
-  reminder: PetitionReminder!
-}
-
 type ReplyCreatedEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
@@ -2506,8 +2506,8 @@ type SendPetitionResult {
 }
 
 type SignatureCancelledEvent implements PetitionEvent {
-  cancellerReason: String
   cancelType: PetitionSignatureCancelReason!
+  cancellerReason: String
   contact: Contact
   createdAt: DateTime!
   id: GID!

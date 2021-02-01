@@ -133,7 +133,7 @@ export function useReactSelectProps<
             />
           </Text>
         ),
-        MultiValueRemove: ({ innerProps }) => {
+        MultiValueRemove: ({ innerProps, ...props }) => {
           const intl = useIntl();
           return (
             <components.MultiValueRemove
@@ -145,6 +145,7 @@ export function useReactSelectProps<
                   defaultMessage: "Remove",
                 }),
               }}
+              {...props}
             >
               <CloseIcon boxSize="10px" marginX={1} />
             </components.MultiValueRemove>

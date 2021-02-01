@@ -152,10 +152,10 @@ export interface NexusGenEnums {
   OnboardingKey:
     | "CONTACT_DETAILS"
     | "CONTACT_LIST"
+    | "PETITIONS_LIST"
     | "PETITION_ACTIVITY"
     | "PETITION_COMPOSE"
-    | "PETITION_REVIEW"
-    | "PETITIONS_LIST";
+    | "PETITION_REVIEW";
   OnboardingStatus: "FINISHED" | "SKIPPED";
   OrganizationRole: "ADMIN" | "NORMAL";
   OrganizationStatus: db.OrganizationStatus;
@@ -563,8 +563,8 @@ export interface NexusGenFieldTypes {
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     deletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
-    deletePetitions: NexusGenEnums["Result"]; // Result!
     deletePetitionSubscription: NexusGenEnums["Result"]; // Result!
+    deletePetitions: NexusGenEnums["Result"]; // Result!
     editPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
@@ -1016,8 +1016,8 @@ export interface NexusGenFieldTypes {
   };
   SignatureCancelledEvent: {
     // field return type
-    cancellerReason: string | null; // String
     cancelType: NexusGenEnums["PetitionSignatureCancelReason"]; // PetitionSignatureCancelReason!
+    cancellerReason: string | null; // String
     contact: NexusGenRootTypes["Contact"] | null; // Contact
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
@@ -1276,8 +1276,8 @@ export interface NexusGenFieldTypeNames {
     deletePetition: "SupportMethodResponse";
     deletePetitionField: "PetitionBase";
     deletePetitionFieldComment: "Result";
-    deletePetitions: "Result";
     deletePetitionSubscription: "Result";
+    deletePetitions: "Result";
     editPetitionUserPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
@@ -1727,8 +1727,8 @@ export interface NexusGenFieldTypeNames {
   };
   SignatureCancelledEvent: {
     // field return type name
-    cancellerReason: "String";
     cancelType: "PetitionSignatureCancelReason";
+    cancellerReason: "String";
     contact: "Contact";
     createdAt: "DateTime";
     id: "GID";
@@ -2002,14 +2002,14 @@ export interface NexusGenArgTypes {
       petitionFieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    deletePetitionSubscription: {
+      // args
+      subscriptionId: NexusGenScalars["GID"]; // GID!
+    };
     deletePetitions: {
       // args
       force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
-    };
-    deletePetitionSubscription: {
-      // args
-      subscriptionId: NexusGenScalars["GID"]; // GID!
     };
     editPetitionUserPermission: {
       // args

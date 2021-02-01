@@ -216,7 +216,6 @@ const _PetitionComposeField = chakraForwardRef<
               <Box
                 width={4}
                 height={4}
-                backgroundColor="red"
                 textAlign="center"
                 marginTop="13px"
                 fontSize="xl"
