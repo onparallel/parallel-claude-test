@@ -10,7 +10,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 
 function Follow() {
   const { query } = useRouter();
-  const breakpoint = "lg";
   const intl = useIntl();
   return (
     <PublicLayout
@@ -122,22 +121,17 @@ function Follow() {
         paddingY={8}
         maxWidth="container.lg"
         textAlign="center"
-        wrapper={{ paddingY: 8, backgroundColor: "#EFEEFE" }}
+        wrapper={{ paddingY: 8, backgroundColor: "purple.50" }}
       >
-        <Heading as="h2" size="xl" fontWeight="bold">
+        <Heading as="h2" size="lg" fontWeight="500">
           <FormattedMessage
             id="public.monitor-progress.cta-title"
             defaultMessage="All your requests in a single place"
           />
         </Heading>
-        <Flex marginTop={16} justifyContent="center">
+        <Flex marginTop={8} justifyContent="center">
           <NakedLink href="/book-demo">
-            <Button
-              as="a"
-              colorScheme="purple"
-              marginBottom={{ base: 2, [breakpoint]: 0 }}
-              marginRight={{ base: 0, [breakpoint]: 2 }}
-            >
+            <Button as="a" colorScheme="purple">
               <FormattedMessage
                 id="public.book-demo-button"
                 defaultMessage="Book a demo"
