@@ -126,6 +126,7 @@ const config = {
                     imgSrc: [
                       "'self'",
                       "*.parallel.so",
+                      "data:",
                       // Google analytics
                       "www.google-analytics.com",
                       "www.googletagmanager.com",
