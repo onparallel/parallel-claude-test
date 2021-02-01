@@ -1,6 +1,7 @@
 import AWS from "aws-sdk";
 import contentDisposition from "content-disposition";
 import { injectable } from "inversify";
+import { Readable } from "stream";
 
 export const STORAGE_FACTORY = Symbol.for("FACTORY<STORAGE>");
 
@@ -63,14 +64,14 @@ export class Storage {
       .promise();
   }
 
-  async uploadFile(key: string, contentType: string, buffer: Buffer) {
+  async uploadFile(key: string, contentType: string, body: Buffer | Readable) {
     return this.s3
       .upload(
         {
           Bucket: this.bucketName,
           Key: key,
           ContentType: contentType,
-          Body: buffer,
+          Body: body,
         },
         {}
       )

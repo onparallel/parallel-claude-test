@@ -12,13 +12,19 @@ import { UnknownError } from "./graphql/helpers/errors";
 import { schema } from "./schema";
 import { LOGGER, Logger } from "./services/logger";
 import { stopwatchEnd } from "./util/stopwatch";
+import { graphqlUploadExpress } from "graphql-upload";
 
 const app = express();
 const container = createContainer();
 
+app.use(graphqlUploadExpress());
 app.use("/api", bodyParser.json(), cors(), cookieParser(), api(container));
 
 const server = new ApolloServer({
+  // Disable the built in file upload implementation that uses an outdated
+  // `graphql-upload` version, see:
+  // https://github.com/apollographql/apollo-server/issues/3508#issuecomment-662371289
+  uploads: false,
   schema,
   tracing: process.env.NODE_ENV === "development",
   plugins: [

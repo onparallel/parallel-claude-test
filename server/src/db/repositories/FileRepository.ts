@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateFileUpload, Contact, CreateTemporaryFile } from "../__types";
+import { CreateFileUpload, CreateTemporaryFile } from "../__types";
 
 @injectable()
 export class FileRepository extends BaseRepository {
@@ -29,12 +29,12 @@ export class FileRepository extends BaseRepository {
       .where("id", id);
   }
 
-  async deleteFileUpload(id: number, contact: Contact) {
+  async deleteFileUpload(id: number, deletedBy: string) {
     await this.from("file_upload")
       .update(
         {
           deleted_at: this.now(),
-          deleted_by: `Contact:${contact.id}`,
+          deleted_by: deletedBy,
         },
         "*"
       )

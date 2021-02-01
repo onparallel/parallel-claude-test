@@ -187,6 +187,8 @@ export type Mutation = {
   clonePetitions: Array<PetitionBase>;
   /** Create a contact. */
   createContact: Contact;
+  /** Creates a reply to a file upload field. */
+  createFileUploadReply: PetitionFieldReply;
   /** Creates a new organization. */
   createOrganization: SupportMethodResponse;
   /** Creates a new user in the same organization as the context user */
@@ -199,6 +201,8 @@ export type Mutation = {
   createPetitionFieldComment: PetitionFieldComment;
   /** Creates a new subscription on a petition */
   createPetitionSubscription: Subscription;
+  /** Creates a reply to a text or select field. */
+  createSimpleReply: PetitionFieldReply;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Deactivates the specified active petition accesses. */
@@ -211,6 +215,8 @@ export type Mutation = {
   deletePetitionField: PetitionBase;
   /** Delete a petition field comment. */
   deletePetitionFieldComment: Result;
+  /** Deletes a reply to a petition field. */
+  deletePetitionReply: Result;
   deletePetitionSubscription: Result;
   /** Delete petitions. */
   deletePetitions: Result;
@@ -297,6 +303,8 @@ export type Mutation = {
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionUser */
   updatePetitionUserSubscription: Petition;
+  /** Updates a reply to a text or select field. */
+  updateSimpleReply: PetitionFieldReply;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
@@ -353,6 +361,12 @@ export type MutationcreateContactArgs = {
   data: CreateContactInput;
 };
 
+export type MutationcreateFileUploadReplyArgs = {
+  fieldId: Scalars["GID"];
+  file: Scalars["Upload"];
+  petitionId: Scalars["GID"];
+};
+
 export type MutationcreateOrganizationArgs = {
   identifier: Scalars["String"];
   name: Scalars["String"];
@@ -393,6 +407,12 @@ export type MutationcreatePetitionSubscriptionArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationcreateSimpleReplyArgs = {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+  reply: Scalars["String"];
+};
+
 export type MutationcreateUserArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
@@ -425,6 +445,11 @@ export type MutationdeletePetitionFieldCommentArgs = {
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationdeletePetitionReplyArgs = {
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationdeletePetitionSubscriptionArgs = {
@@ -672,6 +697,12 @@ export type MutationupdatePetitionFieldReplyMetadataArgs = {
 export type MutationupdatePetitionUserSubscriptionArgs = {
   isSubscribed: Scalars["Boolean"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationupdateSimpleReplyArgs = {
+  petitionId: Scalars["GID"];
+  reply: Scalars["String"];
+  replyId: Scalars["GID"];
 };
 
 export type MutationupdateUserArgs = {
@@ -1593,26 +1624,26 @@ export type RemindersConfigInput = {
 };
 
 export type ReplyCreatedEvent = PetitionEvent & {
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  createdBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply: Maybe<PetitionFieldReply>;
 };
 
 export type ReplyDeletedEvent = PetitionEvent & {
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
+  deletedBy: Maybe<UserOrPetitionAccess>;
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
 };
 
 export type ReplyUpdatedEvent = PetitionEvent & {
-  access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   field: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply: Maybe<PetitionFieldReply>;
+  updatedBy: Maybe<UserOrPetitionAccess>;
 };
 
 /** Represents the result of an operation. */

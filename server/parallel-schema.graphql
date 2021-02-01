@@ -288,6 +288,15 @@ type Mutation {
   createContact(data: CreateContactInput!): Contact!
 
   """
+  Creates a reply to a file upload field.
+  """
+  createFileUploadReply(
+    fieldId: GID!
+    file: Upload!
+    petitionId: GID!
+  ): PetitionFieldReply!
+
+  """
   Creates a new organization.
   """
   createOrganization(
@@ -367,6 +376,15 @@ type Mutation {
   ): Subscription!
 
   """
+  Creates a reply to a text or select field.
+  """
+  createSimpleReply(
+    fieldId: GID!
+    petitionId: GID!
+    reply: String!
+  ): PetitionFieldReply!
+
+  """
   Creates a new user in the specified organization.
   """
   createUser(
@@ -438,6 +456,11 @@ type Mutation {
     petitionFieldId: GID!
     petitionId: GID!
   ): Result!
+
+  """
+  Deletes a reply to a petition field.
+  """
+  deletePetitionReply(petitionId: GID!, replyId: GID!): Result!
   deletePetitionSubscription(subscriptionId: GID!): Result!
 
   """
@@ -771,6 +794,15 @@ type Mutation {
     isSubscribed: Boolean!
     petitionId: GID!
   ): Petition!
+
+  """
+  Updates a reply to a text or select field.
+  """
+  updateSimpleReply(
+    petitionId: GID!
+    reply: String!
+    replyId: GID!
+  ): PetitionFieldReply!
 
   """
   Updates the user with the provided data.

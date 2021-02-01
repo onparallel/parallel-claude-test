@@ -1315,8 +1315,7 @@ export const updatePetitionFieldReplyMetadata = mutationField(
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.updatePetitionFieldReplyMetadata(
         args.replyId,
-        args.metadata,
-        ctx.user!
+        args.metadata
       );
     },
   }

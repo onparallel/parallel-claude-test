@@ -260,11 +260,14 @@ export const publicDeletePetitionReply = mutationField(
           reply.content["file_upload_id"]
         );
         await Promise.all([
-          ctx.files.deleteFileUpload(file!.id, ctx.contact!),
+          ctx.files.deleteFileUpload(file!.id, `Contact:${ctx.contact!.id}`),
           ctx.aws.fileUploads.deleteFile(file!.path),
         ]);
       }
-      await ctx.petitions.deletePetitionFieldReply(args.replyId, ctx.contact!);
+      await ctx.petitions.deletePetitionFieldReply(
+        args.replyId,
+        `Contact:${ctx.contact!.id}`
+      );
       return RESULT.SUCCESS;
     },
   }
@@ -331,6 +334,24 @@ export const publicCreateFileUploadReply = mutationField(
       fieldBelongsToAccess("fieldId"),
       fieldHasType("fieldId", "FILE_UPLOAD")
     ),
+    validateArgs: async (root, args, ctx, info) => {
+      const { contentType } = args.data;
+      if (
+        ![
+          "image/",
+          "application/pdf",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "video/",
+        ].some((typePrefix) => contentType.startsWith(typePrefix))
+      ) {
+        throw new ArgValidationError(
+          info,
+          "file",
+          `File type ${contentType} is not allowed.`
+        );
+      }
+    },
     resolve: async (_, args, ctx) => {
       const key = random(16);
       const { filename, size, contentType } = args.data;
@@ -421,6 +442,13 @@ export const publicUpdateSimpleReply = mutationField(
           throw new ArgValidationError(info, "reply", "Invalid option");
         }
       }
+      if (!["TEXT", "SELECT"].includes(field.type)) {
+        throw new ArgValidationError(
+          info,
+          "replyId",
+          `Reply ${args.replyId} does not belong to a TEXT or SELECT field`
+        );
+      }
     },
     resolve: async (_, args, ctx) => {
       const petitionId = ctx.access!.petition_id;
@@ -428,7 +456,7 @@ export const publicUpdateSimpleReply = mutationField(
         ctx.petitions.updatePetitionFieldReply(
           args.replyId,
           { content: { text: args.reply }, status: "PENDING" },
-          ctx.contact!
+          `Contact:${ctx.contact!.id}`
         ),
         ctx.petitions.getLastEventForPetitionId(petitionId),
       ]);

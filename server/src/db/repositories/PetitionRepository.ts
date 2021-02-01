@@ -1116,10 +1116,20 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  async createPetitionFieldReply(
-    data: CreatePetitionFieldReply,
-    contact: Contact
+  async createPetitionFieldReply<TCreator extends User | Contact>(
+    data: TCreator extends User
+      ? Omit<CreatePetitionFieldReply, "petition_access_id"> & {
+          user_id: number;
+        }
+      : Omit<CreatePetitionFieldReply, "user_id"> & {
+          petition_access_id: number;
+        },
+    creator: TCreator
   ) {
+    const createdBy = isDefined((data as any).petition_access_id)
+      ? "Contact"
+      : "User";
+
     const field = await this.loadField(data.petition_field_id);
     if (!field) {
       throw new Error("Petition field not found");
@@ -1130,14 +1140,14 @@ export class PetitionRepository extends BaseRepository {
     const [[reply]] = await Promise.all([
       this.insert("petition_field_reply", {
         ...data,
-        updated_by: `Contact:${contact.id}`,
-        created_by: `Contact:${contact.id}`,
+        updated_by: `${createdBy}:${creator.id}`,
+        created_by: `${createdBy}:${creator.id}`,
       }),
       this.from("petition")
         .update({
           status: "PENDING",
           updated_at: this.now(),
-          updated_by: `Contact:${contact.id}`,
+          updated_by: `${createdBy}:${creator.id}`,
         })
         .where({ id: field.petition_id, status: "COMPLETED" }),
     ]);
@@ -1145,7 +1155,9 @@ export class PetitionRepository extends BaseRepository {
       type: "REPLY_CREATED",
       petitionId: field.petition_id,
       data: {
-        petition_access_id: reply.petition_access_id!,
+        ...(createdBy === "User"
+          ? { user_id: reply.user_id! }
+          : { petition_access_id: reply.petition_access_id! }),
         petition_field_id: reply.petition_field_id,
         petition_field_reply_id: reply.id,
       },
@@ -1156,7 +1168,7 @@ export class PetitionRepository extends BaseRepository {
   async updatePetitionFieldReply(
     replyId: number,
     data: Partial<PetitionFieldReply>,
-    contact: Contact
+    updatedBy: string
   ) {
     const field = await this.loadFieldForReply(replyId);
     if (!field) {
@@ -1169,7 +1181,7 @@ export class PetitionRepository extends BaseRepository {
           {
             ...data,
             updated_at: this.now(),
-            updated_by: `Contact:${contact.id}`,
+            updated_by: updatedBy,
           },
           "*"
         ),
@@ -1180,29 +1192,18 @@ export class PetitionRepository extends BaseRepository {
     return reply;
   }
 
-  async updatePetitionFieldReplyMetadata(
-    replyId: number,
-    metadata: any,
-    user: User
-  ) {
+  async updatePetitionFieldReplyMetadata(replyId: number, metadata: any) {
     const field = await this.loadFieldForReply(replyId);
     if (!field) {
       throw new Error("Petition field not found");
     }
     const [reply] = await this.from("petition_field_reply")
       .where("id", replyId)
-      .update(
-        {
-          metadata,
-          updated_at: this.now(),
-          updated_by: `User:${user.id}`,
-        },
-        "*"
-      );
+      .update({ metadata }, "*");
     return reply;
   }
 
-  async deletePetitionFieldReply(replyId: number, contact: Contact) {
+  async deletePetitionFieldReply(replyId: number, deletedBy: string) {
     const reply = await this.loadFieldReply(replyId);
     const field = await this.loadField(reply!.petition_field_id);
     if (!field) {
@@ -1218,14 +1219,14 @@ export class PetitionRepository extends BaseRepository {
       this.from("petition_field_reply")
         .update({
           deleted_at: this.now(),
-          deleted_by: `Contact:${contact.id}`,
+          deleted_by: deletedBy,
         })
         .where("id", replyId),
       this.from("petition")
         .update({
           status: "PENDING",
           updated_at: this.now(),
-          updated_by: `Contact:${contact.id}`,
+          updated_by: deletedBy,
         })
         .where({ id: field.petition_id, status: "COMPLETED" }),
       this.createEvent({
