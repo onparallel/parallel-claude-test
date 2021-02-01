@@ -106,7 +106,8 @@ in order to get the uploaded file.
 ~~~bash
 curl -s -L -XGET \\
   -H 'Authorization: Bearer <your API token>' \\
-  'https://www.parallel.so/api/v1/petitions/{petitionId}/replies/{replyId}/download' 
+  'https://www.parallel.so/api/v1/petitions/{petitionId}/replies/{replyId}/download' \\
+  > file.png
 ~~~
 
 *Note that you need to configure your HTTP client to follow redirects, hence
