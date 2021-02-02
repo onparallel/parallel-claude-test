@@ -4,6 +4,7 @@ import { IAuth } from "../src/services/auth";
 import { IAws } from "../src/services/aws";
 import { IEmailsService } from "../src/services/emails";
 import { IRedis } from "../src/services/redis";
+import { IStorage } from "../src/services/storage";
 
 export const userCognitoId = "test-cognito-id";
 
@@ -58,6 +59,34 @@ export class MockAwsService implements IAws {
   readonly cognitoIdP = null as any;
   async enqueueMessages() {}
   async createCognitoUser() {
+    return "";
+  }
+  public get fileUploads() {
+    return new MockStorage();
+  }
+}
+
+@injectable()
+export class MockStorage implements IStorage {
+  async uploadFile(key: string) {
+    return {
+      Key: key,
+      Bucket: "mock-test",
+      ETag: "",
+      Location: "",
+    };
+  }
+  downloadFile() {
+    return {} as any;
+  }
+  async getFileMetadata() {
+    return {} as any;
+  }
+  async deleteFile() {}
+  async getSignedUploadEndpoint() {
+    return "";
+  }
+  async getSignedDownloadEndpoint() {
     return "";
   }
 }

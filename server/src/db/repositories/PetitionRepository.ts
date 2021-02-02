@@ -1533,7 +1533,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async getLastEventForPetitionId(petitionId: number) {
-    const [event] = await this.raw<PetitionEvent>(
+    const [event] = await this.raw<PetitionEvent | null>(
       /* sql */ `
       select * from petition_event where id in (
         select max(id) from petition_event where petition_id = ? 

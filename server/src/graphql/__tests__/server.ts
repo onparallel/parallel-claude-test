@@ -3,24 +3,11 @@ import { createTestClient } from "apollo-server-testing";
 import { serialize as serializeCookie } from "cookie";
 import Knex from "knex";
 import { createTestContainer } from "../../../test/testContainer";
-import { createContainer } from "../../container";
 import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";
-import { ANALYTICS, IAnalyticsService } from "../../services/analytics";
-import { AUTH, IAuth } from "../../services/auth";
-import { AWS_SERVICE, IAws } from "../../services/aws";
-import { EMAILS, IEmailsService } from "../../services/emails";
-import { IRedis, REDIS } from "../../services/redis";
 import { deleteAllData } from "../../util/knexUtils";
 import { UnwrapPromise } from "../../util/types";
 import { schema } from "./../../schema";
-import {
-  MockAnalyticsService,
-  MockAuth,
-  MockAwsService,
-  MockEmailsService,
-  MockRedis,
-} from "../../../test/mocks";
 
 export type TestClient = UnwrapPromise<ReturnType<typeof initServer>>;
 

@@ -5,11 +5,12 @@ import { chunk } from "remeda";
 import { LOGGER, Logger } from "./logger";
 import { createHash } from "crypto";
 import { Memoize } from "typescript-memoize";
-import { Storage, STORAGE_FACTORY } from "./storage";
+import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 
 export interface IAws {
   sqs: AWS.SQS;
   cognitoIdP: AWS.CognitoIdentityServiceProvider;
+  fileUploads: IStorage;
   enqueueMessages(
     queue: keyof Config["queueWorkers"],
     messages:
@@ -64,7 +65,8 @@ export class Aws implements IAws {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(LOGGER) private logger: Logger,
-    @inject(STORAGE_FACTORY) private storageFactory: interfaces.Factory<Storage>
+    @inject(STORAGE_FACTORY)
+    private storageFactory: interfaces.Factory<IStorage>
   ) {
     AWS.config.update({
       ...config.aws,

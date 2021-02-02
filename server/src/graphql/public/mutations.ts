@@ -461,6 +461,7 @@ export const publicUpdateSimpleReply = mutationField(
         ctx.petitions.getLastEventForPetitionId(petitionId),
       ]);
       if (
+        event &&
         (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
         event.data.petition_field_reply_id === args.replyId &&
         differenceInSeconds(new Date(), event.created_at) < 60

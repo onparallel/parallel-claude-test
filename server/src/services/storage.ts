@@ -1,4 +1,6 @@
-import AWS from "aws-sdk";
+import AWS, { AWSError } from "aws-sdk";
+import { HeadObjectOutput, ManagedUpload } from "aws-sdk/clients/s3";
+import { PromiseResult } from "aws-sdk/lib/request";
 import contentDisposition from "content-disposition";
 import { injectable } from "inversify";
 import { Readable } from "stream";
@@ -7,10 +9,29 @@ export const STORAGE_FACTORY = Symbol.for("FACTORY<STORAGE>");
 
 export type StorageFactory = (
   ...args: ConstructorParameters<typeof Storage>
-) => Storage;
+) => IStorage;
+
+export interface IStorage {
+  getSignedUploadEndpoint(key: string, contentType: string): Promise<string>;
+  getSignedDownloadEndpoint(
+    key: string,
+    filename: string,
+    cdType: "attachment" | "inline"
+  ): Promise<string>;
+  downloadFile(key: string): Readable;
+  getFileMetadata(
+    key: string
+  ): Promise<PromiseResult<HeadObjectOutput, AWSError>>;
+  deleteFile(key: string): Promise<void>;
+  uploadFile(
+    key: string,
+    contentType: string,
+    body: Buffer | Readable
+  ): Promise<ManagedUpload.SendData>;
+}
 
 @injectable()
-export class Storage {
+export class Storage implements IStorage {
   constructor(private s3: AWS.S3, private bucketName: string) {}
 
   async getSignedUploadEndpoint(key: string, contentType: string) {

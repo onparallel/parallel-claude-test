@@ -22,6 +22,8 @@ import {
   PetitionUserPermissionType,
   PetitionEventSubscription,
   CreateFeatureFlag,
+  FileUpload,
+  CreateFileUpload,
 } from "../../__types";
 import { hash, random } from "../../../util/token";
 
@@ -185,6 +187,43 @@ export class Mocks {
             content: { text: faker.lorem.words(10) },
             type: "TEXT",
             petition_access_id: access_id,
+            ...builder?.(index),
+          };
+        })
+      )
+      .returning("*");
+  }
+
+  async createRandomFileUpload(
+    amount?: number,
+    builder?: (index: number) => Partial<FileUpload>
+  ) {
+    return await this.knex<FileUpload>("file_upload")
+      .insert(
+        range(0, amount || 1).map<CreateFileUpload>((index) => ({
+          content_type: "application/pdf",
+          filename: "file.pdf",
+          path: random(16),
+          size: 100,
+          upload_complete: true,
+          ...builder?.(index),
+        }))
+      )
+      .returning("*");
+  }
+
+  async createRandomFileReply(
+    fieldId: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldReply>
+  ) {
+    return await this.knex<PetitionFieldReply>("petition_field_reply")
+      .insert(
+        range(0, amount || 1).map<CreatePetitionFieldReply>((index) => {
+          return {
+            petition_field_id: fieldId,
+            type: "FILE_UPLOAD",
+            content: { file_upload_id: 1 },
             ...builder?.(index),
           };
         })

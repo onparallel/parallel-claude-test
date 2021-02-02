@@ -79,16 +79,16 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
     }
   },
   resolve: async (_, args, ctx) => {
-    const petitionId = ctx.access!.petition_id;
     const [reply, event] = await Promise.all([
       ctx.petitions.updatePetitionFieldReply(
         args.replyId,
         { content: { text: args.reply }, status: "PENDING" },
         `User:${ctx.user!.id}`
       ),
-      ctx.petitions.getLastEventForPetitionId(petitionId),
+      ctx.petitions.getLastEventForPetitionId(args.petitionId),
     ]);
     if (
+      event &&
       (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
       event.data.petition_field_reply_id === args.replyId &&
       differenceInSeconds(new Date(), event.created_at) < 60
@@ -97,7 +97,7 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
     } else {
       await ctx.petitions.createEvent({
         type: "REPLY_UPDATED",
-        petitionId,
+        petitionId: args.petitionId,
         data: {
           user_id: reply.user_id!,
           petition_field_id: reply.petition_field_id,
@@ -154,7 +154,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
       bytesWritten += byteLength;
     });
 
-    await ctx.aws.temporaryFiles.uploadFile(key, mimetype, stream);
+    await ctx.aws.fileUploads.uploadFile(key, mimetype, stream);
 
     const file = await ctx.files.createFileUpload(
       {
