@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { DefinePlugin } = require("webpack");
 const SentryWebpackPlugin = require("@sentry/webpack-plugin");
 const { createSecureHeaders } = require("next-secure-headers");
 
@@ -17,7 +16,7 @@ const config = {
 
     config.resolve.alias["@parallel"] = __dirname;
     config.plugins.push(
-      new DefinePlugin({
+      new options.webpack.DefinePlugin({
         "process.env.BUILD_ID": JSON.stringify(options.buildId),
       })
     );
