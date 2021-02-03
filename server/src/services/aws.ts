@@ -9,6 +9,7 @@ import { Storage, STORAGE_FACTORY } from "./storage";
 
 export interface IAws {
   sqs: AWS.SQS;
+  cognitoIdP: AWS.CognitoIdentityServiceProvider;
   enqueueMessages(
     queue: keyof Config["queueWorkers"],
     messages:

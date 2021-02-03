@@ -28,7 +28,8 @@
     "localtunnel": "ts-node ./bin/launch-localtunnel.ts",
     "emails": "concurrently \"ts-node-dev --watch ./emails.tsx --ignore-watch ./src --files ./emails.tsx --respawn\" \"start-storybook --port 60000 --quiet\"",
     "postinstall": "yarn --cwd .. patch-package",
-    "generate-graphql-types": "graphql-codegen"
+    "generate-graphql-types": "graphql-codegen",
+    "verify-cognito-users": "ts-node --project tsconfig.json --transpile-only ./bin/verify-cognito-users.ts"
   },
   "dependencies": {
     "@nexus/schema": "^0.19.2",

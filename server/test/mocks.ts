@@ -55,6 +55,7 @@ export class MockEmailsService implements IEmailsService {
 @injectable()
 export class MockAwsService implements IAws {
   readonly sqs = null as any;
+  readonly cognitoIdP = null as any;
   async enqueueMessages() {}
   async createCognitoUser() {
     return "";
