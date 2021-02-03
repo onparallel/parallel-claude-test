@@ -5,9 +5,7 @@ import Ajv from "ajv";
 
 export function jsonSchema(schema: any) {
   return <TypeName extends string, FieldName extends string>(
-    prop: (
-      args: core.ArgsValue<TypeName, FieldName>
-    ) => string | null | undefined,
+    prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
     argName: string
   ) => {
     return ((_, args, ctx, info) => {
