@@ -21,6 +21,7 @@ export const FeatureFlag = enumType({
       deprecation: "Don't use this",
     },
     "SKIP_FORWARD_SECURITY",
+    "EXPORT_CUATRECASAS",
   ],
   rootTyping: "db.FeatureFlagName",
 });

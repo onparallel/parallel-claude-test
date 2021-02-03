@@ -606,6 +606,7 @@ export interface NexusGenFieldTypes {
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
+    updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionUserSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
@@ -774,6 +775,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     field: NexusGenRootTypes["PetitionField"] | null; // PetitionField
     id: NexusGenScalars["GID"]; // GID!
+    metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
@@ -1319,6 +1321,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionField: "PetitionBaseAndField";
     updatePetitionFieldComment: "PetitionFieldComment";
     updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
+    updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionUserSubscription: "Petition";
     updateUser: "User";
     updateUserStatus: "User";
@@ -1485,6 +1488,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     field: "PetitionField";
     id: "GID";
+    metadata: "JSONObject";
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";
   };
@@ -2237,6 +2241,12 @@ export interface NexusGenArgTypes {
       petitionFieldReplyIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
       status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
+    };
+    updatePetitionFieldReplyMetadata: {
+      // args
+      metadata: NexusGenScalars["JSONObject"]; // JSONObject!
+      petitionId: NexusGenScalars["GID"]; // GID!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionUserSubscription: {
       // args

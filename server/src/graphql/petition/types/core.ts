@@ -549,6 +549,10 @@ export const PetitionFieldReply = objectType({
         return await ctx.petitions.loadField(root.petition_field_id);
       },
     });
+    t.jsonObject("metadata", {
+      description: "Metadata for this reply.",
+      resolve: (o) => o.metadata,
+    });
   },
 });
 

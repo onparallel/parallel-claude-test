@@ -257,7 +257,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     );
     try {
       if (hasFiles) {
-        const res = await showExportRepliesDialog({ fields: petition.fields });
+        const res = await showExportRepliesDialog({
+          user: me,
+          fields: petition.fields,
+        });
         if (res.type === "DOWNLOAD_ZIP") {
           window.open(
             `/api/downloads/petition/${petitionId}/files?pattern=${encodeURIComponent(
@@ -266,7 +269,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             "_blank"
           );
         } else {
-          await showExportRepliesProgressDialog({ petitionId: petition.id });
+          await showExportRepliesProgressDialog({
+            petitionId: petition.id,
+            pattern: res.pattern,
+          });
         }
       } else {
         window.open(`/api/downloads/petition/${petitionId}/files`, "_blank");
@@ -705,9 +711,11 @@ PetitionReplies.fragments = {
         hasPetitionPdfExport: hasFeatureFlag(featureFlag: PETITION_PDF_EXPORT)
         ...PetitionLayout_User
         ...PetitionRepliesFieldComments_User
+        ...ExportRepliesDialog_User
       }
       ${PetitionLayout.fragments.User}
       ${PetitionRepliesFieldComments.fragments.User}
+      ${ExportRepliesDialog.fragments.User}
     `;
   },
 };

@@ -1174,13 +1174,31 @@ export class PetitionRepository extends BaseRepository {
           "*"
         ),
       this.from("petition")
-        .update({
-          status: "PENDING",
-          updated_at: this.now(),
-          updated_by: `Contact:${contact.id}`,
-        })
+        .update({ status: "PENDING" })
         .where({ id: field.petition_id, status: "COMPLETED" }),
     ]);
+    return reply;
+  }
+
+  async updatePetitionFieldReplyMetadata(
+    replyId: number,
+    metadata: any,
+    user: User
+  ) {
+    const field = await this.loadFieldForReply(replyId);
+    if (!field) {
+      throw new Error("Petition field not found");
+    }
+    const [reply] = await this.from("petition_field_reply")
+      .where("id", replyId)
+      .update(
+        {
+          metadata,
+          updated_at: this.now(),
+          updated_by: `User:${user.id}`,
+        },
+        "*"
+      );
     return reply;
   }
 

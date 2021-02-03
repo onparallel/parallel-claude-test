@@ -31,6 +31,17 @@ function* numbers() {
   }
 }
 
+export function getFieldIndexValues(
+  fields: Pick<PetitionField, "type">[]
+): Array<number | string> {
+  const letter = letters();
+  const number = numbers();
+  return fields.map((f) =>
+    f.type === "HEADING"
+      ? (letter.next().value as string)
+      : (number.next().value as number)
+  );
+}
 /**
  * iterates every field and returns an array representing the index of each one in the same order
  * @param fields fields to iterate.
@@ -38,13 +49,7 @@ function* numbers() {
 export function useFieldIndexValues(
   fields: Pick<PetitionField, "type">[]
 ): Array<number | string> {
-  return useMemo(() => {
-    const letter = letters();
-    const number = numbers();
-    return fields.map((f) =>
-      f.type === "HEADING"
-        ? (letter.next().value as string)
-        : (number.next().value as number)
-    );
-  }, [fields.map((f) => f.type).join(",")]);
+  return useMemo(() => getFieldIndexValues(fields), [
+    fields.map((f) => f.type).join(","),
+  ]);
 }

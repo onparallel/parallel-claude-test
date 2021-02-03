@@ -4,144 +4,126 @@ import {
   Button,
   Checkbox,
   Collapse,
-  Input,
   FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
   Radio,
   RadioGroup,
   Stack,
   Text,
-  FormLabel,
-  FormErrorMessage,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
-import { ExportRepliesDialog_PetitionFieldFragment } from "@parallel/graphql/__types";
-import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
-import escapeStringRegexp from "escape-string-regexp";
-import { useMemo, useRef, useState } from "react";
+import {
+  ExportRepliesDialog_PetitionFieldFragment,
+  ExportRepliesDialog_UserFragment,
+} from "@parallel/graphql/__types";
+import {
+  useFilenamePlaceholders,
+  useFilenamePlaceholdersRename,
+} from "@parallel/utils/useFilenamePlaceholders";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import sanitize from "sanitize-filename";
 import {
   PlaceholderInput,
   PlaceholderInputRef,
 } from "../common/PlaceholderInput";
 
 export type ExportRepliesDialogProps = {
+  user: ExportRepliesDialog_UserFragment;
   fields: ExportRepliesDialog_PetitionFieldFragment[];
 };
 
-export type ExportType =
+export type ExportParams =
   | { type: "DOWNLOAD_ZIP"; pattern: string }
   | { type: "EXPORT_CUATRECASAS"; pattern: string; clientId: string };
 
+export type ExportType = ExportParams["type"];
+
+export type ExportOption = {
+  type: ExportType;
+  title: string;
+  description: string;
+};
+
 export function ExportRepliesDialog({
+  user,
   fields,
   ...props
-}: DialogProps<ExportRepliesDialogProps, ExportType>) {
+}: DialogProps<ExportRepliesDialogProps, ExportParams>) {
   const intl = useIntl();
-  const [option, setOption] = useState<ExportType["type"]>("DOWNLOAD_ZIP");
+  const [options, setOptions] = useState<ExportType[]>(["DOWNLOAD_ZIP"]);
+  const [selectedOption, setSelectedOption] = useState<ExportType>(
+    "DOWNLOAD_ZIP"
+  );
+  const messages: Record<ExportType, { title: string; description: string }> = {
+    DOWNLOAD_ZIP: {
+      title: intl.formatMessage({
+        id: "component.export-replies-dialog.download-files",
+        defaultMessage: "Download files as a ZIP",
+      }),
+      description: intl.formatMessage({
+        id:
+          "component.export-replies-dialog.download-files-and-replies-description",
+        defaultMessage:
+          "Download all files including text replies in Excel format.",
+      }),
+    },
+    EXPORT_CUATRECASAS: {
+      title: intl.formatMessage({
+        id: "component.export-replies-dialog.export-cuatrecasas",
+        defaultMessage: "Export to NetDocuments",
+      }),
+      description: intl.formatMessage({
+        id: "component.export-replies-dialog.export-cuatrecasas-description",
+        defaultMessage: "Export files to a folder in NetDocuments.",
+      }),
+    },
+  };
+
+  useEffect(() => {
+    async function ping() {
+      if (user.hasExportCuatrecasas) {
+        try {
+          await fetch("https://localhost:50500/api/v1/echo");
+          setOptions((options) => [...options, "EXPORT_CUATRECASAS"]);
+        } catch {}
+      }
+    }
+    ping().then();
+  }, [user.hasExportCuatrecasas]);
+
   const [rename, setRename] = useState(true);
   const [pattern, setPattern] = useState("#field-title#");
-  const placeholders = useMemo(
-    () => [
-      {
-        value: "field-number",
-        label: intl.formatMessage({
-          id: "component.download-dialog.placeholder-field-number",
-          defaultMessage: "Field number",
-        }),
-      },
-      {
-        value: "field-title",
-        label: intl.formatMessage({
-          id: "component.download-dialog.placeholder-field-title",
-          defaultMessage: "Field title",
-        }),
-      },
-      {
-        value: "contact-first-name",
-        label: intl.formatMessage({
-          id: "component.download-dialog.placeholder-contact-first-name",
-          defaultMessage: "Contact first name",
-        }),
-      },
-      {
-        value: "contact-last-name",
-        label: intl.formatMessage({
-          id: "component.download-dialog.placeholder-contact-last-name",
-          defaultMessage: "Contact last name",
-        }),
-      },
-      {
-        value: "file-name",
-        label: intl.formatMessage({
-          id: "component.download-dialog.placeholder-file-name",
-          defaultMessage: "File name",
-        }),
-      },
-    ],
-    [intl.locale]
-  );
+  const placeholders = useFilenamePlaceholders();
   const [clientId, setClientId] = useState("");
   const [clientIdError, setClientIdError] = useState(false);
   const clientIdRef = useRef<HTMLInputElement>(null);
-
-  const fieldIndexValues = useFieldIndexValues(fields);
+  const placeholdersRename = useFilenamePlaceholdersRename();
   const example = useMemo(() => {
     const field = fields.find(
       (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
     )!;
-    const position = fieldIndexValues[fields.indexOf(field)];
     const reply = field.replies[0];
-    const extension =
-      (reply.content.filename as string).match(/\.[a-z0-9]+$/)?.[0] ?? "";
-    const parts = pattern.split(
-      new RegExp(
-        `(#(?:${placeholders
-          .map((p) => escapeStringRegexp(p.value))
-          .join("|")})#)`,
-        "g"
-      )
-    );
-    const name = parts
-      .map((part) => {
-        if (part.startsWith("#") && part.endsWith("#")) {
-          const value = part.slice(1, -1);
-          switch (value) {
-            case "field-number":
-              return position;
-            case "field-title":
-              return field.title ?? "";
-            case "file-name":
-              // remove file extension since it's added back later
-              return reply.content.filename.replace(/\.[a-z0-9]+$/, "");
-            case "contact-first-name":
-              return reply.access?.contact?.firstName ?? "";
-            case "contact-last-name":
-              return reply.access?.contact?.lastName ?? "";
-          }
-        }
-        return part;
-      })
-      .join("");
-    return sanitize(`${name}${extension ?? ""}`);
-  }, [pattern, fields, fieldIndexValues]);
+    return placeholdersRename(fields)(field, reply, pattern);
+  }, [fields, placeholdersRename]);
 
   const inputRef = useRef<PlaceholderInputRef>(null);
   const handleConfirmClick = () => {
     const _pattern = rename ? pattern : "#field-title#";
-    if (option === "DOWNLOAD_ZIP") {
-      props.onResolve({ type: option, pattern: _pattern });
-    } else if (option === "EXPORT_CUATRECASAS") {
+    if (selectedOption === "DOWNLOAD_ZIP") {
+      props.onResolve({ type: selectedOption, pattern: _pattern });
+    } else if (selectedOption === "EXPORT_CUATRECASAS") {
       if (!clientId || !/^\d{6}$/.test(clientId)) {
         setClientIdError(true);
         clientIdRef.current?.focus();
       } else {
         setClientIdError(false);
-        props.onResolve({ type: option, pattern: _pattern, clientId });
+        props.onResolve({ type: selectedOption, pattern: _pattern, clientId });
       }
     }
   };
@@ -157,125 +139,109 @@ export function ExportRepliesDialog({
         />
       }
       body={
-        <Box>
-          <Text marginBottom={2}>
-            <FormattedMessage
-              id="component.export-replies-dialog.text"
-              defaultMessage="Choose how you would like to export the replies:"
-            />
-          </Text>
-          <RadioGroup
-            value={option}
-            as={Stack}
-            onChange={(option) => {
-              if (option === "EXPORT_CUATRECASAS") {
-                setTimeout(() => clientIdRef.current?.focus());
-              }
-              setOption(option as any);
-            }}
-          >
-            <Radio size="lg" value="DOWNLOAD_ZIP">
-              <Text fontSize="md">
-                <FormattedMessage
-                  id="component.export-replies-dialog.download-files"
-                  defaultMessage="Download files as a ZIP"
-                />
-              </Text>
-              <Text fontSize="sm" color="gray.500">
-                <FormattedMessage
-                  id="component.export-replies-dialog.download-files-and-replies-description"
-                  defaultMessage="Download all files including text replies in Excel format."
-                />
-              </Text>
-            </Radio>
-            <Radio size="lg" value="EXPORT_CUATRECASAS">
-              <Text fontSize="md">
-                <FormattedMessage
-                  id="component.export-replies-dialog.export-cuatrecasas"
-                  defaultMessage="Export to NetDocuments"
-                />
-              </Text>
-              <Text fontSize="sm" color="gray.500">
-                <FormattedMessage
-                  id="component.export-replies-dialog.export-cuatrecasas-description"
-                  defaultMessage="Export files to a folder in NetDocuments."
-                />
-              </Text>
-            </Radio>
-          </RadioGroup>
-          <Box marginX={-1}>
-            <Collapse in={option === "EXPORT_CUATRECASAS"}>
-              <FormControl
-                padding={1}
-                paddingLeft={7}
-                isInvalid={clientIdError}
-              >
-                <FormLabel fontWeight="normal">
-                  <FormattedMessage
-                    id="component.export-replies-dialog.export-cuatrecasas-client-number"
-                    defaultMessage="Client number"
-                  />
-                  <Input
-                    ref={clientIdRef}
-                    value={clientId}
-                    onChange={(e) => {
-                      setClientId(e.target.value);
-                      setClientIdError(false);
+        <Stack spacing={4}>
+          {options.length > 1 || selectedOption === "EXPORT_CUATRECASAS" ? (
+            <Stack>
+              {options.length > 1 ? (
+                <>
+                  <Text marginBottom={2}>
+                    <FormattedMessage
+                      id="component.export-replies-dialog.text"
+                      defaultMessage="Choose how you would like to export the replies:"
+                    />
+                  </Text>
+                  <RadioGroup
+                    value={selectedOption}
+                    as={Stack}
+                    onChange={(option) => {
+                      if (option === "EXPORT_CUATRECASAS") {
+                        setTimeout(() => clientIdRef.current?.focus());
+                      }
+                      setSelectedOption(option as any);
                     }}
-                    placeholder="123456"
-                    pattern="[0-9]{6}"
+                  >
+                    {options.map((option) => (
+                      <Radio key={option} size="lg" value={option}>
+                        <Text fontSize="md">{messages[option].title}</Text>
+                        <Text fontSize="sm" color="gray.500">
+                          {messages[option].description}
+                        </Text>
+                      </Radio>
+                    ))}
+                  </RadioGroup>
+                </>
+              ) : null}
+              {selectedOption === "EXPORT_CUATRECASAS" ? (
+                <FormControl paddingLeft={7} isInvalid={clientIdError}>
+                  <FormLabel fontWeight="normal">
+                    <FormattedMessage
+                      id="component.export-replies-dialog.export-cuatrecasas-client-number"
+                      defaultMessage="Client number"
+                    />
+                    <Input
+                      ref={clientIdRef}
+                      value={clientId}
+                      onChange={(e) => {
+                        setClientId(e.target.value);
+                        setClientIdError(false);
+                      }}
+                      placeholder="123456"
+                      pattern="[0-9]{6}"
+                      maxLength={6}
+                    />
+                  </FormLabel>
+                  <FormErrorMessage>
+                    <FormattedMessage
+                      id="component.export-replies-dialog.export-cuatrecasas-client-number-error"
+                      defaultMessage="Client ID must be a 6 digit code"
+                    />
+                  </FormErrorMessage>
+                </FormControl>
+              ) : null}
+            </Stack>
+          ) : null}
+          <Box>
+            <Checkbox
+              marginLeft={1}
+              isChecked={rename}
+              onChange={(e) => {
+                setRename(e.target.checked);
+                if (e.target.checked) {
+                  inputRef.current?.focus();
+                }
+              }}
+            >
+              <FormattedMessage
+                id="component.export-replies-dialog.rename"
+                defaultMessage="Rename downloaded files automatically"
+              />
+            </Checkbox>
+            <Box marginX={-1}>
+              <Collapse in={rename}>
+                <Box marginLeft={7} padding={1}>
+                  <PlaceholderInput
+                    ref={inputRef}
+                    value={pattern}
+                    onChange={setPattern}
+                    placeholders={placeholders}
+                    marginBottom={2}
                   />
-                </FormLabel>
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="component.export-replies-dialog.export-cuatrecasas-client-number-error"
-                    defaultMessage="Client ID must be a 6 digit code"
-                  />
-                </FormErrorMessage>
-              </FormControl>
-            </Collapse>
+                  <Text as="div" fontSize="xs" color="gray.500">
+                    <FormattedMessage
+                      id="generic.for-example"
+                      defaultMessage="E.g. {example}"
+                      values={{ example }}
+                    />
+                  </Text>
+                </Box>
+              </Collapse>
+            </Box>
           </Box>
-          <Checkbox
-            marginTop={6}
-            size="lg"
-            isChecked={rename}
-            onChange={(e) => {
-              setRename(e.target.checked);
-              if (e.target.checked) {
-                inputRef.current?.focus();
-              }
-            }}
-          >
-            <FormattedMessage
-              id="component.export-replies-dialog.rename"
-              defaultMessage="Rename files"
-            />
-          </Checkbox>
-          <Box marginX={-1}>
-            <Collapse in={rename}>
-              <Box marginLeft={7} padding={1}>
-                <PlaceholderInput
-                  ref={inputRef}
-                  value={pattern}
-                  onChange={setPattern}
-                  placeholders={placeholders}
-                  marginBottom={2}
-                />
-                <Text as="div" fontSize="xs" color="gray.500">
-                  <FormattedMessage
-                    id="generic.for-example"
-                    defaultMessage="E.g. {example}"
-                    values={{ example }}
-                  />
-                </Text>
-              </Box>
-            </Collapse>
-          </Box>
-        </Box>
+        </Stack>
       }
       confirm={
         <Button colorScheme="purple" onClick={handleConfirmClick}>
-          {option.startsWith("DOWNLOAD") ? (
+          {selectedOption.startsWith("DOWNLOAD") ? (
             <FormattedMessage id="generic.download" defaultMessage="Download" />
           ) : (
             <FormattedMessage id="generic.export" defaultMessage="Export" />
@@ -288,20 +254,22 @@ export function ExportRepliesDialog({
 }
 
 ExportRepliesDialog.fragments = {
+  User: gql`
+    fragment ExportRepliesDialog_User on User {
+      hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
+    }
+  `,
   PetitionField: gql`
     fragment ExportRepliesDialog_PetitionField on PetitionField {
-      title
+      id
       type
+      ...useFilenamePlaceholdersRename_PetitionField
       replies {
-        content
-        access {
-          contact {
-            firstName
-            lastName
-          }
-        }
+        ...useFilenamePlaceholdersRename_PetitionFieldReply
       }
     }
+    ${useFilenamePlaceholdersRename.fragments.PetitionField}
+    ${useFilenamePlaceholdersRename.fragments.PetitionFieldReply}
   `,
 };
 

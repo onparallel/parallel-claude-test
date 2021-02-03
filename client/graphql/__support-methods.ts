@@ -19,6 +19,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "ID", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
         {
           name: "userId",
@@ -29,6 +31,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "Int", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
       ],
       type: {
@@ -55,6 +59,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "String", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
         {
           name: "name",
@@ -65,6 +71,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "String", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
         {
           name: "status",
@@ -75,6 +83,8 @@ export const supportMethods: {
             ofType: { kind: "ENUM", name: "OrganizationStatus", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
       ],
       type: {
@@ -101,6 +111,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "String", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
         {
           name: "firstName",
@@ -111,6 +123,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "String", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
         {
           name: "lastName",
@@ -121,6 +135,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "String", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
         {
           name: "organizationId",
@@ -131,6 +147,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "Int", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
         {
           name: "password",
@@ -141,6 +159,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "String", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
         {
           name: "role",
@@ -151,6 +171,8 @@ export const supportMethods: {
             ofType: { kind: "ENUM", name: "OrganizationRole", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
       ],
       type: {
@@ -177,6 +199,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "ID", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
       ],
       type: {
@@ -204,6 +228,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "ID", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
       ],
       type: {
@@ -230,6 +256,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "Int", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
         {
           name: "type",
@@ -240,6 +268,8 @@ export const supportMethods: {
             ofType: { kind: "ENUM", name: "EntityType", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
       ],
       type: {
@@ -267,6 +297,8 @@ export const supportMethods: {
             ofType: { kind: "SCALAR", name: "Int", ofType: null },
           },
           defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
         },
       ],
       type: {
@@ -286,6 +318,7 @@ export const schemaTypes: IntrospectionType[] = [
     kind: "OBJECT",
     name: "SupportMethodResponse",
     description: "Return type for all support methods",
+    specifiedByUrl: null,
     fields: [
       {
         name: "message",
@@ -317,6 +350,7 @@ export const schemaTypes: IntrospectionType[] = [
     kind: "ENUM",
     name: "Result",
     description: "Represents the result of an operation.",
+    specifiedByUrl: null,
     fields: null,
     inputFields: null,
     interfaces: null,
@@ -340,6 +374,7 @@ export const schemaTypes: IntrospectionType[] = [
     kind: "ENUM",
     name: "OrganizationStatus",
     description: "The status of the organization.",
+    specifiedByUrl: null,
     fields: null,
     inputFields: null,
     interfaces: null,
@@ -375,6 +410,7 @@ export const schemaTypes: IntrospectionType[] = [
     kind: "ENUM",
     name: "OrganizationRole",
     description: "The roles of a user within an organization.",
+    specifiedByUrl: null,
     fields: null,
     inputFields: null,
     interfaces: null,
@@ -398,6 +434,7 @@ export const schemaTypes: IntrospectionType[] = [
     kind: "ENUM",
     name: "EntityType",
     description: null,
+    specifiedByUrl: null,
     fields: null,
     inputFields: null,
     interfaces: null,

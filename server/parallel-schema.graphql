@@ -156,6 +156,7 @@ enum EntityType {
 
 enum FeatureFlag {
   API_TOKENS
+  EXPORT_CUATRECASAS
   HIDE_RECIPIENT_VIEW_CONTENTS @deprecated(reason: "Don't use this")
   INTERNAL_COMMENTS
   PETITION_PDF_EXPORT
@@ -753,6 +754,15 @@ type Mutation {
     petitionId: GID!
     status: PetitionFieldReplyStatus!
   ): PetitionWithFieldAndReplies!
+
+  """
+  Updates the metada of the specified petition field reply
+  """
+  updatePetitionFieldReplyMetadata(
+    metadata: JSONObject!
+    petitionId: GID!
+    replyId: GID!
+  ): PetitionFieldReply!
 
   """
   Updates the subscription flag on a PetitionUser
@@ -1486,6 +1496,11 @@ type PetitionFieldReply implements Timestamps {
   The ID of the petition field reply.
   """
   id: GID!
+
+  """
+  Metadata for this reply.
+  """
+  metadata: JSONObject!
 
   """
   The status of the reply.

@@ -33,10 +33,11 @@ import {
 } from "../../helpers/authorize";
 import { datetimeArg } from "../../helpers/date";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
-import { jsonArg } from "../../helpers/json";
+import { jsonArg, jsonObjectArg } from "../../helpers/json";
 import { RESULT } from "../../helpers/result";
 import { validateAnd, validateOr } from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
+import { jsonSchema } from "../../helpers/validators/jsonSchema";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
@@ -1289,3 +1290,34 @@ export const reopenPetition = mutationField("reopenPetition", {
     });
   },
 });
+
+export const updatePetitionFieldReplyMetadata = mutationField(
+  "updatePetitionFieldReplyMetadata",
+  {
+    description: "Updates the metada of the specified petition field reply",
+    type: "PetitionFieldReply",
+    authorize: chain(
+      authenticate(),
+      and(
+        userHasAccessToPetitions("petitionId"),
+        repliesBelongsToPetition("petitionId", "replyId")
+      )
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
+      metadata: nonNull(jsonObjectArg()),
+    },
+    validateArgs: jsonSchema({
+      type: "object",
+      additionalProperties: { type: ["string", "boolean", "number"] },
+    })((args) => args.metadata, "metadata"),
+    resolve: async (_, args, ctx) => {
+      return await ctx.petitions.updatePetitionFieldReplyMetadata(
+        args.replyId,
+        args.metadata,
+        ctx.user!
+      );
+    },
+  }
+);

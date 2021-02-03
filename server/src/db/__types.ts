@@ -10,6 +10,7 @@ type PartialProps<T, K extends keyof T = never> = Omit<T, K> &
 
 export type FeatureFlagName =
   | "API_TOKENS"
+  | "EXPORT_CUATRECASAS"
   | "HIDE_RECIPIENT_VIEW_CONTENTS"
   | "INTERNAL_COMMENTS"
   | "PETITION_PDF_EXPORT"
@@ -177,17 +178,17 @@ export interface TablePrimaryKeys {
 }
 
 export interface Contact {
-  id: number;
-  email: string;
-  first_name: Maybe<string>;
-  last_name: Maybe<string>;
-  org_id: number;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
+  id: number; // int4
+  email: string; // varchar
+  first_name: Maybe<string>; // varchar
+  last_name: Maybe<string>; // varchar
+  org_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
 }
 
 export type CreateContact = PartialProps<
@@ -203,10 +204,10 @@ export type CreateContact = PartialProps<
 >;
 
 export interface ContactAuthentication {
-  id: number;
-  contact_id: number;
-  cookie_value_hash: string;
-  access_log: any;
+  id: number; // int4
+  contact_id: number; // int4
+  cookie_value_hash: string; // varchar
+  access_log: any; // jsonb
 }
 
 export type CreateContactAuthentication = PartialProps<
@@ -215,15 +216,15 @@ export type CreateContactAuthentication = PartialProps<
 >;
 
 export interface ContactAuthenticationRequest {
-  id: number;
-  petition_access_id: number;
-  token_hash: string;
-  code: string;
-  remaining_attempts: number;
-  email_log_id: Maybe<number>;
-  ip: Maybe<string>;
-  user_agent: Maybe<string>;
-  expires_at: Date;
+  id: number; // int4
+  petition_access_id: number; // int4
+  token_hash: string; // varchar
+  code: string; // varchar
+  remaining_attempts: number; // int4
+  email_log_id: Maybe<number>; // int4
+  ip: Maybe<string>; // varchar
+  user_agent: Maybe<string>; // varchar
+  expires_at: Date; // timestamptz
 }
 
 export type CreateContactAuthenticationRequest = PartialProps<
@@ -232,19 +233,19 @@ export type CreateContactAuthenticationRequest = PartialProps<
 >;
 
 export interface EmailAttachment {
-  id: number;
-  email_log_id: number;
-  temporary_file_id: number;
+  id: number; // int4
+  email_log_id: number; // int4
+  temporary_file_id: number; // int4
 }
 
 export type CreateEmailAttachment = PartialProps<Omit<EmailAttachment, "id">>;
 
 export interface EmailEvent {
-  id: number;
-  email_log_id: number;
-  event: string;
-  payload: string;
-  created_at: Date;
+  id: number; // int4
+  email_log_id: number; // int4
+  event: string; // varchar
+  payload: string; // text
+  created_at: Date; // timestamptz
 }
 
 export type CreateEmailEvent = PartialProps<
@@ -253,19 +254,19 @@ export type CreateEmailEvent = PartialProps<
 >;
 
 export interface EmailLog {
-  id: number;
-  to: string;
-  from: string;
-  subject: string;
-  text: string;
-  html: string;
-  track_opens: boolean;
-  created_at: Date;
-  created_from: string;
-  sent_at: Maybe<Date>;
-  response: Maybe<string>;
-  external_id: Maybe<string>;
-  reply_to: Maybe<string>;
+  id: number; // int4
+  to: string; // text
+  from: string; // text
+  subject: string; // text
+  text: string; // text
+  html: string; // text
+  track_opens: boolean; // bool
+  created_at: Date; // timestamptz
+  created_from: string; // varchar
+  sent_at: Maybe<Date>; // timestamptz
+  response: Maybe<string>; // text
+  external_id: Maybe<string>; // varchar
+  reply_to: Maybe<string>; // text
 }
 
 export type CreateEmailLog = PartialProps<
@@ -279,9 +280,9 @@ export type CreateEmailLog = PartialProps<
 >;
 
 export interface FeatureFlag {
-  id: number;
-  name: FeatureFlagName;
-  default_value: boolean;
+  id: number; // int4
+  name: FeatureFlagName; // feature_flag_name
+  default_value: boolean; // bool
 }
 
 export type CreateFeatureFlag = PartialProps<
@@ -290,11 +291,11 @@ export type CreateFeatureFlag = PartialProps<
 >;
 
 export interface FeatureFlagOverride {
-  id: number;
-  feature_flag_name: FeatureFlagName;
-  org_id: Maybe<number>;
-  user_id: Maybe<number>;
-  value: boolean;
+  id: number; // int4
+  feature_flag_name: FeatureFlagName; // feature_flag_name
+  org_id: Maybe<number>; // int4
+  user_id: Maybe<number>; // int4
+  value: boolean; // bool
 }
 
 export type CreateFeatureFlagOverride = PartialProps<
@@ -303,18 +304,18 @@ export type CreateFeatureFlagOverride = PartialProps<
 >;
 
 export interface FileUpload {
-  id: number;
-  path: string;
-  filename: string;
-  size: string;
-  content_type: string;
-  upload_complete: boolean;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
+  id: number; // int4
+  path: string; // varchar
+  filename: string; // varchar
+  size: string; // int8
+  content_type: string; // varchar
+  upload_complete: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
 }
 
 export type CreateFileUpload = PartialProps<
@@ -329,16 +330,16 @@ export type CreateFileUpload = PartialProps<
 >;
 
 export interface Organization {
-  id: number;
-  name: string;
-  identifier: string;
-  status: OrganizationStatus;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
+  id: number; // int4
+  name: string; // varchar
+  identifier: string; // varchar
+  status: OrganizationStatus; // organization_status
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
 }
 
 export type CreateOrganization = PartialProps<
@@ -352,12 +353,12 @@ export type CreateOrganization = PartialProps<
 >;
 
 export interface OrgIntegration {
-  id: number;
-  org_id: number;
-  type: IntegrationType;
-  provider: string;
-  settings: Maybe<any>;
-  is_enabled: boolean;
+  id: number; // int4
+  org_id: number; // int4
+  type: IntegrationType; // integration_type
+  provider: string; // varchar
+  settings: Maybe<any>; // jsonb
+  is_enabled: boolean; // bool
 }
 
 export type CreateOrgIntegration = PartialProps<
@@ -366,31 +367,31 @@ export type CreateOrgIntegration = PartialProps<
 >;
 
 export interface Petition {
-  id: number;
-  org_id: number;
-  name: Maybe<string>;
-  custom_ref: Maybe<string>;
-  locale: string;
-  is_template: boolean;
-  status: Maybe<PetitionStatus>;
-  deadline: Maybe<Date>;
-  email_subject: Maybe<string>;
-  email_body: Maybe<string>;
-  reminders_active: boolean;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
-  reminders_config: Maybe<any>;
-  template_description: Maybe<string>;
-  template_public: boolean;
-  from_template_id: Maybe<number>;
-  signature_config: Maybe<any>;
-  comments_enabled: boolean;
-  hide_recipient_view_contents: boolean;
-  skip_forward_security: boolean;
+  id: number; // int4
+  org_id: number; // int4
+  name: Maybe<string>; // varchar
+  custom_ref: Maybe<string>; // varchar
+  locale: string; // varchar
+  is_template: boolean; // bool
+  status: Maybe<PetitionStatus>; // petition_status
+  deadline: Maybe<Date>; // timestamptz
+  email_subject: Maybe<string>; // varchar
+  email_body: Maybe<string>; // text
+  reminders_active: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+  reminders_config: Maybe<any>; // jsonb
+  template_description: Maybe<string>; // text
+  template_public: boolean; // bool
+  from_template_id: Maybe<number>; // int4
+  signature_config: Maybe<any>; // jsonb
+  comments_enabled: boolean; // bool
+  hide_recipient_view_contents: boolean; // bool
+  skip_forward_security: boolean; // bool
 }
 
 export type CreatePetition = PartialProps<
@@ -420,20 +421,20 @@ export type CreatePetition = PartialProps<
 >;
 
 export interface PetitionAccess {
-  id: number;
-  petition_id: number;
-  granter_id: number;
-  contact_id: number;
-  keycode: string;
-  status: PetitionAccessStatus;
-  next_reminder_at: Maybe<Date>;
-  reminders_active: boolean;
-  reminders_config: Maybe<any>;
-  reminders_left: number;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
+  id: number; // int4
+  petition_id: number; // int4
+  granter_id: number; // int4
+  contact_id: number; // int4
+  keycode: string; // varchar
+  status: PetitionAccessStatus; // petition_access_status
+  next_reminder_at: Maybe<Date>; // timestamptz
+  reminders_active: boolean; // bool
+  reminders_config: Maybe<any>; // jsonb
+  reminders_left: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
 }
 
 export type CreatePetitionAccess = PartialProps<
@@ -449,13 +450,13 @@ export type CreatePetitionAccess = PartialProps<
 >;
 
 export interface PetitionContactNotification {
-  id: number;
-  petition_access_id: number;
-  petition_id: number;
-  type: PetitionContactNotificationType;
-  data: Maybe<any>;
-  is_read: boolean;
-  created_at: Date;
+  id: number; // int4
+  petition_access_id: number; // int4
+  petition_id: number; // int4
+  type: PetitionContactNotificationType; // petition_contact_notification_type
+  data: Maybe<any>; // jsonb
+  is_read: boolean; // bool
+  created_at: Date; // timestamptz
 }
 
 export type CreatePetitionContactNotification = PartialProps<
@@ -464,11 +465,11 @@ export type CreatePetitionContactNotification = PartialProps<
 >;
 
 export interface PetitionEvent {
-  id: number;
-  petition_id: number;
-  type: PetitionEventType;
-  data: Maybe<any>;
-  created_at: Date;
+  id: number; // int4
+  petition_id: number; // int4
+  type: PetitionEventType; // petition_event_type
+  data: Maybe<any>; // jsonb
+  created_at: Date; // timestamptz
 }
 
 export type CreatePetitionEvent = PartialProps<
@@ -477,16 +478,16 @@ export type CreatePetitionEvent = PartialProps<
 >;
 
 export interface PetitionEventSubscription {
-  id: number;
-  user_id: number;
-  petition_id: number;
-  endpoint: string;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
+  id: number; // int4
+  user_id: number; // int4
+  petition_id: number; // int4
+  endpoint: string; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
 }
 
 export type CreatePetitionEventSubscription = PartialProps<
@@ -500,23 +501,23 @@ export type CreatePetitionEventSubscription = PartialProps<
 >;
 
 export interface PetitionField {
-  id: number;
-  petition_id: number;
-  position: number;
-  type: PetitionFieldType;
-  title: Maybe<string>;
-  description: Maybe<string>;
-  optional: boolean;
-  multiple: boolean;
-  options: Maybe<any>;
-  validated: boolean;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
-  is_fixed: boolean;
+  id: number; // int4
+  petition_id: number; // int4
+  position: number; // int4
+  type: PetitionFieldType; // petition_field_type
+  title: Maybe<string>; // text
+  description: Maybe<string>; // text
+  optional: boolean; // bool
+  multiple: boolean; // bool
+  options: Maybe<any>; // json
+  validated: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+  is_fixed: boolean; // bool
 }
 
 export type CreatePetitionField = PartialProps<
@@ -537,21 +538,21 @@ export type CreatePetitionField = PartialProps<
 >;
 
 export interface PetitionFieldComment {
-  id: number;
-  petition_id: number;
-  petition_field_id: number;
-  petition_field_reply_id: Maybe<number>;
-  content: string;
-  user_id: Maybe<number>;
-  petition_access_id: Maybe<number>;
-  published_at: Maybe<Date>;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
-  is_internal: boolean;
+  id: number; // int4
+  petition_id: number; // int4
+  petition_field_id: number; // int4
+  petition_field_reply_id: Maybe<number>; // int4
+  content: string; // text
+  user_id: Maybe<number>; // int4
+  petition_access_id: Maybe<number>; // int4
+  published_at: Maybe<Date>; // timestamptz
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+  is_internal: boolean; // bool
 }
 
 export type CreatePetitionFieldComment = PartialProps<
@@ -570,18 +571,19 @@ export type CreatePetitionFieldComment = PartialProps<
 >;
 
 export interface PetitionFieldReply {
-  id: number;
-  petition_field_id: number;
-  type: PetitionFieldType;
-  content: any;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
-  petition_access_id: number;
-  status: PetitionFieldReplyStatus;
+  id: number; // int4
+  petition_field_id: number; // int4
+  type: PetitionFieldType; // petition_field_type
+  content: any; // json
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+  petition_access_id: number; // int4
+  status: PetitionFieldReplyStatus; // petition_field_reply_status
+  metadata: any; // jsonb
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -593,20 +595,21 @@ export type CreatePetitionFieldReply = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "status"
+  | "metadata"
 >;
 
 export interface PetitionMessage {
-  id: number;
-  petition_id: number;
-  petition_access_id: number;
-  sender_id: number;
-  email_subject: Maybe<string>;
-  email_body: Maybe<string>;
-  status: PetitionMessageStatus;
-  scheduled_at: Maybe<Date>;
-  email_log_id: Maybe<number>;
-  created_at: Date;
-  created_by: Maybe<string>;
+  id: number; // int4
+  petition_id: number; // int4
+  petition_access_id: number; // int4
+  sender_id: number; // int4
+  email_subject: Maybe<string>; // varchar
+  email_body: Maybe<string>; // text
+  status: PetitionMessageStatus; // petition_message_status
+  scheduled_at: Maybe<Date>; // timestamptz
+  email_log_id: Maybe<number>; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
 }
 
 export type CreatePetitionMessage = PartialProps<
@@ -620,14 +623,14 @@ export type CreatePetitionMessage = PartialProps<
 >;
 
 export interface PetitionReminder {
-  id: number;
-  email_log_id: Maybe<number>;
-  type: PetitionReminderType;
-  status: PetitionReminderStatus;
-  created_at: Date;
-  created_by: Maybe<string>;
-  sender_id: Maybe<number>;
-  petition_access_id: number;
+  id: number; // int4
+  email_log_id: Maybe<number>; // int4
+  type: PetitionReminderType; // petition_reminder_type
+  status: PetitionReminderStatus; // petition_reminder_status
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  sender_id: Maybe<number>; // int4
+  petition_access_id: number; // int4
 }
 
 export type CreatePetitionReminder = PartialProps<
@@ -636,18 +639,18 @@ export type CreatePetitionReminder = PartialProps<
 >;
 
 export interface PetitionSignatureRequest {
-  id: number;
-  petition_id: number;
-  external_id: Maybe<string>;
-  signature_config: any;
-  status: PetitionSignatureStatus;
-  cancel_reason: Maybe<PetitionSignatureCancelReason>;
-  cancel_data: Maybe<any>;
-  data: Maybe<any>;
-  event_logs: Maybe<any>;
-  file_upload_id: Maybe<number>;
-  created_at: Date;
-  updated_at: Date;
+  id: number; // int4
+  petition_id: number; // int4
+  external_id: Maybe<string>; // varchar
+  signature_config: any; // jsonb
+  status: PetitionSignatureStatus; // petition_signature_status
+  cancel_reason: Maybe<PetitionSignatureCancelReason>; // petition_signature_cancel_reason
+  cancel_data: Maybe<any>; // jsonb
+  data: Maybe<any>; // jsonb
+  event_logs: Maybe<any>; // jsonb
+  file_upload_id: Maybe<number>; // int4
+  created_at: Date; // timestamptz
+  updated_at: Date; // timestamptz
 }
 
 export type CreatePetitionSignatureRequest = PartialProps<
@@ -664,17 +667,17 @@ export type CreatePetitionSignatureRequest = PartialProps<
 >;
 
 export interface PetitionUser {
-  id: number;
-  petition_id: number;
-  user_id: number;
-  permission_type: PetitionUserPermissionType;
-  is_subscribed: boolean;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
+  id: number; // int4
+  petition_id: number; // int4
+  user_id: number; // int4
+  permission_type: PetitionUserPermissionType; // petition_user_permission_type
+  is_subscribed: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
 }
 
 export type CreatePetitionUser = PartialProps<
@@ -690,13 +693,13 @@ export type CreatePetitionUser = PartialProps<
 >;
 
 export interface PetitionUserNotification {
-  id: number;
-  user_id: number;
-  petition_id: number;
-  type: PetitionUserNotificationType;
-  data: Maybe<any>;
-  is_read: boolean;
-  created_at: Date;
+  id: number; // int4
+  user_id: number; // int4
+  petition_id: number; // int4
+  type: PetitionUserNotificationType; // petition_user_notification_type
+  data: Maybe<any>; // jsonb
+  is_read: boolean; // bool
+  created_at: Date; // timestamptz
 }
 
 export type CreatePetitionUserNotification = PartialProps<
@@ -705,13 +708,13 @@ export type CreatePetitionUserNotification = PartialProps<
 >;
 
 export interface TemporaryFile {
-  id: number;
-  path: string;
-  filename: string;
-  size: string;
-  content_type: string;
-  created_at: Date;
-  created_by: Maybe<string>;
+  id: number; // int4
+  path: string; // varchar
+  filename: string; // varchar
+  size: string; // int8
+  content_type: string; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
 }
 
 export type CreateTemporaryFile = PartialProps<
@@ -720,22 +723,22 @@ export type CreateTemporaryFile = PartialProps<
 >;
 
 export interface User {
-  id: number;
-  cognito_id: string;
-  org_id: number;
-  organization_role: UserOrganizationRole;
-  email: string;
-  first_name: Maybe<string>;
-  last_name: Maybe<string>;
-  created_at: Date;
-  created_by: Maybe<string>;
-  updated_at: Date;
-  updated_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
-  last_active_at: Maybe<Date>;
-  onboarding_status: any;
-  status: UserStatus;
+  id: number; // int4
+  cognito_id: string; // varchar
+  org_id: number; // int4
+  organization_role: UserOrganizationRole; // user_organization_role
+  email: string; // varchar
+  first_name: Maybe<string>; // varchar
+  last_name: Maybe<string>; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+  last_active_at: Maybe<Date>; // timestamptz
+  onboarding_status: any; // jsonb
+  status: UserStatus; // user_status
 }
 
 export type CreateUser = PartialProps<
@@ -755,15 +758,15 @@ export type CreateUser = PartialProps<
 >;
 
 export interface UserAuthenticationToken {
-  id: number;
-  user_id: number;
-  token_name: string;
-  token_hash: string;
-  last_used_at: Maybe<Date>;
-  created_at: Date;
-  created_by: Maybe<string>;
-  deleted_at: Maybe<Date>;
-  deleted_by: Maybe<string>;
+  id: number; // int4
+  user_id: number; // int4
+  token_name: string; // varchar
+  token_hash: string; // varchar
+  last_used_at: Maybe<Date>; // timestamptz
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
 }
 
 export type CreateUserAuthenticationToken = PartialProps<
