@@ -88,38 +88,21 @@ export class OrganizationRepository extends BaseRepository {
   readonly getOrgLogoUrl = fromDataLoader(
     new DataLoader<number, Maybe<string>>(async (orgIds) => {
       const orgs = await this.loadOrg(orgIds);
-      return orgs.map((org) =>
-        org &&
-        [
-          "doctoralia",
-          "l4law",
-          "cecamagan",
-          "encomenda",
-          "cuatrecasas",
-          "cscorporateadvisors",
-          "andersen",
-          "meetmaps",
-          "treinta",
-          "iomed",
-          "leica",
-          "spin",
-          "atadvocats",
-          "santalucia",
-          "payfit",
-          "prontopiso",
-          "brickbro",
-          "kantox",
-          "osborneclarke",
-          "themillandpartners",
-          "targetglobal",
-          "adplegal",
-          "altamar",
-        ].includes(org.identifier)
-          ? `${this.config.misc.assetsUrl}/static/logos/${org.identifier}.png`
-          : null
-      );
+      return orgs.map((org) => org?.logo_url ?? null);
     })
   );
+
+  async updateOrgLogo(id: number, logoUrl: string, user: User) {
+    const [org] = await this.from("organization")
+      .where("id", id)
+      .update({
+        logo_url: logoUrl,
+        updated_at: this.now(),
+        updated_by: `User:${user.id}`,
+      })
+      .returning("*");
+    return org;
+  }
 
   async createOrganization(data: CreateOrganization, user: User) {
     const [org] = await this.insert("organization", {

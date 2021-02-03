@@ -8,7 +8,6 @@ import { Memoize } from "typescript-memoize";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 
 export interface IAws {
-  fileUploads: IStorage;
   enqueueMessages(
     queue: keyof Config["queueWorkers"],
     messages:
@@ -57,6 +56,13 @@ export class Aws implements IAws {
     return this.storageFactory(
       this.s3,
       this.config.s3.temporaryFilesBucketName
+    ) as Storage;
+  }
+
+  @Memoize() public get publicFiles() {
+    return this.storageFactory(
+      this.s3,
+      this.config.s3.publicFilesBucketName
     ) as Storage;
   }
 

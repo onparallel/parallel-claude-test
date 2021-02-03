@@ -82,7 +82,12 @@ export class Storage implements IStorage {
       .promise();
   }
 
-  async uploadFile(key: string, contentType: string, body: Buffer | Readable) {
+  async uploadFile(
+    key: string,
+    contentType: string,
+    body: Buffer | Readable,
+    extraParams?: Partial<AWS.S3.PutObjectRequest>
+  ) {
     await this.s3
       .upload(
         {
@@ -90,6 +95,7 @@ export class Storage implements IStorage {
           Key: key,
           ContentType: contentType,
           Body: body,
+          ...extraParams,
         },
         {}
       )

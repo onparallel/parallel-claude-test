@@ -28,6 +28,7 @@ export function buildConfig() {
     s3: Object.freeze({
       fileUploadsBucketName: process.env.S3_FILE_UPLOADS_BUCKET_NAME!,
       temporaryFilesBucketName: process.env.S3_TEMPORARY_FILES_BUCKET_NAME!,
+      publicFilesBucketName: process.env.S3_PUBLIC_FILES_BUCKET_NAME!,
     }),
     smtp: Object.freeze({
       host: process.env.SMTP_HOST!,
