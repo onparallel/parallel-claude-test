@@ -95,7 +95,6 @@ In this respect, the following sub-processors are deemed as authorized by the Us
 
 - Amazon Web Services, Inc. as provider of the hosting of the Service, through servers located in Ireland.
 - Google services: Google Analytics
-- Hotjar and Mixpanel, for the usage feedback of the Service
 
   3.4. PARALLEL shall guarantee the confidentiality of the Accessed Data, even after the termination of the Service.
 

@@ -5,7 +5,6 @@ import {
   I18nProvider,
 } from "@parallel/components/common/I18nProvider";
 import { GoogleAnalytics } from "@parallel/components/scripts/GoogleAnalytics";
-import { Hotjar } from "@parallel/components/scripts/Hotjar";
 import { Hubspot } from "@parallel/components/scripts/Hubspot";
 import { AppProps } from "next/app";
 import { useEffect } from "react";
@@ -36,7 +35,6 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
         <>
           <GoogleAnalytics />
           <Hubspot />
-          <Hotjar />
         </>
       ) : null}
       <I18nProvider {...props}>

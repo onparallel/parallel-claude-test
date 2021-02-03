@@ -84,8 +84,6 @@ const config = {
                       "googleads.g.doubleclick.net",
                       "www.google.com",
                       "www.googleadservices.com",
-                      // Hotjar
-                      "*.hotjar.com",
                       // Hubspot
                       "js.hs-scripts.com",
                       "js.hscollectedforms.net",
@@ -106,9 +104,6 @@ const config = {
                       "*.sentry.io",
                       // Google analytics
                       "www.google-analytics.com",
-                      // Hotjar
-                      "*.hotjar.com",
-                      "*.hotjar.io",
                       // Hubspot
                       "*.hubspot.com",
                       "*.hubapi.com",
@@ -139,8 +134,6 @@ const config = {
                     frameSrc: [
                       "'self'",
                       "*.parallel.so",
-                      // Hotjar
-                      "vars.hotjar.com",
                       // Hubspot
                       "app.hubspot.com",
                       "forms.hsforms.com",
@@ -151,6 +144,10 @@ const config = {
                       "*.parallel.so",
                       // Hubspot
                       "fonts.gstatic.com",
+                      // this is coming from udecode/slate-plugins using fabricui.
+                      // the fonts are not loading but not adding this line causes
+                      // a lot of error logging on the console.
+                      "*.sharepointonline.com",
                     ],
                   },
                 },
