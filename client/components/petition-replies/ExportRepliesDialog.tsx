@@ -56,7 +56,14 @@ export function ExportRepliesDialog({
   ...props
 }: DialogProps<ExportRepliesDialogProps, ExportParams>) {
   const intl = useIntl();
-  const [options, setOptions] = useState<ExportType[]>(["DOWNLOAD_ZIP"]);
+  const [options, setOptions] = useState<
+    { type: ExportType; isEnabled: boolean }[]
+  >([
+    { type: "DOWNLOAD_ZIP", isEnabled: true },
+    ...(user.hasExportCuatrecasas
+      ? [{ type: "EXPORT_CUATRECASAS" as const, isEmabled: false }]
+      : []),
+  ]);
   const [selectedOption, setSelectedOption] = useState<ExportType>(
     "DOWNLOAD_ZIP"
   );
@@ -87,10 +94,17 @@ export function ExportRepliesDialog({
 
   useEffect(() => {
     async function ping() {
+      // check if localAPI available and then enable EXPORT_CUATRECASAS
       if (user.hasExportCuatrecasas) {
         try {
           await fetch("https://localhost:50500/api/v1/echo");
-          setOptions((options) => [...options, "EXPORT_CUATRECASAS"]);
+          setOptions((options) =>
+            options.map((option) =>
+              option.type === "EXPORT_CUATRECASAS"
+                ? { ...option, isEnabled: true }
+                : option
+            )
+          );
         } catch {}
       }
     }
@@ -161,10 +175,15 @@ export function ExportRepliesDialog({
                     }}
                   >
                     {options.map((option) => (
-                      <Radio key={option} size="lg" value={option}>
-                        <Text fontSize="md">{messages[option].title}</Text>
+                      <Radio
+                        key={option.type}
+                        size="lg"
+                        value={option.type}
+                        isDisabled={!option.isEnabled}
+                      >
+                        <Text fontSize="md">{messages[option.type].title}</Text>
                         <Text fontSize="sm" color="gray.500">
-                          {messages[option].description}
+                          {messages[option.type].description}
                         </Text>
                       </Radio>
                     ))}
