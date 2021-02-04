@@ -34,14 +34,14 @@ import {
   ExportRepliesDialog,
   useExportRepliesDialog,
 } from "@parallel/components/petition-replies/ExportRepliesDialog";
+import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/ExportRepliesProgressDialog";
 import { useFailureGeneratingLinkDialog } from "@parallel/components/petition-replies/FailureGeneratingLinkDialog";
 import {
   PetitionRepliesField,
-  PetitionRepliesFieldAction,
+  PetitionRepliesFieldProps,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
-import { useExportRepliesProgressDialog } from "@parallel/components/petition-replies/ExportRepliesProgressDialog";
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
@@ -235,16 +235,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     [petitionId]
   );
 
-  const handleAction = async function (action: PetitionRepliesFieldAction) {
-    switch (action.type) {
+  const handleAction: PetitionRepliesFieldProps["onAction"] = async function (
+    action,
+    reply
+  ) {
+    switch (action) {
       case "DOWNLOAD_FILE":
       case "PREVIEW_FILE":
         try {
-          await downloadReplyFile(
-            petitionId,
-            action.reply,
-            action.type === "PREVIEW_FILE"
-          );
+          await downloadReplyFile(petitionId, reply, action === "PREVIEW_FILE");
         } catch {}
         break;
     }

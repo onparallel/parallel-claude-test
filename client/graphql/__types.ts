@@ -3091,7 +3091,8 @@ export type PetitionRepliesField_PetitionFieldFragment = {
 
 export type PetitionRepliesField_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-} & Pick<PetitionFieldReply, "id" | "content" | "status" | "createdAt">;
+} & Pick<PetitionFieldReply, "id"> &
+  PetitionRepliesFieldReply_PetitionFieldReplyFragment;
 
 export type PetitionRepliesFieldComments_UserFragment = {
   __typename?: "User";
@@ -3132,6 +3133,17 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
           >;
         })
       | ({ __typename?: "User" } & Pick<User, "id" | "fullName">)
+    >;
+  };
+
+export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
+  __typename?: "PetitionFieldReply";
+} & Pick<
+  PetitionFieldReply,
+  "id" | "content" | "status" | "createdAt" | "metadata"
+> & {
+    field?: Maybe<
+      { __typename?: "PetitionField" } & Pick<PetitionField, "type">
     >;
   };
 
@@ -6159,13 +6171,24 @@ export const PetitionCompose_UserFragmentDoc = gql`
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionSettings_UserFragmentDoc}
 `;
-export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
-  fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
+export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
     id
     content
     status
     createdAt
+    metadata
+    field {
+      type
+    }
   }
+`;
+export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
+  fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
+    id
+    ...PetitionRepliesFieldReply_PetitionFieldReply
+  }
+  ${PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc}
 `;
 export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionField on PetitionField {

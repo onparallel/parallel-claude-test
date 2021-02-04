@@ -13,6 +13,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -123,7 +124,10 @@ export function ExportRepliesDialog({
       (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
     )!;
     const reply = field.replies[0];
-    return placeholdersRename(fields)(field, reply, pattern);
+    return [
+      reply.content.filename,
+      placeholdersRename(fields)(field, reply, pattern),
+    ];
   }, [fields, placeholdersRename, pattern]);
 
   const inputRef = useRef<PlaceholderInputRef>(null);
@@ -253,7 +257,13 @@ export function ExportRepliesDialog({
                     <FormattedMessage
                       id="generic.for-example"
                       defaultMessage="E.g. {example}"
-                      values={{ example }}
+                      values={{
+                        example: (
+                          <Text as="span">
+                            {example[0]} <ArrowForwardIcon /> {example[1]}
+                          </Text>
+                        ),
+                      }}
                     />
                   </Text>
                 </Box>
@@ -263,7 +273,11 @@ export function ExportRepliesDialog({
         </Stack>
       }
       confirm={
-        <Button colorScheme="purple" onClick={handleConfirmClick}>
+        <Button
+          colorScheme="purple"
+          onClick={handleConfirmClick}
+          isDisabled={rename && !pattern}
+        >
           {selectedOption.startsWith("DOWNLOAD") ? (
             <FormattedMessage id="generic.download" defaultMessage="Download" />
           ) : (

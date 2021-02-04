@@ -12,15 +12,8 @@ import {
   Switch,
   Text,
   Theme,
-  VisuallyHidden,
 } from "@chakra-ui/react";
-import {
-  CheckIcon,
-  CloseIcon,
-  CommentIcon,
-  DownloadIcon,
-  EyeIcon,
-} from "@parallel/chakra/icons";
+import { CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -29,22 +22,15 @@ import {
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import { FORMATS } from "@parallel/utils/dates";
-import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
-import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
-import { DateTime } from "../common/DateTime";
-import { FileSize } from "../common/FileSize";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { Spacer } from "../common/Spacer";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
-
-export type PetitionRepliesFieldAction = {
-  type: "DOWNLOAD_FILE" | "PREVIEW_FILE";
-  reply: PetitionRepliesField_PetitionFieldReplyFragment;
-};
+import {
+  PetitionRepliesFieldAction,
+  PetitionRepliesFieldReply,
+} from "./PetitionRepliesFieldReply";
 
 export interface PetitionRepliesFieldProps extends BoxProps {
   field: PetitionRepliesField_PetitionFieldFragment;
@@ -53,7 +39,10 @@ export interface PetitionRepliesFieldProps extends BoxProps {
   commentCount: number;
   newCommentCount: number;
   isActive: boolean;
-  onAction: (action: PetitionRepliesFieldAction) => void;
+  onAction: (
+    action: PetitionRepliesFieldAction,
+    reply: PetitionRepliesField_PetitionFieldReplyFragment
+  ) => void;
   onToggleComments: () => void;
   onUpdateReplyStatus: (
     replyId: string,
@@ -76,7 +65,6 @@ export function PetitionRepliesField({
   ...props
 }: PetitionRepliesFieldProps) {
   const intl = useIntl();
-  const isTextLikeType = ["TEXT", "SELECT"].includes(field.type);
   return field.type === "HEADING" ? (
     <Stack
       spacing={1}
@@ -232,69 +220,9 @@ export function PetitionRepliesField({
             <PetitionRepliesFieldReply
               key={reply.id}
               reply={reply}
+              onAction={(action) => onAction(action, reply)}
               onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
-              actions={
-                isTextLikeType ? (
-                  <CopyToClipboardButton size="xs" text={reply.content.text} />
-                ) : field.type === "FILE_UPLOAD" ? (
-                  <Stack spacing={1}>
-                    <IconButtonWithTooltip
-                      size="xs"
-                      icon={<DownloadIcon />}
-                      label={intl.formatMessage({
-                        id:
-                          "petition-replies.petition-field-reply.file-download",
-                        defaultMessage: "Download file",
-                      })}
-                      onClick={() => onAction({ type: "DOWNLOAD_FILE", reply })}
-                    />
-                    {isPreviewable(reply.content.contentType) ? (
-                      <IconButtonWithTooltip
-                        key="2"
-                        size="xs"
-                        icon={<EyeIcon />}
-                        label={intl.formatMessage({
-                          id:
-                            "petition-replies.petition-field-reply.file-preview",
-                          defaultMessage: "Preview file",
-                        })}
-                        onClick={() =>
-                          onAction({ type: "PREVIEW_FILE", reply })
-                        }
-                      />
-                    ) : null}
-                  </Stack>
-                ) : null
-              }
-            >
-              {isTextLikeType ? (
-                <BreakLines text={reply.content.text} />
-              ) : field.type === "FILE_UPLOAD" ? (
-                <Box>
-                  <VisuallyHidden>
-                    {intl.formatMessage({
-                      id: "generic.file-name",
-                      defaultMessage: "File name",
-                    })}
-                  </VisuallyHidden>
-                  <Text as="span">{reply.content.filename}</Text>
-                  <Text as="span" marginX={2}>
-                    -
-                  </Text>
-                  <Text
-                    as="span"
-                    aria-label={intl.formatMessage({
-                      id: "generic.file-size",
-                      defaultMessage: "File size",
-                    })}
-                    fontSize="sm"
-                    color="gray.500"
-                  >
-                    <FileSize value={reply.content.size} />
-                  </Text>
-                </Box>
-              ) : null}
-            </PetitionRepliesFieldReply>
+            />
           ))}
         </Stack>
       ) : (
@@ -308,79 +236,6 @@ export function PetitionRepliesField({
         </Box>
       )}
     </Card>
-  );
-}
-
-function isPreviewable(contentType: string) {
-  return contentType === "application/pdf" || contentType.startsWith("image/");
-}
-
-function PetitionRepliesFieldReply({
-  actions,
-  children,
-  reply,
-  onUpdateStatus,
-  ...props
-}: {
-  actions: ReactNode;
-  reply: PetitionRepliesField_PetitionFieldReplyFragment;
-  onUpdateStatus: (status: PetitionFieldReplyStatus) => void;
-} & BoxProps) {
-  const intl = useIntl();
-  return (
-    <Flex {...props}>
-      <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">
-        {actions}
-      </Box>
-      <Flex
-        flexDirection="column"
-        justifyContent="center"
-        flex="1"
-        marginLeft={2}
-      >
-        {children}
-        <Box fontSize="sm">
-          <DateTime
-            as="span"
-            color="gray.500"
-            value={reply.createdAt}
-            format={FORMATS.LLL}
-          />
-        </Box>
-      </Flex>
-      <Stack direction="row" spacing={1}>
-        <IconButtonWithTooltip
-          icon={<CheckIcon />}
-          label={intl.formatMessage({
-            id: "petition-replies.petition-field-reply.approve",
-            defaultMessage: "Approve",
-          })}
-          size="xs"
-          placement="bottom"
-          colorScheme={reply.status === "APPROVED" ? "green" : "gray"}
-          role="switch"
-          aria-checked={reply.status === "APPROVED"}
-          onClick={() =>
-            onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")
-          }
-        />
-        <IconButtonWithTooltip
-          icon={<CloseIcon />}
-          label={intl.formatMessage({
-            id: "petition-replies.petition-field-reply.reject",
-            defaultMessage: "Reject",
-          })}
-          size="xs"
-          placement="bottom"
-          role="switch"
-          colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
-          aria-checked={reply.status === "REJECTED"}
-          onClick={() =>
-            onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")
-          }
-        />
-      </Stack>
-    </Flex>
   );
 }
 
@@ -485,9 +340,8 @@ PetitionRepliesField.fragments = {
     }
     fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
       id
-      content
-      status
-      createdAt
+      ...PetitionRepliesFieldReply_PetitionFieldReply
     }
+    ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
   `,
 };
