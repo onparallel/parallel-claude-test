@@ -1,13 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Flex,
-  Stack,
-  Text,
-  Tooltip,
-  VisuallyHidden,
-} from "@chakra-ui/react";
+import { Box, Flex, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
 import {
   CheckIcon,
   CloseIcon,
