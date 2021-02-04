@@ -24,10 +24,6 @@ import { DateTime } from "../common/DateTime";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 
-function isPreviewable(contentType: string) {
-  return contentType === "application/pdf" || contentType.startsWith("image/");
-}
-
 export interface PetitionRepliesFieldReplyProps {
   reply: PetitionRepliesFieldReply_PetitionFieldReplyFragment;
   onUpdateStatus: (status: PetitionFieldReplyStatus) => void;

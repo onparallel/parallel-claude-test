@@ -220,7 +220,7 @@ export function ExportRepliesDialog({
                   <FormErrorMessage>
                     <FormattedMessage
                       id="component.export-replies-dialog.export-cuatrecasas-client-number-error"
-                      defaultMessage="Client ID must be a 6 digit code"
+                      defaultMessage="Client number must be a 6 digit code"
                     />
                   </FormErrorMessage>
                 </FormControl>

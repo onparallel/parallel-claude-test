@@ -225,11 +225,6 @@ export function CreateUserDialog({
           />
         </Button>
       }
-      cancel={
-        <Button onClick={props.onReject}>
-          <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-        </Button>
-      }
       {...props}
     />
   );

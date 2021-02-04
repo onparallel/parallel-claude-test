@@ -41,7 +41,7 @@ export function ErrorDialog({
           />
         </Button>
       }
-      cancel={null}
+      cancel={<></>}
       {...props}
     />
   );

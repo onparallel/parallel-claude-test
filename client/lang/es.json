@@ -200,36 +200,6 @@
     "context": "Revoke access {count, plural, =1 {token} other {tokens}}"
   },
   {
-    "term": "component.download-all-dialog.description",
-    "definition": "Selecciona si quieres renombrar los archivos.",
-    "context": "Select if you want to rename the individual files."
-  },
-  {
-    "term": "component.download-all-dialog.header",
-    "definition": "Descargar archivos",
-    "context": "Download all files"
-  },
-  {
-    "term": "component.download-all-dialog.keep-original",
-    "definition": "Mantener el nombre original",
-    "context": "Keep the original name"
-  },
-  {
-    "term": "component.download-all-dialog.rename",
-    "definition": "Renombrar archivos",
-    "context": "Rename files"
-  },
-  {
-    "term": "component.download-dialog.placeholder-contact-first-name",
-    "definition": "Nombre del contacto",
-    "context": "Contact first name"
-  },
-  {
-    "term": "component.download-dialog.placeholder-contact-last-name",
-    "definition": "Apellido del contacto",
-    "context": "Contact last name"
-  },
-  {
     "term": "component.download-dialog.placeholder-field-number",
     "definition": "Número del campo",
     "context": "Field number"
@@ -263,6 +233,101 @@
     "term": "component.existing-contact-toast.title",
     "definition": "Contacto existente",
     "context": "Existing contact"
+  },
+  {
+    "term": "component.export-replies-dialog.download-files",
+    "definition": "Descargar ZIP con los archivos",
+    "context": "Download files as a ZIP"
+  },
+  {
+    "term": "component.export-replies-dialog.download-files-and-replies-description",
+    "definition": "Descargar todos los archivos incluyendo respuestas en formato Excel.",
+    "context": "Download all files including text replies in Excel format."
+  },
+  {
+    "term": "component.export-replies-dialog.export-cuatrecasas",
+    "definition": "Exportar a NetDocuments",
+    "context": "Export to NetDocuments"
+  },
+  {
+    "term": "component.export-replies-dialog.export-cuatrecasas-client-number",
+    "definition": "Número de cliente",
+    "context": "Client number"
+  },
+  {
+    "term": "component.export-replies-dialog.export-cuatrecasas-client-number-error",
+    "definition": "El número de cliente debe ser un código de 6 dígitos",
+    "context": "Client number must be a 6 digit code"
+  },
+  {
+    "term": "component.export-replies-dialog.export-cuatrecasas-description",
+    "definition": "Exportar archivos a una carpeta en NetDocuments.",
+    "context": "Export files to a folder in NetDocuments."
+  },
+  {
+    "term": "component.export-replies-dialog.header",
+    "definition": "Exportar respuestas",
+    "context": "Export replies"
+  },
+  {
+    "term": "component.export-replies-dialog.rename",
+    "definition": "Renombrar archivos descargados automáticamente",
+    "context": "Rename downloaded files automatically"
+  },
+  {
+    "term": "component.export-replies-dialog.text",
+    "definition": "Escoge como te gustaría exportar las respuestas:",
+    "context": "Choose how you would like to export the replies:"
+  },
+  {
+    "term": "component.export-replies-progress-dialog.body-1",
+    "definition": "El archivo {filename} ya ha sido exportado a NetDocuments",
+    "context": "The file {filename} has already been exported to NetDocuments"
+  },
+  {
+    "term": "component.export-replies-progress-dialog.body2",
+    "definition": "¿Quieres exportarlo de nuevo?",
+    "context": "Do you want to export it again?"
+  },
+  {
+    "term": "component.export-replies-progress-dialog.export-again",
+    "definition": "Exportar de nuevo",
+    "context": "Export again"
+  },
+  {
+    "term": "component.export-replies-progress-dialog.exported-header",
+    "definition": "¡Exportación finalizada con éxito!",
+    "context": "Export finished successfully!"
+  },
+  {
+    "term": "component.export-replies-progress-dialog.exported-text",
+    "definition": "Tus archivos han sido exportados con éxito.",
+    "context": "Your files have been exported successfully."
+  },
+  {
+    "term": "component.export-replies-progress-dialog.exporting-header",
+    "definition": "Estamos exportando tus archivos...",
+    "context": "We are exporting your files..."
+  },
+  {
+    "term": "component.export-replies-progress-dialog.exporting-text",
+    "definition": "Por favor, espere un momento hasta que se complete la exportación.",
+    "context": "Please wait a moment until the export is completed."
+  },
+  {
+    "term": "component.export-replies-progress-dialog.header",
+    "definition": "Este archivo ya ha sido exportado",
+    "context": "This file has already been exported"
+  },
+  {
+    "term": "component.export-replies-progress-dialog.netdocuments-error",
+    "definition": "No hemos podido subir el archivo a la carpeta de cliente especificada. Por favor, asegurate de introducir el número de cliente correcto y de que tienes los permisos necesarios.",
+    "context": "We couldn't upload the file to the specified client folder. Please make sure that you entered the correct client number and that you have the necessary permissions."
+  },
+  {
+    "term": "component.export-replies-progress-dialog.open-file",
+    "definition": "Abrir archivo en NetDocuments",
+    "context": "Open file in NetDocuments"
   },
   {
     "term": "component.generate-new-token-dialog.api-key-label",
@@ -303,51 +368,6 @@
     "term": "component.generate-new-token-dialog.token-name-used",
     "definition": "Ya tienes un token con este mismo nombre",
     "context": "You already have a token with this name"
-  },
-  {
-    "term": "component.export-replies-dialog.download-files",
-    "definition": "",
-    "context": "Download files as a ZIP"
-  },
-  {
-    "term": "component.export-replies-dialog.download-files-and-replies-description",
-    "definition": "",
-    "context": "Download all files including text replies in Excel format."
-  },
-  {
-    "term": "component.export-replies-dialog.export-cuatrecasas",
-    "definition": "",
-    "context": "Export to NetDocuments"
-  },
-  {
-    "term": "component.export-replies-dialog.export-cuatrecasas-client-number",
-    "definition": "",
-    "context": "Client number"
-  },
-  {
-    "term": "component.export-replies-dialog.export-cuatrecasas-client-number-error",
-    "definition": "",
-    "context": "Client ID must be a 6 digit code"
-  },
-  {
-    "term": "component.export-replies-dialog.export-cuatrecasas-description",
-    "definition": "",
-    "context": "Export files to a folder in NetDocuments."
-  },
-  {
-    "term": "component.export-replies-dialog.header",
-    "definition": "",
-    "context": "Export replies"
-  },
-  {
-    "term": "component.export-replies-dialog.rename",
-    "definition": "",
-    "context": "Rename files"
-  },
-  {
-    "term": "component.export-replies-dialog.text",
-    "definition": "",
-    "context": "Choose how you would like to export the replies:"
   },
   {
     "term": "component.header-name-editable.change-name",
@@ -795,26 +815,6 @@
     "context": "Enter your answer"
   },
   {
-    "term": "component.reply-export-dialog.exported-header",
-    "definition": "",
-    "context": "Export finished successfully!"
-  },
-  {
-    "term": "component.reply-export-dialog.exported-text",
-    "definition": "",
-    "context": "Your files have been exported successfully"
-  },
-  {
-    "term": "component.reply-export-dialog.exporting-header",
-    "definition": "",
-    "context": "We are exporting your files..."
-  },
-  {
-    "term": "component.reply-export-dialog.exporting-text",
-    "definition": "",
-    "context": "Please wait a moment until the export is completed."
-  },
-  {
     "term": "component.search-input.placeholder",
     "definition": "Buscar...",
     "context": "Search..."
@@ -1245,6 +1245,11 @@
     "context": "Done"
   },
   {
+    "term": "generic.dont-ask-again",
+    "definition": "No preguntar más",
+    "context": "Don't ask again"
+  },
+  {
     "term": "generic.download",
     "definition": "Descargar",
     "context": "Download"
@@ -1286,7 +1291,7 @@
   },
   {
     "term": "generic.export",
-    "definition": "",
+    "definition": "Exportar",
     "context": "Export"
   },
   {
@@ -1533,6 +1538,11 @@
     "term": "generic.notifications",
     "definition": "Notificaciones",
     "context": "Notifications"
+  },
+  {
+    "term": "generic.omit",
+    "definition": "Omitir",
+    "context": "Omit"
   },
   {
     "term": "generic.optional-field",
@@ -2116,7 +2126,7 @@
   },
   {
     "term": "petition-replies.export-replies",
-    "definition": "",
+    "definition": "Exportar respuestas",
     "context": "Export replies"
   },
   {
@@ -2175,9 +2185,14 @@
     "context": "Download file"
   },
   {
-    "term": "petition-replies.petition-field-reply.file-preview",
-    "definition": "Previsualizar",
-    "context": "Preview file"
+    "term": "petition-replies.petition-field-reply.file-preview-download",
+    "definition": "Previsualizar archivo. ⇧ + click para descargar",
+    "context": "Preview file. ⇧ + click to download"
+  },
+  {
+    "term": "petition-replies.petition-field-reply.netdocuments-link",
+    "definition": "Acceder al archivo en NetDocuments",
+    "context": "Access file in NetDocuments"
   },
   {
     "term": "petition-replies.petition-field-reply.reject",

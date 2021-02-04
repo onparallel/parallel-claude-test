@@ -21,10 +21,11 @@ import {
 } from "@parallel/graphql/__types";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
 import { useEffect, useRef, useState } from "react";
-import { FormattedMessage, FormattedNumber } from "react-intl";
+import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 import { BaseDialog } from "../common/BaseDialog";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
+import { useErrorDialog } from "../common/ErrorDialog";
 import { NormalLink } from "../common/Link";
 
 export interface ExportRepliesProgressDialogProps {
@@ -40,7 +41,7 @@ function exportFile(
   signal: AbortSignal,
   onProgress: (event: ProgressEvent) => void
 ) {
-  return new Promise<string>((resolve) => {
+  return new Promise<string>((resolve, reject) => {
     const download = new XMLHttpRequest();
     signal.addEventListener("abort", () => download.abort());
     download.open("GET", url);
@@ -67,7 +68,11 @@ function exportFile(
         }
       );
       const result = await res.json();
-      resolve(result.IdND);
+      if (res.ok) {
+        resolve(result.IdND);
+      } else {
+        reject(result);
+      }
     };
     download.send();
   });
@@ -79,10 +84,11 @@ export function ExportRepliesProgressDialog({
   externalClientId,
   ...props
 }: DialogProps<ExportRepliesProgressDialogProps>) {
+  const intl = useIntl();
   const [progress, setProgress] = useState(0);
-  const [state, setState] = useState<
-    "LOADING" | "UPLOADING" | "FINISHED" | "NOTHING"
-  >("LOADING");
+  const [state, setState] = useState<"LOADING" | "UPLOADING" | "FINISHED">(
+    "LOADING"
+  );
   const { data } = useExportRepliesProgressDialog_PetitionRepliesQuery({
     variables: { petitionId },
   });
@@ -96,6 +102,7 @@ export function ExportRepliesProgressDialog({
   ] = useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation();
   const { current: abort } = useRef(new AbortController());
   const showAlreadyExported = useDialog(AlreadyExportedDialog);
+  const showErrorDialog = useErrorDialog();
   useEffect(() => {
     async function exportReplies() {
       const petition = data!.petition!;
@@ -108,64 +115,75 @@ export function ExportRepliesProgressDialog({
           ? field.replies.map((reply) => ({ reply, field }))
           : []
       );
-      if (files.length === 0) {
-        setState("NOTHING");
-      } else {
-        setState("UPLOADING");
-        let uploaded = 0;
-        let dontAskAgain = false;
-        let exportAgain = false;
-        for (const { reply, field } of files) {
-          if (reply.metadata.EXTERNAL_ID_CUATRECASAS) {
-            if (!dontAskAgain) {
-              const result = await showAlreadyExported({
-                filename: reply.content.filename,
-                externalId: reply.metadata.EXTERNAL_ID_CUATRECASAS,
-              });
-              dontAskAgain = result.dontAskAgain;
-              exportAgain = result.exportAgain;
-            }
-            if (!exportAgain) {
-              continue;
-            }
+      setState("UPLOADING");
+      let uploaded = 0;
+      let dontAskAgain = false;
+      let exportAgain = false;
+      for (const { reply, field } of files) {
+        if (reply.metadata.EXTERNAL_ID_CUATRECASAS) {
+          if (!dontAskAgain) {
+            const result = await showAlreadyExported({
+              filename: reply.content.filename,
+              externalId: reply.metadata.EXTERNAL_ID_CUATRECASAS,
+            });
+            dontAskAgain = result.dontAskAgain;
+            exportAgain = result.exportAgain;
           }
-          if (abort.signal.aborted) {
-            return;
+          if (!exportAgain) {
+            continue;
           }
-          const res = await fileUploadReplyDownloadLink({
+        }
+        if (abort.signal.aborted) {
+          props.onReject({ reason: "CANCEL" });
+          return;
+        }
+        const res = await fileUploadReplyDownloadLink({
+          variables: {
+            petitionId: petition.id,
+            replyId: reply.id,
+          },
+        });
+        try {
+          const externalId = await exportFile(
+            res.data!.fileUploadReplyDownloadLink.url!,
+            rename(field, reply, pattern),
+            externalClientId,
+            abort.signal,
+            ({ loaded, total }) =>
+              setProgress((uploaded + (loaded / total) * 0.5) / files.length)
+          );
+          await updatePetitionFieldReplyMetadata({
             variables: {
               petitionId: petition.id,
               replyId: reply.id,
+              metadata: {
+                ...reply.metadata,
+                EXTERNAL_ID_CUATRECASAS: externalId,
+              },
             },
           });
-          try {
-            const externalId = await exportFile(
-              res.data!.fileUploadReplyDownloadLink.url!,
-              rename(field, reply, pattern),
-              externalClientId,
-              abort.signal,
-              ({ loaded, total }) =>
-                setProgress((uploaded + (loaded / total) * 0.5) / files.length)
-            );
-            if (abort.signal.aborted) {
-              return;
-            }
-            await updatePetitionFieldReplyMetadata({
-              variables: {
-                petitionId: petition.id,
-                replyId: reply.id,
-                metadata: {
-                  ...reply.metadata,
-                  EXTERNAL_ID_CUATRECASAS: externalId,
-                },
-              },
-            });
-          } catch {}
-          uploaded += 1;
-          setProgress(uploaded / files.length);
+        } catch (e) {
+          if (e.name === "AbortError") {
+            props.onReject({ reason: "CANCEL" });
+          } else if (e?.ErrorMessage?.startsWith("NDError")) {
+            props.onReject({ reason: "ERROR" });
+            try {
+              await showErrorDialog({
+                message: intl.formatMessage({
+                  id:
+                    "component.export-replies-progress-dialog.netdocuments-error",
+                  defaultMessage:
+                    "We couldn't upload the file to the specified client folder. Please make sure that you entered the correct client number and that you have the necessary permissions.",
+                }),
+              });
+            } catch {}
+          }
+          return;
         }
-        setState("FINISHED");
+        uploaded += 1;
+        setProgress(uploaded / files.length);
       }
+      setState("FINISHED");
     }
     if (data && !isRunning.current) {
       isRunning.current = true;
@@ -219,7 +237,7 @@ export function ExportRepliesProgressDialog({
               <Text textAlign="center">
                 <FormattedMessage
                   id="component.export-replies-progress-dialog.exported-text"
-                  defaultMessage="Your files have been exported successfully"
+                  defaultMessage="Your files have been exported successfully."
                 />
               </Text>
               <Button colorScheme="purple" onClick={() => props.onResolve()}>
@@ -273,51 +291,11 @@ export function ExportRepliesProgressDialog({
             <Button
               onClick={() => {
                 abort.abort();
-                props.onReject({ reason: "CANCEL" });
               }}
             >
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
           </ModalFooter>
-        </ModalContent>
-      ) : state === "NOTHING" ? (
-        <ModalContent>
-          <ModalHeader
-            as={Stack}
-            alignItems="center"
-            paddingTop={8}
-            paddingBottom={3}
-          >
-            <Center
-              backgroundColor="green.500"
-              borderRadius="full"
-              boxSize="32px"
-            >
-              <CheckIcon color="white" boxSize="20px" />
-            </Center>
-            <Text>
-              <FormattedMessage
-                id="component.export-replies-progress-dialog.nothing-header"
-                defaultMessage="All files have already been exported"
-              />
-            </Text>
-          </ModalHeader>
-          <ModalBody>
-            <Stack spacing={6} marginBottom={6} alignItems="center">
-              <Text textAlign="center">
-                <FormattedMessage
-                  id="component.export-replies-progress-dialog.nothing-text"
-                  defaultMessage="Your files have have already been successfully"
-                />
-              </Text>
-              <Button colorScheme="purple" onClick={() => props.onResolve()}>
-                <FormattedMessage
-                  id="generic.continue"
-                  defaultMessage="Continue"
-                />
-              </Button>
-            </Stack>
-          </ModalBody>
         </ModalContent>
       ) : null}
     </BaseDialog>
