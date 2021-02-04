@@ -1,14 +1,9 @@
 import { gql } from "@apollo/client";
 import {
-  PetitionField,
-  PetitionFieldReply,
   useFilenamePlaceholdersRename_PetitionFieldFragment,
   useFilenamePlaceholdersRename_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import {
-  getFieldIndexValues,
-  useFieldIndexValues,
-} from "@parallel/utils/fieldIndexValues";
+import { getFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import escapeStringRegexp from "escape-string-regexp";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";

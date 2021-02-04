@@ -28,6 +28,7 @@ import { DialogProps, useDialog } from "../common/DialogProvider";
 import { NormalLink } from "../common/Link";
 
 export interface ExportRepliesProgressDialogProps {
+  externalClientId: string;
   petitionId: string;
   pattern: string;
 }
@@ -35,6 +36,7 @@ export interface ExportRepliesProgressDialogProps {
 function exportFile(
   url: string,
   fileName: string,
+  externalClientId: string,
   signal: AbortSignal,
   onProgress: (event: ProgressEvent) => void
 ) {
@@ -48,7 +50,7 @@ function exportFile(
     };
     download.onload = async function () {
       const body = new FormData();
-      body.append("IdClient", "999999");
+      body.append("IdClient", externalClientId);
       body.append("IdMatter", "00001");
       body.append("IdArea", "");
       body.append("IdAdminGroup", "");
@@ -74,6 +76,7 @@ function exportFile(
 export function ExportRepliesProgressDialog({
   petitionId,
   pattern,
+  externalClientId,
   ...props
 }: DialogProps<ExportRepliesProgressDialogProps>) {
   const [progress, setProgress] = useState(0);
@@ -139,6 +142,7 @@ export function ExportRepliesProgressDialog({
             const externalId = await exportFile(
               res.data!.fileUploadReplyDownloadLink.url!,
               rename(field, reply, pattern),
+              externalClientId,
               abort.signal,
               ({ loaded, total }) =>
                 setProgress((uploaded + (loaded / total) * 0.5) / files.length)

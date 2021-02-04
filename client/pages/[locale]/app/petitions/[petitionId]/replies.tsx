@@ -269,9 +269,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             "_blank"
           );
         } else {
+          const { pattern, externalClientId } = res;
           await showExportRepliesProgressDialog({
             petitionId: petition.id,
-            pattern: res.pattern,
+            pattern,
+            externalClientId,
           });
         }
       } else {

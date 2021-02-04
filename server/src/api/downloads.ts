@@ -31,10 +31,7 @@ export const downloads = Router()
       if (!hasAccess) {
         throw new Error("No access");
       }
-      const pattern = req.query.pattern as string;
-      if (typeof pattern !== "string") {
-        throw new Error("Missing pattern");
-      }
+      const pattern = (req.query.pattern as string) ?? "#file-name#";
       const petition = await ctx.petitions.loadPetition(petitionId);
 
       const name = petition?.name?.replace(/\./g, "_") ?? "files";

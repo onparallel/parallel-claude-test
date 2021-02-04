@@ -40,7 +40,7 @@ export type ExportRepliesDialogProps = {
 
 export type ExportParams =
   | { type: "DOWNLOAD_ZIP"; pattern: string }
-  | { type: "EXPORT_CUATRECASAS"; pattern: string; clientId: string };
+  | { type: "EXPORT_CUATRECASAS"; pattern: string; externalClientId: string };
 
 export type ExportType = ExportParams["type"];
 
@@ -61,7 +61,7 @@ export function ExportRepliesDialog({
   >([
     { type: "DOWNLOAD_ZIP", isEnabled: true },
     ...(user.hasExportCuatrecasas
-      ? [{ type: "EXPORT_CUATRECASAS" as const, isEmabled: false }]
+      ? [{ type: "EXPORT_CUATRECASAS" as const, isEnabled: false }]
       : []),
   ]);
   const [selectedOption, setSelectedOption] = useState<ExportType>(
@@ -114,7 +114,7 @@ export function ExportRepliesDialog({
   const [rename, setRename] = useState(true);
   const [pattern, setPattern] = useState("#field-title#");
   const placeholders = useFilenamePlaceholders();
-  const [clientId, setClientId] = useState("");
+  const [externalClientId, setExternalClientId] = useState("");
   const [clientIdError, setClientIdError] = useState(false);
   const clientIdRef = useRef<HTMLInputElement>(null);
   const placeholdersRename = useFilenamePlaceholdersRename();
@@ -124,7 +124,7 @@ export function ExportRepliesDialog({
     )!;
     const reply = field.replies[0];
     return placeholdersRename(fields)(field, reply, pattern);
-  }, [fields, placeholdersRename]);
+  }, [fields, placeholdersRename, pattern]);
 
   const inputRef = useRef<PlaceholderInputRef>(null);
   const handleConfirmClick = () => {
@@ -132,12 +132,16 @@ export function ExportRepliesDialog({
     if (selectedOption === "DOWNLOAD_ZIP") {
       props.onResolve({ type: selectedOption, pattern: _pattern });
     } else if (selectedOption === "EXPORT_CUATRECASAS") {
-      if (!clientId || !/^\d{6}$/.test(clientId)) {
+      if (!externalClientId || !/^\d{6}$/.test(externalClientId)) {
         setClientIdError(true);
         clientIdRef.current?.focus();
       } else {
         setClientIdError(false);
-        props.onResolve({ type: selectedOption, pattern: _pattern, clientId });
+        props.onResolve({
+          type: selectedOption,
+          pattern: _pattern,
+          externalClientId,
+        });
       }
     }
   };
@@ -199,9 +203,9 @@ export function ExportRepliesDialog({
                     />
                     <Input
                       ref={clientIdRef}
-                      value={clientId}
+                      value={externalClientId}
                       onChange={(e) => {
-                        setClientId(e.target.value);
+                        setExternalClientId(e.target.value);
                         setClientIdError(false);
                       }}
                       placeholder="123456"
