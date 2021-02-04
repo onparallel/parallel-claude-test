@@ -321,7 +321,7 @@
   },
   {
     "term": "component.export-replies-progress-dialog.netdocuments-error",
-    "definition": "No hemos podido subir el archivo a la carpeta de cliente especificada. Por favor, asegurate de introducir el número de cliente correcto y de que tienes los permisos necesarios.",
+    "definition": "No hemos podido subir el archivo a la carpeta de cliente especificada. Por favor, asegúrate de introducir el número de cliente correcto y de que tienes los permisos necesarios.",
     "context": "We couldn't upload the file to the specified client folder. Please make sure that you entered the correct client number and that you have the necessary permissions."
   },
   {
