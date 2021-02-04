@@ -356,8 +356,8 @@
   },
   {
     "term": "verification-code-request.expiry",
-    "definition": "Este código de verificación caducará en 10 minutos, intente utilizarlo lo antes posible.",
-    "context": "This verification code will expire in 10 minutes, so make sure you use as soon as possible."
+    "definition": "Este código de verificación caducará en 30 minutos, intente utilizarlo lo antes posible.",
+    "context": "This verification code will expire in 30 minutes, so make sure you use as soon as possible."
   },
   {
     "term": "verification-code-request.instructions",

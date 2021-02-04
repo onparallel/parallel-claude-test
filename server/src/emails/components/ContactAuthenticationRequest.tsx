@@ -54,7 +54,7 @@ const email: Email<ContactAuthenticationRequest> = {
       ${intl.formatMessage({
         id: "verification-code-request.expiry",
         defaultMessage:
-          "This verification code will expire in 10 minutes, so make sure you use as soon as possible.",
+          "This verification code will expire in 30 minutes, so make sure you use as soon as possible.",
       })}
       
       ${closing({}, intl)}
@@ -121,7 +121,7 @@ const email: Email<ContactAuthenticationRequest> = {
             <MjmlText>
               <FormattedMessage
                 id="verification-code-request.expiry"
-                defaultMessage="This verification code will expire in 10 minutes, so make sure you use as soon as possible."
+                defaultMessage="This verification code will expire in 30 minutes, so make sure you use as soon as possible."
               />
             </MjmlText>
             <Closing />

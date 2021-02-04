@@ -237,7 +237,7 @@ export class ContactRepository extends BaseRepository {
         .padStart(6, "0"),
       token_hash: await hash(token, ""),
       remaining_attempts: 3,
-      expires_at: addMinutes(Date.now(), 10),
+      expires_at: addMinutes(Date.now(), 30),
     });
     return { request, token };
   }
