@@ -745,6 +745,11 @@ type Mutation {
   updateOnboardingStatus(key: OnboardingKey!, status: OnboardingStatus!): User!
 
   """
+  Updates the logo of an organization
+  """
+  updateOrganizationLogo(file: Upload!, orgId: GID!): Organization!
+
+  """
   Updates a petition.
   """
   updatePetition(data: UpdatePetitionInput!, petitionId: GID!): PetitionBase!

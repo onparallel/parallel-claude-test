@@ -10,6 +10,7 @@ export * from "./contact/mutations";
 
 export * from "./organization/types";
 export * from "./organization/queries";
+export * from "./organization/mutations";
 
 export * from "./petition/types";
 export * from "./petition/queries";

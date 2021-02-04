@@ -601,6 +601,7 @@ export interface NexusGenFieldTypes {
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
+    updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
@@ -1319,6 +1320,7 @@ export interface NexusGenFieldTypeNames {
     updateContact: "Contact";
     updateFieldPositions: "PetitionBase";
     updateOnboardingStatus: "User";
+    updateOrganizationLogo: "Organization";
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionBaseAndField";
     updatePetitionFieldComment: "PetitionFieldComment";
@@ -2235,6 +2237,11 @@ export interface NexusGenArgTypes {
       // args
       key: NexusGenEnums["OnboardingKey"]; // OnboardingKey!
       status: NexusGenEnums["OnboardingStatus"]; // OnboardingStatus!
+    };
+    updateOrganizationLogo: {
+      // args
+      file: NexusGenScalars["Upload"]; // Upload!
+      orgId: NexusGenScalars["GID"]; // GID!
     };
     updatePetition: {
       // args

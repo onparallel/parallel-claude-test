@@ -308,6 +308,8 @@ export type Mutation = {
   updateFieldPositions: PetitionBase;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
+  /** Updates the logo of an organization */
+  updateOrganizationLogo: Organization;
   /** Updates a petition. */
   updatePetition: PetitionBase;
   /** Updates a petition field. */
@@ -678,6 +680,11 @@ export type MutationupdateFieldPositionsArgs = {
 export type MutationupdateOnboardingStatusArgs = {
   key: OnboardingKey;
   status: OnboardingStatus;
+};
+
+export type MutationupdateOrganizationLogoArgs = {
+  file: Scalars["Upload"];
+  orgId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionArgs = {
@@ -3786,6 +3793,33 @@ export type ContactsUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ContactsUserQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Contacts_UserFragment;
+};
+
+export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
+  orgId: Scalars["GID"];
+  file: Scalars["Upload"];
+}>;
+
+export type OrganizationBranding_updateOrgLogoMutation = {
+  __typename?: "Mutation";
+} & {
+  updateOrganizationLogo: { __typename?: "Organization" } & Pick<
+    Organization,
+    "id" | "logoUrl"
+  >;
+};
+
+export type OrganizationBrandingQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type OrganizationBrandingQuery = { __typename?: "Query" } & {
+  me: { __typename?: "User" } & {
+    organization: { __typename?: "Organization" } & Pick<
+      Organization,
+      "id" | "logoUrl" | "identifier"
+    >;
+  } & SettingsLayout_UserFragment;
 };
 
 export type OrganizationSettingsQueryVariables = Exact<{
@@ -8893,6 +8927,104 @@ export type ContactsUserQueryHookResult = ReturnType<
 >;
 export type ContactsUserLazyQueryHookResult = ReturnType<
   typeof useContactsUserLazyQuery
+>;
+export const OrganizationBranding_updateOrgLogoDocument = gql`
+  mutation OrganizationBranding_updateOrgLogo($orgId: GID!, $file: Upload!) {
+    updateOrganizationLogo(orgId: $orgId, file: $file) {
+      id
+      logoUrl
+    }
+  }
+`;
+
+/**
+ * __useOrganizationBranding_updateOrgLogoMutation__
+ *
+ * To run a mutation, you first call `useOrganizationBranding_updateOrgLogoMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOrganizationBranding_updateOrgLogoMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [organizationBrandingUpdateOrgLogoMutation, { data, loading, error }] = useOrganizationBranding_updateOrgLogoMutation({
+ *   variables: {
+ *      orgId: // value for 'orgId'
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useOrganizationBranding_updateOrgLogoMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OrganizationBranding_updateOrgLogoMutation,
+    OrganizationBranding_updateOrgLogoMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    OrganizationBranding_updateOrgLogoMutation,
+    OrganizationBranding_updateOrgLogoMutationVariables
+  >(OrganizationBranding_updateOrgLogoDocument, baseOptions);
+}
+export type OrganizationBranding_updateOrgLogoMutationHookResult = ReturnType<
+  typeof useOrganizationBranding_updateOrgLogoMutation
+>;
+export const OrganizationBrandingDocument = gql`
+  query OrganizationBranding {
+    me {
+      ...SettingsLayout_User
+      organization {
+        id
+        logoUrl
+        identifier
+      }
+    }
+  }
+  ${SettingsLayout_UserFragmentDoc}
+`;
+
+/**
+ * __useOrganizationBrandingQuery__
+ *
+ * To run a query within a React component, call `useOrganizationBrandingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOrganizationBrandingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOrganizationBrandingQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useOrganizationBrandingQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    OrganizationBrandingQuery,
+    OrganizationBrandingQueryVariables
+  >
+) {
+  return Apollo.useQuery<
+    OrganizationBrandingQuery,
+    OrganizationBrandingQueryVariables
+  >(OrganizationBrandingDocument, baseOptions);
+}
+export function useOrganizationBrandingLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    OrganizationBrandingQuery,
+    OrganizationBrandingQueryVariables
+  >
+) {
+  return Apollo.useLazyQuery<
+    OrganizationBrandingQuery,
+    OrganizationBrandingQueryVariables
+  >(OrganizationBrandingDocument, baseOptions);
+}
+export type OrganizationBrandingQueryHookResult = ReturnType<
+  typeof useOrganizationBrandingQuery
+>;
+export type OrganizationBrandingLazyQueryHookResult = ReturnType<
+  typeof useOrganizationBrandingLazyQuery
 >;
 export const OrganizationSettingsDocument = gql`
   query OrganizationSettings {

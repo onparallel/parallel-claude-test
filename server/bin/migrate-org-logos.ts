@@ -82,6 +82,6 @@ const identifiers = [
     },
     { concurrency: 5 }
   );
-  console.log("DONE!");
+
   process.exit(0);
 })();

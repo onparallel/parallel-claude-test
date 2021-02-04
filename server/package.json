@@ -100,9 +100,9 @@
     "yargs": "^16.2.0"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.20.0",
-    "@graphql-codegen/typescript": "^1.20.0",
-    "@graphql-codegen/typescript-operations": "^1.17.13",
+    "@graphql-codegen/cli": "^1.20.1",
+    "@graphql-codegen/typescript": "^1.20.2",
+    "@graphql-codegen/typescript-operations": "^1.17.14",
     "@graphql-tools/graphql-tag-pluck": "6.4.0",
     "@storybook/addon-a11y": "^6.1.15",
     "@storybook/addon-controls": "^6.1.15",

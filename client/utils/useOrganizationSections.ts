@@ -7,6 +7,13 @@ export function useOrganizationSections() {
     () => [
       {
         title: intl.formatMessage({
+          id: "organization.branding.title",
+          defaultMessage: "Branding",
+        }),
+        path: "/app/organization/branding",
+      },
+      {
+        title: intl.formatMessage({
           id: "organization.users.title",
           defaultMessage: "Users",
         }),

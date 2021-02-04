@@ -188,30 +188,3 @@ export const resetSignaturitOrganizationBranding = mutationField(
     },
   }
 );
-
-// export const uploadOrgLogo = mutationField("uploadOrganizationLogo", {
-//   description: "Uploads a logo for an organization.",
-//   type: "SupportMethodResponse",
-//   args: {
-//     orgId: nonNull(intArg()),
-//     logo: nonNull(arg({ type: "Upload" })),
-//   },
-//   validateArgs: fileIsImage((args) => args.logo, "logo"),
-//   authorize: supportMethodAccess(),
-//   resolve: async (_, args, ctx) => {
-//     const org = await ctx.organizations.loadOrg(args.orgId);
-//     if (!org) {
-//       throw new WhitelistedError(
-//         `Organization with id ${args.orgId} not found`,
-//         "ORGANIZATION_NOT_FOUND"
-//       );
-//     }
-
-//     const file = await (args.logo as Promise<UploadedFile>);
-//     console.log(file);
-
-//     return {
-//       result: RESULT.SUCCESS,
-//     };
-//   },
-// });

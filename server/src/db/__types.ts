@@ -340,6 +340,7 @@ export interface Organization {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  logo_url: Maybe<string>; // varchar
 }
 
 export type CreateOrganization = PartialProps<
@@ -350,6 +351,7 @@ export type CreateOrganization = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+  | "logo_url"
 >;
 
 export interface OrgIntegration {

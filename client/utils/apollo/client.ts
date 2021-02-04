@@ -1,6 +1,5 @@
 import {
   ApolloClient,
-  createHttpLink,
   FieldMergeFunction,
   from,
   InMemoryCache,
@@ -11,6 +10,7 @@ import { IncomingMessage } from "http";
 import { filter, indexBy, map, pipe } from "remeda";
 import typeDefs from "./client-schema.graphql";
 import { parse as parseCookie, serialize as serializeCookie } from "cookie";
+import { createUploadLink } from "apollo-upload-client";
 
 export interface CreateApolloClientOptions {
   req?: IncomingMessage;
@@ -65,7 +65,7 @@ export function createApolloClient(
     return _cached;
   }
 
-  const httpLink = createHttpLink({
+  const httpLink = createUploadLink({
     uri: process.browser ? "/graphql" : "http://localhost:4000/graphql",
   });
 
