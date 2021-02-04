@@ -58,20 +58,24 @@ function exportFile(
       body.append("Folder", "");
       body.append("DocType", "41");
       body.append("File", new File([this.response], fileName));
-      const res = await fetch(
-        "https://localhost:50500/api/v1/netdocuments/uploaddocument",
-        {
-          method: "POST",
-          body,
-          headers: new Headers({ AppName: "Parallel" }),
-          signal,
+      try {
+        const res = await fetch(
+          "https://localhost:50500/api/v1/netdocuments/uploaddocument",
+          {
+            method: "POST",
+            body,
+            headers: new Headers({ AppName: "Parallel" }),
+            signal,
+          }
+        );
+        const result = await res.json();
+        if (res.ok) {
+          resolve(result.IdND);
+        } else {
+          reject(result);
         }
-      );
-      const result = await res.json();
-      if (res.ok) {
-        resolve(result.IdND);
-      } else {
-        reject(result);
+      } catch (e) {
+        reject(e);
       }
     };
     download.send();
