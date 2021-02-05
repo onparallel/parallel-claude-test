@@ -26,6 +26,7 @@ createCronWorker("reporting", async (context) => {
   users.columns = [
     { header: "ID", key: "id" },
     { header: "Email", key: "email" },
+    { header: "Organization Id", key: "org_id" },
     { header: "First Name", key: "first_name" },
     { header: "Last Name", key: "last_name" },
     { header: "Register Date", key: "created_at" },
@@ -75,7 +76,7 @@ createCronWorker("reporting", async (context) => {
     to: ["alex@parallel.so", "derek@parallel.so"],
     subject: `Reporting ${format(new Date(), "yyyy-MM-dd")}`,
     text: outdent`
-      Hola Alex,
+      Hola,
       Te envío el reporting que me has pedido. Como me caes bien, aquí va un cita del célebre Sun Tzu:
 
       ${quotes[Math.floor(Math.random() * quotes.length)]}
