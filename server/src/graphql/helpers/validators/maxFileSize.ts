@@ -12,14 +12,21 @@ export function maxFileSize<TypeName extends string, FieldName extends string>(
     const { createReadStream } = await prop(args);
     const maxSizeExceeded = await new Promise<boolean>((resolve) => {
       let bytesRead = 0;
-      createReadStream()
+      const stream = createReadStream();
+      stream
         .on("data", (buffer: Buffer) => {
           bytesRead += buffer.byteLength;
           if (bytesRead > maxSizeBytes) {
+            stream.destroy();
             resolve(true);
           }
         })
-        .on("error", () => resolve(true))
+        .on("error", () => {
+          if (!stream.destroyed) {
+            stream.destroy();
+          }
+          resolve(true);
+        })
         .on("end", () => resolve(false))
         .resume();
     });
