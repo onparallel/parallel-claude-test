@@ -4,10 +4,10 @@ import {
   I18nProps,
   I18nProvider,
 } from "@parallel/components/common/I18nProvider";
-import { GoogleAnalytics } from "@parallel/components/scripts/GoogleAnalytics";
 import { Hubspot } from "@parallel/components/scripts/Hubspot";
+import PlausibleProvider from "next-plausible";
 import { AppProps } from "next/app";
-import { useEffect } from "react";
+import { createElement, useEffect } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { init as initSentry } from "../utils/sentry";
@@ -33,17 +33,19 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
     <>
       {loadTrackingScripts ? (
         <>
-          <GoogleAnalytics />
           <Hubspot />
         </>
       ) : null}
-      <I18nProvider {...props}>
-        <ChakraProvider theme={theme} resetCSS portalZIndex={40}>
-          <DndProvider backend={HTML5Backend}>
-            <Component {...pageProps} />
-          </DndProvider>
-        </ChakraProvider>
-      </I18nProvider>
+      {[
+        [PlausibleProvider, { domain: "parallel.so", exclude: "/*/print/*" }],
+        [I18nProvider, props],
+        [ChakraProvider, { theme, resetCSS: true, portalZIndex: 40 }],
+        [DndProvider, { backend: HTML5Backend }],
+      ].reduceRight(
+        (acc, [provider, props]) =>
+          createElement(provider as any, props as any, acc),
+        <Component {...pageProps} />
+      )}
     </>
   );
 }
