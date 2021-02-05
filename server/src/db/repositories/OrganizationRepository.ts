@@ -1,9 +1,6 @@
-import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { Config, CONFIG } from "../../config";
-import { fromDataLoader } from "../../util/fromDataLoader";
-import { Maybe } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
@@ -83,13 +80,6 @@ export class OrganizationRepository extends BaseRepository {
 
   readonly loadUserCount = this.buildLoadCountBy("user", "org_id", (q) =>
     q.whereNull("deleted_at")
-  );
-
-  readonly getOrgLogoUrl = fromDataLoader(
-    new DataLoader<number, Maybe<string>>(async (orgIds) => {
-      const orgs = await this.loadOrg(orgIds);
-      return orgs.map((org) => org?.logo_url ?? null);
-    })
   );
 
   async updateOrgLogo(id: number, logoUrl: string, user: User) {

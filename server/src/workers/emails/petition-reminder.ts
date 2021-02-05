@@ -52,15 +52,14 @@ export async function petitionReminder(
         `Contact not found for petition_access.contact_id ${access.contact_id}`
       );
     }
-    const [org, logoUrl] = await Promise.all([
-      context.organizations.loadOrg(granter.org_id),
-      context.organizations.getOrgLogoUrl(granter.org_id),
-    ]);
+    const org = await context.organizations.loadOrg(granter.org_id);
     if (!org) {
       throw new Error(
         `Organization not found for user.org_id ${access.contact_id}`
       );
     }
+    const logoUrl = org.logo_url;
+
     const replies = await context.petitions.loadRepliesForField(
       fields.map((f) => f.id)
     );

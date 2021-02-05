@@ -52,18 +52,15 @@ function OrganizationBranding() {
   ] = useOrganizationBranding_updateOrgLogoMutation();
   const handleLogoUpload = async (files: File[], rejected: FileRejection[]) => {
     if (rejected.length > 0) {
-      if (rejected[0].errors[0].code === "file-too-large") {
-        await showErrorDialog({
-          message: intl.formatMessage(
-            {
-              id: "organization.branding.error.file-too-large",
-              defaultMessage:
-                "The logo must be a PNG file of size up to {kb}Kb.",
-            },
-            { kb: MAX_FILE_SIZE / 1000 }
-          ),
-        });
-      }
+      await showErrorDialog({
+        message: intl.formatMessage(
+          {
+            id: "organization.branding.logo-error",
+            defaultMessage: "The logo must be a PNG file of size up to {kb}Kb.",
+          },
+          { kb: MAX_FILE_SIZE / 1000 }
+        ),
+      });
     } else {
       await updateLogo({
         variables: {

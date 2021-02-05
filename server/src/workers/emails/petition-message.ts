@@ -38,16 +38,17 @@ export async function petitionMessage(
       `Petition access not found for petition_message.petition_access_id ${message.petition_access_id}`
     );
   }
-  const [contact, org, logoUrl] = await Promise.all([
+  const [contact, org] = await Promise.all([
     context.contacts.loadContact(access.contact_id),
     context.organizations.loadOrg(sender.org_id),
-    context.organizations.getOrgLogoUrl(sender.org_id),
   ]);
   if (!org) {
     throw new Error(
       `Organization not found for user.org_id ${access.contact_id}`
     );
   }
+  const logoUrl = org.logo_url;
+
   if (!contact) {
     throw new Error(
       `Contact not found for petition_access.contact_id ${access.contact_id}`

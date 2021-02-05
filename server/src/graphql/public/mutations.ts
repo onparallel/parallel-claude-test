@@ -109,7 +109,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
           isAllowed: false,
           email: anonymizeEmail(ctx.contact!.email),
           orgName: org!.name,
-          orgLogoUrl: await ctx.organizations.getOrgLogoUrl(org!.id),
+          orgLogoUrl: org!.logo_url,
         };
       }
     } else {

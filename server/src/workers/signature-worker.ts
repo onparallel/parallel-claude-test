@@ -287,12 +287,11 @@ async function fetchTemplateData(petition: Petition, ctx: WorkerContext) {
     throw new Error(`Org with id ${petition.org_id} not found`);
   }
 
-  const logoUrl = await ctx.organizations.getOrgLogoUrl(petition.org_id);
-
   const signatureConfig = petition.signature_config as PetitionSignatureConfig;
   return {
     senderFirstName: user.first_name ?? "",
-    logoUrl: logoUrl ?? `${ctx.config.misc.assetsUrl}/static/emails/logo.png`,
+    logoUrl:
+      org.logo_url ?? `${ctx.config.misc.assetsUrl}/static/emails/logo.png`,
     logoAlt: org.identifier,
     documentName: signatureConfig.title,
   };

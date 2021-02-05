@@ -55,15 +55,14 @@ export async function petitionCompleted(
     return;
   }
 
-  const [org, logoUrl] = await Promise.all([
-    context.organizations.loadOrg(petition!.org_id),
-    context.organizations.getOrgLogoUrl(petition!.org_id),
-  ]);
+  const org = await context.organizations.loadOrg(petition.org_id);
   if (!org) {
     throw new Error(
       `Organization not found for granter.org_id ${petition!.org_id}`
     );
   }
+  const logoUrl = org.logo_url;
+
   const emails: EmailLog[] = [];
   const subscribed = permissions.filter((p) => p && p.is_subscribed);
   for (const permission of subscribed) {
