@@ -334,24 +334,6 @@ export const publicCreateFileUploadReply = mutationField(
       fieldBelongsToAccess("fieldId"),
       fieldHasType("fieldId", "FILE_UPLOAD")
     ),
-    validateArgs: async (root, args, ctx, info) => {
-      const { contentType } = args.data;
-      if (
-        ![
-          "image/",
-          "application/pdf",
-          "application/msword",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "video/",
-        ].some((typePrefix) => contentType.startsWith(typePrefix))
-      ) {
-        throw new ArgValidationError(
-          info,
-          "file",
-          `File type ${contentType} is not allowed.`
-        );
-      }
-    },
     resolve: async (_, args, ctx) => {
       const key = random(16);
       const { filename, size, contentType } = args.data;

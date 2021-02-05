@@ -1,4 +1,3 @@
-import { GraphQLUpload } from "graphql-upload";
 import gql from "graphql-tag";
 import Knex from "knex";
 import { omit } from "remeda";

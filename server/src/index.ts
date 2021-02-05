@@ -17,9 +17,9 @@ import { graphqlUploadExpress } from "graphql-upload";
 const app = express();
 const container = createContainer();
 
-app.use(graphqlUploadExpress());
 app.use("/api", bodyParser.json(), cors(), cookieParser(), api(container));
 
+app.use("/graphql", graphqlUploadExpress());
 const server = new ApolloServer({
   // Disable the built in file upload implementation that uses an outdated
   // `graphql-upload` version, see:

@@ -33,6 +33,7 @@ export const schema = makeSchema({
     paginationPlugin(),
   ],
   typegenAutoConfig: {
+    headers: [`import { FileUpload } from "graphql-upload";`],
     sources: [
       { source: resolve("./db/__types.ts"), alias: "db" },
       { source: resolve("./db/events.ts"), alias: "events" },

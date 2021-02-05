@@ -1,12 +1,12 @@
-import { arg, mutationField, nonNull, stringArg } from "@nexus/schema";
+import { mutationField, nonNull, stringArg } from "@nexus/schema";
 import { differenceInSeconds } from "date-fns";
-import { FileUpload, GraphQLUpload } from "graphql-upload";
 import { random } from "../../../util/token";
 import { Maybe } from "../../../util/types";
 import { authenticateAnd } from "../../helpers/authorize";
 import { ArgValidationError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { RESULT } from "../../helpers/result";
+import { uploadArg } from "../../helpers/upload";
 import { fieldHasType } from "../../public/authorizers";
 import {
   fieldsBelongsToPetition,
@@ -115,53 +115,29 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldId: nonNull(globalIdArg("PetitionField")),
-    file: nonNull(arg({ type: GraphQLUpload })),
+    file: nonNull(uploadArg()),
   },
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldHasType("fieldId", ["FILE_UPLOAD"])
   ),
-  validateArgs: async (root, args, ctx, info) => {
-    const { mimetype } = await (args.file as Promise<FileUpload>);
-    if (
-      ![
-        "image/",
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "video/",
-      ].some((typePrefix) => mimetype.startsWith(typePrefix))
-    ) {
-      throw new ArgValidationError(
-        info,
-        "file",
-        `File type ${mimetype} is not allowed.`
-      );
-    }
-  },
   resolve: async (_, args, ctx) => {
-    const {
-      createReadStream,
-      filename,
-      mimetype,
-    } = await (args.file as Promise<FileUpload>);
+    const { createReadStream, filename, mimetype } = await args.file;
     const key = random(16);
 
-    let bytesWritten = 0;
-    const stream = createReadStream();
-    stream.on("data", ({ byteLength }: Buffer) => {
-      bytesWritten += byteLength;
-    });
-
-    await ctx.aws.fileUploads.uploadFile(key, mimetype, stream);
+    const res = await ctx.aws.fileUploads.uploadFile(
+      key,
+      mimetype,
+      createReadStream()
+    );
 
     const file = await ctx.files.createFileUpload(
       {
         content_type: mimetype,
         filename,
         path: key,
-        size: bytesWritten.toString(),
+        size: res["ContentLength"]!.toString(),
         upload_complete: true,
       },
       `User:${ctx.user!.id}`
