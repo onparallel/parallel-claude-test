@@ -1,13 +1,13 @@
+import AWS from "aws-sdk";
 import "reflect-metadata";
 import { Consumer } from "sqs-consumer";
+import yargs from "yargs";
 import { CONFIG, Config } from "../../config";
 import { createContainer } from "../../container";
 import { WorkerContext } from "../../context";
-import { AWS_SERVICE, IAws } from "../../services/aws";
 import { LOGGER, Logger } from "../../services/logger";
 import { loadEnv } from "../../util/loadEnv";
 import { stopwatch } from "../../util/stopwatch";
-import yargs from "yargs";
 
 export type QueueWorkerOptions<T> = {
   parser?: (message: string) => T;
@@ -60,7 +60,15 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
       () => {},
       () => {
         const logger = container.get<Logger>(LOGGER);
-        const aws = container.get<IAws>(AWS_SERVICE);
+        const config = container.get<Config>(CONFIG);
+        AWS.config.update({
+          ...config.aws,
+          signatureVersion: "v4",
+          logger:
+            process.env.NODE_ENV === "production"
+              ? undefined
+              : { log: logger.debug.bind(logger) },
+        });
         const consumer = Consumer.create({
           queueUrl: config.queueWorkers[name].endpoint,
           batchSize: 10,
@@ -76,7 +84,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
               duration,
             });
           },
-          sqs: aws.sqs as any,
+          sqs: new AWS.SQS(),
         });
         consumer.on("error", (error) => {
           logger.error(error.stack);

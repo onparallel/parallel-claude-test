@@ -8,8 +8,6 @@ import { Memoize } from "typescript-memoize";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 
 export interface IAws {
-  sqs: AWS.SQS;
-  cognitoIdP: AWS.CognitoIdentityServiceProvider;
   fileUploads: IStorage;
   enqueueMessages(
     queue: keyof Config["queueWorkers"],
@@ -28,7 +26,7 @@ export const AWS_SERVICE = Symbol.for("AWS_SERVICE");
 
 @injectable()
 export class Aws implements IAws {
-  @Memoize() public get s3() {
+  @Memoize() private get s3() {
     return new AWS.S3({
       signatureVersion: "v4",
       region: this.config.aws.region,
@@ -36,15 +34,15 @@ export class Aws implements IAws {
     });
   }
 
-  @Memoize() public get sqs() {
+  @Memoize() private get sqs() {
     return new AWS.SQS();
   }
 
-  @Memoize() public get logs() {
+  @Memoize() private get logs() {
     return new AWS.CloudWatchLogs();
   }
 
-  @Memoize() public get cognitoIdP() {
+  @Memoize() private get cognitoIdP() {
     return new AWS.CognitoIdentityServiceProvider();
   }
 
@@ -74,11 +72,7 @@ export class Aws implements IAws {
       logger:
         process.env.NODE_ENV === "production"
           ? undefined
-          : {
-              log(message) {
-                logger.debug(message);
-              },
-            },
+          : { log: logger.debug.bind(logger) },
     });
   }
 

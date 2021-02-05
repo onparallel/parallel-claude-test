@@ -1,6 +1,5 @@
-import AWS, { AWSError } from "aws-sdk";
-import { HeadObjectOutput, ManagedUpload } from "aws-sdk/clients/s3";
-import { PromiseResult } from "aws-sdk/lib/request";
+import AWS from "aws-sdk";
+import { HeadObjectOutput } from "aws-sdk/clients/s3";
 import contentDisposition from "content-disposition";
 import { injectable } from "inversify";
 import { Readable } from "stream";
@@ -19,15 +18,13 @@ export interface IStorage {
     cdType: "attachment" | "inline"
   ): Promise<string>;
   downloadFile(key: string): Readable;
-  getFileMetadata(
-    key: string
-  ): Promise<PromiseResult<HeadObjectOutput, AWSError>>;
+  getFileMetadata(key: string): Promise<HeadObjectOutput>;
   deleteFile(key: string): Promise<void>;
   uploadFile(
     key: string,
     contentType: string,
     body: Buffer | Readable
-  ): Promise<ManagedUpload.SendData>;
+  ): Promise<HeadObjectOutput>;
 }
 
 @injectable()
@@ -68,7 +65,7 @@ export class Storage implements IStorage {
   }
 
   async getFileMetadata(key: string) {
-    return this.s3
+    return await this.s3
       .headObject({
         Bucket: this.bucketName,
         Key: key,
@@ -77,7 +74,7 @@ export class Storage implements IStorage {
   }
 
   async deleteFile(key: string) {
-    this.s3
+    await this.s3
       .deleteObject({
         Bucket: this.bucketName,
         Key: key,
@@ -86,7 +83,7 @@ export class Storage implements IStorage {
   }
 
   async uploadFile(key: string, contentType: string, body: Buffer | Readable) {
-    return this.s3
+    await this.s3
       .upload(
         {
           Bucket: this.bucketName,
@@ -97,5 +94,6 @@ export class Storage implements IStorage {
         {}
       )
       .promise();
+    return await this.getFileMetadata(key);
   }
 }
