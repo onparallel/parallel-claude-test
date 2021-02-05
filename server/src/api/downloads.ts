@@ -111,13 +111,7 @@ export const downloads = Router()
     }
   });
 
-const placeholders = [
-  "field-number",
-  "field-title",
-  "contact-first-name",
-  "contact-last-name",
-  "file-name",
-] as const;
+const placeholders = ["field-number", "field-title", "file-name"] as const;
 
 async function* getPetitionFiles(
   ctx: ApiContext,
@@ -139,21 +133,6 @@ async function* getPetitionFiles(
     files.filter((f) => f !== null),
     (f) => f!.id
   );
-  const accesses = await ctx.petitions.loadAccess(
-    fieldReplies.flat().map((reply) => reply.petition_access_id)
-  );
-  const accessesById = indexBy(
-    accesses.filter((a) => a !== null),
-    (a) => a!.id
-  );
-  const contacts = await ctx.contacts.loadContact(
-    accesses.map((a) => a!.contact_id)
-  );
-  const contactsById = indexBy(
-    contacts.filter((c) => c !== null),
-    (c) => c!.id
-  );
-
   const textReplies = new TextRepliesExcel(locale);
   const seen = new Set<string>();
   let headingCount = 0;
@@ -163,8 +142,6 @@ async function* getPetitionFiles(
     } else if (field.type === "FILE_UPLOAD") {
       for (const reply of replies) {
         const file = filesById[reply.content["file_upload_id"]];
-        const contact =
-          contactsById[accessesById[reply.petition_access_id]!.contact_id];
         if (file) {
           const extension = file.filename.match(/\.[a-z0-9]+$/)?.[0] ?? "";
           const name = rename(pattern, placeholders, (placeholder) => {
@@ -176,10 +153,6 @@ async function* getPetitionFiles(
               case "file-name":
                 // remove file extension since it's added back later
                 return file.filename.replace(/\.[a-z0-9]+$/, "");
-              case "contact-first-name":
-                return contact?.first_name ?? "";
-              case "contact-last-name":
-                return contact?.last_name ?? "";
             }
           });
           let filename = sanitize(`${name}${extension}`);
