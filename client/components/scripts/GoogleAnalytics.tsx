@@ -4,6 +4,7 @@ import ReactGA from "react-ga";
 
 export const GoogleAnalytics = memo(() => {
   useEffect(() => {
+    ReactGA.initialize("UA-153451031-1");
     function handler() {
       setTimeout(() => {
         ReactGA.pageview(window.location.href + window.location.search);
