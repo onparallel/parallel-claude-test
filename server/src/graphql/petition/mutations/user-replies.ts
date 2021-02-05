@@ -161,7 +161,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
         content_type: mimetype,
         filename,
         path: key,
-        size: bytesWritten,
+        size: bytesWritten.toString(),
         upload_complete: true,
       },
       `User:${ctx.user!.id}`

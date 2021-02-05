@@ -204,7 +204,7 @@ export class Mocks {
           content_type: "application/pdf",
           filename: "file.pdf",
           path: random(16),
-          size: 100,
+          size: "100",
           upload_complete: true,
           ...builder?.(index),
         }))
