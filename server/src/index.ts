@@ -16,7 +16,7 @@ import { graphqlUploadExpress } from "graphql-upload";
 
 const app = express();
 const container = createContainer();
-app.use(graphqlUploadExpress());
+
 app.use("/api", bodyParser.json(), cors(), cookieParser(), api(container));
 
 app.use("/graphql", graphqlUploadExpress());

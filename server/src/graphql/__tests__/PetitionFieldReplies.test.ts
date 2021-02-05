@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import Knex from "knex";
 import { omit } from "remeda";
-import { MockStorage, userCognitoId } from "../../../test/mocks";
+import { userCognitoId } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
@@ -16,8 +16,6 @@ import {
 } from "../../db/__types";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
-import { IStorage, STORAGE_FACTORY } from "../../services/storage";
-import { AWS_SERVICE, IAws } from "../../services/aws";
 
 describe("GraphQL/Petition Field Replies", () => {
   let testClient: TestClient;
@@ -645,7 +643,7 @@ describe("GraphQL/Petition Field Replies", () => {
     });
 
     it("deletes a file reply and its entry on file_upload table", async () => {
-      const { errors, data } = await testClient.mutate({
+      const { errors } = await testClient.mutate({
         mutation: gql`
           mutation($petitionId: GID!, $replyId: GID!) {
             deletePetitionReply(petitionId: $petitionId, replyId: $replyId)

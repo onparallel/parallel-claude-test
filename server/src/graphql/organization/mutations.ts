@@ -1,7 +1,7 @@
-import { arg, mutationField, nonNull } from "@nexus/schema";
-import { GraphQLUpload, FileUpload } from "graphql-upload";
+import { mutationField, nonNull } from "@nexus/schema";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { uploadArg } from "../helpers/upload";
 import { validateAnd } from "../helpers/validateArgs";
 import { contentType } from "../helpers/validators/contentType";
 import { maxFileSize } from "../helpers/validators/maxFileSize";
@@ -13,7 +13,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   type: "Organization",
   args: {
     orgId: nonNull(globalIdArg()),
-    file: nonNull(arg({ type: GraphQLUpload })),
+    file: nonNull(uploadArg()),
   },
   authorize: authenticateAnd(
     contextUserIsAdmin(),
@@ -24,7 +24,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     maxFileSize((args) => args.file, 50000, "file")
   ),
   resolve: async (root, args, ctx) => {
-    const file = await (args.file as Promise<FileUpload>);
+    const file = await args.file;
     const organization = (await ctx.organizations.loadOrg(args.orgId))!;
 
     const {

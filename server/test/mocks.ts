@@ -62,17 +62,15 @@ export class MockAwsService implements IAws {
   public get fileUploads() {
     return new MockStorage();
   }
+  public get publicFiles() {
+    return new MockStorage();
+  }
 }
 
 @injectable()
 export class MockStorage implements IStorage {
-  async uploadFile(key: string) {
-    return {
-      Key: key,
-      Bucket: "mock-test",
-      ETag: "",
-      Location: "",
-    };
+  async uploadFile() {
+    return {} as any;
   }
   downloadFile() {
     return {} as any;
