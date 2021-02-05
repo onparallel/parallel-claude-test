@@ -1910,6 +1910,31 @@
     "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
   },
   {
+    "term": "organization.branding.error.file-too-large",
+    "definition": "El logo debe ser una imagen PNG de hasta {kb}Kb de tamaño.",
+    "context": "The logo must be a PNG file of size up to {kb}Kb."
+  },
+  {
+    "term": "organization.branding.logo-header",
+    "definition": "Logo de la organización",
+    "context": "Organization logo"
+  },
+  {
+    "term": "organization.branding.logo-help",
+    "definition": "Usaremos este logo en todas las comunicaciones con tus clientes. Debe ser una imagen PNG de hasta {kb}Kb de tamaño.",
+    "context": "We will use this logo in all communications with your clients. Must be a PNG file of size up to {kb}Kb."
+  },
+  {
+    "term": "organization.branding.title",
+    "definition": "Branding",
+    "context": "Branding"
+  },
+  {
+    "term": "organization.branding.upload-logo",
+    "definition": "Subir un nuevo logo",
+    "context": "Upload a new logo"
+  },
+  {
     "term": "organization.confirm-activate-user-dialog.body",
     "definition": "Estás seguro que quieres <b>activar</b> {count, plural, =1{el usuario seleccionado} other{los usuarios seleccionados}}?",
     "context": "Are you sure you want to <b>activate</b> the selected {count, plural, =1{user} other {users}}?"
