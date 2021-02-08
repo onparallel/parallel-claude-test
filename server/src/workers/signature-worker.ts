@@ -282,7 +282,10 @@ async function fetchTemplateData(petition: Petition, ctx: WorkerContext) {
     throw new Error(`Can't find OWNER of petition with id ${petition.id}`);
   }
 
-  const org = await ctx.organizations.loadOrg(petition.org_id);
+  const [org, logoUrl] = await Promise.all([
+    ctx.organizations.loadOrg(petition.org_id),
+    ctx.organizations.getOrgLogoUrl(petition.org_id),
+  ]);
   if (!org) {
     throw new Error(`Org with id ${petition.org_id} not found`);
   }
@@ -290,8 +293,7 @@ async function fetchTemplateData(petition: Petition, ctx: WorkerContext) {
   const signatureConfig = petition.signature_config as PetitionSignatureConfig;
   return {
     senderFirstName: user.first_name ?? "",
-    logoUrl:
-      org.logo_url ?? `${ctx.config.misc.assetsUrl}/static/emails/logo.png`,
+    logoUrl: logoUrl ?? `${ctx.config.misc.assetsUrl}/static/emails/logo.png`,
     logoAlt: org.identifier,
     documentName: signatureConfig.title,
   };

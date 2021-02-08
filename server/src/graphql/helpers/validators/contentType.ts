@@ -2,15 +2,16 @@ import { core } from "@nexus/schema";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { ArgValidationError } from "../errors";
 import { FileUpload } from "graphql-upload";
+import match from "mime-match";
 
 export function contentType<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => Promise<FileUpload>,
-  contentType: string | RegExp,
+  contentType: string,
   argName: string
 ) {
   return (async (_, args, ctx, info) => {
     const { mimetype } = await prop(args);
-    if (!mimetype.match(contentType)) {
+    if (!match(mimetype, contentType)) {
       throw new ArgValidationError(
         info,
         argName,

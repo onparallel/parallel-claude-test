@@ -34,19 +34,19 @@ export async function petitionAccessDelegated(
     );
   }
 
-  const [contact, delegator, petitionOwner, org] = await Promise.all([
+  const [contact, delegator, petitionOwner, org, logoUrl] = await Promise.all([
     context.contacts.loadContact(newAccess.contact_id),
     context.contacts.loadContact(originalAccess.contact_id),
     context.users.loadUser(originalAccess.granter_id),
     context.organizations.loadOrg(petition.org_id),
+    context.organizations.getOrgLogoUrl(petition.org_id),
   ]);
+
   if (!org) {
     throw new Error(
       `Organization ${petition.org_id} not found for petition with id ${petition.id}`
     );
   }
-  const logoUrl = org.logo_url;
-
   if (!contact) {
     throw new Error(
       `Contact ${newAccess.contact_id} not found for petition_access with id ${newAccess.id}`

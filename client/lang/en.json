@@ -1910,9 +1910,9 @@
     "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
   },
   {
-    "term": "organization.branding.error.file-too-large",
-    "definition": "The logo must be a PNG file of size up to {kb}Kb.",
-    "context": "The logo must be a PNG file of size up to {kb}Kb."
+    "term": "organization.branding.logo-error",
+    "definition": "The logo must be a PNG file of size up to {size}.",
+    "context": "The logo must be a PNG file of size up to {size}."
   },
   {
     "term": "organization.branding.logo-header",

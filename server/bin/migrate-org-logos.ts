@@ -6,10 +6,13 @@ import { Readable } from "stream";
 import { OrganizationRepository } from "../src/db/repositories/OrganizationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import pMap from "p-map";
+import { random } from "../src/util/token";
+import { FileRepository } from "../src/db/repositories/FileRepository";
 
 const container = createContainer();
 const aws = container.get<IAws>(AWS_SERVICE);
 const orgs = container.get<OrganizationRepository>(OrganizationRepository);
+const filesRepo = container.get<FileRepository>(FileRepository);
 const users = container.get<UserRepository>(UserRepository);
 const identifiers = [
   "adplegal",
@@ -57,21 +60,38 @@ const identifiers = [
         // 2. Download logo from static URL
         console.log(identifier, "downloading logo...");
         const data = await fetch(
-          `https://static.parallel.so/static/logos/${identifier}.png`
+          `https://static.onparallel.com/static/logos/${identifier}.png`
         );
 
         // 3. Upload logo to public S3 bucket
         console.log(identifier, "uploading logo to S3...");
-        const s3Result = await aws.publicFiles.uploadFile(
-          `logos/${identifier}.png`,
+        const filename = random(16);
+        const path = `uploads/${filename}`;
+        await aws.publicFiles.uploadFile(
+          path,
           "image/png",
-          Readable.from(data.body),
-          { ACL: "public-read" }
+          Readable.from(data.body)
         );
 
-        // 4. Update org logo_url
+        // 4. Update database
         console.log(identifier, "updating database...");
-        await orgs.updateOrgLogo(org.id, s3Result.Location, user);
+        const file = await filesRepo.createPublicFile(
+          {
+            filename,
+            path,
+            content_type: "image/png",
+            size: data.size.toString(),
+          },
+          `User:${user.id}`
+        );
+
+        await orgs.updateOrganization(
+          org.id,
+          {
+            public_file_logo_id: file.id,
+          },
+          user
+        );
 
         console.log(identifier, "migrated.");
       } catch (e) {

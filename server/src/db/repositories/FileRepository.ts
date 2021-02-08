@@ -2,7 +2,11 @@ import { inject, injectable } from "inversify";
 import Knex from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateFileUpload, CreateTemporaryFile } from "../__types";
+import {
+  CreateFileUpload,
+  CreatePublicFileUpload,
+  CreateTemporaryFile,
+} from "../__types";
 
 @injectable()
 export class FileRepository extends BaseRepository {
@@ -48,6 +52,21 @@ export class FileRepository extends BaseRepository {
       ...data,
       created_by: createdBy,
     }).returning("*");
+    return rows[0];
+  }
+
+  readonly loadPublicFile = this.buildLoadById(
+    "public_file_upload",
+    "id",
+    (q) => q.whereNull("deleted_at")
+  );
+
+  async createPublicFile(data: CreatePublicFileUpload, createdBy: string) {
+    const rows = await this.insert("public_file_upload", {
+      ...data,
+      created_by: createdBy,
+    }).returning("*");
+
     return rows[0];
   }
 }

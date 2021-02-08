@@ -55,13 +55,15 @@ export async function petitionCompleted(
     return;
   }
 
-  const org = await context.organizations.loadOrg(petition.org_id);
+  const [org, logoUrl] = await Promise.all([
+    context.organizations.loadOrg(petition.org_id),
+    context.organizations.getOrgLogoUrl(petition.org_id),
+  ]);
   if (!org) {
     throw new Error(
-      `Organization not found for granter.org_id ${petition!.org_id}`
+      `Organization not found for granter.org_id ${petition.org_id}`
     );
   }
-  const logoUrl = org.logo_url;
 
   const emails: EmailLog[] = [];
   const subscribed = permissions.filter((p) => p && p.is_subscribed);
@@ -73,7 +75,7 @@ export async function petitionCompleted(
         isSigned: Boolean(payload.signer_contact_id ?? false),
         name: user!.first_name,
         petitionId: toGlobalId("Petition", petitionId),
-        petitionName: petition!.name,
+        petitionName: petition.name,
         contactNameOrEmail:
           fullName(contact.first_name, contact.last_name) || contact.email,
         fields: fields.map(pick(["id", "title", "position", "type"])),

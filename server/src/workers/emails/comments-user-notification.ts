@@ -27,13 +27,15 @@ export async function commentsUserNotification(
       `Petition not found for petition_id ${payload.petition_id}`
     );
   }
-  const org = await context.organizations.loadOrg(petition.org_id);
+  const [org, logoUrl] = await Promise.all([
+    context.organizations.loadOrg(petition.org_id),
+    context.organizations.getOrgLogoUrl(petition.org_id),
+  ]);
   if (!org) {
     throw new Error(
       `Organization not found for petition.org_id ${petition.org_id}`
     );
   }
-  const logoUrl = org.logo_url;
   const comments = (
     await context.petitions.loadPetitionFieldComment(
       payload.petition_field_comment_ids

@@ -37,13 +37,15 @@ export async function contactAuthenticationRequest(
       `Petition not found for petition_access.petition_id ${access.petition_id}`
     );
   }
-  const org = await context.organizations.loadOrg(petition.org_id);
+  const [org, logoUrl] = await Promise.all([
+    context.organizations.loadOrg(petition.org_id),
+    context.organizations.getOrgLogoUrl(petition.org_id),
+  ]);
   if (!org) {
     throw new Error(
       `Organization not found for user.org_id ${access.contact_id}`
     );
   }
-  const logoUrl = org.logo_url;
   const ua = request.user_agent ? new UAParser(request.user_agent) : null;
   const { html, text, subject, from } = await buildEmail(
     ContactAuthenticationRequest,

@@ -1,4 +1,5 @@
 import { mutationField, nonNull } from "@nexus/schema";
+import { random } from "../../util/token";
 import { authenticateAnd } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { uploadArg } from "../helpers/upload";
@@ -24,21 +25,29 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     maxFileSize((args) => args.file, 50000, "file")
   ),
   resolve: async (root, args, ctx) => {
-    const file = await args.file;
-    const organization = (await ctx.organizations.loadOrg(args.orgId))!;
+    const { mimetype, createReadStream } = await args.file;
+    const filename = random(16);
+    const path = `uploads/${filename}`;
 
-    const {
-      Location,
-    } = await ctx.aws.publicFiles.uploadFile(
-      `logos/${organization.identifier}.png`,
-      file.mimetype,
-      file.createReadStream(),
-      { ACL: "public-read" }
+    const res = await ctx.aws.publicFiles.uploadFile(
+      path,
+      mimetype,
+      createReadStream()
     );
 
-    return await ctx.organizations.updateOrgLogo(
+    const logoFile = await ctx.files.createPublicFile(
+      {
+        path,
+        filename,
+        content_type: mimetype,
+        size: res["ContentLength"]!.toString(),
+      },
+      `User:${ctx.user!.id}`
+    );
+
+    return await ctx.organizations.updateOrganization(
       args.orgId,
-      Location,
+      { public_file_logo_id: logoFile.id },
       ctx.user!
     );
   },

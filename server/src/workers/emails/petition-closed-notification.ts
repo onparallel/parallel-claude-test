@@ -31,13 +31,15 @@ export async function petitionClosedNotification(
     throw new Error(`User not found for user_id ${payload.user_id}`);
   }
 
-  const org = await context.organizations.loadOrg(sender.org_id);
+  const [org, logoUrl] = await Promise.all([
+    context.organizations.loadOrg(sender.org_id),
+    context.organizations.getOrgLogoUrl(sender.org_id),
+  ]);
   if (!org) {
     throw new Error(
       `Organization not found for sender.org_id ${sender.org_id}`
     );
   }
-  const logoUrl = org.logo_url;
 
   const emails: EmailLog[] = [];
   for (const accessId of payload.petition_access_ids) {

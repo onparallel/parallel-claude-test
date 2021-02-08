@@ -11,6 +11,7 @@ import {
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
+import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
@@ -56,9 +57,9 @@ function OrganizationBranding() {
         message: intl.formatMessage(
           {
             id: "organization.branding.logo-error",
-            defaultMessage: "The logo must be a PNG file of size up to {kb}Kb.",
+            defaultMessage: "The logo must be a PNG file of size up to {size}.",
           },
-          { kb: MAX_FILE_SIZE / 1000 }
+          { size: <FileSize value={MAX_FILE_SIZE} /> }
         ),
       });
     } else {
@@ -68,9 +69,7 @@ function OrganizationBranding() {
           file: files[0],
         },
         update(_, { data }) {
-          setLogoSrc(
-            `${data!.updateOrganizationLogo.logoUrl!}?v=${Date.now()}` // cachebuster
-          );
+          setLogoSrc(data!.updateOrganizationLogo.logoUrl!);
         },
       });
     }

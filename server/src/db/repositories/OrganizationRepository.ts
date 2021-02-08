@@ -1,6 +1,10 @@
+import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
+import pMap from "p-map";
 import { Config, CONFIG } from "../../config";
+import { fromDataLoader } from "../../util/fromDataLoader";
+import { Maybe } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
@@ -82,11 +86,15 @@ export class OrganizationRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  async updateOrgLogo(id: number, logoUrl: string, user: User) {
+  async updateOrganization(
+    id: number,
+    data: Partial<CreateOrganization>,
+    user: User
+  ) {
     const [org] = await this.from("organization")
       .where("id", id)
       .update({
-        logo_url: logoUrl,
+        ...data,
         updated_at: this.now(),
         updated_by: `User:${user.id}`,
       })
@@ -130,4 +138,28 @@ export class OrganizationRepository extends BaseRepository {
       opts
     );
   }
+
+  readonly getOrgLogoUrl = fromDataLoader(
+    new DataLoader<number, Maybe<string>>(async (orgIds) => {
+      const organizations = await this.loadOrg(orgIds);
+      return await pMap(
+        organizations,
+        async (org) => {
+          if (!org?.public_file_logo_id) {
+            return null;
+          }
+
+          const [logo] = await this.from("public_file_upload")
+            .where({
+              id: org.public_file_logo_id,
+              deleted_at: null,
+            })
+            .returning("*");
+
+          return logo ? `${this.config.misc.assetsUrl}/${logo.path}` : null;
+        },
+        { concurrency: 10 }
+      );
+    })
+  );
 }

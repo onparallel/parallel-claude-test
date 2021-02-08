@@ -104,12 +104,15 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         );
         return { isAllowed: true };
       } else {
-        const org = await ctx.organizations.loadOrg(ctx.contact!.org_id);
+        const [org, logoUrl] = await Promise.all([
+          ctx.organizations.loadOrg(ctx.contact!.org_id),
+          ctx.organizations.getOrgLogoUrl(ctx.contact!.org_id),
+        ]);
         return {
           isAllowed: false,
           email: anonymizeEmail(ctx.contact!.email),
           orgName: org!.name,
-          orgLogoUrl: org!.logo_url,
+          orgLogoUrl: logoUrl,
         };
       }
     } else {

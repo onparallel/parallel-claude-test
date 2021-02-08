@@ -23,9 +23,8 @@ export interface IStorage {
   uploadFile(
     key: string,
     contentType: string,
-    body: Buffer | Readable,
-    extraParams?: Partial<AWS.S3.PutObjectRequest>
-  ): Promise<HeadObjectOutput & { Location: string }>;
+    body: Buffer | Readable
+  ): Promise<HeadObjectOutput>;
 }
 
 @injectable()
@@ -83,28 +82,18 @@ export class Storage implements IStorage {
       .promise();
   }
 
-  async uploadFile(
-    key: string,
-    contentType: string,
-    body: Buffer | Readable,
-    extraParams?: Partial<AWS.S3.PutObjectRequest>
-  ) {
-    const { Location } = await this.s3
+  async uploadFile(key: string, contentType: string, body: Buffer | Readable) {
+    await this.s3
       .upload(
         {
           Bucket: this.bucketName,
           Key: key,
           ContentType: contentType,
           Body: body,
-          ...extraParams,
         },
         {}
       )
       .promise();
-
-    return {
-      ...(await this.getFileMetadata(key)),
-      Location,
-    };
+    return await this.getFileMetadata(key);
   }
 }

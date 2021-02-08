@@ -112,6 +112,7 @@ export interface TableTypes {
   petition_signature_request: PetitionSignatureRequest;
   petition_user: PetitionUser;
   petition_user_notification: PetitionUserNotification;
+  public_file_upload: PublicFileUpload;
   temporary_file: TemporaryFile;
   user: User;
   user_authentication_token: UserAuthenticationToken;
@@ -142,6 +143,7 @@ export interface TableCreateTypes {
   petition_signature_request: CreatePetitionSignatureRequest;
   petition_user: CreatePetitionUser;
   petition_user_notification: CreatePetitionUserNotification;
+  public_file_upload: CreatePublicFileUpload;
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
   user_authentication_token: CreateUserAuthenticationToken;
@@ -172,6 +174,7 @@ export interface TablePrimaryKeys {
   petition_signature_request: "id";
   petition_user: "id";
   petition_user_notification: "id";
+  public_file_upload: "id";
   temporary_file: "id";
   user: "id";
   user_authentication_token: "id";
@@ -340,7 +343,7 @@ export interface Organization {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
-  logo_url: Maybe<string>; // varchar
+  public_file_logo_id: Maybe<number>; // int4
 }
 
 export type CreateOrganization = PartialProps<
@@ -351,7 +354,7 @@ export type CreateOrganization = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
-  | "logo_url"
+  | "public_file_logo_id"
 >;
 
 export interface OrgIntegration {
@@ -710,6 +713,30 @@ export interface PetitionUserNotification {
 export type CreatePetitionUserNotification = PartialProps<
   Omit<PetitionUserNotification, "id">,
   "data" | "is_read" | "created_at"
+>;
+
+export interface PublicFileUpload {
+  id: number; // int4
+  path: string; // varchar
+  filename: string; // varchar
+  size: string; // int8
+  content_type: string; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreatePublicFileUpload = PartialProps<
+  Omit<PublicFileUpload, "id">,
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
 >;
 
 export interface TemporaryFile {

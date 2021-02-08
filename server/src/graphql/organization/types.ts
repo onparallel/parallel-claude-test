@@ -68,8 +68,8 @@ export const Organization = objectType({
     });
     t.nullable.string("logoUrl", {
       description: "URL of the organization logo",
-      resolve: (o) => {
-        return o.logo_url;
+      resolve: async (root, args, ctx) => {
+        return ctx.organizations.getOrgLogoUrl(root.id);
       },
     });
     t.field("status", {

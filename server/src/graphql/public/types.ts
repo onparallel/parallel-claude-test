@@ -223,7 +223,9 @@ export const PublicOrganization = objectType({
     });
     t.nullable.string("logoUrl", {
       description: "The logo of the organization.",
-      resolve: (o) => o.logo_url,
+      resolve: async (root, _, ctx) => {
+        return await ctx.organizations.getOrgLogoUrl(root.id);
+      },
     });
   },
 });

@@ -37,11 +37,13 @@ export async function developerWebhookFailed(
     );
   }
 
-  const org = await context.organizations.loadOrg(user.org_id);
+  const [org, logoUrl] = await Promise.all([
+    context.organizations.loadOrg(user.org_id),
+    context.organizations.getOrgLogoUrl(user.org_id),
+  ]);
   if (!org) {
     throw new Error(`Organization with id ${user.org_id} not found`);
   }
-  const logoUrl = org.logo_url;
 
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,

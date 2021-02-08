@@ -40,7 +40,6 @@ export const publicOrgLogo = queryField("publicOrgLogoUrl", {
     id: nonNull(globalIdArg("Organization")),
   },
   resolve: async (_, { id }, ctx) => {
-    const org = await ctx.organizations.loadOrg(id);
-    return org?.logo_url ?? null;
+    return await ctx.organizations.getOrgLogoUrl(id);
   },
 });
