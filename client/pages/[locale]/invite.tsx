@@ -5,16 +5,26 @@ import { PublicContainer } from "@parallel/components/public/layout/PublicContai
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import languages from "@parallel/lang/languages.json";
 import { useHubspotForm } from "@parallel/utils/useHubspotForm";
+import { usePlausible } from "next-plausible";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function Invite() {
   const intl = useIntl();
   const { query } = useRouter();
+  const plausible = usePlausible();
   useHubspotForm(
     query.locale
       ? {
           target: "#form-container",
+          onFormSubmit() {
+            plausible("HS-invite-submit", {
+              props: {
+                category: "HS-form-submit",
+                label: "new-invite",
+              },
+            });
+          },
           ...({
             es: {
               portalId: "6692004",
