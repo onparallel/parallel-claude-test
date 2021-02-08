@@ -11,7 +11,7 @@
       "args": {
         "contactFullName": "Derek Lou",
         "senderName": "Santi",
-        "senderEmail": "santi@parallel.so",
+        "senderEmail": "santi@onparallel.com",
         "body": [
           { "children": [{ "text": "Hola," }] },
           { "children": [{ "text": "" }] },
@@ -32,9 +32,9 @@
           { "children": [{ "text": "" }] },
           { "children": [{ "text": "Un saludo." }] }
         ],
-        "parallelUrl": "https://www.parallel.so",
-        "assetsUrl": "https://static.parallel.so",
-        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "parallelUrl": "https://www.onparallel.com",
+        "assetsUrl": "https://static.onparallel.com",
+        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {

@@ -11,13 +11,13 @@
       "args": {
         "name": "Derek",
         "ownerName": "Santi Albo",
-        "ownerEmail": "santi@parallel.so",
+        "ownerEmail": "santi@onparallel.com",
         "petitionName": "Declaración de la renta",
         "petitionId": "1234567890",
         "message": "hola tio aqui la tienes\\npara que veas",
-        "parallelUrl": "https://www.parallel.so",
-        "assetsUrl": "https://static.parallel.so",
-        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "parallelUrl": "https://www.onparallel.com",
+        "assetsUrl": "https://static.onparallel.com",
+        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {

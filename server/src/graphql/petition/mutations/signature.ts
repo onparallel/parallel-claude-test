@@ -37,7 +37,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
       const contacts = await ctx.contacts.loadContact(
         petition.signature_config.contactIds as number[]
       );
-      if (!contacts.every((c) => c && c.email.endsWith("@parallel.so"))) {
+      if (!contacts.every((c) => c && c.email.endsWith("@onparallel.com"))) {
         throw new WhitelistedError(
           "DEVELOPMENT: All recipients must have a parallel email.",
           "403"

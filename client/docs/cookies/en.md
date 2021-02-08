@@ -2,7 +2,7 @@
 
 ## Cookies
 
-This website parallel.so, hereafter website uses a technology called "cookies" in order to collect information about Web site usage.
+This website onparallel.com, hereafter website uses a technology called "cookies" in order to collect information about Web site usage.
 
 Cookies are small storage devices and data retrieval that are installed on your computer with the purposes expressed herein and in no case our cookies process personal data or compromising your privacy.
 
@@ -40,4 +40,4 @@ PARALLEL SOLUTIONS, S.L. may at any time modify the cookies policy. We therefore
 
 ## Contact
 
-If you use a different browser, you can obtain further information on how to configure the installation of cookies through the help or assistance section of that browser. If you need help to configure the cookies with your browser, please send an e-mail to hello@parallel.so and we will contact you.
+If you use a different browser, you can obtain further information on how to configure the installation of cookies through the help or assistance section of that browser. If you need help to configure the cookies with your browser, please send an e-mail to hello@onparallel.com and we will contact you.

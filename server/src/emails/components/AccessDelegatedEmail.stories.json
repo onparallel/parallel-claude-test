@@ -11,9 +11,9 @@
       "args": {
         "fullName": "Derek Lou",
         "senderName": "Santi",
-        "senderEmail": "santi@parallel.so",
+        "senderEmail": "santi@onparallel.com",
         "petitionOwnerFullName": "Mariano Rodriguez",
-        "petitionOwnerEmail": "mariano@parallel.so",
+        "petitionOwnerEmail": "mariano@onparallel.com",
         "body": [
           {
             "children": [
@@ -38,8 +38,8 @@
           }
         ],
         "keycode": "asdfghjkl",
-        "parallelUrl": "https://staging.parallel.so",
-        "assetsUrl": "https://static-staging.parallel.so",
+        "parallelUrl": "https://staging.onparallel.com",
+        "assetsUrl": "https://static-staging.onparallel.com",
         "logoUrl": "http://localhost/static/emails/logo.png",
         "logoAlt": "Parallel"
       },

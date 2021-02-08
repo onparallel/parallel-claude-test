@@ -19,9 +19,9 @@
           "data": { "petitionAccessId": "12313123" },
           "createdAt": "2021-01-19T16:59:13.952Z"
         },
-        "parallelUrl": "https://www.parallel.so",
-        "assetsUrl": "https://static.parallel.so",
-        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "parallelUrl": "https://www.onparallel.com",
+        "assetsUrl": "https://static.onparallel.com",
+        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {

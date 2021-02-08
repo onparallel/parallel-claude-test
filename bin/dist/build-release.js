@@ -33,7 +33,7 @@ async function main() {
     const buildId = `${commit}-${env}`;
     const buildDir = `${WORK_DIR}/${buildId}`;
     console.log(chalk_1.default `Checking out the code for commit {bold ${commit}}`);
-    child_process_1.execSync(`git clone --no-checkout git@github.com:parallel-so/parallel.git ${buildDir}`, { cwd: WORK_DIR, encoding: "utf-8" });
+    child_process_1.execSync(`git clone --no-checkout git@github.com:onparallel/parallel.git ${buildDir}`, { cwd: WORK_DIR, encoding: "utf-8" });
     child_process_1.execSync(`git checkout ${commit}`, { cwd: buildDir, encoding: "utf-8" });
     child_process_1.execSync(`rm -rf .git`, { cwd: buildDir, encoding: "utf-8" });
     console.log("Installing dependencies...");
@@ -52,7 +52,7 @@ async function main() {
         }
     }
     console.log("Getting the secrets 🤫");
-    child_process_1.execSync("git clone --depth 1 git@github.com:parallel-so/secrets.git secrets", {
+    child_process_1.execSync("git clone --depth 1 git@github.com:onparallel/secrets.git secrets", {
         cwd: WORK_DIR,
         encoding: "utf-8",
     });

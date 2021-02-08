@@ -125,17 +125,17 @@ export const api = new RestApi({
     contact: {
       name: "API Support",
       email: "devs@onparallel.com",
-      url: "https://www.parallel.so/developers/api",
+      url: "https://www.onparallel.com/developers/api",
     },
     "x-logo": {
-      url: "https://www.parallel.so/static/emails/logo.png",
+      url: "https://www.onparallel.com/static/emails/logo.png",
       altText: "Parallel",
-      href: "https://www.parallel.so",
+      href: "https://www.onparallel.com",
     },
   },
   servers: [
     {
-      url: "https://www.parallel.so/api/v1",
+      url: "https://www.onparallel.com/api/v1",
       description: "Production server",
     },
   ],
@@ -736,7 +736,7 @@ api
         ~~~bash
         curl -s -L -XGET \\
           -H 'Authorization: Bearer <your API token>' \\
-          'http://www.parallel.so/api/v1/petitions/{petitionId}/replies/{replyId}/download' \\
+          'http://www.onparallel.com/api/v1/petitions/{petitionId}/replies/{replyId}/download' \\
           > image.png
         ~~~
       `,

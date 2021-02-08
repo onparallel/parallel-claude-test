@@ -34,7 +34,7 @@ async function main() {
 
   console.log(chalk`Checking out the code for commit {bold ${commit}}`);
   execSync(
-    `git clone --no-checkout git@github.com:parallel-so/parallel.git ${buildDir}`,
+    `git clone --no-checkout git@github.com:onparallel/parallel.git ${buildDir}`,
     { cwd: WORK_DIR, encoding: "utf-8" }
   );
   execSync(`git checkout ${commit}`, { cwd: buildDir, encoding: "utf-8" });
@@ -68,7 +68,7 @@ async function main() {
 
   console.log("Getting the secrets 🤫");
   execSync(
-    "git clone --depth 1 git@github.com:parallel-so/secrets.git secrets",
+    "git clone --depth 1 git@github.com:onparallel/secrets.git secrets",
     {
       cwd: WORK_DIR,
       encoding: "utf-8",

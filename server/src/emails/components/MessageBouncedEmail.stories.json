@@ -17,9 +17,9 @@
         "body": [
           { "children": [{ "text": "Completame los siguientes datos porfa" }] }
         ],
-        "parallelUrl": "https://www.parallel.so",
-        "assetsUrl": "https://static.parallel.so",
-        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "parallelUrl": "https://www.onparallel.com",
+        "assetsUrl": "https://static.onparallel.com",
+        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {

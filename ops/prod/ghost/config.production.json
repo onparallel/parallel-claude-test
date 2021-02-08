@@ -1,5 +1,5 @@
 {
-  "url": "http://staging.parallel.so/blog",
+  "url": "http://staging.onparallel.com/blog",
   "server": {
     "port": 2368,
     "host": "127.0.0.1"
@@ -14,7 +14,7 @@
     }
   },
   "mail": {
-    "from": "'Parallel' <no-reply@parallel.so>",
+    "from": "'Parallel' <no-reply@onparallel.com>",
     "transport": "SMTP",
     "options": {
       "host": "email-smtp.eu-west-1.amazonaws.com",

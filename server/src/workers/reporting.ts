@@ -72,8 +72,8 @@ createCronWorker("reporting", async (context) => {
     "n"
   );
   await context.smtp.sendEmail({
-    from: "El becario <no-reply@parallel.so>",
-    to: ["alex@parallel.so", "derek@parallel.so"],
+    from: "El becario <no-reply@onparallel.com>",
+    to: ["alex@onparallel.com", "derek@onparallel.com"],
     subject: `Reporting ${format(new Date(), "yyyy-MM-dd")}`,
     text: outdent`
       Hola,

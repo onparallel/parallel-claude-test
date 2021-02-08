@@ -105,13 +105,13 @@ export const Layout: FC<LayoutProps> = function Layout({
               width="120px"
               alt="Parallel"
               src={`${assetsUrl}/static/emails/logo.png`}
-              href="https://www.parallel.so"
+              href="https://www.onparallel.com"
             />
             <MjmlSocial align="center" icon-padding="1px">
               <MjmlSocialElement
                 alt="LinkedIn"
                 name="linkedin-noshare"
-                href="https://www.linkedin.com/company/parallel-so"
+                href="https://www.linkedin.com/company/onparallel"
                 backgroundColor="#6059f7"
               >
                 {" "}

@@ -19,7 +19,7 @@ export async function seed(knex: Knex): Promise<any> {
     {
       org_id: orgIds[0],
       cognito_id: "123e4567-e89b-12d3-a456-426655440000",
-      email: "harvey@parallel.so",
+      email: "harvey@onparallel.com",
       organization_role: "ADMIN",
       first_name: "Harvey",
       last_name: "Specter",
@@ -27,7 +27,7 @@ export async function seed(knex: Knex): Promise<any> {
     {
       org_id: orgIds[0],
       cognito_id: "f3a469da-cd92-46de-84d1-cc09b4e57788",
-      email: "mike@parallel.so",
+      email: "mike@onparallel.com",
       organization_role: "NORMAL",
       first_name: "Mike",
       last_name: "Ross",
@@ -52,7 +52,7 @@ export async function seed(knex: Knex): Promise<any> {
   const contacts: CreateContact[] = [
     {
       org_id: orgIds[0],
-      email: "derek@parallel.so",
+      email: "derek@onparallel.com",
       first_name: "Derek",
       last_name: "Lou",
       created_by: `User:${userIds[2]}`,
@@ -60,14 +60,14 @@ export async function seed(knex: Knex): Promise<any> {
     },
     {
       org_id: orgIds[0],
-      email: "alex@parallel.so",
+      email: "alex@onparallel.com",
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,
     },
     {
       org_id: orgIds[0],
       first_name: "Santi",
-      email: "santi@parallel.so",
+      email: "santi@onparallel.com",
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,
     },

@@ -111,7 +111,7 @@ function ThanksFooter() {
       </NakedLink>
       <Stack direction="row" marginTop={2}>
         <NormalLink
-          href="https://www.linkedin.com/company/parallel-so"
+          href="https://www.linkedin.com/company/onparallel"
           aria-label="LinkedIn"
           isExternal
         >

@@ -33,9 +33,9 @@ PARALLEL shall process as controller your personal data to provide you with the 
 
 2.5. PARALLEL may share the personal data with third parties, some of which may be located outside of the European Economic Area, only for the provision of the Service and at all times subject to the guarantees and requirements provided by applicable data protection laws.
 
-2.6. The User may at all times exercise his rights to access, rectification, erasure and restriction of processing and data portability as provided in the GPDR and applicable regulations by contacting PARALLEL at C/Almogàvers 165, 59.203, 08018 Barcelona (Spain); or, by sending an email to privacy@parallel.so. The User may also lodge a complaint before the Spanish Data Protection Authority at www.agpd.es.
+2.6. The User may at all times exercise his rights to access, rectification, erasure and restriction of processing and data portability as provided in the GPDR and applicable regulations by contacting PARALLEL at C/Almogàvers 165, 59.203, 08018 Barcelona (Spain); or, by sending an email to privacy@onparallel.com. The User may also lodge a complaint before the Spanish Data Protection Authority at www.agpd.es.
 
-If at any time the User wishes to stop receiving communications regarding PARALLEL or with commercial information about the Service, the User may request so by sending an email to privacy@parallel.so
+If at any time the User wishes to stop receiving communications regarding PARALLEL or with commercial information about the Service, the User may request so by sending an email to privacy@onparallel.com
 
 ## 3. Processing of personal data on behalf of Users by PARALLEL (as Data Processor)
 

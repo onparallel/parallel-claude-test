@@ -10,7 +10,7 @@ import { FormattedMessage } from "react-intl";
 export default function Custom404() {
   const setLocale = useSetLocale();
   const [supportUrl, setSupportUrl] = useState(
-    "https://support.parallel.so/hc"
+    "https://support.onparallel.com/hc"
   );
   useEffect(() => {
     const match = document.location.pathname.match(/^\/([a-z-]*)\//i);
@@ -23,8 +23,8 @@ export default function Custom404() {
       setLocale(locale);
       setSupportUrl(
         ({
-          en: "https://support.parallel.so/hc/en-us",
-          es: "https://support.parallel.so/hc/es",
+          en: "https://support.onparallel.com/hc/en-us",
+          es: "https://support.onparallel.com/hc/es",
         } as any)[locale]
       );
     }

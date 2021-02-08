@@ -12,7 +12,7 @@ document workflows.
 
 ## Authentication
 In order to authenticate your requests, first, you need generate a token on the
-[API tokens](https://www.parallel.so/en/app/settings/tokens) section of your
+[API tokens](https://www.onparallel.com/en/app/settings/tokens) section of your
 account settings.
 
 When you make any requests to the Parallel API pass the generated token in the
@@ -29,7 +29,7 @@ your document workflows through our API.
 
 To start you will need the following:
 
-- An **API token**: You can generate one on the [API tokens section](https://www.parallel.so/en/app/settings/tokens)
+- An **API token**: You can generate one on the [API tokens section](https://www.onparallel.com/en/app/settings/tokens)
   under your account settings.
 - At least **one Petition Template**. Make sure to write down the ID so we can
   create a petition based on it. You can find this ID on the [browser URL](https://support.onparallel.com/hc/en-us/articles/360017297578-How-can-I-find-a-template-Id-)
@@ -47,7 +47,7 @@ curl -s -XPOST \\
   "name": "<an optional name>",
   "eventsUrl": "<your webhook endpoint to receive events>"
 }' \\
-'https://www.parallel.so/api/v1/petitions'
+'https://www.onparallel.com/api/v1/petitions'
 ~~~
 
 When creating the petition, you can pass an optional argument \`eventsUrl\` to
@@ -80,7 +80,7 @@ curl -s -XPOST \\
     },
     "subject": "Please fill this petition"
   }' \\
-  'https://www.parallel.so/api/v1/petitions/{petitionId}/recipients'
+  'https://www.onparallel.com/api/v1/petitions/{petitionId}/recipients'
 ~~~
 
 If everything went correctly, you should have received an email with your first
@@ -95,7 +95,7 @@ replies you will need to call another endpoint.
 ~~~bash
 curl -s -XGET \\
   -H 'Authorization: Bearer <your API token>' \\
-  'https://www.parallel.so/api/v1/petitions/{petitionId}/replies' 
+  'https://www.onparallel.com/api/v1/petitions/{petitionId}/replies' 
 ~~~
 
 ### Step 4: Download files
@@ -106,7 +106,7 @@ in order to get the uploaded file.
 ~~~bash
 curl -s -L -XGET \\
   -H 'Authorization: Bearer <your API token>' \\
-  'https://www.parallel.so/api/v1/petitions/{petitionId}/replies/{replyId}/download' \\
+  'https://www.onparallel.com/api/v1/petitions/{petitionId}/replies/{replyId}/download' \\
   > file.png
 ~~~
 

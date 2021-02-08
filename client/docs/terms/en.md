@@ -4,7 +4,7 @@ _Last modified: November, 2019._
 
 ## 1. GENERAL
 
-- The website available through the domain name https://www.parallel.so and all sub domains, or sections ("Website") are operated by PARALLEL SOLUTIONS, S.L. (“PARALLEL”).
+- The website available through the domain name https://www.onparallel.com and all sub domains, or sections ("Website") are operated by PARALLEL SOLUTIONS, S.L. (“PARALLEL”).
   These terms of use ("Terms") govern the access, browsing and use of the Website; by its users ("User" or "Users", as applicable) as well as the services available on the Website and the enjoyment of the services derived thereof (the "Services").
   Some Services may be subject to specific conditions or instructions that must be accepted by the User prior to the provision of the relevant Service. These specific conditions may be imposed by PARALLEL or by third parties. Such specific conditions shall apply in addition to these Terms and in case of conflict shall supersede the Terms. Accordingly, the User must acknowledge to have read and accepted such specific conditions.
   Regarding the collection and processing of personal data, the **[Privacy Policy](/en/legal/privacy)** shall apply.
@@ -24,7 +24,7 @@ _Last modified: November, 2019._
 - Registered Office: C/Almogàvers 165, 59.203, 08018 Barcelona (España).
 - Tax Identification Number (N.I.F.): B-67505586
 - Mercantile Register Information: Registered in the Mercantile Register of Barcelona, Volume 47074, Book 167, Sheet 540253, First registration.
-- E-mail: hello@parallel.so
+- E-mail: hello@onparallel.com
 
 ## 3. ACCESS TO THE WEBSITE AND TO THE SERVICES
 
@@ -75,7 +75,7 @@ _Last modified: November, 2019._
 
 - Whenever the User does not fill out a required field, it will not be allowed to advance through the purchase process until such required field is filled out. A message will be displayed warning the User of such circumstance.
 - The User will be able, at any time, to modify and/or update his info as User of the Service by accessing the “Account” section. The User can access this section by clicking on the access button to Parallel settings on the lower left side of user panel.
-- In the event of non-rectifiable errors during the purchase process (for example, the purchase is made for the wrong email account), the User may request within 30 days the correction of such error by sending a communication to privacy@parallel.so.
+- In the event of non-rectifiable errors during the purchase process (for example, the purchase is made for the wrong email account), the User may request within 30 days the correction of such error by sending a communication to privacy@onparallel.com.
 
 ## 9. PRICING AND TERM OF PARALLEL SERVICE
 
@@ -84,12 +84,12 @@ _Last modified: November, 2019._
 
 ## 10. REFUNDS
 
-- PARALLEL shall refund the User the total amount paid in the event that User terminates the use of the Services for Purchase within 30 days from its purchase. To such extent, the User shall contact PARALLEL through refund@parallel.so.
+- PARALLEL shall refund the User the total amount paid in the event that User terminates the use of the Services for Purchase within 30 days from its purchase. To such extent, the User shall contact PARALLEL through refund@onparallel.com.
 
 ## 11. SUPPORT
 
-- In case of doubt regarding the Services, the User may contact PARALLEL by sending an email at hello@parallel.so.
-- The User may also consult the issues raised through support@parallel.so.
+- In case of doubt regarding the Services, the User may contact PARALLEL by sending an email at hello@onparallel.com.
+- The User may also consult the issues raised through support@onparallel.com.
 
 ## 12. LIMITATION OF LIABILITY
 
@@ -117,7 +117,7 @@ _Last modified: November, 2019._
 ## 13. NOTICES
 
 - All notices, requests, demands, and other communications between PARALLEL and the User in connection with the Service or the access to the Website shall be in writing and shall be deemed to have been duly delivered if sent by certified mail or certified fax (burofax) to the address which the parties have indicated to the other to that effect.
-- Notwithstanding the foregoing, notices sent to PARALLEL shall be deemed to have been duly made when sent by means of email at hello@parallel.so.
+- Notwithstanding the foregoing, notices sent to PARALLEL shall be deemed to have been duly made when sent by means of email at hello@onparallel.com.
 - On the other hand, notices sent to the User shall be deemed to have been duly made when sent by means of email at the address associated with the User’s email account as of the start of the Service use or, if required, the one that the User had provided PARALLEL with to that effect.
 
 ## 14. SEVERABILITY

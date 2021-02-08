@@ -11,7 +11,7 @@
       "args": {
         "fullName": "Santi Albo",
         "senderName": "Derek",
-        "senderEmail": "derek@parallel.so",
+        "senderEmail": "derek@onparallel.com",
         "deadline": "2022-12-11T17:29:24.601Z",
         "fields": [
           { "position": 0, "id": 236, "title": "Sección 1", "type": "HEADING" },
@@ -25,9 +25,9 @@
           { "position": 4, "id": 6905, "title": "Nombre", "type": "TEXT" }
         ],
         "keycode": "asdfghjkl",
-        "parallelUrl": "https://www.parallel.so",
-        "assetsUrl": "https://static.parallel.so",
-        "logoUrl": "https://static.parallel.so/static/emails/logo.png",
+        "parallelUrl": "https://www.onparallel.com",
+        "assetsUrl": "https://static.onparallel.com",
+        "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {

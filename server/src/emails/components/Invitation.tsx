@@ -80,7 +80,7 @@ const email: Email<InvitationProps> = {
 export default email;
 
 export const props: InvitationProps = {
-  email: "derek@parallel.so",
+  email: "derek@onparallel.com",
   password: "Qwerty1!",
   assetsUrl: "http://localhost",
   parallelUrl: "http://localhost",

@@ -931,8 +931,8 @@
   },
   {
     "term": "component.user-select.no-options-contact-us",
-    "definition": "Contacta con nosotros vía email en <a>soporte@parallel.so</a> o vía chat y le crearemos una cuenta",
-    "context": "Contact us via email on <a>support@parallel.so</a> or the support chat and we will create them an account"
+    "definition": "Contacta con nosotros vía email en <a>soporte@onparallel.com</a> o vía chat y le crearemos una cuenta",
+    "context": "Contact us via email on <a>support@onparallel.com</a> or the support chat and we will create them an account"
   },
   {
     "term": "component.user-select.search-hint",

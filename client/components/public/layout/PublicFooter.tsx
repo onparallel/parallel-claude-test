@@ -24,10 +24,10 @@ export function PublicFooter(props: BoxProps) {
   const intl = useIntl();
   const supportUrl =
     ({
-      en: "https://support.parallel.so/hc/en-us",
-      es: "https://support.parallel.so/hc/es",
+      en: "https://support.onparallel.com/hc/en-us",
+      es: "https://support.onparallel.com/hc/es",
     } as any)[router.query.locale as string] ??
-    "https://support.parallel.so/hc";
+    "https://support.onparallel.com/hc";
 
   function handleLangChange(event: ChangeEvent<HTMLSelectElement>) {
     const locale = event.target.value;
@@ -132,7 +132,7 @@ export function PublicFooter(props: BoxProps) {
               </NormalLink>
             </ListItem>
             <ListItem>
-              <NormalLink href="mailto:hello@parallel.so">
+              <NormalLink href="mailto:hello@onparallel.com">
                 <FormattedMessage
                   id="public.contact-link"
                   defaultMessage="Contact"
@@ -222,7 +222,7 @@ export function PublicFooter(props: BoxProps) {
           <IconButton
             as={"a" as any}
             {...{
-              href: "https://www.linkedin.com/company/parallel-so/",
+              href: "https://www.linkedin.com/company/onparallel/",
               target: "_blank",
               rel: "noopener noreferrer",
             }}

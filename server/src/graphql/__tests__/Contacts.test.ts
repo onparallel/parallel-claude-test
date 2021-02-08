@@ -40,7 +40,7 @@ describe("GraphQL/Contacts", () => {
       (n) => ({
         email:
           n === 4
-            ? "email.search@parallel.so"
+            ? "email.search@onparallel.com"
             : faker.internet.email().toLowerCase(),
       })
     );
@@ -85,7 +85,7 @@ describe("GraphQL/Contacts", () => {
     expect(errors).toBeUndefined();
     expect(data!.contacts).toEqual({
       totalCount: 1,
-      items: [{ email: "email.search@parallel.so" }],
+      items: [{ email: "email.search@onparallel.com" }],
     });
   });
 
@@ -223,7 +223,7 @@ describe("GraphQL/Contacts", () => {
         }
       `,
       variables: {
-        email: "mark.hamill@parallel.so",
+        email: "mark.hamill@onparallel.com",
         firstName: "Mark",
         lastName: "Hamill",
       },
@@ -231,7 +231,7 @@ describe("GraphQL/Contacts", () => {
 
     expect(errors).toBeUndefined();
     expect(data!.createContact).toEqual({
-      email: "mark.hamill@parallel.so",
+      email: "mark.hamill@onparallel.com",
       firstName: "Mark",
       lastName: "Hamill",
       fullName: "Mark Hamill",
