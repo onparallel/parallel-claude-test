@@ -132,7 +132,7 @@ export function ExportRepliesDialog({
 
   const inputRef = useRef<PlaceholderInputRef>(null);
   const handleConfirmClick = () => {
-    const _pattern = rename ? pattern : "#field-title#";
+    const _pattern = rename ? pattern : "#file-name#";
     if (selectedOption === "DOWNLOAD_ZIP") {
       props.onResolve({ type: selectedOption, pattern: _pattern });
     } else if (selectedOption === "EXPORT_CUATRECASAS") {
