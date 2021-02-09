@@ -77,11 +77,11 @@ async function main() {
     child_process_1.execSync(`aws s3 sync \
       ${buildDir}/client/.next/static \
       s3://parallel-static-${env}/_next/static \
-      --cache-control max-age=2592000 \
+      --cache-control max-age=31536000 \
       --profile parallel-deploy`);
     child_process_1.execSync(`aws s3 sync \
-      ${buildDir}/client/public \
-      s3://parallel-static-${env} \
+      ${buildDir}/client/public/static \
+      s3://parallel-static-${env}/static \
       --cache-control max-age=2592000 \
       --profile parallel-deploy`);
     console.log("Building the server");

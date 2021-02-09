@@ -79,7 +79,8 @@ async function main() {
     }, "Target not healthy. Waiting 5 more seconds...", 5000);
     console.log("Create invalidation for static files");
     const result = await cloudfront.listDistributions().promise();
-    const distributionId = result.DistributionList.Items.find((i) => i.Origins.Items[0].Id === `S3-parallel-static-${env}`).Id;
+    // find distribution for
+    const distributionId = result.DistributionList.Items.find((d) => d.Origins.Items.some((o) => o.Id === `S3-parallel-static-${env}`)).Id;
     await cloudfront
         .createInvalidation({
         DistributionId: distributionId,
@@ -87,7 +88,7 @@ async function main() {
             CallerReference: buildId,
             Paths: {
                 Quantity: 1,
-                Items: ["/*"],
+                Items: ["/static/*"],
             },
         },
     })
