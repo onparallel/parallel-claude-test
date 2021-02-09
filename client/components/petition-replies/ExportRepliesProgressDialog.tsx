@@ -52,7 +52,7 @@ function exportFile(
     download.onload = async function () {
       const body = new FormData();
       body.append("IdClient", externalClientId);
-      body.append("IdMatter", "00001");
+      body.append("IdMatter", "CLIENT_INFO");
       body.append("IdArea", "");
       body.append("IdAdminGroup", "");
       body.append("Folder", "");
