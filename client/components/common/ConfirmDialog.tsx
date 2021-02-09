@@ -28,13 +28,14 @@ export function ConfirmDialog<TResult = void>({
   confirm,
   cancel,
   content,
+  initialFocusRef,
   hasCloseButton,
   ...props
 }: ConfirmDialogProps<TResult>) {
   const intl = useIntl();
   const cancelRef = useRef<HTMLButtonElement>(null);
   return (
-    <BaseDialog {...props}>
+    <BaseDialog initialFocusRef={initialFocusRef ?? cancelRef} {...props}>
       <ModalContent {...content}>
         {hasCloseButton ? (
           <ModalCloseButton

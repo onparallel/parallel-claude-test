@@ -27,6 +27,7 @@ import {
   useFilenamePlaceholders,
   useFilenamePlaceholdersRename,
 } from "@parallel/utils/useFilenamePlaceholders";
+import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
@@ -112,7 +113,7 @@ export function ExportRepliesDialog({
     ping().then();
   }, [user.hasExportCuatrecasas]);
 
-  const [rename, setRename] = useState(true);
+  const [rename, setRename] = useUserPreference("export-replies-rename", true);
   const [pattern, setPattern] = useState("#field-title#");
   const placeholders = useFilenamePlaceholders();
   const [externalClientId, setExternalClientId] = useState("");
@@ -153,7 +154,7 @@ export function ExportRepliesDialog({
   return (
     <ConfirmDialog
       size="lg"
-      initialFocusRef={inputRef as any}
+      initialFocusRef={rename ? (inputRef as any) : undefined}
       header={
         <FormattedMessage
           id="component.export-replies-dialog.header"
