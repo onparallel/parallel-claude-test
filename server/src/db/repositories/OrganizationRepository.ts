@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex from "knex";
-import pMap from "p-map";
+import { indexBy } from "remeda";
 import { Config, CONFIG } from "../../config";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { Maybe } from "../../util/types";
@@ -141,24 +141,19 @@ export class OrganizationRepository extends BaseRepository {
 
   readonly getOrgLogoUrl = fromDataLoader(
     new DataLoader<number, Maybe<string>>(async (orgIds) => {
-      const organizations = await this.loadOrg(orgIds);
-      return await pMap(
-        organizations,
-        async (org) => {
-          if (!org?.public_file_logo_id) {
-            return null;
-          }
-
-          const [logo] = await this.from("public_file_upload")
-            .where({
-              id: org.public_file_logo_id,
-              deleted_at: null,
-            })
-            .returning("*");
-
-          return logo ? `${this.config.misc.assetsUrl}/${logo.path}` : null;
-        },
-        { concurrency: 10 }
+      const results = await this.raw<{ id: number; path: string }>(
+        /* sql */ `
+        select o.id, pfu.path from organization o
+          join public_file_upload pfu on o.public_file_logo_id = pfu.id
+          where o.id in (${orgIds.map(() => "?").join(",")})
+      `,
+        [...orgIds]
+      );
+      const resultsById = indexBy(results, (x) => x.id);
+      return orgIds.map((id) =>
+        resultsById[id]
+          ? `${this.config.misc.assetsUrl}/${resultsById[id].path}`
+          : null
       );
     })
   );
