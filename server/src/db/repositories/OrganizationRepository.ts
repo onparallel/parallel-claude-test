@@ -152,7 +152,7 @@ export class OrganizationRepository extends BaseRepository {
       const resultsById = indexBy(results, (x) => x.id);
       return orgIds.map((id) =>
         resultsById[id]
-          ? `${this.config.misc.assetsUrl}/${resultsById[id].path}`
+          ? `${this.config.misc.uploadsUrl}/${resultsById[id].path}`
           : null
       );
     })

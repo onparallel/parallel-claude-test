@@ -78,6 +78,7 @@ export function buildConfig() {
       streamName: process.env.LOGS_STREAM_NAME!,
     }),
     misc: Object.freeze({
+      uploadsUrl: process.env.PUBLIC_UPLOADS_URL!,
       assetsUrl: process.env.ASSETS_URL!,
       parallelUrl: process.env.PARALLEL_URL!,
       emailFrom: process.env.EMAIL_FROM!,
