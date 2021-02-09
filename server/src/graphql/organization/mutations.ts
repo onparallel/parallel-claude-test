@@ -22,7 +22,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
   ),
   validateArgs: validateAnd(
     contentType((args) => args.file, "image/png", "file"),
-    maxFileSize((args) => args.file, 50000, "file")
+    maxFileSize((args) => args.file, 50 * 1024, "file")
   ),
   resolve: async (root, args, ctx) => {
     const { mimetype, createReadStream } = await args.file;

@@ -30,7 +30,7 @@ import { useRef, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 
-const MAX_FILE_SIZE = 50000;
+const MAX_FILE_SIZE = 50 * 1024;
 
 function OrganizationBranding() {
   const intl = useIntl();
@@ -112,9 +112,9 @@ function OrganizationBranding() {
           <HelpPopover marginLeft={2}>
             <FormattedMessage
               id="organization.branding.logo-help"
-              defaultMessage="We will use this logo in all communications with your clients. Must be a PNG file of size up to {kb}Kb."
+              defaultMessage="We will use this logo in all communications with your clients. Must be a PNG file of size up to {size}."
               values={{
-                kb: MAX_FILE_SIZE / 1000,
+                size: <FileSize value={MAX_FILE_SIZE} />,
               }}
             />
           </HelpPopover>
