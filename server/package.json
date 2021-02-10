@@ -29,8 +29,7 @@
     "emails": "concurrently \"ts-node-dev --watch ./emails.tsx --ignore-watch ./src --files ./emails.tsx --respawn\" \"start-storybook --port 60000 --quiet\"",
     "postinstall": "yarn --cwd .. patch-package",
     "generate-graphql-types": "graphql-codegen",
-    "verify-cognito-users": "ts-node --project tsconfig.json --transpile-only ./bin/verify-cognito-users.ts",
-    "migrate-logos": "ts-node --project tsconfig.json --transpile-only ./bin/migrate-org-logos.ts"
+    "run-ts-script": "ts-node --project tsconfig.json --transpile-only"
   },
   "dependencies": {
     "@nexus/schema": "^0.19.2",
@@ -93,6 +92,7 @@
     "signaturit-sdk": "^1.2.0",
     "sqs-consumer": "^5.5.0",
     "timezone-support": "^2.0.2",
+    "ts-node": "^9.1.1",
     "typed-url-params": "^1.0.0-20210105161750.commit-12a4e67",
     "typescript-memoize": "^1.0.0-alpha.4",
     "ua-parser-js": "^0.7.23",
@@ -159,7 +159,6 @@
     "patch-package": "^6.2.2",
     "postinstall-postinstall": "^2.1.0",
     "ts-jest": "^26.5.0",
-    "ts-node": "^9.1.1",
     "ts-node-dev": "^1.1.1",
     "typescript": "^4.1.3"
   }
