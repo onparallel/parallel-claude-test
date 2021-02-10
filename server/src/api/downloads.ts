@@ -204,17 +204,29 @@ async function* getPetitionFiles(
 
   if (
     latestPetitionSignature &&
-    latestPetitionSignature.status === "COMPLETED" &&
-    isDefined(latestPetitionSignature.file_upload_id)
+    latestPetitionSignature.status === "COMPLETED"
   ) {
-    const signedPetition = await ctx.files.loadFileUpload(
-      latestPetitionSignature.file_upload_id
-    );
-    if (signedPetition) {
-      yield {
-        filename: signedPetition.filename,
-        stream: ctx.aws.fileUploads.downloadFile(signedPetition.path),
-      };
+    if (isDefined(latestPetitionSignature.file_upload_id)) {
+      const signedPetition = await ctx.files.loadFileUpload(
+        latestPetitionSignature.file_upload_id
+      );
+      if (signedPetition) {
+        yield {
+          filename: signedPetition.filename,
+          stream: ctx.aws.fileUploads.downloadFile(signedPetition.path),
+        };
+      }
+    }
+    if (isDefined(latestPetitionSignature.file_upload_audit_trail_id)) {
+      const auditTrail = await ctx.files.loadFileUpload(
+        latestPetitionSignature.file_upload_audit_trail_id
+      );
+      if (auditTrail) {
+        yield {
+          filename: auditTrail.filename,
+          stream: ctx.aws.fileUploads.downloadFile(auditTrail.path),
+        };
+      }
     }
   }
 }

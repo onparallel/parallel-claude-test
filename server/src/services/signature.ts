@@ -69,6 +69,7 @@ export interface ISignatureClient {
 
   cancelSignatureRequest: (externalId: string) => Promise<SignatureResponse>;
   downloadSignedDocument: (externalId: string) => Promise<Buffer>;
+  downloadAuditTrail: (externalId: string) => Promise<Buffer>;
 }
 
 export const SIGNATURE = Symbol.for("SIGNATURE");
@@ -193,6 +194,13 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     const [signatureId, documentId] = externalId.split("/");
     return Buffer.from(
       await this.sdk.downloadSignedDocument(signatureId, documentId)
+    );
+  }
+
+  public async downloadAuditTrail(externalId: string) {
+    const [signatureId, documentId] = externalId.split("/");
+    return Buffer.from(
+      await this.sdk.downloadAuditTrail(signatureId, documentId)
     );
   }
 

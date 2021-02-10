@@ -4,6 +4,7 @@ import { ApiContext } from "../../context";
 import { PetitionSignatureRequest } from "../../db/__types";
 import sanitize from "sanitize-filename";
 import { random } from "../../util/token";
+import { withRetry } from "../helpers/withRetry";
 
 export async function validateSignaturitRequest(
   req: Request & { context: ApiContext },
@@ -47,8 +48,8 @@ export function signaturItEventHandler(type: SignatureEvents) {
   switch (type) {
     case "document_declined":
       return documentDeclined;
-    case "document_completed":
-      return documentCompleted;
+    case "audit_trail_completed":
+      return auditTrailCompleted;
     default:
       return appendEventLogs;
   }
@@ -98,8 +99,8 @@ async function documentDeclined(
   });
 }
 
-/** document has been completed and is ready to be downloaded */
-async function documentCompleted(
+/** audit trail has been completed and documents are ready to be downloaded */
+async function auditTrailCompleted(
   petitionId: number,
   data: SignaturItEventBody,
   ctx: ApiContext
@@ -148,33 +149,38 @@ async function documentCompleted(
     );
   }
 
-  const buffer = await client.downloadSignedDocument(
-    `${signatureId}/${documentId}`
-  );
-
   const config = petition.signature_config as any;
 
-  const filename = sanitize(
-    `${config.title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`
+  // there could be scenarios where the signed doc is not ready to be downloaded
+  // so we need to execute the download function inside a "retry wrapper"
+  const downloadSignedDocumentWithRetry = withRetry(
+    client.downloadSignedDocument.bind(client),
+    { maxRetries: 1, retryIntervalMs: 1000 * 60 * 5 }
   );
-  const path = random(16);
-  await ctx.aws.fileUploads.uploadFile(path, "application/pdf", buffer);
-  const file = await ctx.files.createFileUpload(
-    {
-      content_type: "application/pdf",
-      filename,
-      path,
-      size: Buffer.byteLength(buffer).toString(),
-      upload_complete: true,
-    },
-    `OrgIntegration:${signaturitIntegration.id}`
-  );
+
+  const [signedDoc, auditTrail] = await Promise.all([
+    storeDocument(
+      await downloadSignedDocumentWithRetry(`${signatureId}/${documentId}`),
+      sanitize(
+        `${config.title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`
+      ),
+      signaturitIntegration.id,
+      ctx
+    ),
+    storeDocument(
+      await client.downloadAuditTrail(`${signatureId}/${documentId}`),
+      sanitize(`${config.title}_audit_trail.pdf`),
+      signaturitIntegration.id,
+      ctx
+    ),
+  ]);
 
   const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
     `SIGNATURIT/${signatureId}`,
     {
       status: "COMPLETED",
-      file_upload_id: file.id,
+      file_upload_id: signedDoc.id,
+      file_upload_audit_trail_id: auditTrail.id,
     }
   );
 
@@ -188,7 +194,7 @@ async function documentCompleted(
       petitionId,
       data: {
         petition_signature_request_id: signatureRequest.id,
-        file_upload_id: file.id,
+        file_upload_id: signedDoc.id,
       },
     }),
   ]);
@@ -219,5 +225,30 @@ async function appendEventLogs(
   await ctx.petitions.appendPetitionSignatureEventLogs(
     `SIGNATURIT/${data.document.signature.id}`,
     [data]
+  );
+}
+
+async function storeDocument(
+  buffer: Buffer,
+  filename: string,
+  integrationId: number,
+  ctx: ApiContext
+) {
+  const path = random(16);
+  const s3Response = await ctx.aws.fileUploads.uploadFile(
+    path,
+    "application/pdf",
+    buffer
+  );
+
+  return await ctx.files.createFileUpload(
+    {
+      content_type: "application/pdf",
+      filename,
+      path,
+      size: s3Response["ContentLength"]!.toString(),
+      upload_complete: true,
+    },
+    `OrgIntegration:${integrationId}`
   );
 }

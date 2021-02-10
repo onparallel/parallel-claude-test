@@ -659,6 +659,7 @@ export interface PetitionSignatureRequest {
   file_upload_id: Maybe<number>; // int4
   created_at: Date; // timestamptz
   updated_at: Date; // timestamptz
+  file_upload_audit_trail_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionSignatureRequest = PartialProps<
@@ -672,6 +673,7 @@ export type CreatePetitionSignatureRequest = PartialProps<
   | "file_upload_id"
   | "created_at"
   | "updated_at"
+  | "file_upload_audit_trail_id"
 >;
 
 export interface PetitionUser {
