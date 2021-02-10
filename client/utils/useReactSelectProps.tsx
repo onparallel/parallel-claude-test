@@ -97,7 +97,7 @@ export function useReactSelectProps<
     }),
     [intl.locale]
   );
-  return useMemo<SelectProps<OptionType>>(
+  return useMemo<SelectProps<OptionType, IsMulti, GroupType>>(
     () => ({
       inputId,
       isDisabled,

@@ -20,12 +20,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage } from "react-intl";
-import {
-  components,
-  InputActionMeta,
-  OptionProps,
-  OptionsType,
-} from "react-select";
+import { components, InputActionMeta, OptionProps } from "react-select";
 import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
 } from "react-select/async-creatable";
