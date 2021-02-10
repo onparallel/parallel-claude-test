@@ -1,3 +1,4 @@
+import "./../src/init";
 import Knex from "knex";
 import fetch from "node-fetch";
 import pMap from "p-map";
@@ -10,7 +11,6 @@ import { UserRepository } from "../src/db/repositories/UserRepository";
 import { Organization } from "../src/db/__types";
 import { AWS_SERVICE, IAws } from "../src/services/aws";
 import { random } from "../src/util/token";
-import "./../src/init";
 
 const container = createContainer();
 const aws = container.get<IAws>(AWS_SERVICE);
@@ -68,7 +68,7 @@ const identifiers = [
         console.log(org.identifier, "uploading logo to S3...");
         const filename = random(16);
         const path = `uploads/${filename}`;
-        await aws.publicFiles.uploadFile(
+        const res = await aws.publicFiles.uploadFile(
           path,
           "image/png",
           Readable.from(data.body)
@@ -81,7 +81,7 @@ const identifiers = [
             filename,
             path,
             content_type: "image/png",
-            size: data.size.toString(),
+            size: res.ContentLength!.toString(),
           },
           `User:${user.id}`
         );
