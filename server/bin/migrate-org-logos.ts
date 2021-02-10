@@ -1,17 +1,21 @@
-import "./../src/init";
-import { createContainer } from "../src/container";
-import { AWS_SERVICE, IAws } from "../src/services/aws";
+import Knex from "knex";
 import fetch from "node-fetch";
+import pMap from "p-map";
 import { Readable } from "stream";
+import { createContainer } from "../src/container";
+import { KNEX } from "../src/db/knex";
+import { FileRepository } from "../src/db/repositories/FileRepository";
 import { OrganizationRepository } from "../src/db/repositories/OrganizationRepository";
 import { UserRepository } from "../src/db/repositories/UserRepository";
-import pMap from "p-map";
+import { Organization } from "../src/db/__types";
+import { AWS_SERVICE, IAws } from "../src/services/aws";
 import { random } from "../src/util/token";
-import { FileRepository } from "../src/db/repositories/FileRepository";
+import "./../src/init";
 
 const container = createContainer();
 const aws = container.get<IAws>(AWS_SERVICE);
 const orgs = container.get<OrganizationRepository>(OrganizationRepository);
+const knex = container.get<Knex>(KNEX);
 const filesRepo = container.get<FileRepository>(FileRepository);
 const users = container.get<UserRepository>(UserRepository);
 const identifiers = [
@@ -41,30 +45,27 @@ const identifiers = [
 ];
 
 (async () => {
-  const organizations = (await orgs.loadOrganizations({ limit: 100 })).items;
-  const user = await users.loadUserByEmail("mariano@parallel.so");
+  const organizations = await knex
+    .from<Organization>("organization")
+    .whereIn("identifier", identifiers)
+    .whereNull("deleted_at")
+    .select("*");
+  const user = await users.loadUserByEmail("mariano@onparallel.com");
   if (!user) {
     return;
   }
   await pMap(
-    identifiers,
-    async (identifier) => {
+    organizations,
+    async (org) => {
       try {
-        //1. get org data
-        const org = organizations.find((o) => o.identifier === identifier);
-        if (!org) {
-          console.error(`${identifier} not found`);
-          return Promise.resolve();
-        }
-
         // 2. Download logo from static URL
-        console.log(identifier, "downloading logo...");
+        console.log(org.identifier, "downloading logo...");
         const data = await fetch(
-          `https://static.onparallel.com/static/logos/${identifier}.png`
+          `https://static.onparallel.com/static/logos/${org.identifier}.png`
         );
 
         // 3. Upload logo to public S3 bucket
-        console.log(identifier, "uploading logo to S3...");
+        console.log(org.identifier, "uploading logo to S3...");
         const filename = random(16);
         const path = `uploads/${filename}`;
         await aws.publicFiles.uploadFile(
@@ -74,7 +75,7 @@ const identifiers = [
         );
 
         // 4. Update database
-        console.log(identifier, "updating database...");
+        console.log(org.identifier, "updating database...");
         const file = await filesRepo.createPublicFile(
           {
             filename,
@@ -93,14 +94,14 @@ const identifiers = [
           user
         );
 
-        console.log(identifier, "migrated.");
+        console.log(org.identifier, "migrated.");
       } catch (e) {
-        console.error(`Error processing ${identifier}`);
+        console.error(`Error processing ${org.identifier}`);
         console.error(e);
       }
       return Promise.resolve();
     },
-    { concurrency: 5 }
+    { concurrency: 1 }
   );
 
   process.exit(0);
