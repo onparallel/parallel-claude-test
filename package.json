@@ -27,8 +27,5 @@
   },
   "dependencies": {
     "patch-package": "^6.2.2"
-  },
-  "resolutions": {
-    "prettier": "2.2.1"
   }
 }

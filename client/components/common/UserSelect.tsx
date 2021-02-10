@@ -85,17 +85,18 @@ function userSelect<IsMulti extends boolean>(isMulti: IsMulti) {
 export const UserMultiSelect = Object.assign(userSelect(true), { fragments });
 
 export const UserSingleSelect = Object.assign(userSelect(false), { fragments });
+import deepmerge from "deepmerge";
 
 function useUserSelectReactSelectProps<IsMulti extends boolean>(
   props: UseReactSelectProps
-) {
-  const reactSelectProps = useReactSelectProps<UserSelectSelection>(props);
+): AsyncUserSelectProps<IsMulti> {
+  const reactSelectProps = useReactSelectProps<UserSelectSelection, IsMulti>(
+    props
+  );
   return useMemo(
     () =>
-      ({
-        ...reactSelectProps,
+      deepmerge<AsyncUserSelectProps<IsMulti>>(reactSelectProps, {
         components: {
-          ...reactSelectProps.components,
           NoOptionsMessage: memo(({ selectProps }) => {
             const search = selectProps.inputValue;
             return (
@@ -199,7 +200,7 @@ function useUserSelectReactSelectProps<IsMulti extends boolean>(
           }
         },
         getOptionValue: (option) => option.id,
-      } as Partial<AsyncUserSelectProps<IsMulti>>),
+      }),
     [reactSelectProps]
   );
 }

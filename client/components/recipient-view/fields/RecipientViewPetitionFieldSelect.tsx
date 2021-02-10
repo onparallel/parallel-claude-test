@@ -10,6 +10,7 @@ import {
   UseReactSelectProps,
   useReactSelectProps,
 } from "@parallel/utils/useReactSelectProps";
+import deepmerge from "deepmerge";
 import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -168,6 +169,7 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
       {showNewReply ? (
         <Box flex="1" position="relative" marginTop={2}>
           <Select
+            {...reactSelectProps}
             ref={newReplyRef as any}
             value={value}
             options={values as any}
@@ -180,7 +182,6 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
                 defaultMessage: "Select an option",
               })
             }
-            {...reactSelectProps}
           />
           <Center height="100%" position="absolute" right={9} top={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator
@@ -242,6 +243,7 @@ export const RecipientViewPetitionFieldReplySelect = forwardRef<
       <Box flex="1" position="relative">
         <Box position="relative">
           <Select
+            {...reactSelectProps}
             ref={ref}
             value={value}
             options={values as any}
@@ -254,7 +256,6 @@ export const RecipientViewPetitionFieldReplySelect = forwardRef<
                 defaultMessage: "Select an option",
               })
             }
-            {...reactSelectProps}
           />
           <Center height="100%" position="absolute" right={9} top={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator
@@ -289,10 +290,8 @@ function useFieldSelectReactSelectProps(props: UseReactSelectProps) {
   const _reactSelectProps = useReactSelectProps(props);
   return useMemo(
     () =>
-      ({
-        ..._reactSelectProps,
+      deepmerge(_reactSelectProps, {
         styles: {
-          ..._reactSelectProps.styles,
           menu: (styles, props) => ({
             ...styles,
             ..._reactSelectProps.styles!.menu?.(styles, props),

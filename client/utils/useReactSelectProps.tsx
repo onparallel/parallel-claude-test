@@ -10,8 +10,9 @@ import React, { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   components,
+  GroupTypeBase,
   OptionTypeBase,
-  Props as SelectProps,
+  Props,
   Theme,
 } from "react-select";
 
@@ -46,8 +47,8 @@ export const SIZES = {
       menuGutter: 8,
       baseUnit: 4,
     },
-    paddingX: 3,
-    borderRadius: "sm" as const,
+    paddingX: 2,
+    borderRadius: "md" as const,
     multiValue: {
       borderRadius: "sm" as const,
     },
@@ -60,12 +61,24 @@ export type UseReactSelectProps = {
   isDisabled?: boolean;
   isInvalid?: boolean;
 };
+
+export interface SelectProps<
+  OptionType extends OptionTypeBase = { label: string; value: string },
+  IsMulti extends boolean = any,
+  GroupType extends GroupTypeBase<OptionType> = GroupTypeBase<OptionType>
+> extends Props<OptionType, IsMulti, GroupType> {}
+
 /**
  * Generates the props necessary for styling react-select as a chakra component
  */
 export function useReactSelectProps<
-  OptionType extends OptionTypeBase = { label: string; value: string }
->({ size = "md", ...props }: UseReactSelectProps) {
+  OptionType extends OptionTypeBase = { label: string; value: string },
+  IsMulti extends boolean = any,
+  GroupType extends GroupTypeBase<OptionType> = GroupTypeBase<OptionType>
+>({
+  size = "md",
+  ...props
+}: UseReactSelectProps): SelectProps<OptionType, IsMulti, GroupType> {
   const intl = useIntl();
   const { colors, radii, sizes } = useTheme();
 
@@ -121,8 +134,11 @@ export function useReactSelectProps<
           />
         ),
         DropdownIndicator: () => (
-          <Center marginRight={2} width={6} color="gray.600">
-            <ChevronDownIcon display="block" />
+          <Center
+            width={SIZES[size].spacing.controlHeight + "px"}
+            color="gray.600"
+          >
+            <ChevronDownIcon display="block" position="relative" top="1px" />
           </Center>
         ),
         NoOptionsMessage: () => (
@@ -165,6 +181,10 @@ export function useReactSelectProps<
           ...styles,
           cursor: isDisabled ? "not-allowed" : "default",
           pointerEvents: undefined,
+        }),
+        input: (styles) => ({
+          ...styles,
+          margin: "0 2px",
         }),
         control: (styles, { isDisabled, isFocused, theme }: any) => {
           return {

@@ -9,6 +9,7 @@ import {
 } from "@parallel/utils/useReactSelectProps";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
+import deepmerge from "deepmerge";
 import {
   forwardRef,
   KeyboardEvent,
@@ -197,134 +198,131 @@ function useContactSelectReactSelectProps(
   const reactSelectProps = useReactSelectProps<ContactSelectSelection>(props);
   return useMemo(
     () =>
-      ({
-        ...reactSelectProps,
-        components: {
-          ...reactSelectProps.components,
-          NoOptionsMessage: memo(({ selectProps }) => {
-            const search = selectProps.inputValue;
-            return (
-              <Box textAlign="center" color="gray.400" padding={4}>
-                <UserPlusIcon boxSize={8} />
-                {search ? (
-                  <>
-                    <Text as="div" marginTop={2}>
-                      <FormattedMessage
-                        id="component.contact-select.no-options"
-                        defaultMessage="We could not find any existing contacts for <em>{search}</em>"
-                        values={{
-                          search,
-                          em: (chunks: any[]) => <em>{chunks}</em>,
-                        }}
-                      />
-                    </Text>
-                    <Text as="div" marginTop={2}>
-                      <FormattedMessage
-                        id="component.contact-select.enter-email"
-                        defaultMessage="You can also enter a valid email."
-                      />
-                    </Text>
-                  </>
-                ) : (
-                  <Text as="div" marginTop={2}>
-                    <FormattedMessage
-                      id="component.contact-select.search-hint"
-                      defaultMessage="Search for existing contacts or enter a valid email."
-                    />
-                  </Text>
-                )}
-              </Box>
-            );
-          }),
-          MultiValueLabel: memo(
-            ({
-              data,
-              children,
-              ...props
-            }: {
-              data: ContactSelectSelection;
-              children: ReactNode;
-            }) => {
-              const { fullName, email, isDeleted } = data;
+      deepmerge<AsyncCreatableSelectProps<ContactSelectSelection, any>>(
+        reactSelectProps,
+        {
+          components: {
+            NoOptionsMessage: memo(({ selectProps }) => {
+              const search = selectProps.inputValue;
               return (
-                <components.MultiValueLabel {...(props as any)}>
-                  <Text as="span" marginLeft={1}>
-                    {isDeleted ? (
-                      <DeletedContact color="red.600" />
-                    ) : fullName ? (
-                      `${fullName} <${email}>`
-                    ) : (
-                      email
-                    )}
-                  </Text>
-                </components.MultiValueLabel>
-              );
-            }
-          ),
-          Option: ({
-            children,
-            data,
-            ...props
-          }: Omit<OptionProps<ContactSelectSelection, true>, "data"> & {
-            data: ContactSelectSelection;
-          }) => {
-            if ((data as any).__isNew__) {
-              return (
-                <components.Option data={data} {...props}>
-                  {children} {/* from formatCreateLabel */}
-                </components.Option>
-              );
-            } else {
-              return (
-                <components.Option data={data} {...props}>
-                  {data.fullName ? (
-                    <Text as="span" verticalAlign="baseline">
-                      <Text as="span">{data.fullName}</Text>
-                      <Text as="span" display="inline-block" width={2} />
-                      <Text as="span" fontSize="sm" color="gray.500">
-                        {data.email}
+                <Box textAlign="center" color="gray.400" padding={4}>
+                  <UserPlusIcon boxSize={8} />
+                  {search ? (
+                    <>
+                      <Text as="div" marginTop={2}>
+                        <FormattedMessage
+                          id="component.contact-select.no-options"
+                          defaultMessage="We could not find any existing contacts for <em>{search}</em>"
+                          values={{
+                            search,
+                            em: (chunks: any[]) => <em>{chunks}</em>,
+                          }}
+                        />
                       </Text>
-                    </Text>
+                      <Text as="div" marginTop={2}>
+                        <FormattedMessage
+                          id="component.contact-select.enter-email"
+                          defaultMessage="You can also enter a valid email."
+                        />
+                      </Text>
+                    </>
                   ) : (
-                    <Text as="span">{data.email}</Text>
+                    <Text as="div" marginTop={2}>
+                      <FormattedMessage
+                        id="component.contact-select.search-hint"
+                        defaultMessage="Search for existing contacts or enter a valid email."
+                      />
+                    </Text>
                   )}
-                </components.Option>
+                </Box>
               );
+            }),
+            MultiValueLabel: memo(
+              ({
+                data,
+                children,
+                ...props
+              }: {
+                data: ContactSelectSelection;
+                children: ReactNode;
+              }) => {
+                const { fullName, email, isDeleted } = data;
+                return (
+                  <components.MultiValueLabel {...(props as any)}>
+                    <Text as="span" marginLeft={1}>
+                      {isDeleted ? (
+                        <DeletedContact color="red.600" />
+                      ) : fullName ? (
+                        `${fullName} <${email}>`
+                      ) : (
+                        email
+                      )}
+                    </Text>
+                  </components.MultiValueLabel>
+                );
+              }
+            ),
+            Option: ({
+              children,
+              data,
+              ...props
+            }: Omit<OptionProps<ContactSelectSelection, true>, "data"> & {
+              data: ContactSelectSelection;
+            }) => {
+              if ((data as any).__isNew__) {
+                return (
+                  <components.Option data={data} {...props}>
+                    {children} {/* from formatCreateLabel */}
+                  </components.Option>
+                );
+              } else {
+                return (
+                  <components.Option data={data} {...props}>
+                    {data.fullName ? (
+                      <Text as="span" verticalAlign="baseline">
+                        <Text as="span">{data.fullName}</Text>
+                        <Text as="span" display="inline-block" width={2} />
+                        <Text as="span" fontSize="sm" color="gray.500">
+                          {data.email}
+                        </Text>
+                      </Text>
+                    ) : (
+                      <Text as="span">{data.email}</Text>
+                    )}
+                  </components.Option>
+                );
+              }
+            },
+          },
+          getOptionLabel: (option) => {
+            if ((option as any).__isNew__) {
+              return (option as any).label;
+            } else {
+              return option.email;
             }
           },
-        },
-        getOptionLabel: (option) => {
-          if ((option as any).__isNew__) {
-            return (option as any).label;
-          } else {
-            return option.email;
-          }
-        },
-        getOptionValue: (option) => option.id,
-        isValidNewOption: (
-          value: string,
-          _,
-          options: OptionsType<ContactSelectSelection>
-        ) => {
-          return options.length === 0 && EMAIL_REGEX.test(value);
-        },
-        formatCreateLabel: (label: string) => {
-          return (
-            <FormattedMessage
-              id="component.contact-select.create-new-contact"
-              defaultMessage="Create new contact for: <b>{email}</b>"
-              values={{
-                email: label,
-                b: (chunks: any[]) => (
-                  <Text as="strong" style={{ marginLeft: "4px" }}>
-                    {chunks}
-                  </Text>
-                ),
-              }}
-            />
-          );
-        },
-      } as Partial<AsyncCreatableSelectProps<ContactSelectSelection, true>>),
+          getOptionValue: (option) => option.id,
+          isValidNewOption: (value, _, options) => {
+            return options.length === 0 && EMAIL_REGEX.test(value);
+          },
+          formatCreateLabel: (label) => {
+            return (
+              <FormattedMessage
+                id="component.contact-select.create-new-contact"
+                defaultMessage="Create new contact for: <b>{email}</b>"
+                values={{
+                  email: label,
+                  b: (chunks: any[]) => (
+                    <Text as="strong" style={{ marginLeft: "4px" }}>
+                      {chunks}
+                    </Text>
+                  ),
+                }}
+              />
+            );
+          },
+        }
+      ),
     [reactSelectProps, handleCreateContact]
   );
 }

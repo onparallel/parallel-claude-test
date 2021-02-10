@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
+import deepmerge from "deepmerge";
 
 type ClosePetitionDialogAction = "APPROVE" | "REJECT";
 
@@ -28,16 +29,10 @@ export function ClosePetitionDialog(
   const theme = useTheme();
   const radioStyleConfig = {
     ...theme.components.Radio,
-    baseStyle: (props: any) => {
-      const fromTheme = theme.components.Radio.baseStyle(props);
-      return {
-        ...fromTheme,
-        label: {
-          ...fromTheme.label,
-          flex: 1,
-        },
-      };
-    },
+    baseStyle: (props: any) =>
+      deepmerge(theme.components.Radio.baseStyle(props), {
+        label: { flex: 1 },
+      }),
   };
   return (
     <ConfirmDialog

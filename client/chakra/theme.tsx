@@ -2,11 +2,12 @@ import {
   extendTheme,
   Menu,
   Popover,
-  Tooltip,
-  theme as base,
   Select,
+  theme as base,
+  Tooltip,
 } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
+import deepmerge from "deepmerge";
 import { ChevronDownIcon } from "./icons";
 import { styles } from "./styles";
 
@@ -134,15 +135,9 @@ export const theme = extendTheme({
     Popover: {
       baseStyle: (props) => {
         // Workaround until this is fixed https://github.com/chakra-ui/chakra-ui/issues/2481
-        const _baseStyle = base.components.Popover.baseStyle(props);
-        const baseStyle = {
-          ..._baseStyle,
-          popper: {
-            ..._baseStyle.popper,
-            maxW: "container.5xs",
-          },
-        };
-        return baseStyle;
+        return deepmerge(base.components.Popover.baseStyle(props), {
+          popper: { maxW: "container.5xs" },
+        });
       },
     },
     Switch: {
