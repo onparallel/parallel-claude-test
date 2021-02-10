@@ -1921,8 +1921,8 @@
   },
   {
     "term": "organization.branding.logo-help",
-    "definition": "We will use this logo in all communications with your clients. Must be a PNG file of size up to {kb}Kb.",
-    "context": "We will use this logo in all communications with your clients. Must be a PNG file of size up to {kb}Kb."
+    "definition": "We will use this logo in all communications with your clients. Must be a PNG file of size up to {size}.",
+    "context": "We will use this logo in all communications with your clients. Must be a PNG file of size up to {size}."
   },
   {
     "term": "organization.branding.title",
