@@ -72,7 +72,7 @@ import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { countBy } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -82,11 +82,6 @@ type PetitionComposeProps = UnwrapPromise<
 >;
 
 type FieldSelection = PetitionCompose_PetitionFieldFragment;
-
-type PetitionComposeState = {
-  activeFieldId: Maybe<string>;
-  showSettings: boolean;
-};
 
 function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const router = useRouter();
@@ -107,18 +102,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
 
   const [petitionState, wrapper] = usePetitionState();
-  const [{ activeFieldId, showSettings }, dispatch] = useReducer(
-    function (
-      state: PetitionComposeState,
-      action: (prev: PetitionComposeState) => PetitionComposeState
-    ) {
-      return action(state);
-    },
-    {
-      activeFieldId: null,
-      showSettings: false,
-    }
-  );
+  const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
 
   const client = useApolloClient();
   const handleIsDescriptionShownChange = useCallback(
@@ -241,13 +225,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
   const handleDeleteField = useCallback(
     wrapper(async function (fieldId: string) {
-      dispatch((state) => ({
-        ...state,
-        activeFieldId:
-          state.activeFieldId === fieldId ? null : state.activeFieldId,
-        showSettings:
-          state.activeFieldId === fieldId ? false : state.showSettings,
-      }));
+      setActiveFieldId((activeFieldId) =>
+        activeFieldId === fieldId ? null : activeFieldId
+      );
       try {
         await deletePetitionField({
           variables: { petitionId, fieldId },
@@ -266,19 +246,16 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleSettingsClick = useCallback(
     function (fieldId: string) {
-      dispatch((state) => ({
-        ...state,
-        activeFieldId: fieldId,
-        showSettings:
-          state.activeFieldId !== fieldId ? true : !state.showSettings,
-      }));
+      setActiveFieldId((activeFieldId) =>
+        activeFieldId === fieldId ? null : fieldId
+      );
     },
     [petitionId]
   );
 
   const handleSettingsClose = useCallback(
     function () {
-      dispatch((state) => ({ ...state, showSettings: false }));
+      setActiveFieldId(null);
     },
     [petitionId]
   );
@@ -352,16 +329,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }),
     [petitionId]
   );
-
-  const handleSelectField = useCallback(function (fieldId: string) {
-    // Show settings only if they were already showing for this field
-    dispatch((state) => ({
-      ...state,
-      activeFieldId: fieldId,
-      showSettings:
-        state.activeFieldId === fieldId ? state.showSettings : false,
-    }));
-  }, []);
 
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
@@ -572,11 +539,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       }
     >
       <PaneWithFlyout
-        isFlyoutActive={showSettings}
-        alignWith={showSettings ? activeFieldElement : null}
+        isFlyoutActive={Boolean(activeField)}
+        alignWith={activeField ? activeFieldElement : null}
         flyout={
           <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
-            {showSettings && activeField ? (
+            {activeField ? (
               <PetitionComposeFieldSettings
                 key={activeField.id}
                 field={activeField}
@@ -642,7 +609,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             onAddField={handleAddField}
             onCopyFieldClick={handleClonePetitionField}
             onDeleteField={handleDeleteField}
-            onSelectField={handleSelectField}
             onUpdateFieldPositions={handleUpdateFieldPositions}
             onFieldEdit={handleFieldEdit}
             onFieldSettingsClick={handleSettingsClick}
