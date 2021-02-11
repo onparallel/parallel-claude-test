@@ -154,8 +154,8 @@ async function auditTrailCompleted(
   // there could be scenarios where the signed doc is not ready to be downloaded
   // so we need to execute the download function inside a "retry wrapper"
   const downloadSignedDocumentWithRetry = withRetry(
-    client.downloadSignedDocument.bind(client),
-    { maxRetries: 1, retryIntervalMs: 1000 * 60 * 5 }
+    client.downloadSignedDocument,
+    { maxRetries: 1, retryIntervalMs: 1000 * 60 * 5, thisArg: client }
   );
 
   const [signedDoc, auditTrail] = await Promise.all([

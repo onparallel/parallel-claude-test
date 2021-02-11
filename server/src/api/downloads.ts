@@ -202,10 +202,7 @@ async function* getPetitionFiles(
     petitionId
   );
 
-  if (
-    latestPetitionSignature &&
-    latestPetitionSignature.status === "COMPLETED"
-  ) {
+  if (latestPetitionSignature?.status === "COMPLETED") {
     if (isDefined(latestPetitionSignature.file_upload_id)) {
       const signedPetition = await ctx.files.loadFileUpload(
         latestPetitionSignature.file_upload_id
