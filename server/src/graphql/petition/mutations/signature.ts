@@ -160,12 +160,12 @@ export const signedPetitionDownloadLink = mutationField(
           args.petitionSignatureRequestId
         );
 
-        if (signature?.status !== "COMPLETED") {
+        if (signature?.status !== "COMPLETED" || !signature.file_upload_id) {
           throw new Error(
             `Can't download signed doc on ${signature?.status} petitionSignatureRequest with id ${args.petitionSignatureRequestId}`
           );
         }
-        const file = await ctx.files.loadFileUpload(signature.file_upload_id!);
+        const file = await ctx.files.loadFileUpload(signature.file_upload_id);
         if (!file) {
           throw new Error(
             `Can't get signed file for signature request with id ${args.petitionSignatureRequestId}`
@@ -173,9 +173,10 @@ export const signedPetitionDownloadLink = mutationField(
         }
         return {
           result: RESULT.SUCCESS,
+          filename: file.filename,
           url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
-            file!.path,
-            file!.filename,
+            file.path,
+            file.filename,
             args.preview ? "inline" : "attachment"
           ),
         };

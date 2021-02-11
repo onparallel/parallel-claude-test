@@ -165,6 +165,7 @@ enum FeatureFlag {
 }
 
 type FileUploadReplyDownloadLinkResult {
+  filename: String
   result: Result!
   url: String
 }
@@ -1769,6 +1770,11 @@ type PetitionSignatureRequest implements Timestamps {
   """
   createdAt: DateTime!
   id: GID!
+
+  """
+  Metadata for this signature request.
+  """
+  metadata: JSONObject!
   petition: Petition!
 
   """

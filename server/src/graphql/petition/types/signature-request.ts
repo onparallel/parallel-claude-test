@@ -31,5 +31,9 @@ export const PetitionSignatureRequest = objectType({
       type: "PetitionSignatureRequestStatus",
       description: "The status of the petition signature.",
     });
+    t.jsonObject("metadata", {
+      description: "Metadata for this signature request.",
+      resolve: (o) => o.metadata,
+    });
   },
 });

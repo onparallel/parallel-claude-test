@@ -553,6 +553,7 @@ export const FileUploadReplyDownloadLinkResult = objectType({
   name: "FileUploadReplyDownloadLinkResult",
   definition(t) {
     t.field("result", { type: "Result" });
+    t.nullable.string("filename");
     t.nullable.string("url");
   },
 });

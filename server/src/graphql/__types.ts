@@ -251,6 +251,7 @@ export interface NexusGenObjects {
   };
   FileUploadReplyDownloadLinkResult: {
     // root type
+    filename?: string | null; // String
     result: NexusGenEnums["Result"]; // Result!
     url?: string | null; // String
   };
@@ -509,6 +510,7 @@ export interface NexusGenFieldTypes {
   };
   FileUploadReplyDownloadLinkResult: {
     // field return type
+    filename: string | null; // String
     result: NexusGenEnums["Result"]; // Result!
     url: string | null; // String
   };
@@ -819,6 +821,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     petition: NexusGenRootTypes["Petition"]; // Petition!
     signatureConfig: NexusGenRootTypes["SignatureConfig"]; // SignatureConfig!
     status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
@@ -1228,6 +1231,7 @@ export interface NexusGenFieldTypeNames {
   };
   FileUploadReplyDownloadLinkResult: {
     // field return type name
+    filename: "String";
     result: "Result";
     url: "String";
   };
@@ -1536,6 +1540,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    metadata: "JSONObject";
     petition: "Petition";
     signatureConfig: "SignatureConfig";
     status: "PetitionSignatureRequestStatus";

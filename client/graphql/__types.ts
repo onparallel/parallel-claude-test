@@ -150,6 +150,7 @@ export type FeatureFlag =
 
 export type FileUploadReplyDownloadLinkResult = {
   __typename?: "FileUploadReplyDownloadLinkResult";
+  filename?: Maybe<Scalars["String"]>;
   result: Result;
   url?: Maybe<Scalars["String"]>;
 };
@@ -1255,6 +1256,8 @@ export type PetitionSignatureRequest = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  /** Metadata for this signature request. */
+  metadata: Scalars["JSONObject"];
   petition: Petition;
   /** The signature configuration for the request. */
   signatureConfig: SignatureConfig;
