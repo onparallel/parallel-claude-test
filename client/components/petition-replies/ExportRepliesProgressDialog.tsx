@@ -17,7 +17,9 @@ import { CheckIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import {
   useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation,
   useExportRepliesProgressDialog_PetitionRepliesQuery,
+  useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation,
   useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation,
+  useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation,
 } from "@parallel/graphql/__types";
 import { useFilenamePlaceholdersRename } from "@parallel/utils/useFilenamePlaceholders";
 import { useEffect, useRef, useState } from "react";
@@ -27,7 +29,7 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { useErrorDialog } from "../common/ErrorDialog";
 import { NormalLink } from "../common/Link";
-
+import deepmerge from "deepmerge";
 export interface ExportRepliesProgressDialogProps {
   externalClientId: string;
   petitionId: string;
@@ -102,8 +104,14 @@ export function ExportRepliesProgressDialog({
     fileUploadReplyDownloadLink,
   ] = useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation();
   const [
+    signedPetitionDownloadLink,
+  ] = useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation();
+  const [
     updatePetitionFieldReplyMetadata,
   ] = useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation();
+  const [
+    updateSignatureRequestMetadata,
+  ] = useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation();
   const { current: abort } = useRef(new AbortController());
   const showAlreadyExported = useDialog(AlreadyExportedDialog);
   const showErrorDialog = useErrorDialog();
@@ -119,6 +127,30 @@ export function ExportRepliesProgressDialog({
           ? field.replies.map((reply) => ({ reply, field }))
           : []
       );
+
+      const signatureDocs =
+        petition.currentSignatureRequest?.status === "COMPLETED"
+          ? [
+              {
+                type: "signed-document",
+                externalId:
+                  petition.currentSignatureRequest.metadata.signedDocument
+                    ?.EXTERNAL_ID_CUATRECASAS,
+                filename:
+                  petition.currentSignatureRequest.signedDocumentFilename,
+              },
+              {
+                type: "audit-trail",
+                externalId:
+                  petition.currentSignatureRequest.metadata.auditTrail
+                    ?.EXTERNAL_ID_CUATRECASAS,
+                filename: petition.currentSignatureRequest.auditTrailFilename,
+              },
+            ]
+          : [];
+
+      const totalFiles = files.length + signatureDocs.length;
+
       setState("UPLOADING");
       let uploaded = 0;
       let dontAskAgain = false;
@@ -154,7 +186,7 @@ export function ExportRepliesProgressDialog({
             externalClientId,
             abort.signal,
             ({ loaded, total }) =>
-              setProgress((uploaded + (loaded / total) * 0.5) / files.length)
+              setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
           );
           await updatePetitionFieldReplyMetadata({
             variables: {
@@ -167,25 +199,70 @@ export function ExportRepliesProgressDialog({
             },
           });
         } catch (e) {
-          if (e.name === "AbortError") {
-            props.onReject({ reason: "CANCEL" });
-          } else if (e?.ErrorMessage?.startsWith("NDError")) {
-            props.onReject({ reason: "ERROR" });
-            try {
-              await showErrorDialog({
-                message: intl.formatMessage({
-                  id:
-                    "component.export-replies-progress-dialog.netdocuments-error",
-                  defaultMessage:
-                    "We couldn't upload the file to the specified client folder. Please make sure that you entered the correct client number and that you have the necessary permissions.",
-                }),
-              });
-            } catch {}
-          }
-          return;
+          return await processError(e);
         }
         uploaded += 1;
-        setProgress(uploaded / files.length);
+        setProgress(uploaded / totalFiles);
+      }
+
+      for (const signatureDoc of signatureDocs) {
+        if (signatureDoc.externalId) {
+          if (!dontAskAgain) {
+            const result = await showAlreadyExported({
+              filename: signatureDoc.filename!,
+              externalId: signatureDoc.externalId,
+            });
+            dontAskAgain = result.dontAskAgain;
+            exportAgain = result.exportAgain;
+          }
+          if (!exportAgain) {
+            continue;
+          }
+        }
+        if (abort.signal.aborted) {
+          props.onReject({ reason: "CANCEL" });
+          return;
+        }
+        const res = await signedPetitionDownloadLink({
+          variables: {
+            petitionSignatureRequestId: petition.currentSignatureRequest!.id,
+            downloadAuditTrail: signatureDoc.type === "audit-trail",
+          },
+        });
+        try {
+          const externalId = await exportFile(
+            res.data!.signedPetitionDownloadLink.url!,
+            signatureDoc.filename!,
+            externalClientId,
+            abort.signal,
+            ({ loaded, total }) =>
+              setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
+          );
+
+          await updateSignatureRequestMetadata({
+            variables: {
+              petitionSignatureRequestId: petition.currentSignatureRequest!.id,
+              metadata: deepmerge(
+                petition.currentSignatureRequest!.metadata,
+                signatureDoc.type === "signed-document"
+                  ? {
+                      signedDocument: {
+                        EXTERNAL_ID_CUATRECASAS: externalId,
+                      },
+                    }
+                  : {
+                      auditTrail: {
+                        EXTERNAL_ID_CUATRECASAS: externalId,
+                      },
+                    }
+              ),
+            },
+          });
+        } catch (e) {
+          return await processError(e);
+        }
+        uploaded += 1;
+        setProgress(uploaded / totalFiles);
       }
       setState("FINISHED");
     }
@@ -304,6 +381,23 @@ export function ExportRepliesProgressDialog({
       ) : null}
     </BaseDialog>
   );
+
+  async function processError(e: any) {
+    if (e.name === "AbortError") {
+      props.onReject({ reason: "CANCEL" });
+    } else if (e?.ErrorMessage?.startsWith("NDError")) {
+      props.onReject({ reason: "ERROR" });
+      try {
+        await showErrorDialog({
+          message: intl.formatMessage({
+            id: "component.export-replies-progress-dialog.netdocuments-error",
+            defaultMessage:
+              "We couldn't upload the file to the specified client folder. Please make sure that you entered the correct client number and that you have the necessary permissions.",
+          }),
+        });
+      } catch {}
+    }
+  }
 }
 
 ExportRepliesProgressDialog.fragments = {
@@ -319,6 +413,13 @@ ExportRepliesProgressDialog.fragments = {
           metadata
           ...useFilenamePlaceholdersRename_PetitionFieldReply
         }
+      }
+      currentSignatureRequest {
+        id
+        status
+        signedDocumentFilename
+        auditTrailFilename
+        metadata
       }
     }
     ${useFilenamePlaceholdersRename.fragments.PetitionField}
@@ -350,6 +451,21 @@ ExportRepliesProgressDialog.mutations = [
     }
   `,
   gql`
+    mutation ExportRepliesProgressDialog_signedPetitionDownloadLink(
+      $petitionSignatureRequestId: GID!
+      $downloadAuditTrail: Boolean
+    ) {
+      signedPetitionDownloadLink(
+        petitionSignatureRequestId: $petitionSignatureRequestId
+        downloadAuditTrail: $downloadAuditTrail
+      ) {
+        result
+        filename
+        url
+      }
+    }
+  `,
+  gql`
     mutation ExportRepliesProgressDialog_updatePetitionFieldReplyMetadata(
       $petitionId: GID!
       $replyId: GID!
@@ -358,6 +474,20 @@ ExportRepliesProgressDialog.mutations = [
       updatePetitionFieldReplyMetadata(
         petitionId: $petitionId
         replyId: $replyId
+        metadata: $metadata
+      ) {
+        id
+        metadata
+      }
+    }
+  `,
+  gql`
+    mutation ExportRepliesProgressDialog_updateSignatureRequestMetadata(
+      $petitionSignatureRequestId: GID!
+      $metadata: JSONObject!
+    ) {
+      updateSignatureRequestMetadata(
+        petitionSignatureRequestId: $petitionSignatureRequestId
         metadata: $metadata
       ) {
         id

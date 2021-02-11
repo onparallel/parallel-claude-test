@@ -610,6 +610,7 @@ export interface NexusGenFieldTypes {
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionUserSubscription: NexusGenRootTypes["Petition"]; // Petition!
+    updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     updateSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
@@ -819,11 +820,13 @@ export interface NexusGenFieldTypes {
   };
   PetitionSignatureRequest: {
     // field return type
+    auditTrailFilename: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     metadata: NexusGenScalars["JSONObject"]; // JSONObject!
     petition: NexusGenRootTypes["Petition"]; // Petition!
     signatureConfig: NexusGenRootTypes["SignatureConfig"]; // SignatureConfig!
+    signedDocumentFilename: string | null; // String
     status: NexusGenEnums["PetitionSignatureRequestStatus"]; // PetitionSignatureRequestStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
@@ -1331,6 +1334,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionUserSubscription: "Petition";
+    updateSignatureRequestMetadata: "PetitionSignatureRequest";
     updateSimpleReply: "PetitionFieldReply";
     updateUser: "User";
     updateUserStatus: "User";
@@ -1538,11 +1542,13 @@ export interface NexusGenFieldTypeNames {
   };
   PetitionSignatureRequest: {
     // field return type name
+    auditTrailFilename: "String";
     createdAt: "DateTime";
     id: "GID";
     metadata: "JSONObject";
     petition: "Petition";
     signatureConfig: "SignatureConfig";
+    signedDocumentFilename: "String";
     status: "PetitionSignatureRequestStatus";
     updatedAt: "DateTime";
   };
@@ -2205,6 +2211,7 @@ export interface NexusGenArgTypes {
     };
     signedPetitionDownloadLink: {
       // args
+      downloadAuditTrail?: boolean | null; // Boolean
       petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
       preview?: boolean | null; // Boolean
     };
@@ -2283,6 +2290,11 @@ export interface NexusGenArgTypes {
       // args
       isSubscribed: boolean; // Boolean!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    updateSignatureRequestMetadata: {
+      // args
+      metadata: NexusGenScalars["JSONObject"]; // JSONObject!
+      petitionSignatureRequestId: NexusGenScalars["GID"]; // GID!
     };
     updateSimpleReply: {
       // args

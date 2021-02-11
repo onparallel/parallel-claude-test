@@ -31,6 +31,21 @@ export const PetitionSignatureRequest = objectType({
       type: "PetitionSignatureRequestStatus",
       description: "The status of the petition signature.",
     });
+    t.nullable.string("signedDocumentFilename", {
+      resolve: async (o, _, ctx) => {
+        return o.file_upload_id
+          ? (await ctx.files.loadFileUpload(o.file_upload_id))?.filename ?? null
+          : null;
+      },
+    });
+    t.nullable.string("auditTrailFilename", {
+      resolve: async (o, _, ctx) => {
+        return o.file_upload_audit_trail_id
+          ? (await ctx.files.loadFileUpload(o.file_upload_audit_trail_id))
+              ?.filename ?? null
+          : null;
+      },
+    });
     t.jsonObject("metadata", {
       description: "Metadata for this signature request.",
       resolve: (o) => o.metadata,

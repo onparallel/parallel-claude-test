@@ -323,6 +323,7 @@ export type Mutation = {
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionUser */
   updatePetitionUserSubscription: Petition;
+  updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
   /** Updates the user with the provided data. */
@@ -644,6 +645,7 @@ export type MutationsendRemindersArgs = {
 };
 
 export type MutationsignedPetitionDownloadLinkArgs = {
+  downloadAuditTrail?: Maybe<Scalars["Boolean"]>;
   petitionSignatureRequestId: Scalars["GID"];
   preview?: Maybe<Scalars["Boolean"]>;
 };
@@ -722,6 +724,11 @@ export type MutationupdatePetitionFieldReplyMetadataArgs = {
 export type MutationupdatePetitionUserSubscriptionArgs = {
   isSubscribed: Scalars["Boolean"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationupdateSignatureRequestMetadataArgs = {
+  metadata: Scalars["JSONObject"];
+  petitionSignatureRequestId: Scalars["GID"];
 };
 
 export type MutationupdateSimpleReplyArgs = {
@@ -1253,6 +1260,7 @@ export type PetitionSignatureCancelReason =
 
 export type PetitionSignatureRequest = Timestamps & {
   __typename?: "PetitionSignatureRequest";
+  auditTrailFilename?: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -1261,6 +1269,7 @@ export type PetitionSignatureRequest = Timestamps & {
   petition: Petition;
   /** The signature configuration for the request. */
   signatureConfig: SignatureConfig;
+  signedDocumentFilename?: Maybe<Scalars["String"]>;
   /** The status of the petition signature. */
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
@@ -3080,6 +3089,16 @@ export type ExportRepliesProgressDialog_PetitionFragment = {
           >;
         } & useFilenamePlaceholdersRename_PetitionFieldFragment
     >;
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        | "id"
+        | "status"
+        | "signedDocumentFilename"
+        | "auditTrailFilename"
+        | "metadata"
+      >
+    >;
   };
 
 export type ExportRepliesProgressDialog_PetitionRepliesQueryVariables = Exact<{
@@ -3110,6 +3129,19 @@ export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
 };
 
+export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  downloadAuditTrail?: Maybe<Scalars["Boolean"]>;
+}>;
+
+export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
+  __typename?: "Mutation";
+} & {
+  signedPetitionDownloadLink: {
+    __typename?: "FileUploadReplyDownloadLinkResult";
+  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "filename" | "url">;
+};
+
 export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
@@ -3122,6 +3154,19 @@ export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation
   updatePetitionFieldReplyMetadata: {
     __typename?: "PetitionFieldReply";
   } & Pick<PetitionFieldReply, "id" | "metadata">;
+};
+
+export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  metadata: Scalars["JSONObject"];
+}>;
+
+export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation = {
+  __typename?: "Mutation";
+} & {
+  updateSignatureRequestMetadata: {
+    __typename?: "PetitionSignatureRequest";
+  } & Pick<PetitionSignatureRequest, "id" | "metadata">;
 };
 
 export type PetitionRepliesField_PetitionFieldFragment = {
@@ -5232,6 +5277,13 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
         metadata
         ...useFilenamePlaceholdersRename_PetitionFieldReply
       }
+    }
+    currentSignatureRequest {
+      id
+      status
+      signedDocumentFilename
+      auditTrailFilename
+      metadata
     }
   }
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
@@ -7566,6 +7618,57 @@ export function useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutati
 export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
   typeof useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation
 >;
+export const ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument = gql`
+  mutation ExportRepliesProgressDialog_signedPetitionDownloadLink(
+    $petitionSignatureRequestId: GID!
+    $downloadAuditTrail: Boolean
+  ) {
+    signedPetitionDownloadLink(
+      petitionSignatureRequestId: $petitionSignatureRequestId
+      downloadAuditTrail: $downloadAuditTrail
+    ) {
+      result
+      filename
+      url
+    }
+  }
+`;
+
+/**
+ * __useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation__
+ *
+ * To run a mutation, you first call `useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [exportRepliesProgressDialogSignedPetitionDownloadLinkMutation, { data, loading, error }] = useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation({
+ *   variables: {
+ *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
+ *      downloadAuditTrail: // value for 'downloadAuditTrail'
+ *   },
+ * });
+ */
+export function useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation,
+    ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation,
+    ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables
+  >(
+    ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument,
+    baseOptions
+  );
+}
+export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation
+>;
 export const ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument = gql`
   mutation ExportRepliesProgressDialog_updatePetitionFieldReplyMetadata(
     $petitionId: GID!
@@ -7618,6 +7721,56 @@ export function useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataM
 }
 export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationHookResult = ReturnType<
   typeof useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation
+>;
+export const ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument = gql`
+  mutation ExportRepliesProgressDialog_updateSignatureRequestMetadata(
+    $petitionSignatureRequestId: GID!
+    $metadata: JSONObject!
+  ) {
+    updateSignatureRequestMetadata(
+      petitionSignatureRequestId: $petitionSignatureRequestId
+      metadata: $metadata
+    ) {
+      id
+      metadata
+    }
+  }
+`;
+
+/**
+ * __useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation__
+ *
+ * To run a mutation, you first call `useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [exportRepliesProgressDialogUpdateSignatureRequestMetadataMutation, { data, loading, error }] = useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation({
+ *   variables: {
+ *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
+ *      metadata: // value for 'metadata'
+ *   },
+ * });
+ */
+export function useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation,
+    ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation,
+    ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables
+  >(
+    ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument,
+    baseOptions
+  );
+}
+export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation
 >;
 export const PetitionSignaturesCard_cancelSignatureRequestDocument = gql`
   mutation PetitionSignaturesCard_cancelSignatureRequest(

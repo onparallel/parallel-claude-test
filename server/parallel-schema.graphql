@@ -701,6 +701,10 @@ type Mutation {
   Generates a download link for the signed PDF petition.
   """
   signedPetitionDownloadLink(
+    """
+    If true, downloads the audit trail instead of the signed document
+    """
+    downloadAuditTrail: Boolean
     petitionSignatureRequestId: GID!
 
     """
@@ -800,6 +804,10 @@ type Mutation {
     isSubscribed: Boolean!
     petitionId: GID!
   ): Petition!
+  updateSignatureRequestMetadata(
+    metadata: JSONObject!
+    petitionSignatureRequestId: GID!
+  ): PetitionSignatureRequest!
 
   """
   Updates a reply to a text or select field.
@@ -1765,6 +1773,8 @@ enum PetitionSignatureCancelReason {
 }
 
 type PetitionSignatureRequest implements Timestamps {
+  auditTrailFilename: String
+
   """
   Time when the resource was created.
   """
@@ -1781,6 +1791,7 @@ type PetitionSignatureRequest implements Timestamps {
   The signature configuration for the request.
   """
   signatureConfig: SignatureConfig!
+  signedDocumentFilename: String
 
   """
   The status of the petition signature.

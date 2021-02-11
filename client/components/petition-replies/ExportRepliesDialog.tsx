@@ -124,6 +124,7 @@ export function ExportRepliesDialog({
     const field = fields.find(
       (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
     )!;
+    if (!field) return [null];
     const reply = field.replies[0];
     return [
       reply.content.filename,
@@ -228,49 +229,51 @@ export function ExportRepliesDialog({
               ) : null}
             </Stack>
           ) : null}
-          <Box>
-            <Checkbox
-              marginLeft={1}
-              isChecked={rename}
-              onChange={(e) => {
-                setRename(e.target.checked);
-                if (e.target.checked) {
-                  inputRef.current?.focus();
-                }
-              }}
-            >
-              <FormattedMessage
-                id="component.export-replies-dialog.rename"
-                defaultMessage="Rename downloaded files automatically"
-              />
-            </Checkbox>
-            <Box marginX={-1}>
-              <Collapse in={rename}>
-                <Box marginLeft={7} padding={1}>
-                  <PlaceholderInput
-                    ref={inputRef}
-                    value={pattern}
-                    onChange={setPattern}
-                    placeholders={placeholders}
-                    marginBottom={2}
-                  />
-                  <Text as="div" fontSize="xs" color="gray.500">
-                    <FormattedMessage
-                      id="generic.for-example"
-                      defaultMessage="E.g. {example}"
-                      values={{
-                        example: (
-                          <Text as="span">
-                            {example[0]} <ArrowForwardIcon /> {example[1]}
-                          </Text>
-                        ),
-                      }}
+          {example[0] !== null ? (
+            <Box>
+              <Checkbox
+                marginLeft={1}
+                isChecked={rename}
+                onChange={(e) => {
+                  setRename(e.target.checked);
+                  if (e.target.checked) {
+                    inputRef.current?.focus();
+                  }
+                }}
+              >
+                <FormattedMessage
+                  id="component.export-replies-dialog.rename"
+                  defaultMessage="Rename downloaded files automatically"
+                />
+              </Checkbox>
+              <Box marginX={-1}>
+                <Collapse in={rename}>
+                  <Box marginLeft={7} padding={1}>
+                    <PlaceholderInput
+                      ref={inputRef}
+                      value={pattern}
+                      onChange={setPattern}
+                      placeholders={placeholders}
+                      marginBottom={2}
                     />
-                  </Text>
-                </Box>
-              </Collapse>
+                    <Text as="div" fontSize="xs" color="gray.500">
+                      <FormattedMessage
+                        id="generic.for-example"
+                        defaultMessage="E.g. {example}"
+                        values={{
+                          example: (
+                            <Text as="span">
+                              {example[0]} <ArrowForwardIcon /> {example[1]}
+                            </Text>
+                          ),
+                        }}
+                      />
+                    </Text>
+                  </Box>
+                </Collapse>
+              </Box>
             </Box>
-          </Box>
+          ) : null}
         </Stack>
       }
       confirm={

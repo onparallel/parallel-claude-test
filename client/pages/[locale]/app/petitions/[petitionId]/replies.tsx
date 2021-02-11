@@ -251,9 +251,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const showExportRepliesDialog = useExportRepliesDialog();
   const showExportRepliesProgressDialog = useExportRepliesProgressDialog();
   const handleDownloadAllClick = useCallback(async () => {
-    const hasFiles = petition.fields.some(
-      (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
-    );
+    const hasFiles =
+      petition.fields.some(
+        (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
+      ) || petition.currentSignatureRequest?.status === "COMPLETED";
     try {
       if (hasFiles) {
         const res = await showExportRepliesDialog({

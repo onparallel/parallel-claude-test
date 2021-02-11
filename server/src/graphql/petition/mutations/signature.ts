@@ -3,6 +3,7 @@ import { toGlobalId } from "../../../util/globalId";
 import { authenticateAnd } from "../../helpers/authorize";
 import { WhitelistedError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { jsonObjectArg } from "../../helpers/json";
 import { RESULT } from "../../helpers/result";
 import {
   userHasAccessToPetitions,
@@ -133,6 +134,32 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
   },
 });
 
+export const updateSignatureRequestMetadata = mutationField(
+  "updateSignatureRequestMetadata",
+  {
+    type: nonNull("PetitionSignatureRequest"),
+    authorize: authenticateAnd(
+      userHasFeatureFlag("PETITION_SIGNATURE"),
+      userHasAccessToSignatureRequest("petitionSignatureRequestId", [
+        "OWNER",
+        "WRITE",
+      ])
+    ),
+    args: {
+      petitionSignatureRequestId: nonNull(globalIdArg()),
+      metadata: nonNull(jsonObjectArg()),
+    },
+    resolve: async (_, args, ctx) => {
+      return await ctx.petitions.updatePetitionSignature(
+        args.petitionSignatureRequestId,
+        {
+          metadata: args.metadata,
+        }
+      );
+    },
+  }
+);
+
 export const signedPetitionDownloadLink = mutationField(
   "signedPetitionDownloadLink",
   {
@@ -153,6 +180,10 @@ export const signedPetitionDownloadLink = mutationField(
         description:
           "If true will use content-disposition inline instead of attachment",
       }),
+      downloadAuditTrail: booleanArg({
+        description:
+          "If true, downloads the audit trail instead of the signed document",
+      }),
     },
     resolve: async (_, args, ctx) => {
       try {
@@ -160,15 +191,27 @@ export const signedPetitionDownloadLink = mutationField(
           args.petitionSignatureRequestId
         );
 
-        if (signature?.status !== "COMPLETED" || !signature.file_upload_id) {
+        if (
+          signature?.status !== "COMPLETED" ||
+          (args.downloadAuditTrail && !signature.file_upload_audit_trail_id) ||
+          (!args.downloadAuditTrail && !signature.file_upload_id)
+        ) {
           throw new Error(
             `Can't download signed doc on ${signature?.status} petitionSignatureRequest with id ${args.petitionSignatureRequestId}`
           );
         }
-        const file = await ctx.files.loadFileUpload(signature.file_upload_id);
+        const file = await ctx.files.loadFileUpload(
+          args.downloadAuditTrail
+            ? signature.file_upload_audit_trail_id!
+            : signature.file_upload_id!
+        );
         if (!file) {
           throw new Error(
-            `Can't get signed file for signature request with id ${args.petitionSignatureRequestId}`
+            `Can't get ${
+              args.downloadAuditTrail ? "audit trail" : "signed"
+            } file for signature request with id ${
+              args.petitionSignatureRequestId
+            }`
           );
         }
         return {
