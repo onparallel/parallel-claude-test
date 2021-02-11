@@ -56,36 +56,6 @@ export function PetitionComposeFieldSettings({
             />
           </Box>
         )}
-        {!field.isReadOnly && (
-          <SettingsRow
-            label={
-              <FormattedMessage
-                id="field-settings.required-label"
-                defaultMessage="Required"
-              />
-            }
-            description={
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="field-settings.required-description"
-                  defaultMessage="If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field."
-                />
-              </Text>
-            }
-            controlId="field-required"
-          >
-            <Switch
-              height="20px"
-              display="block"
-              id="field-required"
-              color="green"
-              isChecked={!field.optional}
-              onChange={(event) =>
-                onFieldEdit(field.id, { optional: !event.target.checked })
-              }
-            />
-          </SettingsRow>
-        )}
 
         <SettingsRow
           label={

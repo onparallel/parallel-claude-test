@@ -3025,6 +3025,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
   | "optional"
   | "multiple"
   | "isFixed"
+  | "isReadOnly"
   | "isDescriptionShown"
 > &
   SelectTypeFieldOptions_PetitionFieldFragment;
@@ -5239,6 +5240,7 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     optional
     multiple
     isFixed
+    isReadOnly
     isDescriptionShown @client
     ...SelectTypeFieldOptions_PetitionField
   }

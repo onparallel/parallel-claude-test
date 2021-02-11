@@ -1,5 +1,13 @@
 import { gql } from "@apollo/client";
-import { Box, Input, Stack, Tooltip } from "@chakra-ui/react";
+import {
+  Box,
+  Input,
+  Stack,
+  FormControl,
+  FormLabel,
+  Switch,
+  Tooltip,
+} from "@chakra-ui/react";
 import {
   CopyIcon,
   DeleteIcon,
@@ -16,7 +24,7 @@ import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { isSelectionExpanded } from "@udecode/slate-plugins";
 import { memo, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { shallowEqualObjects } from "shallow-equal";
 import { Editor, Point } from "slate";
@@ -80,12 +88,6 @@ const _PetitionComposeField = chakraForwardRef<
   ref
 ) {
   const intl = useIntl();
-  const labels = {
-    required: intl.formatMessage({
-      id: "generic.required-field",
-      defaultMessage: "Required field",
-    }),
-  };
   const { elementRef, dragRef, previewRef, isDragging } = useDragAndDrop(
     field.id,
     index,
@@ -171,7 +173,7 @@ const _PetitionComposeField = chakraForwardRef<
           "&:hover, &:focus-within": {
             backgroundColor: isActive ? "purple.50" : "gray.50",
             ".field-actions": {
-              display: "block",
+              display: "flex",
             },
           },
         }}
@@ -210,8 +212,10 @@ const _PetitionComposeField = chakraForwardRef<
           <Box marginX={-2} position="relative">
             <Tooltip
               placement="top"
-              aria-label={labels.required}
-              label={labels.required}
+              label={intl.formatMessage({
+                id: "generic.required-field",
+                defaultMessage: "Required field",
+              })}
             >
               <Box
                 width={4}
@@ -244,81 +248,114 @@ const _PetitionComposeField = chakraForwardRef<
           paddingLeft={2}
           paddingTop={2}
           paddingBottom={10}
-          paddingRight={2}
+          paddingRight={4}
         >
-          <Input
-            id={`field-title-${field.id}`}
-            ref={titleRef}
-            aria-label={intl.formatMessage({
-              id: "petition.field-title-label",
-              defaultMessage: "Field title",
-            })}
-            placeholder={
-              field.type === "HEADING"
-                ? intl.formatMessage({
-                    id: "petition.field-title-heading-placeholder",
-                    defaultMessage:
-                      "Enter an introductory title for this section...",
-                  })
-                : field.type === "FILE_UPLOAD"
-                ? intl.formatMessage({
-                    id: "petition.field-title-file-upload-placeholder",
-                    defaultMessage: "Describe the file(s) that you need...",
-                  })
-                : intl.formatMessage({
-                    id: "petition.field-title-generic-placeholder",
-                    defaultMessage: "Ask for the information that you need...",
-                  })
-            }
-            value={title ?? ""}
-            width="100%"
-            maxLength={500}
-            border="none"
-            paddingX={2}
-            height={6}
-            marginBottom={1}
-            _placeholder={
-              showError && !title ? { color: "red.500" } : undefined
-            }
-            _focus={{ boxShadow: "none" }}
-            onChange={(event) => setTitle(event.target.value ?? null)}
-            onBlur={() => {
-              const trimmed = title?.trim() ?? null;
-              setNativeValue(titleRef.current!, trimmed ?? "");
-              if (field.title !== trimmed) {
-                onFieldEdit({ title: trimmed });
-              }
-            }}
-            onKeyDown={(event) => {
-              switch (event.key) {
-                case "ArrowDown":
-                  event.preventDefault();
-                  if (field.isDescriptionShown) {
-                    descriptionRef.current!.focus();
-                  } else if (field.type === "SELECT") {
-                    selectFieldOptionsRef.current!.focus("START");
-                  } else {
-                    onFocusNextField();
+          <Stack direction="row">
+            <Box flex={1} marginBottom={1}>
+              <Input
+                id={`field-title-${field.id}`}
+                ref={titleRef}
+                aria-label={intl.formatMessage({
+                  id: "petition.field-title-label",
+                  defaultMessage: "Field title",
+                })}
+                placeholder={
+                  field.type === "HEADING"
+                    ? intl.formatMessage({
+                        id: "petition.field-title-heading-placeholder",
+                        defaultMessage:
+                          "Enter an introductory title for this section...",
+                      })
+                    : field.type === "FILE_UPLOAD"
+                    ? intl.formatMessage({
+                        id: "petition.field-title-file-upload-placeholder",
+                        defaultMessage: "Describe the file(s) that you need...",
+                      })
+                    : intl.formatMessage({
+                        id: "petition.field-title-generic-placeholder",
+                        defaultMessage:
+                          "Ask for the information that you need...",
+                      })
+                }
+                value={title ?? ""}
+                width="100%"
+                maxLength={500}
+                border="none"
+                paddingX={2}
+                height={6}
+                _placeholder={
+                  showError && !title ? { color: "red.500" } : undefined
+                }
+                _focus={{ boxShadow: "none" }}
+                onChange={(event) => setTitle(event.target.value ?? null)}
+                onBlur={() => {
+                  const trimmed = title?.trim() ?? null;
+                  setNativeValue(titleRef.current!, trimmed ?? "");
+                  if (field.title !== trimmed) {
+                    onFieldEdit({ title: trimmed });
                   }
-                  break;
-                case "ArrowUp":
-                  event.preventDefault();
-                  onFocusPrevField();
-                  break;
-              }
-            }}
-            onKeyUp={(event) => {
-              switch (event.key) {
-                case "Enter":
-                  onAddField();
-                  break;
-              }
-            }}
-          />
+                }}
+                onKeyDown={(event) => {
+                  switch (event.key) {
+                    case "ArrowDown":
+                      event.preventDefault();
+                      if (field.isDescriptionShown) {
+                        descriptionRef.current!.focus();
+                      } else if (field.type === "SELECT") {
+                        selectFieldOptionsRef.current!.focus("START");
+                      } else {
+                        onFocusNextField();
+                      }
+                      break;
+                    case "ArrowUp":
+                      event.preventDefault();
+                      onFocusPrevField();
+                      break;
+                  }
+                }}
+                onKeyUp={(event) => {
+                  switch (event.key) {
+                    case "Enter":
+                      onAddField();
+                      break;
+                  }
+                }}
+              />
+            </Box>
+            {field.isReadOnly ? null : (
+              <FormControl
+                className="field-actions"
+                display="flex"
+                alignItems="center"
+                width="auto"
+                height="24px"
+              >
+                <FormLabel
+                  htmlFor={`field-required-${field.id}`}
+                  fontWeight="normal"
+                  marginBottom="0"
+                >
+                  <FormattedMessage
+                    id="petition.required-label"
+                    defaultMessage="Required"
+                  />
+                </FormLabel>
+                <Switch
+                  id={`field-required-${field.id}`}
+                  height="20px"
+                  isChecked={!field.optional}
+                  onChange={(event) =>
+                    onFieldEdit({ optional: !event.target.checked })
+                  }
+                />
+              </FormControl>
+            )}
+          </Stack>
           {field.isDescriptionShown ? (
             <GrowingTextarea
-              id={`field-description-${field.id}`}
               ref={descriptionRef}
+              id={`field-description-${field.id}`}
+              className={"field-description"}
               placeholder={intl.formatMessage({
                 id: "petition.field-description-placeholder",
                 defaultMessage: "Add a description...",
@@ -426,10 +463,11 @@ const _PetitionComposeField = chakraForwardRef<
         <Stack
           className="field-actions"
           position="absolute"
-          bottom="0"
-          right="0"
+          bottom={0}
+          right={0}
           direction="row"
           padding={1}
+          paddingRight={3}
         >
           <IconButtonWithTooltip
             icon={<CopyIcon />}
@@ -494,6 +532,7 @@ export const PetitionComposeField = Object.assign(
           optional
           multiple
           isFixed
+          isReadOnly
           isDescriptionShown @client
           ...SelectTypeFieldOptions_PetitionField
         }
