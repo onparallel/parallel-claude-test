@@ -100,13 +100,6 @@ const _PetitionComposeField = chakraForwardRef<
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const selectFieldOptionsRef = useRef<SelectTypeFieldOptionsRef>(null);
 
-  // to make sure 'description' is set to null on client
-  useEffect(() => {
-    if (!field.isDescriptionShown) {
-      setDescription(null);
-    }
-  }, [field.isDescriptionShown]);
-
   const _ref = useMemo(
     () =>
       ({
@@ -118,7 +111,7 @@ const _PetitionComposeField = chakraForwardRef<
         focusFromNext: () => {
           if (field.type === "SELECT") {
             selectFieldOptionsRef.current!.focus("END");
-          } else if (field.isDescriptionShown) {
+          } else if (field.description) {
             const textarea = descriptionRef.current!;
             textarea.focus();
             textarea.selectionStart = textarea.selectionEnd = 0;
@@ -157,7 +150,6 @@ const _PetitionComposeField = chakraForwardRef<
         display="flex"
         flexDirection="row"
         opacity={isDragging ? 0 : 1}
-        minHeight="102px"
         backgroundColor={isActive ? "purple.50" : "white"}
         sx={{
           "[draggable]": {
@@ -299,7 +291,7 @@ const _PetitionComposeField = chakraForwardRef<
                   switch (event.key) {
                     case "ArrowDown":
                       event.preventDefault();
-                      if (field.isDescriptionShown) {
+                      if (field.description) {
                         descriptionRef.current!.focus();
                       } else if (field.type === "SELECT") {
                         selectFieldOptionsRef.current!.focus("START");
@@ -351,68 +343,65 @@ const _PetitionComposeField = chakraForwardRef<
               </FormControl>
             )}
           </Stack>
-          {field.isDescriptionShown ? (
-            <GrowingTextarea
-              ref={descriptionRef}
-              id={`field-description-${field.id}`}
-              className={"field-description"}
-              placeholder={intl.formatMessage({
-                id: "petition.field-description-placeholder",
-                defaultMessage: "Add a description...",
-              })}
-              aria-label={intl.formatMessage({
-                id: "petition.field-description-label",
-                defaultMessage: "Field description",
-              })}
-              fontSize="sm"
-              background="transparent"
-              value={description ?? ""}
-              maxLength={4000}
-              border="none"
-              height="20px"
-              paddingX={2}
-              paddingY={0}
-              minHeight={0}
-              rows={1}
-              _focus={{
-                boxShadow: "none",
-              }}
-              onChange={(event) => setDescription(event.target.value ?? null)}
-              onBlur={() => {
-                const trimmed = description?.trim() ?? null;
-                setNativeValue(descriptionRef.current!, trimmed ?? "");
-                if (field.description !== trimmed) {
-                  onFieldEdit({ description: trimmed });
-                }
-              }}
-              onKeyDown={(event) => {
-                const textarea = event.target as HTMLTextAreaElement;
-                const totalLines =
-                  (textarea.value.match(/\n/g) ?? []).length + 1;
-                const beforeCursor = textarea.value.substr(
-                  0,
-                  textarea.selectionStart
-                );
-                const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
-                switch (event.key) {
-                  case "ArrowDown":
-                    if (currentLine === totalLines - 1) {
-                      if (field.type === "SELECT") {
-                        selectFieldOptionsRef.current!.focus("START");
-                      } else {
-                        onFocusNextField();
-                      }
+          <GrowingTextarea
+            ref={descriptionRef}
+            id={`field-description-${field.id}`}
+            className={"field-description"}
+            placeholder={intl.formatMessage({
+              id: "petition.field-description-placeholder",
+              defaultMessage: "Add a description...",
+            })}
+            aria-label={intl.formatMessage({
+              id: "petition.field-description-label",
+              defaultMessage: "Field description",
+            })}
+            fontSize="sm"
+            background="transparent"
+            value={description ?? ""}
+            maxLength={4000}
+            border="none"
+            height="20px"
+            paddingX={2}
+            paddingY={0}
+            minHeight={0}
+            rows={1}
+            _focus={{
+              boxShadow: "none",
+            }}
+            onChange={(event) => setDescription(event.target.value ?? null)}
+            onBlur={() => {
+              const trimmed = description?.trim() ?? null;
+              setNativeValue(descriptionRef.current!, trimmed ?? "");
+              if (field.description !== trimmed) {
+                onFieldEdit({ description: trimmed });
+              }
+            }}
+            onKeyDown={(event) => {
+              const textarea = event.target as HTMLTextAreaElement;
+              const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
+              const beforeCursor = textarea.value.substr(
+                0,
+                textarea.selectionStart
+              );
+              const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
+              switch (event.key) {
+                case "ArrowDown":
+                  if (currentLine === totalLines - 1) {
+                    if (field.type === "SELECT") {
+                      selectFieldOptionsRef.current!.focus("START");
+                    } else {
+                      onFocusNextField();
                     }
-                    break;
-                  case "ArrowUp":
-                    if (currentLine === 0) {
-                      titleRef.current!.focus();
-                    }
-                    break;
-                }
-              }}
-            />
-          ) : null}
+                  }
+                  break;
+                case "ArrowUp":
+                  if (currentLine === 0) {
+                    titleRef.current!.focus();
+                  }
+                  break;
+              }
+            }}
+          />
           {field.type === "SELECT" ? (
             <Box marginTop={1}>
               <SelectTypeFieldOptions
@@ -447,11 +436,7 @@ const _PetitionComposeField = chakraForwardRef<
                         Editor.start(editor, [])
                       );
                       if (atStart) {
-                        if (field.isDescriptionShown) {
-                          descriptionRef.current!.focus();
-                        } else {
-                          titleRef.current!.focus();
-                        }
+                        descriptionRef.current!.focus();
                       }
                       break;
                   }
@@ -533,7 +518,6 @@ export const PetitionComposeField = Object.assign(
           multiple
           isFixed
           isReadOnly
-          isDescriptionShown @client
           ...SelectTypeFieldOptions_PetitionField
         }
         ${SelectTypeFieldOptions.fragments.PetitionField}

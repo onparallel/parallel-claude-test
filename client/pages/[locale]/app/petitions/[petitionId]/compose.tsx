@@ -50,7 +50,6 @@ import {
   PetitionComposeUserQuery,
   PetitionCompose_PetitionFieldFragment,
   PetitionFieldType,
-  updateIsDescriptionShown_PetitionFieldFragment,
   UpdatePetitionFieldInput,
   UpdatePetitionInput,
   usePetitionComposeQuery,
@@ -105,50 +104,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
 
   const client = useApolloClient();
-  const handleIsDescriptionShownChange = useCallback(
-    async (fieldId: string) => {
-      try {
-        const fragment = gql`
-          fragment updateIsDescriptionShown_PetitionField on PetitionField {
-            isDescriptionShown @client
-            description
-          }
-        `;
-        const {
-          isDescriptionShown,
-          description,
-        } = client.cache.readFragment<updateIsDescriptionShown_PetitionFieldFragment>(
-          {
-            fragment,
-            id: fieldId,
-          }
-        )!;
-        client.cache.writeFragment<updateIsDescriptionShown_PetitionFieldFragment>(
-          {
-            fragment,
-            id: fieldId,
-            data: {
-              __typename: "PetitionField",
-              isDescriptionShown: !isDescriptionShown,
-              description,
-            },
-          }
-        );
-        if (isDescriptionShown && !!description) {
-          await updatePetitionField({
-            variables: {
-              petitionId,
-              fieldId,
-              data: { description: null },
-            },
-          });
-        } else {
-          focusFieldDescription(fieldId);
-        }
-      } catch {}
-    },
-    [petitionId]
-  );
 
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
@@ -549,7 +504,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 field={activeField}
                 onFieldEdit={handleFieldEdit}
                 onFieldTypeChange={handleFieldTypeChange}
-                onIsDescriptionShownChange={handleIsDescriptionShownChange}
                 onClose={handleSettingsClose}
               />
             ) : (

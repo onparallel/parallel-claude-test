@@ -8,7 +8,6 @@ import { setContext } from "@apollo/client/link/context";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
 import { IncomingMessage } from "http";
 import { filter, indexBy, map, pipe } from "remeda";
-import typeDefs from "./client-schema.graphql";
 import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 import { createUploadLink } from "apollo-upload-client";
 
@@ -112,11 +111,8 @@ export function createApolloClient(
         },
         PetitionField: {
           fields: {
-            options: { merge: false },
-            isDescriptionShown: {
-              read(value, { readField }) {
-                return Boolean(value || readField("description"));
-              },
+            options: {
+              merge: false,
             },
           },
         },
@@ -139,7 +135,6 @@ export function createApolloClient(
         },
       },
     }).restore(initialState ?? {}),
-    typeDefs,
     connectToDevTools:
       process.browser && process.env.NODE_ENV === "development",
   });

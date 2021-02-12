@@ -1,7 +1,6 @@
 {
   "schemaPath": [
     "server/parallel-schema.graphql",
-    "client/utils/apollo/client-schema.graphql",
   ],
   "include": "./client/**/*.tsx",
   "endpoint": "http://localhost/graphql",
