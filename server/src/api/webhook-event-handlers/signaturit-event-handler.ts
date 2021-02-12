@@ -4,7 +4,6 @@ import { ApiContext } from "../../context";
 import { PetitionSignatureRequest } from "../../db/__types";
 import sanitize from "sanitize-filename";
 import { random } from "../../util/token";
-import { withRetry } from "../helpers/withRetry";
 
 export async function validateSignaturitRequest(
   req: Request & { context: ApiContext },
@@ -48,6 +47,8 @@ export function signaturItEventHandler(type: SignatureEvents) {
   switch (type) {
     case "document_declined":
       return documentDeclined;
+    case "document_completed":
+      return documentCompleted;
     case "audit_trail_completed":
       return auditTrailCompleted;
     default:
@@ -98,9 +99,8 @@ async function documentDeclined(
     },
   });
 }
-
-/** audit trail has been completed and documents are ready to be downloaded */
-async function auditTrailCompleted(
+/** signed document has been completed and is ready to be downloaded */
+async function documentCompleted(
   petitionId: number,
   data: SignaturItEventBody,
   ctx: ApiContext
@@ -151,36 +151,20 @@ async function auditTrailCompleted(
 
   const config = petition.signature_config as any;
 
-  // there could be scenarios where the signed doc is not ready to be downloaded
-  // so we need to execute the download function inside a "retry wrapper"
-  const downloadSignedDocumentWithRetry = withRetry(
-    client.downloadSignedDocument,
-    { maxRetries: 1, retryIntervalMs: 1000 * 60 * 5, thisArg: client }
+  const signedDoc = await storeDocument(
+    await client.downloadSignedDocument(`${signatureId}/${documentId}`),
+    sanitize(
+      `${config.title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`
+    ),
+    signaturitIntegration.id,
+    ctx
   );
-
-  const [signedDoc, auditTrail] = await Promise.all([
-    storeDocument(
-      await downloadSignedDocumentWithRetry(`${signatureId}/${documentId}`),
-      sanitize(
-        `${config.title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`
-      ),
-      signaturitIntegration.id,
-      ctx
-    ),
-    storeDocument(
-      await client.downloadAuditTrail(`${signatureId}/${documentId}`),
-      sanitize(`${config.title}_audit_trail.pdf`),
-      signaturitIntegration.id,
-      ctx
-    ),
-  ]);
 
   const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
     `SIGNATURIT/${signatureId}`,
     {
       status: "COMPLETED",
       file_upload_id: signedDoc.id,
-      file_upload_audit_trail_id: auditTrail.id,
     }
   );
 
@@ -198,6 +182,62 @@ async function auditTrailCompleted(
       },
     }),
   ]);
+}
+
+/** audit trail has been completed and is ready to be downloaded */
+async function auditTrailCompleted(
+  petitionId: number,
+  data: SignaturItEventBody,
+  ctx: ApiContext
+) {
+  const petition = await ctx.petitions.loadPetition(petitionId);
+
+  if (!petition) {
+    throw new Error(`petition with id ${petitionId} not found.`);
+  }
+
+  const orgIntegration = await ctx.integrations.loadEnabledIntegrationsForOrgId(
+    petition.org_id
+  );
+
+  const signaturitIntegration = orgIntegration.find(
+    (i) => i.type === "SIGNATURE" && i.provider === "SIGNATURIT"
+  );
+
+  if (!signaturitIntegration) {
+    throw new Error(
+      `Can't load SignaturIt integration for org with id ${petition.org_id}`
+    );
+  }
+  const client = ctx.signature.getClient(signaturitIntegration);
+
+  const {
+    id: documentId,
+    signature: { id: signatureId },
+  } = data.document;
+
+  const signature = await fetchPetitionSignature(signatureId, ctx);
+  if (signature.status === "CANCELLED") {
+    throw new Error(
+      `Requested petition signature with externalId: ${signatureId} was previously cancelled`
+    );
+  }
+
+  const config = petition.signature_config as any;
+
+  const auditTrail = await storeDocument(
+    await client.downloadAuditTrail(`${signatureId}/${documentId}`),
+    sanitize(`${config.title}_audit_trail.pdf`),
+    signaturitIntegration.id,
+    ctx
+  );
+
+  await ctx.petitions.updatePetitionSignatureByExternalId(
+    `SIGNATURIT/${signatureId}`,
+    { file_upload_audit_trail_id: auditTrail.id }
+  );
+
+  await appendEventLogs(petitionId, data, ctx);
 }
 
 async function fetchPetitionSignature(

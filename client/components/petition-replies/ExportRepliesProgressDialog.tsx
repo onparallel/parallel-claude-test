@@ -128,26 +128,27 @@ export function ExportRepliesProgressDialog({
           : []
       );
 
-      const signatureDocs =
-        petition.currentSignatureRequest?.status === "COMPLETED"
-          ? [
-              {
-                type: "signed-document",
-                externalId:
-                  petition.currentSignatureRequest.metadata.signedDocument
-                    ?.EXTERNAL_ID_CUATRECASAS,
-                filename:
-                  petition.currentSignatureRequest.signedDocumentFilename,
-              },
-              {
-                type: "audit-trail",
-                externalId:
-                  petition.currentSignatureRequest.metadata.auditTrail
-                    ?.EXTERNAL_ID_CUATRECASAS,
-                filename: petition.currentSignatureRequest.auditTrailFilename,
-              },
-            ]
-          : [];
+      const signatureDocs = [];
+      if (petition.currentSignatureRequest?.status === "COMPLETED") {
+        signatureDocs.push({
+          type: "signed-document",
+          externalId:
+            petition.currentSignatureRequest.metadata
+              .SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS,
+          filename: petition.currentSignatureRequest.signedDocumentFilename!,
+        });
+
+        // audit trail may not be able to export at the time
+        if (petition.currentSignatureRequest.auditTrailFilename) {
+          signatureDocs.push({
+            type: "audit-trail",
+            externalId:
+              petition.currentSignatureRequest.metadata
+                .AUDIT_TRAIL_EXTERNAL_ID_CUATRECASAS,
+            filename: petition.currentSignatureRequest.auditTrailFilename,
+          });
+        }
+      }
 
       const totalFiles = files.length + signatureDocs.length;
 
@@ -246,14 +247,10 @@ export function ExportRepliesProgressDialog({
                 petition.currentSignatureRequest!.metadata,
                 signatureDoc.type === "signed-document"
                   ? {
-                      signedDocument: {
-                        EXTERNAL_ID_CUATRECASAS: externalId,
-                      },
+                      SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS: externalId,
                     }
                   : {
-                      auditTrail: {
-                        EXTERNAL_ID_CUATRECASAS: externalId,
-                      },
+                      AUDIT_TRAIL_EXTERNAL_ID_CUATRECASAS: externalId,
                     }
               ),
             },
