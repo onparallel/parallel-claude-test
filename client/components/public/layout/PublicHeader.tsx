@@ -6,7 +6,7 @@ import {
   Menu,
   MenuButton,
   MenuItem,
-  MenuItemOptions,
+  MenuItemProps,
   MenuList,
   Portal,
   Stack,
@@ -97,7 +97,7 @@ export function PublicHeader(props: BoxProps) {
   );
 }
 
-interface MenuItemLinkProps extends MenuItemOptions {
+interface MenuItemLinkProps extends MenuItemProps {
   href: string;
 }
 
@@ -118,7 +118,7 @@ const MenuItemLink = chakraForwardRef<"a", MenuItemLinkProps>(
                 color: "purple.600",
               }
             : {})}
-          {...(props as any)}
+          {...props}
         />
       </NakedLink>
     );
