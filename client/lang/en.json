@@ -1085,26 +1085,6 @@
     "context": "Allow more than one reply"
   },
   {
-    "term": "field-settings.required-description",
-    "definition": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field.",
-    "context": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field."
-  },
-  {
-    "term": "field-settings.required-label",
-    "definition": "Required",
-    "context": "Required"
-  },
-  {
-    "term": "field-settings.show-description-description",
-    "definition": "Enabling this allows you to write a description for the field.",
-    "context": "Enabling this allows you to write a description for the field."
-  },
-  {
-    "term": "field-settings.show-description-label",
-    "definition": "Show description",
-    "context": "Show description"
-  },
-  {
     "term": "field-settings.text-multiline-description",
     "definition": "Enabling this will display a multi-line input field instead of a single line.",
     "context": "Enabling this will display a multi-line input field instead of a single line."
@@ -2833,6 +2813,11 @@
     "term": "petition.replies.download-file-error-dialog.header",
     "definition": "Error downloading {filename}",
     "context": "Error downloading {filename}"
+  },
+  {
+    "term": "petition.required-label",
+    "definition": "Required",
+    "context": "Required"
   },
   {
     "term": "petition.schedule-delivery.header",

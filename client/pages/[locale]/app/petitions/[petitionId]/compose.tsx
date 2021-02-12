@@ -454,14 +454,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     });
   }
 
-  function focusFieldDescription(fieldId: string) {
-    setTimeout(() => {
-      const title = document.querySelector<HTMLElement>(
-        `#field-description-${fieldId}`
-      );
-      title?.focus();
-    });
-  }
   const extendFlexColumn = {
     display: "flex",
     flexDirection: "column",

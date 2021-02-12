@@ -1085,26 +1085,6 @@
     "context": "Allow more than one reply"
   },
   {
-    "term": "field-settings.required-description",
-    "definition": "Al marcar el campo como obligatorio, el destinatario no podrá finalizar la petición hasta que haya respondido al campo.",
-    "context": "If you mark this field as required, the recipients won't be able to finish the petition until they reply to this field."
-  },
-  {
-    "term": "field-settings.required-label",
-    "definition": "Obligatorio",
-    "context": "Required"
-  },
-  {
-    "term": "field-settings.show-description-description",
-    "definition": "Activar esta opción te permitirá escribir una descripción para el campo.",
-    "context": "Enabling this allows you to write a description for the field."
-  },
-  {
-    "term": "field-settings.show-description-label",
-    "definition": "Mostrar descripción",
-    "context": "Show description"
-  },
-  {
     "term": "field-settings.text-multiline-description",
     "definition": "Activar esta opción hará que el campo de texto para responder sea de múltiples líneas en lugar de una sola.",
     "context": "Enabling this will display a multi-line input field instead of a single line."
@@ -2833,6 +2813,11 @@
     "term": "petition.replies.download-file-error-dialog.header",
     "definition": "Error descargando {filename}",
     "context": "Error downloading {filename}"
+  },
+  {
+    "term": "petition.required-label",
+    "definition": "Obligatorio",
+    "context": "Required"
   },
   {
     "term": "petition.schedule-delivery.header",

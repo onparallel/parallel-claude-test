@@ -22,7 +22,7 @@ import {
 import { generateCssStripe } from "@parallel/utils/css";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { isSelectionExpanded } from "@udecode/slate-plugins";
-import { memo, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { memo, MouseEvent, useMemo, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -230,7 +230,9 @@ const _PetitionComposeField = chakraForwardRef<
             type={field.type}
             relativeIndex={fieldRelativeIndex}
             as={field.isFixed ? "div" : "button"}
-            onClick={field.isFixed ? undefined : onSettingsClick}
+            onClick={
+              field.isFixed || field.isReadOnly ? undefined : onSettingsClick
+            }
             marginTop="10px"
             alignSelf="flex-start"
           />
@@ -468,6 +470,7 @@ const _PetitionComposeField = chakraForwardRef<
           />
           <IconButtonWithTooltip
             icon={<SettingsIcon />}
+            disabled={field.isReadOnly}
             size="sm"
             variant="ghost"
             placement="bottom"
