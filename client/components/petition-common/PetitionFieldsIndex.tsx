@@ -130,7 +130,7 @@ export function PetitionFieldsIndex({
               <PetitionFieldTypeIndicator
                 as="div"
                 type={field.type}
-                relativeIndex={fieldIndexValues[index]}
+                fieldIndex={fieldIndexValues[index]}
               />
             </Stack>
           </Box>

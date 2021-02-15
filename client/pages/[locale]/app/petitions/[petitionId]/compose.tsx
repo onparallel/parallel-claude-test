@@ -441,7 +441,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     const fieldElement = document.querySelector(`#field-${fieldId}`);
     if (fieldElement) {
       focusFieldTitle(fieldId);
-      await scrollIntoView(fieldElement, { scrollMode: "if-needed" });
+      await scrollIntoView(fieldElement, {
+        behavior: "smooth",
+        scrollMode: "if-needed",
+      });
     }
   }, []);
 

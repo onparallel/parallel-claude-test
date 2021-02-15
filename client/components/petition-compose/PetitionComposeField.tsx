@@ -1,10 +1,10 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Input,
-  Stack,
   FormControl,
   FormLabel,
+  Input,
+  Stack,
   Switch,
   Tooltip,
 } from "@chakra-ui/react";
@@ -19,15 +19,21 @@ import {
   PetitionComposeField_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
+import { assignRef } from "@parallel/utils/assignRef";
 import { generateCssStripe } from "@parallel/utils/css";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { isSelectionExpanded } from "@udecode/slate-plugins";
-import { memo, MouseEvent, useMemo, useRef, useState } from "react";
+import {
+  memo,
+  MouseEvent,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { shallowEqualObjects } from "shallow-equal";
-import { Editor, Point } from "slate";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
@@ -38,7 +44,7 @@ import {
 
 export interface PetitionComposeFieldProps {
   field: PetitionComposeField_PetitionFieldFragment;
-  fieldRelativeIndex: number | string;
+  fieldIndex: number | string;
   index: number;
   isActive: boolean;
   showError: boolean;
@@ -70,7 +76,7 @@ const _PetitionComposeField = chakraForwardRef<
 >(function PetitionComposeField(
   {
     field,
-    fieldRelativeIndex,
+    fieldIndex,
     index,
     isActive,
     showError,
@@ -94,41 +100,6 @@ const _PetitionComposeField = chakraForwardRef<
     onMove,
     field.isFixed ? "FIXED_FIELD" : "FIELD"
   );
-  const [title, setTitle] = useState(field.title);
-  const titleRef = useRef<HTMLInputElement>(null);
-  const [description, setDescription] = useState(field.description);
-  const descriptionRef = useRef<HTMLTextAreaElement>(null);
-  const selectFieldOptionsRef = useRef<SelectTypeFieldOptionsRef>(null);
-
-  const _ref = useMemo(
-    () =>
-      ({
-        focusFromPrevious: () => {
-          const input = titleRef.current!;
-          input.focus();
-          input.setSelectionRange(0, 0);
-        },
-        focusFromNext: () => {
-          if (field.type === "SELECT") {
-            selectFieldOptionsRef.current!.focus("END");
-          } else if (field.description) {
-            const textarea = descriptionRef.current!;
-            textarea.focus();
-            textarea.selectionStart = textarea.selectionEnd = 0;
-          } else {
-            const input = titleRef.current!;
-            input.focus();
-            input.selectionStart = input.selectionEnd = 0;
-          }
-        },
-      } as PetitionComposeFieldRef),
-    [field]
-  );
-  if (typeof ref === "function") {
-    ref(_ref);
-  } else if (ref) {
-    ref.current = _ref;
-  }
 
   return (
     <Box
@@ -228,7 +199,7 @@ const _PetitionComposeField = chakraForwardRef<
         <Box marginLeft={3}>
           <PetitionFieldTypeIndicator
             type={field.type}
-            relativeIndex={fieldRelativeIndex}
+            fieldIndex={fieldIndex}
             as={field.isFixed ? "div" : "button"}
             onClick={
               field.isFixed || field.isReadOnly ? undefined : onSettingsClick
@@ -237,216 +208,20 @@ const _PetitionComposeField = chakraForwardRef<
             alignSelf="flex-start"
           />
         </Box>
-        <Box
+        <PetitionComposeFieldInner
+          ref={ref}
           flex="1"
           paddingLeft={2}
           paddingTop={2}
           paddingBottom={10}
           paddingRight={4}
-        >
-          <Stack direction="row">
-            <Box flex={1} marginBottom={1}>
-              <Input
-                id={`field-title-${field.id}`}
-                ref={titleRef}
-                aria-label={intl.formatMessage({
-                  id: "petition.field-title-label",
-                  defaultMessage: "Field title",
-                })}
-                placeholder={
-                  field.type === "HEADING"
-                    ? intl.formatMessage({
-                        id: "petition.field-title-heading-placeholder",
-                        defaultMessage:
-                          "Enter an introductory title for this section...",
-                      })
-                    : field.type === "FILE_UPLOAD"
-                    ? intl.formatMessage({
-                        id: "petition.field-title-file-upload-placeholder",
-                        defaultMessage: "Describe the file(s) that you need...",
-                      })
-                    : intl.formatMessage({
-                        id: "petition.field-title-generic-placeholder",
-                        defaultMessage:
-                          "Ask for the information that you need...",
-                      })
-                }
-                value={title ?? ""}
-                width="100%"
-                maxLength={500}
-                border="none"
-                paddingX={2}
-                height={6}
-                _placeholder={
-                  showError && !title ? { color: "red.500" } : undefined
-                }
-                _focus={{ boxShadow: "none" }}
-                onChange={(event) => setTitle(event.target.value ?? null)}
-                onBlur={() => {
-                  const trimmed = title?.trim() ?? null;
-                  setNativeValue(titleRef.current!, trimmed ?? "");
-                  if (field.title !== trimmed) {
-                    onFieldEdit({ title: trimmed });
-                  }
-                }}
-                onKeyDown={(event) => {
-                  switch (event.key) {
-                    case "ArrowDown":
-                      event.preventDefault();
-                      if (field.description) {
-                        descriptionRef.current!.focus();
-                      } else if (field.type === "SELECT") {
-                        selectFieldOptionsRef.current!.focus("START");
-                      } else {
-                        onFocusNextField();
-                      }
-                      break;
-                    case "ArrowUp":
-                      event.preventDefault();
-                      onFocusPrevField();
-                      break;
-                  }
-                }}
-                onKeyUp={(event) => {
-                  switch (event.key) {
-                    case "Enter":
-                      onAddField();
-                      break;
-                  }
-                }}
-              />
-            </Box>
-            {field.isReadOnly ? null : (
-              <FormControl
-                className="field-actions"
-                display="flex"
-                alignItems="center"
-                width="auto"
-                height="24px"
-              >
-                <FormLabel
-                  htmlFor={`field-required-${field.id}`}
-                  fontWeight="normal"
-                  marginBottom="0"
-                >
-                  <FormattedMessage
-                    id="petition.required-label"
-                    defaultMessage="Required"
-                  />
-                </FormLabel>
-                <Switch
-                  id={`field-required-${field.id}`}
-                  height="20px"
-                  isChecked={!field.optional}
-                  onChange={(event) =>
-                    onFieldEdit({ optional: !event.target.checked })
-                  }
-                />
-              </FormControl>
-            )}
-          </Stack>
-          <GrowingTextarea
-            ref={descriptionRef}
-            id={`field-description-${field.id}`}
-            className={"field-description"}
-            placeholder={intl.formatMessage({
-              id: "petition.field-description-placeholder",
-              defaultMessage: "Add a description...",
-            })}
-            aria-label={intl.formatMessage({
-              id: "petition.field-description-label",
-              defaultMessage: "Field description",
-            })}
-            fontSize="sm"
-            background="transparent"
-            value={description ?? ""}
-            maxLength={4000}
-            border="none"
-            height="20px"
-            paddingX={2}
-            paddingY={0}
-            minHeight={0}
-            rows={1}
-            _focus={{
-              boxShadow: "none",
-            }}
-            onChange={(event) => setDescription(event.target.value ?? null)}
-            onBlur={() => {
-              const trimmed = description?.trim() ?? null;
-              setNativeValue(descriptionRef.current!, trimmed ?? "");
-              if (field.description !== trimmed) {
-                onFieldEdit({ description: trimmed });
-              }
-            }}
-            onKeyDown={(event) => {
-              const textarea = event.target as HTMLTextAreaElement;
-              const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
-              const beforeCursor = textarea.value.substr(
-                0,
-                textarea.selectionStart
-              );
-              const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
-              switch (event.key) {
-                case "ArrowDown":
-                  if (currentLine === totalLines - 1) {
-                    if (field.type === "SELECT") {
-                      selectFieldOptionsRef.current!.focus("START");
-                    } else {
-                      onFocusNextField();
-                    }
-                  }
-                  break;
-                case "ArrowUp":
-                  if (currentLine === 0) {
-                    titleRef.current!.focus();
-                  }
-                  break;
-              }
-            }}
-          />
-          {field.type === "SELECT" ? (
-            <Box marginTop={1}>
-              <SelectTypeFieldOptions
-                ref={selectFieldOptionsRef}
-                field={field}
-                onFieldEdit={onFieldEdit}
-                showError={showError}
-                onKeyDown={(event) => {
-                  const { editor } = selectFieldOptionsRef.current!;
-
-                  if (editor.selection && isSelectionExpanded(editor)) {
-                    return;
-                  }
-                  const anchor = editor.selection?.anchor;
-                  if (!anchor) {
-                    return;
-                  }
-
-                  switch (event.key) {
-                    case "ArrowDown":
-                      const atEnd = Point.equals(
-                        anchor,
-                        Editor.end(editor, [])
-                      );
-                      if (atEnd) {
-                        onFocusNextField();
-                      }
-                      break;
-                    case "ArrowUp":
-                      const atStart = Point.equals(
-                        anchor,
-                        Editor.start(editor, [])
-                      );
-                      if (atStart) {
-                        descriptionRef.current!.focus();
-                      }
-                      break;
-                  }
-                }}
-              />
-            </Box>
-          ) : null}
-        </Box>
+          field={field}
+          showError={showError}
+          onFieldEdit={onFieldEdit}
+          onFocusNextField={onFocusNextField}
+          onFocusPrevField={onFocusPrevField}
+          onAddField={onAddField}
+        />
         <Stack
           className="field-actions"
           position="absolute"
@@ -500,15 +275,277 @@ const _PetitionComposeField = chakraForwardRef<
   );
 });
 
+type PetitionComposeFieldInnerProps = Pick<
+  PetitionComposeFieldProps,
+  | "field"
+  | "showError"
+  | "onFieldEdit"
+  | "onFocusNextField"
+  | "onFocusPrevField"
+  | "onAddField"
+>;
+
+// This component was extracted so the whole PetitionComposeField doesn't rerender
+// when the fieldIndex changes
+const _PetitionComposeFieldInner = chakraForwardRef<
+  "div",
+  PetitionComposeFieldInnerProps,
+  PetitionComposeFieldRef
+>(function PetitionComposeField(
+  {
+    field,
+    showError,
+    onFieldEdit,
+    onFocusNextField,
+    onFocusPrevField,
+    onAddField,
+    ...props
+  },
+  ref
+) {
+  const intl = useIntl();
+  const [title, setTitle] = useState(field.title);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const focusTitle = useCallback((atStart?: boolean) => {
+    const input = titleRef.current!;
+    input.focus();
+    if (atStart) {
+      input.setSelectionRange(0, 0);
+    }
+  }, []);
+
+  const [description, setDescription] = useState(field.description);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
+  const focusDescription = useCallback((atStart?: boolean) => {
+    const textarea = descriptionRef.current!;
+    textarea.focus();
+    if (atStart) {
+      textarea.selectionStart = textarea.selectionEnd = 0;
+    }
+  }, []);
+
+  const selectFieldOptionsRef = useRef<SelectTypeFieldOptionsRef>(null);
+  const focusSelectOptions = useCallback((atStart?: boolean) => {
+    selectFieldOptionsRef.current?.focus(atStart ? "START" : undefined);
+  }, []);
+
+  assignRef(
+    ref,
+    useMemo(
+      () =>
+        ({
+          focusFromPrevious: () => focusTitle(true),
+          focusFromNext: () => {
+            if (field.type === "SELECT") {
+              focusSelectOptions(true);
+            } else if (field.description) {
+              focusDescription(true);
+            } else {
+              focusTitle(true);
+            }
+          },
+        } as PetitionComposeFieldRef),
+      [field]
+    )
+  );
+
+  return (
+    <Box {...props}>
+      <Stack direction="row">
+        <Box flex={1} marginBottom={1}>
+          <Input
+            id={`field-title-${field.id}`}
+            ref={titleRef}
+            aria-label={intl.formatMessage({
+              id: "petition.field-title-label",
+              defaultMessage: "Field title",
+            })}
+            placeholder={
+              field.type === "HEADING"
+                ? intl.formatMessage({
+                    id: "petition.field-title-heading-placeholder",
+                    defaultMessage:
+                      "Enter an introductory title for this section...",
+                  })
+                : field.type === "FILE_UPLOAD"
+                ? intl.formatMessage({
+                    id: "petition.field-title-file-upload-placeholder",
+                    defaultMessage: "Describe the file(s) that you need...",
+                  })
+                : intl.formatMessage({
+                    id: "petition.field-title-generic-placeholder",
+                    defaultMessage: "Ask for the information that you need...",
+                  })
+            }
+            value={title ?? ""}
+            width="100%"
+            maxLength={500}
+            border="none"
+            paddingX={2}
+            height={6}
+            _placeholder={
+              showError && !title ? { color: "red.500" } : undefined
+            }
+            _focus={{ boxShadow: "none" }}
+            onChange={(event) => setTitle(event.target.value ?? null)}
+            onBlur={() => {
+              const trimmed = title?.trim() ?? null;
+              setNativeValue(titleRef.current!, trimmed ?? "");
+              if (field.title !== trimmed) {
+                onFieldEdit({ title: trimmed });
+              }
+            }}
+            onKeyDown={(event) => {
+              switch (event.key) {
+                case "ArrowDown":
+                  event.preventDefault();
+                  if (field.description) {
+                    focusDescription(true);
+                  } else if (field.type === "SELECT") {
+                    focusSelectOptions(true);
+                  } else {
+                    onFocusNextField();
+                  }
+                  break;
+                case "ArrowUp":
+                  event.preventDefault();
+                  onFocusPrevField();
+                  break;
+              }
+            }}
+            onKeyUp={(event) => {
+              switch (event.key) {
+                case "Enter":
+                  onAddField();
+                  break;
+              }
+            }}
+          />
+        </Box>
+        {field.isReadOnly ? null : (
+          <FormControl
+            className="field-actions"
+            display="flex"
+            alignItems="center"
+            width="auto"
+            height="24px"
+          >
+            <FormLabel
+              htmlFor={`field-required-${field.id}`}
+              fontWeight="normal"
+              marginBottom="0"
+            >
+              <FormattedMessage
+                id="petition.required-label"
+                defaultMessage="Required"
+              />
+            </FormLabel>
+            <Switch
+              id={`field-required-${field.id}`}
+              height="20px"
+              isChecked={!field.optional}
+              onChange={(event) =>
+                onFieldEdit({ optional: !event.target.checked })
+              }
+            />
+          </FormControl>
+        )}
+      </Stack>
+      <GrowingTextarea
+        ref={descriptionRef}
+        id={`field-description-${field.id}`}
+        className={"field-description"}
+        placeholder={intl.formatMessage({
+          id: "petition.field-description-placeholder",
+          defaultMessage: "Add a description...",
+        })}
+        aria-label={intl.formatMessage({
+          id: "petition.field-description-label",
+          defaultMessage: "Field description",
+        })}
+        fontSize="sm"
+        background="transparent"
+        value={description ?? ""}
+        maxLength={4000}
+        border="none"
+        height="20px"
+        paddingX={2}
+        paddingY={0}
+        minHeight={0}
+        rows={1}
+        _focus={{
+          boxShadow: "none",
+        }}
+        onChange={(event) => setDescription(event.target.value ?? null)}
+        onBlur={() => {
+          const trimmed = description?.trim() ?? null;
+          setNativeValue(descriptionRef.current!, trimmed ?? "");
+          if (field.description !== trimmed) {
+            onFieldEdit({ description: trimmed });
+          }
+        }}
+        onKeyDown={(event) => {
+          const textarea = event.target as HTMLTextAreaElement;
+          const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
+          const beforeCursor = textarea.value.substr(
+            0,
+            textarea.selectionStart
+          );
+          const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
+          switch (event.key) {
+            case "ArrowDown":
+              if (currentLine === totalLines - 1) {
+                if (field.type === "SELECT") {
+                  focusSelectOptions(true);
+                } else {
+                  onFocusNextField();
+                }
+              }
+              break;
+            case "ArrowUp":
+              if (currentLine === 0) {
+                focusTitle();
+              }
+              break;
+          }
+        }}
+      />
+      {field.type === "SELECT" ? (
+        <Box marginTop={1}>
+          <SelectTypeFieldOptions
+            ref={selectFieldOptionsRef}
+            field={field}
+            onFieldEdit={onFieldEdit}
+            showError={showError}
+            onFocusNextField={onFocusNextField}
+            onFocusDescription={focusDescription}
+          />
+        </Box>
+      ) : null}
+    </Box>
+  );
+});
+
+function shallowCompareFieldProp<T extends { field: any }>(
+  prev: Readonly<T>,
+  next: Readonly<T>
+) {
+  return (
+    shallowEqualObjects(omit(prev, ["field"]), omit(next, ["field"])) &&
+    shallowEqualObjects(prev["field"], next["field"])
+  );
+}
+
+const PetitionComposeFieldInner = memo(
+  _PetitionComposeFieldInner,
+  shallowCompareFieldProp
+) as typeof _PetitionComposeFieldInner;
+
 export const PetitionComposeField = Object.assign(
-  memo(_PetitionComposeField, (prevProps, nextProps) => {
-    return (
-      shallowEqualObjects(
-        omit(prevProps, ["field"]),
-        omit(nextProps, ["field"])
-      ) && shallowEqualObjects(prevProps["field"], nextProps["field"])
-    );
-  }) as typeof _PetitionComposeField,
+  memo(
+    _PetitionComposeField,
+    shallowCompareFieldProp
+  ) as typeof _PetitionComposeField,
   {
     fragments: {
       PetitionField: gql`

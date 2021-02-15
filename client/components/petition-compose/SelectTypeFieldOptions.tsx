@@ -4,10 +4,18 @@ import {
   SelectTypeFieldOptions_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { pipe } from "@udecode/slate-plugins";
-import { forwardRef, useMemo, useState } from "react";
+import { assignRef } from "@parallel/utils/assignRef";
+import { isSelectionExpanded, pipe } from "@udecode/slate-plugins";
+import {
+  forwardRef,
+  useCallback,
+  useMemo,
+  useState,
+  KeyboardEvent,
+} from "react";
 import { FormattedMessage } from "react-intl";
-import { createEditor, Editor, Node, Transforms } from "slate";
+import { shallowEqualArrays } from "shallow-equal";
+import { createEditor, Editor, Node, Point, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import {
   Editable,
@@ -23,6 +31,8 @@ export interface SelectTypeFieldOptionsProps extends EditableProps {
   field: SelectTypeFieldOptions_PetitionFieldFragment;
   showError: boolean;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
+  onFocusNextField: () => void;
+  onFocusDescription: () => void;
 }
 
 function renderElement({ attributes, children, element }: RenderElementProps) {
@@ -75,7 +85,14 @@ function valuesToSlateNodes(values: string[]) {
 export const SelectTypeFieldOptions = Object.assign(
   forwardRef<SelectTypeFieldOptionsRef, SelectTypeFieldOptionsProps>(
     function SelectTypeFieldOptions(
-      { field, showError, onFieldEdit, ...props },
+      {
+        field,
+        showError,
+        onFieldEdit,
+        onFocusNextField,
+        onFocusDescription,
+        ...props
+      },
       ref
     ) {
       const editor = useMemo(
@@ -85,43 +102,73 @@ export const SelectTypeFieldOptions = Object.assign(
       const [value, onChange] = useState<Node[]>(
         valuesToSlateNodes(field.options.values ?? [])
       );
-      const _ref = useMemo(
-        () =>
-          ({
-            focus: (position) => {
-              ReactEditor.focus(editor);
-              if (position) {
-                Transforms.select(
-                  editor,
-                  position === "START"
-                    ? Editor.start(editor, [])
-                    : Editor.end(editor, [])
-                );
-              }
-            },
-            editor,
-          } as SelectTypeFieldOptionsRef),
-        [editor]
+      assignRef(
+        ref,
+        useMemo(
+          () =>
+            ({
+              focus: (position) => {
+                ReactEditor.focus(editor);
+                if (position) {
+                  Transforms.select(
+                    editor,
+                    position === "START"
+                      ? Editor.start(editor, [])
+                      : Editor.end(editor, [])
+                  );
+                }
+              },
+              editor,
+            } as SelectTypeFieldOptionsRef),
+          [editor]
+        )
       );
-      if (typeof ref === "function") {
-        ref(_ref);
-      } else if (ref) {
-        ref.current = _ref;
-      }
+
+      const handleKeyDown = useCallback(
+        (event: KeyboardEvent) => {
+          if (editor.selection && isSelectionExpanded(editor)) {
+            return;
+          }
+          const anchor = editor.selection?.anchor;
+          if (!anchor) {
+            return;
+          }
+
+          switch (event.key) {
+            case "ArrowDown":
+              const atEnd = Point.equals(anchor, Editor.end(editor, []));
+              if (atEnd) {
+                onFocusNextField();
+              }
+              break;
+            case "ArrowUp":
+              const atStart = Point.equals(anchor, Editor.start(editor, []));
+              if (atStart) {
+                onFocusDescription();
+              }
+              break;
+          }
+        },
+        [editor, onFocusNextField, onFocusDescription]
+      );
+
+      const handleBlur = useCallback(() => {
+        const values = value
+          .map((n) => (n.children as any)[0].text.trim())
+          .filter((option) => option !== "");
+        if (!shallowEqualArrays(field.options.values, values)) {
+          onFieldEdit({ options: { values } });
+          setTimeout(() => onChange(valuesToSlateNodes(values)));
+        }
+      }, [value, onFieldEdit, onChange]);
       return (
         <Slate editor={editor} value={value} onChange={onChange}>
           <Box maxHeight="200px" overflow="auto" fontSize="sm">
             <Editable
               renderElement={renderElement}
               renderLeaf={renderLeaf}
-              onBlur={() => {
-                const values = value
-                  .map((n) => (n.children as any)[0].text.trim())
-                  .filter((option) => option !== "");
-                onFieldEdit({ options: { values } });
-                setTimeout(() => onChange(valuesToSlateNodes(values)));
-              }}
-              {...props}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
             />
           </Box>
         </Slate>

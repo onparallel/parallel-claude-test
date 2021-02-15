@@ -634,7 +634,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   id={`field-${field.id}`}
                   key={field.id}
                   field={field}
-                  fieldRelativeIndex={fieldIndexValues[index]}
+                  fieldIndex={fieldIndexValues[index]}
                   index={index}
                   onValidateToggle={() =>
                     handleValidateToggle([field.id], !field.validated)

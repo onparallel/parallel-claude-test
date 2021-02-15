@@ -34,7 +34,7 @@ import {
 
 export interface PetitionRepliesFieldProps extends BoxProps {
   field: PetitionRepliesField_PetitionFieldFragment;
-  fieldRelativeIndex: number | string;
+  fieldIndex: number | string;
   index: number;
   commentCount: number;
   newCommentCount: number;
@@ -53,7 +53,7 @@ export interface PetitionRepliesFieldProps extends BoxProps {
 
 export function PetitionRepliesField({
   field,
-  fieldRelativeIndex,
+  fieldIndex,
   index,
   commentCount,
   newCommentCount,
@@ -77,7 +77,7 @@ export function PetitionRepliesField({
         <PetitionFieldTypeIndicator
           marginLeft="1px"
           type={field.type}
-          relativeIndex={fieldRelativeIndex}
+          fieldIndex={fieldIndex}
         />
         <Box flex="1" minWidth="0">
           {field.title ? (
@@ -131,7 +131,7 @@ export function PetitionRepliesField({
           <PetitionFieldTypeIndicator
             marginTop="2px"
             type={field.type}
-            relativeIndex={fieldRelativeIndex}
+            fieldIndex={fieldIndex}
           />
           <Box marginLeft={4} flex="1">
             {field.title ? (

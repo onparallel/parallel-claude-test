@@ -7,6 +7,7 @@ import {
   usePopper,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
+import { assignRef } from "@parallel/utils/assignRef";
 import {
   Placeholder,
   PlaceholderPlugin,
@@ -62,20 +63,18 @@ export const PlaceholderInput = chakraForwardRef<
     return [PlaceholderPlugin(placeholders)];
   }, [placeholders]);
 
-  const _ref = useMemo(
-    () => ({
-      focus: () => {
-        ReactEditor.focus(editor);
-        Transforms.select(editor, Editor.end(editor, []));
-      },
-    }),
-    [editor]
+  assignRef(
+    ref,
+    useMemo(
+      () => ({
+        focus: () => {
+          ReactEditor.focus(editor);
+          Transforms.select(editor, Editor.end(editor, []));
+        },
+      }),
+      [editor]
+    )
   );
-  if (typeof ref === "function") {
-    ref(_ref);
-  } else if (ref) {
-    ref.current = _ref;
-  }
 
   const { onChangeSelection } = useSingleLine(editor);
 

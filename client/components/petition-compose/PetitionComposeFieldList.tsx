@@ -7,7 +7,6 @@ import {
   Flex,
   HTMLChakraProps,
   IconButton,
-  ScaleFade,
 } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -26,6 +25,7 @@ import {
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
+import { assignRef } from "@parallel/utils/assignRef";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
@@ -102,6 +102,8 @@ export const PetitionComposeFieldList = Object.assign(
     const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
 
     // Memoize field callbacks
+    const fieldsDataRef = useRef(fields);
+    assignRef(fieldsDataRef, fields);
     const fieldProps = useMemoFactory(
       (
         fieldId: string
@@ -129,6 +131,7 @@ export const PetitionComposeFieldList = Object.assign(
         },
         onFieldEdit: (data) => onFieldEdit(fieldId, data),
         onFocusPrevField: () => {
+          const fields = fieldsDataRef.current;
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index > 0) {
             const prevId = fields[index - 1].id;
@@ -136,6 +139,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
         onFocusNextField: () => {
+          const fields = fieldsDataRef.current;
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index < fields.length - 1) {
             const nextId = fields[index + 1].id;
@@ -143,6 +147,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
         onAddField: () => {
+          const fields = fieldsDataRef.current;
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index === fields.length - 1) {
             document
@@ -160,68 +165,74 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
       }),
-      [
-        onCopyFieldClick,
-        onFieldSettingsClick,
-        onDeleteField,
-        onFieldEdit,
-        fields.map((f) => `${f.id}:${f.type}`).join(","),
-      ]
+      [onCopyFieldClick, onFieldSettingsClick, onDeleteField, onFieldEdit]
     );
 
     const fieldIndexValues = useFieldIndexValues(
       fieldIds.map((fieldId) => pick(fieldsById[fieldId], ["type"]))
     );
 
-    const [hoveredFieldId, setHoveredFieldId] = useState<string | null>(null);
-    const [
-      hoveredFieldIdWhileMenuOpened,
-      setHoveredFieldIdWhileMenuOpened,
-    ] = useState<string | null>(null);
-    const [isMenuOpened, setIsMenuOpened] = useState(false);
+    const [hoveredFieldId, _setHoveredFieldId] = useState<string | null>(null);
+    const hoveredFieldIdRef = useRef<string>(null);
+    const hoveredFieldIdWhileMenuOpenedRef = useRef<string>(null);
+    const setHoveredFieldId = useCallback(
+      (fieldId) => {
+        _setHoveredFieldId(fieldId);
+        assignRef(hoveredFieldIdRef, fieldId);
+      },
+      [_setHoveredFieldId]
+    );
+    const [focusedFieldId, _setFocusedFieldId] = useState<string | null>(null);
+    const focusedFieldIdRef = useRef<string>(null);
+    const setFocusedFieldId = useCallback(
+      (fieldId) => {
+        _setFocusedFieldId(fieldId);
+        assignRef(focusedFieldIdRef, fieldId);
+      },
+      [_setFocusedFieldId]
+    );
+    const isMenuOpenedRef = useRef(false);
     const timeoutRef = useRef<number>();
     const fieldMouseHandlers = useMemoFactory(
       (fieldId) =>
         ({
           onFocus() {
             clearTimeout(timeoutRef.current);
-            if (fieldId !== hoveredFieldId) {
-              setHoveredFieldId(fieldId);
+            if (fieldId !== focusedFieldIdRef.current) {
+              setFocusedFieldId(fieldId);
             }
           },
           onBlur() {
-            timeoutRef.current = setTimeout(() => setHoveredFieldId(null));
+            timeoutRef.current = setTimeout(() => setFocusedFieldId(null));
           },
           onMouseMove() {
-            if (!isMenuOpened) {
-              if (fieldId !== hoveredFieldId) {
+            if (!isMenuOpenedRef.current) {
+              if (fieldId !== hoveredFieldIdRef.current) {
                 setHoveredFieldId(fieldId);
               }
             } else {
-              if (fieldId !== hoveredFieldIdWhileMenuOpened) {
-                setHoveredFieldIdWhileMenuOpened(fieldId);
+              if (fieldId !== hoveredFieldIdWhileMenuOpenedRef.current) {
+                assignRef(hoveredFieldIdWhileMenuOpenedRef, fieldId);
               }
             }
           },
           onMouseEnter() {
             clearTimeout(timeoutRef.current);
-            if (!isMenuOpened) {
+            if (!isMenuOpenedRef.current) {
               setHoveredFieldId(fieldId);
             } else {
-              setHoveredFieldIdWhileMenuOpened(fieldId);
+              assignRef(hoveredFieldIdWhileMenuOpenedRef, fieldId);
             }
           },
           onMouseLeave() {
-            if (!isMenuOpened) {
+            if (!isMenuOpenedRef.current) {
               timeoutRef.current = setTimeout(() => setHoveredFieldId(null));
             } else {
-              timeoutRef.current = setTimeout(() =>
-                setHoveredFieldIdWhileMenuOpened(null)
-              );
+              assignRef(hoveredFieldIdWhileMenuOpenedRef, null);
             }
           },
         } as HTMLChakraProps<"div">),
-      [hoveredFieldId, hoveredFieldIdWhileMenuOpened, isMenuOpened]
+      [setHoveredFieldId, setFocusedFieldId]
     );
     const addButtonMouseHandlers = useMemoFactory(
       (fieldId) =>
@@ -232,8 +243,24 @@ export const PetitionComposeFieldList = Object.assign(
           onFocus() {
             clearTimeout(timeoutRef.current);
           },
-        } as HTMLChakraProps<"div">),
-      [isMenuOpened]
+          onSelectFieldType(type) {
+            const fields = fieldsDataRef.current;
+            onAddField(type, fields.findIndex((f) => f.id === fieldId) + 1);
+          },
+          onOpen() {
+            assignRef(isMenuOpenedRef, true);
+          },
+          onClose() {
+            assignRef(isMenuOpenedRef, false);
+            if (
+              hoveredFieldIdRef.current !==
+              hoveredFieldIdWhileMenuOpenedRef.current
+            ) {
+              setHoveredFieldId(hoveredFieldIdWhileMenuOpenedRef.current);
+            }
+          },
+        } as HTMLChakraProps<"button"> & AddFieldButtonProps),
+      []
     );
 
     return (
@@ -244,6 +271,11 @@ export const PetitionComposeFieldList = Object.assign(
             const isActive = active === fieldId;
             const nextFieldId =
               index < fieldIds.length - 1 ? fieldIds[index + 1] : null;
+            const showAddFieldButton =
+              fieldId === hoveredFieldId ||
+              nextFieldId === hoveredFieldId ||
+              fieldId === focusedFieldId ||
+              nextFieldId === focusedFieldId;
             return (
               <Fragment key={fieldId}>
                 <PetitionComposeField
@@ -251,7 +283,7 @@ export const PetitionComposeFieldList = Object.assign(
                   id={`field-${fieldId}`}
                   onMove={handleFieldMove}
                   field={field}
-                  fieldRelativeIndex={fieldIndexValues[index]}
+                  fieldIndex={fieldIndexValues[index]}
                   index={index}
                   isActive={isActive}
                   showError={showErrors}
@@ -259,36 +291,20 @@ export const PetitionComposeFieldList = Object.assign(
                   {...fieldMouseHandlers(fieldId)}
                 />
                 {nextFieldId ? (
-                  <Box className="add-field-button-wrapper" position="relative">
-                    <Box
+                  <Box
+                    className="add-field-button-wrapper"
+                    position="relative"
+                    zIndex="1"
+                    display={showAddFieldButton ? "block" : "none"}
+                  >
+                    <AddFieldButton
                       position="absolute"
                       bottom={0}
                       left="50%"
                       transform="translate(-50%, 50%)"
-                      zIndex="1"
+                      className="add-field-after-button"
                       {...addButtonMouseHandlers(fieldId)}
-                    >
-                      <ScaleFade
-                        unmountOnExit
-                        in={[fieldId, nextFieldId].includes(hoveredFieldId!)}
-                      >
-                        <AddFieldButton
-                          className="add-field-after-button"
-                          onSelectFieldType={(type) =>
-                            onAddField(type, index + 1)
-                          }
-                          onOpen={() => setIsMenuOpened(true)}
-                          onClose={() => {
-                            setIsMenuOpened(false);
-                            if (
-                              hoveredFieldId !== hoveredFieldIdWhileMenuOpened
-                            ) {
-                              setHoveredFieldId(hoveredFieldIdWhileMenuOpened);
-                            }
-                          }}
-                        />
-                      </ScaleFade>
-                    </Box>
+                    />
                   </Box>
                 ) : null}
               </Fragment>
@@ -328,8 +344,11 @@ export const PetitionComposeFieldList = Object.assign(
 
 interface AddFieldButtonProps extends ButtonProps, AddFieldPopoverProps {}
 
-const AddFieldButton = chakraForwardRef<"button", AddFieldButtonProps>(
-  function AddFieldButton(props, ref) {
+const AddFieldButton = memo(
+  chakraForwardRef<"button", AddFieldButtonProps>(function AddFieldButton(
+    props,
+    ref
+  ) {
     const intl = useIntl();
     return (
       <AddFieldPopover
@@ -357,5 +376,5 @@ const AddFieldButton = chakraForwardRef<"button", AddFieldButtonProps>(
         {...props}
       />
     );
-  }
+  })
 );

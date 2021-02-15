@@ -9,14 +9,14 @@ import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 
 export interface PetitionFieldTypeIndicatorProps {
   type: PetitionFieldType;
-  relativeIndex: number | string;
+  fieldIndex: number | string;
 }
 
 export const PetitionFieldTypeIndicator = chakraForwardRef<
   "button",
   PetitionFieldTypeIndicatorProps
 >(function PetitionFieldTypeIndicator(
-  { type, relativeIndex, ...props }: PetitionFieldTypeIndicatorProps,
+  { type, fieldIndex, ...props }: PetitionFieldTypeIndicatorProps,
   ref
 ) {
   const label = usePetitionFieldTypeLabel(type);
@@ -42,7 +42,7 @@ export const PetitionFieldTypeIndicator = chakraForwardRef<
           marginLeft={1}
           textAlign="center"
         >
-          {relativeIndex}
+          {fieldIndex}
         </Text>
       </Button>
     </Tooltip>
