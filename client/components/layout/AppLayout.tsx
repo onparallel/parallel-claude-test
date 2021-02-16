@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { BoxProps, Flex } from "@chakra-ui/react";
+import { BoxProps, Center, Flex, Spinner } from "@chakra-ui/react";
 import {
   AppLayout_UserFragment,
   OnboardingKey,
   OnboardingStatus,
   useAppLayout_updateOnboardingStatusMutation,
 } from "@parallel/graphql/__types";
+import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
 import { useCallback, useContext } from "react";
 import {
@@ -41,6 +42,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
     },
     [isRunning, toggle]
   );
+  const rehydrated = useRehydrated();
   return (
     <>
       <Head>
@@ -80,7 +82,19 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
             overflow="auto"
             {...props}
           >
-            {children}
+            {rehydrated ? (
+              children
+            ) : (
+              <Center flex="1">
+                <Spinner
+                  thickness="4px"
+                  speed="0.65s"
+                  emptyColor="gray.200"
+                  color="purple.500"
+                  size="xl"
+                />
+              </Center>
+            )}
           </Flex>
           <AppLayoutNavbar
             isMobile
