@@ -1235,11 +1235,6 @@
     "context": "Download"
   },
   {
-    "term": "generic.drag-to-sort",
-    "definition": "Drag to sort",
-    "context": "Drag to sort"
-  },
-  {
     "term": "generic.dropzone-allowed-types",
     "definition": "Only the following file types are allowed:",
     "context": "Only the following file types are allowed:"

@@ -161,14 +161,7 @@ const _PetitionComposeField = chakraForwardRef<
               defaultMessage: "Drag to sort this petition fields",
             })}
           >
-            <Tooltip
-              label={intl.formatMessage({
-                id: "generic.drag-to-sort",
-                defaultMessage: "Drag to sort",
-              })}
-            >
-              <DragHandleIcon role="presentation" />
-            </Tooltip>
+            <DragHandleIcon role="presentation" />
           </Box>
         )}
         {field.optional ? null : (

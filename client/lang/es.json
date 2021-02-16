@@ -1235,11 +1235,6 @@
     "context": "Download"
   },
   {
-    "term": "generic.drag-to-sort",
-    "definition": "Arrastra para reordenar",
-    "context": "Drag to sort"
-  },
-  {
     "term": "generic.dropzone-allowed-types",
     "definition": "Solo los siguientes tipos están permitidos:",
     "context": "Only the following file types are allowed:"
