@@ -341,7 +341,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const handleIndexFieldClick = useCallback(async (fieldId: string) => {
     const fieldElement = document.querySelector(`#field-${fieldId}`);
     if (fieldElement) {
-      await scrollIntoView(fieldElement, { scrollMode: "if-needed" });
+      await scrollIntoView(fieldElement, {
+        scrollMode: "if-needed",
+        behavior: "smooth",
+      });
       fieldElement.setAttribute("data-highlighted", "true");
       setTimeout(() => {
         fieldElement.removeAttribute("data-highlighted");

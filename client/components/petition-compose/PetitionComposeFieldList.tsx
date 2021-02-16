@@ -151,7 +151,7 @@ export const PetitionComposeFieldList = Object.assign(
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index === fields.length - 1) {
             document
-              .querySelector<HTMLButtonElement>(".add-field-outer-button")!
+              .querySelector<HTMLButtonElement>(".big-add-field-button")!
               .click();
           } else {
             setHoveredFieldId(fieldId);
@@ -259,7 +259,7 @@ export const PetitionComposeFieldList = Object.assign(
               setHoveredFieldId(hoveredFieldIdWhileMenuOpenedRef.current);
             }
           },
-        } as HTMLChakraProps<"button"> & AddFieldButtonProps),
+        } as ButtonProps & AddFieldPopoverProps),
       []
     );
 
@@ -312,17 +312,10 @@ export const PetitionComposeFieldList = Object.assign(
           })}
         </Card>
         <Flex marginTop={4} justifyContent="center">
-          <AddFieldPopover
-            as={Button}
-            className="add-field-outer-button"
-            leftIcon={<AddIcon />}
+          <BigAddFieldButton
+            className="big-add-field-button"
             onSelectFieldType={onAddField}
-          >
-            <FormattedMessage
-              id="petition.add-another-field-button"
-              defaultMessage="Add another field"
-            />
-          </AddFieldPopover>
+          />
         </Flex>
       </>
     );
@@ -342,39 +335,51 @@ export const PetitionComposeFieldList = Object.assign(
   }
 );
 
-interface AddFieldButtonProps extends ButtonProps, AddFieldPopoverProps {}
-
 const AddFieldButton = memo(
-  chakraForwardRef<"button", AddFieldButtonProps>(function AddFieldButton(
-    props,
-    ref
-  ) {
-    const intl = useIntl();
-    return (
-      <AddFieldPopover
-        ref={ref as any}
-        as={IconButton}
-        label={intl.formatMessage({
-          id: "petition.add-field-button",
-          defaultMessage: "Add field",
-        })}
-        icon={<AddIcon />}
-        autoFocus={false}
-        size="xs"
-        variant="outline"
-        rounded="full"
-        backgroundColor="white"
-        borderColor="gray.200"
-        color="gray.500"
-        _hover={{
-          borderColor: "gray.300",
-          color: "gray.800",
-        }}
-        _active={{
-          backgroundColor: "gray.50",
-        }}
-        {...props}
-      />
-    );
-  })
+  chakraForwardRef<"button", ButtonProps & AddFieldPopoverProps>(
+    function AddFieldButton(props, ref) {
+      const intl = useIntl();
+      return (
+        <AddFieldPopover
+          ref={ref as any}
+          as={IconButton}
+          label={intl.formatMessage({
+            id: "petition.add-field-button",
+            defaultMessage: "Add field",
+          })}
+          icon={<AddIcon />}
+          autoFocus={false}
+          size="xs"
+          variant="outline"
+          rounded="full"
+          backgroundColor="white"
+          borderColor="gray.200"
+          color="gray.500"
+          _hover={{
+            borderColor: "gray.300",
+            color: "gray.800",
+          }}
+          _active={{
+            backgroundColor: "gray.50",
+          }}
+          {...props}
+        />
+      );
+    }
+  )
+);
+
+const BigAddFieldButton = memo(
+  chakraForwardRef<"button", ButtonProps & AddFieldPopoverProps>(
+    function AddFieldButton(props, ref) {
+      return (
+        <AddFieldPopover as={Button} leftIcon={<AddIcon />} {...props}>
+          <FormattedMessage
+            id="petition.add-another-field-button"
+            defaultMessage="Add another field"
+          />
+        </AddFieldPopover>
+      );
+    }
+  )
 );
