@@ -1,5 +1,5 @@
 import {
-  Center,
+  Flex,
   CloseButton,
   Text,
   useFormControl,
@@ -15,6 +15,8 @@ import {
   Props,
   Theme,
 } from "react-select";
+import { omit } from "remeda";
+import { SelectProps } from "./types";
 
 export const SIZES = {
   lg: {
@@ -24,6 +26,7 @@ export const SIZES = {
       baseUnit: 4,
     },
     paddingX: 4,
+    fontSize: "md" as const,
     borderRadius: "md" as const,
     multiValue: {
       borderRadius: "sm" as const,
@@ -36,6 +39,7 @@ export const SIZES = {
       baseUnit: 4,
     },
     paddingX: 4,
+    fontSize: "md" as const,
     borderRadius: "md" as const,
     multiValue: {
       borderRadius: "sm" as const,
@@ -48,6 +52,7 @@ export const SIZES = {
       baseUnit: 4,
     },
     paddingX: 2,
+    fontSize: "sm" as const,
     borderRadius: "md" as const,
     multiValue: {
       borderRadius: "sm" as const,
@@ -62,25 +67,19 @@ export type UseReactSelectProps = {
   isInvalid?: boolean;
 };
 
-export interface SelectProps<
-  OptionType extends OptionTypeBase = { label: string; value: string },
-  IsMulti extends boolean = any,
-  GroupType extends GroupTypeBase<OptionType> = GroupTypeBase<OptionType>
-> extends Props<OptionType, IsMulti, GroupType> {}
-
 /**
  * Generates the props necessary for styling react-select as a chakra component
  */
 export function useReactSelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string },
   IsMulti extends boolean = any,
-  GroupType extends GroupTypeBase<OptionType> = GroupTypeBase<OptionType>
+  GroupType extends GroupTypeBase<OptionType> = never
 >({
   size = "md",
   ...props
 }: UseReactSelectProps): SelectProps<OptionType, IsMulti, GroupType> {
   const intl = useIntl();
-  const { colors, radii, sizes } = useTheme();
+  const { colors, radii, sizes, fontSizes } = useTheme();
 
   const {
     id: inputId,
@@ -97,6 +96,7 @@ export function useReactSelectProps<
     }),
     [intl.locale]
   );
+
   return useMemo<SelectProps<OptionType, IsMulti, GroupType>>(
     () => ({
       inputId,
@@ -134,12 +134,13 @@ export function useReactSelectProps<
           />
         ),
         DropdownIndicator: () => (
-          <Center
-            width={SIZES[size].spacing.controlHeight + "px"}
+          <Flex
+            alignItems="center"
+            paddingRight={SIZES[size].paddingX}
             color="gray.600"
           >
             <ChevronDownIcon display="block" position="relative" top="1px" />
-          </Center>
+          </Flex>
         ),
         NoOptionsMessage: () => (
           <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
@@ -209,20 +210,23 @@ export function useReactSelectProps<
                 : colors.gray[300],
             },
             pointerEvents: isDisabled ? "none" : undefined,
+            fontSize: fontSizes[SIZES[size].fontSize],
           };
         },
         placeholder: (styles) => ({
           ...styles,
           color: colors.gray[400],
+          whiteSpace: "nowrap",
         }),
         valueContainer: (styles) => ({
-          ...styles,
+          ...omit(styles, ["padding"]),
           paddingLeft: (sizes as any)[SIZES[size].paddingX],
+          paddingRight: 0,
         }),
         option: (styles) => ({
           ...styles,
           cursor: "pointer",
-          padding: "0 1rem",
+          padding: `0 ${SIZES[size].paddingX / 4}rem`,
           minHeight: "32px",
           display: "flex",
           alignItems: "center",
@@ -231,10 +235,7 @@ export function useReactSelectProps<
           ...styles,
           padding: "0.5rem 0",
         }),
-        singleValue: (styles, props) => ({
-          ...styles,
-          color: "unset",
-        }),
+        singleValue: (styles, props) => omit(styles, ["color"]),
         multiValue: (styles, { data }) => ({
           ...styles,
           backgroundColor: data.isInvalid ? colors.red[200] : colors.gray[200],
@@ -262,4 +263,46 @@ export function useReactSelectProps<
     }),
     [size, inputId, isInvalid, isDisabled]
   );
+}
+
+export function useInlineReactSelectProps<
+  OptionType extends OptionTypeBase = { label: string; value: string },
+  IsMulti extends boolean = any,
+  GroupType extends GroupTypeBase<OptionType> = never
+>(props: UseReactSelectProps): SelectProps<OptionType, IsMulti, GroupType> {
+  const rsProps = useReactSelectProps<OptionType, IsMulti, GroupType>(props);
+
+  return useMemo<SelectProps<OptionType, IsMulti, GroupType>>(
+    () => ({
+      ...rsProps,
+      styles: {
+        ...rsProps.styles,
+        control: (styles, data) =>
+          omit(rsProps.styles?.control?.(styles, data) ?? styles, ["flexWrap"]),
+        valueContainer: (styles, data) =>
+          omit(rsProps.styles?.valueContainer?.(styles, data) ?? styles, [
+            "flexWrap",
+          ]),
+        singleValue: (styles, data) =>
+          omit(rsProps.styles?.singleValue?.(styles, data) ?? styles, [
+            "position",
+            "maxWidth",
+            "transform",
+            "top",
+          ]),
+        menu: (styles, data) => ({
+          ...(rsProps.styles?.menu?.(styles, data) ?? styles),
+          minWidth: "100%",
+          width: "unset",
+          left: "50%",
+          transform: "translateX(-50%)",
+        }),
+        option: (styles, data) => ({
+          ...(rsProps.styles?.option?.(styles, data) ?? styles),
+          whiteSpace: "nowrap",
+        }),
+      },
+    }),
+    [rsProps]
+  ) as any;
 }

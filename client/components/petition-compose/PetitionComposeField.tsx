@@ -282,7 +282,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   "div",
   PetitionComposeFieldInnerProps,
   PetitionComposeFieldRef
->(function PetitionComposeField(
+>(function PetitionComposeFieldInner(
   {
     field,
     showError,

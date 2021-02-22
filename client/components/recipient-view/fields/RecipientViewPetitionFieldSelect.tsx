@@ -9,7 +9,7 @@ import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import {
   UseReactSelectProps,
   useReactSelectProps,
-} from "@parallel/utils/useReactSelectProps";
+} from "@parallel/utils/react-select/hooks";
 import deepmerge from "deepmerge";
 import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useMemo, useRef, useState } from "react";
@@ -25,6 +25,7 @@ import {
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
+import { SelectProps } from "@parallel/utils/react-select/types";
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
@@ -35,7 +36,7 @@ export interface RecipientViewPetitionFieldSelectProps
   isDisabled: boolean;
 }
 
-type SelectInstance = Select<{ label: string; value: string }, false>;
+type SelectInstance = Select<{ label: string; value: string }, false, never>;
 
 export const RecipientViewPetitionFieldSelect = chakraForwardRef<
   "section",
@@ -241,7 +242,7 @@ export const RecipientViewPetitionFieldReplySelect = forwardRef<
     <Stack direction="row">
       <Box flex="1" position="relative">
         <Box position="relative">
-          <Select
+          <Select<{ label: string; value: string }, false, never>
             {...reactSelectProps}
             ref={ref}
             value={value}
@@ -250,8 +251,7 @@ export const RecipientViewPetitionFieldReplySelect = forwardRef<
             placeholder={
               options.placeholder ??
               intl.formatMessage({
-                id:
-                  "component.recipient-view-petition-field-reply.select-placeholder",
+                id: "generic.select-an-option",
                 defaultMessage: "Select an option",
               })
             }
@@ -287,7 +287,7 @@ function toSelectOption(value: string | null) {
 
 function useFieldSelectReactSelectProps(props: UseReactSelectProps) {
   const _reactSelectProps = useReactSelectProps(props);
-  return useMemo(
+  return useMemo<SelectProps>(
     () =>
       deepmerge(_reactSelectProps, {
         styles: {

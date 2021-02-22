@@ -4,10 +4,12 @@ import { UserSelect_UserFragment } from "@parallel/graphql/__types";
 import {
   useReactSelectProps,
   UseReactSelectProps,
-} from "@parallel/utils/useReactSelectProps";
+} from "@parallel/utils/react-select/hooks";
+import { CustomAsyncSelectProps } from "@parallel/utils/react-select/types";
+import deepmerge from "deepmerge";
 import { forwardRef, memo, ReactNode, useCallback, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
-import { components, OptionProps } from "react-select";
+import { components } from "react-select";
 import AsyncSelect, { Props as AsyncSelectProps } from "react-select/async";
 import { NormalLink } from "./Link";
 
@@ -15,28 +17,18 @@ export type UserSelectSelection = UserSelect_UserFragment;
 
 export type UserSelectInstance<IsMulti extends boolean> = AsyncSelect<
   UserSelectSelection,
-  IsMulti
->;
-
-type AsyncUserSelectProps<IsMulti extends boolean> = AsyncSelectProps<
-  UserSelectSelection,
-  IsMulti
+  IsMulti,
+  never
 >;
 
 interface UserSelectProps<IsMulti extends boolean>
-  extends Omit<AsyncUserSelectProps<IsMulti>, "value" | "onChange">,
-    UseReactSelectProps {
-  value?: IsMulti extends true ? UserSelectSelection[] : UserSelectSelection;
-  onChange?: IsMulti extends true
-    ? (users: UserSelectSelection[]) => void
-    : (user: UserSelectSelection) => void;
-
+  extends UseReactSelectProps,
+    CustomAsyncSelectProps<UserSelectSelection, IsMulti> {
   onSearchUsers: (
     search: string,
     exclude: string[]
   ) => Promise<UserSelectSelection[]>;
 }
-
 const fragments = {
   User: gql`
     fragment UserSelect_User on User {
@@ -68,7 +60,7 @@ function userSelect<IsMulti extends boolean>(isMulti: IsMulti) {
       const reactSelectProps = useUserSelectReactSelectProps<IsMulti>(props);
 
       return (
-        <AsyncSelect<UserSelectSelection, IsMulti>
+        <AsyncSelect<UserSelectSelection, IsMulti, never>
           ref={ref}
           value={value}
           onChange={onChange as any}
@@ -85,7 +77,12 @@ function userSelect<IsMulti extends boolean>(isMulti: IsMulti) {
 export const UserMultiSelect = Object.assign(userSelect(true), { fragments });
 
 export const UserSingleSelect = Object.assign(userSelect(false), { fragments });
-import deepmerge from "deepmerge";
+
+type AsyncUserSelectProps<IsMulti extends boolean> = AsyncSelectProps<
+  UserSelectSelection,
+  IsMulti,
+  never
+>;
 
 function useUserSelectReactSelectProps<IsMulti extends boolean>(
   props: UseReactSelectProps
@@ -140,7 +137,7 @@ function useUserSelectReactSelectProps<IsMulti extends boolean>(
             );
           }),
           SingleValue: memo(({ children, ...props }) => {
-            const { fullName, email } = props.data;
+            const { fullName, email } = props.data as UserSelectSelection;
             return (
               <components.SingleValue {...props}>
                 <Text as="span">
@@ -168,15 +165,10 @@ function useUserSelectReactSelectProps<IsMulti extends boolean>(
               );
             }
           ),
-          Option: ({
-            children,
-            data,
-            ...props
-          }: Omit<OptionProps<UserSelectSelection, IsMulti>, "data"> & {
-            data: UserSelectSelection;
-          }) => {
+          Option: ({ children, ...props }) => {
+            const data = props.data as UserSelectSelection;
             return (
-              <components.Option data={data} {...props}>
+              <components.Option {...props}>
                 {data.fullName ? (
                   <Text as="span" verticalAlign="baseline">
                     <Text as="span">{data.fullName}</Text>
@@ -193,13 +185,17 @@ function useUserSelectReactSelectProps<IsMulti extends boolean>(
           },
         },
         getOptionLabel: (option) => {
-          if ((option as any).__isNew__) {
-            return (option as any).label;
+          const user = option as UserSelectSelection;
+          if ((user as any).__isNew__) {
+            return (user as any).label;
           } else {
-            return option.email;
+            return user.email;
           }
         },
-        getOptionValue: (option) => option.id,
+        getOptionValue: (option) => {
+          const user = option as UserSelectSelection;
+          return user.id;
+        },
       }),
     [reactSelectProps]
   );

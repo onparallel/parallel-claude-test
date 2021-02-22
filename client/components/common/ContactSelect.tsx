@@ -2,11 +2,12 @@ import { gql } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
-import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import {
   useReactSelectProps,
   UseReactSelectProps,
-} from "@parallel/utils/useReactSelectProps";
+} from "@parallel/utils/react-select/hooks";
+import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
+import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import deepmerge from "deepmerge";
@@ -20,7 +21,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage } from "react-intl";
-import { components, InputActionMeta, OptionProps } from "react-select";
+import { components, InputActionMeta } from "react-select";
 import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
 } from "react-select/async-creatable";
@@ -34,13 +35,8 @@ export type ContactSelectSelection = ContactSelect_ContactFragment & {
 
 export interface ContactSelectProps
   extends UseReactSelectProps,
-    Omit<
-      AsyncCreatableSelectProps<ContactSelectSelection, true>,
-      "value" | "onChange"
-    > {
+    CustomAsyncCreatableSelectProps<ContactSelectSelection, true> {
   placeholder?: string;
-  value: ContactSelectSelection[];
-  onChange: (recipients: ContactSelectSelection[]) => void;
   onCreateContact: (data: {
     defaultEmail?: string;
   }) => Promise<ContactSelectSelection>;
@@ -78,7 +74,7 @@ export const ContactSelect = Object.assign(
         return [];
       }
       const exclude: string[] = [];
-      for (const recipient of value) {
+      for (const recipient of value ?? []) {
         if (!recipient.isInvalid) {
           exclude.push(recipient.id);
         }
@@ -93,7 +89,7 @@ export const ContactSelect = Object.assign(
       try {
         const contact = await onCreateContact({ defaultEmail: email });
         onChange([
-          ...value.filter((v) => v.id !== email),
+          ...(value ?? []).filter((v) => v.id !== email),
           pick(contact, ["id", "email", "fullName"]),
         ]);
         setIsCreating(false);
@@ -126,7 +122,7 @@ export const ContactSelect = Object.assign(
           if (EMAIL_REGEX.test(cleaned)) {
             const option = options?.find((o) => o.email === cleaned);
             if (option) {
-              onChange([...value, option]);
+              onChange([...(value ?? []), option]);
               setInputValue("");
               setOptions(undefined);
             } else {
@@ -157,7 +153,7 @@ export const ContactSelect = Object.assign(
     }
 
     return (
-      <AsyncCreatableSelect<ContactSelectSelection, true>
+      <AsyncCreatableSelect<ContactSelectSelection, true, never>
         ref={useMergedRef(ref, innerRef)}
         value={value}
         isMulti
@@ -190,10 +186,12 @@ function useContactSelectReactSelectProps(
   props: UseReactSelectProps,
   handleCreateContact: (email: string) => any
 ) {
-  const reactSelectProps = useReactSelectProps<ContactSelectSelection>(props);
+  const reactSelectProps = useReactSelectProps<ContactSelectSelection, true>(
+    props
+  );
   return useMemo(
     () =>
-      deepmerge<AsyncCreatableSelectProps<ContactSelectSelection, any>>(
+      deepmerge<AsyncCreatableSelectProps<ContactSelectSelection, true, never>>(
         reactSelectProps,
         {
           components: {
@@ -257,32 +255,27 @@ function useContactSelectReactSelectProps(
                 );
               }
             ),
-            Option: ({
-              children,
-              data,
-              ...props
-            }: Omit<OptionProps<ContactSelectSelection, true>, "data"> & {
-              data: ContactSelectSelection;
-            }) => {
-              if ((data as any).__isNew__) {
+            Option: ({ children, ...props }) => {
+              if ((props.data as any).__isNew__) {
                 return (
-                  <components.Option data={data} {...props}>
+                  <components.Option {...props}>
                     {children} {/* from formatCreateLabel */}
                   </components.Option>
                 );
               } else {
+                const contact = props.data as ContactSelectSelection;
                 return (
-                  <components.Option data={data} {...props}>
-                    {data.fullName ? (
+                  <components.Option {...props}>
+                    {contact.fullName ? (
                       <Text as="span" verticalAlign="baseline">
-                        <Text as="span">{data.fullName}</Text>
+                        <Text as="span">{contact.fullName}</Text>
                         <Text as="span" display="inline-block" width={2} />
                         <Text as="span" fontSize="sm" color="gray.500">
-                          {data.email}
+                          {contact.email}
                         </Text>
                       </Text>
                     ) : (
-                      <Text as="span">{data.email}</Text>
+                      <Text as="span">{contact.email}</Text>
                     )}
                   </components.Option>
                 );

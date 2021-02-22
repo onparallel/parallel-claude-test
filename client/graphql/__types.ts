@@ -4350,6 +4350,53 @@ export type PetitionQuery = { __typename?: "Query" } & {
   >;
 };
 
+export type Pruebas_Petition_Petition_Fragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id"> & {
+    fields: Array<
+      {
+        __typename?: "PetitionField";
+      } & PetitionFieldCondition_PetitionFieldFragment
+    >;
+  };
+
+export type Pruebas_Petition_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id"> & {
+    fields: Array<
+      {
+        __typename?: "PetitionField";
+      } & PetitionFieldCondition_PetitionFieldFragment
+    >;
+  };
+
+export type Pruebas_PetitionFragment =
+  | Pruebas_Petition_Petition_Fragment
+  | Pruebas_Petition_PetitionTemplate_Fragment;
+
+export type PruebasQueryVariables = Exact<{
+  id: Scalars["GID"];
+}>;
+
+export type PruebasQuery = { __typename?: "Query" } & {
+  petition?: Maybe<
+    | ({ __typename?: "Petition" } & Pruebas_Petition_Petition_Fragment)
+    | ({
+        __typename?: "PetitionTemplate";
+      } & Pruebas_Petition_PetitionTemplate_Fragment)
+  >;
+};
+
+export type PetitionFieldSelect_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "type" | "title">;
+
+export type PetitionFieldCondition_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "type" | "multiple"> & {
+    fieldOptions: PetitionField["options"];
+  } & PetitionFieldSelect_PetitionFieldFragment;
+
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "hasCommentsEnabled"> & {
@@ -6352,6 +6399,32 @@ export const PetitionCompose_UserFragmentDoc = gql`
   }
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionSettings_UserFragmentDoc}
+`;
+export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldSelect_PetitionField on PetitionField {
+    id
+    type
+    title
+  }
+`;
+export const PetitionFieldCondition_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldCondition_PetitionField on PetitionField {
+    id
+    type
+    multiple
+    fieldOptions: options
+    ...PetitionFieldSelect_PetitionField
+  }
+  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
+`;
+export const Pruebas_PetitionFragmentDoc = gql`
+  fragment Pruebas_Petition on PetitionBase {
+    id
+    fields {
+      ...PetitionFieldCondition_PetitionField
+    }
+  }
+  ${PetitionFieldCondition_PetitionFieldFragmentDoc}
 `;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
@@ -10557,6 +10630,49 @@ export type PetitionQueryHookResult = ReturnType<typeof usePetitionQuery>;
 export type PetitionLazyQueryHookResult = ReturnType<
   typeof usePetitionLazyQuery
 >;
+export const PruebasDocument = gql`
+  query Pruebas($id: GID!) {
+    petition(id: $id) {
+      ...Pruebas_Petition
+    }
+  }
+  ${Pruebas_PetitionFragmentDoc}
+`;
+
+/**
+ * __usePruebasQuery__
+ *
+ * To run a query within a React component, call `usePruebasQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePruebasQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePruebasQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function usePruebasQuery(
+  baseOptions: Apollo.QueryHookOptions<PruebasQuery, PruebasQueryVariables>
+) {
+  return Apollo.useQuery<PruebasQuery, PruebasQueryVariables>(
+    PruebasDocument,
+    baseOptions
+  );
+}
+export function usePruebasLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<PruebasQuery, PruebasQueryVariables>
+) {
+  return Apollo.useLazyQuery<PruebasQuery, PruebasQueryVariables>(
+    PruebasDocument,
+    baseOptions
+  );
+}
+export type PruebasQueryHookResult = ReturnType<typeof usePruebasQuery>;
+export type PruebasLazyQueryHookResult = ReturnType<typeof usePruebasLazyQuery>;
 export const PetitionReplies_updatePetitionDocument = gql`
   mutation PetitionReplies_updatePetition(
     $petitionId: GID!

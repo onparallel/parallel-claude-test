@@ -56,6 +56,24 @@ export const theme = extendTheme({
     },
   },
   components: {
+    Input: {
+      sizes: {
+        sm: {
+          field: {
+            borderRadius: "md",
+          },
+        },
+      },
+    },
+    NumberInput: {
+      sizes: {
+        sm: {
+          field: {
+            borderRadius: "md",
+          },
+        },
+      },
+    },
     Button: {
       sizes: {
         "2xs": {
