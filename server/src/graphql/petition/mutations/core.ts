@@ -35,7 +35,11 @@ import { datetimeArg } from "../../helpers/date";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonArg, jsonObjectArg } from "../../helpers/json";
 import { RESULT } from "../../helpers/result";
-import { validateAnd, validateOr } from "../../helpers/validateArgs";
+import {
+  validateAnd,
+  validateIf,
+  validateOr,
+} from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
 import { jsonSchema } from "../../helpers/validators/jsonSchema";
 import { maxLength } from "../../helpers/validators/maxLength";
@@ -43,6 +47,7 @@ import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
+import { validFieldVisibilityJson } from "../../helpers/validators/validFieldVisibility";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
@@ -555,16 +560,33 @@ export const updatePetitionField = mutationField("updatePetitionField", {
           t.nullable.field("options", { type: "JSONObject" });
           t.nullable.boolean("optional");
           t.nullable.boolean("multiple");
+          t.nullable.field("visibility", { type: "JSONObject" });
         },
       }).asArg()
     ),
   },
   validateArgs: validateAnd(
     notEmptyObject((args) => args.data, "data"),
-    maxLength((args) => args.data.title, "data.title", 500)
+    maxLength((args) => args.data.title, "data.title", 500),
+    validateIf(
+      (args) => isDefined(args.data.visibility),
+      validFieldVisibilityJson(
+        (args) => args.petitionId,
+        (args) => args.fieldId,
+        (args) => args.data.visibility,
+        "data.visibility"
+      )
+    )
   ),
   resolve: async (_, args, ctx, info) => {
-    const { title, description, optional, multiple, options } = args.data;
+    const {
+      title,
+      description,
+      optional,
+      multiple,
+      options,
+      visibility,
+    } = args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
       data.title = title?.trim() || null;
@@ -572,13 +594,13 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     if (description !== undefined) {
       data.description = description?.trim() || null;
     }
-    if (optional !== undefined && optional !== null) {
+    if (isDefined(optional)) {
       data.optional = optional;
     }
-    if (multiple !== undefined && multiple !== null) {
+    if (isDefined(multiple)) {
       data.multiple = multiple;
     }
-    if (options !== undefined && options !== null) {
+    if (isDefined(options)) {
       try {
         await ctx.petitions.validateFieldData(args.fieldId, { options });
         data.options = options;
@@ -586,6 +608,11 @@ export const updatePetitionField = mutationField("updatePetitionField", {
         throw new ArgValidationError(info, "data.options", e.toString());
       }
     }
+
+    if (isDefined(visibility)) {
+      data.visibility = visibility;
+    }
+
     return await ctx.petitions.updatePetitionField(
       args.petitionId,
       args.fieldId,

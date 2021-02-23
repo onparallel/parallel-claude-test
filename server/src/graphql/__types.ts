@@ -115,6 +115,7 @@ export interface NexusGenInputs {
     optional?: boolean | null; // Boolean
     options?: NexusGenScalars["JSONObject"] | null; // JSONObject
     title?: string | null; // String
+    visibility?: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   UpdatePetitionInput: {
     // input type
@@ -760,6 +761,7 @@ export interface NexusGenFieldTypes {
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
     validated: boolean; // Boolean!
+    visibility: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   PetitionFieldComment: {
     // field return type
@@ -1482,6 +1484,7 @@ export interface NexusGenFieldTypeNames {
     title: "String";
     type: "PetitionFieldType";
     validated: "Boolean";
+    visibility: "JSONObject";
   };
   PetitionFieldComment: {
     // field return type name

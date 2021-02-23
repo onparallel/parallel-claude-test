@@ -87,10 +87,17 @@ async function loadField(fieldId: string, ctx: ApiContext) {
   return field;
 }
 
-function validateCondition(ctx: ApiContext, petitionId: number) {
+function validateCondition(
+  ctx: ApiContext,
+  petitionId: number,
+  fieldId: number
+) {
   return async (c: Condition) => {
     const field = c.fieldId ? await loadField(c.fieldId, ctx) : null;
 
+    if (field?.id === fieldId) {
+      throw new Error(`Can't add a reference to field ${fieldId}`);
+    }
     if (field && field.petition_id !== petitionId) {
       throw new Error(
         `Field with id ${field.id} is not linked to petition with id ${petitionId}`
@@ -178,6 +185,7 @@ function validateCondition(ctx: ApiContext, petitionId: number) {
 export async function validateFieldVisibilityConditions(
   json: any,
   petitionId: number,
+  fieldId: number,
   ctx: ApiContext
 ) {
   const validator = new Ajv({ allowUnionTypes: true }).compile<Visibility>(
@@ -188,7 +196,9 @@ export async function validateFieldVisibilityConditions(
     throw new Error(JSON.stringify(validator.errors));
   }
 
-  await Promise.all(json.conditions.map(validateCondition(ctx, petitionId)));
+  await Promise.all(
+    json.conditions.map(validateCondition(ctx, petitionId, fieldId))
+  );
 }
 
 export function validFieldVisibilityJson<
@@ -196,14 +206,16 @@ export function validFieldVisibilityJson<
   FieldName extends string
 >(
   petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
+  fieldIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
   argName: string
 ) {
-  return ((root, args, ctx, info) => {
+  return (async (root, args, ctx, info) => {
     try {
       const json = prop(args);
       const petitionId = petitionIdProp(args);
-      validateFieldVisibilityConditions(json, petitionId, ctx);
+      const fieldId = fieldIdProp(args);
+      await validateFieldVisibilityConditions(json, petitionId, fieldId, ctx);
     } catch (e) {
       throw new ArgValidationError(info, argName, e.message);
     }

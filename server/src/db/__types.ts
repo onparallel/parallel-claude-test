@@ -523,6 +523,7 @@ export interface PetitionField {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   is_fixed: boolean; // bool
+  visibility: Maybe<any>; // jsonb
 }
 
 export type CreatePetitionField = PartialProps<
@@ -540,6 +541,7 @@ export type CreatePetitionField = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "is_fixed"
+  | "visibility"
 >;
 
 export interface PetitionFieldComment {

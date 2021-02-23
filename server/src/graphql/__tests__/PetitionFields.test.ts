@@ -967,6 +967,7 @@ describe("GraphQL/Petition Fields", () => {
                 options
                 optional
                 multiple
+                visibility
               }
             }
           }
@@ -980,6 +981,19 @@ describe("GraphQL/Petition Fields", () => {
             optional: true,
             options: { placeholder: "enter text here...", multiline: false },
             title: "new title",
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  id: "1",
+                  fieldId: fieldGIDs[2],
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "EQUAL",
+                  value: 1,
+                },
+              ],
+            },
           },
         },
       });
@@ -992,8 +1006,126 @@ describe("GraphQL/Petition Fields", () => {
           options: { placeholder: "enter text here...", multiline: false },
           optional: true,
           multiple: true,
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                id: "1",
+                fieldId: fieldGIDs[2],
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "EQUAL",
+                value: 1,
+              },
+            ],
+          },
         },
       });
+    });
+
+    it("should allow updating the petition field with an incomplete visibility condition", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              field {
+                id
+                visibility
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: fieldGIDs[1],
+          data: {
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  id: "1",
+                  fieldId: null,
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "EQUAL",
+                  value: null,
+                },
+              ],
+            },
+          },
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.updatePetitionField).toEqual({
+        field: {
+          id: fieldGIDs[1],
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                id: "1",
+                fieldId: null,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "EQUAL",
+                value: null,
+              },
+            ],
+          },
+        },
+      });
+    });
+
+    it("sends error when updating petition field with invalid visibility json", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              field {
+                id
+                visibility
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: fieldGIDs[1],
+          data: {
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  id: "1",
+                  fieldId: "123",
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "EQUAL",
+                  value: null,
+                },
+              ],
+            },
+          },
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
     });
 
     it("trims title and description of field before writing to database", async () => {

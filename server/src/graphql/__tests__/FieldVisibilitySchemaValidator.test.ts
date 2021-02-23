@@ -6,7 +6,7 @@ import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, PetitionField, User } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { validateFieldVisibilityConditions } from "../helpers/validators/validFieldConditions";
+import { validateFieldVisibilityConditions } from "../helpers/validators/validFieldVisibility";
 
 describe("Field Visibility Conditions", () => {
   let container: Container;
@@ -83,6 +83,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        selectField.id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -105,6 +106,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        selectField.id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -127,6 +129,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -149,6 +152,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -185,6 +189,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        selectField.id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -199,6 +204,7 @@ describe("Field Visibility Conditions", () => {
           conditions: [],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -256,6 +262,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        selectField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -278,6 +285,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        selectField.id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -300,6 +308,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -322,6 +331,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -344,6 +354,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        selectField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -366,6 +377,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        fileUploadField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -388,6 +400,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        selectField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -410,6 +423,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        selectField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -432,6 +446,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -454,6 +469,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -476,6 +492,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -498,6 +515,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -520,6 +538,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -549,6 +568,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        textField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -585,6 +605,30 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
+        selectField.id,
+        ctx
+      )
+    ).rejects.toThrowError();
+  });
+
+  it("can't set visibility for a field being referenced on one of the conditions", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              id: "1",
+              fieldId: toGlobalId("PetitionField", textField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+          ],
+        },
+        petition[0].id,
+        textField.id,
         ctx
       )
     ).rejects.toThrowError();
