@@ -19,6 +19,7 @@ describe("Field Visibility Conditions", () => {
 
   let textField: PetitionField;
   let fileUploadField: PetitionField;
+  let selectField: PetitionField;
 
   let deletedField: PetitionField;
   let fieldOnAnotherPetition: PetitionField;
@@ -36,10 +37,11 @@ describe("Field Visibility Conditions", () => {
     [
       textField,
       fileUploadField,
+      selectField,
       deletedField,
-    ] = await mocks.createRandomPetitionFields(petition[0].id, 3, (i) => ({
-      type: i === 0 ? "TEXT" : "FILE_UPLOAD",
-      deleted_at: i === 2 ? new Date() : null,
+    ] = await mocks.createRandomPetitionFields(petition[0].id, 4, (i) => ({
+      type: i === 0 ? "TEXT" : i === 1 ? "FILE_UPLOAD" : "SELECT",
+      deleted_at: i === 3 ? new Date() : null,
     }));
 
     [fieldOnAnotherPetition] = await mocks.createRandomPetitionFields(
@@ -68,6 +70,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -89,6 +92,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -124,6 +128,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -137,9 +142,111 @@ describe("Field Visibility Conditions", () => {
           operator: "OR",
           conditions: [],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
+  });
+
+  it("should have up to 5 conditions", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "HIDE",
+          operator: "OR",
+          conditions: [
+            {
+              id: "1",
+              fieldId: toGlobalId("PetitionField", textField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+            {
+              id: "2",
+              fieldId: toGlobalId("PetitionField", textField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+            {
+              id: "3",
+              fieldId: toGlobalId("PetitionField", textField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+            {
+              id: "4",
+              fieldId: toGlobalId("PetitionField", textField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+            {
+              id: "5",
+              fieldId: toGlobalId("PetitionField", textField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+            {
+              id: "6",
+              fieldId: toGlobalId("PetitionField", textField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+          ],
+        },
+        petition[0].id,
+        ctx
+      )
+    ).rejects.toThrowError();
+  });
+
+  it("should allow null values on conditions", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              id: "1",
+              fieldId: toGlobalId("PetitionField", textField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: null,
+            },
+          ],
+        },
+        petition[0].id,
+        ctx
+      )
+    ).resolves.not.toThrowError();
+  });
+
+  it("should allow null fieldIds on conditions", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              id: "1",
+              fieldId: null,
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+          ],
+        },
+        petition[0].id,
+        ctx
+      )
+    ).resolves.not.toThrowError();
   });
 
   it("value for NUMBER_OF_REPLIES modifier should be a number", async () => {
@@ -158,6 +265,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
@@ -179,6 +287,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
@@ -200,6 +309,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
@@ -221,12 +331,35 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
   });
 
-  it("modifier for FILE_UPLOAD field must be NUMBER_OF_REPLIES", async () => {
+  it("conditions on SELECT field replies should not allow substring comparisons", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              id: "1",
+              fieldId: toGlobalId("PetitionField", selectField.id),
+              modifier: "NONE",
+              operator: "START_WITH",
+              value: "Yes",
+            },
+          ],
+        },
+        petition[0].id,
+        ctx
+      )
+    ).rejects.toThrowError();
+  });
+
+  it("modifier for FILE_UPLOAD field should be NUMBER_OF_REPLIES", async () => {
     await expect(
       validateFieldVisibilityConditions(
         {
@@ -242,6 +375,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
@@ -263,6 +397,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
@@ -284,6 +419,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
@@ -312,6 +448,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
@@ -347,6 +484,7 @@ describe("Field Visibility Conditions", () => {
             },
           ],
         },
+        petition[0].id,
         ctx
       )
     ).rejects.toThrowError();
