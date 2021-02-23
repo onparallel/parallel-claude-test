@@ -20,6 +20,7 @@ describe("Field Visibility Conditions", () => {
   let textField: PetitionField;
   let fileUploadField: PetitionField;
   let selectField: PetitionField;
+  let headingField: PetitionField;
 
   let deletedField: PetitionField;
   let fieldOnAnotherPetition: PetitionField;
@@ -38,10 +39,21 @@ describe("Field Visibility Conditions", () => {
       textField,
       fileUploadField,
       selectField,
+      headingField,
       deletedField,
-    ] = await mocks.createRandomPetitionFields(petition[0].id, 4, (i) => ({
-      type: i === 0 ? "TEXT" : i === 1 ? "FILE_UPLOAD" : "SELECT",
-      deleted_at: i === 3 ? new Date() : null,
+    ] = await mocks.createRandomPetitionFields(petition[0].id, 5, (i) => ({
+      type:
+        i === 0
+          ? "TEXT"
+          : i === 1
+          ? "FILE_UPLOAD"
+          : i === 2
+          ? "SELECT"
+          : i === 3
+          ? "HEADING"
+          : "TEXT",
+      options: i === 2 ? { values: ["Option 1", "Option 2", "Option 3"] } : {},
+      deleted_at: i === 4 ? new Date() : null,
     }));
 
     [fieldOnAnotherPetition] = await mocks.createRandomPetitionFields(
@@ -89,6 +101,50 @@ describe("Field Visibility Conditions", () => {
               modifier: "ANY",
               operator: "EQUAL",
               value: "Yes",
+            },
+          ],
+        },
+        petition[0].id,
+        ctx
+      )
+    ).resolves.not.toThrowError();
+  });
+
+  it("simple condition on SELECT field replies", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              id: "1",
+              fieldId: toGlobalId("PetitionField", selectField.id),
+              modifier: "ANY",
+              operator: "EQUAL",
+              value: "Option 2",
+            },
+          ],
+        },
+        petition[0].id,
+        ctx
+      )
+    ).resolves.not.toThrowError();
+  });
+
+  it("simple condition on FILE_UPLOAD field replies", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              id: "1",
+              fieldId: toGlobalId("PetitionField", fileUploadField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "EQUAL",
+              value: 1,
             },
           ],
         },
@@ -249,6 +305,28 @@ describe("Field Visibility Conditions", () => {
     ).resolves.not.toThrowError();
   });
 
+  it("should not allow conditions referencing HEADING fields", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              id: "1",
+              fieldId: toGlobalId("PetitionField", headingField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+          ],
+        },
+        petition[0].id,
+        ctx
+      )
+    ).rejects.toThrowError();
+  });
+
   it("value for NUMBER_OF_REPLIES modifier should be a number", async () => {
     await expect(
       validateFieldVisibilityConditions(
@@ -350,6 +428,28 @@ describe("Field Visibility Conditions", () => {
               modifier: "NONE",
               operator: "START_WITH",
               value: "Yes",
+            },
+          ],
+        },
+        petition[0].id,
+        ctx
+      )
+    ).rejects.toThrowError();
+  });
+
+  it("value on SELECT field replies should be one of the selector options", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              id: "1",
+              fieldId: toGlobalId("PetitionField", selectField.id),
+              modifier: "ANY",
+              operator: "EQUAL",
+              value: "Unknown option",
             },
           ],
         },

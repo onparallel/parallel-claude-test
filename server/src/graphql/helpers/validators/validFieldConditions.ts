@@ -5,6 +5,11 @@ import { ArgValidationError } from "../errors";
 import { fromGlobalId } from "../../../util/globalId";
 import { ApiContext } from "../../../context";
 
+interface Visibility {
+  type: "SHOW" | "HIDE";
+  operator: "AND" | "OR";
+  conditions: Condition[];
+}
 interface Condition {
   fieldId: string | null;
   modifier: "ANY" | "ALL" | "NONE" | "NUMBER_OF_REPLIES";
@@ -92,23 +97,46 @@ function validateCondition(ctx: ApiContext, petitionId: number) {
       );
     }
 
+    // check value type based on modifier
+    if (c.value !== null) {
+      if (
+        (c.modifier === "NUMBER_OF_REPLIES" && typeof c.value !== "number") ||
+        (c.modifier !== "NUMBER_OF_REPLIES" && typeof c.value !== "string")
+      ) {
+        throw new Error(
+          `Invalid value type ${typeof c.value} for modifier ${c.modifier}`
+        );
+      }
+    }
+
+    // check operator/modifier compatibility
     if (
-      field?.type === "SELECT" &&
-      ![
-        "EQUAL",
-        "NOT_EQUAL",
-        "LESS_THAN",
-        "LESS_THAN_OR_EQUAL",
-        "GREATER_THAN",
-        "GREATER_THAN_OR_EQUAL",
-      ].includes(c.operator)
+      (c.modifier === "NUMBER_OF_REPLIES" &&
+        ![
+          "EQUAL",
+          "NOT_EQUAL",
+          "LESS_THAN",
+          "LESS_THAN_OR_EQUAL",
+          "GREATER_THAN",
+          "GREATER_THAN_OR_EQUAL",
+        ].includes(c.operator)) ||
+      (c.modifier !== "NUMBER_OF_REPLIES" &&
+        ![
+          "EQUAL",
+          "NOT_EQUAL",
+          "START_WITH",
+          "END_WITH",
+          "CONTAIN",
+          "NOT_CONTAIN",
+        ].includes(c.operator))
     ) {
       throw new Error(
-        `Invalid operator ${c.operator} for field of type ${field.type}`
+        `Invalid operator ${c.operator} for modifier ${c.modifier}`
       );
     }
 
-    if (c.modifier === "NUMBER_OF_REPLIES") {
+    // check rules based on type of referenced field
+    if (field?.type === "SELECT") {
       if (
         ![
           "EQUAL",
@@ -120,42 +148,29 @@ function validateCondition(ctx: ApiContext, petitionId: number) {
         ].includes(c.operator)
       ) {
         throw new Error(
-          `Invalid operator ${c.operator} for modifier ${c.modifier}`
+          `Invalid operator ${c.operator} for field of type ${field.type}`
         );
       }
-
-      if (c.value !== null && typeof c.value !== "number") {
-        throw new Error(
-          `Invalid value type ${typeof c.value} for modifier ${c.modifier}`
-        );
+      if (c.modifier !== "NUMBER_OF_REPLIES") {
+        // value on SELECT condition should be one of the selector values
+        if (
+          c.value !== null &&
+          !(field.options.values as any[]).includes(c.value)
+        ) {
+          throw new Error(
+            `Invalid value ${c.value} for field of type ${field.type}. 
+            Should be one of: ${field.options.values.toString()}`
+          );
+        }
       }
-    } else {
-      if (field?.type === "FILE_UPLOAD") {
+    } else if (field?.type === "FILE_UPLOAD") {
+      if (c.modifier !== "NUMBER_OF_REPLIES") {
         throw new Error(
           `Invalid modifier ${c.modifier} for field of type ${field.type}`
         );
       }
-
-      if (
-        ![
-          "EQUAL",
-          "NOT_EQUAL",
-          "START_WITH",
-          "END_WITH",
-          "CONTAIN",
-          "NOT_CONTAIN",
-        ].includes(c.operator)
-      ) {
-        throw new Error(
-          `Invalid operator ${c.operator} for modifier ${c.modifier}`
-        );
-      }
-
-      if (c.value !== null && typeof c.value !== "string") {
-        throw new Error(
-          `Invalid value type ${typeof c.value} for modifier ${c.modifier}`
-        );
-      }
+    } else if (field?.type === "HEADING") {
+      throw new Error(`Invalid field type ${field.type} on condition`);
     }
   };
 }
@@ -165,14 +180,15 @@ export async function validateFieldVisibilityConditions(
   petitionId: number,
   ctx: ApiContext
 ) {
-  const ajv = new Ajv({ allowUnionTypes: true });
-  if (!ajv.validate(schema, json)) {
-    throw new Error(ajv.errorsText());
+  const validator = new Ajv({ allowUnionTypes: true }).compile<Visibility>(
+    schema
+  );
+
+  if (!validator(json)) {
+    throw new Error(JSON.stringify(validator.errors));
   }
 
-  await Promise.all(
-    (json.conditions as Condition[]).map(validateCondition(ctx, petitionId))
-  );
+  await Promise.all(json.conditions.map(validateCondition(ctx, petitionId)));
 }
 
 export function validFieldVisibilityJson<
