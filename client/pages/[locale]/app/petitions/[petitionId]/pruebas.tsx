@@ -48,7 +48,7 @@ function Pruebas({
   console.log(petition);
   return (
     <Box padding={8}>
-      <PetitionFieldCondition fields={petition!.fields} />
+      <PetitionFieldCondition showError={true} fields={petition!.fields} />
     </Box>
   );
 }
@@ -142,9 +142,13 @@ let counter = 0;
 
 interface PetitionFieldConditionProps {
   fields: PetitionFieldCondition_PetitionFieldFragment[];
+  showError: boolean;
 }
 
-function PetitionFieldCondition({ fields }: PetitionFieldConditionProps) {
+function PetitionFieldCondition({
+  fields,
+  showError,
+}: PetitionFieldConditionProps) {
   const intl = useIntl();
   const _fields = useMemo(() => fields.filter((f) => f.type !== "HEADING"), [
     fields,
@@ -283,6 +287,7 @@ function PetitionFieldCondition({ fields }: PetitionFieldConditionProps) {
               <PetitionFieldSelect
                 id={`petition-field-condition-field-select-${condition.id}`}
                 size="sm"
+                isInvalid={showError && !conditionField}
                 value={conditionField}
                 fields={_fields}
                 indices={indices}
@@ -324,6 +329,7 @@ function PetitionFieldCondition({ fields }: PetitionFieldConditionProps) {
                     />
                   ) : null}
                   <ConditionPredicate
+                    showError={showError}
                     field={conditionField}
                     value={condition}
                     onChange={(condition) =>
@@ -339,16 +345,18 @@ function PetitionFieldCondition({ fields }: PetitionFieldConditionProps) {
         })}
       </Grid>
 
-      <Button
-        variant="ghost"
-        fontWeight="normal"
-        size="xs"
-        leftIcon={<PlusCircleIcon position="relative" top="-1px" />}
-        alignSelf="start"
-        onClick={addCondition}
-      >
-        Add condition
-      </Button>
+      {visibility.conditions.length < 5 ? (
+        <Button
+          variant="ghost"
+          fontWeight="normal"
+          size="xs"
+          leftIcon={<PlusCircleIcon position="relative" top="-1px" />}
+          alignSelf="start"
+          onClick={addCondition}
+        >
+          Add condition
+        </Button>
+      ) : null}
       <pre>{JSON.stringify(visibility, null, 2)}</pre>
     </Stack>
   );
@@ -440,12 +448,14 @@ function ConditionMultipleFieldModifier({
 
 interface ConditionPredicateProps extends ValueProps<Condition> {
   field: PetitionFieldCondition_PetitionFieldFragment;
+  showError: boolean;
 }
 
 function ConditionPredicate({
   field,
   value: condition,
   onChange,
+  showError,
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const { modifier } = condition!;
@@ -645,17 +655,24 @@ function ConditionPredicate({
         onChange={handleChange}
         {...iprops}
       />
-      <ConditionValue field={field} value={condition} onChange={onChange} />
+      <ConditionValue
+        field={field}
+        showError={showError}
+        value={condition}
+        onChange={onChange}
+      />
     </>
   );
 }
 
 interface ConditionValueProps extends ValueProps<Condition> {
   field: PetitionFieldCondition_PetitionFieldFragment;
+  showError: boolean;
 }
 
 function ConditionValue({
   field,
+  showError,
   value: condition,
   onChange,
 }: ConditionValueProps) {
@@ -689,6 +706,7 @@ function ConditionValue({
         </NumberInput>
       ) : field.type === "SELECT" ? (
         <ConditionValueSelect
+          isInvalid={showError && condition!.value === null}
           options={field.fieldOptions.values}
           value={condition!.value as any}
           onChange={(value) => onChange({ ...condition!, value })}
@@ -698,6 +716,7 @@ function ConditionValue({
           size="sm"
           value={condition!.value ?? ""}
           backgroundColor="white"
+          isInvalid={showError && condition!.value === null}
           onChange={(e) =>
             onChange({ ...condition!, value: e.target.value || null })
           }
@@ -711,20 +730,22 @@ function ConditionValue({
   );
 }
 
-interface ConditionValueSelect {
+interface ConditionValueSelect extends CustomSelectProps<string> {
   options: string[];
-  value: string;
-  onChange: (value: string) => void;
 }
 
 function ConditionValueSelect({
   options,
   value,
   onChange,
+  ...props
 }: ConditionValueSelect) {
   const intl = useIntl();
 
-  const rsProps = useReactSelectProps<any, false, never>({ size: "sm" });
+  const rsProps = useReactSelectProps<any, false, never>({
+    size: "sm",
+    ...props,
+  });
   const _options = useMemo(() => options.map(toSelectOption), [options]);
   const _value = toSelectOption(value);
 
