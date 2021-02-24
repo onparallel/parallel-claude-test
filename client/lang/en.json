@@ -3431,13 +3431,13 @@
   },
   {
     "term": "public.how-it-works-hero.screenshot-2",
-    "definition": "A screenshot of the app showing how you can schedule the sendout of a petition so the email arrives when the user decides.",
-    "context": "A screenshot of the app showing how you can schedule the sendout of a petition so the email arrives when the user decides."
+    "definition": "A screenshot of the app showing what the recipient of the petition will see.",
+    "context": "A screenshot of the app showing what the recipient of the petition will see."
   },
   {
     "term": "public.how-it-works-hero.screenshot-3",
-    "definition": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
-    "context": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status."
+    "definition": "A screenshot of the app showing the gathered information and documents from a petition sent with Parallel.",
+    "context": "A screenshot of the app showing the gathered information and documents from a petition sent with Parallel."
   },
   {
     "term": "public.how-it-works-hero.screenshot-4",
@@ -4086,8 +4086,8 @@
   },
   {
     "term": "public.showcase-hero-alt",
-    "definition": "A professional asking her client for some necessary information she needs for a case. Her client is responding \"Here you go!\".",
-    "context": "A professional asking her client for some necessary information she needs for a case. Her client is responding \"Here you go!\"."
+    "definition": "A screenshot of the app showcasing the information received using Parallel",
+    "context": "A screenshot of the app showcasing the information received using Parallel"
   },
   {
     "term": "public.support.faq",

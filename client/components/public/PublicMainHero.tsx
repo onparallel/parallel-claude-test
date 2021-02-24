@@ -74,7 +74,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             alt={intl.formatMessage({
               id: "public.showcase-hero-alt",
               defaultMessage:
-                'A professional asking her client for some necessary information she needs for a case. Her client is responding "Here you go!".',
+                "A screenshot of the app showcasing the information received using Parallel",
             })}
             src={`${imageName}.png?v=${process.env.BUILD_ID}`}
           />

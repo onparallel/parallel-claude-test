@@ -80,7 +80,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       alt: intl.formatMessage({
         id: "public.how-it-works-hero.screenshot-2",
         defaultMessage:
-          "A screenshot of the app showing how you can schedule the sendout of a petition so the email arrives when the user decides.",
+          "A screenshot of the app showing what the recipient of the petition will see.",
       }),
     },
     {
@@ -100,7 +100,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       alt: intl.formatMessage({
         id: "public.how-it-works-hero.screenshot-3",
         defaultMessage:
-          "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status.",
+          "A screenshot of the app showing the gathered information and documents from a petition sent with Parallel.",
       }),
     },
     {

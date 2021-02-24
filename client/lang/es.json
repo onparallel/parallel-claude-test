@@ -3431,13 +3431,13 @@
   },
   {
     "term": "public.how-it-works-hero.screenshot-2",
-    "definition": "Una captura de pantalla de la aplicación donde se muestra como se puede programar el envío de una petición de manera que el correo electrónico llegué cuando el usuario decida.",
-    "context": "A screenshot of the app showing how you can schedule the sendout of a petition so the email arrives when the user decides."
+    "definition": "Una captura de pantalla de la aplicación donde se muestra lo que el destinatario de la petición verá.",
+    "context": "A screenshot of the app showing what the recipient of the petition will see."
   },
   {
     "term": "public.how-it-works-hero.screenshot-3",
-    "definition": "Una captura de pantalla de la aplicación donde se muestra las peticiones que el usario ha creado con información de cada una, de manera que este pueda ver rápidamente el estado global.",
-    "context": "A screenshot of the app showing the petitions the user has created with some information for each one so the user can quickly see the overall status."
+    "definition": "Una captura de pantalla de la aplicación donde se muestra la información y documentos recopilados mediante una petición de Parallel.",
+    "context": "A screenshot of the app showing the gathered information and documents from a petition sent with Parallel."
   },
   {
     "term": "public.how-it-works-hero.screenshot-4",
@@ -4086,8 +4086,8 @@
   },
   {
     "term": "public.showcase-hero-alt",
-    "definition": "Una profesional está pidiendo a su cliente unos documentos que necesita para un caso. Su cliente le responde \"¡Aquí los tienes!\".",
-    "context": "A professional asking her client for some necessary information she needs for a case. Her client is responding \"Here you go!\"."
+    "definition": "Una imagen de la aplicación mostrando la información recibida utilizando Parallel",
+    "context": "A screenshot of the app showcasing the information received using Parallel"
   },
   {
     "term": "public.support.faq",
