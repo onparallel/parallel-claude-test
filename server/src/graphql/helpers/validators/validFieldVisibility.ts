@@ -87,7 +87,7 @@ async function loadField(fieldId: string, ctx: ApiContext) {
   return field;
 }
 
-function assert(predicate: any, errorMessage: string) {
+function assert(predicate: boolean, errorMessage: string) {
   if (!predicate) {
     throw new Error(errorMessage);
   }
