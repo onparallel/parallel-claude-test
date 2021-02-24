@@ -611,7 +611,7 @@ describe("Field Visibility Conditions", () => {
     ).rejects.toThrowError();
   });
 
-  it("can't set visibility for a field being referenced on one of the conditions", async () => {
+  it("can't set a condition based on itself", async () => {
     await expect(
       validateFieldVisibilityConditions(
         {

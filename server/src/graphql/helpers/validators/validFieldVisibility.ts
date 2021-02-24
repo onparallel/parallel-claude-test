@@ -87,6 +87,16 @@ async function loadField(fieldId: string, ctx: ApiContext) {
   return field;
 }
 
+function assert(predicate: any, errorMessage: string) {
+  if (!predicate) {
+    throw new Error(errorMessage);
+  }
+}
+
+function assertOneOf<T>(value: T, options: T[], errorMessage: string) {
+  assert(options.includes(value), errorMessage);
+}
+
 function validateCondition(
   ctx: ApiContext,
   petitionId: number,
@@ -95,89 +105,73 @@ function validateCondition(
   return async (c: Condition) => {
     const field = c.fieldId ? await loadField(c.fieldId, ctx) : null;
 
-    if (field?.id === fieldId) {
-      throw new Error(`Can't add a reference to field ${fieldId}`);
+    if (field === null) {
+      return;
     }
-    if (field && field.petition_id !== petitionId) {
-      throw new Error(
-        `Field with id ${field.id} is not linked to petition with id ${petitionId}`
-      );
-    }
-
-    // check value type based on modifier
-    if (c.value !== null) {
-      if (
-        (c.modifier === "NUMBER_OF_REPLIES" && typeof c.value !== "number") ||
-        (c.modifier !== "NUMBER_OF_REPLIES" && typeof c.value !== "string")
-      ) {
-        throw new Error(
-          `Invalid value type ${typeof c.value} for modifier ${c.modifier}`
-        );
-      }
-    }
+    assert(
+      field.type !== "HEADING",
+      `Conditions can't reference HEADING fields`
+    );
+    assert(field.id !== fieldId, `Can't add a reference to field itself`);
+    assert(
+      field.petition_id === petitionId,
+      `Field with id ${field.id} is not linked to petition with id ${petitionId}`
+    );
 
     // check operator/modifier compatibility
-    if (
-      (c.modifier === "NUMBER_OF_REPLIES" &&
-        ![
+    if (c.modifier === "NUMBER_OF_REPLIES") {
+      assertOneOf(
+        c.operator,
+        [
           "EQUAL",
           "NOT_EQUAL",
           "LESS_THAN",
           "LESS_THAN_OR_EQUAL",
           "GREATER_THAN",
           "GREATER_THAN_OR_EQUAL",
-        ].includes(c.operator)) ||
-      (c.modifier !== "NUMBER_OF_REPLIES" &&
-        ![
-          "EQUAL",
-          "NOT_EQUAL",
-          "START_WITH",
-          "END_WITH",
-          "CONTAIN",
-          "NOT_CONTAIN",
-        ].includes(c.operator))
-    ) {
-      throw new Error(
+        ],
         `Invalid operator ${c.operator} for modifier ${c.modifier}`
       );
-    }
-
-    // check rules based on type of referenced field
-    if (field?.type === "SELECT") {
-      if (
-        ![
-          "EQUAL",
-          "NOT_EQUAL",
-          "LESS_THAN",
-          "LESS_THAN_OR_EQUAL",
-          "GREATER_THAN",
-          "GREATER_THAN_OR_EQUAL",
-        ].includes(c.operator)
-      ) {
-        throw new Error(
+      assert(
+        c.value === null || typeof c.value === "number",
+        `Invalid value type ${typeof c.value} for modifier ${c.modifier}`
+      );
+    } else {
+      if (field.type === "TEXT") {
+        assertOneOf(
+          c.operator,
+          [
+            "EQUAL",
+            "NOT_EQUAL",
+            "START_WITH",
+            "END_WITH",
+            "CONTAIN",
+            "NOT_CONTAIN",
+          ],
           `Invalid operator ${c.operator} for field of type ${field.type}`
         );
-      }
-      if (c.modifier !== "NUMBER_OF_REPLIES") {
-        // value on SELECT condition should be one of the selector values
-        if (
-          c.value !== null &&
-          !(field.options.values as any[]).includes(c.value)
-        ) {
-          throw new Error(
-            `Invalid value ${c.value} for field of type ${field.type}. 
-            Should be one of: ${field.options.values.toString()}`
-          );
-        }
-      }
-    } else if (field?.type === "FILE_UPLOAD") {
-      if (c.modifier !== "NUMBER_OF_REPLIES") {
+
+        assert(
+          c.value === null || typeof c.value === "string",
+          `Invalid value type ${typeof c.value} for field of type ${field.type}`
+        );
+      } else if (field.type === "FILE_UPLOAD") {
         throw new Error(
           `Invalid modifier ${c.modifier} for field of type ${field.type}`
         );
+      } else if (field.type === "SELECT") {
+        assertOneOf(
+          c.operator,
+          ["EQUAL", "NOT_EQUAL"],
+          `Invalid operator ${c.operator} for field of type ${field.type}`
+        );
+        assert(
+          c.value === null || field.options.values.includes(c.value),
+          `Invalid value ${c.value} for field of type ${
+            field.type
+          }. Should be one of: ${field.options.values.join(",")}`
+        );
       }
-    } else if (field?.type === "HEADING") {
-      throw new Error(`Invalid field type ${field.type} on condition`);
     }
   };
 }
