@@ -936,6 +936,7 @@ export interface NexusGenFieldTypes {
     unpublishedCommentCount: number; // Int!
     unreadCommentCount: number; // Int!
     validated: boolean; // Boolean!
+    visibility: NexusGenScalars["JSONObject"] | null; // JSONObject
   };
   PublicPetitionFieldComment: {
     // field return type
@@ -1659,6 +1660,7 @@ export interface NexusGenFieldTypeNames {
     unpublishedCommentCount: "Int";
     unreadCommentCount: "Int";
     validated: "Boolean";
+    visibility: "JSONObject";
   };
   PublicPetitionFieldComment: {
     // field return type name

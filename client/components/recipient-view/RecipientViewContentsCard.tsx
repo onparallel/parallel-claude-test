@@ -5,6 +5,7 @@ import {
   RecipientViewContentsCard_PublicPetitionFragment,
   RecipientViewContentsCard_PublicUserFragment,
 } from "@parallel/graphql/__types";
+import { filterFieldsByVisibility } from "@parallel/utils/filterFieldsByVisibility";
 import { Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
@@ -27,7 +28,8 @@ export function RecipientViewContentsCard({
   ...props
 }: RecipientViewContentsCardProps) {
   const { query } = useRouter();
-  const { pages, fields } = getPagesAndFields(petition.fields, currentPage);
+  const visibleFields = filterFieldsByVisibility(petition.fields);
+  const { pages, fields } = getPagesAndFields(visibleFields, currentPage);
   return (
     <Card padding={4} display="flex" flexDirection="column" {...props}>
       <Heading
@@ -234,7 +236,9 @@ RecipientViewContentsCard.fragments = {
         commentCount
         unpublishedCommentCount
         unreadCommentCount
+        ...filterFieldsByVisibility_PublicPetitionField
       }
+      ${filterFieldsByVisibility.fragments.PublicPetitionField}
     `;
   },
 };

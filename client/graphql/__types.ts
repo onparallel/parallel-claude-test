@@ -1107,6 +1107,8 @@ export type PetitionField = {
   type: PetitionFieldType;
   /** Determines if the content of this field has been validated. */
   validated: Scalars["Boolean"];
+  /** A JSON object representing the conditions for the field to be visible */
+  visibility?: Maybe<Scalars["JSONObject"]>;
 };
 
 /** A comment on a petition field */
@@ -1478,6 +1480,8 @@ export type PublicPetitionField = {
   unreadCommentCount: Scalars["Int"];
   /** Determines if the content of this field has been validated. */
   validated: Scalars["Boolean"];
+  /** A JSON object representing the conditions for the field to be visible */
+  visibility?: Maybe<Scalars["JSONObject"]>;
 };
 
 /** A comment on a petition field */
@@ -1818,6 +1822,7 @@ export type UpdatePetitionFieldInput = {
   optional?: Maybe<Scalars["Boolean"]>;
   options?: Maybe<Scalars["JSONObject"]>;
   title?: Maybe<Scalars["String"]>;
+  visibility?: Maybe<Scalars["JSONObject"]>;
 };
 
 export type UpdatePetitionInput = {
@@ -3368,7 +3373,7 @@ export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
         "id"
       >
     >;
-  };
+  } & filterFieldsByVisibility_PublicPetitionFieldFragment;
 
 export type RecipientViewProgressFooter_PublicPetitionFragment = {
   __typename?: "PublicPetition";
@@ -3392,7 +3397,7 @@ export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
         "id"
       >
     >;
-  };
+  } & filterFieldsByVisibility_PublicPetitionFieldFragment;
 
 export type RecipientViewSenderCard_PublicUserFragment = {
   __typename?: "PublicUser";
@@ -4859,7 +4864,8 @@ export type RecipientView_PublicPetitionFieldFragment = {
 } & Pick<PublicPetitionField, "id"> &
   RecipientViewPetitionField_PublicPetitionFieldFragment &
   RecipientViewContentsCard_PublicPetitionFieldFragment &
-  RecipientViewProgressFooter_PublicPetitionFieldFragment;
+  RecipientViewProgressFooter_PublicPetitionFieldFragment &
+  filterFieldsByVisibility_PublicPetitionFieldFragment;
 
 export type RecipientView_PublicUserFragment = {
   __typename?: "PublicUser";
@@ -5010,6 +5016,17 @@ export type Thanks_PetitionLogoQuery = { __typename?: "Query" } & Pick<
   Query,
   "publicOrgLogoUrl"
 >;
+
+export type filterFieldsByVisibility_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & Pick<PublicPetitionField, "id" | "visibility"> & {
+    replies: Array<
+      { __typename?: "PublicPetitionFieldReply" } & Pick<
+        PublicPetitionFieldReply,
+        "id" | "content"
+      >
+    >;
+  };
 
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
@@ -6664,6 +6681,16 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc}
 `;
+export const filterFieldsByVisibility_PublicPetitionFieldFragmentDoc = gql`
+  fragment filterFieldsByVisibility_PublicPetitionField on PublicPetitionField {
+    id
+    visibility
+    replies {
+      id
+      content
+    }
+  }
+`;
 export const RecipientViewContentsCard_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewContentsCard_PublicPetitionField on PublicPetitionField {
     id
@@ -6678,7 +6705,9 @@ export const RecipientViewContentsCard_PublicPetitionFieldFragmentDoc = gql`
     commentCount
     unpublishedCommentCount
     unreadCommentCount
+    ...filterFieldsByVisibility_PublicPetitionField
   }
+  ${filterFieldsByVisibility_PublicPetitionFieldFragmentDoc}
 `;
 export const RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewProgressFooter_PublicPetitionField on PublicPetitionField {
@@ -6688,7 +6717,9 @@ export const RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc = gql`
     replies {
       id
     }
+    ...filterFieldsByVisibility_PublicPetitionField
   }
+  ${filterFieldsByVisibility_PublicPetitionFieldFragmentDoc}
 `;
 export const RecipientView_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientView_PublicPetitionField on PublicPetitionField {
@@ -6696,10 +6727,12 @@ export const RecipientView_PublicPetitionFieldFragmentDoc = gql`
     ...RecipientViewPetitionField_PublicPetitionField
     ...RecipientViewContentsCard_PublicPetitionField
     ...RecipientViewProgressFooter_PublicPetitionField
+    ...filterFieldsByVisibility_PublicPetitionField
   }
   ${RecipientViewPetitionField_PublicPetitionFieldFragmentDoc}
   ${RecipientViewContentsCard_PublicPetitionFieldFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
+  ${filterFieldsByVisibility_PublicPetitionFieldFragmentDoc}
 `;
 export const RecipientView_PublicContactFragmentDoc = gql`
   fragment RecipientView_PublicContact on PublicContact {

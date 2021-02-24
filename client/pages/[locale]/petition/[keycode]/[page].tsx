@@ -49,11 +49,13 @@ import { compose } from "@parallel/utils/compose";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
+import { filterFieldsByVisibility } from "@parallel/utils/filterFieldsByVisibility";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
+import { AnimatePresence, motion } from "framer-motion";
 
 type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -75,7 +77,11 @@ function RecipientView({
   const contact = access!.contact!;
   const signers = petition!.signers!;
 
-  const { fields, pages } = useGetPageFields(petition.fields, currentPage);
+  const visibleFields = filterFieldsByVisibility<RecipientView_PublicPetitionFieldFragment>(
+    petition.fields
+  );
+
+  const { fields, pages } = useGetPageFields(visibleFields, currentPage);
 
   const [showAlert, setShowAlert] = useState(true);
 
@@ -88,7 +94,7 @@ function RecipientView({
     async function () {
       try {
         setFinalized(true);
-        const canFinalize = petition.fields.every(
+        const canFinalize = visibleFields.every(
           (f) => f.optional || f.replies.length > 0 || f.isReadOnly
         );
         if (canFinalize) {
@@ -117,7 +123,7 @@ function RecipientView({
         } else {
           // go to first repliable field without replies
           let page = 1;
-          const field = petition.fields.find((f) => {
+          const field = visibleFields.find((f) => {
             if (f.type === "HEADING" && f.options.hasPageBreak) {
               page += 1;
             }
@@ -130,7 +136,7 @@ function RecipientView({
         }
       } catch {}
     },
-    [petition.fields, granter, router.query]
+    [visibleFields, granter, router.query]
   );
 
   const [
@@ -160,7 +166,7 @@ function RecipientView({
     });
   }
 
-  const pendingComments = petition.fields.reduce(
+  const pendingComments = visibleFields.reduce(
     (acc, f) => acc + f.unpublishedCommentCount,
     0
   );
@@ -333,21 +339,29 @@ function RecipientView({
           </Box>
           <Flex flexDirection="column" flex="2" minWidth={0}>
             <Stack spacing={4}>
-              {fields.map((field) => (
-                <RecipientViewPetitionField
-                  key={field.id}
-                  id={`field-${field.id}`}
-                  petitionId={petition.id}
-                  keycode={keycode}
-                  access={access!}
-                  field={field}
-                  isDisabled={field.validated || petition.status === "CLOSED"}
-                  isInvalid={
-                    finalized && field.replies.length === 0 && !field.optional
-                  }
-                  hasCommentsEnabled={petition.hasCommentsEnabled}
-                />
-              ))}
+              <AnimatePresence initial={false}>
+                {fields.map((field) => (
+                  <motion.div key={field.id} layout="position">
+                    <RecipientViewPetitionField
+                      key={field.id}
+                      id={`field-${field.id}`}
+                      petitionId={petition.id}
+                      keycode={keycode}
+                      access={access!}
+                      field={field}
+                      isDisabled={
+                        field.validated || petition.status === "CLOSED"
+                      }
+                      isInvalid={
+                        finalized &&
+                        field.replies.length === 0 &&
+                        !field.optional
+                      }
+                      hasCommentsEnabled={petition.hasCommentsEnabled}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </Stack>
             <Spacer />
             {pages > 1 ? (
@@ -493,10 +507,12 @@ RecipientView.fragments = {
         ...RecipientViewPetitionField_PublicPetitionField
         ...RecipientViewContentsCard_PublicPetitionField
         ...RecipientViewProgressFooter_PublicPetitionField
+        ...filterFieldsByVisibility_PublicPetitionField
       }
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
       ${RecipientViewContentsCard.fragments.PublicPetitionField}
       ${RecipientViewProgressFooter.fragments.PublicPetitionField}
+      ${filterFieldsByVisibility.fragments.PublicPetitionField}
     `;
   },
   get PublicUser() {

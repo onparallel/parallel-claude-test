@@ -169,6 +169,11 @@ export const PublicPetitionField = objectType({
         );
       },
     });
+    t.nullable.jsonObject("visibility", {
+      description:
+        "A JSON object representing the conditions for the field to be visible",
+      resolve: (o) => o.visibility,
+    });
   },
 });
 

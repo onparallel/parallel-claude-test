@@ -2188,6 +2188,11 @@ type PublicPetitionField {
   Determines if the content of this field has been validated.
   """
   validated: Boolean!
+
+  """
+  A JSON object representing the conditions for the field to be visible
+  """
+  visibility: JSONObject
 }
 
 """
