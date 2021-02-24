@@ -213,12 +213,7 @@ export function PublicFooter(props: BoxProps) {
           alignItems="center"
           justifyContent="space-around"
         >
-          <NormalLink
-            href="https://acelera.cuatrecasas.com"
-            isExternal
-            display="flex"
-            justifyContent="center"
-          >
+          <NormalLink href="https://acelera.cuatrecasas.com" isExternal>
             <Image
               alt="Cuatrecasas Acelera"
               width="120px"
@@ -227,12 +222,7 @@ export function PublicFooter(props: BoxProps) {
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/cuatrecasas-acelera2.png`}
             />
           </NormalLink>
-          <NormalLink
-            href="https://www.enisa.es/"
-            isExternal
-            display="flex"
-            justifyContent="center"
-          >
+          <NormalLink href="https://www.enisa.es/" isExternal>
             <Image
               alt="Enisa"
               width="80px"

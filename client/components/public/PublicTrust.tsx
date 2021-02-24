@@ -28,12 +28,7 @@ export function PublicTrust(props: BoxProps) {
         gridGap={8}
       >
         <Center>
-          <NormalLink
-            href="https://www.cuatrecasas.com"
-            isExternal
-            display="flex"
-            justifyContent="center"
-          >
+          <NormalLink href="https://www.cuatrecasas.com" isExternal>
             <Image
               alt="Cuatrecasas Acelera"
               width="220px"
@@ -46,8 +41,6 @@ export function PublicTrust(props: BoxProps) {
           <NormalLink
             href="https://es.andersen.com/"
             isExternal
-            display="flex"
-            justifyContent="center"
             marginBottom={{ md: "8px" }}
           >
             <Image
