@@ -230,7 +230,7 @@ export const RecipientViewPetitionFieldText = chakraForwardRef<
           </AnimatePresence>
         </List>
       ) : null}
-      {showNewReply ? (
+      {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
           {field.options.multiline ? (
             <GrowingTextarea {...inputProps} />

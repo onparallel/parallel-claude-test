@@ -166,7 +166,7 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
           </AnimatePresence>
         </List>
       ) : null}
-      {showNewReply ? (
+      {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Box flex="1" position="relative" marginTop={2}>
           <Select
             {...reactSelectProps}
