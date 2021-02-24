@@ -68,17 +68,7 @@ const schema = {
 };
 
 async function loadField(fieldId: string, ctx: ApiContext) {
-  let id: number;
-
-  try {
-    const data = fromGlobalId(fieldId);
-    id = data.id;
-    if (data.type !== "PetitionField") {
-      throw new Error(`Invalid GlobalID ${fieldId}`);
-    }
-  } catch {
-    throw new Error(`Invalid GlobalID ${fieldId}`);
-  }
+  const { id } = fromGlobalId(fieldId, "PetitionField");
   const field = await ctx.petitions.loadField(id);
   if (!field) {
     throw new Error(`Can't find field with id ${id}`);
