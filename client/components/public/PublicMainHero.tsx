@@ -1,8 +1,15 @@
-import { Box, BoxProps, Button, Flex, Heading, Stack } from "@chakra-ui/react";
+import {
+  Box,
+  BoxProps,
+  Button,
+  Center,
+  Flex,
+  Heading,
+  Stack,
+} from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PublicContainer } from "./layout/PublicContainer";
 
 export type PublicHeroProps = BoxProps;
 
@@ -12,41 +19,33 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
   const imageName = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/showcase_hero_${query.locale}`;
   const breakpoint = "lg";
   return (
-    <PublicContainer
-      {...props}
-      wrapper={{
-        marginY: { base: 8, md: 12, lg: 20 },
-        minHeight: { [breakpoint]: "400px" },
-      }}
+    <Stack
+      spacing={12}
+      direction={{ base: "column-reverse", [breakpoint]: "row" }}
     >
-      <Stack spacing={12} direction={{ base: "column", [breakpoint]: "row" }}>
-        <Box flex="1">
-          <Heading
-            as="h1"
-            fontFamily="hero"
-            size="3xl"
-            fontWeight="light"
-            aria-live="polite"
-            aria-atomic="true"
-          >
+      <Center
+        flex="1"
+        marginLeft={{ base: 8, [breakpoint]: 20 }}
+        marginRight={{ base: 8, [breakpoint]: 0 }}
+      >
+        <Stack spacing={8}>
+          <Heading as="h1" fontFamily="hero" fontWeight="600" size="3xl">
             <FormattedMessage
               id="public.home.hero-title"
-              defaultMessage="Say goodbye to long email threads to obtain information"
+              defaultMessage="Accelerate your team's work"
             />
           </Heading>
-          <Heading as="h2" size="md" fontWeight="light" marginTop={8}>
+          <Heading as="h2" size="md" fontWeight="light">
             <FormattedMessage
               id="public.home.hero-subtitle"
-              defaultMessage="Parallel collects and organizes the information you need on time so that you can keep focus and stay productive."
+              defaultMessage="With Parallel you can easily automate forms with documents and make it an agile and safe process."
             />
           </Heading>
-          <Flex
-            marginTop={8}
-            flexDirection={{ base: "column", [breakpoint]: "row" }}
-          >
+          <Box>
             <NakedLink href="/book-demo">
               <Button
                 as="a"
+                size="lg"
                 colorScheme="purple"
                 marginBottom={{ base: 2, [breakpoint]: 0 }}
                 marginRight={{ base: 0, [breakpoint]: 2 }}
@@ -57,33 +56,30 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
                 />
               </Button>
             </NakedLink>
-            <NakedLink href="/invite">
-              <Button as="a" variant="outline">
-                <FormattedMessage
-                  id="public.invite-button"
-                  defaultMessage="Request an invite"
-                />
-              </Button>
-            </NakedLink>
-          </Flex>
-        </Box>
-        <Flex flex="1" justifyContent="center">
-          <Box as="picture" margin="auto">
-            <source
-              srcSet={`${imageName}.webp?v=${process.env.BUILD_ID}`}
-              type="image/webp"
-            />
-            <img
-              alt={intl.formatMessage({
-                id: "public.showcase-hero-alt",
-                defaultMessage:
-                  'A professional asking her client for some necessary information she needs for a case. Her client is responding "Here you go!".',
-              })}
-              src={`${imageName}.png?v=${process.env.BUILD_ID}`}
-            />
           </Box>
-        </Flex>
-      </Stack>
-    </PublicContainer>
+        </Stack>
+      </Center>
+      <Flex
+        flex="1"
+        justifyContent="center"
+        width={{ base: "80vw", [breakpoint]: "auto" }}
+        alignSelf={{ base: "flex-end", [breakpoint]: "auto" }}
+      >
+        <Box as="picture" margin="auto">
+          <source
+            srcSet={`${imageName}.webp?v=${process.env.BUILD_ID}`}
+            type="image/webp"
+          />
+          <img
+            alt={intl.formatMessage({
+              id: "public.showcase-hero-alt",
+              defaultMessage:
+                'A professional asking her client for some necessary information she needs for a case. Her client is responding "Here you go!".',
+            })}
+            src={`${imageName}.png?v=${process.env.BUILD_ID}`}
+          />
+        </Box>
+      </Flex>
+    </Stack>
   );
 }

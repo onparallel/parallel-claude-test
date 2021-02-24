@@ -3290,21 +3290,6 @@
     "context": "Legal industry"
   },
   {
-    "term": "public.for-whom.freelance",
-    "definition": "Freelancers",
-    "context": "Freelancers"
-  },
-  {
-    "term": "public.for-whom.legal",
-    "definition": "Legal",
-    "context": "Legal"
-  },
-  {
-    "term": "public.for-whom.services",
-    "definition": "Professional Services",
-    "context": "Professional Services"
-  },
-  {
     "term": "public.forgot-password.explanation",
     "definition": "We will send you a message to reset your password.",
     "context": "We will send you a message to reset your password."
@@ -3386,13 +3371,13 @@
   },
   {
     "term": "public.home.hero-subtitle",
-    "definition": "Parallel collects and organizes the information you need on time so that you can keep focus and stay productive.",
-    "context": "Parallel collects and organizes the information you need on time so that you can keep focus and stay productive."
+    "definition": "With Parallel you can easily automate forms with documents and make it an agile and safe process.",
+    "context": "With Parallel you can easily automate forms with documents and make it an agile and safe process."
   },
   {
     "term": "public.home.hero-title",
-    "definition": "Say goodbye to long email threads to obtain information",
-    "context": "Say goodbye to long email threads to obtain information"
+    "definition": "Accelerate your team's work",
+    "context": "Accelerate your team's work"
   },
   {
     "term": "public.home.press",
@@ -3485,39 +3470,14 @@
     "context": "How it works"
   },
   {
-    "term": "public.invite-button",
-    "definition": "Request an invite",
-    "context": "Request an invite"
-  },
-  {
     "term": "public.invite.consent",
     "definition": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time.",
     "context": "Parallel needs the contact information you provide to us to contact you about our products. You may unsubscribe from these communications at any time."
   },
   {
-    "term": "public.invite.meta-description",
-    "definition": "Request an invite to start using Parallel",
-    "context": "Request an invite to start using Parallel"
-  },
-  {
-    "term": "public.invite.request-invite",
-    "definition": "Request your invite!",
-    "context": "Request your invite!"
-  },
-  {
     "term": "public.invite.review-privacy",
     "definition": "For more information, please review our <a>Privacy Policy</a>.",
     "context": "For more information, please review our <a>Privacy Policy</a>."
-  },
-  {
-    "term": "public.invite.tell-us-about-yourself",
-    "definition": "Leave us your email. We will send you the <a>invitation</a> as soon as possible.",
-    "context": "Leave us your email. We will send you the <a>invitation</a> as soon as possible."
-  },
-  {
-    "term": "public.invite.title",
-    "definition": "Request an invite",
-    "context": "Request an invite"
   },
   {
     "term": "public.login-button",
@@ -3621,11 +3581,6 @@
   },
   {
     "term": "public.people.title",
-    "definition": "For whom",
-    "context": "For whom"
-  },
-  {
-    "term": "public.persons-link",
     "definition": "For whom",
     "context": "For whom"
   },
@@ -4156,8 +4111,8 @@
   },
   {
     "term": "public.who-trust-us.title",
-    "definition": "Who trust us",
-    "context": "Who trust us"
+    "definition": "Already trust us",
+    "context": "Already trust us"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",

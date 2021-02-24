@@ -18,7 +18,7 @@ export const theme = extendTheme({
   fonts: {
     body: "'IBM Plex Sans', sans-serif",
     heading: "'IBM Plex Sans', sans-serif",
-    hero: "'Playfair Display', serif",
+    hero: "'Source Sans Pro', sans-serif",
   },
   sizes: {
     container: {

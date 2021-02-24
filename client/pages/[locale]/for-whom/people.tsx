@@ -194,11 +194,11 @@ function People() {
               defaultMessage="If you want to start using Parallel for free, register here."
             />
           </Text>
-          <NakedLink href="/invite">
+          <NakedLink href="/book-demo">
             <Button as="a" colorScheme="purple" marginTop={8}>
               <FormattedMessage
-                id="public.invite-button"
-                defaultMessage="Request an invite"
+                id="public.book-demo-button"
+                defaultMessage="Book a demo"
               />
             </Button>
           </NakedLink>

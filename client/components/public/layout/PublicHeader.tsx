@@ -41,11 +41,7 @@ export function PublicHeader(props: BoxProps) {
       wrapper={{
         as: "header",
         backgroundColor: "white",
-        boxShadow: isThin
-          ? "md"
-          : isOpen
-          ? { base: "md", [bp]: "none" }
-          : "none",
+        boxShadow: isOpen ? { base: "md", [bp]: "none" } : "md",
         ...props,
       }}
     >
@@ -162,36 +158,6 @@ function PublicHeaderMenu(props: StackProps) {
               <FormattedMessage
                 id="public.product.security-link"
                 defaultMessage="A secure environment"
-              />
-            </MenuItemLink>
-          </MenuList>
-        </Portal>
-      </Menu>
-      <Menu placement="bottom">
-        <MenuButton as={Button} variant="ghost" rightIcon={<ChevronDownIcon />}>
-          <FormattedMessage
-            id="public.persons-link"
-            defaultMessage="For whom"
-          />
-        </MenuButton>
-        <Portal>
-          <MenuList>
-            <MenuItemLink href="/for-whom/people">
-              <FormattedMessage
-                id="public.for-whom.freelance"
-                defaultMessage="Freelancers"
-              />
-            </MenuItemLink>
-            <MenuItemLink href="/for-whom/legal-industry">
-              <FormattedMessage
-                id="public.for-whom.legal"
-                defaultMessage="Legal"
-              />
-            </MenuItemLink>
-            <MenuItemLink href="/for-whom/services">
-              <FormattedMessage
-                id="public.for-whom.services"
-                defaultMessage="Professional Services"
               />
             </MenuItemLink>
           </MenuList>

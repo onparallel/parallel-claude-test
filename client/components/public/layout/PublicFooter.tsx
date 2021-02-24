@@ -4,20 +4,23 @@ import {
   Divider,
   Flex,
   IconButton,
+  Image,
   List,
   ListItem,
   Select,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import { LinkedInIcon, TwitterIcon } from "@parallel/chakra/icons";
 import { Link, NormalLink } from "@parallel/components/common/Link";
+import { Spacer } from "@parallel/components/common/Spacer";
 import { resolveUrl } from "@parallel/utils/next";
+import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
 import { ChangeEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
 import { PublicFooterBox } from "./PublicFooterBox";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 
 export function PublicFooter(props: BoxProps) {
   const router = useRouter();
@@ -179,10 +182,10 @@ export function PublicFooter(props: BoxProps) {
         </PublicFooterBox>
       </Flex>
       <Divider marginY={8} />
-      <Flex wrap="wrap">
-        <Box flex="1">
-          <Text fontSize="xs">© 2020 Parallel Solutions, S.L.</Text>
-          <Flex>
+      <Stack direction={{ base: "column", md: "row" }} spacing={8}>
+        <Flex flex="1">
+          <Box flex={{ base: "1", md: "unset" }}>
+            <Text fontSize="xs">© 2020 Parallel Solutions, S.L.</Text>
             <Select
               size="sm"
               width="auto"
@@ -201,9 +204,44 @@ export function PublicFooter(props: BoxProps) {
                 </option>
               ))}
             </Select>
-          </Flex>
-        </Box>
-        <Box>
+          </Box>
+          <Spacer display={{ base: "none", md: "block" }} />
+        </Flex>
+        <Stack
+          direction="row"
+          alignSelf="top"
+          alignItems="center"
+          justifyContent="space-around"
+        >
+          <NormalLink
+            href="https://acelera.cuatrecasas.com"
+            isExternal
+            display="flex"
+            justifyContent="center"
+          >
+            <Image
+              alt="Cuatrecasas Acelera"
+              width="120px"
+              loading="lazy"
+              filter="grayscale(100%)"
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/cuatrecasas-acelera2.png`}
+            />
+          </NormalLink>
+          <NormalLink
+            href="https://www.enisa.es/"
+            isExternal
+            display="flex"
+            justifyContent="center"
+          >
+            <Image
+              alt="Enisa"
+              width="80px"
+              loading="lazy"
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/enisa_${router.query.locale}.png`}
+            />
+          </NormalLink>
+        </Stack>
+        <Stack direction="row" justifyContent="space-around">
           <IconButton
             as={"a" as any}
             {...{
@@ -229,14 +267,13 @@ export function PublicFooter(props: BoxProps) {
             icon={<LinkedInIcon />}
             isRound
             colorScheme="purple"
-            marginLeft={2}
             aria-label={intl.formatMessage({
               id: "public.footer.linkedin-profile",
               defaultMessage: "LinkedIn profile",
             })}
           />
-        </Box>
-      </Flex>
+        </Stack>
+      </Stack>
     </PublicContainer>
   );
 }
