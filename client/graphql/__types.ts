@@ -4996,7 +4996,7 @@ export type PetitionPdf_PetitionFieldFragment = {
         "id" | "content"
       >
     >;
-  };
+  } & filterFieldsByVisibility_PetitionFieldFragment;
 
 export type PdfViewPetitionQueryVariables = Exact<{
   token: Scalars["String"];
@@ -5023,6 +5023,17 @@ export type filterFieldsByVisibility_PublicPetitionFieldFragment = {
     replies: Array<
       { __typename?: "PublicPetitionFieldReply" } & Pick<
         PublicPetitionFieldReply,
+        "id" | "content"
+      >
+    >;
+  };
+
+export type filterFieldsByVisibility_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "visibility"> & {
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<
+        PetitionFieldReply,
         "id" | "content"
       >
     >;
@@ -6857,6 +6868,16 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   ${RecipientViewContactCard_PublicContactFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
 `;
+export const filterFieldsByVisibility_PetitionFieldFragmentDoc = gql`
+  fragment filterFieldsByVisibility_PetitionField on PetitionField {
+    id
+    visibility
+    replies {
+      id
+      content
+    }
+  }
+`;
 export const PetitionPdf_PetitionFieldFragmentDoc = gql`
   fragment PetitionPdf_PetitionField on PetitionField {
     id
@@ -6869,7 +6890,9 @@ export const PetitionPdf_PetitionFieldFragmentDoc = gql`
       id
       content
     }
+    ...filterFieldsByVisibility_PetitionField
   }
+  ${filterFieldsByVisibility_PetitionFieldFragmentDoc}
 `;
 export const PetitionPdf_PetitionFragmentDoc = gql`
   fragment PetitionPdf_Petition on Petition {

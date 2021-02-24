@@ -15,6 +15,7 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
+import { filterFieldsByVisibility } from "@parallel/utils/filterFieldsByVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import jwtDecode from "jwt-decode";
 import { useMemo } from "react";
@@ -45,13 +46,15 @@ function PetitionPdf({ token }: { token: string }) {
 
   const contacts = signatureConfig?.contacts;
 
-  const fieldIndexValues = useFieldIndexValues(petition.fields);
+  const visibleFields = filterFieldsByVisibility(petition.fields);
+
+  const fieldIndexValues = useFieldIndexValues(visibleFields);
   const intl = useIntl();
   const pages = useMemo(() => {
     const fields = fieldIndexValues.map((indexValue, i) => ({
-      ...petition.fields[i],
+      ...visibleFields[i],
       title: `${indexValue} - ${
-        petition.fields[i].title ??
+        visibleFields[i].title ??
         intl.formatMessage({
           id: "generic.untitled-field",
           defaultMessage: "Untitled field",
@@ -59,7 +62,7 @@ function PetitionPdf({ token }: { token: string }) {
       }`,
     }));
     return groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(fields);
-  }, [petition.fields]);
+  }, [visibleFields]);
 
   return (
     <>
@@ -177,7 +180,9 @@ PetitionPdf.fragments = {
           id
           content
         }
+        ...filterFieldsByVisibility_PetitionField
       }
+      ${filterFieldsByVisibility.fragments.PetitionField}
     `;
   },
 };
