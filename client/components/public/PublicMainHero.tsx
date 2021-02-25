@@ -29,7 +29,13 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
         marginRight={{ base: 8, [breakpoint]: 0 }}
       >
         <Stack spacing={8}>
-          <Heading as="h1" fontFamily="hero" fontWeight="600" size="3xl">
+          <Heading
+            as="h1"
+            fontFamily="hero"
+            fontWeight="600"
+            size="3xl"
+            lineHeight="1.2"
+          >
             <FormattedMessage
               id="public.home.hero-title"
               defaultMessage="Accelerate your team's work"
