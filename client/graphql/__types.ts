@@ -3373,7 +3373,7 @@ export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
         "id"
       >
     >;
-  } & filterFieldsByVisibility_PublicPetitionFieldFragment;
+  } & evaluateFieldVisibility_PublicPetitionFieldFragment;
 
 export type RecipientViewProgressFooter_PublicPetitionFragment = {
   __typename?: "PublicPetition";
@@ -3397,7 +3397,7 @@ export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
         "id"
       >
     >;
-  } & filterFieldsByVisibility_PublicPetitionFieldFragment;
+  } & evaluateFieldVisibility_PublicPetitionFieldFragment;
 
 export type RecipientViewSenderCard_PublicUserFragment = {
   __typename?: "PublicUser";
@@ -4865,7 +4865,7 @@ export type RecipientView_PublicPetitionFieldFragment = {
   RecipientViewPetitionField_PublicPetitionFieldFragment &
   RecipientViewContentsCard_PublicPetitionFieldFragment &
   RecipientViewProgressFooter_PublicPetitionFieldFragment &
-  filterFieldsByVisibility_PublicPetitionFieldFragment;
+  evaluateFieldVisibility_PublicPetitionFieldFragment;
 
 export type RecipientView_PublicUserFragment = {
   __typename?: "PublicUser";
@@ -4996,7 +4996,7 @@ export type PetitionPdf_PetitionFieldFragment = {
         "id" | "content"
       >
     >;
-  } & filterFieldsByVisibility_PetitionFieldFragment;
+  } & evaluateFieldVisibility_PetitionFieldFragment;
 
 export type PdfViewPetitionQueryVariables = Exact<{
   token: Scalars["String"];
@@ -5017,7 +5017,7 @@ export type Thanks_PetitionLogoQuery = { __typename?: "Query" } & Pick<
   "publicOrgLogoUrl"
 >;
 
-export type filterFieldsByVisibility_PublicPetitionFieldFragment = {
+export type evaluateFieldVisibility_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
 } & Pick<PublicPetitionField, "id" | "visibility"> & {
     replies: Array<
@@ -5028,7 +5028,7 @@ export type filterFieldsByVisibility_PublicPetitionFieldFragment = {
     >;
   };
 
-export type filterFieldsByVisibility_PetitionFieldFragment = {
+export type evaluateFieldVisibility_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "visibility"> & {
     replies: Array<
@@ -6692,8 +6692,8 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc}
 `;
-export const filterFieldsByVisibility_PublicPetitionFieldFragmentDoc = gql`
-  fragment filterFieldsByVisibility_PublicPetitionField on PublicPetitionField {
+export const evaluateFieldVisibility_PublicPetitionFieldFragmentDoc = gql`
+  fragment evaluateFieldVisibility_PublicPetitionField on PublicPetitionField {
     id
     visibility
     replies {
@@ -6716,9 +6716,9 @@ export const RecipientViewContentsCard_PublicPetitionFieldFragmentDoc = gql`
     commentCount
     unpublishedCommentCount
     unreadCommentCount
-    ...filterFieldsByVisibility_PublicPetitionField
+    ...evaluateFieldVisibility_PublicPetitionField
   }
-  ${filterFieldsByVisibility_PublicPetitionFieldFragmentDoc}
+  ${evaluateFieldVisibility_PublicPetitionFieldFragmentDoc}
 `;
 export const RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewProgressFooter_PublicPetitionField on PublicPetitionField {
@@ -6728,9 +6728,9 @@ export const RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc = gql`
     replies {
       id
     }
-    ...filterFieldsByVisibility_PublicPetitionField
+    ...evaluateFieldVisibility_PublicPetitionField
   }
-  ${filterFieldsByVisibility_PublicPetitionFieldFragmentDoc}
+  ${evaluateFieldVisibility_PublicPetitionFieldFragmentDoc}
 `;
 export const RecipientView_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientView_PublicPetitionField on PublicPetitionField {
@@ -6738,12 +6738,12 @@ export const RecipientView_PublicPetitionFieldFragmentDoc = gql`
     ...RecipientViewPetitionField_PublicPetitionField
     ...RecipientViewContentsCard_PublicPetitionField
     ...RecipientViewProgressFooter_PublicPetitionField
-    ...filterFieldsByVisibility_PublicPetitionField
+    ...evaluateFieldVisibility_PublicPetitionField
   }
   ${RecipientViewPetitionField_PublicPetitionFieldFragmentDoc}
   ${RecipientViewContentsCard_PublicPetitionFieldFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
-  ${filterFieldsByVisibility_PublicPetitionFieldFragmentDoc}
+  ${evaluateFieldVisibility_PublicPetitionFieldFragmentDoc}
 `;
 export const RecipientView_PublicContactFragmentDoc = gql`
   fragment RecipientView_PublicContact on PublicContact {
@@ -6868,8 +6868,8 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   ${RecipientViewContactCard_PublicContactFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
 `;
-export const filterFieldsByVisibility_PetitionFieldFragmentDoc = gql`
-  fragment filterFieldsByVisibility_PetitionField on PetitionField {
+export const evaluateFieldVisibility_PetitionFieldFragmentDoc = gql`
+  fragment evaluateFieldVisibility_PetitionField on PetitionField {
     id
     visibility
     replies {
@@ -6890,9 +6890,9 @@ export const PetitionPdf_PetitionFieldFragmentDoc = gql`
       id
       content
     }
-    ...filterFieldsByVisibility_PetitionField
+    ...evaluateFieldVisibility_PetitionField
   }
-  ${filterFieldsByVisibility_PetitionFieldFragmentDoc}
+  ${evaluateFieldVisibility_PetitionFieldFragmentDoc}
 `;
 export const PetitionPdf_PetitionFragmentDoc = gql`
   fragment PetitionPdf_Petition on Petition {

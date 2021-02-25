@@ -15,7 +15,7 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
-import { filterFieldsByVisibility } from "@parallel/utils/filterFieldsByVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import jwtDecode from "jwt-decode";
 import { useMemo } from "react";
@@ -46,7 +46,9 @@ function PetitionPdf({ token }: { token: string }) {
 
   const contacts = signatureConfig?.contacts;
 
-  const visibleFields = filterFieldsByVisibility(petition.fields);
+  const visibleFields = evaluateFieldVisibility(petition.fields).filter(
+    (f) => f.isVisible
+  );
 
   const fieldIndexValues = useFieldIndexValues(visibleFields);
   const intl = useIntl();
@@ -180,9 +182,9 @@ PetitionPdf.fragments = {
           id
           content
         }
-        ...filterFieldsByVisibility_PetitionField
+        ...evaluateFieldVisibility_PetitionField
       }
-      ${filterFieldsByVisibility.fragments.PetitionField}
+      ${evaluateFieldVisibility.fragments.PetitionField}
     `;
   },
 };

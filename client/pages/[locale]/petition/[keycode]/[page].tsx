@@ -49,7 +49,7 @@ import { compose } from "@parallel/utils/compose";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { filterFieldsByVisibility } from "@parallel/utils/filterFieldsByVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -77,11 +77,7 @@ function RecipientView({
   const contact = access!.contact!;
   const signers = petition!.signers!;
 
-  const visibleFields = filterFieldsByVisibility<RecipientView_PublicPetitionFieldFragment>(
-    petition.fields
-  );
-
-  const { fields, pages } = useGetPageFields(visibleFields, currentPage);
+  const { fields, pages } = useGetPageFields(petition.fields, currentPage);
 
   const [showAlert, setShowAlert] = useState(true);
 
@@ -94,8 +90,9 @@ function RecipientView({
     async function () {
       try {
         setFinalized(true);
-        const canFinalize = visibleFields.every(
-          (f) => f.optional || f.replies.length > 0 || f.isReadOnly
+        const canFinalize = fields.every(
+          (f) =>
+            f.optional || f.replies.length > 0 || f.isReadOnly || !f.isVisible
         );
         if (canFinalize) {
           if (signers.length > 0) {
@@ -123,11 +120,16 @@ function RecipientView({
         } else {
           // go to first repliable field without replies
           let page = 1;
-          const field = visibleFields.find((f) => {
+          const field = fields.find((f) => {
             if (f.type === "HEADING" && f.options.hasPageBreak) {
               page += 1;
             }
-            return f.replies.length === 0 && !f.optional && !f.isReadOnly;
+            return (
+              f.replies.length === 0 &&
+              !f.optional &&
+              !f.isReadOnly &&
+              f.isVisible
+            );
           })!;
           const { keycode, locale } = router.query;
           router.push(
@@ -136,7 +138,7 @@ function RecipientView({
         }
       } catch {}
     },
-    [visibleFields, granter, router.query]
+    [fields, granter, router.query]
   );
 
   const [
@@ -166,7 +168,7 @@ function RecipientView({
     });
   }
 
-  const pendingComments = visibleFields.reduce(
+  const pendingComments = fields.reduce(
     (acc, f) => acc + f.unpublishedCommentCount,
     0
   );
@@ -341,7 +343,15 @@ function RecipientView({
             <Stack spacing={4}>
               <AnimatePresence initial={false}>
                 {fields.map((field) => (
-                  <motion.div key={field.id} layout="position">
+                  <motion.div
+                    key={field.id}
+                    layout="position"
+                    hidden={
+                      !field.isVisible &&
+                      field.commentCount === 0 &&
+                      field.replies.length === 0
+                    }
+                  >
                     <RecipientViewPetitionField
                       key={field.id}
                       id={`field-${field.id}`}
@@ -350,7 +360,9 @@ function RecipientView({
                       access={access!}
                       field={field}
                       isDisabled={
-                        field.validated || petition.status === "CLOSED"
+                        field.validated ||
+                        petition.status === "CLOSED" ||
+                        !field.isVisible
                       }
                       isInvalid={
                         finalized &&
@@ -507,12 +519,12 @@ RecipientView.fragments = {
         ...RecipientViewPetitionField_PublicPetitionField
         ...RecipientViewContentsCard_PublicPetitionField
         ...RecipientViewProgressFooter_PublicPetitionField
-        ...filterFieldsByVisibility_PublicPetitionField
+        ...evaluateFieldVisibility_PublicPetitionField
       }
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
       ${RecipientViewContentsCard.fragments.PublicPetitionField}
       ${RecipientViewProgressFooter.fragments.PublicPetitionField}
-      ${filterFieldsByVisibility.fragments.PublicPetitionField}
+      ${evaluateFieldVisibility.fragments.PublicPetitionField}
     `;
   },
   get PublicUser() {
@@ -551,7 +563,7 @@ function useGetPageFields(
   page: number
 ) {
   return useMemo(() => {
-    const fieldsByPage = groupFieldsByPages(fields);
+    const fieldsByPage = groupFieldsByPages(evaluateFieldVisibility(fields));
     return { fields: fieldsByPage[page - 1], pages: fieldsByPage.length };
   }, [fields, page]);
 }

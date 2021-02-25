@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
 import {
-  filterFieldsByVisibility_PublicPetitionFieldFragment,
-  filterFieldsByVisibility_PetitionFieldFragment,
+  evaluateFieldVisibility_PublicPetitionFieldFragment,
+  evaluateFieldVisibility_PetitionFieldFragment,
 } from "@parallel/graphql/__types";
 
 type VisibilityField =
-  | filterFieldsByVisibility_PublicPetitionFieldFragment
-  | filterFieldsByVisibility_PetitionFieldFragment;
+  | evaluateFieldVisibility_PublicPetitionFieldFragment
+  | evaluateFieldVisibility_PetitionFieldFragment;
 
 function evaluate<T extends string | number>(a: T, operator: string, b: T) {
   switch (operator) {
@@ -56,11 +56,11 @@ function isValidCondition(condition: any, replies: { content: any }[]) {
   }
 }
 
-export function filterFieldsByVisibility<T extends VisibilityField>(
+export function evaluateFieldVisibility<T extends VisibilityField>(
   fields: T[]
-) {
-  return fields.filter((field) => {
-    if (!field.visibility) return true;
+): Array<T & { isVisible: boolean }> {
+  return fields.map((field) => {
+    if (!field.visibility) return { ...field, isVisible: true };
     let conditionsResult: boolean;
     switch (field.visibility.operator) {
       case "OR":
@@ -78,15 +78,17 @@ export function filterFieldsByVisibility<T extends VisibilityField>(
         break;
     }
 
-    return field.visibility.type === "SHOW"
-      ? conditionsResult
-      : !conditionsResult;
+    return {
+      ...field,
+      isVisible:
+        field.visibility.type === "SHOW" ? conditionsResult : !conditionsResult,
+    };
   });
 }
 
-filterFieldsByVisibility.fragments = {
+evaluateFieldVisibility.fragments = {
   PublicPetitionField: gql`
-    fragment filterFieldsByVisibility_PublicPetitionField on PublicPetitionField {
+    fragment evaluateFieldVisibility_PublicPetitionField on PublicPetitionField {
       id
       visibility
       replies {
@@ -96,7 +98,7 @@ filterFieldsByVisibility.fragments = {
     }
   `,
   PetitionField: gql`
-    fragment filterFieldsByVisibility_PetitionField on PetitionField {
+    fragment evaluateFieldVisibility_PetitionField on PetitionField {
       id
       visibility
       replies {

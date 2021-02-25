@@ -1,11 +1,20 @@
 import { gql } from "@apollo/client";
-import { Box, Heading, List, ListItem, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  List,
+  ListItem,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { ConditionIcon } from "@parallel/chakra/icons";
 import {
   RecipientViewContentsCard_PublicPetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFragment,
   RecipientViewContentsCard_PublicUserFragment,
 } from "@parallel/graphql/__types";
-import { filterFieldsByVisibility } from "@parallel/utils/filterFieldsByVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
 import { Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
@@ -28,8 +37,7 @@ export function RecipientViewContentsCard({
   ...props
 }: RecipientViewContentsCardProps) {
   const { query } = useRouter();
-  const visibleFields = filterFieldsByVisibility(petition.fields);
-  const { pages, fields } = getPagesAndFields(visibleFields, currentPage);
+  const { pages, fields } = getPagesAndFields(petition.fields, currentPage);
   return (
     <Card padding={4} display="flex" flexDirection="column" {...props}>
       <Heading
@@ -118,6 +126,13 @@ export function RecipientViewContentsCard({
                           transform="translate(0, -50%)"
                         />
                       ) : null}
+
+                      {field.visibility && (
+                        <Flex alignItems="center" paddingRight={1}>
+                          <ConditionIcon color="purple.500" />
+                        </Flex>
+                      )}
+
                       <NakedLink
                         href={`/petition/${query.keycode}/${index + 1}#field-${
                           field.id
@@ -173,8 +188,11 @@ function getPagesAndFields(
     hasUnreadComments?: boolean;
     fake?: boolean;
   }[] = [];
+  const visibleFields = evaluateFieldVisibility(fields).filter(
+    (f) => f.isVisible
+  );
   const _fields: RecipientViewContentsCard_PublicPetitionFieldFragment[] = [];
-  for (const [index, field] of Array.from(fields.entries())) {
+  for (const [index, field] of Array.from(visibleFields.entries())) {
     if (
       field.type === "HEADING" &&
       (index === 0 || field.options!.hasPageBreak)
@@ -236,9 +254,9 @@ RecipientViewContentsCard.fragments = {
         commentCount
         unpublishedCommentCount
         unreadCommentCount
-        ...filterFieldsByVisibility_PublicPetitionField
+        ...evaluateFieldVisibility_PublicPetitionField
       }
-      ${filterFieldsByVisibility.fragments.PublicPetitionField}
+      ${evaluateFieldVisibility.fragments.PublicPetitionField}
     `;
   },
 };

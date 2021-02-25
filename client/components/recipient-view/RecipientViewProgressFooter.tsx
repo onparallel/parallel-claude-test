@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { RecipientViewProgressFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
-import { filterFieldsByVisibility } from "@parallel/utils/filterFieldsByVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { Card, CardProps } from "../common/Card";
@@ -21,8 +21,8 @@ export function RecipientViewProgressFooter({
 }: RecipientViewProgressFooterProps) {
   const { replied, optional, total } = useMemo(
     () =>
-      filterFieldsByVisibility(petition.fields)
-        .filter((f) => !f.isReadOnly)
+      evaluateFieldVisibility(petition.fields)
+        .filter((f) => !f.isReadOnly && f.isVisible)
         .reduce(
           (acc, field) => ({
             replied: acc.replied + (field.replies.length ? 1 : 0),
@@ -146,9 +146,9 @@ RecipientViewProgressFooter.fragments = {
         replies {
           id
         }
-        ...filterFieldsByVisibility_PublicPetitionField
+        ...evaluateFieldVisibility_PublicPetitionField
       }
-      ${filterFieldsByVisibility.fragments.PublicPetitionField}
+      ${evaluateFieldVisibility.fragments.PublicPetitionField}
     `;
   },
 };
