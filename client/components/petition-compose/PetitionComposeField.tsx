@@ -194,9 +194,7 @@ const _PetitionComposeField = chakraForwardRef<
             type={field.type}
             fieldIndex={fieldIndex}
             as={field.isFixed ? "div" : "button"}
-            onClick={
-              field.isFixed || field.isReadOnly ? undefined : onSettingsClick
-            }
+            onClick={field.isFixed ? undefined : onSettingsClick}
             marginTop="10px"
             alignSelf="flex-start"
           />
@@ -238,7 +236,7 @@ const _PetitionComposeField = chakraForwardRef<
           />
           <IconButtonWithTooltip
             icon={<SettingsIcon />}
-            disabled={field.isReadOnly}
+            disabled={field.isFixed}
             size="sm"
             variant="ghost"
             placement="bottom"
