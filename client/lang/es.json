@@ -3380,14 +3380,14 @@
     "context": "Accelerate your team's work"
   },
   {
-    "term": "public.home.press",
-    "definition": "Puede que también nos recuerdes de...",
-    "context": "You may also remember us from..."
-  },
-  {
     "term": "public.home.title",
     "definition": "Recopila información eficientemente",
     "context": "Collect information efficiently"
+  },
+  {
+    "term": "public.home.work-in-parallel",
+    "definition": "¿Trabajamos en paralelo?",
+    "context": "Shall we work in parallel?"
   },
   {
     "term": "public.how-it-works-hero.client-timings-1",
@@ -4108,6 +4108,46 @@
     "term": "public.terms.title",
     "definition": "Términos y condiciones",
     "context": "Terms & Conditions"
+  },
+  {
+    "term": "public.who-trust-us.feedback",
+    "definition": "y esto es lo que dicen...",
+    "context": "and this is what they say..."
+  },
+  {
+    "term": "public.who-trust-us.feedback-1",
+    "definition": "Parallel ha sido <b>muy ágil en la ejecución</b> de nuestros requerimientos y las plantillas son flexibles. Feliz con la experiencia.",
+    "context": "Parallel has been <b>very agile in the execution</b> of our requirements and templates are flexible. Happy with the experience."
+  },
+  {
+    "term": "public.who-trust-us.feedback-2a",
+    "definition": "Es una plataforma muy <b>útil, sencilla e intuitiva</b>, tanto para Cuatrecasas como para el Cliente.",
+    "context": "It's a very <b>useful, easy-to-use and intuitive</b> platform, for both Cuatrecasas and for our clients."
+  },
+  {
+    "term": "public.who-trust-us.feedback-2b",
+    "definition": "La plataforma Parallel para KYC <b>ahorra mucho tiempo</b> en comunicaciones con el cliente e internas y se recogen todas las dudas o comentarios del cliente en un mismo espacio, con la facilidad que ello comporta al no tener que buscar emails intercambiados en el pasado.",
+    "context": "When we use Parallel for KYC we <b>save a lot of time</b> in both external and internal communications, and all doubts and comments from our clients are in the same place, so that we can forget about searching things in old email conversations."
+  },
+  {
+    "term": "public.who-trust-us.feedback-3",
+    "definition": "El proceso de revisión de la documentación de cliente es <b>dos veces más rápido</b> que el actual. Principalmente se debe a la rapidez de acceso a los documentos y la facilidad para chequear la documentación aportada con lo contestado en el formulario.",
+    "context": "Reviewing documents from our clients is <b>twice as fast</b> than it was. It is mainly due to the ease of access to the documents and the information provided in the forms."
+  },
+  {
+    "term": "public.who-trust-us.position-1",
+    "definition": "Socia",
+    "context": "Partner"
+  },
+  {
+    "term": "public.who-trust-us.position-2",
+    "definition": "Assistant socios",
+    "context": "Partners assistant"
+  },
+  {
+    "term": "public.who-trust-us.position-3",
+    "definition": "Analista AML",
+    "context": "AML analyst"
   },
   {
     "term": "public.who-trust-us.title",

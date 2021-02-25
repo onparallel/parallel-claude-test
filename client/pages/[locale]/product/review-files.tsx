@@ -1,7 +1,7 @@
-import { Button, Flex, Heading, Text } from "@chakra-ui/react";
-import { NakedLink } from "@parallel/components/common/Link";
+import { Heading, Text } from "@chakra-ui/react";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicDemoCta } from "@parallel/components/public/PublicDemoCta";
 import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
 import { PublicVideoShowcase } from "@parallel/components/public/PublicVideoShowcase";
 import languages from "@parallel/lang/languages.json";
@@ -111,29 +111,12 @@ function Review() {
           </Text>
         </PublicShowcase>
       </PublicContainer>
-      <PublicContainer
-        paddingY={8}
-        maxWidth="container.lg"
-        textAlign="center"
-        wrapper={{ paddingY: 8, backgroundColor: "purple.50" }}
-      >
-        <Heading as="h2" size="lg" fontWeight="500">
-          <FormattedMessage
-            id="public.review-files.cta-title"
-            defaultMessage="Do you want to see how it works? Try it now!"
-          />
-        </Heading>
-        <Flex marginTop={8} justifyContent="center">
-          <NakedLink href="/book-demo">
-            <Button as="a" colorScheme="purple">
-              <FormattedMessage
-                id="public.book-demo-button"
-                defaultMessage="Book a demo"
-              />
-            </Button>
-          </NakedLink>
-        </Flex>
-      </PublicContainer>
+      <PublicDemoCta>
+        <FormattedMessage
+          id="public.review-files.cta-title"
+          defaultMessage="Do you want to see how it works? Try it now!"
+        />
+      </PublicDemoCta>
     </PublicLayout>
   );
 }

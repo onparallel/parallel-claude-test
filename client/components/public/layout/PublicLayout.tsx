@@ -62,7 +62,7 @@ export function PublicLayout({
         <Flex as="main" flex="1" direction="column">
           {children}
         </Flex>
-        {hideFooter ? null : <PublicFooter marginTop={8} />}
+        {hideFooter ? null : <PublicFooter />}
         <CookieConsent />
       </Flex>
     </>

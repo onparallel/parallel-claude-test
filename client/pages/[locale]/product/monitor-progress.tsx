@@ -7,6 +7,7 @@ import { PublicVideoShowcase } from "@parallel/components/public/PublicVideoShow
 import languages from "@parallel/lang/languages.json";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
+import { PublicDemoCta } from "@parallel/components/public/PublicDemoCta";
 
 function Follow() {
   const { query } = useRouter();
@@ -117,29 +118,12 @@ function Follow() {
           </Text>
         </PublicShowcase>
       </PublicContainer>
-      <PublicContainer
-        paddingY={8}
-        maxWidth="container.lg"
-        textAlign="center"
-        wrapper={{ paddingY: 8, backgroundColor: "purple.50" }}
-      >
-        <Heading as="h2" size="lg" fontWeight="500">
-          <FormattedMessage
-            id="public.monitor-progress.cta-title"
-            defaultMessage="All your requests in a single place"
-          />
-        </Heading>
-        <Flex marginTop={8} justifyContent="center">
-          <NakedLink href="/book-demo">
-            <Button as="a" colorScheme="purple">
-              <FormattedMessage
-                id="public.book-demo-button"
-                defaultMessage="Book a demo"
-              />
-            </Button>
-          </NakedLink>
-        </Flex>
-      </PublicContainer>
+      <PublicDemoCta>
+        <FormattedMessage
+          id="public.monitor-progress.cta-title"
+          defaultMessage="All your requests in a single place"
+        />
+      </PublicDemoCta>
     </PublicLayout>
   );
 }

@@ -1,11 +1,12 @@
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicDemoCta } from "@parallel/components/public/PublicDemoCta";
 import { PublicHeroClaim } from "@parallel/components/public/PublicHeroClaim";
+import { PublicHeroPopularUseCases } from "@parallel/components/public/PublicHeroPopularUseCases";
 import { PublicHowItWorksHero } from "@parallel/components/public/PublicHowItWorksHero";
 import { PublicMainHero } from "@parallel/components/public/PublicMainHero";
-import { PublicPress } from "@parallel/components/public/PublicPress";
 import { PublicTrust } from "@parallel/components/public/PublicTrust";
 import languages from "@parallel/lang/languages.json";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 function Home() {
   const intl = useIntl();
@@ -19,9 +20,14 @@ function Home() {
       <PublicMainHero />
       <PublicHowItWorksHero />
       <PublicHeroClaim />
-      {/* <PublicHeroPopularUseCases /> */}
+      <PublicHeroPopularUseCases />
       <PublicTrust />
-      <PublicPress />
+      <PublicDemoCta>
+        <FormattedMessage
+          id="public.home.work-in-parallel"
+          defaultMessage="Shall we work in parallel?"
+        />
+      </PublicDemoCta>
     </PublicLayout>
   );
 }
