@@ -3,7 +3,7 @@ import {
   BoxProps,
   Button,
   Center,
-  Flex,
+  AspectRatio,
   Heading,
   Stack,
 } from "@chakra-ui/react";
@@ -65,9 +65,9 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
           </Box>
         </Stack>
       </Center>
-      <Flex
+      <AspectRatio
+        ratio={1426 / 1140}
         flex="1"
-        justifyContent="center"
         width={{ base: "80vw", [breakpoint]: "auto" }}
         alignSelf={{ base: "flex-end", [breakpoint]: "auto" }}
       >
@@ -85,7 +85,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             src={`${imageName}.png?v=${process.env.BUILD_ID}`}
           />
         </Box>
-      </Flex>
+      </AspectRatio>
     </Stack>
   );
 }
