@@ -8,6 +8,8 @@ type VisibilityField =
   | evaluateFieldVisibility_PublicPetitionFieldFragment
   | evaluateFieldVisibility_PetitionFieldFragment;
 
+export type WithIsVisible<T> = T & { isVisible: boolean };
+
 function evaluate<T extends string | number>(a: T, operator: string, b: T) {
   switch (operator) {
     case "EQUAL":
@@ -58,7 +60,7 @@ function isValidCondition(condition: any, replies: { content: any }[]) {
 
 export function evaluateFieldVisibility<T extends VisibilityField>(
   fields: T[]
-): Array<T & { isVisible: boolean }> {
+): WithIsVisible<T>[] {
   return fields.map((field) => {
     if (!field.visibility) return { ...field, isVisible: true };
     let conditionsResult: boolean;

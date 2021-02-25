@@ -1,8 +1,12 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Stack, Text } from "@chakra-ui/react";
-import { CommentIcon } from "@parallel/chakra/icons";
+import { CommentIcon, ConditionIcon } from "@parallel/chakra/icons";
 import { PetitionFieldsIndex_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
+import {
+  evaluateFieldVisibility,
+  WithIsVisible,
+} from "@parallel/utils/fieldVisibility";
 import { Fragment } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
@@ -10,7 +14,7 @@ import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewComme
 import { PetitionFieldTypeIndicator } from "./PetitionFieldTypeIndicator";
 
 export type PetitionFieldsIndexProps = {
-  fields: PetitionFieldsIndex_PetitionFieldFragment[];
+  fields: Array<WithIsVisible<PetitionFieldsIndex_PetitionFieldFragment>>;
   onFieldClick: (fieldId: string) => void;
 };
 
@@ -61,14 +65,26 @@ export function PetitionFieldsIndex({
               alignItems="center"
               height="auto"
               padding={2}
-              paddingLeft={field.type === "HEADING" ? 2 : 4}
+              paddingLeft={
+                field.type !== "HEADING" && !field.visibility ? 8 : 2
+              }
               fontWeight={field.type === "HEADING" ? "medium" : "normal"}
               textAlign="left"
               onClick={() => onFieldClick(field.id)}
+              backgroundColor={!field.isVisible ? "gray.100" : "inherit"}
             >
+              {field.visibility ? (
+                <ConditionIcon
+                  color={field.isVisible ? "purple.500" : "gray.500"}
+                />
+              ) : null}
               {field.title ? (
                 <Text as="div" flex="1" minWidth={0}>
-                  <Text as="div" isTruncated>
+                  <Text
+                    as="div"
+                    isTruncated
+                    color={!field.isVisible ? "gray.500" : "inherit"}
+                  >
                     {field.title}
                   </Text>
                 </Text>
@@ -152,6 +168,8 @@ PetitionFieldsIndex.fragments = {
         isUnread
         publishedAt
       }
+      ...evaluateFieldVisibility_PetitionField
     }
+    ${evaluateFieldVisibility.fragments.PetitionField}
   `,
 };

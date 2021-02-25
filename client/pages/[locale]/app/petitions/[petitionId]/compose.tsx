@@ -66,6 +66,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
@@ -99,6 +100,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       },
     })
   );
+
+  const fieldsWithVisibility = evaluateFieldVisibility(petition!.fields);
 
   const [petitionState, wrapper] = usePetitionState();
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
@@ -532,7 +535,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   <TabPanels {...extendFlexColumn}>
                     <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
                       <PetitionFieldsIndex
-                        fields={petition!.fields}
+                        fields={fieldsWithVisibility}
                         onFieldClick={handleIndexFieldClick}
                       />
                     </TabPanel>
@@ -640,10 +643,12 @@ PetitionCompose.fragments = {
         ...PetitionComposeField_PetitionField
         ...PetitionComposeFieldSettings_PetitionField
         ...PetitionFieldsIndex_PetitionField
+        ...evaluateFieldVisibility_PetitionField
       }
       ${PetitionComposeField.fragments.PetitionField}
       ${PetitionComposeFieldSettings.fragments.PetitionField}
       ${PetitionFieldsIndex.fragments.PetitionField}
+      ${evaluateFieldVisibility.fragments.PetitionField}
     `;
   },
   get User() {

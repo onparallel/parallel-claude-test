@@ -76,6 +76,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
 import { unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -102,6 +103,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     })
   );
   const petition = data!.petition as PetitionReplies_PetitionFragment;
+
+  const fieldsWithVisibility = evaluateFieldVisibility(petition.fields);
   const toast = useToast();
 
   const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
@@ -621,7 +624,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   </CardHeader>
                   <Box overflow="auto">
                     <PetitionFieldsIndex
-                      fields={petition.fields}
+                      fields={fieldsWithVisibility}
                       onFieldClick={handleIndexFieldClick}
                     />
                   </Box>
@@ -632,7 +635,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         >
           <Box padding={4}>
             <Stack flex="2" spacing={4} id="petition-replies">
-              {petition.fields.map((field, index) => (
+              {fieldsWithVisibility.map((field, index) => (
                 <PetitionRepliesField
                   id={`field-${field.id}`}
                   key={field.id}
@@ -702,11 +705,13 @@ PetitionReplies.fragments = {
         ...PetitionFieldsIndex_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
         ...ExportRepliesDialog_PetitionField
+        ...evaluateFieldVisibility_PetitionField
       }
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${ExportRepliesDialog.fragments.PetitionField}
       ${PetitionFieldsIndex.fragments.PetitionField}
+      ${evaluateFieldVisibility.fragments.PetitionField}
     `;
   },
   get User() {

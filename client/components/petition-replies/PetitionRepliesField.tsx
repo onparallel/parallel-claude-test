@@ -22,6 +22,7 @@ import {
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
+import { WithIsVisible } from "@parallel/utils/fieldVisibility";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
@@ -33,7 +34,7 @@ import {
 } from "./PetitionRepliesFieldReply";
 
 export interface PetitionRepliesFieldProps extends BoxProps {
-  field: PetitionRepliesField_PetitionFieldFragment;
+  field: WithIsVisible<PetitionRepliesField_PetitionFieldFragment>;
   fieldIndex: number | string;
   index: number;
   commentCount: number;
@@ -110,6 +111,7 @@ export function PetitionRepliesField({
   ) : (
     <Card
       display="flex"
+      backgroundColor={!field.isVisible ? "gray.100" : "inherit"}
       flexDirection="column"
       position="relative"
       _highlighted={{
@@ -225,12 +227,21 @@ export function PetitionRepliesField({
             />
           ))}
         </Stack>
-      ) : (
+      ) : field.isVisible ? (
         <Box paddingY={4}>
           <Text textStyle="hint" textAlign="center">
             <FormattedMessage
               id="petition-replies.petition-field.no-replies"
               defaultMessage="There are no replies to this field yet"
+            />
+          </Text>
+        </Box>
+      ) : (
+        <Box paddingY={4}>
+          <Text textStyle="hint" textAlign="center">
+            <FormattedMessage
+              id="petition-replies.petition-field.conditions-not-met"
+              defaultMessage="Visibility conditions for this field are not met"
             />
           </Text>
         </Box>
