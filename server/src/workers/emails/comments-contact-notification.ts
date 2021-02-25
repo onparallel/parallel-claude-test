@@ -40,9 +40,9 @@ export async function commentsContactNotification(
     )
   ).filter(isDefined);
   const fieldIds = uniq(comments.map((c) => c!.petition_field_id));
-  const _fields = (await context.petitions.loadField(fieldIds)).filter(
-    isDefined
-  );
+  const _fields = (
+    await context.petitions.loadFieldWithNullVisibility(fieldIds)
+  ).filter(isDefined);
   const commentsByField = groupBy(comments, (c) => c.petition_field_id);
   const fields = sortBy(_fields, (f) => f.position).map((f) => ({
     ...pick(f, ["id", "title", "position"]),

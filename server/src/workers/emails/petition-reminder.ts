@@ -30,7 +30,9 @@ export async function petitionReminder(
       context.petitions.loadPetition(access.petition_id),
       context.users.loadUser(access.granter_id),
       context.contacts.loadContact(access.contact_id),
-      context.petitions.loadFieldsForPetition(access.petition_id),
+      context.petitions.loadFieldsForPetitionWithNullVisibility(
+        access.petition_id
+      ),
     ]);
     if (!petition) {
       throw new Error(

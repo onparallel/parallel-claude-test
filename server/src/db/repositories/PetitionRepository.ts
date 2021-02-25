@@ -64,6 +64,12 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
+  readonly loadFieldWithNullVisibility = this.buildLoadById(
+    "petition_field",
+    "id",
+    (q) => q.where({ deleted_at: null, visibility: null })
+  );
+
   readonly loadFieldReply = this.buildLoadById(
     "petition_field_reply",
     "id",
@@ -265,6 +271,12 @@ export class PetitionRepository extends BaseRepository {
     "petition_field",
     "petition_id",
     (q) => q.whereNull("deleted_at").orderBy("position")
+  );
+
+  readonly loadFieldsForPetitionWithNullVisibility = this.buildLoadMultipleBy(
+    "petition_field",
+    "petition_id",
+    (q) => q.where({ deleted_at: null, visibility: null }).orderBy("position")
   );
 
   readonly loadFieldCountForPetition = this.buildLoadCountBy(

@@ -21,7 +21,9 @@ export async function petitionMessage(
     context.petitions.loadPetition(message.petition_id),
     context.users.loadUser(message.sender_id),
     context.petitions.loadAccess(message.petition_access_id),
-    context.petitions.loadFieldsForPetition(message.petition_id),
+    context.petitions.loadFieldsForPetitionWithNullVisibility(
+      message.petition_id
+    ),
   ]);
   if (!petition) {
     throw new Error(

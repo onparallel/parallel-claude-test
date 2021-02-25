@@ -44,7 +44,7 @@ export async function petitionCompleted(
   const [petition, permissions, fields] = await Promise.all([
     context.petitions.loadPetition(petitionId),
     context.petitions.loadUserPermissions(petitionId),
-    context.petitions.loadFieldsForPetition(petitionId),
+    context.petitions.loadFieldsForPetitionWithNullVisibility(petitionId),
   ]);
 
   if (!petition) {

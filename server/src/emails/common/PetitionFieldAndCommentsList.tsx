@@ -27,7 +27,7 @@ export function PetitionFieldAndComments({
           <MjmlSection padding="8px 0 0">
             <MjmlColumn>
               <MjmlText padding="0 20px 0 50px" lineHeight="24px">
-                <ol style={{ margin: 0, padding: 0 }}>
+                <ul style={{ margin: 0, padding: 0 }}>
                   <li value={position + 1} style={{ margin: 0, padding: 0 }}>
                     {title ? (
                       <span>{title}</span>
@@ -40,7 +40,7 @@ export function PetitionFieldAndComments({
                       </span>
                     )}
                   </li>
-                </ol>
+                </ul>
               </MjmlText>
             </MjmlColumn>
           </MjmlSection>

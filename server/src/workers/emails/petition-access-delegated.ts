@@ -16,7 +16,9 @@ export async function petitionAccessDelegated(
 ) {
   const [petition, fields, newAccess, originalAccess] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
-    context.petitions.loadFieldsForPetition(payload.petition_id),
+    context.petitions.loadFieldsForPetitionWithNullVisibility(
+      payload.petition_id
+    ),
     context.petitions.loadAccess(payload.new_access_id),
     context.petitions.loadAccess(payload.original_access_id),
   ]);
