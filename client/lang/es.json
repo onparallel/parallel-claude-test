@@ -3010,16 +3010,6 @@
     "context": "About"
   },
   {
-    "term": "public.benefits.description",
-    "definition": "Obtén la información que necesitas y céntrate en lo importante.",
-    "context": "Obtain the information you need and focus on what really matters."
-  },
-  {
-    "term": "public.benefits.title",
-    "definition": "Una herramienta potente y flexible para tus flujos de trabajo",
-    "context": "A powerful and flexible tool for your workflows"
-  },
-  {
     "term": "public.blog-link",
     "definition": "Blog",
     "context": "Blog"
@@ -3185,36 +3175,6 @@
     "context": "Without Parallel"
   },
   {
-    "term": "public.claim.client-experience",
-    "definition": "Mejora la experiencia de tus clientes",
-    "context": "Improve your clients' experience"
-  },
-  {
-    "term": "public.claim.help-your-recipients",
-    "definition": "Ayuda a tus destinatarios a completar más fácilmente la información.",
-    "context": "Help your recipients complete the information more easily."
-  },
-  {
-    "term": "public.claim.obtain-organized-information",
-    "definition": "Obtén la información organizada para optimizar tu trabajo.",
-    "context": "Obtain the information organized to optimize your work."
-  },
-  {
-    "term": "public.claim.processes",
-    "definition": "Utiliza una herramienta que escala para trabajar mejor y hacer que los procesos fluyan.",
-    "context": "Use a tool that scales to work better and make your processes flow."
-  },
-  {
-    "term": "public.claim.productivity",
-    "definition": "Incrementa la productividad",
-    "context": "Increase productivity"
-  },
-  {
-    "term": "public.claim.speed",
-    "definition": "Conoce el estado, acelera las transacciones",
-    "context": "Speed up processes"
-  },
-  {
     "term": "public.contact-link",
     "definition": "Contacta",
     "context": "Contact"
@@ -3353,21 +3313,6 @@
     "term": "public.home-link",
     "definition": "Inicio",
     "context": "Home"
-  },
-  {
-    "term": "public.home.hero-discover-use",
-    "definition": "Puedes utilizar Parallel si trabajas en un despacho de abogados, en contabilidad o en una startup.",
-    "context": "You can use Parallel if you work in a law firm, accounting firm or startup."
-  },
-  {
-    "term": "public.home.hero-discover-use-2",
-    "definition": "Descubre todo lo que puedes hacer con nuestra plataforma.",
-    "context": "Discover everything you can do with our platform."
-  },
-  {
-    "term": "public.home.hero-popular-use-cases",
-    "definition": "Casos de uso populares",
-    "context": "Popular use cases"
   },
   {
     "term": "public.home.hero-subtitle",
@@ -3570,6 +3515,76 @@
     "context": "All your requests in a single place"
   },
   {
+    "term": "public.parallel-use-cases.aml-description",
+    "definition": "Cierra más rápido el proceso de alta e identificación.",
+    "context": "Close your know your customers processes faster."
+  },
+  {
+    "term": "public.parallel-use-cases.aml-title",
+    "definition": "Prevención de Blanqueo de Capitales",
+    "context": "Anti Money Laundering"
+  },
+  {
+    "term": "public.parallel-use-cases.corporate-description",
+    "definition": "Facilita la gestión de la información de los inversores.",
+    "context": "Make it easier to manage your investors information."
+  },
+  {
+    "term": "public.parallel-use-cases.corporate-title",
+    "definition": "Mercantil",
+    "context": "Corporate"
+  },
+  {
+    "term": "public.parallel-use-cases.litigation-description",
+    "definition": "Obtén los antecedentes de los casos a tiempo.",
+    "context": "Collect precedents on time and focus on solving the case."
+  },
+  {
+    "term": "public.parallel-use-cases.litigation-title",
+    "definition": "Procesal",
+    "context": "Litigation"
+  },
+  {
+    "term": "public.parallel-use-cases.other-contact",
+    "definition": "¡Escríbenos!",
+    "context": "Contact us"
+  },
+  {
+    "term": "public.parallel-use-cases.other-title",
+    "definition": "¿No encuentras tu caso de uso?",
+    "context": "Can't find your use case?"
+  },
+  {
+    "term": "public.parallel-use-cases.real-estate-description",
+    "definition": "Consigue los documentos para cerrar las operaciones inmobiliarias.",
+    "context": "Obtain the documents to close real estate transactions faster."
+  },
+  {
+    "term": "public.parallel-use-cases.real-estate-title",
+    "definition": "Inmobiliario",
+    "context": "Real Estate"
+  },
+  {
+    "term": "public.parallel-use-cases.subtitle",
+    "definition": "Somos una herramienta flexible con capacidad para gestionar procesos complejos",
+    "context": "We are a flexible tool able to solve complex processes"
+  },
+  {
+    "term": "public.parallel-use-cases.tax-description",
+    "definition": "Gestiona la documentación de tus campañas de declaraciones.",
+    "context": "Manage the documents of your tax returns campaigns."
+  },
+  {
+    "term": "public.parallel-use-cases.tax-title",
+    "definition": "Fiscal",
+    "context": "Tax"
+  },
+  {
+    "term": "public.parallel-use-cases.title",
+    "definition": "Qué puede hacer por ti Parallel",
+    "context": "What Parallel can do for you"
+  },
+  {
     "term": "public.people.hero-title",
     "definition": "Laura tiene ahora más tiempo para dedicarle al trabajo importante",
     "context": "Laura now has more time to focus on the important work"
@@ -3583,66 +3598,6 @@
     "term": "public.people.title",
     "definition": "Para quién",
     "context": "For whom"
-  },
-  {
-    "term": "public.popular.accounting",
-    "definition": "Contabilidad",
-    "context": "Accounting"
-  },
-  {
-    "term": "public.popular.claims",
-    "definition": "Demandas",
-    "context": "Claims"
-  },
-  {
-    "term": "public.popular.collect-schedules",
-    "definition": "Recopila todos los anexos sin límite de espacios y accede a ellos en un único lugar",
-    "context": "Collect all the schedules without space limitation and access them in a single place"
-  },
-  {
-    "term": "public.popular.contract-addenda",
-    "definition": "Anexos contractuales",
-    "context": "Contract addenda"
-  },
-  {
-    "term": "public.popular.easily-collect",
-    "definition": "Recopila de manera sencilla toda la información de potenciales clientes antes de empezar a trabajar",
-    "context": "Easily collect all the information from potential clients before starting to work"
-  },
-  {
-    "term": "public.popular.focus-on-contract",
-    "definition": "Céntrate en el contrato mientras tus clientes te envían los anexos a su ritmo",
-    "context": "Focus on the contract while your clients send you the addenda at their pace"
-  },
-  {
-    "term": "public.popular.information-ready",
-    "definition": "Ten tu información lista cada mes en tu espacio y reduce los correos en tu bandeja de entrada",
-    "context": "Have your information ready every month in your space and reduce the emails received in your inbox"
-  },
-  {
-    "term": "public.popular.investor-relations",
-    "definition": "Relaciones con inversores",
-    "context": "Investor relations"
-  },
-  {
-    "term": "public.popular.kyc",
-    "definition": "Verifica tus clientes (KYC)",
-    "context": "Know your customer (KYC)"
-  },
-  {
-    "term": "public.popular.multiple-recipients",
-    "definition": "Envía una sola petición a múltiples partes para recopilar la información y mantén todo organizado",
-    "context": "Send a single request to multiple parties to gather the information and keep everything organized"
-  },
-  {
-    "term": "public.popular.periodical-reporting",
-    "definition": "Reportes periódicos",
-    "context": "Periodical reporting"
-  },
-  {
-    "term": "public.popular.periodical-requests",
-    "definition": "Configura peticiones periódicas que recopilan automáticamente la información para ti",
-    "context": "Set up periodical requests that automatically collects the information for you"
   },
   {
     "term": "public.privacy.title",

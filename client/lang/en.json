@@ -3010,16 +3010,6 @@
     "context": "About"
   },
   {
-    "term": "public.benefits.description",
-    "definition": "Obtain the information you need and focus on what really matters.",
-    "context": "Obtain the information you need and focus on what really matters."
-  },
-  {
-    "term": "public.benefits.title",
-    "definition": "A powerful and flexible tool for your workflows",
-    "context": "A powerful and flexible tool for your workflows"
-  },
-  {
     "term": "public.blog-link",
     "definition": "Blog",
     "context": "Blog"
@@ -3185,36 +3175,6 @@
     "context": "Without Parallel"
   },
   {
-    "term": "public.claim.client-experience",
-    "definition": "Improve your clients' experience",
-    "context": "Improve your clients' experience"
-  },
-  {
-    "term": "public.claim.help-your-recipients",
-    "definition": "Help your recipients complete the information more easily.",
-    "context": "Help your recipients complete the information more easily."
-  },
-  {
-    "term": "public.claim.obtain-organized-information",
-    "definition": "Obtain the information organized to optimize your work.",
-    "context": "Obtain the information organized to optimize your work."
-  },
-  {
-    "term": "public.claim.processes",
-    "definition": "Use a tool that scales to work better and make your processes flow.",
-    "context": "Use a tool that scales to work better and make your processes flow."
-  },
-  {
-    "term": "public.claim.productivity",
-    "definition": "Increase productivity",
-    "context": "Increase productivity"
-  },
-  {
-    "term": "public.claim.speed",
-    "definition": "Speed up processes",
-    "context": "Speed up processes"
-  },
-  {
     "term": "public.contact-link",
     "definition": "Contact",
     "context": "Contact"
@@ -3353,21 +3313,6 @@
     "term": "public.home-link",
     "definition": "Home",
     "context": "Home"
-  },
-  {
-    "term": "public.home.hero-discover-use",
-    "definition": "You can use Parallel if you work in a law firm, accounting firm or startup.",
-    "context": "You can use Parallel if you work in a law firm, accounting firm or startup."
-  },
-  {
-    "term": "public.home.hero-discover-use-2",
-    "definition": "Discover everything you can do with our platform.",
-    "context": "Discover everything you can do with our platform."
-  },
-  {
-    "term": "public.home.hero-popular-use-cases",
-    "definition": "Popular use cases",
-    "context": "Popular use cases"
   },
   {
     "term": "public.home.hero-subtitle",
@@ -3570,6 +3515,76 @@
     "context": "All your requests in a single place"
   },
   {
+    "term": "public.parallel-use-cases.aml-description",
+    "definition": "Close your know your customers processes faster.",
+    "context": "Close your know your customers processes faster."
+  },
+  {
+    "term": "public.parallel-use-cases.aml-title",
+    "definition": "Anti Money Laundering",
+    "context": "Anti Money Laundering"
+  },
+  {
+    "term": "public.parallel-use-cases.corporate-description",
+    "definition": "Make it easier to manage your investors information.",
+    "context": "Make it easier to manage your investors information."
+  },
+  {
+    "term": "public.parallel-use-cases.corporate-title",
+    "definition": "Corporate",
+    "context": "Corporate"
+  },
+  {
+    "term": "public.parallel-use-cases.litigation-description",
+    "definition": "Collect precedents on time and focus on solving the case.",
+    "context": "Collect precedents on time and focus on solving the case."
+  },
+  {
+    "term": "public.parallel-use-cases.litigation-title",
+    "definition": "Litigation",
+    "context": "Litigation"
+  },
+  {
+    "term": "public.parallel-use-cases.other-contact",
+    "definition": "Contact us",
+    "context": "Contact us"
+  },
+  {
+    "term": "public.parallel-use-cases.other-title",
+    "definition": "Can't find your use case?",
+    "context": "Can't find your use case?"
+  },
+  {
+    "term": "public.parallel-use-cases.real-estate-description",
+    "definition": "Obtain the documents to close real estate transactions faster.",
+    "context": "Obtain the documents to close real estate transactions faster."
+  },
+  {
+    "term": "public.parallel-use-cases.real-estate-title",
+    "definition": "Real Estate",
+    "context": "Real Estate"
+  },
+  {
+    "term": "public.parallel-use-cases.subtitle",
+    "definition": "We are a flexible tool able to solve complex processes",
+    "context": "We are a flexible tool able to solve complex processes"
+  },
+  {
+    "term": "public.parallel-use-cases.tax-description",
+    "definition": "Manage the documents of your tax returns campaigns.",
+    "context": "Manage the documents of your tax returns campaigns."
+  },
+  {
+    "term": "public.parallel-use-cases.tax-title",
+    "definition": "Tax",
+    "context": "Tax"
+  },
+  {
+    "term": "public.parallel-use-cases.title",
+    "definition": "What Parallel can do for you",
+    "context": "What Parallel can do for you"
+  },
+  {
     "term": "public.people.hero-title",
     "definition": "Laura now has more time to focus on the important work",
     "context": "Laura now has more time to focus on the important work"
@@ -3583,66 +3598,6 @@
     "term": "public.people.title",
     "definition": "For whom",
     "context": "For whom"
-  },
-  {
-    "term": "public.popular.accounting",
-    "definition": "Accounting",
-    "context": "Accounting"
-  },
-  {
-    "term": "public.popular.claims",
-    "definition": "Claims",
-    "context": "Claims"
-  },
-  {
-    "term": "public.popular.collect-schedules",
-    "definition": "Collect all the schedules without space limitation and access them in a single place",
-    "context": "Collect all the schedules without space limitation and access them in a single place"
-  },
-  {
-    "term": "public.popular.contract-addenda",
-    "definition": "Contract addenda",
-    "context": "Contract addenda"
-  },
-  {
-    "term": "public.popular.easily-collect",
-    "definition": "Easily collect all the information from potential clients before starting to work",
-    "context": "Easily collect all the information from potential clients before starting to work"
-  },
-  {
-    "term": "public.popular.focus-on-contract",
-    "definition": "Focus on the contract while your clients send you the addenda at their pace",
-    "context": "Focus on the contract while your clients send you the addenda at their pace"
-  },
-  {
-    "term": "public.popular.information-ready",
-    "definition": "Have your information ready every month in your space and reduce the emails received in your inbox",
-    "context": "Have your information ready every month in your space and reduce the emails received in your inbox"
-  },
-  {
-    "term": "public.popular.investor-relations",
-    "definition": "Investor relations",
-    "context": "Investor relations"
-  },
-  {
-    "term": "public.popular.kyc",
-    "definition": "Know your customer (KYC)",
-    "context": "Know your customer (KYC)"
-  },
-  {
-    "term": "public.popular.multiple-recipients",
-    "definition": "Send a single request to multiple parties to gather the information and keep everything organized",
-    "context": "Send a single request to multiple parties to gather the information and keep everything organized"
-  },
-  {
-    "term": "public.popular.periodical-reporting",
-    "definition": "Periodical reporting",
-    "context": "Periodical reporting"
-  },
-  {
-    "term": "public.popular.periodical-requests",
-    "definition": "Set up periodical requests that automatically collects the information for you",
-    "context": "Set up periodical requests that automatically collects the information for you"
   },
   {
     "term": "public.privacy.title",

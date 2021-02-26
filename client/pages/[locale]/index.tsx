@@ -1,6 +1,6 @@
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicDemoCta } from "@parallel/components/public/PublicDemoCta";
-import { PublicHeroClaim } from "@parallel/components/public/PublicHeroClaim";
+import { PublicHeroPopularUseCases } from "@parallel/components/public/PublicHeroPopularUseCases";
 import { PublicHowItWorksHero } from "@parallel/components/public/PublicHowItWorksHero";
 import { PublicMainHero } from "@parallel/components/public/PublicMainHero";
 import { PublicTrust } from "@parallel/components/public/PublicTrust";
@@ -17,9 +17,8 @@ function Home() {
       })}
     >
       <PublicMainHero />
+      <PublicHeroPopularUseCases />
       <PublicHowItWorksHero />
-      <PublicHeroClaim />
-      {/* <PublicHeroPopularUseCases /> */}
       <PublicTrust />
       <PublicDemoCta>
         <FormattedMessage
