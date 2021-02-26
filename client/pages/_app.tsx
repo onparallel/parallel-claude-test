@@ -39,7 +39,11 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
       {[
         [
           PlausibleProvider,
-          { domain: "onparallel.com", exclude: "/*/print/*" },
+          {
+            customDomain: "p.onparallel.com",
+            domain: "onparallel.com",
+            exclude: "/*/print/*",
+          },
         ],
         [I18nProvider, props],
         [ChakraProvider, { theme, resetCSS: true, portalZIndex: 40 }],
