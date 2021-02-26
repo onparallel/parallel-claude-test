@@ -49,6 +49,7 @@ import {
   PetitionEvent,
 } from "../__types";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
+import { toGlobalId } from "../../util/globalId";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
