@@ -5,7 +5,7 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { PetitionFieldCondition } from "@parallel/components/petition-compose/PetitionFieldCondition";
+import { PetitionFieldVisibilityEditor } from "@parallel/components/petition-compose/PetitionFieldVisibilityEditor";
 import {
   PruebasQuery,
   PruebasQueryVariables,
@@ -24,7 +24,10 @@ function Pruebas({
   console.log(petition);
   return (
     <Box padding={8}>
-      <PetitionFieldCondition showError={true} fields={petition!.fields} />
+      <PetitionFieldVisibilityEditor
+        showError={true}
+        fields={petition!.fields}
+      />
     </Box>
   );
 }
@@ -35,10 +38,10 @@ Pruebas.fragments = {
       fragment Pruebas_Petition on PetitionBase {
         id
         fields {
-          ...PetitionFieldCondition_PetitionField
+          ...PetitionFieldVisibility_PetitionField
         }
       }
-      ${PetitionFieldCondition.fragments.PetitionField}
+      ${PetitionFieldVisibilityEditor.fragments.PetitionField}
     `;
   },
 };

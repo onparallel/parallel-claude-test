@@ -10,20 +10,26 @@ import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 export interface PetitionFieldTypeIndicatorProps {
   type: PetitionFieldType;
   fieldIndex: number | string;
+  isTooltipDisabled?: boolean;
 }
 
 export const PetitionFieldTypeIndicator = chakraForwardRef<
   "button",
   PetitionFieldTypeIndicatorProps
 >(function PetitionFieldTypeIndicator(
-  { type, fieldIndex, ...props }: PetitionFieldTypeIndicatorProps,
+  {
+    type,
+    fieldIndex,
+    isTooltipDisabled,
+    ...props
+  }: PetitionFieldTypeIndicatorProps,
   ref
 ) {
   const label = usePetitionFieldTypeLabel(type);
   const color = usePetitionFieldTypeColor(type);
 
   return (
-    <Tooltip label={label}>
+    <Tooltip label={label} isDisabled={isTooltipDisabled}>
       <Button
         ref={ref}
         size="2xs"

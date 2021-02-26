@@ -23,9 +23,9 @@ const schema = {
       items: {
         type: "object",
         additionalProperties: false,
-        required: ["id", "fieldId", "modifier", "operator", "value"],
+        required: ["fieldId", "modifier", "operator", "value"],
         properties: {
-          id: { type: "string" },
+          // id: { type: "string" },
           fieldId: { type: ["string", "null"] },
           modifier: { enum: ["ANY", "ALL", "NONE", "NUMBER_OF_REPLIES"] },
           operator: {

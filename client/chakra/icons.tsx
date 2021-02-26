@@ -92,6 +92,24 @@ export const GlobeIcon = createIcon({
   ),
 });
 
+export const AutomationIcon = createIcon({
+  displayName: "AutomationIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={2}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18.6668 22C20.5078 22 22.0002 20.5076 22.0002 18.6667C22.0002 16.8257 20.5078 15.3333 18.6668 15.3333C16.8259 15.3333 15.3335 16.8257 15.3335 18.6667C15.3335 20.5076 16.8259 22 18.6668 22Z" />
+      <path d="M5.33333 8.66667C7.17428 8.66667 8.66667 7.17428 8.66667 5.33333C8.66667 3.49238 7.17428 2 5.33333 2C3.49238 2 2 3.49238 2 5.33333C2 7.17428 3.49238 8.66667 5.33333 8.66667Z" />
+      <path d="M5.3335 8.66666C5.3335 12.0829 5.3335 15.2904 5.3335 17.1124C5.3335 17.9715 6.02757 18.6667 6.88668 18.6667C8.64952 18.6667 11.7499 18.6667 15.3335 18.6667" />
+    </g>
+  ),
+});
+
 export const KeyIcon = createIcon({
   displayName: "KeyIcon",
   viewBox: "0 0 24 24",

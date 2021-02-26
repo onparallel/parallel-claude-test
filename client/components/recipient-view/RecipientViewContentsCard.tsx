@@ -14,7 +14,7 @@ import {
   RecipientViewContentsCard_PublicPetitionFragment,
   RecipientViewContentsCard_PublicUserFragment,
 } from "@parallel/graphql/__types";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
 import { Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";

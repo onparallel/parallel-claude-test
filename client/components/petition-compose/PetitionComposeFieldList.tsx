@@ -54,7 +54,7 @@ export interface PetitionComposeFieldListProps extends BoxProps {
   fields: FieldSelection[];
   showErrors: boolean;
   onUpdateFieldPositions: (fieldIds: string[]) => void;
-  onCopyFieldClick: (fieldId: string) => void;
+  onCloneField: (fieldId: string) => void;
   onFieldSettingsClick: (fieldId: string) => void;
   onDeleteField: (fieldId: string) => void;
   onAddField: (type: PetitionFieldType, position?: number) => void;
@@ -67,7 +67,7 @@ export const PetitionComposeFieldList = Object.assign(
     fields,
     showErrors,
     onUpdateFieldPositions,
-    onCopyFieldClick,
+    onCloneField,
     onFieldSettingsClick,
     onDeleteField,
     onAddField,
@@ -109,7 +109,7 @@ export const PetitionComposeFieldList = Object.assign(
         fieldId: string
       ): Pick<
         PetitionComposeFieldProps & BoxProps,
-        | "onCloneClick"
+        | "onCloneField"
         | "onSettingsClick"
         | "onDeleteClick"
         | "onFieldEdit"
@@ -117,18 +117,9 @@ export const PetitionComposeFieldList = Object.assign(
         | "onFocusNextField"
         | "onAddField"
       > => ({
-        onCloneClick: (event) => {
-          event.stopPropagation();
-          onCopyFieldClick(fieldId);
-        },
-        onSettingsClick: (event) => {
-          event.stopPropagation();
-          onFieldSettingsClick(fieldId);
-        },
-        onDeleteClick: (event) => {
-          event.stopPropagation();
-          onDeleteField(fieldId);
-        },
+        onCloneField: () => onCloneField(fieldId),
+        onSettingsClick: () => onFieldSettingsClick(fieldId),
+        onDeleteClick: () => onDeleteField(fieldId),
         onFieldEdit: (data) => onFieldEdit(fieldId, data),
         onFocusPrevField: () => {
           const fields = fieldsDataRef.current;
@@ -165,7 +156,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
       }),
-      [onCopyFieldClick, onFieldSettingsClick, onDeleteField, onFieldEdit]
+      [onCloneField, onFieldSettingsClick, onDeleteField, onFieldEdit]
     );
 
     const fieldIndexValues = useFieldIndexValues(
@@ -283,6 +274,7 @@ export const PetitionComposeFieldList = Object.assign(
                   id={`field-${fieldId}`}
                   onMove={handleFieldMove}
                   field={field}
+                  fields={fields}
                   fieldIndex={fieldIndexValues[index]}
                   index={index}
                   isActive={isActive}

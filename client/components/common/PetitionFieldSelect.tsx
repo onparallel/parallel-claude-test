@@ -8,7 +8,6 @@ import {
   CustomSelectProps,
   SelectProps,
 } from "@parallel/utils/react-select/types";
-import deepmerge from "deepmerge";
 import { memo, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { components } from "react-select";
@@ -35,6 +34,7 @@ const FieldItem = memo(function FieldItem({
         as="div"
         type={field.type}
         fieldIndex={fieldIndex}
+        isTooltipDisabled
         flexShrink={0}
       />
       <Box marginLeft={2} flex="1" minWidth="0" isTruncated>
@@ -61,51 +61,53 @@ export function PetitionFieldSelect<
   T extends PetitionFieldSelect_PetitionFieldFragment
 >({ value, onChange, fields, indices, ...props }: PetitionFieldSelectProps<T>) {
   const intl = useIntl();
-  const rsProps = useReactSelectProps<T>(props);
-  const fieldSelectProps = useMemo(
-    () =>
-      deepmerge<SelectProps<T>>(rsProps, {
-        components: {
-          Option: ({ children, ...props }) => {
-            const field = props.data as T;
-            const index = indices[fields!.findIndex((f) => f.id === field.id)];
-            return (
-              <components.Option {...props}>
-                <FieldItem
-                  field={field}
-                  fieldIndex={index}
-                  highlight={props.selectProps.inputValue ?? ""}
-                />
-              </components.Option>
-            );
-          },
-          SingleValue: ({ children, ...props }) => {
-            const field = props.data as T;
-            const index = indices[fields!.findIndex((f) => f.id === field.id)];
-            return (
-              <components.SingleValue {...props}>
-                <FieldItem field={field} fieldIndex={index} />
-              </components.SingleValue>
-            );
-          },
+  const rsProps = useReactSelectProps<T, any, never>(props);
+  const fieldSelectProps = useMemo<SelectProps<T, any, never>>(
+    () => ({
+      ...rsProps,
+      components: {
+        ...rsProps.components,
+        Option: ({ children, ...props }) => {
+          const field = props.data as T;
+          const index = indices[fields!.findIndex((f) => f.id === field.id)];
+          return (
+            <components.Option {...props}>
+              <FieldItem
+                field={field}
+                fieldIndex={index}
+                highlight={props.selectProps.inputValue ?? ""}
+              />
+            </components.Option>
+          );
         },
-        styles: {
-          singleValue: (styles) => {
-            return {
-              maxWidth: "calc(100% - 6px)",
-              display: "flex",
-              flex: "0 1 auto",
-              alignItems: "center",
-            };
-          },
+        SingleValue: ({ children, ...props }) => {
+          const field = props.data as T;
+          const index = indices[fields!.findIndex((f) => f.id === field.id)];
+          return (
+            <components.SingleValue {...props}>
+              <FieldItem field={field} fieldIndex={index} />
+            </components.SingleValue>
+          );
         },
-        getOptionValue(field) {
-          return field.id;
+      },
+      styles: {
+        ...rsProps.styles,
+        singleValue: (styles) => {
+          return {
+            maxWidth: "calc(100% - 6px)",
+            display: "flex",
+            flex: "0 1 auto",
+            alignItems: "center",
+          };
         },
-        getOptionLabel(field) {
-          return field.title ?? "";
-        },
-      }),
+      },
+      getOptionValue(field) {
+        return field.id;
+      },
+      getOptionLabel(field) {
+        return field.title ?? "";
+      },
+    }),
     [rsProps, fields, indices]
   );
   return (

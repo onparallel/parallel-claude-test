@@ -1978,6 +1978,10 @@ export type OnboardingTour_UserFragment = { __typename?: "User" } & Pick<
   "onboardingStatus"
 >;
 
+export type PetitionFieldSelect_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "type" | "title">;
+
 export type PetitionSignatureCellContent_PetitionFragment = {
   __typename?: "Petition";
 } & {
@@ -3030,8 +3034,10 @@ export type PetitionComposeField_PetitionFieldFragment = {
   | "multiple"
   | "isFixed"
   | "isReadOnly"
+  | "visibility"
 > &
-  SelectTypeFieldOptions_PetitionFieldFragment;
+  SelectTypeFieldOptions_PetitionFieldFragment &
+  PetitionFieldVisibility_PetitionFieldFragment;
 
 export type PetitionComposeFieldList_PetitionFragment = {
   __typename?: "Petition";
@@ -3055,6 +3061,12 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   | "isFixed"
   | "position"
 >;
+
+export type PetitionFieldVisibility_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "type" | "multiple" | "isReadOnly"> & {
+    fieldOptions: PetitionField["options"];
+  } & PetitionFieldSelect_PetitionFieldFragment;
 
 export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   __typename?: "PetitionTemplate";
@@ -4356,7 +4368,7 @@ export type Pruebas_Petition_Petition_Fragment = {
     fields: Array<
       {
         __typename?: "PetitionField";
-      } & PetitionFieldCondition_PetitionFieldFragment
+      } & PetitionFieldVisibility_PetitionFieldFragment
     >;
   };
 
@@ -4366,7 +4378,7 @@ export type Pruebas_Petition_PetitionTemplate_Fragment = {
     fields: Array<
       {
         __typename?: "PetitionField";
-      } & PetitionFieldCondition_PetitionFieldFragment
+      } & PetitionFieldVisibility_PetitionFieldFragment
     >;
   };
 
@@ -4386,16 +4398,6 @@ export type PruebasQuery = { __typename?: "Query" } & {
       } & Pruebas_Petition_PetitionTemplate_Fragment)
   >;
 };
-
-export type PetitionFieldSelect_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "title">;
-
-export type PetitionFieldCondition_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "multiple"> & {
-    fieldOptions: PetitionField["options"];
-  } & PetitionFieldSelect_PetitionFieldFragment;
 
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
@@ -5301,6 +5303,24 @@ export const SelectTypeFieldOptions_PetitionFieldFragmentDoc = gql`
     options
   }
 `;
+export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldSelect_PetitionField on PetitionField {
+    id
+    type
+    title
+  }
+`;
+export const PetitionFieldVisibility_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldVisibility_PetitionField on PetitionField {
+    id
+    type
+    multiple
+    fieldOptions: options
+    isReadOnly
+    ...PetitionFieldSelect_PetitionField
+  }
+  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
+`;
 export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
   fragment PetitionComposeField_PetitionField on PetitionField {
     id
@@ -5311,9 +5331,12 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     multiple
     isFixed
     isReadOnly
+    visibility
     ...SelectTypeFieldOptions_PetitionField
+    ...PetitionFieldVisibility_PetitionField
   }
   ${SelectTypeFieldOptions_PetitionFieldFragmentDoc}
+  ${PetitionFieldVisibility_PetitionFieldFragmentDoc}
 `;
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   fragment PetitionComposeFieldList_Petition on Petition {
@@ -6400,31 +6423,14 @@ export const PetitionCompose_UserFragmentDoc = gql`
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionSettings_UserFragmentDoc}
 `;
-export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldSelect_PetitionField on PetitionField {
-    id
-    type
-    title
-  }
-`;
-export const PetitionFieldCondition_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldCondition_PetitionField on PetitionField {
-    id
-    type
-    multiple
-    fieldOptions: options
-    ...PetitionFieldSelect_PetitionField
-  }
-  ${PetitionFieldSelect_PetitionFieldFragmentDoc}
-`;
 export const Pruebas_PetitionFragmentDoc = gql`
   fragment Pruebas_Petition on PetitionBase {
     id
     fields {
-      ...PetitionFieldCondition_PetitionField
+      ...PetitionFieldVisibility_PetitionField
     }
   }
-  ${PetitionFieldCondition_PetitionFieldFragmentDoc}
+  ${PetitionFieldVisibility_PetitionFieldFragmentDoc}
 `;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {

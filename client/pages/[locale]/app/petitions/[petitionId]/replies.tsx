@@ -76,7 +76,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
 import { unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useCallback, useEffect, useMemo, useState } from "react";

@@ -15,140 +15,130 @@ import {
 } from "@chakra-ui/react";
 import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
-import { PetitionFieldCondition_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { PetitionFieldVisibility_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import {
   useInlineReactSelectProps,
   useReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
-import { Fragment, SetStateAction, useMemo, useState } from "react";
+import { Fragment, SetStateAction, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
+import { pick } from "remeda";
+import {
+  PetitionFieldVisibility,
+  PetitionFieldVisibilityCondition,
+  PetitionFieldVisibilityConditionModifier,
+  PetitionFieldVisibilityConditionOperator,
+  PetitionFieldVisibilityOperator,
+  PetitionFieldVisibilityType,
+} from "@parallel/utils/fieldVisibility/types";
 
 interface ValueProps<T> {
   value: T | null;
   onChange: (value: T) => void;
 }
 
-interface Visibility {
-  type: VisibilityType;
-  operator: VisibilityOperator;
-  conditions: Condition[];
-}
-
-type VisibilityType = "SHOW" | "HIDE";
-
-type VisibilityOperator = "AND" | "OR";
-
-interface Condition {
-  id: string;
-  fieldId: string | null;
-  modifier: ConditionMultipleFieldModifier;
-  operator: ConditionOperator;
-  value: string | number | null;
-}
-
-type ConditionValue = string | number | null;
-
-type ConditionMultipleFieldModifier =
-  | "ANY"
-  | "ALL"
-  | "NONE"
-  | "NUMBER_OF_REPLIES";
-
-type ConditionOperator =
-  | "EQUAL"
-  | "NOT_EQUAL"
-  | "START_WITH"
-  | "END_WITH"
-  | "CONTAIN"
-  | "NOT_CONTAIN"
-  | "LESS_THAN"
-  | "LESS_THAN_OR_EQUAL"
-  | "GREATER_THAN"
-  | "GREATER_THAN_OR_EQUAL";
-
-let counter = 0;
-
-export interface PetitionFieldConditionProps {
-  fields: PetitionFieldCondition_PetitionFieldFragment[];
+export interface PetitionFieldVisibilityProps {
+  fieldId: string;
+  visibility: PetitionFieldVisibility;
+  fields: PetitionFieldVisibility_PetitionFieldFragment[];
   showError: boolean;
+  onVisibilityEdit: (visibility: PetitionFieldVisibility) => void;
 }
 
-export function PetitionFieldCondition({
+export function PetitionFieldVisibilityEditor({
+  fieldId,
+  visibility,
   fields,
   showError,
-}: PetitionFieldConditionProps) {
+  onVisibilityEdit,
+}: PetitionFieldVisibilityProps) {
   const intl = useIntl();
-  const _fields = useMemo(() => fields.filter((f) => f.type !== "HEADING"), [
-    fields,
-  ]);
+  const _fields = useMemo(
+    () =>
+      fields
+        .filter((f) => f)
+        // if we don't rename this, react-select picks the options property
+        // and thinks you want groups
+        .map((field) =>
+          pick(field, [
+            "id",
+            "type",
+            "title",
+            "multiple",
+            "isReadOnly",
+            "fieldOptions",
+          ])
+        ),
+    [fields]
+  );
   const indices = useFieldIndexValues(_fields);
-  const [visibility, setVisibility] = useState<Visibility>({
-    type: "SHOW",
-    operator: "AND",
-    conditions: [
-      {
-        id: `${counter++}`,
-        fieldId: "6Y8DSH92uxPavbeseLeRq",
-        modifier: "NUMBER_OF_REPLIES",
-        operator: "EQUAL",
-        value: null,
-      },
-      {
-        id: `${counter++}`,
-        fieldId: null,
-        modifier: "ANY",
-        operator: "EQUAL",
-        value: null,
-      },
-    ],
-  });
-  function setConditions(value: SetStateAction<Condition[]>) {
+  function setVisibility(
+    dispatch: (prev: PetitionFieldVisibility) => PetitionFieldVisibility
+  ) {
+    onVisibilityEdit(dispatch(visibility));
+  }
+  function setConditions(
+    value: SetStateAction<PetitionFieldVisibilityCondition[]>
+  ) {
     return setVisibility((visibility) => ({
       ...visibility,
       conditions:
         typeof value === "function" ? value(visibility.conditions) : value,
     }));
   }
-  function setVisibilityOperator(value: SetStateAction<VisibilityOperator>) {
+  function setVisibilityOperator(
+    value: SetStateAction<PetitionFieldVisibilityOperator>
+  ) {
     return setVisibility((visibility) => ({
       ...visibility,
       operator:
         typeof value === "function" ? value(visibility.operator) : value,
     }));
   }
-  function setVisibilityType(value: SetStateAction<VisibilityType>) {
+  function setVisibilityType(
+    value: SetStateAction<PetitionFieldVisibilityType>
+  ) {
     return setVisibility((visibility) => ({
       ...visibility,
       type: typeof value === "function" ? value(visibility.type) : value,
     }));
   }
   const updateCondition = function (
-    conditionId: string,
-    data: Partial<Condition>
+    index: number,
+    data: Partial<PetitionFieldVisibilityCondition>
   ) {
     setConditions((conditions) =>
-      conditions.map((c) => (c.id === conditionId ? { ...c, ...data } : c))
+      conditions.map((c, i) => (i === index ? { ...c, ...data } : c))
     );
   };
-  const removeCondition = function (conditionId: string) {
-    setConditions((conditions) =>
-      conditions.filter((c) => c.id !== conditionId)
-    );
+  const removeCondition = function (index: number) {
+    setConditions((conditions) => conditions.filter((c, i) => i !== index));
   };
   const addCondition = function () {
-    setConditions((conditions) => [
-      ...conditions,
-      {
-        id: `${counter++}`,
-        fieldId: null,
-        modifier: "ANY",
-        operator: "EQUAL",
-        value: null,
-      },
-    ]);
+    const index = fields.findIndex((f) => f.id === fieldId);
+    // try to use previous reply, if not possible, use next
+    const prev = fields
+      .slice(0, index)
+      .reverse()
+      .find((f) => !f.isReadOnly);
+    const ref = prev ?? fields.slice(index + 1).find((f) => f.id === fieldId)!;
+    const condition: PetitionFieldVisibilityCondition = {
+      fieldId: ref.id,
+      modifier: ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
+      operator: "EQUAL",
+      value:
+        ref.type === "FILE_UPLOAD"
+          ? 0
+          : ref.type === "TEXT"
+          ? null
+          : ref.type === "SELECT"
+          ? ref.fieldOptions.values[0] ?? null
+          : null,
+    };
+    setConditions((conditions) => [...conditions, condition]);
   };
   return (
     <Stack spacing={1}>
@@ -170,7 +160,7 @@ export function PetitionFieldCondition({
             ? _fields.find((f) => f.id === condition.fieldId) ?? null
             : null;
           return (
-            <Fragment key={condition.id}>
+            <Fragment key={index}>
               <Box fontSize="sm">
                 {index === 0 ? (
                   <VisibilityTypeSelect
@@ -187,12 +177,11 @@ export function PetitionFieldCondition({
                         id: "generic.remove",
                         defaultMessage: "Remove",
                       })}
-                      onClick={() => removeCondition(condition.id)}
+                      onClick={() => removeCondition(index)}
                     />
                     {index === 1 ? (
                       <Box flex="1">
                         <VisibilityOperatorSelect
-                          id={`petition-field-condition-and-or-select-${condition.id}`}
                           value={visibility.operator}
                           onChange={setVisibilityOperator}
                         />
@@ -216,7 +205,6 @@ export function PetitionFieldCondition({
                 )}
               </Box>
               <PetitionFieldSelect
-                id={`petition-field-condition-field-select-${condition.id}`}
                 size="sm"
                 isInvalid={showError && !conditionField}
                 value={conditionField}
@@ -224,7 +212,7 @@ export function PetitionFieldCondition({
                 indices={indices}
                 onChange={(field) => {
                   const changedFieldType = field.type !== conditionField?.type;
-                  updateCondition(condition.id, {
+                  updateCondition(index, {
                     fieldId: field?.id,
                     modifier:
                       field?.type === "FILE_UPLOAD"
@@ -233,7 +221,12 @@ export function PetitionFieldCondition({
                         ? condition.modifier
                         : "ANY",
                     operator: changedFieldType ? "EQUAL" : condition.operator,
-                    value: changedFieldType ? null : condition.value,
+                    value:
+                      field.type === "SELECT"
+                        ? field.fieldOptions.values[0] ?? null
+                        : changedFieldType
+                        ? null
+                        : condition.value,
                   });
                 }}
               />
@@ -241,7 +234,6 @@ export function PetitionFieldCondition({
                 <Stack direction="row" gridColumn={{ base: "2", md: "auto" }}>
                   {conditionField.multiple ? (
                     <ConditionMultipleFieldModifier
-                      id={`petition-field-condition-modifier-select-${condition.id}`}
                       type={conditionField.type}
                       value={condition.modifier}
                       onChange={(modifier) => {
@@ -249,7 +241,7 @@ export function PetitionFieldCondition({
                         const prev = condition.modifier === "NUMBER_OF_REPLIES";
                         const changedModifierType =
                           (next as any) + (prev as any) === 1;
-                        updateCondition(condition.id, {
+                        updateCondition(index, {
                           modifier,
                           operator: changedModifierType
                             ? "EQUAL"
@@ -263,9 +255,7 @@ export function PetitionFieldCondition({
                     showError={showError}
                     field={conditionField}
                     value={condition}
-                    onChange={(condition) =>
-                      updateCondition(condition.id, condition)
-                    }
+                    onChange={(condition) => updateCondition(index, condition)}
                   />
                 </Stack>
               ) : (
@@ -288,19 +278,18 @@ export function PetitionFieldCondition({
           Add condition
         </Button>
       ) : null}
-      <pre>{JSON.stringify(visibility, null, 2)}</pre>
     </Stack>
   );
 }
 
-PetitionFieldCondition.fragments = {
+PetitionFieldVisibilityEditor.fragments = {
   PetitionField: gql`
-    fragment PetitionFieldCondition_PetitionField on PetitionField {
+    fragment PetitionFieldVisibility_PetitionField on PetitionField {
       id
       type
       multiple
-      # if we don't rename it there's issues with react-select thinking there's suboptions
       fieldOptions: options
+      isReadOnly
       ...PetitionFieldSelect_PetitionField
     }
     ${PetitionFieldSelect.fragments.PetitionField}
@@ -311,10 +300,10 @@ function ConditionMultipleFieldModifier({
   type,
   value,
   onChange,
-}: CustomSelectProps<ConditionMultipleFieldModifier>) {
+}: CustomSelectProps<PetitionFieldVisibilityConditionModifier>) {
   const intl = useIntl();
   const options = useMemo<
-    { label: string; value: ConditionMultipleFieldModifier }[]
+    { label: string; value: PetitionFieldVisibilityConditionModifier }[]
   >(() => {
     if (type === "FILE_UPLOAD") {
       return [
@@ -377,8 +366,9 @@ function ConditionMultipleFieldModifier({
   );
 }
 
-interface ConditionPredicateProps extends ValueProps<Condition> {
-  field: PetitionFieldCondition_PetitionFieldFragment;
+interface ConditionPredicateProps
+  extends ValueProps<PetitionFieldVisibilityCondition> {
+  field: PetitionFieldVisibility_PetitionFieldFragment;
   showError: boolean;
 }
 
@@ -393,7 +383,10 @@ function ConditionPredicate({
   const options = useMemo(() => {
     const options: {
       label: string;
-      value: ConditionOperator | "HAVE_REPLY" | "NOT_HAVE_REPLY";
+      value:
+        | PetitionFieldVisibilityConditionOperator
+        | "HAVE_REPLY"
+        | "NOT_HAVE_REPLY";
     }[] = [];
     if (field.multiple && modifier === "NUMBER_OF_REPLIES") {
       options.push(
@@ -521,7 +514,7 @@ function ConditionPredicate({
 
   const operator = useMemo(() => {
     let operator:
-      | ConditionOperator
+      | PetitionFieldVisibilityConditionOperator
       | "HAVE_REPLY"
       | "NOT_HAVE_REPLY" = condition!.operator;
     if (!field.multiple && condition!.modifier === "NUMBER_OF_REPLIES") {
@@ -537,7 +530,10 @@ function ConditionPredicate({
   function handleChange({
     value,
   }: {
-    value: ConditionOperator | "HAVE_REPLY" | "NOT_HAVE_REPLY";
+    value:
+      | PetitionFieldVisibilityConditionOperator
+      | "HAVE_REPLY"
+      | "NOT_HAVE_REPLY";
   }) {
     if (value === "HAVE_REPLY") {
       onChange({
@@ -596,8 +592,9 @@ function ConditionPredicate({
   );
 }
 
-interface ConditionValueProps extends ValueProps<Condition> {
-  field: PetitionFieldCondition_PetitionFieldFragment;
+interface ConditionValueProps
+  extends ValueProps<PetitionFieldVisibilityCondition> {
+  field: PetitionFieldVisibility_PetitionFieldFragment;
   showError: boolean;
 }
 
@@ -702,14 +699,16 @@ function VisibilityOperatorSelect({
   value,
   onChange,
   ...props
-}: CustomSelectProps<VisibilityOperator>) {
+}: CustomSelectProps<PetitionFieldVisibilityOperator>) {
   const intl = useIntl();
 
   const rsProps = useReactSelectProps<any, false, never>({
     size: "sm",
     ...props,
   });
-  const _options = useMemo<{ label: string; value: VisibilityOperator }[]>(
+  const _options = useMemo<
+    { label: string; value: PetitionFieldVisibilityOperator }[]
+  >(
     () => [
       {
         value: "AND",
@@ -747,14 +746,16 @@ function VisibilityTypeSelect({
   value,
   onChange,
   ...props
-}: CustomSelectProps<VisibilityType>) {
+}: CustomSelectProps<PetitionFieldVisibilityType>) {
   const intl = useIntl();
 
   const rsProps = useInlineReactSelectProps<any, false, never>({
     size: "sm",
     ...props,
   });
-  const _options = useMemo<{ label: string; value: VisibilityType }[]>(
+  const _options = useMemo<
+    { label: string; value: PetitionFieldVisibilityType }[]
+  >(
     () => [
       {
         value: "SHOW",

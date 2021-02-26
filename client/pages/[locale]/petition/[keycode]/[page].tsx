@@ -49,7 +49,7 @@ import { compose } from "@parallel/utils/compose";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";

@@ -66,7 +66,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
@@ -134,23 +134,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
   }, []);
 
-  const confirmDelete = useConfirmDeleteFieldDialog();
-  const [
-    deletePetitionField,
-  ] = usePetitionCompose_deletePetitionFieldMutation();
-
   const [updatePetition] = usePetitionCompose_updatePetitionMutation();
-  const [clonePetitionField] = usePetitionCompose_clonePetitionFieldMutation();
-  const [
-    updateFieldPositions,
-  ] = usePetitionCompose_updateFieldPositionsMutation();
-  const [
-    createPetitionField,
-  ] = usePetitionCompose_createPetitionFieldMutation();
-  const [
-    updatePetitionField,
-  ] = usePetitionCompose_updatePetitionFieldMutation();
-
   const handleUpdatePetition = useCallback(
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({
@@ -164,6 +148,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
+  const [
+    updateFieldPositions,
+  ] = usePetitionCompose_updateFieldPositionsMutation();
   const handleUpdateFieldPositions = useCallback(
     wrapper(async function (fieldIds: string[]) {
       await updateFieldPositions({ variables: { petitionId, fieldIds } });
@@ -171,7 +158,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const handleClonePetitionField = useCallback(
+  const [clonePetitionField] = usePetitionCompose_clonePetitionFieldMutation();
+  const handleCloneField = useCallback(
     wrapper(async (fieldId: string) => {
       const { data } = await clonePetitionField({
         variables: { petitionId, fieldId },
@@ -181,6 +169,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }),
     [petitionId]
   );
+
+  const [
+    deletePetitionField,
+  ] = usePetitionCompose_deletePetitionFieldMutation();
+  const confirmDelete = useConfirmDeleteFieldDialog();
   const handleDeleteField = useCallback(
     wrapper(async function (fieldId: string) {
       setActiveFieldId((activeFieldId) =>
@@ -202,7 +195,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const handleSettingsClick = useCallback(
+  const handleFieldSettingsClick = useCallback(
     function (fieldId: string) {
       setActiveFieldId((activeFieldId) =>
         activeFieldId === fieldId ? null : fieldId
@@ -218,6 +211,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
+  const [
+    updatePetitionField,
+  ] = usePetitionCompose_updatePetitionFieldMutation();
   const handleFieldEdit = useCallback(
     wrapper(async function (fieldId: string, data: UpdatePetitionFieldInput) {
       const field = client.cache.readFragment<onFieldEdit_PetitionFieldFragment>(
@@ -277,6 +273,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
+  const [
+    createPetitionField,
+  ] = usePetitionCompose_createPetitionFieldMutation();
   const handleAddField = useCallback(
     wrapper(async function (type: PetitionFieldType, position?: number) {
       const { data } = await createPetitionField({
@@ -559,11 +558,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             fields={petition!.fields}
             active={activeFieldId}
             onAddField={handleAddField}
-            onCopyFieldClick={handleClonePetitionField}
+            onCloneField={handleCloneField}
             onDeleteField={handleDeleteField}
             onUpdateFieldPositions={handleUpdateFieldPositions}
             onFieldEdit={handleFieldEdit}
-            onFieldSettingsClick={handleSettingsClick}
+            onFieldSettingsClick={handleFieldSettingsClick}
           />
           {petition?.__typename === "PetitionTemplate" ? (
             <PetitionTemplateDescriptionEdit

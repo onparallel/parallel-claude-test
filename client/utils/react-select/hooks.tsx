@@ -1,6 +1,6 @@
 import {
-  Flex,
   CloseButton,
+  Flex,
   Text,
   useFormControl,
   useTheme,
@@ -8,15 +8,10 @@ import {
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import React, { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import {
-  components,
-  GroupTypeBase,
-  OptionTypeBase,
-  Props,
-  Theme,
-} from "react-select";
+import { components, GroupTypeBase, OptionTypeBase, Theme } from "react-select";
 import { omit } from "remeda";
 import { SelectProps } from "./types";
+import { useRehydrated } from "@parallel/utils/useRehydrated";
 
 export const SIZES = {
   lg: {
@@ -97,10 +92,12 @@ export function useReactSelectProps<
     [intl.locale]
   );
 
+  const rehydrated = useRehydrated();
   return useMemo<SelectProps<OptionType, IsMulti, GroupType>>(
     () => ({
       inputId,
       isDisabled,
+      menuPortalTarget: rehydrated ? document.body : undefined,
       theme: (theme: Theme) =>
         ({
           spacing: SIZES[size].spacing,
@@ -261,7 +258,7 @@ export function useReactSelectProps<
         }),
       },
     }),
-    [size, inputId, isInvalid, isDisabled]
+    [rehydrated, size, inputId, isInvalid, isDisabled]
   );
 }
 

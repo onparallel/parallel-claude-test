@@ -13,23 +13,19 @@ import {
   DeleteIcon,
   DragHandleIcon,
   SettingsIcon,
+  AutomationIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionComposeField_PetitionFieldFragment,
+  PetitionFieldVisibility_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
 import { generateCssStripe } from "@parallel/utils/css";
+import { PetitionFieldVisibilityCondition } from "@parallel/utils/fieldVisibility/types";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
-import {
-  memo,
-  MouseEvent,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -37,6 +33,7 @@ import { shallowEqualObjects } from "shallow-equal";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
+import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 import {
   SelectTypeFieldOptions,
   SelectTypeFieldOptionsRef,
@@ -44,24 +41,19 @@ import {
 
 export interface PetitionComposeFieldProps {
   field: PetitionComposeField_PetitionFieldFragment;
+  fields: PetitionFieldVisibility_PetitionFieldFragment[];
   fieldIndex: number | string;
   index: number;
   isActive: boolean;
   showError: boolean;
   onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
-  onCloneClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  onSettingsClick: (event: MouseEvent<HTMLButtonElement>) => void;
-  onDeleteClick: (event: MouseEvent<HTMLButtonElement>) => void;
+  onCloneField: () => void;
+  onSettingsClick: () => void;
+  onDeleteClick: () => void;
   onFocusNextField: () => void;
   onFocusPrevField: () => void;
   onAddField: () => void;
-}
-
-interface DragItem {
-  index: number;
-  id: string;
-  type: string;
 }
 
 export type PetitionComposeFieldRef = {
@@ -76,16 +68,17 @@ const _PetitionComposeField = chakraForwardRef<
 >(function PetitionComposeField(
   {
     field,
+    fields,
     fieldIndex,
     index,
     isActive,
     showError,
     onMove,
     onFocus,
-    onCloneClick,
+    onCloneField,
     onSettingsClick,
-    onFieldEdit,
     onDeleteClick,
+    onFieldEdit,
     onFocusNextField,
     onFocusPrevField,
     onAddField,
@@ -100,6 +93,40 @@ const _PetitionComposeField = chakraForwardRef<
     onMove,
     field.isFixed ? "FIXED_FIELD" : "FIELD"
   );
+  const handleVisibilityClick = useCallback(() => {
+    if (field.visibility) {
+      onFieldEdit({ visibility: null });
+    } else {
+      const index = fields.findIndex((f) => f.id === field.id);
+      // try to use previous reply, if not possible, use next
+      const prev = fields
+        .slice(0, index)
+        .reverse()
+        .find((f) => !f.isReadOnly);
+      const ref =
+        prev ?? fields.slice(index + 1).find((f) => f.id === field.id)!;
+      const condition: PetitionFieldVisibilityCondition = {
+        fieldId: ref.id,
+        modifier: ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
+        operator: "EQUAL",
+        value:
+          ref.type === "FILE_UPLOAD"
+            ? 0
+            : ref.type === "TEXT"
+            ? null
+            : ref.type === "SELECT"
+            ? ref.fieldOptions.values[0] ?? null
+            : null,
+      };
+      onFieldEdit({
+        visibility: {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [condition],
+        },
+      });
+    }
+  }, [fields, field, onFieldEdit]);
 
   return (
     <Box
@@ -207,60 +234,24 @@ const _PetitionComposeField = chakraForwardRef<
           paddingBottom={10}
           paddingRight={4}
           field={field}
+          fields={fields}
           showError={showError}
           onFieldEdit={onFieldEdit}
           onFocusNextField={onFocusNextField}
           onFocusPrevField={onFocusPrevField}
           onAddField={onAddField}
         />
-        <Stack
+        <PetitionComposeFieldActions
+          field={field}
+          onCloneField={onCloneField}
+          onSettingsClick={onSettingsClick}
+          onDeleteClick={onDeleteClick}
+          onVisibilityClick={handleVisibilityClick}
           className="field-actions"
           position="absolute"
           bottom={0}
-          right={0}
-          direction="row"
-          padding={1}
-          paddingRight={3}
-        >
-          <IconButtonWithTooltip
-            icon={<CopyIcon />}
-            size="sm"
-            variant="ghost"
-            placement="bottom"
-            color="gray.600"
-            label={intl.formatMessage({
-              id: "petition.field-clone",
-              defaultMessage: "Clone field",
-            })}
-            onClick={onCloneClick}
-          />
-          <IconButtonWithTooltip
-            icon={<SettingsIcon />}
-            disabled={field.isFixed}
-            size="sm"
-            variant="ghost"
-            placement="bottom"
-            color="gray.600"
-            label={intl.formatMessage({
-              id: "petition.field-settings",
-              defaultMessage: "Field settings",
-            })}
-            onClick={onSettingsClick}
-          />
-          <IconButtonWithTooltip
-            icon={<DeleteIcon />}
-            disabled={field.isFixed}
-            size="sm"
-            variant="ghost"
-            placement="bottom"
-            color="gray.600"
-            label={intl.formatMessage({
-              id: "petition.field-delete-button",
-              defaultMessage: "Delete field",
-            })}
-            onClick={onDeleteClick}
-          />
-        </Stack>
+          right={2}
+        />
       </Box>
     </Box>
   );
@@ -269,6 +260,7 @@ const _PetitionComposeField = chakraForwardRef<
 type PetitionComposeFieldInnerProps = Pick<
   PetitionComposeFieldProps,
   | "field"
+  | "fields"
   | "showError"
   | "onFieldEdit"
   | "onFocusNextField"
@@ -285,6 +277,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 >(function PetitionComposeFieldInner(
   {
     field,
+    fields,
     showError,
     onFieldEdit,
     onFocusNextField,
@@ -351,6 +344,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               id: "petition.field-title-label",
               defaultMessage: "Field title",
             })}
+            isTruncated
             placeholder={
               field.type === "HEADING"
                 ? intl.formatMessage({
@@ -382,6 +376,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             onBlur={() => {
               const trimmed = title?.trim() ?? null;
               setNativeValue(titleRef.current!, trimmed ?? "");
+              titleRef.current!.selectionStart = titleRef.current!.selectionEnd = 0;
               if (field.title !== trimmed) {
                 onFieldEdit({ title: trimmed });
               }
@@ -513,19 +508,130 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           />
         </Box>
       ) : null}
+      {field.visibility ? (
+        <Box
+          marginTop={2}
+          marginBottom={
+            field.visibility && field.visibility.conditions.length < 5 ? -5 : 0
+          }
+        >
+          <PetitionFieldVisibilityEditor
+            showError={showError}
+            fieldId={field.id}
+            visibility={field.visibility as any}
+            fields={fields}
+            onVisibilityEdit={(visibility) => onFieldEdit({ visibility })}
+          />
+        </Box>
+      ) : null}
     </Box>
   );
 });
 
-function shallowCompareFieldProp<T extends { field: any }>(
-  prev: Readonly<T>,
-  next: Readonly<T>
+interface PetitionComposeFieldActionsProps
+  extends Pick<
+    PetitionComposeFieldProps,
+    "field" | "onCloneField" | "onSettingsClick" | "onDeleteClick"
+  > {
+  onVisibilityClick: () => void;
+}
+
+const _PetitionComposeFieldActions = chakraForwardRef<
+  "div",
+  PetitionComposeFieldActionsProps
+>(function PetitionComposeFieldActions(
+  {
+    field,
+    onVisibilityClick,
+    onCloneField,
+    onSettingsClick,
+    onDeleteClick,
+    ...props
+  },
+  ref
 ) {
+  const intl = useIntl();
+  const hasCondition = field.description;
   return (
-    shallowEqualObjects(omit(prev, ["field"]), omit(next, ["field"])) &&
-    shallowEqualObjects(prev["field"], next["field"])
+    <Stack ref={ref} direction="row" padding={1} {...props}>
+      <IconButtonWithTooltip
+        icon={<AutomationIcon />}
+        isDisabled={field.isFixed}
+        size="sm"
+        variant="ghost"
+        placement="bottom"
+        colorScheme={hasCondition ? "purple" : "gray"}
+        color={hasCondition ? "purple.500" : "gray.600"}
+        label={
+          hasCondition
+            ? intl.formatMessage({
+                id: "petition.remove-condition",
+                defaultMessage: "Remove condition",
+              })
+            : intl.formatMessage({
+                id: "petition.add-condition",
+                defaultMessage: "Add condition",
+              })
+        }
+        onClick={onVisibilityClick}
+      />
+      <IconButtonWithTooltip
+        icon={<CopyIcon />}
+        size="sm"
+        variant="ghost"
+        placement="bottom"
+        color="gray.600"
+        label={intl.formatMessage({
+          id: "petition.field-clone",
+          defaultMessage: "Clone field",
+        })}
+        onClick={onCloneField}
+      />
+      <IconButtonWithTooltip
+        icon={<SettingsIcon />}
+        isDisabled={field.isReadOnly}
+        size="sm"
+        variant="ghost"
+        placement="bottom"
+        color="gray.600"
+        label={intl.formatMessage({
+          id: "petition.field-settings",
+          defaultMessage: "Field settings",
+        })}
+        onClick={onSettingsClick}
+      />
+      <IconButtonWithTooltip
+        icon={<DeleteIcon />}
+        isDisabled={field.isFixed}
+        size="sm"
+        variant="ghost"
+        placement="bottom"
+        color="gray.600"
+        label={intl.formatMessage({
+          id: "petition.field-delete-button",
+          defaultMessage: "Delete field",
+        })}
+        onClick={onDeleteClick}
+      />
+    </Stack>
+  );
+});
+
+function shallowCompareFieldProp<
+  T extends { field: PetitionComposeField_PetitionFieldFragment; fields: any[] }
+>(prev: Readonly<T>, next: Readonly<T>) {
+  return (
+    shallowEqualObjects(
+      omit(prev, ["field", "fields"]),
+      omit(next, ["field", "fields"])
+    ) && shallowEqualObjects(prev["field"], next["field"])
   );
 }
+
+const PetitionComposeFieldActions = memo(
+  _PetitionComposeFieldActions,
+  shallowCompareFieldProp
+) as typeof _PetitionComposeFieldActions;
 
 const PetitionComposeFieldInner = memo(
   _PetitionComposeFieldInner,
@@ -549,13 +655,22 @@ export const PetitionComposeField = Object.assign(
           multiple
           isFixed
           isReadOnly
+          visibility
           ...SelectTypeFieldOptions_PetitionField
+          ...PetitionFieldVisibility_PetitionField
         }
         ${SelectTypeFieldOptions.fragments.PetitionField}
+        ${PetitionFieldVisibilityEditor.fragments.PetitionField}
       `,
     },
   }
 );
+
+interface DragItem {
+  index: number;
+  id: string;
+  type: string;
+}
 
 function useDragAndDrop(
   id: string,

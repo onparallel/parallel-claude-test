@@ -22,7 +22,7 @@ import {
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import { WithIsVisible } from "@parallel/utils/fieldVisibility";
+import { WithIsVisible } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";

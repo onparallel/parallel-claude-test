@@ -6,7 +6,7 @@ import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import {
   evaluateFieldVisibility,
   WithIsVisible,
-} from "@parallel/utils/fieldVisibility";
+} from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
 import { Fragment } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
@@ -71,7 +71,6 @@ export function PetitionFieldsIndex({
               fontWeight={field.type === "HEADING" ? "medium" : "normal"}
               textAlign="left"
               onClick={() => onFieldClick(field.id)}
-              backgroundColor={!field.isVisible ? "gray.100" : "inherit"}
             >
               {field.visibility ? (
                 <ConditionIcon
@@ -79,14 +78,14 @@ export function PetitionFieldsIndex({
                 />
               ) : null}
               {field.title ? (
-                <Text as="div" flex="1" minWidth={0}>
-                  <Text
-                    as="div"
-                    isTruncated
-                    color={!field.isVisible ? "gray.500" : "inherit"}
-                  >
-                    {field.title}
-                  </Text>
+                <Text
+                  as="div"
+                  flex="1"
+                  minWidth={0}
+                  isTruncated
+                  opacity={field.isVisible ? 1 : 0.6}
+                >
+                  {field.title}
                 </Text>
               ) : (
                 <Text as="div" flex="1" textStyle="hint">

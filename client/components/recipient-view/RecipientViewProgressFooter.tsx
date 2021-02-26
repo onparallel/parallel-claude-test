@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { RecipientViewProgressFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import { Card, CardProps } from "../common/Card";

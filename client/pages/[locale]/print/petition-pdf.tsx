@@ -15,7 +15,7 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import jwtDecode from "jwt-decode";
 import { useMemo } from "react";
