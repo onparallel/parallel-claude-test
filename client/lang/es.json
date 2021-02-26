@@ -4361,7 +4361,7 @@
   },
   {
     "term": "settings.api-tokens.confirm-delete-tokens-dialog.warning",
-    "definition": "Cualquier aplicación on programa que utilice {count, plural, =1 {este token} other {estos tokens}} no podrá acceder a la API de Parallel. Esta acción <b>no puede deshacerse</b>.",
+    "definition": "Cualquier aplicación o programa que utilice {count, plural, =1 {este token} other {estos tokens}} no podrá acceder a la API de Parallel. Esta acción <b>no puede deshacerse</b>.",
     "context": "Any applications or scripts using this {count, plural, =1 {token} other {tokens}} will no longer be able to access the Parallel API. This action <b>cannot be undone</b>."
   },
   {
