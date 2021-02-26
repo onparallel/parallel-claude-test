@@ -596,8 +596,8 @@
   },
   {
     "term": "component.petition-progress-bar.not-replied",
-    "definition": "{count, plural, =1{# campo no ha sido rellenado} other {# campos no han sido rellenados}}.",
-    "context": "{count, plural, =1{# field has} other {# fields have}} not been replied."
+    "definition": "{count} {count, plural, =1{campo} other {campos}} sin rellenar.",
+    "context": "{count} {count, plural, =1{field} other {fields}} without replies."
   },
   {
     "term": "component.petition-progress-bar.not-sent",
@@ -606,18 +606,18 @@
   },
   {
     "term": "component.petition-progress-bar.optional",
-    "definition": "{count, plural, =1{# campo no ha sido rellenado pero es opcional} other {# campos no han sido rellenados pero son opcionales}}.",
-    "context": "{count, plural, =1{# field has not been replied but it is optional.} other {# fields have not been replied but they are optional.}}"
+    "definition": "{count} {count, plural, =1{campo opcional} other {campos opcionales}} sin rellenar.",
+    "context": "{count} optional {count, plural, =1{field} other {fields}} without replies."
   },
   {
-    "term": "component.petition-progress-bar.pending",
-    "definition": "{count, plural, =1{# campo ha sido rellenado.} other {# campos han sido rellenados.}}",
-    "context": "{count, plural, =1{# field has been replied.} other {# fields have been replied.}}"
+    "term": "component.petition-progress-bar.replied",
+    "definition": "{count} {count, plural, =1{campo rellenado} other {campos rellenados}}.",
+    "context": "{count} replied {count, plural, =1{field} other {fields}}."
   },
   {
     "term": "component.petition-progress-bar.validated",
-    "definition": "{count, plural, =1{# campo ha sido rellenado y revisado.} other {# campos han sido rellenados y revisado.}}",
-    "context": "{count, plural, =1{# field has} other {# fields have}} been filled and reviewed."
+    "definition": "{count} {count, plural, =1{campo aprobado} other {campos aprobados}}.",
+    "context": "{count} reviewed {count, plural, =1{field} other {fields}}."
   },
   {
     "term": "component.petition-reminder-settings.next-reminder",
@@ -2243,6 +2243,11 @@
     "term": "petition-replies.petition-field-reply.reject",
     "definition": "Rechazar",
     "context": "Reject"
+  },
+  {
+    "term": "petition-replies.petition-field.conditions-not-met",
+    "definition": "No se cumplen las condiciones de visibilidad de este campo",
+    "context": "Visibility conditions for this field are not met"
   },
   {
     "term": "petition-replies.petition-field.no-replies",

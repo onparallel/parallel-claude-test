@@ -1,21 +1,43 @@
 /**
- * Similar code is also on /server/src/utils/fieldVisibility.ts
+ * Similar code is also on /client/utils/fieldVisibility.ts
  * Don't forget to update it as well!
  */
 
-import { gql } from "@apollo/client";
-import {
-  evaluateFieldVisibility_PublicPetitionFieldFragment,
-  evaluateFieldVisibility_PetitionFieldFragment,
-} from "@parallel/graphql/__types";
+type WithIsVisible<T> = T & { isVisible: boolean };
 
-type VisibilityField =
-  | evaluateFieldVisibility_PublicPetitionFieldFragment
-  | evaluateFieldVisibility_PetitionFieldFragment;
+export interface Visibility {
+  type: "SHOW" | "HIDE";
+  operator: "AND" | "OR";
+  conditions: FieldVisibilityCondition[];
+}
+export interface FieldVisibilityCondition {
+  fieldId: string;
+  modifier: "ANY" | "ALL" | "NONE" | "NUMBER_OF_REPLIES";
+  operator:
+    | "EQUAL"
+    | "NOT_EQUAL"
+    | "START_WITH"
+    | "END_WITH"
+    | "CONTAIN"
+    | "NOT_CONTAIN"
+    | "LESS_THAN"
+    | "LESS_THAN_OR_EQUAL"
+    | "GREATER_THAN"
+    | "GREATER_THAN_OR_EQUAL";
+  value: string | number;
+}
 
-export type WithIsVisible<T> = T & { isVisible: boolean };
+type VisibilityField = {
+  id: string;
+  visibility: Visibility;
+  replies: { content: any }[];
+};
 
-function evaluate<T extends string | number>(a: T, operator: string, b: T) {
+function evaluate<T extends string | number>(
+  a: T,
+  operator: FieldVisibilityCondition["operator"],
+  b: T
+) {
   switch (operator) {
     case "EQUAL":
       return a === b;
@@ -42,7 +64,11 @@ function evaluate<T extends string | number>(a: T, operator: string, b: T) {
   }
 }
 
-function isValidCondition(condition: any, replies: { content: any }[]) {
+function isValidCondition(
+  condition: FieldVisibilityCondition,
+  replies: VisibilityField["replies"]
+) {
+  debugger;
   switch (condition.modifier) {
     case "ANY":
       return replies.some((r) =>
@@ -71,12 +97,12 @@ export function evaluateFieldVisibility<T extends VisibilityField>(
     let conditionsResult: boolean;
     switch (field.visibility.operator) {
       case "OR":
-        conditionsResult = (field.visibility.conditions as any[]).some((c) =>
+        conditionsResult = field.visibility.conditions.some((c) =>
           isValidCondition(c, fields.find((f) => f.id === c.fieldId)!.replies)
         );
         break;
       case "AND":
-        conditionsResult = (field.visibility.conditions as any[]).every((c) =>
+        conditionsResult = field.visibility.conditions.every((c) =>
           isValidCondition(c, fields.find((f) => f.id === c.fieldId)!.replies)
         );
         break;
@@ -92,26 +118,3 @@ export function evaluateFieldVisibility<T extends VisibilityField>(
     };
   });
 }
-
-evaluateFieldVisibility.fragments = {
-  PublicPetitionField: gql`
-    fragment evaluateFieldVisibility_PublicPetitionField on PublicPetitionField {
-      id
-      visibility
-      replies {
-        id
-        content
-      }
-    }
-  `,
-  PetitionField: gql`
-    fragment evaluateFieldVisibility_PetitionField on PetitionField {
-      id
-      visibility
-      replies {
-        id
-        content
-      }
-    }
-  `,
-};

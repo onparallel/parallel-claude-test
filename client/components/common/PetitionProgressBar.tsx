@@ -1,4 +1,12 @@
-import { Box, BoxProps, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  BoxProps,
+  Flex,
+  FlexProps,
+  Square,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
@@ -62,50 +70,44 @@ export function PetitionProgressBar({
             </Text>
           </Box>
         ) : (
-          <Stack
-            as="ul"
-            margin={2}
-            fontSize="sm"
-            listStyleType="none"
-            spacing={1}
-          >
+          <Stack as="ul" fontSize="sm" listStyleType="none" spacing={1}>
             {validated ? (
-              <Text as="li">
+              <ProgressText as="li" type="validated">
                 <FormattedMessage
                   id="component.petition-progress-bar.validated"
-                  defaultMessage="{count, plural, =1{# field has} other {# fields have}} been filled and reviewed."
+                  defaultMessage="{count} reviewed {count, plural, =1{field} other {fields}}."
                   values={{ count: validated }}
                 />
-              </Text>
+              </ProgressText>
             ) : null}
             {replied ? (
-              <Text as="li">
+              <ProgressText as="li" type="replied">
                 <FormattedMessage
-                  id="component.petition-progress-bar.pending"
-                  defaultMessage="{count, plural, =1{# field has been replied.} other {# fields have been replied.}}"
+                  id="component.petition-progress-bar.replied"
+                  defaultMessage="{count} replied {count, plural, =1{field} other {fields}}."
                   values={{ count: replied }}
                 />
-              </Text>
+              </ProgressText>
             ) : null}
             {optional ? (
-              <Text as="li">
+              <ProgressText as="li" type="optional">
                 <FormattedMessage
                   id="component.petition-progress-bar.optional"
-                  defaultMessage="{count, plural, =1{# field has not been replied but it is optional.} other {# fields have not been replied but they are optional.}}"
+                  defaultMessage="{count} optional {count, plural, =1{field} other {fields}} without replies."
                   values={{ count: optional }}
                 />
-              </Text>
+              </ProgressText>
             ) : null}
             {validated + replied + optional < total ? (
-              <Text as="li">
+              <ProgressText as="li" type="empty">
                 <FormattedMessage
                   id="component.petition-progress-bar.not-replied"
-                  defaultMessage="{count, plural, =1{# field has} other {# fields have}} not been replied."
+                  defaultMessage="{count} {count, plural, =1{field} other {fields}} without replies."
                   values={{
                     count: total - (validated + replied + optional),
                   }}
                 />
-              </Text>
+              </ProgressText>
             ) : null}
           </Stack>
         )
@@ -140,5 +142,29 @@ export function PetitionProgressBar({
         </ProgressTrack>
       </Box>
     </SmallPopover>
+  );
+}
+
+const styles = {
+  validated: { backgroundColor: "green.400" },
+  replied: { backgroundColor: "yellow.400" },
+  optional: {
+    backgroundColor: "yellow.400",
+    backgroundImage:
+      "linear-gradient(135deg, #E2E8F0 25%, transparent 25%, transparent 50%, #E2E8F0 50%, #E2E8F0 75%, transparent 75%, transparent )",
+  },
+  empty: { backgroundColor: "gray.200" },
+};
+
+function ProgressText({
+  children,
+  type,
+  ...props
+}: FlexProps & { type: keyof typeof styles }) {
+  return (
+    <Flex {...props} alignItems="baseline">
+      <Square size="14px" borderRadius="sm" marginRight={2} {...styles[type]} />
+      <Text fontSize="md">{children}</Text>
+    </Flex>
   );
 }

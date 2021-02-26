@@ -4,28 +4,10 @@ import Ajv from "ajv";
 import { ArgValidationError } from "../errors";
 import { fromGlobalId } from "../../../util/globalId";
 import { ApiContext } from "../../../context";
-
-interface Visibility {
-  type: "SHOW" | "HIDE";
-  operator: "AND" | "OR";
-  conditions: Condition[];
-}
-interface Condition {
-  fieldId: string | null;
-  modifier: "ANY" | "ALL" | "NONE" | "NUMBER_OF_REPLIES";
-  operator:
-    | "EQUAL"
-    | "NOT_EQUAL"
-    | "START_WITH"
-    | "END_WITH"
-    | "CONTAIN"
-    | "NOT_CONTAIN"
-    | "LESS_THAN"
-    | "LESS_THAN_OR_EQUAL"
-    | "GREATER_THAN"
-    | "GREATER_THAN_OR_EQUAL";
-  value: string | number | null;
-}
+import {
+  FieldVisibilityCondition,
+  Visibility,
+} from "../../../util/fieldVisibility";
 
 const schema = {
   type: "object",
@@ -92,7 +74,7 @@ function validateCondition(
   petitionId: number,
   fieldId: number
 ) {
-  return async (c: Condition) => {
+  return async (c: FieldVisibilityCondition) => {
     const field = c.fieldId ? await loadField(c.fieldId, ctx) : null;
 
     if (field === null) {

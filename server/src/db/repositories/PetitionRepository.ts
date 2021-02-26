@@ -48,6 +48,8 @@ import {
   PetitionUserPermissionType,
   PetitionEvent,
 } from "../__types";
+import { evaluateFieldVisibility } from "../../util/fieldVisibility";
+import { toGlobalId } from "../../util/globalId";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
@@ -297,8 +299,8 @@ export class PetitionRepository extends BaseRepository {
     >(async (ids) => {
       const fields: (Pick<
         PetitionField,
-        "id" | "petition_id" | "validated" | "optional"
-      > & { replies: number })[] = await this.knex<PetitionField>(
+        "id" | "petition_id" | "validated" | "optional" | "visibility"
+      > & { content: string })[] = await this.knex<PetitionField>(
         "petition_field as pf"
       )
         .leftJoin<PetitionFieldReply>(
@@ -312,26 +314,51 @@ export class PetitionRepository extends BaseRepository {
         .whereIn("pf.petition_id", ids)
         .whereNull("pf.deleted_at")
         .whereNotIn("pf.type", ["HEADING"])
-        .groupBy("pf.id", "pf.petition_id", "pf.validated", "pf.optional")
+        .groupBy(
+          "pf.id",
+          "pf.petition_id",
+          "pf.validated",
+          "pf.optional",
+          "pf.visibility",
+          this.knex.raw(`"pfr"."content"::text`)
+        )
         .select(
           "pf.id",
           "pf.petition_id",
           "pf.validated",
           "pf.optional",
-          this.knex.raw(`count("pfr"."id")::int as "replies"`) as any
+          "pf.visibility",
+          this.knex.raw(`"pfr"."content"::text as "content"`) as any
         );
 
-      const fieldsById = groupBy(fields, (f) => f.petition_id);
+      const fieldsByPetition = groupBy(fields, (f) => f.petition_id);
       return ids.map((id) => {
-        const fields = fieldsById[id] ?? [];
+        const fields = groupBy(fieldsByPetition[id] ?? [], (f) => f.id);
+        // group fields by replies to remove duplicated rows
+        // also we need the right object structure for evaluateFieldVisibility
+        const fieldsWithReplies = Object.values(fields).map((arr) => ({
+          ...arr[0],
+          id: toGlobalId("PetitionField", arr[0].id),
+          replies: arr
+            .map((a) => ({ content: JSON.parse(a.content) }))
+            .filter((r) => r.content !== null),
+        }));
+
+        const visibleFields = evaluateFieldVisibility(fieldsWithReplies).filter(
+          (f) => f.isVisible
+        );
+
         return {
-          validated: countBy(fields, (f) => f.validated),
-          replied: countBy(fields, (f) => f.replies > 0 && !f.validated),
-          optional: countBy(
-            fields,
-            (f) => f.optional && f.replies === 0 && !f.validated
+          validated: countBy(visibleFields, (f) => f.validated),
+          replied: countBy(
+            visibleFields,
+            (f) => f.replies.length > 0 && !f.validated
           ),
-          total: fields.length,
+          optional: countBy(
+            visibleFields,
+            (f) => f.optional && f.replies.length === 0 && !f.validated
+          ),
+          total: visibleFields.length,
         };
       });
     })
