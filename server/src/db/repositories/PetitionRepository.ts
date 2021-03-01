@@ -1305,9 +1305,20 @@ export class PetitionRepository extends BaseRepository {
     const repliesByFieldId = Object.fromEntries(
       fieldsIds.map((id, index) => [id, replies[index]])
     );
-    const canComplete = fields
-      .filter((f) => f.type !== "HEADING")
-      .every((f) => f.optional || repliesByFieldId[f.id].length > 0);
+    const fieldsWithReplies = fields.map((f) => ({
+      ...f,
+      id: toGlobalId("PetitionField", f.id),
+      replies: repliesByFieldId[f.id],
+    }));
+
+    const canComplete = evaluateFieldVisibility(fieldsWithReplies).every(
+      (f) =>
+        f.type === "HEADING" ||
+        f.optional ||
+        f.replies.length > 0 ||
+        !f.isVisible
+    );
+
     if (canComplete) {
       const petition = await this.withTransaction(async (t) => {
         await this.updateRemindersForPetition(petitionId, null, t);
