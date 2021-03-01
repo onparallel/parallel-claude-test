@@ -149,7 +149,6 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
             {field.replies.map((reply) => (
               <motion.li
                 key={reply.id}
-                layout
                 animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
                 exit={{ opacity: 0, x: -100, transition: { duration: 0.2 } }}
               >
