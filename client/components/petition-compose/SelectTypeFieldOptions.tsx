@@ -158,9 +158,8 @@ export const SelectTypeFieldOptions = Object.assign(
           .filter((option) => option !== "");
         if (!shallowEqualArrays(field.options.values, values)) {
           onFieldEdit({ options: { values } });
-          setTimeout(() => onChange(valuesToSlateNodes(values)));
         }
-      }, [value, onFieldEdit, onChange]);
+      }, [field.options.values, value, onFieldEdit, onChange]);
       return (
         <Slate editor={editor} value={value} onChange={onChange}>
           <Box maxHeight="200px" overflow="auto" fontSize="sm">
