@@ -29,20 +29,18 @@ export interface FieldVisibilityCondition {
 
 type VisibilityField = {
   id: string;
-  visibility: Visibility;
-  replies: { content: any }[];
+  visibility: Visibility | null;
+  replies: { content: { text: string } }[];
 };
 
 function evaluate<T extends string | number>(
-  a: T,
+  reply: T,
   operator: FieldVisibilityCondition["operator"],
-  b: T
+  value: T
 ) {
+  const a = typeof reply === "string" ? reply.toLowerCase() : reply;
+  const b = typeof value === "string" ? value.toLowerCase() : value;
   switch (operator) {
-    case "EQUAL":
-      return a === b;
-    case "NOT_EQUAL":
-      return a !== b;
     case "LESS_THAN":
       return a < b;
     case "LESS_THAN_OR_EQUAL":
@@ -51,6 +49,10 @@ function evaluate<T extends string | number>(
       return a > b;
     case "GREATER_THAN_OR_EQUAL":
       return a >= b;
+    case "EQUAL":
+      return a === b;
+    case "NOT_EQUAL":
+      return a !== b;
     case "START_WITH":
       return a.toString().startsWith(b.toString());
     case "END_WITH":
