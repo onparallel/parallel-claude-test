@@ -40,7 +40,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
         [
           PlausibleProvider,
           {
-            customDomain: "p.onparallel.com",
+            customDomain: "https://p.onparallel.com",
             domain: "onparallel.com",
             exclude: "/*/print/*",
           },
