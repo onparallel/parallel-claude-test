@@ -1,6 +1,7 @@
 import {
   Box,
   Heading,
+  Image,
   Menu,
   MenuButton,
   MenuItem,
@@ -21,7 +22,7 @@ import {
 } from "@parallel/utils/petitionFields";
 import useMergedRef from "@react-hook/merged-ref";
 import { useEffect, useRef, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { SelectLikeButton } from "../common/SelectLikeButton";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 
@@ -150,6 +151,8 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
   const fieldListWidth = 230;
   const descriptionWidth = 270;
 
+  const { locale } = useIntl();
+  const typeSelectBoxRef = useRef<HTMLDivElement>(null);
   return (
     <MenuList
       ref={useMergedRef(ref, ownRef)}
@@ -164,7 +167,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
       overflow="hidden"
       {...props}
     >
-      <Box flex="1">
+      <Box flex="1" ref={typeSelectBoxRef}>
         <Box
           display={{ base: "none", sm: showHeader ? "block" : "none" }}
           paddingX={4}
@@ -207,6 +210,8 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
         borderLeftColor="gray.200"
         paddingX={4}
         paddingY={3}
+        height={typeSelectBoxRef.current?.clientHeight}
+        overflowY="scroll"
       >
         <Box>
           <Heading as="h2" size="sm" marginBottom={2}>
@@ -266,6 +271,10 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
                 </Text>
               </Stack>
             ) : null}
+            <Image
+              marginTop={2}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/${activeType}_${locale}.png`}
+            />
           </Box>
         </Box>
       </Box>
