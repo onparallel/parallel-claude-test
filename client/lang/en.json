@@ -435,6 +435,51 @@
     "context": "Show"
   },
   {
+    "term": "component.petition-field-type-select-dropdown.file-upload-description-1",
+    "definition": "Collect documents or other files in an organized way.",
+    "context": "Collect documents or other files in an organized way."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.file-upload-description-2",
+    "definition": "Using this option will allow the recipient to upload a file very easily.",
+    "context": "Using this option will allow the recipient to upload a file very easily."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.header",
+    "definition": "What do you need?",
+    "context": "What do you need?"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.heading-description-1",
+    "definition": "Organize your petitions in sections or pages with a heading.",
+    "context": "Organize your petitions in sections or pages with a heading."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.heading-description-2",
+    "definition": "Sections are for information purposes only and do not collect information.",
+    "context": "Sections are for information purposes only and do not collect information."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.select-description-1",
+    "definition": "Collect text replies through a drop-down menu of options.",
+    "context": "Collect text replies through a drop-down menu of options."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.select-description-2",
+    "definition": "Using this option will allow the recipient to select from a predefined list of possible answers.",
+    "context": "Using this option will allow the recipient to select from a predefined list of possible answers."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.text-description",
+    "definition": "Obtain written information that is not stored in documents or other files.",
+    "context": "Obtain written information that is not stored in documents or other files."
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
+    "definition": "Thumbnail for field type \"{type}\"",
+    "context": "Thumbnail for field type \"{type}\""
+  },
+  {
     "term": "component.petition-header.clone-label",
     "definition": "Clone petition",
     "context": "Clone petition"
@@ -2365,11 +2410,6 @@
     "context": "Add field"
   },
   {
-    "term": "component.petition-field-type-select-dropdown.header",
-    "definition": "What do you need?",
-    "context": "What do you need?"
-  },
-  {
     "term": "petition.already-sent",
     "definition": "This petition has already been sent.",
     "context": "This petition has already been sent."
@@ -2555,29 +2595,9 @@
     "context": "Documents and files"
   },
   {
-    "term": "component.petition-field-type-select-dropdown.file-upload-description-1",
-    "definition": "Collect documents or other files in an organized way.",
-    "context": "Collect documents or other files in an organized way."
-  },
-  {
-    "term": "component.petition-field-type-select-dropdown.file-upload-description-2",
-    "definition": "Using this option will allow the recipient to upload a file very easily.",
-    "context": "Using this option will allow the recipient to upload a file very easily."
-  },
-  {
     "term": "petition.field-type.heading",
     "definition": "Section",
     "context": "Section"
-  },
-  {
-    "term": "component.petition-field-type-select-dropdown.heading-description-1",
-    "definition": "Organize your petitions in sections or pages with a heading.",
-    "context": "Organize your petitions in sections or pages with a heading."
-  },
-  {
-    "term": "component.petition-field-type-select-dropdown.heading-description-2",
-    "definition": "Sections are for information purposes only and do not collect information.",
-    "context": "Sections are for information purposes only and do not collect information."
   },
   {
     "term": "petition.field-type.select",
@@ -2585,24 +2605,9 @@
     "context": "Dropdown"
   },
   {
-    "term": "component.petition-field-type-select-dropdown.select-description-1",
-    "definition": "Collect text replies through a drop-down menu of options.",
-    "context": "Collect text replies through a drop-down menu of options."
-  },
-  {
-    "term": "component.petition-field-type-select-dropdown.select-description-2",
-    "definition": "Using this option will allow the recipient to select from a predefined list of possible answers.",
-    "context": "Using this option will allow the recipient to select from a predefined list of possible answers."
-  },
-  {
     "term": "petition.field-type.text",
     "definition": "Text reply",
     "context": "Text reply"
-  },
-  {
-    "term": "component.petition-field-type-select-dropdown.text-description",
-    "definition": "Obtain written information that is not stored in documents or other files.",
-    "context": "Obtain written information that is not stored in documents or other files."
   },
   {
     "term": "petition.finalize-start-signature.body-1",
