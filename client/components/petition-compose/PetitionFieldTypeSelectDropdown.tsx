@@ -1,4 +1,5 @@
 import {
+  AspectRatio,
   Box,
   Heading,
   Image,
@@ -123,8 +124,10 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
   { onSelectFieldType, showHeader, showDescription, role = "menu", ...props },
   ref
 ) {
+  const intl = useIntl();
   const ownRef = useRef<HTMLDivElement>(null);
   const [activeType, setActiveType] = useState<PetitionFieldType>("HEADING");
+  const activeTypeLabel = usePetitionFieldTypeLabel(activeType);
 
   // Until we can set the roles via props
   useEffect(() => {
@@ -152,7 +155,6 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
   const descriptionWidth = 270;
 
   const { locale } = useIntl();
-  const typeSelectBoxRef = useRef<HTMLDivElement>(null);
   return (
     <MenuList
       ref={useMergedRef(ref, ownRef)}
@@ -165,17 +167,19 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
           : `${fieldListWidth}px`,
       }}
       overflow="hidden"
+      maxHeight="232px"
       {...props}
     >
-      <Box flex="1" ref={typeSelectBoxRef}>
+      <Box flex="1">
         <Box
-          display={{ base: "none", sm: showHeader ? "block" : "none" }}
+          display={{ base: "none", sm: showHeader ? "flex" : "none" }}
+          alignItems="center"
           paddingX={4}
-          paddingY={3}
+          height={12}
         >
           <Heading size="sm">
             <FormattedMessage
-              id="petition.add-field-button.question"
+              id="component.petition-field-type-select-dropdown.header"
               defaultMessage="What do you need?"
             />
           </Heading>
@@ -210,8 +214,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
         borderLeftColor="gray.200"
         paddingX={4}
         paddingY={3}
-        height={typeSelectBoxRef.current?.clientHeight}
-        overflowY="scroll"
+        overflow="auto"
       >
         <Box>
           <Heading as="h2" size="sm" marginBottom={2}>
@@ -222,13 +225,13 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
               <Stack>
                 <Text>
                   <FormattedMessage
-                    id="petition.field-type.heading.description-1"
+                    id="component.petition-field-type-select-dropdown.heading-description-1"
                     defaultMessage="Organize your petitions in sections or pages with a heading."
                   />
                 </Text>
                 <Text>
                   <FormattedMessage
-                    id="petition.field-type.heading.description-2"
+                    id="component.petition-field-type-select-dropdown.heading-description-2"
                     defaultMessage="Sections are for information purposes only and do not collect information."
                   />
                 </Text>
@@ -236,7 +239,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
             ) : activeType === "TEXT" ? (
               <Text>
                 <FormattedMessage
-                  id="petition.field-type.text.description"
+                  id="component.petition-field-type-select-dropdown.text-description"
                   defaultMessage="Obtain written information that is not stored in documents or other files."
                 />
               </Text>
@@ -244,13 +247,13 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
               <Stack>
                 <Text>
                   <FormattedMessage
-                    id="petition.field-type.file-upload.description-1"
+                    id="component.petition-field-type-select-dropdown.file-upload-description-1"
                     defaultMessage="Collect documents or other files in an organized way."
                   />
                 </Text>
                 <Text>
                   <FormattedMessage
-                    id="petition.field-type.file-upload.description-2"
+                    id="component.petition-field-type-select-dropdown.file-upload-description-2"
                     defaultMessage="Using this option will allow the recipient to upload a file very easily."
                   />
                 </Text>
@@ -259,23 +262,32 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
               <Stack>
                 <Text>
                   <FormattedMessage
-                    id="petition.field-type.select.description-1"
+                    id="component.petition-field-type-select-dropdown.select-description-1"
                     defaultMessage="Collect text replies through a drop-down menu of options."
                   />
                 </Text>
                 <Text>
                   <FormattedMessage
-                    id="petition.field-type.select.description-2"
+                    id="component.petition-field-type-select-dropdown.select-description-2"
                     defaultMessage="Using this option will allow the recipient to select from a predefined list of possible answers."
                   />
                 </Text>
               </Stack>
             ) : null}
+          </Box>
+          <AspectRatio ratio={490 / 212} marginTop={2}>
             <Image
-              marginTop={2}
+              alt={intl.formatMessage(
+                {
+                  id:
+                    "component.petition-field-type-select-dropdown.thumbnail-alt",
+                  defaultMessage: 'Thumbnail for field type "{type}"',
+                },
+                { type: activeTypeLabel }
+              )}
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/${activeType}_${locale}.png`}
             />
-          </Box>
+          </AspectRatio>
         </Box>
       </Box>
     </MenuList>

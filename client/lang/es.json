@@ -2365,7 +2365,7 @@
     "context": "Add field"
   },
   {
-    "term": "petition.add-field-button.question",
+    "term": "component.petition-field-type-select-dropdown.header",
     "definition": "¿Qué necesitas?",
     "context": "What do you need?"
   },
@@ -2555,12 +2555,12 @@
     "context": "Documents and files"
   },
   {
-    "term": "petition.field-type.file-upload.description-1",
+    "term": "component.petition-field-type-select-dropdown.file-upload-description-1",
     "definition": "Recopila documentos u otra información de manera organizada.",
     "context": "Collect documents or other files in an organized way."
   },
   {
-    "term": "petition.field-type.file-upload.description-2",
+    "term": "component.petition-field-type-select-dropdown.file-upload-description-2",
     "definition": "Usando esta opción permitirás al destinatario subir archivos de forma fácil.",
     "context": "Using this option will allow the recipient to upload a file very easily."
   },
@@ -2570,12 +2570,12 @@
     "context": "Section"
   },
   {
-    "term": "petition.field-type.heading.description-1",
+    "term": "component.petition-field-type-select-dropdown.heading-description-1",
     "definition": "Organiza tus peticiones en secciones o páginas con encabezado.",
     "context": "Organize your petitions in sections or pages with a heading."
   },
   {
-    "term": "petition.field-type.heading.description-2",
+    "term": "component.petition-field-type-select-dropdown.heading-description-2",
     "definition": "Las secciones únicamente son informativas y no permiten obtener información.",
     "context": "Sections are for information purposes only and do not collect information."
   },
@@ -2585,12 +2585,12 @@
     "context": "Dropdown"
   },
   {
-    "term": "petition.field-type.select.description-1",
+    "term": "component.petition-field-type-select-dropdown.select-description-1",
     "definition": "Recopila respuestas mediante un menú desplegable con opciones.",
     "context": "Collect text replies through a drop-down menu of options."
   },
   {
-    "term": "petition.field-type.select.description-2",
+    "term": "component.petition-field-type-select-dropdown.select-description-2",
     "definition": "Usando esta opción permitirás al destinatario escoger de una lista de posibles respuestas predefinidas.",
     "context": "Using this option will allow the recipient to select from a predefined list of possible answers."
   },
@@ -2600,7 +2600,7 @@
     "context": "Text reply"
   },
   {
-    "term": "petition.field-type.text.description",
+    "term": "component.petition-field-type-select-dropdown.text-description",
     "definition": "Obtén información escrita que no está almacenada en documentos u otros archivos.",
     "context": "Obtain written information that is not stored in documents or other files."
   },
