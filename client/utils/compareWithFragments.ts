@@ -54,6 +54,9 @@ function checkSelectionSet(
     return true;
   }
   if (Array.isArray(a)) {
+    if (a.length !== b.length) {
+      return false;
+    }
     for (let i = 0; i < a.length; i++) {
       if (!checkSelectionSet(a[i], b[i], selectionSet, fragmentMap)) {
         return false;
@@ -88,7 +91,7 @@ function checkField(
 ) {
   const key = field.alias?.value ?? field.name.value;
   if (!field.selectionSet) {
-    return a[key] === b[key];
+    return a?.[key] === b?.[key];
   } else {
     return checkSelectionSet(a[key], b[key], field.selectionSet, fragmentMap);
   }

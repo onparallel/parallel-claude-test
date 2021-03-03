@@ -37,7 +37,7 @@ const FieldItem = memo(function FieldItem({
         isTooltipDisabled
         flexShrink={0}
       />
-      <Box marginLeft={2} flex="1" minWidth="0" isTruncated>
+      <Box marginLeft={2} paddingRight={1} flex="1" minWidth="0" isTruncated>
         {field.title ? (
           highlight ? (
             <HighlightText text={field.title} search={highlight} />

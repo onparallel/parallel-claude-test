@@ -332,8 +332,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 
   return (
     <Box {...props}>
-      <Stack direction="row">
-        <Box flex={1} marginBottom={1}>
+      <Stack direction="row" marginBottom={1}>
+        <Box flex={1}>
           <Input
             id={`field-title-${field.id}`}
             ref={titleRef}
@@ -548,7 +548,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
   ref
 ) {
   const intl = useIntl();
-  const hasCondition = field.description;
+  const hasCondition = field.visibility;
   return (
     <Stack ref={ref} direction="row" padding={1} {...props}>
       <IconButtonWithTooltip

@@ -4,13 +4,13 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import {
   UseReactSelectProps,
   useReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
-import deepmerge from "deepmerge";
+import { SelectProps } from "@parallel/utils/react-select/types";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -25,7 +25,6 @@ import {
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
 import { RecipientViewPetitionFieldReplyStatusIndicator } from "./RecipientViewPetitionFieldReplyStatusIndicator";
-import { SelectProps } from "@parallel/utils/react-select/types";
 
 export interface RecipientViewPetitionFieldSelectProps
   extends Omit<
@@ -289,8 +288,10 @@ function useFieldSelectReactSelectProps(props: UseReactSelectProps) {
   const _reactSelectProps = useReactSelectProps(props);
   return useMemo<SelectProps>(
     () =>
-      deepmerge(_reactSelectProps, {
+      ({
+        ..._reactSelectProps,
         styles: {
+          ..._reactSelectProps.styles,
           menu: (styles, props) => ({
             ...styles,
             ..._reactSelectProps.styles!.menu?.(styles, props),
