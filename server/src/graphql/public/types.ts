@@ -1,6 +1,7 @@
 import { core, objectType, unionType } from "@nexus/schema";
 import { extension } from "mime-types";
 import { fullName } from "../../util/fullName";
+import { toGlobalId } from "../../util/globalId";
 
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
@@ -172,7 +173,13 @@ export const PublicPetitionField = objectType({
     t.nullable.jsonObject("visibility", {
       description:
         "A JSON object representing the conditions for the field to be visible",
-      resolve: (o) => o.visibility,
+      resolve: ({ visibility }) => ({
+        ...visibility,
+        conditions: visibility.conditions.map((c: any) => ({
+          ...c,
+          fieldId: c.fieldId ? toGlobalId("PetitionField", c.fieldId) : null,
+        })),
+      }),
     });
   },
 });

@@ -11,7 +11,7 @@ export interface Visibility {
   conditions: FieldVisibilityCondition[];
 }
 export interface FieldVisibilityCondition {
-  fieldId: string;
+  fieldId: number;
   modifier: "ANY" | "ALL" | "NONE" | "NUMBER_OF_REPLIES";
   operator:
     | "EQUAL"
@@ -28,7 +28,7 @@ export interface FieldVisibilityCondition {
 }
 
 type VisibilityField = {
-  id: string;
+  id: number;
   visibility: Visibility | null;
   replies: { content: { text: string } }[];
 };

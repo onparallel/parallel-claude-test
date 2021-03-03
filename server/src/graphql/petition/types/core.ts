@@ -1,5 +1,6 @@
 import { enumType, objectType, interfaceType } from "@nexus/schema";
 import { extension } from "mime-types";
+import { toGlobalId } from "../../../util/globalId";
 import { safeJsonParse } from "../../../util/safeJsonParse";
 import { userHasFeatureFlag } from "../authorizers";
 
@@ -340,7 +341,13 @@ export const PetitionField = objectType({
     t.nullable.jsonObject("visibility", {
       description:
         "A JSON object representing the conditions for the field to be visible",
-      resolve: (o) => o.visibility,
+      resolve: ({ visibility }) => ({
+        ...visibility,
+        conditions: visibility.conditions.map((c: any) => ({
+          ...c,
+          fieldId: c.fieldId ? toGlobalId("PetitionField", c.fieldId) : null,
+        })),
+      }),
     });
   },
   rootTyping: "db.PetitionField",

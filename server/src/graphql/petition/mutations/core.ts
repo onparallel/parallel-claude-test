@@ -20,7 +20,11 @@ import {
   PetitionUser,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
-import { fromGlobalIds, toGlobalId } from "../../../util/globalId";
+import {
+  fromGlobalId,
+  fromGlobalIds,
+  toGlobalId,
+} from "../../../util/globalId";
 import { isDefined } from "../../../util/remedaExtensions";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import {
@@ -610,7 +614,15 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     }
 
     if (isDefined(visibility)) {
-      data.visibility = visibility;
+      data.visibility = {
+        ...visibility,
+        conditions: visibility.conditions.map((c: any) => ({
+          ...c,
+          fieldId: c.fieldId
+            ? fromGlobalId(c.fieldId, "PetitionField").id
+            : null,
+        })),
+      };
     }
 
     return await ctx.petitions.updatePetitionField(

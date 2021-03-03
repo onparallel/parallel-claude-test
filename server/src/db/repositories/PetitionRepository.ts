@@ -49,7 +49,6 @@ import {
   PetitionEvent,
 } from "../__types";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
-import { toGlobalId } from "../../util/globalId";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
@@ -338,7 +337,6 @@ export class PetitionRepository extends BaseRepository {
         // also we need the right object structure for evaluateFieldVisibility
         const fieldsWithReplies = Object.values(fields).map((arr) => ({
           ...arr[0],
-          id: toGlobalId("PetitionField", arr[0].id),
           replies: arr
             .map((a) => ({ content: JSON.parse(a.content) }))
             .filter((r) => r.content !== null),
@@ -1307,7 +1305,6 @@ export class PetitionRepository extends BaseRepository {
     );
     const fieldsWithReplies = fields.map((f) => ({
       ...f,
-      id: toGlobalId("PetitionField", f.id),
       replies: repliesByFieldId[f.id],
     }));
 
