@@ -20,6 +20,7 @@ export type Scalars = {
   GID: string;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
+  PetitionFieldVisibility: PetitionFieldVisibilty;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { [key: string]: any };
   /** The `Upload` scalar type represents a file upload. */
@@ -3037,7 +3038,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
   | "visibility"
 > &
   SelectTypeFieldOptions_PetitionFieldFragment &
-  PetitionFieldVisibility_PetitionFieldFragment;
+  PetitionFieldVisibilityEditor_PetitionFieldFragment;
 
 export type PetitionComposeFieldList_PetitionFragment = {
   __typename?: "Petition";
@@ -3062,7 +3063,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   | "position"
 >;
 
-export type PetitionFieldVisibility_PetitionFieldFragment = {
+export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "type" | "multiple" | "isReadOnly"> & {
     fieldOptions: PetitionField["options"];
@@ -4368,7 +4369,7 @@ export type Pruebas_Petition_Petition_Fragment = {
     fields: Array<
       {
         __typename?: "PetitionField";
-      } & PetitionFieldVisibility_PetitionFieldFragment
+      } & PetitionFieldVisibilityEditor_PetitionFieldFragment
     >;
   };
 
@@ -4378,7 +4379,7 @@ export type Pruebas_Petition_PetitionTemplate_Fragment = {
     fields: Array<
       {
         __typename?: "PetitionField";
-      } & PetitionFieldVisibility_PetitionFieldFragment
+      } & PetitionFieldVisibilityEditor_PetitionFieldFragment
     >;
   };
 
@@ -5310,8 +5311,8 @@ export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
     title
   }
 `;
-export const PetitionFieldVisibility_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldVisibility_PetitionField on PetitionField {
+export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
     id
     type
     multiple
@@ -5333,10 +5334,10 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     isReadOnly
     visibility
     ...SelectTypeFieldOptions_PetitionField
-    ...PetitionFieldVisibility_PetitionField
+    ...PetitionFieldVisibilityEditor_PetitionField
   }
   ${SelectTypeFieldOptions_PetitionFieldFragmentDoc}
-  ${PetitionFieldVisibility_PetitionFieldFragmentDoc}
+  ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
 `;
 export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   fragment PetitionComposeFieldList_Petition on Petition {
@@ -6427,10 +6428,10 @@ export const Pruebas_PetitionFragmentDoc = gql`
   fragment Pruebas_Petition on PetitionBase {
     id
     fields {
-      ...PetitionFieldVisibility_PetitionField
+      ...PetitionFieldVisibilityEditor_PetitionField
     }
   }
-  ${PetitionFieldVisibility_PetitionFieldFragmentDoc}
+  ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
 `;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {

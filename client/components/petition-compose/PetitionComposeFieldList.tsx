@@ -119,8 +119,21 @@ export const PetitionComposeFieldList = Object.assign(
       > => ({
         onCloneField: () => onCloneField(fieldId),
         onSettingsClick: () => onFieldSettingsClick(fieldId),
-        onDeleteClick: () => onDeleteField(fieldId),
-        onFieldEdit: (data) => onFieldEdit(fieldId, data),
+        onDeleteClick: () => {
+          const fields = fieldsDataRef.current!;
+          if (
+            fields.some((f) => f.visibility?.conditions.some((c) => c.fieldId))
+          )
+            onDeleteField(fieldId);
+        },
+        onFieldEdit: (data) => {
+          const fields = fieldsDataRef.current!;
+          const field = fields.find((f) => f.id === fieldId)!;
+          if (field.type === "SELECT" && data.options) {
+            // ensure no other field has a condition on it
+          }
+          onFieldEdit(fieldId, data);
+        },
         onFocusPrevField: () => {
           const fields = fieldsDataRef.current;
           const index = fields.findIndex((f) => f.id === fieldId);

@@ -38,7 +38,7 @@ Pruebas.fragments = {
       fragment Pruebas_Petition on PetitionBase {
         id
         fields {
-          ...PetitionFieldVisibility_PetitionField
+          ...PetitionFieldVisibilityEditor_PetitionField
         }
       }
       ${PetitionFieldVisibilityEditor.fragments.PetitionField}

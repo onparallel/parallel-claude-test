@@ -98,6 +98,7 @@ export function useReactSelectProps<
       inputId,
       isDisabled,
       menuPortalTarget: rehydrated ? document.body : undefined,
+      menuPlacement: "auto",
       theme: (theme: Theme) =>
         ({
           spacing: SIZES[size].spacing,

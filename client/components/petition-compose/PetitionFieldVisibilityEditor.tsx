@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
-import { PetitionFieldVisibility_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
 import {
   useInlineReactSelectProps,
@@ -25,7 +25,7 @@ import { CustomSelectProps } from "@parallel/utils/react-select/types";
 import { Fragment, SetStateAction, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { pick } from "remeda";
+import { pick, zip } from "remeda";
 import {
   PetitionFieldVisibility,
   PetitionFieldVisibilityCondition,
@@ -43,7 +43,7 @@ interface ValueProps<T> {
 export interface PetitionFieldVisibilityProps {
   fieldId: string;
   visibility: PetitionFieldVisibility;
-  fields: PetitionFieldVisibility_PetitionFieldFragment[];
+  fields: PetitionFieldVisibilityEditor_PetitionFieldFragment[];
   showError: boolean;
   onVisibilityEdit: (visibility: PetitionFieldVisibility) => void;
 }
@@ -56,25 +56,34 @@ export function PetitionFieldVisibilityEditor({
   onVisibilityEdit,
 }: PetitionFieldVisibilityProps) {
   const intl = useIntl();
-  const _fields = useMemo(
-    () =>
-      fields
-        .filter((f) => f)
-        // if we don't rename this, react-select picks the options property
-        // and thinks you want groups
-        .map((field) =>
-          pick(field, [
-            "id",
-            "type",
-            "title",
-            "multiple",
-            "isReadOnly",
-            "fieldOptions",
-          ])
-        ),
-    [fields]
-  );
-  const indices = useFieldIndexValues(_fields);
+  const indices = useFieldIndexValues(fields);
+  const [_fields, _indices] = useMemo(() => {
+    const pairs = zip(fields, indices)
+      .filter(([f]) => !f.isReadOnly && f.id !== fieldId)
+      // if we don't rename this, react-select picks the options property
+      // and thinks you want groups
+      .map(
+        ([field, index]) =>
+          [
+            pick(field, [
+              "id",
+              "type",
+              "title",
+              "multiple",
+              "isReadOnly",
+              "fieldOptions",
+            ]),
+            index,
+          ] as const
+      );
+    const _fields: typeof pairs[0][0][] = [];
+    const _indices: typeof pairs[0][1][] = [];
+    for (const [field, index] of pairs) {
+      _fields.push(field);
+      _indices.push(index);
+    }
+    return [_fields, _indices];
+  }, [fields, indices]);
   function setVisibility(
     dispatch: (prev: PetitionFieldVisibility) => PetitionFieldVisibility
   ) {
@@ -124,7 +133,7 @@ export function PetitionFieldVisibilityEditor({
       .slice(0, index)
       .reverse()
       .find((f) => !f.isReadOnly);
-    const ref = prev ?? fields.slice(index + 1).find((f) => f.id === fieldId)!;
+    const ref = prev ?? fields.slice(index + 1).find((f) => !f.isReadOnly)!;
     const condition: PetitionFieldVisibilityCondition = {
       fieldId: ref.id,
       modifier: ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
@@ -143,8 +152,7 @@ export function PetitionFieldVisibilityEditor({
   return (
     <Stack spacing={1}>
       <Grid
-        paddingY={3}
-        paddingX={4}
+        padding={3}
         borderRadius="md"
         backgroundColor="gray.100"
         templateColumns={{
@@ -209,7 +217,7 @@ export function PetitionFieldVisibilityEditor({
                 isInvalid={showError && !conditionField}
                 value={conditionField}
                 fields={_fields}
-                indices={indices}
+                indices={_indices}
                 onChange={(field) => {
                   const changedFieldType = field.type !== conditionField?.type;
                   updateCondition(index, {
@@ -284,7 +292,7 @@ export function PetitionFieldVisibilityEditor({
 
 PetitionFieldVisibilityEditor.fragments = {
   PetitionField: gql`
-    fragment PetitionFieldVisibility_PetitionField on PetitionField {
+    fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
       id
       type
       multiple
@@ -368,7 +376,7 @@ function ConditionMultipleFieldModifier({
 
 interface ConditionPredicateProps
   extends ValueProps<PetitionFieldVisibilityCondition> {
-  field: PetitionFieldVisibility_PetitionFieldFragment;
+  field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
   showError: boolean;
 }
 
@@ -594,7 +602,7 @@ function ConditionPredicate({
 
 interface ConditionValueProps
   extends ValueProps<PetitionFieldVisibilityCondition> {
-  field: PetitionFieldVisibility_PetitionFieldFragment;
+  field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
   showError: boolean;
 }
 

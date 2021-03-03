@@ -9,27 +9,26 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import {
+  ConditionFullIcon,
   CopyIcon,
   DeleteIcon,
   DragHandleIcon,
   SettingsIcon,
-  AutomationIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionComposeField_PetitionFieldFragment,
-  PetitionFieldVisibility_PetitionFieldFragment,
+  PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
+import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { PetitionFieldVisibilityCondition } from "@parallel/utils/fieldVisibility/types";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
-import { omit } from "remeda";
-import { shallowEqualObjects } from "shallow-equal";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
@@ -41,7 +40,7 @@ import {
 
 export interface PetitionComposeFieldProps {
   field: PetitionComposeField_PetitionFieldFragment;
-  fields: PetitionFieldVisibility_PetitionFieldFragment[];
+  fields: PetitionFieldVisibilityEditor_PetitionFieldFragment[];
   fieldIndex: number | string;
   index: number;
   isActive: boolean;
@@ -98,13 +97,11 @@ const _PetitionComposeField = chakraForwardRef<
       onFieldEdit({ visibility: null });
     } else {
       const index = fields.findIndex((f) => f.id === field.id);
-      // try to use previous reply, if not possible, use next
       const prev = fields
         .slice(0, index)
         .reverse()
         .find((f) => !f.isReadOnly);
-      const ref =
-        prev ?? fields.slice(index + 1).find((f) => f.id === field.id)!;
+      const ref = prev ?? fields.slice(index + 1).find((f) => !f.isReadOnly)!;
       const condition: PetitionFieldVisibilityCondition = {
         fieldId: ref.id,
         modifier: ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
@@ -555,7 +552,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
   return (
     <Stack ref={ref} direction="row" padding={1} {...props}>
       <IconButtonWithTooltip
-        icon={<AutomationIcon />}
+        icon={<ConditionFullIcon />}
         isDisabled={field.isFixed}
         size="sm"
         variant="ghost"
@@ -617,53 +614,47 @@ const _PetitionComposeFieldActions = chakraForwardRef<
   );
 });
 
-function shallowCompareFieldProp<
-  T extends { field: PetitionComposeField_PetitionFieldFragment; fields: any[] }
->(prev: Readonly<T>, next: Readonly<T>) {
-  return (
-    shallowEqualObjects(
-      omit(prev, ["field", "fields"]),
-      omit(next, ["field", "fields"])
-    ) && shallowEqualObjects(prev["field"], next["field"])
-  );
-}
+const fragments = {
+  PetitionField: gql`
+    fragment PetitionComposeField_PetitionField on PetitionField {
+      id
+      type
+      title
+      description
+      optional
+      multiple
+      isFixed
+      isReadOnly
+      visibility
+      ...SelectTypeFieldOptions_PetitionField
+      ...PetitionFieldVisibilityEditor_PetitionField
+    }
+    ${SelectTypeFieldOptions.fragments.PetitionField}
+    ${PetitionFieldVisibilityEditor.fragments.PetitionField}
+  `,
+};
+
+const comparePetitionComposeFieldProps = compareWithFragments<any>({
+  field: fragments.PetitionField,
+  fields: PetitionFieldVisibilityEditor.fragments.PetitionField,
+} as any);
 
 const PetitionComposeFieldActions = memo(
   _PetitionComposeFieldActions,
-  shallowCompareFieldProp
+  comparePetitionComposeFieldProps
 ) as typeof _PetitionComposeFieldActions;
 
 const PetitionComposeFieldInner = memo(
   _PetitionComposeFieldInner,
-  shallowCompareFieldProp
+  comparePetitionComposeFieldProps
 ) as typeof _PetitionComposeFieldInner;
 
 export const PetitionComposeField = Object.assign(
   memo(
     _PetitionComposeField,
-    shallowCompareFieldProp
+    comparePetitionComposeFieldProps
   ) as typeof _PetitionComposeField,
-  {
-    fragments: {
-      PetitionField: gql`
-        fragment PetitionComposeField_PetitionField on PetitionField {
-          id
-          type
-          title
-          description
-          optional
-          multiple
-          isFixed
-          isReadOnly
-          visibility
-          ...SelectTypeFieldOptions_PetitionField
-          ...PetitionFieldVisibility_PetitionField
-        }
-        ${SelectTypeFieldOptions.fragments.PetitionField}
-        ${PetitionFieldVisibilityEditor.fragments.PetitionField}
-      `,
-    },
-  }
+  { fragments }
 );
 
 interface DragItem {

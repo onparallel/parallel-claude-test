@@ -92,8 +92,8 @@ export const GlobeIcon = createIcon({
   ),
 });
 
-export const AutomationIcon = createIcon({
-  displayName: "AutomationIcon",
+export const ConditionFullIcon = createIcon({
+  displayName: "ConditionFullIcon",
   viewBox: "0 0 24 24",
   path: (
     <g

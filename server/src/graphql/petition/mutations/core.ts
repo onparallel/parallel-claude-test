@@ -628,16 +628,17 @@ export const updatePetitionField = mutationField("updatePetitionField", {
       }
     }
 
-    if (isDefined(visibility)) {
-      data.visibility = {
-        ...visibility,
-        conditions: visibility.conditions.map((c: any) => ({
-          ...c,
-          fieldId: c.fieldId
-            ? fromGlobalId(c.fieldId, "PetitionField").id
-            : null,
-        })),
-      };
+    if (visibility !== undefined) {
+      data.visibility =
+        visibility === null
+          ? null
+          : {
+              ...visibility,
+              conditions: visibility.conditions.map((c: any) => ({
+                ...c,
+                fieldId: fromGlobalId(c.fieldId, "PetitionField").id,
+              })),
+            };
     }
 
     return await ctx.petitions.updatePetitionField(

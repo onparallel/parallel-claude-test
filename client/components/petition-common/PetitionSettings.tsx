@@ -27,7 +27,7 @@ import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe } from "@parallel/utils/types";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import { ReactNode } from "react";
+import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
@@ -38,6 +38,7 @@ import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
 } from "./SignatureConfigDialog";
+import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 
 export type PetitionSettingsProps = {
   user: PetitionSettings_UserFragment;
@@ -45,7 +46,7 @@ export type PetitionSettingsProps = {
   onUpdatePetition: (value: UpdatePetitionInput) => void;
 };
 
-export function PetitionSettings({
+function _PetitionSettings({
   user,
   petition,
   onUpdatePetition,
@@ -296,7 +297,7 @@ export function PetitionSettings({
   );
 }
 
-PetitionSettings.fragments = {
+const fragments = {
   User: gql`
     fragment PetitionSettings_User on User {
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
@@ -332,8 +333,7 @@ PetitionSettings.fragments = {
     ${SignatureConfigDialog.fragments.Petition}
   `,
 };
-
-PetitionSettings.mutations = [
+const mutations = [
   gql`
     mutation PetitionSettings_cancelPetitionSignatureRequest(
       $petitionSignatureRequestId: GID!
@@ -347,6 +347,17 @@ PetitionSettings.mutations = [
     }
   `,
 ];
+
+export const PetitionSettings = Object.assign(
+  memo(
+    _PetitionSettings,
+    compareWithFragments<PetitionSettingsProps>({
+      user: fragments.User,
+      petition: fragments.PetitionBase,
+    })
+  ) as typeof _PetitionSettings,
+  { fragments, mutations }
+);
 
 function SwitchSetting({
   title,
