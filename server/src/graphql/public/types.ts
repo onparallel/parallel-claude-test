@@ -173,13 +173,14 @@ export const PublicPetitionField = objectType({
     t.nullable.jsonObject("visibility", {
       description:
         "A JSON object representing the conditions for the field to be visible",
-      resolve: ({ visibility }) => ({
-        ...visibility,
-        conditions: visibility.conditions.map((c: any) => ({
-          ...c,
-          fieldId: c.fieldId ? toGlobalId("PetitionField", c.fieldId) : null,
-        })),
-      }),
+      resolve: (o) =>
+        o.visibility && {
+          ...o.visibility,
+          conditions: o.visibility.conditions.map((c: any) => ({
+            ...c,
+            fieldId: toGlobalId("PetitionField", c.fieldId),
+          })),
+        },
     });
   },
 });

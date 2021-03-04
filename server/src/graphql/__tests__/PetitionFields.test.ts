@@ -534,12 +534,33 @@ describe("GraphQL/Petition Fields", () => {
       );
       fields = await mocks.createRandomPetitionFields(
         userPetition.id,
-        5,
+        6,
         (index) => ({
           type: index === 0 ? "HEADING" : "TEXT",
           is_fixed: index === 0,
           validated: index < 4,
         })
+      );
+
+      await mocks.knex.raw(
+        /* sql */ `
+        UPDATE petition_field SET visibility = ? WHERE id = ?
+      `,
+        [
+          JSON.stringify({
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: fields[5].id,
+                modifier: "NONE",
+                operator: "CONTAIN",
+                value: "$",
+              },
+            ],
+          }),
+          fields[1].id,
+        ]
       );
 
       const [contact] = await mocks.createRandomContacts(organization.id, 1);
@@ -579,6 +600,7 @@ describe("GraphQL/Petition Fields", () => {
           { id: gIds[1] },
           { id: gIds[3] },
           { id: gIds[4] },
+          { id: gIds[5] },
         ],
       });
     });
@@ -616,6 +638,7 @@ describe("GraphQL/Petition Fields", () => {
           { id: gIds[2], replies: [] },
           { id: gIds[3], replies: [] },
           { id: gIds[4], replies: [] },
+          { id: gIds[5], replies: [] },
         ],
       });
     });
@@ -785,6 +808,31 @@ describe("GraphQL/Petition Fields", () => {
       });
 
       expect(errors).toContainGraphQLError("FIELD_HAS_REPLIES_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to delete a field that is being referenced in the visibility conditions of another field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              force: true
+            ) {
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[5].id),
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FIELD_IS_REFERENCED_ERROR");
       expect(data).toBeNull();
     });
   });

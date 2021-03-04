@@ -534,6 +534,21 @@ export const deletePetitionField = mutationField("deletePetitionField", {
       );
     }
 
+    const petitionFields = await ctx.petitions.loadFieldsForPetition(
+      args.petitionId,
+      { cache: false }
+    );
+    if (
+      petitionFields.some((f) =>
+        f.visibility?.conditions.some((c: any) => c.fieldId === args.fieldId)
+      )
+    ) {
+      throw new WhitelistedError(
+        "The petition field is being referenced in another field.",
+        "FIELD_IS_REFERENCED_ERROR"
+      );
+    }
+
     return await ctx.petitions.deletePetitionField(
       args.petitionId,
       args.fieldId,
