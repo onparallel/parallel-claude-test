@@ -74,7 +74,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
@@ -97,7 +96,6 @@ describe("Field Visibility Conditions", () => {
           operator: "OR",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "ANY",
               operator: "EQUAL",
@@ -120,7 +118,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", selectField.id),
               modifier: "ANY",
               operator: "EQUAL",
@@ -143,7 +140,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", fileUploadField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "EQUAL",
@@ -166,21 +162,18 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NONE",
               operator: "CONTAIN",
               value: "NO",
             },
             {
-              id: "2",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN_OR_EQUAL",
               value: 3,
             },
             {
-              id: "3",
               fieldId: toGlobalId("PetitionField", fileUploadField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "LESS_THAN",
@@ -218,42 +211,36 @@ describe("Field Visibility Conditions", () => {
           operator: "OR",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
               value: 1,
             },
             {
-              id: "2",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
               value: 1,
             },
             {
-              id: "3",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
               value: 1,
             },
             {
-              id: "4",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
               value: 1,
             },
             {
-              id: "5",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
               value: 1,
             },
             {
-              id: "6",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
@@ -276,7 +263,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
@@ -299,7 +285,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: null,
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
@@ -322,7 +307,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", headingField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
@@ -345,7 +329,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
@@ -368,7 +351,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "ALL",
               operator: "CONTAIN",
@@ -391,7 +373,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "START_WITH",
@@ -414,7 +395,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "ALL",
               operator: "LESS_THAN",
@@ -437,7 +417,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", selectField.id),
               modifier: "NONE",
               operator: "START_WITH",
@@ -460,7 +439,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", selectField.id),
               modifier: "ANY",
               operator: "EQUAL",
@@ -483,7 +461,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", fileUploadField.id),
               modifier: "NONE",
               operator: "START_WITH",
@@ -506,7 +483,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: "1234",
               modifier: "NONE",
               operator: "START_WITH",
@@ -529,7 +505,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", 1101010),
               modifier: "NONE",
               operator: "START_WITH",
@@ -552,14 +527,12 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", fileUploadField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "EQUAL",
               value: 1,
             },
             {
-              id: "2",
               fieldId: toGlobalId("PetitionField", deletedField.id),
               modifier: "NONE",
               operator: "START_WITH",
@@ -582,21 +555,18 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
               value: 1,
             },
             {
-              id: "2",
               fieldId: toGlobalId("PetitionField", fileUploadField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
               value: 1,
             },
             {
-              id: "3",
               fieldId: toGlobalId("PetitionField", fieldOnAnotherPetition.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "EQUAL",
@@ -619,7 +589,6 @@ describe("Field Visibility Conditions", () => {
           operator: "AND",
           conditions: [
             {
-              id: "1",
               fieldId: toGlobalId("PetitionField", textField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",

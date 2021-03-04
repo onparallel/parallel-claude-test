@@ -1034,7 +1034,6 @@ describe("GraphQL/Petition Fields", () => {
               operator: "AND",
               conditions: [
                 {
-                  id: "1",
                   fieldId: fieldGIDs[2],
                   modifier: "NUMBER_OF_REPLIES",
                   operator: "EQUAL",
@@ -1059,7 +1058,6 @@ describe("GraphQL/Petition Fields", () => {
             operator: "AND",
             conditions: [
               {
-                id: "1",
                 fieldId: fieldGIDs[2],
                 modifier: "NUMBER_OF_REPLIES",
                 operator: "EQUAL",
@@ -1100,7 +1098,6 @@ describe("GraphQL/Petition Fields", () => {
               operator: "AND",
               conditions: [
                 {
-                  id: "1",
                   fieldId: null,
                   modifier: "NUMBER_OF_REPLIES",
                   operator: "EQUAL",
@@ -1120,7 +1117,6 @@ describe("GraphQL/Petition Fields", () => {
             operator: "AND",
             conditions: [
               {
-                id: "1",
                 fieldId: null,
                 modifier: "NUMBER_OF_REPLIES",
                 operator: "EQUAL",
@@ -1161,7 +1157,6 @@ describe("GraphQL/Petition Fields", () => {
               operator: "AND",
               conditions: [
                 {
-                  id: "1",
                   fieldId: "123",
                   modifier: "NUMBER_OF_REPLIES",
                   operator: "EQUAL",

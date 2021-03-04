@@ -22,6 +22,7 @@ function evaluate<T extends string | number>(
 ) {
   const a = typeof reply === "string" ? reply.toLowerCase() : reply;
   const b = typeof value === "string" ? value.toLowerCase() : value;
+  if (a === null || b === null) return false;
   switch (operator) {
     case "LESS_THAN":
       return a < b;

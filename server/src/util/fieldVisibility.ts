@@ -11,7 +11,11 @@ export interface Visibility {
   conditions: FieldVisibilityCondition[];
 }
 export interface FieldVisibilityCondition {
-  fieldId: number;
+  /*
+    When used on the GraphQL validator, the fieldId will be a string (coming from the client)
+    When used to evaluate a field visibility, the field will be a number (coming from the database)
+  */
+  fieldId: number | string;
   modifier: "ANY" | "ALL" | "NONE" | "NUMBER_OF_REPLIES";
   operator:
     | "EQUAL"
@@ -40,6 +44,7 @@ function evaluate<T extends string | number>(
 ) {
   const a = typeof reply === "string" ? reply.toLowerCase() : reply;
   const b = typeof value === "string" ? value.toLowerCase() : value;
+  if (a === null || b === null) return false;
   switch (operator) {
     case "LESS_THAN":
       return a < b;

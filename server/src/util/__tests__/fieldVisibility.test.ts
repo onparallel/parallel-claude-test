@@ -4,38 +4,38 @@ describe("fieldVisibility", () => {
   it("no conditions", () => {
     const fields = evaluateFieldVisibility([
       {
-        id: "1",
+        id: 1,
         visibility: null,
         replies: [{ content: { text: "Yes" } }],
       },
       {
-        id: "2",
+        id: 2,
         visibility: null,
         replies: [{ content: { text: "No" } }],
       },
     ]);
 
     expect(fields).toMatchObject([
-      { id: "1", isVisible: true },
-      { id: "2", isVisible: true },
+      { id: 1, isVisible: true },
+      { id: 2, isVisible: true },
     ]);
   });
 
   it("should be case-insensitive", () => {
     const fields = evaluateFieldVisibility([
       {
-        id: "1",
+        id: 1,
         visibility: null,
         replies: [{ content: { text: "Jon Snow" } }],
       },
       {
-        id: "2",
+        id: 2,
         visibility: {
           type: "SHOW",
           operator: "OR",
           conditions: [
             {
-              fieldId: "1",
+              fieldId: 1,
               modifier: "ANY",
               operator: "EQUAL",
               value: "JON SNOW",
@@ -47,8 +47,8 @@ describe("fieldVisibility", () => {
     ]);
 
     expect(fields).toMatchObject([
-      { id: "1", isVisible: true },
-      { id: "2", isVisible: true },
+      { id: 1, isVisible: true },
+      { id: 2, isVisible: true },
     ]);
   });
 
@@ -56,18 +56,18 @@ describe("fieldVisibility", () => {
     it("ANY EQUAL", () => {
       const fields = evaluateFieldVisibility([
         {
-          id: "1",
+          id: 1,
           visibility: null,
           replies: [{ content: { text: "Jon Snow" } }],
         },
         {
-          id: "2",
+          id: 2,
           visibility: {
             type: "SHOW",
             operator: "OR",
             conditions: [
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "ANY",
                 operator: "EQUAL",
                 value: "Jon Snow",
@@ -79,15 +79,15 @@ describe("fieldVisibility", () => {
       ]);
 
       expect(fields).toMatchObject([
-        { id: "1", isVisible: true },
-        { id: "2", isVisible: true },
+        { id: 1, isVisible: true },
+        { id: 2, isVisible: true },
       ]);
     });
 
     it("ANY CONTAIN", () => {
       const fields = evaluateFieldVisibility([
         {
-          id: "1",
+          id: 1,
           visibility: null,
           replies: [
             { content: { text: "Jon Snow" } },
@@ -95,13 +95,13 @@ describe("fieldVisibility", () => {
           ],
         },
         {
-          id: "2",
+          id: 2,
           visibility: {
             type: "SHOW",
             operator: "OR",
             conditions: [
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "ANY",
                 operator: "CONTAIN",
                 value: "Targaryen",
@@ -113,15 +113,15 @@ describe("fieldVisibility", () => {
       ]);
 
       expect(fields).toMatchObject([
-        { id: "1", isVisible: true },
-        { id: "2", isVisible: true },
+        { id: 1, isVisible: true },
+        { id: 2, isVisible: true },
       ]);
     });
 
     it("ALL END_WITH", () => {
       const fields = evaluateFieldVisibility([
         {
-          id: "1",
+          id: 1,
           visibility: null,
           replies: [
             { content: { text: "Robb Stark" } },
@@ -130,13 +130,13 @@ describe("fieldVisibility", () => {
           ],
         },
         {
-          id: "2",
+          id: 2,
           visibility: {
             type: "SHOW",
             operator: "OR",
             conditions: [
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "ALL",
                 operator: "END_WITH",
                 value: "Stark",
@@ -147,15 +147,15 @@ describe("fieldVisibility", () => {
         },
       ]);
       expect(fields).toMatchObject([
-        { id: "1", isVisible: true },
-        { id: "2", isVisible: true },
+        { id: 1, isVisible: true },
+        { id: 2, isVisible: true },
       ]);
     });
 
     it("NONE CONTAIN", () => {
       const fields = evaluateFieldVisibility([
         {
-          id: "1",
+          id: 1,
           visibility: null,
           replies: [
             { content: { text: "Robert Baratheon, king of Westeros" } },
@@ -163,13 +163,13 @@ describe("fieldVisibility", () => {
           ],
         },
         {
-          id: "2",
+          id: 2,
           visibility: {
             type: "SHOW",
             operator: "OR",
             conditions: [
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "NONE",
                 operator: "CONTAIN",
                 value: "dragons",
@@ -181,15 +181,15 @@ describe("fieldVisibility", () => {
       ]);
 
       expect(fields).toMatchObject([
-        { id: "1", isVisible: true },
-        { id: "2", isVisible: false },
+        { id: 1, isVisible: true },
+        { id: 2, isVisible: false },
       ]);
     });
 
     it("NUMBER_OF_REPLIES", () => {
       const fields = evaluateFieldVisibility([
         {
-          id: "1",
+          id: 1,
           visibility: null,
           replies: [
             { content: { text: "Robb" } },
@@ -200,13 +200,13 @@ describe("fieldVisibility", () => {
           ],
         },
         {
-          id: "2",
+          id: 2,
           visibility: {
             type: "SHOW",
             operator: "OR",
             conditions: [
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "NUMBER_OF_REPLIES",
                 operator: "LESS_THAN_OR_EQUAL",
                 value: 3,
@@ -218,8 +218,8 @@ describe("fieldVisibility", () => {
       ]);
 
       expect(fields).toMatchObject([
-        { id: "1", isVisible: true },
-        { id: "2", isVisible: false },
+        { id: 1, isVisible: true },
+        { id: 2, isVisible: false },
       ]);
     });
   });
@@ -228,24 +228,24 @@ describe("fieldVisibility", () => {
     it("NONE CONTAIN AND NUMBER_OF_REPLIES", () => {
       const fields = evaluateFieldVisibility([
         {
-          id: "1",
+          id: 1,
           visibility: null,
           replies: [{ content: { text: "Jon Snow" } }],
         },
         {
-          id: "2",
+          id: 2,
           visibility: {
             type: "SHOW",
             operator: "AND",
             conditions: [
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "NONE",
                 operator: "CONTAIN",
                 value: "King",
               },
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "NUMBER_OF_REPLIES",
                 operator: "EQUAL",
                 value: 1,
@@ -257,15 +257,15 @@ describe("fieldVisibility", () => {
       ]);
 
       expect(fields).toMatchObject([
-        { id: "1", isVisible: true },
-        { id: "2", isVisible: true },
+        { id: 1, isVisible: true },
+        { id: 2, isVisible: true },
       ]);
     });
 
     it("ALL CONTAIN AND ANY START_WITH", () => {
       const fields = evaluateFieldVisibility([
         {
-          id: "1",
+          id: 1,
           visibility: null,
           replies: [
             { content: { text: "King in the North" } },
@@ -275,19 +275,19 @@ describe("fieldVisibility", () => {
           ],
         },
         {
-          id: "2",
+          id: 2,
           visibility: {
             type: "SHOW",
             operator: "AND",
             conditions: [
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "ALL",
                 operator: "CONTAIN",
                 value: "king",
               },
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "ANY",
                 operator: "END_WITH",
                 value: "killer",
@@ -299,15 +299,15 @@ describe("fieldVisibility", () => {
       ]);
 
       expect(fields).toMatchObject([
-        { id: "1", isVisible: true },
-        { id: "2", isVisible: true },
+        { id: 1, isVisible: true },
+        { id: 2, isVisible: true },
       ]);
     });
 
     it("NUMBER_OF_REPLIES OR NONE END_WITH OR ANY START_WITH", () => {
       const fields = evaluateFieldVisibility([
         {
-          id: "1",
+          id: 1,
           visibility: null,
           replies: [
             { content: { text: "Jon Snow" } },
@@ -317,7 +317,7 @@ describe("fieldVisibility", () => {
           ],
         },
         {
-          id: "2",
+          id: 2,
           visibility: null,
           replies: [
             { content: { text: "King in the North" } },
@@ -327,25 +327,25 @@ describe("fieldVisibility", () => {
           ],
         },
         {
-          id: "3",
+          id: 3,
           visibility: {
             type: "SHOW",
             operator: "OR",
             conditions: [
               {
-                fieldId: "1",
+                fieldId: 1,
                 modifier: "NUMBER_OF_REPLIES",
                 operator: "EQUAL",
                 value: 1,
               },
               {
-                fieldId: "2",
+                fieldId: 2,
                 modifier: "NONE",
                 operator: "END_WITH",
                 value: "killer",
               },
               {
-                fieldId: "2",
+                fieldId: 2,
                 modifier: "ANY",
                 operator: "START_WITH",
                 value: "hand",
@@ -357,9 +357,9 @@ describe("fieldVisibility", () => {
       ]);
 
       expect(fields).toMatchObject([
-        { id: "1", isVisible: true },
-        { id: "2", isVisible: true },
-        { id: "3", isVisible: true },
+        { id: 1, isVisible: true },
+        { id: 2, isVisible: true },
+        { id: 3, isVisible: true },
       ]);
     });
   });
