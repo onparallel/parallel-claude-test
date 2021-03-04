@@ -3065,7 +3065,10 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
 
 export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "multiple" | "isReadOnly"> & {
+} & Pick<
+  PetitionField,
+  "id" | "type" | "visibility" | "multiple" | "isReadOnly"
+> & {
     fieldOptions: PetitionField["options"];
   } & PetitionFieldSelect_PetitionFieldFragment;
 
@@ -5315,6 +5318,7 @@ export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
   fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
     id
     type
+    visibility
     multiple
     fieldOptions: options
     isReadOnly

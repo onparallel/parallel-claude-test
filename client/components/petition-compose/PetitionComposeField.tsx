@@ -33,7 +33,10 @@ import {
 import { assignRef } from "@parallel/utils/assignRef";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
-import { PetitionFieldVisibilityCondition } from "@parallel/utils/fieldVisibility/types";
+import {
+  PetitionFieldVisibility,
+  PetitionFieldVisibilityCondition,
+} from "@parallel/utils/fieldVisibility/types";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
@@ -113,31 +116,44 @@ const _PetitionComposeField = chakraForwardRef<
       } catch {}
     } else {
       const index = fields.findIndex((f) => f.id === field.id);
-      const prev = fields
-        .slice(0, index)
-        .reverse()
-        .find((f) => !f.isReadOnly);
-      const ref = prev ?? fields.slice(index + 1).find((f) => !f.isReadOnly)!;
-      const condition: PetitionFieldVisibilityCondition = {
-        fieldId: ref.id,
-        modifier: ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
-        operator: "EQUAL",
-        value:
-          ref.type === "FILE_UPLOAD"
-            ? 0
-            : ref.type === "TEXT"
-            ? null
-            : ref.type === "SELECT"
-            ? ref.fieldOptions.values[0] ?? null
-            : null,
-      };
-      onFieldEdit({
-        visibility: {
-          type: "SHOW",
-          operator: "AND",
-          conditions: [condition],
-        },
-      });
+      const prevField = fields[index - 1];
+      // if the previous field has a visibility setting and doesn't reference
+      // this field copy the visibility setup
+      if (
+        prevField.visibility &&
+        !(prevField.visibility as PetitionFieldVisibility).conditions.some(
+          (c) => c.fieldId === field.id
+        )
+      ) {
+        onFieldEdit({ visibility: prevField.visibility });
+      } else {
+        // create a factible condition based on the previous field
+        const prev = fields
+          .slice(0, index)
+          .reverse()
+          .find((f) => !f.isReadOnly);
+        const ref = prev ?? fields.slice(index + 1).find((f) => !f.isReadOnly)!;
+        const condition: PetitionFieldVisibilityCondition = {
+          fieldId: ref.id,
+          modifier: ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
+          operator: "EQUAL",
+          value:
+            ref.type === "FILE_UPLOAD"
+              ? 0
+              : ref.type === "TEXT"
+              ? null
+              : ref.type === "SELECT"
+              ? ref.fieldOptions.values[0] ?? null
+              : null,
+        };
+        onFieldEdit({
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [condition],
+          },
+        });
+      }
     }
   }, [fields, field, onFieldEdit]);
   const canChangeVisibility =

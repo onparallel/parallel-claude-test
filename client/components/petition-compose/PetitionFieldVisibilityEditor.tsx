@@ -127,27 +127,26 @@ export function PetitionFieldVisibilityEditor({
     setConditions((conditions) => conditions.filter((c, i) => i !== index));
   };
   const addCondition = function () {
-    const index = fields.findIndex((f) => f.id === fieldId);
-    // try to use previous reply, if not possible, use next
-    const prev = fields
-      .slice(0, index)
-      .reverse()
-      .find((f) => !f.isReadOnly);
-    const ref = prev ?? fields.slice(index + 1).find((f) => !f.isReadOnly)!;
-    const condition: PetitionFieldVisibilityCondition = {
-      fieldId: ref.id,
-      modifier: ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
-      operator: "EQUAL",
-      value:
-        ref.type === "FILE_UPLOAD"
-          ? 0
-          : ref.type === "TEXT"
-          ? null
-          : ref.type === "SELECT"
-          ? ref.fieldOptions.values[0] ?? null
-          : null,
-    };
-    setConditions((conditions) => [...conditions, condition]);
+    setConditions((conditions) => {
+      const last = conditions[conditions.length - 1];
+      const field = fields.find((f) => f.id === last.fieldId)!;
+      if (field.type === "SELECT") {
+        const values = field.fieldOptions.values as string[];
+        const index = Math.min(
+          values.indexOf(last.value as string) + 1,
+          values.length - 1
+        );
+        return [
+          ...conditions,
+          {
+            ...last,
+            value: values[index],
+          },
+        ];
+      } else {
+        return [...conditions, { ...last }];
+      }
+    });
   };
   return (
     <Stack spacing={1}>
@@ -295,6 +294,7 @@ PetitionFieldVisibilityEditor.fragments = {
     fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
       id
       type
+      visibility
       multiple
       fieldOptions: options
       isReadOnly
