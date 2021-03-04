@@ -326,7 +326,7 @@ export const PetitionComposeFieldList = Object.assign(
             clearTimeout(timeoutRef.current);
           },
           onSelectFieldType(type) {
-            const [fields] = fieldsDataRef.current;
+            const { fields } = fieldsDataRef.current;
             onAddField(type, fields.findIndex((f) => f.id === fieldId) + 1);
           },
           onOpen() {
