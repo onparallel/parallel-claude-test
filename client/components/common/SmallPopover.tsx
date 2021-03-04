@@ -11,16 +11,20 @@ import {
 import { cloneElement, ReactNode, useState } from "react";
 
 export function SmallPopover({
+  isDisabled,
   children,
   content,
   ...props
 }: {
+  isDisabled?: boolean;
   content: ReactNode;
   children: ReactNode;
 } & Pick<PopoverProps, "placement">) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverId = useId(undefined, "small-popover");
-  return (
+  return isDisabled ? (
+    <>{children}</>
+  ) : (
     <Popover
       trigger="hover"
       id={popoverId}

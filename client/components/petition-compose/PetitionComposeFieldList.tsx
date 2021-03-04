@@ -117,8 +117,8 @@ export const PetitionComposeFieldList = Object.assign(
 
     const showDeletingReferencedFields = useDeletingReferencedFieldsDialog();
     // Memoize field callbacks
-    const fieldsDataRef = useRef([fields, indices] as const);
-    assignRef(fieldsDataRef, [fields, indices]);
+    const fieldsDataRef = useRef({ fields, indices, active });
+    assignRef(fieldsDataRef, { fields, indices, active });
     const fieldProps = useMemoFactory(
       (
         fieldId: string
@@ -135,7 +135,7 @@ export const PetitionComposeFieldList = Object.assign(
         onCloneField: () => onCloneField(fieldId),
         onSettingsClick: () => onFieldSettingsClick(fieldId),
         onDeleteClick: async () => {
-          const [fields] = fieldsDataRef.current!;
+          const { fields } = fieldsDataRef.current!;
           // if this field is being referenced by any other field?
           const referencing = zip(fields, indices).filter(([f]) =>
             (f.visibility as PetitionFieldVisibility)?.conditions.some(
@@ -169,7 +169,7 @@ export const PetitionComposeFieldList = Object.assign(
           await onDeleteField(fieldId);
         },
         onFieldEdit: async (data) => {
-          const [fields] = fieldsDataRef.current!;
+          const { fields } = fieldsDataRef.current!;
           const field = fields.find((f) => f.id === fieldId)!;
           await onFieldEdit(fieldId, data);
           if (field.type === "SELECT" && data.options) {
@@ -207,7 +207,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
         onFocusPrevField: () => {
-          const [fields] = fieldsDataRef.current!;
+          const { fields } = fieldsDataRef.current!;
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index > 0) {
             const prevId = fields[index - 1].id;
@@ -215,7 +215,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
         onFocusNextField: () => {
-          const [fields] = fieldsDataRef.current!;
+          const { fields } = fieldsDataRef.current!;
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index < fields.length - 1) {
             const nextId = fields[index + 1].id;
@@ -223,7 +223,7 @@ export const PetitionComposeFieldList = Object.assign(
           }
         },
         onAddField: () => {
-          const [fields] = fieldsDataRef.current!;
+          const { fields } = fieldsDataRef.current!;
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index === fields.length - 1) {
             document
@@ -273,6 +273,16 @@ export const PetitionComposeFieldList = Object.assign(
             if (fieldId !== focusedFieldIdRef.current) {
               setFocusedFieldId(fieldId);
             }
+            // if field settings are visisble change them the focused field
+            const { fields, active } = fieldsDataRef.current!;
+            if (active && fieldId !== active) {
+              const field = fields.find((f) => f.id === fieldId)!;
+              if (field.type === "HEADING" && field.isFixed) {
+                // pass
+              } else {
+                onFieldSettingsClick(fieldId);
+              }
+            }
           },
           onBlur() {
             timeoutRef.current = setTimeout(() => setFocusedFieldId(null));
@@ -304,7 +314,7 @@ export const PetitionComposeFieldList = Object.assign(
             }
           },
         } as HTMLChakraProps<"div">),
-      [setHoveredFieldId, setFocusedFieldId]
+      [setHoveredFieldId, setFocusedFieldId, onFieldSettingsClick]
     );
     const addButtonMouseHandlers = useMemoFactory(
       (fieldId) =>

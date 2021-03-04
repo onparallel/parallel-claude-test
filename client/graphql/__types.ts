@@ -20,7 +20,6 @@ export type Scalars = {
   GID: string;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
-  PetitionFieldVisibility: PetitionFieldVisibilty;
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { [key: string]: any };
   /** The `Upload` scalar type represents a file upload. */
@@ -3061,6 +3060,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   | "isReadOnly"
   | "isFixed"
   | "position"
+  | "visibility"
 >;
 
 export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
@@ -6270,6 +6270,7 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     isReadOnly
     isFixed
     position
+    visibility
   }
 `;
 export const evaluateFieldVisibility_PetitionFieldFragmentDoc = gql`

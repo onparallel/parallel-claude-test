@@ -2545,27 +2545,27 @@
     "context": "Deadline"
   },
   {
-    "term": "petition.drag-to-sort-label",
+    "term": "component.petition-compose-field.drag-to-sort-label",
     "definition": "Drag to sort this petition fields",
     "context": "Drag to sort this petition fields"
   },
   {
-    "term": "petition.field-clone",
+    "term": "component.petition-compose-field.field-clone",
     "definition": "Clone field",
     "context": "Clone field"
   },
   {
-    "term": "petition.field-delete-button",
+    "term": "component.petition-compose-field.field-delete",
     "definition": "Delete field",
     "context": "Delete field"
   },
   {
-    "term": "petition.field-description-label",
+    "term": "component.petition-compose-field.field-description-label",
     "definition": "Field description",
     "context": "Field description"
   },
   {
-    "term": "petition.field-description-placeholder",
+    "term": "component.petition-compose-field.field-description-placeholder",
     "definition": "Add a description...",
     "context": "Add a description..."
   },
@@ -2575,22 +2575,22 @@
     "context": "Field settings"
   },
   {
-    "term": "petition.field-title-file-upload-placeholder",
+    "term": "component.petition-compose-field.file-upload-title-placeholder",
     "definition": "Describe the file(s) that you need...",
     "context": "Describe the file(s) that you need..."
   },
   {
-    "term": "petition.field-title-generic-placeholder",
+    "term": "component.petition-compose-field.generic-title-placeholder",
     "definition": "Ask for the information that you need...",
     "context": "Ask for the information that you need..."
   },
   {
-    "term": "petition.field-title-heading-placeholder",
+    "term": "component.petition-compose-field.heading-title-placeholder",
     "definition": "Enter an introductory title for this section...",
     "context": "Enter an introductory title for this section..."
   },
   {
-    "term": "petition.field-title-label",
+    "term": "component.petition-compose-field.field-title-label",
     "definition": "Field title",
     "context": "Field title"
   },

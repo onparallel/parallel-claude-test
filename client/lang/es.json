@@ -2545,27 +2545,27 @@
     "context": "Deadline"
   },
   {
-    "term": "petition.drag-to-sort-label",
+    "term": "component.petition-compose-field.drag-to-sort-label",
     "definition": "Arrastrar para ordenar los campos de la petición",
     "context": "Drag to sort this petition fields"
   },
   {
-    "term": "petition.field-clone",
+    "term": "component.petition-compose-field.field-clone",
     "definition": "Clonar campo",
     "context": "Clone field"
   },
   {
-    "term": "petition.field-delete-button",
+    "term": "component.petition-compose-field.field-delete",
     "definition": "Eliminar campo",
     "context": "Delete field"
   },
   {
-    "term": "petition.field-description-label",
+    "term": "component.petition-compose-field.field-description-label",
     "definition": "Descripción del campo",
     "context": "Field description"
   },
   {
-    "term": "petition.field-description-placeholder",
+    "term": "component.petition-compose-field.field-description-placeholder",
     "definition": "Añade una descripción...",
     "context": "Add a description..."
   },
@@ -2575,22 +2575,22 @@
     "context": "Field settings"
   },
   {
-    "term": "petition.field-title-file-upload-placeholder",
+    "term": "component.petition-compose-field.file-upload-title-placeholder",
     "definition": "Describe el archivo que necesites...",
     "context": "Describe the file(s) that you need..."
   },
   {
-    "term": "petition.field-title-generic-placeholder",
+    "term": "component.petition-compose-field.generic-title-placeholder",
     "definition": "Pregunta lo que necesites...",
     "context": "Ask for the information that you need..."
   },
   {
-    "term": "petition.field-title-heading-placeholder",
+    "term": "component.petition-compose-field.heading-title-placeholder",
     "definition": "Escribe un título introductorio para esta sección...",
     "context": "Enter an introductory title for this section..."
   },
   {
-    "term": "petition.field-title-label",
+    "term": "component.petition-compose-field.field-title-label",
     "definition": "Título del campo",
     "context": "Field title"
   },

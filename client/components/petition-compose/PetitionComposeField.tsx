@@ -5,6 +5,7 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  IconButton,
   Input,
   Stack,
   Switch,
@@ -41,6 +42,7 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { SmallPopover } from "../common/SmallPopover";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 import {
@@ -55,7 +57,7 @@ export interface PetitionComposeFieldProps {
   index: number;
   isActive: boolean;
   showError: boolean;
-  onMove?: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
+  onMove: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onCloneField: () => void;
   onSettingsClick: () => void;
@@ -138,7 +140,8 @@ const _PetitionComposeField = chakraForwardRef<
       });
     }
   }, [fields, field, onFieldEdit]);
-
+  const canChangeVisibility =
+    fields.filter((f) => f.id !== field.id && !f.isReadOnly).length >= 1;
   return (
     <Box
       ref={elementRef}
@@ -195,7 +198,7 @@ const _PetitionComposeField = chakraForwardRef<
               color: "gray.700",
             }}
             aria-label={intl.formatMessage({
-              id: "petition.drag-to-sort-label",
+              id: "component.petition-compose-field.drag-to-sort-label",
               defaultMessage: "Drag to sort this petition fields",
             })}
           >
@@ -254,6 +257,7 @@ const _PetitionComposeField = chakraForwardRef<
         />
         <PetitionComposeFieldActions
           field={field}
+          canChangeVisibility={canChangeVisibility}
           onCloneField={onCloneField}
           onSettingsClick={onSettingsClick}
           onDeleteClick={onDeleteClick}
@@ -352,24 +356,27 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             id={`field-title-${field.id}`}
             ref={titleRef}
             aria-label={intl.formatMessage({
-              id: "petition.field-title-label",
+              id: "component.petition-compose-field.field-title-label",
               defaultMessage: "Field title",
             })}
             isTruncated
             placeholder={
               field.type === "HEADING"
                 ? intl.formatMessage({
-                    id: "petition.field-title-heading-placeholder",
+                    id:
+                      "component.petition-compose-field.heading-title-placeholder",
                     defaultMessage:
                       "Enter an introductory title for this section...",
                   })
                 : field.type === "FILE_UPLOAD"
                 ? intl.formatMessage({
-                    id: "petition.field-title-file-upload-placeholder",
+                    id:
+                      "component.petition-compose-field.file-upload-title-placeholder",
                     defaultMessage: "Describe the file(s) that you need...",
                   })
                 : intl.formatMessage({
-                    id: "petition.field-title-generic-placeholder",
+                    id:
+                      "component.petition-compose-field.generic-title-placeholder",
                     defaultMessage: "Ask for the information that you need...",
                   })
             }
@@ -453,11 +460,11 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         id={`field-description-${field.id}`}
         className={"field-description"}
         placeholder={intl.formatMessage({
-          id: "petition.field-description-placeholder",
+          id: "component.petition-compose-field.field-description-placeholder",
           defaultMessage: "Add a description...",
         })}
         aria-label={intl.formatMessage({
-          id: "petition.field-description-label",
+          id: "component.petition-compose-field.field-description-label",
           defaultMessage: "Field description",
         })}
         fontSize="sm"
@@ -544,6 +551,7 @@ interface PetitionComposeFieldActionsProps
     PetitionComposeFieldProps,
     "field" | "onCloneField" | "onSettingsClick" | "onDeleteClick"
   > {
+  canChangeVisibility: boolean;
   onVisibilityClick: () => void;
 }
 
@@ -553,6 +561,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
 >(function PetitionComposeFieldActions(
   {
     field,
+    canChangeVisibility,
     onVisibilityClick,
     onCloneField,
     onSettingsClick,
@@ -565,27 +574,56 @@ const _PetitionComposeFieldActions = chakraForwardRef<
   const hasCondition = field.visibility;
   return (
     <Stack ref={ref} direction="row" padding={1} {...props}>
-      <IconButtonWithTooltip
-        icon={<ConditionFullIcon />}
-        isDisabled={field.isFixed}
-        size="sm"
-        variant="ghost"
-        placement="bottom"
-        colorScheme={hasCondition ? "purple" : "gray"}
-        color={hasCondition ? "purple.500" : "gray.600"}
-        label={
-          hasCondition
-            ? intl.formatMessage({
-                id: "petition.remove-condition",
-                defaultMessage: "Remove condition",
-              })
-            : intl.formatMessage({
-                id: "petition.add-condition",
+      {canChangeVisibility || field.isFixed ? (
+        <IconButtonWithTooltip
+          icon={<ConditionFullIcon />}
+          isDisabled={
+            field.type === "HEADING" &&
+            (field.isFixed || field.options.hasPageBreak)
+          }
+          size="sm"
+          variant="ghost"
+          placement="bottom"
+          colorScheme={hasCondition ? "purple" : "gray"}
+          color={hasCondition ? "purple.500" : "gray.600"}
+          label={
+            hasCondition
+              ? intl.formatMessage({
+                  id: "component.petition-compose-field.remove-condition",
+                  defaultMessage: "Remove condition",
+                })
+              : intl.formatMessage({
+                  id: "component.petition-compose-field.add-condition",
+                  defaultMessage: "Add condition",
+                })
+          }
+          onClick={onVisibilityClick}
+        />
+      ) : (
+        <SmallPopover
+          placement="top"
+          content={
+            <Text fontSize="sm">
+              <FormattedMessage
+                id="component.petition-compose-field.conditions-not-enough-fields"
+                defaultMessage="Add more fields to be able to set conditions between them."
+              />
+            </Text>
+          }
+        >
+          <Box>
+            <IconButton
+              size="sm"
+              isDisabled
+              icon={<ConditionFullIcon />}
+              aria-label={intl.formatMessage({
+                id: "component.petition-compose-field.add-condition",
                 defaultMessage: "Add condition",
-              })
-        }
-        onClick={onVisibilityClick}
-      />
+              })}
+            />
+          </Box>
+        </SmallPopover>
+      )}
       <IconButtonWithTooltip
         icon={<CopyIcon />}
         size="sm"
@@ -593,20 +631,20 @@ const _PetitionComposeFieldActions = chakraForwardRef<
         placement="bottom"
         color="gray.600"
         label={intl.formatMessage({
-          id: "petition.field-clone",
+          id: "component.petition-compose-field.field-clone",
           defaultMessage: "Clone field",
         })}
         onClick={onCloneField}
       />
       <IconButtonWithTooltip
         icon={<SettingsIcon />}
-        isDisabled={field.isReadOnly}
+        isDisabled={field.isFixed}
         size="sm"
         variant="ghost"
         placement="bottom"
         color="gray.600"
         label={intl.formatMessage({
-          id: "petition.field-settings",
+          id: "component.petition-compose-field.field-settings",
           defaultMessage: "Field settings",
         })}
         onClick={onSettingsClick}
@@ -619,7 +657,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
         placement="bottom"
         color="gray.600"
         label={intl.formatMessage({
-          id: "petition.field-delete-button",
+          id: "component.petition-compose-field.field-delete",
           defaultMessage: "Delete field",
         })}
         onClick={onDeleteClick}

@@ -22,6 +22,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
+import { SmallPopover } from "../common/SmallPopover";
 import { PetitionFieldTypeSelect } from "./PetitionFieldTypeSelectDropdown";
 
 export type PetitionComposeFieldSettingsProps = {
@@ -138,18 +139,36 @@ function HeadingSettings({
         }
         controlId="heading-page-break"
       >
-        <Switch
-          height="20px"
-          display="block"
-          id="heading-page-break"
-          color="green"
-          isChecked={options.hasPageBreak}
-          onChange={(event) =>
-            onFieldEdit(field.id, {
-              options: { ...field.options, hasPageBreak: event.target.checked },
-            })
+        <SmallPopover
+          isDisabled={!field.visibility}
+          content={
+            <Text fontSize="sm">
+              <FormattedMessage
+                id="field-settings.heading-page-break-visibility"
+                defaultMessage="Can't add page breaks on headings with visibility conditions"
+              />
+            </Text>
           }
-        />
+        >
+          <Box>
+            <Switch
+              isDisabled={field.visibility !== null}
+              height="20px"
+              display="block"
+              id="heading-page-break"
+              color="green"
+              isChecked={options.hasPageBreak}
+              onChange={(event) =>
+                onFieldEdit(field.id, {
+                  options: {
+                    ...field.options,
+                    hasPageBreak: event.target.checked,
+                  },
+                })
+              }
+            />
+          </Box>
+        </SmallPopover>
       </SettingsRow>
     ) : null
   );
@@ -340,6 +359,7 @@ PetitionComposeFieldSettings.fragments = {
       isReadOnly
       isFixed
       position
+      visibility
     }
   `,
 };
