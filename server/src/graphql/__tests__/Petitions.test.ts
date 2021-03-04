@@ -1,6 +1,6 @@
 import { initServer, TestClient } from "./server";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, User, Petition } from "../../db/__types";
+import { Organization, User, Petition, PetitionField } from "../../db/__types";
 import { userCognitoId } from "../../../test/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
@@ -38,6 +38,8 @@ describe("GraphQL/Petitions", () => {
 
   let mocks: Mocks;
 
+  let fields: PetitionField[];
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
@@ -72,6 +74,29 @@ describe("GraphQL/Petitions", () => {
       sessionUser.id,
       10,
       petitionsBuilder(organization.id)
+    );
+
+    fields = await mocks.createRandomPetitionFields(petitions[0].id, 2, () => ({
+      type: "TEXT",
+    }));
+
+    await mocks.knex.raw(
+      "UPDATE petition_field set visibility = ? where id = ?",
+      [
+        JSON.stringify({
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: fields[0].id,
+              modifier: "NONE",
+              operator: "CONTAIN",
+              value: "$",
+            },
+          ],
+        }),
+        fields[1].id,
+      ]
     );
 
     // petitions[0] and petitions[1] are shared to another user
@@ -896,6 +921,48 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+
+    it("updates referenced fieldIds on visibility conditions when cloning a petition", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              fields {
+                id
+                visibility
+              }
+            }
+          }
+        `,
+        variables: { petitionIds: [toGlobalId("Petition", petitions[0].id)] },
+      });
+
+      const clonedFieldIds = data!.clonePetitions[0].fields.map(
+        (f: any) => f.id
+      );
+
+      expect(errors).toBeUndefined();
+      expect(data!.clonePetitions[0]).toEqual({
+        fields: [
+          { id: clonedFieldIds[0], visibility: null },
+          {
+            id: clonedFieldIds[1],
+            visibility: {
+              conditions: [
+                {
+                  fieldId: clonedFieldIds[0],
+                  modifier: "NONE",
+                  operator: "CONTAIN",
+                  value: "$",
+                },
+              ],
+              operator: "AND",
+              type: "SHOW",
+            },
+          },
+        ],
+      });
     });
   });
 

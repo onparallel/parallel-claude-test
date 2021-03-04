@@ -49,7 +49,6 @@ import {
   PetitionEvent,
 } from "../__types";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
-import { toGlobalId } from "../../util/globalId";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
@@ -1401,7 +1400,7 @@ export class PetitionRepository extends BaseRepository {
       );
 
       const fields = await this.loadFieldsForPetition(petitionId);
-      await Promise.all([
+      const [clonedFields] = await Promise.all([
         this.insert(
           "petition_field",
           fields.map((field) => ({
@@ -1417,7 +1416,7 @@ export class PetitionRepository extends BaseRepository {
             updated_by: `User:${user.id}`,
           })),
           t
-        ),
+        ).returning("*"),
         this.insert(
           "petition_user",
           {
@@ -1429,6 +1428,38 @@ export class PetitionRepository extends BaseRepository {
           t
         ),
       ]);
+
+      /* 
+        we have to make sure the visibility conditions on the cloned fields refer to the new cloned fieldIds,
+        so here we create a map with the updated visibility JSON, and later update each of this fields
+      */
+      const fieldsToUpdate: Record<number, any> = {};
+      fields.forEach((f, i) => {
+        if (f.visibility) {
+          fieldsToUpdate[clonedFields[i].id] = {
+            ...f.visibility,
+            conditions: f.visibility.conditions.map((c: any) => ({
+              ...c,
+              fieldId: c.fieldId
+                ? clonedFields[fields.findIndex((f) => f.id === c.fieldId)].id
+                : null,
+            })),
+          };
+        }
+      });
+
+      await Promise.all(
+        Object.entries(fieldsToUpdate).map(([fieldId, visibility]) =>
+          this.updatePetitionField(
+            cloned.id,
+            parseInt(fieldId, 10),
+            { visibility },
+            user,
+            t
+          )
+        )
+      );
+
       return cloned;
     });
   }
