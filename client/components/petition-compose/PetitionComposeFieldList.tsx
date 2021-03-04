@@ -63,9 +63,12 @@ export interface PetitionComposeFieldListProps extends BoxProps {
   onUpdateFieldPositions: (fieldIds: string[]) => void;
   onCloneField: (fieldId: string) => void;
   onFieldSettingsClick: (fieldId: string) => void;
-  onDeleteField: (fieldId: string) => void;
+  onDeleteField: (fieldId: string) => Promise<void>;
   onAddField: (type: PetitionFieldType, position?: number) => void;
-  onFieldEdit: (fieldId: string, data: UpdatePetitionFieldInput) => void;
+  onFieldEdit: (
+    fieldId: string,
+    data: UpdatePetitionFieldInput
+  ) => Promise<void>;
 }
 
 export const PetitionComposeFieldList = Object.assign(
@@ -152,7 +155,7 @@ export const PetitionComposeFieldList = Object.assign(
                 const conditions = visibility.conditions.filter(
                   (c) => c.fieldId !== fieldId
                 );
-                onFieldEdit(field.id, {
+                await onFieldEdit(field.id, {
                   visibility:
                     conditions.length > 0
                       ? { ...visibility, conditions }
@@ -163,15 +166,45 @@ export const PetitionComposeFieldList = Object.assign(
               return;
             }
           }
-          onDeleteField(fieldId);
+          await onDeleteField(fieldId);
         },
-        onFieldEdit: (data) => {
+        onFieldEdit: async (data) => {
           const [fields] = fieldsDataRef.current!;
           const field = fields.find((f) => f.id === fieldId)!;
+          await onFieldEdit(fieldId, data);
           if (field.type === "SELECT" && data.options) {
-            // ensure no other field has a condition on it
+            // ensure no field has a condition on a missing value
+            const values = field.options.values as any[];
+            const newValues = data.options.values as any[];
+            const referencing = fields.filter((f) =>
+              (f.visibility as PetitionFieldVisibility)?.conditions.some(
+                (c) => c.fieldId === fieldId && !newValues.includes(c.value)
+              )
+            );
+            for (const field of referencing) {
+              const visibility = field.visibility as PetitionFieldVisibility;
+              // update visibility for fields referencing old options
+              await onFieldEdit(field.id, {
+                visibility: {
+                  ...visibility,
+                  conditions: visibility.conditions.map((c) => {
+                    if (c.fieldId === fieldId && !newValues.includes(c.value)) {
+                      const index = values.indexOf(c.value);
+                      return {
+                        ...c,
+                        value:
+                          index > newValues.length - 1
+                            ? null
+                            : newValues[index],
+                      };
+                    } else {
+                      return c;
+                    }
+                  }),
+                },
+              });
+            }
           }
-          onFieldEdit(fieldId, data);
         },
         onFocusPrevField: () => {
           const [fields] = fieldsDataRef.current!;
@@ -283,7 +316,7 @@ export const PetitionComposeFieldList = Object.assign(
             clearTimeout(timeoutRef.current);
           },
           onSelectFieldType(type) {
-            const fields = fieldsDataRef.current;
+            const [fields] = fieldsDataRef.current;
             onAddField(type, fields.findIndex((f) => f.id === fieldId) + 1);
           },
           onOpen() {

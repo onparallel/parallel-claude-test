@@ -1,11 +1,14 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  Button,
+  Flex,
   FormControl,
   FormLabel,
   Input,
   Stack,
   Switch,
+  Text,
   Tooltip,
 } from "@chakra-ui/react";
 import {
@@ -17,6 +20,11 @@ import {
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
+  PetitionComposeFieldProps,
+  PetitionComposeFieldRef,
+} from "@parallel/components/petition-compose/PetitionComposeField";
+import {
+  PetitionComposeFieldList_PetitionFragment,
   PetitionComposeField_PetitionFieldFragment,
   PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
@@ -29,6 +37,8 @@ import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
+import { ConfirmDialog } from "../common/ConfirmDialog";
+import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
@@ -92,9 +102,13 @@ const _PetitionComposeField = chakraForwardRef<
     onMove,
     field.isFixed ? "FIXED_FIELD" : "FIELD"
   );
-  const handleVisibilityClick = useCallback(() => {
+  const confirmRemoveVisibility = useConfirmRemoveVisibilityDialog();
+  const handleVisibilityClick = useCallback(async () => {
     if (field.visibility) {
-      onFieldEdit({ visibility: null });
+      try {
+        await confirmRemoveVisibility({});
+        onFieldEdit({ visibility: null });
+      } catch {}
     } else {
       const index = fields.findIndex((f) => f.id === field.id);
       const prev = fields
@@ -741,4 +755,39 @@ function useDragAndDrop(
 
   drop(elementRef);
   return { elementRef, dragRef, previewRef, isDragging };
+}
+
+function useConfirmRemoveVisibilityDialog() {
+  return useDialog(ConfirmRemoveVisibilityDialog);
+}
+
+function ConfirmRemoveVisibilityDialog(props: DialogProps) {
+  return (
+    <ConfirmDialog
+      {...props}
+      closeOnOverlayClick={false}
+      header={
+        <FormattedMessage
+          id="component.confirm-remove-visibility-dialog.header"
+          defaultMessage="Removing conditions"
+        />
+      }
+      body={
+        <Text>
+          <FormattedMessage
+            id="component.confirm-remove-visibility-dialog.description"
+            defaultMessage="Are you sure you want to remove the conditions for this field?"
+          />
+        </Text>
+      }
+      confirm={
+        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="component.confirm-remove-visibility-dialog.confirm"
+            defaultMessage="Remove conditions"
+          />
+        </Button>
+      }
+    />
+  );
 }
