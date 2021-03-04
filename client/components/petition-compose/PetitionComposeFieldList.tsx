@@ -178,7 +178,10 @@ export const PetitionComposeFieldList = Object.assign(
             const newValues = data.options.values as any[];
             const referencing = fields.filter((f) =>
               (f.visibility as PetitionFieldVisibility)?.conditions.some(
-                (c) => c.fieldId === fieldId && !newValues.includes(c.value)
+                (c) =>
+                  c.fieldId === fieldId &&
+                  c.value !== null &&
+                  !newValues.includes(c.value)
               )
             );
             for (const field of referencing) {
@@ -188,7 +191,11 @@ export const PetitionComposeFieldList = Object.assign(
                 visibility: {
                   ...visibility,
                   conditions: visibility.conditions.map((c) => {
-                    if (c.fieldId === fieldId && !newValues.includes(c.value)) {
+                    if (
+                      c.fieldId === fieldId &&
+                      c.value !== null &&
+                      !newValues.includes(c.value)
+                    ) {
                       const index = values.indexOf(c.value);
                       return {
                         ...c,
