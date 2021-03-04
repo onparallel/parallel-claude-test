@@ -161,6 +161,13 @@ export async function validateFieldVisibilityConditions(
     throw new Error(JSON.stringify(validator.errors));
   }
 
+  const field = await ctx.petitions.loadField(fieldId);
+
+  assert(
+    field?.type !== "HEADING" || !field.options.hasPageBreak,
+    `Can't add visibility conditions on a heading with page break`
+  );
+
   await Promise.all(
     json.conditions.map(validateCondition(ctx, petitionId, fieldId))
   );

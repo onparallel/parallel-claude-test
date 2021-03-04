@@ -989,6 +989,9 @@ describe("GraphQL/Petition Fields", () => {
             | "FILE_UPLOAD",
           is_fixed: index === 0,
           validated: true,
+          options: {
+            hasPageBreak: index === 0,
+          },
         })
       );
 
@@ -1158,6 +1161,49 @@ describe("GraphQL/Petition Fields", () => {
               conditions: [
                 {
                   fieldId: "123",
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "EQUAL",
+                  value: null,
+                },
+              ],
+            },
+          },
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when trying to add visibility conditions on a heading with page break", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              field {
+                id
+                visibility
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: fieldGIDs[0],
+          data: {
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: null,
                   modifier: "NUMBER_OF_REPLIES",
                   operator: "EQUAL",
                   value: null,
