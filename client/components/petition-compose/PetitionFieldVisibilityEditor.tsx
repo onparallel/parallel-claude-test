@@ -131,6 +131,7 @@ export function PetitionFieldVisibilityEditor({
       const last = conditions[conditions.length - 1];
       const field = fields.find((f) => f.id === last.fieldId)!;
       if (field.type === "SELECT") {
+        // if the previous condition is of type SELECT try to get the next value
         const values = field.fieldOptions.values as string[];
         const index = Math.min(
           values.indexOf(last.value as string) + 1,
@@ -163,9 +164,9 @@ export function PetitionFieldVisibilityEditor({
         rowGap={2}
       >
         {visibility.conditions.map((condition, index) => {
-          const conditionField = condition.fieldId
-            ? _fields.find((f) => f.id === condition.fieldId) ?? null
-            : null;
+          const conditionField = _fields.find(
+            (f) => f.id === condition.fieldId
+          )!;
           return (
             <Fragment key={index}>
               <Box fontSize="sm">
@@ -213,16 +214,15 @@ export function PetitionFieldVisibilityEditor({
               </Box>
               <PetitionFieldSelect
                 size="sm"
-                isInvalid={showError && !conditionField}
                 value={conditionField}
                 fields={_fields}
                 indices={_indices}
                 onChange={(field) => {
-                  const changedFieldType = field.type !== conditionField?.type;
+                  const changedFieldType = field.type !== conditionField.type;
                   updateCondition(index, {
-                    fieldId: field?.id,
+                    fieldId: field.id,
                     modifier:
-                      field?.type === "FILE_UPLOAD"
+                      field.type === "FILE_UPLOAD"
                         ? "NUMBER_OF_REPLIES"
                         : !changedFieldType && field.multiple
                         ? condition.modifier

@@ -178,7 +178,7 @@ export const PublicPetitionField = objectType({
           ...o.visibility,
           conditions: o.visibility.conditions.map((c: any) => ({
             ...c,
-            fieldId: c.fieldId ? toGlobalId("PetitionField", c.fieldId) : null,
+            fieldId: toGlobalId("PetitionField", c.fieldId),
           })),
         },
     });

@@ -25,7 +25,7 @@ const schema = {
         additionalProperties: false,
         required: ["fieldId", "modifier", "operator", "value"],
         properties: {
-          fieldId: { type: ["string", "null"] },
+          fieldId: { type: "string" },
           modifier: { enum: ["ANY", "ALL", "NONE", "NUMBER_OF_REPLIES"] },
           operator: {
             enum: [
@@ -74,7 +74,7 @@ function validateCondition(
   fieldId: number
 ) {
   return async (c: FieldVisibilityCondition) => {
-    const field = c.fieldId ? await loadField(c.fieldId as string, ctx) : null;
+    const field = await loadField(c.fieldId as string, ctx);
 
     if (field === null) {
       return;

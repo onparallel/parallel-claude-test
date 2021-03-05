@@ -9,7 +9,7 @@ export type PetitionFieldVisibilityType = "SHOW" | "HIDE";
 export type PetitionFieldVisibilityOperator = "AND" | "OR";
 
 export interface PetitionFieldVisibilityCondition {
-  fieldId: string | null;
+  fieldId: string;
   modifier: PetitionFieldVisibilityConditionModifier;
   operator: PetitionFieldVisibilityConditionOperator;
   value: string | number | null;
