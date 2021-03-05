@@ -51,7 +51,11 @@ export function PetitionComposeFieldSettings({
           <Box>
             <PetitionFieldTypeSelect
               type={field.type}
-              onChange={(type) => onFieldTypeChange(field.id, type)}
+              onChange={(type) => {
+                if (type !== field.type) {
+                  onFieldTypeChange(field.id, type);
+                }
+              }}
             />
           </Box>
         )}

@@ -22,7 +22,6 @@ import {
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import { WithIsVisible } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
@@ -34,11 +33,9 @@ import {
 } from "./PetitionRepliesFieldReply";
 
 export interface PetitionRepliesFieldProps extends BoxProps {
-  field: WithIsVisible<PetitionRepliesField_PetitionFieldFragment>;
+  field: PetitionRepliesField_PetitionFieldFragment;
   fieldIndex: number | string;
-  index: number;
-  commentCount: number;
-  newCommentCount: number;
+  isVisible: boolean;
   isActive: boolean;
   onAction: (
     action: PetitionRepliesFieldAction,
@@ -55,9 +52,7 @@ export interface PetitionRepliesFieldProps extends BoxProps {
 export function PetitionRepliesField({
   field,
   fieldIndex,
-  index,
-  commentCount,
-  newCommentCount,
+  isVisible,
   isActive: isShowingComments,
   onAction,
   onToggleComments,
@@ -111,7 +106,7 @@ export function PetitionRepliesField({
   ) : (
     <Card
       display="flex"
-      backgroundColor={!field.isVisible ? "gray.100" : "inherit"}
+      backgroundColor={!isVisible ? "gray.100" : "inherit"}
       flexDirection="column"
       position="relative"
       _highlighted={{
@@ -197,7 +192,6 @@ export function PetitionRepliesField({
                 (c) => !c.publishedAt
               )}
               onClick={onToggleComments}
-              id={`comment-${index}`}
             />
           </Flex>
         </Flex>
@@ -227,7 +221,7 @@ export function PetitionRepliesField({
             />
           ))}
         </Stack>
-      ) : field.isVisible ? (
+      ) : isVisible ? (
         <Box paddingY={4}>
           <Text textStyle="hint" textAlign="center">
             <FormattedMessage

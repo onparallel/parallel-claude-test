@@ -1,23 +1,15 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Flex,
-  Heading,
-  List,
-  ListItem,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
-import { ConditionIcon } from "@parallel/chakra/icons";
+import { Box, Heading, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import {
   RecipientViewContentsCard_PublicPetitionFieldFragment,
   RecipientViewContentsCard_PublicPetitionFragment,
   RecipientViewContentsCard_PublicUserFragment,
 } from "@parallel/graphql/__types";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
+import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { Maybe } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
+import { zip } from "remeda";
 import { Card, CardProps } from "../common/Card";
 import { NakedLink } from "../common/Link";
 import { RecipientViewCommentsBadge } from "./RecipientViewCommentsBadge";
@@ -37,7 +29,7 @@ export function RecipientViewContentsCard({
   ...props
 }: RecipientViewContentsCardProps) {
   const { query } = useRouter();
-  const { pages, fields } = getPagesAndFields(petition.fields, currentPage);
+  const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage);
   return (
     <Card padding={4} display="flex" flexDirection="column" {...props}>
       <Heading
@@ -111,7 +103,7 @@ export function RecipientViewContentsCard({
                       as={field.type === "HEADING" ? "h3" : "div"}
                       display="flex"
                       position="relative"
-                      paddingLeft={4}
+                      paddingLeft={field.type === "HEADING" ? 4 : 6}
                       fontWeight={field.type === "HEADING" ? "bold" : "normal"}
                     >
                       {hasCommentsEnabled ? (
@@ -126,12 +118,6 @@ export function RecipientViewContentsCard({
                           transform="translate(0, -50%)"
                         />
                       ) : null}
-
-                      {field.visibility && (
-                        <Flex alignItems="center" paddingRight={1}>
-                          <ConditionIcon color="purple.500" />
-                        </Flex>
-                      )}
 
                       <NakedLink
                         href={`/petition/${query.keycode}/${index + 1}#field-${
@@ -178,7 +164,7 @@ export function RecipientViewContentsCard({
   );
 }
 
-function getPagesAndFields(
+function useGetPagesAndFields(
   fields: RecipientViewContentsCard_PublicPetitionFieldFragment[],
   page: number
 ) {
@@ -188,14 +174,12 @@ function getPagesAndFields(
     hasUnreadComments?: boolean;
     fake?: boolean;
   }[] = [];
-  const visibleFields = evaluateFieldVisibility(fields).filter(
-    (f) => f.isVisible
-  );
+  const fieldVisibility = useFieldVisibility(fields);
   const _fields: RecipientViewContentsCard_PublicPetitionFieldFragment[] = [];
-  for (const [index, field] of Array.from(visibleFields.entries())) {
+  for (const [field, isVisible] of zip(fields, fieldVisibility)) {
     if (
       field.type === "HEADING" &&
-      (index === 0 || field.options!.hasPageBreak)
+      (pages.length === 0 || field.options.hasPageBreak)
     ) {
       pages.push({ title: field.title ?? null });
       page -= 1;
@@ -209,10 +193,8 @@ function getPagesAndFields(
       currentPage.hasUnreadComments || field.unreadCommentCount > 0;
     currentPage.hasUnpublishedComments =
       currentPage.hasUnpublishedComments || field.unpublishedCommentCount > 0;
-    if (page === 0) {
-      if (field.type !== "HEADING" || _fields.length !== 0) {
-        _fields.push(field);
-      }
+    if (page === 0 && isVisible) {
+      _fields.push(field);
     } else {
       continue;
     }
@@ -254,9 +236,9 @@ RecipientViewContentsCard.fragments = {
         commentCount
         unpublishedCommentCount
         unreadCommentCount
-        ...evaluateFieldVisibility_PublicPetitionField
+        ...useFieldVisibility_PublicPetitionField
       }
-      ${evaluateFieldVisibility.fragments.PublicPetitionField}
+      ${useFieldVisibility.fragments.PublicPetitionField}
     `;
   },
 };

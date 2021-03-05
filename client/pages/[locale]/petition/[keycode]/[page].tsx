@@ -46,16 +46,16 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compose } from "@parallel/utils/compose";
+import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
+import { AnimatePresence, motion } from "framer-motion";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
-import { AnimatePresence, motion } from "framer-motion";
 
 type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -519,12 +519,10 @@ RecipientView.fragments = {
         ...RecipientViewPetitionField_PublicPetitionField
         ...RecipientViewContentsCard_PublicPetitionField
         ...RecipientViewProgressFooter_PublicPetitionField
-        ...evaluateFieldVisibility_PublicPetitionField
       }
       ${RecipientViewPetitionField.fragments.PublicPetitionField}
       ${RecipientViewContentsCard.fragments.PublicPetitionField}
       ${RecipientViewProgressFooter.fragments.PublicPetitionField}
-      ${evaluateFieldVisibility.fragments.PublicPetitionField}
     `;
   },
   get PublicUser() {

@@ -16,13 +16,13 @@ import {
 import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
 import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSelect";
 import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
-import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
+import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import {
   useInlineReactSelectProps,
   useReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
 import { CustomSelectProps } from "@parallel/utils/react-select/types";
-import { Fragment, SetStateAction, useMemo } from "react";
+import { Fragment, SetStateAction, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 import { pick, zip } from "remeda";
@@ -56,7 +56,7 @@ export function PetitionFieldVisibilityEditor({
   onVisibilityEdit,
 }: PetitionFieldVisibilityProps) {
   const intl = useIntl();
-  const indices = useFieldIndexValues(fields);
+  const indices = useFieldIndices(fields);
   const [_fields, _indices] = useMemo(() => {
     const pairs = zip(fields, indices)
       .filter(([f]) => !f.isReadOnly && f.id !== fieldId)
@@ -613,6 +613,7 @@ function ConditionValue({
   onChange,
 }: ConditionValueProps) {
   const intl = useIntl();
+  const [value, setValue] = useState(condition!.value);
 
   return (
     <Box flex="1" minWidth={20}>
@@ -620,8 +621,9 @@ function ConditionValue({
         <NumberInput
           size="sm"
           min={0}
-          value={condition!.value ?? 0}
-          onChange={(_, value) => onChange({ ...condition!, value })}
+          value={(value as number) ?? 0}
+          onChange={(_, value) => setValue(value)}
+          onBlur={() => onChange({ ...condition!, value })}
           keepWithinRange
           clampValueOnBlur
           placeholder={intl.formatMessage({
@@ -650,12 +652,11 @@ function ConditionValue({
       ) : (
         <Input
           size="sm"
-          value={condition!.value ?? ""}
+          onChange={(e) => setValue(e.target.value || null)}
+          onBlur={() => onChange({ ...condition!, value })}
+          value={value ?? ""}
           backgroundColor="white"
           isInvalid={showError && condition!.value === null}
-          onChange={(e) =>
-            onChange({ ...condition!, value: e.target.value || null })
-          }
           placeholder={intl.formatMessage({
             id: "generic.enter-a-value",
             defaultMessage: "Enter a value",

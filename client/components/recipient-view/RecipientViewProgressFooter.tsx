@@ -2,9 +2,10 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { RecipientViewProgressFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
+import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
+import { zip } from "remeda";
 import { Card, CardProps } from "../common/Card";
 import { ProgressIndicator, ProgressTrack } from "../common/Progress";
 import { Spacer } from "../common/Spacer";
@@ -19,21 +20,20 @@ export function RecipientViewProgressFooter({
   onFinalize,
   ...props
 }: RecipientViewProgressFooterProps) {
-  const { replied, optional, total } = useMemo(
-    () =>
-      evaluateFieldVisibility(petition.fields)
-        .filter((f) => !f.isReadOnly && f.isVisible)
-        .reduce(
-          (acc, field) => ({
-            replied: acc.replied + (field.replies.length ? 1 : 0),
-            optional:
-              acc.optional + (field.optional && !field.replies.length ? 1 : 0),
-            total: acc.total + 1,
-          }),
-          { replied: 0, optional: 0, total: 0 }
-        ),
-    [petition.fields]
-  );
+  const fieldVisibility = useFieldVisibility(petition.fields);
+  const { replied, optional, total } = useMemo(() => {
+    let replied = 0;
+    let optional = 0;
+    let total = 0;
+    for (const [field, isVisible] of zip(petition.fields, fieldVisibility)) {
+      if (isVisible && !field.isReadOnly) {
+        replied += field.replies.length ? 1 : 0;
+        optional += field.optional && !field.replies.length ? 1 : 0;
+        total += 1;
+      }
+    }
+    return { replied, optional, total };
+  }, [petition.fields, fieldVisibility]);
   const isCompleted = petition.status === "COMPLETED";
   return (
     <Card
@@ -146,9 +146,9 @@ RecipientViewProgressFooter.fragments = {
         replies {
           id
         }
-        ...evaluateFieldVisibility_PublicPetitionField
+        ...useFieldVisibility_PublicPetitionField
       }
-      ${evaluateFieldVisibility.fragments.PublicPetitionField}
+      ${useFieldVisibility.fragments.PublicPetitionField}
     `;
   },
 };

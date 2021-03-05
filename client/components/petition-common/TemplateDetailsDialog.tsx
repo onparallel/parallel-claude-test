@@ -33,7 +33,7 @@ import {
   useTemplateDetailsDialogPetitionQueryVariables,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
+import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
@@ -43,6 +43,7 @@ import { BaseDialog } from "../common/BaseDialog";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { SplitButton } from "../common/SplitButton";
+import { zip } from "remeda";
 
 export function useTemplateDetailsDialog() {
   const apollo = useApolloClient();
@@ -117,7 +118,7 @@ export function TemplateDetailsDialog({
       ["OWNER", "WRITE"].includes(permission.permissionType)
   );
 
-  const fieldIndexValues = useFieldIndexValues(template.fields);
+  const indices = useFieldIndices(template.fields);
 
   return (
     <BaseDialog size="4xl" {...props}>
@@ -256,23 +257,16 @@ export function TemplateDetailsDialog({
             />
           </Heading>
           <Box paddingLeft={8}>
-            {template.fields.map((field, index) => {
+            {zip(template.fields, indices).map(([field, index]) => {
               return field.type === "HEADING" ? (
                 <Text key={field.id} fontWeight="bold" marginBottom={2}>
-                  {fieldIndexValues[index]}.{" "}
+                  {index}.{" "}
                   {field.title ? (
-                    <Text as="span" fontWeight="bold" aria-label={field.title}>
+                    <Text as="span" fontWeight="bold">
                       {field.title}
                     </Text>
                   ) : (
-                    <Text
-                      as="span"
-                      textStyle="hint"
-                      aria-label={intl.formatMessage({
-                        id: "generic.empty-heading",
-                        defaultMessage: "Untitled heading",
-                      })}
-                    >
+                    <Text as="span" textStyle="hint">
                       <FormattedMessage
                         id="generic.empty-heading"
                         defaultMessage="Untitled heading"
@@ -282,20 +276,13 @@ export function TemplateDetailsDialog({
                 </Text>
               ) : (
                 <Text key={field.id} marginLeft={4} marginBottom={2}>
-                  {fieldIndexValues[index]}.{" "}
+                  {index}.{" "}
                   {field.title ? (
                     <Text as="span" aria-label={field.title}>
                       {field.title}
                     </Text>
                   ) : (
-                    <Text
-                      as="span"
-                      textStyle="hint"
-                      aria-label={intl.formatMessage({
-                        id: "generic.untitled-field",
-                        defaultMessage: "Untitled field",
-                      })}
-                    >
+                    <Text as="span" textStyle="hint">
                       <FormattedMessage
                         id="generic.untitled-field"
                         defaultMessage="Untitled field"

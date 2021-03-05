@@ -3,20 +3,17 @@ import { Box, Button, Stack, Text } from "@chakra-ui/react";
 import { CommentIcon, ConditionIcon } from "@parallel/chakra/icons";
 import { PetitionFieldsIndex_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
-import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
-import {
-  evaluateFieldVisibility,
-  WithIsVisible,
-} from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
+import { useFieldIndices } from "@parallel/utils/fieldIndices";
+import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
+import { zipX } from "@parallel/utils/zipX";
 import { memo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Divider } from "../common/Divider";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
-import { PetitionFieldTypeIndicator } from "./PetitionFieldTypeIndicator";
 
 export type PetitionFieldsIndexProps = {
-  fields: WithIsVisible<PetitionFieldsIndex_PetitionFieldFragment>[];
+  fields: PetitionFieldsIndex_PetitionFieldFragment[];
   onFieldClick: (fieldId: string) => void;
 };
 
@@ -24,22 +21,25 @@ export function PetitionFieldsIndex({
   fields,
   onFieldClick,
 }: PetitionFieldsIndexProps) {
-  const fieldIndexValues = useFieldIndexValues(fields);
+  const fieldVisibility = useFieldVisibility(fields);
+  const fieldIndices = useFieldIndices(fields);
   const handleFieldClick = useMemoFactory(
     (fieldId: string) => () => onFieldClick(fieldId),
     [onFieldClick]
   );
   return (
     <Stack as="ol" spacing={1} padding={4}>
-      {fields.map((field, index) => (
-        <PetitionFieldsIndexItem
-          key={field.id}
-          field={field}
-          isVisible={field.isVisible}
-          fieldIndex={fieldIndexValues[index]}
-          onFieldClick={handleFieldClick(field.id)}
-        />
-      ))}
+      {zipX(fields, fieldIndices, fieldVisibility).map(
+        ([field, fieldIndex, isVisible]) => (
+          <PetitionFieldsIndexItem
+            key={field.id}
+            field={field}
+            isVisible={isVisible}
+            fieldIndex={fieldIndex}
+            onFieldClick={handleFieldClick(field.id)}
+          />
+        )
+      )}
     </Stack>
   );
 }
@@ -56,9 +56,9 @@ PetitionFieldsIndex.fragments = {
         isUnread
         publishedAt
       }
-      ...evaluateFieldVisibility_PetitionField
+      ...useFieldVisibility_PetitionField
     }
-    ${evaluateFieldVisibility.fragments.PetitionField}
+    ${useFieldVisibility.fragments.PetitionField}
   `,
 };
 
@@ -114,39 +114,37 @@ const PetitionFieldsIndexItem = memo(
             alignItems="center"
             height="auto"
             padding={2}
-            paddingLeft={field.type !== "HEADING" && !field.visibility ? 8 : 2}
+            paddingLeft={field.type === "HEADING" ? 2 : 4}
             fontWeight={field.type === "HEADING" ? "medium" : "normal"}
             textAlign="left"
             onClick={onFieldClick}
           >
-            {field.visibility ? (
-              <ConditionIcon color={isVisible ? "purple.500" : "gray.500"} />
-            ) : null}
-            {field.title ? (
-              <Text
-                as="div"
-                flex="1"
-                minWidth={0}
-                isTruncated
-                opacity={isVisible ? 1 : 0.6}
-              >
-                {field.title}
-              </Text>
-            ) : (
-              <Text as="div" flex="1" textStyle="hint">
-                {field.type === "HEADING" ? (
-                  <FormattedMessage
-                    id="generic.empty-heading"
-                    defaultMessage="Untitled heading"
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="generic.untitled-field"
-                    defaultMessage="Untitled field"
-                  />
-                )}
-              </Text>
-            )}
+            <Text
+              as="div"
+              flex="1"
+              minWidth={0}
+              isTruncated
+              opacity={isVisible ? 1 : 0.6}
+            >
+              <Text as="span">{fieldIndex}. </Text>
+              {field.title ? (
+                field.title
+              ) : (
+                <Text as="span" flex="1" textStyle="hint">
+                  {field.type === "HEADING" ? (
+                    <FormattedMessage
+                      id="generic.empty-heading"
+                      defaultMessage="Untitled heading"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="generic.untitled-field"
+                      defaultMessage="Untitled field"
+                    />
+                  )}
+                </Text>
+              )}
+            </Text>
             {field.comments.length ? (
               <Stack
                 as="span"
@@ -187,11 +185,9 @@ const PetitionFieldsIndexItem = memo(
                 />
               </Stack>
             ) : null}
-            <PetitionFieldTypeIndicator
-              as="div"
-              type={field.type}
-              fieldIndex={fieldIndex}
-            />
+            {field.visibility ? (
+              <ConditionIcon color={isVisible ? "purple.500" : "gray.500"} />
+            ) : null}
           </Stack>
         </Box>
       </>

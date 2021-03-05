@@ -35,7 +35,7 @@ interface TextFieldProps extends BoxProps {
 function TextField({ field, ...props }: TextFieldProps) {
   return (
     <Card {...props} boxShadow="none" borderColor="gray.400">
-      <Text style={{ fontWeight: "bold" }}>{field.title}</Text>
+      <Text fontWeight="bold">{field.title ?? "-"}</Text>
       <Text marginLeft="2mm" fontStyle="italic">
         {field.description}
       </Text>
@@ -60,7 +60,7 @@ interface HeadingFieldProps extends BoxProps {
 function HeadingField({ field, ...props }: HeadingFieldProps) {
   return (
     <Box {...props}>
-      <Heading size="lg">{field.title}</Heading>
+      <Heading size="lg">{field.title ?? "-"}</Heading>
       <Text marginLeft="2mm" fontStyle="italic">
         {field.description}
       </Text>
@@ -75,7 +75,7 @@ interface FileUploadFieldProps extends BoxProps {
 function FileUploadField({ field, ...props }: FileUploadFieldProps) {
   return (
     <Card {...props} boxShadow="none" borderColor="gray.400">
-      <Text style={{ fontWeight: "bold" }}>{field.title}</Text>
+      <Text style={{ fontWeight: "bold" }}>{field.title ?? "-"}</Text>
       <Text marginLeft="2mm" fontStyle="italic">
         {field.description}
       </Text>

@@ -14,12 +14,12 @@ import {
   usePdfViewPetitionQuery,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
-import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
+import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import jwtDecode from "jwt-decode";
 import { useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
+import { zip } from "remeda";
 
 function PetitionPdf({ token }: { token: string }) {
   const { data } = assertQuery(
@@ -46,25 +46,14 @@ function PetitionPdf({ token }: { token: string }) {
 
   const contacts = signatureConfig?.contacts;
 
-  const visibleFields = evaluateFieldVisibility(petition.fields).filter(
-    (f) => f.isVisible
-  );
+  const visibility = useFieldVisibility(petition.fields);
 
-  const fieldIndexValues = useFieldIndexValues(visibleFields);
-  const intl = useIntl();
   const pages = useMemo(() => {
-    const fields = fieldIndexValues.map((indexValue, i) => ({
-      ...visibleFields[i],
-      title: `${indexValue} - ${
-        visibleFields[i].title ??
-        intl.formatMessage({
-          id: "generic.untitled-field",
-          defaultMessage: "Untitled field",
-        })
-      }`,
-    }));
+    const fields = zip(petition.fields, visibility)
+      .filter(([, isVisible]) => isVisible)
+      .map(([field]) => field);
     return groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(fields);
-  }, [visibleFields]);
+  }, [petition.fields, visibility]);
 
   return (
     <>
@@ -182,9 +171,9 @@ PetitionPdf.fragments = {
           id
           content
         }
-        ...evaluateFieldVisibility_PetitionField
+        ...useFieldVisibility_PetitionField
       }
-      ${evaluateFieldVisibility.fragments.PetitionField}
+      ${useFieldVisibility.fragments.PetitionField}
     `;
   },
 };

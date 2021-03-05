@@ -3,7 +3,7 @@ import {
   useFilenamePlaceholdersRename_PetitionFieldFragment,
   useFilenamePlaceholdersRename_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import { getFieldIndexValues } from "@parallel/utils/fieldIndexValues";
+import { getFieldIndices } from "@parallel/utils/fieldIndices";
 import escapeStringRegexp from "escape-string-regexp";
 import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
@@ -44,7 +44,7 @@ export function useFilenamePlaceholdersRename() {
   return useCallback(
     (fields: useFilenamePlaceholdersRename_PetitionFieldFragment[]) => {
       const seen = new Set<string>();
-      const fieldIndexValues = getFieldIndexValues(fields);
+      const indices = getFieldIndices(fields);
       return (
         field: useFilenamePlaceholdersRename_PetitionFieldFragment,
         reply: useFilenamePlaceholdersRename_PetitionFieldReplyFragment,
@@ -54,8 +54,7 @@ export function useFilenamePlaceholdersRename() {
         if (reset) {
           seen.clear();
         }
-        const index = fields.findIndex((f) => f.id === field.id);
-        const position = fieldIndexValues[index];
+        const index = indices[fields.findIndex((f) => f.id === field.id)];
         const extension =
           (reply.content.filename as string).match(/\.[a-z0-9]+$/)?.[0] ?? "";
         const parts = pattern.split(
@@ -72,7 +71,7 @@ export function useFilenamePlaceholdersRename() {
               const value = part.slice(1, -1);
               switch (value) {
                 case "field-number":
-                  return position;
+                  return index;
                 case "field-title":
                   return field.title ?? "";
                 case "file-name":

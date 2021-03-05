@@ -7,8 +7,6 @@ import {
   Flex,
   HTMLChakraProps,
   IconButton,
-  Stack,
-  Text,
 } from "@chakra-ui/react";
 import { AddIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -23,24 +21,25 @@ import {
   PetitionComposeFieldRef,
 } from "@parallel/components/petition-compose/PetitionComposeField";
 import {
-  PetitionComposeFieldList_PetitionFragment,
   PetitionComposeField_PetitionFieldFragment,
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
-import { useFieldIndexValues } from "@parallel/utils/fieldIndexValues";
+import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, pick, zip } from "remeda";
-import { ConfirmDialog } from "../common/ConfirmDialog";
-import { DialogProps, useDialog } from "../common/DialogProvider";
-import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
+import {
+  ReferencedFieldDialog,
+  useReferencedFieldDialog,
+} from "./ReferencedFieldDialog";
 
 type FieldSelection = PetitionComposeField_PetitionFieldFragment;
 
@@ -87,7 +86,7 @@ export const PetitionComposeFieldList = Object.assign(
     const [{ fieldsById, fieldIds }, setState] = useState(reset(fields));
     useEffectSkipFirst(() => setState(reset(fields)), [fields]);
 
-    const indices = useFieldIndexValues(
+    const indices = useFieldIndices(
       fieldIds.map((fieldId) => pick(fieldsById[fieldId], ["type"]))
     );
 
@@ -115,10 +114,9 @@ export const PetitionComposeFieldList = Object.assign(
 
     const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
 
-    const showDeletingReferencedFields = useDeletingReferencedFieldsDialog();
+    const showReferencedFieldDialog = useReferencedFieldDialog();
     // Memoize field callbacks
-    const fieldsDataRef = useRef({ fields, indices, active });
-    assignRef(fieldsDataRef, { fields, indices, active });
+    const fieldsDataRef = useUpdatingRef({ fields, indices, active });
     const fieldProps = useMemoFactory(
       (
         fieldId: string
@@ -144,7 +142,7 @@ export const PetitionComposeFieldList = Object.assign(
           );
           if (referencing.length > 0) {
             try {
-              await showDeletingReferencedFields({
+              await showReferencedFieldDialog({
                 fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
                   field,
                   fieldIndex,
@@ -417,9 +415,11 @@ export const PetitionComposeFieldList = Object.assign(
           fields {
             isFixed
             ...PetitionComposeField_PetitionField
+            ...ReferencedFieldDialogDialog_PetitionField
           }
         }
         ${PetitionComposeField.fragments.PetitionField}
+        ${ReferencedFieldDialog.fragments.PetitionField}
       `,
     },
   }
@@ -473,72 +473,3 @@ const BigAddFieldButton = memo(
     }
   )
 );
-
-function useDeletingReferencedFieldsDialog() {
-  return useDialog(DeletingReferencedFieldsDialog);
-}
-
-function DeletingReferencedFieldsDialog({
-  fieldsWithIndices,
-  ...props
-}: DialogProps<{
-  fieldsWithIndices: {
-    field: PetitionComposeFieldList_PetitionFragment["fields"][0];
-    fieldIndex: string | number;
-  }[];
-}>) {
-  return (
-    <ConfirmDialog
-      {...props}
-      closeOnOverlayClick={false}
-      header={
-        <FormattedMessage
-          id="component.deleting-referenced-field-dialog.header"
-          defaultMessage="This field is being referenced"
-        />
-      }
-      body={
-        <Stack>
-          <Text>
-            <FormattedMessage
-              id="component.deleting-referenced-field-dialog.description"
-              defaultMessage="The following {count, plural, =1 {field is} other {fields are}} referencing the field you are trying to delete:"
-              values={{ count: fieldsWithIndices.length }}
-            />
-          </Text>
-          {fieldsWithIndices.map(({ field, fieldIndex }) => (
-            <Flex key={field.id} paddingLeft={2}>
-              <PetitionFieldTypeIndicator
-                as="div"
-                type={field.type}
-                fieldIndex={fieldIndex}
-                isTooltipDisabled
-                flexShrink={0}
-              />
-              <Box marginLeft={2} flex="1" minWidth="0" isTruncated>
-                {field.title ? (
-                  field.title
-                ) : (
-                  <Text as="span" textStyle="hint">
-                    <FormattedMessage
-                      id="generic.untitled-field"
-                      defaultMessage="Untitled field"
-                    />
-                  </Text>
-                )}
-              </Box>
-            </Flex>
-          ))}
-        </Stack>
-      }
-      confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="component.deleting-referenced-field-dialog.confirm"
-            defaultMessage="Remove conditions"
-          />
-        </Button>
-      }
-    />
-  );
-}

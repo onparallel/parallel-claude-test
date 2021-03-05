@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   Box,
   ListItem,
@@ -43,8 +43,8 @@ import { PetitionComposeFieldList } from "@parallel/components/petition-compose/
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/PetitionComposeFieldSettings";
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
+import { useReferencedFieldDialog } from "@parallel/components/petition-compose/ReferencedFieldDialog";
 import {
-  onFieldEdit_PetitionFieldFragment,
   PetitionComposeQuery,
   PetitionComposeQueryVariables,
   PetitionComposeUserQuery,
@@ -66,15 +66,17 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/evalutateFieldVisibility";
+import { useFieldIndices } from "@parallel/utils/fieldIndices";
+import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { countBy } from "remeda";
+import { countBy, zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<
@@ -101,12 +103,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     })
   );
 
-  const fieldsWithVisibility = evaluateFieldVisibility(petition!.fields);
+  const indices = useFieldIndices(petition!.fields);
+  const petitionDataRef = useUpdatingRef({ fields: petition!.fields, indices });
 
   const [petitionState, wrapper] = usePetitionState();
   const [activeFieldId, setActiveFieldId] = useState<Maybe<string>>(null);
-
-  const client = useApolloClient();
 
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
@@ -214,20 +215,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const [
     updatePetitionField,
   ] = usePetitionCompose_updatePetitionFieldMutation();
-  const handleFieldEdit = useCallback(
-    wrapper(async function (fieldId: string, data: UpdatePetitionFieldInput) {
-      const field = client.cache.readFragment<onFieldEdit_PetitionFieldFragment>(
-        {
-          fragment: gql`
-            fragment onFieldEdit_PetitionField on PetitionField {
-              ...PetitionCompose_PetitionField
-            }
-            ${PetitionCompose.fragments.PetitionField}
-          `,
-          fragmentName: "onFieldEdit_PetitionField",
-          id: fieldId,
-        }
-      )!;
+  const _handleFieldEdit = useCallback(
+    async function (fieldId: string, data: UpdatePetitionFieldInput) {
+      const { fields } = petitionDataRef.current!;
+      const field = fields.find((f) => f.id === fieldId);
       await updatePetitionField({
         variables: { petitionId, fieldId, data },
         optimisticResponse: {
@@ -247,16 +238,55 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           },
         },
       });
-    }),
+    },
     [petitionId]
   );
+  const handleFieldEdit = useCallback(wrapper(_handleFieldEdit), [
+    petitionId,
+    _handleFieldEdit,
+  ]);
 
+  const showReferencedFieldDialog = useReferencedFieldDialog();
   const confirmChangeFieldType = useConfirmChangeFieldTypeDialog();
   const [
     changePetitionFieldType,
   ] = usePetitionCompose_changePetitionFieldTypeMutation();
   const handleFieldTypeChange = useCallback(
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
+      const { fields, indices } = petitionDataRef.current!;
+      const field = fields.find((f) => f.id === fieldId)!;
+      const referencing = zip(fields, indices).filter(([f]) =>
+        (f.visibility as PetitionFieldVisibility)?.conditions.some(
+          (c) => c.fieldId === fieldId
+        )
+      );
+      if (referencing.length) {
+        // valid field types changes
+        if (type === "TEXT" && field.type === "SELECT") {
+          // pass
+        } else {
+          try {
+            await showReferencedFieldDialog({
+              fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
+                field,
+                fieldIndex,
+              })),
+            });
+            for (const [field] of referencing) {
+              const visibility = field.visibility! as PetitionFieldVisibility;
+              const conditions = visibility.conditions.filter(
+                (c) => c.fieldId !== fieldId
+              );
+              await _handleFieldEdit(field.id, {
+                visibility:
+                  conditions.length > 0 ? { ...visibility, conditions } : null,
+              });
+            }
+          } catch {
+            return;
+          }
+        }
+      }
       try {
         await changePetitionFieldType({
           variables: { petitionId, fieldId, type },
@@ -534,7 +564,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   <TabPanels {...extendFlexColumn}>
                     <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
                       <PetitionFieldsIndex
-                        fields={fieldsWithVisibility}
+                        fields={petition!.fields}
                         onFieldClick={handleIndexFieldClick}
                       />
                     </TabPanel>
@@ -642,12 +672,10 @@ PetitionCompose.fragments = {
         ...PetitionComposeField_PetitionField
         ...PetitionComposeFieldSettings_PetitionField
         ...PetitionFieldsIndex_PetitionField
-        ...evaluateFieldVisibility_PetitionField
       }
       ${PetitionComposeField.fragments.PetitionField}
       ${PetitionComposeFieldSettings.fragments.PetitionField}
       ${PetitionFieldsIndex.fragments.PetitionField}
-      ${evaluateFieldVisibility.fragments.PetitionField}
     `;
   },
   get User() {

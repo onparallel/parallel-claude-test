@@ -261,7 +261,6 @@ export function RecipientViewPetitionFieldCommentsDialog({
         <ModalFooter display="block">
           <GrowingTextarea
             ref={textareaRef}
-            height="20px"
             size="sm"
             borderRadius="md"
             paddingX={2}
