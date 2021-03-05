@@ -176,6 +176,10 @@ export function useReactSelectProps<
         ),
       },
       styles: {
+        menuPortal: (styles) => ({
+          ...styles,
+          zIndex: 40,
+        }),
         container: (styles, { isDisabled }) => ({
           ...styles,
           cursor: isDisabled ? "not-allowed" : "default",
