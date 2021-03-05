@@ -19,7 +19,6 @@ import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import jwtDecode from "jwt-decode";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
-import { zip } from "remeda";
 
 function PetitionPdf({ token }: { token: string }) {
   const { data } = assertQuery(
@@ -46,14 +45,15 @@ function PetitionPdf({ token }: { token: string }) {
 
   const contacts = signatureConfig?.contacts;
 
-  const visibility = useFieldVisibility(petition.fields);
-
-  const pages = useMemo(() => {
-    const fields = zip(petition.fields, visibility)
-      .filter(([, isVisible]) => isVisible)
-      .map(([field]) => field);
-    return groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(fields);
-  }, [petition.fields, visibility]);
+  const fieldVisibility = useFieldVisibility(petition.fields);
+  const pages = useMemo(
+    () =>
+      groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(
+        petition.fields,
+        fieldVisibility
+      ),
+    [petition.fields, fieldVisibility]
+  );
 
   return (
     <>

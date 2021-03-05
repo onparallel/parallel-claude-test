@@ -1,17 +1,21 @@
-export function groupFieldsByPages<T>(fields: T[]): T[][] {
+import { PublicPetitionField } from "@parallel/graphql/__types";
+import { zip } from "remeda";
+
+export function groupFieldsByPages<
+  T extends Pick<PublicPetitionField, "type" | "options">
+>(fields: T[], visibility: boolean[]): T[][] {
   const pages: T[][] = [];
   let page: T[] = [];
-  for (const field of fields) {
-    if (
-      (field as any).type === "HEADING" &&
-      (field as any).options!.hasPageBreak
-    ) {
+  for (const [field, isVisible] of zip(fields, visibility)) {
+    if (field.type === "HEADING" && field.options!.hasPageBreak) {
       if (page.length > 0) {
         pages.push(page);
         page = [];
       }
     }
-    page.push(field);
+    if (isVisible) {
+      page.push(field);
+    }
   }
   pages.push(page);
   return pages;

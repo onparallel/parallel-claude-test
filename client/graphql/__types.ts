@@ -4123,8 +4123,7 @@ export type PetitionCompose_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & PetitionComposeField_PetitionFieldFragment &
   PetitionComposeFieldSettings_PetitionFieldFragment &
-  PetitionFieldsIndex_PetitionFieldFragment &
-  useFieldVisibility_PetitionFieldFragment;
+  PetitionFieldsIndex_PetitionFieldFragment;
 
 export type PetitionCompose_UserFragment = {
   __typename?: "User";
@@ -4364,43 +4363,6 @@ export type PetitionQuery = { __typename?: "Query" } & {
   petition?: Maybe<
     | ({ __typename?: "Petition" } & Pick<Petition, "status" | "id">)
     | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">)
-  >;
-};
-
-export type Pruebas_Petition_Petition_Fragment = {
-  __typename?: "Petition";
-} & Pick<Petition, "id"> & {
-    fields: Array<
-      {
-        __typename?: "PetitionField";
-      } & PetitionFieldVisibilityEditor_PetitionFieldFragment
-    >;
-  };
-
-export type Pruebas_Petition_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id"> & {
-    fields: Array<
-      {
-        __typename?: "PetitionField";
-      } & PetitionFieldVisibilityEditor_PetitionFieldFragment
-    >;
-  };
-
-export type Pruebas_PetitionFragment =
-  | Pruebas_Petition_Petition_Fragment
-  | Pruebas_Petition_PetitionTemplate_Fragment;
-
-export type PruebasQueryVariables = Exact<{
-  id: Scalars["GID"];
-}>;
-
-export type PruebasQuery = { __typename?: "Query" } & {
-  petition?: Maybe<
-    | ({ __typename?: "Petition" } & Pruebas_Petition_Petition_Fragment)
-    | ({
-        __typename?: "PetitionTemplate";
-      } & Pruebas_Petition_PetitionTemplate_Fragment)
   >;
 };
 
@@ -4920,8 +4882,7 @@ export type RecipientView_PublicPetitionFieldFragment = {
 } & Pick<PublicPetitionField, "id"> &
   RecipientViewPetitionField_PublicPetitionFieldFragment &
   RecipientViewContentsCard_PublicPetitionFieldFragment &
-  RecipientViewProgressFooter_PublicPetitionFieldFragment &
-  useFieldVisibility_PublicPetitionFieldFragment;
+  RecipientViewProgressFooter_PublicPetitionFieldFragment;
 
 export type RecipientView_PublicUserFragment = {
   __typename?: "PublicUser";
@@ -6377,12 +6338,10 @@ export const PetitionCompose_PetitionFieldFragmentDoc = gql`
     ...PetitionComposeField_PetitionField
     ...PetitionComposeFieldSettings_PetitionField
     ...PetitionFieldsIndex_PetitionField
-    ...useFieldVisibility_PetitionField
   }
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
   ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
-  ${useFieldVisibility_PetitionFieldFragmentDoc}
 `;
 export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   fragment PetitionCompose_PetitionBase on PetitionBase {
@@ -6432,15 +6391,6 @@ export const PetitionCompose_UserFragmentDoc = gql`
   }
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionSettings_UserFragmentDoc}
-`;
-export const Pruebas_PetitionFragmentDoc = gql`
-  fragment Pruebas_Petition on PetitionBase {
-    id
-    fields {
-      ...PetitionFieldVisibilityEditor_PetitionField
-    }
-  }
-  ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
 `;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
@@ -6845,12 +6795,10 @@ export const RecipientView_PublicPetitionFieldFragmentDoc = gql`
     ...RecipientViewPetitionField_PublicPetitionField
     ...RecipientViewContentsCard_PublicPetitionField
     ...RecipientViewProgressFooter_PublicPetitionField
-    ...useFieldVisibility_PublicPetitionField
   }
   ${RecipientViewPetitionField_PublicPetitionFieldFragmentDoc}
   ${RecipientViewContentsCard_PublicPetitionFieldFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
-  ${useFieldVisibility_PublicPetitionFieldFragmentDoc}
 `;
 export const RecipientView_PublicContactFragmentDoc = gql`
   fragment RecipientView_PublicContact on PublicContact {
@@ -10646,49 +10594,6 @@ export type PetitionQueryHookResult = ReturnType<typeof usePetitionQuery>;
 export type PetitionLazyQueryHookResult = ReturnType<
   typeof usePetitionLazyQuery
 >;
-export const PruebasDocument = gql`
-  query Pruebas($id: GID!) {
-    petition(id: $id) {
-      ...Pruebas_Petition
-    }
-  }
-  ${Pruebas_PetitionFragmentDoc}
-`;
-
-/**
- * __usePruebasQuery__
- *
- * To run a query within a React component, call `usePruebasQuery` and pass it any options that fit your needs.
- * When your component renders, `usePruebasQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePruebasQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function usePruebasQuery(
-  baseOptions: Apollo.QueryHookOptions<PruebasQuery, PruebasQueryVariables>
-) {
-  return Apollo.useQuery<PruebasQuery, PruebasQueryVariables>(
-    PruebasDocument,
-    baseOptions
-  );
-}
-export function usePruebasLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<PruebasQuery, PruebasQueryVariables>
-) {
-  return Apollo.useLazyQuery<PruebasQuery, PruebasQueryVariables>(
-    PruebasDocument,
-    baseOptions
-  );
-}
-export type PruebasQueryHookResult = ReturnType<typeof usePruebasQuery>;
-export type PruebasLazyQueryHookResult = ReturnType<typeof usePruebasLazyQuery>;
 export const PetitionReplies_updatePetitionDocument = gql`
   mutation PetitionReplies_updatePetition(
     $petitionId: GID!

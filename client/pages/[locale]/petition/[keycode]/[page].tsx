@@ -46,7 +46,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compose } from "@parallel/utils/compose";
-import { evaluateFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
+import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
@@ -91,8 +91,7 @@ function RecipientView({
       try {
         setFinalized(true);
         const canFinalize = fields.every(
-          (f) =>
-            f.optional || f.replies.length > 0 || f.isReadOnly || !f.isVisible
+          (f) => f.optional || f.replies.length > 0 || f.isReadOnly
         );
         if (canFinalize) {
           if (signers.length > 0) {
@@ -124,12 +123,7 @@ function RecipientView({
             if (f.type === "HEADING" && f.options.hasPageBreak) {
               page += 1;
             }
-            return (
-              f.replies.length === 0 &&
-              !f.optional &&
-              !f.isReadOnly &&
-              f.isVisible
-            );
+            return f.replies.length === 0 && !f.optional && !f.isReadOnly;
           })!;
           const { keycode, locale } = router.query;
           router.push(
@@ -343,15 +337,7 @@ function RecipientView({
             <Stack spacing={4}>
               <AnimatePresence initial={false}>
                 {fields.map((field) => (
-                  <motion.div
-                    key={field.id}
-                    layout="position"
-                    hidden={
-                      !field.isVisible &&
-                      field.commentCount === 0 &&
-                      field.replies.length === 0
-                    }
-                  >
+                  <motion.div key={field.id} layout="position">
                     <RecipientViewPetitionField
                       key={field.id}
                       id={`field-${field.id}`}
@@ -360,9 +346,7 @@ function RecipientView({
                       access={access!}
                       field={field}
                       isDisabled={
-                        field.validated ||
-                        petition.status === "CLOSED" ||
-                        !field.isVisible
+                        field.validated || petition.status === "CLOSED"
                       }
                       isInvalid={
                         finalized &&
@@ -560,10 +544,11 @@ function useGetPageFields(
   fields: RecipientView_PublicPetitionFieldFragment[],
   page: number
 ) {
+  const fieldVisibility = useFieldVisibility(fields);
   return useMemo(() => {
-    const fieldsByPage = groupFieldsByPages(evaluateFieldVisibility(fields));
-    return { fields: fieldsByPage[page - 1], pages: fieldsByPage.length };
-  }, [fields, page]);
+    const pages = groupFieldsByPages(fields, fieldVisibility);
+    return { fields: pages[page - 1], pages: pages.length };
+  }, [fields, page, fieldVisibility]);
 }
 
 function useHelpModal() {

@@ -97,7 +97,7 @@ export function RecipientViewContentsCard({
                 spacing={1}
                 paddingLeft={pages.length > 1 ? 4 : 0}
               >
-                {fields.map((field) => (
+                {fields.slice(1).map((field) => (
                   <ListItem key={field.id} position="relative">
                     <Text
                       as={field.type === "HEADING" ? "h3" : "div"}
