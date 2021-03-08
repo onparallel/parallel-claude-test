@@ -48,7 +48,10 @@ import {
   PetitionUserPermissionType,
   PetitionEvent,
 } from "../__types";
-import { evaluateFieldVisibility } from "../../util/fieldVisibility";
+import {
+  evaluateFieldVisibility,
+  Visibility,
+} from "../../util/fieldVisibility";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
@@ -787,7 +790,7 @@ export class PetitionRepository extends BaseRepository {
       const _ids = await this.from("petition_field", t)
         .where("petition_id", petitionId)
         .whereNull("deleted_at")
-        .select("id", "is_fixed", "position")
+        .select("id", "is_fixed", "position", "visibility")
         .orderBy("position", "asc");
 
       const ids = _ids.map((f) => f.id);
@@ -804,6 +807,20 @@ export class PetitionRepository extends BaseRepository {
       ) {
         throw new Error("INVALID_PETITION_FIELD_IDS");
       }
+
+      // visibility conditions on reordered field must always refer to a previous field
+      const validConditionIds: number[] = [];
+      fieldIds.forEach((fieldId) => {
+        const visibility = _ids.find(({ id }) => id === fieldId)!
+          .visibility as Maybe<Visibility>;
+        const referencedFieldIds = (visibility?.conditions ?? []).map(
+          (c) => c.fieldId as number
+        );
+        if (!referencedFieldIds.every((id) => validConditionIds.includes(id))) {
+          throw new Error("INVALID_FIELD_CONDITIONS_ORDER");
+        }
+        validConditionIds.push(fieldId);
+      });
 
       await t.raw(
         /* sql */ `

@@ -858,6 +858,27 @@ describe("GraphQL/Petition Fields", () => {
         })
       );
 
+      await mocks.knex.raw(
+        /* sql */ `
+        UPDATE petition_field SET visibility = ? WHERE id = ?
+      `,
+        [
+          JSON.stringify({
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: fields[1].id,
+                modifier: "NONE",
+                operator: "CONTAIN",
+                value: "$",
+              },
+            ],
+          }),
+          fields[4].id,
+        ]
+      );
+
       fieldGIDs = fields.map((f) => toGlobalId("PetitionField", f.id));
     });
 
@@ -877,8 +898,8 @@ describe("GraphQL/Petition Fields", () => {
           fieldIds: [
             fieldGIDs[0],
             fieldGIDs[2],
-            fieldGIDs[4],
             fieldGIDs[1],
+            fieldGIDs[4],
             fieldGIDs[3],
           ],
         },
@@ -889,8 +910,8 @@ describe("GraphQL/Petition Fields", () => {
         fields: [
           { id: fieldGIDs[0] },
           { id: fieldGIDs[2] },
-          { id: fieldGIDs[4] },
           { id: fieldGIDs[1] },
+          { id: fieldGIDs[4] },
           { id: fieldGIDs[3] },
         ],
       });
@@ -952,16 +973,43 @@ describe("GraphQL/Petition Fields", () => {
         variables: {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldIds: [
-            fieldGIDs[4],
             fieldGIDs[1],
             fieldGIDs[2],
             fieldGIDs[3],
+            fieldGIDs[4],
             fieldGIDs[0],
           ],
         },
       });
 
       expect(errors).toContainGraphQLError("INVALID_PETITION_FIELD_IDS");
+      expect(data).toBeNull();
+    });
+
+    it("sends error when updating a field position leaves a visibility condition refering to a next field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation($petitionId: GID!, $fieldIds: [GID!]!) {
+            updateFieldPositions(fieldIds: $fieldIds, petitionId: $petitionId) {
+              fields {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldIds: [
+            fieldGIDs[0],
+            fieldGIDs[4],
+            fieldGIDs[1],
+            fieldGIDs[2],
+            fieldGIDs[3],
+          ],
+        },
+      });
+
+      expect(errors).toContainGraphQLError("INVALID_FIELD_CONDITIONS_ORDER");
       expect(data).toBeNull();
     });
   });
@@ -1025,7 +1073,7 @@ describe("GraphQL/Petition Fields", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", userPetition.id),
-          fieldId: fieldGIDs[1],
+          fieldId: fieldGIDs[4],
           data: {
             description: "this is the new description",
             multiple: true,
@@ -1050,7 +1098,7 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
         field: {
-          id: fieldGIDs[1],
+          id: fieldGIDs[4],
           title: "new title",
           description: "this is the new description",
           options: { placeholder: "enter text here...", multiline: false },
@@ -1072,7 +1120,7 @@ describe("GraphQL/Petition Fields", () => {
       });
     });
 
-    it("should allow updating the petition field with an incomplete visibility condition", async () => {
+    it("should allow updating the petition field with a null condition value", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation(
@@ -1094,14 +1142,14 @@ describe("GraphQL/Petition Fields", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", userPetition.id),
-          fieldId: fieldGIDs[1],
+          fieldId: fieldGIDs[4],
           data: {
             visibility: {
               type: "SHOW",
               operator: "AND",
               conditions: [
                 {
-                  fieldId: null,
+                  fieldId: fieldGIDs[2],
                   modifier: "NUMBER_OF_REPLIES",
                   operator: "EQUAL",
                   value: null,
@@ -1114,13 +1162,13 @@ describe("GraphQL/Petition Fields", () => {
       expect(errors).toBeUndefined();
       expect(data!.updatePetitionField).toEqual({
         field: {
-          id: fieldGIDs[1],
+          id: fieldGIDs[4],
           visibility: {
             type: "SHOW",
             operator: "AND",
             conditions: [
               {
-                fieldId: null,
+                fieldId: fieldGIDs[2],
                 modifier: "NUMBER_OF_REPLIES",
                 operator: "EQUAL",
                 value: null,
@@ -1174,6 +1222,49 @@ describe("GraphQL/Petition Fields", () => {
       expect(data).toBeNull();
     });
 
+    it("sends error when adding visibility conditions refering to a next field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              field {
+                id
+                visibility
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: fieldGIDs[1],
+          data: {
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: fieldGIDs[2],
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "EQUAL",
+                  value: 1,
+                },
+              ],
+            },
+          },
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
     it("sends error when trying to add visibility conditions on a heading with page break", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -1203,7 +1294,7 @@ describe("GraphQL/Petition Fields", () => {
               operator: "AND",
               conditions: [
                 {
-                  fieldId: null,
+                  fieldId: fieldGIDs[1],
                   modifier: "NUMBER_OF_REPLIES",
                   operator: "EQUAL",
                   value: null,

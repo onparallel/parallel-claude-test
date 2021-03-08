@@ -8,6 +8,7 @@ import {
   FieldVisibilityCondition,
   Visibility,
 } from "../../../util/fieldVisibility";
+import { PetitionField } from "../../../db/__types";
 
 const schema = {
   type: "object",
@@ -71,22 +72,36 @@ function assertOneOf<T>(value: T, options: T[], errorMessage: string) {
 function validateCondition(
   ctx: ApiContext,
   petitionId: number,
-  fieldId: number
+  field: PetitionField
 ) {
-  return async (c: FieldVisibilityCondition) => {
-    const field = await loadField(c.fieldId as string, ctx);
+  assert(
+    field.type !== "HEADING" || !field.options.hasPageBreak,
+    `Can't add visibility conditions on a heading with page break`
+  );
 
-    if (field === null) {
+  return async (c: FieldVisibilityCondition) => {
+    const referencedField = await loadField(c.fieldId as string, ctx);
+
+    if (referencedField === null) {
       return;
     }
+
     assert(
-      field.type !== "HEADING",
+      referencedField.position < field.position,
+      "Can't reference fields that come next"
+    );
+
+    assert(
+      referencedField.type !== "HEADING",
       `Conditions can't reference HEADING fields`
     );
-    assert(field.id !== fieldId, `Can't add a reference to field itself`);
     assert(
-      field.petition_id === petitionId,
-      `Field with id ${field.id} is not linked to petition with id ${petitionId}`
+      referencedField.id !== field.id,
+      `Can't add a reference to field itself`
+    );
+    assert(
+      referencedField.petition_id === petitionId,
+      `Field with id ${referencedField.id} is not linked to petition with id ${petitionId}`
     );
 
     // check operator/modifier compatibility
@@ -108,7 +123,7 @@ function validateCondition(
         `Invalid value type ${typeof c.value} for modifier ${c.modifier}`
       );
     } else {
-      if (field.type === "TEXT") {
+      if (referencedField.type === "TEXT") {
         assertOneOf(
           c.operator,
           [
@@ -119,28 +134,30 @@ function validateCondition(
             "CONTAIN",
             "NOT_CONTAIN",
           ],
-          `Invalid operator ${c.operator} for field of type ${field.type}`
+          `Invalid operator ${c.operator} for field of type ${referencedField.type}`
         );
 
         assert(
           c.value === null || typeof c.value === "string",
-          `Invalid value type ${typeof c.value} for field of type ${field.type}`
+          `Invalid value type ${typeof c.value} for field of type ${
+            referencedField.type
+          }`
         );
-      } else if (field.type === "FILE_UPLOAD") {
+      } else if (referencedField.type === "FILE_UPLOAD") {
         throw new Error(
-          `Invalid modifier ${c.modifier} for field of type ${field.type}`
+          `Invalid modifier ${c.modifier} for field of type ${referencedField.type}`
         );
-      } else if (field.type === "SELECT") {
+      } else if (referencedField.type === "SELECT") {
         assertOneOf(
           c.operator,
           ["EQUAL", "NOT_EQUAL"],
-          `Invalid operator ${c.operator} for field of type ${field.type}`
+          `Invalid operator ${c.operator} for field of type ${referencedField.type}`
         );
         assert(
-          c.value === null || field.options.values.includes(c.value),
+          c.value === null || referencedField.options.values.includes(c.value),
           `Invalid value ${c.value} for field of type ${
-            field.type
-          }. Should be one of: ${field.options.values.join(",")}`
+            referencedField.type
+          }. Should be one of: ${referencedField.options.values.join(",")}`
         );
       }
     }
@@ -161,15 +178,10 @@ export async function validateFieldVisibilityConditions(
     throw new Error(JSON.stringify(validator.errors));
   }
 
-  const field = await ctx.petitions.loadField(fieldId);
-
-  assert(
-    field?.type !== "HEADING" || !field.options.hasPageBreak,
-    `Can't add visibility conditions on a heading with page break`
-  );
+  const field = (await ctx.petitions.loadField(fieldId))!;
 
   await Promise.all(
-    json.conditions.map(validateCondition(ctx, petitionId, fieldId))
+    json.conditions.map(validateCondition(ctx, petitionId, field))
   );
 }
 

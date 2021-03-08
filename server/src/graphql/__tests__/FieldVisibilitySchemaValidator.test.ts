@@ -21,6 +21,7 @@ describe("Field Visibility Conditions", () => {
   let fileUploadField: PetitionField;
   let selectField: PetitionField;
   let headingField: PetitionField;
+  let finalTextField: PetitionField;
 
   let deletedField: PetitionField;
   let fieldOnAnotherPetition: PetitionField;
@@ -40,8 +41,9 @@ describe("Field Visibility Conditions", () => {
       fileUploadField,
       selectField,
       headingField,
+      finalTextField,
       deletedField,
-    ] = await mocks.createRandomPetitionFields(petition[0].id, 5, (i) => ({
+    ] = await mocks.createRandomPetitionFields(petition[0].id, 6, (i) => ({
       type:
         i === 0
           ? "TEXT"
@@ -53,7 +55,7 @@ describe("Field Visibility Conditions", () => {
           ? "HEADING"
           : "TEXT",
       options: i === 2 ? { values: ["Option 1", "Option 2", "Option 3"] } : {},
-      deleted_at: i === 4 ? new Date() : null,
+      deleted_at: i === 5 ? new Date() : null,
     }));
 
     [fieldOnAnotherPetition] = await mocks.createRandomPetitionFields(
@@ -126,7 +128,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
-        textField.id,
+        headingField.id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -148,7 +150,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
-        textField.id,
+        selectField.id,
         ctx
       )
     ).resolves.not.toThrowError();
@@ -277,7 +279,7 @@ describe("Field Visibility Conditions", () => {
     ).resolves.not.toThrowError();
   });
 
-  it("should allow null fieldIds on conditions", async () => {
+  it("should NOT allow null fieldIds on conditions", async () => {
     await expect(
       validateFieldVisibilityConditions(
         {
@@ -296,7 +298,7 @@ describe("Field Visibility Conditions", () => {
         textField.id,
         ctx
       )
-    ).resolves.not.toThrowError();
+    ).rejects.toThrowError();
   });
 
   it("should not allow conditions referencing HEADING fields", async () => {
@@ -315,7 +317,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
-        textField.id,
+        finalTextField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -425,7 +427,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
-        textField.id,
+        finalTextField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -447,7 +449,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
-        textField.id,
+        finalTextField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -469,7 +471,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
-        textField.id,
+        selectField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -541,7 +543,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
-        textField.id,
+        finalTextField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -575,7 +577,7 @@ describe("Field Visibility Conditions", () => {
           ],
         },
         petition[0].id,
-        selectField.id,
+        finalTextField.id,
         ctx
       )
     ).rejects.toThrowError();
@@ -590,6 +592,28 @@ describe("Field Visibility Conditions", () => {
           conditions: [
             {
               fieldId: toGlobalId("PetitionField", textField.id),
+              modifier: "NUMBER_OF_REPLIES",
+              operator: "GREATER_THAN",
+              value: 1,
+            },
+          ],
+        },
+        petition[0].id,
+        textField.id,
+        ctx
+      )
+    ).rejects.toThrowError();
+  });
+
+  it("can't set a condition on a field that comes next", async () => {
+    await expect(
+      validateFieldVisibilityConditions(
+        {
+          type: "SHOW",
+          operator: "AND",
+          conditions: [
+            {
+              fieldId: toGlobalId("PetitionField", finalTextField.id),
               modifier: "NUMBER_OF_REPLIES",
               operator: "GREATER_THAN",
               value: 1,

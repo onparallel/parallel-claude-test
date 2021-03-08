@@ -312,6 +312,11 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
           "Invalid petition field ids",
           "INVALID_PETITION_FIELD_IDS"
         );
+      } else if (e.message === "INVALID_FIELD_CONDITIONS_ORDER") {
+        throw new WhitelistedError(
+          "Invalid field conditions order",
+          "INVALID_FIELD_CONDITIONS_ORDER"
+        );
       } else {
         throw e;
       }
