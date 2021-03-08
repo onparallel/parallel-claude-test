@@ -42,7 +42,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
           {
             customDomain: "https://p.onparallel.com",
             domain: "onparallel.com",
-            exclude: "/*/print/*",
+            exclude: "/*/print/*, /*/app/*, /*/petition/*",
           },
         ],
         [I18nProvider, props],
