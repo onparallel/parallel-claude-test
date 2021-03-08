@@ -115,11 +115,10 @@ const _PetitionComposeField = chakraForwardRef<
         onFieldEdit({ visibility: prevField.visibility });
       } else {
         // create a factible condition based on the previous field
-        const prev = fields
+        const ref = fields
           .slice(0, index)
           .reverse()
-          .find((f) => !f.isReadOnly);
-        const ref = prev ?? fields.slice(index + 1).find((f) => !f.isReadOnly)!;
+          .find((f) => !f.isReadOnly)!;
         const condition: PetitionFieldVisibilityCondition = {
           fieldId: ref.id,
           modifier: ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
@@ -144,7 +143,12 @@ const _PetitionComposeField = chakraForwardRef<
     }
   }, [fields, field, onFieldEdit]);
   const canChangeVisibility =
-    fields.filter((f) => f.id !== field.id && !f.isReadOnly).length >= 1;
+    fields
+      .slice(
+        0,
+        fields.findIndex((f) => f.id === field.id)
+      )
+      .filter((f) => !f.isReadOnly).length > 0;
   return (
     <Box
       ref={elementRef}
@@ -609,7 +613,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
             <Text fontSize="sm">
               <FormattedMessage
                 id="component.petition-compose-field.conditions-not-enough-fields"
-                defaultMessage="Add more fields to be able to set conditions between them."
+                defaultMessage="You can only add conditions based on previous fields. Add more fields to be able to set conditions between them."
               />
             </Text>
           }

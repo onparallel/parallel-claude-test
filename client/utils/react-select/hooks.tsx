@@ -6,7 +6,7 @@ import {
   useTheme,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components, GroupTypeBase, OptionTypeBase, Theme } from "react-select";
 import { omit } from "remeda";

@@ -58,10 +58,11 @@ export function PetitionFieldVisibilityEditor({
   const intl = useIntl();
   const indices = useFieldIndices(fields);
   const [_fields, _indices] = useMemo(() => {
+    const index = fields.findIndex((f) => f.id === fieldId);
     const pairs = zip(fields, indices)
-      .filter(([f]) => !f.isReadOnly && f.id !== fieldId)
-      // if we don't rename this, react-select picks the options property
-      // and thinks you want groups
+      .slice(0, index)
+      .filter(([f]) => !f.isReadOnly)
+      // make sure to not include "options" or react-select breaks thinking you want groups
       .map(
         ([field, index]) =>
           [

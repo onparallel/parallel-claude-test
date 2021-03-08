@@ -36,6 +36,7 @@ import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { Fragment, memo, useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy, pick, zip } from "remeda";
+import { useErrorDialog } from "../common/ErrorDialog";
 import {
   ReferencedFieldDialog,
   useReferencedFieldDialog,
@@ -90,24 +91,49 @@ export const PetitionComposeFieldList = Object.assign(
       fieldIds.map((fieldId) => pick(fieldsById[fieldId], ["type"]))
     );
 
+    const fieldsStateRef = useUpdatingRef({ fieldsById, fieldIds, fields });
+
+    const showError = useErrorDialog();
     const handleFieldMove = useCallback(
       async function (
         dragIndex: number,
         hoverIndex: number,
         dropped?: boolean
       ) {
-        setState((state) => {
-          const newFieldIds = [...state.fieldIds];
-          const [field] = newFieldIds.splice(dragIndex, 1);
-          newFieldIds.splice(hoverIndex, 0, field);
-          if (dropped) {
-            setTimeout(() => onUpdateFieldPositions(newFieldIds));
+        const { fieldIds, fieldsById, fields } = fieldsStateRef.current;
+        const newFieldIds = [...fieldIds];
+        const [fieldId] = newFieldIds.splice(dragIndex, 1);
+        newFieldIds.splice(hoverIndex, 0, fieldId);
+        if (dropped) {
+          const fieldIndices = Object.fromEntries(
+            Array.from(newFieldIds.entries()).map(([i, id]) => [id, i])
+          );
+          for (const [index, fieldId] of Array.from(fieldIds.entries())) {
+            const visibility = fieldsById[fieldId]
+              .visibility as PetitionFieldVisibility;
+            if (
+              visibility &&
+              visibility.conditions.some((c) => fieldIndices[c.fieldId] > index)
+            ) {
+              try {
+                setState(reset(fields));
+                await showError({
+                  message: (
+                    <FormattedMessage
+                      id="component.petition-compose-field-list.move-referenced-field-error"
+                      defaultMessage="You can only move fields so that they refer to previous fields in their visibility conditions."
+                    />
+                  ),
+                });
+              } catch {}
+              return;
+            }
           }
-          return {
-            ...state,
-            fieldIds: newFieldIds,
-          };
-        });
+          setState({ fieldsById, fieldIds: newFieldIds });
+          setTimeout(() => onUpdateFieldPositions(newFieldIds));
+        } else {
+          setState({ fieldsById, fieldIds: newFieldIds });
+        }
       },
       [onUpdateFieldPositions]
     );
