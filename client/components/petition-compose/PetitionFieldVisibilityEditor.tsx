@@ -433,7 +433,7 @@ function ConditionPredicate({
           value: "NOT_EQUAL",
         }
       );
-    } else {
+    } else if (field.type !== "FILE_UPLOAD") {
       options.push(
         {
           label: intl.formatMessage(
