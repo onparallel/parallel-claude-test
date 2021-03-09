@@ -56,9 +56,10 @@ function evaluatePredicate<T extends string | number>(
 
 function conditionIsMet(
   condition: PetitionFieldVisibilityCondition,
-  field: VisibilityField
+  field: VisibilityField,
+  isVisible: boolean
 ) {
-  const replies = field.replies as any[];
+  const replies = isVisible ? (field.replies as any[]) : [];
   switch (condition.modifier) {
     case "ANY":
       return replies.some((r) =>
@@ -86,20 +87,32 @@ function conditionIsMet(
 export function useFieldVisibility<T extends VisibilityField>(fields: T[]) {
   return useMemo(() => {
     const fieldsById = indexBy(fields, (f) => f.id);
-    return fields.map((field) => {
+    const visibilitiesById: { [fieldId: string]: boolean } = {};
+    for (const field of fields) {
       if (field.visibility) {
         const v = field.visibility as PetitionFieldVisibility;
         const result =
           v.operator === "OR"
-            ? v.conditions.some((c) => conditionIsMet(c, fieldsById[c.fieldId]))
+            ? v.conditions.some((c) =>
+                conditionIsMet(
+                  c,
+                  fieldsById[c.fieldId],
+                  visibilitiesById[c.fieldId]
+                )
+              )
             : v.conditions.every((c) =>
-                conditionIsMet(c, fieldsById[c.fieldId])
+                conditionIsMet(
+                  c,
+                  fieldsById[c.fieldId],
+                  visibilitiesById[c.fieldId]
+                )
               );
-        return v.type === "SHOW" ? result : !result;
+        visibilitiesById[field.id] = v.type === "SHOW" ? result : !result;
       } else {
-        return true;
+        visibilitiesById[field.id] = true;
       }
-    });
+    }
+    return fields.map((f) => visibilitiesById[f.id]);
   }, [fields]);
 }
 
