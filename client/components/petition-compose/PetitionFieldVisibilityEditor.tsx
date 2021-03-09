@@ -258,7 +258,11 @@ export function PetitionFieldVisibilityEditor({
                           operator: changedModifierType
                             ? "EQUAL"
                             : condition.operator,
-                          value: changedModifierType ? null : condition.value,
+                          value: changedModifierType
+                            ? next
+                              ? 0
+                              : null
+                            : condition.value,
                         });
                       }}
                     />
@@ -626,15 +630,18 @@ function ConditionValue({
   const intl = useIntl();
   const [value, setValue] = useState(condition!.value);
 
+  const numberValue = typeof value === "number" ? value : 0;
+  const stringValue = typeof value === "string" ? value : null;
+
   return (
     <Box flex="1" minWidth={20}>
       {condition!.modifier === "NUMBER_OF_REPLIES" ? (
         <NumberInput
           size="sm"
           min={0}
-          value={(value as number) ?? 0}
+          value={numberValue}
           onChange={(_, value) => setValue(value)}
-          onBlur={() => onChange({ ...condition!, value })}
+          onBlur={() => onChange({ ...condition!, value: numberValue })}
           keepWithinRange
           clampValueOnBlur
         >
@@ -664,8 +671,8 @@ function ConditionValue({
         <Input
           size="sm"
           onChange={(e) => setValue(e.target.value || null)}
-          onBlur={() => onChange({ ...condition!, value })}
-          value={value ?? ""}
+          onBlur={() => onChange({ ...condition!, value: stringValue })}
+          value={stringValue ?? ""}
           backgroundColor="white"
           isInvalid={showError && condition!.value === null}
           placeholder={intl.formatMessage({
