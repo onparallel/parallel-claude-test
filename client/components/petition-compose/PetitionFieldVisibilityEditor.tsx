@@ -158,7 +158,7 @@ export function PetitionFieldVisibilityEditor({
         backgroundColor="gray.100"
         templateColumns={{
           base: "auto minmax(160px, 1fr)",
-          md: "auto minmax(160px, 2fr) 3fr",
+          xl: "auto minmax(160px, 2fr) 3fr",
         }}
         alignItems="center"
         columnGap={2}
@@ -239,7 +239,7 @@ export function PetitionFieldVisibilityEditor({
                 }}
               />
               {conditionField ? (
-                <Stack direction="row" gridColumn={{ base: "2", md: "auto" }}>
+                <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>
                   {conditionField.multiple ? (
                     <ConditionMultipleFieldModifier
                       type={conditionField.type}
@@ -633,16 +633,16 @@ function ConditionValue({
           onBlur={() => onChange({ ...condition!, value })}
           keepWithinRange
           clampValueOnBlur
-          placeholder={intl.formatMessage({
-            id: "generic.enter-a-value",
-            defaultMessage: "Enter a value",
-          })}
         >
           <NumberInputField
             type="number"
             textAlign="right"
             paddingRight={8}
             backgroundColor="white"
+            placeholder={intl.formatMessage({
+              id: "generic.enter-a-value",
+              defaultMessage: "Enter a value",
+            })}
           />
           <NumberInputStepper>
             <NumberIncrementStepper />
