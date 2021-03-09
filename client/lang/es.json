@@ -446,7 +446,7 @@
   },
   {
     "term": "component.petition-compose-field.conditions-not-enough-fields",
-    "definition": "Solo puedes añadir condiciones basadas en campos anteriores. Añade más campo para poder establecer condiciones entre ellos.",
+    "definition": "Solo puedes añadir condiciones basadas en campos anteriores. Añade más campos para poder establecer condiciones entre ellos.",
     "context": "You can only add conditions based on previous fields. Add more fields to be able to set conditions between them."
   },
   {

@@ -228,11 +228,16 @@ export function PetitionFieldVisibilityEditor({
                   } else {
                     if (field.type === "FILE_UPLOAD") {
                       modifier = "NUMBER_OF_REPLIES";
-                      operator = "EQUAL";
+                      operator = "GREATER_THAN";
+                      value = 0;
                     }
                   }
                   if (field.type === "SELECT") {
-                    value = field.fieldOptions.values[0] ?? null;
+                    operator = "EQUAL";
+                    value =
+                      modifier === "NUMBER_OF_REPLIES"
+                        ? 0
+                        : field.fieldOptions.values[0] ?? null;
                   }
                   updateCondition(index, {
                     fieldId: field.id,
