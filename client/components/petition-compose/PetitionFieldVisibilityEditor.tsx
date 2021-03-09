@@ -219,22 +219,32 @@ export function PetitionFieldVisibilityEditor({
                 fields={_fields}
                 indices={_indices}
                 onChange={(field) => {
-                  const changedFieldType = field.type !== conditionField.type;
+                  let { modifier, operator, value } = condition;
+                  if (field.type === "FILE_UPLOAD") {
+                    modifier = "NUMBER_OF_REPLIES";
+                  }
+                  if (field.type === conditionField.type) {
+                    // pass
+                    if (!field.multiple && modifier !== "ANY") {
+                      modifier = "ANY";
+                    }
+                  } else {
+                    if (field.multiple && modifier === "NUMBER_OF_REPLIES") {
+                      // pass
+                    } else {
+                      modifier = "ANY";
+                      operator = "EQUAL";
+                      value = null;
+                    }
+                  }
+                  if (field.type === "SELECT") {
+                    value = field.fieldOptions.values[0] ?? null;
+                  }
                   updateCondition(index, {
                     fieldId: field.id,
-                    modifier:
-                      field.type === "FILE_UPLOAD"
-                        ? "NUMBER_OF_REPLIES"
-                        : !changedFieldType && field.multiple
-                        ? condition.modifier
-                        : "ANY",
-                    operator: changedFieldType ? "EQUAL" : condition.operator,
-                    value:
-                      field.type === "SELECT"
-                        ? field.fieldOptions.values[0] ?? null
-                        : changedFieldType
-                        ? null
-                        : condition.value,
+                    modifier,
+                    operator,
+                    value,
                   });
                 }}
               />
