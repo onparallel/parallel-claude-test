@@ -9,6 +9,11 @@ import {
   Switch,
   Text,
   Tooltip,
+  Popover,
+  PopoverArrow,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
 } from "@chakra-ui/react";
 import {
   ConditionFullIcon,
@@ -600,6 +605,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
       ) : (
         <SmallPopover
           placement="top"
+          closeDelay={0}
           content={
             <Text fontSize="sm">
               <FormattedMessage

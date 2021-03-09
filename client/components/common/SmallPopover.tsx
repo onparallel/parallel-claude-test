@@ -19,7 +19,7 @@ export function SmallPopover({
   isDisabled?: boolean;
   content: ReactNode;
   children: ReactNode;
-} & Pick<PopoverProps, "placement">) {
+} & Pick<PopoverProps, "placement" | "isLazy" | "closeDelay">) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverId = useId(undefined, "small-popover");
   return isDisabled ? (
