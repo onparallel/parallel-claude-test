@@ -320,7 +320,7 @@ describe("Field Visibility Conditions", () => {
         finalTextField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError("Conditions can't reference HEADING fields");
   });
 
   it("value for NUMBER_OF_REPLIES modifier should be a number", async () => {
@@ -342,7 +342,9 @@ describe("Field Visibility Conditions", () => {
         selectField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError(
+      "Invalid value type string for modifier NUMBER_OF_REPLIES"
+    );
   });
 
   it("value for text match modifier should be a string", async () => {
@@ -364,7 +366,7 @@ describe("Field Visibility Conditions", () => {
         fileUploadField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError("Invalid value type number for field of type TEXT");
   });
 
   it("operator for NUMBER_OF_REPLIES should be of numeric comparator", async () => {
@@ -386,7 +388,9 @@ describe("Field Visibility Conditions", () => {
         selectField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError(
+      "Invalid operator START_WITH for modifier NUMBER_OF_REPLIES"
+    );
   });
 
   it("operator for text match modifiers should be of text comparator", async () => {
@@ -408,7 +412,7 @@ describe("Field Visibility Conditions", () => {
         selectField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError("Invalid operator LESS_THAN for field of type TEXT");
   });
 
   it("conditions on SELECT field replies should not allow substring comparisons", async () => {
@@ -430,7 +434,9 @@ describe("Field Visibility Conditions", () => {
         finalTextField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError(
+      "Invalid operator START_WITH for field of type SELECT"
+    );
   });
 
   it("value on SELECT field replies should be one of the selector options", async () => {
@@ -452,7 +458,9 @@ describe("Field Visibility Conditions", () => {
         finalTextField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError(
+      "Invalid value Unknown option for field of type SELECT. Should be one of: Option 1, Option 2, Option 3"
+    );
   });
 
   it("modifier for FILE_UPLOAD field should be NUMBER_OF_REPLIES", async () => {
@@ -474,7 +482,9 @@ describe("Field Visibility Conditions", () => {
         selectField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError(
+      "Invalid modifier NONE for field of type FILE_UPLOAD"
+    );
   });
 
   it("fieldId value for conditions should be a PetitionField GID", async () => {
@@ -496,7 +506,7 @@ describe("Field Visibility Conditions", () => {
         textField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError("Invalid Global ID");
   });
 
   it("referenced fields on conditions should exist and be valid", async () => {
@@ -518,7 +528,7 @@ describe("Field Visibility Conditions", () => {
         textField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError("Can't find field with id 1101010");
   });
 
   it("referenced fields on conditions should not be deleted", async () => {
@@ -546,7 +556,7 @@ describe("Field Visibility Conditions", () => {
         finalTextField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError("Can't find field with id 6");
   });
 
   it("referenced fields on conditions should all belong to the same petition", async () => {
@@ -580,7 +590,9 @@ describe("Field Visibility Conditions", () => {
         finalTextField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError(
+      "Field with id 7 is not linked to petition with id 1"
+    );
   });
 
   it("can't set a condition based on itself", async () => {
@@ -602,7 +614,7 @@ describe("Field Visibility Conditions", () => {
         textField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError("Can't reference fields that come next");
   });
 
   it("can't set a condition on a field that comes next", async () => {
@@ -624,6 +636,6 @@ describe("Field Visibility Conditions", () => {
         textField.id,
         ctx
       )
-    ).rejects.toThrowError();
+    ).rejects.toThrowError("Can't reference fields that come next");
   });
 });

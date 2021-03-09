@@ -6,7 +6,13 @@ export function toGlobalId(type: string, id: number) {
 }
 
 export function fromGlobalId<T extends string>(globalId: string, type?: T) {
-  const [_type, id] = decode(globalId).toString("utf8").split(":");
+  let decoded: string;
+  try {
+    decoded = decode(globalId).toString("utf8");
+  } catch {
+    throw new Error("Invalid Global ID");
+  }
+  const [_type, id] = decoded.split(":");
   if (type && _type !== type) {
     throw new Error(`${globalId} is not a ${type}`);
   }

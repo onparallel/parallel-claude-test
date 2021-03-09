@@ -157,7 +157,7 @@ function validateCondition(
           c.value === null || referencedField.options.values.includes(c.value),
           `Invalid value ${c.value} for field of type ${
             referencedField.type
-          }. Should be one of: ${referencedField.options.values.join(",")}`
+          }. Should be one of: ${referencedField.options.values.join(", ")}`
         );
       }
     }

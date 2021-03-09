@@ -799,40 +799,49 @@ export class PetitionRepository extends BaseRepository {
     user: User
   ) {
     return await this.withTransaction(async (t) => {
-      const _ids = await this.from("petition_field", t)
+      const fields = await this.from("petition_field", t)
         .where("petition_id", petitionId)
         .whereNull("deleted_at")
         .select("id", "is_fixed", "position", "visibility")
         .orderBy("position", "asc");
 
-      const ids = _ids.map((f) => f.id);
-      const fixedPositions = _ids.reduce<number[]>(
-        (positions, _id, index) =>
-          _id.is_fixed ? positions.concat(index) : positions,
-        []
-      );
-
+      // check only valid fieldIds and not repeated
+      const _fieldIds = uniq(fieldIds);
+      const ids = new Set(fields.map((f) => f.id));
       if (
-        ids.length !== fieldIds.length ||
-        fieldIds.some((id) => !ids.includes(id)) ||
-        fixedPositions.some((position) => ids[position] !== fieldIds[position]) // trying to reorder a fixed field
+        _fieldIds.length !== fieldIds.length ||
+        _fieldIds.length !== ids.size ||
+        _fieldIds.some((id) => !ids.has(id))
       ) {
         throw new Error("INVALID_PETITION_FIELD_IDS");
       }
 
-      // visibility conditions on reordered field must always refer to a previous field
-      const validConditionIds: number[] = [];
-      fieldIds.forEach((fieldId) => {
-        const visibility = _ids.find(({ id }) => id === fieldId)!
-          .visibility as Maybe<PetitionFieldVisibility>;
-        const referencedFieldIds = (visibility?.conditions ?? []).map(
-          (c) => c.fieldId as number
-        );
-        if (!referencedFieldIds.every((id) => validConditionIds.includes(id))) {
+      // check fixed positions have not moved
+      const fixedPositions = fields
+        .map((field, index) => [field, index] as const)
+        .filter(([field]) => field.is_fixed);
+      if (
+        fixedPositions.some(
+          ([field, index]) => fieldIds.indexOf(field.id) !== index
+        )
+      ) {
+        throw new Error("INVALID_PETITION_FIELD_IDS");
+      }
+
+      // check visibility conditions fields refer to previous fields
+      const positions = Object.fromEntries(
+        Array.from(fieldIds.entries()).map(([index, id]) => [id, index])
+      );
+      for (const field of fields) {
+        const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
+        if (
+          visibility?.conditions.some(
+            (c) => positions[c.fieldId] >= positions[field.id]
+          )
+        ) {
           throw new Error("INVALID_FIELD_CONDITIONS_ORDER");
         }
-        validConditionIds.push(fieldId);
-      });
+      }
 
       await t.raw(
         /* sql */ `
