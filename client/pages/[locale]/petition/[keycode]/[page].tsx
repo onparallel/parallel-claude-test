@@ -334,7 +334,7 @@ function RecipientView({
             </Stack>
           </Box>
           <Flex flexDirection="column" flex="2" minWidth={0}>
-            <Stack spacing={4}>
+            <Stack spacing={4} key={currentPage}>
               <AnimatePresence initial={false}>
                 {fields.map((field) => (
                   <motion.div key={field.id} layout="position">

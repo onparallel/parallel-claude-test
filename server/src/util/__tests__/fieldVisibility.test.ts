@@ -15,10 +15,7 @@ describe("fieldVisibility", () => {
       },
     ]);
 
-    expect(fields).toMatchObject([
-      { id: 1, isVisible: true },
-      { id: 2, isVisible: true },
-    ]);
+    expect(fields).toMatchObject([true, true]);
   });
 
   it("should be case-insensitive", () => {
@@ -46,10 +43,7 @@ describe("fieldVisibility", () => {
       },
     ]);
 
-    expect(fields).toMatchObject([
-      { id: 1, isVisible: true },
-      { id: 2, isVisible: true },
-    ]);
+    expect(fields).toMatchObject([true, true]);
   });
 
   describe("simple conditions", () => {
@@ -78,10 +72,7 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([
-        { id: 1, isVisible: true },
-        { id: 2, isVisible: true },
-      ]);
+      expect(fields).toMatchObject([true, true]);
     });
 
     it("ANY CONTAIN", () => {
@@ -112,10 +103,7 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([
-        { id: 1, isVisible: true },
-        { id: 2, isVisible: true },
-      ]);
+      expect(fields).toMatchObject([true, true]);
     });
 
     it("ALL END_WITH", () => {
@@ -146,10 +134,7 @@ describe("fieldVisibility", () => {
           replies: [{ content: { text: "." } }],
         },
       ]);
-      expect(fields).toMatchObject([
-        { id: 1, isVisible: true },
-        { id: 2, isVisible: true },
-      ]);
+      expect(fields).toMatchObject([true, true]);
     });
 
     it("NONE CONTAIN", () => {
@@ -180,10 +165,7 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([
-        { id: 1, isVisible: true },
-        { id: 2, isVisible: false },
-      ]);
+      expect(fields).toMatchObject([true, false]);
     });
 
     it("NUMBER_OF_REPLIES", () => {
@@ -217,10 +199,7 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([
-        { id: 1, isVisible: true },
-        { id: 2, isVisible: false },
-      ]);
+      expect(fields).toMatchObject([true, false]);
     });
   });
 
@@ -256,10 +235,7 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([
-        { id: 1, isVisible: true },
-        { id: 2, isVisible: true },
-      ]);
+      expect(fields).toMatchObject([true, true]);
     });
 
     it("ALL CONTAIN AND ANY START_WITH", () => {
@@ -298,10 +274,7 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([
-        { id: 1, isVisible: true },
-        { id: 2, isVisible: true },
-      ]);
+      expect(fields).toMatchObject([true, true]);
     });
 
     it("NUMBER_OF_REPLIES OR NONE END_WITH OR ANY START_WITH", () => {
@@ -356,11 +329,7 @@ describe("fieldVisibility", () => {
         },
       ]);
 
-      expect(fields).toMatchObject([
-        { id: 1, isVisible: true },
-        { id: 2, isVisible: true },
-        { id: 3, isVisible: true },
-      ]);
+      expect(fields).toMatchObject([true, true, true]);
     });
   });
 });

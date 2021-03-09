@@ -5,8 +5,8 @@ import { ArgValidationError } from "../errors";
 import { fromGlobalId } from "../../../util/globalId";
 import { ApiContext } from "../../../context";
 import {
-  FieldVisibilityCondition,
-  Visibility,
+  PetitionFieldVisibilityCondition,
+  PetitionFieldVisibility,
 } from "../../../util/fieldVisibility";
 import { PetitionField } from "../../../db/__types";
 
@@ -79,7 +79,7 @@ function validateCondition(
     `Can't add visibility conditions on a heading with page break`
   );
 
-  return async (c: FieldVisibilityCondition) => {
+  return async (c: PetitionFieldVisibilityCondition) => {
     const referencedField = await loadField(c.fieldId as string, ctx);
 
     if (referencedField === null) {
@@ -170,9 +170,9 @@ export async function validateFieldVisibilityConditions(
   fieldId: number,
   ctx: ApiContext
 ) {
-  const validator = new Ajv({ allowUnionTypes: true }).compile<Visibility>(
-    schema
-  );
+  const validator = new Ajv({
+    allowUnionTypes: true,
+  }).compile<PetitionFieldVisibility>(schema);
 
   if (!validator(json)) {
     throw new Error(JSON.stringify(validator.errors));

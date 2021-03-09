@@ -3,14 +3,14 @@
  * Don't forget to update it as well!
  */
 
-type WithIsVisible<T> = T & { isVisible: boolean };
+import { indexBy } from "remeda";
 
-export interface Visibility {
+export interface PetitionFieldVisibility {
   type: "SHOW" | "HIDE";
   operator: "AND" | "OR";
-  conditions: FieldVisibilityCondition[];
+  conditions: PetitionFieldVisibilityCondition[];
 }
-export interface FieldVisibilityCondition {
+export interface PetitionFieldVisibilityCondition {
   /*
     When used on the GraphQL validator, the fieldId will be a string (coming from the client)
     When used to evaluate a field visibility, the field will be a number (coming from the database)
@@ -33,14 +33,14 @@ export interface FieldVisibilityCondition {
 
 type VisibilityField = {
   id: number;
-  visibility: Visibility | null;
+  visibility: PetitionFieldVisibility | null;
   replies: { content: { text: string } }[];
 };
 
-function evaluate<T extends string | number>(
+function evaluatePredicate<T extends string | number>(
   reply: T,
-  operator: FieldVisibilityCondition["operator"],
-  value: T
+  operator: PetitionFieldVisibilityCondition["operator"],
+  value: T | null
 ) {
   const a = typeof reply === "string" ? reply.toLowerCase() : reply;
   const b = typeof value === "string" ? value.toLowerCase() : value;
@@ -71,26 +71,30 @@ function evaluate<T extends string | number>(
   }
 }
 
-function isValidCondition(
-  condition: FieldVisibilityCondition,
-  replies: VisibilityField["replies"]
+function conditionIsMet(
+  condition: PetitionFieldVisibilityCondition,
+  field: VisibilityField
 ) {
-  debugger;
+  const replies = field.replies as any[];
   switch (condition.modifier) {
     case "ANY":
       return replies.some((r) =>
-        evaluate(r.content.text, condition.operator, condition.value)
+        evaluatePredicate(r.content.text, condition.operator, condition.value)
       );
     case "ALL":
       return replies.every((r) =>
-        evaluate(r.content.text, condition.operator, condition.value)
+        evaluatePredicate(r.content.text, condition.operator, condition.value)
       );
     case "NONE":
       return !replies.some((r) =>
-        evaluate(r.content.text, condition.operator, condition.value)
+        evaluatePredicate(r.content.text, condition.operator, condition.value)
       );
     case "NUMBER_OF_REPLIES":
-      return evaluate(replies.length, condition.operator, condition.value);
+      return evaluatePredicate(
+        replies.length,
+        condition.operator,
+        condition.value
+      );
     default:
       return false;
   }
@@ -98,30 +102,18 @@ function isValidCondition(
 
 export function evaluateFieldVisibility<T extends VisibilityField>(
   fields: T[]
-): WithIsVisible<T>[] {
+): boolean[] {
+  const fieldsById = indexBy(fields, (f) => f.id);
   return fields.map((field) => {
-    if (!field.visibility) return { ...field, isVisible: true };
-    let conditionsResult: boolean;
-    switch (field.visibility.operator) {
-      case "OR":
-        conditionsResult = field.visibility.conditions.some((c) =>
-          isValidCondition(c, fields.find((f) => f.id === c.fieldId)!.replies)
-        );
-        break;
-      case "AND":
-        conditionsResult = field.visibility.conditions.every((c) =>
-          isValidCondition(c, fields.find((f) => f.id === c.fieldId)!.replies)
-        );
-        break;
-      default:
-        conditionsResult = false;
-        break;
+    if (field.visibility) {
+      const v = field.visibility;
+      const result =
+        v.operator === "OR"
+          ? v.conditions.some((c) => conditionIsMet(c, fieldsById[c.fieldId]))
+          : v.conditions.every((c) => conditionIsMet(c, fieldsById[c.fieldId]));
+      return v.type === "SHOW" ? result : !result;
+    } else {
+      return true;
     }
-
-    return {
-      ...field,
-      isVisible:
-        field.visibility.type === "SHOW" ? conditionsResult : !conditionsResult,
-    };
   });
 }

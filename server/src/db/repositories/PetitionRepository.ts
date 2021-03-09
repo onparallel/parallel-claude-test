@@ -2,7 +2,16 @@ import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import Knex, { QueryBuilder, Transaction } from "knex";
 import { outdent } from "outdent";
-import { countBy, groupBy, indexBy, maxBy, omit, sortBy, uniq } from "remeda";
+import {
+  countBy,
+  groupBy,
+  indexBy,
+  maxBy,
+  omit,
+  sortBy,
+  uniq,
+  zip,
+} from "remeda";
 import { PetitionEventPayload } from "../events";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { unMaybeArray } from "../../util/arrays";
@@ -50,7 +59,7 @@ import {
 } from "../__types";
 import {
   evaluateFieldVisibility,
-  Visibility,
+  PetitionFieldVisibility,
 } from "../../util/fieldVisibility";
 
 type PetitionType = "PETITION" | "TEMPLATE";
@@ -345,9 +354,12 @@ export class PetitionRepository extends BaseRepository {
             .filter((r) => r.content !== null),
         }));
 
-        const visibleFields = evaluateFieldVisibility(fieldsWithReplies).filter(
-          (f) => f.isVisible
-        );
+        const visibleFields = zip(
+          fieldsWithReplies,
+          evaluateFieldVisibility(fieldsWithReplies)
+        )
+          .filter(([, isVisible]) => isVisible)
+          .map(([field]) => field);
 
         return {
           validated: countBy(visibleFields, (f) => f.validated),
@@ -812,7 +824,7 @@ export class PetitionRepository extends BaseRepository {
       const validConditionIds: number[] = [];
       fieldIds.forEach((fieldId) => {
         const visibility = _ids.find(({ id }) => id === fieldId)!
-          .visibility as Maybe<Visibility>;
+          .visibility as Maybe<PetitionFieldVisibility>;
         const referencedFieldIds = (visibility?.conditions ?? []).map(
           (c) => c.fieldId as number
         );
@@ -1325,12 +1337,15 @@ export class PetitionRepository extends BaseRepository {
       replies: repliesByFieldId[f.id],
     }));
 
-    const canComplete = evaluateFieldVisibility(fieldsWithReplies).every(
-      (f) =>
-        f.type === "HEADING" ||
-        f.optional ||
-        f.replies.length > 0 ||
-        !f.isVisible
+    const canComplete = zip(
+      fieldsWithReplies,
+      evaluateFieldVisibility(fieldsWithReplies)
+    ).every(
+      ([field, isVisible]) =>
+        field.type === "HEADING" ||
+        field.optional ||
+        field.replies.length > 0 ||
+        !isVisible
     );
 
     if (canComplete) {

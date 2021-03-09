@@ -22,10 +22,7 @@ export const RecipientViewPetitionField = Object.assign(
   chakraForwardRef<"header" | "section", RecipientViewPetitionFieldProps>(
     function RecipientViewPetitionField(props, ref) {
       return props.field.type === "HEADING" ? (
-        <RecipientViewPetitionFieldHeading
-          ref={ref as any}
-          field={props.field}
-        />
+        <RecipientViewPetitionFieldHeading ref={ref as any} {...props} />
       ) : props.field.type === "TEXT" ? (
         <RecipientViewPetitionFieldText ref={ref as any} {...props} />
       ) : props.field.type === "SELECT" ? (

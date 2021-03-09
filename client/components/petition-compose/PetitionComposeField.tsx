@@ -104,14 +104,8 @@ const _PetitionComposeField = chakraForwardRef<
     } else {
       const index = fields.findIndex((f) => f.id === field.id);
       const prevField = fields[index - 1];
-      // if the previous field has a visibility setting and doesn't reference
-      // this field copy the visibility setup
-      if (
-        prevField.visibility &&
-        !(prevField.visibility as PetitionFieldVisibility).conditions.some(
-          (c) => c.fieldId === field.id
-        )
-      ) {
+      // if the previous field has a visibility setting copy it
+      if (prevField.visibility) {
         onFieldEdit({ visibility: prevField.visibility });
       } else {
         // create a factible condition based on the previous field

@@ -30,6 +30,7 @@ export function RecipientViewContentsCard({
 }: RecipientViewContentsCardProps) {
   const { query } = useRouter();
   const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage);
+  console.log(pages, fields);
   return (
     <Card padding={4} display="flex" flexDirection="column" {...props}>
       <Heading
@@ -45,57 +46,54 @@ export function RecipientViewContentsCard({
         />
       </Heading>
       <Stack as={List} spacing={1} marginBottom={4}>
-        {pages.map(({ title, fake, ...badge }, index) => (
+        {pages.map(({ title, ...badge }, index) => (
           <ListItem key={index}>
-            {/* On old petitions where there's no initial heading don't show anything */}
-            {fake && pages.length === 1 ? null : (
-              <Text
-                as="h2"
-                display="flex"
-                paddingLeft={4}
-                position="relative"
-                fontWeight="bold"
-                isTruncated
-              >
-                {hasCommentsEnabled && index + 1 !== currentPage ? (
-                  <RecipientViewCommentsBadge
-                    {...badge}
-                    position="absolute"
-                    left="0"
-                    top="50%"
-                    transform="translate(0, -50%)"
-                  />
-                ) : null}
-                <NakedLink href={`/petition/${query.keycode}/${index + 1}`}>
-                  <Box
-                    as="a"
-                    display="block"
-                    flex="1"
-                    cursor="pointer"
-                    isTruncated
-                    {...(title
-                      ? {}
-                      : {
-                          color: "gray.500",
-                          fontWeight: "normal",
-                          fontStyle: "italic",
-                        })}
-                  >
-                    {title || (
-                      <FormattedMessage
-                        id="generic.empty-heading"
-                        defaultMessage="Untitled heading"
-                      />
-                    )}
-                  </Box>
-                </NakedLink>
-              </Text>
-            )}
+            <Text
+              as="h2"
+              display="flex"
+              paddingLeft={4}
+              position="relative"
+              fontWeight="bold"
+              isTruncated
+            >
+              {hasCommentsEnabled && index + 1 !== currentPage ? (
+                <RecipientViewCommentsBadge
+                  {...badge}
+                  position="absolute"
+                  left="0"
+                  top="50%"
+                  transform="translate(0, -50%)"
+                />
+              ) : null}
+              <NakedLink href={`/petition/${query.keycode}/${index + 1}`}>
+                <Box
+                  as="a"
+                  display="block"
+                  flex="1"
+                  cursor="pointer"
+                  isTruncated
+                  {...(title
+                    ? {}
+                    : {
+                        color: "gray.500",
+                        fontWeight: "normal",
+                        fontStyle: "italic",
+                      })}
+                >
+                  {title || (
+                    <FormattedMessage
+                      id="generic.empty-heading"
+                      defaultMessage="Untitled heading"
+                    />
+                  )}
+                </Box>
+              </NakedLink>
+            </Text>
             {index + 1 === currentPage ? (
               <Stack
                 as={List}
                 spacing={1}
-                paddingLeft={pages.length > 1 ? 4 : 0}
+                paddingLeft={pages.length > 1 ? 2 : 0}
               >
                 {fields.slice(1).map((field) => (
                   <ListItem key={field.id} position="relative">
@@ -103,7 +101,7 @@ export function RecipientViewContentsCard({
                       as={field.type === "HEADING" ? "h3" : "div"}
                       display="flex"
                       position="relative"
-                      paddingLeft={field.type === "HEADING" ? 4 : 6}
+                      paddingLeft={4}
                       fontWeight={field.type === "HEADING" ? "bold" : "normal"}
                     >
                       {hasCommentsEnabled ? (
@@ -172,7 +170,6 @@ function useGetPagesAndFields(
     title: Maybe<string>;
     hasUnpublishedComments?: boolean;
     hasUnreadComments?: boolean;
-    fake?: boolean;
   }[] = [];
   const fieldVisibility = useFieldVisibility(fields);
   const _fields: RecipientViewContentsCard_PublicPetitionFieldFragment[] = [];
@@ -184,11 +181,7 @@ function useGetPagesAndFields(
       pages.push({ title: field.title ?? null });
       page -= 1;
     }
-    let currentPage = pages[pages.length - 1];
-    if (!currentPage) {
-      currentPage = { title: null, fake: true };
-      pages.push(currentPage);
-    }
+    const currentPage = pages[pages.length - 1];
     currentPage.hasUnreadComments =
       currentPage.hasUnreadComments || field.unreadCommentCount > 0;
     currentPage.hasUnpublishedComments =
