@@ -1041,7 +1041,7 @@
   },
   {
     "term": "component.referenced-field-dialog.description",
-    "definition": "{count, plural, =1 {El campo siguiente} other {Los campos siguientes}} hacen referencia a este campo:",
+    "definition": "{count, plural, =1 {El campo siguiente hace} other {Los campos siguientes hacen}} referencia a este campo:",
     "context": "The following {count, plural, =1 {field is} other {fields are}} referencing this field:"
   },
   {
