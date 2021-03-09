@@ -26,10 +26,7 @@ import {
 import { assignRef } from "@parallel/utils/assignRef";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
-import {
-  PetitionFieldVisibility,
-  PetitionFieldVisibilityCondition,
-} from "@parallel/utils/fieldVisibility/types";
+import { PetitionFieldVisibilityCondition } from "@parallel/utils/fieldVisibility/types";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { memo, useCallback, useMemo, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
