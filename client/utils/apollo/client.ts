@@ -114,6 +114,9 @@ export function createApolloClient(
             options: {
               merge: false,
             },
+            replies: {
+              merge: false,
+            },
           },
         },
         PublicPetitionField: {
