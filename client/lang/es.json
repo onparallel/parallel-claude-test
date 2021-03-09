@@ -435,6 +435,81 @@
     "context": "Show"
   },
   {
+    "term": "component.petition-compose-field-list.move-referenced-field-error",
+    "definition": "Solo se pueden mover campos de manera que las condiciones de visibilidad hagan referencia únicamente a campos anteriores.",
+    "context": "You can only move fields so that visibility conditions refer only to previous fields."
+  },
+  {
+    "term": "component.petition-compose-field.add-condition",
+    "definition": "Añadir condición",
+    "context": "Add condition"
+  },
+  {
+    "term": "component.petition-compose-field.conditions-not-enough-fields",
+    "definition": "Solo puedes añadir condiciones basadas en campos anteriores. Añade más campo para poder establecer condiciones entre ellos.",
+    "context": "You can only add conditions based on previous fields. Add more fields to be able to set conditions between them."
+  },
+  {
+    "term": "component.petition-compose-field.drag-to-sort-label",
+    "definition": "Arrastrar para ordenar los campos de la petición",
+    "context": "Drag to sort this petition fields"
+  },
+  {
+    "term": "component.petition-compose-field.field-clone",
+    "definition": "Clonar campo",
+    "context": "Clone field"
+  },
+  {
+    "term": "component.petition-compose-field.field-delete",
+    "definition": "Eliminar campo",
+    "context": "Delete field"
+  },
+  {
+    "term": "component.petition-compose-field.field-description-label",
+    "definition": "Descripción del campo",
+    "context": "Field description"
+  },
+  {
+    "term": "component.petition-compose-field.field-description-placeholder",
+    "definition": "Añade una descripción...",
+    "context": "Add a description..."
+  },
+  {
+    "term": "component.petition-compose-field.field-settings",
+    "definition": "Ajustes de campo",
+    "context": "Field settings"
+  },
+  {
+    "term": "component.petition-compose-field.field-title-label",
+    "definition": "Título del campo",
+    "context": "Field title"
+  },
+  {
+    "term": "component.petition-compose-field.file-upload-title-placeholder",
+    "definition": "Describe el archivo que necesites...",
+    "context": "Describe the file(s) that you need..."
+  },
+  {
+    "term": "component.petition-compose-field.generic-title-placeholder",
+    "definition": "Pregunta lo que necesites...",
+    "context": "Ask for the information that you need..."
+  },
+  {
+    "term": "component.petition-compose-field.heading-title-placeholder",
+    "definition": "Escribe un título introductorio para esta sección...",
+    "context": "Enter an introductory title for this section..."
+  },
+  {
+    "term": "component.petition-compose-field.remove-condition",
+    "definition": "Borrar condición",
+    "context": "Remove condition"
+  },
+  {
+    "term": "component.petition-field-select.placeholder",
+    "definition": "Selecciona un campo",
+    "context": "Select a field"
+  },
+  {
     "term": "component.petition-field-type-select-dropdown.file-upload-description-1",
     "definition": "Recopila documentos u otra información de manera organizada.",
     "context": "Collect documents or other files in an organized way."
@@ -478,6 +553,106 @@
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
     "definition": "Previsualización del tipo de campo \"{type}\"",
     "context": "Thumbnail for field type \"{type}\""
+  },
+  {
+    "term": "component.petition-field-visibility-editor.add-condition",
+    "definition": "Añadir condición",
+    "context": "Add condition"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.all",
+    "definition": "todas",
+    "context": "all"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.and",
+    "definition": "y",
+    "context": "and"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.any",
+    "definition": "alguna",
+    "context": "any"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.contain-default",
+    "definition": "{modifier, select, ALL {contienen} other {contiene}}",
+    "context": "{modifier, select, ALL {contain} other {contains}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.end-with-default",
+    "definition": "{modifier, select, ALL {acaban} other {acaba}} en",
+    "context": "{modifier, select, ALL {end with} other {ends with}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.equal-default",
+    "definition": "{modifier, select, ALL {son iguales a} other {es igual a}}",
+    "context": "{modifier, select, ALL {are equal to} other {is equal to}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.equal-select",
+    "definition": "{modifier, select, ALL {son} other {es}}",
+    "context": "{modifier, select, ALL {are} other {is}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.have-reply",
+    "definition": "tiene respuestas",
+    "context": "has replies"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.hide",
+    "definition": "Ocultar si",
+    "context": "Hide when"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.none",
+    "definition": "ninguna",
+    "context": "none"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-contain-default",
+    "definition": "no {modifier, select, ALL {contienen} other {contiene}}",
+    "context": "{modifier, select, ALL {do not contain} other {does not contain}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-equal-default",
+    "definition": "no {modifier, select, ALL {son iguales} other {es igual}} a",
+    "context": "{modifier, select, ALL {are not equal to} other {is not equal to}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-equal-select",
+    "definition": "no {modifier, select, ALL {son} other {es}}",
+    "context": "{modifier, select, ALL {are not} other {is not}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-have-reply",
+    "definition": "no tiene respuestas",
+    "context": "does not have replies"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.number-of-files",
+    "definition": "nº de archivos",
+    "context": "no. of files"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.number-of-replies",
+    "definition": "nº de respuestas",
+    "context": "no. of replies"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.or",
+    "definition": "o",
+    "context": "or"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.show",
+    "definition": "Mostrar si",
+    "context": "Show when"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.start-with-default",
+    "definition": "{modifier, select, ALL {comienzan} other {comienza}} por",
+    "context": "{modifier, select, ALL {start with} other {starts with}}"
   },
   {
     "term": "component.petition-header.clone-label",
@@ -860,6 +1035,26 @@
     "context": "Enter your answer"
   },
   {
+    "term": "component.referenced-field-dialog.confirm",
+    "definition": "Borrar condiciones",
+    "context": "Remove conditions"
+  },
+  {
+    "term": "component.referenced-field-dialog.description",
+    "definition": "{count, plural, =1 {El campo siguiente} other {Los campos siguientes}} hacen referencia a este campo:",
+    "context": "The following {count, plural, =1 {field is} other {fields are}} referencing this field:"
+  },
+  {
+    "term": "component.referenced-field-dialog.description-2",
+    "definition": "Para proceder, necesitas borrar las condiciones que hacen referencia.",
+    "context": "To proceed you need to remove the referencing conditions."
+  },
+  {
+    "term": "component.referenced-field-dialog.header",
+    "definition": "Este campo está siendo referenciado",
+    "context": "This field is being referenced"
+  },
+  {
     "term": "component.search-input.placeholder",
     "definition": "Buscar...",
     "context": "Search..."
@@ -1120,6 +1315,11 @@
     "context": "Start new page"
   },
   {
+    "term": "field-settings.heading-page-break-visibility",
+    "definition": "No se puede añadir saltos de página en secciones con condiciones de visibilidad",
+    "context": "Can't add page breaks on headings with visibility conditions"
+  },
+  {
     "term": "field-settings.multiple-description",
     "definition": "Activar esta opción permitirá al destinatario responder más de una vez a este campo.",
     "context": "Enabling this allows the recipient to submit multiple answers to this field."
@@ -1303,6 +1503,11 @@
     "term": "generic.empty-heading",
     "definition": "Encabezado vacío",
     "context": "Untitled heading"
+  },
+  {
+    "term": "generic.enter-a-value",
+    "definition": "Introduce un valor",
+    "context": "Enter a value"
   },
   {
     "term": "generic.expand",
@@ -1653,6 +1858,11 @@
     "term": "generic.saving-changes",
     "definition": "Guardando...",
     "context": "Saving..."
+  },
+  {
+    "term": "generic.select-an-option",
+    "definition": "Selecciona una opción",
+    "context": "Select an option"
   },
   {
     "term": "generic.send",
@@ -2545,54 +2755,9 @@
     "context": "Deadline"
   },
   {
-    "term": "component.petition-compose-field.drag-to-sort-label",
-    "definition": "Arrastrar para ordenar los campos de la petición",
-    "context": "Drag to sort this petition fields"
-  },
-  {
-    "term": "component.petition-compose-field.field-clone",
-    "definition": "Clonar campo",
-    "context": "Clone field"
-  },
-  {
-    "term": "component.petition-compose-field.field-delete",
-    "definition": "Eliminar campo",
-    "context": "Delete field"
-  },
-  {
-    "term": "component.petition-compose-field.field-description-label",
-    "definition": "Descripción del campo",
-    "context": "Field description"
-  },
-  {
-    "term": "component.petition-compose-field.field-description-placeholder",
-    "definition": "Añade una descripción...",
-    "context": "Add a description..."
-  },
-  {
     "term": "petition.field-settings",
     "definition": "Ajustes de campo",
     "context": "Field settings"
-  },
-  {
-    "term": "component.petition-compose-field.file-upload-title-placeholder",
-    "definition": "Describe el archivo que necesites...",
-    "context": "Describe the file(s) that you need..."
-  },
-  {
-    "term": "component.petition-compose-field.generic-title-placeholder",
-    "definition": "Pregunta lo que necesites...",
-    "context": "Ask for the information that you need..."
-  },
-  {
-    "term": "component.petition-compose-field.heading-title-placeholder",
-    "definition": "Escribe un título introductorio para esta sección...",
-    "context": "Enter an introductory title for this section..."
-  },
-  {
-    "term": "component.petition-compose-field.field-title-label",
-    "definition": "Título del campo",
-    "context": "Field title"
   },
   {
     "term": "petition.field-type.file-upload",

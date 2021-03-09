@@ -30,7 +30,6 @@ export function RecipientViewContentsCard({
 }: RecipientViewContentsCardProps) {
   const { query } = useRouter();
   const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage);
-  console.log(pages, fields);
   return (
     <Card padding={4} display="flex" flexDirection="column" {...props}>
       <Heading

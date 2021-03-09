@@ -163,8 +163,15 @@ function ProgressText({
 }: FlexProps & { type: keyof typeof styles }) {
   return (
     <Flex {...props} alignItems="baseline">
-      <Square size="14px" borderRadius="sm" marginRight={2} {...styles[type]} />
-      <Text fontSize="md">{children}</Text>
+      <Square
+        size="14px"
+        borderRadius="sm"
+        marginRight={2}
+        {...styles[type]}
+        position="relative"
+        top="1px"
+      />
+      <Text fontSize="sm">{children}</Text>
     </Flex>
   );
 }

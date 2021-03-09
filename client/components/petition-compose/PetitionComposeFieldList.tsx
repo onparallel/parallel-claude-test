@@ -121,7 +121,7 @@ export const PetitionComposeFieldList = Object.assign(
                   message: (
                     <FormattedMessage
                       id="component.petition-compose-field-list.move-referenced-field-error"
-                      defaultMessage="You can only move fields so that they refer to previous fields in their visibility conditions."
+                      defaultMessage="You can only move fields so that visibility conditions refer only to previous fields."
                     />
                   ),
                 });

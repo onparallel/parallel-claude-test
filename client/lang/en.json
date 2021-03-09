@@ -435,6 +435,81 @@
     "context": "Show"
   },
   {
+    "term": "component.petition-compose-field-list.move-referenced-field-error",
+    "definition": "You can only move fields so that visibility conditions refer only to previous fields.",
+    "context": "You can only move fields so that visibility conditions refer only to previous fields."
+  },
+  {
+    "term": "component.petition-compose-field.add-condition",
+    "definition": "Add condition",
+    "context": "Add condition"
+  },
+  {
+    "term": "component.petition-compose-field.conditions-not-enough-fields",
+    "definition": "You can only add conditions based on previous fields. Add more fields to be able to set conditions between them.",
+    "context": "You can only add conditions based on previous fields. Add more fields to be able to set conditions between them."
+  },
+  {
+    "term": "component.petition-compose-field.drag-to-sort-label",
+    "definition": "Drag to sort this petition fields",
+    "context": "Drag to sort this petition fields"
+  },
+  {
+    "term": "component.petition-compose-field.field-clone",
+    "definition": "Clone field",
+    "context": "Clone field"
+  },
+  {
+    "term": "component.petition-compose-field.field-delete",
+    "definition": "Delete field",
+    "context": "Delete field"
+  },
+  {
+    "term": "component.petition-compose-field.field-description-label",
+    "definition": "Field description",
+    "context": "Field description"
+  },
+  {
+    "term": "component.petition-compose-field.field-description-placeholder",
+    "definition": "Add a description...",
+    "context": "Add a description..."
+  },
+  {
+    "term": "component.petition-compose-field.field-settings",
+    "definition": "Field settings",
+    "context": "Field settings"
+  },
+  {
+    "term": "component.petition-compose-field.field-title-label",
+    "definition": "Field title",
+    "context": "Field title"
+  },
+  {
+    "term": "component.petition-compose-field.file-upload-title-placeholder",
+    "definition": "Describe the file(s) that you need...",
+    "context": "Describe the file(s) that you need..."
+  },
+  {
+    "term": "component.petition-compose-field.generic-title-placeholder",
+    "definition": "Ask for the information that you need...",
+    "context": "Ask for the information that you need..."
+  },
+  {
+    "term": "component.petition-compose-field.heading-title-placeholder",
+    "definition": "Enter an introductory title for this section...",
+    "context": "Enter an introductory title for this section..."
+  },
+  {
+    "term": "component.petition-compose-field.remove-condition",
+    "definition": "Remove condition",
+    "context": "Remove condition"
+  },
+  {
+    "term": "component.petition-field-select.placeholder",
+    "definition": "Select a field",
+    "context": "Select a field"
+  },
+  {
     "term": "component.petition-field-type-select-dropdown.file-upload-description-1",
     "definition": "Collect documents or other files in an organized way.",
     "context": "Collect documents or other files in an organized way."
@@ -478,6 +553,106 @@
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
     "definition": "Thumbnail for field type \"{type}\"",
     "context": "Thumbnail for field type \"{type}\""
+  },
+  {
+    "term": "component.petition-field-visibility-editor.add-condition",
+    "definition": "Add condition",
+    "context": "Add condition"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.all",
+    "definition": "all",
+    "context": "all"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.and",
+    "definition": "and",
+    "context": "and"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.any",
+    "definition": "any",
+    "context": "any"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.contain-default",
+    "definition": "{modifier, select, ALL {contain} other {contains}}",
+    "context": "{modifier, select, ALL {contain} other {contains}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.end-with-default",
+    "definition": "{modifier, select, ALL {end with} other {ends with}}",
+    "context": "{modifier, select, ALL {end with} other {ends with}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.equal-default",
+    "definition": "{modifier, select, ALL {are equal to} other {is equal to}}",
+    "context": "{modifier, select, ALL {are equal to} other {is equal to}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.equal-select",
+    "definition": "{modifier, select, ALL {are} other {is}}",
+    "context": "{modifier, select, ALL {are} other {is}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.have-reply",
+    "definition": "has replies",
+    "context": "has replies"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.hide",
+    "definition": "Hide when",
+    "context": "Hide when"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.none",
+    "definition": "none",
+    "context": "none"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-contain-default",
+    "definition": "{modifier, select, ALL {do not contain} other {does not contain}}",
+    "context": "{modifier, select, ALL {do not contain} other {does not contain}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-equal-default",
+    "definition": "{modifier, select, ALL {are not equal to} other {is not equal to}}",
+    "context": "{modifier, select, ALL {are not equal to} other {is not equal to}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-equal-select",
+    "definition": "{modifier, select, ALL {are not} other {is not}}",
+    "context": "{modifier, select, ALL {are not} other {is not}}"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.not-have-reply",
+    "definition": "does not have replies",
+    "context": "does not have replies"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.number-of-files",
+    "definition": "no. of files",
+    "context": "no. of files"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.number-of-replies",
+    "definition": "no. of replies",
+    "context": "no. of replies"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.or",
+    "definition": "or",
+    "context": "or"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.show",
+    "definition": "Show when",
+    "context": "Show when"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.start-with-default",
+    "definition": "{modifier, select, ALL {start with} other {starts with}}",
+    "context": "{modifier, select, ALL {start with} other {starts with}}"
   },
   {
     "term": "component.petition-header.clone-label",
@@ -860,6 +1035,26 @@
     "context": "Enter your answer"
   },
   {
+    "term": "component.referenced-field-dialog.confirm",
+    "definition": "Remove conditions",
+    "context": "Remove conditions"
+  },
+  {
+    "term": "component.referenced-field-dialog.description",
+    "definition": "The following {count, plural, =1 {field is} other {fields are}} referencing this field:",
+    "context": "The following {count, plural, =1 {field is} other {fields are}} referencing this field:"
+  },
+  {
+    "term": "component.referenced-field-dialog.description-2",
+    "definition": "To proceed you need to remove the referencing conditions.",
+    "context": "To proceed you need to remove the referencing conditions."
+  },
+  {
+    "term": "component.referenced-field-dialog.header",
+    "definition": "This field is being referenced",
+    "context": "This field is being referenced"
+  },
+  {
     "term": "component.search-input.placeholder",
     "definition": "Search...",
     "context": "Search..."
@@ -1120,6 +1315,11 @@
     "context": "Start new page"
   },
   {
+    "term": "field-settings.heading-page-break-visibility",
+    "definition": "Can't add page breaks on headings with visibility conditions",
+    "context": "Can't add page breaks on headings with visibility conditions"
+  },
+  {
     "term": "field-settings.multiple-description",
     "definition": "Enabling this allows the recipient to submit multiple answers to this field.",
     "context": "Enabling this allows the recipient to submit multiple answers to this field."
@@ -1303,6 +1503,11 @@
     "term": "generic.empty-heading",
     "definition": "Untitled heading",
     "context": "Untitled heading"
+  },
+  {
+    "term": "generic.enter-a-value",
+    "definition": "Enter a value",
+    "context": "Enter a value"
   },
   {
     "term": "generic.expand",
@@ -1653,6 +1858,11 @@
     "term": "generic.saving-changes",
     "definition": "Saving...",
     "context": "Saving..."
+  },
+  {
+    "term": "generic.select-an-option",
+    "definition": "Select an option",
+    "context": "Select an option"
   },
   {
     "term": "generic.send",
@@ -2545,54 +2755,9 @@
     "context": "Deadline"
   },
   {
-    "term": "component.petition-compose-field.drag-to-sort-label",
-    "definition": "Drag to sort this petition fields",
-    "context": "Drag to sort this petition fields"
-  },
-  {
-    "term": "component.petition-compose-field.field-clone",
-    "definition": "Clone field",
-    "context": "Clone field"
-  },
-  {
-    "term": "component.petition-compose-field.field-delete",
-    "definition": "Delete field",
-    "context": "Delete field"
-  },
-  {
-    "term": "component.petition-compose-field.field-description-label",
-    "definition": "Field description",
-    "context": "Field description"
-  },
-  {
-    "term": "component.petition-compose-field.field-description-placeholder",
-    "definition": "Add a description...",
-    "context": "Add a description..."
-  },
-  {
     "term": "petition.field-settings",
     "definition": "Field settings",
     "context": "Field settings"
-  },
-  {
-    "term": "component.petition-compose-field.file-upload-title-placeholder",
-    "definition": "Describe the file(s) that you need...",
-    "context": "Describe the file(s) that you need..."
-  },
-  {
-    "term": "component.petition-compose-field.generic-title-placeholder",
-    "definition": "Ask for the information that you need...",
-    "context": "Ask for the information that you need..."
-  },
-  {
-    "term": "component.petition-compose-field.heading-title-placeholder",
-    "definition": "Enter an introductory title for this section...",
-    "context": "Enter an introductory title for this section..."
-  },
-  {
-    "term": "component.petition-compose-field.field-title-label",
-    "definition": "Field title",
-    "context": "Field title"
   },
   {
     "term": "petition.field-type.file-upload",

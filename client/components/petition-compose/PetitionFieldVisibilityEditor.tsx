@@ -199,12 +199,12 @@ export function PetitionFieldVisibilityEditor({
                       <Flex flex="1" alignItems="center" paddingLeft="11px">
                         {visibility.operator === "AND" ? (
                           <FormattedMessage
-                            id="component.petition-field-condition.and"
+                            id="component.petition-field-visibility-editor.and"
                             defaultMessage="and"
                           />
                         ) : (
                           <FormattedMessage
-                            id="component.petition-field-condition.or"
+                            id="component.petition-field-visibility-editor.or"
                             defaultMessage="or"
                           />
                         )}
@@ -283,7 +283,10 @@ export function PetitionFieldVisibilityEditor({
           alignSelf="start"
           onClick={addCondition}
         >
-          Add condition
+          <FormattedMessage
+            id="component.petition-field-visibility-editor.add-condition"
+            defaultMessage="Add condition"
+          />
         </Button>
       ) : null}
     </Stack>
@@ -318,7 +321,7 @@ function ConditionMultipleFieldModifier({
       return [
         {
           label: intl.formatMessage({
-            id: "component.petition-field-condition.number-of-files",
+            id: "component.petition-field-visibility-editor.number-of-files",
             defaultMessage: "no. of files",
           }),
           value: "NUMBER_OF_REPLIES",
@@ -328,28 +331,28 @@ function ConditionMultipleFieldModifier({
       return [
         {
           label: intl.formatMessage({
-            id: "component.petition-field-condition.any",
+            id: "component.petition-field-visibility-editor.any",
             defaultMessage: "any",
           }),
           value: "ANY",
         },
         {
           label: intl.formatMessage({
-            id: "component.petition-field-condition.all",
+            id: "component.petition-field-visibility-editor.all",
             defaultMessage: "all",
           }),
           value: "ALL",
         },
         {
           label: intl.formatMessage({
-            id: "component.petition-field-condition.none",
+            id: "component.petition-field-visibility-editor.none",
             defaultMessage: "none",
           }),
           value: "NONE",
         },
         {
           label: intl.formatMessage({
-            id: "component.petition-field-condition.number-of-replies",
+            id: "component.petition-field-visibility-editor.number-of-replies",
             defaultMessage: "no. of replies",
           }),
           value: "NUMBER_OF_REPLIES",
@@ -411,7 +414,7 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id: "component.petition-field-condition.equal-select",
+              id: "component.petition-field-visibility-editor.equal-select",
               defaultMessage: "{modifier, select, ALL {are} other {is}}",
             },
             { modifier }
@@ -421,7 +424,7 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id: "component.petition-field-condition.not-equal-select",
+              id: "component.petition-field-visibility-editor.not-equal-select",
               defaultMessage:
                 "{modifier, select, ALL {are not} other {is not}}",
             },
@@ -435,7 +438,7 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id: "component.petition-field-condition.equal-default",
+              id: "component.petition-field-visibility-editor.equal-default",
               defaultMessage:
                 "{modifier, select, ALL {are equal to} other {is equal to}}",
             },
@@ -446,7 +449,8 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id: "component.petition-field-condition.not-equal-default",
+              id:
+                "component.petition-field-visibility-editor.not-equal-default",
               defaultMessage:
                 "{modifier, select, ALL {are not equal to} other {is not equal to}}",
             },
@@ -457,7 +461,8 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id: "component.petition-field-condition.start-with-default",
+              id:
+                "component.petition-field-visibility-editor.start-with-default",
               defaultMessage:
                 "{modifier, select, ALL {start with} other {starts with}}",
             },
@@ -468,7 +473,7 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id: "component.petition-field-condition.end-with-default",
+              id: "component.petition-field-visibility-editor.end-with-default",
               defaultMessage:
                 "{modifier, select, ALL {end with} other {ends with}}",
             },
@@ -479,7 +484,7 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id: "component.petition-field-condition.contain-default",
+              id: "component.petition-field-visibility-editor.contain-default",
               defaultMessage:
                 "{modifier, select, ALL {contain} other {contains}}",
             },
@@ -490,7 +495,8 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id: "component.petition-field-condition.not-contain-default",
+              id:
+                "component.petition-field-visibility-editor.not-contain-default",
               defaultMessage:
                 "{modifier, select, ALL {do not contain} other {does not contain}}",
             },
@@ -504,14 +510,14 @@ function ConditionPredicate({
       options.push(
         {
           label: intl.formatMessage({
-            id: "component.petition-field-condition.has-reply",
+            id: "component.petition-field-visibility-editor.have-reply",
             defaultMessage: "has replies",
           }),
           value: "HAVE_REPLY",
         },
         {
           label: intl.formatMessage({
-            id: "component.petition-field-condition.has-reply",
+            id: "component.petition-field-visibility-editor.not-have-reply",
             defaultMessage: "does not have replies",
           }),
           value: "NOT_HAVE_REPLY",
@@ -723,14 +729,14 @@ function VisibilityOperatorSelect({
       {
         value: "AND",
         label: intl.formatMessage({
-          id: "component.petition-field-condition.and",
+          id: "component.petition-field-visibility-editor.and",
           defaultMessage: "and",
         }),
       },
       {
         value: "OR",
         label: intl.formatMessage({
-          id: "component.petition-field-condition.or",
+          id: "component.petition-field-visibility-editor.or",
           defaultMessage: "or",
         }),
       },
@@ -770,14 +776,14 @@ function VisibilityTypeSelect({
       {
         value: "SHOW",
         label: intl.formatMessage({
-          id: "component.petition-field-condition.show",
+          id: "component.petition-field-visibility-editor.show",
           defaultMessage: "Show when",
         }),
       },
       {
         value: "HIDE",
         label: intl.formatMessage({
-          id: "component.petition-field-condition.hide",
+          id: "component.petition-field-visibility-editor.hide",
           defaultMessage: "Hide when",
         }),
       },

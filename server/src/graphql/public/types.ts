@@ -174,7 +174,6 @@ export const PublicPetitionField = objectType({
       description:
         "A JSON object representing the conditions for the field to be visible",
       resolve: (o) => {
-        console.log(o.visibility);
         return (
           o.visibility && {
             ...o.visibility,
