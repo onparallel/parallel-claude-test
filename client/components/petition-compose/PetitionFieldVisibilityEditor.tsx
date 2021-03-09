@@ -220,21 +220,15 @@ export function PetitionFieldVisibilityEditor({
                 indices={_indices}
                 onChange={(field) => {
                   let { modifier, operator, value } = condition;
-                  if (field.type === "FILE_UPLOAD") {
-                    modifier = "NUMBER_OF_REPLIES";
-                  }
                   if (field.type === conditionField.type) {
                     // pass
-                    if (!field.multiple && modifier !== "ANY") {
+                    if (field.type !== "FILE_UPLOAD" && !field.multiple) {
                       modifier = "ANY";
                     }
                   } else {
-                    if (field.multiple && modifier === "NUMBER_OF_REPLIES") {
-                      // pass
-                    } else {
-                      modifier = "ANY";
+                    if (field.type === "FILE_UPLOAD") {
+                      modifier = "NUMBER_OF_REPLIES";
                       operator = "EQUAL";
-                      value = null;
                     }
                   }
                   if (field.type === "SELECT") {
