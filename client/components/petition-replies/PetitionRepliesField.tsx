@@ -106,7 +106,7 @@ export function PetitionRepliesField({
   ) : (
     <Card
       display="flex"
-      backgroundColor={!isVisible ? "gray.100" : "inherit"}
+      backgroundColor={isVisible ? "white" : "gray.50"}
       flexDirection="column"
       position="relative"
       _highlighted={{
