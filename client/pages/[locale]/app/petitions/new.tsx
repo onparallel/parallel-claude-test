@@ -45,6 +45,7 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
+import { useRehydratedEffect } from "@parallel/utils/useRehydrated";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import {
@@ -53,7 +54,6 @@ import {
   ReactNode,
   Ref,
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -221,7 +221,7 @@ function NewPetition() {
   }, [goToPetition, createPetition]);
 
   const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
+  useRehydratedEffect(() => {
     inputRef.current!.focus();
   }, []);
 
