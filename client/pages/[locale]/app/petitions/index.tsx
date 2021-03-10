@@ -40,7 +40,7 @@ import {
 } from "@parallel/utils/queryState";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { usePetitionsTableColumns } from "../../../../utils/usePetitionsTableColumns";
+import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 
 const PAGE_SIZE = 10;
 

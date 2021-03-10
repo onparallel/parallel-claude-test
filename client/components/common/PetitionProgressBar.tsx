@@ -1,6 +1,7 @@
 import {
   Box,
   BoxProps,
+  ChakraProps,
   Flex,
   FlexProps,
   Square,
@@ -17,6 +18,19 @@ import { SmallPopover } from "./SmallPopover";
 interface PetitionProgressBarProps extends PetitionProgress, BoxProps {
   status: PetitionStatus;
 }
+
+const STYLES = (() => {
+  const styles = {
+    VALIDATED: { backgroundColor: "green.400" },
+    REPLIED: { backgroundColor: "yellow.400" },
+    OPTIONAL: {
+      backgroundColor: "yellow.400",
+      sx: generateCssStripe({ color: "gray.200", size: "1rem" }),
+    },
+    EMPTY: { backgroundColor: "gray.200" },
+  };
+  return styles as Record<keyof typeof styles, ChakraProps>;
+})();
 
 export function PetitionProgressBar({
   status,
@@ -72,7 +86,7 @@ export function PetitionProgressBar({
         ) : (
           <Stack as="ul" fontSize="sm" listStyleType="none" spacing={1}>
             {validated ? (
-              <ProgressText as="li" type="validated">
+              <ProgressText as="li" type="VALIDATED">
                 <FormattedMessage
                   id="component.petition-progress-bar.validated"
                   defaultMessage="{count} reviewed {count, plural, =1{field} other {fields}}."
@@ -81,7 +95,7 @@ export function PetitionProgressBar({
               </ProgressText>
             ) : null}
             {replied ? (
-              <ProgressText as="li" type="replied">
+              <ProgressText as="li" type="REPLIED">
                 <FormattedMessage
                   id="component.petition-progress-bar.replied"
                   defaultMessage="{count} replied {count, plural, =1{field} other {fields}}."
@@ -90,7 +104,7 @@ export function PetitionProgressBar({
               </ProgressText>
             ) : null}
             {optional ? (
-              <ProgressText as="li" type="optional">
+              <ProgressText as="li" type="OPTIONAL">
                 <FormattedMessage
                   id="component.petition-progress-bar.optional"
                   defaultMessage="{count} optional {count, plural, =1{field} other {fields}} without replies."
@@ -99,7 +113,7 @@ export function PetitionProgressBar({
               </ProgressText>
             ) : null}
             {validated + replied + optional < total ? (
-              <ProgressText as="li" type="empty">
+              <ProgressText as="li" type="EMPTY">
                 <FormattedMessage
                   id="component.petition-progress-bar.not-replied"
                   defaultMessage="{count} {count, plural, =1{field} other {fields}} without replies."
@@ -119,25 +133,26 @@ export function PetitionProgressBar({
           min={0}
           max={total!}
           value={validated! + replied!}
+          {...STYLES["EMPTY"]}
         >
           <ProgressIndicator
             min={0}
             max={total!}
             value={validated!}
             backgroundColor="green.400"
+            {...STYLES["VALIDATED"]}
           />
           <ProgressIndicator
             min={0}
             max={total!}
             value={replied!}
-            backgroundColor="yellow.400"
+            {...STYLES["REPLIED"]}
           />
           <ProgressIndicator
             min={0}
             max={total!}
             value={optional!}
-            backgroundColor="yellow.400"
-            sx={generateCssStripe({ color: "gray.200", size: "1rem" })}
+            {...STYLES["OPTIONAL"]}
           />
         </ProgressTrack>
       </Box>
@@ -145,31 +160,20 @@ export function PetitionProgressBar({
   );
 }
 
-const styles = {
-  validated: { backgroundColor: "green.400" },
-  replied: { backgroundColor: "yellow.400" },
-  optional: {
-    backgroundColor: "yellow.400",
-    backgroundImage:
-      "linear-gradient(135deg, #E2E8F0 25%, transparent 25%, transparent 50%, #E2E8F0 50%, #E2E8F0 75%, transparent 75%, transparent )",
-  },
-  empty: { backgroundColor: "gray.200" },
-};
-
 function ProgressText({
   children,
   type,
   ...props
-}: FlexProps & { type: keyof typeof styles }) {
+}: FlexProps & { type: keyof typeof STYLES }) {
   return (
     <Flex {...props} alignItems="baseline">
       <Square
         size="14px"
         borderRadius="sm"
         marginRight={2}
-        {...styles[type]}
         position="relative"
         top="1px"
+        {...STYLES[type]}
       />
       <Text fontSize="sm">{children}</Text>
     </Flex>

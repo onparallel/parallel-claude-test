@@ -16,7 +16,7 @@ export function PetitionStatusCellContent({
         status={status}
         {...omit(progress, ["__typename"])}
         flex="1"
-        minWidth="80px"
+        width="80px"
       />
       <Center width={6}>
         <PetitionStatusIcon status={status} />
