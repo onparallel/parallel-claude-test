@@ -1,5 +1,6 @@
 import { Text, Heading, Box, BoxProps } from "@chakra-ui/react";
 import { PetitionPdf_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { Fragment } from "react";
 import { FormattedMessage } from "react-intl";
 import { Card } from "../common/Card";
 import { FileSize } from "../common/FileSize";
@@ -81,9 +82,8 @@ function FileUploadField({ field, ...props }: FileUploadFieldProps) {
       </Text>
 
       {field.replies.map((r) => (
-        <>
+        <Fragment key={r.id}>
           <FormattedMessage
-            key={r.id}
             id="petition-signature.file-submitted.pending-review"
             defaultMessage="{filename} - {size} (Pending review)"
             values={{
@@ -96,7 +96,7 @@ function FileUploadField({ field, ...props }: FileUploadFieldProps) {
             }}
           />
           <br />
-        </>
+        </Fragment>
       ))}
 
       {field.replies.length === 0 && (

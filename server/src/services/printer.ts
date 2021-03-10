@@ -25,12 +25,7 @@ export class Printer implements IPrinter {
     const browser = await chromium.launch({ headless: true });
     const context = await browser.newContext();
     const page = await context.newPage();
-
-    const isProduction = process.env.NODE_ENV === "production";
-    // on develop the 'networkidle' event is not triggered, because of webpack doing regular polls
-    const waitUntil = isProduction ? "networkidle" : "load";
-    await page.goto(url, { waitUntil });
-
+    await page.goto(url, { waitUntil: "load" });
     const buffer = await page.pdf({
       printBackground: true,
       displayHeaderFooter: false,
