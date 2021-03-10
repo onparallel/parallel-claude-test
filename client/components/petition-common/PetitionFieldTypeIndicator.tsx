@@ -36,6 +36,7 @@ export const PetitionFieldTypeIndicator = chakraForwardRef<
         aria-label={label}
         backgroundColor={color}
         _hover={{ backgroundColor: color }}
+        _active={{ backgroundColor: color }}
         color="white"
         alignItems="center"
         {...props}
