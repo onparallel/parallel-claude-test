@@ -582,7 +582,6 @@ const _PetitionComposeFieldActions = chakraForwardRef<
           size="sm"
           variant="ghost"
           placement="bottom"
-          colorScheme={hasCondition ? "purple" : "gray"}
           color={hasCondition ? "purple.500" : "gray.600"}
           label={
             hasCondition
@@ -610,17 +609,21 @@ const _PetitionComposeFieldActions = chakraForwardRef<
             </Text>
           }
         >
-          <Box>
-            <IconButton
-              size="sm"
-              isDisabled
-              icon={<ConditionFullIcon />}
-              aria-label={intl.formatMessage({
-                id: "component.petition-compose-field.add-condition",
-                defaultMessage: "Add condition",
-              })}
-            />
-          </Box>
+          <IconButton
+            size="sm"
+            // fake disabled look so popover still works
+            opacity={0.4}
+            cursor="not-allowed"
+            backgroundColor="transparent"
+            _hover={{ backgroundColor: "transparent" }}
+            _active={{ backgroundColor: "transparent" }}
+            as="div"
+            icon={<ConditionFullIcon />}
+            aria-label={intl.formatMessage({
+              id: "component.petition-compose-field.add-condition",
+              defaultMessage: "Add condition",
+            })}
+          />
         </SmallPopover>
       )}
       <IconButtonWithTooltip
