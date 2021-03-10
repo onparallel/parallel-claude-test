@@ -219,32 +219,39 @@ export function PetitionFieldVisibilityEditor({
                 fields={_fields}
                 indices={_indices}
                 onChange={(field) => {
-                  let { modifier, operator, value } = condition;
-                  if (field.type === conditionField.type) {
-                    // pass
-                    if (field.type !== "FILE_UPLOAD" && !field.multiple) {
-                      modifier = "ANY";
-                    }
+                  if (
+                    field.type === conditionField.type &&
+                    field.multiple === conditionField.multiple
+                  ) {
+                    updateCondition(index, {
+                      ...condition,
+                      fieldId: field.id,
+                      value:
+                        field.type === "SELECT"
+                          ? field.fieldOptions.values?.includes(condition.value)
+                            ? condition.value
+                            : field.fieldOptions.values[0] ?? null
+                          : null,
+                    });
                   } else {
-                    if (field.type === "FILE_UPLOAD") {
-                      modifier = "NUMBER_OF_REPLIES";
-                      operator = "GREATER_THAN";
-                      value = 0;
-                    }
+                    // default condition based on field
+                    updateCondition(index, {
+                      fieldId: field.id,
+                      modifier:
+                        field.type === "FILE_UPLOAD"
+                          ? "NUMBER_OF_REPLIES"
+                          : "ANY",
+                      operator: "EQUAL",
+                      value:
+                        field.type === "FILE_UPLOAD"
+                          ? 0
+                          : field.type === "TEXT"
+                          ? null
+                          : field.type === "SELECT"
+                          ? field.fieldOptions.values[0] ?? null
+                          : null,
+                    });
                   }
-                  if (field.type === "SELECT") {
-                    operator = "EQUAL";
-                    value =
-                      modifier === "NUMBER_OF_REPLIES"
-                        ? 0
-                        : field.fieldOptions.values[0] ?? null;
-                  }
-                  updateCondition(index, {
-                    fieldId: field.id,
-                    modifier,
-                    operator,
-                    value,
-                  });
                 }}
               />
               {conditionField ? (
