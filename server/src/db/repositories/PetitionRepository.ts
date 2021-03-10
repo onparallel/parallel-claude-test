@@ -1481,9 +1481,8 @@ export class PetitionRepository extends BaseRepository {
             ...f.visibility,
             conditions: f.visibility.conditions.map((c: any) => ({
               ...c,
-              fieldId: c.fieldId
-                ? clonedFields[fields.findIndex((f) => f.id === c.fieldId)].id
-                : null,
+              fieldId:
+                clonedFields[fields.findIndex((f) => f.id === c.fieldId)].id,
             })),
           };
         }

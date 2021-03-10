@@ -641,9 +641,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
               ...visibility,
               conditions: visibility.conditions.map((c: any) => ({
                 ...c,
-                fieldId: c.fieldId
-                  ? fromGlobalId(c.fieldId, "PetitionField").id
-                  : null,
+                fieldId: fromGlobalId(c.fieldId, "PetitionField").id,
               })),
             };
     }
