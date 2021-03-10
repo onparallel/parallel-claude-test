@@ -588,18 +588,18 @@ const TemplateCard = memo(function TemplateCard({
             defaultMessage: "Untitled template",
           })}
       </Heading>
-      <Text fontSize="sm" noOfLines={2}>
-        {template.description ? (
+      {template.description ? (
+        <Text fontSize="sm" noOfLines={2}>
           <BreakLines text={template.description} />
-        ) : (
-          <Text fontStyle="italic">
-            <FormattedMessage
-              id="template-details.no-description-provided"
-              defaultMessage="No description provided."
-            />
-          </Text>
-        )}
-      </Text>
+        </Text>
+      ) : (
+        <Text fontSize="sm" fontStyle="italic">
+          <FormattedMessage
+            id="template-details.no-description-provided"
+            defaultMessage="No description provided."
+          />
+        </Text>
+      )}
       <Spacer />
       <Flex alignItems="center" marginTop={2}>
         <LocaleBadge locale={template.locale} />
