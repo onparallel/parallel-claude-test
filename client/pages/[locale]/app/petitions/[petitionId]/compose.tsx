@@ -219,6 +219,42 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     async function (fieldId: string, data: UpdatePetitionFieldInput) {
       const { fields } = petitionDataRef.current!;
       const field = fields.find((f) => f.id === fieldId);
+      if (data.multiple === false) {
+        // check no field is referencing with invalid NUMBER_OF_REPLIES condition
+        const referencing = zip(fields, indices).filter(([f]) =>
+          (f.visibility as PetitionFieldVisibility)?.conditions.some(
+            (c) =>
+              c.fieldId === fieldId &&
+              c.modifier === "NUMBER_OF_REPLIES" &&
+              !(
+                c.value === 0 &&
+                (c.operator === "EQUAL" || c.operator === "GREATER_THAN")
+              )
+          )
+        );
+        if (referencing.length) {
+          try {
+            await showReferencedFieldDialog({
+              fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
+                field,
+                fieldIndex,
+              })),
+            });
+            for (const [field] of referencing) {
+              const visibility = field.visibility! as PetitionFieldVisibility;
+              const conditions = visibility.conditions.filter(
+                (c) => c.fieldId !== fieldId
+              );
+              await _handleFieldEdit(field.id, {
+                visibility:
+                  conditions.length > 0 ? { ...visibility, conditions } : null,
+              });
+            }
+          } catch {
+            return;
+          }
+        }
+      }
       await updatePetitionField({
         variables: { petitionId, fieldId, data },
         optimisticResponse: {
