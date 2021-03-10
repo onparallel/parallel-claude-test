@@ -11,6 +11,15 @@ import {
   FieldNode,
 } from "graphql";
 
+/**
+ * Creates a comparer function meant to be used with React.memo.
+ * It will deep-compare props specified in `fragments` but it will only check
+ * fields specified in the fragment.
+ * It is useful when fragments are being composed in parent elements and these
+ * props have other fields that don't affect the rendering of the component.
+ * @param fragments A dictionary where the key is the name of the prop and the
+ * value is the fragment document to use for it
+ */
 export function compareWithFragments<T>(
   fragments: Partial<{ [K in keyof T]: DocumentNode }>
 ) {

@@ -84,6 +84,12 @@ function conditionIsMet(
   }
 }
 
+/**
+ * Evaluates the visibility of the fields based on the visibility conditions
+ * and the replies.
+ * Returns an array with the visibilities corresponding to each field in the
+ * passed array of fields.
+ */
 export function useFieldVisibility<T extends VisibilityField>(fields: T[]) {
   return useMemo(() => {
     const fieldsById = indexBy(fields, (f) => f.id);

@@ -105,15 +105,18 @@ export const PetitionComposeFieldList = Object.assign(
         const [fieldId] = newFieldIds.splice(dragIndex, 1);
         newFieldIds.splice(hoverIndex, 0, fieldId);
         if (dropped) {
-          const fieldIndices = Object.fromEntries(
+          // check that this order of fields is respecting that visibility only refers to previous fields
+          const fieldPositions = Object.fromEntries(
             Array.from(newFieldIds.entries()).map(([i, id]) => [id, i])
           );
-          for (const [index, fieldId] of Array.from(fieldIds.entries())) {
+          for (const [position, fieldId] of Array.from(fieldIds.entries())) {
             const visibility = fieldsById[fieldId]
               .visibility as PetitionFieldVisibility;
             if (
               visibility &&
-              visibility.conditions.some((c) => fieldIndices[c.fieldId] > index)
+              visibility.conditions.some(
+                (c) => fieldPositions[c.fieldId] > position
+              )
             ) {
               try {
                 setState(reset(fields));
@@ -160,7 +163,8 @@ export const PetitionComposeFieldList = Object.assign(
         onSettingsClick: () => onFieldSettingsClick(fieldId),
         onDeleteClick: async () => {
           const { fields } = fieldsDataRef.current!;
-          // if this field is being referenced by any other field?
+          // if this field is being referenced by any other field ask the user
+          // if they want to remove the conflicting conditions
           const referencing = zip(fields, indices).filter(([f]) =>
             (f.visibility as PetitionFieldVisibility)?.conditions.some(
               (c) => c.fieldId === fieldId
@@ -304,7 +308,7 @@ export const PetitionComposeFieldList = Object.assign(
             if (fieldId !== focusedFieldIdRef.current) {
               setFocusedFieldId(fieldId);
             }
-            // if field settings are visisble change them the focused field
+            // if field settings are visible change them the focused field
             const { fields, active } = fieldsDataRef.current!;
             if (active && fieldId !== active) {
               const field = fields.find((f) => f.id === fieldId)!;
