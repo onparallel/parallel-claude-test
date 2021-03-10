@@ -2807,13 +2807,13 @@ export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   hasSkipForwardSecurity: User["hasFeatureFlag"];
   hasHideRecipientViewContents: User["hasFeatureFlag"];
 } & {
-  organization: { __typename?: "Organization" } & {
-    signatureIntegrations: Array<
-      {
-        __typename?: "OrgIntegration";
-      } & SignatureConfigDialog_OrgIntegrationFragment
-    >;
-  };
+  organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+      signatureIntegrations: Array<
+        {
+          __typename?: "OrgIntegration";
+        } & SignatureConfigDialog_OrgIntegrationFragment
+      >;
+    };
 };
 
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
@@ -3011,7 +3011,7 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
     owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
         organization: { __typename?: "Organization" } & Pick<
           Organization,
-          "name"
+          "id" | "name"
         >;
       };
     userPermissions: Array<
@@ -5250,6 +5250,7 @@ export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
     owner {
       id
       organization {
+        id
         name
       }
       fullName
@@ -6377,6 +6378,7 @@ export const PetitionSettings_UserFragmentDoc = gql`
       featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS
     )
     organization {
+      id
       signatureIntegrations: integrations(type: SIGNATURE) {
         ...SignatureConfigDialog_OrgIntegration
       }

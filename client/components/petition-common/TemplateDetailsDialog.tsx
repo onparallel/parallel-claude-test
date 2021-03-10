@@ -314,6 +314,7 @@ TemplateDetailsDialog.fragments = {
       owner {
         id
         organization {
+          id
           name
         }
         fullName

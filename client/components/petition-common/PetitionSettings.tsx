@@ -306,6 +306,7 @@ const fragments = {
         featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS
       )
       organization {
+        id
         signatureIntegrations: integrations(type: SIGNATURE) {
           ...SignatureConfigDialog_OrgIntegration
         }
