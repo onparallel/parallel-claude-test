@@ -556,7 +556,7 @@ describe("Field Visibility Conditions", () => {
         finalTextField.id,
         ctx
       )
-    ).rejects.toThrowError("Can't find field with id 6");
+    ).rejects.toThrowError(`Can't find field with id ${deletedField.id}`);
   });
 
   it("referenced fields on conditions should all belong to the same petition", async () => {
@@ -591,7 +591,7 @@ describe("Field Visibility Conditions", () => {
         ctx
       )
     ).rejects.toThrowError(
-      "Field with id 7 is not linked to petition with id 1"
+      `Field with id ${fieldOnAnotherPetition.id} is not linked to petition with id ${petition[0].id}`
     );
   });
 

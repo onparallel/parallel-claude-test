@@ -9,11 +9,6 @@ import {
   Switch,
   Text,
   Tooltip,
-  Popover,
-  PopoverArrow,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverBody,
 } from "@chakra-ui/react";
 import {
   ConditionFullIcon,
