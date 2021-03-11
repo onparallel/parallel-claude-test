@@ -85,14 +85,15 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
         `Petition signature request with id ${petitionSignatureRequestId} not found`
       );
     }
-    if (!signature.external_id) {
+
+    if (!["PROCESSING", "ENQUEUED"].includes(signature.status)) {
+      throw new Error(`Can't cancel a ${signature.status} signature process.`);
+    }
+
+    if (signature.status === "PROCESSING" && !signature.external_id) {
       throw new Error(
         `Can't find external_id on petition signature request ${signature.id}`
       );
-    }
-
-    if (signature.status !== "PROCESSING") {
-      throw new Error(`Can't cancel a ${signature.status} signature process.`);
     }
 
     const petition = await ctx.petitions.loadPetition(signature.petition_id);
@@ -110,13 +111,15 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
           user_id: ctx.user!.id,
         },
       }),
-      ctx.aws.enqueueMessages("signature-worker", {
-        groupId: `signature-${toGlobalId("Petition", petition.id)}`,
-        body: {
-          type: "cancel-signature-process",
-          payload: { petitionSignatureRequestId: signature.id },
-        },
-      }),
+      signature.status === "PROCESSING"
+        ? ctx.aws.enqueueMessages("signature-worker", {
+            groupId: `signature-${toGlobalId("Petition", petition.id)}`,
+            body: {
+              type: "cancel-signature-process",
+              payload: { petitionSignatureRequestId: signature.id },
+            },
+          })
+        : Promise.resolve(),
       ctx.petitions.createEvent({
         type: "SIGNATURE_CANCELLED",
         petitionId: petition.id,

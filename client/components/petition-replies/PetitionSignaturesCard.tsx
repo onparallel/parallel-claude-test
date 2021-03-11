@@ -56,6 +56,9 @@ export function PetitionSignaturesCard({
   ...props
 }: PetitionSignaturesCardProps) {
   const [current, ...finished] = petition.signatureRequests!;
+  if (current?.status === "CANCELLED") {
+    finished.unshift(current);
+  }
 
   const [
     cancelSignatureRequest,
@@ -122,10 +125,7 @@ export function PetitionSignaturesCard({
         variables: { petitionId: petition.id, signatureConfig },
       });
 
-      if (
-        ["COMPLETED", "CLOSED"].includes(petition.status) ||
-        (current && ["COMPLETED", "CANCELLED"].includes(current.status))
-      ) {
+      if (["COMPLETED", "CLOSED"].includes(petition.status)) {
         await handleStartSignatureProcess();
       }
     } catch {}
@@ -172,13 +172,21 @@ export function PetitionSignaturesCard({
         </Box>
       </GenericCardHeader>
 
-      {current ? (
+      {current || petition.signatureConfig ? (
         <>
-          <CurrentSignatureRequestRow
-            signatureRequest={current}
-            onCancel={handleCancelSignatureProcess}
-            onDownload={handleDownloadSignedDoc}
-          />
+          {current && current.status !== "CANCELLED" ? (
+            <CurrentSignatureRequestRow
+              signatureRequest={current}
+              onCancel={handleCancelSignatureProcess}
+              onDownload={handleDownloadSignedDoc}
+            />
+          ) : petition.signatureConfig ? (
+            <NewSignatureRequestRow
+              petition={petition}
+              onStart={handleStartSignatureProcess}
+              onUpdateConfig={handleUpdateSignatureConfig}
+            />
+          ) : null}
           {finished.length ? (
             <FinishedSignatureRequests
               signatures={finished}
@@ -186,12 +194,6 @@ export function PetitionSignaturesCard({
             />
           ) : null}
         </>
-      ) : petition.signatureConfig ? (
-        <NewSignatureRequestRow
-          petition={petition}
-          onStart={handleStartSignatureProcess}
-          onUpdateConfig={handleUpdateSignatureConfig}
-        />
       ) : (
         <Center
           flexDirection="column"

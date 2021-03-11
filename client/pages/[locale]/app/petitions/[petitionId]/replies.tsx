@@ -440,10 +440,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const showSolveUnreviewedRepliesDialog = useSolveUnreviewedRepliesDialog();
 
-  const showConfirmDisableOngoingSignature = useDialog(
-    ConfirmDisableOngoingSignature
+  const showConfirmCancelOngoingSignature = useDialog(
+    ConfirmCancelOngoingSignature
   );
-  const showPendingSignatureDialog = useDialog(PendingSignatureDialog);
 
   const [
     cancelSignatureRequest,
@@ -455,32 +454,30 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         const hasPendingSignature =
           (petition.currentSignatureRequest &&
             ["ENQUEUED", "PROCESSING"].includes(
-              petition.currentSignatureRequest?.status
+              petition.currentSignatureRequest.status
             )) ??
           false;
-        const hasConfiguredSignature =
-          !petition.currentSignatureRequest && petition.signatureConfig;
-        if (hasPendingSignature) {
-          await showConfirmDisableOngoingSignature({});
-          await cancelSignatureRequest({
-            variables: {
-              petitionSignatureRequestId: petition.currentSignatureRequest!.id,
-            },
-          });
-        } else if (hasConfiguredSignature) {
-          const continueWithSignature = await showPendingSignatureDialog({});
-          if (continueWithSignature) {
-            // TODO
-            return;
-          } else {
-            await updatePetition({
+        if (
+          hasPendingSignature ||
+          (petition.signatureConfig && !petition.currentSignatureRequest) ||
+          (petition.signatureConfig && petition.status === "PENDING")
+        ) {
+          await showConfirmCancelOngoingSignature({});
+          if (hasPendingSignature) {
+            await cancelSignatureRequest({
               variables: {
-                petitionId: petition.id,
-                data: { signatureConfig: null },
+                petitionSignatureRequestId: petition.currentSignatureRequest!
+                  .id,
               },
             });
-            refetch();
           }
+          await updatePetition({
+            variables: {
+              petitionId: petition.id,
+              data: { signatureConfig: null },
+            },
+          });
+          refetch();
         }
 
         const hasUnreviewedReplies = petition.fields.some((f) =>
@@ -1156,7 +1153,7 @@ function useUpdatePetitionFieldRepliesStatus() {
   );
 }
 
-function ConfirmDisableOngoingSignature(props: DialogProps<{}, void>) {
+function ConfirmCancelOngoingSignature(props: DialogProps<{}, void>) {
   return (
     <ConfirmDialog
       header={
@@ -1238,44 +1235,6 @@ function PetitionContentsIndicators({
     </>
   );
 }
-
-function PendingSignatureDialog(props: DialogProps<{}, boolean>) {
-  return (
-    <ConfirmDialog
-      header={
-        <FormattedMessage
-          id="component.confirm-pending-signature.header"
-          defaultMessage="Pending eSignature"
-        />
-      }
-      body={
-        <FormattedMessage
-          id="component.pending-signature-dialog.body"
-          defaultMessage="<b>Start the eSignature</b> or <b>disable it</b> to continue and close this petition."
-          values={{ b: (chunks: any[]) => <b>{chunks}</b> }}
-        />
-      }
-      cancel={
-        <Button onClick={() => props.onResolve(false)}>
-          <FormattedMessage
-            id="component.pending-signature-dialog.disable"
-            defaultMessage="Disable"
-          />
-        </Button>
-      }
-      confirm={
-        <Button colorScheme="purple" onClick={() => props.onResolve(true)}>
-          <FormattedMessage
-            id="component.pending-signature-dialog.start-signature"
-            defaultMessage="Start eSignature"
-          />
-        </Button>
-      }
-      {...props}
-    />
-  );
-}
-
 PetitionReplies.getInitialProps = async ({
   query,
   fetchQuery,

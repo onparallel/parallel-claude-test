@@ -11,7 +11,7 @@ import {
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { Controller, useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { ContactSelect } from "../common/ContactSelect";
 
 export function SignerSelectDialog(
@@ -28,6 +28,7 @@ export function SignerSelectDialog(
 
   const handleSearchContacts = useSearchContacts();
   const handleCreateContact = useCreateContact();
+  const intl = useIntl();
 
   return (
     <ConfirmDialog
@@ -66,6 +67,11 @@ export function SignerSelectDialog(
                 onChange={onChange}
                 onSearchContacts={handleSearchContacts}
                 onCreateContact={handleCreateContact}
+                placeholder={intl.formatMessage({
+                  id:
+                    "component.signature-config-dialog.contacts-placeholder.required",
+                  defaultMessage: "Select the signers",
+                })}
               />
             )}
           />

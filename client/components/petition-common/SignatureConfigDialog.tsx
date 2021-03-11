@@ -19,7 +19,7 @@ import {
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
-import { useReactSelectProps } from "@parallel/utils/useReactSelectProps";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import useMergedRef from "@react-hook/merged-ref";
 import { useMemo, useRef } from "react";
@@ -44,12 +44,6 @@ export function SignatureConfigDialog({
 
   const intl = useIntl();
   const petitionIsCompleted = ["COMPLETED", "CLOSED"].includes(petition.status);
-  const hasFinishedSignature =
-    (petition.currentSignatureRequest &&
-      ["COMPLETED", "CANCELLED"].includes(
-        petition.currentSignatureRequest.status
-      )) ??
-    false;
 
   const {
     control,
@@ -114,8 +108,7 @@ export function SignatureConfigDialog({
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             contactIds: contacts.map((c) => c!.id),
             provider,
-            review:
-              petitionIsCompleted || hasFinishedSignature ? false : review,
+            review: petitionIsCompleted ? false : review,
             title,
           });
         }),
@@ -180,7 +173,7 @@ export function SignatureConfigDialog({
               })}
             />
           </FormControl>
-          <FormControl hidden={petitionIsCompleted || hasFinishedSignature}>
+          <FormControl hidden={petitionIsCompleted}>
             <FormLabel>
               <FormattedMessage
                 id="component.signature-config-dialog.review-before-send-label"
@@ -218,11 +211,7 @@ export function SignatureConfigDialog({
             />
           </FormControl>
           <FormControl
-            hidden={
-              hideContactSelection &&
-              !petitionIsCompleted &&
-              !hasFinishedSignature
-            }
+            hidden={hideContactSelection && !petitionIsCompleted}
             isInvalid={!!errors.contacts}
           >
             <FormLabel>
@@ -235,9 +224,7 @@ export function SignatureConfigDialog({
               name="contacts"
               control={control}
               rules={{
-                validate: (value) =>
-                  (!petitionIsCompleted && !hasFinishedSignature) ||
-                  value.length > 0,
+                validate: (value) => !petitionIsCompleted || value.length > 0,
               }}
               render={({ onChange, value }) => (
                 <ContactSelect
@@ -265,7 +252,7 @@ export function SignatureConfigDialog({
         </Stack>
       }
       confirm={
-        petitionIsCompleted || hasFinishedSignature ? (
+        petitionIsCompleted ? (
           <Button colorScheme="purple" type="submit">
             <FormattedMessage
               id="component.signature-config-dialog.confirm-start"
