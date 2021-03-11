@@ -846,6 +846,7 @@ async function startSignatureRequest(
               )
             ).id,
           ],
+      message: contactSigner?.message,
     }
   );
   await ctx.aws.enqueueMessages("signature-worker", {

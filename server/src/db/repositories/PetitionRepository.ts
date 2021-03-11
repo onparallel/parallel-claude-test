@@ -2893,6 +2893,7 @@ export class PetitionRepository extends BaseRepository {
       contactIds: number[];
       timezone: string;
       title: string;
+      message?: string;
     }
   ) {
     const [row] = await this.insert("petition_signature_request", {

@@ -235,7 +235,8 @@ function RecipientView({
       >
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
           {showAlert && ["COMPLETED", "CLOSED"].includes(petition.status) ? (
-            !petition.signature || petition.signatureStatus === "COMPLETED" ? (
+            !petition.signature ||
+            (petition.signature && petition.signatureStatus === "COMPLETED") ? (
               <Alert status="success" variant="subtle" zIndex={2}>
                 <Flex
                   maxWidth="container.lg"

@@ -1,6 +1,5 @@
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
-import { outdent } from "outdent";
 import { resolve } from "path";
 import sanitize from "sanitize-filename";
 import { URLSearchParams } from "url";
@@ -19,6 +18,7 @@ type PetitionSignatureConfig = {
   contactIds: number[];
   title: string;
   review: boolean;
+  message?: string;
 };
 
 /** starts a signature request on the petition */
@@ -105,15 +105,7 @@ async function startSignatureProcess(
         templateData,
         signingMode: "parallel",
         signatureBoxPositions,
-        initialMessage: outdent`
-        
-        Hello,
-      
-        I have completed this document requested by Cuatrecasas through Parallel. Could you please sign it?
-      
-        Thanks,
-        Mariano.
-      `,
+        initialMessage: settings.message,
       }
     );
 

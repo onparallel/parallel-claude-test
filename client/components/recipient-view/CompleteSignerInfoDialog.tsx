@@ -86,7 +86,12 @@ function CompleteSignerInfoDialog({
       {...props}
       content={{
         as: "form",
-        onSubmit: handleSubmit<CompleteSignerInfoDialogData>(props.onResolve),
+        onSubmit: handleSubmit<CompleteSignerInfoDialogData>((data) => {
+          props.onResolve({
+            ...data,
+            message: showMessage ? data.message : null,
+          });
+        }),
       }}
       header={
         <FormattedMessage

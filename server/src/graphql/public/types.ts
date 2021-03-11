@@ -105,9 +105,9 @@ export const PublicPetition = objectType({
         );
 
         return signature
-          ? ["PROCESSING", "ENQUEUED"].includes(signature.status)
-            ? "STARTED"
-            : "COMPLETED"
+          ? signature.status === "COMPLETED"
+            ? "COMPLETED"
+            : "STARTED"
           : null;
       },
     });
