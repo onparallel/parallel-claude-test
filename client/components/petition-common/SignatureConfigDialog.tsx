@@ -123,7 +123,7 @@ export function SignatureConfigDialog({
         <Stack>
           <Text>
             <FormattedMessage
-              id="component.signature-config-dialog..subtitle-1"
+              id="component.signature-config-dialog.header.subtitle"
               defaultMessage="A PDF with all the replies will be generated and sent to the eSignature provider. You can define when and by whom the document should be signed."
             />
           </Text>

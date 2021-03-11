@@ -532,20 +532,20 @@ function ReviewBeforeSignDialog({
       size="lg"
       header={
         <FormattedMessage
-          id="petition.finalize-review-before-sign.header"
+          id="recipient-view.review-before-sign.header"
           defaultMessage="Review and sign"
         />
       }
       body={
         <>
           <FormattedMessage
-            id="petition.finalize-review-before-sign.body-1"
+            id="recipient-view.review-before-sign.body-1"
             defaultMessage="This petition requires an <b>eSignature</b> in order to be completed."
             values={{ b: (chunks: any[]) => <b>{chunks}</b> }}
           />
           <Spacer marginTop={2} />
           <FormattedMessage
-            id="petition.finalize-review-before-sign.body-2"
+            id="recipient-view.review-before-sign.body-2"
             defaultMessage="We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign to the appropriate persons."
             values={{
               b: (chunks: any[]) => <b>{chunks}</b>,

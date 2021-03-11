@@ -310,6 +310,11 @@
     "context": "Please find attached a copy of the document you just signed through {signatureProvider}."
   },
   {
+    "term": "signature-requested.document-name",
+    "definition": "Documento: {documentName}",
+    "context": "Document: {documentName}"
+  },
+  {
     "term": "signature-requested.external-link",
     "definition": "Para revisar y firmar el documento, haga click en el siguiente enlace:",
     "context": "To review and sign it, click on the following link:"
@@ -321,8 +326,8 @@
   },
   {
     "term": "signature-requested.text",
-    "definition": "Ha recibido una petición para firmar un documento con el nombre de {documentName}.",
-    "context": "You have received a signature request to sign a document named {documentName}"
+    "definition": "Ha recibido una petición para firmar un documento.",
+    "context": "You have received a signature request to sign a document."
   },
   {
     "term": "template-sharing-notification.access-button",

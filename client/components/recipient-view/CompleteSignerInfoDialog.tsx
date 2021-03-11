@@ -95,14 +95,14 @@ function CompleteSignerInfoDialog({
       }}
       header={
         <FormattedMessage
-          id="petition.finalize-start-signature.header"
+          id="recipient-view.complete-signer-info-dialog.header"
           defaultMessage="Sign petition"
         />
       }
       body={
         <Stack>
           <FormattedMessage
-            id="recipient-view.delegate-access-dialog.subtitle-12"
+            id="recipient-view.complete-signer-info-dialog.subtitle"
             defaultMessage="An eSignature is required to complete this petition. <b>Who has to sign the document?</b>"
             values={{
               b: (chunks: any[]) => <b>{chunks}</b>,

@@ -1005,6 +1005,11 @@
     "context": "Sending"
   },
   {
+    "term": "component.petition-signatures-card.add-signature.label",
+    "definition": "Add signature",
+    "context": "Add signature"
+  },
+  {
     "term": "component.petition-signatures-card.header",
     "definition": "Petition eSignature",
     "context": "Petition eSignature"
@@ -1025,14 +1030,14 @@
     "context": "Previous signatures"
   },
   {
-    "term": "component.petition-signatures-card.signature-not-started",
-    "definition": "The signature process will start when the recipients complete the petition.",
-    "context": "The signature process will start when the recipients complete the petition."
-  },
-  {
     "term": "component.petition-signatures-card.signers",
     "definition": "Signers",
     "context": "Signers"
+  },
+  {
+    "term": "component.petition-signatures-card.start",
+    "definition": "Start...",
+    "context": "Start..."
   },
   {
     "term": "component.petition-signatures-card.status",
@@ -1200,9 +1205,29 @@
     "context": "This template has not been shared yet."
   },
   {
+    "term": "component.signature-config-dialog.confirm-start",
+    "definition": "Start signature",
+    "context": "Start signature"
+  },
+  {
     "term": "component.signature-config-dialog.contacts-label",
     "definition": "Who has to sign the petition?",
     "context": "Who has to sign the petition?"
+  },
+  {
+    "term": "component.signature-config-dialog.contacts-placeholder.optional",
+    "definition": "Let the recipient choose",
+    "context": "Let the recipient choose"
+  },
+  {
+    "term": "component.signature-config-dialog.contacts-placeholder.required",
+    "definition": "Select the signers",
+    "context": "Select the signers"
+  },
+  {
+    "term": "component.signature-config-dialog.dont-review-before-send.explainer",
+    "definition": "The signature will be initiated when the recipient has completed the information.",
+    "context": "The signature will be initiated when the recipient has completed the information."
   },
   {
     "term": "component.signature-config-dialog.header",
@@ -1210,9 +1235,34 @@
     "context": "eSignature configuration"
   },
   {
+    "term": "component.signature-config-dialog.header.subtitle",
+    "definition": "A PDF with all the replies will be generated and sent to the eSignature provider. You can define when and by whom the document should be signed.",
+    "context": "A PDF with all the replies will be generated and sent to the eSignature provider. You can define when and by whom the document should be signed."
+  },
+  {
     "term": "component.signature-config-dialog.provider-label",
     "definition": "eSignature provider",
     "context": "eSignature provider"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send-label",
+    "definition": "Do you want to review the information before it is sent to sign?",
+    "context": "Do you want to review the information before it is sent to sign?"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send.explainer",
+    "definition": "After reviewing the information you will have to start the signature manually.",
+    "context": "After reviewing the information you will have to start the signature manually."
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send.option-1",
+    "definition": "Yes, review before starting the signature process",
+    "context": "Yes, review before starting the signature process"
+  },
+  {
+    "term": "component.signature-config-dialog.review-before-send.option-2",
+    "definition": "No, start automatically when completing the petition",
+    "context": "No, start automatically when completing the petition"
   },
   {
     "term": "component.signature-config-dialog.title-help",
@@ -1485,9 +1535,19 @@
     "context": "Work better with"
   },
   {
+    "term": "generic.accept",
+    "definition": "Accept",
+    "context": "Accept"
+  },
+  {
     "term": "generic.actions-button",
     "definition": "Actions",
     "context": "Actions"
+  },
+  {
+    "term": "generic.add-message",
+    "definition": "Add message",
+    "context": "Add message"
   },
   {
     "term": "generic.all-languages",
@@ -1955,11 +2015,6 @@
     "context": "Required field"
   },
   {
-    "term": "generic.restart",
-    "definition": "Restart",
-    "context": "Restart"
-  },
-  {
     "term": "generic.richtext.bold",
     "definition": "Bold",
     "context": "Bold"
@@ -2013,11 +2068,6 @@
     "term": "generic.skip",
     "definition": "Skip",
     "context": "Skip"
-  },
-  {
-    "term": "generic.start",
-    "definition": "Start",
-    "context": "Start"
   },
   {
     "term": "generic.submit",
@@ -3063,11 +3113,6 @@
     "term": "petition.shared-delete-error",
     "definition": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first.",
     "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
-  },
-  {
-    "term": "petition.signature-config-dialog.contacts-placeholder",
-    "definition": "Search contacts...",
-    "context": "Search contacts..."
   },
   {
     "term": "petition.signature-successful.subtitle",
@@ -4335,6 +4380,16 @@
     "context": "Already trust us"
   },
   {
+    "term": "recipient-view.complete-signer-info-dialog.header",
+    "definition": "Sign petition",
+    "context": "Sign petition"
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.subtitle",
+    "definition": "An eSignature is required to complete this petition. <b>Who has to sign the document?</b>",
+    "context": "An eSignature is required to complete this petition. <b>Who has to sign the document?</b>"
+  },
+  {
     "term": "recipient-view.completed-petition.toast-description",
     "definition": "{name} will be notified for its revision.",
     "context": "{name} will be notified for its revision."
@@ -4470,6 +4525,16 @@
     "context": "Access delegated"
   },
   {
+    "term": "recipient-view.petition-requires-signature-alert-1",
+    "definition": "This petition requires an <b>eSignature</b> to be completed.",
+    "context": "This petition requires an <b>eSignature</b> to be completed."
+  },
+  {
+    "term": "recipient-view.petition-requires-signature-alert-2",
+    "definition": "We will send the <b>document to sign</b> once the replies have been reviewed and validated.",
+    "context": "We will send the <b>document to sign</b> once the replies have been reviewed and validated."
+  },
+  {
     "term": "recipient-view.powered-by",
     "definition": "Powered by {parallel}",
     "context": "Powered by {parallel}"
@@ -4488,6 +4553,21 @@
     "term": "recipient-view.remaining-attempts",
     "definition": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}",
     "context": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
+  },
+  {
+    "term": "recipient-view.review-before-sign.body-1",
+    "definition": "This petition requires an <b>eSignature</b> in order to be completed.",
+    "context": "This petition requires an <b>eSignature</b> in order to be completed."
+  },
+  {
+    "term": "recipient-view.review-before-sign.body-2",
+    "definition": "We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign to the appropriate persons.",
+    "context": "We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign to the appropriate persons."
+  },
+  {
+    "term": "recipient-view.review-before-sign.header",
+    "definition": "Review and sign",
+    "context": "Review and sign"
   },
   {
     "term": "recipient-view.security-link",

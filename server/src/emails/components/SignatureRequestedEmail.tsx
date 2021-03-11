@@ -29,19 +29,31 @@ const email: Email<SignatureRequestedProps> = {
     });
   },
   text(
-    { signerName: fullName, documentName, signButton }: SignatureRequestedProps,
+    {
+      signerName: fullName,
+      documentName,
+      signButton,
+      emailBody,
+    }: SignatureRequestedProps,
     intl: IntlShape
   ) {
     return outdent`
       ${greetingFormal({ fullName }, intl)}
+      ${intl.formatMessage({
+        id: "signature-requested.text",
+        defaultMessage:
+          "You have received a signature request to sign a document.",
+      })}
+
       ${intl.formatMessage(
         {
-          id: "signature-requested.text",
-          defaultMessage:
-            "You have received a signature request to sign a document named {documentName}",
+          id: "signature-requested.document-name",
+          defaultMessage: "Document: {documentName}",
         },
         { documentName }
       )}
+
+      ${emailBody}
 
       ${intl.formatMessage({
         id: "signature-requested.external-link",
