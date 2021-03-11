@@ -780,6 +780,7 @@ function useDragAndDrop(
   });
 
   const [{ isDragging }, dragRef, previewRef] = useDrag({
+    type: "FIELD",
     item: { type, id, index },
     canDrag: () => type === "FIELD",
     collect: (monitor: any) => {

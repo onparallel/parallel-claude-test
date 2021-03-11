@@ -1,4 +1,4 @@
-import { keyframes } from "@chakra-ui/react";
+import { keyframes, SystemStyleObject } from "@chakra-ui/react";
 import { getColor } from "@chakra-ui/theme-tools";
 import { Theme } from "@parallel/chakra/theme";
 
@@ -10,9 +10,9 @@ export function generateCssStripe({
   color = "transparent",
   secondaryColor = "transparent",
   isAnimated = false,
-}) {
+}): SystemStyleObject {
   return {
-    backgroundImage: (theme: Theme) => {
+    backgroundImage: ((theme: Theme) => {
       const _primary = getColor(theme, color);
       const _secondary = getColor(theme, secondaryColor);
       return `linear-gradient(
@@ -25,7 +25,7 @@ export function generateCssStripe({
         ${_secondary} 75%,
         ${_secondary}
       )`;
-    },
+    }) as any,
     backgroundSize: `${size} ${size}`,
     backgroundPosition: "left",
     animation: isAnimated

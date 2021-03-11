@@ -151,6 +151,7 @@ export const theme = extendTheme({
       },
     },
     Popover: {
+      parts: base.components.Popover.parts,
       baseStyle: (props) => {
         // Workaround until this is fixed https://github.com/chakra-ui/chakra-ui/issues/2481
         return deepmerge(base.components.Popover.baseStyle(props), {

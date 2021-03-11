@@ -320,7 +320,9 @@ export const PetitionComposeFieldList = Object.assign(
             }
           },
           onBlur() {
-            timeoutRef.current = setTimeout(() => setFocusedFieldId(null));
+            timeoutRef.current = window.setTimeout(() =>
+              setFocusedFieldId(null)
+            );
           },
           onMouseMove() {
             if (!isMenuOpenedRef.current) {
@@ -343,7 +345,9 @@ export const PetitionComposeFieldList = Object.assign(
           },
           onMouseLeave() {
             if (!isMenuOpenedRef.current) {
-              timeoutRef.current = setTimeout(() => setHoveredFieldId(null));
+              timeoutRef.current = window.setTimeout(() =>
+                setHoveredFieldId(null)
+              );
             } else {
               assignRef(hoveredFieldIdWhileMenuOpenedRef, null);
             }

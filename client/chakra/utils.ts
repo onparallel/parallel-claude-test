@@ -12,5 +12,5 @@ export type WithChakraProps<T extends As, P> = P &
 export function chakraForwardRef<T extends As, P = {}, R = ElementRef<T>>(
   render: ForwardRefRenderFunction<R, WithChakraProps<T, P>>
 ): ComponentWithAs<T, WithChakraProps<T, P> & { ref?: Ref<R> }> {
-  return forwardRef(render) as any;
+  return forwardRef(render as any) as any;
 }
