@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { injectable } from "inversify";
-import Knex, { Transaction, QueryBuilder, RawBinding } from "knex";
+import { Knex } from "knex";
 import { groupBy, indexBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray, UnwrapPromise } from "../../util/types";
@@ -17,7 +17,7 @@ type TableKey<
 > = TableTypes[TName][TablePrimaryKeys[TName]] & (string | number);
 
 type QueryBuilderFunction<TRecord, TResult = TRecord> = (
-  q: QueryBuilder<TRecord, TResult>
+  q: Knex.QueryBuilder<TRecord, TResult>
 ) => void;
 
 @injectable()
@@ -34,7 +34,7 @@ export class BaseRepository {
 
   protected from<TName extends TableNames>(
     tableName: TName,
-    transaction?: Transaction
+    transaction?: Knex.Transaction
   ) {
     return transaction
       ? transaction<TableTypes[TName]>(tableName)
@@ -43,8 +43,8 @@ export class BaseRepository {
 
   protected async raw<TResult>(
     sql: string,
-    bindings?: readonly RawBinding[],
-    transaction?: Transaction
+    bindings?: readonly Knex.RawBinding[],
+    transaction?: Knex.Transaction
   ): Promise<TResult[]> {
     let raw = this.knex.raw<{ rows: TResult[] }>(sql, bindings ?? []);
     if (transaction) {
@@ -57,7 +57,7 @@ export class BaseRepository {
   protected insert<TName extends TableNames>(
     tableName: TName,
     data: MaybeArray<TableCreateTypes[TName]>,
-    transaction?: Transaction
+    transaction?: Knex.Transaction
   ) {
     return (transaction
       ? transaction<TableTypes[TName]>(tableName)
@@ -126,7 +126,7 @@ export class BaseRepository {
     tableName: TName,
     column: TColumn,
     builder?: (
-      builder: QueryBuilder<TableTypes[TName], TableTypes[TName]>
+      builder: Knex.QueryBuilder<TableTypes[TName], TableTypes[TName]>
     ) => void
   ) {
     return fromDataLoader(
@@ -149,7 +149,10 @@ export class BaseRepository {
   protected async loadPageAndCount<TRecord, TResult>(
     query: Knex.QueryBuilder<TRecord, TResult>,
     { offset, limit }: PageOpts
-  ) {
+  ): Promise<{
+    totalCount: number;
+    items: UnwrapPromise<Knex.QueryBuilder<TRecord, TResult>>;
+  }> {
     const [{ count }] = await query
       .clone()
       .clearOrder()
@@ -158,22 +161,22 @@ export class BaseRepository {
     if (count === 0) {
       return {
         totalCount: 0,
-        items: ([] as unknown) as UnwrapPromise<typeof query>,
-      };
+        items: [],
+      } as any;
     } else {
       return {
         totalCount: count as number,
-        items: (await query
+        items: await query
           .clone()
           .offset(offset ?? 0)
-          .limit(limit ?? 0)) as UnwrapPromise<typeof query>,
+          .limit(limit ?? 0),
       };
     }
   }
 
   public async withTransaction<T>(
-    transactionScope: (t: Transaction) => Promise<T>,
-    transaction?: Transaction
+    transactionScope: (t: Knex.Transaction) => Promise<T>,
+    transaction?: Knex.Transaction
   ) {
     return transaction
       ? await transactionScope(transaction)

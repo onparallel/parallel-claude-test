@@ -1,13 +1,13 @@
-import { QueryBuilder } from "knex";
+import { Knex, knex } from "knex";
 
-QueryBuilder.extend("whereLike", likeClause("like"));
-QueryBuilder.extend("whereIlike", likeClause("ilike"));
-QueryBuilder.extend("whereNotLike", likeClause("not like"));
-QueryBuilder.extend("whereNotIlike", likeClause("not ilike"));
+(knex as any).QueryBuilder.extend("whereLike", likeClause("like"));
+(knex as any).QueryBuilder.extend("whereIlike", likeClause("ilike"));
+(knex as any).QueryBuilder.extend("whereNotLike", likeClause("not like"));
+(knex as any).QueryBuilder.extend("whereNotIlike", likeClause("not ilike"));
 
 function likeClause<TRecord = any, TResult = unknown>(operator: string) {
   return function (
-    this: QueryBuilder<TRecord, TResult>,
+    this: Knex.QueryBuilder<TRecord, TResult>,
     columnName: string,
     pattern: string,
     escape?: string
@@ -24,9 +24,9 @@ function likeClause<TRecord = any, TResult = unknown>(operator: string) {
   };
 }
 
-QueryBuilder.extend("mmodify", function mmodify<
+(knex as any).QueryBuilder.extend("mmodify", function mmodify<
   TRecord,
   TResult
->(this: QueryBuilder<TRecord, TResult>, ...args: Parameters<QueryBuilder["modify"]>) {
+>(this: Knex.QueryBuilder<TRecord, TResult>, ...args: Parameters<Knex.QueryBuilder["modify"]>) {
   return this.modify<TRecord, TResult>(...args);
 });

@@ -5,7 +5,7 @@ import { userCognitoId } from "../../../test/mocks";
 import faker from "faker";
 import { initServer, TestClient } from "./server";
 import { toGlobalId } from "../../util/globalId";
-import Knex from "knex";
+import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 
 describe("GraphQL/Contacts", () => {

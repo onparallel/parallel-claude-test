@@ -1,5 +1,5 @@
 import faker from "faker";
-import Knex from "knex";
+import { Knex } from "knex";
 import { range } from "remeda";
 import {
   CreateOrganization,

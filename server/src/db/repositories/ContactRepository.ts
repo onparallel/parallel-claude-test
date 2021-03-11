@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { addMinutes } from "date-fns";
 import { inject, injectable } from "inversify";
-import Knex, { QueryBuilder } from "knex";
+import { Knex } from "knex";
 import { groupBy, indexBy, mapValues, pipe, toPairs } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
@@ -40,9 +40,9 @@ export class ContactRepository extends BaseRepository {
         );
         const rows = await this.from("contact")
           .whereNull("deleted_at")
-          .where((qb: QueryBuilder<Contact>) => {
+          .where((qb) => {
             for (const [orgId, emails] of byOrgId) {
-              qb.orWhere((qb: QueryBuilder<Contact>) =>
+              qb.orWhere((qb) =>
                 qb.where("org_id", parseInt(orgId)).whereIn("email", emails)
               );
             }

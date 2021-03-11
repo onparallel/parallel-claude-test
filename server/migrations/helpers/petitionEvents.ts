@@ -1,4 +1,4 @@
-import * as Knex from "knex";
+import { Knex } from "knex";
 
 export async function addPetitionEvent(knex: Knex, eventName: string) {
   await knex.schema.raw(/* sql */ `

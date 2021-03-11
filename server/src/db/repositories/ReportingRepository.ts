@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import Knex from "knex";
+import { Knex } from "knex";
 import pMap from "p-map";
 import { chunk, indexBy, omit } from "remeda";
 import { BaseRepository } from "../helpers/BaseRepository";

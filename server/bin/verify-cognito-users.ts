@@ -4,7 +4,7 @@ import { AWS_SERVICE, IAws } from "../src/services/aws";
 import pMap from "p-map";
 import { Config, CONFIG } from "../src/config";
 import { KNEX } from "../src/db/knex";
-import Knex from "knex";
+import { Knex } from "knex";
 
 const container = createContainer();
 const knex = container.get<Knex>(KNEX);

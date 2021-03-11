@@ -1,7 +1,7 @@
 import { ApolloServer } from "apollo-server-express";
 import { createTestClient } from "apollo-server-testing";
 import { serialize as serializeCookie } from "cookie";
-import Knex from "knex";
+import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";

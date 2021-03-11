@@ -2,7 +2,7 @@ import gql from "graphql-tag";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { PetitionAccess, PetitionField } from "../../db/__types";
 import { initServer, TestClient } from "./server";
-import Knex from "knex";
+import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";
 import { serialize as serializeCookie } from "cookie";

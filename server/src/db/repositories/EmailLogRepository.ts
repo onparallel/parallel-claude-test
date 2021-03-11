@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import Knex from "knex";
+import { Knex } from "knex";
 import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
@@ -28,6 +28,9 @@ export class EmailLogRepository extends BaseRepository {
     emailLogId: number,
     temporaryFileIds: MaybeArray<number>
   ) {
+    if (Array.isArray(temporaryFileIds) && temporaryFileIds.length === 0) {
+      return;
+    }
     await this.insert(
       "email_attachment",
       unMaybeArray(temporaryFileIds).map((temporaryFileId) => ({

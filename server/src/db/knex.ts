@@ -1,15 +1,15 @@
 import { interfaces } from "inversify";
-import Knex from "knex";
+import { Knex, knex } from "knex";
 import { CONFIG, Config } from "../config";
 import { LOGGER, Logger } from "../services/logger";
 import "./helpers/knexExtensions";
 
 export const KNEX = Symbol.for("KNEX");
 
-export function createKnex({ container }: interfaces.Context) {
+export function createKnex({ container }: interfaces.Context): Knex {
   const config = container.get<Config>(CONFIG);
   const logger = container.get<Logger>(LOGGER);
-  const knex = Knex({
+  const instance = knex({
     client: "pg",
     connection: config.db,
     asyncStackTraces: process.env.NODE_ENV !== "production",
@@ -19,9 +19,9 @@ export function createKnex({ container }: interfaces.Context) {
     },
   });
   if (process.env.NODE_ENV === "development") {
-    knex.on("query", ({ sql, bindings }) => {
+    instance.on("query", ({ sql, bindings }) => {
       logger.debug(sql, { bindings });
     });
   }
-  return knex;
+  return instance;
 }

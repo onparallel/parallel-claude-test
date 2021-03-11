@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import Knex, { Transaction } from "knex";
+import { Knex } from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { CreateUser, User } from "../__types";
@@ -40,7 +40,7 @@ export class UserRepository extends BaseRepository {
     id: MaybeArray<number>,
     data: Partial<CreateUser>,
     user: User,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     const ids = unMaybeArray(id);
     return await this.from("user", t)

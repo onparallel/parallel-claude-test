@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
-import Knex, { QueryBuilder, Transaction } from "knex";
+import { Knex } from "knex";
 import { outdent } from "outdent";
 import {
   countBy,
@@ -12,9 +12,12 @@ import {
   uniq,
   zip,
 } from "remeda";
-import { PetitionEventPayload } from "../events";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { unMaybeArray } from "../../util/arrays";
+import {
+  evaluateFieldVisibility,
+  PetitionFieldVisibility,
+} from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
 import { isDefined } from "../../util/remedaExtensions";
@@ -24,6 +27,7 @@ import {
 } from "../../util/reminderUtils";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
+import { PetitionEventPayload } from "../events";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import {
   defaultFieldOptions,
@@ -35,32 +39,30 @@ import {
   Contact,
   CreatePetition,
   CreatePetitionAccess,
+  CreatePetitionContactNotification,
   CreatePetitionField,
   CreatePetitionFieldReply,
   CreatePetitionMessage,
   CreatePetitionReminder,
   CreatePetitionUser,
+  CreatePetitionUserNotification,
   Petition,
   PetitionAccess,
   PetitionContactNotification,
+  PetitionEvent,
   PetitionEventType,
   PetitionField,
   PetitionFieldComment,
   PetitionFieldReply,
   PetitionFieldReplyStatus,
   PetitionFieldType,
-  PetitionStatus,
-  User,
   PetitionSignatureRequest,
+  PetitionStatus,
   PetitionUser,
   PetitionUserNotification,
   PetitionUserPermissionType,
-  PetitionEvent,
+  User,
 } from "../__types";
-import {
-  evaluateFieldVisibility,
-  PetitionFieldVisibility,
-} from "../../util/fieldVisibility";
 
 type PetitionType = "PETITION" | "TEMPLATE";
 @injectable()
@@ -399,28 +401,33 @@ export class PetitionRepository extends BaseRepository {
     >[],
     user: User
   ) {
-    const rows = await this.insert(
-      "petition_access",
-      data.map((item) => ({
-        ...item,
-        petition_id: petitionId,
-        granter_id: user.id,
-        keycode: random(16),
-        status: "ACTIVE",
-        created_by: `User:${user.id}`,
-        updated_by: `User:${user.id}`,
-      }))
-    );
-    await this.createEvent(
-      rows.map((access) => ({
-        type: "ACCESS_ACTIVATED",
-        petitionId,
-        data: {
-          petition_access_id: access.id,
-          user_id: user.id,
-        },
-      }))
-    );
+    const rows =
+      data.length === 0
+        ? []
+        : await this.insert(
+            "petition_access",
+            data.map((item) => ({
+              ...item,
+              petition_id: petitionId,
+              granter_id: user.id,
+              keycode: random(16),
+              status: "ACTIVE",
+              created_by: `User:${user.id}`,
+              updated_by: `User:${user.id}`,
+            }))
+          );
+    if (rows.length > 0) {
+      await this.createEvent(
+        rows.map((access) => ({
+          type: "ACCESS_ACTIVATED",
+          petitionId,
+          data: {
+            petition_access_id: access.id,
+            user_id: user.id,
+          },
+        }))
+      );
+    }
     return rows;
   }
 
@@ -459,25 +466,30 @@ export class PetitionRepository extends BaseRepository {
     >[],
     user: User
   ) {
-    const rows = await this.insert(
-      "petition_message",
-      data.map((item) => ({
-        ...item,
-        scheduled_at: scheduledAt,
-        petition_id: petitionId,
-        sender_id: user.id,
-        created_by: `User:${user.id}`,
-      }))
-    );
-    await this.createEvent(
-      rows.map((message) => ({
-        type: scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
-        petitionId,
-        data: {
-          petition_message_id: message.id,
-        },
-      }))
-    );
+    const rows =
+      data.length === 0
+        ? []
+        : await this.insert(
+            "petition_message",
+            data.map((item) => ({
+              ...item,
+              scheduled_at: scheduledAt,
+              petition_id: petitionId,
+              sender_id: user.id,
+              created_by: `User:${user.id}`,
+            }))
+          );
+    if (rows.length > 0) {
+      await this.createEvent(
+        rows.map((message) => ({
+          type: scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
+          petitionId,
+          data: {
+            petition_message_id: message.id,
+          },
+        }))
+      );
+    }
 
     return rows;
   }
@@ -668,7 +680,7 @@ export class PetitionRepository extends BaseRepository {
     petitionIds: number[],
     userId: number,
     deletedBy: User,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     return await this.from("petition_user", t)
       .whereIn("petition_id", petitionIds)
@@ -686,7 +698,7 @@ export class PetitionRepository extends BaseRepository {
   async deleteAllPermissions(
     petitionIds: number[],
     user: User,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     return await this.withTransaction(async (t) => {
       return await this.from("petition_user", t)
@@ -708,7 +720,7 @@ export class PetitionRepository extends BaseRepository {
   async deletePetitionById(
     petitionId: MaybeArray<number>,
     user: User,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     const petitionIds = unMaybeArray(petitionId);
     return await this.withTransaction(async (t) => {
@@ -778,7 +790,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     data: Partial<CreatePetition>,
     user: User,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     const [row] = await this.from("petition", t)
       .where("id", petitionId)
@@ -905,7 +917,7 @@ export class PetitionRepository extends BaseRepository {
     data: Omit<CreatePetitionField, "petition_id" | "position">,
     position: number,
     user: User,
-    transaction?: Transaction<any, any>
+    t?: Knex.Transaction<any, any>
   ) {
     return await this.withTransaction(async (t) => {
       const [{ max }] = await this.from("petition_field", t)
@@ -967,7 +979,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       return { field, petition };
-    }, transaction);
+    }, t);
   }
 
   async deletePetitionField(petitionId: number, fieldId: number, user: User) {
@@ -1048,7 +1060,7 @@ export class PetitionRepository extends BaseRepository {
     fieldId: number,
     data: Partial<CreatePetitionField>,
     user: User,
-    transaction?: Transaction<any, any>
+    t?: Knex.Transaction<any, any>
   ) {
     return this.withTransaction(async (t) => {
       const [field] = await this.from("petition_field", t)
@@ -1107,7 +1119,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       return { field, petition };
-    }, transaction);
+    }, t);
   }
 
   async validateFieldData(
@@ -1177,7 +1189,7 @@ export class PetitionRepository extends BaseRepository {
   async updateRemindersForPetition(
     petitionId: number,
     nextReminderAt: Maybe<Date>,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     return this.withTransaction(async (t) => {
       return await this.from("petition_access", t)
@@ -1442,22 +1454,24 @@ export class PetitionRepository extends BaseRepository {
 
       const fields = await this.loadFieldsForPetition(petitionId);
       const [clonedFields] = await Promise.all([
-        this.insert(
-          "petition_field",
-          fields.map((field) => ({
-            ...omit(field, [
-              "id",
-              "petition_id",
-              "created_at",
-              "updated_at",
-              "validated",
-            ]),
-            petition_id: cloned.id,
-            created_by: `User:${user.id}`,
-            updated_by: `User:${user.id}`,
-          })),
-          t
-        ).returning("*"),
+        fields.length === 0
+          ? []
+          : this.insert(
+              "petition_field",
+              fields.map((field) => ({
+                ...omit(field, [
+                  "id",
+                  "petition_id",
+                  "created_at",
+                  "updated_at",
+                  "validated",
+                ]),
+                petition_id: cloned.id,
+                created_by: `User:${user.id}`,
+                updated_by: `User:${user.id}`,
+              })),
+              t
+            ).returning("*"),
         this.insert(
           "petition_user",
           {
@@ -1512,7 +1526,10 @@ export class PetitionRepository extends BaseRepository {
   );
 
   async createReminders(petitionId: number, data: CreatePetitionReminder[]) {
-    const reminders = await this.withTransaction(async (t) => {
+    if (data.length === 0) {
+      return [];
+    }
+    return await this.withTransaction(async (t) => {
       await this.from("petition_access", t)
         .whereIn(
           "id",
@@ -1528,18 +1545,23 @@ export class PetitionRepository extends BaseRepository {
             case when "reminders_left" <= 1 then false else "reminders_active" end
           `),
         });
-      return await this.insert("petition_reminder", data, t).returning("*");
+      const reminders = await this.insert(
+        "petition_reminder",
+        data,
+        t
+      ).returning("*");
+      await this.createEvent(
+        reminders.map((reminder) => ({
+          type: "REMINDER_SENT",
+          petitionId,
+          data: {
+            petition_reminder_id: reminder.id,
+          },
+        })),
+        t
+      );
+      return reminders;
     });
-    await this.createEvent(
-      reminders.map((reminder) => ({
-        type: "REMINDER_SENT",
-        petitionId,
-        data: {
-          petition_reminder_id: reminder.id,
-        },
-      }))
-    );
-    return reminders;
   }
 
   async processReminder(reminderId: number, emailLogId: number) {
@@ -1623,14 +1645,15 @@ export class PetitionRepository extends BaseRepository {
       type: TType;
       data: PetitionEventPayload<TType>;
     }>,
-    t?: Transaction<any, any>
-  ) {
-    const eventsArray = unMaybeArray(events);
-    if (eventsArray.length === 0) return [];
+    t?: Knex.Transaction<any, any>
+  ): Promise<PetitionEvent[]> {
+    if (Array.isArray(events) && events.length === 0) {
+      return [];
+    }
 
     const petitionEvents = await this.insert(
       "petition_event",
-      eventsArray.map(({ petitionId, type, data }) => ({
+      unMaybeArray(events).map(({ petitionId, type, data }) => ({
         petition_id: petitionId,
         type,
         data,
@@ -1679,11 +1702,11 @@ export class PetitionRepository extends BaseRepository {
         const rows = await this.from("petition_field_comment")
           .where((qb) => {
             for (const { userId, petitionId, petitionFieldId } of ids) {
-              qb = qb.orWhere((qb: QueryBuilder<PetitionFieldComment>) => {
+              qb = qb.orWhere((qb) => {
                 qb.where({
                   petition_id: petitionId,
                   petition_field_id: petitionFieldId,
-                }).andWhere((qb: QueryBuilder<PetitionFieldComment>) => {
+                }).andWhere((qb) => {
                   qb.whereNotNull("published_at").orWhere({ user_id: userId });
                 });
               });
@@ -1716,11 +1739,11 @@ export class PetitionRepository extends BaseRepository {
         const rows = await this.from("petition_field_comment")
           .where((qb) => {
             for (const { accessId, petitionId, petitionFieldId } of ids) {
-              qb = qb.orWhere((qb: QueryBuilder<PetitionFieldComment>) => {
+              qb = qb.orWhere((qb) => {
                 qb.where({
                   petition_id: petitionId,
                   petition_field_id: petitionFieldId,
-                }).andWhere((qb: QueryBuilder<PetitionFieldComment>) => {
+                }).andWhere((qb) => {
                   qb.whereNotNull("published_at").orWhere({
                     petition_access_id: accessId,
                   });
@@ -1956,25 +1979,30 @@ export class PetitionRepository extends BaseRepository {
     >(
       async (ids) => {
         const rows = await this.from("petition_user_notification")
-          .where((qb: QueryBuilder<PetitionUserNotification>) => {
+          .where((qb) => {
             for (const {
               userId,
               petitionId,
               petitionFieldId,
               petitionFieldCommentId,
             } of ids) {
-              qb = qb.orWhere((qb2: QueryBuilder<PetitionUserNotification>) => {
-                qb2
-                  .where({
-                    user_id: userId,
-                    petition_id: petitionId,
-                  })
-                  .whereRaw("data ->> 'petition_field_id' = ?", petitionFieldId)
-                  .whereRaw(
-                    "data ->> 'petition_field_comment_id' = ?",
-                    petitionFieldCommentId
-                  );
-              });
+              qb = qb.orWhere(
+                (qb2: Knex.QueryBuilder<PetitionUserNotification>) => {
+                  qb2
+                    .where({
+                      user_id: userId,
+                      petition_id: petitionId,
+                    })
+                    .whereRaw(
+                      "data ->> 'petition_field_id' = ?",
+                      petitionFieldId
+                    )
+                    .whereRaw(
+                      "data ->> 'petition_field_comment_id' = ?",
+                      petitionFieldCommentId
+                    );
+                }
+              );
             }
           })
           .where("type", "COMMENT_CREATED")
@@ -2024,7 +2052,7 @@ export class PetitionRepository extends BaseRepository {
     >(
       async (ids) => {
         const rows = await this.from("petition_contact_notification")
-          .where((qb: QueryBuilder<PetitionContactNotification>) => {
+          .where((qb) => {
             for (const {
               petitionAccessId,
               petitionId,
@@ -2032,7 +2060,7 @@ export class PetitionRepository extends BaseRepository {
               petitionFieldCommentId,
             } of ids) {
               qb = qb.orWhere(
-                (qb2: QueryBuilder<PetitionContactNotification>) => {
+                (qb2: Knex.QueryBuilder<PetitionContactNotification>) => {
                   qb2
                     .where({
                       petition_access_id: petitionAccessId,
@@ -2253,50 +2281,58 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async publishPetitionFieldCommentsForUser(petitionId: number, user: User) {
-    const comments = await this.from("petition_field_comment")
-      .where({
-        petition_id: petitionId,
-        user_id: user.id,
-      })
-      .whereNull("published_at")
-      .whereNull("deleted_at")
-      .update(
-        {
-          published_at: this.now(),
-        },
-        "*"
-      );
+    return await this.withTransaction(async (t) => {
+      const comments = await this.from("petition_field_comment", t)
+        .where({
+          petition_id: petitionId,
+          user_id: user.id,
+        })
+        .whereNull("published_at")
+        .whereNull("deleted_at")
+        .update(
+          {
+            published_at: this.now(),
+          },
+          "*"
+        );
 
-    // Create contact notifications
-    const accesses = await this.loadAccessesForPetition(petitionId);
-    await this.insert(
-      "petition_contact_notification",
-      accesses
+      // Create contact notifications
+      const accesses = await this.loadAccessesForPetition(petitionId);
+      const notifications = accesses
         .filter((access) => access.status === "ACTIVE")
         .flatMap((access) =>
+          comments.map(
+            (comment) =>
+              ({
+                type: "COMMENT_CREATED",
+                petition_id: comment.petition_id,
+                petition_access_id: access.id,
+                data: {
+                  petition_field_id: comment.petition_field_id,
+                  petition_field_comment_id: comment.id,
+                },
+              } as CreatePetitionContactNotification)
+          )
+        );
+      if (notifications.length > 0) {
+        await this.insert("petition_contact_notification", notifications, t);
+      }
+
+      if (comments.length > 0) {
+        await this.createEvent(
           comments.map((comment) => ({
-            type: "COMMENT_CREATED",
-            petition_id: comment.petition_id,
-            petition_access_id: access.id,
+            type: "COMMENT_PUBLISHED",
+            petitionId,
             data: {
               petition_field_id: comment.petition_field_id,
               petition_field_comment_id: comment.id,
             },
-          }))
-        )
-    );
-
-    await this.createEvent(
-      comments.map((comment) => ({
-        type: "COMMENT_PUBLISHED",
-        petitionId,
-        data: {
-          petition_field_id: comment.petition_field_id,
-          petition_field_comment_id: comment.id,
-        },
-      }))
-    );
-    return { comments, accesses };
+          })),
+          t
+        );
+      }
+      return { comments, accesses };
+    });
   }
 
   async publishPetitionFieldCommentsForAccess(
@@ -2321,21 +2357,21 @@ export class PetitionRepository extends BaseRepository {
       // Create user notifications and events
       const userIds = await this.loadSubscribedUserIdsOnPetition(petitionId);
 
-      await this.insert(
-        "petition_user_notification",
-        userIds.flatMap((id) =>
-          comments.map((comment) => ({
-            type: "COMMENT_CREATED",
-            petition_id: comment.petition_id,
-            user_id: id,
-            data: {
-              petition_field_id: comment.petition_field_id,
-              petition_field_comment_id: comment.id,
-            },
-          }))
-        ),
-        t
+      const notifications = userIds.flatMap((id) =>
+        comments.map(
+          (comment) =>
+            ({
+              type: "COMMENT_CREATED",
+              petition_id: comment.petition_id,
+              user_id: id,
+              data: {
+                petition_field_id: comment.petition_field_id,
+                petition_field_comment_id: comment.id,
+              },
+            } as CreatePetitionUserNotification)
+        )
       );
+      await this.insert("petition_user_notification", notifications, t);
 
       await this.createEvent(
         comments.map((comment) => ({
@@ -2364,9 +2400,9 @@ export class PetitionRepository extends BaseRepository {
         user_id: user.id,
         type: "COMMENT_CREATED",
       })
-      .where((qb: QueryBuilder<PetitionUserNotification>) => {
+      .where((qb) => {
         for (const comment of comments) {
-          qb = qb.orWhere((qb: QueryBuilder<PetitionUserNotification>) => {
+          qb = qb.orWhere((qb) => {
             qb.where({ petition_id: comment.petition_id })
               .whereRaw(
                 "data ->> 'petition_field_id' = ?",
@@ -2392,9 +2428,9 @@ export class PetitionRepository extends BaseRepository {
         petition_access_id: accessId,
         type: "COMMENT_CREATED",
       })
-      .where((qb: QueryBuilder<PetitionContactNotification>) => {
+      .where((qb) => {
         for (const comment of comments) {
-          qb = qb.orWhere((qb: QueryBuilder<PetitionContactNotification>) => {
+          qb = qb.orWhere((qb) => {
             qb.where({ petition_id: comment.petition_id })
               .whereRaw(
                 "data ->> 'petition_field_id' = ?",
@@ -2502,7 +2538,7 @@ export class PetitionRepository extends BaseRepository {
     userIds: number[],
     permissionType: PetitionUserPermissionType,
     user: User,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     const batch: CreatePetitionUser[] = petitionIds.flatMap((petitionId) =>
       userIds.map((userId) => ({
@@ -2589,7 +2625,7 @@ export class PetitionRepository extends BaseRepository {
     userIds: number[],
     removeAll: boolean,
     user: User,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     return this.withTransaction(async (t) => {
       const removedPermissions = await this.from("petition_user", t)
@@ -2635,7 +2671,7 @@ export class PetitionRepository extends BaseRepository {
   async removePetitionUserPermissionsById(
     petitionUserPermissionIds: number[],
     deletedBy: User,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     return this.withTransaction(async (t) => {
       const removedPermissions = await this.from("petition_user", t)
@@ -2673,7 +2709,7 @@ export class PetitionRepository extends BaseRepository {
     toUserId: number,
     keepOriginalPermissions: boolean,
     updatedBy: User,
-    t?: Transaction
+    t?: Knex.Transaction
   ) {
     return await this.withTransaction(async (t) => {
       // change permission of original owner to WRITE

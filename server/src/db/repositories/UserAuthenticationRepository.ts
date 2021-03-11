@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import Knex from "knex";
+import { Knex } from "knex";
 import { hash, random } from "../../util/token";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";

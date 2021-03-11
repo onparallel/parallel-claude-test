@@ -5,7 +5,7 @@ import { userCognitoId } from "../../../test/mocks";
 import { toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
 import { KNEX } from "../../db/knex";
-import Knex from "knex";
+import { Knex } from "knex";
 
 describe("GraphQL/Users", () => {
   let mocks: Mocks;

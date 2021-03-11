@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import Knex from "knex";
+import { Knex } from "knex";
 import { deleteAllData } from "../../../util/knexUtils";
 import { KNEX } from "../../knex";
 import {

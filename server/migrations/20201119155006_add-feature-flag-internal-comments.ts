@@ -1,4 +1,4 @@
-import * as Knex from "knex";
+import { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
   // need to commit the transaction before safely using new enum value

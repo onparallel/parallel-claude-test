@@ -14,7 +14,7 @@ import {
 import { toGlobalId } from "../../util/globalId";
 import { userCognitoId } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
-import Knex from "knex";
+import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 
 describe("GraphQL/Petition Fields", () => {

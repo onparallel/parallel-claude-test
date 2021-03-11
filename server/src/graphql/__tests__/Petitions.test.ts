@@ -4,9 +4,10 @@ import { Organization, User, Petition, PetitionField } from "../../db/__types";
 import { userCognitoId } from "../../../test/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
-import Knex from "knex";
+import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 import { omit } from "remeda";
+import faker from "faker";
 
 const petitionsBuilder = (orgId: number) => (
   index: number
@@ -204,7 +205,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = templates!.templates;
 
       // pick a random templateId that is not on first position of items array
-      const index = Math.floor(Math.random() * (items.length - 1) + 1);
+      const index = faker.random.number({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition
@@ -330,7 +331,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = templates!.publicTemplates;
 
       // pick a random templateId that is not on first position of items array
-      const index = Math.floor(Math.random() * (items.length - 1) + 1);
+      const index = faker.random.number({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition

@@ -1,4 +1,4 @@
-import * as Knex from "knex";
+import { Knex } from "knex";
 import { groupBy, sortBy, pick, indexBy } from "remeda";
 
 type Maybe<T> = T | null;

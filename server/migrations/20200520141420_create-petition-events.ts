@@ -1,4 +1,4 @@
-import * as Knex from "knex";
+import { Knex } from "knex";
 import { sortBy } from "remeda";
 
 type Maybe<T> = T | null;
@@ -233,7 +233,9 @@ export async function up(knex: Knex): Promise<any> {
       });
     }
   }
-  await knex("petition_event").insert(sortBy(events, (e) => e.created_at));
+  if (events.length) {
+    await knex("petition_event").insert(sortBy(events, (e) => e.created_at));
+  }
 }
 
 export async function down(knex: Knex): Promise<any> {

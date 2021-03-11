@@ -1,5 +1,5 @@
 import { differenceInMinutes } from "date-fns";
-import * as Knex from "knex";
+import { Knex } from "knex";
 import { groupBy } from "remeda";
 import { PetitionEvent } from "../src/db/__types";
 import { UnwrapArray } from "../src/util/types";

@@ -9,7 +9,7 @@ import {
 import { userCognitoId } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
 import { toGlobalId } from "../../util/globalId";
-import Knex from "knex";
+import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
 
 describe("GraphQL/UserAuthenticationToken", () => {

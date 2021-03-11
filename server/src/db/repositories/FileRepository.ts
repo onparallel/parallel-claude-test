@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import Knex from "knex";
+import { Knex } from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import {

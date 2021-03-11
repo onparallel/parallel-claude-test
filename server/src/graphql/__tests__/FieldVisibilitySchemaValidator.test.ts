@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import Knex from "knex";
+import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
 import { KNEX } from "../../db/knex";

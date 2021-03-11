@@ -1,5 +1,5 @@
 import "./../src/init";
-import Knex from "knex";
+import { Knex } from "knex";
 import fetch from "node-fetch";
 import pMap from "p-map";
 import { Readable } from "stream";

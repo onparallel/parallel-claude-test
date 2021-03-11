@@ -2,14 +2,14 @@
 require("dotenv").config();
 import camelCase from "camelcase";
 import { promises as fs } from "fs";
-import Knex from "knex";
+import { knex } from "knex";
 import path from "path";
 import { format } from "prettier";
 import { groupBy, indexBy } from "remeda";
 
 const EXCLUDED_TABLES = ["migrations", "migrations_lock"];
 
-const knex = Knex({
+const instance = knex({
   client: "pg",
   connection: {
     host: process.env.DB_HOST!,
@@ -115,7 +115,7 @@ export type Create${table.name} = PartialProps<
 }
 
 async function query<T>(sql: string, bindings?: any[]) {
-  const result = await knex.raw(sql, bindings as any);
+  const result = await instance.raw(sql, bindings as any);
   return result.rows as T[];
 }
 
@@ -267,7 +267,7 @@ async function main() {
   } catch (e) {
     console.log(e);
   } finally {
-    await knex.destroy();
+    await instance.destroy();
   }
 }
 

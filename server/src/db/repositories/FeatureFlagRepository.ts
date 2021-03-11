@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
-import Knex from "knex";
+import { Knex } from "knex";
 import { indexBy, uniq } from "remeda";
 import {
   fromDataLoader,

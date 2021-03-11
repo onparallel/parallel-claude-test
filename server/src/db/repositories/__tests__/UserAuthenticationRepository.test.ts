@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import Knex from "knex";
+import { Knex } from "knex";
 import { KNEX } from "../../knex";
 import { Mocks } from "./mocks";
 import { UserAuthenticationRepository } from "../UserAuthenticationRepository";

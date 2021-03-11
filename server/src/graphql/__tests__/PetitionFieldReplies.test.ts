@@ -1,5 +1,5 @@
 import gql from "graphql-tag";
-import Knex from "knex";
+import { Knex } from "knex";
 import { omit } from "remeda";
 import { userCognitoId } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";

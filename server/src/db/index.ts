@@ -1,5 +1,5 @@
 import { ContainerModule } from "inversify";
-import Knex from "knex";
+import { Knex } from "knex";
 import { createKnex, KNEX } from "./knex";
 import { ContactRepository } from "./repositories/ContactRepository";
 import { EmailLogRepository } from "./repositories/EmailLogRepository";
