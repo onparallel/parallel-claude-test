@@ -89,6 +89,13 @@ export interface NexusGenInputs {
     filename: string; // String!
     size: number; // Int!
   };
+  PublicPetitionSignerData: {
+    // input type
+    email: string; // String!
+    firstName: string; // String!
+    lastName: string; // String!
+    message?: string | null; // String
+  };
   RemindersConfigInput: {
     // input type
     offset: number; // Int!
@@ -100,6 +107,7 @@ export interface NexusGenInputs {
     // input type
     contactIds: string[]; // [ID!]!
     provider: string; // String!
+    review: boolean; // Boolean!
     timezone: string; // String!
     title: string; // String!
   };
@@ -185,6 +193,7 @@ export interface NexusGenEnums {
   PetitionStatus: db.PetitionStatus;
   PetitionUserPermissionType: db.PetitionUserPermissionType;
   PetitionUserPermissionTypeRW: "READ" | "WRITE";
+  PublicSignatureStatus: "COMPLETED" | "STARTED";
   QueryContacts_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -352,6 +361,10 @@ export interface NexusGenObjects {
   PublicPetitionField: db.PetitionField;
   PublicPetitionFieldComment: db.PetitionFieldComment;
   PublicPetitionFieldReply: db.PetitionFieldReply;
+  PublicSignatureConfig: {
+    contactIds: number[];
+    review: boolean;
+  };
   PublicUser: db.User;
   Query: {};
   ReminderSentEvent: events.ReminderSentEvent;
@@ -377,6 +390,7 @@ export interface NexusGenObjects {
     contactIds: number[];
     timezone: string;
     title: string;
+    review: boolean;
   };
   SignatureStartedEvent: events.SignatureStartedEvent;
   Subscription: db.PetitionEventSubscription;
@@ -909,7 +923,8 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    signers: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
+    signature: NexusGenRootTypes["PublicSignatureConfig"] | null; // PublicSignatureConfig
+    signatureStatus: NexusGenEnums["PublicSignatureStatus"] | null; // PublicSignatureStatus
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
@@ -953,6 +968,11 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  PublicSignatureConfig: {
+    // field return type
+    review: boolean; // Boolean!
+    signers: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
   };
   PublicUser: {
     // field return type
@@ -1042,6 +1062,7 @@ export interface NexusGenFieldTypes {
     // field return type
     contacts: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     provider: string; // String!
+    review: boolean; // Boolean!
     timezone: string; // String!
     title: string; // String!
   };
@@ -1632,7 +1653,8 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
-    signers: "PublicContact";
+    signature: "PublicSignatureConfig";
+    signatureStatus: "PublicSignatureStatus";
     status: "PetitionStatus";
     updatedAt: "DateTime";
   };
@@ -1676,6 +1698,11 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";
+  };
+  PublicSignatureConfig: {
+    // field return type name
+    review: "Boolean";
+    signers: "PublicContact";
   };
   PublicUser: {
     // field return type name
@@ -1765,6 +1792,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     contacts: "Contact";
     provider: "String";
+    review: "Boolean";
     timezone: "String";
     title: "String";
   };
@@ -2080,6 +2108,7 @@ export interface NexusGenArgTypes {
     publicCompletePetition: {
       // args
       keycode: string; // ID!
+      signer?: NexusGenInputs["PublicPetitionSignerData"] | null; // PublicPetitionSignerData
     };
     publicCreateFileUploadReply: {
       // args
@@ -2336,6 +2365,10 @@ export interface NexusGenArgTypes {
     };
   };
   Petition: {
+    currentSignatureRequest: {
+      // args
+      token?: string | null; // String
+    };
     events: {
       // args
       limit?: number | null; // Int

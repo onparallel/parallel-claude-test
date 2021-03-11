@@ -58,6 +58,36 @@ export class ContactRepository extends BaseRepository {
     )
   );
 
+  async loadOrCreate(
+    {
+      email,
+      orgId,
+      firstName,
+      lastName,
+    }: {
+      email: string;
+      orgId: number;
+      firstName: string;
+      lastName: string;
+    },
+    doneBy: Contact
+  ) {
+    let contact = await this.loadContactByEmail({ email, orgId });
+    if (!contact) {
+      contact = await this.createContact(
+        {
+          email,
+          first_name: firstName,
+          last_name: lastName,
+        },
+        doneBy,
+        `Contact:${doneBy.id}`
+      );
+    }
+
+    return contact;
+  }
+
   async userHasAccessToContacts(user: User, contactIds: number[]) {
     const [{ count }] = await this.from("contact")
       .where({

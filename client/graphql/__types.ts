@@ -248,7 +248,10 @@ export type Mutation = {
   /** Marks the specified comments as read. */
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
   publicCheckVerificationCode: VerificationCodeCheck;
-  /** Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user. */
+  /**
+   * Marks a filled petition as COMPLETED.
+   * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
+   */
   publicCompletePetition: PublicPetition;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: CreateFileUploadReply;
@@ -508,6 +511,7 @@ export type MutationpublicCheckVerificationCodeArgs = {
 
 export type MutationpublicCompletePetitionArgs = {
   keycode: Scalars["ID"];
+  signer?: Maybe<PublicPetitionSignerData>;
 };
 
 export type MutationpublicCreateFileUploadReplyArgs = {
@@ -909,6 +913,11 @@ export type Petition = PetitionBase & {
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
   userPermissions: Array<PetitionUserPermission>;
+};
+
+/** A petition */
+export type PetitioncurrentSignatureRequestArgs = {
+  token?: Maybe<Scalars["String"]>;
 };
 
 /** A petition */
@@ -1424,8 +1433,9 @@ export type PublicPetition = Timestamps & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The signers of the petition */
-  signers: Array<Maybe<PublicContact>>;
+  /** The signature config of the petition */
+  signature?: Maybe<PublicSignatureConfig>;
+  signatureStatus?: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
   /** Time when the resource was last updated. */
@@ -1503,6 +1513,24 @@ export type PublicPetitionFieldReply = Timestamps & {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
+
+export type PublicPetitionSignerData = {
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  message?: Maybe<Scalars["String"]>;
+};
+
+/** The public signature settings of a petition */
+export type PublicSignatureConfig = {
+  __typename?: "PublicSignatureConfig";
+  /** If true, lets the user review the replies before starting the signature process */
+  review: Scalars["Boolean"];
+  /** The contacts that need to sign the generated document. */
+  signers: Array<Maybe<PublicContact>>;
+};
+
+export type PublicSignatureStatus = "COMPLETED" | "STARTED";
 
 /** A public view of a user */
 export type PublicUser = {
@@ -1750,6 +1778,8 @@ export type SignatureConfig = {
   contacts: Array<Maybe<Contact>>;
   /** The selected provider for the signature. */
   provider: Scalars["String"];
+  /** If true, lets the user review the replies before starting the signature process */
+  review: Scalars["Boolean"];
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** Title of the signature document */
@@ -1762,6 +1792,8 @@ export type SignatureConfigInput = {
   contactIds: Array<Scalars["ID"]>;
   /** The selected provider for the signature. */
   provider: Scalars["String"];
+  /** If true, lets the user review the replies before starting the signature process */
+  review: Scalars["Boolean"];
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** The title of the signing document */
@@ -2854,6 +2886,19 @@ export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
   >;
 };
 
+export type PetitionSettings_startPetitionSignatureRequestMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionSettings_startPetitionSignatureRequestMutation = {
+  __typename?: "Mutation";
+} & {
+  startSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
+    PetitionSignatureRequest,
+    "id" | "status"
+  >;
+};
+
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name"> & {
@@ -2959,11 +3004,17 @@ export type PetitionSharingModal_PetitionUserPermissionsQuery = {
 
 export type SignatureConfigDialog_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "name"> & {
+} & Pick<Petition, "name" | "status"> & {
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "id" | "status"
+      >
+    >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<
         SignatureConfig,
-        "provider" | "timezone" | "title"
+        "provider" | "title" | "review"
       > & {
           contacts: Array<
             Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
@@ -2974,7 +3025,7 @@ export type SignatureConfigDialog_PetitionFragment = {
 
 export type SignatureConfigDialog_OrgIntegrationFragment = {
   __typename?: "OrgIntegration";
-} & Pick<OrgIntegration, "name" | "provider">;
+} & { label: OrgIntegration["name"]; value: OrgIntegration["provider"] };
 
 export type useTemplateDetailsDialogPetitionQueryVariables = Exact<{
   templateId: Scalars["GID"];
@@ -3257,11 +3308,21 @@ export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
     >;
   };
 
+export type PetitionSignaturesCard_UserFragment = { __typename?: "User" } & {
+  organization: { __typename?: "Organization" } & {
+    signatureIntegrations: Array<
+      {
+        __typename?: "OrgIntegration";
+      } & SignatureConfigDialog_OrgIntegrationFragment
+    >;
+  };
+};
+
 export type PetitionSignaturesCard_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "status"> & {
     signatureConfig?: Maybe<
-      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "provider"> & {
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "timezone"> & {
           contacts: Array<
             Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
           >;
@@ -3274,7 +3335,7 @@ export type PetitionSignaturesCard_PetitionFragment = {
         } & PetitionSignaturesCard_PetitionSignatureRequestFragment
       >
     >;
-  };
+  } & SignatureConfigDialog_PetitionFragment;
 
 export type PetitionSignaturesCard_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
@@ -3285,6 +3346,19 @@ export type PetitionSignaturesCard_PetitionSignatureRequestFragment = {
       >;
     };
   };
+
+export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  signatureConfig?: Maybe<SignatureConfigInput>;
+}>;
+
+export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
+  __typename?: "Mutation";
+} & {
+  updatePetition:
+    | ({ __typename?: "Petition" } & PetitionSignaturesCard_PetitionFragment)
+    | { __typename?: "PetitionTemplate" };
+};
 
 export type PetitionSignaturesCard_cancelSignatureRequestMutationVariables = Exact<{
   petitionSignatureRequestId: Scalars["GID"];
@@ -3391,8 +3465,11 @@ export type RecipientViewProgressFooter_PublicPetitionFragment = {
         __typename?: "PublicPetitionField";
       } & RecipientViewProgressFooter_PublicPetitionFieldFragment
     >;
-    signers: Array<
-      Maybe<{ __typename?: "PublicContact" } & Pick<PublicContact, "id">>
+    signature?: Maybe<
+      { __typename?: "PublicSignatureConfig" } & Pick<
+        PublicSignatureConfig,
+        "review"
+      >
     >;
   };
 
@@ -4372,7 +4449,8 @@ export type PetitionReplies_UserFragment = { __typename?: "User" } & {
   hasPetitionPdfExport: User["hasFeatureFlag"];
 } & PetitionLayout_UserFragment &
   PetitionRepliesFieldComments_UserFragment &
-  ExportRepliesDialog_UserFragment;
+  ExportRepliesDialog_UserFragment &
+  PetitionSignaturesCard_UserFragment;
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -4827,16 +4905,23 @@ export type RecipientView_PublicPetitionFragment = {
   | "deadline"
   | "hasCommentsEnabled"
   | "isRecipientViewContentsHidden"
+  | "signatureStatus"
 > & {
     fields: Array<
       {
         __typename?: "PublicPetitionField";
       } & RecipientView_PublicPetitionFieldFragment
     >;
-    signers: Array<
-      Maybe<
-        { __typename?: "PublicContact" } & RecipientView_PublicContactFragment
-      >
+    signature?: Maybe<
+      { __typename?: "PublicSignatureConfig" } & {
+        signers: Array<
+          Maybe<
+            {
+              __typename?: "PublicContact";
+            } & RecipientView_PublicContactFragment
+          >
+        >;
+      }
     >;
   } & RecipientViewContentsCard_PublicPetitionFragment &
   RecipientViewProgressFooter_PublicPetitionFragment;
@@ -4859,6 +4944,7 @@ export type RecipientView_PublicUserFragment = {
 
 export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
   keycode: Scalars["ID"];
+  signer?: Maybe<PublicPetitionSignerData>;
 }>;
 
 export type RecipientView_publicCompletePetitionMutation = {
@@ -4955,17 +5041,22 @@ export type PetitionPdf_PetitionFragment = { __typename?: "Petition" } & Pick<
       Organization,
       "name" | "logoUrl"
     >;
-    signatureConfig?: Maybe<
-      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "timezone"> & {
-          contacts: Array<
-            Maybe<
-              { __typename?: "Contact" } & Pick<
-                Contact,
-                "id" | "fullName" | "email"
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & {
+        signatureConfig: { __typename?: "SignatureConfig" } & Pick<
+          SignatureConfig,
+          "timezone"
+        > & {
+            contacts: Array<
+              Maybe<
+                { __typename?: "Contact" } & Pick<
+                  Contact,
+                  "id" | "fullName" | "email"
+                >
               >
-            >
-          >;
-        }
+            >;
+          };
+      }
     >;
   };
 
@@ -6255,13 +6346,18 @@ export const ContactSelect_ContactFragmentDoc = gql`
 export const SignatureConfigDialog_PetitionFragmentDoc = gql`
   fragment SignatureConfigDialog_Petition on Petition {
     name
+    status
+    currentSignatureRequest {
+      id
+      status
+    }
     signatureConfig {
       provider
       contacts {
         ...ContactSelect_Contact
       }
-      timezone
       title
+      review
     }
   }
   ${ContactSelect_ContactFragmentDoc}
@@ -6349,8 +6445,8 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
 `;
 export const SignatureConfigDialog_OrgIntegrationFragmentDoc = gql`
   fragment SignatureConfigDialog_OrgIntegration on OrgIntegration {
-    name
-    provider
+    label: name
+    value: provider
   }
 `;
 export const PetitionSettings_UserFragmentDoc = gql`
@@ -6510,7 +6606,7 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
     id
     status
     signatureConfig {
-      provider
+      timezone
       contacts {
         ...ContactLink_Contact
       }
@@ -6518,9 +6614,11 @@ export const PetitionSignaturesCard_PetitionFragmentDoc = gql`
     signatureRequests {
       ...PetitionSignaturesCard_PetitionSignatureRequest
     }
+    ...SignatureConfigDialog_Petition
   }
   ${ContactLink_ContactFragmentDoc}
   ${PetitionSignaturesCard_PetitionSignatureRequestFragmentDoc}
+  ${SignatureConfigDialog_PetitionFragmentDoc}
 `;
 export const PetitionReplies_PetitionFragmentDoc = gql`
   fragment PetitionReplies_Petition on Petition {
@@ -6553,6 +6651,16 @@ export const ExportRepliesDialog_UserFragmentDoc = gql`
     hasExportCuatrecasas: hasFeatureFlag(featureFlag: EXPORT_CUATRECASAS)
   }
 `;
+export const PetitionSignaturesCard_UserFragmentDoc = gql`
+  fragment PetitionSignaturesCard_User on User {
+    organization {
+      signatureIntegrations: integrations(type: SIGNATURE) {
+        ...SignatureConfigDialog_OrgIntegration
+      }
+    }
+  }
+  ${SignatureConfigDialog_OrgIntegrationFragmentDoc}
+`;
 export const PetitionReplies_UserFragmentDoc = gql`
   fragment PetitionReplies_User on User {
     hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
@@ -6560,10 +6668,12 @@ export const PetitionReplies_UserFragmentDoc = gql`
     ...PetitionLayout_User
     ...PetitionRepliesFieldComments_User
     ...ExportRepliesDialog_User
+    ...PetitionSignaturesCard_User
   }
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionRepliesFieldComments_UserFragmentDoc}
   ${ExportRepliesDialog_UserFragmentDoc}
+  ${PetitionSignaturesCard_UserFragmentDoc}
 `;
 export const PetitionReplies_createPetitionFieldComment_PetitionFieldFragmentDoc = gql`
   fragment PetitionReplies_createPetitionFieldComment_PetitionField on PetitionField {
@@ -6817,8 +6927,8 @@ export const RecipientViewProgressFooter_PublicPetitionFragmentDoc = gql`
     fields {
       ...RecipientViewProgressFooter_PublicPetitionField
     }
-    signers {
-      id
+    signature {
+      review
     }
   }
   ${RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc}
@@ -6833,9 +6943,12 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
     fields {
       ...RecipientView_PublicPetitionField
     }
-    signers {
-      ...RecipientView_PublicContact
+    signature {
+      signers {
+        ...RecipientView_PublicContact
+      }
     }
+    signatureStatus
     ...RecipientViewContentsCard_PublicPetition
     ...RecipientViewProgressFooter_PublicPetition
   }
@@ -6945,13 +7058,15 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
       name
       logoUrl
     }
-    signatureConfig {
-      contacts {
-        id
-        fullName
-        email
+    currentSignatureRequest(token: $token) {
+      signatureConfig {
+        contacts {
+          id
+          fullName
+          email
+        }
+        timezone
       }
-      timezone
     }
   }
   ${PetitionPdf_PetitionFieldFragmentDoc}
@@ -7359,6 +7474,46 @@ export function usePetitionSettings_cancelPetitionSignatureRequestMutation(
 }
 export type PetitionSettings_cancelPetitionSignatureRequestMutationHookResult = ReturnType<
   typeof usePetitionSettings_cancelPetitionSignatureRequestMutation
+>;
+export const PetitionSettings_startPetitionSignatureRequestDocument = gql`
+  mutation PetitionSettings_startPetitionSignatureRequest($petitionId: GID!) {
+    startSignatureRequest(petitionId: $petitionId) {
+      id
+      status
+    }
+  }
+`;
+
+/**
+ * __usePetitionSettings_startPetitionSignatureRequestMutation__
+ *
+ * To run a mutation, you first call `usePetitionSettings_startPetitionSignatureRequestMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSettings_startPetitionSignatureRequestMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionSettingsStartPetitionSignatureRequestMutation, { data, loading, error }] = usePetitionSettings_startPetitionSignatureRequestMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function usePetitionSettings_startPetitionSignatureRequestMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSettings_startPetitionSignatureRequestMutation,
+    PetitionSettings_startPetitionSignatureRequestMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionSettings_startPetitionSignatureRequestMutation,
+    PetitionSettings_startPetitionSignatureRequestMutationVariables
+  >(PetitionSettings_startPetitionSignatureRequestDocument, baseOptions);
+}
+export type PetitionSettings_startPetitionSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSettings_startPetitionSignatureRequestMutation
 >;
 export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionUserPermission(
@@ -7873,6 +8028,55 @@ export function useExportRepliesProgressDialog_updateSignatureRequestMetadataMut
 }
 export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationHookResult = ReturnType<
   typeof useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation
+>;
+export const PetitionSignaturesCard_updatePetitionSignatureConfigDocument = gql`
+  mutation PetitionSignaturesCard_updatePetitionSignatureConfig(
+    $petitionId: GID!
+    $signatureConfig: SignatureConfigInput
+  ) {
+    updatePetition(
+      petitionId: $petitionId
+      data: { signatureConfig: $signatureConfig }
+    ) {
+      ... on Petition {
+        ...PetitionSignaturesCard_Petition
+      }
+    }
+  }
+  ${PetitionSignaturesCard_PetitionFragmentDoc}
+`;
+
+/**
+ * __usePetitionSignaturesCard_updatePetitionSignatureConfigMutation__
+ *
+ * To run a mutation, you first call `usePetitionSignaturesCard_updatePetitionSignatureConfigMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionSignaturesCard_updatePetitionSignatureConfigMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionSignaturesCardUpdatePetitionSignatureConfigMutation, { data, loading, error }] = usePetitionSignaturesCard_updatePetitionSignatureConfigMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      signatureConfig: // value for 'signatureConfig'
+ *   },
+ * });
+ */
+export function usePetitionSignaturesCard_updatePetitionSignatureConfigMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionSignaturesCard_updatePetitionSignatureConfigMutation,
+    PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables
+  >
+) {
+  return Apollo.useMutation<
+    PetitionSignaturesCard_updatePetitionSignatureConfigMutation,
+    PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables
+  >(PetitionSignaturesCard_updatePetitionSignatureConfigDocument, baseOptions);
+}
+export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_updatePetitionSignatureConfigMutation
 >;
 export const PetitionSignaturesCard_cancelSignatureRequestDocument = gql`
   mutation PetitionSignaturesCard_cancelSignatureRequest(
@@ -11984,8 +12188,11 @@ export type CurrentUserLazyQueryHookResult = ReturnType<
   typeof useCurrentUserLazyQuery
 >;
 export const RecipientView_publicCompletePetitionDocument = gql`
-  mutation RecipientView_publicCompletePetition($keycode: ID!) {
-    publicCompletePetition(keycode: $keycode) {
+  mutation RecipientView_publicCompletePetition(
+    $keycode: ID!
+    $signer: PublicPetitionSignerData
+  ) {
+    publicCompletePetition(keycode: $keycode, signer: $signer) {
       id
       status
     }
@@ -12006,6 +12213,7 @@ export const RecipientView_publicCompletePetitionDocument = gql`
  * const [recipientViewPublicCompletePetitionMutation, { data, loading, error }] = useRecipientView_publicCompletePetitionMutation({
  *   variables: {
  *      keycode: // value for 'keycode'
+ *      signer: // value for 'signer'
  *   },
  * });
  */

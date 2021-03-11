@@ -106,7 +106,7 @@ export function RecipientViewProgressFooter({
         isDisabled={isCompleted}
         onClick={onFinalize}
       >
-        {petition.signers.length > 0 ? (
+        {petition.signature?.review === false ? (
           <FormattedMessage
             id="recipient-view.submit-and-sign-button-short"
             defaultMessage="Finalize and sign"
@@ -130,8 +130,8 @@ RecipientViewProgressFooter.fragments = {
         fields {
           ...RecipientViewProgressFooter_PublicPetitionField
         }
-        signers {
-          id
+        signature {
+          review
         }
       }
       ${this.PublicPetitionField}

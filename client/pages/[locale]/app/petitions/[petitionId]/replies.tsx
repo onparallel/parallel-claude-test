@@ -443,46 +443,69 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const showConfirmDisableOngoingSignature = useDialog(
     ConfirmDisableOngoingSignature
   );
+  const showPendingSignatureDialog = useDialog(PendingSignatureDialog);
+
   const [
     cancelSignatureRequest,
   ] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
 
-  const handleClosePetition = useCallback(async () => {
-    try {
-      const hasUnreviewedReplies = petition.fields.some((f) =>
-        f.replies.some((r) => r.status === "PENDING")
-      );
+  const handleClosePetition = useCallback(
+    async (sendNotification: boolean) => {
+      try {
+        const hasPendingSignature =
+          (petition.currentSignatureRequest &&
+            ["ENQUEUED", "PROCESSING"].includes(
+              petition.currentSignatureRequest?.status
+            )) ??
+          false;
+        const hasConfiguredSignature =
+          !petition.currentSignatureRequest && petition.signatureConfig;
+        if (hasPendingSignature) {
+          await showConfirmDisableOngoingSignature({});
+          await cancelSignatureRequest({
+            variables: {
+              petitionSignatureRequestId: petition.currentSignatureRequest!.id,
+            },
+          });
+        } else if (hasConfiguredSignature) {
+          const continueWithSignature = await showPendingSignatureDialog({});
+          if (continueWithSignature) {
+            // TODO
+            return;
+          } else {
+            await updatePetition({
+              variables: {
+                petitionId: petition.id,
+                data: { signatureConfig: null },
+              },
+            });
+            refetch();
+          }
+        }
 
-      const hasPendingSignature =
-        petition.currentSignatureRequest?.status === "PROCESSING";
+        const hasUnreviewedReplies = petition.fields.some((f) =>
+          f.replies.some((r) => r.status === "PENDING")
+        );
+        const option = hasUnreviewedReplies
+          ? await closePetitionDialog({})
+          : "APPROVE";
 
-      if (hasPendingSignature) {
-        await showConfirmDisableOngoingSignature({});
-        await cancelSignatureRequest({
-          variables: {
-            petitionSignatureRequestId: petition.currentSignatureRequest!.id,
-          },
-        });
-      }
+        await handleFinishPetition({ requiredMessage: false });
 
-      const option = hasUnreviewedReplies
-        ? await showSolveUnreviewedRepliesDialog({})
-        : "APPROVE";
-
-      await handleFinishPetition({ requiredMessage: false });
-
-      await handleValidateToggle(
-        petition.fields.map((f) => f.id),
-        true,
-        option === "APPROVE" ? "APPROVED" : "REJECTED"
-      );
-    } catch {}
-  }, [
-    petition,
-    handleValidateToggle,
-    handleFinishPetition,
-    cancelSignatureRequest,
-  ]);
+        await handleValidateToggle(
+          petition.fields.map((f) => f.id),
+          true,
+          option === "APPROVE" ? "APPROVED" : "REJECTED"
+        );
+      } catch {}
+    },
+    [
+      petition,
+      handleValidateToggle,
+      handleFinishPetition,
+      cancelSignatureRequest,
+    ]
+  );
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
@@ -686,6 +709,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             {me.hasPetitionSignature ? (
               <PetitionSignaturesCard
                 petition={petition}
+                user={me}
                 marginTop={8}
                 onRefetchPetition={refetch}
               />
@@ -745,10 +769,12 @@ PetitionReplies.fragments = {
         ...PetitionLayout_User
         ...PetitionRepliesFieldComments_User
         ...ExportRepliesDialog_User
+        ...PetitionSignaturesCard_User
       }
       ${PetitionLayout.fragments.User}
       ${PetitionRepliesFieldComments.fragments.User}
       ${ExportRepliesDialog.fragments.User}
+      ${PetitionSignaturesCard.fragments.User}
     `;
   },
 };
@@ -1210,6 +1236,43 @@ function PetitionContentsIndicators({
         <ConditionIcon color={isVisible ? "purple.500" : "gray.500"} />
       ) : null}
     </>
+  );
+}
+
+function PendingSignatureDialog(props: DialogProps<{}, boolean>) {
+  return (
+    <ConfirmDialog
+      header={
+        <FormattedMessage
+          id="component.confirm-pending-signature.header"
+          defaultMessage="Pending eSignature"
+        />
+      }
+      body={
+        <FormattedMessage
+          id="component.pending-signature-dialog.body"
+          defaultMessage="<b>Start the eSignature</b> or <b>disable it</b> to continue and close this petition."
+          values={{ b: (chunks: any[]) => <b>{chunks}</b> }}
+        />
+      }
+      cancel={
+        <Button onClick={() => props.onResolve(false)}>
+          <FormattedMessage
+            id="component.pending-signature-dialog.disable"
+            defaultMessage="Disable"
+          />
+        </Button>
+      }
+      confirm={
+        <Button colorScheme="purple" onClick={() => props.onResolve(true)}>
+          <FormattedMessage
+            id="component.pending-signature-dialog.start-signature"
+            defaultMessage="Start eSignature"
+          />
+        </Button>
+      }
+      {...props}
+    />
   );
 }
 

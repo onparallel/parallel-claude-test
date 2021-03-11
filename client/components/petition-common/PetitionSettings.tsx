@@ -21,11 +21,10 @@ import {
   PetitionSettings_UserFragment,
   UpdatePetitionInput,
   usePetitionSettings_cancelPetitionSignatureRequestMutation,
+  usePetitionSettings_startPetitionSignatureRequestMutation,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe } from "@parallel/utils/types";
-import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { memo, ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -65,8 +64,6 @@ function _PetitionSettings({
       : null;
 
   const showSignatureConfigDialog = useSignatureConfigDialog();
-  const handleSearchContacts = useSearchContacts();
-  const handleCreateContact = useCreateContact();
 
   const showConfirmConfigureOngoingSignature = useDialog(
     ConfirmConfigureOngoingSignature
@@ -77,6 +74,10 @@ function _PetitionSettings({
   const [
     cancelSignatureRequest,
   ] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
+  const [
+    startSignatureRequest,
+  ] = usePetitionSettings_startPetitionSignatureRequestMutation();
+
   async function handleConfigureSignatureClick() {
     if (petition.__typename !== "Petition") {
       return;
@@ -88,8 +89,6 @@ function _PetitionSettings({
       const signatureConfig = await showSignatureConfigDialog({
         petition,
         providers: user.organization.signatureIntegrations,
-        onSearchContacts: handleSearchContacts,
-        onCreateContact: handleCreateContact,
       });
       if (
         // config changed
@@ -106,7 +105,11 @@ function _PetitionSettings({
           },
         });
       }
-      onUpdatePetition({ signatureConfig });
+      await onUpdatePetition({ signatureConfig });
+
+      if (petition.status === "CLOSED" || petition.status === "COMPLETED") {
+        await startSignatureRequest({ variables: { petitionId: petition.id } });
+      }
     } catch {}
   }
 
@@ -342,6 +345,14 @@ const mutations = [
       cancelSignatureRequest(
         petitionSignatureRequestId: $petitionSignatureRequestId
       ) {
+        id
+        status
+      }
+    }
+  `,
+  gql`
+    mutation PetitionSettings_startPetitionSignatureRequest($petitionId: GID!) {
+      startSignatureRequest(petitionId: $petitionId) {
         id
         status
       }

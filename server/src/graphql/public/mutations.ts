@@ -11,6 +11,8 @@ import {
 import { differenceInSeconds } from "date-fns";
 import { prop } from "remeda";
 import { getClientIp } from "request-ip";
+import { ApiContext } from "../../context";
+import { Petition } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
 import { stallFor } from "../../util/stallFor";
 import { random } from "../../util/token";
@@ -469,11 +471,21 @@ export const publicUpdateSimpleReply = mutationField(
 );
 
 export const publicCompletePetition = mutationField("publicCompletePetition", {
-  description:
-    "Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user.",
+  description: `
+    Marks a filled petition as COMPLETED.
+    If the petition does not require a review, starts the signing process. Otherwise sends email to user.`,
   type: "PublicPetition",
   args: {
     keycode: nonNull(idArg()),
+    signer: inputObjectType({
+      name: "PublicPetitionSignerData",
+      definition(t) {
+        t.nonNull.string("email");
+        t.nonNull.string("firstName");
+        t.nonNull.string("lastName");
+        t.nullable.string("message");
+      },
+    }).asArg(),
   },
   authorize: authenticatePublicAccess("keycode"),
   resolve: async (_, args, ctx) => {
@@ -483,22 +495,15 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
     );
 
     const signatureConfig = petition.signature_config as {
+      provider: string;
+      review: boolean;
       contactIds: number[];
-    };
-    const requiresSignature =
-      signatureConfig && signatureConfig.contactIds.length > 0;
-    if (requiresSignature) {
-      const signatureRequest = await ctx.petitions.createPetitionSignature(
-        petition.id,
-        petition.signature_config
-      );
-      await ctx.aws.enqueueMessages("signature-worker", {
-        groupId: `signature-${toGlobalId("Petition", petition.id)}`,
-        body: {
-          type: "start-signature-process",
-          payload: { petitionSignatureRequestId: signatureRequest.id },
-        },
-      });
+      timezone: string;
+      title: string;
+    } | null;
+
+    if (signatureConfig?.review === false) {
+      await startSignatureRequest(petition, args.signer ?? null, ctx);
     } else {
       await ctx.emails.sendPetitionCompletedEmail(petition.id, {
         accessIds: ctx.access!.id,
@@ -509,7 +514,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       {
         access_id: ctx.access!.id,
         petition_id: petition.id,
-        requiresSignature,
+        requiresSignature: !!signatureConfig,
       },
       toGlobalId("User", ctx.access!.granter_id)
     );
@@ -804,3 +809,50 @@ export const publicDelegateAccessToContact = mutationField(
     },
   }
 );
+
+async function startSignatureRequest(
+  petition: Petition,
+  contactSigner: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    message?: string | null;
+  } | null,
+  ctx: ApiContext
+) {
+  const specifiedByUser = petition.signature_config.contactIds.length > 0;
+  if (!specifiedByUser && !contactSigner) {
+    throw new Error(
+      `Can't complete petition with id ${petition.id}. Signer info is not specified.`
+    );
+  }
+
+  const signatureRequest = await ctx.petitions.createPetitionSignature(
+    petition.id,
+    {
+      ...petition.signature_config,
+      contactIds: specifiedByUser
+        ? petition.signature_config.contactIds
+        : [
+            (
+              await ctx.contacts.loadOrCreate(
+                {
+                  email: contactSigner!.email,
+                  firstName: contactSigner!.firstName,
+                  lastName: contactSigner!.lastName,
+                  orgId: ctx.contact!.org_id,
+                },
+                ctx.contact!
+              )
+            ).id,
+          ],
+    }
+  );
+  await ctx.aws.enqueueMessages("signature-worker", {
+    groupId: `signature-${toGlobalId("Petition", petition.id)}`,
+    body: {
+      type: "start-signature-process",
+      payload: { petitionSignatureRequestId: signatureRequest.id },
+    },
+  });
+}

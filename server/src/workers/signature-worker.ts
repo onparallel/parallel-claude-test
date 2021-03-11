@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
+import { outdent } from "outdent";
 import { resolve } from "path";
 import sanitize from "sanitize-filename";
 import { URLSearchParams } from "url";
@@ -17,6 +18,7 @@ type PetitionSignatureConfig = {
   timezone: string;
   contactIds: number[];
   title: string;
+  review: boolean;
 };
 
 /** starts a signature request on the petition */
@@ -42,7 +44,7 @@ async function startSignatureProcess(
   }
 
   const petitionGID = toGlobalId("Petition", signature.petition_id);
-  const settings = petition.signature_config as PetitionSignatureConfig;
+  const settings = signature.signature_config as PetitionSignatureConfig;
 
   let removeGeneratedPdf = true;
   const tmpPdfPath = resolve(
@@ -103,6 +105,15 @@ async function startSignatureProcess(
         templateData,
         signingMode: "parallel",
         signatureBoxPositions,
+        initialMessage: outdent`
+        
+        Hello,
+      
+        I have completed this document requested by Cuatrecasas through Parallel. Could you please sign it?
+      
+        Thanks,
+        Mariano.
+      `,
       }
     );
 
@@ -168,7 +179,7 @@ async function cancelSignatureProcess(
   }
 
   const petition = await fetchPetition(signature.petition_id, ctx);
-  const config = petition.signature_config as PetitionSignatureConfig;
+  const config = signature.signature_config as PetitionSignatureConfig;
   const signatureIntegration = await fetchOrgSignatureIntegration(
     petition.org_id,
     config.provider,

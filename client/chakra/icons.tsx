@@ -1255,6 +1255,25 @@ export const SignatureIcon = createIcon({
   ),
 });
 
+export const SignaturePlusIcon = createIcon({
+  displayName: "SignaturePlusIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.34481"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4.2869 2.39422C3.09152 1.19883 1.29844 2.99191 2.49383 4.18729L8.17189 9.86535L10.5627 10.463L9.96496 8.07228L4.2869 2.39422Z" />
+      <path d="M1 14.0491C1.69628 13.701 4.20923 11.3122 4.11341 9.90598C3.98846 8.0722 1.59769 8.0722 1.18626 9.75185C0.868287 11.05 2.19538 12.8537 2.79307 13.4514C3.39076 14.0491 4.58615 14.6468 5.4837 13.0819C7.0012 10.4362 6.53487 14.0433 7.5746 14.0491C8.76998 14.0491 9.27863 11.5587 9.89051 12.4682C11.7584 15.2445 14.1492 14.0491 12.9538 12.256" />
+      <path d="M13 3V7" />
+      <path d="M15 5H11" />
+    </g>
+  ),
+});
+
 export const FieldSelectIcon = createIcon({
   displayName: "FieldSelectIcon",
   viewBox: "0 0 24 24",

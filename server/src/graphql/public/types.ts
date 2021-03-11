@@ -1,4 +1,4 @@
-import { core, objectType, unionType } from "@nexus/schema";
+import { core, enumType, objectType, unionType } from "@nexus/schema";
 import { extension } from "mime-types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -27,6 +27,28 @@ export const PublicPetitionAccess = objectType({
       },
     });
   },
+});
+
+export const PublicSignatureConfig = objectType({
+  name: "PublicSignatureConfig",
+  description: "The public signature settings of a petition",
+  definition(t) {
+    t.list.nullable.field("signers", {
+      type: "PublicContact",
+      description: "The contacts that need to sign the generated document.",
+      resolve: async (root, _, ctx) => {
+        return await ctx.contacts.loadContact(root.contactIds);
+      },
+    });
+    t.boolean("review", {
+      description:
+        "If true, lets the user review the replies before starting the signature process",
+    });
+  },
+  rootTyping: /* ts */ `{
+    contactIds: number[];
+    review: boolean;
+  }`,
 });
 
 export const PublicPetition = objectType({
@@ -67,16 +89,26 @@ export const PublicPetition = objectType({
         return await ctx.petitions.loadFieldsForPetition(root.id);
       },
     });
-    t.list.nullable.field("signers", {
-      type: "PublicContact",
-      description: "The signers of the petition",
+    t.nullable.field("signature", {
+      type: "PublicSignatureConfig",
+      description: "The signature config of the petition",
+      resolve: (o) => o.signature_config,
+    });
+    t.nullable.field("signatureStatus", {
+      type: enumType({
+        name: "PublicSignatureStatus",
+        members: ["STARTED", "COMPLETED"],
+      }),
       resolve: async (root, _, ctx) => {
-        if (!root.signature_config || !root.signature_config.contactIds) {
-          return [];
-        }
-        return (await ctx.contacts.loadContact(
-          root.signature_config!.contactIds as number[]
-        ))!;
+        const signature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
+          root.id
+        );
+
+        return signature
+          ? ["PROCESSING", "ENQUEUED"].includes(signature.status)
+            ? "STARTED"
+            : "COMPLETED"
+          : null;
       },
     });
   },

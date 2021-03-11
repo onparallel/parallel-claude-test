@@ -45,6 +45,10 @@ export type SignatureOptions = {
    *  Inside each page, there's an array with the signers information.
    */
   signatureBoxPositions?: Array<SignerBox[]>;
+  /**
+   * Optional plain-text custom message to include in the "signature requested" emails
+   */
+  initialMessage?: string;
 };
 
 type SignatureResponse = {
@@ -166,8 +170,9 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
       files,
       recipients,
       removeNotDefined<SignatureParams>({
+        body: opts.initialMessage,
         delivery_type: "email",
-        signing_mode: opts?.signingMode ?? "parallel",
+        signing_mode: opts.signingMode ?? "parallel",
         branding_id: brandingId,
         events_url: `${baseEventsUrl}/api/webhooks/signaturit/${petitionId}/events`,
         callback_url: `${this.config.misc.parallelUrl}/${locale}/thanks-for-signing?o=${orgGID}`,
@@ -236,6 +241,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
           signButton: "{{sign_button}}",
           signerName: "{{signer_name}}",
           documentName: "{{filename}}",
+          emailBody: "{{email_body}}",
           logoUrl: opts.templateData?.logoUrl ?? "",
           logoAlt: opts.templateData?.logoAlt ?? "",
           parallelUrl: this.config.misc.parallelUrl,

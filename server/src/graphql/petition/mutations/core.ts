@@ -359,6 +359,10 @@ export const SignatureConfigInput = inputObjectType({
     t.nonNull.string("title", {
       description: "The title of the signing document",
     });
+    t.nonNull.boolean("review", {
+      description:
+        "If true, lets the user review the replies before starting the signature process",
+    });
   },
 });
 
@@ -456,7 +460,7 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (signatureConfig !== undefined) {
       data.signature_config = signatureConfig && {
-        ...pick(signatureConfig, ["provider", "timezone", "title"]),
+        ...pick(signatureConfig, ["provider", "timezone", "title", "review"]),
         contactIds: fromGlobalIds(signatureConfig.contactIds, "Contact").ids,
       };
     }

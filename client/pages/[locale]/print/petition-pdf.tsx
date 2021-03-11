@@ -40,10 +40,11 @@ function PetitionPdf({ token }: { token: string }) {
 
   const {
     organization: { name: orgName, logoUrl: orgLogo },
-    signatureConfig,
+    currentSignatureRequest,
   } = petition;
 
-  const contacts = signatureConfig?.contacts;
+  const contacts = currentSignatureRequest?.signatureConfig.contacts;
+  const timezone = currentSignatureRequest?.signatureConfig.timezone;
 
   const fieldVisibility = useFieldVisibility(petition.fields);
   const pages = useMemo(
@@ -109,7 +110,7 @@ function PetitionPdf({ token }: { token: string }) {
                         <SignatureBox
                           key={signer.id}
                           signer={{ ...signer!, key: index }}
-                          timezone={signatureConfig!.timezone}
+                          timezone={timezone!}
                         />
                       )
                   )}
@@ -146,13 +147,15 @@ PetitionPdf.fragments = {
           name
           logoUrl
         }
-        signatureConfig {
-          contacts {
-            id
-            fullName
-            email
+        currentSignatureRequest(token: $token) {
+          signatureConfig {
+            contacts {
+              id
+              fullName
+              email
+            }
+            timezone
           }
-          timezone
         }
       }
       ${this.PetitionField}

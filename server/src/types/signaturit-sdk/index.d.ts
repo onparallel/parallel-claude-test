@@ -135,6 +135,8 @@ declare module "signaturit-sdk" {
   };
 
   export type SignatureParams = {
+    /** Email body (html code is allowed) for email and sms type requests. */
+    body?: string;
     /** Use a custom branding for the signature request */
     branding_id?: string;
     /** Url to redirect the user when finish the signature process. */

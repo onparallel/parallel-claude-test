@@ -510,9 +510,13 @@ type Mutation {
   ): VerificationCodeCheck!
 
   """
-  Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user.
+  Marks a filled petition as COMPLETED.
+  If the petition does not require a review, starts the signing process. Otherwise sends email to user.
   """
-  publicCompletePetition(keycode: ID!): PublicPetition!
+  publicCompletePetition(
+    keycode: ID!
+    signer: PublicPetitionSignerData
+  ): PublicPetition!
 
   """
   Creates a reply to a file upload field.
@@ -1034,7 +1038,7 @@ type Petition implements PetitionBase {
   """
   The current signature request.
   """
-  currentSignatureRequest: PetitionSignatureRequest
+  currentSignatureRequest(token: String): PetitionSignatureRequest
 
   """
   The deadline of the petition.
@@ -2091,9 +2095,10 @@ type PublicPetition implements Timestamps {
   locale: PetitionLocale!
 
   """
-  The signers of the petition
+  The signature config of the petition
   """
-  signers: [PublicContact]!
+  signature: PublicSignatureConfig
+  signatureStatus: PublicSignatureStatus
 
   """
   The status of the petition.
@@ -2247,6 +2252,33 @@ type PublicPetitionFieldReply implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+input PublicPetitionSignerData {
+  email: String!
+  firstName: String!
+  lastName: String!
+  message: String
+}
+
+"""
+The public signature settings of a petition
+"""
+type PublicSignatureConfig {
+  """
+  If true, lets the user review the replies before starting the signature process
+  """
+  review: Boolean!
+
+  """
+  The contacts that need to sign the generated document.
+  """
+  signers: [PublicContact]!
+}
+
+enum PublicSignatureStatus {
+  COMPLETED
+  STARTED
 }
 
 """
@@ -2597,6 +2629,11 @@ type SignatureConfig {
   provider: String!
 
   """
+  If true, lets the user review the replies before starting the signature process
+  """
+  review: Boolean!
+
+  """
   The timezone used to generate the document.
   """
   timezone: String!
@@ -2620,6 +2657,11 @@ input SignatureConfigInput {
   The selected provider for the signature.
   """
   provider: String!
+
+  """
+  If true, lets the user review the replies before starting the signature process
+  """
+  review: Boolean!
 
   """
   The timezone used to generate the document.

@@ -8,6 +8,7 @@ import { Layout, LayoutProps } from "../common/Layout";
 import { closing, gdprDisclaimer, greetingFormal } from "../common/texts";
 
 type SignatureRequestedProps = {
+  emailBody: string | null;
   signerName: string | null;
   documentName: string | null;
   signButton: string;
@@ -62,6 +63,7 @@ const email: Email<SignatureRequestedProps> = {
     logoUrl,
     signButton,
     documentName,
+    emailBody,
   }: SignatureRequestedProps) {
     const intl = useIntl();
     return (
@@ -82,12 +84,26 @@ const email: Email<SignatureRequestedProps> = {
             <MjmlText>
               <FormattedMessage
                 id="signature-requested.text"
-                defaultMessage="You have received a signature request to sign a document named {documentName}"
-                values={{
-                  documentName,
-                }}
+                defaultMessage="You have received a signature request to sign a document."
               />
             </MjmlText>
+
+            <MjmlSection padding="0 20px">
+              <MjmlColumn
+                backgroundColor="#f6f6f6"
+                borderRadius="4px"
+                padding="10px 0"
+              >
+                <MjmlText>
+                  <FormattedMessage
+                    id="signature-requested.document-name"
+                    defaultMessage="Document: {documentName}"
+                    values={{ documentName }}
+                  />
+                </MjmlText>
+                {emailBody ? <MjmlText>{emailBody}</MjmlText> : null}
+              </MjmlColumn>
+            </MjmlSection>
 
             <MjmlText>
               <FormattedMessage
@@ -95,7 +111,6 @@ const email: Email<SignatureRequestedProps> = {
                 defaultMessage="To review and sign it, click on the following link:"
               />
             </MjmlText>
-
             <MjmlText align="center" fontSize="16px">
               {`${signButton}`}
             </MjmlText>

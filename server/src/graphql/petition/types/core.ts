@@ -1,7 +1,15 @@
-import { enumType, objectType, interfaceType } from "@nexus/schema";
+import {
+  enumType,
+  objectType,
+  interfaceType,
+  nullable,
+  stringArg,
+} from "@nexus/schema";
 import { extension } from "mime-types";
 import { toGlobalId } from "../../../util/globalId";
+import { isDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
+import { or } from "../../helpers/authorize";
 import { userHasFeatureFlag } from "../authorizers";
 
 export const PetitionLocale = enumType({
@@ -173,7 +181,14 @@ export const Petition = objectType({
     t.nullable.field("currentSignatureRequest", {
       type: "PetitionSignatureRequest",
       description: "The current signature request.",
-      authorize: userHasFeatureFlag("PETITION_SIGNATURE"),
+      args: {
+        token: nullable(stringArg()),
+      },
+      authorize: or(
+        userHasFeatureFlag("PETITION_SIGNATURE"),
+        (_, { token }, ctx) =>
+          isDefined(token) && ctx.security.verifyAuthToken(token)
+      ),
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
           root.id
@@ -408,12 +423,17 @@ export const SignatureConfig = objectType({
     t.string("title", {
       description: "Title of the signature document",
     });
+    t.boolean("review", {
+      description:
+        "If true, lets the user review the replies before starting the signature process",
+    });
   },
   rootTyping: /* ts */ `{
     provider: string;
     contactIds: number[];
     timezone: string;
     title: string;
+    review: boolean;
   }`,
 });
 

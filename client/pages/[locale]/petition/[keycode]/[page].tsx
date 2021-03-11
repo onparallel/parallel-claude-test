@@ -25,6 +25,7 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { useCompleteSignerInfoDialog } from "@parallel/components/recipient-view/CompleteSignerInfoDialog";
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
 import { RecipientViewContactCard } from "@parallel/components/recipient-view/RecipientViewContactCard";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
@@ -36,9 +37,11 @@ import { RecipientViewSenderCard } from "@parallel/components/recipient-view/Rec
 import {
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
+  PublicPetitionSignerData,
   RecipientView_PublicContactFragment,
   RecipientView_PublicPetitionFieldFragment,
   RecipientView_PublicPetitionFragment,
+  RecipientView_PublicUserFragment,
   usePublicPetitionQuery,
   useRecipientView_publicCompletePetitionMutation,
   useRecipientView_submitUnpublishedCommentsMutation,
@@ -75,7 +78,7 @@ function RecipientView({
   const petition = access!.petition!;
   const granter = access!.granter!;
   const contact = access!.contact!;
-  const signers = petition!.signers!;
+  const signers = petition!.signature?.signers ?? [];
 
   const { fields, pages, visibility } = useGetPageFields(
     petition.fields,
@@ -89,6 +92,8 @@ function RecipientView({
     ConfirmStartSignatureProcess
   );
   const [completePetition] = useRecipientView_publicCompletePetitionMutation();
+  const showCompleteSignerInfoDialog = useCompleteSignerInfoDialog();
+  const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
   const handleFinalize = useCallback(
     async function () {
       try {
@@ -101,13 +106,27 @@ function RecipientView({
             f.isReadOnly
         );
         if (canFinalize) {
-          if (signers.length > 0) {
-            await confirmStartSignatureProcessDialog({
-              signers,
-              contactId: contact.id,
-            });
+          let signer: Maybe<PublicPetitionSignerData> = null;
+          if (petition.signature) {
+            if (!petition.signature.review) {
+              if (signers.length === 0) {
+                signer = await showCompleteSignerInfoDialog({
+                  keycode,
+                  organization: granter.organization.name,
+                  contactName: contact.firstName ?? "",
+                });
+              } else {
+                await confirmStartSignatureProcessDialog({
+                  signers,
+                  contactId: contact.id,
+                });
+              }
+            }
           }
-          await completePetition({ variables: { keycode } });
+          await completePetition({ variables: { keycode, signer } });
+          if (petition.signature?.review) {
+            await showReviewBeforeSigningDialog({ granter });
+          }
           toast({
             title: intl.formatMessage({
               id: "recipient-view.completed-petition.toast-title",
@@ -216,57 +235,106 @@ function RecipientView({
       >
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
           {showAlert && ["COMPLETED", "CLOSED"].includes(petition.status) ? (
-            <Alert status="success" variant="subtle" zIndex={2}>
-              <Flex
-                maxWidth="container.lg"
-                alignItems="center"
-                justifyContent="flex-start"
-                marginX="auto"
-                width="100%"
-                paddingLeft={4}
-                paddingRight={12}
-              >
-                <AlertIcon />
-                <AlertDescription>
-                  {petition.status === "COMPLETED" ? (
-                    <>
-                      <Text>
-                        <FormattedMessage
-                          id="recipient-view.petition-completed-alert-1"
-                          defaultMessage="This petition has been completed and {name} has been notified for its revision and validation."
-                          values={{
-                            name: <b>{granter.fullName}</b>,
-                          }}
-                        />
-                      </Text>
-                      <Text>
-                        <FormattedMessage
-                          id="recipient-view.petition-completed-alert-2"
-                          defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
-                          values={{
-                            b: (chunks: any[]) => <b>{chunks}</b>,
-                          }}
-                        />
-                      </Text>
-                    </>
-                  ) : (
+            !petition.signature || petition.signatureStatus === "COMPLETED" ? (
+              <Alert status="success" variant="subtle" zIndex={2}>
+                <Flex
+                  maxWidth="container.lg"
+                  alignItems="center"
+                  justifyContent="flex-start"
+                  marginX="auto"
+                  width="100%"
+                  paddingLeft={4}
+                  paddingRight={12}
+                >
+                  <AlertIcon />
+                  <AlertDescription>
+                    {petition.status === "COMPLETED" ? (
+                      <>
+                        <Text>
+                          <FormattedMessage
+                            id="recipient-view.petition-completed-alert-1"
+                            defaultMessage="This petition has been completed and {name} has been notified for its revision and validation."
+                            values={{
+                              name: <b>{granter.fullName}</b>,
+                            }}
+                          />
+                        </Text>
+                        <Text>
+                          <FormattedMessage
+                            id="recipient-view.petition-completed-alert-2"
+                            defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
+                            values={{
+                              b: (chunks: any[]) => <b>{chunks}</b>,
+                            }}
+                          />
+                        </Text>
+                      </>
+                    ) : (
+                      <FormattedMessage
+                        id="recipient-view.petition-closed-alert"
+                        defaultMessage="This petition has been closed. If you need to make any changes, please reach out to {name}."
+                        values={{
+                          name: <b>{granter.fullName}</b>,
+                        }}
+                      />
+                    )}
+                  </AlertDescription>
+                </Flex>
+                <CloseButton
+                  position="absolute"
+                  right="8px"
+                  top="8px"
+                  onClick={() => setShowAlert(false)}
+                />
+              </Alert>
+            ) : (
+              <Alert backgroundColor="yellow.100" zIndex={2}>
+                <Flex
+                  maxWidth="container.lg"
+                  alignItems="center"
+                  justifyContent="flex-start"
+                  marginX="auto"
+                  width="100%"
+                  paddingLeft={4}
+                  paddingRight={12}
+                >
+                  <AlertIcon color="yellow.400" />
+                  <AlertDescription>
+                    <Text>
+                      <FormattedMessage
+                        id="recipient-view.petition-requires-signature-alert-1"
+                        defaultMessage="This petition requires an <b>eSignature</b> to be completed."
+                        values={{
+                          b: (chunks: any[]) => <b>{chunks}</b>,
+                        }}
+                      />
+                    </Text>
+                    <Text>
+                      <FormattedMessage
+                        id="recipient-view.petition-requires-signature-alert-2"
+                        defaultMessage="We will send the <b>document to sign</b> once the replies have been reviewed and validated."
+                        values={{
+                          b: (chunks: any[]) => <b>{chunks}</b>,
+                        }}
+                      />
+                    </Text>
                     <FormattedMessage
-                      id="recipient-view.petition-closed-alert"
-                      defaultMessage="This petition has been closed. If you need to make any changes, please reach out to {name}."
+                      id="recipient-view.petition-completed-alert-2"
+                      defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
                       values={{
-                        name: <b>{granter.fullName}</b>,
+                        b: (chunks: any[]) => <b>{chunks}</b>,
                       }}
                     />
-                  )}
-                </AlertDescription>
-              </Flex>
-              <CloseButton
-                position="absolute"
-                right="8px"
-                top="8px"
-                onClick={() => setShowAlert(false)}
-              />
-            </Alert>
+                  </AlertDescription>
+                </Flex>
+                <CloseButton
+                  position="absolute"
+                  right="8px"
+                  top="8px"
+                  onClick={() => setShowAlert(false)}
+                />
+              </Alert>
+            )
           ) : null}
           {pendingComments ? (
             <Box backgroundColor="yellow.100" boxShadow="sm">
@@ -452,6 +520,50 @@ function ConfirmStartSignatureProcess({
   );
 }
 
+function ReviewBeforeSignDialog({
+  granter,
+  ...props
+}: DialogProps<{ granter: RecipientView_PublicUserFragment }>) {
+  return (
+    <ConfirmDialog
+      closeOnEsc={false}
+      closeOnOverlayClick={false}
+      size="lg"
+      header={
+        <FormattedMessage
+          id="petition.finalize-review-before-sign.header"
+          defaultMessage="Review and sign"
+        />
+      }
+      body={
+        <>
+          <FormattedMessage
+            id="petition.finalize-review-before-sign.body-1"
+            defaultMessage="This petition requires an <b>eSignature</b> in order to be completed."
+            values={{ b: (chunks: any[]) => <b>{chunks}</b> }}
+          />
+          <Spacer marginTop={2} />
+          <FormattedMessage
+            id="petition.finalize-review-before-sign.body-2"
+            defaultMessage="We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign to the appropriate persons."
+            values={{
+              b: (chunks: any[]) => <b>{chunks}</b>,
+              name: <b>{granter.fullName}</b>,
+            }}
+          />
+        </>
+      }
+      confirm={null}
+      cancel={
+        <Button colorScheme="purple" onClick={() => props.onResolve()}>
+          <FormattedMessage id="generic.accept" defaultMessage="Accept" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
 RecipientView.fragments = {
   get PublicPetitionAccess() {
     return gql`
@@ -484,9 +596,12 @@ RecipientView.fragments = {
         fields {
           ...RecipientView_PublicPetitionField
         }
-        signers {
-          ...RecipientView_PublicContact
+        signature {
+          signers {
+            ...RecipientView_PublicContact
+          }
         }
+        signatureStatus
         ...RecipientViewContentsCard_PublicPetition
         ...RecipientViewProgressFooter_PublicPetition
       }
@@ -533,8 +648,11 @@ RecipientView.fragments = {
 
 RecipientView.mutations = [
   gql`
-    mutation RecipientView_publicCompletePetition($keycode: ID!) {
-      publicCompletePetition(keycode: $keycode) {
+    mutation RecipientView_publicCompletePetition(
+      $keycode: ID!
+      $signer: PublicPetitionSignerData
+    ) {
+      publicCompletePetition(keycode: $keycode, signer: $signer) {
         id
         status
       }
