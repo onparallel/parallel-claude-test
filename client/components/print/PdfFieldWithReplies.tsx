@@ -51,7 +51,9 @@ export function PdfFieldWithReplies({
                 />
               </Text>
             ) : (
-              <Text key={reply.id}>{reply.content.text}</Text>
+              <Text key={reply.id}>
+                <BreakLines text={reply.content.text} />
+              </Text>
             )
           )}
           {field.replies.length === 0 ? (
