@@ -25,6 +25,7 @@ function DeveloperApi({
           jsonSampleExpandLevel: 3,
           expandSingleSchemaField: true,
           showExtensions: false,
+          hideLoading: true,
           theme: {
             logo: {
               gutter: "16px 36px 8px 24px",

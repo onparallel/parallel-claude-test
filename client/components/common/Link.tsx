@@ -12,19 +12,19 @@ export interface LinkProps
     Omit<ChakraLinkProps, "href"> {
   next?: Omit<NextLinkProps, "href">;
   children?: ReactNode;
+  omitLocale?: boolean;
 }
 
 export const Link = chakraForwardRef<"a", LinkProps>(function Link(
-  { next, children, href, ...props },
+  { next, children, href, omitLocale, ...props },
   ref
 ) {
   const { query } = useRouter();
+  const _href = omitLocale
+    ? href
+    : `/${query.locale ?? "en"}/${href.toString().replace(/^\//, "")}`;
   return (
-    <NextLink
-      href={`/${query.locale ?? "en"}/${href.toString().replace(/^\//, "")}`}
-      {...next}
-      passHref
-    >
+    <NextLink href={_href} {...next} passHref>
       <ChakraLink {...props} ref={ref}>
         {children}
       </ChakraLink>

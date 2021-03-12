@@ -3,6 +3,7 @@ import {
   BoxProps,
   Divider,
   Flex,
+  Grid,
   IconButton,
   Image,
   List,
@@ -48,15 +49,16 @@ export function PublicFooter(props: BoxProps) {
         ...props,
       }}
     >
-      <Flex
-        justify="space-between"
-        align="stretch"
-        wrap="wrap"
-        textAlign={{ base: "center", md: "left" }}
+      <Grid
+        textAlign={{ base: "center", sm: "left" }}
+        templateColumns={{
+          base: "1fr",
+          sm: "repeat(2, 1fr)",
+          md: "repeat(4, 1fr)",
+        }}
+        gridGap={8}
       >
         <PublicFooterBox
-          flex="1"
-          minWidth={{ base: "100%", md: 40 }}
           heading={intl.formatMessage({
             id: "public.footer.product",
             defaultMessage: "Product",
@@ -71,12 +73,17 @@ export function PublicFooter(props: BoxProps) {
                 />
               </Link>
             </ListItem>
+            <ListItem>
+              <Link href="/developers/api" omitLocale>
+                <FormattedMessage
+                  id="public.api-docs-link"
+                  defaultMessage="API Documentation"
+                />
+              </Link>
+            </ListItem>
           </List>
         </PublicFooterBox>
         <PublicFooterBox
-          flex="1"
-          minWidth={{ base: "100%", md: 40 }}
-          marginTop={{ base: 4, md: 0 }}
           heading={intl.formatMessage({
             id: "public.footer.support",
             defaultMessage: "Support",
@@ -104,9 +111,6 @@ export function PublicFooter(props: BoxProps) {
           </List>
         </PublicFooterBox>
         <PublicFooterBox
-          flex="1"
-          minWidth={{ base: "100%", md: 40 }}
-          marginTop={{ base: 4, md: 0 }}
           heading={intl.formatMessage({
             id: "public.footer.company",
             defaultMessage: "Company",
@@ -145,9 +149,6 @@ export function PublicFooter(props: BoxProps) {
           </List>
         </PublicFooterBox>
         <PublicFooterBox
-          flex="1"
-          minWidth={{ base: "100%", md: 40 }}
-          marginTop={{ base: 4, md: 0 }}
           heading={intl.formatMessage({
             id: "public.footer.legal-information",
             defaultMessage: "Legal information",
@@ -180,7 +181,7 @@ export function PublicFooter(props: BoxProps) {
             </ListItem>
           </List>
         </PublicFooterBox>
-      </Flex>
+      </Grid>
       <Divider marginY={8} />
       <Stack direction={{ base: "column", md: "row" }} spacing={8}>
         <Flex flex="1">
