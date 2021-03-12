@@ -46,7 +46,7 @@ export const Layout: FC<LayoutProps> = function Layout({
       <MjmlHead>
         {title ? <MjmlTitle>{title}</MjmlTitle> : null}
         <MjmlAttributes>
-          <MjmlAll fontSize="14px" />
+          <MjmlAll fontSize="14px" lineHeight="1.4" />
           <MjmlClass
             name="button-primary"
             backgroundColor="#6059f7"
