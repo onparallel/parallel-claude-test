@@ -1,11 +1,19 @@
 import { gql } from "@apollo/client";
-import { Box, BoxProps, Flex, Heading, Image, Text } from "@chakra-ui/react";
+import {
+  Box,
+  BoxProps,
+  Flex,
+  Heading,
+  Image,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { FieldWithReplies } from "@parallel/components/print/FieldWithReplies";
+import { PdfFieldWithReplies } from "@parallel/components/print/PdfFieldWithReplies";
 import { PdfPage } from "@parallel/components/print/PdfPage";
 import { SignatureBox } from "@parallel/components/print/SignatureBox";
 import {
@@ -81,9 +89,11 @@ function PetitionPdf({ token }: { token: string }) {
               </Heading>
             </>
           ) : undefined}
-          {fields.map((field, fieldNum) => (
-            <FieldWithReplies key={`${pageNum}/${fieldNum}`} field={field} />
-          ))}
+          <Stack spacing="4mm">
+            {fields.map((field) => (
+              <PdfFieldWithReplies key={field.id} field={field} />
+            ))}
+          </Stack>
           {tokenPayload.showSignatureBoxes &&
             pageNum === pages.length - 1 &&
             (contacts ?? []).length > 0 && (
