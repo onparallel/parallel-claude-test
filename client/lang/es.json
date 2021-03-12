@@ -1210,22 +1210,27 @@
     "context": "Start signature"
   },
   {
+    "term": "component.signature-config-dialog.contact-select.label",
+    "definition": "",
+    "context": "Who has to sign the petition?"
+  },
+  {
+    "term": "component.signature-config-dialog.contact-select.placeholder-optional",
+    "definition": "",
+    "context": "Let the recipient choose"
+  },
+  {
+    "term": "component.signature-config-dialog.contact-select.placeholder-required",
+    "definition": "",
+    "context": "Select the signers"
+  },
+  {
     "term": "component.signature-config-dialog.contacts-label",
     "definition": "¿Quién tiene que firmar la petición?",
     "context": "Who has to sign the petition?"
   },
   {
-    "term": "component.signature-config-dialog.contacts-placeholder.optional",
-    "definition": "Dejar que escoja el destinatario",
-    "context": "Let the recipient choose"
-  },
-  {
-    "term": "component.signature-config-dialog.contacts-placeholder.required",
-    "definition": "Selecciona",
-    "context": "Select the signers"
-  },
-  {
-    "term": "component.signature-config-dialog.dont-review-before-send.explainer",
+    "term": "component.signature-config-dialog.dont-review-before-send.option-no.explainer",
     "definition": "La firma se iniciará cuando el destinatario haya completado la información.",
     "context": "The signature will be initiated when the recipient has completed the information."
   },
@@ -1250,19 +1255,19 @@
     "context": "Do you want to review the information before it is sent to sign?"
   },
   {
-    "term": "component.signature-config-dialog.review-before-send.explainer",
-    "definition": "Tras revisar la información tendrás que iniciar la firma manualmente.",
-    "context": "After reviewing the information you will have to start the signature manually."
+    "term": "component.signature-config-dialog.review-before-send.option-no",
+    "definition": "No, iniciar automáticamente al completar la petición",
+    "context": "No, start automatically when completing the petition"
   },
   {
-    "term": "component.signature-config-dialog.review-before-send.option-1",
+    "term": "component.signature-config-dialog.review-before-send.option-yes",
     "definition": "Sí, revisar antes de iniciar la firma",
     "context": "Yes, review before starting the signature process"
   },
   {
-    "term": "component.signature-config-dialog.review-before-send.option-2",
-    "definition": "No, iniciar automáticamente al completar la petición",
-    "context": "No, start automatically when completing the petition"
+    "term": "component.signature-config-dialog.review-before-send.option-yes.explainer",
+    "definition": "Tras revisar la información tendrás que iniciar la firma manualmente.",
+    "context": "After reviewing the information you will have to start the signature manually."
   },
   {
     "term": "component.signature-config-dialog.title-help",
@@ -2068,6 +2073,11 @@
     "term": "generic.skip",
     "definition": "Omitir",
     "context": "Skip"
+  },
+  {
+    "term": "generic.start",
+    "definition": "Iniciar",
+    "context": "Start"
   },
   {
     "term": "generic.submit",

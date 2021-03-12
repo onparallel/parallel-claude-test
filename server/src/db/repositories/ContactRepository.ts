@@ -72,9 +72,9 @@ export class ContactRepository extends BaseRepository {
     },
     doneBy: Contact
   ) {
-    let contact = await this.loadContactByEmail({ email, orgId });
-    if (!contact) {
-      contact = await this.createContact(
+    return (
+      (await this.loadContactByEmail({ email, orgId })) ??
+      (await this.createContact(
         {
           email,
           first_name: firstName,
@@ -82,10 +82,8 @@ export class ContactRepository extends BaseRepository {
         },
         doneBy,
         `Contact:${doneBy.id}`
-      );
-    }
-
-    return contact;
+      ))
+    );
   }
 
   async userHasAccessToContacts(user: User, contactIds: number[]) {

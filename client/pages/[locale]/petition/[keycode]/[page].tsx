@@ -107,20 +107,18 @@ function RecipientView({
         );
         if (canFinalize) {
           let signer: Maybe<PublicPetitionSignerData> = null;
-          if (petition.signature) {
-            if (!petition.signature.review) {
-              if (signers.length === 0) {
-                signer = await showCompleteSignerInfoDialog({
-                  keycode,
-                  organization: granter.organization.name,
-                  contactName: contact.firstName ?? "",
-                });
-              } else {
-                await confirmStartSignatureProcessDialog({
-                  signers,
-                  contactId: contact.id,
-                });
-              }
+          if (petition.signature?.review === false) {
+            if (signers.length === 0) {
+              signer = await showCompleteSignerInfoDialog({
+                keycode,
+                organization: granter.organization.name,
+                contactName: contact.firstName ?? "",
+              });
+            } else {
+              await confirmStartSignatureProcessDialog({
+                signers,
+                contactId: contact.id,
+              });
             }
           }
           await completePetition({ variables: { keycode, signer } });

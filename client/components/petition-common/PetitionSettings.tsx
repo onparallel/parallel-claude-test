@@ -107,7 +107,7 @@ function _PetitionSettings({
       }
       await onUpdatePetition({ signatureConfig });
 
-      if (petition.status === "CLOSED" || petition.status === "COMPLETED") {
+      if (["COMPLETED", "CLOSED"].includes(petition.status)) {
         await startSignatureRequest({ variables: { petitionId: petition.id } });
       }
     } catch {}

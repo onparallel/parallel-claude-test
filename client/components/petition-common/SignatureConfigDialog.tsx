@@ -70,7 +70,7 @@ export function SignatureConfigDialog({
     },
   });
 
-  const hideContactSelection = watch("review");
+  const review = watch("review");
 
   const titleInputRef = useRef<HTMLInputElement>(null);
 
@@ -79,14 +79,14 @@ export function SignatureConfigDialog({
       {
         value: "YES",
         label: intl.formatMessage({
-          id: "component.signature-config-dialog.review-before-send.option-1",
+          id: "component.signature-config-dialog.review-before-send.option-yes",
           defaultMessage: "Yes, review before starting the signature process",
         }),
       },
       {
         value: "NO",
         label: intl.formatMessage({
-          id: "component.signature-config-dialog.review-before-send.option-2",
+          id: "component.signature-config-dialog.review-before-send.option-no",
           defaultMessage:
             "No, start automatically when completing the petition",
         }),
@@ -137,18 +137,15 @@ export function SignatureConfigDialog({
             <Controller
               name="provider"
               control={control}
-              render={({ onChange, value }) => {
-                const provider = providers.find((p) => p.value === value);
-                return (
-                  <Select
-                    {...reactSelectProps}
-                    value={provider}
-                    onChange={(p: any) => onChange(p.value)}
-                    options={providers}
-                    isSearchable={false}
-                  />
-                );
-              }}
+              render={({ onChange, value }) => (
+                <Select
+                  {...reactSelectProps}
+                  value={providers.find((p) => p.value === value)}
+                  onChange={(p: any) => onChange(p.value)}
+                  options={providers}
+                  isSearchable={false}
+                />
+              )}
             />
           </FormControl>
           <FormControl isInvalid={!!errors.title}>
@@ -191,17 +188,16 @@ export function SignatureConfigDialog({
                     options={reviewBeforeSendOptions}
                     onChange={(v: any) => onChange(v.value === "YES")}
                     isSearchable={false}
-                    isDisabled={petitionIsCompleted}
                   />
                   <Text marginTop={2} color="gray.500" fontSize="sm">
                     {review ? (
                       <FormattedMessage
-                        id="component.signature-config-dialog.review-before-send.explainer"
+                        id="component.signature-config-dialog.review-before-send.option-yes.explainer"
                         defaultMessage="After reviewing the information you will have to start the signature manually."
                       />
                     ) : (
                       <FormattedMessage
-                        id="component.signature-config-dialog.dont-review-before-send.explainer"
+                        id="component.signature-config-dialog.dont-review-before-send.option-no.explainer"
                         defaultMessage=" The signature will be initiated when the recipient has completed the information."
                       />
                     )}
@@ -211,12 +207,12 @@ export function SignatureConfigDialog({
             />
           </FormControl>
           <FormControl
-            hidden={hideContactSelection && !petitionIsCompleted}
+            hidden={review && !petitionIsCompleted}
             isInvalid={!!errors.contacts}
           >
             <FormLabel>
               <FormattedMessage
-                id="component.signature-config-dialog.contacts-label"
+                id="component.signature-config-dialog.contact-select.label"
                 defaultMessage="Who has to sign the petition?"
               />
             </FormLabel>
@@ -236,12 +232,12 @@ export function SignatureConfigDialog({
                     petitionIsCompleted
                       ? intl.formatMessage({
                           id:
-                            "component.signature-config-dialog.contacts-placeholder.required",
+                            "component.signature-config-dialog.contact-select.placeholder-required",
                           defaultMessage: "Select the signers",
                         })
                       : intl.formatMessage({
                           id:
-                            "component.signature-config-dialog.contacts-placeholder.optional",
+                            "component.signature-config-dialog.contact-select.placeholder-optional",
                           defaultMessage: "Let the recipient choose",
                         })
                   }
@@ -275,10 +271,6 @@ SignatureConfigDialog.fragments = {
     fragment SignatureConfigDialog_Petition on Petition {
       name
       status
-      currentSignatureRequest {
-        id
-        status
-      }
       signatureConfig {
         provider
         contacts {

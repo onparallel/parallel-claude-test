@@ -69,7 +69,7 @@ export function SignerSelectDialog(
                 onCreateContact={handleCreateContact}
                 placeholder={intl.formatMessage({
                   id:
-                    "component.signature-config-dialog.contacts-placeholder.required",
+                    "component.signature-config-dialog.contact-select.placeholder-required",
                   defaultMessage: "Select the signers",
                 })}
               />

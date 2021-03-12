@@ -27,6 +27,7 @@ import {
   usePetitionSignaturesCard_startSignatureRequestMutation,
   usePetitionSignaturesCard_updatePetitionSignatureConfigMutation,
 } from "@parallel/graphql/__types";
+import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useCallback } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -55,9 +56,17 @@ export function PetitionSignaturesCard({
   onRefetchPetition,
   ...props
 }: PetitionSignaturesCardProps) {
-  const [current, ...finished] = petition.signatureRequests!;
+  let current: Maybe<
+    UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>
+  > = petition.signatureRequests![0];
+  const older = petition.signatureRequests!.slice(1);
+  /**
+   * A cancelled request is not considered to be "current"
+   * So we move it to the older requests to give space in the Card for a new request
+   */
   if (current?.status === "CANCELLED") {
-    finished.unshift(current);
+    older.unshift(current);
+    current = null;
   }
 
   const [
@@ -174,7 +183,7 @@ export function PetitionSignaturesCard({
 
       {current || petition.signatureConfig ? (
         <>
-          {current && current.status !== "CANCELLED" ? (
+          {current ? (
             <CurrentSignatureRequestRow
               signatureRequest={current}
               onCancel={handleCancelSignatureProcess}
@@ -187,9 +196,9 @@ export function PetitionSignaturesCard({
               onUpdateConfig={handleUpdateSignatureConfig}
             />
           ) : null}
-          {finished.length ? (
-            <FinishedSignatureRequests
-              signatures={finished}
+          {older.length ? (
+            <OlderSignatureRequests
+              signatures={older}
               onDownload={handleDownloadSignedDoc}
             />
           ) : null}
@@ -241,11 +250,13 @@ function NewSignatureRequestRow({
   const showSignerSelectDialog = useSignerSelectDialog();
   const handleStartSignature = async () => {
     try {
-      const data = await showSignerSelectDialog({});
-      await onUpdateConfig({
-        ...omit(petition.signatureConfig!, ["contacts", "__typename"]),
-        contactIds: data.contactIds,
-      });
+      if (signers.length === 0) {
+        const contactIds = (await showSignerSelectDialog({})).contactIds;
+        await onUpdateConfig({
+          ...omit(petition.signatureConfig!, ["contacts", "__typename"]),
+          contactIds,
+        });
+      }
       onStart();
     } catch {}
   };
@@ -316,10 +327,14 @@ function NewSignatureRequestRow({
                 marginLeft={2}
                 onClick={handleStartSignature}
               >
-                <FormattedMessage
-                  id="component.petition-signatures-card.start"
-                  defaultMessage="Start..."
-                />
+                {signers.length === 0 ? (
+                  <FormattedMessage
+                    id="component.petition-signatures-card.start"
+                    defaultMessage="Start..."
+                  />
+                ) : (
+                  <FormattedMessage id="generic.start" defaultMessage="Start" />
+                )}
               </Button>
             </Flex>
           )}
@@ -343,7 +358,7 @@ function CurrentSignatureRequestRow({
 }: CurrentSignatureRequestRowProps) {
   const status = signatureRequest.status;
   const signers = signatureRequest.signatureConfig.contacts;
-  const isAwaitingSignature = status === "ENQUEUED" || status === "PROCESSING";
+  const isAwaitingSignature = ["ENQUEUED", "PROCESSING"].includes(status);
   const isSigned = status === "COMPLETED";
 
   return (
@@ -403,7 +418,7 @@ function CurrentSignatureRequestRow({
   );
 }
 
-function FinishedSignatureRequests({
+function OlderSignatureRequests({
   signatures,
   onDownload,
 }: {
@@ -549,7 +564,6 @@ PetitionSignaturesCard.fragments = {
       id
       status
       signatureConfig {
-        timezone
         contacts {
           ...ContactLink_Contact
         }
