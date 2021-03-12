@@ -8,6 +8,7 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> &
   { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
   { [SubKey in K]: Maybe<T[SubKey]> };
+const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -286,8 +287,6 @@ export type Mutation = {
   resetSignaturitOrganizationBranding: SupportMethodResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
-  /** Sends a petition message to the specified contacts. */
-  sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
   sendPetition: SendPetitionResult;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
@@ -614,14 +613,6 @@ export type MutationrevokeUserAuthTokenArgs = {
   authTokenIds: Array<Scalars["GID"]>;
 };
 
-export type MutationsendMessagesArgs = {
-  accessIds: Array<Scalars["GID"]>;
-  body: Scalars["JSON"];
-  petitionId: Scalars["GID"];
-  scheduledAt?: Maybe<Scalars["DateTime"]>;
-  subject: Scalars["String"];
-};
-
 export type MutationsendPetitionArgs = {
   body: Scalars["JSON"];
   contactIds: Array<Scalars["GID"]>;
@@ -641,6 +632,7 @@ export type MutationsendPetitionClosedNotificationArgs = {
 
 export type MutationsendRemindersArgs = {
   accessIds: Array<Scalars["GID"]>;
+  body?: Maybe<Scalars["JSON"]>;
   petitionId: Scalars["GID"];
 };
 
@@ -3983,21 +3975,10 @@ export type PetitionActivity_updatePetitionMutation = {
     | { __typename?: "PetitionTemplate" };
 };
 
-export type PetitionActivity_sendMessagesMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  accessIds: Array<Scalars["GID"]> | Scalars["GID"];
-  subject: Scalars["String"];
-  body: Scalars["JSON"];
-  scheduledAt?: Maybe<Scalars["DateTime"]>;
-}>;
-
-export type PetitionActivity_sendMessagesMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "sendMessages">;
-
 export type PetitionActivity_sendRemindersMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   accessIds: Array<Scalars["GID"]> | Scalars["GID"];
+  body?: Maybe<Scalars["JSON"]>;
 }>;
 
 export type PetitionActivity_sendRemindersMutation = {
@@ -6998,10 +6979,11 @@ export function useWithAdminOrganizationRoleQuery(
     WithAdminOrganizationRoleQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     WithAdminOrganizationRoleQuery,
     WithAdminOrganizationRoleQueryVariables
-  >(WithAdminOrganizationRoleDocument, baseOptions);
+  >(WithAdminOrganizationRoleDocument, options);
 }
 export function useWithAdminOrganizationRoleLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -7009,10 +6991,11 @@ export function useWithAdminOrganizationRoleLazyQuery(
     WithAdminOrganizationRoleQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     WithAdminOrganizationRoleQuery,
     WithAdminOrganizationRoleQueryVariables
-  >(WithAdminOrganizationRoleDocument, baseOptions);
+  >(WithAdminOrganizationRoleDocument, options);
 }
 export type WithAdminOrganizationRoleQueryHookResult = ReturnType<
   typeof useWithAdminOrganizationRoleQuery
@@ -7051,9 +7034,10 @@ export function useHasFeatureFlagQuery(
     HasFeatureFlagQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>(
     HasFeatureFlagDocument,
-    baseOptions
+    options
   );
 }
 export function useHasFeatureFlagLazyQuery(
@@ -7062,9 +7046,10 @@ export function useHasFeatureFlagLazyQuery(
     HasFeatureFlagQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<HasFeatureFlagQuery, HasFeatureFlagQueryVariables>(
     HasFeatureFlagDocument,
-    baseOptions
+    options
   );
 }
 export type HasFeatureFlagQueryHookResult = ReturnType<
@@ -7102,10 +7087,11 @@ export function useWithSuperAdminAccessQuery(
     WithSuperAdminAccessQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     WithSuperAdminAccessQuery,
     WithSuperAdminAccessQueryVariables
-  >(WithSuperAdminAccessDocument, baseOptions);
+  >(WithSuperAdminAccessDocument, options);
 }
 export function useWithSuperAdminAccessLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -7113,10 +7099,11 @@ export function useWithSuperAdminAccessLazyQuery(
     WithSuperAdminAccessQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     WithSuperAdminAccessQuery,
     WithSuperAdminAccessQueryVariables
-  >(WithSuperAdminAccessDocument, baseOptions);
+  >(WithSuperAdminAccessDocument, options);
 }
 export type WithSuperAdminAccessQueryHookResult = ReturnType<
   typeof useWithSuperAdminAccessQuery
@@ -7160,10 +7147,11 @@ export function useAppLayout_updateOnboardingStatusMutation(
     AppLayout_updateOnboardingStatusMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     AppLayout_updateOnboardingStatusMutation,
     AppLayout_updateOnboardingStatusMutationVariables
-  >(AppLayout_updateOnboardingStatusDocument, baseOptions);
+  >(AppLayout_updateOnboardingStatusDocument, options);
 }
 export type AppLayout_updateOnboardingStatusMutationHookResult = ReturnType<
   typeof useAppLayout_updateOnboardingStatusMutation
@@ -7201,10 +7189,11 @@ export function usePetitionHeader_reopenPetitionMutation(
     PetitionHeader_reopenPetitionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionHeader_reopenPetitionMutation,
     PetitionHeader_reopenPetitionMutationVariables
-  >(PetitionHeader_reopenPetitionDocument, baseOptions);
+  >(PetitionHeader_reopenPetitionDocument, options);
 }
 export type PetitionHeader_reopenPetitionMutationHookResult = ReturnType<
   typeof usePetitionHeader_reopenPetitionMutation
@@ -7253,10 +7242,11 @@ export function usePetitionHeader_updatePetitionUserSubscriptionMutation(
     PetitionHeader_updatePetitionUserSubscriptionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionHeader_updatePetitionUserSubscriptionMutation,
     PetitionHeader_updatePetitionUserSubscriptionMutationVariables
-  >(PetitionHeader_updatePetitionUserSubscriptionDocument, baseOptions);
+  >(PetitionHeader_updatePetitionUserSubscriptionDocument, options);
 }
 export type PetitionHeader_updatePetitionUserSubscriptionMutationHookResult = ReturnType<
   typeof usePetitionHeader_updatePetitionUserSubscriptionMutation
@@ -7289,10 +7279,11 @@ export function useCreateUserDialog_emailIsAvailableQuery(
     CreateUserDialog_emailIsAvailableQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     CreateUserDialog_emailIsAvailableQuery,
     CreateUserDialog_emailIsAvailableQueryVariables
-  >(CreateUserDialog_emailIsAvailableDocument, baseOptions);
+  >(CreateUserDialog_emailIsAvailableDocument, options);
 }
 export function useCreateUserDialog_emailIsAvailableLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -7300,10 +7291,11 @@ export function useCreateUserDialog_emailIsAvailableLazyQuery(
     CreateUserDialog_emailIsAvailableQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     CreateUserDialog_emailIsAvailableQuery,
     CreateUserDialog_emailIsAvailableQueryVariables
-  >(CreateUserDialog_emailIsAvailableDocument, baseOptions);
+  >(CreateUserDialog_emailIsAvailableDocument, options);
 }
 export type CreateUserDialog_emailIsAvailableQueryHookResult = ReturnType<
   typeof useCreateUserDialog_emailIsAvailableQuery
@@ -7347,10 +7339,11 @@ export function usePetitionSettings_cancelPetitionSignatureRequestMutation(
     PetitionSettings_cancelPetitionSignatureRequestMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionSettings_cancelPetitionSignatureRequestMutation,
     PetitionSettings_cancelPetitionSignatureRequestMutationVariables
-  >(PetitionSettings_cancelPetitionSignatureRequestDocument, baseOptions);
+  >(PetitionSettings_cancelPetitionSignatureRequestDocument, options);
 }
 export type PetitionSettings_cancelPetitionSignatureRequestMutationHookResult = ReturnType<
   typeof usePetitionSettings_cancelPetitionSignatureRequestMutation
@@ -7403,10 +7396,11 @@ export function usePetitionSharingModal_addPetitionUserPermissionMutation(
     PetitionSharingModal_addPetitionUserPermissionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionSharingModal_addPetitionUserPermissionMutation,
     PetitionSharingModal_addPetitionUserPermissionMutationVariables
-  >(PetitionSharingModal_addPetitionUserPermissionDocument, baseOptions);
+  >(PetitionSharingModal_addPetitionUserPermissionDocument, options);
 }
 export type PetitionSharingModal_addPetitionUserPermissionMutationHookResult = ReturnType<
   typeof usePetitionSharingModal_addPetitionUserPermissionMutation
@@ -7450,10 +7444,11 @@ export function usePetitionSharingModal_removePetitionUserPermissionMutation(
     PetitionSharingModal_removePetitionUserPermissionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionSharingModal_removePetitionUserPermissionMutation,
     PetitionSharingModal_removePetitionUserPermissionMutationVariables
-  >(PetitionSharingModal_removePetitionUserPermissionDocument, baseOptions);
+  >(PetitionSharingModal_removePetitionUserPermissionDocument, options);
 }
 export type PetitionSharingModal_removePetitionUserPermissionMutationHookResult = ReturnType<
   typeof usePetitionSharingModal_removePetitionUserPermissionMutation
@@ -7494,10 +7489,11 @@ export function usePetitionSharingModal_transferPetitionOwnershipMutation(
     PetitionSharingModal_transferPetitionOwnershipMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionSharingModal_transferPetitionOwnershipMutation,
     PetitionSharingModal_transferPetitionOwnershipMutationVariables
-  >(PetitionSharingModal_transferPetitionOwnershipDocument, baseOptions);
+  >(PetitionSharingModal_transferPetitionOwnershipDocument, options);
 }
 export type PetitionSharingModal_transferPetitionOwnershipMutationHookResult = ReturnType<
   typeof usePetitionSharingModal_transferPetitionOwnershipMutation
@@ -7533,10 +7529,11 @@ export function usePetitionSharingModal_PetitionUserPermissionsQuery(
     PetitionSharingModal_PetitionUserPermissionsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     PetitionSharingModal_PetitionUserPermissionsQuery,
     PetitionSharingModal_PetitionUserPermissionsQueryVariables
-  >(PetitionSharingModal_PetitionUserPermissionsDocument, baseOptions);
+  >(PetitionSharingModal_PetitionUserPermissionsDocument, options);
 }
 export function usePetitionSharingModal_PetitionUserPermissionsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -7544,10 +7541,11 @@ export function usePetitionSharingModal_PetitionUserPermissionsLazyQuery(
     PetitionSharingModal_PetitionUserPermissionsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     PetitionSharingModal_PetitionUserPermissionsQuery,
     PetitionSharingModal_PetitionUserPermissionsQueryVariables
-  >(PetitionSharingModal_PetitionUserPermissionsDocument, baseOptions);
+  >(PetitionSharingModal_PetitionUserPermissionsDocument, options);
 }
 export type PetitionSharingModal_PetitionUserPermissionsQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_PetitionUserPermissionsQuery
@@ -7586,10 +7584,11 @@ export function useuseTemplateDetailsDialogPetitionQuery(
     useTemplateDetailsDialogPetitionQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     useTemplateDetailsDialogPetitionQuery,
     useTemplateDetailsDialogPetitionQueryVariables
-  >(useTemplateDetailsDialogPetitionDocument, baseOptions);
+  >(useTemplateDetailsDialogPetitionDocument, options);
 }
 export function useuseTemplateDetailsDialogPetitionLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -7597,10 +7596,11 @@ export function useuseTemplateDetailsDialogPetitionLazyQuery(
     useTemplateDetailsDialogPetitionQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     useTemplateDetailsDialogPetitionQuery,
     useTemplateDetailsDialogPetitionQueryVariables
-  >(useTemplateDetailsDialogPetitionDocument, baseOptions);
+  >(useTemplateDetailsDialogPetitionDocument, options);
 }
 export type useTemplateDetailsDialogPetitionQueryHookResult = ReturnType<
   typeof useuseTemplateDetailsDialogPetitionQuery
@@ -7639,10 +7639,11 @@ export function useExportRepliesProgressDialog_PetitionRepliesQuery(
     ExportRepliesProgressDialog_PetitionRepliesQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     ExportRepliesProgressDialog_PetitionRepliesQuery,
     ExportRepliesProgressDialog_PetitionRepliesQueryVariables
-  >(ExportRepliesProgressDialog_PetitionRepliesDocument, baseOptions);
+  >(ExportRepliesProgressDialog_PetitionRepliesDocument, options);
 }
 export function useExportRepliesProgressDialog_PetitionRepliesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -7650,10 +7651,11 @@ export function useExportRepliesProgressDialog_PetitionRepliesLazyQuery(
     ExportRepliesProgressDialog_PetitionRepliesQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     ExportRepliesProgressDialog_PetitionRepliesQuery,
     ExportRepliesProgressDialog_PetitionRepliesQueryVariables
-  >(ExportRepliesProgressDialog_PetitionRepliesDocument, baseOptions);
+  >(ExportRepliesProgressDialog_PetitionRepliesDocument, options);
 }
 export type ExportRepliesProgressDialog_PetitionRepliesQueryHookResult = ReturnType<
   typeof useExportRepliesProgressDialog_PetitionRepliesQuery
@@ -7697,13 +7699,11 @@ export function useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutati
     ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation,
     ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables
-  >(
-    ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument,
-    baseOptions
-  );
+  >(ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument, options);
 }
 export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
   typeof useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation
@@ -7748,13 +7748,11 @@ export function useExportRepliesProgressDialog_signedPetitionDownloadLinkMutatio
     ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation,
     ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables
-  >(
-    ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument,
-    baseOptions
-  );
+  >(ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument, options);
 }
 export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationHookResult = ReturnType<
   typeof useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation
@@ -7801,12 +7799,13 @@ export function useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataM
     ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation,
     ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables
   >(
     ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument,
-    baseOptions
+    options
   );
 }
 export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationHookResult = ReturnType<
@@ -7851,12 +7850,13 @@ export function useExportRepliesProgressDialog_updateSignatureRequestMetadataMut
     ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation,
     ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables
   >(
     ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument,
-    baseOptions
+    options
   );
 }
 export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationHookResult = ReturnType<
@@ -7898,10 +7898,11 @@ export function usePetitionSignaturesCard_cancelSignatureRequestMutation(
     PetitionSignaturesCard_cancelSignatureRequestMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionSignaturesCard_cancelSignatureRequestMutation,
     PetitionSignaturesCard_cancelSignatureRequestMutationVariables
-  >(PetitionSignaturesCard_cancelSignatureRequestDocument, baseOptions);
+  >(PetitionSignaturesCard_cancelSignatureRequestDocument, options);
 }
 export type PetitionSignaturesCard_cancelSignatureRequestMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_cancelSignatureRequestMutation
@@ -7938,10 +7939,11 @@ export function usePetitionSignaturesCard_startSignatureRequestMutation(
     PetitionSignaturesCard_startSignatureRequestMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionSignaturesCard_startSignatureRequestMutation,
     PetitionSignaturesCard_startSignatureRequestMutationVariables
-  >(PetitionSignaturesCard_startSignatureRequestDocument, baseOptions);
+  >(PetitionSignaturesCard_startSignatureRequestDocument, options);
 }
 export type PetitionSignaturesCard_startSignatureRequestMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_startSignatureRequestMutation
@@ -7985,10 +7987,11 @@ export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
     PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionSignaturesCard_signedPetitionDownloadLinkMutation,
     PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables
-  >(PetitionSignaturesCard_signedPetitionDownloadLinkDocument, baseOptions);
+  >(PetitionSignaturesCard_signedPetitionDownloadLinkDocument, options);
 }
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
@@ -8042,13 +8045,11 @@ export function useRecipientViewContactCard_publicDelegateAccessToContactMutatio
     RecipientViewContactCard_publicDelegateAccessToContactMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewContactCard_publicDelegateAccessToContactMutation,
     RecipientViewContactCard_publicDelegateAccessToContactMutationVariables
-  >(
-    RecipientViewContactCard_publicDelegateAccessToContactDocument,
-    baseOptions
-  );
+  >(RecipientViewContactCard_publicDelegateAccessToContactDocument, options);
 }
 export type RecipientViewContactCard_publicDelegateAccessToContactMutationHookResult = ReturnType<
   typeof useRecipientViewContactCard_publicDelegateAccessToContactMutation
@@ -8091,10 +8092,11 @@ export function useRecipientViewPetitionFieldCommentsQuery(
     RecipientViewPetitionFieldCommentsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     RecipientViewPetitionFieldCommentsQuery,
     RecipientViewPetitionFieldCommentsQueryVariables
-  >(RecipientViewPetitionFieldCommentsDocument, baseOptions);
+  >(RecipientViewPetitionFieldCommentsDocument, options);
 }
 export function useRecipientViewPetitionFieldCommentsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -8102,10 +8104,11 @@ export function useRecipientViewPetitionFieldCommentsLazyQuery(
     RecipientViewPetitionFieldCommentsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     RecipientViewPetitionFieldCommentsQuery,
     RecipientViewPetitionFieldCommentsQueryVariables
-  >(RecipientViewPetitionFieldCommentsDocument, baseOptions);
+  >(RecipientViewPetitionFieldCommentsDocument, options);
 }
 export type RecipientViewPetitionFieldCommentsQueryHookResult = ReturnType<
   typeof useRecipientViewPetitionFieldCommentsQuery
@@ -8152,12 +8155,13 @@ export function useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCom
     RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation,
     RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationVariables
   >(
     RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
@@ -8205,12 +8209,13 @@ export function useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldC
     RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation,
     RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables
   >(
     RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationHookResult = ReturnType<
@@ -8261,12 +8266,13 @@ export function useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldC
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation,
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables
   >(
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationHookResult = ReturnType<
@@ -8311,12 +8317,13 @@ export function useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldC
     RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation,
     RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables
   >(
     RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationHookResult = ReturnType<
@@ -8364,12 +8371,13 @@ export function useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDow
     RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation,
     RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables
   >(
     RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationHookResult = ReturnType<
@@ -8408,12 +8416,13 @@ export function useRecipientViewPetitionFieldMutations_publicDeletePetitionReply
     RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation,
     RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables
   >(
     RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationHookResult = ReturnType<
@@ -8463,12 +8472,13 @@ export function useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMu
     RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
     RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables
   >(
     RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationHookResult = ReturnType<
@@ -8516,12 +8526,13 @@ export function useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMu
     RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation,
     RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables
   >(
     RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationHookResult = ReturnType<
@@ -8572,12 +8583,13 @@ export function useRecipientViewPetitionFieldMutations_publicCreateFileUploadRep
     RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation,
     RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables
   >(
     RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationHookResult = ReturnType<
@@ -8619,12 +8631,13 @@ export function useRecipientViewPetitionFieldMutations_publicFileUploadReplyComp
     RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
     RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables
   >(
     RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument,
-    baseOptions
+    options
   );
 }
 export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationHookResult = ReturnType<
@@ -8667,10 +8680,11 @@ export function useGenerateNewTokenDialog_generateUserAuthTokenMutation(
     GenerateNewTokenDialog_generateUserAuthTokenMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     GenerateNewTokenDialog_generateUserAuthTokenMutation,
     GenerateNewTokenDialog_generateUserAuthTokenMutationVariables
-  >(GenerateNewTokenDialog_generateUserAuthTokenDocument, baseOptions);
+  >(GenerateNewTokenDialog_generateUserAuthTokenDocument, options);
 }
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationHookResult = ReturnType<
   typeof useGenerateNewTokenDialog_generateUserAuthTokenMutation
@@ -8703,17 +8717,19 @@ export const AdminDocument = gql`
 export function useAdminQuery(
   baseOptions?: Apollo.QueryHookOptions<AdminQuery, AdminQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<AdminQuery, AdminQueryVariables>(
     AdminDocument,
-    baseOptions
+    options
   );
 }
 export function useAdminLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<AdminQuery, AdminQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<AdminQuery, AdminQueryVariables>(
     AdminDocument,
-    baseOptions
+    options
   );
 }
 export type AdminQueryHookResult = ReturnType<typeof useAdminQuery>;
@@ -8768,10 +8784,11 @@ export function useAdminOrganizationsQuery(
     AdminOrganizationsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     AdminOrganizationsQuery,
     AdminOrganizationsQueryVariables
-  >(AdminOrganizationsDocument, baseOptions);
+  >(AdminOrganizationsDocument, options);
 }
 export function useAdminOrganizationsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -8779,10 +8796,11 @@ export function useAdminOrganizationsLazyQuery(
     AdminOrganizationsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     AdminOrganizationsQuery,
     AdminOrganizationsQueryVariables
-  >(AdminOrganizationsDocument, baseOptions);
+  >(AdminOrganizationsDocument, options);
 }
 export type AdminOrganizationsQueryHookResult = ReturnType<
   typeof useAdminOrganizationsQuery
@@ -8820,10 +8838,11 @@ export function useAdminOrganizationsUserQuery(
     AdminOrganizationsUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     AdminOrganizationsUserQuery,
     AdminOrganizationsUserQueryVariables
-  >(AdminOrganizationsUserDocument, baseOptions);
+  >(AdminOrganizationsUserDocument, options);
 }
 export function useAdminOrganizationsUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -8831,10 +8850,11 @@ export function useAdminOrganizationsUserLazyQuery(
     AdminOrganizationsUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     AdminOrganizationsUserQuery,
     AdminOrganizationsUserQueryVariables
-  >(AdminOrganizationsUserDocument, baseOptions);
+  >(AdminOrganizationsUserDocument, options);
 }
 export type AdminOrganizationsUserQueryHookResult = ReturnType<
   typeof useAdminOrganizationsUserQuery
@@ -8872,10 +8892,11 @@ export function useAdminSupportMethodsUserQuery(
     AdminSupportMethodsUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     AdminSupportMethodsUserQuery,
     AdminSupportMethodsUserQueryVariables
-  >(AdminSupportMethodsUserDocument, baseOptions);
+  >(AdminSupportMethodsUserDocument, options);
 }
 export function useAdminSupportMethodsUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -8883,10 +8904,11 @@ export function useAdminSupportMethodsUserLazyQuery(
     AdminSupportMethodsUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     AdminSupportMethodsUserQuery,
     AdminSupportMethodsUserQueryVariables
-  >(AdminSupportMethodsUserDocument, baseOptions);
+  >(AdminSupportMethodsUserDocument, options);
 }
 export type AdminSupportMethodsUserQueryHookResult = ReturnType<
   typeof useAdminSupportMethodsUserQuery
@@ -8927,10 +8949,11 @@ export function useContact_updateContactMutation(
     Contact_updateContactMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     Contact_updateContactMutation,
     Contact_updateContactMutationVariables
-  >(Contact_updateContactDocument, baseOptions);
+  >(Contact_updateContactDocument, options);
 }
 export type Contact_updateContactMutationHookResult = ReturnType<
   typeof useContact_updateContactMutation
@@ -8965,9 +8988,10 @@ export function useContactUserQuery(
     ContactUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<ContactUserQuery, ContactUserQueryVariables>(
     ContactUserDocument,
-    baseOptions
+    options
   );
 }
 export function useContactUserLazyQuery(
@@ -8976,9 +9000,10 @@ export function useContactUserLazyQuery(
     ContactUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<ContactUserQuery, ContactUserQueryVariables>(
     ContactUserDocument,
-    baseOptions
+    options
   );
 }
 export type ContactUserQueryHookResult = ReturnType<typeof useContactUserQuery>;
@@ -9014,17 +9039,19 @@ export const ContactDocument = gql`
 export function useContactQuery(
   baseOptions: Apollo.QueryHookOptions<ContactQuery, ContactQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<ContactQuery, ContactQueryVariables>(
     ContactDocument,
-    baseOptions
+    options
   );
 }
 export function useContactLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<ContactQuery, ContactQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<ContactQuery, ContactQueryVariables>(
     ContactDocument,
-    baseOptions
+    options
   );
 }
 export type ContactQueryHookResult = ReturnType<typeof useContactQuery>;
@@ -9058,10 +9085,11 @@ export function useContacts_deleteContactsMutation(
     Contacts_deleteContactsMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     Contacts_deleteContactsMutation,
     Contacts_deleteContactsMutationVariables
-  >(Contacts_deleteContactsDocument, baseOptions);
+  >(Contacts_deleteContactsDocument, options);
 }
 export type Contacts_deleteContactsMutationHookResult = ReturnType<
   typeof useContacts_deleteContactsMutation
@@ -9102,9 +9130,10 @@ export const ContactsDocument = gql`
 export function useContactsQuery(
   baseOptions: Apollo.QueryHookOptions<ContactsQuery, ContactsQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<ContactsQuery, ContactsQueryVariables>(
     ContactsDocument,
-    baseOptions
+    options
   );
 }
 export function useContactsLazyQuery(
@@ -9113,9 +9142,10 @@ export function useContactsLazyQuery(
     ContactsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<ContactsQuery, ContactsQueryVariables>(
     ContactsDocument,
-    baseOptions
+    options
   );
 }
 export type ContactsQueryHookResult = ReturnType<typeof useContactsQuery>;
@@ -9152,9 +9182,10 @@ export function useContactsUserQuery(
     ContactsUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<ContactsUserQuery, ContactsUserQueryVariables>(
     ContactsUserDocument,
-    baseOptions
+    options
   );
 }
 export function useContactsUserLazyQuery(
@@ -9163,9 +9194,10 @@ export function useContactsUserLazyQuery(
     ContactsUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<ContactsUserQuery, ContactsUserQueryVariables>(
     ContactsUserDocument,
-    baseOptions
+    options
   );
 }
 export type ContactsUserQueryHookResult = ReturnType<
@@ -9207,10 +9239,11 @@ export function useOrganizationBranding_updateOrgLogoMutation(
     OrganizationBranding_updateOrgLogoMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     OrganizationBranding_updateOrgLogoMutation,
     OrganizationBranding_updateOrgLogoMutationVariables
-  >(OrganizationBranding_updateOrgLogoDocument, baseOptions);
+  >(OrganizationBranding_updateOrgLogoDocument, options);
 }
 export type OrganizationBranding_updateOrgLogoMutationHookResult = ReturnType<
   typeof useOrganizationBranding_updateOrgLogoMutation
@@ -9250,10 +9283,11 @@ export function useOrganizationBrandingQuery(
     OrganizationBrandingQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     OrganizationBrandingQuery,
     OrganizationBrandingQueryVariables
-  >(OrganizationBrandingDocument, baseOptions);
+  >(OrganizationBrandingDocument, options);
 }
 export function useOrganizationBrandingLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -9261,10 +9295,11 @@ export function useOrganizationBrandingLazyQuery(
     OrganizationBrandingQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     OrganizationBrandingQuery,
     OrganizationBrandingQueryVariables
-  >(OrganizationBrandingDocument, baseOptions);
+  >(OrganizationBrandingDocument, options);
 }
 export type OrganizationBrandingQueryHookResult = ReturnType<
   typeof useOrganizationBrandingQuery
@@ -9303,10 +9338,11 @@ export function useOrganizationSettingsQuery(
     OrganizationSettingsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     OrganizationSettingsQuery,
     OrganizationSettingsQueryVariables
-  >(OrganizationSettingsDocument, baseOptions);
+  >(OrganizationSettingsDocument, options);
 }
 export function useOrganizationSettingsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -9314,10 +9350,11 @@ export function useOrganizationSettingsLazyQuery(
     OrganizationSettingsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     OrganizationSettingsQuery,
     OrganizationSettingsQueryVariables
-  >(OrganizationSettingsDocument, baseOptions);
+  >(OrganizationSettingsDocument, options);
 }
 export type OrganizationSettingsQueryHookResult = ReturnType<
   typeof useOrganizationSettingsQuery
@@ -9370,10 +9407,11 @@ export function useOrganizationUsers_createOrganizationUserMutation(
     OrganizationUsers_createOrganizationUserMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     OrganizationUsers_createOrganizationUserMutation,
     OrganizationUsers_createOrganizationUserMutationVariables
-  >(OrganizationUsers_createOrganizationUserDocument, baseOptions);
+  >(OrganizationUsers_createOrganizationUserDocument, options);
 }
 export type OrganizationUsers_createOrganizationUserMutationHookResult = ReturnType<
   typeof useOrganizationUsers_createOrganizationUserMutation
@@ -9420,10 +9458,11 @@ export function useOrganizationUsers_updateUserStatusMutation(
     OrganizationUsers_updateUserStatusMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     OrganizationUsers_updateUserStatusMutation,
     OrganizationUsers_updateUserStatusMutationVariables
-  >(OrganizationUsers_updateUserStatusDocument, baseOptions);
+  >(OrganizationUsers_updateUserStatusDocument, options);
 }
 export type OrganizationUsers_updateUserStatusMutationHookResult = ReturnType<
   typeof useOrganizationUsers_updateUserStatusMutation
@@ -9483,10 +9522,11 @@ export function useOrganizationUsersQuery(
     OrganizationUsersQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     OrganizationUsersQuery,
     OrganizationUsersQueryVariables
-  >(OrganizationUsersDocument, baseOptions);
+  >(OrganizationUsersDocument, options);
 }
 export function useOrganizationUsersLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -9494,10 +9534,11 @@ export function useOrganizationUsersLazyQuery(
     OrganizationUsersQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     OrganizationUsersQuery,
     OrganizationUsersQueryVariables
-  >(OrganizationUsersDocument, baseOptions);
+  >(OrganizationUsersDocument, options);
 }
 export type OrganizationUsersQueryHookResult = ReturnType<
   typeof useOrganizationUsersQuery
@@ -9541,73 +9582,22 @@ export function usePetitionActivity_updatePetitionMutation(
     PetitionActivity_updatePetitionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionActivity_updatePetitionMutation,
     PetitionActivity_updatePetitionMutationVariables
-  >(PetitionActivity_updatePetitionDocument, baseOptions);
+  >(PetitionActivity_updatePetitionDocument, options);
 }
 export type PetitionActivity_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionActivity_updatePetitionMutation
->;
-export const PetitionActivity_sendMessagesDocument = gql`
-  mutation PetitionActivity_sendMessages(
-    $petitionId: GID!
-    $accessIds: [GID!]!
-    $subject: String!
-    $body: JSON!
-    $scheduledAt: DateTime
-  ) {
-    sendMessages(
-      petitionId: $petitionId
-      accessIds: $accessIds
-      subject: $subject
-      body: $body
-      scheduledAt: $scheduledAt
-    )
-  }
-`;
-
-/**
- * __usePetitionActivity_sendMessagesMutation__
- *
- * To run a mutation, you first call `usePetitionActivity_sendMessagesMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionActivity_sendMessagesMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionActivitySendMessagesMutation, { data, loading, error }] = usePetitionActivity_sendMessagesMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      accessIds: // value for 'accessIds'
- *      subject: // value for 'subject'
- *      body: // value for 'body'
- *      scheduledAt: // value for 'scheduledAt'
- *   },
- * });
- */
-export function usePetitionActivity_sendMessagesMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    PetitionActivity_sendMessagesMutation,
-    PetitionActivity_sendMessagesMutationVariables
-  >
-) {
-  return Apollo.useMutation<
-    PetitionActivity_sendMessagesMutation,
-    PetitionActivity_sendMessagesMutationVariables
-  >(PetitionActivity_sendMessagesDocument, baseOptions);
-}
-export type PetitionActivity_sendMessagesMutationHookResult = ReturnType<
-  typeof usePetitionActivity_sendMessagesMutation
 >;
 export const PetitionActivity_sendRemindersDocument = gql`
   mutation PetitionActivity_sendReminders(
     $petitionId: GID!
     $accessIds: [GID!]!
+    $body: JSON
   ) {
-    sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+    sendReminders(petitionId: $petitionId, accessIds: $accessIds, body: $body)
   }
 `;
 
@@ -9626,6 +9616,7 @@ export const PetitionActivity_sendRemindersDocument = gql`
  *   variables: {
  *      petitionId: // value for 'petitionId'
  *      accessIds: // value for 'accessIds'
+ *      body: // value for 'body'
  *   },
  * });
  */
@@ -9635,10 +9626,11 @@ export function usePetitionActivity_sendRemindersMutation(
     PetitionActivity_sendRemindersMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionActivity_sendRemindersMutation,
     PetitionActivity_sendRemindersMutationVariables
-  >(PetitionActivity_sendRemindersDocument, baseOptions);
+  >(PetitionActivity_sendRemindersDocument, options);
 }
 export type PetitionActivity_sendRemindersMutationHookResult = ReturnType<
   typeof usePetitionActivity_sendRemindersMutation
@@ -9679,10 +9671,11 @@ export function usePetitionActivity_deactivateAccessesMutation(
     PetitionActivity_deactivateAccessesMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionActivity_deactivateAccessesMutation,
     PetitionActivity_deactivateAccessesMutationVariables
-  >(PetitionActivity_deactivateAccessesDocument, baseOptions);
+  >(PetitionActivity_deactivateAccessesDocument, options);
 }
 export type PetitionActivity_deactivateAccessesMutationHookResult = ReturnType<
   typeof usePetitionActivity_deactivateAccessesMutation
@@ -9723,10 +9716,11 @@ export function usePetitionActivity_reactivateAccessesMutation(
     PetitionActivity_reactivateAccessesMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionActivity_reactivateAccessesMutation,
     PetitionActivity_reactivateAccessesMutationVariables
-  >(PetitionActivity_reactivateAccessesDocument, baseOptions);
+  >(PetitionActivity_reactivateAccessesDocument, options);
 }
 export type PetitionActivity_reactivateAccessesMutationHookResult = ReturnType<
   typeof usePetitionActivity_reactivateAccessesMutation
@@ -9767,10 +9761,11 @@ export function usePetitionActivity_cancelScheduledMessageMutation(
     PetitionActivity_cancelScheduledMessageMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionActivity_cancelScheduledMessageMutation,
     PetitionActivity_cancelScheduledMessageMutationVariables
-  >(PetitionActivity_cancelScheduledMessageDocument, baseOptions);
+  >(PetitionActivity_cancelScheduledMessageDocument, options);
 }
 export type PetitionActivity_cancelScheduledMessageMutationHookResult = ReturnType<
   typeof usePetitionActivity_cancelScheduledMessageMutation
@@ -9825,10 +9820,11 @@ export function usePetitionsActivity_sendPetitionMutation(
     PetitionsActivity_sendPetitionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionsActivity_sendPetitionMutation,
     PetitionsActivity_sendPetitionMutationVariables
-  >(PetitionsActivity_sendPetitionDocument, baseOptions);
+  >(PetitionsActivity_sendPetitionDocument, options);
 }
 export type PetitionsActivity_sendPetitionMutationHookResult = ReturnType<
   typeof usePetitionsActivity_sendPetitionMutation
@@ -9877,10 +9873,11 @@ export function usePetitionActivity_switchAutomaticRemindersMutation(
     PetitionActivity_switchAutomaticRemindersMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionActivity_switchAutomaticRemindersMutation,
     PetitionActivity_switchAutomaticRemindersMutationVariables
-  >(PetitionActivity_switchAutomaticRemindersDocument, baseOptions);
+  >(PetitionActivity_switchAutomaticRemindersDocument, options);
 }
 export type PetitionActivity_switchAutomaticRemindersMutationHookResult = ReturnType<
   typeof usePetitionActivity_switchAutomaticRemindersMutation
@@ -9916,9 +9913,10 @@ export function usePetitionActivityQuery(
     PetitionActivityQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionActivityQuery, PetitionActivityQueryVariables>(
     PetitionActivityDocument,
-    baseOptions
+    options
   );
 }
 export function usePetitionActivityLazyQuery(
@@ -9927,10 +9925,11 @@ export function usePetitionActivityLazyQuery(
     PetitionActivityQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     PetitionActivityQuery,
     PetitionActivityQueryVariables
-  >(PetitionActivityDocument, baseOptions);
+  >(PetitionActivityDocument, options);
 }
 export type PetitionActivityQueryHookResult = ReturnType<
   typeof usePetitionActivityQuery
@@ -9968,10 +9967,11 @@ export function usePetitionActivityUserQuery(
     PetitionActivityUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     PetitionActivityUserQuery,
     PetitionActivityUserQueryVariables
-  >(PetitionActivityUserDocument, baseOptions);
+  >(PetitionActivityUserDocument, options);
 }
 export function usePetitionActivityUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -9979,10 +9979,11 @@ export function usePetitionActivityUserLazyQuery(
     PetitionActivityUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     PetitionActivityUserQuery,
     PetitionActivityUserQueryVariables
-  >(PetitionActivityUserDocument, baseOptions);
+  >(PetitionActivityUserDocument, options);
 }
 export type PetitionActivityUserQueryHookResult = ReturnType<
   typeof usePetitionActivityUserQuery
@@ -10034,10 +10035,11 @@ export function usePetitionCompose_updatePetitionMutation(
     PetitionCompose_updatePetitionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionCompose_updatePetitionMutation,
     PetitionCompose_updatePetitionMutationVariables
-  >(PetitionCompose_updatePetitionDocument, baseOptions);
+  >(PetitionCompose_updatePetitionDocument, options);
 }
 export type PetitionCompose_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionCompose_updatePetitionMutation
@@ -10082,10 +10084,11 @@ export function usePetitionCompose_updateFieldPositionsMutation(
     PetitionCompose_updateFieldPositionsMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionCompose_updateFieldPositionsMutation,
     PetitionCompose_updateFieldPositionsMutationVariables
-  >(PetitionCompose_updateFieldPositionsDocument, baseOptions);
+  >(PetitionCompose_updateFieldPositionsDocument, options);
 }
 export type PetitionCompose_updateFieldPositionsMutationHookResult = ReturnType<
   typeof usePetitionCompose_updateFieldPositionsMutation
@@ -10142,10 +10145,11 @@ export function usePetitionCompose_createPetitionFieldMutation(
     PetitionCompose_createPetitionFieldMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionCompose_createPetitionFieldMutation,
     PetitionCompose_createPetitionFieldMutationVariables
-  >(PetitionCompose_createPetitionFieldDocument, baseOptions);
+  >(PetitionCompose_createPetitionFieldDocument, options);
 }
 export type PetitionCompose_createPetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_createPetitionFieldMutation
@@ -10196,10 +10200,11 @@ export function usePetitionCompose_clonePetitionFieldMutation(
     PetitionCompose_clonePetitionFieldMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionCompose_clonePetitionFieldMutation,
     PetitionCompose_clonePetitionFieldMutationVariables
-  >(PetitionCompose_clonePetitionFieldDocument, baseOptions);
+  >(PetitionCompose_clonePetitionFieldDocument, options);
 }
 export type PetitionCompose_clonePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_clonePetitionFieldMutation
@@ -10250,10 +10255,11 @@ export function usePetitionCompose_deletePetitionFieldMutation(
     PetitionCompose_deletePetitionFieldMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionCompose_deletePetitionFieldMutation,
     PetitionCompose_deletePetitionFieldMutationVariables
-  >(PetitionCompose_deletePetitionFieldDocument, baseOptions);
+  >(PetitionCompose_deletePetitionFieldDocument, options);
 }
 export type PetitionCompose_deletePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_deletePetitionFieldMutation
@@ -10310,10 +10316,11 @@ export function usePetitionCompose_updatePetitionFieldMutation(
     PetitionCompose_updatePetitionFieldMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionCompose_updatePetitionFieldMutation,
     PetitionCompose_updatePetitionFieldMutationVariables
-  >(PetitionCompose_updatePetitionFieldDocument, baseOptions);
+  >(PetitionCompose_updatePetitionFieldDocument, options);
 }
 export type PetitionCompose_updatePetitionFieldMutationHookResult = ReturnType<
   typeof usePetitionCompose_updatePetitionFieldMutation
@@ -10370,10 +10377,11 @@ export function usePetitionCompose_changePetitionFieldTypeMutation(
     PetitionCompose_changePetitionFieldTypeMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionCompose_changePetitionFieldTypeMutation,
     PetitionCompose_changePetitionFieldTypeMutationVariables
-  >(PetitionCompose_changePetitionFieldTypeDocument, baseOptions);
+  >(PetitionCompose_changePetitionFieldTypeDocument, options);
 }
 export type PetitionCompose_changePetitionFieldTypeMutationHookResult = ReturnType<
   typeof usePetitionCompose_changePetitionFieldTypeMutation
@@ -10432,10 +10440,11 @@ export function usePetitionCompose_sendPetitionMutation(
     PetitionCompose_sendPetitionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionCompose_sendPetitionMutation,
     PetitionCompose_sendPetitionMutationVariables
-  >(PetitionCompose_sendPetitionDocument, baseOptions);
+  >(PetitionCompose_sendPetitionDocument, options);
 }
 export type PetitionCompose_sendPetitionMutationHookResult = ReturnType<
   typeof usePetitionCompose_sendPetitionMutation
@@ -10470,10 +10479,11 @@ export function usePetitionComposeUserQuery(
     PetitionComposeUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     PetitionComposeUserQuery,
     PetitionComposeUserQueryVariables
-  >(PetitionComposeUserDocument, baseOptions);
+  >(PetitionComposeUserDocument, options);
 }
 export function usePetitionComposeUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -10481,10 +10491,11 @@ export function usePetitionComposeUserLazyQuery(
     PetitionComposeUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     PetitionComposeUserQuery,
     PetitionComposeUserQueryVariables
-  >(PetitionComposeUserDocument, baseOptions);
+  >(PetitionComposeUserDocument, options);
 }
 export type PetitionComposeUserQueryHookResult = ReturnType<
   typeof usePetitionComposeUserQuery
@@ -10524,9 +10535,10 @@ export function usePetitionComposeQuery(
     PetitionComposeQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionComposeQuery, PetitionComposeQueryVariables>(
     PetitionComposeDocument,
-    baseOptions
+    options
   );
 }
 export function usePetitionComposeLazyQuery(
@@ -10535,10 +10547,11 @@ export function usePetitionComposeLazyQuery(
     PetitionComposeQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     PetitionComposeQuery,
     PetitionComposeQueryVariables
-  >(PetitionComposeDocument, baseOptions);
+  >(PetitionComposeDocument, options);
 }
 export type PetitionComposeQueryHookResult = ReturnType<
   typeof usePetitionComposeQuery
@@ -10576,9 +10589,10 @@ export const PetitionDocument = gql`
 export function usePetitionQuery(
   baseOptions: Apollo.QueryHookOptions<PetitionQuery, PetitionQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionQuery, PetitionQueryVariables>(
     PetitionDocument,
-    baseOptions
+    options
   );
 }
 export function usePetitionLazyQuery(
@@ -10587,9 +10601,10 @@ export function usePetitionLazyQuery(
     PetitionQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<PetitionQuery, PetitionQueryVariables>(
     PetitionDocument,
-    baseOptions
+    options
   );
 }
 export type PetitionQueryHookResult = ReturnType<typeof usePetitionQuery>;
@@ -10632,10 +10647,11 @@ export function usePetitionReplies_updatePetitionMutation(
     PetitionReplies_updatePetitionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_updatePetitionMutation,
     PetitionReplies_updatePetitionMutationVariables
-  >(PetitionReplies_updatePetitionDocument, baseOptions);
+  >(PetitionReplies_updatePetitionDocument, options);
 }
 export type PetitionReplies_updatePetitionMutationHookResult = ReturnType<
   typeof usePetitionReplies_updatePetitionMutation
@@ -10695,10 +10711,11 @@ export function usePetitionReplies_validatePetitionFieldsMutation(
     PetitionReplies_validatePetitionFieldsMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_validatePetitionFieldsMutation,
     PetitionReplies_validatePetitionFieldsMutationVariables
-  >(PetitionReplies_validatePetitionFieldsDocument, baseOptions);
+  >(PetitionReplies_validatePetitionFieldsDocument, options);
 }
 export type PetitionReplies_validatePetitionFieldsMutationHookResult = ReturnType<
   typeof usePetitionReplies_validatePetitionFieldsMutation
@@ -10745,10 +10762,11 @@ export function usePetitionReplies_fileUploadReplyDownloadLinkMutation(
     PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_fileUploadReplyDownloadLinkMutation,
     PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
-  >(PetitionReplies_fileUploadReplyDownloadLinkDocument, baseOptions);
+  >(PetitionReplies_fileUploadReplyDownloadLinkDocument, options);
 }
 export type PetitionReplies_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
   typeof usePetitionReplies_fileUploadReplyDownloadLinkMutation
@@ -10803,10 +10821,11 @@ export function usePetitionReplies_createPetitionFieldCommentMutation(
     PetitionReplies_createPetitionFieldCommentMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_createPetitionFieldCommentMutation,
     PetitionReplies_createPetitionFieldCommentMutationVariables
-  >(PetitionReplies_createPetitionFieldCommentDocument, baseOptions);
+  >(PetitionReplies_createPetitionFieldCommentDocument, options);
 }
 export type PetitionReplies_createPetitionFieldCommentMutationHookResult = ReturnType<
   typeof usePetitionReplies_createPetitionFieldCommentMutation
@@ -10858,10 +10877,11 @@ export function usePetitionReplies_updatePetitionFieldCommentMutation(
     PetitionReplies_updatePetitionFieldCommentMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_updatePetitionFieldCommentMutation,
     PetitionReplies_updatePetitionFieldCommentMutationVariables
-  >(PetitionReplies_updatePetitionFieldCommentDocument, baseOptions);
+  >(PetitionReplies_updatePetitionFieldCommentDocument, options);
 }
 export type PetitionReplies_updatePetitionFieldCommentMutationHookResult = ReturnType<
   typeof usePetitionReplies_updatePetitionFieldCommentMutation
@@ -10905,10 +10925,11 @@ export function usePetitionReplies_deletePetitionFieldCommentMutation(
     PetitionReplies_deletePetitionFieldCommentMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_deletePetitionFieldCommentMutation,
     PetitionReplies_deletePetitionFieldCommentMutationVariables
-  >(PetitionReplies_deletePetitionFieldCommentDocument, baseOptions);
+  >(PetitionReplies_deletePetitionFieldCommentDocument, options);
 }
 export type PetitionReplies_deletePetitionFieldCommentMutationHookResult = ReturnType<
   typeof usePetitionReplies_deletePetitionFieldCommentMutation
@@ -10945,10 +10966,11 @@ export function usePetitionReplies_submitUnpublishedCommentsMutation(
     PetitionReplies_submitUnpublishedCommentsMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_submitUnpublishedCommentsMutation,
     PetitionReplies_submitUnpublishedCommentsMutationVariables
-  >(PetitionReplies_submitUnpublishedCommentsDocument, baseOptions);
+  >(PetitionReplies_submitUnpublishedCommentsDocument, options);
 }
 export type PetitionReplies_submitUnpublishedCommentsMutationHookResult = ReturnType<
   typeof usePetitionReplies_submitUnpublishedCommentsMutation
@@ -10992,10 +11014,11 @@ export function usePetitionReplies_markPetitionFieldCommentsAsReadMutation(
     PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_markPetitionFieldCommentsAsReadMutation,
     PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
-  >(PetitionReplies_markPetitionFieldCommentsAsReadDocument, baseOptions);
+  >(PetitionReplies_markPetitionFieldCommentsAsReadDocument, options);
 }
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
   typeof usePetitionReplies_markPetitionFieldCommentsAsReadMutation
@@ -11055,10 +11078,11 @@ export function usePetitionReplies_updatePetitionFieldRepliesStatusMutation(
     PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_updatePetitionFieldRepliesStatusMutation,
     PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
-  >(PetitionReplies_updatePetitionFieldRepliesStatusDocument, baseOptions);
+  >(PetitionReplies_updatePetitionFieldRepliesStatusDocument, options);
 }
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutationHookResult = ReturnType<
   typeof usePetitionReplies_updatePetitionFieldRepliesStatusMutation
@@ -11110,10 +11134,11 @@ export function usePetitionReplies_sendPetitionClosedNotificationMutation(
     PetitionReplies_sendPetitionClosedNotificationMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_sendPetitionClosedNotificationMutation,
     PetitionReplies_sendPetitionClosedNotificationMutationVariables
-  >(PetitionReplies_sendPetitionClosedNotificationDocument, baseOptions);
+  >(PetitionReplies_sendPetitionClosedNotificationDocument, options);
 }
 export type PetitionReplies_sendPetitionClosedNotificationMutationHookResult = ReturnType<
   typeof usePetitionReplies_sendPetitionClosedNotificationMutation
@@ -11149,10 +11174,11 @@ export function usePetitionReplies_presendPetitionClosedNotificationMutation(
     PetitionReplies_presendPetitionClosedNotificationMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionReplies_presendPetitionClosedNotificationMutation,
     PetitionReplies_presendPetitionClosedNotificationMutationVariables
-  >(PetitionReplies_presendPetitionClosedNotificationDocument, baseOptions);
+  >(PetitionReplies_presendPetitionClosedNotificationDocument, options);
 }
 export type PetitionReplies_presendPetitionClosedNotificationMutationHookResult = ReturnType<
   typeof usePetitionReplies_presendPetitionClosedNotificationMutation
@@ -11187,10 +11213,11 @@ export function usePetitionRepliesUserQuery(
     PetitionRepliesUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     PetitionRepliesUserQuery,
     PetitionRepliesUserQueryVariables
-  >(PetitionRepliesUserDocument, baseOptions);
+  >(PetitionRepliesUserDocument, options);
 }
 export function usePetitionRepliesUserLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -11198,10 +11225,11 @@ export function usePetitionRepliesUserLazyQuery(
     PetitionRepliesUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     PetitionRepliesUserQuery,
     PetitionRepliesUserQueryVariables
-  >(PetitionRepliesUserDocument, baseOptions);
+  >(PetitionRepliesUserDocument, options);
 }
 export type PetitionRepliesUserQueryHookResult = ReturnType<
   typeof usePetitionRepliesUserQuery
@@ -11246,9 +11274,10 @@ export function usePetitionRepliesQuery(
     PetitionRepliesQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionRepliesQuery, PetitionRepliesQueryVariables>(
     PetitionRepliesDocument,
-    baseOptions
+    options
   );
 }
 export function usePetitionRepliesLazyQuery(
@@ -11257,10 +11286,11 @@ export function usePetitionRepliesLazyQuery(
     PetitionRepliesQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     PetitionRepliesQuery,
     PetitionRepliesQueryVariables
-  >(PetitionRepliesDocument, baseOptions);
+  >(PetitionRepliesDocument, options);
 }
 export type PetitionRepliesQueryHookResult = ReturnType<
   typeof usePetitionRepliesQuery
@@ -11298,9 +11328,10 @@ export function usePetitionsUserQuery(
     PetitionsUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
     PetitionsUserDocument,
-    baseOptions
+    options
   );
 }
 export function usePetitionsUserLazyQuery(
@@ -11309,9 +11340,10 @@ export function usePetitionsUserLazyQuery(
     PetitionsUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
     PetitionsUserDocument,
-    baseOptions
+    options
   );
 }
 export type PetitionsUserQueryHookResult = ReturnType<
@@ -11369,9 +11401,10 @@ export const PetitionsDocument = gql`
 export function usePetitionsQuery(
   baseOptions: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PetitionsQuery, PetitionsQueryVariables>(
     PetitionsDocument,
-    baseOptions
+    options
   );
 }
 export function usePetitionsLazyQuery(
@@ -11380,9 +11413,10 @@ export function usePetitionsLazyQuery(
     PetitionsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<PetitionsQuery, PetitionsQueryVariables>(
     PetitionsDocument,
-    baseOptions
+    options
   );
 }
 export type PetitionsQueryHookResult = ReturnType<typeof usePetitionsQuery>;
@@ -11436,10 +11470,11 @@ export function useNewPetitionPublicTemplatesQuery(
     NewPetitionPublicTemplatesQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     NewPetitionPublicTemplatesQuery,
     NewPetitionPublicTemplatesQueryVariables
-  >(NewPetitionPublicTemplatesDocument, baseOptions);
+  >(NewPetitionPublicTemplatesDocument, options);
 }
 export function useNewPetitionPublicTemplatesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -11447,10 +11482,11 @@ export function useNewPetitionPublicTemplatesLazyQuery(
     NewPetitionPublicTemplatesQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     NewPetitionPublicTemplatesQuery,
     NewPetitionPublicTemplatesQueryVariables
-  >(NewPetitionPublicTemplatesDocument, baseOptions);
+  >(NewPetitionPublicTemplatesDocument, options);
 }
 export type NewPetitionPublicTemplatesQueryHookResult = ReturnType<
   typeof useNewPetitionPublicTemplatesQuery
@@ -11510,10 +11546,11 @@ export function useNewPetitionTemplatesQuery(
     NewPetitionTemplatesQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     NewPetitionTemplatesQuery,
     NewPetitionTemplatesQueryVariables
-  >(NewPetitionTemplatesDocument, baseOptions);
+  >(NewPetitionTemplatesDocument, options);
 }
 export function useNewPetitionTemplatesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -11521,10 +11558,11 @@ export function useNewPetitionTemplatesLazyQuery(
     NewPetitionTemplatesQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     NewPetitionTemplatesQuery,
     NewPetitionTemplatesQueryVariables
-  >(NewPetitionTemplatesDocument, baseOptions);
+  >(NewPetitionTemplatesDocument, options);
 }
 export type NewPetitionTemplatesQueryHookResult = ReturnType<
   typeof useNewPetitionTemplatesQuery
@@ -11562,9 +11600,10 @@ export function useNewPetitionUserQuery(
     NewPetitionUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<NewPetitionUserQuery, NewPetitionUserQueryVariables>(
     NewPetitionUserDocument,
-    baseOptions
+    options
   );
 }
 export function useNewPetitionUserLazyQuery(
@@ -11573,10 +11612,11 @@ export function useNewPetitionUserLazyQuery(
     NewPetitionUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     NewPetitionUserQuery,
     NewPetitionUserQueryVariables
-  >(NewPetitionUserDocument, baseOptions);
+  >(NewPetitionUserDocument, options);
 }
 export type NewPetitionUserQueryHookResult = ReturnType<
   typeof useNewPetitionUserQuery
@@ -11619,10 +11659,11 @@ export function useAccount_updateAccountMutation(
     Account_updateAccountMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     Account_updateAccountMutation,
     Account_updateAccountMutationVariables
-  >(Account_updateAccountDocument, baseOptions);
+  >(Account_updateAccountDocument, options);
 }
 export type Account_updateAccountMutationHookResult = ReturnType<
   typeof useAccount_updateAccountMutation
@@ -11655,17 +11696,19 @@ export const AccountDocument = gql`
 export function useAccountQuery(
   baseOptions?: Apollo.QueryHookOptions<AccountQuery, AccountQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<AccountQuery, AccountQueryVariables>(
     AccountDocument,
-    baseOptions
+    options
   );
 }
 export function useAccountLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<AccountQuery, AccountQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<AccountQuery, AccountQueryVariables>(
     AccountDocument,
-    baseOptions
+    options
   );
 }
 export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
@@ -11698,9 +11741,10 @@ export const SettingsDocument = gql`
 export function useSettingsQuery(
   baseOptions?: Apollo.QueryHookOptions<SettingsQuery, SettingsQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<SettingsQuery, SettingsQueryVariables>(
     SettingsDocument,
-    baseOptions
+    options
   );
 }
 export function useSettingsLazyQuery(
@@ -11709,9 +11753,10 @@ export function useSettingsLazyQuery(
     SettingsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<SettingsQuery, SettingsQueryVariables>(
     SettingsDocument,
-    baseOptions
+    options
   );
 }
 export type SettingsQueryHookResult = ReturnType<typeof useSettingsQuery>;
@@ -11748,10 +11793,11 @@ export function useSecurity_updatePasswordMutation(
     Security_updatePasswordMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     Security_updatePasswordMutation,
     Security_updatePasswordMutationVariables
-  >(Security_updatePasswordDocument, baseOptions);
+  >(Security_updatePasswordDocument, options);
 }
 export type Security_updatePasswordMutationHookResult = ReturnType<
   typeof useSecurity_updatePasswordMutation
@@ -11785,9 +11831,10 @@ export const SecurityDocument = gql`
 export function useSecurityQuery(
   baseOptions?: Apollo.QueryHookOptions<SecurityQuery, SecurityQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<SecurityQuery, SecurityQueryVariables>(
     SecurityDocument,
-    baseOptions
+    options
   );
 }
 export function useSecurityLazyQuery(
@@ -11796,9 +11843,10 @@ export function useSecurityLazyQuery(
     SecurityQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<SecurityQuery, SecurityQueryVariables>(
     SecurityDocument,
-    baseOptions
+    options
   );
 }
 export type SecurityQueryHookResult = ReturnType<typeof useSecurityQuery>;
@@ -11834,10 +11882,11 @@ export function useRevokeUserAuthTokenMutation(
     RevokeUserAuthTokenMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RevokeUserAuthTokenMutation,
     RevokeUserAuthTokenMutationVariables
-  >(RevokeUserAuthTokenDocument, baseOptions);
+  >(RevokeUserAuthTokenDocument, options);
 }
 export type RevokeUserAuthTokenMutationHookResult = ReturnType<
   typeof useRevokeUserAuthTokenMutation
@@ -11893,17 +11942,19 @@ export const TokensDocument = gql`
 export function useTokensQuery(
   baseOptions: Apollo.QueryHookOptions<TokensQuery, TokensQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<TokensQuery, TokensQueryVariables>(
     TokensDocument,
-    baseOptions
+    options
   );
 }
 export function useTokensLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<TokensQuery, TokensQueryVariables>
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<TokensQuery, TokensQueryVariables>(
     TokensDocument,
-    baseOptions
+    options
   );
 }
 export type TokensQueryHookResult = ReturnType<typeof useTokensQuery>;
@@ -11938,9 +11989,10 @@ export function useCurrentUserQuery(
     CurrentUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<CurrentUserQuery, CurrentUserQueryVariables>(
     CurrentUserDocument,
-    baseOptions
+    options
   );
 }
 export function useCurrentUserLazyQuery(
@@ -11949,9 +12001,10 @@ export function useCurrentUserLazyQuery(
     CurrentUserQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<CurrentUserQuery, CurrentUserQueryVariables>(
     CurrentUserDocument,
-    baseOptions
+    options
   );
 }
 export type CurrentUserQueryHookResult = ReturnType<typeof useCurrentUserQuery>;
@@ -11990,10 +12043,11 @@ export function useRecipientView_publicCompletePetitionMutation(
     RecipientView_publicCompletePetitionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientView_publicCompletePetitionMutation,
     RecipientView_publicCompletePetitionMutationVariables
-  >(RecipientView_publicCompletePetitionDocument, baseOptions);
+  >(RecipientView_publicCompletePetitionDocument, options);
 }
 export type RecipientView_publicCompletePetitionMutationHookResult = ReturnType<
   typeof useRecipientView_publicCompletePetitionMutation
@@ -12030,10 +12084,11 @@ export function useRecipientView_submitUnpublishedCommentsMutation(
     RecipientView_submitUnpublishedCommentsMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientView_submitUnpublishedCommentsMutation,
     RecipientView_submitUnpublishedCommentsMutationVariables
-  >(RecipientView_submitUnpublishedCommentsDocument, baseOptions);
+  >(RecipientView_submitUnpublishedCommentsDocument, options);
 }
 export type RecipientView_submitUnpublishedCommentsMutationHookResult = ReturnType<
   typeof useRecipientView_submitUnpublishedCommentsMutation
@@ -12069,9 +12124,10 @@ export function usePublicPetitionQuery(
     PublicPetitionQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
     PublicPetitionDocument,
-    baseOptions
+    options
   );
 }
 export function usePublicPetitionLazyQuery(
@@ -12080,9 +12136,10 @@ export function usePublicPetitionLazyQuery(
     PublicPetitionQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
     PublicPetitionDocument,
-    baseOptions
+    options
   );
 }
 export type PublicPetitionQueryHookResult = ReturnType<
@@ -12140,10 +12197,11 @@ export function useRecipientView_verifyPublicAccessMutation(
     RecipientView_verifyPublicAccessMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     RecipientView_verifyPublicAccessMutation,
     RecipientView_verifyPublicAccessMutationVariables
-  >(RecipientView_verifyPublicAccessDocument, baseOptions);
+  >(RecipientView_verifyPublicAccessDocument, options);
 }
 export type RecipientView_verifyPublicAccessMutationHookResult = ReturnType<
   typeof useRecipientView_verifyPublicAccessMutation
@@ -12181,10 +12239,11 @@ export function usepublicSendVerificationCodeMutation(
     publicSendVerificationCodeMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     publicSendVerificationCodeMutation,
     publicSendVerificationCodeMutationVariables
-  >(publicSendVerificationCodeDocument, baseOptions);
+  >(publicSendVerificationCodeDocument, options);
 }
 export type publicSendVerificationCodeMutationHookResult = ReturnType<
   typeof usepublicSendVerificationCodeMutation
@@ -12227,10 +12286,11 @@ export function usepublicCheckVerificationCodeMutation(
     publicCheckVerificationCodeMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     publicCheckVerificationCodeMutation,
     publicCheckVerificationCodeMutationVariables
-  >(publicCheckVerificationCodeDocument, baseOptions);
+  >(publicCheckVerificationCodeDocument, options);
 }
 export type publicCheckVerificationCodeMutationHookResult = ReturnType<
   typeof usepublicCheckVerificationCodeMutation
@@ -12266,9 +12326,10 @@ export function usePdfViewPetitionQuery(
     PdfViewPetitionQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<PdfViewPetitionQuery, PdfViewPetitionQueryVariables>(
     PdfViewPetitionDocument,
-    baseOptions
+    options
   );
 }
 export function usePdfViewPetitionLazyQuery(
@@ -12277,10 +12338,11 @@ export function usePdfViewPetitionLazyQuery(
     PdfViewPetitionQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     PdfViewPetitionQuery,
     PdfViewPetitionQueryVariables
-  >(PdfViewPetitionDocument, baseOptions);
+  >(PdfViewPetitionDocument, options);
 }
 export type PdfViewPetitionQueryHookResult = ReturnType<
   typeof usePdfViewPetitionQuery
@@ -12316,10 +12378,11 @@ export function useThanks_PetitionLogoQuery(
     Thanks_PetitionLogoQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     Thanks_PetitionLogoQuery,
     Thanks_PetitionLogoQueryVariables
-  >(Thanks_PetitionLogoDocument, baseOptions);
+  >(Thanks_PetitionLogoDocument, options);
 }
 export function useThanks_PetitionLogoLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12327,10 +12390,11 @@ export function useThanks_PetitionLogoLazyQuery(
     Thanks_PetitionLogoQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     Thanks_PetitionLogoQuery,
     Thanks_PetitionLogoQueryVariables
-  >(Thanks_PetitionLogoDocument, baseOptions);
+  >(Thanks_PetitionLogoDocument, options);
 }
 export type Thanks_PetitionLogoQueryHookResult = ReturnType<
   typeof useThanks_PetitionLogoQuery
@@ -12369,10 +12433,11 @@ export function useuseClonePetitions_clonePetitionsMutation(
     useClonePetitions_clonePetitionsMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     useClonePetitions_clonePetitionsMutation,
     useClonePetitions_clonePetitionsMutationVariables
-  >(useClonePetitions_clonePetitionsDocument, baseOptions);
+  >(useClonePetitions_clonePetitionsDocument, options);
 }
 export type useClonePetitions_clonePetitionsMutationHookResult = ReturnType<
   typeof useuseClonePetitions_clonePetitionsMutation
@@ -12412,10 +12477,11 @@ export function useuseCreateContact_createContactMutation(
     useCreateContact_createContactMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     useCreateContact_createContactMutation,
     useCreateContact_createContactMutationVariables
-  >(useCreateContact_createContactDocument, baseOptions);
+  >(useCreateContact_createContactDocument, options);
 }
 export type useCreateContact_createContactMutationHookResult = ReturnType<
   typeof useuseCreateContact_createContactMutation
@@ -12464,10 +12530,11 @@ export function useuseCreatePetition_createPetitionMutation(
     useCreatePetition_createPetitionMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     useCreatePetition_createPetitionMutation,
     useCreatePetition_createPetitionMutationVariables
-  >(useCreatePetition_createPetitionDocument, baseOptions);
+  >(useCreatePetition_createPetitionDocument, options);
 }
 export type useCreatePetition_createPetitionMutationHookResult = ReturnType<
   typeof useuseCreatePetition_createPetitionMutation
@@ -12501,10 +12568,11 @@ export function useuseDeletePetitions_deletePetitionsMutation(
     useDeletePetitions_deletePetitionsMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     useDeletePetitions_deletePetitionsMutation,
     useDeletePetitions_deletePetitionsMutationVariables
-  >(useDeletePetitions_deletePetitionsDocument, baseOptions);
+  >(useDeletePetitions_deletePetitionsDocument, options);
 }
 export type useDeletePetitions_deletePetitionsMutationHookResult = ReturnType<
   typeof useuseDeletePetitions_deletePetitionsMutation
@@ -12543,10 +12611,11 @@ export function usePetitionComposeSearchContactsQuery(
     PetitionComposeSearchContactsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
     PetitionComposeSearchContactsQuery,
     PetitionComposeSearchContactsQueryVariables
-  >(PetitionComposeSearchContactsDocument, baseOptions);
+  >(PetitionComposeSearchContactsDocument, options);
 }
 export function usePetitionComposeSearchContactsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
@@ -12554,10 +12623,11 @@ export function usePetitionComposeSearchContactsLazyQuery(
     PetitionComposeSearchContactsQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
     PetitionComposeSearchContactsQuery,
     PetitionComposeSearchContactsQueryVariables
-  >(PetitionComposeSearchContactsDocument, baseOptions);
+  >(PetitionComposeSearchContactsDocument, options);
 }
 export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
   typeof usePetitionComposeSearchContactsQuery
@@ -12604,9 +12674,10 @@ export function useSearchUsersQuery(
     SearchUsersQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<SearchUsersQuery, SearchUsersQueryVariables>(
     SearchUsersDocument,
-    baseOptions
+    options
   );
 }
 export function useSearchUsersLazyQuery(
@@ -12615,9 +12686,10 @@ export function useSearchUsersLazyQuery(
     SearchUsersQueryVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<SearchUsersQuery, SearchUsersQueryVariables>(
     SearchUsersDocument,
-    baseOptions
+    options
   );
 }
 export type SearchUsersQueryHookResult = ReturnType<typeof useSearchUsersQuery>;

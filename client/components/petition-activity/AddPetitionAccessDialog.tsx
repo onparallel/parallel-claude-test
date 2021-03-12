@@ -17,8 +17,8 @@ import {
   RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { emptyContent } from "@parallel/utils/slate/emptyContent";
-import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
+import { emptyRTEValue } from "@parallel/utils/slate/emptyRTEValue";
+import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCallback, useRef, useState } from "react";
@@ -29,7 +29,7 @@ import {
   ContactSelectProps,
   ContactSelectSelection,
 } from "../common/ContactSelect";
-import { RichTextEditorContent } from "../common/RichTextEditor";
+import { RichTextEditorValue } from "../common/RichTextEditor";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
 import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersConfig";
@@ -40,14 +40,14 @@ export type AddPettionAccessDialogProps = {
   onCreateContact: ContactSelectProps["onCreateContact"];
   onUpdatePetition?: (data: UpdatePetitionInput) => void;
   defaultSubject?: Maybe<string>;
-  defaultBody?: Maybe<RichTextEditorContent>;
+  defaultBody?: Maybe<RichTextEditorValue>;
   defaultRemindersConfig?: Maybe<RemindersConfig>;
 };
 
 export type AddPettionAccessDialogResult = {
   recipientIds: string[];
   subject: string;
-  body: RichTextEditorContent;
+  body: RichTextEditorValue;
   remindersConfig: Maybe<RemindersConfig>;
   scheduledAt: Maybe<Date>;
 };
@@ -65,8 +65,8 @@ export function AddPetitionAccessDialog({
   const [showErrors, setShowErrors] = useState(false);
   const [recipients, setRecipients] = useState<ContactSelectSelection[]>([]);
   const [subject, setSubject] = useState(defaultSubject ?? "");
-  const [body, setBody] = useState<RichTextEditorContent>(
-    defaultBody ?? emptyContent()
+  const [body, setBody] = useState<RichTextEditorValue>(
+    defaultBody ?? emptyRTEValue()
   );
   const [remindersConfig, setRemindersConfig] = useState<
     Maybe<RemindersConfig>
@@ -88,9 +88,9 @@ export function AddPetitionAccessDialog({
   );
 
   const handleBodyChange = useCallback(
-    (value: RichTextEditorContent) => {
+    (value: RichTextEditorValue) => {
       setBody(value);
-      updateBody({ emailBody: isEmptyContent(value) ? null : value });
+      updateBody({ emailBody: isEmptyRTEValue(value) ? null : value });
     },
     [updateBody]
   );
@@ -111,7 +111,7 @@ export function AddPetitionAccessDialog({
   const invalidRecipients = recipients.filter((r) => r.isInvalid);
   const isValid = Boolean(
     subject &&
-      !isEmptyContent(body) &&
+      !isEmptyRTEValue(body) &&
       validRecipients.length > 0 &&
       invalidRecipients.length === 0
   );

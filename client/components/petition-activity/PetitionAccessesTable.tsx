@@ -16,7 +16,6 @@ import {
   BellIcon,
   BellSettingsIcon,
   ChevronDownIcon,
-  EmailIcon,
   SettingsIcon,
   UserCheckIcon,
   UserPlusIcon,
@@ -39,7 +38,6 @@ import { Table, TableColumn } from "../common/Table";
 export interface PetitionAccessesTable extends BoxProps {
   petition: PetitionAccessTable_PetitionFragment;
   onAddPetitionAccess: () => void;
-  onSendMessage: (accessIds: string[]) => void;
   onSendReminders: (accessIds: string[]) => void;
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
@@ -49,7 +47,6 @@ export interface PetitionAccessesTable extends BoxProps {
 export function PetitionAccessesTable({
   petition,
   onAddPetitionAccess,
-  onSendMessage,
   onSendReminders,
   onReactivateAccess,
   onDeactivateAccess,
@@ -63,9 +60,6 @@ export function PetitionAccessesTable({
     [selection, petition.accesses]
   );
 
-  const handleSendMessage = useCallback(async () => {
-    onSendMessage(selection);
-  }, [selection]);
   const handleSendReminders = useCallback(async () => {
     onSendReminders(selection);
   }, [selection]);
@@ -80,7 +74,6 @@ export function PetitionAccessesTable({
   const context = useMemo(
     () => ({
       petition,
-      onSendMessage,
       onSendReminders,
       onReactivateAccess,
       onDeactivateAccess,
@@ -116,16 +109,6 @@ export function PetitionAccessesTable({
             </MenuButton>
             <Portal>
               <MenuList minWidth="160px">
-                <MenuItem
-                  isDisabled={selected.some((a) => a.status === "INACTIVE")}
-                  onClick={handleSendMessage}
-                >
-                  <EmailIcon marginRight={2} />
-                  <FormattedMessage
-                    id="petition-accesses.send-message"
-                    defaultMessage="Send message"
-                  />
-                </MenuItem>
                 <MenuItem
                   isDisabled={
                     petition.status !== "PENDING" ||
@@ -185,7 +168,6 @@ function usePetitionAccessesColumns(): TableColumn<
     petition: PetitionAccessTable_PetitionFragment;
     onReactivateAccess: (accessId: string) => void;
     onDeactivateAccess: (accessId: string) => void;
-    onSendMessage: (accessIds: string[]) => void;
     onSendReminders: (accessIds: string[]) => void;
     onConfigureReminders: (accessIds: string[]) => void;
   }
@@ -294,7 +276,6 @@ function usePetitionAccessesColumns(): TableColumn<
         CellContent: ({ row: { id, status, contact }, context }) => {
           const {
             petition,
-            onSendMessage,
             onSendReminders,
             onConfigureReminders,
             onDeactivateAccess,
@@ -305,16 +286,6 @@ function usePetitionAccessesColumns(): TableColumn<
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               {status === "ACTIVE" ? (
                 <>
-                  <IconButtonWithTooltip
-                    label={intl.formatMessage({
-                      id: "petition-accesses.send-message",
-                      defaultMessage: "Send message",
-                    })}
-                    onClick={() => onSendMessage([id])}
-                    placement="bottom"
-                    icon={<EmailIcon fontSize="16px" />}
-                    size="sm"
-                  />
                   <IconButtonWithTooltip
                     isDisabled={petition.status !== "PENDING"}
                     label={intl.formatMessage({

@@ -24,6 +24,75 @@
           },
           { "position": 4, "id": 6905, "title": "Nombre", "type": "TEXT" }
         ],
+        "body": [
+          {
+            "children": [
+              { "text": "hola Derek, envimae los " },
+              { "text": "documentos " },
+              { "text": "siguientes ", "bold": true },
+              { "text": "super guays", "bold": true, "underline": true }
+            ]
+          },
+          {
+            "children": [{ "text": "hmmm" }]
+          },
+          {
+            "type": "bulleted-list",
+            "children": [
+              {
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [
+                      { "text": "foto", "bold": true, "underline": true }
+                    ]
+                  }
+                ],
+                "type": "list-item"
+              },
+              {
+                "children": [
+                  {
+                    "type": "paragraph",
+                    "children": [{ "text": "pasaporte", "italic": true }]
+                  },
+                  {
+                    "type": "bulleted-list",
+                    "children": [
+                      {
+                        "children": [
+                          {
+                            "type": "paragraph",
+                            "children": [
+                              {
+                                "text": "foto",
+                                "bold": true,
+                                "underline": true
+                              }
+                            ]
+                          }
+                        ],
+                        "type": "list-item"
+                      },
+                      {
+                        "children": [
+                          {
+                            "type": "paragraph",
+                            "children": [
+                              { "text": "pasaporte", "italic": true }
+                            ]
+                          }
+                        ],
+                        "type": "list-item"
+                      }
+                    ]
+                  }
+                ],
+                "type": "list-item"
+              }
+            ]
+          }
+        ],
         "keycode": "asdfghjkl",
         "parallelUrl": "https://www.onparallel.com",
         "assetsUrl": "https://static.onparallel.com",
@@ -35,6 +104,7 @@
         "senderName": { "control": { "type": "text" } },
         "senderEmail": { "control": { "type": "text" } },
         "fields": { "control": { "type": "object" } },
+        "body": { "control": { "type": "object" } },
         "deadline": { "control": { "type": "date" } },
         "keycode": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },

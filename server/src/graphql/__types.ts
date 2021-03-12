@@ -592,7 +592,6 @@ export interface NexusGenFieldTypes {
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
-    sendMessages: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
     sendReminders: NexusGenEnums["Result"]; // Result!
@@ -1318,7 +1317,6 @@ export interface NexusGenFieldTypeNames {
     reopenPetition: "Petition";
     resetSignaturitOrganizationBranding: "SupportMethodResponse";
     revokeUserAuthToken: "Result";
-    sendMessages: "Result";
     sendPetition: "SendPetitionResult";
     sendPetitionClosedNotification: "Petition";
     sendReminders: "Result";
@@ -2184,14 +2182,6 @@ export interface NexusGenArgTypes {
       // args
       authTokenIds: NexusGenScalars["GID"][]; // [GID!]!
     };
-    sendMessages: {
-      // args
-      accessIds: NexusGenScalars["GID"][]; // [GID!]!
-      body: NexusGenScalars["JSON"]; // JSON!
-      petitionId: NexusGenScalars["GID"]; // GID!
-      scheduledAt?: NexusGenScalars["DateTime"] | null; // DateTime
-      subject: string; // String!
-    };
     sendPetition: {
       // args
       body: NexusGenScalars["JSON"]; // JSON!
@@ -2212,6 +2202,7 @@ export interface NexusGenArgTypes {
     sendReminders: {
       // args
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
+      body?: NexusGenScalars["JSON"] | null; // JSON
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     signedPetitionDownloadLink: {

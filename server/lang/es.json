@@ -256,7 +256,7 @@
   },
   {
     "term": "petition-reminder.subject",
-    "definition": "Le recordamos que {senderName} le envió una petición, de la que queda información pendiente de completar.",
+    "definition": "Recuerde que {senderName} le envió una petición",
     "context": "Remember that {senderName} sent you a petition"
   },
   {

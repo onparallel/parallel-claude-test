@@ -2725,17 +2725,17 @@
     "context": "Delete field"
   },
   {
-    "term": "petition.confirm-send-reminder-message.body",
+    "term": "component.confirm-send-reminder-dialog.body",
     "definition": "¿Estás seguro de que quieres enviar un recordatorio a los contactos seleccionados?",
     "context": "Are you sure you want to send a reminder to the selected contacts?"
   },
   {
-    "term": "petition.confirm-send-reminder-message.confirm",
+    "term": "component.confirm-send-reminder-dialog.confirm",
     "definition": "Sí, enviar",
     "context": "Yes, send"
   },
   {
-    "term": "petition.confirm-send-reminder-message.header",
+    "term": "component.confirm-send-reminder-dialog.header",
     "definition": "Enviar recordatorios",
     "context": "Send reminders"
   },

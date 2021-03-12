@@ -23,12 +23,12 @@ import {
   PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { assignRef } from "@parallel/utils/assignRef";
+import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { PetitionFieldVisibilityCondition } from "@parallel/utils/fieldVisibility/types";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { memo, useCallback, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
 import { GrowingTextarea } from "../common/GrowingTextarea";
@@ -326,24 +326,22 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     selectFieldOptionsRef.current?.focus(atStart ? "START" : undefined);
   }, []);
 
-  assignRef(
+  useAssignMemoRef(
     ref,
-    useMemo(
-      () =>
-        ({
-          focusFromPrevious: () => focusTitle(true),
-          focusFromNext: () => {
-            if (field.type === "SELECT") {
-              focusSelectOptions(true);
-            } else if (field.description) {
-              focusDescription(true);
-            } else {
-              focusTitle(true);
-            }
-          },
-        } as PetitionComposeFieldRef),
-      [field]
-    )
+    () =>
+      ({
+        focusFromPrevious: () => focusTitle(true),
+        focusFromNext: () => {
+          if (field.type === "SELECT") {
+            focusSelectOptions(true);
+          } else if (field.description) {
+            focusDescription(true);
+          } else {
+            focusTitle(true);
+          }
+        },
+      } as PetitionComposeFieldRef),
+    [field]
   );
 
   return (

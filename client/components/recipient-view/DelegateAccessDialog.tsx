@@ -11,8 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { PetitionLocale } from "@parallel/graphql/__types";
-import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
-import { plainTextToContent } from "@parallel/utils/slate/plainTextToContent";
+import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
+import { plainTextToRTEValue } from "@parallel/utils/slate/plainTextToRTEValue";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import outdent from "outdent";
@@ -21,16 +21,13 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
-import {
-  RichTextEditor,
-  RichTextEditorContent,
-} from "../common/RichTextEditor";
+import { RichTextEditor, RichTextEditorValue } from "../common/RichTextEditor";
 
 type DelegateAccessDialogData = {
   email: string;
   firstName: string;
   lastName: string;
-  messageBody: RichTextEditorContent;
+  messageBody: RichTextEditorValue;
 };
 
 const messages: Record<
@@ -82,7 +79,7 @@ function DelegateAccessDialog({
       email: "",
       firstName: "",
       lastName: "",
-      messageBody: plainTextToContent(
+      messageBody: plainTextToRTEValue(
         (messages[intl.locale as PetitionLocale] ?? messages["en"])(
           organizationName,
           contactName
@@ -209,7 +206,7 @@ function DelegateAccessDialog({
               name="messageBody"
               control={control}
               rules={{
-                validate: { required: (value) => !isEmptyContent(value) },
+                validate: { required: (value) => !isEmptyRTEValue(value) },
               }}
               render={({ value, onChange }) => (
                 <RichTextEditor

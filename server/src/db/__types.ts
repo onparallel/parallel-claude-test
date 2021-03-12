@@ -641,11 +641,12 @@ export interface PetitionReminder {
   created_by: Maybe<string>; // varchar
   sender_id: Maybe<number>; // int4
   petition_access_id: number; // int4
+  email_body: Maybe<string>; // text
 }
 
 export type CreatePetitionReminder = PartialProps<
   Omit<PetitionReminder, "id">,
-  "email_log_id" | "created_at" | "created_by" | "sender_id"
+  "email_log_id" | "created_at" | "created_by" | "sender_id" | "email_body"
 >;
 
 export interface PetitionSignatureRequest {

@@ -5,11 +5,7 @@ import {
 } from "react-select";
 import { Props as _AsyncSelectProps } from "react-select/async";
 import { Props as _AsyncCreatableSelectProps } from "react-select/async-creatable";
-
-interface ValueProps<T> {
-  value: T | null;
-  onChange: (value: T) => void;
-}
+import { ValueProps } from "../ValueProps";
 
 export interface CustomSelectProps<
   T,

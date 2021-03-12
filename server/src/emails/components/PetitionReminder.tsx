@@ -1,5 +1,6 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
+import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
@@ -11,7 +12,13 @@ import {
   PetitionFieldList,
   PetitionFieldListProps,
 } from "../common/PetitionFieldList";
-import { disclaimer, greetingFormal, petitionFieldList } from "../common/texts";
+import { RenderSlate } from "../common/RenderSlate";
+import {
+  disclaimer,
+  greetingFormal,
+  petitionFieldList,
+  renderSlateText,
+} from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
 export type PetitionReminderProps = {
@@ -19,6 +26,7 @@ export type PetitionReminderProps = {
   senderName: string;
   senderEmail: string;
   fields: PetitionFieldListProps["fields"];
+  body: any | null;
   deadline: Date | null;
   keycode: string;
 } & LayoutProps;
@@ -48,6 +56,7 @@ const email: Email<PetitionReminderProps> = {
       senderName,
       senderEmail,
       fields,
+      body,
       deadline,
       keycode,
       parallelUrl,
@@ -64,6 +73,8 @@ const email: Email<PetitionReminderProps> = {
         },
         { senderName, senderEmail }
       )}
+      
+      ${renderSlateText(body)}
 
       ${
         fields.length > 0
@@ -110,6 +121,7 @@ const email: Email<PetitionReminderProps> = {
     senderName,
     senderEmail,
     fields,
+    body,
     deadline,
     keycode,
     parallelUrl,
@@ -141,7 +153,18 @@ const email: Email<PetitionReminderProps> = {
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>
-        <MjmlSection paddingTop="0px">
+        {body ? (
+          <MjmlSection padding="0 20px">
+            <MjmlColumn
+              backgroundColor="#f6f6f6"
+              borderRadius="4px"
+              padding="10px 0"
+            >
+              <RenderSlate value={body} />
+            </MjmlColumn>
+          </MjmlSection>
+        ) : null}
+        <MjmlSection paddingTop="10px">
           <MjmlColumn>
             {fields.length > 0 ? (
               <>

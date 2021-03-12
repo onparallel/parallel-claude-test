@@ -17,17 +17,14 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
-import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
-import { plainTextToContent } from "@parallel/utils/slate/plainTextToContent";
+import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
+import { plainTextToRTEValue } from "@parallel/utils/slate/plainTextToRTEValue";
 import { Maybe } from "@parallel/utils/types";
 import outdent from "outdent";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
-import {
-  RichTextEditor,
-  RichTextEditorContent,
-} from "../common/RichTextEditor";
+import { RichTextEditor, RichTextEditorValue } from "../common/RichTextEditor";
 
 const messages: Record<PetitionLocale, string> = {
   en: outdent`
@@ -62,17 +59,17 @@ export function ConfirmPetitionCompletedDialog({
     hasPetitionPdfExport: boolean;
   },
   {
-    body: RichTextEditorContent;
+    body: RichTextEditorValue;
     attachPdfExport: boolean;
     pdfExportTitle: Maybe<string>;
   }
 >) {
   const intl = useIntl();
-  const [body, setBody] = useState<RichTextEditorContent>(
-    plainTextToContent(messages[locale] ?? messages["en"])
+  const [body, setBody] = useState<RichTextEditorValue>(
+    plainTextToRTEValue(messages[locale] ?? messages["en"])
   );
 
-  const isInvalidBody = isEmptyContent(body);
+  const isInvalidBody = isEmptyRTEValue(body);
 
   const [attachPdfExport, setAttachPdfExport] = useState(false);
   const pdfExportTitleRef = useRef<HTMLInputElement>(null);

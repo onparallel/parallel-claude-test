@@ -12,6 +12,8 @@ import {
   ListIcon,
   UnderlineIcon,
 } from "@parallel/chakra/icons";
+import { useAssignMemoRef } from "@parallel/utils/assignRef";
+import { ValueProps } from "@parallel/utils/ValueProps";
 import {
   AutoformatRule,
   BoldPlugin,
@@ -32,12 +34,19 @@ import {
   withAutoformat,
   withList,
 } from "@udecode/slate-plugins";
-import { createElement, CSSProperties, memo, MouseEvent, useMemo } from "react";
+import {
+  createElement,
+  CSSProperties,
+  forwardRef,
+  memo,
+  MouseEvent,
+  useMemo,
+} from "react";
 import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 import { createEditor, Editor, Node } from "slate";
 import { withHistory } from "slate-history";
-import { Slate, useSlate, withReact } from "slate-react";
+import { ReactEditor, Slate, useSlate, withReact } from "slate-react";
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
@@ -121,27 +130,37 @@ const plugins = [
   ListPlugin(options),
 ];
 
-export type RichTextEditorProps = {
+export interface RichTextEditorProps
+  extends ValueProps<RichTextEditorValue, false>,
+    EditablePluginsProps {
   isDisabled?: boolean;
   isInvalid?: boolean;
   isRequired?: boolean;
   isReadOnly?: boolean;
-  value: RichTextEditorContent;
-  onChange: (value: RichTextEditorContent) => void;
-} & EditablePluginsProps;
+}
 
-export type RichTextEditorContent = Node[];
+export type RichTextEditorValue = Node[];
 
-export function RichTextEditor({
-  value,
-  onChange,
-  isDisabled,
-  isInvalid,
-  isRequired,
-  isReadOnly,
-  onKeyDown: _onKeyDown,
-  ...props
-}: RichTextEditorProps) {
+export interface RicthTextEditorInstance {
+  focus(): void;
+}
+
+export const RichTextEditor = forwardRef<
+  RicthTextEditorInstance,
+  RichTextEditorProps
+>(function RichTextEditor(
+  {
+    value,
+    onChange,
+    isDisabled,
+    isInvalid,
+    isRequired,
+    isReadOnly,
+    onKeyDown: _onKeyDown,
+    ...props
+  },
+  ref
+) {
   const formControl = useFormControl({
     isDisabled,
     isInvalid,
@@ -169,6 +188,16 @@ export function RichTextEditor({
         })
       ),
     []
+  );
+
+  useAssignMemoRef(
+    ref,
+    () => ({
+      focus: () => {
+        ReactEditor.focus(editor);
+      },
+    }),
+    [editor]
   );
 
   const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
@@ -220,7 +249,7 @@ export function RichTextEditor({
       </Slate>
     </Box>
   );
-}
+});
 
 interface ToolbarProps extends BoxProps {
   isDisabled?: boolean;

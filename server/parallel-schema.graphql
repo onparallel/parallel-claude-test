@@ -659,17 +659,6 @@ type Mutation {
   revokeUserAuthToken(authTokenIds: [GID!]!): Result!
 
   """
-  Sends a petition message to the specified contacts.
-  """
-  sendMessages(
-    accessIds: [GID!]!
-    body: JSON!
-    petitionId: GID!
-    scheduledAt: DateTime
-    subject: String!
-  ): Result!
-
-  """
   Sends the petition and creates the corresponding accesses and messages.
   """
   sendPetition(
@@ -695,7 +684,7 @@ type Mutation {
   """
   Sends a reminder for the specified petition accesses.
   """
-  sendReminders(accessIds: [GID!]!, petitionId: GID!): Result!
+  sendReminders(accessIds: [GID!]!, body: JSON, petitionId: GID!): Result!
 
   """
   Generates a download link for the signed PDF petition.

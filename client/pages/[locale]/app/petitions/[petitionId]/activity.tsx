@@ -1,13 +1,15 @@
 import { gql } from "@apollo/client";
 import {
   Box,
-  Stack,
   ListItem,
+  Stack,
   Text,
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
+import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { ShareButton } from "@parallel/components/common/ShareButton";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -21,37 +23,32 @@ import { useConfirmReactivateAccessDialog } from "@parallel/components/petition-
 import { useConfirmSendReminderDialog } from "@parallel/components/petition-activity/ConfirmSendReminderDialog";
 import { PetitionAccessesTable } from "@parallel/components/petition-activity/PetitionAccessesTable";
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
-import { useSendMessageDialogDialog } from "@parallel/components/petition-activity/SendMessageDialog";
+import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
 import {
   PetitionActivityQuery,
   PetitionActivityQueryVariables,
   PetitionActivityUserQuery,
+  PetitionActivity_PetitionFragment,
   UpdatePetitionInput,
   usePetitionActivityQuery,
   usePetitionActivityUserQuery,
   usePetitionActivity_cancelScheduledMessageMutation,
   usePetitionActivity_deactivateAccessesMutation,
   usePetitionActivity_reactivateAccessesMutation,
-  usePetitionActivity_sendMessagesMutation,
   usePetitionActivity_sendRemindersMutation,
   usePetitionActivity_switchAutomaticRemindersMutation,
   usePetitionActivity_updatePetitionMutation,
   usePetitionsActivity_sendPetitionMutation,
-  PetitionActivity_PetitionFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
-import { FORMATS } from "@parallel/utils/dates";
-import { UnwrapPromise } from "@parallel/utils/types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
-import { ShareButton } from "@parallel/components/common/ShareButton";
-import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
 
 type PetitionActivityProps = UnwrapPromise<
   ReturnType<typeof PetitionActivity.getInitialProps>
@@ -75,53 +72,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     wrapper(async (data: UpdatePetitionInput) => {
       return await updatePetition({ variables: { petitionId, data } });
     }),
-    [petitionId]
-  );
-
-  const [sendMessages] = usePetitionActivity_sendMessagesMutation();
-  const sendMessageDialog = useSendMessageDialogDialog();
-  const handleSendMessage = useCallback(
-    async (accessIds: string[]) => {
-      try {
-        const { subject, body, scheduledAt } = await sendMessageDialog({});
-        await sendMessages({
-          variables: {
-            petitionId,
-            accessIds,
-            subject,
-            body,
-            scheduledAt: scheduledAt?.toISOString() ?? null,
-          },
-        });
-        toast({
-          title: scheduledAt
-            ? intl.formatMessage({
-                id: "petition.message-scheduled.toast-header",
-                defaultMessage: "Message scheduled",
-              })
-            : intl.formatMessage({
-                id: "petition.message-sent.toast-header",
-                defaultMessage: "Message sent",
-              }),
-          description: scheduledAt
-            ? intl.formatMessage(
-                {
-                  id: "petition.message-scheduled.toast-description",
-                  defaultMessage: "The message will be sent on {date}",
-                },
-                { date: intl.formatDate(scheduledAt, FORMATS.LL) }
-              )
-            : intl.formatMessage({
-                id: "petition.message-sent.toast-description",
-                defaultMessage: "The message is on it's way",
-              }),
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        await refetch();
-      } catch {}
-    },
     [petitionId]
   );
 
@@ -158,22 +108,22 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const handleSendReminders = useCallback(
     async (accessIds: string[]) => {
       try {
-        await confirmSendReminder({});
-      } catch {
-        return;
-      }
-      try {
-        await sendReminders({
-          variables: { petitionId, accessIds: accessIds },
-        });
-      } catch (error) {
-        const extra = error?.graphQLErrors?.[0]?.extensions?.extra;
-        switch (extra?.errorCode) {
-          case "NO_REMINDERS_LEFT": {
-            showNoRemindersLeftToast(extra.petitionAccessId);
-            return;
+        const { message } = await confirmSendReminder({});
+        try {
+          await sendReminders({
+            variables: { petitionId, accessIds, body: message },
+          });
+        } catch (error) {
+          const extra = error?.graphQLErrors?.[0]?.extensions?.extra;
+          switch (extra?.errorCode) {
+            case "NO_REMINDERS_LEFT": {
+              showNoRemindersLeftToast(extra.petitionAccessId);
+              return;
+            }
           }
         }
+      } catch {
+        return;
       }
       toast({
         title: intl.formatMessage({
@@ -398,7 +348,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           id="petition-accesses"
           margin={4}
           petition={petition}
-          onSendMessage={handleSendMessage}
           onSendReminders={handleSendReminders}
           onAddPetitionAccess={handleAddPetitionAccess}
           onReactivateAccess={handleReactivateAccess}
@@ -453,28 +402,12 @@ PetitionActivity.mutations = [
     ${PetitionActivity.fragments.Petition}
   `,
   gql`
-    mutation PetitionActivity_sendMessages(
-      $petitionId: GID!
-      $accessIds: [GID!]!
-      $subject: String!
-      $body: JSON!
-      $scheduledAt: DateTime
-    ) {
-      sendMessages(
-        petitionId: $petitionId
-        accessIds: $accessIds
-        subject: $subject
-        body: $body
-        scheduledAt: $scheduledAt
-      )
-    }
-  `,
-  gql`
     mutation PetitionActivity_sendReminders(
       $petitionId: GID!
       $accessIds: [GID!]!
+      $body: JSON
     ) {
-      sendReminders(petitionId: $petitionId, accessIds: $accessIds)
+      sendReminders(petitionId: $petitionId, accessIds: $accessIds, body: $body)
     }
   `,
   gql`

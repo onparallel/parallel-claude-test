@@ -74,6 +74,7 @@ export async function petitionReminder(
         senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,
         fields: missing.map(pick(["id", "title", "position", "type"])),
+        body: reminder.email_body ? JSON.parse(reminder.email_body) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
         assetsUrl: context.config.misc.assetsUrl,

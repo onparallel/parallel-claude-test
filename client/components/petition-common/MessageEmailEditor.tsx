@@ -4,13 +4,10 @@ import {
   FormLabel,
   Input,
 } from "@chakra-ui/react";
-import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
+import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { Ref } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import {
-  RichTextEditor,
-  RichTextEditorContent,
-} from "../common/RichTextEditor";
+import { RichTextEditor, RichTextEditorValue } from "../common/RichTextEditor";
 
 export function MessageEmailEditor({
   showErrors,
@@ -23,9 +20,9 @@ export function MessageEmailEditor({
   showErrors: boolean;
   subjectRef?: Ref<HTMLInputElement>;
   subject: string;
-  body: RichTextEditorContent;
+  body: RichTextEditorValue;
   onSubjectChange: (value: string) => void;
-  onBodyChange: (value: RichTextEditorContent) => void;
+  onBodyChange: (value: RichTextEditorValue) => void;
 }) {
   const intl = useIntl();
   return (
@@ -56,7 +53,10 @@ export function MessageEmailEditor({
           />
         </FormErrorMessage>
       </FormControl>
-      <FormControl isInvalid={showErrors && isEmptyContent(body)} marginTop={4}>
+      <FormControl
+        isInvalid={showErrors && isEmptyRTEValue(body)}
+        marginTop={4}
+      >
         <RichTextEditor
           value={body}
           onChange={onBodyChange}

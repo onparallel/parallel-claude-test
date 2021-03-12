@@ -961,55 +961,6 @@ export const sendPetition = mutationField("sendPetition", {
   },
 });
 
-export const sendMessages = mutationField("sendMessages", {
-  description: "Sends a petition message to the specified contacts.",
-  type: "Result",
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      accessesBelongToPetition("petitionId", "accessIds")
-    )
-  ),
-  args: {
-    petitionId: nonNull(globalIdArg("Petition")),
-    accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
-    subject: nonNull(stringArg()),
-    body: nonNull(jsonArg()),
-    scheduledAt: datetimeArg(),
-  },
-  validateArgs: validateAnd(
-    notEmptyArray((args) => args.accessIds, "accessIds"),
-    maxLength((args) => args.subject, "subject", 255),
-    notEmptyString((args) => args.subject, "subject"),
-    validRichTextContent((args) => args.body, "body")
-  ),
-  resolve: async (_, args, ctx) => {
-    try {
-      // Create necessary contacts
-      const messages = await ctx.petitions.createMessages(
-        args.petitionId,
-        args.scheduledAt ?? null,
-        args.accessIds.map((accessId) => ({
-          petition_access_id: accessId,
-          status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
-          email_subject: args.subject,
-          email_body: JSON.stringify(args.body),
-        })),
-        ctx.user!
-      );
-
-      if (!args.scheduledAt) {
-        await ctx.emails.sendPetitionMessageEmail(messages.map((s) => s.id));
-      }
-      return RESULT.SUCCESS;
-    } catch (error) {
-      ctx.logger.error(error);
-      return RESULT.FAILURE;
-    }
-  },
-});
-
 export const sendReminders = mutationField("sendReminders", {
   description: "Sends a reminder for the specified petition accesses.",
   type: "Result",
@@ -1022,8 +973,10 @@ export const sendReminders = mutationField("sendReminders", {
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
+    body: jsonArg(),
     accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
+  validateArgs: validRichTextContent((args) => args.body, "body"),
   resolve: async (_, args, ctx, info) => {
     const [petition, accesses] = await Promise.all([
       ctx.petitions.loadPetition(args.petitionId),
@@ -1042,6 +995,7 @@ export const sendReminders = mutationField("sendReminders", {
           status: "PROCESSING",
           petition_access_id: accessId,
           sender_id: ctx.user!.id,
+          email_body: args.body ? JSON.stringify(args.body) : null,
           created_by: `User:${ctx.user!.id}`,
         }))
       );

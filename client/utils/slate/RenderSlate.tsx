@@ -1,5 +1,5 @@
 import { Box, BoxProps, Text, TextProps } from "@chakra-ui/react";
-import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
+import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
 import { memo } from "react";
 import { Element, Text as Leaf } from "slate";
 
@@ -59,7 +59,7 @@ function paragraphIsEmpty(node: Element) {
 }
 
 interface RenderSlate extends BoxProps {
-  value: RichTextEditorContent;
+  value: RichTextEditorValue;
 }
 
 export const RenderSlate = memo(function RenderSlate({

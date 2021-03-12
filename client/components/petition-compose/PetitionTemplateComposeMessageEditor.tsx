@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
 import { Box, BoxProps, Heading, Stack } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
-import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
+import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
 import {
   PetitionTemplateComposeMessageEditor_PetitionFragment,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
-import { emptyContent } from "@parallel/utils/slate/emptyContent";
-import { isEmptyContent } from "@parallel/utils/slate/isEmptyContent";
+import { emptyRTEValue } from "@parallel/utils/slate/emptyRTEValue";
+import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCallback, useState } from "react";
 import { FormattedMessage } from "react-intl";
@@ -24,8 +24,8 @@ export function PetitionTemplateComposeMessageEditor({
   ...props
 }: PetitionTemplateComposeMessageEditorProps) {
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
-  const [body, setBody] = useState<RichTextEditorContent>(
-    petition.emailBody ?? emptyContent()
+  const [body, setBody] = useState<RichTextEditorValue>(
+    petition.emailBody ?? emptyRTEValue()
   );
 
   const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [
@@ -41,9 +41,9 @@ export function PetitionTemplateComposeMessageEditor({
   );
 
   const handleBodyChange = useCallback(
-    (value: RichTextEditorContent) => {
+    (value: RichTextEditorValue) => {
       setBody(value);
-      updatePetition({ emailBody: isEmptyContent(value) ? null : value });
+      updatePetition({ emailBody: isEmptyRTEValue(value) ? null : value });
     },
     [updatePetition]
   );

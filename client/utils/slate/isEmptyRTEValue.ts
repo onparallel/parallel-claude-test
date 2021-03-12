@@ -1,7 +1,7 @@
-import { RichTextEditorContent } from "@parallel/components/common/RichTextEditor";
+import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
 import { Element, Text } from "slate";
 
-export function isEmptyContent(content: RichTextEditorContent) {
+export function isEmptyRTEValue(content: RichTextEditorValue) {
   return (
     content?.length === 1 &&
     (content[0].children as Element) &&
