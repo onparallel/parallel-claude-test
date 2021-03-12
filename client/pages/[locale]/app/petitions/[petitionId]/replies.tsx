@@ -457,11 +457,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               petition.currentSignatureRequest.status
             )) ??
           false;
-        if (
-          hasPendingSignature ||
-          (petition.signatureConfig && !petition.currentSignatureRequest) ||
-          (petition.signatureConfig && petition.status === "PENDING")
-        ) {
+        if (hasPendingSignature || petition.signatureConfig) {
           await showConfirmCancelOngoingSignature({});
           if (hasPendingSignature) {
             await cancelSignatureRequest({

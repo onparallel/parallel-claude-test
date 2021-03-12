@@ -149,7 +149,7 @@ async function documentCompleted(
     );
   }
 
-  const config = petition.signature_config as any;
+  const config = signature.signature_config;
 
   const signedDoc = await storeDocument(
     await client.downloadSignedDocument(`${signatureId}/${documentId}`),
@@ -181,6 +181,11 @@ async function documentCompleted(
         file_upload_id: signedDoc.id,
       },
     }),
+    ctx.petitions.updatePetition(
+      petitionId,
+      { signature_config: null },
+      "Webhook:Signaturit"
+    ),
   ]);
 }
 
@@ -223,7 +228,7 @@ async function auditTrailCompleted(
     );
   }
 
-  const config = petition.signature_config as any;
+  const config = signature.signature_config;
 
   const auditTrail = await storeDocument(
     await client.downloadAuditTrail(`${signatureId}/${documentId}`),

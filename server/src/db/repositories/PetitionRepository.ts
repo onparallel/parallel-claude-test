@@ -789,7 +789,7 @@ export class PetitionRepository extends BaseRepository {
   async updatePetition(
     petitionId: number,
     data: Partial<CreatePetition>,
-    user: User,
+    updatedBy: string,
     t?: Knex.Transaction
   ) {
     const [row] = await this.from("petition", t)
@@ -798,7 +798,7 @@ export class PetitionRepository extends BaseRepository {
         {
           ...data,
           updated_at: this.now(),
-          updated_by: `User:${user.id}`,
+          updated_by: updatedBy,
         },
         "*"
       );

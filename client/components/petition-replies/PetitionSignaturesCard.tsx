@@ -61,10 +61,14 @@ export function PetitionSignaturesCard({
   > = petition.signatureRequests![0];
   const older = petition.signatureRequests!.slice(1);
   /**
-   * A cancelled request is not considered to be "current"
-   * So we move it to the older requests to give space in the Card for a new request
+   * If the signature config is defined on the petition and the last request is finished,
+   * we consider that a new signature will be needed.
+   * So we move the current to the older requests to give space in the Card for a new request
    */
-  if (current?.status === "CANCELLED") {
+  if (
+    petition.signatureConfig &&
+    (current?.status === "COMPLETED" || current?.status === "CANCELLED")
+  ) {
     older.unshift(current);
     current = null;
   }
@@ -181,19 +185,19 @@ export function PetitionSignaturesCard({
         </Box>
       </GenericCardHeader>
 
-      {current || petition.signatureConfig ? (
+      {current || older.length > 0 || petition.signatureConfig ? (
         <>
-          {current ? (
-            <CurrentSignatureRequestRow
-              signatureRequest={current}
-              onCancel={handleCancelSignatureProcess}
-              onDownload={handleDownloadSignedDoc}
-            />
-          ) : petition.signatureConfig ? (
+          {petition.signatureConfig && !current ? (
             <NewSignatureRequestRow
               petition={petition}
               onStart={handleStartSignatureProcess}
               onUpdateConfig={handleUpdateSignatureConfig}
+            />
+          ) : current ? (
+            <CurrentSignatureRequestRow
+              signatureRequest={current}
+              onCancel={handleCancelSignatureProcess}
+              onDownload={handleDownloadSignedDoc}
             />
           ) : null}
           {older.length ? (
@@ -564,6 +568,7 @@ PetitionSignaturesCard.fragments = {
       id
       status
       signatureConfig {
+        timezone
         contacts {
           ...ContactLink_Contact
         }

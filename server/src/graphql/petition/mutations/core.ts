@@ -468,7 +468,11 @@ export const updatePetition = mutationField("updatePetition", {
       data.template_description = description?.trim() || null;
     }
 
-    return await ctx.petitions.updatePetition(args.petitionId, data, ctx.user!);
+    return await ctx.petitions.updatePetition(
+      args.petitionId,
+      data,
+      `User:${ctx.user!.id}`
+    );
   },
 });
 
@@ -928,7 +932,7 @@ export const sendPetition = mutationField("sendPetition", {
       const updatedPetition = await ctx.petitions.updatePetition(
         args.petitionId,
         { name: petition.name ?? args.subject, status: "PENDING" },
-        ctx.user!
+        `User:${ctx.user!.id}`
       );
 
       if (!args.scheduledAt) {
@@ -1276,7 +1280,7 @@ export const reopenPetition = mutationField("reopenPetition", {
       return await ctx.petitions.updatePetition(
         args.petitionId,
         { status: "PENDING" },
-        ctx.user!,
+        `User:${ctx.user!.id}`,
         t
       );
     });

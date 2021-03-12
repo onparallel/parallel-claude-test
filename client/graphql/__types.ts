@@ -3005,12 +3005,6 @@ export type PetitionSharingModal_PetitionUserPermissionsQuery = {
 export type SignatureConfigDialog_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "name" | "status"> & {
-    currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<
-        PetitionSignatureRequest,
-        "id" | "status"
-      >
-    >;
     signatureConfig?: Maybe<
       { __typename?: "SignatureConfig" } & Pick<
         SignatureConfig,
@@ -6347,10 +6341,6 @@ export const SignatureConfigDialog_PetitionFragmentDoc = gql`
   fragment SignatureConfigDialog_Petition on Petition {
     name
     status
-    currentSignatureRequest {
-      id
-      status
-    }
     signatureConfig {
       provider
       contacts {
