@@ -3185,6 +3185,11 @@
     "context": "About"
   },
   {
+    "term": "public.api-docs-link",
+    "definition": "API Documentation",
+    "context": "API Documentation"
+  },
+  {
     "term": "public.blog-link",
     "definition": "Blog",
     "context": "Blog"
