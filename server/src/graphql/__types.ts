@@ -809,6 +809,7 @@ export interface NexusGenFieldTypes {
     // field return type
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    emailBody: NexusGenScalars["JSON"] | null; // JSON
     id: NexusGenScalars["GID"]; // GID!
     sender: NexusGenRootTypes["User"] | null; // User
     type: NexusGenEnums["PetitionReminderType"]; // PetitionReminderType!
@@ -1532,6 +1533,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     access: "PetitionAccess";
     createdAt: "DateTime";
+    emailBody: "JSON";
     id: "GID";
     sender: "User";
     type: "PetitionReminderType";

@@ -1,4 +1,5 @@
 import { enumType, objectType } from "@nexus/schema";
+import { safeJsonParse } from "../../../util/safeJsonParse";
 
 export const PetitionReminderType = enumType({
   name: "PetitionReminderType",
@@ -31,6 +32,10 @@ export const PetitionReminder = objectType({
       resolve: async (root, _, ctx) => {
         return (await ctx.petitions.loadAccess(root.petition_access_id))!;
       },
+    });
+    t.nullable.json("emailBody", {
+      description: "The body of the petition message.",
+      resolve: (o) => safeJsonParse(o.email_body),
     });
     t.nullable.field("sender", {
       type: "User",

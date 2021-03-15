@@ -1225,6 +1225,8 @@ export type PetitionReminder = CreatedAt & {
   access: PetitionAccess;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** The body of the petition message. */
+  emailBody?: Maybe<Scalars["JSON"]>;
   id: Scalars["GID"];
   /** The sender of this petition message. */
   sender?: Maybe<User>;
@@ -2491,6 +2493,14 @@ export type SentPetitionMessageDialog_PetitionMessageFragment = {
     };
   };
 
+export type SentReminderMessageDialog_PetitionReminderFragment = {
+  __typename?: "PetitionReminder";
+} & Pick<PetitionReminder, "createdAt" | "emailBody"> & {
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  };
+
 export type UserReference_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id" | "fullName" | "status"
@@ -2681,7 +2691,7 @@ export type TimelineReminderSentEvent_ReminderSentEventFragment = {
             { __typename?: "Contact" } & ContactLink_ContactFragment
           >;
         };
-      };
+      } & SentReminderMessageDialog_PetitionReminderFragment;
   };
 
 export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
@@ -5797,6 +5807,18 @@ export const TimelineMessageSentEvent_MessageSentEventFragmentDoc = gql`
   ${MessageEventsIndicator_PetitionMessageFragmentDoc}
   ${SentPetitionMessageDialog_PetitionMessageFragmentDoc}
 `;
+export const SentReminderMessageDialog_PetitionReminderFragmentDoc = gql`
+  fragment SentReminderMessageDialog_PetitionReminder on PetitionReminder {
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+    emailBody
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
   fragment TimelineReminderSentEvent_ReminderSentEvent on ReminderSentEvent {
     reminder {
@@ -5809,11 +5831,13 @@ export const TimelineReminderSentEvent_ReminderSentEventFragmentDoc = gql`
           ...ContactLink_Contact
         }
       }
+      ...SentReminderMessageDialog_PetitionReminder
     }
     createdAt
   }
   ${UserReference_UserFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
+  ${SentReminderMessageDialog_PetitionReminderFragmentDoc}
 `;
 export const PetitionFieldReference_PetitionFieldFragmentDoc = gql`
   fragment PetitionFieldReference_PetitionField on PetitionField {

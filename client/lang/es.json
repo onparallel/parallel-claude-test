@@ -85,6 +85,31 @@
     "context": "Restart eSignature process"
   },
   {
+    "term": "component.confirm-send-reminder-dialog.add-message",
+    "definition": "Añadir un mensaje",
+    "context": "Add a message"
+  },
+  {
+    "term": "component.confirm-send-reminder-dialog.body",
+    "definition": "¿Estás seguro de que quieres enviar un recordatorio a los contactos seleccionados?",
+    "context": "Are you sure you want to send a reminder to the selected contacts?"
+  },
+  {
+    "term": "component.confirm-send-reminder-dialog.confirm",
+    "definition": "Sí, enviar",
+    "context": "Yes, send"
+  },
+  {
+    "term": "component.confirm-send-reminder-dialog.header",
+    "definition": "Enviar recordatorios",
+    "context": "Send reminders"
+  },
+  {
+    "term": "component.confirm-send-reminder-dialog.message-placeholder",
+    "definition": "Añade un mensaje para incluir en el correo electrónico",
+    "context": "Add a message to include in the email"
+  },
+  {
     "term": "component.confirm-signature-config-changed.body",
     "definition": "Haz hecho cambios a la configuración de firma digital. Si continúas, el proceso será cancelado.",
     "context": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
@@ -1073,6 +1098,16 @@
     "term": "component.sent-petition-message-dialog.message-sent",
     "definition": "Mensaje enviado a {recipient} el {date}",
     "context": "Message sent to {recipient} on {date}"
+  },
+  {
+    "term": "component.sent-petition-reminder-dialog.header",
+    "definition": "Recordatorio",
+    "context": "Reminder"
+  },
+  {
+    "term": "component.sent-petition-reminder-dialog.message-sent",
+    "definition": "Recordatorio enviado a {recipient} el {date}",
+    "context": "Reminder sent to {recipient} on {date}"
   },
   {
     "term": "component.share-button.petition-not-shared",
@@ -2295,11 +2330,6 @@
     "context": "Reminders sent"
   },
   {
-    "term": "petition-accesses.send-message",
-    "definition": "Enviar mensaje",
-    "context": "Send message"
-  },
-  {
     "term": "petition-accesses.send-reminder",
     "definition": "Enviar recordatorio",
     "context": "Send reminder"
@@ -2725,21 +2755,6 @@
     "context": "Delete field"
   },
   {
-    "term": "component.confirm-send-reminder-dialog.body",
-    "definition": "¿Estás seguro de que quieres enviar un recordatorio a los contactos seleccionados?",
-    "context": "Are you sure you want to send a reminder to the selected contacts?"
-  },
-  {
-    "term": "component.confirm-send-reminder-dialog.confirm",
-    "definition": "Sí, enviar",
-    "context": "Yes, send"
-  },
-  {
-    "term": "component.confirm-send-reminder-dialog.header",
-    "definition": "Enviar recordatorios",
-    "context": "Send reminders"
-  },
-  {
     "term": "petition.contents",
     "definition": "Contenido",
     "context": "Contents"
@@ -2813,16 +2828,6 @@
     "term": "petition.header.replies-tab",
     "definition": "Respuestas",
     "context": "Replies"
-  },
-  {
-    "term": "petition.message-scheduled.toast-description",
-    "definition": "El mensaje se enviará el {date}",
-    "context": "The message will be sent on {date}"
-  },
-  {
-    "term": "petition.message-scheduled.toast-header",
-    "definition": "Mensaje programado",
-    "context": "Message scheduled"
   },
   {
     "term": "petition.message-sent.toast-description",
@@ -3003,11 +3008,6 @@
     "term": "petition.send-from-activity",
     "definition": "Si quieres enviarle la petición a alguien más puedes hacerlo desde la pestaña de <a>Actividad</a>.",
     "context": "If you want to send it to someone else you can do it from the <a>Activity</a> tab."
-  },
-  {
-    "term": "petition.send-message-header.header",
-    "definition": "Enviar mensaje",
-    "context": "Send message"
   },
   {
     "term": "petition.set-deadline",

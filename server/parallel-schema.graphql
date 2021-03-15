@@ -1726,6 +1726,11 @@ type PetitionReminder implements CreatedAt {
   Time when the resource was created.
   """
   createdAt: DateTime!
+
+  """
+  The body of the petition message.
+  """
+  emailBody: JSON
   id: GID!
 
   """
