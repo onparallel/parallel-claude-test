@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
