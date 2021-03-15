@@ -79,7 +79,7 @@ export function PetitionAccessesTable({
       onDeactivateAccess,
       onConfigureReminders,
     }),
-    []
+    [petition]
   );
 
   return (

@@ -41,6 +41,7 @@ export function ConfigureRemindersDialog({
         <PetitionRemindersConfig
           id="petition-reminders"
           value={remindersConfig}
+          startEnabled={enabled}
           onChange={setRemindersConfig}
           marginTop={2}
         />

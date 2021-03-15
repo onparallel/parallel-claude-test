@@ -248,10 +248,10 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       try {
         const firstAccess = petition.accesses.find(
           (a) => a.id === accessIds[0]
-        );
+        )!;
         const { remindersConfig } = await configureRemindersDialog({
-          enabled: !!(firstAccess && firstAccess!.remindersActive),
-          defaultRemindersConfig: firstAccess!.remindersConfig || null,
+          enabled: firstAccess.remindersActive,
+          defaultRemindersConfig: firstAccess.remindersConfig || null,
         });
 
         start = !!remindersConfig;

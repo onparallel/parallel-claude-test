@@ -23,17 +23,19 @@ import {
   startOfToday,
   startOfWeek,
 } from "date-fns";
-import { ChangeEvent, useRef } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";
 
 export function PetitionRemindersConfig({
   value,
+  startEnabled,
   onChange,
   ...props
 }: {
   value: Maybe<RemindersConfig>;
   onChange: (config: Maybe<RemindersConfig>) => void;
+  startEnabled?: boolean;
 } & Omit<BoxProps, "onChange">) {
   let day = addDays(startOfToday(), value?.offset ?? 2);
   if (value?.weekdaysOnly && isWeekend(day)) {
@@ -45,9 +47,11 @@ export function PetitionRemindersConfig({
     onChange: (time) => value && time && onChange({ ...value, timezone, time }),
   });
 
-  const previousValue = useRef<RemindersConfig | null>(null);
+  const previousValue = useRef<RemindersConfig | null>(value);
+  const [isEnabled, setIsEnabled] = useState(startEnabled ?? false);
 
   function handleEnableRemindersChange(event: ChangeEvent<HTMLInputElement>) {
+    setIsEnabled(event.target.checked);
     if (event.target.checked) {
       onChange(
         previousValue.current ?? {
@@ -75,7 +79,7 @@ export function PetitionRemindersConfig({
           colorScheme="purple"
           size="lg"
           marginRight={2}
-          isChecked={Boolean(value)}
+          isChecked={isEnabled}
           onChange={handleEnableRemindersChange}
         >
           <Text fontSize="md" as="span">
@@ -86,7 +90,7 @@ export function PetitionRemindersConfig({
           </Text>
         </Checkbox>
       </Flex>
-      {value ? (
+      {value && isEnabled ? (
         <Box
           as="form"
           noValidate={true}
