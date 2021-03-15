@@ -141,12 +141,12 @@ export interface RichTextEditorProps
 
 export type RichTextEditorValue = Node[];
 
-export interface RicthTextEditorInstance {
+export interface RichTextEditorInstance {
   focus(): void;
 }
 
 export const RichTextEditor = forwardRef<
-  RicthTextEditorInstance,
+  RichTextEditorInstance,
   RichTextEditorProps
 >(function RichTextEditor(
   {

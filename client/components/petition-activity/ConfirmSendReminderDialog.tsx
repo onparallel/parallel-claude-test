@@ -11,7 +11,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import {
   RichTextEditor,
   RichTextEditorValue,
-  RicthTextEditorInstance,
+  RichTextEditorInstance,
 } from "../common/RichTextEditor";
 
 export function ConfirmSendReminderDialog({
@@ -21,7 +21,7 @@ export function ConfirmSendReminderDialog({
   const [message, setMessage] = useState<RichTextEditorValue>(emptyRTEValue());
   const [isInvalid, setIsInvalid] = useState(false);
   const [hasMessage, setHasMessage] = useState(false);
-  const messageRef = useRef<RicthTextEditorInstance>(null);
+  const messageRef = useRef<RichTextEditorInstance>(null);
   return (
     <ConfirmDialog
       size="xl"
