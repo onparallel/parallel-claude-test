@@ -1211,17 +1211,17 @@
   },
   {
     "term": "component.signature-config-dialog.contact-select.label",
-    "definition": "",
+    "definition": "Quién tiene que firmar la petición?",
     "context": "Who has to sign the petition?"
   },
   {
     "term": "component.signature-config-dialog.contact-select.placeholder-optional",
-    "definition": "",
+    "definition": "Dejar que escoja el destinatario",
     "context": "Let the recipient choose"
   },
   {
     "term": "component.signature-config-dialog.contact-select.placeholder-required",
-    "definition": "",
+    "definition": "Seleccione los firmantes",
     "context": "Select the signers"
   },
   {

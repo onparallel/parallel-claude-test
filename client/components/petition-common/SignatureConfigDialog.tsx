@@ -26,7 +26,7 @@ import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import { ContactSelect } from "../common/ContactSelect";
+import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
 
 export type SignatureConfigDialogProps = {
@@ -127,7 +127,7 @@ export function SignatureConfigDialog({
               defaultMessage="A PDF with all the replies will be generated and sent to the eSignature provider. You can define when and by whom the document should be signed."
             />
           </Text>
-          <FormControl>
+          <FormControl hidden={providers.length < 2}>
             <FormLabel>
               <FormattedMessage
                 id="component.signature-config-dialog.provider-label"
@@ -220,7 +220,10 @@ export function SignatureConfigDialog({
               name="contacts"
               control={control}
               rules={{
-                validate: (value) => !petitionIsCompleted || value.length > 0,
+                validate: (contacts: ContactSelectSelection[]) =>
+                  !petitionIsCompleted ||
+                  (contacts.length > 0 &&
+                    contacts.every((c) => !c.isInvalid && !c.isDeleted)),
               }}
               render={({ onChange, value }) => (
                 <ContactSelect
