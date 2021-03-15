@@ -1,25 +1,22 @@
 import { Heading, Stack, Text } from "@chakra-ui/react";
-import { chakraForwardRef } from "@parallel/chakra/utils";
+import { BreakLines } from "@parallel/components/common/BreakLines";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { BreakLines } from "@parallel/components/common/BreakLines";
 
 export interface RecipientViewPetitionFieldHeadingProps {
   field: RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
 }
 
-export const RecipientViewPetitionFieldHeading = chakraForwardRef<
-  "header",
-  RecipientViewPetitionFieldHeadingProps
->(function ({ field, ...props }, ref) {
+export function RecipientViewPetitionFieldHeading({
+  field,
+}: RecipientViewPetitionFieldHeadingProps) {
   return (
     <Stack
       as="header"
-      ref={ref as any}
+      id={`field-${field.id}`}
       spacing={1}
       paddingX={2}
       paddingY={2}
-      {...props}
     >
       {field.title ? (
         <Heading size="md">{field.title}</Heading>
@@ -43,4 +40,4 @@ export const RecipientViewPetitionFieldHeading = chakraForwardRef<
       ) : null}
     </Stack>
   );
-});
+}

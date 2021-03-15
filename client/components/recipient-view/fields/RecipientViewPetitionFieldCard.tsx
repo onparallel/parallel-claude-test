@@ -37,198 +37,186 @@ export interface RecipientViewPetitionFieldCardProps {
   onAddNewReply?: () => void;
 }
 
-export const RecipientViewPetitionFieldCard = Object.assign(
-  chakraForwardRef<"section", RecipientViewPetitionFieldCardProps>(
-    function RecipientViewPetitionFieldCard(
-      {
+export function RecipientViewPetitionFieldCard({
+  keycode,
+  field,
+  access,
+  isInvalid,
+  hasCommentsEnabled,
+  showAddNewReply,
+  onAddNewReply,
+  children,
+}: RecipientViewPetitionFieldCardProps) {
+  const intl = useIntl();
+
+  const isTextLikeType = ["TEXT", "SELECT"].includes(field.type);
+
+  const showFieldComments = usePetitionFieldCommentsDialog();
+  async function handleCommentsButtonClick() {
+    try {
+      await showFieldComments({
         keycode,
-        field,
         access,
-        isInvalid,
-        hasCommentsEnabled,
-        showAddNewReply,
-        onAddNewReply,
-        children,
-        ...props
-      },
-      ref
-    ) {
-      const intl = useIntl();
-
-      const isTextLikeType = ["TEXT", "SELECT"].includes(field.type);
-
-      const showFieldComments = usePetitionFieldCommentsDialog();
-      async function handleCommentsButtonClick() {
-        try {
-          await showFieldComments({
-            keycode,
-            access,
-            field,
-          });
-        } catch {}
-      }
-
-      return (
-        <Card
-          ref={ref}
-          padding={4}
-          {...(isInvalid
-            ? {
-                border: "2px solid",
-                borderColor: "red.500",
-              }
-            : {})}
-          {...props}
-        >
-          <Flex alignItems="baseline">
-            <Box flex="1" marginRight={2}>
-              <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
-                {field.title || (
-                  <Text
-                    as="span"
-                    color="gray.500"
-                    fontWeight="normal"
-                    fontStyle="italic"
-                  >
-                    <FormattedMessage
-                      id="generic.untitled-field"
-                      defaultMessage="Untitled field"
-                    />
-                  </Text>
-                )}
-                {field.optional ? (
-                  <Text
-                    as="span"
-                    marginLeft={2}
-                    color="gray.400"
-                    fontSize="sm"
-                    fontWeight="normal"
-                  >
-                    <FormattedMessage
-                      id="generic.optional-field"
-                      defaultMessage="Optional"
-                    />
-                  </Text>
-                ) : (
-                  <Tooltip
-                    placement="right"
-                    label={intl.formatMessage({
-                      id: "generic.required-field",
-                      defaultMessage: "Required field",
-                    })}
-                  >
-                    <Text as="span" userSelect="none" marginLeft={1}>
-                      *
-                    </Text>
-                  </Tooltip>
-                )}
-              </Heading>
-            </Box>
-            {hasCommentsEnabled ? (
-              <CommentsButton
-                commentCount={field.commentCount}
-                hasUnreadComments={field.unreadCommentCount > 0}
-                hasUnpublishedComments={field.unpublishedCommentCount > 0}
-                onClick={handleCommentsButtonClick}
-              />
-            ) : null}
-          </Flex>
-          <Box>
-            {field.description ? (
-              <Text
-                fontSize="sm"
-                color="gray.600"
-                overflowWrap="anywhere"
-                marginBottom={2}
-              >
-                <BreakLines text={field.description} />
-              </Text>
-            ) : null}
-          </Box>
-          <Text fontSize="sm" color="gray.500">
-            {isTextLikeType ? (
-              <FormattedMessage
-                id="component.recipient-view-petition-field-card.replies-submitted"
-                defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
-                values={{ count: field.replies.length }}
-              />
-            ) : field.type === "FILE_UPLOAD" ? (
-              <FormattedMessage
-                id="component.recipient-view-petition-field-card.files-uploaded"
-                defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
-                values={{ count: field.replies.length }}
-              />
-            ) : null}
-          </Text>
-          {children}
-          {showAddNewReply ? (
-            <Center marginTop={2}>
-              <IconButtonWithTooltip
-                icon={<AddIcon />}
-                variant="outline"
-                isRound
-                label={intl.formatMessage({
-                  id:
-                    "component.recipient-view-petition-field-card.add-another-reply",
-                  defaultMessage: "Add another reply",
-                })}
-                onClick={onAddNewReply}
-              />
-            </Center>
-          ) : null}
-        </Card>
-      );
-    }
-  ),
-  {
-    fragments: {
-      get PublicPetitionAccess() {
-        return gql`
-          fragment RecipientViewPetitionFieldCard_PublicPetitionAccess on PublicPetitionAccess {
-            ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccess
-          }
-          ${RecipientViewPetitionFieldCommentsDialog.fragments
-            .PublicPetitionAccess}
-        `;
-      },
-      get PublicPetitionField() {
-        return gql`
-          fragment RecipientViewPetitionFieldCard_PublicPetitionField on PublicPetitionField {
-            id
-            type
-            title
-            description
-            options
-            optional
-            multiple
-            validated
-            replies {
-              ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
-            }
-            commentCount
-            unpublishedCommentCount
-            unreadCommentCount
-            ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
-          }
-          ${this.PublicPetitionFieldReply}
-          ${RecipientViewPetitionFieldCommentsDialog.fragments
-            .PublicPetitionField}
-        `;
-      },
-      get PublicPetitionFieldReply() {
-        return gql`
-          fragment RecipientViewPetitionFieldCard_PublicPetitionFieldReply on PublicPetitionFieldReply {
-            id
-            status
-            content
-            createdAt
-            updatedAt
-          }
-        `;
-      },
-    },
+        field,
+      });
+    } catch {}
   }
-);
+
+  return (
+    <Card
+      id={`field-${field.id}`}
+      padding={4}
+      {...(isInvalid
+        ? {
+            border: "2px solid",
+            borderColor: "red.500",
+          }
+        : {})}
+    >
+      <Flex alignItems="baseline">
+        <Box flex="1" marginRight={2}>
+          <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
+            {field.title || (
+              <Text
+                as="span"
+                color="gray.500"
+                fontWeight="normal"
+                fontStyle="italic"
+              >
+                <FormattedMessage
+                  id="generic.untitled-field"
+                  defaultMessage="Untitled field"
+                />
+              </Text>
+            )}
+            {field.optional ? (
+              <Text
+                as="span"
+                marginLeft={2}
+                color="gray.400"
+                fontSize="sm"
+                fontWeight="normal"
+              >
+                <FormattedMessage
+                  id="generic.optional-field"
+                  defaultMessage="Optional"
+                />
+              </Text>
+            ) : (
+              <Tooltip
+                placement="right"
+                label={intl.formatMessage({
+                  id: "generic.required-field",
+                  defaultMessage: "Required field",
+                })}
+              >
+                <Text as="span" userSelect="none" marginLeft={1}>
+                  *
+                </Text>
+              </Tooltip>
+            )}
+          </Heading>
+        </Box>
+        {hasCommentsEnabled ? (
+          <CommentsButton
+            commentCount={field.commentCount}
+            hasUnreadComments={field.unreadCommentCount > 0}
+            hasUnpublishedComments={field.unpublishedCommentCount > 0}
+            onClick={handleCommentsButtonClick}
+          />
+        ) : null}
+      </Flex>
+      <Box>
+        {field.description ? (
+          <Text
+            fontSize="sm"
+            color="gray.600"
+            overflowWrap="anywhere"
+            marginBottom={2}
+          >
+            <BreakLines text={field.description} />
+          </Text>
+        ) : null}
+      </Box>
+      <Text fontSize="sm" color="gray.500">
+        {isTextLikeType ? (
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.replies-submitted"
+            defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
+            values={{ count: field.replies.length }}
+          />
+        ) : field.type === "FILE_UPLOAD" ? (
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.files-uploaded"
+            defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
+            values={{ count: field.replies.length }}
+          />
+        ) : null}
+      </Text>
+      {children}
+      {showAddNewReply ? (
+        <Center marginTop={2}>
+          <IconButtonWithTooltip
+            icon={<AddIcon />}
+            variant="outline"
+            isRound
+            label={intl.formatMessage({
+              id:
+                "component.recipient-view-petition-field-card.add-another-reply",
+              defaultMessage: "Add another reply",
+            })}
+            onClick={onAddNewReply}
+          />
+        </Center>
+      ) : null}
+    </Card>
+  );
+}
+
+RecipientViewPetitionFieldCard.fragments = {
+  get PublicPetitionAccess() {
+    return gql`
+      fragment RecipientViewPetitionFieldCard_PublicPetitionAccess on PublicPetitionAccess {
+        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccess
+      }
+      ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionAccess}
+    `;
+  },
+  get PublicPetitionField() {
+    return gql`
+      fragment RecipientViewPetitionFieldCard_PublicPetitionField on PublicPetitionField {
+        id
+        type
+        title
+        description
+        options
+        optional
+        multiple
+        validated
+        replies {
+          ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+        }
+        commentCount
+        unpublishedCommentCount
+        unreadCommentCount
+        ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
+      }
+      ${this.PublicPetitionFieldReply}
+      ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
+    `;
+  },
+  get PublicPetitionFieldReply() {
+    return gql`
+      fragment RecipientViewPetitionFieldCard_PublicPetitionFieldReply on PublicPetitionFieldReply {
+        id
+        status
+        content
+        createdAt
+        updatedAt
+      }
+    `;
+  },
+};
 
 interface CommentsButtonProps extends ButtonProps {
   commentCount: number;

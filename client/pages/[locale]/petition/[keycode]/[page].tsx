@@ -77,7 +77,10 @@ function RecipientView({
   const contact = access!.contact!;
   const signers = petition!.signers!;
 
-  const { fields, pages } = useGetPageFields(petition.fields, currentPage);
+  const { fields, pages, visibility } = useGetPageFields(
+    petition.fields,
+    currentPage
+  );
 
   const [showAlert, setShowAlert] = useState(true);
 
@@ -90,8 +93,12 @@ function RecipientView({
     async function () {
       try {
         setFinalized(true);
-        const canFinalize = fields.every(
-          (f) => f.optional || f.replies.length > 0 || f.isReadOnly
+        const canFinalize = petition.fields.every(
+          (f, index) =>
+            !visibility[index] ||
+            f.optional ||
+            f.replies.length > 0 ||
+            f.isReadOnly
         );
         if (canFinalize) {
           if (signers.length > 0) {
@@ -119,11 +126,16 @@ function RecipientView({
         } else {
           // go to first repliable field without replies
           let page = 1;
-          const field = fields.find((f) => {
-            if (f.type === "HEADING" && f.options.hasPageBreak) {
+          const field = petition.fields.find((field, index) => {
+            if (field.type === "HEADING" && field.options.hasPageBreak) {
               page += 1;
             }
-            return f.replies.length === 0 && !f.optional && !f.isReadOnly;
+            return (
+              visibility[index] &&
+              field.replies.length === 0 &&
+              !field.optional &&
+              !field.isReadOnly
+            );
           })!;
           const { keycode, locale } = router.query;
           router.push(
@@ -132,7 +144,7 @@ function RecipientView({
         }
       } catch {}
     },
-    [fields, granter, router.query]
+    [petition.fields, visibility, granter, router.query]
   );
 
   const [
@@ -340,7 +352,6 @@ function RecipientView({
                   <motion.div key={field.id} layout="position">
                     <RecipientViewPetitionField
                       key={field.id}
-                      id={`field-${field.id}`}
                       petitionId={petition.id}
                       keycode={keycode}
                       access={access!}
@@ -544,11 +555,11 @@ function useGetPageFields(
   fields: RecipientView_PublicPetitionFieldFragment[],
   page: number
 ) {
-  const fieldVisibility = useFieldVisibility(fields);
+  const visibility = useFieldVisibility(fields);
   return useMemo(() => {
-    const pages = groupFieldsByPages(fields, fieldVisibility);
-    return { fields: pages[page - 1], pages: pages.length };
-  }, [fields, page, fieldVisibility]);
+    const pages = groupFieldsByPages(fields, visibility);
+    return { fields: pages[page - 1], pages: pages.length, visibility };
+  }, [fields, page, visibility]);
 }
 
 function useHelpModal() {
