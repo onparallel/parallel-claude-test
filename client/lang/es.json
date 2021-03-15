@@ -25,6 +25,41 @@
     "context": "Open menu"
   },
   {
+    "term": "component.close-petition-dialog.attach-pdf-export.checkbox",
+    "definition": "Adjuntar un archivo PDF con las respuestas recibidas",
+    "context": "Attach a PDF export with the submitted replies"
+  },
+  {
+    "term": "component.close-petition-dialog.attach-pdf-export.title",
+    "definition": "Título del PDF adjunto",
+    "context": "PDF export title"
+  },
+  {
+    "term": "component.close-petition-dialog.attach-pdf-export.title.help",
+    "definition": "Este será el nombre del archivo PDF adjunto.",
+    "context": "This will be the name of the attached PDF file."
+  },
+  {
+    "term": "component.close-petition-dialog.heading",
+    "definition": "Finalizar petición",
+    "context": "Finish petition"
+  },
+  {
+    "term": "component.close-petition-dialog.notify-recipient.checkbox",
+    "definition": "Notificar al destinatario antes de cerrar",
+    "context": "Notify the recipient before closing"
+  },
+  {
+    "term": "component.close-petition-dialog.notify-recipient.message-placeholder",
+    "definition": "Añade un mensaje para incluir en el correo electrónico",
+    "context": "Add a message to include in the email"
+  },
+  {
+    "term": "component.close-petition-dialog.subheading",
+    "definition": "Si está todo correcto, cerraremos esta petición pero podrás volver a revisar la información en cualquier momento. Si quieres, puedes notificar al destinatario para que esté tranquilo.",
+    "context": "If everything is correct, we will close this petition but you can review the information again at any time. If you want, you can notify the recipient for peace of mind."
+  },
+  {
     "term": "component.confirm-configure-ongoing-signature.body",
     "definition": "Hay un proceso de firma digital pendiente. Si realiza cualquier cambio, el proceso será cancelado.",
     "context": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
@@ -1153,6 +1188,26 @@
     "term": "component.signature-config-dialog.title-placeholder",
     "definition": "Ingresa un título...",
     "context": "Enter a title..."
+  },
+  {
+    "term": "component.solve-unreviewed-replies-dialog.approve",
+    "definition": "Aprobar las respuestas sin revisar",
+    "context": "Approve unreviewed replies"
+  },
+  {
+    "term": "component.solve-unreviewed-replies-dialog.heading",
+    "definition": "Hay algunas respuestas sin revisar",
+    "context": "There are some unreviewed replies"
+  },
+  {
+    "term": "component.solve-unreviewed-replies-dialog.reject",
+    "definition": "Rechazar las respuestas sin revisar",
+    "context": "Reject unreviewed replies"
+  },
+  {
+    "term": "component.solve-unreviewed-replies-dialog.subheading",
+    "definition": "¿Qué quieres hacer con ellas?",
+    "context": "What would you like to do with them?"
   },
   {
     "term": "component.table.next-page-button",
@@ -2345,69 +2400,9 @@
     "context": "Settings"
   },
   {
-    "term": "petition-replies.close-petition-without-notify.button",
-    "definition": "Cerrar petición sin notificar",
-    "context": "Close petition without notifying"
-  },
-  {
-    "term": "petition-replies.close-petition.button",
-    "definition": "Cerrar petición y notificar",
-    "context": "Close petition and notify"
-  },
-  {
-    "term": "petition-replies.close-petition.dialog-approve",
-    "definition": "Aprobar las respuestas sin revisar",
-    "context": "Approve unreviewed replies"
-  },
-  {
-    "term": "petition-replies.close-petition.dialog-heading",
-    "definition": "Hay algunas respuestas sin revisar",
-    "context": "There are some unreviewed replies"
-  },
-  {
-    "term": "petition-replies.close-petition.dialog-reject",
-    "definition": "Rechazar las respuestas sin revisar",
-    "context": "Reject unreviewed replies"
-  },
-  {
-    "term": "petition-replies.close-petition.dialog-subheading",
-    "definition": "¿Qué quieres hacer con ellas?",
-    "context": "What would you like to do with them?"
-  },
-  {
     "term": "petition-replies.comment-pending.label",
     "definition": "Pendiente",
     "context": "Pending"
-  },
-  {
-    "term": "petition-replies.confirm-reviewed.attach-pdf-export",
-    "definition": "Adjuntar un archivo PDF con las respuestas recibidas",
-    "context": "Attach a PDF export with the submitted replies"
-  },
-  {
-    "term": "petition-replies.confirm-reviewed.dialog-disclaimer",
-    "definition": "Notificaremos únicamente a los destinatarios con acceso activo.",
-    "context": "We will only notify recipients with active access."
-  },
-  {
-    "term": "petition-replies.confirm-reviewed.dialog-heading",
-    "definition": "Confirmar que ya tienes toda la información",
-    "context": "Confirm that you have all the information"
-  },
-  {
-    "term": "petition-replies.confirm-reviewed.dialog-subheading",
-    "definition": "Si está todo correcto, notifica al destinatario para que esté tranquilo.",
-    "context": "If everything is correct, notify the recipient for peace of mind."
-  },
-  {
-    "term": "petition-replies.confirm-reviewed.pdf-export-title",
-    "definition": "Título del PDF adjunto",
-    "context": "PDF export title"
-  },
-  {
-    "term": "petition-replies.confirm-reviewed.pdf-export-title.help",
-    "definition": "Este será el nombre del archivo PDF adjunto.",
-    "context": "This will be the name of the attached PDF file."
   },
   {
     "term": "petition-replies.export-replies",
@@ -2428,6 +2423,11 @@
     "term": "petition-replies.field-comments.placeholder",
     "definition": "Escribe un comentario",
     "context": "Type a new comment"
+  },
+  {
+    "term": "petition-replies.finalize-petition.button",
+    "definition": "Finalizar petición",
+    "context": "Finish petition"
   },
   {
     "term": "petition-replies.internal-comment-check.help",

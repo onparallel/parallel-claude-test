@@ -503,11 +503,6 @@ type Mutation {
     petitionFieldCommentIds: [GID!]!
     petitionId: GID!
   ): [PetitionFieldComment!]!
-
-  """
-  Checks if a PetitionClosedNotification was already sent or not
-  """
-  presendPetitionClosedNotification(petitionId: GID!): Result!
   publicCheckVerificationCode(
     code: String!
     keycode: ID!

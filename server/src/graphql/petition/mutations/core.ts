@@ -1194,32 +1194,6 @@ export const changePetitionFieldType = mutationField(
   }
 );
 
-export const presendPetitionClosedNotification = mutationField(
-  "presendPetitionClosedNotification",
-  {
-    description:
-      "Checks if a PetitionClosedNotification was already sent or not",
-    type: "Result",
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-    },
-    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
-    resolve: async (_, args, ctx) => {
-      const shouldSendNotification = await ctx.petitions.shouldNotifyPetitionClosed(
-        args.petitionId
-      );
-      if (shouldSendNotification) {
-        return RESULT.SUCCESS;
-      } else {
-        throw new WhitelistedError(
-          "You already notified the contacts",
-          "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
-        );
-      }
-    },
-  }
-);
-
 export const sendPetitionClosedNotification = mutationField(
   "sendPetitionClosedNotification",
   {

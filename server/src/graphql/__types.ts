@@ -571,7 +571,6 @@ export interface NexusGenFieldTypes {
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
-    presendPetitionClosedNotification: NexusGenEnums["Result"]; // Result!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
@@ -1297,7 +1296,6 @@ export interface NexusGenFieldTypeNames {
     fileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     markPetitionFieldCommentsAsRead: "PetitionFieldComment";
-    presendPetitionClosedNotification: "Result";
     publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
     publicCreateFileUploadReply: "CreateFileUploadReply";
@@ -2071,10 +2069,6 @@ export interface NexusGenArgTypes {
     markPetitionFieldCommentsAsRead: {
       // args
       petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
-    presendPetitionClosedNotification: {
-      // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     publicCheckVerificationCode: {

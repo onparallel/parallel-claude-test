@@ -1,6 +1,7 @@
 import { gql, useApolloClient } from "@apollo/client";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import {
+  CheckIcon,
   DownloadIcon,
   ListIcon,
   RepeatIcon,
@@ -26,9 +27,8 @@ import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
-import { ClosePetitionButton } from "@parallel/components/petition-replies/ClosePetitionButton";
+import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/SolveUnreviewedRepliesDialog";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
-import { useConfirmPetitionCompletedDialog } from "@parallel/components/petition-replies/ConfirmPetitionCompletedDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 import {
   ExportRepliesDialog,
@@ -64,7 +64,6 @@ import {
   usePetitionReplies_deletePetitionFieldCommentMutation,
   usePetitionReplies_fileUploadReplyDownloadLinkMutation,
   usePetitionReplies_markPetitionFieldCommentsAsReadMutation,
-  usePetitionReplies_presendPetitionClosedNotificationMutation,
   usePetitionReplies_sendPetitionClosedNotificationMutation,
   usePetitionReplies_submitUnpublishedCommentsMutation,
   usePetitionReplies_updatePetitionFieldCommentMutation,
@@ -77,13 +76,14 @@ import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
-import { unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
+import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { zipX } from "@parallel/utils/zipX";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
 
 type PetitionRepliesProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -358,89 +358,72 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const indices = useFieldIndices(petition.fields);
 
-  const confirmPetitionCompletedDialog = useConfirmPetitionCompletedDialog();
+  const showClosePetitionDialog = useClosePetitionDialog();
   const [
     sendPetitionClosedNotification,
   ] = usePetitionReplies_sendPetitionClosedNotificationMutation();
-  const [
-    presendPetitionClosedNotification,
-  ] = usePetitionReplies_presendPetitionClosedNotificationMutation();
   const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
-  const handleConfirmPetitionCompleted = useCallback(async () => {
-    const petitionClosedNotificationToast = {
-      title: intl.formatMessage({
-        id: "petition.message-sent.toast-header",
-        defaultMessage: "Message sent",
-      }),
-      description: intl.formatMessage({
-        id: "petition.message-sent.toast-description",
-        defaultMessage: "The message is on it's way",
-      }),
-      status: "success" as const,
-      duration: 3000,
-      isClosable: true,
-    };
-    try {
-      await presendPetitionClosedNotification({
-        variables: { petitionId: petition.id },
-      });
-      const {
-        body,
-        attachPdfExport,
-        pdfExportTitle,
-      } = await confirmPetitionCompletedDialog({
-        locale: petition.locale,
-        petitionName: petition.name ?? null,
-        hasPetitionPdfExport: me.hasPetitionPdfExport,
-      });
-      await sendPetitionClosedNotification({
-        variables: {
-          petitionId: petition.id,
-          emailBody: body,
-          attachPdfExport,
-          pdfExportTitle,
-        },
-      });
-      toast(petitionClosedNotificationToast);
-    } catch (error) {
-      if (["CANCEL", "CLOSE"].includes(error.reason)) {
-        throw error;
-      }
-      if (
-        error?.graphQLErrors?.[0]?.extensions.code ===
-        "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
-      ) {
-        try {
-          await petitionAlreadyNotifiedDialog({});
-          const {
-            body,
-            attachPdfExport,
-            pdfExportTitle,
-          } = await confirmPetitionCompletedDialog({
-            locale: petition.locale,
-            petitionName: petition.name ?? null,
-            hasPetitionPdfExport: me.hasPetitionPdfExport,
-          });
+  const handleFinishPetition = useCallback(
+    async ({ requiredMessage }: { requiredMessage: boolean }) => {
+      const petitionClosedNotificationToast = {
+        title: intl.formatMessage({
+          id: "petition.message-sent.toast-header",
+          defaultMessage: "Message sent",
+        }),
+        description: intl.formatMessage({
+          id: "petition.message-sent.toast-description",
+          defaultMessage: "The message is on it's way",
+        }),
+        status: "success" as const,
+        duration: 3000,
+        isClosable: true,
+      };
+      let message: Maybe<RichTextEditorValue> = null;
+      let pdfExportTitle: Maybe<string> = null;
+      try {
+        const data = await showClosePetitionDialog({
+          locale: petition.locale,
+          petitionName: petition.name ?? null,
+          hasPetitionPdfExport: me.hasPetitionPdfExport,
+          requiredMessage,
+        });
+        message = data.message;
+        pdfExportTitle = data.pdfExportTitle;
+
+        if (message) {
           await sendPetitionClosedNotification({
             variables: {
               petitionId: petition.id,
-              emailBody: body,
-              attachPdfExport,
+              emailBody: message,
+              attachPdfExport: !!pdfExportTitle,
+              pdfExportTitle,
+            },
+          });
+          toast(petitionClosedNotificationToast);
+        }
+      } catch (error) {
+        if (
+          error?.graphQLErrors?.[0]?.extensions.code ===
+          "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
+        ) {
+          await petitionAlreadyNotifiedDialog({});
+          await sendPetitionClosedNotification({
+            variables: {
+              petitionId: petition.id,
+              emailBody: message,
+              attachPdfExport: !!pdfExportTitle,
               pdfExportTitle,
               force: true,
             },
           });
           toast(petitionClosedNotificationToast);
-        } catch (error) {
-          if (["CANCEL", "CLOSE"].includes(error.reason)) {
-            throw error;
-          }
         }
       }
-    }
-  }, [petition, intl.locale]);
+    },
+    [petition, intl.locale]
+  );
 
-  const closePetitionDialog = useClosePetitionDialog();
+  const showSolveUnreviewedRepliesDialog = useSolveUnreviewedRepliesDialog();
 
   const showConfirmDisableOngoingSignature = useDialog(
     ConfirmDisableOngoingSignature
@@ -449,49 +432,42 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     cancelSignatureRequest,
   ] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
 
-  const handleClosePetition = useCallback(
-    async (sendNotification: boolean) => {
-      try {
-        const hasUnreviewedReplies = petition.fields.some((f) =>
-          f.replies.some((r) => r.status === "PENDING")
-        );
+  const handleClosePetition = useCallback(async () => {
+    try {
+      const hasUnreviewedReplies = petition.fields.some((f) =>
+        f.replies.some((r) => r.status === "PENDING")
+      );
 
-        const hasPendingSignature =
-          (petition.currentSignatureRequest &&
-            petition.currentSignatureRequest.status === "PROCESSING") ??
-          false;
+      const hasPendingSignature =
+        petition.currentSignatureRequest?.status === "PROCESSING";
 
-        if (hasPendingSignature) {
-          await showConfirmDisableOngoingSignature({});
-          await cancelSignatureRequest({
-            variables: {
-              petitionSignatureRequestId: petition.currentSignatureRequest!.id,
-            },
-          });
-        }
+      if (hasPendingSignature) {
+        await showConfirmDisableOngoingSignature({});
+        await cancelSignatureRequest({
+          variables: {
+            petitionSignatureRequestId: petition.currentSignatureRequest!.id,
+          },
+        });
+      }
 
-        const option = hasUnreviewedReplies
-          ? await closePetitionDialog({})
-          : "APPROVE";
+      const option = hasUnreviewedReplies
+        ? await showSolveUnreviewedRepliesDialog({})
+        : "APPROVE";
 
-        if (sendNotification) {
-          await handleConfirmPetitionCompleted();
-        }
+      await handleFinishPetition({ requiredMessage: false });
 
-        await handleValidateToggle(
-          petition.fields.map((f) => f.id),
-          true,
-          option === "APPROVE" ? "APPROVED" : "REJECTED"
-        );
-      } catch {}
-    },
-    [
-      petition,
-      handleValidateToggle,
-      handleConfirmPetitionCompleted,
-      cancelSignatureRequest,
-    ]
-  );
+      await handleValidateToggle(
+        petition.fields.map((f) => f.id),
+        true,
+        option === "APPROVE" ? "APPROVED" : "REJECTED"
+      );
+    } catch {}
+  }, [
+    petition,
+    handleValidateToggle,
+    handleFinishPetition,
+    cancelSignatureRequest,
+  ]);
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
@@ -542,17 +518,25 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             defaultMessage: "Reload",
           })}
         />
-        <ClosePetitionButton
+
+        <Button
           hidden={petition.status === "CLOSED"}
-          onClosePetition={handleClosePetition}
-        />
+          colorScheme="green"
+          leftIcon={<CheckIcon />}
+          onClick={handleClosePetition}
+        >
+          <FormattedMessage
+            id="petition-replies.finalize-petition.button"
+            defaultMessage="Finish petition"
+          />
+        </Button>
         <Button
           hidden={petition.status !== "CLOSED"}
           colorScheme="blue"
           leftIcon={<ThumbUpIcon fontSize="lg" display="block" />}
           onClick={async () => {
             try {
-              await handleConfirmPetitionCompleted();
+              await handleFinishPetition({ requiredMessage: true });
             } catch {}
           }}
         >
@@ -907,13 +891,6 @@ PetitionReplies.mutations = [
       ) {
         id
       }
-    }
-  `,
-  gql`
-    mutation PetitionReplies_presendPetitionClosedNotification(
-      $petitionId: GID!
-    ) {
-      presendPetitionClosedNotification(petitionId: $petitionId)
     }
   `,
 ];
