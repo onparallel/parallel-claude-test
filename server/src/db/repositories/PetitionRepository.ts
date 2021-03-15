@@ -1064,10 +1064,7 @@ export class PetitionRepository extends BaseRepository {
   ) {
     return this.withTransaction(async (t) => {
       const [field] = await this.from("petition_field", t)
-        .where({
-          id: fieldId,
-          petition_id: petitionId,
-        })
+        .where({ id: fieldId, petition_id: petitionId })
         .update(
           {
             ...data,
@@ -1078,13 +1075,10 @@ export class PetitionRepository extends BaseRepository {
             updated_by: `User:${user.id}`,
           },
           "*"
-        )
-        .then(([updatedField]) => {
-          if (updatedField.is_fixed && data.type !== undefined) {
-            throw new Error("UPDATE_FIXED_FIELD_ERROR");
-          }
-          return [updatedField];
-        });
+        );
+      if (field.is_fixed && data.type !== undefined) {
+        throw new Error("UPDATE_FIXED_FIELD_ERROR");
+      }
 
       let petition: Petition;
       // update petition status if changing anything other than title and description

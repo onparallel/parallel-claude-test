@@ -18,7 +18,6 @@ import {
   DownloadIcon,
   HelpOutlineIcon,
 } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
@@ -51,22 +50,15 @@ export interface RecipientViewPetitionFieldFileUploadProps
   isDisabled: boolean;
 }
 
-export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
-  "section",
-  RecipientViewPetitionFieldFileUploadProps
->(function RecipientViewPetitionFieldFileUpload(
-  {
-    petitionId,
-    keycode,
-    access,
-    field,
-    isDisabled,
-    isInvalid,
-    hasCommentsEnabled,
-    ...props
-  },
-  ref
-) {
+export function RecipientViewPetitionFieldFileUpload({
+  petitionId,
+  keycode,
+  access,
+  field,
+  isDisabled,
+  isInvalid,
+  hasCommentsEnabled,
+}: RecipientViewPetitionFieldFileUploadProps) {
   const uploads = useRef<Record<string, XMLHttpRequest>>({});
 
   const [isDeletingReply, setIsDeletingReply] = useState<
@@ -109,14 +101,11 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
 
   return (
     <RecipientViewPetitionFieldCard
-      ref={ref}
       keycode={keycode}
       access={access}
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
-      overflow="hidden"
-      {...props}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>
@@ -156,7 +145,7 @@ export const RecipientViewPetitionFieldFileUpload = chakraForwardRef<
       </Box>
     </RecipientViewPetitionFieldCard>
   );
-});
+}
 
 interface RecipientViewPetitionFieldReplyFileUploadProps {
   keycode: string;

@@ -1,6 +1,5 @@
 import { Box, Center, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
-import { chakraForwardRef } from "@parallel/chakra/utils";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
@@ -37,22 +36,15 @@ export interface RecipientViewPetitionFieldSelectProps
 
 type SelectInstance = Select<{ label: string; value: string }, false, never>;
 
-export const RecipientViewPetitionFieldSelect = chakraForwardRef<
-  "section",
-  RecipientViewPetitionFieldSelectProps
->(function RecipientViewPetitionField(
-  {
-    petitionId,
-    keycode,
-    access,
-    field,
-    isDisabled,
-    isInvalid,
-    hasCommentsEnabled,
-    ...props
-  },
-  ref
-) {
+export function RecipientViewPetitionFieldSelect({
+  petitionId,
+  keycode,
+  access,
+  field,
+  isDisabled,
+  isInvalid,
+  hasCommentsEnabled,
+}: RecipientViewPetitionFieldSelectProps) {
   const intl = useIntl();
 
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
@@ -133,7 +125,6 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
 
   return (
     <RecipientViewPetitionFieldCard
-      ref={ref}
       keycode={keycode}
       access={access}
       field={field}
@@ -141,7 +132,6 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
       hasCommentsEnabled={hasCommentsEnabled}
       showAddNewReply={!isDisabled && !showNewReply && field.multiple}
       onAddNewReply={handleAddNewReply}
-      {...props}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>
@@ -191,7 +181,7 @@ export const RecipientViewPetitionFieldSelect = chakraForwardRef<
       ) : null}
     </RecipientViewPetitionFieldCard>
   );
-});
+}
 
 interface RecipientViewPetitionFieldReplySelectProps {
   field: RecipientViewPetitionFieldSelectProps["field"];

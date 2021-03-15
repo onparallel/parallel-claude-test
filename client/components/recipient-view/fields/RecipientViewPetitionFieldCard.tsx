@@ -66,6 +66,7 @@ export function RecipientViewPetitionFieldCard({
     <Card
       id={`field-${field.id}`}
       padding={4}
+      overflow="hidden"
       {...(isInvalid
         ? {
             border: "2px solid",
