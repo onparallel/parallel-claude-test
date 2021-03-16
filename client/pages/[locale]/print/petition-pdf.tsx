@@ -1,13 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  BoxProps,
-  Flex,
-  Heading,
-  Image,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, BoxProps, Flex, Heading, Image, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
 import {
   withApolloData,
@@ -89,11 +81,9 @@ function PetitionPdf({ token }: { token: string }) {
               </Heading>
             </>
           ) : undefined}
-          <Stack spacing="4mm">
-            {fields.map((field) => (
-              <PdfFieldWithReplies key={field.id} field={field} />
-            ))}
-          </Stack>
+          {fields.map((field) => (
+            <PdfFieldWithReplies key={field.id} field={field} />
+          ))}
           {tokenPayload.showSignatureBoxes &&
             pageNum === pages.length - 1 &&
             (contacts ?? []).length > 0 && (

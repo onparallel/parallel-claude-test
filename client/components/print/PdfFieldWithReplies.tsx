@@ -10,7 +10,7 @@ export function PdfFieldWithReplies({
   field: PetitionPdf_PetitionFieldFragment;
 }) {
   return (
-    <Box sx={{ pageBreakInside: "avoid" }}>
+    <Box sx={{ pageBreakInside: "avoid" }} marginY="4mm">
       {field.type === "HEADING" ? (
         <Stack>
           <Heading size="lg">{field.title ?? "-"}</Heading>
