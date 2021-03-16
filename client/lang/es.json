@@ -4572,7 +4572,7 @@
   {
     "term": "recipient-view.review-before-sign.body-2",
     "definition": "Hemos notificado a {name} para que proceda a la revisión de las respuestas y una vez validadas enviaremos un email con el documento a firmar a las personas que correspondan.",
-    "context": "We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign to the appropriate persons."
+    "context": "We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people."
   },
   {
     "term": "recipient-view.review-before-sign.header",

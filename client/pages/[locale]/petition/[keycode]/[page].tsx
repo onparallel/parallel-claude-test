@@ -544,7 +544,7 @@ function ReviewBeforeSignDialog({
           <Spacer marginTop={2} />
           <FormattedMessage
             id="recipient-view.review-before-sign.body-2"
-            defaultMessage="We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign to the appropriate persons."
+            defaultMessage="We have notified {name} to proceed with the review of the replies and once validated we will send an email with the document to sign by the appropriate people."
             values={{
               b: (chunks: any[]) => <b>{chunks}</b>,
               name: <b>{granter.fullName}</b>,
@@ -552,12 +552,12 @@ function ReviewBeforeSignDialog({
           />
         </>
       }
-      confirm={null}
-      cancel={
+      confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve()}>
           <FormattedMessage id="generic.accept" defaultMessage="Accept" />
         </Button>
       }
+      cancel={<></>}
       {...props}
     />
   );

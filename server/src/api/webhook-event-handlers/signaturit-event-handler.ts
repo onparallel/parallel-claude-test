@@ -184,7 +184,7 @@ async function documentCompleted(
     ctx.petitions.updatePetition(
       petitionId,
       { signature_config: null },
-      "Webhook:Signaturit"
+      `OrgIntegration:${signaturitIntegration.id}`
     ),
   ]);
 }

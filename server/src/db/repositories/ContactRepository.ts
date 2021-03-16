@@ -72,18 +72,26 @@ export class ContactRepository extends BaseRepository {
     },
     doneBy: Contact
   ) {
-    return (
-      (await this.loadContactByEmail({ email, orgId })) ??
-      (await this.createContact(
-        {
+    const {
+      rows: [contact],
+    } = await this.knex.raw<{ rows: Contact[] }>(
+      /* sql */ `
+      ? 
+      ON CONFLICT (org_id, email) WHERE deleted_at is NULL
+      DO UPDATE SET email=EXCLUDED.email -- need to do an update for the RETURNING to return the row
+      RETURNING *;`,
+      [
+        this.from("contact").insert({
           email,
+          org_id: orgId,
           first_name: firstName,
           last_name: lastName,
-        },
-        doneBy,
-        `Contact:${doneBy.id}`
-      ))
+          created_at: this.now(),
+          created_by: `Contact:${doneBy.id}`,
+        }),
+      ]
     );
+    return contact;
   }
 
   async userHasAccessToContacts(user: User, contactIds: number[]) {
