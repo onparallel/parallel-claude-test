@@ -174,10 +174,9 @@ function RecipientView({
     });
   }
 
-  const pendingComments = fields.reduce(
-    (acc, f) => acc + f.unpublishedCommentCount,
-    0
-  );
+  const pendingComments = petition.hasCommentsEnabled
+    ? fields.reduce((acc, f) => acc + f.unpublishedCommentCount, 0)
+    : 0;
 
   // Prevent closing when theres pending comments
   useEffect(() => {
