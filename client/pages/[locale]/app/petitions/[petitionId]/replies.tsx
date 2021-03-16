@@ -402,6 +402,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           toast(petitionClosedNotificationToast);
         }
       } catch (error) {
+        // rethrow error to avoid continuing flow on function handleClosePetition
+        if (["CANCEL", "CLOSE"].includes(error.reason)) {
+          throw error;
+        }
         if (
           error?.graphQLErrors?.[0]?.extensions.code ===
           "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
