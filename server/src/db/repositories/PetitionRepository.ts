@@ -2365,19 +2365,22 @@ export class PetitionRepository extends BaseRepository {
             } as CreatePetitionUserNotification)
         )
       );
-      await this.insert("petition_user_notification", notifications, t);
-
-      await this.createEvent(
-        comments.map((comment) => ({
-          type: "COMMENT_PUBLISHED",
-          petitionId,
-          data: {
-            petition_field_id: comment.petition_field_id,
-            petition_field_comment_id: comment.id,
-          },
-        })),
-        t
-      );
+      if (notifications.length > 0) {
+        await this.insert("petition_user_notification", notifications, t);
+      }
+      if (comments.length > 0) {
+        await this.createEvent(
+          comments.map((comment) => ({
+            type: "COMMENT_PUBLISHED",
+            petitionId,
+            data: {
+              petition_field_id: comment.petition_field_id,
+              petition_field_comment_id: comment.id,
+            },
+          })),
+          t
+        );
+      }
       return { comments, userIds };
     });
   }
