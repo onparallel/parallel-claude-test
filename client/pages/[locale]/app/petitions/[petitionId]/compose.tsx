@@ -129,7 +129,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   useEffect(() => {
     if (
       petition?.__typename === "Petition" &&
-      petition?.status === "COMPLETED"
+      ["COMPLETED", "CLOSED"].includes(petition.status)
     ) {
       completedDialog({});
     }
