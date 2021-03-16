@@ -21,14 +21,16 @@ export function usePetitionState() {
           return result;
         } catch (error) {
           setState("ERROR");
-          console.log(error);
-          await showError({
-            message: intl.formatMessage({
-              id: "generic.unexpected-error-happened",
-              defaultMessage:
-                "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
-            }),
-          });
+          console.error(error);
+          try {
+            await showError({
+              message: intl.formatMessage({
+                id: "generic.unexpected-error-happened",
+                defaultMessage:
+                  "An unexpected error happened. Please try refreshing your browser window and, if it persists, reach out to support for help.",
+              }),
+            });
+          } catch {}
         }
       } as T;
     },
