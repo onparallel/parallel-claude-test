@@ -232,7 +232,7 @@ export const PetitionComposeFieldList = Object.assign(
                           value:
                             index > newValues.length - 1
                               ? null
-                              : newValues[index],
+                              : newValues[index] ?? null,
                         };
                       } else {
                         return c;
