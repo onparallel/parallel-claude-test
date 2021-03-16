@@ -86,8 +86,8 @@
   },
   {
     "term": "component.confirm-disable-ongoing-signature-petition-close.confirm",
-    "definition": "Cancelar firma digital y cerrar",
-    "context": "Cancel eSignature and close"
+    "definition": "Cancelar firma digital y continuar",
+    "context": "Cancel eSignature and continue"
   },
   {
     "term": "component.confirm-disable-ongoing-signature.body",
