@@ -40,14 +40,19 @@
     "context": "This will be the name of the attached PDF file."
   },
   {
+    "term": "component.close-petition-dialog.button-finish",
+    "definition": "Finish",
+    "context": "Finish"
+  },
+  {
+    "term": "component.close-petition-dialog.button-send-finish",
+    "definition": "Send & finish",
+    "context": "Send & finish"
+  },
+  {
     "term": "component.close-petition-dialog.heading",
     "definition": "Finish petition",
     "context": "Finish petition"
-  },
-  {
-    "term": "component.close-petition-dialog.notify-recipient.checkbox",
-    "definition": "Notify the recipient before closing",
-    "context": "Notify the recipient before closing"
   },
   {
     "term": "component.close-petition-dialog.notify-recipient.message-placeholder",
@@ -55,9 +60,14 @@
     "context": "Add a message to include in the email"
   },
   {
+    "term": "component.close-petition-dialog.notify-recipient.notify-recipient",
+    "definition": "Notify the recipient that everything is reviewed.",
+    "context": "Notify the recipient that everything is reviewed."
+  },
+  {
     "term": "component.close-petition-dialog.subheading",
-    "definition": "If everything is correct, we will close this petition but you can review the information again at any time. If you want, you can notify the recipient for peace of mind.",
-    "context": "If everything is correct, we will close this petition but you can review the information again at any time. If you want, you can notify the recipient for peace of mind."
+    "definition": "When finishing, the petition will remain closed. You can come back anytime to review the information.",
+    "context": "When finishing, the petition will remain closed. You can come back anytime to review the information."
   },
   {
     "term": "component.confirm-configure-ongoing-signature.body",
