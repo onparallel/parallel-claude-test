@@ -12,6 +12,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { RemindersConfig } from "@parallel/graphql/__types";
+import { assignRef } from "@parallel/utils/assignRef";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { useTimeInput } from "@parallel/utils/useTimeInput";
@@ -29,13 +30,13 @@ import { DateTime } from "../common/DateTime";
 
 export function PetitionRemindersConfig({
   value,
-  startEnabled,
+  defaultActive,
   onChange,
   ...props
 }: {
   value: Maybe<RemindersConfig>;
   onChange: (config: Maybe<RemindersConfig>) => void;
-  startEnabled?: boolean;
+  defaultActive?: boolean;
 } & Omit<BoxProps, "onChange">) {
   let day = addDays(startOfToday(), value?.offset ?? 2);
   if (value?.weekdaysOnly && isWeekend(day)) {
@@ -47,14 +48,14 @@ export function PetitionRemindersConfig({
     onChange: (time) => value && time && onChange({ ...value, timezone, time }),
   });
 
-  const previousValue = useRef<RemindersConfig | null>(value);
-  const [isEnabled, setIsEnabled] = useState(startEnabled ?? false);
+  const previousValueRef = useRef<RemindersConfig | null>(value);
+  const [isActive, setIsActive] = useState(defaultActive ?? false);
 
   function handleEnableRemindersChange(event: ChangeEvent<HTMLInputElement>) {
-    setIsEnabled(event.target.checked);
+    setIsActive(event.target.checked);
     if (event.target.checked) {
       onChange(
-        previousValue.current ?? {
+        previousValueRef.current ?? {
           offset: 2,
           time: "09:00",
           timezone,
@@ -62,12 +63,12 @@ export function PetitionRemindersConfig({
         }
       );
     } else {
-      previousValue.current = {
+      assignRef(previousValueRef, {
         offset: value?.offset || 2,
         time: value?.time || "09:00",
         timezone: value?.timezone || timezone,
         weekdaysOnly: value?.weekdaysOnly || false,
-      };
+      });
       onChange(null);
     }
   }
@@ -79,7 +80,7 @@ export function PetitionRemindersConfig({
           colorScheme="purple"
           size="lg"
           marginRight={2}
-          isChecked={isEnabled}
+          isChecked={isActive}
           onChange={handleEnableRemindersChange}
         >
           <Text fontSize="md" as="span">
@@ -90,7 +91,7 @@ export function PetitionRemindersConfig({
           </Text>
         </Checkbox>
       </Flex>
-      {value && isEnabled ? (
+      {value && isActive ? (
         <Box
           as="form"
           noValidate={true}
