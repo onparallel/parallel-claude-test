@@ -208,37 +208,40 @@ export const PetitionComposeFieldList = Object.assign(
               (f.visibility as PetitionFieldVisibility)?.conditions.some(
                 (c) =>
                   c.fieldId === fieldId &&
+                  c.modifier !== "NUMBER_OF_REPLIES" &&
                   c.value !== null &&
                   !newValues.includes(c.value)
               )
             );
-            for (const field of referencing) {
-              const visibility = field.visibility as PetitionFieldVisibility;
-              // update visibility for fields referencing old options
-              await onFieldEdit(field.id, {
-                visibility: {
-                  ...visibility,
-                  conditions: visibility.conditions.map((c) => {
-                    if (
-                      c.fieldId === fieldId &&
-                      c.value !== null &&
-                      !newValues.includes(c.value)
-                    ) {
-                      const index = values.indexOf(c.value);
-                      return {
-                        ...c,
-                        value:
-                          index > newValues.length - 1
-                            ? null
-                            : newValues[index],
-                      };
-                    } else {
-                      return c;
-                    }
-                  }),
-                },
-              });
-            }
+            // update visibility for fields referencing old options
+            await Promise.all(
+              referencing.map(async (field) => {
+                const visibility = field.visibility as PetitionFieldVisibility;
+                await onFieldEdit(field.id, {
+                  visibility: {
+                    ...visibility,
+                    conditions: visibility.conditions.map((c) => {
+                      if (
+                        c.fieldId === fieldId &&
+                        c.value !== null &&
+                        !newValues.includes(c.value)
+                      ) {
+                        const index = values.indexOf(c.value);
+                        return {
+                          ...c,
+                          value:
+                            index > newValues.length - 1
+                              ? null
+                              : newValues[index],
+                        };
+                      } else {
+                        return c;
+                      }
+                    }),
+                  },
+                });
+              })
+            );
           }
         },
         onFocusPrevField: () => {

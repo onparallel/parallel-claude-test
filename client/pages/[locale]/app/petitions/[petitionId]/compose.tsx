@@ -240,16 +240,20 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 fieldIndex,
               })),
             });
-            for (const [field] of referencing) {
-              const visibility = field.visibility! as PetitionFieldVisibility;
-              const conditions = visibility.conditions.filter(
-                (c) => c.fieldId !== fieldId
-              );
-              await _handleFieldEdit(field.id, {
-                visibility:
-                  conditions.length > 0 ? { ...visibility, conditions } : null,
-              });
-            }
+            await Promise.all(
+              referencing.map(async ([field]) => {
+                const visibility = field.visibility! as PetitionFieldVisibility;
+                const conditions = visibility.conditions.filter(
+                  (c) => c.fieldId !== fieldId
+                );
+                await _handleFieldEdit(field.id, {
+                  visibility:
+                    conditions.length > 0
+                      ? { ...visibility, conditions }
+                      : null,
+                });
+              })
+            );
           } catch {
             return;
           }
