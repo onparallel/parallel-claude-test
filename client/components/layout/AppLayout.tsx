@@ -8,7 +8,8 @@ import {
 } from "@parallel/graphql/__types";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
-import { useCallback, useContext } from "react";
+import Router from "next/router";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   OnboardingTour,
   OnboardingTourContext,
@@ -43,6 +44,30 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
     [isRunning, toggle]
   );
   const rehydrated = useRehydrated();
+  const [isLoading, setIsLoading] = useState(false);
+  const timeoutRef = useRef<number>();
+  useEffect(() => {
+    Router.events.on("routeChangeStart", handleRouteChangeStart);
+    Router.events.on("routeChangeComplete", handleRouteChangeComplete);
+    return () => {
+      window.clearTimeout(timeoutRef.current);
+      Router.events.off("routeChangeStart", handleRouteChangeStart);
+      Router.events.off("routeChangeComplete", handleRouteChangeComplete);
+    };
+    function handleRouteChangeStart() {
+      timeoutRef.current = window.setTimeout(() => {
+        timeoutRef.current = undefined;
+        setIsLoading(true);
+      }, 1000);
+    }
+    function handleRouteChangeComplete() {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, []);
   return (
     <>
       <Head>
@@ -82,7 +107,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
             overflow="auto"
             {...props}
           >
-            {rehydrated ? (
+            {rehydrated && !isLoading ? (
               children
             ) : (
               <Center flex="1">
