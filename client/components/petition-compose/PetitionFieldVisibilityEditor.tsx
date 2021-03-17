@@ -318,7 +318,6 @@ PetitionFieldVisibilityEditor.fragments = {
     fragment PetitionFieldVisibilityEditor_PetitionField on PetitionField {
       id
       type
-      visibility
       multiple
       fieldOptions: options
       isReadOnly
