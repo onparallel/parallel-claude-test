@@ -426,6 +426,7 @@ export const SignatureConfig = objectType({
     t.boolean("review", {
       description:
         "If true, lets the user review the replies before starting the signature process",
+      resolve: (o) => o.review ?? false,
     });
   },
   rootTyping: /* ts */ `{
@@ -433,7 +434,7 @@ export const SignatureConfig = objectType({
     contactIds: number[];
     timezone: string;
     title: string;
-    review: boolean;
+    review?: boolean;
   }`,
 });
 

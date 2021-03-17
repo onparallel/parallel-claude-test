@@ -43,11 +43,12 @@ export const PublicSignatureConfig = objectType({
     t.boolean("review", {
       description:
         "If true, lets the user review the replies before starting the signature process",
+      resolve: (o) => o.review ?? false,
     });
   },
   rootTyping: /* ts */ `{
     contactIds: number[];
-    review: boolean;
+    review?: boolean;
   }`,
 });
 

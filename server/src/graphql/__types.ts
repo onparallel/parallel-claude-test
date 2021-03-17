@@ -363,7 +363,7 @@ export interface NexusGenObjects {
   PublicPetitionFieldReply: db.PetitionFieldReply;
   PublicSignatureConfig: {
     contactIds: number[];
-    review: boolean;
+    review?: boolean;
   };
   PublicUser: db.User;
   Query: {};
@@ -390,7 +390,7 @@ export interface NexusGenObjects {
     contactIds: number[];
     timezone: string;
     title: string;
-    review: boolean;
+    review?: boolean;
   };
   SignatureStartedEvent: events.SignatureStartedEvent;
   Subscription: db.PetitionEventSubscription;

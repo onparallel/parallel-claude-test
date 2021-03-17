@@ -7497,10 +7497,11 @@ export function usePetitionSettings_startPetitionSignatureRequestMutation(
     PetitionSettings_startPetitionSignatureRequestMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionSettings_startPetitionSignatureRequestMutation,
     PetitionSettings_startPetitionSignatureRequestMutationVariables
-  >(PetitionSettings_startPetitionSignatureRequestDocument, baseOptions);
+  >(PetitionSettings_startPetitionSignatureRequestDocument, options);
 }
 export type PetitionSettings_startPetitionSignatureRequestMutationHookResult = ReturnType<
   typeof usePetitionSettings_startPetitionSignatureRequestMutation
@@ -8060,10 +8061,11 @@ export function usePetitionSignaturesCard_updatePetitionSignatureConfigMutation(
     PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables
   >
 ) {
+  const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
     PetitionSignaturesCard_updatePetitionSignatureConfigMutation,
     PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables
-  >(PetitionSignaturesCard_updatePetitionSignatureConfigDocument, baseOptions);
+  >(PetitionSignaturesCard_updatePetitionSignatureConfigDocument, options);
 }
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationHookResult = ReturnType<
   typeof usePetitionSignaturesCard_updatePetitionSignatureConfigMutation
