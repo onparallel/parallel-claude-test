@@ -8,17 +8,18 @@ import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 
-/*
-  from contact/user to all subscribed users
+/**
+  from contact/user to all users in `user_ids` arg
 */
 export async function commentsUserNotification(
   payload: {
     petition_id: number;
-    petition_access_id?: number; // if set, the comment comes from a Contact
-    author_user_id?: number; // if set, the comment comes from a User
-    user_ids: number[];
     petition_field_comment_ids: number[];
-  },
+    user_ids: number[];
+  } & (
+    | { author: "User"; user_id: number }
+    | { author: "PetitionAccess"; petition_access_id: number }
+  ),
   context: WorkerContext
 ) {
   const petition = await context.petitions.loadPetition(payload.petition_id);
@@ -56,8 +57,7 @@ export async function commentsUserNotification(
   const emails: EmailLog[] = [];
 
   let authorNameOrEmail;
-  if (payload.petition_access_id) {
-    // Comment author is a contact
+  if (payload.author === "PetitionAccess") {
     const access = await context.petitions.loadAccess(
       payload.petition_access_id
     );
@@ -75,18 +75,15 @@ export async function commentsUserNotification(
 
     authorNameOrEmail =
       fullName(contact.first_name, contact.last_name) || contact.email;
-  } else if (payload.author_user_id) {
-    // comment author is an User
-    const user = await context.users.loadUser(payload.author_user_id);
+  } else if (payload.author === "User") {
+    const user = await context.users.loadUser(payload.user_id);
     if (!user) {
-      throw new Error(
-        `User not found for payload.author_user_id ${payload.author_user_id}`
-      );
+      throw new Error(`User not found for payload.user_id ${payload.user_id}`);
     }
     authorNameOrEmail = fullName(user.first_name, user.last_name) || user.email;
   } else {
     throw new Error(
-      `Arguments petition_access_id and author_user_id can't be both undefined. Payload: ${JSON.stringify(
+      `Arguments petition_access_id and user_id can't be both undefined. Payload: ${JSON.stringify(
         payload
       )}`
     );

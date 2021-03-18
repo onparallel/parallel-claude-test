@@ -629,17 +629,30 @@ export const publicSubmitUnpublishedComments = mutationField(
       const {
         comments,
         userIds,
+        accessIds,
       } = await ctx.petitions.publishPetitionFieldCommentsForAccess(
         ctx.access!.petition_id,
         ctx.access!
       );
-      await ctx.emails.sendPetitionCommentsUserNotificationEmail(
-        ctx.access!.petition_id,
-        ctx.access!.id,
-        userIds,
-        comments.map(prop("id")),
-        false
-      );
+      await Promise.all([
+        // send email to all contacts with active access
+        ctx.emails.sendPetitionCommentsContactNotificationEmail(
+          ctx.access!.petition_id,
+          "PetitionAccess",
+          ctx.access!.id,
+          comments.map(prop("id")),
+          accessIds
+        ),
+        // send email to all subscribed users
+        ctx.emails.sendPetitionCommentsUserNotificationEmail(
+          ctx.access!.petition_id,
+          "PetitionAccess",
+          ctx.access!.id,
+          comments.map(prop("id")),
+          userIds
+        ),
+      ]);
+
       return comments;
     },
   }

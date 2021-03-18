@@ -71,15 +71,17 @@ export const createPetitionFieldComment = mutationField(
       // on internal comment, send email to subscribed users as soon as the comment is created
       if (args.isInternal) {
         const userIds = (
-          await ctx.petitions.loadSubscribedUserIdsOnPetition(args.petitionId)
-        ).filter((id) => id !== ctx.user!.id);
+          await ctx.petitions.loadSubscribedUsersOnPetition(args.petitionId)
+        )
+          .map((u) => u.id)
+          .filter((id) => id !== ctx.user!.id);
 
         await ctx.emails.sendPetitionCommentsUserNotificationEmail(
           args.petitionId,
+          "User",
           ctx.user!.id,
-          userIds,
           [comment.id],
-          true
+          userIds
         );
       }
 
@@ -160,17 +162,30 @@ export const submitUnpublishedComments = mutationField(
     resolve: async (_, args, ctx) => {
       const {
         comments,
-        accesses,
+        userIds,
+        accessIds,
       } = await ctx.petitions.publishPetitionFieldCommentsForUser(
         args.petitionId,
         ctx.user!
       );
-      await ctx.emails.sendPetitionCommentsContactNotificationEmail(
-        args.petitionId,
-        ctx.user!.id,
-        accesses.map(prop("id")),
-        comments.map(prop("id"))
-      );
+      await Promise.all([
+        // send email to all contacts with active access
+        ctx.emails.sendPetitionCommentsContactNotificationEmail(
+          args.petitionId,
+          "User",
+          ctx.user!.id,
+          comments.map(prop("id")),
+          accessIds
+        ),
+        // send email to all subscribed users
+        ctx.emails.sendPetitionCommentsUserNotificationEmail(
+          args.petitionId,
+          "User",
+          ctx.user!.id,
+          comments.map(prop("id")),
+          userIds
+        ),
+      ]);
       return comments;
     },
   }

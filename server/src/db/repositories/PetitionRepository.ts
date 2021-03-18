@@ -2295,27 +2295,61 @@ export class PetitionRepository extends BaseRepository {
           "*"
         );
 
-      // Create contact notifications
-      const accesses = await this.loadAccessesForPetition(petitionId);
-      const notifications = accesses
-        .filter((access) => access.status === "ACTIVE")
-        .flatMap((access) =>
-          comments.map(
-            (comment) =>
-              ({
-                type: "COMMENT_CREATED",
-                petition_id: comment.petition_id,
-                petition_access_id: access.id,
-                data: {
-                  petition_field_id: comment.petition_field_id,
-                  petition_field_comment_id: comment.id,
-                },
-              } as CreatePetitionContactNotification)
-          )
-        );
-      if (notifications.length > 0) {
-        await this.insert("petition_contact_notification", notifications, t);
-      }
+      // Create contact and user notifications
+      const [accesses, users] = await Promise.all([
+        this.loadAccessesForPetition(petitionId),
+        this.loadSubscribedUsersOnPetition(petitionId),
+      ]);
+
+      //every active access
+      const accessIds = accesses
+        .filter((a) => a.status === "ACTIVE")
+        .map((a) => a.id);
+      // every subscribed user, except the one sending the notification
+      const userIds = users.filter((u) => u.id !== user.id).map((u) => u.id);
+
+      const contactNotifications = accessIds.flatMap((id) =>
+        comments.map(
+          (comment) =>
+            ({
+              type: "COMMENT_CREATED",
+              petition_id: comment.petition_id,
+              petition_access_id: id,
+              data: {
+                petition_field_id: comment.petition_field_id,
+                petition_field_comment_id: comment.id,
+              },
+            } as CreatePetitionContactNotification)
+        )
+      );
+
+      const userNotifications = userIds.flatMap((id) =>
+        comments.map(
+          (comment) =>
+            ({
+              type: "COMMENT_CREATED",
+              petition_id: comment.petition_id,
+              user_id: id,
+              data: {
+                petition_field_id: comment.petition_field_id,
+                petition_field_comment_id: comment.id,
+              },
+            } as CreatePetitionUserNotification)
+        )
+      );
+
+      await Promise.all([
+        contactNotifications.length > 0
+          ? this.insert(
+              "petition_contact_notification",
+              contactNotifications,
+              t
+            )
+          : [],
+        userNotifications.length > 0
+          ? this.insert("petition_user_notification", userNotifications, t)
+          : [],
+      ]);
 
       if (comments.length > 0) {
         await this.createEvent(
@@ -2330,7 +2364,7 @@ export class PetitionRepository extends BaseRepository {
           t
         );
       }
-      return { comments, accesses };
+      return { comments, userIds, accessIds };
     });
   }
 
@@ -2353,10 +2387,20 @@ export class PetitionRepository extends BaseRepository {
           "*"
         );
 
-      // Create user notifications and events
-      const userIds = await this.loadSubscribedUserIdsOnPetition(petitionId);
+      // Create notifications and events
+      const [users, accesses] = await Promise.all([
+        this.loadSubscribedUsersOnPetition(petitionId),
+        this.loadAccessesForPetition(petitionId),
+      ]);
 
-      const notifications = userIds.flatMap((id) =>
+      // every subscribed user
+      const userIds = users.map((u) => u.id);
+      // all active accesses, except the one sending the notification
+      const accessIds = accesses
+        .filter((a) => a.id !== access.id && a.status === "ACTIVE")
+        .map((a) => a.id);
+
+      const userNotifications = userIds.flatMap((id) =>
         comments.map(
           (comment) =>
             ({
@@ -2370,9 +2414,35 @@ export class PetitionRepository extends BaseRepository {
             } as CreatePetitionUserNotification)
         )
       );
-      if (notifications.length > 0) {
-        await this.insert("petition_user_notification", notifications, t);
-      }
+
+      const contactNotifications = accessIds.flatMap((id) =>
+        comments.map(
+          (comment) =>
+            ({
+              type: "COMMENT_CREATED",
+              petition_id: comment.petition_id,
+              petition_access_id: id,
+              data: {
+                petition_field_id: comment.petition_field_id,
+                petition_field_comment_id: comment.id,
+              },
+            } as CreatePetitionContactNotification)
+        )
+      );
+
+      await Promise.all([
+        userNotifications.length > 0
+          ? this.insert("petition_user_notification", userNotifications, t)
+          : [],
+        contactNotifications.length > 0
+          ? this.insert(
+              "petition_contact_notification",
+              contactNotifications,
+              t
+            )
+          : [],
+      ]);
+
       if (comments.length > 0) {
         await this.createEvent(
           comments.map((comment) => ({
@@ -2386,7 +2456,7 @@ export class PetitionRepository extends BaseRepository {
           t
         );
       }
-      return { comments, userIds };
+      return { comments, userIds, accessIds };
     });
   }
 
@@ -2980,16 +3050,14 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(ids).size;
   }
 
-  async loadSubscribedUserIdsOnPetition(petitionId: number): Promise<number[]> {
-    const subscribedUserIds = await this.from("petition_user")
-      .where({
-        petition_id: petitionId,
-        deleted_at: null,
-        is_subscribed: true,
-      })
-      .select<[{ id: number }]>("user_id as id");
-
-    return subscribedUserIds.map((u) => u.id);
+  async loadSubscribedUsersOnPetition(petitionId: number) {
+    return await this.from("user")
+      .join("petition_user", "user.id", "petition_user.user_id")
+      .where("petition_user.petition_id", petitionId)
+      .where("petition_user.is_subscribed", true)
+      .whereNull("petition_user.deleted_at")
+      .whereNull("user.deleted_at")
+      .select<User[]>(this.knex.raw(`distinct("user".*)`));
   }
 
   async updatePetitionUser(
