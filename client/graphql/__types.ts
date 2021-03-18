@@ -2787,16 +2787,10 @@ export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragmen
     >;
   };
 
-export type PetitionFieldsIndex_PetitionFieldFragment = {
+export type PetitionContents_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "title" | "type" | "options"> & {
-    comments: Array<
-      { __typename?: "PetitionFieldComment" } & Pick<
-        PetitionFieldComment,
-        "id" | "isUnread" | "publishedAt"
-      >
-    >;
-  } & useFieldVisibility_PetitionFieldFragment;
+} & Pick<PetitionField, "id" | "title" | "type" | "options"> &
+  filterPetitionFields_PetitionFieldFragment;
 
 export type PetitionSettings_UserFragment = { __typename?: "User" } & {
   hasPetitionSignature: User["hasFeatureFlag"];
@@ -4105,7 +4099,7 @@ export type PetitionCompose_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & PetitionComposeField_PetitionFieldFragment &
   PetitionComposeFieldSettings_PetitionFieldFragment &
-  PetitionFieldsIndex_PetitionFieldFragment;
+  PetitionContents_PetitionFieldFragment;
 
 export type PetitionCompose_UserFragment = {
   __typename?: "User";
@@ -4368,7 +4362,7 @@ export type PetitionReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "isReadOnly"> &
   PetitionRepliesField_PetitionFieldFragment &
-  PetitionFieldsIndex_PetitionFieldFragment &
+  PetitionContents_PetitionFieldFragment &
   PetitionRepliesFieldComments_PetitionFieldFragment &
   ExportRepliesDialog_PetitionFieldFragment &
   useFieldVisibility_PetitionFieldFragment;
@@ -5027,6 +5021,14 @@ export type useFieldVisibility_PetitionFieldFragment = {
         PetitionFieldReply,
         "id" | "content"
       >
+    >;
+  };
+
+export type filterPetitionFields_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "isReadOnly"> & {
+    replies: Array<
+      { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">
     >;
   };
 
@@ -6296,40 +6298,34 @@ export const PetitionComposeFieldSettings_PetitionFieldFragmentDoc = gql`
     visibility
   }
 `;
-export const useFieldVisibility_PetitionFieldFragmentDoc = gql`
-  fragment useFieldVisibility_PetitionField on PetitionField {
+export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
+  fragment filterPetitionFields_PetitionField on PetitionField {
     id
-    visibility
+    isReadOnly
     replies {
       id
-      content
     }
   }
 `;
-export const PetitionFieldsIndex_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldsIndex_PetitionField on PetitionField {
+export const PetitionContents_PetitionFieldFragmentDoc = gql`
+  fragment PetitionContents_PetitionField on PetitionField {
     id
     title
     type
     options
-    comments {
-      id
-      isUnread
-      publishedAt
-    }
-    ...useFieldVisibility_PetitionField
+    ...filterPetitionFields_PetitionField
   }
-  ${useFieldVisibility_PetitionFieldFragmentDoc}
+  ${filterPetitionFields_PetitionFieldFragmentDoc}
 `;
 export const PetitionCompose_PetitionFieldFragmentDoc = gql`
   fragment PetitionCompose_PetitionField on PetitionField {
     ...PetitionComposeField_PetitionField
     ...PetitionComposeFieldSettings_PetitionField
-    ...PetitionFieldsIndex_PetitionField
+    ...PetitionContents_PetitionField
   }
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${PetitionComposeFieldSettings_PetitionFieldFragmentDoc}
-  ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
+  ${PetitionContents_PetitionFieldFragmentDoc}
 `;
 export const PetitionCompose_PetitionBaseFragmentDoc = gql`
   fragment PetitionCompose_PetitionBase on PetitionBase {
@@ -6472,17 +6468,27 @@ export const ExportRepliesDialog_PetitionFieldFragmentDoc = gql`
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 `;
+export const useFieldVisibility_PetitionFieldFragmentDoc = gql`
+  fragment useFieldVisibility_PetitionField on PetitionField {
+    id
+    visibility
+    replies {
+      id
+      content
+    }
+  }
+`;
 export const PetitionReplies_PetitionFieldFragmentDoc = gql`
   fragment PetitionReplies_PetitionField on PetitionField {
     isReadOnly
     ...PetitionRepliesField_PetitionField
-    ...PetitionFieldsIndex_PetitionField
+    ...PetitionContents_PetitionField
     ...PetitionRepliesFieldComments_PetitionField
     ...ExportRepliesDialog_PetitionField
     ...useFieldVisibility_PetitionField
   }
   ${PetitionRepliesField_PetitionFieldFragmentDoc}
-  ${PetitionFieldsIndex_PetitionFieldFragmentDoc}
+  ${PetitionContents_PetitionFieldFragmentDoc}
   ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
   ${ExportRepliesDialog_PetitionFieldFragmentDoc}
   ${useFieldVisibility_PetitionFieldFragmentDoc}

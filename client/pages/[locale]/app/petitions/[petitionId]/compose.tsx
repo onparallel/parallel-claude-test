@@ -33,7 +33,7 @@ import {
   AddPetitionAccessDialog,
   useAddPetitionAccessDialog,
 } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
-import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
+import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { PetitionSettings } from "@parallel/components/petition-common/PetitionSettings";
 import { useCompletedPetitionDialog } from "@parallel/components/petition-compose/CompletedPetitionDialog";
 import { useConfirmChangeFieldTypeDialog } from "@parallel/components/petition-compose/ConfirmChangeFieldTypeDialog";
@@ -603,8 +603,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                   </TabList>
                   <TabPanels {...extendFlexColumn}>
                     <TabPanel {...extendFlexColumn} padding={0} overflow="auto">
-                      <PetitionFieldsIndex
+                      <PetitionContents
                         fields={petition!.fields}
+                        fieldIndices={indices}
                         onFieldClick={handleIndexFieldClick}
                       />
                     </TabPanel>
@@ -711,11 +712,11 @@ PetitionCompose.fragments = {
       fragment PetitionCompose_PetitionField on PetitionField {
         ...PetitionComposeField_PetitionField
         ...PetitionComposeFieldSettings_PetitionField
-        ...PetitionFieldsIndex_PetitionField
+        ...PetitionContents_PetitionField
       }
       ${PetitionComposeField.fragments.PetitionField}
       ${PetitionComposeFieldSettings.fragments.PetitionField}
-      ${PetitionFieldsIndex.fragments.PetitionField}
+      ${PetitionContents.fragments.PetitionField}
     `;
   },
   get User() {

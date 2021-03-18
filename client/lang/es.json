@@ -575,6 +575,11 @@
     "context": "Remove condition"
   },
   {
+    "term": "component.petition-contents.hidden-fields-divider",
+    "definition": "{count, plural, =1 {1 campo oculto} other {# campos ocultos}}",
+    "context": "{count, plural, =1 {1 hidden field} other {# hidden fields}}"
+  },
+  {
     "term": "component.petition-field-select.placeholder",
     "definition": "Selecciona un campo",
     "context": "Select a field"
@@ -878,6 +883,31 @@
     "term": "component.petition-reminder-settings.text",
     "definition": "Enviar recordatorios cada <days-input></days-input> días a las <time-input></time-input>",
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>"
+  },
+  {
+    "term": "component.petition-replies-filter-button.show-no-replies",
+    "definition": "Mostrar campos sin respuestas",
+    "context": "Show fields without replies"
+  },
+  {
+    "term": "component.petition-replies-filter-button.show-not-visibible",
+    "definition": "Mostart campos <x>no activados</x>",
+    "context": "Show <x>non-activated</x> fields"
+  },
+  {
+    "term": "component.petition-replies-filter-button.text",
+    "definition": "Filtrar",
+    "context": "Filter"
+  },
+  {
+    "term": "component.petition-replies-filtered-fields.no-replies",
+    "definition": "{count, plural, =1 {1 campo no tiene} other {# campos no tienen}} repuestas",
+    "context": "{count, plural, =1 {1 field} other {# fields}} don't have replies"
+  },
+  {
+    "term": "component.petition-replies-filtered-fields.non-activated",
+    "definition": "{count, plural, =1 {1 campo} other {# campos}} <x>{count, plural, =1 {no ha sido activado} other {no han sido activados}}</x>",
+    "context": "{count, plural, =1 {1 field} other {# fields}} are <x>not activated</x>"
   },
   {
     "term": "component.petition-settings.deadline-description",
@@ -1853,6 +1883,11 @@
     "term": "generic.no-description",
     "definition": "Sin descripción",
     "context": "No description"
+  },
+  {
+    "term": "generic.non-activated-fields-explanation",
+    "definition": "Campos en los que las condiciones de visibilidad no se cumplen",
+    "context": "Fields where visibility conditions are not met"
   },
   {
     "term": "generic.not-specified",

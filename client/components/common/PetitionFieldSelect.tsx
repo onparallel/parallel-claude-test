@@ -3,6 +3,7 @@ import { Box, Text } from "@chakra-ui/react";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionFieldSelect_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import {
   CustomSelectProps,
@@ -16,7 +17,7 @@ export interface PetitionFieldSelectProps<
   T extends PetitionFieldSelect_PetitionFieldFragment
 > extends CustomSelectProps<T> {
   fields: T[];
-  indices: (string | number)[];
+  indices: PetitionFieldIndex[];
 }
 
 const FieldItem = memo(function FieldItem({
@@ -25,7 +26,7 @@ const FieldItem = memo(function FieldItem({
   highlight,
 }: {
   field: PetitionFieldSelect_PetitionFieldFragment;
-  fieldIndex: number | string;
+  fieldIndex: PetitionFieldIndex;
   highlight?: string;
 }) {
   return (

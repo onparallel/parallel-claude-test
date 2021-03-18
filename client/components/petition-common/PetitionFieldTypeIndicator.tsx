@@ -1,6 +1,7 @@
 import { Button, Text, Tooltip } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
+import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import {
   usePetitionFieldTypeColor,
   usePetitionFieldTypeLabel,
@@ -9,7 +10,7 @@ import { PetitionFieldTypeIcon } from "./PetitionFieldTypeIcon";
 
 export interface PetitionFieldTypeIndicatorProps {
   type: PetitionFieldType;
-  fieldIndex: number | string;
+  fieldIndex: PetitionFieldIndex;
   isTooltipDisabled?: boolean;
 }
 

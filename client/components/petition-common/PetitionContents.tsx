@@ -1,0 +1,211 @@
+import { gql } from "@apollo/client";
+import { Box, Button, Center, Flex, Stack, Text } from "@chakra-ui/react";
+import { FilterIcon } from "@parallel/chakra/icons";
+import { PetitionContents_PetitionFieldFragment } from "@parallel/graphql/__types";
+import { compareWithFragments } from "@parallel/utils/compareWithFragments";
+import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import {
+  filterPetitionFields,
+  PetitionFieldFilter,
+} from "@parallel/utils/filterPetitionFields";
+import { useMemoFactory } from "@parallel/utils/useMemoFactory";
+import { ComponentType, createElement, memo, ReactNode } from "react";
+import { FormattedMessage } from "react-intl";
+import { Divider } from "../common/Divider";
+
+interface PetitionContentsFieldIndicatorsProps<
+  T extends PetitionContents_PetitionFieldFragment
+> {
+  field: T;
+  isVisible: boolean;
+}
+
+export interface PetitionContentsProps<
+  T extends PetitionContents_PetitionFieldFragment
+> {
+  fields: T[];
+  fieldIndices: PetitionFieldIndex[];
+  fieldVisibility?: boolean[];
+  onFieldClick: (fieldId: string) => void;
+  filter?: PetitionFieldFilter;
+  fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
+}
+
+export function PetitionContents<
+  T extends PetitionContents_PetitionFieldFragment
+>({
+  fields,
+  filter,
+  fieldIndices,
+  fieldVisibility,
+  onFieldClick,
+  fieldIndicators,
+}: PetitionContentsProps<T>) {
+  const handleFieldClick = useMemoFactory(
+    (fieldId: string) => () => onFieldClick(fieldId),
+    [onFieldClick]
+  );
+  return (
+    <Stack as="ol" spacing={1} padding={4}>
+      {filterPetitionFields(
+        fields,
+        fieldIndices,
+        fieldVisibility ?? [],
+        filter
+      ).map((x) =>
+        x.type === "FIELD" ? (
+          <PetitionContentsItem
+            key={x.field.id}
+            field={x.field}
+            isVisible={x.isVisible ?? true}
+            fieldIndex={x.fieldIndex}
+            onFieldClick={handleFieldClick(x.field.id)}
+            fieldIndicators={fieldIndicators}
+          />
+        ) : (
+          <PetititionContentsDivider isDashed>
+            <Flex alignItems="center">
+              <FilterIcon marginRight={1} />
+              <FormattedMessage
+                id="component.petition-contents.hidden-fields-divider"
+                defaultMessage="{count, plural, =1 {1 hidden field} other {# hidden fields}}"
+                values={{
+                  count: (x.SHOW_NOT_REPLIED ?? 0) + (x.SHOW_NOT_VISIBLE ?? 0),
+                }}
+              />
+            </Flex>
+          </PetititionContentsDivider>
+        )
+      )}
+    </Stack>
+  );
+}
+
+PetitionContents.fragments = {
+  PetitionField: gql`
+    fragment PetitionContents_PetitionField on PetitionField {
+      id
+      title
+      type
+      options
+      ...filterPetitionFields_PetitionField
+    }
+    ${filterPetitionFields.fragments.PetitionField}
+  `,
+};
+
+interface PetitionContentsItemProps<
+  T extends PetitionContents_PetitionFieldFragment
+> {
+  field: T;
+  fieldIndex: PetitionFieldIndex;
+  isVisible: boolean;
+  onFieldClick: () => void;
+  fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
+}
+
+function _PetitionContentsItem<
+  T extends PetitionContents_PetitionFieldFragment
+>({
+  field,
+  isVisible,
+  fieldIndex,
+  onFieldClick,
+  fieldIndicators,
+}: PetitionContentsItemProps<T>) {
+  return (
+    <>
+      {field.type === "HEADING" && field.options.hasPageBreak ? (
+        <PetititionContentsDivider>
+          <FormattedMessage
+            id="generic.page-break"
+            defaultMessage="Page break"
+          />
+        </PetititionContentsDivider>
+      ) : null}
+      <Box as="li" listStyleType="none" display="flex">
+        <Stack
+          as={Button}
+          direction="row"
+          flex="1"
+          variant="ghost"
+          alignItems="center"
+          height="auto"
+          padding={2}
+          paddingLeft={field.type === "HEADING" ? 2 : 4}
+          fontWeight={field.type === "HEADING" ? "medium" : "normal"}
+          textAlign="left"
+          onClick={onFieldClick}
+        >
+          <Text
+            as="div"
+            flex="1"
+            minWidth={0}
+            isTruncated
+            opacity={isVisible ? 1 : 0.6}
+          >
+            <Text as="span">{fieldIndex}. </Text>
+            {field.title ? (
+              field.title
+            ) : (
+              <Text as="span" flex="1" textStyle="hint">
+                {field.type === "HEADING" ? (
+                  <FormattedMessage
+                    id="generic.empty-heading"
+                    defaultMessage="Untitled heading"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="generic.untitled-field"
+                    defaultMessage="Untitled field"
+                  />
+                )}
+              </Text>
+            )}
+          </Text>
+          {fieldIndicators
+            ? createElement(fieldIndicators, { field, isVisible })
+            : null}
+        </Stack>
+      </Box>
+    </>
+  );
+}
+
+const PetitionContentsItem = memo(
+  _PetitionContentsItem,
+  compareWithFragments<
+    PetitionContentsItemProps<PetitionContents_PetitionFieldFragment>
+  >({
+    field: PetitionContents.fragments.PetitionField,
+  })
+) as typeof _PetitionContentsItem;
+
+function PetititionContentsDivider({
+  children,
+  isDashed,
+}: {
+  children: ReactNode;
+  isDashed?: boolean;
+}) {
+  return (
+    <Center position="relative" role="separator">
+      <Divider
+        position="absolute"
+        top="50%"
+        width="100%"
+        borderStyle={isDashed ? "dashed" : "solid"}
+      />
+      <Text
+        as="div"
+        backgroundColor="white"
+        paddingX={1}
+        fontSize="xs"
+        color="gray.500"
+        zIndex="1"
+      >
+        {children}
+      </Text>
+    </Center>
+  );
+}

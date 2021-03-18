@@ -2,12 +2,19 @@ import { gql, useApolloClient } from "@apollo/client";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import {
   CheckIcon,
+  CommentIcon,
+  ConditionIcon,
   DownloadIcon,
+  FilterIcon,
   ListIcon,
   RepeatIcon,
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
-import { Card, CardHeader } from "@parallel/components/common/Card";
+import {
+  Card,
+  CardHeader,
+  GenericCardHeader,
+} from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -17,6 +24,7 @@ import {
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
+import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
 import { ShareButton } from "@parallel/components/common/ShareButton";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
@@ -25,9 +33,8 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { PetitionFieldsIndex } from "@parallel/components/petition-common/PetitionFieldsIndex";
+import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
-import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/SolveUnreviewedRepliesDialog";
 import { useClosePetitionDialog } from "@parallel/components/petition-replies/ClosePetitionDialog";
 import { useConfirmResendCompletedNotificationDialog } from "@parallel/components/petition-replies/ConfirmResendCompletedNotificationDialog";
 import {
@@ -41,7 +48,11 @@ import {
   PetitionRepliesFieldProps,
 } from "@parallel/components/petition-replies/PetitionRepliesField";
 import { PetitionRepliesFieldComments } from "@parallel/components/petition-replies/PetitionRepliesFieldComments";
+import { PetitionRepliesFilterButton } from "@parallel/components/petition-replies/PetitionRepliesFilterButton";
+import { PetitionRepliesFilteredFields } from "@parallel/components/petition-replies/PetitionRepliesFilteredFields";
 import { PetitionSignaturesCard } from "@parallel/components/petition-replies/PetitionSignaturesCard";
+import { useSolveUnreviewedRepliesDialog } from "@parallel/components/petition-replies/SolveUnreviewedRepliesDialog";
+import { RecipientViewCommentsBadge } from "@parallel/components/recipient-view/RecipientViewCommentsBadge";
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
@@ -53,6 +64,7 @@ import {
   PetitionReplies_createPetitionFieldComment_PetitionFieldFragment,
   PetitionReplies_deletePetitionFieldCommentMutationVariables,
   PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment,
+  PetitionReplies_PetitionFieldFragment,
   PetitionReplies_PetitionFragment,
   PetitionReplies_updatePetitionFieldCommentMutationVariables,
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
@@ -76,14 +88,18 @@ import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
+import {
+  defaultFieldsFilter,
+  filterPetitionFields,
+  PetitionFieldFilter,
+} from "@parallel/utils/filterPetitionFields";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
-import { zipX } from "@parallel/utils/zipX";
+import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
 
 type PetitionRepliesProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
@@ -483,6 +499,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     } catch {}
   };
 
+  const [filter, setFilter] = useUserPreference<PetitionFieldFilter>(
+    "replies-fields-filter",
+    defaultFieldsFilter
+  );
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -602,7 +623,14 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   flexDirection="column"
                   maxHeight={`calc(100vh - 153px)`}
                 >
-                  <CardHeader>
+                  <GenericCardHeader
+                    rightAction={
+                      <PetitionRepliesFilterButton
+                        value={filter}
+                        onChange={setFilter}
+                      />
+                    }
+                  >
                     <Text as="span" display="flex" alignItems="center">
                       <ListIcon fontSize="18px" marginRight={2} />
                       <FormattedMessage
@@ -610,11 +638,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                         defaultMessage="Contents"
                       />
                     </Text>
-                  </CardHeader>
+                  </GenericCardHeader>
                   <Box overflow="auto">
-                    <PetitionFieldsIndex
+                    <PetitionContents
                       fields={petition.fields}
+                      filter={filter}
+                      fieldIndices={indices}
+                      fieldVisibility={fieldVisibility}
                       onFieldClick={handleIndexFieldClick}
+                      fieldIndicators={PetitionContentsIndicators}
                     />
                   </Box>
                 </Card>
@@ -624,28 +656,35 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         >
           <Box padding={4}>
             <Stack flex="2" spacing={4} id="petition-replies">
-              {zipX(petition.fields, indices, fieldVisibility).map(
-                ([field, fieldIndex, isVisible]) => (
+              {filterPetitionFields(
+                petition.fields,
+                indices,
+                fieldVisibility ?? [],
+                filter
+              ).map((x, index) =>
+                x.type === "FIELD" ? (
                   <PetitionRepliesField
-                    id={`field-${field.id}`}
-                    key={field.id}
-                    field={field}
-                    isVisible={isVisible}
-                    fieldIndex={fieldIndex}
+                    id={`field-${x.field.id}`}
+                    key={x.field.id}
+                    field={x.field}
+                    isVisible={x.isVisible}
+                    fieldIndex={x.fieldIndex}
                     onValidateToggle={() =>
-                      handleValidateToggle([field.id], !field.validated)
+                      handleValidateToggle([x.field.id], !x.field.validated)
                     }
                     onAction={handleAction}
-                    isActive={activeFieldId === field.id}
+                    isActive={activeFieldId === x.field.id}
                     onToggleComments={() =>
                       setActiveFieldId(
-                        activeFieldId === field.id ? null : field.id
+                        activeFieldId === x.field.id ? null : x.field.id
                       )
                     }
                     onUpdateReplyStatus={(replyId, status) =>
-                      handleUpdateRepliesStatus(field.id, [replyId], status)
+                      handleUpdateRepliesStatus(x.field.id, [replyId], status)
                     }
                   />
+                ) : (
+                  <PetitionRepliesFilteredFields key={index} fields={x} />
                 )
               )}
             </Stack>
@@ -691,7 +730,7 @@ PetitionReplies.fragments = {
       fragment PetitionReplies_PetitionField on PetitionField {
         isReadOnly
         ...PetitionRepliesField_PetitionField
-        ...PetitionFieldsIndex_PetitionField
+        ...PetitionContents_PetitionField
         ...PetitionRepliesFieldComments_PetitionField
         ...ExportRepliesDialog_PetitionField
         ...useFieldVisibility_PetitionField
@@ -699,7 +738,7 @@ PetitionReplies.fragments = {
       ${PetitionRepliesField.fragments.PetitionField}
       ${PetitionRepliesFieldComments.fragments.PetitionField}
       ${ExportRepliesDialog.fragments.PetitionField}
-      ${PetitionFieldsIndex.fragments.PetitionField}
+      ${PetitionContents.fragments.PetitionField}
       ${useFieldVisibility.fragments.PetitionField}
     `;
   },
@@ -1121,6 +1160,61 @@ function ConfirmDisableOngoingSignature(props: DialogProps<{}, void>) {
       }
       {...props}
     />
+  );
+}
+
+function PetitionContentsIndicators({
+  field,
+  isVisible,
+}: {
+  field: PetitionReplies_PetitionFieldFragment;
+  isVisible: boolean;
+}) {
+  const intl = useIntl();
+  return (
+    <>
+      {field.comments.length ? (
+        <Stack
+          as="span"
+          direction="row-reverse"
+          display="inline-flex"
+          alignItems="center"
+        >
+          <Stack
+            as="span"
+            direction="row-reverse"
+            spacing={1}
+            display="inline-flex"
+            alignItems="flex-end"
+            color="gray.600"
+          >
+            <CommentIcon fontSize="sm" opacity="0.8" />
+            <Text
+              as="span"
+              fontSize="xs"
+              role="img"
+              aria-label={intl.formatMessage(
+                {
+                  id: "generic.comments-button-label",
+                  defaultMessage:
+                    "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+                },
+                { commentCount: field.comments.length }
+              )}
+            >
+              {intl.formatNumber(field.comments.length)}
+            </Text>
+          </Stack>
+          <RecipientViewCommentsBadge
+            hasUnreadComments={field.comments.some((c) => c.isUnread)}
+            hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
+          />
+        </Stack>
+      ) : null}
+      {field.visibility ? (
+        <ConditionIcon color={isVisible ? "purple.500" : "gray.500"} />
+      ) : null}
+    </>
   );
 }
 

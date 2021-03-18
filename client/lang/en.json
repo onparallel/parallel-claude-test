@@ -575,6 +575,11 @@
     "context": "Remove condition"
   },
   {
+    "term": "component.petition-contents.hidden-fields-divider",
+    "definition": "{count, plural, =1 {1 hidden field} other {# hidden fields}}",
+    "context": "{count, plural, =1 {1 hidden field} other {# hidden fields}}"
+  },
+  {
     "term": "component.petition-field-select.placeholder",
     "definition": "Select a field",
     "context": "Select a field"
@@ -878,6 +883,31 @@
     "term": "component.petition-reminder-settings.text",
     "definition": "Send reminders every <days-input></days-input> days at <time-input></time-input>",
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>"
+  },
+  {
+    "term": "component.petition-replies-filter-button.show-no-replies",
+    "definition": "Show fields without replies",
+    "context": "Show fields without replies"
+  },
+  {
+    "term": "component.petition-replies-filter-button.show-not-visibible",
+    "definition": "Show <x>non-activated</x> fields",
+    "context": "Show <x>non-activated</x> fields"
+  },
+  {
+    "term": "component.petition-replies-filter-button.text",
+    "definition": "Filter",
+    "context": "Filter"
+  },
+  {
+    "term": "component.petition-replies-filtered-fields.no-replies",
+    "definition": "{count, plural, =1 {1 field} other {# fields}} don't have replies",
+    "context": "{count, plural, =1 {1 field} other {# fields}} don't have replies"
+  },
+  {
+    "term": "component.petition-replies-filtered-fields.non-activated",
+    "definition": "{count, plural, =1 {1 field} other {# fields}} are <x>not activated</x>",
+    "context": "{count, plural, =1 {1 field} other {# fields}} are <x>not activated</x>"
   },
   {
     "term": "component.petition-settings.deadline-description",
@@ -1853,6 +1883,11 @@
     "term": "generic.no-description",
     "definition": "No description",
     "context": "No description"
+  },
+  {
+    "term": "generic.non-activated-fields-explanation",
+    "definition": "Fields where visibility conditions are not met",
+    "context": "Fields where visibility conditions are not met"
   },
   {
     "term": "generic.not-specified",

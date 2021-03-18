@@ -26,6 +26,7 @@ import {
 import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
+import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { PetitionFieldVisibilityCondition } from "@parallel/utils/fieldVisibility/types";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { memo, useCallback, useRef, useState } from "react";
@@ -44,7 +45,7 @@ import {
 export interface PetitionComposeFieldProps {
   field: PetitionComposeField_PetitionFieldFragment;
   fields: PetitionFieldVisibilityEditor_PetitionFieldFragment[];
-  fieldIndex: number | string;
+  fieldIndex: PetitionFieldIndex;
   index: number;
   isActive: boolean;
   showError: boolean;

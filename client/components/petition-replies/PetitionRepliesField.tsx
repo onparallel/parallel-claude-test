@@ -22,6 +22,7 @@ import {
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
+import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
@@ -34,7 +35,7 @@ import {
 
 export interface PetitionRepliesFieldProps extends BoxProps {
   field: PetitionRepliesField_PetitionFieldFragment;
-  fieldIndex: number | string;
+  fieldIndex: PetitionFieldIndex;
   isVisible: boolean;
   isActive: boolean;
   onAction: (

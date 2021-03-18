@@ -1,6 +1,8 @@
 import { PetitionField } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 
+export type PetitionFieldIndex = number | string;
+
 /**
  * Generates and increasing sequence of letter indices (same as Excel columns)
  * A, B, ... Z, AA, AB, ... AZ, BA ... ZZ, AAA, AAB, ...
@@ -33,7 +35,7 @@ function* numbers() {
 
 export function getFieldIndices(
   fields: Pick<PetitionField, "type">[]
-): Array<number | string> {
+): PetitionFieldIndex[] {
   const letter = letters();
   const number = numbers();
   return fields.map((f) =>
@@ -48,7 +50,7 @@ export function getFieldIndices(
  */
 export function useFieldIndices(
   fields: Pick<PetitionField, "type">[]
-): Array<number | string> {
+): PetitionFieldIndex[] {
   return useMemo(() => getFieldIndices(fields), [
     fields.map((f) => f.type).join(","),
   ]);

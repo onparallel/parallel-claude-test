@@ -1,10 +1,10 @@
 import {
   Box,
   CloseButton,
-  Flex,
   Heading,
   HeadingProps,
   HTMLChakraProps,
+  Stack,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
@@ -34,47 +34,64 @@ export const Card = chakraForwardRef<"section", {}>(function Card(
   );
 });
 
-export type CardHeaderProps = {
-  children: ReactNode;
-  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-  size?: HeadingProps["size"];
+export interface CardHeaderProps
+  extends Omit<GenericCardHeaderProps, "rightAction"> {
   isCloseable?: boolean;
   onClose?: () => void;
-};
+}
 
 export function CardHeader({
-  as = "h3",
-  size: size = "sm",
-  children,
   isCloseable,
   onClose,
+  ...props
 }: CardHeaderProps) {
   const intl = useIntl();
   return (
+    <GenericCardHeader
+      {...props}
+      rightAction={
+        isCloseable ? (
+          <CloseButton
+            size="sm"
+            aria-label={intl.formatMessage({
+              id: "generic.close",
+              defaultMessage: "Close",
+            })}
+            onClick={onClose}
+          />
+        ) : null
+      }
+    />
+  );
+}
+
+export interface GenericCardHeaderProps {
+  children: ReactNode;
+  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  size?: HeadingProps["size"];
+  rightAction?: ReactNode;
+}
+
+export function GenericCardHeader({
+  as = "h3",
+  size: size = "sm",
+  children,
+  rightAction,
+}: GenericCardHeaderProps) {
+  return (
     <>
-      <Flex as="header" padding={4}>
-        <Heading as={as} size={size} overflowWrap="anywhere">
+      <Stack
+        direction="row"
+        as="header"
+        paddingX={4}
+        minHeight="52px"
+        alignItems="center"
+      >
+        <Heading flex="1" as={as} size={size} overflowWrap="anywhere">
           {children}
         </Heading>
-        {isCloseable ? (
-          <Flex
-            flex="1"
-            height={5}
-            marginLeft={2}
-            justifyContent="flex-end"
-            alignItems="center"
-          >
-            <CloseButton
-              size="sm"
-              aria-label={intl.formatMessage({
-                id: "generic.close",
-                defaultMessage: "Close",
-              })}
-              onClick={onClose}
-            />
-          </Flex>
-        ) : null}
-      </Flex>
+        {rightAction}
+      </Stack>
       <Divider />
     </>
   );

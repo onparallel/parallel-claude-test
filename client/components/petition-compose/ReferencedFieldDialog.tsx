@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
 import { PetitionComposeFieldList_PetitionFragment } from "@parallel/graphql/__types";
+import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
@@ -16,7 +17,7 @@ export function ReferencedFieldDialog({
 }: DialogProps<{
   fieldsWithIndices: {
     field: PetitionComposeFieldList_PetitionFragment["fields"][0];
-    fieldIndex: string | number;
+    fieldIndex: PetitionFieldIndex;
   }[];
 }>) {
   return (
