@@ -244,6 +244,7 @@ export function SignatureConfigDialog({
                           defaultMessage: "Let the recipient choose",
                         })
                   }
+                  placeholderColor={!petitionIsCompleted ? "black" : undefined}
                 />
               )}
             />

@@ -81,16 +81,23 @@ export function PetitionSignaturesCard({
   ] = usePetitionSignaturesCard_startSignatureRequestMutation();
 
   const [
+    updateSignatureConfig,
+  ] = usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
+
+  const [
     downloadSignedDoc,
   ] = usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
 
   const handleCancelSignatureProcess = useCallback(
     async (petitionSignatureRequestId: string) => {
+      await updateSignatureConfig({
+        variables: { petitionId: petition.id, signatureConfig: null },
+      });
       await cancelSignatureRequest({
         variables: { petitionSignatureRequestId },
       });
     },
-    [cancelSignatureRequest]
+    [updateSignatureConfig, cancelSignatureRequest]
   );
 
   const handleStartSignatureProcess = useCallback(async () => {
@@ -99,10 +106,6 @@ export function PetitionSignaturesCard({
     });
     await onRefetchPetition();
   }, [startSignatureRequest, petition]);
-
-  const [
-    updateSignatureConfig,
-  ] = usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
 
   const handleDownloadSignedDoc = useCallback(
     async (petitionSignatureRequestId: string) => {

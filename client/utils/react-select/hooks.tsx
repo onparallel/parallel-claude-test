@@ -60,6 +60,7 @@ export type UseReactSelectProps = {
   id?: string;
   isDisabled?: boolean;
   isInvalid?: boolean;
+  placeholderColor?: string;
 };
 
 /**
@@ -71,6 +72,7 @@ export function useReactSelectProps<
   GroupType extends GroupTypeBase<OptionType> = never
 >({
   size = "md",
+  placeholderColor,
   ...props
 }: UseReactSelectProps): SelectProps<OptionType, IsMulti, GroupType> {
   const intl = useIntl();
@@ -217,7 +219,7 @@ export function useReactSelectProps<
         },
         placeholder: (styles) => ({
           ...styles,
-          color: colors.gray[400],
+          color: placeholderColor ?? colors.gray[400],
           whiteSpace: "nowrap",
         }),
         valueContainer: (styles) => ({

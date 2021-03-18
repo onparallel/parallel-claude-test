@@ -81,6 +81,7 @@ function CompleteSignerInfoDialog({
 
   return (
     <ConfirmDialog
+      size="xl"
       initialFocusRef={emailRef as any}
       hasCloseButton
       {...props}

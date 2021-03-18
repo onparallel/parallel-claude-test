@@ -36,6 +36,7 @@ export interface ContactSelectProps
   extends UseReactSelectProps,
     CustomAsyncCreatableSelectProps<ContactSelectSelection, true> {
   placeholder?: string;
+  placeholderColor?: string;
   onCreateContact: (data: {
     defaultEmail?: string;
   }) => Promise<ContactSelectSelection>;
@@ -50,7 +51,14 @@ export const ContactSelect = Object.assign(
     AsyncCreatableSelect<ContactSelectSelection, true>,
     ContactSelectProps
   >(function (
-    { value, onSearchContacts, onCreateContact, onChange, ...props },
+    {
+      value,
+      onSearchContacts,
+      onCreateContact,
+      onChange,
+      placeholderColor,
+      ...props
+    },
     ref
   ) {
     const errorToast = useExistingContactToast();
@@ -60,7 +68,11 @@ export const ContactSelect = Object.assign(
     const [options, setOptions] = useState<ContactSelectSelection[]>();
 
     const reactSelectProps = useContactSelectReactSelectProps(
-      { ...props, isDisabled: props.isDisabled || isCreating },
+      {
+        ...props,
+        isDisabled: props.isDisabled || isCreating,
+        placeholderColor,
+      },
       handleCreate
     );
     const innerRef = useRef<any>();
