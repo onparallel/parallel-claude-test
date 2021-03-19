@@ -6,12 +6,19 @@ import {
   useTheme,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
-import { useMemo } from "react";
+import { useRehydrated } from "@parallel/utils/useRehydrated";
+import { DependencyList, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { components, GroupTypeBase, OptionTypeBase, Theme } from "react-select";
+import {
+  GroupTypeBase,
+  OptionTypeBase,
+  SelectComponentsConfig,
+  StylesConfig,
+  Theme,
+  components as Components,
+} from "react-select";
 import { omit } from "remeda";
 import { SelectProps } from "./types";
-import { useRehydrated } from "@parallel/utils/useRehydrated";
 
 export const SIZES = {
   lg: {
@@ -60,8 +67,20 @@ export type UseReactSelectProps = {
   id?: string;
   isDisabled?: boolean;
   isInvalid?: boolean;
-  placeholderColor?: string;
+  styles?: StylesConfig<any, any, any>;
+  components?: SelectComponentsConfig<any, any, any>;
 };
+
+export function useMemoReactSelectProps<
+  OptionType extends OptionTypeBase = { label: string; value: string },
+  IsMulti extends boolean = any,
+  GroupType extends GroupTypeBase<OptionType> = never
+>(
+  factory: () => UseReactSelectProps,
+  deps: DependencyList | undefined
+): SelectProps<OptionType, IsMulti, GroupType> {
+  return useReactSelectProps(useMemo(factory, deps));
+}
 
 /**
  * Generates the props necessary for styling react-select as a chakra component
@@ -72,9 +91,10 @@ export function useReactSelectProps<
   GroupType extends GroupTypeBase<OptionType> = never
 >({
   size = "md",
-  placeholderColor,
+  styles,
+  components,
   ...props
-}: UseReactSelectProps): SelectProps<OptionType, IsMulti, GroupType> {
+}: UseReactSelectProps = {}): SelectProps<OptionType, IsMulti, GroupType> {
   const intl = useIntl();
   const { colors, radii, sizes, fontSizes } = useTheme();
 
@@ -153,7 +173,7 @@ export function useReactSelectProps<
         MultiValueRemove: ({ innerProps, ...props }) => {
           const intl = useIntl();
           return (
-            <components.MultiValueRemove
+            <Components.MultiValueRemove
               innerProps={{
                 ...innerProps,
                 role: "button",
@@ -165,7 +185,7 @@ export function useReactSelectProps<
               {...props}
             >
               <CloseIcon boxSize="10px" marginX={1} />
-            </components.MultiValueRemove>
+            </Components.MultiValueRemove>
           );
         },
         LoadingMessage: () => (
@@ -176,6 +196,7 @@ export function useReactSelectProps<
             />
           </Text>
         ),
+        ...components,
       },
       styles: {
         menuPortal: (styles) => ({
@@ -219,7 +240,7 @@ export function useReactSelectProps<
         },
         placeholder: (styles) => ({
           ...styles,
-          color: placeholderColor ?? colors.gray[400],
+          color: colors.gray[400],
           whiteSpace: "nowrap",
         }),
         valueContainer: (styles) => ({
@@ -263,9 +284,10 @@ export function useReactSelectProps<
           display: "inline-flex",
           alignItems: "center",
         }),
+        ...styles,
       },
     }),
-    [rehydrated, size, inputId, isInvalid, isDisabled]
+    [rehydrated, size, inputId, isInvalid, isDisabled, components, styles]
   );
 }
 

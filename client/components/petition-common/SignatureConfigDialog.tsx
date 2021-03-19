@@ -19,13 +19,16 @@ import {
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import {
+  useMemoReactSelectProps,
+  useReactSelectProps,
+} from "@parallel/utils/react-select/hooks";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import useMergedRef from "@react-hook/merged-ref";
 import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select";
+import Select, { StylesConfig } from "react-select";
 import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
 
@@ -95,7 +98,24 @@ export function SignatureConfigDialog({
     [intl.locale]
   );
 
-  const reactSelectProps = useReactSelectProps({});
+  const reactSelectProps = useReactSelectProps();
+
+  const contactProps = useMemo(
+    () => ({
+      styles: {
+        placeholder: (styles, { theme }) => {
+          return {
+            ...styles,
+            color: petitionIsCompleted
+              ? theme.colors.neutral40
+              : theme.colors.neutral90,
+            whiteSpace: "nowrap",
+          };
+        },
+      } as StylesConfig<any, any, any>,
+    }),
+    [petitionIsCompleted]
+  );
 
   return (
     <ConfirmDialog
@@ -244,7 +264,7 @@ export function SignatureConfigDialog({
                           defaultMessage: "Let the recipient choose",
                         })
                   }
-                  placeholderColor={!petitionIsCompleted ? "black" : undefined}
+                  {...contactProps}
                 />
               )}
             />

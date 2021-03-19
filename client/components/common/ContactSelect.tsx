@@ -3,6 +3,7 @@ import { Box, Text } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import {
+  useMemoReactSelectProps,
   useReactSelectProps,
   UseReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
@@ -11,6 +12,7 @@ import { useExistingContactToast } from "@parallel/utils/useExistingContactToast
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import {
+  DependencyList,
   forwardRef,
   KeyboardEvent,
   memo,
@@ -36,7 +38,6 @@ export interface ContactSelectProps
   extends UseReactSelectProps,
     CustomAsyncCreatableSelectProps<ContactSelectSelection, true> {
   placeholder?: string;
-  placeholderColor?: string;
   onCreateContact: (data: {
     defaultEmail?: string;
   }) => Promise<ContactSelectSelection>;
@@ -56,7 +57,8 @@ export const ContactSelect = Object.assign(
       onSearchContacts,
       onCreateContact,
       onChange,
-      placeholderColor,
+      components,
+      styles,
       ...props
     },
     ref
@@ -67,14 +69,12 @@ export const ContactSelect = Object.assign(
 
     const [options, setOptions] = useState<ContactSelectSelection[]>();
 
-    const reactSelectProps = useContactSelectReactSelectProps(
-      {
-        ...props,
-        isDisabled: props.isDisabled || isCreating,
-        placeholderColor,
-      },
-      handleCreate
-    );
+    const reactSelectProps = useContactSelectReactSelectProps({
+      ...props,
+      isDisabled: props.isDisabled || isCreating,
+      components,
+      styles,
+    });
     const innerRef = useRef<any>();
 
     const [inputValue, setInputValue] = useState("");
@@ -194,19 +194,16 @@ export const ContactSelect = Object.assign(
 );
 
 function useContactSelectReactSelectProps(
-  props: UseReactSelectProps,
-  handleCreateContact: (email: string) => any
+  props: UseReactSelectProps
 ): AsyncCreatableSelectProps<ContactSelectSelection, true, never> {
-  const reactSelectProps = useReactSelectProps<ContactSelectSelection, true>(
-    props
-  );
-  return useMemo<
-    AsyncCreatableSelectProps<ContactSelectSelection, true, never>
+  const reactSelectProps = useMemoReactSelectProps<
+    ContactSelectSelection,
+    true
   >(
     () => ({
-      ...reactSelectProps,
+      ...props,
       components: {
-        ...reactSelectProps.components,
+        ...props.components,
         NoOptionsMessage: memo(({ selectProps }) => {
           const search = selectProps.inputValue;
           return (
@@ -294,6 +291,14 @@ function useContactSelectReactSelectProps(
           }
         },
       },
+    }),
+    [props]
+  );
+  return useMemo<
+    AsyncCreatableSelectProps<ContactSelectSelection, true, never>
+  >(
+    () => ({
+      ...reactSelectProps,
       getOptionLabel: (option) => {
         if ((option as any).__isNew__) {
           return (option as any).label;
@@ -322,6 +327,6 @@ function useContactSelectReactSelectProps(
         );
       },
     }),
-    [reactSelectProps, handleCreateContact]
+    [reactSelectProps]
   );
 }
