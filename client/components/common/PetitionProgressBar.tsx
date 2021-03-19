@@ -135,25 +135,29 @@ export function PetitionProgressBar({
           value={validated! + replied!}
           {...STYLES["EMPTY"]}
         >
-          <ProgressIndicator
-            min={0}
-            max={total!}
-            value={validated!}
-            backgroundColor="green.400"
-            {...STYLES["VALIDATED"]}
-          />
-          <ProgressIndicator
-            min={0}
-            max={total!}
-            value={replied!}
-            {...STYLES["REPLIED"]}
-          />
-          <ProgressIndicator
-            min={0}
-            max={total!}
-            value={optional!}
-            {...STYLES["OPTIONAL"]}
-          />
+          {status !== "DRAFT" ? (
+            <>
+              <ProgressIndicator
+                min={0}
+                max={total!}
+                value={validated!}
+                backgroundColor="green.400"
+                {...STYLES["VALIDATED"]}
+              />
+              <ProgressIndicator
+                min={0}
+                max={total!}
+                value={replied!}
+                {...STYLES["REPLIED"]}
+              />
+              <ProgressIndicator
+                min={0}
+                max={total!}
+                value={optional!}
+                {...STYLES["OPTIONAL"]}
+              />
+            </>
+          ) : null}
         </ProgressTrack>
       </Box>
     </SmallPopover>
