@@ -3057,7 +3057,7 @@ export class PetitionRepository extends BaseRepository {
       .where("petition_user.is_subscribed", true)
       .whereNull("petition_user.deleted_at")
       .whereNull("user.deleted_at")
-      .select<User[]>(this.knex.raw(`distinct("user".*)`));
+      .select<User[]>("user.*");
   }
 
   async updatePetitionUser(
