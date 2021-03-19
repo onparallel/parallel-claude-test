@@ -27,7 +27,6 @@ import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { PetitionFieldVisibilityCondition } from "@parallel/utils/fieldVisibility/types";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { memo, useCallback, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
@@ -53,6 +52,7 @@ export interface PetitionComposeFieldProps {
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onCloneField: () => void;
   onSettingsClick: () => void;
+  onFieldVisibilityClick: () => void;
   onDeleteClick: () => void;
   onFocusNextField: () => void;
   onFocusPrevField: () => void;
@@ -82,6 +82,7 @@ const _PetitionComposeField = chakraForwardRef<
     onSettingsClick,
     onDeleteClick,
     onFieldEdit,
+    onFieldVisibilityClick,
     onFocusNextField,
     onFocusPrevField,
     onAddField,
@@ -96,44 +97,6 @@ const _PetitionComposeField = chakraForwardRef<
     onMove,
     field.isFixed ? "FIXED_FIELD" : "FIELD"
   );
-  const handleVisibilityClick = useCallback(async () => {
-    if (field.visibility) {
-      onFieldEdit({ visibility: null });
-    } else {
-      const index = fields.findIndex((f) => f.id === field.id);
-      const prevField = fields[index - 1];
-      // if the previous field has a visibility setting copy it
-      if (prevField.visibility) {
-        onFieldEdit({ visibility: prevField.visibility });
-      } else {
-        // create a factible condition based on the previous field
-        const ref = fields
-          .slice(0, index)
-          .reverse()
-          .find((f) => !f.isReadOnly)!;
-        const condition: PetitionFieldVisibilityCondition = {
-          fieldId: ref.id,
-          modifier: ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
-          operator: "EQUAL",
-          value:
-            ref.type === "FILE_UPLOAD"
-              ? 0
-              : ref.type === "TEXT"
-              ? null
-              : ref.type === "SELECT"
-              ? ref.fieldOptions.values[0] ?? null
-              : null,
-        };
-        onFieldEdit({
-          visibility: {
-            type: "SHOW",
-            operator: "AND",
-            conditions: [condition],
-          },
-        });
-      }
-    }
-  }, [fields, field, onFieldEdit]);
   const canChangeVisibility =
     fields
       .slice(
@@ -260,7 +223,7 @@ const _PetitionComposeField = chakraForwardRef<
           onCloneField={onCloneField}
           onSettingsClick={onSettingsClick}
           onDeleteClick={onDeleteClick}
-          onVisibilityClick={handleVisibilityClick}
+          onVisibilityClick={onFieldVisibilityClick}
           className="field-actions"
           position="absolute"
           bottom={0}

@@ -27,7 +27,10 @@ import {
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
-import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
+import {
+  PetitionFieldVisibility,
+  PetitionFieldVisibilityCondition,
+} from "@parallel/utils/fieldVisibility/types";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -155,6 +158,7 @@ export const PetitionComposeFieldList = Object.assign(
         | "onSettingsClick"
         | "onDeleteClick"
         | "onFieldEdit"
+        | "onFieldVisibilityClick"
         | "onFocusPrevField"
         | "onFocusNextField"
         | "onAddField"
@@ -242,6 +246,47 @@ export const PetitionComposeFieldList = Object.assign(
                 });
               })
             );
+          }
+        },
+        onFieldVisibilityClick: () => {
+          const { fields } = fieldsDataRef.current!;
+          const field = fields.find((f) => f.id === fieldId)!;
+          if (field.visibility) {
+            onFieldEdit(fieldId, { visibility: null });
+          } else {
+            const index = fields.findIndex((f) => f.id === field.id);
+            const prevField = fields[index - 1];
+            // if the previous field has a visibility setting copy it
+            if (prevField.visibility) {
+              onFieldEdit(fieldId, { visibility: prevField.visibility });
+            } else {
+              // create a factible condition based on the previous field
+              const ref = fields
+                .slice(0, index)
+                .reverse()
+                .find((f) => !f.isReadOnly)!;
+              const condition: PetitionFieldVisibilityCondition = {
+                fieldId: ref.id,
+                modifier:
+                  ref.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
+                operator: "EQUAL",
+                value:
+                  ref.type === "FILE_UPLOAD"
+                    ? 0
+                    : ref.type === "TEXT"
+                    ? null
+                    : ref.type === "SELECT"
+                    ? ref.fieldOptions.values[0] ?? null
+                    : null,
+              };
+              onFieldEdit(fieldId, {
+                visibility: {
+                  type: "SHOW",
+                  operator: "AND",
+                  conditions: [condition],
+                },
+              });
+            }
           }
         },
         onFocusPrevField: () => {
