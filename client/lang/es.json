@@ -891,7 +891,7 @@
   },
   {
     "term": "component.petition-replies-filter-button.show-not-visibible",
-    "definition": "Mostart campos <x>no activados</x>",
+    "definition": "Mostrar campos <x>no activados</x>",
     "context": "Show <x>non-activated</x> fields"
   },
   {
