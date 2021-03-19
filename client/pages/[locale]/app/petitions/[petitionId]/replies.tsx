@@ -5,16 +5,11 @@ import {
   CommentIcon,
   ConditionIcon,
   DownloadIcon,
-  FilterIcon,
   ListIcon,
   RepeatIcon,
   ThumbUpIcon,
 } from "@parallel/chakra/icons";
-import {
-  Card,
-  CardHeader,
-  GenericCardHeader,
-} from "@parallel/components/common/Card";
+import { Card, GenericCardHeader } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,

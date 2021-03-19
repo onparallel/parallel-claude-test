@@ -52,7 +52,7 @@ export function PetitionContents<
         fieldIndices,
         fieldVisibility ?? [],
         filter
-      ).map((x) =>
+      ).map((x, index) =>
         x.type === "FIELD" ? (
           <PetitionContentsItem
             key={x.field.id}
@@ -63,7 +63,7 @@ export function PetitionContents<
             fieldIndicators={fieldIndicators}
           />
         ) : (
-          <PetititionContentsDivider isDashed>
+          <PetitionContentsDivider key={index} isDashed>
             <Flex alignItems="center">
               <FilterIcon marginRight={1} />
               <FormattedMessage
@@ -74,7 +74,7 @@ export function PetitionContents<
                 }}
               />
             </Flex>
-          </PetititionContentsDivider>
+          </PetitionContentsDivider>
         )
       )}
     </Stack>
@@ -116,12 +116,12 @@ function _PetitionContentsItem<
   return (
     <>
       {field.type === "HEADING" && field.options.hasPageBreak ? (
-        <PetititionContentsDivider>
+        <PetitionContentsDivider>
           <FormattedMessage
             id="generic.page-break"
             defaultMessage="Page break"
           />
-        </PetititionContentsDivider>
+        </PetitionContentsDivider>
       ) : null}
       <Box as="li" listStyleType="none" display="flex">
         <Stack
@@ -181,7 +181,7 @@ const PetitionContentsItem = memo(
   })
 ) as typeof _PetitionContentsItem;
 
-function PetititionContentsDivider({
+function PetitionContentsDivider({
   children,
   isDashed,
 }: {

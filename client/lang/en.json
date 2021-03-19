@@ -901,13 +901,13 @@
   },
   {
     "term": "component.petition-replies-filtered-fields.no-replies",
-    "definition": "{count, plural, =1 {1 field} other {# fields}} don't have replies",
-    "context": "{count, plural, =1 {1 field} other {# fields}} don't have replies"
+    "definition": "{count, plural, =1 {1 field doesn't} other {# fields don't}} have replies",
+    "context": "{count, plural, =1 {1 field doesn't} other {# fields don't}} have replies"
   },
   {
     "term": "component.petition-replies-filtered-fields.non-activated",
-    "definition": "{count, plural, =1 {1 field} other {# fields}} are <x>not activated</x>",
-    "context": "{count, plural, =1 {1 field} other {# fields}} are <x>not activated</x>"
+    "definition": "{count, plural, =1 {1 field is} other {# fields are}} <x>not activated</x>",
+    "context": "{count, plural, =1 {1 field is} other {# fields are}} <x>not activated</x>"
   },
   {
     "term": "component.petition-settings.deadline-description",

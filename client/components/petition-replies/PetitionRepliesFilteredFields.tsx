@@ -35,7 +35,7 @@ export function PetitionRepliesFilteredFields({
                 <Text as="li">
                   <FormattedMessage
                     id="component.petition-replies-filtered-fields.no-replies"
-                    defaultMessage="{count, plural, =1 {1 field} other {# fields}} don't have replies"
+                    defaultMessage="{count, plural, =1 {1 field doesn't} other {# fields don't}} have replies"
                     values={{
                       count: SHOW_NOT_REPLIED ?? 0,
                     }}
@@ -46,7 +46,7 @@ export function PetitionRepliesFilteredFields({
                 <Text as="li">
                   <FormattedMessage
                     id="component.petition-replies-filtered-fields.non-activated"
-                    defaultMessage="{count, plural, =1 {1 field} other {# fields}} are <x>not activated</x>"
+                    defaultMessage="{count, plural, =1 {1 field is} other {# fields are}} <x>not activated</x>"
                     values={{
                       count: SHOW_NOT_VISIBLE ?? 0,
                       x: (chunks: any[]) => (

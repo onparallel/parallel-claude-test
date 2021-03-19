@@ -902,12 +902,12 @@
   {
     "term": "component.petition-replies-filtered-fields.no-replies",
     "definition": "{count, plural, =1 {1 campo no tiene} other {# campos no tienen}} repuestas",
-    "context": "{count, plural, =1 {1 field} other {# fields}} don't have replies"
+    "context": "{count, plural, =1 {1 field doesn't} other {# fields don't}} have replies"
   },
   {
     "term": "component.petition-replies-filtered-fields.non-activated",
     "definition": "{count, plural, =1 {1 campo} other {# campos}} <x>{count, plural, =1 {no ha sido activado} other {no han sido activados}}</x>",
-    "context": "{count, plural, =1 {1 field} other {# fields}} are <x>not activated</x>"
+    "context": "{count, plural, =1 {1 field is} other {# fields are}} <x>not activated</x>"
   },
   {
     "term": "component.petition-settings.deadline-description",
