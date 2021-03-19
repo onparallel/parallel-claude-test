@@ -1477,36 +1477,41 @@ export class PetitionRepository extends BaseRepository {
           t
         ),
       ]);
-
-      /* 
-        we have to make sure the visibility conditions on the cloned fields refer to the new cloned fieldIds,
-        so here we create a map with the updated visibility JSON, and later update each of this fields
-      */
-      const fieldsToUpdate: Record<number, any> = {};
-      fields.forEach((f, i) => {
-        if (f.visibility) {
-          fieldsToUpdate[clonedFields[i].id] = {
-            ...f.visibility,
-            conditions: f.visibility.conditions.map((c: any) => ({
-              ...c,
-              fieldId:
-                clonedFields[fields.findIndex((f) => f.id === c.fieldId)].id,
-            })),
-          };
-        }
-      });
-
-      await Promise.all(
-        Object.entries(fieldsToUpdate).map(([fieldId, visibility]) =>
-          this.updatePetitionField(
-            cloned.id,
-            parseInt(fieldId, 10),
-            { visibility },
-            user,
-            t
-          )
+      const newIds = Object.fromEntries(
+        zip(
+          fields.map((f) => f.id),
+          sortBy(clonedFields, (f) => f.position).map((f) => f.id)
         )
       );
+
+      const toUpdate = clonedFields.filter((f) => f.visibility);
+      if (toUpdate.length > 0) {
+        await this.raw<PetitionField>(
+          /* sql */ `
+            update petition_field as pf set
+              visibility = t.visibility
+            from (
+              values ${toUpdate.map(() => "(?::int, ?::jsonb)").join(", ")}
+            ) as t (id, visibility)
+            where t.id = pf.id
+            returning *;
+          `,
+          toUpdate.flatMap((field) => {
+            const visibility = field.visibility as PetitionFieldVisibility;
+            return [
+              field.id,
+              JSON.stringify({
+                ...visibility,
+                conditions: visibility.conditions.map((condition) => ({
+                  ...condition,
+                  fieldId: newIds[condition.fieldId],
+                })),
+              }),
+            ];
+          }),
+          t
+        );
+      }
 
       return cloned;
     });

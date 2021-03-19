@@ -320,7 +320,11 @@ function randomPetitionStatus() {
 }
 
 function randomPetitionFieldType() {
-  return faker.random.arrayElement(["FILE_UPLOAD", "TEXT"] as const);
+  return faker.random.arrayElement<PetitionFieldType>([
+    "FILE_UPLOAD",
+    "TEXT",
+    "SELECT",
+  ]);
 }
 
 function randomSupportedLocale() {
@@ -339,6 +343,11 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
       return {
         multiline: faker.random.boolean(),
         placeholder: faker.random.words(3),
+      };
+    }
+    case "SELECT": {
+      return {
+        values: ["Option 1", "Option 2", "Option 3"],
       };
     }
     default:
