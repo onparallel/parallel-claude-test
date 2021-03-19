@@ -4,7 +4,6 @@ import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
 import {
   useMemoReactSelectProps,
-  useReactSelectProps,
   UseReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
@@ -12,7 +11,6 @@ import { useExistingContactToast } from "@parallel/utils/useExistingContactToast
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import {
-  DependencyList,
   forwardRef,
   KeyboardEvent,
   memo,

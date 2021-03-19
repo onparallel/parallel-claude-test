@@ -19,10 +19,7 @@ import {
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
-import {
-  useMemoReactSelectProps,
-  useReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import useMergedRef from "@react-hook/merged-ref";
 import { useMemo, useRef } from "react";
