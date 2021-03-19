@@ -50,15 +50,7 @@ export const ContactSelect = Object.assign(
     AsyncCreatableSelect<ContactSelectSelection, true>,
     ContactSelectProps
   >(function (
-    {
-      value,
-      onSearchContacts,
-      onCreateContact,
-      onChange,
-      components,
-      styles,
-      ...props
-    },
+    { value, onSearchContacts, onCreateContact, onChange, ...props },
     ref
   ) {
     const errorToast = useExistingContactToast();
@@ -70,8 +62,6 @@ export const ContactSelect = Object.assign(
     const reactSelectProps = useContactSelectReactSelectProps({
       ...props,
       isDisabled: props.isDisabled || isCreating,
-      components,
-      styles,
     });
     const innerRef = useRef<any>();
 
@@ -173,7 +163,6 @@ export const ContactSelect = Object.assign(
         onCreateOption={handleCreate}
         loadOptions={loadOptions}
         defaultOptions={options}
-        {...props}
         {...reactSelectProps}
       />
     );

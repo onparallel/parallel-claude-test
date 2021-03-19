@@ -22,7 +22,7 @@ export type UserSelectInstance<IsMulti extends boolean> = AsyncSelect<
 
 interface UserSelectProps<IsMulti extends boolean>
   extends UseReactSelectProps,
-    CustomAsyncSelectProps<UserSelectSelection, IsMulti> {
+    CustomAsyncSelectProps<UserSelectSelection, IsMulti, never> {
   onSearchUsers: (
     search: string,
     exclude: string[]
@@ -65,7 +65,6 @@ function userSelect<IsMulti extends boolean>(isMulti: IsMulti) {
           onChange={onChange as any}
           isMulti={isMulti}
           loadOptions={loadOptions}
-          {...props}
           {...reactSelectProps}
         />
       );

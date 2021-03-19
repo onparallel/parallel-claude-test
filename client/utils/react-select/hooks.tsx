@@ -10,12 +10,11 @@ import { useRehydrated } from "@parallel/utils/useRehydrated";
 import { DependencyList, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
+  components as Components,
   GroupTypeBase,
   OptionTypeBase,
   SelectComponentsConfig,
   StylesConfig,
-  Theme,
-  components as Components,
 } from "react-select";
 import { omit } from "remeda";
 import { SelectProps } from "./types";
@@ -66,6 +65,7 @@ export type UseReactSelectProps = {
   size?: keyof typeof SIZES;
   id?: string;
   isDisabled?: boolean;
+  placeholder?: string;
   isInvalid?: boolean;
   styles?: StylesConfig<any, any, any>;
   components?: SelectComponentsConfig<any, any, any>;
@@ -91,6 +91,7 @@ export function useReactSelectProps<
   GroupType extends GroupTypeBase<OptionType> = never
 >({
   size = "md",
+  placeholder,
   styles,
   components,
   ...props
@@ -117,31 +118,31 @@ export function useReactSelectProps<
   const rehydrated = useRehydrated();
   return useMemo<SelectProps<OptionType, IsMulti, GroupType>>(
     () => ({
+      placeholder,
       inputId,
       isDisabled,
       menuPortalTarget: rehydrated ? document.body : undefined,
       menuPlacement: "auto",
-      theme: (theme: Theme) =>
-        ({
-          spacing: SIZES[size].spacing,
-          colors: {
-            ...theme.colors,
-            primary: colors.blue[500],
-            primary25: colors.gray[100],
-            neutral0: colors.white,
-            neutral5: colors.gray[50],
-            neutral10: colors.gray[100],
-            neutral20: colors.gray[200],
-            neutral30: colors.gray[300],
-            neutral40: colors.gray[400],
-            neutral50: colors.gray[500],
-            neutral60: colors.gray[600],
-            neutral70: colors.gray[700],
-            neutral80: colors.gray[800],
-            neutral90: colors.gray[900],
-          },
-          borderRadius: radii[SIZES[size].borderRadius] as any,
-        } as Theme),
+      theme: (theme) => ({
+        spacing: SIZES[size].spacing,
+        colors: {
+          ...theme.colors,
+          primary: colors.blue[500],
+          primary25: colors.gray[100],
+          neutral0: colors.white,
+          neutral5: colors.gray[50],
+          neutral10: colors.gray[100],
+          neutral20: colors.gray[200],
+          neutral30: colors.gray[300],
+          neutral40: colors.gray[400],
+          neutral50: colors.gray[500],
+          neutral60: colors.gray[600],
+          neutral70: colors.gray[700],
+          neutral80: colors.gray[800],
+          neutral90: colors.gray[900],
+        },
+        borderRadius: radii[SIZES[size].borderRadius] as any,
+      }),
       components: {
         IndicatorSeparator: () => null,
         ClearIndicator: ({ innerProps }) => (
@@ -287,7 +288,16 @@ export function useReactSelectProps<
         ...styles,
       },
     }),
-    [rehydrated, size, inputId, isInvalid, isDisabled, components, styles]
+    [
+      rehydrated,
+      size,
+      placeholder,
+      inputId,
+      isInvalid,
+      isDisabled,
+      components,
+      styles,
+    ]
   );
 }
 
