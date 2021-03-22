@@ -33,7 +33,7 @@ import {
 
 const messages: Record<PetitionLocale, string> = {
   en: outdent`
-    Dear #contact_name#,
+    Dear #contactName#,
 
     We have reviewed all the information that we requested, and we can confirm that everything is correct.
 
@@ -42,7 +42,7 @@ const messages: Record<PetitionLocale, string> = {
     Best regards.
   `,
   es: outdent`
-    Apreciado/a #contact_name#,
+    Apreciado/a #contactName#,
 
     Le comunicamos que hemos revisado toda la información que le requerimos y le confirmamos que está todo correcto.
     

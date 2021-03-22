@@ -2,7 +2,7 @@ import DataLoader from "dataloader";
 import { addMinutes } from "date-fns";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { groupBy, indexBy, mapValues, pipe, toPairs } from "remeda";
+import { groupBy, indexBy, mapValues, omit, pipe, toPairs } from "remeda";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
@@ -56,6 +56,26 @@ export class ContactRepository extends BaseRepository {
         cacheKeyFn: keyBuilder(["orgId", "email"]),
       }
     )
+  );
+
+  readonly loadContactByAccessId = fromDataLoader(
+    new DataLoader<number, Contact | null>(async (ids) => {
+      const { rows } = await this.knex.raw<{
+        rows: Array<Contact & { access_id: number }>;
+      }>(
+        /* sql */ `
+        select c.*, pa.id as access_id from contact c
+        left join petition_access pa on pa.contact_id = c.id
+        where pa.id in (${ids.map(() => "?").join(",")})
+      `,
+        [...ids]
+      );
+
+      const byAccessId = indexBy(rows, (r) => r.access_id);
+      return ids.map((id) =>
+        byAccessId[id] ? omit(byAccessId[id], ["access_id"]) : null
+      );
+    })
   );
 
   async loadOrCreate(

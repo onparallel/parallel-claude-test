@@ -10,7 +10,7 @@ export function usePetitionMessagePlaceholderOptions() {
           id: "petition-message.placeholder-option.contact-name",
           defaultMessage: "Contact name",
         }),
-        value: "contact_name",
+        value: "contactName",
       },
     ],
     [intl.locale]
