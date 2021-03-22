@@ -1,18 +1,28 @@
 import {
   Box,
   BoxProps,
+  Portal,
   Stack,
   Text,
   useFormControl,
+  useId,
   useMultiStyleConfig,
 } from "@chakra-ui/react";
 import {
   BoldIcon,
+  SharpIcon,
   ItalicIcon,
   ListIcon,
   UnderlineIcon,
 } from "@parallel/chakra/icons";
 import { useAssignMemoRef } from "@parallel/utils/assignRef";
+import {
+  PlaceholderMenu,
+  PlaceholderPlugin,
+} from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
+import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
+import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
   AutoformatRule,
@@ -40,13 +50,16 @@ import {
   forwardRef,
   memo,
   MouseEvent,
+  useCallback,
   useMemo,
 } from "react";
 import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
-import { createEditor, Editor, Node } from "slate";
+import { createEditor, Editor, Node, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import { ReactEditor, Slate, useSlate, withReact } from "slate-react";
+import { CardProps } from "./Card";
+
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
@@ -123,13 +136,6 @@ export const options = {
   },
 };
 
-const plugins = [
-  BoldPlugin(options),
-  ItalicPlugin(options),
-  UnderlinePlugin(options),
-  ListPlugin(options),
-];
-
 export interface RichTextEditorProps
   extends ValueProps<RichTextEditorValue, false>,
     EditablePluginsProps {
@@ -137,6 +143,7 @@ export interface RichTextEditorProps
   isInvalid?: boolean;
   isRequired?: boolean;
   isReadOnly?: boolean;
+  allowPlaceholders?: boolean;
 }
 
 export type RichTextEditorValue = Node[];
@@ -157,10 +164,25 @@ export const RichTextEditor = forwardRef<
     isRequired,
     isReadOnly,
     onKeyDown: _onKeyDown,
+    allowPlaceholders = true,
     ...props
   },
   ref
 ) {
+  const placeholderOptions = allowPlaceholders
+    ? usePetitionMessagePlaceholderOptions()
+    : [];
+
+  const plugins = useMemo(
+    () => [
+      BoldPlugin(options),
+      ItalicPlugin(options),
+      UnderlinePlugin(options),
+      ListPlugin(options),
+      PlaceholderPlugin(placeholderOptions),
+    ],
+    []
+  );
   const formControl = useFormControl({
     isDisabled,
     isInvalid,
@@ -185,7 +207,8 @@ export const RichTextEditor = forwardRef<
               },
             },
           ] as AutoformatRule[],
-        })
+        }),
+        withPlaceholders(placeholderOptions)
       ),
     []
   );
@@ -226,6 +249,54 @@ export const RichTextEditor = forwardRef<
       } as CSSProperties),
     []
   );
+
+  const {
+    onAddPlaceholder,
+    onChangePlaceholder,
+    onKeyDownPlaceholder,
+    onHighlightOption,
+    selectedIndex,
+    search,
+    target,
+    values,
+  } = usePlaceholders(placeholderOptions);
+
+  const isMenuOpen = Boolean(target && values.length > 0);
+
+  const handleChange = useCallback(
+    (value) => {
+      onChangePlaceholder(editor);
+      onChange(value);
+    },
+    [onChange, onChangePlaceholder]
+  );
+
+  const placeholderMenuId = useId(undefined, "placeholder-menu");
+  const itemIdPrefix = useId(undefined, "placeholder-menu-item");
+
+  const menuPosition = useMemo<CardProps>(() => {
+    if (!isMenuOpen) return {};
+    const { path, offset } = target!.focus;
+
+    const block = ReactEditor.toDOMNode(editor, editor.children[path[0]]);
+    let node = block.children[Math.min(path[1], block.children.length - 1)];
+
+    // if the wanted node is on a list item, the path array will have the required coordinates
+    for (let i = 2; i < path.length; i += 2) {
+      const [row, col] = [path[i], path[i + 1]];
+      node = node.children[row].children[col];
+    }
+
+    const rect = node.getBoundingClientRect();
+    const cursorRelativeX =
+      rect.width * (offset / (node.textContent ?? "").length);
+    return {
+      position: "relative",
+      top: rect.y + rect.height + 5,
+      left: rect.left + cursorRelativeX,
+    };
+  }, [isMenuOpen]);
+
   return (
     <Box
       {...pick(formControl, [
@@ -236,26 +307,51 @@ export const RichTextEditor = forwardRef<
       ])}
       {...inputStyles}
     >
-      <Slate editor={editor} value={value} onChange={onChange as any}>
-        <Toolbar isDisabled={formControl.disabled || formControl.readOnly} />
+      <Slate editor={editor} value={value} onChange={handleChange}>
+        <Toolbar
+          isDisabled={formControl.disabled || formControl.readOnly}
+          hasPlaceholders={placeholderOptions.length > 0}
+        />
         <Box maxHeight="360px" overflow="auto">
           <EditablePlugins
             readOnly={formControl.disabled || formControl.readOnly}
+            onKeyDown={[onKeyDownPlaceholder]}
+            onKeyDownDeps={[selectedIndex, search, target]}
             style={style}
             plugins={plugins}
             {...props}
           />
         </Box>
       </Slate>
+      <Portal>
+        <PlaceholderMenu
+          menuId={placeholderMenuId}
+          itemIdPrefix={itemIdPrefix}
+          values={values}
+          selectedIndex={selectedIndex}
+          hidden={!isMenuOpen}
+          onAddPlaceholder={(placeholder) =>
+            onAddPlaceholder(editor, placeholder)
+          }
+          onHighlightOption={onHighlightOption}
+          width="fit-content"
+          {...menuPosition}
+        />
+      </Portal>
     </Box>
   );
 });
 
 interface ToolbarProps extends BoxProps {
   isDisabled?: boolean;
+  hasPlaceholders?: boolean;
 }
 
-const Toolbar = memo(function _Toolbar({ isDisabled, ...props }: ToolbarProps) {
+const Toolbar = memo(function _Toolbar({
+  isDisabled,
+  hasPlaceholders,
+  ...props
+}: ToolbarProps) {
   const intl = useIntl();
   return (
     <Stack
@@ -301,6 +397,16 @@ const Toolbar = memo(function _Toolbar({ isDisabled, ...props }: ToolbarProps) {
           defaultMessage: "Bullet list",
         })}
       />
+      {hasPlaceholders ? (
+        <PlaceholderButton
+          icon={<SharpIcon />}
+          isDisabled={isDisabled}
+          label={intl.formatMessage({
+            id: "generic.richtext.personalize",
+            defaultMessage: "Personalize",
+          })}
+        />
+      ) : null}
     </Stack>
   );
 });
@@ -346,6 +452,23 @@ function MarkButton({
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
         toggleMark(editor, type);
+      }}
+      {...props}
+    />
+  );
+}
+
+function PlaceholderButton(props: IconButtonWithTooltipProps) {
+  const editor = useSlate();
+  return (
+    <IconButtonWithTooltip
+      placement="bottom"
+      variant="ghost"
+      tabIndex={-1}
+      onMouseDown={(event: MouseEvent) => {
+        event.stopPropagation();
+        Transforms.insertText(editor, "#", { at: editor.selection?.anchor });
+        ReactEditor.focus(editor);
       }}
       {...props}
     />

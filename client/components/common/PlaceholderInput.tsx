@@ -10,6 +10,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import {
   Placeholder,
+  PlaceholderMenu,
   PlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { slateNodesToTextWithPlaceholders } from "@parallel/utils/slate/placeholders/slateNodesToTextWithPlaceholders";
@@ -28,7 +29,6 @@ import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import { ReactEditor, Slate, withReact } from "slate-react";
-import { Card } from "./Card";
 
 export type PlaceholderInputProps = {
   placeholders: Placeholder[];
@@ -109,12 +109,7 @@ export const PlaceholderInput = chakraForwardRef<
   } as any;
 
   const slateValue = useMemo(
-    () => [
-      {
-        type: "paragraph",
-        children: textWithPlaceholderToSlateNodes(value, placeholders),
-      },
-    ],
+    () => textWithPlaceholderToSlateNodes(value, placeholders),
     [value]
   );
   const selected = isOpen ? values[selectedIndex] : undefined;
@@ -220,61 +215,5 @@ export const PlaceholderInput = chakraForwardRef<
         />
       </Portal>
     </>
-  );
-});
-
-const PlaceholderMenu = chakraForwardRef<
-  "div",
-  {
-    menuId: string;
-    itemIdPrefix: string;
-    values: Placeholder[];
-    selectedIndex: number;
-    onAddPlaceholder: (placeholder: Placeholder) => void;
-    onHighlightOption: (index: number) => void;
-  }
->(function PlaceholderMenu(
-  {
-    menuId,
-    itemIdPrefix,
-    values,
-    selectedIndex,
-    onAddPlaceholder,
-    onHighlightOption,
-    ...props
-  },
-  ref
-) {
-  return (
-    <Card
-      as="div"
-      ref={ref}
-      id={menuId}
-      role="listbox"
-      overflow="auto"
-      maxHeight="180px"
-      paddingY={1}
-      {...props}
-    >
-      {values.map((placeholder, index) => {
-        const isSelected = index === selectedIndex;
-        return (
-          <Box
-            key={placeholder.value}
-            id={`${itemIdPrefix}-${placeholder.value}`}
-            role="option"
-            aria-selected={isSelected ? "true" : undefined}
-            backgroundColor={isSelected ? "gray.100" : "white"}
-            paddingX={4}
-            paddingY={1}
-            cursor="pointer"
-            onMouseDown={() => onAddPlaceholder(placeholder)}
-            onMouseEnter={() => onHighlightOption(index)}
-          >
-            {placeholder.label}
-          </Box>
-        );
-      })}
-    </Card>
   );
 });

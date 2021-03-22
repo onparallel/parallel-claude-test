@@ -18,7 +18,8 @@ import {
 } from "@parallel/components/common/DialogProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
 import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
-import { plainTextToRTEValue } from "@parallel/utils/slate/plainTextToRTEValue";
+import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
 import { Maybe } from "@parallel/utils/types";
 import outdent from "outdent";
 import { useRef, useState } from "react";
@@ -32,7 +33,7 @@ import {
 
 const messages: Record<PetitionLocale, string> = {
   en: outdent`
-    Dear Sir/Madam,
+    Dear #contact_name#,
 
     We have reviewed all the information that we requested, and we can confirm that everything is correct.
 
@@ -41,7 +42,7 @@ const messages: Record<PetitionLocale, string> = {
     Best regards.
   `,
   es: outdent`
-    Apreciado Sr/Sra,
+    Apreciado/a #contact_name#,
 
     Le comunicamos que hemos revisado toda la información que le requerimos y le confirmamos que está todo correcto.
     
@@ -71,9 +72,12 @@ export function ClosePetitionDialog({
   ...props
 }: DialogProps<ClosePetitionDialogInput, ClosePetitionDialogNotification>) {
   const intl = useIntl();
-
+  const placeholders = usePetitionMessagePlaceholderOptions();
   const [message, setMessage] = useState<RichTextEditorValue>(
-    plainTextToRTEValue(messages[intl.locale as PetitionLocale])
+    textWithPlaceholderToSlateNodes(
+      messages[intl.locale as PetitionLocale],
+      placeholders
+    )
   );
   const [sendMessage, setSendMessage] = useState(requiredMessage);
   const messageRef = useRef<RichTextEditorInstance>(null);

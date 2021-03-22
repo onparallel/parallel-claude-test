@@ -39,11 +39,28 @@ export const validRichTextContent = jsonSchema({
         children: {
           type: "array",
           items: {
-            $ref: "#/definitions/leaf",
+            anyOf: [
+              { $ref: "#/definitions/leaf" },
+              { $ref: "#/definitions/placeholder" },
+            ],
           },
         },
         type: { enum: ["paragraph"] },
       },
+    },
+    placeholder: {
+      type: "object",
+      properties: {
+        type: { enum: ["placeholder"] },
+        placeholder: { type: "string" },
+        children: {
+          type: "array",
+          items: {
+            $ref: "#/definitions/leaf",
+          },
+        },
+      },
+      required: ["type", "placeholder"],
     },
     leaf: {
       type: "object",

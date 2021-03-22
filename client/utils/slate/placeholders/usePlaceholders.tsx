@@ -65,8 +65,11 @@ export function usePlaceholders(placeholders: Placeholder[] = []) {
         }
 
         if (["Tab", "Enter"].includes(e.key)) {
-          e.preventDefault();
-          return onAddPlaceholder(editor, values[index]);
+          const value = values[index];
+          if (value) {
+            e.preventDefault();
+            return onAddPlaceholder(editor, value);
+          }
         }
       }
     },
