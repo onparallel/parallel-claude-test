@@ -190,6 +190,21 @@ describe("Slate", () => {
           "</ul>"
       );
     });
+
+    it("escapes HTML passed as text", () => {
+      expect(
+        toHtml([
+          {
+            type: "paragraph",
+            children: [
+              { text: '<div style="color:red">im a malicious script!</div>' },
+            ],
+          },
+        ])
+      ).toEqual(
+        "<p><span>&lt;div style=&quot;color:red&quot;&gt;im a malicious script!&lt;/div&gt;</span></p>"
+      );
+    });
   });
 
   describe("toPlainText", () => {
