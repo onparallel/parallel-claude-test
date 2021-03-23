@@ -28,7 +28,9 @@ export function toHtml(body: SlateNode[], placeholders?: Placeholders) {
         case undefined:
           return `<p>${children}</p>`;
         case "placeholder":
-          return escapeHTML(placeholders?.[node.placeholder!] ?? "");
+          return `<span>${escapeHTML(
+            placeholders?.[node.placeholder!] ?? ""
+          )}</span>`;
         case "bulleted-list":
           return `<ul style="padding-left:24px">${children}</ul>`;
         case "numbered-list":

@@ -917,7 +917,6 @@ export const sendPetition = mutationField("sendPetition", {
         })),
         ctx.user!
       );
-
       const messages = await ctx.petitions.createMessages(
         args.petitionId,
         args.scheduledAt ?? null,
@@ -1232,6 +1231,7 @@ export const sendPetitionClosedNotification = mutationField(
       const accesses = await ctx.petitions.loadAccessesForPetition(
         args.petitionId
       );
+
       const activeAccesses = accesses.filter((a) => a.status === "ACTIVE");
 
       await ctx.emails.sendPetitionClosedEmail(

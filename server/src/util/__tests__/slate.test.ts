@@ -88,6 +88,108 @@ describe("Slate", () => {
         '<ul style="padding-left:24px"><li><p><span>item 1</span></p></li><li><p><span>item 2</span></p></li></ul>'
       );
     });
+
+    it("message with rich content and placeholders", () => {
+      expect(
+        toHtml(
+          [
+            {
+              children: [
+                { text: "hola " },
+                {
+                  type: "placeholder",
+                  placeholder: "contactName",
+                  children: [{ text: "" }],
+                },
+                { text: ", enviame los " },
+                { text: "documentos " },
+                { text: "siguientes ", bold: true },
+                { text: "super guays", bold: true, underline: true },
+              ],
+            },
+            {
+              children: [{ text: "hmmm" }],
+            },
+            {
+              type: "bulleted-list",
+              children: [
+                {
+                  children: [
+                    {
+                      type: "paragraph",
+                      children: [{ text: "foto", bold: true, underline: true }],
+                    },
+                  ],
+                  type: "list-item",
+                },
+                {
+                  children: [
+                    {
+                      type: "paragraph",
+                      children: [{ text: "pasaporte", italic: true }],
+                    },
+                    {
+                      type: "bulleted-list",
+                      children: [
+                        {
+                          children: [
+                            {
+                              type: "paragraph",
+                              children: [
+                                {
+                                  text: "foto",
+                                  bold: true,
+                                  underline: true,
+                                },
+                              ],
+                            },
+                          ],
+                          type: "list-item",
+                        },
+                        {
+                          children: [
+                            {
+                              type: "paragraph",
+                              children: [{ text: "pasaporte", italic: true }],
+                            },
+                          ],
+                          type: "list-item",
+                        },
+                      ],
+                    },
+                  ],
+                  type: "list-item",
+                },
+              ],
+            },
+          ],
+          { contactName: "Mariano" }
+        )
+      ).toEqual(
+        // first paragraph
+        "<p>" +
+          "<span>hola </span>" +
+          "<span>Mariano</span>" +
+          "<span>, enviame los </span>" +
+          "<span>documentos </span>" +
+          '<span style="font-weight:bold;">siguientes </span>' +
+          '<span style="font-weight:bold;text-decoration:underline;">super guays</span>' +
+          "</p>" +
+          // second paragraph
+          "<p><span>hmmm</span></p>" +
+          // bullet list
+          '<ul style="padding-left:24px">' +
+          '<li><p><span style="font-weight:bold;text-decoration:underline;">foto</span></p></li>' +
+          "<li>" +
+          '<p><span style="font-style:italic;">pasaporte</span></p>' +
+          '<ul style="padding-left:24px">' +
+          '<li><p><span style="font-weight:bold;text-decoration:underline;">foto</span></p></li>' +
+          '<li><p><span style="font-style:italic;">pasaporte</span></p></li>' +
+          "</ul>" +
+          "</li>" +
+          "</ul>"
+      );
+    });
   });
 
   describe("toPlainText", () => {
