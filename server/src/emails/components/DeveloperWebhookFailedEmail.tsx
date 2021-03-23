@@ -1,12 +1,12 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
+import { toHtml, toPlainText } from "../../util/slate";
 import { Email } from "../buildEmail";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { RenderSlate } from "../common/RenderSlate";
-import { closing, greeting, renderSlateText } from "../common/texts";
+import { closing, greeting } from "../common/texts";
 
 export type DeveloperWebhookFailedEmailProps = {
   userName: string | null;
@@ -51,7 +51,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
       }
     )}
 
-    ${renderSlateText([
+    ${toPlainText([
       {
         children: [
           {
@@ -111,22 +111,26 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
             borderRadius="4px"
             padding="10px 0"
           >
-            <RenderSlate
-              value={[
-                {
-                  children: [
+            <MjmlText>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: toHtml([
                     {
-                      text: errorMessage,
-                      bold: true,
-                      type: "paragraph",
+                      children: [
+                        {
+                          text: errorMessage,
+                          bold: true,
+                          type: "paragraph",
+                        },
+                      ],
                     },
-                  ],
-                },
-                {
-                  children: [{ text: JSON.stringify(postBody) }],
-                },
-              ]}
-            />
+                    {
+                      children: [{ text: JSON.stringify(postBody) }],
+                    },
+                  ]),
+                }}
+              ></span>
+            </MjmlText>
           </MjmlColumn>
         </MjmlSection>
 

@@ -9,11 +9,22 @@
         }
       },
       "args": {
-        "contactFullName": "Derek Lou",
+        "contactFirstName": "Derek",
+        "contactLastName": "Lou",
         "senderName": "Santi",
         "senderEmail": "santi@onparallel.com",
         "body": [
-          { "children": [{ "text": "Hola," }] },
+          {
+            "children": [
+              { "text": "Hola " },
+              {
+                "type": "placeholder",
+                "placeholder": "contactName",
+                "children": [{ "text": "" }]
+              },
+              { "text": "," }
+            ]
+          },
           { "children": [{ "text": "" }] },
           {
             "children": [
@@ -38,7 +49,8 @@
         "logoAlt": "Parallel"
       },
       "argsTypes": {
-        "contactFullName": { "control": { "type": "text" } },
+        "contactFirstName": { "control": { "type": "text" } },
+        "contactLastName": { "control": { "type": "text" } },
         "senderName": { "control": { "type": "text" } },
         "senderEmail": { "control": { "type": "text" } },
         "body": { "control": { "type": "object" } },

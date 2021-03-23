@@ -9,7 +9,8 @@
         }
       },
       "args": {
-        "fullName": "Santi Albo",
+        "contactFirstName": "Santi",
+        "contactLastName": "Albo",
         "senderName": "Derek",
         "senderEmail": "derek@onparallel.com",
         "deadline": "2022-12-11T17:29:24.601Z",
@@ -100,7 +101,8 @@
         "logoAlt": "Parallel"
       },
       "argsTypes": {
-        "fullName": { "control": { "type": "text" } },
+        "contactFirstName": { "control": { "type": "text" } },
+        "contactLastName": { "control": { "type": "text" } },
         "senderName": { "control": { "type": "text" } },
         "senderEmail": { "control": { "type": "text" } },
         "fields": { "control": { "type": "object" } },

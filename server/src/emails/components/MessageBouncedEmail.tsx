@@ -1,18 +1,20 @@
 import { MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { fullName } from "../../util/fullName";
+import { toHtml, toPlainText } from "../../util/slate";
 import { Email } from "../buildEmail";
 import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import { RenderSlate } from "../common/RenderSlate";
-import { closing, greeting, renderSlateText } from "../common/texts";
+import { closing, greeting } from "../common/texts";
 
 export type MessageBouncedEmailProps = {
   senderName: string | null;
   contactEmail: string;
-  contactFullName: string | null;
+  contactFirstName: string | null;
+  contactLastName: string | null;
   petitionId: string;
   petitionName: string | null;
   body: any | null;
@@ -35,7 +37,8 @@ const email: Email<MessageBouncedEmailProps> = {
     {
       senderName,
       contactEmail,
-      contactFullName,
+      contactFirstName,
+      contactLastName,
       petitionId,
       petitionName,
       parallelUrl,
@@ -59,7 +62,7 @@ const email: Email<MessageBouncedEmailProps> = {
             "We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):",
         },
         {
-          contactFullName,
+          contactFullName: fullName(contactFirstName, contactLastName)!,
           contactEmail,
           petitionName:
             petitionName ??
@@ -70,7 +73,7 @@ const email: Email<MessageBouncedEmailProps> = {
         }
       )}
 
-      ${renderSlateText(body)}
+      ${toPlainText(body, { contactName: contactFirstName ?? "" })}
 
       ${intl.formatMessage(
         {
@@ -78,7 +81,7 @@ const email: Email<MessageBouncedEmailProps> = {
           defaultMessage:
             "Please, verify that the email {contactEmail} is correct and try again.",
         },
-        { contactEmail: <b>{contactEmail}</b> }
+        { contactEmail }
       )}
 
       ${intl.formatMessage({
@@ -94,7 +97,8 @@ const email: Email<MessageBouncedEmailProps> = {
     body,
     senderName,
     contactEmail,
-    contactFullName,
+    contactFirstName,
+    contactLastName,
     petitionId,
     petitionName,
     parallelUrl,
@@ -133,7 +137,7 @@ const email: Email<MessageBouncedEmailProps> = {
                 id="petition-message-bounced.intro-text"
                 defaultMessage="We couldn't deliver the petition {petitionName} you sent to {contactFullName} ({contactEmail}):"
                 values={{
-                  contactFullName,
+                  contactFullName: fullName(contactFirstName, contactLastName)!,
                   contactEmail,
                   petitionName: petitionName ? (
                     <b>{petitionName}</b>
@@ -157,7 +161,13 @@ const email: Email<MessageBouncedEmailProps> = {
             borderRadius="4px"
             padding="10px 0"
           >
-            <RenderSlate value={body} />
+            <MjmlText>
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: toHtml(body, { contactName: contactFirstName ?? "" }),
+                }}
+              ></span>
+            </MjmlText>
           </MjmlColumn>
         </MjmlSection>
 

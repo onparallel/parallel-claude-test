@@ -1,6 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
+import { toHtml, toPlainText } from "../../util/slate";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
@@ -11,13 +12,7 @@ import {
   PetitionFieldList,
   PetitionFieldListProps,
 } from "../common/PetitionFieldList";
-import { RenderSlate } from "../common/RenderSlate";
-import {
-  disclaimer,
-  greetingFormal,
-  petitionFieldList,
-  renderSlateText,
-} from "../common/texts";
+import { disclaimer, greetingFormal, petitionFieldList } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
 export type AccessDelegatedEmailProps = {
@@ -79,7 +74,7 @@ const email: Email<AccessDelegatedEmailProps> = {
         { senderName, senderEmail, petitionOwnerFullName, petitionOwnerEmail }
       )}
 
-      ${renderSlateText(body)}
+      ${toPlainText(body)}
 
       ${
         deadline
@@ -156,7 +151,9 @@ const email: Email<AccessDelegatedEmailProps> = {
             borderRadius="4px"
             padding="10px 0"
           >
-            <RenderSlate value={body} />
+            <MjmlText>
+              <span dangerouslySetInnerHTML={{ __html: toHtml(body) }}></span>
+            </MjmlText>
           </MjmlColumn>
         </MjmlSection>
         <MjmlSection paddingTop="10px">

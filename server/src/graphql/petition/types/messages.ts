@@ -1,5 +1,5 @@
 import { enumType, objectType } from "@nexus/schema";
-import { safeJsonParse } from "../../../util/safeJsonParse";
+import { toHtml } from "../../../util/slate";
 
 export const PetitionMessageStatus = enumType({
   name: "PetitionMessageStatus",
@@ -45,9 +45,18 @@ export const PetitionMessage = objectType({
       description: "The subject of the petition message.",
       resolve: (o) => o.email_subject,
     });
-    t.nullable.json("emailBody", {
-      description: "The body of the petition message.",
-      resolve: (o) => safeJsonParse(o.email_body),
+    t.nullable.string("emailBody", {
+      description: "The body of the petition message on HTML format.",
+      resolve: async (o, _, ctx) => {
+        if (!o.email_body) return null;
+
+        const contact = await ctx.contacts.loadContactByAccessId(
+          o.petition_access_id
+        );
+        return toHtml(JSON.parse(o.email_body), {
+          contactName: contact?.first_name ?? "",
+        });
+      },
     });
     t.field("status", {
       type: "PetitionMessageStatus",

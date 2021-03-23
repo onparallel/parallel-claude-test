@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
 import { SentPetitionMessageDialog_PetitionMessageFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { RenderSlate } from "@parallel/utils/slate/RenderSlate";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { ContactLink } from "../common/ContactLink";
@@ -58,7 +57,7 @@ export function SentPetitionMessageDialog({
             )}
           </Text>
           <Box>
-            <RenderSlate value={message.emailBody} />
+            <Text dangerouslySetInnerHTML={{ __html: message.emailBody! }} />
           </Box>
         </Stack>
       }

@@ -2,6 +2,8 @@ import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import React from "react";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { fullName } from "../../util/fullName";
+import { toHtml, toPlainText } from "../../util/slate";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
@@ -12,17 +14,12 @@ import {
   PetitionFieldList,
   PetitionFieldListProps,
 } from "../common/PetitionFieldList";
-import { RenderSlate } from "../common/RenderSlate";
-import {
-  disclaimer,
-  greetingFormal,
-  petitionFieldList,
-  renderSlateText,
-} from "../common/texts";
+import { disclaimer, greetingFormal, petitionFieldList } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
 export type PetitionReminderProps = {
-  fullName: string | null;
+  contactFirstName: string | null;
+  contactLastName: string | null;
   senderName: string;
   senderEmail: string;
   fields: PetitionFieldListProps["fields"];
@@ -52,7 +49,8 @@ const email: Email<PetitionReminderProps> = {
   },
   text(
     {
-      fullName,
+      contactFirstName,
+      contactLastName,
       senderName,
       senderEmail,
       fields,
@@ -64,7 +62,10 @@ const email: Email<PetitionReminderProps> = {
     intl: IntlShape
   ) {
     return outdent`
-      ${greetingFormal({ fullName }, intl)}
+      ${greetingFormal(
+        { fullName: fullName(contactFirstName, contactLastName) },
+        intl
+      )}
       ${intl.formatMessage(
         {
           id: "reminder.text",
@@ -74,7 +75,7 @@ const email: Email<PetitionReminderProps> = {
         { senderName, senderEmail }
       )}
       
-      ${renderSlateText(body)}
+      ${toPlainText(body, { contactName: contactFirstName ?? "" })}
 
       ${
         fields.length > 0
@@ -117,7 +118,8 @@ const email: Email<PetitionReminderProps> = {
     `;
   },
   html({
-    fullName,
+    contactFirstName,
+    contactLastName,
     senderName,
     senderEmail,
     fields,
@@ -140,7 +142,9 @@ const email: Email<PetitionReminderProps> = {
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
-            <GreetingFormal fullName={fullName} />
+            <GreetingFormal
+              fullName={fullName(contactFirstName, contactLastName)}
+            />
             <MjmlText>
               <FormattedMessage
                 id="reminder.text"
@@ -160,7 +164,15 @@ const email: Email<PetitionReminderProps> = {
               borderRadius="4px"
               padding="10px 0"
             >
-              <RenderSlate value={body} />
+              <MjmlText>
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: toHtml(body, {
+                      contactName: contactFirstName ?? "",
+                    }),
+                  }}
+                ></span>
+              </MjmlText>
             </MjmlColumn>
           </MjmlSection>
         ) : null}

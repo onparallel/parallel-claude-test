@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import { Box, Button, Heading, Stack, Text } from "@chakra-ui/react";
 import { SentReminderMessageDialog_PetitionReminderFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { RenderSlate } from "@parallel/utils/slate/RenderSlate";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { ContactLink } from "../common/ContactLink";
@@ -50,7 +49,7 @@ export function SentReminderMessageDialog({
             />
           </Text>
           <Box>
-            <RenderSlate value={reminder.emailBody} />
+            <Text dangerouslySetInnerHTML={{ __html: reminder.emailBody! }} />
           </Box>
         </Stack>
       }

@@ -49,10 +49,8 @@ export async function petitionClosedNotification(
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
       {
-        contactFullName: fullName(
-          contact?.first_name ?? null,
-          contact?.last_name ?? null
-        ),
+        contactFirstName: contact!.first_name,
+        contactLastName: contact!.last_name,
         senderName: fullName(sender.first_name, sender.last_name)!,
         senderEmail: sender.email,
         body: payload.message,

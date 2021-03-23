@@ -11,7 +11,7 @@ import {
   stringArg,
 } from "@nexus/schema";
 import pMap from "p-map";
-import { countBy, indexBy, pick, zip } from "remeda";
+import { countBy, pick } from "remeda";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import {
   CreatePetition,
@@ -38,7 +38,6 @@ import {
 import { datetimeArg } from "../../helpers/date";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { jsonArg, jsonObjectArg } from "../../helpers/json";
-import { replaceSlatePlaceholders } from "../../helpers/replaceSlatePlaceholders";
 import { RESULT } from "../../helpers/result";
 import {
   validateAnd,
@@ -901,39 +900,32 @@ export const sendPetition = mutationField("sendPetition", {
       if (countBy(fields, (f) => f.type !== "HEADING") === 0) {
         throw new Error("Petition has no repliable fields");
       }
-      const [accesses, contacts] = await Promise.all([
-        ctx.petitions.createAccesses(
-          args.petitionId,
-          args.contactIds.map((id) => ({
-            petition_id: args.petitionId,
-            contact_id: id,
-            reminders_left: 10,
-            reminders_active: Boolean(args.remindersConfig),
-            reminders_config: args.remindersConfig,
-            next_reminder_at: args.remindersConfig
-              ? calculateNextReminder(
-                  args.scheduledAt ?? new Date(),
-                  args.remindersConfig
-                )
-              : null,
-          })),
-          ctx.user!
-        ),
-        ctx.contacts.loadContact(args.contactIds),
-      ]);
-      const accessesByContactId = indexBy(accesses, (a) => a.contact_id);
+      const accesses = await ctx.petitions.createAccesses(
+        args.petitionId,
+        args.contactIds.map((id) => ({
+          petition_id: args.petitionId,
+          contact_id: id,
+          reminders_left: 10,
+          reminders_active: Boolean(args.remindersConfig),
+          reminders_config: args.remindersConfig,
+          next_reminder_at: args.remindersConfig
+            ? calculateNextReminder(
+                args.scheduledAt ?? new Date(),
+                args.remindersConfig
+              )
+            : null,
+        })),
+        ctx.user!
+      );
+
       const messages = await ctx.petitions.createMessages(
         args.petitionId,
         args.scheduledAt ?? null,
-        contacts.map((contact) => ({
-          petition_access_id: accessesByContactId[contact!.id].id,
+        accesses.map((access) => ({
+          petition_access_id: access.id,
           status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
           email_subject: args.subject,
-          email_body: JSON.stringify(
-            replaceSlatePlaceholders(args.body, {
-              contactName: contact?.first_name ?? "",
-            })
-          ),
+          email_body: JSON.stringify(args.body),
         })),
         ctx.user!
       );
@@ -995,10 +987,9 @@ export const sendReminders = mutationField("sendReminders", {
   },
   validateArgs: validRichTextContent((args) => args.body, "body"),
   resolve: async (_, args, ctx, info) => {
-    const [petition, accesses, contacts] = await Promise.all([
+    const [petition, accesses] = await Promise.all([
       ctx.petitions.loadPetition(args.petitionId),
       ctx.petitions.loadAccess(args.accessIds),
-      ctx.contacts.loadContactByAccessId(args.accessIds),
     ]);
 
     validatePetitionStatus(petition, "PENDING", info);
@@ -1008,18 +999,12 @@ export const sendReminders = mutationField("sendReminders", {
     try {
       const reminders = await ctx.petitions.createReminders(
         args.petitionId,
-        zip(args.accessIds, contacts).map(([accessId, contact]) => ({
+        args.accessIds.map((accessId) => ({
           type: "MANUAL",
           status: "PROCESSING",
           petition_access_id: accessId,
           sender_id: ctx.user!.id,
-          email_body: args.body
-            ? JSON.stringify(
-                replaceSlatePlaceholders(args.body, {
-                  contactName: contact?.first_name ?? "",
-                })
-              )
-            : null,
+          email_body: args.body ? JSON.stringify(args.body) : null,
           created_by: `User:${ctx.user!.id}`,
         }))
       );
@@ -1249,32 +1234,23 @@ export const sendPetitionClosedNotification = mutationField(
       );
       const activeAccesses = accesses.filter((a) => a.status === "ACTIVE");
 
-      const accessIds = activeAccesses.map((a) => a.id);
-      const contacts = await ctx.contacts.loadContactByAccessId(accessIds);
-
-      await Promise.all(
-        zip(accessIds, contacts).map(([accessId, contact]) =>
-          ctx.emails.sendPetitionClosedEmail(
-            args.petitionId,
-            ctx.user!.id,
-            accessId,
-            replaceSlatePlaceholders(args.emailBody, {
-              contactName: contact?.first_name ?? "",
-            }),
-            args.attachPdfExport,
-            args.pdfExportTitle ?? null
-          )
-        )
+      await ctx.emails.sendPetitionClosedEmail(
+        args.petitionId,
+        ctx.user!.id,
+        activeAccesses.map((a) => a.id),
+        args.emailBody,
+        args.attachPdfExport,
+        args.pdfExportTitle ?? null
       );
 
       await Promise.all(
-        accessIds.map((accessId) =>
+        activeAccesses.map((access) =>
           ctx.petitions.createEvent({
             type: "PETITION_CLOSED_NOTIFIED",
             petitionId: args.petitionId,
             data: {
               user_id: ctx.user!.id,
-              petition_access_id: accessId,
+              petition_access_id: access.id,
             },
           })
         )

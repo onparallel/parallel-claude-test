@@ -62,37 +62,6 @@ export function petitionFieldList(
     .join("\n");
 }
 
-export function renderSlateText(node: any) {
-  function render(node: any) {
-    if (Array.isArray(node.children)) {
-      switch (node.type) {
-        case "paragraph":
-        case undefined:
-          return `${node.children.map(render).join("")}`;
-        case "bulleted-list":
-          return node.children
-            .map((child: any) => render(child).replace(/^/gm, "  "))
-            .join("\n");
-        case "list-item":
-          return node.children
-            .map((child: any, i: number) => {
-              switch (child.type) {
-                case "paragraph":
-                  return `${i === 0 ? "- " : "  "}${render(child)}`;
-                default:
-                  return render(child).replace(/^/gm, "  ");
-              }
-            })
-            .join("\n");
-      }
-    } else if (typeof node.text === "string") {
-      return node.text;
-    }
-    return "";
-  }
-  return node?.map(render).join("\n") || "";
-}
-
 export function dateTime({ value, format }: DateTimeProps, intl: IntlShape) {
   return intl.formatDate(value, format);
 }

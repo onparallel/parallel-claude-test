@@ -1180,8 +1180,8 @@ export type PetitionMessage = CreatedAt & {
   createdAt: Scalars["DateTime"];
   /** Tells when the email was delivered. */
   deliveredAt?: Maybe<Scalars["DateTime"]>;
-  /** The body of the petition message. */
-  emailBody?: Maybe<Scalars["JSON"]>;
+  /** The body of the petition message on HTML format. */
+  emailBody?: Maybe<Scalars["String"]>;
   /** The subject of the petition message. */
   emailSubject?: Maybe<Scalars["JSON"]>;
   /** The ID of the petition message. */
@@ -1228,8 +1228,8 @@ export type PetitionReminder = CreatedAt & {
   access: PetitionAccess;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-  /** The body of the petition message. */
-  emailBody?: Maybe<Scalars["JSON"]>;
+  /** The body of the message in HTML format. */
+  emailBody?: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   /** The sender of this petition message. */
   sender?: Maybe<User>;

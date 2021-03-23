@@ -55,12 +55,13 @@ export async function petitionMessageBounced(
   const { html, text, subject, from } = await buildEmail(
     MessageBouncedEmail,
     {
+      contactFirstName: contact.first_name,
+      contactLastName: contact.last_name,
       senderName: fullName(sender.first_name, sender.last_name)!,
       petitionId: toGlobalId("Petition", petition.id),
       petitionName: petition.name,
       body: message.email_body ? JSON.parse(message.email_body) : [],
       contactEmail: contact.email,
-      contactFullName: fullName(contact.first_name, contact.last_name)!,
       assetsUrl: context.config.misc.assetsUrl,
       parallelUrl: context.config.misc.parallelUrl,
       logoUrl:

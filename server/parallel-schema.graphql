@@ -1625,9 +1625,9 @@ type PetitionMessage implements CreatedAt {
   deliveredAt: DateTime
 
   """
-  The body of the petition message.
+  The body of the petition message on HTML format.
   """
-  emailBody: JSON
+  emailBody: String
 
   """
   The subject of the petition message.
@@ -1727,9 +1727,9 @@ type PetitionReminder implements CreatedAt {
   createdAt: DateTime!
 
   """
-  The body of the petition message.
+  The body of the message in HTML format.
   """
-  emailBody: JSON
+  emailBody: String
   id: GID!
 
   """
