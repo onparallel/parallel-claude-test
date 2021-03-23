@@ -2040,6 +2040,11 @@
     "context": "Bullet list"
   },
   {
+    "term": "generic.richtext.personalize",
+    "definition": "Personalize",
+    "context": "Personalize"
+  },
+  {
     "term": "generic.richtext.underline",
     "definition": "Underline",
     "context": "Underline"
@@ -2508,6 +2513,11 @@
     "term": "petition-compose.settings",
     "definition": "Settings",
     "context": "Settings"
+  },
+  {
+    "term": "petition-message.placeholder-option.contact-name",
+    "definition": "Contact name",
+    "context": "Contact name"
   },
   {
     "term": "petition-replies.comment-pending.label",

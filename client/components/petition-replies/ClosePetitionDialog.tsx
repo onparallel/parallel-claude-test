@@ -90,6 +90,8 @@ export function ClosePetitionDialog({
     (sendMessage && isEmptyRTEValue(message)) ||
     (attachPdfExport && !pdfExportTitle);
 
+  const placeholderOptions = usePetitionMessagePlaceholderOptions();
+
   return (
     <ConfirmDialog
       size="xl"
@@ -145,6 +147,7 @@ export function ClosePetitionDialog({
                           "component.close-petition-dialog.notify-recipient.message-placeholder",
                         defaultMessage: "Add a message to include in the email",
                       })}
+                      placeholderOptions={placeholderOptions}
                     />
                     {hasPetitionPdfExport ? (
                       <>

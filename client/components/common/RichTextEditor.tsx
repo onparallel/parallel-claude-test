@@ -17,10 +17,10 @@ import {
 } from "@parallel/chakra/icons";
 import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import {
+  Placeholder,
   PlaceholderMenu,
   PlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
-import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
 import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
 import { ValueProps } from "@parallel/utils/ValueProps";
@@ -143,7 +143,7 @@ export interface RichTextEditorProps
   isInvalid?: boolean;
   isRequired?: boolean;
   isReadOnly?: boolean;
-  allowPlaceholders?: boolean;
+  placeholderOptions?: Placeholder[];
 }
 
 export type RichTextEditorValue = Node[];
@@ -164,15 +164,11 @@ export const RichTextEditor = forwardRef<
     isRequired,
     isReadOnly,
     onKeyDown: _onKeyDown,
-    allowPlaceholders = true,
+    placeholderOptions = [],
     ...props
   },
   ref
 ) {
-  const placeholderOptions = allowPlaceholders
-    ? usePetitionMessagePlaceholderOptions()
-    : [];
-
   const plugins = useMemo(
     () => [
       BoldPlugin(options),

@@ -17,7 +17,7 @@ export function replaceSlatePlaceholders(
 ) {
   function deepSearchPlaceholders(node: SlateNode): SlateNode {
     if (node.type === "placeholder") {
-      return { text: placeholders[node.placeholder!] ?? "" };
+      return { text: placeholders[node.placeholder!] };
     } else if (Array.isArray(node.children)) {
       return { ...node, children: node.children.map(deepSearchPlaceholders) };
     } else {

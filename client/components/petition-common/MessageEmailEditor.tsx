@@ -5,6 +5,7 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
 import { Ref } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { RichTextEditor, RichTextEditorValue } from "../common/RichTextEditor";
@@ -25,6 +26,7 @@ export function MessageEmailEditor({
   onBodyChange: (value: RichTextEditorValue) => void;
 }) {
   const intl = useIntl();
+  const placeholderOptions = usePetitionMessagePlaceholderOptions();
   return (
     <>
       <FormControl isInvalid={showErrors && !subject}>
@@ -64,6 +66,7 @@ export function MessageEmailEditor({
             id: "component.message-email-editor.body-placeholder",
             defaultMessage: "Write a message to include in the email",
           })}
+          placeholderOptions={placeholderOptions}
         />
         <FormErrorMessage>
           <FormattedMessage

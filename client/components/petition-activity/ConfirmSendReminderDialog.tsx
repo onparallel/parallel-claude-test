@@ -6,6 +6,7 @@ import {
 } from "@parallel/components/common/DialogProvider";
 import { emptyRTEValue } from "@parallel/utils/slate/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
+import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
@@ -22,6 +23,8 @@ export function ConfirmSendReminderDialog({
   const [isInvalid, setIsInvalid] = useState(false);
   const [hasMessage, setHasMessage] = useState(false);
   const messageRef = useRef<RichTextEditorInstance>(null);
+
+  const placeholderOptions = usePetitionMessagePlaceholderOptions();
   return (
     <ConfirmDialog
       size="xl"
@@ -69,6 +72,7 @@ export function ConfirmSendReminderDialog({
                           "component.confirm-send-reminder-dialog.message-placeholder",
                         defaultMessage: "Add a message to include in the email",
                       })}
+                      placeholderOptions={placeholderOptions}
                     />
                   </Box>
                 </Collapse>
