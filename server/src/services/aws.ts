@@ -1,10 +1,10 @@
-import { inject, injectable, interfaces } from "inversify";
-import { Config, CONFIG } from "../config";
 import AWS from "aws-sdk";
-import { chunk } from "remeda";
-import { LOGGER, Logger } from "./logger";
 import { createHash } from "crypto";
+import { inject, injectable, interfaces } from "inversify";
+import { chunk } from "remeda";
 import { Memoize } from "typescript-memoize";
+import { Config, CONFIG } from "../config";
+import { LOGGER, Logger } from "./logger";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 
 export interface IAws {

@@ -11,7 +11,6 @@ import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, PetitionAccess, User } from "./db/__types";
 import { AUTH, Auth } from "./services/auth";
 import { Aws, AWS_SERVICE } from "./services/aws";
-import { Cognito } from "./services/cognito";
 import { EMAILS, EmailsService } from "./services/emails";
 import { LOGGER, Logger } from "./services/logger";
 import { PRINTER, Printer } from "./services/printer";
@@ -42,7 +41,6 @@ export class ApiContext {
     @inject(PRINTER) public readonly printer: Printer,
     @inject(AWS_SERVICE) public readonly aws: Aws,
 
-    public readonly cognito: Cognito,
     // Repositories
     public readonly contacts: ContactRepository,
     public readonly emailLogs: EmailLogRepository,

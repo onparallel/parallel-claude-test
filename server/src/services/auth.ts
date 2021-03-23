@@ -1,14 +1,13 @@
-import { CognitoUserSession } from "amazon-cognito-identity-js";
+import AWS from "aws-sdk";
 import DataLoader from "dataloader";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { inject, injectable } from "inversify";
 import { decode } from "jsonwebtoken";
 import pMap from "p-map";
-import { ApiContext } from "../context";
+import { Memoize } from "typescript-memoize";
+import { CONFIG, Config } from "../config";
 import { fromDataLoader } from "../util/fromDataLoader";
-import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
-import { Cognito } from "./cognito";
 import { REDIS, Redis } from "./redis";
 
 export interface IAuth {
@@ -22,43 +21,41 @@ export interface IAuth {
 
 export const AUTH = Symbol.for("AUTH");
 
+interface CognitoSession {
+  IdToken: string;
+  RefreshToken: string;
+}
 @injectable()
 export class Auth implements IAuth {
   private readonly EXPIRY = 30 * 24 * 60 * 60;
 
-  constructor(private cognito: Cognito, @inject(REDIS) private redis: Redis) {}
-
-  private async trackSessionLogin(
-    session: CognitoUserSession,
-    ctx: ApiContext
-  ) {
-    const user = await ctx.users.loadSessionUser(
-      session.getIdToken().payload["cognito:username"]
-    );
-    ctx.analytics.identifyUser(user);
-    ctx.analytics.trackEvent(
-      "USER_LOGGED_IN",
-      {
-        email: user.email,
-        org_id: user.org_id,
-        user_id: user.id,
-      },
-      toGlobalId("User", user.id)
-    );
+  @Memoize()
+  get cognito() {
+    return new AWS.CognitoIdentityServiceProvider();
   }
+
+  constructor(
+    @inject(CONFIG) private config: Config,
+    @inject(REDIS) private redis: Redis
+  ) {}
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
-      const session = await this.cognito.login(email, password);
-      const token = await this.storeSession(session);
-      await this.trackSessionLogin(session, req.context);
-      this.setSession(res, token);
+      const auth = await this.initiateAuth(email, password);
+      if (auth.AuthenticationResult) {
+        const token = await this.storeSession(auth.AuthenticationResult as any);
+        this.setSession(res, token);
+      } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
+        res.status(401).send({ error: "NewPasswordRequired" });
+      } else {
+        console.log(auth);
+        res.status(401).send({ error: "UnknownError" });
+      }
     } catch (error) {
       switch (error.code) {
-        case "NewPasswordRequired":
         case "PasswordResetRequiredException":
-          res.status(401).send({ error: "NewPasswordRequired" });
+          res.status(401).send({ error: "PasswordResetRequired" });
           return;
         case "UserNotFoundException":
         case "NotAuthorizedException":
@@ -72,16 +69,27 @@ export class Auth implements IAuth {
   async newPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password, newPassword } = req.body;
-      const session = await this.cognito.completeNewPasword(
+      const auth = await this.initiateAuth(email, password);
+      if (auth.ChallengeName !== "NEW_PASSWORD_REQUIRED") {
+        console.log(auth);
+        return res.status(401).send({ error: "wtf" });
+      }
+      const challenge = await this.respondToNewPasswordRequiredChallenge(
+        auth.Session!,
         email,
-        password,
         newPassword
       );
-      const token = await this.storeSession(session);
-      await this.trackSessionLogin(session, req.context);
-      this.setSession(res, token);
-      return;
+      if (challenge.AuthenticationResult) {
+        const token = await this.storeSession(
+          challenge.AuthenticationResult as any
+        );
+        this.setSession(res, token);
+      } else {
+        console.log(auth);
+        res.status(401).send({ error: "UnknownError" });
+      }
     } catch (error) {
+      console.log(error);
       next(error);
     }
   }
@@ -89,7 +97,12 @@ export class Auth implements IAuth {
   async forgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email } = req.body;
-      await this.cognito.forgotPassword(email);
+      await this.cognito
+        .forgotPassword({
+          ClientId: this.config.cognito.clientId,
+          Username: email,
+        })
+        .promise();
       res.status(204).send();
     } catch (error) {
       switch (error.code) {
@@ -105,7 +118,14 @@ export class Auth implements IAuth {
   async confirmForgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, verificationCode, newPassword } = req.body;
-      await this.cognito.confirmPassword(email, verificationCode, newPassword);
+      await this.cognito
+        .confirmForgotPassword({
+          ClientId: this.config.cognito.clientId,
+          Username: email,
+          Password: newPassword,
+          ConfirmationCode: verificationCode,
+        })
+        .promise();
       res.status(204).send();
     } catch (error) {
       switch (error.code) {
@@ -136,6 +156,7 @@ export class Auth implements IAuth {
     res.status(201).send({});
   }
 
+  /** Delete session on Redis */
   private async deleteSession(token: string) {
     await this.redis.delete(
       `session:${token}:idToken`,
@@ -143,19 +164,72 @@ export class Auth implements IAuth {
     );
   }
 
-  private async storeSession(session: CognitoUserSession, token?: string) {
-    if (!token) {
-      token = random(48);
-    }
-    const idToken = session.getIdToken().getJwtToken();
-    const refreshToken = session.getRefreshToken().getToken();
-    await this.redis.set(`session:${token}:idToken`, idToken, this.EXPIRY);
+  /** Store session on Redis */
+  private async storeSession(session: CognitoSession) {
+    const token = random(48);
+    await Promise.all([
+      this.redis.set(`session:${token}:idToken`, session.IdToken, this.EXPIRY),
+      this.redis.set(
+        `session:${token}:refreshToken`,
+        session.RefreshToken,
+        this.EXPIRY
+      ),
+    ]);
+    return token;
+  }
+
+  private async updateSession(token: string, session: CognitoSession) {
     await this.redis.set(
-      `session:${token}:refreshToken`,
-      refreshToken,
+      `session:${token}:idToken`,
+      session.IdToken,
       this.EXPIRY
     );
-    return token;
+  }
+
+  private async initiateAuth(email: string, password: string) {
+    return await this.cognito
+      .adminInitiateAuth({
+        AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
+        ClientId: this.config.cognito.clientId,
+        UserPoolId: this.config.cognito.defaultPoolId,
+        AuthParameters: {
+          USERNAME: email,
+          PASSWORD: password,
+        },
+      })
+      .promise();
+  }
+
+  private async respondToNewPasswordRequiredChallenge(
+    session: string,
+    email: string,
+    newPassword: string
+  ) {
+    return await this.cognito
+      .adminRespondToAuthChallenge({
+        ClientId: this.config.cognito.clientId,
+        UserPoolId: this.config.cognito.defaultPoolId,
+        ChallengeName: "NEW_PASSWORD_REQUIRED",
+        Session: session,
+        ChallengeResponses: {
+          USERNAME: email,
+          NEW_PASSWORD: newPassword,
+        },
+      })
+      .promise();
+  }
+
+  private async refreshToken(refreshToken: string) {
+    return this.cognito
+      .adminInitiateAuth({
+        AuthFlow: "REFRESH_TOKEN_AUTH",
+        ClientId: this.config.cognito.clientId,
+        UserPoolId: this.config.cognito.defaultPoolId,
+        AuthParameters: {
+          REFRESH_TOKEN: refreshToken,
+        },
+      })
+      .promise();
   }
 
   validateSession = fromDataLoader(
@@ -166,15 +240,9 @@ export class Auth implements IAuth {
           if (idToken === null) {
             return null;
           }
-          const {
-            exp: expiresAt,
-            "cognito:username": cognitoId,
-            email,
-          } = decode(idToken) as {
-            exp: number;
-            "cognito:username": string;
-            email: string;
-          };
+          const payload = decode(idToken) as any;
+          const expiresAt = payload["exp"] as number;
+          const cognitoId = payload["cognito:username"] as string;
           if (Date.now() > expiresAt * 1000) {
             const refreshToken = await this.redis.get(
               `session:${token}:refreshToken`
@@ -182,11 +250,13 @@ export class Auth implements IAuth {
             if (refreshToken === null) {
               return null;
             }
-            const session = await this.cognito.refreshSession(
-              email,
-              refreshToken
-            );
-            await this.storeSession(session, token);
+            const auth = await this.refreshToken(refreshToken);
+            if (auth.AuthenticationResult) {
+              await this.updateSession(token, auth.AuthenticationResult as any);
+            } else {
+              console.log(auth);
+              return null;
+            }
           }
           return cognitoId;
         } catch (error) {

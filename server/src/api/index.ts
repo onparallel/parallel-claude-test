@@ -4,7 +4,6 @@ import morgan from "morgan";
 import { ApiContext } from "../context";
 import { LOGGER, Logger } from "../services/logger";
 import { downloads } from "./downloads";
-import { authorize } from "./helpers/authorize";
 import { api as publicApi } from "./public";
 import { webhooks } from "./webhooks";
 
@@ -34,19 +33,19 @@ export function api(container: Container) {
     .use(
       "/auth",
       Router()
-        .post("/login", authorize(), (req, res, next) =>
+        .post("/login", (req, res, next) =>
           req.context.auth.login(req, res, next)
         )
         .post("/logout", (req, res, next) =>
           req.context.auth.logout(req, res, next)
         )
-        .post("/new-password", authorize(), (req, res, next) =>
+        .post("/new-password", (req, res, next) =>
           req.context.auth.newPassword(req, res, next)
         )
-        .post("/forgot-password", authorize(), (req, res, next) =>
+        .post("/forgot-password", (req, res, next) =>
           req.context.auth.forgotPassword(req, res, next)
         )
-        .post("/confirm-forgot-password", authorize(), (req, res, next) =>
+        .post("/confirm-forgot-password", (req, res, next) =>
           req.context.auth.confirmForgotPassword(req, res, next)
         )
     )
