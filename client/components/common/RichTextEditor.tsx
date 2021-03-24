@@ -61,7 +61,6 @@ import { omit, pick } from "remeda";
 import { createEditor, Editor, Node, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import { ReactEditor, Slate, useSlate, withReact } from "slate-react";
-import { CardProps } from "./Card";
 
 import {
   IconButtonWithTooltip,
@@ -283,7 +282,6 @@ export const RichTextEditor = forwardRef<
     clone.textContent = node.textContent!.slice(0, offset);
     clone.style.position = "fixed";
     clone.style.visibility = "hidden";
-    clone.style.backgroundColor = "red";
     const rect = node.getBoundingClientRect();
     node.parentElement!.appendChild(clone);
     const cloneRect = clone.getBoundingClientRect();

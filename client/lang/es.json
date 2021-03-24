@@ -2515,9 +2515,44 @@
     "context": "Settings"
   },
   {
-    "term": "petition-message.placeholder-option.contact-name",
+    "term": "petition-message.placeholder-option.contact-email",
+    "definition": "Email del contacto",
+    "context": "Contact email"
+  },
+  {
+    "term": "petition-message.placeholder-option.contact-first-name",
     "definition": "Nombre del contacto",
-    "context": "Contact name"
+    "context": "Contact first name"
+  },
+  {
+    "term": "petition-message.placeholder-option.contact-full-name",
+    "definition": "Nombre completo del contacto",
+    "context": "Contact full name"
+  },
+  {
+    "term": "petition-message.placeholder-option.contact-last-name",
+    "definition": "Apellido del contacto",
+    "context": "Contact last name"
+  },
+  {
+    "term": "petition-message.placeholder-option.petition-title",
+    "definition": "Título de la petición",
+    "context": "Petition title"
+  },
+  {
+    "term": "petition-message.placeholder-option.user-first-name",
+    "definition": "Nombre del usuario",
+    "context": "User first name"
+  },
+  {
+    "term": "petition-message.placeholder-option.user-full-name",
+    "definition": "Nombre completo del usuario",
+    "context": "User full name"
+  },
+  {
+    "term": "petition-message.placeholder-option.user-last-name",
+    "definition": "Apellido del usuario",
+    "context": "User last name"
   },
   {
     "term": "petition-replies.comment-pending.label",

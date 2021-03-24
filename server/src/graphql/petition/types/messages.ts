@@ -50,11 +50,15 @@ export const PetitionMessage = objectType({
       resolve: async (o, _, ctx) => {
         if (!o.email_body) return null;
 
-        const contact = await ctx.contacts.loadContactByAccessId(
-          o.petition_access_id
-        );
+        const [contact, petition] = await Promise.all([
+          ctx.contacts.loadContactByAccessId(o.petition_access_id),
+          ctx.petitions.loadPetition(o.petition_id),
+        ]);
+
         return toHtml(JSON.parse(o.email_body), {
-          contactName: contact?.first_name ?? "",
+          petition,
+          contact,
+          user: ctx.user,
         });
       },
     });

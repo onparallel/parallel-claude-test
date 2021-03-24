@@ -57,7 +57,7 @@ export async function petitionMessage(
     );
   }
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
-  const slate = slateParser({ contactName: contact.first_name ?? "" });
+  const slate = slateParser({ contact, user: sender, petition });
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {

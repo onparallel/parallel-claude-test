@@ -47,7 +47,7 @@ export async function petitionClosedNotification(
     const access = await context.petitions.loadAccess(accessId);
     const contact = await context.contacts.loadContact(access!.contact_id);
 
-    const slate = slateParser({ contactName: contact?.first_name ?? "" });
+    const slate = slateParser({ contact, user: sender, petition });
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
       {

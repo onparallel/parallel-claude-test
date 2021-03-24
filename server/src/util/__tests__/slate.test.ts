@@ -98,7 +98,7 @@ describe("Slate", () => {
                 { text: "hola " },
                 {
                   type: "placeholder",
-                  placeholder: "contactName",
+                  placeholder: "contact-first-name",
                   children: [{ text: "" }],
                 },
                 { text: ", enviame los " },
@@ -163,7 +163,7 @@ describe("Slate", () => {
               ],
             },
           ],
-          { contactName: "Mariano" }
+          { contact: { first_name: "Mariano" } }
         )
       ).toEqual(
         // first paragraph

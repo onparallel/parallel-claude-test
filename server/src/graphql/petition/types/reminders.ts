@@ -38,11 +38,16 @@ export const PetitionReminder = objectType({
       resolve: async (o, _, ctx) => {
         if (!o.email_body) return null;
 
-        const contact = await ctx.contacts.loadContactByAccessId(
-          o.petition_access_id
-        );
+        const [contact, access] = await Promise.all([
+          ctx.contacts.loadContactByAccessId(o.petition_access_id),
+          ctx.petitions.loadAccess(o.petition_access_id),
+        ]);
+        const petition = await ctx.petitions.loadPetition(access!.petition_id);
+
         return toHtml(JSON.parse(o.email_body), {
-          contactName: contact?.first_name ?? "",
+          petition,
+          contact,
+          user: ctx.user,
         });
       },
     });

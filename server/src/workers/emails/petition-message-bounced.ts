@@ -53,7 +53,7 @@ export async function petitionMessageBounced(
     );
   }
 
-  const slate = slateParser({ contactName: contact.first_name ?? "" });
+  const slate = slateParser({ contact, user: sender, petition });
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const { html, text, subject, from } = await buildEmail(
     MessageBouncedEmail,

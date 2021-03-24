@@ -1,8 +1,12 @@
 import escapeHTML from "escape-html";
+import { Contact, Petition, User } from "../db/__types";
+import { fullName } from "./fullName";
 
-type Placeholders = {
-  contactName: string;
-};
+interface SlateContext {
+  petition?: Partial<Petition> | null;
+  user?: Partial<User> | null;
+  contact?: Partial<Contact> | null;
+}
 
 type SlateNode = {
   children?: SlateNode[];
@@ -12,14 +16,41 @@ type SlateNode = {
     | "numbered-list"
     | "list-item"
     | "placeholder";
-  placeholder?: keyof Placeholders;
+  placeholder?: string;
   text?: string;
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;
 };
 
-export function toHtml(body: SlateNode[], placeholders?: Placeholders) {
+function getPlaceholder(key?: string, ctx?: SlateContext) {
+  if (!ctx || !key) return "";
+  switch (key) {
+    case "contact-first-name":
+      return ctx.contact?.first_name ?? "";
+    case "contact-last-name":
+      return ctx.contact?.last_name ?? "";
+    case "contact-full-name":
+      return fullName(
+        ctx.contact?.first_name ?? "",
+        ctx.contact?.last_name ?? ""
+      )!;
+    case "contact-email":
+      return ctx.contact?.email ?? "";
+    case "user-first-name":
+      return ctx.user?.first_name ?? "";
+    case "user-last-name":
+      return ctx.user?.last_name ?? "";
+    case "user-full-name":
+      return fullName(ctx.user?.first_name ?? "", ctx.user?.last_name ?? "")!;
+    case "petition-title":
+      return ctx.petition?.name ?? "";
+    default:
+      return "";
+  }
+}
+
+export function toHtml(body: SlateNode[], ctx?: SlateContext) {
   function serialize(node: SlateNode): string {
     if (Array.isArray(node.children)) {
       const children = node.children.map(serialize).join("");
@@ -29,7 +60,7 @@ export function toHtml(body: SlateNode[], placeholders?: Placeholders) {
           return `<p>${children}</p>`;
         case "placeholder":
           return `<span>${escapeHTML(
-            placeholders?.[node.placeholder!] ?? ""
+            getPlaceholder(node.placeholder, ctx)
           )}</span>`;
         case "bulleted-list":
           return `<ul style="padding-left:24px">${children}</ul>`;
@@ -61,7 +92,7 @@ export function toHtml(body: SlateNode[], placeholders?: Placeholders) {
   return body.map(serialize).join("");
 }
 
-export function toPlainText(body: SlateNode[], placeholders?: Placeholders) {
+export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
   function serialize(node: SlateNode): string {
     if (Array.isArray(node.children)) {
       switch (node.type) {
@@ -69,7 +100,7 @@ export function toPlainText(body: SlateNode[], placeholders?: Placeholders) {
         case undefined:
           return `${node.children.map(serialize).join("")}`;
         case "placeholder":
-          return placeholders?.[node.placeholder!] ?? "";
+          return getPlaceholder(node.placeholder, ctx);
         case "bulleted-list":
         case "numbered-list":
           return node.children
@@ -95,9 +126,9 @@ export function toPlainText(body: SlateNode[], placeholders?: Placeholders) {
   return body.map(serialize).join("\n");
 }
 
-export function slateParser(placeholders?: Placeholders) {
+export function slateParser(ctx?: SlateContext) {
   return {
-    toHtml: (body: SlateNode[]) => toHtml(body, placeholders),
-    toPlainText: (body: SlateNode[]) => toPlainText(body, placeholders),
+    toHtml: (body: SlateNode[]) => toHtml(body, ctx),
+    toPlainText: (body: SlateNode[]) => toPlainText(body, ctx),
   };
 }

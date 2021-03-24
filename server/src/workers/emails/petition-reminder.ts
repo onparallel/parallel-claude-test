@@ -72,7 +72,7 @@ export async function petitionReminder(
     const bodyJson = reminder.email_body
       ? JSON.parse(reminder.email_body)
       : null;
-    const slate = slateParser({ contactName: contact.first_name ?? "" });
+    const slate = slateParser({ contact, user: granter, petition });
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
