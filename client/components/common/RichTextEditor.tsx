@@ -179,7 +179,7 @@ export const RichTextEditor = forwardRef<
       ListPlugin(options),
       PlaceholderPlugin(placeholderOptions),
     ],
-    []
+    [placeholderOptions]
   );
   const formControl = useFormControl({
     isDisabled,

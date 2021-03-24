@@ -16,6 +16,7 @@ export type Placeholder = {
 
 export function PlaceholderPlugin(placeholders: Placeholder[]): SlatePlugin {
   return {
+    renderElementDeps: [placeholders],
     renderElement: getRenderElement({
       type: "placeholder",
       component: ({ children, attributes, element }: RenderElementProps) => {

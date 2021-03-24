@@ -2516,23 +2516,23 @@
   },
   {
     "term": "petition-message.placeholder-option.contact-email",
-    "definition": "Contact email",
-    "context": "Contact email"
+    "definition": "Recipient email",
+    "context": "Recipient email"
   },
   {
     "term": "petition-message.placeholder-option.contact-first-name",
-    "definition": "Contact first name",
-    "context": "Contact first name"
+    "definition": "Recipient first name",
+    "context": "Recipient first name"
   },
   {
     "term": "petition-message.placeholder-option.contact-full-name",
-    "definition": "Contact full name",
-    "context": "Contact full name"
+    "definition": "Recipient full name",
+    "context": "Recipient full name"
   },
   {
     "term": "petition-message.placeholder-option.contact-last-name",
-    "definition": "Contact last name",
-    "context": "Contact last name"
+    "definition": "Recipient last name",
+    "context": "Recipient last name"
   },
   {
     "term": "petition-message.placeholder-option.petition-title",
@@ -2541,18 +2541,18 @@
   },
   {
     "term": "petition-message.placeholder-option.user-first-name",
-    "definition": "User first name",
-    "context": "User first name"
+    "definition": "My first name",
+    "context": "My first name"
   },
   {
     "term": "petition-message.placeholder-option.user-full-name",
-    "definition": "User full name",
-    "context": "User full name"
+    "definition": "My full name",
+    "context": "My full name"
   },
   {
     "term": "petition-message.placeholder-option.user-last-name",
-    "definition": "User last name",
-    "context": "User last name"
+    "definition": "My last name",
+    "context": "My last name"
   },
   {
     "term": "petition-replies.comment-pending.label",
