@@ -1,6 +1,7 @@
-import escapeHTML from "escape-html";
 import { Contact, Petition, User } from "../db/__types";
 import { fullName } from "./fullName";
+import { CSSProperties, Fragment } from "react";
+import { renderToString } from "react-dom/server";
 
 interface SlateContext {
   petition?: Partial<Petition> | null;
@@ -50,46 +51,79 @@ function getPlaceholder(key?: string, ctx?: SlateContext) {
   }
 }
 
-export function toHtml(body: SlateNode[], ctx?: SlateContext) {
-  function serialize(node: SlateNode): string {
-    if (Array.isArray(node.children)) {
-      const children = node.children.map(serialize).join("");
-      switch (node.type) {
-        case "paragraph":
-        case undefined:
-          return `<p>${children}</p>`;
-        case "placeholder":
-          return `<span>${escapeHTML(
-            getPlaceholder(node.placeholder, ctx)
-          )}</span>`;
-        case "bulleted-list":
-          return `<ul style="padding-left:24px">${children}</ul>`;
-        case "numbered-list":
-          return `<ol>${children}</ol>`;
-        case "list-item":
-          return `<li>${children}</li>`;
-        default:
-          return "";
+function renderDOMNode(node: SlateNode, ctx?: SlateContext, index?: number) {
+  if (Array.isArray(node.children)) {
+    switch (node.type) {
+      case "paragraph":
+      case undefined:
+        return (
+          <p style={{ margin: 0 }} key={index}>
+            {paragraphIsEmpty(node) ? (
+              <br />
+            ) : (
+              node.children.map((child: any, index: number) => (
+                <Fragment key={index}>{renderDOMNode(child, ctx)}</Fragment>
+              ))
+            )}
+          </p>
+        );
+      case "placeholder":
+        return <span>{getPlaceholder(node.placeholder, ctx)}</span>;
+      case "bulleted-list":
+        return (
+          <ul
+            style={{ margin: 0, marginLeft: "24px", paddingLeft: 0 }}
+            key={index}
+          >
+            {node.children.map((child: any, index: number) =>
+              renderDOMNode(child, ctx, index)
+            )}
+          </ul>
+        );
+      case "list-item": {
+        return (
+          <li key={index} style={{ marginLeft: 0 }}>
+            {node.children.map((child: any, index: number) =>
+              renderDOMNode(child, ctx, index)
+            )}
+          </li>
+        );
       }
-    } else if (typeof node.text === "string") {
-      let style = "";
-      if (node.bold) {
-        style += "font-weight:bold;";
-      }
-      if (node.italic) {
-        style += "font-style:italic;";
-      }
-      if (node.underline) {
-        style += "text-decoration:underline;";
-      }
-      return `<span${style !== "" ? ` style="${style}"` : ""}>${escapeHTML(
-        node.text
-      )}</span>`;
     }
-    return "";
+  } else if (typeof node.text === "string") {
+    const style: CSSProperties = {};
+    if (node.bold) {
+      style.fontWeight = "bold";
+    }
+    if (node.italic) {
+      style.fontStyle = "italic";
+    }
+    if (node.underline) {
+      style.textDecoration = "underline";
+    }
+    return (
+      <span style={style} key={index}>
+        {node.text}
+      </span>
+    );
   }
+  return null;
+}
 
-  return body.map(serialize).join("");
+function paragraphIsEmpty(node: SlateNode) {
+  return node?.children?.length === 1 && node.children[0]?.text === "";
+}
+
+export function toHtml(body: SlateNode[], ctx?: SlateContext) {
+  return renderToString(
+    <>
+      {body?.map((node, index: number) => (
+        <div key={index} style={{ padding: "0 20px", lineHeight: "24px" }}>
+          {renderDOMNode(node, ctx)}
+        </div>
+      ))}
+    </>
+  );
 }
 
 export function toPlainText(body: SlateNode[], ctx?: SlateContext) {

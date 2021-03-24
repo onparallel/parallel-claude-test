@@ -1,5 +1,13 @@
 import { toHtml, toPlainText } from "../slate";
 
+const rootNode = (children: string) =>
+  `<div style="padding:0 20px;line-height:24px" data-reactroot="">${children}</div>`;
+const paragraph = (children: string) => `<p style="margin:0">${children}</p>`;
+const bulletList = (children: string) =>
+  `<ul style="margin:0;margin-left:24px;padding-left:0">${children}</ul>`;
+const listItem = (children: string) =>
+  `<li style="margin-left:0">${children}</li>`;
+
 describe("Slate", () => {
   describe("toHTML", () => {
     it("one paragraph", () => {
@@ -13,7 +21,7 @@ describe("Slate", () => {
             ],
           },
         ])
-      ).toEqual("<p><span>Hello World!</span></p>");
+      ).toEqual(rootNode(paragraph("<span>Hello World!</span>")));
     });
 
     it("two paragraphs", () => {
@@ -36,7 +44,10 @@ describe("Slate", () => {
             ],
           },
         ])
-      ).toEqual("<p><span>Hello World!</span></p><p><span>Goodbye.</span></p>");
+      ).toEqual(
+        rootNode(paragraph("<span>Hello World!</span>")) +
+          rootNode(paragraph("<span>Goodbye.</span>"))
+      );
     });
 
     it("with bold text", () => {
@@ -53,7 +64,11 @@ describe("Slate", () => {
           },
         ])
       ).toEqual(
-        '<p><span style="font-weight:bold;">Hello</span><span>World!</span></p>'
+        rootNode(
+          paragraph(
+            '<span style="font-weight:bold">Hello</span><span>World!</span>'
+          )
+        )
       );
     });
 
@@ -85,7 +100,12 @@ describe("Slate", () => {
           },
         ])
       ).toEqual(
-        '<ul style="padding-left:24px"><li><p><span>item 1</span></p></li><li><p><span>item 2</span></p></li></ul>'
+        rootNode(
+          bulletList(
+            listItem(paragraph("<span>item 1</span>")) +
+              listItem(paragraph("<span>item 2</span>"))
+          )
+        )
       );
     });
 
@@ -166,28 +186,43 @@ describe("Slate", () => {
           { contact: { first_name: "Mariano" } }
         )
       ).toEqual(
-        // first paragraph
-        "<p>" +
-          "<span>hola </span>" +
-          "<span>Mariano</span>" +
-          "<span>, enviame los </span>" +
-          "<span>documentos </span>" +
-          '<span style="font-weight:bold;">siguientes </span>' +
-          '<span style="font-weight:bold;text-decoration:underline;">super guays</span>' +
-          "</p>" +
-          // second paragraph
-          "<p><span>hmmm</span></p>" +
-          // bullet list
-          '<ul style="padding-left:24px">' +
-          '<li><p><span style="font-weight:bold;text-decoration:underline;">foto</span></p></li>' +
-          "<li>" +
-          '<p><span style="font-style:italic;">pasaporte</span></p>' +
-          '<ul style="padding-left:24px">' +
-          '<li><p><span style="font-weight:bold;text-decoration:underline;">foto</span></p></li>' +
-          '<li><p><span style="font-style:italic;">pasaporte</span></p></li>' +
-          "</ul>" +
-          "</li>" +
-          "</ul>"
+        rootNode(
+          paragraph(
+            "<span>hola </span>" +
+              "<span>Mariano</span>" +
+              "<span>, enviame los </span>" +
+              "<span>documentos </span>" +
+              '<span style="font-weight:bold">siguientes </span>' +
+              '<span style="font-weight:bold;text-decoration:underline">super guays</span>'
+          )
+        ) +
+          rootNode(paragraph("<span>hmmm</span>")) +
+          rootNode(
+            bulletList(
+              listItem(
+                paragraph(
+                  '<span style="font-weight:bold;text-decoration:underline">foto</span>'
+                )
+              ) +
+                listItem(
+                  paragraph(
+                    '<span style="font-style:italic">pasaporte</span>'
+                  ) +
+                    bulletList(
+                      listItem(
+                        paragraph(
+                          '<span style="font-weight:bold;text-decoration:underline">foto</span>'
+                        )
+                      ) +
+                        listItem(
+                          paragraph(
+                            '<span style="font-style:italic">pasaporte</span>'
+                          )
+                        )
+                    )
+                )
+            )
+          )
       );
     });
 
@@ -202,7 +237,11 @@ describe("Slate", () => {
           },
         ])
       ).toEqual(
-        "<p><span>&lt;div style=&quot;color:red&quot;&gt;im a malicious script!&lt;/div&gt;</span></p>"
+        rootNode(
+          paragraph(
+            "<span>&lt;div style=&quot;color:red&quot;&gt;im a malicious script!&lt;/div&gt;</span>"
+          )
+        )
       );
     });
   });
