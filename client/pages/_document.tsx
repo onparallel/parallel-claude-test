@@ -61,6 +61,7 @@ class MyDocument extends Document<MyDocumentProps> {
           <script
             src={`https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
               [
+                "requestAnimationFrame",
                 "Array.prototype.flat",
                 "Array.prototype.flatMap",
                 "Object.fromEntries",
