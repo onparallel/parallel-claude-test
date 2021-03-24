@@ -60,9 +60,7 @@ export class ContactRepository extends BaseRepository {
 
   readonly loadContactByAccessId = fromDataLoader(
     new DataLoader<number, Contact | null>(async (ids) => {
-      const { rows } = await this.knex.raw<{
-        rows: Array<Contact & { access_id: number }>;
-      }>(
+      const contacts = await this.raw<Contact & { access_id: number }>(
         /* sql */ `
         select c.*, pa.id as access_id from contact c
         left join petition_access pa on pa.contact_id = c.id
@@ -71,7 +69,7 @@ export class ContactRepository extends BaseRepository {
         [...ids]
       );
 
-      const byAccessId = indexBy(rows, (r) => r.access_id);
+      const byAccessId = indexBy(contacts, (r) => r.access_id);
       return ids.map((id) =>
         byAccessId[id] ? omit(byAccessId[id], ["access_id"]) : null
       );

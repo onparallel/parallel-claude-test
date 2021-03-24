@@ -44,7 +44,7 @@ export function usePlaceholders(placeholders: Placeholder[] = []) {
 
   const onKeyDownPlaceholder = useCallback(
     (e: any, editor: Editor) => {
-      if (target) {
+      if (target && values.length > 0) {
         if (e.key === "ArrowDown") {
           e.preventDefault();
           dispatch((state) => ({

@@ -43,6 +43,7 @@ import {
   unwrapList,
   withAutoformat,
   withList,
+  getNode,
 } from "@udecode/slate-plugins";
 import {
   createElement,
@@ -51,7 +52,9 @@ import {
   memo,
   MouseEvent,
   useCallback,
+  useEffect,
   useMemo,
+  useRef,
 } from "react";
 import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
@@ -270,28 +273,24 @@ export const RichTextEditor = forwardRef<
   const placeholderMenuId = useId(undefined, "placeholder-menu");
   const itemIdPrefix = useId(undefined, "placeholder-menu-item");
 
-  const menuPosition = useMemo<CardProps>(() => {
-    if (!isMenuOpen) return {};
-    const { path, offset } = target!.focus;
+  const menuRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!isMenuOpen || !target) return;
+    const { path, offset } = target.anchor;
 
-    const block = ReactEditor.toDOMNode(editor, editor.children[path[0]]);
-    let node = block.children[Math.min(path[1], block.children.length - 1)];
-
-    // if the wanted node is on a list item, the path array will have the required coordinates
-    for (let i = 2; i < path.length; i += 2) {
-      const [row, col] = [path[i], path[i + 1]];
-      node = node.children[row].children[col];
-    }
-
+    const node = ReactEditor.toDOMNode(editor, getNode(editor, path)!);
+    const clone = node.cloneNode() as HTMLElement;
+    clone.textContent = node.textContent!.slice(0, offset);
+    clone.style.position = "fixed";
+    clone.style.visibility = "hidden";
+    clone.style.backgroundColor = "red";
     const rect = node.getBoundingClientRect();
-    const cursorRelativeX =
-      rect.width * (offset / (node.textContent ?? "").length);
-    return {
-      position: "relative",
-      top: rect.y + rect.height + 5,
-      left: rect.left + cursorRelativeX,
-    };
-  }, [isMenuOpen]);
+    node.parentElement!.appendChild(clone);
+    const cloneRect = clone.getBoundingClientRect();
+    node.parentElement!.removeChild(clone);
+    menuRef.current!.style.top = `${rect.bottom + 5}px`;
+    menuRef.current!.style.left = `${rect.left + cloneRect.width}px`;
+  }, [isMenuOpen, target?.anchor]);
 
   return (
     <Box
@@ -321,6 +320,7 @@ export const RichTextEditor = forwardRef<
       </Slate>
       <Portal>
         <PlaceholderMenu
+          ref={menuRef as any}
           menuId={placeholderMenuId}
           itemIdPrefix={itemIdPrefix}
           values={values}
@@ -331,7 +331,7 @@ export const RichTextEditor = forwardRef<
           }
           onHighlightOption={onHighlightOption}
           width="fit-content"
-          {...menuPosition}
+          position="relative"
         />
       </Portal>
     </Box>

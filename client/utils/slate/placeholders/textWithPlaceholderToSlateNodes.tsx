@@ -5,23 +5,17 @@ export function textWithPlaceholderToSlateNodes(
   value: string,
   placeholders: Placeholder[]
 ) {
-  const paragraphs = value
-    .split("\n")
-    .map((line) =>
-      line.split(
-        new RegExp(
-          `(#(?:${placeholders
-            .map((p) => escapeStringRegexp(p.value))
-            .join("|")})#)`,
-          "g"
-        )
+  return value.split("\n").map((line) => {
+    const parts = line.split(
+      new RegExp(
+        `(#(?:${placeholders
+          .map((p) => escapeStringRegexp(p.value))
+          .join("|")})#)`,
+        "g"
       )
     );
-  const result = [];
-
-  for (const paragraph of paragraphs) {
     const children = [];
-    for (const part of paragraph) {
+    for (const part of parts) {
       if (part.startsWith("#") && part.endsWith("#")) {
         const value = part.slice(1, -1);
         if (placeholders.some((p) => p.value === value)) {
@@ -40,8 +34,6 @@ export function textWithPlaceholderToSlateNodes(
         children.push({ text: part });
       }
     }
-    result.push({ type: "paragraph", children });
-  }
-
-  return result;
+    return { type: "paragraph", children };
+  });
 }
