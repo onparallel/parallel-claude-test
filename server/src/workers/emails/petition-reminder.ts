@@ -4,6 +4,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionReminder from "../../emails/components/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import { slateParser } from "../../util/slate";
 
 export async function petitionReminder(
   payload: { petition_reminder_id: number },
@@ -67,15 +68,20 @@ export async function petitionReminder(
       fields.map((f) => f.id)
     );
     const missing = fields.filter((f, index) => replies[index]?.length === 0);
+
+    const bodyJson = reminder.email_body
+      ? JSON.parse(reminder.email_body)
+      : null;
+    const slate = slateParser({ contactName: contact.first_name ?? "" });
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
-        contactFirstName: contact.first_name,
-        contactLastName: contact.last_name,
+        contactFullName: fullName(contact.first_name, contact.last_name)!,
         senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,
         fields: missing.map(pick(["id", "title", "position", "type"])),
-        body: reminder.email_body ? JSON.parse(reminder.email_body) : null,
+        bodyHtml: bodyJson ? slate.toHtml(bodyJson) : null,
+        bodyPlainText: bodyJson ? slate.toPlainText(bodyJson) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
         assetsUrl: context.config.misc.assetsUrl,

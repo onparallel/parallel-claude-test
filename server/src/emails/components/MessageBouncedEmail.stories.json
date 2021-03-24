@@ -11,13 +11,11 @@
       "args": {
         "senderName": "Santi",
         "contactEmail": "mariano@parallels.so",
-        "contactFirstName": "Mariano",
-        "contactLastName": "Rodriguez",
+        "contactFullName": "Mariano Rodriguez",
         "petitionId": "1234567890",
         "petitionName": "Know your Client",
-        "body": [
-          { "children": [{ "text": "Completame los siguientes datos porfa" }] }
-        ],
+        "bodyHtml": "<p>Completame los siguientes datos porfa</p>",
+        "bodyPlainText": "Completame los siguientes datos porfa",
         "parallelUrl": "https://www.onparallel.com",
         "assetsUrl": "https://static.onparallel.com",
         "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
@@ -26,11 +24,11 @@
       "argsTypes": {
         "senderName": { "control": { "type": "text" } },
         "contactEmail": { "control": { "type": "text" } },
-        "contactFirstName": { "control": { "type": "text" } },
-        "contactLastName": { "control": { "type": "text" } },
+        "contactFullName": { "control": { "type": "text" } },
         "petitionId": { "control": { "type": "text" } },
         "petitionName": { "control": { "type": "text" } },
-        "body": { "control": { "type": "object" } },
+        "bodyHtml": { "control": { "type": "text" } },
+        "bodyPlainText": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },
         "logoUrl": { "control": { "type": "text" } },

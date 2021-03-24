@@ -62,7 +62,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
         ],
       },
       {
-        children: [{ text: postBody }],
+        children: [{ text: JSON.stringify(postBody, null, 2) }],
       },
     ])}
 
@@ -125,7 +125,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
                       ],
                     },
                     {
-                      children: [{ text: JSON.stringify(postBody) }],
+                      children: [{ text: JSON.stringify(postBody, null, 2) }],
                     },
                   ]),
                 }}

@@ -1,8 +1,6 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage } from "react-intl";
-import { fullName } from "../../util/fullName";
-import { toHtml, toPlainText } from "../../util/slate";
 import { Email } from "../buildEmail";
 import { Disclaimer } from "../common/Disclaimer";
 import { GreetingFormal } from "../common/Greeting";
@@ -10,11 +8,11 @@ import { Layout, LayoutProps } from "../common/Layout";
 import { disclaimer, greetingFormal } from "../common/texts";
 
 export type PetitionClosedNotificationProps = {
-  contactFirstName: string | null;
-  contactLastName: string | null;
+  contactFullName: string;
   senderName: string;
   senderEmail: string;
-  body: any | null;
+  bodyHtml: string;
+  bodyPlainText: string;
 } & LayoutProps;
 
 const email: Email<PetitionClosedNotificationProps> = {
@@ -36,15 +34,9 @@ const email: Email<PetitionClosedNotificationProps> = {
       { senderName }
     );
   },
-  text(
-    { contactFirstName, contactLastName, senderName, senderEmail, body },
-    intl
-  ) {
+  text({ contactFullName, senderName, senderEmail, bodyPlainText }, intl) {
     return outdent`
-      ${greetingFormal(
-        { fullName: fullName(contactFirstName, contactLastName) },
-        intl
-      )}
+      ${greetingFormal({ fullName: contactFullName }, intl)}
       ${intl.formatMessage(
         {
           id: "petition-closed-notification.text",
@@ -54,19 +46,16 @@ const email: Email<PetitionClosedNotificationProps> = {
         { senderName, senderEmail }
       )}
 
-      ${toPlainText(body, {
-        contactName: contactFirstName ?? "",
-      })}
+      ${bodyPlainText}
       
       ${disclaimer({ email: senderEmail }, intl)}
     `;
   },
   html({
-    contactFirstName,
-    contactLastName,
+    contactFullName,
     senderName,
     senderEmail,
-    body,
+    bodyHtml,
     parallelUrl,
     assetsUrl,
     logoUrl,
@@ -82,9 +71,7 @@ const email: Email<PetitionClosedNotificationProps> = {
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
-            <GreetingFormal
-              fullName={fullName(contactFirstName, contactLastName)}
-            />
+            <GreetingFormal fullName={contactFullName} />
             <MjmlText>
               <FormattedMessage
                 id="petition-closed-notification.text"
@@ -104,11 +91,7 @@ const email: Email<PetitionClosedNotificationProps> = {
             padding="10px 0"
           >
             <MjmlText>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: toHtml(body, { contactName: contactFirstName ?? "" }),
-                }}
-              ></span>
+              <span dangerouslySetInnerHTML={{ __html: bodyHtml }}></span>
             </MjmlText>
             <MjmlSpacer height="10px" />
           </MjmlColumn>

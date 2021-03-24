@@ -7,6 +7,7 @@ import { EmailLog } from "../../db/__types";
 import { URLSearchParams } from "url";
 import { random } from "../../util/token";
 import sanitize from "sanitize-filename";
+import { slateParser } from "../../util/slate";
 
 export async function petitionClosedNotification(
   payload: {
@@ -46,14 +47,15 @@ export async function petitionClosedNotification(
     const access = await context.petitions.loadAccess(accessId);
     const contact = await context.contacts.loadContact(access!.contact_id);
 
+    const slate = slateParser({ contactName: contact?.first_name ?? "" });
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
       {
-        contactFirstName: contact!.first_name,
-        contactLastName: contact!.last_name,
+        contactFullName: fullName(contact!.first_name, contact!.last_name)!,
         senderName: fullName(sender.first_name, sender.last_name)!,
         senderEmail: sender.email,
-        body: payload.message,
+        bodyHtml: slate.toHtml(payload.message),
+        bodyPlainText: slate.toPlainText(payload.message),
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
         logoUrl:

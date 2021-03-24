@@ -1,8 +1,6 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
-import { fullName } from "../../util/fullName";
-import { toHtml, toPlainText } from "../../util/slate";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
@@ -17,14 +15,14 @@ import { disclaimer, greetingFormal, petitionFieldList } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
 export type PetitionMessageProps = {
-  contactFirstName: string | null;
-  contactLastName: string | null;
+  contactFullName: string;
   senderName: string;
   senderEmail: string;
   showFields: boolean;
   fields: PetitionFieldListProps["fields"];
   subject: string | null;
-  body: any | null;
+  bodyHtml: string;
+  bodyPlainText: string;
   deadline: Date | null;
   keycode: string;
 } & LayoutProps;
@@ -44,13 +42,12 @@ const email: Email<PetitionMessageProps> = {
   },
   text(
     {
-      contactFirstName,
-      contactLastName,
+      contactFullName,
       senderName,
       senderEmail,
       showFields,
       fields,
-      body,
+      bodyPlainText,
       deadline,
       keycode,
       parallelUrl,
@@ -58,10 +55,7 @@ const email: Email<PetitionMessageProps> = {
     intl
   ) {
     return outdent`
-      ${greetingFormal(
-        { fullName: fullName(contactFirstName, contactLastName) },
-        intl
-      )}
+      ${greetingFormal({ fullName: contactFullName }, intl)}
       ${intl.formatMessage(
         {
           id: "new-petition.text",
@@ -71,7 +65,7 @@ const email: Email<PetitionMessageProps> = {
         { senderName, senderEmail }
       )}
 
-      ${toPlainText(body, { contactName: contactFirstName ?? "" })}
+      ${bodyPlainText}
 
       ${
         showFields
@@ -107,13 +101,12 @@ const email: Email<PetitionMessageProps> = {
     `;
   },
   html({
-    contactFirstName,
-    contactLastName,
+    contactFullName,
     senderName,
     senderEmail,
     showFields,
     fields,
-    body,
+    bodyHtml,
     deadline,
     keycode,
     parallelUrl,
@@ -133,9 +126,7 @@ const email: Email<PetitionMessageProps> = {
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
-            <GreetingFormal
-              fullName={fullName(contactFirstName, contactLastName)}
-            />
+            <GreetingFormal fullName={contactFullName} />
             <MjmlText>
               <FormattedMessage
                 id="new-petition.text"
@@ -155,11 +146,7 @@ const email: Email<PetitionMessageProps> = {
             padding="10px 0"
           >
             <MjmlText>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: toHtml(body, { contactName: contactFirstName ?? "" }),
-                }}
-              ></span>
+              <span dangerouslySetInnerHTML={{ __html: bodyHtml }}></span>
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>

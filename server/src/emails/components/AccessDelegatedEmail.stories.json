@@ -14,13 +14,8 @@
         "senderEmail": "santi@onparallel.com",
         "petitionOwnerFullName": "Mariano Rodriguez",
         "petitionOwnerEmail": "mariano@onparallel.com",
-        "body": [
-          {
-            "children": [
-              { "text": "hola Derek, ayudame a completar esto porfa" }
-            ]
-          }
-        ],
+        "bodyPlainText": "hola Derek, ayudame a completar esto porfa",
+        "bodyHtml": "<p>hola Derek, ayudame a completar esto porfa</p>",
         "deadline": "2022-12-11T17:29:24.601Z",
         "fields": [
           { "position": 1, "id": 1223, "title": "DNI", "type": "TEXT" },
@@ -49,7 +44,8 @@
         "senderEmail": { "control": { "type": "text" } },
         "petitionOwnerFullName": { "control": { "type": "text" } },
         "petitionOwnerEmail": { "control": { "type": "text" } },
-        "body": { "control": { "type": "object" } },
+        "bodyHtml": { "control": { "type": "text" } },
+        "bodyPlainText": { "control": { "type": "text" } },
         "deadline": { "control": { "type": "date" } },
         "fields": { "control": { "type": "object" } },
         "keycode": { "control": { "type": "text" } },

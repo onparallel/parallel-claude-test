@@ -4,6 +4,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/components/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import { slateParser } from "../../util/slate";
 
 export async function petitionMessage(
   payload: { petition_message_id: number },
@@ -55,15 +56,17 @@ export async function petitionMessage(
       `Contact not found for petition_access.contact_id ${access.contact_id}`
     );
   }
+  const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
+  const slate = slateParser({ contactName: contact.first_name ?? "" });
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {
-      contactFirstName: contact.first_name,
-      contactLastName: contact.last_name,
+      contactFullName: fullName(contact.first_name, contact.last_name)!,
       senderName: fullName(sender.first_name, sender.last_name)!,
       senderEmail: sender.email,
       subject: message.email_subject,
-      body: message.email_body ? JSON.parse(message.email_body) : [],
+      bodyHtml: slate.toHtml(bodyJson),
+      bodyPlainText: slate.toPlainText(bodyJson),
       showFields: !petition.hide_recipient_view_contents,
       fields: fields.map(pick(["id", "title", "position", "type"])),
       deadline: petition.deadline,

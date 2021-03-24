@@ -4,6 +4,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import AccessDelegatedEmail from "../../emails/components/AccessDelegatedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import { toHtml, toPlainText } from "../../util/slate";
 
 export async function petitionAccessDelegated(
   payload: {
@@ -75,7 +76,8 @@ export async function petitionAccessDelegated(
       )!,
       petitionOwnerEmail: petitionOwner.email,
       fields: fields.map(pick(["id", "title", "position", "type"])),
-      body: payload.message_body,
+      bodyHtml: toHtml(payload.message_body),
+      bodyPlainText: toPlainText(payload.message_body),
       deadline: petition.deadline,
       keycode: newAccess.keycode,
       assetsUrl: context.config.misc.assetsUrl,

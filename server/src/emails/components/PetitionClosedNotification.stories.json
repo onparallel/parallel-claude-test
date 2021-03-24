@@ -9,51 +9,22 @@
         }
       },
       "args": {
-        "contactFirstName": "Derek",
-        "contactLastName": "Lou",
+        "contactFullName": "Derek Lou",
         "senderName": "Santi",
         "senderEmail": "santi@onparallel.com",
-        "body": [
-          {
-            "children": [
-              { "text": "Hola " },
-              {
-                "type": "placeholder",
-                "placeholder": "contactName",
-                "children": [{ "text": "" }]
-              },
-              { "text": "," }
-            ]
-          },
-          { "children": [{ "text": "" }] },
-          {
-            "children": [
-              { "text": "Ya hemos revisado toda la información. " },
-              { "text": "Te confirmamos que está todo correcto." }
-            ]
-          },
-          { "children": [{ "text": "" }] },
-          {
-            "children": [
-              {
-                "text": " Vamos a ponernos a trabajar y si tenemos cualquier duda o necesitamos cualquier información más te lo haremos saber."
-              }
-            ]
-          },
-          { "children": [{ "text": "" }] },
-          { "children": [{ "text": "Un saludo." }] }
-        ],
+        "bodyHtml": "<div><span><p><span>Hola </span><span>Derek</span><span>,</span></p><p><span></span></p><p><span>Ya hemos revisado toda la información. </span><span>Te confirmamos que está todo correcto.</span></p><p><span></span></p><p><span> Vamos a ponernos a trabajar y si tenemos cualquier duda o necesitamos cualquier información más te lo haremos saber.</span></p><p><span></span></p><p><span>Un saludo.</span></p></span></div>",
+        "bodyPlainText": "Hola Derek,\\n\\nYa hemos revisado toda la información. Te confirmamos que está todo correcto.\\n\\nVamos a ponernos a trabajar y si tenemos cualquier duda o necesitamos cualquier información más te lo haremos saber.\\n\\nUn saludo.",
         "parallelUrl": "https://www.onparallel.com",
         "assetsUrl": "https://static.onparallel.com",
         "logoUrl": "https://static.onparallel.com/static/emails/logo.png",
         "logoAlt": "Parallel"
       },
       "argsTypes": {
-        "contactFirstName": { "control": { "type": "text" } },
-        "contactLastName": { "control": { "type": "text" } },
+        "contactFullName": { "control": { "type": "text" } },
         "senderName": { "control": { "type": "text" } },
         "senderEmail": { "control": { "type": "text" } },
-        "body": { "control": { "type": "object" } },
+        "bodyHtml": { "control": { "type": "text" } },
+        "bodyPlainText": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },
         "logoUrl": { "control": { "type": "text" } },

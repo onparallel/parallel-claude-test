@@ -1,7 +1,6 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
-import { toHtml, toPlainText } from "../../util/slate";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
@@ -22,7 +21,8 @@ export type AccessDelegatedEmailProps = {
   petitionOwnerFullName: string;
   petitionOwnerEmail: string;
   fields: PetitionFieldListProps["fields"];
-  body: any | null;
+  bodyHtml: string;
+  bodyPlainText: string;
   deadline: Date | null;
   keycode: string;
 } & LayoutProps;
@@ -56,7 +56,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       petitionOwnerFullName,
       petitionOwnerEmail,
       fields,
-      body,
+      bodyPlainText,
       deadline,
       keycode,
       parallelUrl,
@@ -74,7 +74,7 @@ const email: Email<AccessDelegatedEmailProps> = {
         { senderName, senderEmail, petitionOwnerFullName, petitionOwnerEmail }
       )}
 
-      ${toPlainText(body)}
+      ${bodyPlainText}
 
       ${
         deadline
@@ -111,7 +111,7 @@ const email: Email<AccessDelegatedEmailProps> = {
     petitionOwnerFullName,
     petitionOwnerEmail,
     fields,
-    body,
+    bodyHtml,
     deadline,
     keycode,
     parallelUrl,
@@ -152,7 +152,7 @@ const email: Email<AccessDelegatedEmailProps> = {
             padding="10px 0"
           >
             <MjmlText>
-              <span dangerouslySetInnerHTML={{ __html: toHtml(body) }}></span>
+              <span dangerouslySetInnerHTML={{ __html: bodyHtml }}></span>
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>

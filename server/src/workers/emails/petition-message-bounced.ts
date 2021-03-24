@@ -4,6 +4,7 @@ import MessageBouncedEmail from "../../emails/components/MessageBouncedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { slateParser } from "../../util/slate";
 
 export async function petitionMessageBounced(
   payload: { email_log_id: number },
@@ -52,15 +53,17 @@ export async function petitionMessageBounced(
     );
   }
 
+  const slate = slateParser({ contactName: contact.first_name ?? "" });
+  const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const { html, text, subject, from } = await buildEmail(
     MessageBouncedEmail,
     {
-      contactFirstName: contact.first_name,
-      contactLastName: contact.last_name,
+      contactFullName: fullName(contact.first_name, contact.last_name)!,
       senderName: fullName(sender.first_name, sender.last_name)!,
       petitionId: toGlobalId("Petition", petition.id),
       petitionName: petition.name,
-      body: message.email_body ? JSON.parse(message.email_body) : [],
+      bodyHtml: slate.toHtml(bodyJson),
+      bodyPlainText: slate.toPlainText(bodyJson),
       contactEmail: contact.email,
       assetsUrl: context.config.misc.assetsUrl,
       parallelUrl: context.config.misc.parallelUrl,

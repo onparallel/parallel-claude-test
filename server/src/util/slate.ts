@@ -94,3 +94,10 @@ export function toPlainText(body: SlateNode[], placeholders?: Placeholders) {
   }
   return body.map(serialize).join("\n");
 }
+
+export function slateParser(placeholders?: Placeholders) {
+  return {
+    toHtml: (body: SlateNode[]) => toHtml(body, placeholders),
+    toPlainText: (body: SlateNode[]) => toPlainText(body, placeholders),
+  };
+}

@@ -9,8 +9,7 @@
         }
       },
       "args": {
-        "contactFirstName": "Santi",
-        "contactLastName": "Albo",
+        "contactFullName": "Santi Albo",
         "senderName": "Derek",
         "senderEmail": "derek@onparallel.com",
         "deadline": "2022-12-11T17:29:24.601Z",
@@ -25,75 +24,8 @@
           },
           { "position": 4, "id": 6905, "title": "Nombre", "type": "TEXT" }
         ],
-        "body": [
-          {
-            "children": [
-              { "text": "hola Derek, envimae los " },
-              { "text": "documentos " },
-              { "text": "siguientes ", "bold": true },
-              { "text": "super guays", "bold": true, "underline": true }
-            ]
-          },
-          {
-            "children": [{ "text": "hmmm" }]
-          },
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      { "text": "foto", "bold": true, "underline": true }
-                    ]
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [{ "text": "pasaporte", "italic": true }]
-                  },
-                  {
-                    "type": "bulleted-list",
-                    "children": [
-                      {
-                        "children": [
-                          {
-                            "type": "paragraph",
-                            "children": [
-                              {
-                                "text": "foto",
-                                "bold": true,
-                                "underline": true
-                              }
-                            ]
-                          }
-                        ],
-                        "type": "list-item"
-                      },
-                      {
-                        "children": [
-                          {
-                            "type": "paragraph",
-                            "children": [
-                              { "text": "pasaporte", "italic": true }
-                            ]
-                          }
-                        ],
-                        "type": "list-item"
-                      }
-                    ]
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ],
+        "bodyHtml": "<div><span><p><span>hola </span><span>Derek</span><span>, enviame los </span><span>documentos </span><span style=\"font-weight:bold;\">siguientes </span><span style=\"font-weight:bold;text-decoration:underline;\">super guays</span></p><p><span>hmmm</span></p><ul style=\"padding-left:24px\"><li><p><span style=\"font-weight:bold;text-decoration:underline;\">foto</span></p></li><li><p><span style=\"font-style:italic;\">pasaporte</span></p><ul style=\"padding-left:24px\"><li><p><span style=\"font-weight:bold;text-decoration:underline;\">foto</span></p></li><li><p><span style=\"font-style:italic;\">pasaporte</span></p></li></ul></li></ul></span></div>",
+        "bodyPlainText": "hola Derek, enviame los documentos siguientes super guays\\nhmmm\\n  - foto\\n  - pasaporte\\n    - foto\\n    - pasaporte",
         "keycode": "asdfghjkl",
         "parallelUrl": "https://www.onparallel.com",
         "assetsUrl": "https://static.onparallel.com",
@@ -101,12 +33,12 @@
         "logoAlt": "Parallel"
       },
       "argsTypes": {
-        "contactFirstName": { "control": { "type": "text" } },
-        "contactLastName": { "control": { "type": "text" } },
+        "contactFullName": { "control": { "type": "text" } },
         "senderName": { "control": { "type": "text" } },
         "senderEmail": { "control": { "type": "text" } },
         "fields": { "control": { "type": "object" } },
-        "body": { "control": { "type": "object" } },
+        "bodyHtml": { "control": { "type": "text" } },
+        "bodyPlainText": { "control": { "type": "text" } },
         "deadline": { "control": { "type": "date" } },
         "keycode": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },

@@ -9,86 +9,12 @@
         }
       },
       "args": {
-        "contactFirstName": "Derek",
-        "contactLastName": "Lou",
+        "contactFullName": "Derek Lou",
         "senderName": "Santi",
         "senderEmail": "santi@onparallel.com",
         "subject": "Hola!",
-        "body": [
-          {
-            "children": [
-              { "text": "hola " },
-              {
-                "type": "placeholder",
-                "placeholder": "contactName",
-                "children": [{ "text": "" }]
-              },
-              { "text": ", enviame los " },
-              { "text": "documentos " },
-              { "text": "siguientes ", "bold": true },
-              { "text": "super guays", "bold": true, "underline": true }
-            ]
-          },
-          {
-            "children": [{ "text": "hmmm" }]
-          },
-          {
-            "type": "bulleted-list",
-            "children": [
-              {
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [
-                      { "text": "foto", "bold": true, "underline": true }
-                    ]
-                  }
-                ],
-                "type": "list-item"
-              },
-              {
-                "children": [
-                  {
-                    "type": "paragraph",
-                    "children": [{ "text": "pasaporte", "italic": true }]
-                  },
-                  {
-                    "type": "bulleted-list",
-                    "children": [
-                      {
-                        "children": [
-                          {
-                            "type": "paragraph",
-                            "children": [
-                              {
-                                "text": "foto",
-                                "bold": true,
-                                "underline": true
-                              }
-                            ]
-                          }
-                        ],
-                        "type": "list-item"
-                      },
-                      {
-                        "children": [
-                          {
-                            "type": "paragraph",
-                            "children": [
-                              { "text": "pasaporte", "italic": true }
-                            ]
-                          }
-                        ],
-                        "type": "list-item"
-                      }
-                    ]
-                  }
-                ],
-                "type": "list-item"
-              }
-            ]
-          }
-        ],
+        "bodyHtml": "<div><span><p><span>hola </span><span>Derek</span><span>, enviame los </span><span>documentos </span><span style=\"font-weight:bold;\">siguientes </span><span style=\"font-weight:bold;text-decoration:underline;\">super guays</span></p><p><span>hmmm</span></p><ul style=\"padding-left:24px\"><li><p><span style=\"font-weight:bold;text-decoration:underline;\">foto</span></p></li><li><p><span style=\"font-style:italic;\">pasaporte</span></p><ul style=\"padding-left:24px\"><li><p><span style=\"font-weight:bold;text-decoration:underline;\">foto</span></p></li><li><p><span style=\"font-style:italic;\">pasaporte</span></p></li></ul></li></ul></span></div>",
+        "bodyPlainText": "hola Derek, enviame los documentos siguientes super guays\\nhmmm\\n  - foto\\n  - pasaporte\\n    - foto\\n    - pasaporte",
         "showFields": true,
         "fields": [
           { "position": 0, "id": 123, "title": "Title 1", "type": "HEADING" },
@@ -117,12 +43,12 @@
         "logoAlt": "Parallel"
       },
       "argsTypes": {
-        "contactFirstName": { "control": { "type": "text" } },
-        "contactLastName": { "control": { "type": "text" } },
+        "contactFullName": { "control": { "type": "text" } },
         "senderName": { "control": { "type": "text" } },
         "senderEmail": { "control": { "type": "text" } },
         "subject": { "control": { "type": "text" } },
-        "body": { "control": { "type": "object" } },
+        "bodyHtml": { "control": { "type": "text" } },
+        "bodyPlainText": { "control": { "type": "text" } },
         "showFields": { "control": { "type": "boolean" } },
         "fields": { "control": { "type": "object" } },
         "keycode": { "control": { "type": "text" } },
