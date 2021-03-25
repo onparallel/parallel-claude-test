@@ -1860,6 +1860,11 @@
     "context": "Passwords must match"
   },
   {
+    "term": "generic.forms.radiogroup-error",
+    "definition": "Por favor, escoja una opción",
+    "context": "Please, choose an option"
+  },
+  {
     "term": "generic.forms.required-first-name-error",
     "definition": "El nombre es un campo requerido",
     "context": "First name is required"
@@ -4446,8 +4451,23 @@
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle",
-    "definition": "Se requiere de una firma digital para completar esta petición. <b>¿Quién tiene que firmar el documento?</b>",
-    "context": "An eSignature is required to complete this petition. <b>Who has to sign the document?</b>"
+    "definition": "Se requiere de una firma digital para completar esta petición.",
+    "context": "An eSignature is required to complete this petition."
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.who-will-sign",
+    "definition": "¿Quién tiene que firmar el documento?",
+    "context": "Who has to sign the document?"
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.who-will-sign.myself",
+    "definition": "Firmaré yo ({email})",
+    "context": "I will sign ({email})"
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.who-will-sign.other",
+    "definition": "Firmará otra persona",
+    "context": "Another person will sign"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",

@@ -1860,6 +1860,11 @@
     "context": "Passwords must match"
   },
   {
+    "term": "generic.forms.radiogroup-error",
+    "definition": "Please, choose an option",
+    "context": "Please, choose an option"
+  },
+  {
     "term": "generic.forms.required-first-name-error",
     "definition": "First name is required",
     "context": "First name is required"
@@ -4446,8 +4451,23 @@
   },
   {
     "term": "recipient-view.complete-signer-info-dialog.subtitle",
-    "definition": "An eSignature is required to complete this petition. <b>Who has to sign the document?</b>",
-    "context": "An eSignature is required to complete this petition. <b>Who has to sign the document?</b>"
+    "definition": "An eSignature is required to complete this petition.",
+    "context": "An eSignature is required to complete this petition."
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.who-will-sign",
+    "definition": "Who has to sign the document?",
+    "context": "Who has to sign the document?"
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.who-will-sign.myself",
+    "definition": "I will sign ({email})",
+    "context": "I will sign ({email})"
+  },
+  {
+    "term": "recipient-view.complete-signer-info-dialog.who-will-sign.other",
+    "definition": "Another person will sign",
+    "context": "Another person will sign"
   },
   {
     "term": "recipient-view.completed-petition.toast-description",

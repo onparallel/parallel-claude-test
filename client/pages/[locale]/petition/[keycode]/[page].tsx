@@ -112,7 +112,7 @@ function RecipientView({
               signer = await showCompleteSignerInfoDialog({
                 keycode,
                 organization: granter.organization.name,
-                contactName: contact.firstName ?? "",
+                contact,
               });
             } else {
               await confirmStartSignatureProcessDialog({
@@ -575,12 +575,14 @@ RecipientView.fragments = {
         }
         contact {
           ...RecipientViewContactCard_PublicContact
+          ...useCompleteSignerInfoDialog_PublicContact
         }
         ...RecipientViewPetitionField_PublicPetitionAccess
       }
       ${this.PublicPetition}
       ${this.PublicUser}
       ${RecipientViewContactCard.fragments.PublicContact}
+      ${useCompleteSignerInfoDialog.fragments.PublicContact}
       ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
     `;
   },

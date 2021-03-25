@@ -3393,6 +3393,10 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
 };
 
+export type useCompleteSignerInfoDialog_PublicContactFragment = {
+  __typename?: "PublicContact";
+} & Pick<PublicContact, "firstName" | "lastName" | "email">;
+
 export type RecipientViewContactCard_PublicContactFragment = {
   __typename?: "PublicContact";
 } & Pick<PublicContact, "id" | "fullName" | "firstName" | "email">;
@@ -4886,7 +4890,8 @@ export type RecipientView_PublicPetitionAccessFragment = {
   contact?: Maybe<
     {
       __typename?: "PublicContact";
-    } & RecipientViewContactCard_PublicContactFragment
+    } & RecipientViewContactCard_PublicContactFragment &
+      useCompleteSignerInfoDialog_PublicContactFragment
   >;
 } & RecipientViewPetitionField_PublicPetitionAccessFragment;
 
@@ -6988,6 +6993,13 @@ export const RecipientViewContactCard_PublicContactFragmentDoc = gql`
     email
   }
 `;
+export const useCompleteSignerInfoDialog_PublicContactFragmentDoc = gql`
+  fragment useCompleteSignerInfoDialog_PublicContact on PublicContact {
+    firstName
+    lastName
+    email
+  }
+`;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccess on PublicPetitionAccess {
     granter {
@@ -7020,12 +7032,14 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
     }
     contact {
       ...RecipientViewContactCard_PublicContact
+      ...useCompleteSignerInfoDialog_PublicContact
     }
     ...RecipientViewPetitionField_PublicPetitionAccess
   }
   ${RecipientView_PublicPetitionFragmentDoc}
   ${RecipientView_PublicUserFragmentDoc}
   ${RecipientViewContactCard_PublicContactFragmentDoc}
+  ${useCompleteSignerInfoDialog_PublicContactFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
 `;
 export const PetitionPdf_PetitionFieldFragmentDoc = gql`
