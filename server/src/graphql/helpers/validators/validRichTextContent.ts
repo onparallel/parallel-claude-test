@@ -15,7 +15,7 @@ export const validRichTextContent = jsonSchema({
             ],
           },
         },
-        type: { enum: ["list-item"] },
+        type: { const: "list-item" },
       },
       required: ["type"],
     },
@@ -38,39 +38,34 @@ export const validRichTextContent = jsonSchema({
       properties: {
         children: {
           type: "array",
-          items: {
-            anyOf: [
-              { $ref: "#/definitions/leaf" },
-              { $ref: "#/definitions/placeholder" },
-            ],
-          },
+          items: { $ref: "#/definitions/leaf" },
         },
-        type: { enum: ["paragraph"] },
+        type: { const: "paragraph" },
       },
     },
     placeholder: {
       type: "object",
       properties: {
-        type: { enum: ["placeholder"] },
+        type: { const: "placeholder" },
         placeholder: { type: "string" },
-        children: {
-          type: "array",
-          items: {
-            $ref: "#/definitions/leaf",
-          },
-        },
       },
       required: ["type", "placeholder"],
     },
     leaf: {
       type: "object",
-      properties: {
-        text: { type: "string" },
-        bold: { type: "boolean" },
-        italic: { type: "boolean" },
-        underline: { type: "boolean" },
-      },
-      required: ["text"],
+      anyOf: [
+        { $ref: "#/definitions/placeholder" },
+        {
+          type: "object",
+          properties: {
+            text: { type: "string" },
+            bold: { type: "boolean" },
+            italic: { type: "boolean" },
+            underline: { type: "boolean" },
+          },
+          required: ["text"],
+        },
+      ],
     },
     root: {
       type: "array",
