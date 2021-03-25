@@ -34,7 +34,7 @@ export function PetitionRepliesFilteredFields({ count }: { count: number }) {
           <Flex alignItems="center">
             <EyeOffIcon marginRight={1} />
             <FormattedMessage
-              id="component.petition-contents.hidden-fields-divider"
+              id="component.petition-replies-filtered-fields.hidden-fields-divider"
               defaultMessage="{count, plural, =1 {1 field is} other {# fields are}} not applicable"
               values={{ count }}
             />

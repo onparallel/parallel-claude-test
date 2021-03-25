@@ -910,6 +910,11 @@
     "context": "Filter"
   },
   {
+    "term": "component.petition-replies-filtered-fields.hidden-fields-divider",
+    "definition": "{count, plural, =1 {1 field is} other {# fields are}} not applicable",
+    "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
+  },
+  {
     "term": "component.petition-replies-filtered-fields.hidden-fields-explanation",
     "definition": "Fields not shown to the recipient because the visibility conditions are not met.",
     "context": "Fields not shown to the recipient because the visibility conditions are not met."

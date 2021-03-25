@@ -576,7 +576,7 @@
   },
   {
     "term": "component.petition-contents.hidden-fields-divider",
-    "definition": "{count, plural, =1 {1 campo oculto} other {# campos ocultos}}",
+    "definition": "{count, plural, =1 {1 campo no aplica} other {# campos no aplican}}",
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
   },
   {
@@ -908,6 +908,11 @@
     "term": "component.petition-replies-filter-button.text",
     "definition": "Filtrar",
     "context": "Filter"
+  },
+  {
+    "term": "component.petition-replies-filtered-fields.hidden-fields-divider",
+    "definition": "{count, plural, =1 {1 campo no aplica} other {# campos no aplican}}",
+    "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
   },
   {
     "term": "component.petition-replies-filtered-fields.hidden-fields-explanation",
