@@ -63,7 +63,7 @@ export function filterPetitionFields<
       if (filter.SHOW_WITH_COMMENTS) {
         conditions.push(field.comments.length > 0);
       }
-      if (conditions.every((x) => x)) {
+      if (field.isReadOnly || conditions.every((x) => x)) {
         filtered.push({ type: "FIELD", field, fieldIndex });
       }
     }
