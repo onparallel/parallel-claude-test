@@ -91,7 +91,7 @@ const email: Email<PetitionClosedNotificationProps> = {
             padding="10px 0"
           >
             <MjmlText>
-              <span dangerouslySetInnerHTML={{ __html: bodyHtml }}></span>
+              <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
             </MjmlText>
             <MjmlSpacer height="10px" />
           </MjmlColumn>

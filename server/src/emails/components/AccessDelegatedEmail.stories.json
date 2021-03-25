@@ -15,7 +15,7 @@
         "petitionOwnerFullName": "Mariano Rodriguez",
         "petitionOwnerEmail": "mariano@onparallel.com",
         "bodyPlainText": "hola Derek, ayudame a completar esto porfa",
-        "bodyHtml": "<p>hola Derek, ayudame a completar esto porfa</p>",
+        "bodyHtml": "<p style=\"margin:0\">hola Derek, ayudame a completar esto porfa</p>",
         "deadline": "2022-12-11T17:29:24.601Z",
         "fields": [
           { "position": 1, "id": 1223, "title": "DNI", "type": "TEXT" },

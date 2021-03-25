@@ -68,7 +68,6 @@ app.get("/:email", async (req, res, next) => {
         </IntlProvider>,
         {
           keepComments: true,
-          beautify: true,
           minify: false,
           validationLevel: "soft",
         }

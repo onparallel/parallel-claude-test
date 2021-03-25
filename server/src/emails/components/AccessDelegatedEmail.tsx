@@ -152,7 +152,7 @@ const email: Email<AccessDelegatedEmailProps> = {
             padding="10px 0"
           >
             <MjmlText>
-              <span dangerouslySetInnerHTML={{ __html: bodyHtml }}></span>
+              <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>

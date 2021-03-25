@@ -1,7 +1,6 @@
 import { MjmlColumn, MjmlSection, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape } from "react-intl";
-import { toHtml, toPlainText } from "../../util/slate";
 import { Email } from "../buildEmail";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
@@ -51,28 +50,17 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
       }
     )}
 
-    ${toPlainText([
-      {
-        children: [
-          {
-            text: errorMessage,
-            bold: true,
-            type: "paragraph",
-          },
-        ],
-      },
-      {
-        children: [{ text: JSON.stringify(postBody, null, 2) }],
-      },
-    ])}
+    ${errorMessage}
+    
+    ${JSON.stringify(postBody, null, 2)}
 
-      ${intl.formatMessage({
-        id: "developer.webhook-error-email.tip",
-        defaultMessage:
-          "Please, make sure your subscription configuration is correct and the URL is valid and accepts requests.",
-      })}
+    ${intl.formatMessage({
+      id: "developer.webhook-error-email.tip",
+      defaultMessage:
+        "Please, make sure your subscription configuration is correct and the URL is valid and accepts requests.",
+    })}
       
-      ${closing({}, intl)}
+    ${closing({}, intl)}
     `;
   },
   html({
@@ -111,25 +99,9 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
             borderRadius="4px"
             padding="10px 0"
           >
+            <MjmlText fontWeight={600}>{errorMessage}</MjmlText>
             <MjmlText>
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: toHtml([
-                    {
-                      children: [
-                        {
-                          text: errorMessage,
-                          bold: true,
-                          type: "paragraph",
-                        },
-                      ],
-                    },
-                    {
-                      children: [{ text: JSON.stringify(postBody, null, 2) }],
-                    },
-                  ]),
-                }}
-              ></span>
+              <pre>{JSON.stringify(postBody, null, 2)}</pre>
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>

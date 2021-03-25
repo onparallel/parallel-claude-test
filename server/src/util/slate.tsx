@@ -1,7 +1,7 @@
+import React, { Fragment } from "react";
+import { renderToString } from "react-dom/server";
 import { Contact, Petition, User } from "../db/__types";
 import { fullName } from "./fullName";
-import { CSSProperties, Fragment } from "react";
-import { renderToString } from "react-dom/server";
 
 interface SlateContext {
   petition?: Partial<Petition> | null;
@@ -32,10 +32,7 @@ function getPlaceholder(key?: string, ctx?: SlateContext) {
     case "contact-last-name":
       return ctx.contact?.last_name ?? "";
     case "contact-full-name":
-      return fullName(
-        ctx.contact?.first_name ?? "",
-        ctx.contact?.last_name ?? ""
-      )!;
+      return fullName(ctx.contact?.first_name, ctx.contact?.last_name)!;
     case "contact-email":
       return ctx.contact?.email ?? "";
     case "user-first-name":
@@ -43,7 +40,7 @@ function getPlaceholder(key?: string, ctx?: SlateContext) {
     case "user-last-name":
       return ctx.user?.last_name ?? "";
     case "user-full-name":
-      return fullName(ctx.user?.first_name ?? "", ctx.user?.last_name ?? "")!;
+      return fullName(ctx.user?.first_name, ctx.user?.last_name)!;
     case "petition-title":
       return ctx.petition?.name ?? "";
     default:
@@ -51,59 +48,47 @@ function getPlaceholder(key?: string, ctx?: SlateContext) {
   }
 }
 
-function renderDOMNode(node: SlateNode, ctx?: SlateContext, index?: number) {
+function renderSlate(node: SlateNode | SlateNode[], ctx?: SlateContext) {
+  if (Array.isArray(node)) {
+    return node.map((child, index) => (
+      <Fragment key={index}>{renderSlate(child, ctx)}</Fragment>
+    ));
+  }
   if (Array.isArray(node.children)) {
     switch (node.type) {
       case "paragraph":
       case undefined:
         return (
-          <p style={{ margin: 0 }} key={index}>
-            {paragraphIsEmpty(node) ? (
-              <br />
-            ) : (
-              node.children.map((child: any, index: number) => (
-                <Fragment key={index}>{renderDOMNode(child, ctx)}</Fragment>
-              ))
-            )}
+          <p style={{ margin: 0 }}>
+            {paragraphIsEmpty(node) ? <br /> : renderSlate(node.children, ctx)}
           </p>
         );
       case "placeholder":
-        return <span>{getPlaceholder(node.placeholder, ctx)}</span>;
+        return (
+          <span>{renderWhiteSpace(getPlaceholder(node.placeholder, ctx))}</span>
+        );
       case "bulleted-list":
         return (
-          <ul
-            style={{ margin: 0, marginLeft: "24px", paddingLeft: 0 }}
-            key={index}
-          >
-            {node.children.map((child: any, index: number) =>
-              renderDOMNode(child, ctx, index)
-            )}
+          <ul style={{ margin: 0, marginLeft: "24px", paddingLeft: 0 }}>
+            {renderSlate(node.children, ctx)}
           </ul>
         );
       case "list-item": {
         return (
-          <li key={index} style={{ marginLeft: 0 }}>
-            {node.children.map((child: any, index: number) =>
-              renderDOMNode(child, ctx, index)
-            )}
-          </li>
+          <li style={{ marginLeft: 0 }}>{renderSlate(node.children, ctx)}</li>
         );
       }
     }
   } else if (typeof node.text === "string") {
-    const style: CSSProperties = {};
-    if (node.bold) {
-      style.fontWeight = "bold";
-    }
-    if (node.italic) {
-      style.fontStyle = "italic";
-    }
-    if (node.underline) {
-      style.textDecoration = "underline";
-    }
     return (
-      <span style={style} key={index}>
-        {node.text}
+      <span
+        style={{
+          fontWeight: node.bold ? "bold" : undefined,
+          fontStyle: node.italic ? "italic" : undefined,
+          textDecoration: node.underline ? "underline" : undefined,
+        }}
+      >
+        {renderWhiteSpace(node.text)}
       </span>
     );
   }
@@ -114,15 +99,30 @@ function paragraphIsEmpty(node: SlateNode) {
   return node?.children?.length === 1 && node.children[0]?.text === "";
 }
 
-export function toHtml(body: SlateNode[], ctx?: SlateContext) {
-  return renderToString(
-    <>
-      {body?.map((node, index: number) => (
-        <div key={index} style={{ padding: "0 20px", lineHeight: "24px" }}>
-          {renderDOMNode(node, ctx)}
-        </div>
-      ))}
-    </>
+function renderWhiteSpace(text: string) {
+  return text.split(/ ( +)/).map((part, index) => (
+    <Fragment key={index}>
+      {part.match(/^ +$/) ? (
+        <>
+          {" "}
+          {part.split("").map((_, index) => (
+            <Fragment key={index}>&nbsp;</Fragment>
+          ))}
+        </>
+      ) : (
+        part
+      )}
+    </Fragment>
+  ));
+}
+
+export function toHtml(body: SlateNode[], ctx: SlateContext = {}) {
+  return renderToString(<>{renderSlate(body, ctx)}</>).replace(
+    /<!-- --> <!-- -->(\u00A0<!-- -->)+/g,
+    function (match) {
+      const extra = (match.length - 17) / 9;
+      return " " + "&nbsp;".repeat(extra);
+    }
   );
 }
 

@@ -25,7 +25,6 @@ export async function buildEmail<T>(
     </IntlProvider>,
     {
       keepComments: false,
-      beautify: false,
       minify: true,
       validationLevel: "skip",
     }

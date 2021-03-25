@@ -14,7 +14,7 @@
         "contactFullName": "Mariano Rodriguez",
         "petitionId": "1234567890",
         "petitionName": "Know your Client",
-        "bodyHtml": "<p>Completame los siguientes datos porfa</p>",
+        "bodyHtml": "<p style=\"margin:0\">Completame los siguientes datos porfa</p>",
         "bodyPlainText": "Completame los siguientes datos porfa",
         "parallelUrl": "https://www.onparallel.com",
         "assetsUrl": "https://static.onparallel.com",

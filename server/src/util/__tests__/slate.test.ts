@@ -1,12 +1,14 @@
 import { toHtml, toPlainText } from "../slate";
 
-const rootNode = (children: string) =>
-  `<div style="padding:0 20px;line-height:24px" data-reactroot="">${children}</div>`;
-const paragraph = (children: string) => `<p style="margin:0">${children}</p>`;
-const bulletList = (children: string) =>
-  `<ul style="margin:0;margin-left:24px;padding-left:0">${children}</ul>`;
-const listItem = (children: string) =>
-  `<li style="margin-left:0">${children}</li>`;
+const rootNode = (...children: string[]) => children.join("");
+const paragraph = (...children: string[]) =>
+  `<p style="margin:0">${children.join("")}</p>`;
+const bulletList = (...children: string[]) =>
+  `<ul style="margin:0;margin-left:24px;padding-left:0">${children.join(
+    ""
+  )}</ul>`;
+const listItem = (...children: string[]) =>
+  `<li style="margin-left:0">${children.join("")}</li>`;
 
 describe("Slate", () => {
   describe("toHTML", () => {
@@ -45,8 +47,10 @@ describe("Slate", () => {
           },
         ])
       ).toEqual(
-        rootNode(paragraph("<span>Hello World!</span>")) +
-          rootNode(paragraph("<span>Goodbye.</span>"))
+        rootNode(
+          paragraph("<span>Hello World!</span>"),
+          paragraph("<span>Goodbye.</span>")
+        )
       );
     });
 
@@ -66,7 +70,8 @@ describe("Slate", () => {
       ).toEqual(
         rootNode(
           paragraph(
-            '<span style="font-weight:bold">Hello</span><span>World!</span>'
+            '<span style="font-weight:bold">Hello</span>',
+            "<span>World!</span>"
           )
         )
       );
@@ -102,8 +107,8 @@ describe("Slate", () => {
       ).toEqual(
         rootNode(
           bulletList(
-            listItem(paragraph("<span>item 1</span>")) +
-              listItem(paragraph("<span>item 2</span>"))
+            listItem(paragraph("<span>item 1</span>")),
+            listItem(paragraph("<span>item 2</span>"))
           )
         )
       );
@@ -188,41 +193,35 @@ describe("Slate", () => {
       ).toEqual(
         rootNode(
           paragraph(
-            "<span>hola </span>" +
-              "<span>Mariano</span>" +
-              "<span>, enviame los </span>" +
-              "<span>documentos </span>" +
-              '<span style="font-weight:bold">siguientes </span>' +
-              '<span style="font-weight:bold;text-decoration:underline">super guays</span>'
-          )
-        ) +
-          rootNode(paragraph("<span>hmmm</span>")) +
-          rootNode(
-            bulletList(
-              listItem(
-                paragraph(
-                  '<span style="font-weight:bold;text-decoration:underline">foto</span>'
-                )
-              ) +
+            "<span>hola </span>",
+            "<span>Mariano</span>",
+            "<span>, enviame los </span>",
+            "<span>documentos </span>",
+            '<span style="font-weight:bold">siguientes </span>',
+            '<span style="font-weight:bold;text-decoration:underline">super guays</span>'
+          ),
+          paragraph("<span>hmmm</span>"),
+          bulletList(
+            listItem(
+              paragraph(
+                '<span style="font-weight:bold;text-decoration:underline">foto</span>'
+              )
+            ),
+            listItem(
+              paragraph('<span style="font-style:italic">pasaporte</span>'),
+              bulletList(
                 listItem(
                   paragraph(
-                    '<span style="font-style:italic">pasaporte</span>'
-                  ) +
-                    bulletList(
-                      listItem(
-                        paragraph(
-                          '<span style="font-weight:bold;text-decoration:underline">foto</span>'
-                        )
-                      ) +
-                        listItem(
-                          paragraph(
-                            '<span style="font-style:italic">pasaporte</span>'
-                          )
-                        )
-                    )
+                    '<span style="font-weight:bold;text-decoration:underline">foto</span>'
+                  )
+                ),
+                listItem(
+                  paragraph('<span style="font-style:italic">pasaporte</span>')
                 )
+              )
             )
           )
+        )
       );
     });
 
@@ -241,6 +240,21 @@ describe("Slate", () => {
           paragraph(
             "<span>&lt;div style=&quot;color:red&quot;&gt;im a malicious script!&lt;/div&gt;</span>"
           )
+        )
+      );
+    });
+
+    it("adds the right amount of whitespace", () => {
+      expect(
+        toHtml([
+          {
+            type: "paragraph",
+            children: [{ text: "hola que  tal   estas?" }],
+          },
+        ])
+      ).toEqual(
+        rootNode(
+          paragraph("<span>hola que &nbsp;tal &nbsp;&nbsp;estas?</span>")
         )
       );
     });
