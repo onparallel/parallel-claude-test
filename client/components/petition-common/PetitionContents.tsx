@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Box, Button, Center, Flex, Stack, Text } from "@chakra-ui/react";
-import { FilterIcon } from "@parallel/chakra/icons";
+import { EyeOffIcon } from "@parallel/chakra/icons";
 import { PetitionContents_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
@@ -57,7 +57,7 @@ export function PetitionContents<
           <PetitionContentsItem
             key={x.field.id}
             field={x.field}
-            isVisible={x.isVisible ?? true}
+            isVisible={true}
             fieldIndex={x.fieldIndex}
             onFieldClick={handleFieldClick(x.field.id)}
             fieldIndicators={fieldIndicators}
@@ -65,13 +65,11 @@ export function PetitionContents<
         ) : (
           <PetitionContentsDivider key={index} isDashed>
             <Flex alignItems="center">
-              <FilterIcon marginRight={1} />
+              <EyeOffIcon marginRight={1} />
               <FormattedMessage
                 id="component.petition-contents.hidden-fields-divider"
-                defaultMessage="{count, plural, =1 {1 hidden field} other {# hidden fields}}"
-                values={{
-                  count: (x.SHOW_NOT_REPLIED ?? 0) + (x.SHOW_NOT_VISIBLE ?? 0),
-                }}
+                defaultMessage="{count, plural, =1 {1 field is} other {# fields are}} not applicable"
+                values={{ count: x.count }}
               />
             </Flex>
           </PetitionContentsDivider>

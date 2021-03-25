@@ -90,7 +90,6 @@ import {
 } from "@parallel/utils/filterPetitionFields";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
-import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
@@ -506,8 +505,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     } catch {}
   };
 
-  const [filter, setFilter] = useUserPreference<PetitionFieldFilter>(
-    "replies-fields-filter",
+  const [filter, setFilter] = useState<PetitionFieldFilter>(
     defaultFieldsFilter
   );
 
@@ -674,7 +672,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                     id={`field-${x.field.id}`}
                     key={x.field.id}
                     field={x.field}
-                    isVisible={x.isVisible}
+                    isVisible={true}
                     fieldIndex={x.fieldIndex}
                     onValidateToggle={() =>
                       handleValidateToggle([x.field.id], !x.field.validated)
@@ -691,7 +689,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                     }
                   />
                 ) : (
-                  <PetitionRepliesFilteredFields key={index} fields={x} />
+                  <PetitionRepliesFilteredFields key={index} count={x.count} />
                 )
               )}
             </Stack>

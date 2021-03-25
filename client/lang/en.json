@@ -576,8 +576,8 @@
   },
   {
     "term": "component.petition-contents.hidden-fields-divider",
-    "definition": "{count, plural, =1 {1 hidden field} other {# hidden fields}}",
-    "context": "{count, plural, =1 {1 hidden field} other {# hidden fields}}"
+    "definition": "{count, plural, =1 {1 field is} other {# fields are}} not applicable",
+    "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
   },
   {
     "term": "component.petition-field-select.placeholder",
@@ -885,14 +885,24 @@
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>"
   },
   {
-    "term": "component.petition-replies-filter-button.show-no-replies",
-    "definition": "Show fields without replies",
-    "context": "Show fields without replies"
+    "term": "component.petition-replies-filter-button.show-not-reviewed",
+    "definition": "Not reviewed",
+    "context": "Not reviewed"
   },
   {
-    "term": "component.petition-replies-filter-button.show-not-visibible",
-    "definition": "Show <x>non-activated</x> fields",
-    "context": "Show <x>non-activated</x> fields"
+    "term": "component.petition-replies-filter-button.show-reviewed",
+    "definition": "Reviewed",
+    "context": "Reviewed"
+  },
+  {
+    "term": "component.petition-replies-filter-button.show-with-comments",
+    "definition": "With comments",
+    "context": "With comments"
+  },
+  {
+    "term": "component.petition-replies-filter-button.show-with-replies",
+    "definition": "With replies",
+    "context": "With replies"
   },
   {
     "term": "component.petition-replies-filter-button.text",
@@ -900,14 +910,9 @@
     "context": "Filter"
   },
   {
-    "term": "component.petition-replies-filtered-fields.no-replies",
-    "definition": "{count, plural, =1 {1 field doesn't} other {# fields don't}} have replies",
-    "context": "{count, plural, =1 {1 field doesn't} other {# fields don't}} have replies"
-  },
-  {
-    "term": "component.petition-replies-filtered-fields.non-activated",
-    "definition": "{count, plural, =1 {1 field is} other {# fields are}} <x>not activated</x>",
-    "context": "{count, plural, =1 {1 field is} other {# fields are}} <x>not activated</x>"
+    "term": "component.petition-replies-filtered-fields.hidden-fields-explanation",
+    "definition": "Fields not shown to the recipient because the visibility conditions are not met.",
+    "context": "Fields not shown to the recipient because the visibility conditions are not met."
   },
   {
     "term": "component.petition-settings.deadline-description",
@@ -1948,11 +1953,6 @@
     "term": "generic.no-description",
     "definition": "No description",
     "context": "No description"
-  },
-  {
-    "term": "generic.non-activated-fields-explanation",
-    "definition": "Fields where visibility conditions are not met",
-    "context": "Fields where visibility conditions are not met"
   },
   {
     "term": "generic.not-specified",

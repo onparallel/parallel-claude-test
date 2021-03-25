@@ -5111,7 +5111,10 @@ export type useFieldVisibility_PetitionFieldFragment = {
 
 export type filterPetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "isReadOnly"> & {
+} & Pick<PetitionField, "id" | "isReadOnly" | "validated"> & {
+    comments: Array<
+      { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
+    >;
     replies: Array<
       { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">
     >;
@@ -6388,6 +6391,10 @@ export const filterPetitionFields_PetitionFieldFragmentDoc = gql`
   fragment filterPetitionFields_PetitionField on PetitionField {
     id
     isReadOnly
+    validated
+    comments {
+      id
+    }
     replies {
       id
     }

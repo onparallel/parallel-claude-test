@@ -3,7 +3,11 @@ import { filterPetitionFields_PetitionFieldFragment } from "@parallel/graphql/__
 import { PetitionFieldIndex } from "./fieldIndices";
 import { zipX } from "./zipX";
 
-export type PetitionFieldFilterType = "SHOW_NOT_REPLIED" | "SHOW_NOT_VISIBLE";
+export type PetitionFieldFilterType =
+  | "SHOW_REPLIED"
+  | "SHOW_REVIEWED"
+  | "SHOW_NOT_REVIEWED"
+  | "SHOW_WITH_COMMENTS";
 
 export type PetitionFieldFilter = Record<PetitionFieldFilterType, boolean>;
 
@@ -14,13 +18,14 @@ type FilterPetitionFieldResult<
       type: "FIELD";
       field: T;
       fieldIndex: PetitionFieldIndex;
-      isVisible: boolean;
     }
-  | ({ type: "HIDDEN" } & Partial<Record<PetitionFieldFilterType, number>>);
+  | { type: "HIDDEN"; count: number };
 
 export const defaultFieldsFilter = {
-  SHOW_NOT_REPLIED: true,
-  SHOW_NOT_VISIBLE: false,
+  SHOW_REPLIED: false,
+  SHOW_REVIEWED: false,
+  SHOW_NOT_REVIEWED: false,
+  SHOW_WITH_COMMENTS: false,
 };
 
 export function filterPetitionFields<
@@ -37,22 +42,30 @@ export function filterPetitionFields<
     fieldIndices,
     fieldVisibility ?? []
   )) {
-    const reason = ([
-      [!isVisible, "SHOW_NOT_VISIBLE"],
-      [!field.isReadOnly && field.replies.length === 0, "SHOW_NOT_REPLIED"],
-    ] as [boolean, PetitionFieldFilterType][]).find(
-      ([check, type]) => check && !filter[type]
-    );
-    if (reason) {
-      const [, type] = reason;
-      const last = filtered[filtered.length - 1];
+    const last = filtered[filtered.length - 1];
+    if (!isVisible) {
       if (last?.type === "HIDDEN") {
-        last[type] = (last[type] ?? 0) + 1;
+        last.count += 1;
       } else {
-        filtered.push({ type: "HIDDEN", [type]: 1 });
+        filtered.push({ type: "HIDDEN", count: 1 });
       }
     } else {
-      filtered.push({ type: "FIELD", field, fieldIndex, isVisible });
+      const conditions: boolean[] = [];
+      if (filter.SHOW_REPLIED) {
+        conditions.push(field.replies.length > 0);
+      }
+      if (filter.SHOW_REVIEWED && !filter.SHOW_NOT_REVIEWED) {
+        conditions.push(field.validated);
+      }
+      if (!filter.SHOW_REVIEWED && filter.SHOW_NOT_REVIEWED) {
+        conditions.push(!field.validated);
+      }
+      if (filter.SHOW_WITH_COMMENTS) {
+        conditions.push(field.comments.length > 0);
+      }
+      if (conditions.every((x) => x)) {
+        filtered.push({ type: "FIELD", field, fieldIndex });
+      }
     }
   }
   return filtered;
@@ -63,6 +76,10 @@ filterPetitionFields.fragments = {
     fragment filterPetitionFields_PetitionField on PetitionField {
       id
       isReadOnly
+      validated
+      comments {
+        id
+      }
       replies {
         id
       }
