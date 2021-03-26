@@ -17,8 +17,9 @@ import {
 } from "@parallel/graphql/__types";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
+import autosize from "autosize";
 import outdent from "outdent";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -91,7 +92,14 @@ function CompleteSignerInfoDialog({
   });
 
   const [showMessage, setShowMessage] = useState(true);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
   const signer = watch("signer");
+  useEffect(() => {
+    if (signer === "other" && showMessage) {
+      const timeout = setTimeout(() => autosize.update(messageRef.current!));
+      return () => clearTimeout(timeout);
+    }
+  }, [signer, showMessage]);
 
   return (
     <ConfirmDialog
@@ -271,27 +279,31 @@ function CompleteSignerInfoDialog({
                   />
                 </Checkbox>
               </FormControl>
-            </Stack>
-            <PaddedCollapse in={showMessage}>
-              <FormControl isInvalid={showMessage && !!errors.message}>
-                <GrowingTextarea
-                  name="message"
-                  ref={register({
-                    required: signer === "other" && showMessage,
-                  })}
-                  placeholder={intl.formatMessage({
-                    id: "component.message-email-editor.body-placeholder",
-                    defaultMessage: "Write a message to include in the email",
-                  })}
-                />
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="component.message-email-editor.body-required-error"
-                    defaultMessage="Customizing the initial message improves the response time of the recipients"
+              <PaddedCollapse in={showMessage}>
+                <FormControl isInvalid={showMessage && !!errors.message}>
+                  <GrowingTextarea
+                    name="message"
+                    height="172px"
+                    ref={useMergedRef(
+                      messageRef,
+                      register({
+                        required: signer === "other" && showMessage,
+                      })
+                    )}
+                    placeholder={intl.formatMessage({
+                      id: "component.message-email-editor.body-placeholder",
+                      defaultMessage: "Write a message to include in the email",
+                    })}
                   />
-                </FormErrorMessage>
-              </FormControl>
-            </PaddedCollapse>
+                  <FormErrorMessage>
+                    <FormattedMessage
+                      id="component.message-email-editor.body-required-error"
+                      defaultMessage="Customizing the initial message improves the response time of the recipients"
+                    />
+                  </FormErrorMessage>
+                </FormControl>
+              </PaddedCollapse>
+            </Stack>
           </PaddedCollapse>
         </Stack>
       }
