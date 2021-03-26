@@ -60,10 +60,18 @@ function useTranslations() {
     };
   });
   const setLocale = useCallback(async function (locale: string) {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.json?v=${process.env.BUILD_ID}`
-    );
-    const messages = await res.json();
+    let messages: IntlConfig["messages"];
+    if (process.env.NODE_ENV === "production") {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.json?v=${process.env.BUILD_ID}`
+      );
+      messages = await res.json();
+    } else {
+      const { default: data } = await import(`@parallel/lang/${locale}.json`);
+      messages = Object.fromEntries<string>(
+        data.map((t: any) => [t.term, t.definition])
+      );
+    }
     setState(({ cache }) => ({
       current: locale,
       cache: {
