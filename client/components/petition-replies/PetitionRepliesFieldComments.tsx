@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Collapse,
   Flex,
   IconButton,
   Menu,
@@ -48,6 +47,7 @@ import { Divider } from "../common/Divider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { HelpPopover } from "../common/HelpPopover";
 import { Link } from "../common/Link";
+import { PaddedCollapse } from "../common/PaddedCollapse";
 import { SmallPopover } from "../common/SmallPopover";
 import { Spacer } from "../common/Spacer";
 import { UserReference } from "../petition-activity/UserReference";
@@ -210,7 +210,7 @@ export function PetitionRepliesFieldComments({
           onChange={handleDraftChange as any}
           {...inputFocusBind}
         />
-        <Collapse in={isExpanded}>
+        <PaddedCollapse in={isExpanded}>
           <Stack
             paddingTop={2}
             direction="row"
@@ -221,7 +221,7 @@ export function PetitionRepliesFieldComments({
             {user.hasInternalComments && (
               <Stack display="flex" alignItems="center" direction="row">
                 <Checkbox
-                  marginLeft={2}
+                  marginLeft={1}
                   colorScheme="purple"
                   isChecked={isInternalComment}
                   isDisabled={hasCommentsEnabled ? false : true}
@@ -255,7 +255,7 @@ export function PetitionRepliesFieldComments({
               </Button>
             </Stack>
           </Stack>
-        </Collapse>
+        </PaddedCollapse>
       </Box>
     </Card>
   );

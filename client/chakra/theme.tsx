@@ -1,5 +1,4 @@
 import {
-  ChakraTheme,
   extendTheme,
   keyframes,
   Menu,

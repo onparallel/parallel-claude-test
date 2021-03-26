@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import {
   Button,
   Checkbox,
-  Collapse,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -26,6 +25,7 @@ import { omit } from "remeda";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
+import { PaddedCollapse } from "../common/PaddedCollapse";
 
 type CompleteSignerInfoDialogData = {
   signer: "myself" | "other" | null;
@@ -180,94 +180,99 @@ function CompleteSignerInfoDialog({
             </FormErrorMessage>
           </FormControl>
 
-          <Collapse in={signer === "other"}>
-            <FormControl
-              id="contact-email"
-              isInvalid={signer === "other" && !!errors.email}
-            >
-              <FormLabel>
-                <FormattedMessage
-                  id="generic.forms.email-label"
-                  defaultMessage="Email"
-                />
-              </FormLabel>
-              <Input
-                ref={useMergedRef(
-                  emailRef,
-                  register({
-                    required: signer === "other",
-                    pattern: EMAIL_REGEX,
-                  })
-                )}
-                type="email"
-                name="email"
-                placeholder={intl.formatMessage({
-                  id: "generic.forms.email-placeholder",
-                  defaultMessage: "name@example.com",
-                })}
-              />
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.invalid-email-error"
-                  defaultMessage="Please, enter a valid email"
-                />
-              </FormErrorMessage>
-            </FormControl>
-            <Stack direction="row" marginTop={2}>
+          <PaddedCollapse in={signer === "other"}>
+            <Stack>
               <FormControl
-                id="contact-first-name"
-                isInvalid={!!errors.firstName}
+                id="contact-email"
+                isInvalid={signer === "other" && !!errors.email}
               >
                 <FormLabel>
                   <FormattedMessage
-                    id="generic.forms.first-name-label"
-                    defaultMessage="First name"
+                    id="generic.forms.email-label"
+                    defaultMessage="Email"
                   />
                 </FormLabel>
                 <Input
-                  name="firstName"
-                  ref={register({ required: signer === "other" })}
+                  ref={useMergedRef(
+                    emailRef,
+                    register({
+                      required: signer === "other",
+                      pattern: EMAIL_REGEX,
+                    })
+                  )}
+                  type="email"
+                  name="email"
+                  placeholder={intl.formatMessage({
+                    id: "generic.forms.email-placeholder",
+                    defaultMessage: "name@example.com",
+                  })}
                 />
                 <FormErrorMessage>
                   <FormattedMessage
-                    id="generic.forms.invalid-contact-first-name-error"
-                    defaultMessage="Please, enter the contact first name"
+                    id="generic.forms.invalid-email-error"
+                    defaultMessage="Please, enter a valid email"
                   />
                 </FormErrorMessage>
               </FormControl>
-              <FormControl id="contact-last-name" isInvalid={!!errors.lastName}>
-                <FormLabel>
-                  <FormattedMessage
-                    id="generic.forms.last-name-label"
-                    defaultMessage="Last name"
+              <Stack direction={{ base: "column", sm: "row" }}>
+                <FormControl
+                  id="contact-first-name"
+                  isInvalid={!!errors.firstName}
+                >
+                  <FormLabel>
+                    <FormattedMessage
+                      id="generic.forms.first-name-label"
+                      defaultMessage="First name"
+                    />
+                  </FormLabel>
+                  <Input
+                    name="firstName"
+                    ref={register({ required: signer === "other" })}
                   />
-                </FormLabel>
-                <Input
-                  name="lastName"
-                  ref={register({ required: signer === "other" })}
-                />
-                <FormErrorMessage>
-                  <FormattedMessage
-                    id="generic.forms.invalid-contact-last-name-error"
-                    defaultMessage="Please, enter the contact last name"
+                  <FormErrorMessage>
+                    <FormattedMessage
+                      id="generic.forms.invalid-contact-first-name-error"
+                      defaultMessage="Please, enter the contact first name"
+                    />
+                  </FormErrorMessage>
+                </FormControl>
+                <FormControl
+                  id="contact-last-name"
+                  isInvalid={!!errors.lastName}
+                >
+                  <FormLabel>
+                    <FormattedMessage
+                      id="generic.forms.last-name-label"
+                      defaultMessage="Last name"
+                    />
+                  </FormLabel>
+                  <Input
+                    name="lastName"
+                    ref={register({ required: signer === "other" })}
                   />
-                </FormErrorMessage>
+                  <FormErrorMessage>
+                    <FormattedMessage
+                      id="generic.forms.invalid-contact-last-name-error"
+                      defaultMessage="Please, enter the contact last name"
+                    />
+                  </FormErrorMessage>
+                </FormControl>
+              </Stack>
+              <FormControl>
+                <FormLabel />
+                <Checkbox
+                  colorScheme="purple"
+                  isChecked={showMessage}
+                  onChange={(e) => setShowMessage(e.target.checked)}
+                >
+                  <FormattedMessage
+                    id="generic.add-message"
+                    defaultMessage="Add message"
+                  />
+                </Checkbox>
               </FormControl>
             </Stack>
-            <FormControl>
-              <FormLabel marginTop={2} />
-              <Checkbox
-                colorScheme="purple"
-                isChecked={showMessage}
-                onChange={(e) => setShowMessage(e.target.checked)}
-              >
-                <FormattedMessage
-                  id="generic.add-message"
-                  defaultMessage="Add message"
-                />
-              </Checkbox>
-            </FormControl>
-            <Collapse in={showMessage}>
+            <PaddedCollapse in={showMessage}>
               <FormControl isInvalid={showMessage && !!errors.message}>
                 <GrowingTextarea
                   name="message"
@@ -286,8 +291,8 @@ function CompleteSignerInfoDialog({
                   />
                 </FormErrorMessage>
               </FormControl>
-            </Collapse>
-          </Collapse>
+            </PaddedCollapse>
+          </PaddedCollapse>
         </Stack>
       }
       confirm={

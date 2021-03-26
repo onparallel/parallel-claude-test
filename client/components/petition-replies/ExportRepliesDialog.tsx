@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Collapse,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -30,6 +29,7 @@ import {
 import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { PaddedCollapse } from "../common/PaddedCollapse";
 import {
   PlaceholderInput,
   PlaceholderInputRef,
@@ -246,32 +246,30 @@ export function ExportRepliesDialog({
                   defaultMessage="Rename downloaded files automatically"
                 />
               </Checkbox>
-              <Box marginX={-1}>
-                <Collapse in={rename}>
-                  <Box marginLeft={7} padding={1}>
-                    <PlaceholderInput
-                      ref={inputRef}
-                      value={pattern}
-                      onChange={setPattern}
-                      placeholders={placeholders}
-                      marginBottom={2}
+              <PaddedCollapse in={rename}>
+                <Box marginLeft={7}>
+                  <PlaceholderInput
+                    ref={inputRef}
+                    value={pattern}
+                    onChange={setPattern}
+                    placeholders={placeholders}
+                    marginBottom={2}
+                  />
+                  <Text as="div" fontSize="xs" color="gray.500">
+                    <FormattedMessage
+                      id="generic.for-example"
+                      defaultMessage="E.g. {example}"
+                      values={{
+                        example: (
+                          <Text as="span">
+                            {example[0]} <ArrowForwardIcon /> {example[1]}
+                          </Text>
+                        ),
+                      }}
                     />
-                    <Text as="div" fontSize="xs" color="gray.500">
-                      <FormattedMessage
-                        id="generic.for-example"
-                        defaultMessage="E.g. {example}"
-                        values={{
-                          example: (
-                            <Text as="span">
-                              {example[0]} <ArrowForwardIcon /> {example[1]}
-                            </Text>
-                          ),
-                        }}
-                      />
-                    </Text>
-                  </Box>
-                </Collapse>
-              </Box>
+                  </Text>
+                </Box>
+              </PaddedCollapse>
             </Box>
           ) : null}
         </Stack>

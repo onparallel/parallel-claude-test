@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, Collapse, Stack, Text } from "@chakra-ui/react";
+import { Button, Checkbox, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -9,10 +9,11 @@ import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { PaddedCollapse } from "../common/PaddedCollapse";
 import {
   RichTextEditor,
-  RichTextEditorValue,
   RichTextEditorInstance,
+  RichTextEditorValue,
 } from "../common/RichTextEditor";
 
 export function ConfirmSendReminderDialog({
@@ -58,26 +59,20 @@ export function ConfirmSendReminderDialog({
                 defaultMessage="Add a message"
               />
             </Checkbox>
-            <Box>
-              <Box margin={-1}>
-                <Collapse in={hasMessage}>
-                  <Box padding={1}>
-                    <RichTextEditor
-                      isInvalid={isInvalid && isEmptyRTEValue(message)}
-                      ref={messageRef}
-                      value={message}
-                      onChange={setMessage}
-                      placeholder={intl.formatMessage({
-                        id:
-                          "component.confirm-send-reminder-dialog.message-placeholder",
-                        defaultMessage: "Add a message to include in the email",
-                      })}
-                      placeholderOptions={placeholderOptions}
-                    />
-                  </Box>
-                </Collapse>
-              </Box>
-            </Box>
+            <PaddedCollapse in={hasMessage}>
+              <RichTextEditor
+                isInvalid={isInvalid && isEmptyRTEValue(message)}
+                ref={messageRef}
+                value={message}
+                onChange={setMessage}
+                placeholder={intl.formatMessage({
+                  id:
+                    "component.confirm-send-reminder-dialog.message-placeholder",
+                  defaultMessage: "Add a message to include in the email",
+                })}
+                placeholderOptions={placeholderOptions}
+              />
+            </PaddedCollapse>
           </Stack>
         </Stack>
       }

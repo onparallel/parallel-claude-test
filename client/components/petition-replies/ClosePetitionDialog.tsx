@@ -1,9 +1,7 @@
 import {
-  Box,
   Button,
   Center,
   Checkbox,
-  Collapse,
   FormControl,
   FormLabel,
   Input,
@@ -25,6 +23,7 @@ import outdent from "outdent";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
+import { PaddedCollapse } from "../common/PaddedCollapse";
 import {
   RichTextEditor,
   RichTextEditorInstance,
@@ -133,82 +132,65 @@ export function ClosePetitionDialog({
                 defaultMessage="Notify the recipient that everything is reviewed."
               />
             </Checkbox>
-            <Box>
-              <Box margin={-1}>
-                <Collapse in={requiredMessage || sendMessage}>
-                  <Stack padding={1}>
-                    <RichTextEditor
-                      isInvalid={sendMessage && isEmptyRTEValue(message)}
-                      ref={messageRef}
-                      value={message}
-                      onChange={setMessage}
-                      placeholder={intl.formatMessage({
-                        id:
-                          "component.close-petition-dialog.notify-recipient.message-placeholder",
-                        defaultMessage: "Add a message to include in the email",
-                      })}
-                      placeholderOptions={placeholderOptions}
-                    />
-                    {hasPetitionPdfExport ? (
-                      <>
-                        <Checkbox
-                          colorScheme="purple"
-                          onChange={(e) => {
-                            setAttachPdfExport(e.target.checked);
-                            if (e.target.checked) {
-                              setTimeout(() => {
-                                pdfExportTitleRef.current!.select();
-                              });
-                            }
-                          }}
-                          isChecked={attachPdfExport}
-                        >
+            <PaddedCollapse in={requiredMessage || sendMessage}>
+              <Stack>
+                <RichTextEditor
+                  isInvalid={sendMessage && isEmptyRTEValue(message)}
+                  ref={messageRef}
+                  value={message}
+                  onChange={setMessage}
+                  placeholder={intl.formatMessage({
+                    id:
+                      "component.close-petition-dialog.notify-recipient.message-placeholder",
+                    defaultMessage: "Add a message to include in the email",
+                  })}
+                  placeholderOptions={placeholderOptions}
+                />
+                {hasPetitionPdfExport ? (
+                  <>
+                    <Checkbox
+                      colorScheme="purple"
+                      onChange={(e) => {
+                        setAttachPdfExport(e.target.checked);
+                        if (e.target.checked) {
+                          setTimeout(() => {
+                            pdfExportTitleRef.current!.select();
+                          });
+                        }
+                      }}
+                      isChecked={attachPdfExport}
+                    >
+                      <FormattedMessage
+                        id="component.close-petition-dialog.attach-pdf-export.checkbox"
+                        defaultMessage="Attach a PDF export with the submitted replies"
+                      />
+                    </Checkbox>
+                    <PaddedCollapse in={attachPdfExport}>
+                      <FormControl>
+                        <FormLabel display="flex" alignItems="center">
                           <FormattedMessage
-                            id="component.close-petition-dialog.attach-pdf-export.checkbox"
-                            defaultMessage="Attach a PDF export with the submitted replies"
+                            id="component.close-petition-dialog.attach-pdf-export.title"
+                            defaultMessage="PDF export title"
                           />
-                        </Checkbox>
-                        <Box>
-                          <Box margin={-1}>
-                            <Collapse in={attachPdfExport}>
-                              <Box padding={1}>
-                                <FormControl>
-                                  <FormLabel display="flex" alignItems="center">
-                                    <FormattedMessage
-                                      id="component.close-petition-dialog.attach-pdf-export.title"
-                                      defaultMessage="PDF export title"
-                                    />
-                                    <HelpPopover
-                                      marginLeft={2}
-                                      placement="auto"
-                                    >
-                                      <FormattedMessage
-                                        id="component.close-petition-dialog.attach-pdf-export.title.help"
-                                        defaultMessage="This will be the name of the attached PDF file."
-                                      />
-                                    </HelpPopover>
-                                  </FormLabel>
-                                  <Input
-                                    ref={pdfExportTitleRef}
-                                    value={pdfExportTitle}
-                                    isInvalid={
-                                      attachPdfExport && !pdfExportTitle
-                                    }
-                                    onChange={(e) =>
-                                      setPdfExportTitle(e.target.value)
-                                    }
-                                  />
-                                </FormControl>
-                              </Box>
-                            </Collapse>
-                          </Box>
-                        </Box>
-                      </>
-                    ) : null}
-                  </Stack>
-                </Collapse>
-              </Box>
-            </Box>
+                          <HelpPopover marginLeft={2} placement="auto">
+                            <FormattedMessage
+                              id="component.close-petition-dialog.attach-pdf-export.title.help"
+                              defaultMessage="This will be the name of the attached PDF file."
+                            />
+                          </HelpPopover>
+                        </FormLabel>
+                        <Input
+                          ref={pdfExportTitleRef}
+                          value={pdfExportTitle}
+                          isInvalid={attachPdfExport && !pdfExportTitle}
+                          onChange={(e) => setPdfExportTitle(e.target.value)}
+                        />
+                      </FormControl>
+                    </PaddedCollapse>
+                  </>
+                ) : null}
+              </Stack>
+            </PaddedCollapse>
           </Stack>
         </Stack>
       }

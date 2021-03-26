@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Center,
-  Collapse,
   Flex,
   IconButton,
   Menu,
@@ -28,6 +27,7 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
+import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables,
   RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables,
@@ -275,7 +275,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
             onChange={handleDraftChange as any}
             {...inputFocusBind}
           />
-          <Collapse in={isExpanded}>
+          <PaddedCollapse in={isExpanded}>
             <Stack direction="row" justifyContent="flex-end" paddingTop={2}>
               <Button size="sm" onClick={handleCancelClick}>
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
@@ -289,7 +289,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
                 <FormattedMessage id="generic.submit" defaultMessage="Submit" />
               </Button>
             </Stack>
-          </Collapse>
+          </PaddedCollapse>
         </ModalFooter>
       </ModalContent>
     </BaseDialog>

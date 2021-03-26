@@ -187,7 +187,6 @@ export function PetitionSignaturesCard({
           />
         </Box>
       </GenericCardHeader>
-
       {current || older.length > 0 || petition.signatureConfig ? (
         <>
           {petition.signatureConfig && !current ? (

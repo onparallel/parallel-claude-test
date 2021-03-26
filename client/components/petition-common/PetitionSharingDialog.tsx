@@ -7,7 +7,6 @@ import {
   Center,
   Checkbox,
   Circle,
-  Collapse,
   Flex,
   Menu,
   MenuButton,
@@ -42,6 +41,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
+import { PaddedCollapse } from "../common/PaddedCollapse";
 import {
   UserMultiSelect,
   UserSelectInstance,
@@ -249,7 +249,7 @@ export function PetitionSharingDialog({
                   defaultMessage="Notify users"
                 />
               </Checkbox>
-              <Collapse in={notify}>
+              <PaddedCollapse in={notify}>
                 <GrowingTextarea
                   name="message"
                   ref={useMergedRef(messageRef, register)}
@@ -263,7 +263,7 @@ export function PetitionSharingDialog({
                     defaultMessage: "Message",
                   })}
                 />
-              </Collapse>
+              </PaddedCollapse>
             </Stack>
             <Stack display={hasUsers ? "none" : "flex"} paddingTop={2}>
               {userPermissions.map(({ user, permissionType }) => (

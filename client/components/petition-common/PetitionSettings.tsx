@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   CloseButton,
-  Collapse,
   Flex,
   FormControl,
   FormLabel,
@@ -23,6 +22,7 @@ import {
   usePetitionSettings_cancelPetitionSignatureRequestMutation,
   usePetitionSettings_startPetitionSignatureRequestMutation,
 } from "@parallel/graphql/__types";
+import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
@@ -31,13 +31,13 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
+import { PaddedCollapse } from "../common/PaddedCollapse";
 import { Spacer } from "../common/Spacer";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 import {
   SignatureConfigDialog,
   useSignatureConfigDialog,
 } from "./SignatureConfigDialog";
-import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 
 export type PetitionSettingsProps = {
   user: PetitionSettings_UserFragment;
@@ -240,7 +240,7 @@ function _PetitionSettings({
             isChecked={Boolean(petition.signatureConfig)}
             isDisabled={!hasSignature}
           />
-          <Collapse in={Boolean(petition.signatureConfig)}>
+          <PaddedCollapse in={Boolean(petition.signatureConfig)}>
             <Flex justifyContent="center" marginTop={2}>
               <Button
                 leftIcon={<SignatureIcon fontSize="18px" />}
@@ -255,7 +255,7 @@ function _PetitionSettings({
                 </Text>
               </Button>
             </Flex>
-          </Collapse>
+          </PaddedCollapse>
         </Box>
       ) : null}
       {user.hasSkipForwardSecurity ? (
