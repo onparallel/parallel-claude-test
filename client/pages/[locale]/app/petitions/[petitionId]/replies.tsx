@@ -509,6 +509,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     defaultFieldsFilter
   );
 
+  const petitionSignatureStatus =
+    petition.signatureConfig?.review && petition.status === "COMPLETED"
+      ? "START"
+      : petition.currentSignatureRequest?.status ?? null;
+
   return (
     <PetitionLayout
       key={petition.id}
@@ -652,6 +657,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       fieldVisibility={fieldVisibility}
                       onFieldClick={handleIndexFieldClick}
                       fieldIndicators={PetitionContentsIndicators}
+                      signatureStatus={petitionSignatureStatus}
                     />
                   </Box>
                 </Card>
