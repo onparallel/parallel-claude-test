@@ -64,6 +64,7 @@ async function generate(locales, input, rawOutput, compiledOutput) {
         }
         if (missing > 0) {
             log_1.warn(`Locale ${chalk_1.default.bold(locale)} is missing ${missing} translations.`);
+            throw new Error();
         }
     }
 }

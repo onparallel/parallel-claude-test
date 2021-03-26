@@ -73,6 +73,7 @@ async function generate(
     }
     if (missing > 0) {
       warn(`Locale ${chalk.bold(locale)} is missing ${missing} translations.`);
+      throw new Error();
     }
   }
 }
