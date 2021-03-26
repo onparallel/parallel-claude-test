@@ -1,7 +1,7 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { indexBy } from "remeda";
+import { indexBy, omit } from "remeda";
 import { Config, CONFIG } from "../../config";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { Maybe } from "../../util/types";
@@ -81,6 +81,20 @@ export class OrganizationRepository extends BaseRepository {
       opts
     );
   }
+
+  readonly loadOrgByDomain = fromDataLoader(
+    new DataLoader<string, Organization | null>(async (domains) => {
+      const orgs = await this.knex
+        .from("organization as o")
+        .join("org_domain as od", "od.org_id", "o.id")
+        .whereIn("od.domain", domains)
+        .select<(Organization & { domain: string })[]>("o.*", "od.domain");
+      const byDomain = indexBy(orgs, (o) => o.domain);
+      return domains.map((d) =>
+        byDomain[d] ? omit(byDomain[d], ["domain"]) : null
+      );
+    })
+  );
 
   readonly loadUserCount = this.buildLoadCountBy("user", "org_id", (q) =>
     q.whereNull("deleted_at")

@@ -3,6 +3,7 @@ import {
   Avatar,
   Box,
   Button,
+  Center,
   FormControl,
   FormErrorMessage,
   FormLabel,
@@ -23,12 +24,13 @@ import {
   Login_UserFragment,
   useCurrentUserQuery,
 } from "@parallel/graphql/__types";
-import { postJson } from "@parallel/utils/rest";
+import { postJSON } from "@parallel/utils/rest";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
+import { LockIcon } from "@parallel/chakra/icons";
 
 function Login() {
   const router = useRouter();
@@ -42,12 +44,13 @@ function Login() {
     password?: string;
   }>({ required: false });
   const intl = useIntl();
+
   const toast = useToast();
 
-  async function onLoginSubmit({ email, password }: LoginFormData) {
+  async function handleLoginSubmit({ email, password }: LoginFormData) {
     setIsSubmitting(true);
     try {
-      await postJson<{ token: string }>("/api/auth/login", {
+      await postJSON<{ token: string }>("/api/auth/login", {
         email,
         password,
       });
@@ -75,13 +78,13 @@ function Login() {
     setIsSubmitting(false);
   }
 
-  async function onPasswordChangeSubmit({
+  async function handlePasswordChangeSubmit({
     password1: newPassword,
   }: PasswordChangeData) {
     setIsSubmitting(true);
     try {
       const { email, password } = passwordChange;
-      await postJson<{ token: string }>("/api/auth/new-password", {
+      await postJSON<{ token: string }>("/api/auth/new-password", {
         email,
         password,
         newPassword,
@@ -113,12 +116,12 @@ function Login() {
           />
         ) : passwordChange.required ? (
           <PasswordChangeForm
-            onSubmit={onPasswordChangeSubmit}
+            onSubmit={handlePasswordChangeSubmit}
             onBackToLogin={() => setPasswordChange({ required: false })}
             isSubmitting={isSubmitting}
           />
         ) : (
-          <LoginForm onSubmit={onLoginSubmit} isSubmitting={isSubmitting} />
+          <LoginForm onSubmit={handleLoginSubmit} isSubmitting={isSubmitting} />
         )}
       </PublicUserFormContainer>
     </PublicLayout>
@@ -189,7 +192,25 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
     handleSubmit,
     register,
     formState: { errors },
+    watch,
   } = useForm<LoginFormData>();
+  const [ssoUrl, setSsoUrl] = useState<string | undefined>(undefined);
+  const email = watch("email");
+  useEffect(() => {
+    async function guessLogin() {
+      const result = await postJSON<{ type: "SSO" | "PASSWORD"; url?: string }>(
+        "/api/auth/guess-login",
+        { email }
+      );
+      console.log(result);
+      if (result) {
+        setSsoUrl(result?.url);
+      }
+    }
+    if (EMAIL_REGEX.test(email)) {
+      guessLogin().then();
+    }
+  }, [email]);
   return (
     <>
       <Box marginBottom={6} textAlign="center">
@@ -206,7 +227,16 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           />
         </Text>
       </Box>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form
+        onSubmit={handleSubmit((data) => {
+          if (ssoUrl) {
+            window.location.href = ssoUrl;
+          } else {
+            onSubmit(data);
+          }
+        })}
+        noValidate
+      >
         <FormControl id="email" isInvalid={!!errors.email}>
           <FormLabel>
             <FormattedMessage
@@ -230,23 +260,37 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             </FormErrorMessage>
           )}
         </FormControl>
-        <FormControl id="password" marginTop={2} isInvalid={!!errors.password}>
-          <FormLabel>
+        {ssoUrl ? (
+          <Center marginTop={2} height="72px">
+            <LockIcon marginRight={2} />
             <FormattedMessage
-              id="generic.forms.password-label"
-              defaultMessage="Password"
+              id="public.login.sso-enabled"
+              defaultMessage="Single sign-on enabled"
             />
-          </FormLabel>
-          <PasswordInput {...register("password", { required: true })} />
-          {errors.password && (
-            <FormErrorMessage>
+          </Center>
+        ) : (
+          <FormControl
+            id="password"
+            marginTop={2}
+            isInvalid={!!errors.password}
+          >
+            <FormLabel>
               <FormattedMessage
-                id="generic.forms.required-password-error"
-                defaultMessage="Please, enter a password"
+                id="generic.forms.password-label"
+                defaultMessage="Password"
               />
-            </FormErrorMessage>
-          )}
-        </FormControl>
+            </FormLabel>
+            <PasswordInput {...register("password", { required: true })} />
+            {errors.password && (
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms.required-password-error"
+                  defaultMessage="Please, enter a password"
+                />
+              </FormErrorMessage>
+            )}
+          </FormControl>
+        )}
         <Button
           marginTop={6}
           width="100%"
@@ -255,7 +299,11 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           type="submit"
           id="pw-login-submit"
         >
-          <FormattedMessage id="public.login-button" defaultMessage="Login" />
+          {ssoUrl ? (
+            <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+          ) : (
+            <FormattedMessage id="public.login-button" defaultMessage="Login" />
+          )}
         </Button>
       </form>
       <Box marginTop={4} textAlign="center">

@@ -149,7 +149,7 @@ export const createUser = mutationField("createUser", {
           first_name: args.firstName,
           last_name: args.lastName,
         },
-        ctx.user!
+        `User:${ctx.user!.id}`
       );
       return {
         result: RESULT.SUCCESS,

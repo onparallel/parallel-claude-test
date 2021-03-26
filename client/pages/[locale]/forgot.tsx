@@ -14,7 +14,7 @@ import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
 import languages from "@parallel/lang/languages.json";
-import { postJson } from "@parallel/utils/rest";
+import { postJSON } from "@parallel/utils/rest";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -39,7 +39,7 @@ function Forgot() {
   async function onForgotPasswordSubmit({ email }: ForgotPasswordFormData) {
     setIsSubmitting(true);
     try {
-      await postJson("/api/auth/forgot-password", {
+      await postJSON("/api/auth/forgot-password", {
         email,
       });
       setVerification({ sent: true, email });
@@ -67,7 +67,7 @@ function Forgot() {
     setIsSubmitting(true);
     setVerification({ ...verification, verificationCodeError: false });
     try {
-      await postJson("/api/auth/confirm-forgot-password", {
+      await postJSON("/api/auth/confirm-forgot-password", {
         email: verification.email,
         verificationCode,
         newPassword,

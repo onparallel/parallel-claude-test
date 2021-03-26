@@ -13,7 +13,7 @@ export async function authenticateFromRequest(
     if (!cognitoId) {
       throw new Error();
     }
-    const user = await ctx.users.loadSessionUser(cognitoId);
+    const user = await ctx.users.loadUserByCognitoId(cognitoId);
     if (!user) {
       throw new Error();
     }

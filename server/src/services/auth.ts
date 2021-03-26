@@ -3,14 +3,20 @@ import DataLoader from "dataloader";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { inject, injectable } from "inversify";
 import { decode } from "jsonwebtoken";
+import fetch from "node-fetch";
 import pMap from "p-map";
 import { Memoize } from "typescript-memoize";
+import { URL } from "url";
 import { CONFIG, Config } from "../config";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
+import { UserRepository } from "../db/repositories/UserRepository";
 import { fromDataLoader } from "../util/fromDataLoader";
 import { random } from "../util/token";
 import { REDIS, Redis } from "./redis";
 
 export interface IAuth {
+  guessLogin: RequestHandler;
+  callback: RequestHandler;
   login: RequestHandler;
   logout: RequestHandler;
   newPassword: RequestHandler;
@@ -36,8 +42,111 @@ export class Auth implements IAuth {
 
   constructor(
     @inject(CONFIG) private config: Config,
-    @inject(REDIS) private redis: Redis
+    @inject(REDIS) private redis: Redis,
+    private orgs: OrganizationRepository,
+    private users: UserRepository
   ) {}
+
+  async guessLogin(req: Request, res: Response, next: NextFunction) {
+    const { email } = req.body;
+    const [, domain] = email.split("@");
+    try {
+      const org = await this.orgs.loadOrgByDomain(domain);
+      if (org && org.sso_provider) {
+        const url = new URL(
+          `https://${this.config.cognito.domain}/oauth2/authorize`
+        );
+        for (const [name, value] of Object.entries({
+          identity_provider: org.sso_provider,
+          redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
+          response_type: "code",
+          client_id: this.config.cognito.clientId,
+          scope: "aws.cognito.signin.user.admin email openid profile",
+        })) {
+          url.searchParams.append(name, value);
+        }
+        res.json({ type: "SSO", url: url.href });
+      } else {
+        res.json({ type: "PASSWORD" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async callback(req: Request, res: Response, next: NextFunction) {
+    try {
+      const url = new URL(`https://${this.config.cognito.domain}/oauth2/token`);
+      for (const [name, value] of Object.entries({
+        grant_type: "authorization_code",
+        client_id: this.config.cognito.clientId,
+        redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
+        code: req.query.code as string,
+      })) {
+        url.searchParams.append(name, value);
+      }
+      const response = await fetch(url.href, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
+      const tokens = await response.json();
+      const payload = decode(tokens["id_token"]) as any;
+      const cognitoId = payload["cognito:username"] as string;
+      const firstName = payload["given_name"] as string;
+      const lastName = payload["family_name"] as string;
+      const email = payload["email"] as string;
+      const existing = await this.users.loadUserByEmail(email);
+      const org = existing
+        ? await this.orgs.loadOrg(existing.org_id)
+        : await this.orgs.loadOrgByDomain(email.split("@")[1]);
+      if (!org) {
+        throw new Error("missing org for domain");
+      }
+      if (!existing) {
+        await this.users.createUser(
+          {
+            first_name: firstName,
+            last_name: lastName,
+            email: email,
+            cognito_id: cognitoId,
+            org_id: org.id,
+            is_sso_user: true,
+          },
+          `OrganizationSSO:${org.id}`
+        );
+      } else {
+        if (
+          existing.first_name !== firstName ||
+          existing.last_name !== lastName ||
+          existing.cognito_id !== cognitoId
+        ) {
+          await this.users.updateUserById(
+            existing.id,
+            {
+              first_name: firstName,
+              last_name: lastName,
+              cognito_id: cognitoId,
+              is_sso_user: true,
+            },
+            `OrganizationSSO:${org.id}`
+          );
+        }
+      }
+      const token = await this.storeSession({
+        IdToken: tokens["id_token"],
+        RefreshToken: tokens["refresh_token"],
+      });
+      this.setSession(res, token);
+      res.redirect(
+        302,
+        `${this.config.misc.parallelUrl}?url=${encodeURIComponent(
+          "/app/petitions"
+        )}`
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
@@ -46,6 +155,7 @@ export class Auth implements IAuth {
       if (auth.AuthenticationResult) {
         const token = await this.storeSession(auth.AuthenticationResult as any);
         this.setSession(res, token);
+        res.status(201).send({});
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
         res.status(401).send({ error: "NewPasswordRequired" });
       } else {
@@ -84,6 +194,7 @@ export class Auth implements IAuth {
           challenge.AuthenticationResult as any
         );
         this.setSession(res, token);
+        res.status(201).send({});
       } else {
         console.log(auth);
         res.status(401).send({ error: "UnknownError" });
@@ -153,7 +264,6 @@ export class Auth implements IAuth {
       secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     });
-    res.status(201).send({});
   }
 
   /** Delete session on Redis */

@@ -8,6 +8,8 @@ function Redirect() {
 }
 
 Redirect.getInitialProps = async (context: NextPageContext) => {
+  // this only runs in development
+  const url = context.query.url;
   const locale = negotiate(
     process.browser
       ? navigator.languages
@@ -15,7 +17,7 @@ Redirect.getInitialProps = async (context: NextPageContext) => {
     languages.map((l) => l.locale),
     languages.find((l) => l.default)!.locale
   );
-  return redirect(context, `/${locale}`);
+  return redirect(context, `/${locale}${url ?? ""}`);
 };
 
 export default Redirect;

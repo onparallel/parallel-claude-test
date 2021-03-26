@@ -13,6 +13,8 @@ export class MockAuth implements IAuth {
   async validateSession() {
     return userCognitoId;
   }
+  async guessLogin() {}
+  async callback() {}
   async login() {}
   async logout() {}
   async newPassword() {}

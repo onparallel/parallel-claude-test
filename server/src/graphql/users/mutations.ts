@@ -62,7 +62,7 @@ export const updateUser = mutationField("updateUser", {
         first_name: firstName,
         last_name: lastName,
       }),
-      ctx.user!
+      `User:${ctx.user!.id}`
     );
     return user;
   },
@@ -152,7 +152,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
         first_name: args.firstName,
         last_name: args.lastName,
       },
-      ctx.user!
+      `User:${ctx.user!.id}`
     );
   },
 });
@@ -198,7 +198,11 @@ export const updateUserStatus = mutationField("updateUserStatus", {
   },
   resolve: async (_, { userIds, status, transferToUserId }, ctx, info) => {
     if (status === "ACTIVE") {
-      return await ctx.users.updateUserById(userIds, { status }, ctx.user!);
+      return await ctx.users.updateUserById(
+        userIds,
+        { status },
+        `User:${ctx.user!.id}`
+      );
     } else {
       const permissionsByUserId = await ctx.petitions.loadUserPermissionsByUserId(
         userIds
@@ -212,7 +216,12 @@ export const updateUserStatus = mutationField("updateUserStatus", {
               (p) => p.permission_type === "OWNER"
             );
             const [[user]] = await Promise.all([
-              ctx.users.updateUserById(userId, { status }, ctx.user!, t),
+              ctx.users.updateUserById(
+                userId,
+                { status },
+                `User:${ctx.user!.id}`,
+                t
+              ),
               // delete permissions with type !== OWNER
               notOwnedPermissions.length > 0
                 ? ctx.petitions.deleteUserPermissions(

@@ -2,6 +2,7 @@ import { ErrorRequestHandler, Router } from "express";
 import { Container } from "inversify";
 import morgan from "morgan";
 import { ApiContext } from "../context";
+import { AUTH, Auth } from "../services/auth";
 import { LOGGER, Logger } from "../services/logger";
 import { downloads } from "./downloads";
 import { api as publicApi } from "./public";
@@ -9,6 +10,7 @@ import { webhooks } from "./webhooks";
 
 export function api(container: Container) {
   const logger = container.get<Logger>(LOGGER);
+  const auth = container.get<Auth>(AUTH);
   return Router()
     .use(((err, req, res, next) => {
       logger.error(err?.message, { stack: err?.stack });
@@ -33,6 +35,12 @@ export function api(container: Container) {
     .use(
       "/auth",
       Router()
+        .post("/guess-login", (req, res, next) =>
+          req.context.auth.guessLogin(req, res, next)
+        )
+        .get("/callback", (req, res, next) =>
+          req.context.auth.callback(req, res, next)
+        )
         .post("/login", (req, res, next) =>
           req.context.auth.login(req, res, next)
         )

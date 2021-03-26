@@ -13,6 +13,7 @@ export function buildConfig() {
       maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS!),
     }),
     cognito: Object.freeze({
+      domain: process.env.COGNITO_DOMAIN!,
       clientId: process.env.COGNITO_CLIENT_ID!,
       defaultPoolId: process.env.COGNITO_DEFAULT_POOL_ID!,
     }),

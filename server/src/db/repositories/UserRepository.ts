@@ -15,12 +15,11 @@ export class UserRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadSessionUser = fromDataLoader(
+  readonly loadUserByCognitoId = fromDataLoader(
     new DataLoader<string, User>(async (cognitoIds) => {
       const rows = await this.from("user")
         .update({ last_active_at: this.now() })
         .whereIn("cognito_id", cognitoIds)
-        .where("status", "=", "ACTIVE")
         .whereNull("deleted_at")
         .returning("*");
       const byCognitoId = indexBy(rows, (r) => r.cognito_id);
@@ -39,7 +38,7 @@ export class UserRepository extends BaseRepository {
   async updateUserById(
     id: MaybeArray<number>,
     data: Partial<CreateUser>,
-    user: User,
+    updatedBy: string,
     t?: Knex.Transaction
   ) {
     const ids = unMaybeArray(id);
@@ -74,11 +73,11 @@ export class UserRepository extends BaseRepository {
     return rows[0];
   }
 
-  async createUser(data: CreateUser, user: User) {
+  async createUser(data: CreateUser, createdBy: string) {
     const [row] = await this.insert("user", {
       ...data,
-      created_by: `User:${user.id}`,
-      updated_by: `User:${user.id}`,
+      created_by: createdBy,
+      updated_by: createdBy,
     });
     return row;
   }

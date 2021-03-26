@@ -1,4 +1,4 @@
-export async function postJson<T = any>(url: string, content?: any) {
+export async function postJSON<T = any>(url: string, content?: any) {
   const res = await fetch(url, {
     credentials: "include",
     method: "POST",
