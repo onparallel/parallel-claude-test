@@ -7,11 +7,9 @@ import {
   Flex,
   Heading,
   IconButton,
-  keyframes,
   Stack,
   Switch,
   Text,
-  Theme,
 } from "@chakra-ui/react";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -23,6 +21,7 @@ import {
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
@@ -62,6 +61,8 @@ export function PetitionRepliesField({
   ...props
 }: PetitionRepliesFieldProps) {
   const intl = useIntl();
+
+  const { highlightProps } = useHighlightElement();
   return field.type === "HEADING" ? (
     <Stack
       spacing={1}
@@ -110,18 +111,9 @@ export function PetitionRepliesField({
       backgroundColor={isVisible ? "white" : "gray.50"}
       flexDirection="column"
       position="relative"
-      _highlighted={{
-        animation: ((theme: Theme) =>
-          `${keyframes`
-            0% { background-color: white; }
-            25% { background-color: ${theme.colors.gray[100]}; }
-            50% { background-color: white }
-            75% { background-color: ${theme.colors.gray[100]}; }
-            100% { background-color: white; }
-          `} 500ms ease`) as any,
-      }}
       paddingY={4}
       paddingX={{ base: 4, md: 6 }}
+      {...highlightProps}
       {...props}
     >
       <Flex flexWrap="wrap" justifyContent="space-between">

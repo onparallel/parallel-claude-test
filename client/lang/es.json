@@ -580,6 +580,11 @@
     "context": "{count, plural, =1 {1 field is} other {# fields are}} not applicable"
   },
   {
+    "term": "component.petition-contents.signature-status",
+    "definition": "Firma digital de petición",
+    "context": "Petition eSignature"
+  },
+  {
     "term": "component.petition-field-select.placeholder",
     "definition": "Selecciona un campo",
     "context": "Select a field"
@@ -1053,21 +1058,6 @@
     "term": "component.petition-signatures-card.status",
     "definition": "Estado",
     "context": "Status"
-  },
-  {
-    "term": "component.petition-status-cell-content.e-signature-cancelled",
-    "definition": "Firma digital cancelada",
-    "context": "eSignature cancelled"
-  },
-  {
-    "term": "component.petition-status-cell-content.e-signature-completed",
-    "definition": "Firma digital completada",
-    "context": "eSignature completed"
-  },
-  {
-    "term": "component.petition-status-cell-content.e-signature-processing",
-    "definition": "Firma digital pendiente",
-    "context": "eSignature pending"
   },
   {
     "term": "component.petition-template.delete-label",
@@ -2748,6 +2738,26 @@
     "term": "petition-sharing.write",
     "definition": "Editor",
     "context": "Editor"
+  },
+  {
+    "term": "petition-signature-status-label.e-signature-cancelled",
+    "definition": "Firma digital cancelada",
+    "context": "eSignature cancelled"
+  },
+  {
+    "term": "petition-signature-status-label.e-signature-completed",
+    "definition": "Firma digital completada",
+    "context": "eSignature completed"
+  },
+  {
+    "term": "petition-signature-status-label.e-signature-processing",
+    "definition": "Firma digital pendiente",
+    "context": "eSignature pending"
+  },
+  {
+    "term": "petition-signature-status-label.e-signature-start",
+    "definition": "Pendiente de inicio",
+    "context": "Pending start"
   },
   {
     "term": "petition-signature.file-not-submitted",

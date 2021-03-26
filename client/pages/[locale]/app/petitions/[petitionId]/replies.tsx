@@ -89,6 +89,7 @@ import {
   PetitionFieldFilter,
 } from "@parallel/utils/filterPetitionFields";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
+import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -352,19 +353,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     });
   }
 
-  const handleIndexFieldClick = useCallback(async (fieldId: string) => {
-    const fieldElement = document.querySelector(`#field-${fieldId}`);
-    if (fieldElement) {
-      await scrollIntoView(fieldElement, {
-        scrollMode: "if-needed",
-        behavior: "smooth",
-      });
-      fieldElement.setAttribute("data-highlighted", "true");
-      setTimeout(() => {
-        fieldElement.removeAttribute("data-highlighted");
-      }, 1000);
-    }
-  }, []);
+  const { highlightProps, highlight } = useHighlightElement();
 
   const indices = useFieldIndices(petition.fields);
 
@@ -655,9 +644,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       filter={filter}
                       fieldIndices={indices}
                       fieldVisibility={fieldVisibility}
-                      onFieldClick={handleIndexFieldClick}
+                      onFieldClick={(fieldId) => highlight(`#field-${fieldId}`)}
                       fieldIndicators={PetitionContentsIndicators}
                       signatureStatus={petitionSignatureStatus}
+                      onSignatureStatusClick={() =>
+                        highlight("#petition-replies-signatures-card")
+                      }
                     />
                   </Box>
                 </Card>
@@ -701,10 +693,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             </Stack>
             {me.hasPetitionSignature ? (
               <PetitionSignaturesCard
+                id="petition-replies-signatures-card"
                 petition={petition}
                 user={me}
                 marginTop={8}
                 onRefetchPetition={refetch}
+                {...highlightProps}
               />
             ) : null}
           </Box>

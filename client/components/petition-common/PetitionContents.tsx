@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  BoxProps,
   Button,
   Center,
   Flex,
@@ -48,6 +49,7 @@ export interface PetitionContentsProps<
   filter?: PetitionFieldFilter;
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
   signatureStatus?: PetitionContentsSignatureStatus | null;
+  onSignatureStatusClick?: () => void;
 }
 
 export function PetitionContents<
@@ -60,6 +62,7 @@ export function PetitionContents<
   onFieldClick,
   fieldIndicators,
   signatureStatus,
+  onSignatureStatusClick,
 }: PetitionContentsProps<T>) {
   const handleFieldClick = useMemoFactory(
     (fieldId: string) => () => onFieldClick(fieldId),
@@ -96,7 +99,10 @@ export function PetitionContents<
         )
       )}
       {signatureStatus ? (
-        <SignatureStatusInfo status={signatureStatus} />
+        <SignatureStatusInfo
+          status={signatureStatus}
+          onClick={onSignatureStatusClick}
+        />
       ) : null}
     </Stack>
   );
@@ -104,44 +110,55 @@ export function PetitionContents<
 
 function SignatureStatusInfo({
   status,
-}: {
+  ...props
+}: BoxProps & {
   status: PetitionContentsSignatureStatus;
 }) {
   const labels = usePetitionSignatureStatusLabels();
   return (
-    <Flex justifyContent="space-between" alignItems="center">
-      <Text fontWeight="bold">
-        <FormattedMessage
-          id="component.petition-contents.signature-status"
-          defaultMessage="Petition eSignature"
-        />
-      </Text>
-      <Tooltip label={labels[status]}>
-        <Flex alignItems="center">
-          <Box
-            hidden={status !== "START"}
-            width="4px"
-            height="4px"
-            borderColor="purple.500"
-            borderWidth="4px"
-            borderRadius="100%"
-            marginRight={2}
-          ></Box>
-          <SignatureIcon
-            color={status === "COMPLETED" ? "gray.700" : "gray.400"}
+    <Box as="li" listStyleType="none" display="flex" {...props}>
+      <Stack
+        as={Button}
+        direction="row"
+        flex="1"
+        variant="ghost"
+        justifyContent="space-between"
+        height="auto"
+        padding={2}
+      >
+        <Text fontWeight="bold">
+          <FormattedMessage
+            id="component.petition-contents.signature-status"
+            defaultMessage="Petition eSignature"
           />
-          {status === "CANCELLED" ? (
-            <AlertCircleIcon
-              color="red.500"
-              fontSize="14px"
-              position="relative"
-              bottom={2}
-              right={2}
+        </Text>
+        <Tooltip label={labels[status]}>
+          <Flex>
+            <Box
+              hidden={status !== "START"}
+              width="4px"
+              height="4px"
+              borderColor="purple.500"
+              borderWidth="4px"
+              borderRadius="100%"
+              marginRight={2}
+            ></Box>
+            <SignatureIcon
+              color={status === "COMPLETED" ? "gray.700" : "gray.400"}
             />
-          ) : null}
-        </Flex>
-      </Tooltip>
-    </Flex>
+            {status === "CANCELLED" ? (
+              <AlertCircleIcon
+                color="red.500"
+                fontSize="14px"
+                position="relative"
+                bottom={2}
+                right={2}
+              />
+            ) : null}
+          </Flex>
+        </Tooltip>
+      </Stack>
+    </Box>
   );
 }
 
