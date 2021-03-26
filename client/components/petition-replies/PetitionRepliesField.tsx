@@ -21,7 +21,6 @@ import {
   PetitionRepliesField_PetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
@@ -62,7 +61,6 @@ export function PetitionRepliesField({
 }: PetitionRepliesFieldProps) {
   const intl = useIntl();
 
-  const { highlightProps } = useHighlightElement();
   return field.type === "HEADING" ? (
     <Stack
       spacing={1}
@@ -107,13 +105,13 @@ export function PetitionRepliesField({
     </Stack>
   ) : (
     <Card
+      layerStyle="highlightable"
       display="flex"
       backgroundColor={isVisible ? "white" : "gray.50"}
       flexDirection="column"
       position="relative"
       paddingY={4}
       paddingX={{ base: 4, md: 6 }}
-      {...highlightProps}
       {...props}
     >
       <Flex flexWrap="wrap" justifyContent="space-between">

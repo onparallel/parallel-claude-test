@@ -353,7 +353,13 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     });
   }
 
-  const { highlightProps, highlight } = useHighlightElement();
+  const highlight = useHighlightElement();
+  const handlePetitionContentsFieldClick = useCallback((fieldId: string) => {
+    highlight(document.querySelector(`#field-${fieldId}`));
+  }, []);
+  const handlePetitionContentsSignatureClick = useCallback(() => {
+    highlight(document.querySelector("#petition-replies-signatures-card"));
+  }, []);
 
   const indices = useFieldIndices(petition.fields);
 
@@ -650,11 +656,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       filter={filter}
                       fieldIndices={indices}
                       fieldVisibility={fieldVisibility}
-                      onFieldClick={(fieldId) => highlight(`#field-${fieldId}`)}
+                      onFieldClick={handlePetitionContentsFieldClick}
                       fieldIndicators={PetitionContentsIndicators}
                       signatureStatus={petitionSignatureStatus}
-                      onSignatureStatusClick={() =>
-                        highlight("#petition-replies-signatures-card")
+                      onSignatureStatusClick={
+                        handlePetitionContentsSignatureClick
                       }
                     />
                   </Box>
@@ -702,9 +708,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 id="petition-replies-signatures-card"
                 petition={petition}
                 user={me}
+                layerStyle="highlightable"
                 marginTop={8}
                 onRefetchPetition={refetch}
-                {...highlightProps}
               />
             ) : null}
           </Box>

@@ -170,7 +170,7 @@ export function PetitionSignaturesCard({
                 defaultMessage: "Add signature",
               })}
               size="sm"
-              icon={<SignaturePlusIcon />}
+              icon={<SignaturePlusIcon fontSize="20px" />}
               onClick={handleAddNewSignature}
               borderColor="gray.300"
               borderWidth="1px"

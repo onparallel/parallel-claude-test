@@ -1,5 +1,7 @@
 import {
+  ChakraTheme,
   extendTheme,
+  keyframes,
   Menu,
   Popover,
   Select,
@@ -47,6 +49,20 @@ export const theme = extendTheme({
       700: "#433ead",
       800: "#332f80",
       900: "#282666",
+    },
+  },
+  layerStyles: {
+    highlightable: {
+      _highlighted: {
+        animation: ((theme: any) =>
+          `${keyframes`
+              0% { background-color: white; }
+              25% { background-color: ${theme.colors.gray[100]}; }
+              50% { background-color: white }
+              75% { background-color: ${theme.colors.gray[100]}; }
+              100% { background-color: white; }
+              `} 500ms ease`) as any,
+      },
     },
   },
   textStyles: {
