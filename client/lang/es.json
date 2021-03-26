@@ -230,21 +230,6 @@
     "context": "Copy to clipboard"
   },
   {
-    "term": "component.create-petition-dialog.add-deadline",
-    "definition": "Añadir fecha de vencimiento",
-    "context": "Add a deadline"
-  },
-  {
-    "term": "component.create-petition-dialog.header",
-    "definition": "Creando petición",
-    "context": "Creating petition"
-  },
-  {
-    "term": "component.create-petition-dialog.name-label",
-    "definition": "Asigna un nombre identificatorio",
-    "context": "Give it an identifying name"
-  },
-  {
     "term": "component.date-picker.next-month",
     "definition": "Mes siguiente",
     "context": "Next month"
@@ -1565,11 +1550,6 @@
     "context": "by {name}"
   },
   {
-    "term": "generic.can-be-changed-later",
-    "definition": "Podrás cambiar estos ajustes más adelante",
-    "context": "You can change these settings later"
-  },
-  {
     "term": "generic.cancel",
     "definition": "Cancelar",
     "context": "Cancel"
@@ -2521,7 +2501,7 @@
   },
   {
     "term": "petition-message.placeholder-option.contact-full-name",
-    "definition": "nombre completo del destinatario",
+    "definition": "Nombre completo del destinatario",
     "context": "Recipient full name"
   },
   {

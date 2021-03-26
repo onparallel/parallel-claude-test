@@ -230,21 +230,6 @@
     "context": "Copy to clipboard"
   },
   {
-    "term": "component.create-petition-dialog.add-deadline",
-    "definition": "Add a deadline",
-    "context": "Add a deadline"
-  },
-  {
-    "term": "component.create-petition-dialog.header",
-    "definition": "Creating petition",
-    "context": "Creating petition"
-  },
-  {
-    "term": "component.create-petition-dialog.name-label",
-    "definition": "Give it an identifying name",
-    "context": "Give it an identifying name"
-  },
-  {
     "term": "component.date-picker.next-month",
     "definition": "Next month",
     "context": "Next month"
@@ -1563,11 +1548,6 @@
     "term": "generic.by",
     "definition": "by {name}",
     "context": "by {name}"
-  },
-  {
-    "term": "generic.can-be-changed-later",
-    "definition": "You can change these settings later",
-    "context": "You can change these settings later"
   },
   {
     "term": "generic.cancel",
