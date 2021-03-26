@@ -321,15 +321,20 @@ function NewSignatureRequestRow({
         </Box>
         <Stack flex="1" direction="row" justifyContent="flex-end">
           {petition.status === "PENDING" ? (
-            <Button colorScheme="red" onClick={() => onUpdateConfig(null)}>
+            <Button
+              width="24"
+              colorScheme="red"
+              onClick={() => onUpdateConfig(null)}
+            >
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
           ) : (
             <Flex alignItems="center">
-              <Button onClick={() => onUpdateConfig(null)}>
+              <Button width="24" onClick={() => onUpdateConfig(null)}>
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
               </Button>
               <Button
+                width="24"
                 colorScheme="purple"
                 marginLeft={2}
                 onClick={handleStartSignature}
@@ -402,6 +407,7 @@ function CurrentSignatureRequestRow({
         <Stack flex="1" direction="row" justifyContent="flex-end">
           {isAwaitingSignature ? (
             <Button
+              width="24"
               colorScheme="red"
               onClick={() => onCancel(signatureRequest.id)}
             >
@@ -409,6 +415,7 @@ function CurrentSignatureRequestRow({
             </Button>
           ) : isSigned ? (
             <Button
+              width="24"
               colorScheme="purple"
               onClick={() => onDownload(signatureRequest.id)}
             >
@@ -434,7 +441,7 @@ function OlderSignatureRequests({
 }) {
   return (
     <>
-      <Box paddingX={4} paddingY={1}>
+      <Box paddingX={4} paddingY={1.5}>
         <Heading size="xs">
           <FormattedMessage
             id="component.petition-signatures-card.previous-signatures"
@@ -464,7 +471,12 @@ function OlderSignatureRequests({
             </Text>
             <Spacer />
             {signature.status === "COMPLETED" ? (
-              <Button size="xs" onClick={() => onDownload(signature.id)}>
+              <Button
+                width="24"
+                fontSize="sm"
+                height={8}
+                onClick={() => onDownload(signature.id)}
+              >
                 <FormattedMessage
                   id="generic.download"
                   defaultMessage="Download"
