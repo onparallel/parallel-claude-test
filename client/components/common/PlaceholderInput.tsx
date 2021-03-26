@@ -204,6 +204,7 @@ export const PlaceholderInput = chakraForwardRef<
         <PlaceholderMenu
           menuId={placeholderMenuId}
           itemIdPrefix={itemIdPrefix}
+          search={search}
           values={values}
           selectedIndex={selectedIndex}
           visibility={isOpen ? "visible" : "hidden"}

@@ -18,11 +18,7 @@ export function HighlightText({ text, search }: HighlightTextProps) {
       {text.split(regex).map((value, i) => {
         if (value.toLowerCase() === _search) {
           return (
-            <Text
-              key={i}
-              as="span"
-              sx={{ "-webkit-text-stroke-width": "0.04em" }}
-            >
+            <Text key={i} as="span" sx={{ WebkitTextStrokeWidth: "0.04em" }}>
               {value}
             </Text>
           );

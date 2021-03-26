@@ -10,9 +10,9 @@ import {
 } from "@chakra-ui/react";
 import {
   BoldIcon,
-  SharpIcon,
   ItalicIcon,
   ListIcon,
+  SharpIcon,
   UnderlineIcon,
 } from "@parallel/chakra/icons";
 import { useAssignMemoRef } from "@parallel/utils/assignRef";
@@ -29,21 +29,21 @@ import {
   BoldPlugin,
   EditablePlugins,
   EditablePluginsProps,
+  getNode,
   isMarkActive,
-  someNode,
   ItalicPlugin,
   ListPlugin,
   MARK_BOLD,
   MARK_ITALIC,
   MARK_UNDERLINE,
   pipe,
+  someNode,
   toggleList,
   toggleMark,
   UnderlinePlugin,
   unwrapList,
   withAutoformat,
   withList,
-  getNode,
 } from "@udecode/slate-plugins";
 import {
   createElement,
@@ -51,6 +51,7 @@ import {
   forwardRef,
   memo,
   MouseEvent,
+  RefObject,
   useCallback,
   useEffect,
   useMemo,
@@ -58,10 +59,9 @@ import {
 } from "react";
 import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
-import { createEditor, Editor, Node, Transforms } from "slate";
+import { createEditor, Editor, Node, Range, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import { ReactEditor, Slate, useSlate, withReact } from "slate-react";
-
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
@@ -273,22 +273,7 @@ export const RichTextEditor = forwardRef<
   const itemIdPrefix = useId(undefined, "placeholder-menu-item");
 
   const menuRef = useRef<HTMLElement>(null);
-  useEffect(() => {
-    if (!isMenuOpen || !target) return;
-    const { path, offset } = target.anchor;
-
-    const node = ReactEditor.toDOMNode(editor, getNode(editor, path)!);
-    const clone = node.cloneNode() as HTMLElement;
-    clone.textContent = node.textContent!.slice(0, offset);
-    clone.style.position = "fixed";
-    clone.style.visibility = "hidden";
-    const rect = node.getBoundingClientRect();
-    node.parentElement!.appendChild(clone);
-    const cloneRect = clone.getBoundingClientRect();
-    node.parentElement!.removeChild(clone);
-    menuRef.current!.style.top = `${rect.bottom + 5}px`;
-    menuRef.current!.style.left = `${rect.left + cloneRect.width}px`;
-  }, [isMenuOpen, target?.anchor]);
+  useRepositionPlaceholderMenu(isMenuOpen, target, editor, menuRef);
 
   return (
     <Box
@@ -321,6 +306,7 @@ export const RichTextEditor = forwardRef<
           ref={menuRef as any}
           menuId={placeholderMenuId}
           itemIdPrefix={itemIdPrefix}
+          search={search}
           values={values}
           selectedIndex={selectedIndex}
           hidden={!isMenuOpen}
@@ -404,6 +390,36 @@ const Toolbar = memo(function _Toolbar({
     </Stack>
   );
 });
+
+function useRepositionPlaceholderMenu(
+  isMenuOpen: boolean,
+  target: Range | null,
+  editor: ReactEditor,
+  menuRef: RefObject<HTMLElement>
+) {
+  useEffect(() => {
+    if (isMenuOpen && target) {
+      reposition();
+      document.addEventListener("scroll", reposition, true);
+      return () => document.removeEventListener("scroll", reposition, true);
+    }
+    function reposition() {
+      const { path, offset } = target!.anchor;
+
+      const node = ReactEditor.toDOMNode(editor, getNode(editor, path)!);
+      const clone = node.cloneNode() as HTMLElement;
+      clone.textContent = node.textContent!.slice(0, offset);
+      clone.style.position = "fixed";
+      clone.style.visibility = "hidden";
+      const rect = node.getBoundingClientRect();
+      node.parentElement!.appendChild(clone);
+      const cloneRect = clone.getBoundingClientRect();
+      node.parentElement!.removeChild(clone);
+      menuRef.current!.style.top = `${rect.bottom + 5}px`;
+      menuRef.current!.style.left = `${rect.left + cloneRect.width}px`;
+    }
+  }, [isMenuOpen, target?.anchor]);
+}
 
 function ListButton({
   type,

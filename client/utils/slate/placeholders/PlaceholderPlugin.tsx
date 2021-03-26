@@ -1,6 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
+import { HighlightText } from "@parallel/components/common/HighlightText";
 import {
   getNodeDeserializer,
   getRenderElement,
@@ -50,61 +51,66 @@ export function PlaceholderPlugin(placeholders: Placeholder[]): SlatePlugin {
   };
 }
 
-export const PlaceholderMenu = chakraForwardRef<
-  "div",
-  {
-    menuId: string;
-    itemIdPrefix: string;
-    values: Placeholder[];
-    selectedIndex: number;
-    onAddPlaceholder: (placeholder: Placeholder) => void;
-    onHighlightOption: (index: number) => void;
+interface PlaceholderMenuProps {
+  menuId: string;
+  itemIdPrefix: string;
+  search?: string | null;
+  values: Placeholder[];
+  selectedIndex: number;
+  onAddPlaceholder: (placeholder: Placeholder) => void;
+  onHighlightOption: (index: number) => void;
+}
+
+export const PlaceholderMenu = chakraForwardRef<"div", PlaceholderMenuProps>(
+  function PlaceholderMenu(
+    {
+      search,
+      menuId,
+      itemIdPrefix,
+      values,
+      selectedIndex,
+      onAddPlaceholder,
+      onHighlightOption,
+      ...props
+    },
+    ref
+  ) {
+    return (
+      <Card
+        as="div"
+        ref={ref}
+        id={menuId}
+        role="listbox"
+        overflow="auto"
+        maxHeight="180px"
+        paddingY={1}
+        {...props}
+      >
+        {values.map((placeholder, index) => {
+          const isSelected = index === selectedIndex;
+          return (
+            <Box
+              key={placeholder.value}
+              id={`${itemIdPrefix}-${placeholder.value}`}
+              role="option"
+              aria-selected={isSelected ? "true" : undefined}
+              backgroundColor={isSelected ? "gray.100" : "white"}
+              paddingX={4}
+              paddingY={1}
+              cursor="pointer"
+              onMouseDown={() => onAddPlaceholder(placeholder)}
+              onMouseEnter={() => onHighlightOption(index)}
+            >
+              <Box whiteSpace="nowrap">
+                <HighlightText text={placeholder.label} search={search ?? ""} />
+              </Box>
+            </Box>
+          );
+        })}
+      </Card>
+    );
   }
->(function PlaceholderMenu(
-  {
-    menuId,
-    itemIdPrefix,
-    values,
-    selectedIndex,
-    onAddPlaceholder,
-    onHighlightOption,
-    ...props
-  },
-  ref
-) {
-  return (
-    <Card
-      as="div"
-      ref={ref}
-      id={menuId}
-      role="listbox"
-      overflow="auto"
-      maxHeight="180px"
-      paddingY={1}
-      {...props}
-    >
-      {values.map((placeholder, index) => {
-        const isSelected = index === selectedIndex;
-        return (
-          <Box
-            key={placeholder.value}
-            id={`${itemIdPrefix}-${placeholder.value}`}
-            role="option"
-            aria-selected={isSelected ? "true" : undefined}
-            backgroundColor={isSelected ? "gray.100" : "white"}
-            paddingX={4}
-            paddingY={1}
-            cursor="pointer"
-            onMouseDown={() => onAddPlaceholder(placeholder)}
-            onMouseEnter={() => onHighlightOption(index)}
-          >
-            {placeholder.label}
-          </Box>
-        );
-      })}
-    </Card>
-  );
-});
+);
 
 const PlaceholderToken = function ({
   value,

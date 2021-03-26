@@ -3,7 +3,7 @@ import {
   getPreviousIndex,
   isPointAtWordEnd,
 } from "@udecode/slate-plugins";
-import { useCallback, useReducer } from "react";
+import { KeyboardEvent, useCallback, useReducer } from "react";
 import { Editor, Range, Transforms } from "slate";
 import { insertPlaceholder } from "./insertPlaceholder";
 import { Placeholder } from "./PlaceholderPlugin";
@@ -43,7 +43,7 @@ export function usePlaceholders(placeholders: Placeholder[] = []) {
   );
 
   const onKeyDownPlaceholder = useCallback(
-    (e: any, editor: Editor) => {
+    (e: KeyboardEvent, editor: Editor) => {
       if (target && values.length > 0) {
         if (e.key === "ArrowDown") {
           e.preventDefault();
