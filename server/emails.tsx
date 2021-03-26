@@ -1,12 +1,13 @@
+import Convert from "ansi-to-html";
 import cors from "cors";
+import escapeHTML from "escape-html";
 import express, { Request } from "express";
 import { createServer } from "livereload";
 import { render } from "mjml-react";
 import path from "path";
 import { createIntl, IntlProvider } from "react-intl";
 import { mapValues } from "remeda";
-import Convert from "ansi-to-html";
-import escapeHTML from "escape-html";
+import { loadMessages } from "./src/emails/utils/loadMessages";
 
 const app = express();
 app.use(cors());
@@ -53,13 +54,9 @@ app.get("/:email", async (req, res, next) => {
     const type = req.query.type as string;
     const {
       default: { html: Component, text, subject, from },
-    } = await import(
-      path.join(__dirname, `src/emails/components/${email}.tsx`)
-    );
+    } = await import(`./src/emails/components/${email}.tsx`);
     const params = await parseArgs(req);
-    const messages = await import(
-      path.join(__dirname, `lang/compiled/${locale}.json`)
-    );
+    const messages = await loadMessages(locale);
     const intl = createIntl({ messages, locale });
     if (type === "html") {
       const { html } = render(

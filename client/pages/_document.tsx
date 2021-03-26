@@ -8,19 +8,33 @@ import Document, {
   Main,
   NextScript,
 } from "next/document";
+import { outdent } from "outdent";
 import { IntlConfig } from "react-intl";
 
 const LANG_DIR = process.env.ROOT + "/public/static/lang";
 
 const messagesCache: Record<string, IntlConfig["messages"]> = {};
-async function loadMessages(locale: string) {
-  if (!(locale in messagesCache)) {
-    const messages = await fs.readFile(LANG_DIR + `/compiled/${locale}.json`, {
-      encoding: "utf-8",
-    });
-    messagesCache[locale] = JSON.parse(messages) as IntlConfig["messages"];
+async function loadMessages(locale: string): Promise<IntlConfig["messages"]> {
+  if (process.env.NODE_ENV !== "production") {
+    // on development load /lang files
+    const messages = await fs.readFile(
+      process.env.ROOT + `/lang/${locale}.json`,
+      { encoding: "utf-8" }
+    );
+    return Object.fromEntries<string>(
+      JSON.parse(messages).map((t: any) => [t.term, t.definition])
+    );
+  } else {
+    if (!(locale in messagesCache)) {
+      // on production load compiled files
+      const messages = await fs.readFile(
+        LANG_DIR + `/compiled/${locale}.json`,
+        { encoding: "utf-8" }
+      );
+      messagesCache[locale] = JSON.parse(messages);
+    }
+    return messagesCache[locale];
   }
-  return messagesCache[locale];
 }
 
 type MyDocumentProps = I18nProps;
@@ -42,22 +56,24 @@ class MyDocument extends Document<MyDocumentProps> {
         ),
       });
     const initialProps = await Document.getInitialProps(ctx);
-    return { ...initialProps, locale };
+    return { ...initialProps, locale, messages };
   }
 
   render() {
-    const { locale } = this.props;
+    const { locale, messages } = this.props;
     return (
       <Html lang={locale}>
         <Head>
           <link href={process.env.NEXT_PUBLIC_ASSETS_URL} rel="preconnect" />
           <link href="https://polyfill.io" rel="preconnect" />
-          <link
-            rel="preload"
-            href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
-            as="script"
-            crossOrigin="anonymous"
-          />
+          {process.env.NODE_ENV === "production" ? (
+            <link
+              rel="preload"
+              href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
+              as="script"
+              crossOrigin="anonymous"
+            />
+          ) : null}
           <script
             src={`https://polyfill.io/v3/polyfill.min.js?features=${encodeURIComponent(
               [
@@ -82,10 +98,21 @@ class MyDocument extends Document<MyDocumentProps> {
         </Head>
         <body>
           <Main />
-          <script
-            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
-            crossOrigin="anonymous"
-          />
+          {process.env.NODE_ENV === "production" ? (
+            <script
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/lang/${locale}.js?v=${process.env.BUILD_ID}`}
+              crossOrigin="anonymous"
+            />
+          ) : (
+            <script
+              dangerouslySetInnerHTML={{
+                __html: outdent`
+                  window.__LOCALE__ = "${locale}";
+                  window.__LOCALE_DATA__ = ${JSON.stringify(messages)};
+                `,
+              }}
+            />
+          )}
           <NextScript />
         </body>
       </Html>

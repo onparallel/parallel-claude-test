@@ -1,6 +1,7 @@
 import { render } from "mjml-react";
 import { ComponentType, createElement } from "react";
 import { IntlProvider, IntlShape, createIntl } from "react-intl";
+import { loadMessages } from "./utils/loadMessages";
 
 export interface EmailOptions {
   locale: string;
@@ -18,7 +19,7 @@ export async function buildEmail<T>(
   props: T,
   { locale }: EmailOptions
 ) {
-  const messages = await import(`../../lang/compiled/${locale}.json`);
+  const messages = await loadMessages(locale);
   const { html } = render(
     <IntlProvider locale={locale} messages={messages}>
       {createElement(email.html, props)}
