@@ -2,13 +2,15 @@ import { Box } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { HighlightText } from "@parallel/components/common/HighlightText";
+import useMergedRef from "@react-hook/merged-ref";
 import {
   getNodeDeserializer,
   getRenderElement,
   SlatePlugin,
 } from "@udecode/slate-plugins";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { RenderElementProps, useFocused, useSelected } from "slate-react";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 export type Placeholder = {
   value: string;
@@ -75,10 +77,18 @@ export const PlaceholderMenu = chakraForwardRef<"div", PlaceholderMenuProps>(
     },
     ref
   ) {
+    const menuRef = useRef<HTMLElement>(null);
+    const mergedRef = useMergedRef(ref, menuRef);
+    useEffect(() => {
+      const element = menuRef.current?.children.item(selectedIndex);
+      if (element) {
+        scrollIntoView(element, { block: "nearest", scrollMode: "if-needed" });
+      }
+    }, [selectedIndex]);
     return (
       <Card
         as="div"
-        ref={ref}
+        ref={mergedRef}
         id={menuId}
         role="listbox"
         overflow="auto"

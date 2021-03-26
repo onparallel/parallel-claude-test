@@ -2526,7 +2526,7 @@
   },
   {
     "term": "petition-message.placeholder-option.contact-full-name",
-    "definition": "Nombre y apellido del destinatario",
+    "definition": "nombre completo del destinatario",
     "context": "Recipient full name"
   },
   {
@@ -2546,7 +2546,7 @@
   },
   {
     "term": "petition-message.placeholder-option.user-full-name",
-    "definition": "Mi nombre y apellido",
+    "definition": "Mi nombre completo",
     "context": "My full name"
   },
   {
