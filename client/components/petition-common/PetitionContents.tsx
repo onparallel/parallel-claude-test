@@ -133,7 +133,7 @@ function SignatureStatusInfo({
           />
         </Text>
         <Tooltip label={labels[status]}>
-          <Flex>
+          <Flex alignItems="center">
             <Box
               hidden={status !== "START"}
               width="4px"
@@ -153,6 +153,7 @@ function SignatureStatusInfo({
                 position="relative"
                 bottom={2}
                 right={2}
+                marginRight={-2}
               />
             ) : null}
           </Flex>

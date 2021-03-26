@@ -499,9 +499,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   );
 
   const petitionSignatureStatus =
-    petition.signatureConfig?.review && petition.status === "COMPLETED"
+    petition.signatureConfig?.review &&
+    petition.status === "COMPLETED" &&
+    (!petition.currentSignatureRequest ||
+      !["ENQUEUED", "PROCESSING"].includes(
+        petition.currentSignatureRequest.status
+      ))
       ? "START"
-      : petition.currentSignatureRequest?.status ?? null;
+      : petition.currentSignatureRequest?.status ??
+        (petition.signatureConfig ? "PROCESSING" : null);
 
   return (
     <PetitionLayout
