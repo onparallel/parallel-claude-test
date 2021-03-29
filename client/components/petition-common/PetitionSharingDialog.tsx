@@ -32,7 +32,6 @@ import {
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import { useUpdatingMemoRef } from "@parallel/utils/useUpdatingRef";
 import useMergedRef from "@react-hook/merged-ref";
 import { usePreviousValue } from "beautiful-react-hooks";
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -102,16 +101,6 @@ export function PetitionSharingDialog({
 
   const usersRef = useRef<UserSelectInstance<true>>(null);
   const messageRef = useRef<HTMLInputElement>(null);
-  const focusableRef = useUpdatingMemoRef(
-    () => ({
-      focus: () => {
-        try {
-          setTimeout(() => usersRef.current?.focus());
-        } catch {}
-      },
-    }),
-    []
-  );
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
@@ -167,7 +156,7 @@ export function PetitionSharingDialog({
   return (
     <ConfirmDialog
       size="xl"
-      initialFocusRef={focusableRef}
+      initialFocusRef={usersRef}
       hasCloseButton
       {...props}
       content={{ as: "form", onSubmit: handleAddUserPermissions }}

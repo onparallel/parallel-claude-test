@@ -8,6 +8,7 @@ import {
   ModalHeader,
   Stack,
 } from "@chakra-ui/react";
+import { useUpdatingMemoRef } from "@parallel/utils/useUpdatingRef";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BaseDialog, BaseDialogProps } from "./BaseDialog";
@@ -34,8 +35,20 @@ export function ConfirmDialog<TResult = void>({
 }: ConfirmDialogProps<TResult>) {
   const intl = useIntl();
   const cancelRef = useRef<HTMLButtonElement>(null);
+  const focusRef = useUpdatingMemoRef(
+    () => ({
+      focus() {
+        setTimeout(() => {
+          try {
+            (initialFocusRef ?? cancelRef).current?.focus();
+          } catch {}
+        });
+      },
+    }),
+    []
+  );
   return (
-    <BaseDialog initialFocusRef={initialFocusRef ?? cancelRef} {...props}>
+    <BaseDialog initialFocusRef={focusRef} {...props}>
       <ModalContent {...content}>
         {hasCloseButton ? (
           <ModalCloseButton
