@@ -2090,6 +2090,11 @@
     "context": "Old password is incorrect"
   },
   {
+    "term": "generic.forms.invalid-password-policy-error",
+    "definition": "Please choose a stronger password",
+    "context": "Please choose a stronger password"
+  },
+  {
     "term": "generic.forms.invalid-user-first-name-error",
     "definition": "Please, enter the user first name",
     "context": "Please, enter the user first name"
@@ -2173,6 +2178,11 @@
     "term": "generic.forms.required-verification-code",
     "definition": "The verification code is required",
     "context": "The verification code is required"
+  },
+  {
+    "term": "generic.forms.sso-user-error",
+    "definition": "Your account uses SSO. To reset your password, please contact your team admin.",
+    "context": "Your account uses SSO. To reset your password, please contact your team admin."
   },
   {
     "term": "generic.forms.verification-code-label",
@@ -3985,6 +3995,16 @@
     "context": "Password reset"
   },
   {
+    "term": "public.forgot-password.reset-required-toast-description",
+    "definition": "A password reset is required.",
+    "context": "A password reset is required."
+  },
+  {
+    "term": "public.forgot-password.reset-required-toast-title",
+    "definition": "Password reset",
+    "context": "Password reset"
+  },
+  {
     "term": "public.forgot-password.reset-success-toast-description",
     "definition": "Your password has been reset successfully.",
     "context": "Your password has been reset successfully."
@@ -4208,6 +4228,11 @@
     "term": "public.login.password-update-header",
     "definition": "Update your password",
     "context": "Update your password"
+  },
+  {
+    "term": "public.login.sso-enabled",
+    "definition": "Single sign-on enabled",
+    "context": "Single sign-on enabled"
   },
   {
     "term": "public.login.title",

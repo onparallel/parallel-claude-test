@@ -1,16 +1,16 @@
 import AWS from "aws-sdk";
-import DataLoader from "dataloader";
+import { ContextDataType } from "aws-sdk/clients/cognitoidentityserviceprovider";
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { inject, injectable } from "inversify";
 import { decode } from "jsonwebtoken";
 import fetch from "node-fetch";
-import pMap from "p-map";
+import { IncomingMessage } from "node:http";
+import { getClientIp } from "request-ip";
 import { Memoize } from "typescript-memoize";
 import { URL } from "url";
 import { CONFIG, Config } from "../config";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
-import { fromDataLoader } from "../util/fromDataLoader";
 import { random } from "../util/token";
 import { REDIS, Redis } from "./redis";
 
@@ -22,7 +22,10 @@ export interface IAuth {
   newPassword: RequestHandler;
   forgotPassword: RequestHandler;
   confirmForgotPassword: RequestHandler;
-  validateSession: (session: string) => Promise<string | null>;
+  validateSession(
+    session: string,
+    req: IncomingMessage
+  ): Promise<string | null>;
 }
 
 export const AUTH = Symbol.for("AUTH");
@@ -151,7 +154,7 @@ export class Auth implements IAuth {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password } = req.body;
-      const auth = await this.initiateAuth(email, password);
+      const auth = await this.initiateAuth(email, password, req);
       if (auth.AuthenticationResult) {
         const token = await this.storeSession(auth.AuthenticationResult as any);
         this.setSession(res, token);
@@ -179,15 +182,16 @@ export class Auth implements IAuth {
   async newPassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { email, password, newPassword } = req.body;
-      const auth = await this.initiateAuth(email, password);
+      const auth = await this.initiateAuth(email, password, req);
       if (auth.ChallengeName !== "NEW_PASSWORD_REQUIRED") {
         console.log(auth);
-        return res.status(401).send({ error: "wtf" });
+        return res.status(401).send({ error: "UnknownError" });
       }
       const challenge = await this.respondToNewPasswordRequiredChallenge(
         auth.Session!,
         email,
-        newPassword
+        newPassword,
+        req
       );
       if (challenge.AuthenticationResult) {
         const token = await this.storeSession(
@@ -216,7 +220,11 @@ export class Auth implements IAuth {
         .promise();
       res.status(204).send();
     } catch (error) {
+      console.log(error);
       switch (error.code) {
+        case "NotAuthorizedException":
+          res.status(401).send({ error: "ExternalUser" });
+          return;
         case "UserNotFoundException":
           // don't leak whether users exist or not
           res.status(204);
@@ -240,6 +248,9 @@ export class Auth implements IAuth {
       res.status(204).send();
     } catch (error) {
       switch (error.code) {
+        case "InvalidPasswordException":
+          res.status(400).send({ error: "InvalidPassword" });
+          return;
         case "ExpiredCodeException":
         case "CodeMismatchException":
         case "UserNotFoundException":
@@ -296,7 +307,28 @@ export class Auth implements IAuth {
     );
   }
 
-  private async initiateAuth(email: string, password: string) {
+  private getContextData(req: IncomingMessage): ContextDataType {
+    return {
+      IpAddress: getClientIp(req)!,
+      HttpHeaders: Object.entries(req.headers)
+        .flatMap(([name, value]) =>
+          value === undefined
+            ? []
+            : Array.isArray(value)
+            ? value.map((v) => [name, v] as const)
+            : [[name, value] as const]
+        )
+        .map(([name, value]) => ({ headerName: name, headerValue: value })),
+      ServerName: this.config.misc.parallelUrl,
+      ServerPath: req.url!,
+    };
+  }
+
+  private async initiateAuth(
+    email: string,
+    password: string,
+    req: IncomingMessage
+  ) {
     return await this.cognito
       .adminInitiateAuth({
         AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
@@ -306,6 +338,7 @@ export class Auth implements IAuth {
           USERNAME: email,
           PASSWORD: password,
         },
+        ContextData: this.getContextData(req),
       })
       .promise();
   }
@@ -313,7 +346,8 @@ export class Auth implements IAuth {
   private async respondToNewPasswordRequiredChallenge(
     session: string,
     email: string,
-    newPassword: string
+    newPassword: string,
+    req: Request
   ) {
     return await this.cognito
       .adminRespondToAuthChallenge({
@@ -325,11 +359,12 @@ export class Auth implements IAuth {
           USERNAME: email,
           NEW_PASSWORD: newPassword,
         },
+        ContextData: this.getContextData(req),
       })
       .promise();
   }
 
-  private async refreshToken(refreshToken: string) {
+  private async refreshToken(refreshToken: string, req: IncomingMessage) {
     return this.cognito
       .adminInitiateAuth({
         AuthFlow: "REFRESH_TOKEN_AUTH",
@@ -338,41 +373,39 @@ export class Auth implements IAuth {
         AuthParameters: {
           REFRESH_TOKEN: refreshToken,
         },
+        ContextData: this.getContextData(req),
       })
       .promise();
   }
 
-  validateSession = fromDataLoader(
-    new DataLoader<string, string | null>(async (tokens) => {
-      return await pMap(tokens as string[], async (token) => {
-        try {
-          const idToken = await this.redis.get(`session:${token}:idToken`);
-          if (idToken === null) {
-            return null;
-          }
-          const payload = decode(idToken) as any;
-          const expiresAt = payload["exp"] as number;
-          const cognitoId = payload["cognito:username"] as string;
-          if (Date.now() > expiresAt * 1000) {
-            const refreshToken = await this.redis.get(
-              `session:${token}:refreshToken`
-            );
-            if (refreshToken === null) {
-              return null;
-            }
-            const auth = await this.refreshToken(refreshToken);
-            if (auth.AuthenticationResult) {
-              await this.updateSession(token, auth.AuthenticationResult as any);
-            } else {
-              console.log(auth);
-              return null;
-            }
-          }
-          return cognitoId;
-        } catch (error) {
+  async validateSession(token: string, req: IncomingMessage) {
+    try {
+      const idToken = await this.redis.get(`session:${token}:idToken`);
+      if (idToken === null) {
+        return null;
+      }
+      const payload = decode(idToken) as any;
+      const expiresAt = payload["exp"] as number;
+      const cognitoId = payload["cognito:username"] as string;
+      if (Date.now() > expiresAt * 1000) {
+        const refreshToken = await this.redis.get(
+          `session:${token}:refreshToken`
+        );
+        if (refreshToken === null) {
           return null;
         }
-      });
-    })
-  );
+        const auth = await this.refreshToken(refreshToken, req);
+        console.log(auth);
+        if (auth.AuthenticationResult) {
+          await this.updateSession(token, auth.AuthenticationResult as any);
+        } else {
+          console.log(auth);
+          return null;
+        }
+      }
+      return cognitoId;
+    } catch (error) {
+      return null;
+    }
+  }
 }

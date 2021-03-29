@@ -1,36 +1,27 @@
 import { gql, useApolloClient } from "@apollo/client";
+import { useToast } from "@chakra-ui/react";
+import { AlreadyLoggedIn } from "@parallel/components/auth/AlreadyLoggedIn";
+import { LoginData, LoginForm } from "@parallel/components/auth/LoginForm";
 import {
-  Avatar,
-  Box,
-  Button,
-  Center,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Input,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
-import { Link, NormalLink } from "@parallel/components/common/Link";
-import { PasswordInput } from "@parallel/components/common/PasswordInput";
+  PasswordChangeData,
+  PasswordChangeForm,
+} from "@parallel/components/auth/PasswordChangeForm";
+import {
+  PasswordResetData,
+  PasswordResetForm,
+} from "@parallel/components/auth/PasswordResetForm";
+import { NormalLink } from "@parallel/components/common/Link";
 import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
-import {
-  Login_UserFragment,
-  useCurrentUserQuery,
-} from "@parallel/graphql/__types";
+import { useCurrentUserQuery } from "@parallel/graphql/__types";
 import { postJSON } from "@parallel/utils/rest";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { LockIcon } from "@parallel/chakra/icons";
 
 function Login() {
   const router = useRouter();
@@ -39,15 +30,19 @@ function Login() {
   const [showContinueAs, setShowContinueAs] = useState(Boolean(data?.me));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [passwordChange, setPasswordChange] = useState<{
-    required: boolean;
-    email?: string;
+    type: "CHANGE" | "RESET";
+    email: string;
     password?: string;
-  }>({ required: false });
+  } | null>(null);
+  const [verificationCodeStatus, setVerificationCodeStatus] = useState({
+    hasVerificationCodeError: false,
+    isInvalidPassword: false,
+  });
   const intl = useIntl();
 
   const toast = useToast();
 
-  async function handleLoginSubmit({ email, password }: LoginFormData) {
+  async function handleLoginSubmit({ email, password }: LoginData) {
     setIsSubmitting(true);
     try {
       await postJSON<{ token: string }>("/api/auth/login", {
@@ -58,7 +53,24 @@ function Login() {
       router.push(`/${router.query.locale}/app/petitions`);
     } catch (error) {
       if (error.error === "NewPasswordRequired") {
-        setPasswordChange({ required: true, email, password });
+        setPasswordChange({ type: "CHANGE", email, password });
+      } else if (error.error === "PasswordResetRequired") {
+        toast({
+          title: intl.formatMessage({
+            id: "public.forgot-password.reset-required-toast-title",
+            defaultMessage: "Password reset",
+          }),
+          description: intl.formatMessage({
+            id: "public.forgot-password.reset-required-toast-description",
+            defaultMessage: "A password reset is required.",
+          }),
+          status: "error",
+          isClosable: true,
+        });
+        await postJSON("/api/auth/forgot-password", {
+          email,
+        });
+        setPasswordChange({ type: "RESET", email });
       } else {
         toast({
           title: intl.formatMessage({
@@ -79,11 +91,11 @@ function Login() {
   }
 
   async function handlePasswordChangeSubmit({
-    password1: newPassword,
+    password: newPassword,
   }: PasswordChangeData) {
     setIsSubmitting(true);
     try {
-      const { email, password } = passwordChange;
+      const { email, password } = passwordChange!;
       await postJSON<{ token: string }>("/api/auth/new-password", {
         email,
         password,
@@ -92,6 +104,44 @@ function Login() {
       router.push(`/${router.query.locale}/app/petitions`);
     } catch (error) {}
     setIsSubmitting(false);
+  }
+
+  async function handlePasswordResetSubmit({
+    verificationCode,
+    password,
+  }: PasswordResetData) {
+    setIsSubmitting(true);
+    setVerificationCodeStatus({
+      hasVerificationCodeError: false,
+      isInvalidPassword: false,
+    });
+    try {
+      await postJSON("/api/auth/confirm-forgot-password", {
+        email: passwordChange!.email,
+        verificationCode,
+        newPassword: password,
+      });
+      toast({
+        title: intl.formatMessage({
+          id: "public.forgot-password.reset-success-toast-title",
+          defaultMessage: "Password reset",
+        }),
+        description: intl.formatMessage({
+          id: "public.forgot-password.reset-success-toast-description",
+          defaultMessage: "Your password has been reset successfully.",
+        }),
+        status: "success",
+        isClosable: true,
+      });
+      setPasswordChange(null);
+      setIsSubmitting(false);
+    } catch (error) {
+      setVerificationCodeStatus({
+        hasVerificationCodeError: error.error === "InvalidVerificationCode",
+        isInvalidPassword: error.error === "InvalidPassword",
+      });
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -114,10 +164,34 @@ function Login() {
               router.push(`/${router.query.locale}/app/petitions`)
             }
           />
-        ) : passwordChange.required ? (
+        ) : passwordChange?.type === "CHANGE" ? (
           <PasswordChangeForm
             onSubmit={handlePasswordChangeSubmit}
-            onBackToLogin={() => setPasswordChange({ required: false })}
+            backLink={
+              <NormalLink role="button" onClick={() => setPasswordChange(null)}>
+                <FormattedMessage
+                  id="public.login.back-to-login-link"
+                  defaultMessage="Go back to login"
+                />
+              </NormalLink>
+            }
+            isSubmitting={isSubmitting}
+          />
+        ) : passwordChange?.type === "RESET" ? (
+          <PasswordResetForm
+            onSubmit={handlePasswordResetSubmit}
+            backLink={
+              <NormalLink role="button" onClick={() => setPasswordChange(null)}>
+                <FormattedMessage
+                  id="public.login.back-to-login-link"
+                  defaultMessage="Go back to login"
+                />
+              </NormalLink>
+            }
+            hasVerificationCodeError={
+              verificationCodeStatus.hasVerificationCodeError
+            }
+            isInvalidPassword={verificationCodeStatus.isInvalidPassword}
             isSubmitting={isSubmitting}
           />
         ) : (
@@ -125,283 +199,6 @@ function Login() {
         )}
       </PublicUserFormContainer>
     </PublicLayout>
-  );
-}
-
-interface AlreadyLoggedInProps {
-  me: Login_UserFragment;
-  onRelogin: () => void;
-  onContinueAs: () => void;
-}
-
-function AlreadyLoggedIn({
-  me,
-  onRelogin,
-  onContinueAs,
-}: AlreadyLoggedInProps) {
-  return (
-    <>
-      <Box marginTop={4} textAlign="center">
-        <Avatar name={me.fullName ?? undefined} size="lg" />
-        <Text marginTop={4}>
-          <FormattedMessage
-            id="public.login.already-logged-in.explanation"
-            defaultMessage="You are already logged in as {name}"
-            values={{ name: <b>{me.fullName || me.email}</b> }}
-          />
-        </Text>
-        {me.fullName ? <Text>({me.email})</Text> : null}
-      </Box>
-      <Button
-        marginTop={6}
-        width="100%"
-        colorScheme="purple"
-        type="submit"
-        onClick={onContinueAs}
-      >
-        <FormattedMessage
-          id="public.login.already-logged-in.continue-button"
-          defaultMessage="Continue as {name}"
-          values={{ name: me.fullName || me.email }}
-        />
-      </Button>
-      <Box marginTop={4} textAlign="center">
-        <NormalLink role="button" onClick={onRelogin}>
-          <FormattedMessage
-            id="public.login.already-logged-in.relogin"
-            defaultMessage="Login as someone else"
-          />
-        </NormalLink>
-      </Box>
-    </>
-  );
-}
-
-interface LoginFormData {
-  email: string;
-  password: string;
-}
-
-interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => Promise<void>;
-  isSubmitting: boolean;
-}
-
-function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-    watch,
-  } = useForm<LoginFormData>();
-  const [ssoUrl, setSsoUrl] = useState<string | undefined>(undefined);
-  const email = watch("email");
-  useEffect(() => {
-    async function guessLogin() {
-      const result = await postJSON<{ type: "SSO" | "PASSWORD"; url?: string }>(
-        "/api/auth/guess-login",
-        { email }
-      );
-      console.log(result);
-      if (result) {
-        setSsoUrl(result?.url);
-      }
-    }
-    if (EMAIL_REGEX.test(email)) {
-      guessLogin().then();
-    }
-  }, [email]);
-  return (
-    <>
-      <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} size="md">
-          <FormattedMessage
-            id="public.login.header"
-            defaultMessage="Enter Parallel"
-          />
-        </Heading>
-        <Text>
-          <FormattedMessage
-            id="public.login.explanation"
-            defaultMessage="Login using your email and password"
-          />
-        </Text>
-      </Box>
-      <form
-        onSubmit={handleSubmit((data) => {
-          if (ssoUrl) {
-            window.location.href = ssoUrl;
-          } else {
-            onSubmit(data);
-          }
-        })}
-        noValidate
-      >
-        <FormControl id="email" isInvalid={!!errors.email}>
-          <FormLabel>
-            <FormattedMessage
-              id="generic.forms.email-label"
-              defaultMessage="Email"
-            />
-          </FormLabel>
-          <Input
-            type="email"
-            {...register("email", {
-              required: true,
-              pattern: EMAIL_REGEX,
-            })}
-          />
-          {errors.email && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.invalid-email-error"
-                defaultMessage="Please, enter a valid email"
-              />
-            </FormErrorMessage>
-          )}
-        </FormControl>
-        {ssoUrl ? (
-          <Center marginTop={2} height="72px">
-            <LockIcon marginRight={2} />
-            <FormattedMessage
-              id="public.login.sso-enabled"
-              defaultMessage="Single sign-on enabled"
-            />
-          </Center>
-        ) : (
-          <FormControl
-            id="password"
-            marginTop={2}
-            isInvalid={!!errors.password}
-          >
-            <FormLabel>
-              <FormattedMessage
-                id="generic.forms.password-label"
-                defaultMessage="Password"
-              />
-            </FormLabel>
-            <PasswordInput {...register("password", { required: true })} />
-            {errors.password && (
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.required-password-error"
-                  defaultMessage="Please, enter a password"
-                />
-              </FormErrorMessage>
-            )}
-          </FormControl>
-        )}
-        <Button
-          marginTop={6}
-          width="100%"
-          colorScheme="purple"
-          isLoading={isSubmitting}
-          type="submit"
-          id="pw-login-submit"
-        >
-          {ssoUrl ? (
-            <FormattedMessage id="generic.continue" defaultMessage="Continue" />
-          ) : (
-            <FormattedMessage id="public.login-button" defaultMessage="Login" />
-          )}
-        </Button>
-      </form>
-      <Box marginTop={4} textAlign="center">
-        <Link href="/forgot">
-          <FormattedMessage
-            id="public.login.forgot-password-link"
-            defaultMessage="I forgot my password"
-          />
-        </Link>
-      </Box>
-    </>
-  );
-}
-
-interface PasswordChangeData {
-  password1: string;
-  password2: string;
-}
-
-interface PasswordChangeFormProps {
-  onSubmit: (data: PasswordChangeData) => Promise<void>;
-  onBackToLogin: () => void;
-  isSubmitting: boolean;
-}
-
-function PasswordChangeForm({
-  onSubmit,
-  onBackToLogin,
-  isSubmitting,
-}: PasswordChangeFormProps) {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm<PasswordChangeData>({
-    mode: "onBlur",
-  });
-  return (
-    <>
-      <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} size="md">
-          <FormattedMessage
-            id="public.login.password-update-header"
-            defaultMessage="Update your password"
-          />
-        </Heading>
-        <Text>
-          <FormattedMessage
-            id="public.login.password-update-explanation"
-            defaultMessage="First time users need to update their password"
-          />
-        </Text>
-      </Box>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <FormControl id="password" isInvalid={!!errors.password1}>
-          <FormLabel>
-            <FormattedMessage
-              id="generic.forms.new-password-label"
-              defaultMessage="New password"
-            />
-          </FormLabel>
-          <PasswordInput
-            {...register("password1", {
-              required: true,
-              validate: (value) => value.length >= 8,
-            })}
-          />
-          {errors.password1 && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.password-policy-error"
-                defaultMessage="The password must have a least 8 characters"
-              />
-            </FormErrorMessage>
-          )}
-        </FormControl>
-        <Button
-          marginTop={6}
-          width="100%"
-          colorScheme="purple"
-          isLoading={isSubmitting}
-          type="submit"
-        >
-          <FormattedMessage
-            id="public.login.password-update-button"
-            defaultMessage="Update password"
-          />
-        </Button>
-      </form>
-      <Box marginTop={4} textAlign="center">
-        <NormalLink role="button" onClick={onBackToLogin}>
-          <FormattedMessage
-            id="public.login.back-to-login-link"
-            defaultMessage="Go back to login"
-          />
-        </NormalLink>
-      </Box>
-    </>
   );
 }
 

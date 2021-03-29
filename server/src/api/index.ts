@@ -10,7 +10,6 @@ import { webhooks } from "./webhooks";
 
 export function api(container: Container) {
   const logger = container.get<Logger>(LOGGER);
-  const auth = container.get<Auth>(AUTH);
   return Router()
     .use(((err, req, res, next) => {
       logger.error(err?.message, { stack: err?.stack });

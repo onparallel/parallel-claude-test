@@ -1,0 +1,174 @@
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  Input,
+  Text,
+} from "@chakra-ui/react";
+import { PasswordInput } from "@parallel/components/common/PasswordInput";
+import { ReactElement, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { FormattedMessage } from "react-intl";
+
+export interface PasswordResetData {
+  verificationCode: string;
+  password: string;
+  passwordConfirm: string;
+}
+
+export interface PasswordResetFormProps {
+  onSubmit: (data: PasswordResetData) => Promise<void>;
+  backLink?: ReactElement;
+  hasVerificationCodeError?: boolean;
+  isInvalidPassword?: boolean;
+  isSubmitting: boolean;
+}
+
+export function PasswordResetForm({
+  onSubmit,
+  backLink,
+  hasVerificationCodeError,
+  isInvalidPassword,
+  isSubmitting,
+}: PasswordResetFormProps) {
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    getValues,
+    setError,
+    clearErrors,
+  } = useForm<PasswordResetData>({ mode: "onBlur" });
+  useEffect(() => {
+    if (hasVerificationCodeError) {
+      setError("verificationCode", { type: "validate" });
+    } else {
+      clearErrors("verificationCode");
+    }
+  }, [hasVerificationCodeError]);
+  return (
+    <>
+      <Box marginBottom={6} textAlign="center">
+        <Heading marginTop={4} marginBottom={2} size="md">
+          <FormattedMessage
+            id="public.forgot-password.reset-header"
+            defaultMessage="Password reset"
+          />
+        </Heading>
+        <Text>
+          <FormattedMessage
+            id="public.forgot-password.reset-explanation"
+            defaultMessage="Use the verification code in the email you have received."
+          />
+        </Text>
+      </Box>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <FormControl
+          id="verification-code"
+          isInvalid={!!errors.verificationCode}
+        >
+          <FormLabel>
+            <FormattedMessage
+              id="generic.forms.verification-code-label"
+              defaultMessage="Verification code"
+            />
+          </FormLabel>
+          <Input {...register("verificationCode", { required: true })} />
+          {errors.verificationCode?.type === "validate" && (
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.invalid-verification-code"
+                defaultMessage="The verification code is invalid"
+              />
+            </FormErrorMessage>
+          )}
+          {errors.verificationCode?.type === "required" && (
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.required-verification-code"
+                defaultMessage="The verification code is required"
+              />
+            </FormErrorMessage>
+          )}
+        </FormControl>
+        <FormControl
+          id="password"
+          isInvalid={!!errors.password || isInvalidPassword}
+        >
+          <FormLabel>
+            <FormattedMessage
+              id="generic.forms.new-password-label"
+              defaultMessage="New password"
+            />
+          </FormLabel>
+          <PasswordInput
+            {...register("password", {
+              required: true,
+              validate: (value) => value.length >= 8,
+            })}
+          />
+          {errors.password && (
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.password-policy-error"
+                defaultMessage="The password must have a least 8 characters"
+              />
+            </FormErrorMessage>
+          )}
+          {isInvalidPassword ? (
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.invalid-password-policy-error"
+                defaultMessage="Please choose a stronger password"
+              />
+            </FormErrorMessage>
+          ) : null}
+        </FormControl>
+        <FormControl
+          id="password-confirm"
+          marginTop={2}
+          isInvalid={!!errors.passwordConfirm}
+        >
+          <FormLabel>
+            <FormattedMessage
+              id="generic.forms.confirm-password-label"
+              defaultMessage="Confirm password"
+            />
+          </FormLabel>
+          <PasswordInput
+            {...register("passwordConfirm", {
+              required: true,
+              validate: (value) => value === getValues().password,
+            })}
+          />
+          {errors.passwordConfirm && (
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.passwords-must-match"
+                defaultMessage="Passwords must match"
+              />
+            </FormErrorMessage>
+          )}
+        </FormControl>
+        <Button
+          marginTop={6}
+          width="100%"
+          colorScheme="purple"
+          isLoading={isSubmitting}
+          type="submit"
+        >
+          <FormattedMessage
+            id="public.forgot-password.reset-button"
+            defaultMessage="Reset password"
+          />
+        </Button>
+      </form>
+      <Box marginTop={4} textAlign="center">
+        {backLink}
+      </Box>
+    </>
+  );
+}

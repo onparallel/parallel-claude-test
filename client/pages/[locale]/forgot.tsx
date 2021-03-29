@@ -1,42 +1,35 @@
+import { useToast } from "@chakra-ui/react";
 import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Input,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
-import { Link, NormalLink } from "@parallel/components/common/Link";
-import { PasswordInput } from "@parallel/components/common/PasswordInput";
+  ForgotPasswordData,
+  ForgotPasswordForm,
+} from "@parallel/components/auth/ForgotPasswordForm";
+import {
+  PasswordResetData,
+  PasswordResetForm,
+} from "@parallel/components/auth/PasswordResetForm";
+import { NormalLink } from "@parallel/components/common/Link";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
 import languages from "@parallel/lang/languages.json";
 import { postJSON } from "@parallel/utils/rest";
-import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-
-interface ForgotPasswordFormData {
-  email: string;
-}
 
 function Forgot() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verification, setVerification] = useState<{
     sent: boolean;
     email?: string;
-    verificationCodeError?: boolean;
+    hasVerificationCodeError?: boolean;
+    isInvalidPassword?: boolean;
+    isExternalUserError?: boolean;
   }>({ sent: false });
   const router = useRouter();
   const intl = useIntl();
   const toast = useToast();
 
-  async function onForgotPasswordSubmit({ email }: ForgotPasswordFormData) {
+  async function handleForgotPasswordSubmit({ email }: ForgotPasswordData) {
     setIsSubmitting(true);
     try {
       await postJSON("/api/auth/forgot-password", {
@@ -56,21 +49,32 @@ function Forgot() {
         status: "success",
         isClosable: true,
       });
-    } catch (error) {}
+    } catch (error) {
+      if (error.error === "ExternalUser") {
+        setVerification({
+          sent: false,
+          isExternalUserError: error.error === "ExternalUser",
+        });
+      }
+    }
     setIsSubmitting(false);
   }
 
-  async function onPasswordResetSubmit({
+  async function handlePasswordResetSubmit({
     verificationCode,
-    password1: newPassword,
-  }: PasswordResetFormData) {
+    password,
+  }: PasswordResetData) {
     setIsSubmitting(true);
-    setVerification({ ...verification, verificationCodeError: false });
+    setVerification({
+      ...verification,
+      hasVerificationCodeError: false,
+      isInvalidPassword: false,
+    });
     try {
       await postJSON("/api/auth/confirm-forgot-password", {
         email: verification.email,
         verificationCode,
-        newPassword,
+        newPassword: password,
       });
       toast({
         title: intl.formatMessage({
@@ -86,7 +90,11 @@ function Forgot() {
       });
       router.push(`/${router.query.locale}/login`);
     } catch (error) {
-      setVerification({ ...verification, verificationCodeError: true });
+      setVerification({
+        ...verification,
+        hasVerificationCodeError: error.error === "InvalidVerificationCode",
+        isInvalidPassword: error.error === "InvalidPassword",
+      });
     }
     setIsSubmitting(false);
   }
@@ -101,250 +109,31 @@ function Forgot() {
       <PublicUserFormContainer>
         {verification.sent ? (
           <PasswordResetForm
-            onSubmit={onPasswordResetSubmit}
-            onBackToForgotPassword={() => setVerification({ sent: false })}
-            verificationCodeError={!!verification.verificationCodeError}
+            onSubmit={handlePasswordResetSubmit}
+            backLink={
+              <NormalLink
+                role="button"
+                onClick={() => setVerification({ sent: false })}
+              >
+                <FormattedMessage
+                  id="public.login.back-to-forgot-link"
+                  defaultMessage="Go back to forgot password"
+                />
+              </NormalLink>
+            }
+            isInvalidPassword={verification.isInvalidPassword}
+            hasVerificationCodeError={verification.hasVerificationCodeError}
             isSubmitting={isSubmitting}
           />
         ) : (
           <ForgotPasswordForm
-            onSubmit={onForgotPasswordSubmit}
+            isExternalUserError={verification.isExternalUserError}
+            onSubmit={handleForgotPasswordSubmit}
             isSubmitting={isSubmitting}
           />
         )}
       </PublicUserFormContainer>
     </PublicLayout>
-  );
-}
-
-interface ForgotPasswordFormProps {
-  onSubmit: (data: ForgotPasswordFormData) => Promise<void>;
-  isSubmitting: boolean;
-}
-
-function ForgotPasswordForm({
-  onSubmit,
-  isSubmitting,
-}: ForgotPasswordFormProps) {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm<ForgotPasswordFormData>();
-  return (
-    <>
-      <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} size="md">
-          <FormattedMessage
-            id="public.forgot-password.header"
-            defaultMessage="Forgot password"
-          />
-        </Heading>
-        <Text>
-          <FormattedMessage
-            id="public.forgot-password.explanation"
-            defaultMessage="We will send you a message to reset your password."
-          />
-        </Text>
-      </Box>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <FormControl id="email" isInvalid={!!errors.email}>
-          <FormLabel>
-            <FormattedMessage
-              id="generic.forms.email-label"
-              defaultMessage="Email"
-            />
-          </FormLabel>
-          <Input
-            type="email"
-            {...register("email", {
-              required: true,
-              pattern: EMAIL_REGEX,
-            })}
-          />
-          {errors.email && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.invalid-email-error"
-                defaultMessage="Please, enter a valid email"
-              />
-            </FormErrorMessage>
-          )}
-        </FormControl>
-        <Button
-          marginTop={6}
-          width="100%"
-          colorScheme="purple"
-          isLoading={isSubmitting}
-          type="submit"
-        >
-          <FormattedMessage
-            id="public.forgot-password.send-button"
-            defaultMessage="Send verification code"
-          />
-        </Button>
-      </form>
-      <Box marginTop={4} textAlign="center">
-        <Link href="/login">
-          <FormattedMessage
-            id="public.forgot-password.login-link"
-            defaultMessage="I remembered my password"
-          />
-        </Link>
-      </Box>
-    </>
-  );
-}
-
-interface PasswordResetFormData {
-  verificationCode: string;
-  password1: string;
-  password2: string;
-}
-
-interface PasswordResetFormProps {
-  onSubmit: (data: PasswordResetFormData) => Promise<void>;
-  onBackToForgotPassword: () => void;
-  verificationCodeError: boolean;
-  isSubmitting: boolean;
-}
-
-function PasswordResetForm({
-  onSubmit,
-  onBackToForgotPassword,
-  verificationCodeError,
-  isSubmitting,
-}: PasswordResetFormProps) {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-    getValues,
-    setError,
-    clearErrors,
-  } = useForm<PasswordResetFormData>({ mode: "onBlur" });
-  useEffect(() => {
-    if (verificationCodeError) {
-      setError("verificationCode", { type: "validate" });
-    } else {
-      clearErrors("verificationCode");
-    }
-  }, [verificationCodeError]);
-  return (
-    <>
-      <Box marginBottom={6} textAlign="center">
-        <Heading marginTop={4} marginBottom={2} size="md">
-          <FormattedMessage
-            id="public.forgot-password.reset-header"
-            defaultMessage="Password reset"
-          />
-        </Heading>
-        <Text>
-          <FormattedMessage
-            id="public.forgot-password.reset-explanation"
-            defaultMessage="Use the verification code in the email you have received."
-          />
-        </Text>
-      </Box>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <FormControl
-          id="verification-code"
-          isInvalid={!!errors.verificationCode}
-        >
-          <FormLabel>
-            <FormattedMessage
-              id="generic.forms.verification-code-label"
-              defaultMessage="Verification code"
-            />
-          </FormLabel>
-          <Input {...register("verificationCode", { required: true })} />
-          {errors.verificationCode?.type === "validate" && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.invalid-verification-code"
-                defaultMessage="The verification code is invalid"
-              />
-            </FormErrorMessage>
-          )}
-          {errors.verificationCode?.type === "required" && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.required-verification-code"
-                defaultMessage="The verification code is required"
-              />
-            </FormErrorMessage>
-          )}
-        </FormControl>
-        <FormControl id="password" isInvalid={!!errors.password1}>
-          <FormLabel>
-            <FormattedMessage
-              id="generic.forms.new-password-label"
-              defaultMessage="New password"
-            />
-          </FormLabel>
-          <PasswordInput
-            {...register("password1", {
-              required: true,
-              validate: (value) => value.length >= 8,
-            })}
-          />
-          {errors.password1 && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.password-policy-error"
-                defaultMessage="The password must have a least 8 characters"
-              />
-            </FormErrorMessage>
-          )}
-        </FormControl>
-        <FormControl
-          id="password-confirm"
-          marginTop={2}
-          isInvalid={!!errors.password2}
-        >
-          <FormLabel>
-            <FormattedMessage
-              id="generic.forms.confirm-password-label"
-              defaultMessage="Confirm password"
-            />
-          </FormLabel>
-          <PasswordInput
-            {...register("password2", {
-              required: true,
-              validate: (value) => value === getValues().password1,
-            })}
-          />
-          {errors.password2 && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.passwords-must-match"
-                defaultMessage="Passwords must match"
-              />
-            </FormErrorMessage>
-          )}
-        </FormControl>
-        <Button
-          marginTop={6}
-          width="100%"
-          colorScheme="purple"
-          isLoading={isSubmitting}
-          type="submit"
-        >
-          <FormattedMessage
-            id="public.forgot-password.reset-button"
-            defaultMessage="Reset password"
-          />
-        </Button>
-      </form>
-      <Box marginTop={4} textAlign="center">
-        <NormalLink role="button" onClick={onBackToForgotPassword}>
-          <FormattedMessage
-            id="public.login.back-to-forgot-link"
-            defaultMessage="Go back to forgot password"
-          />
-        </NormalLink>
-      </Box>
-    </>
   );
 }
 

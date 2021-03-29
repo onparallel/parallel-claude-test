@@ -9,7 +9,7 @@ export async function authenticateFromRequest(
   const cookies = parseCookie(req.headers.cookie ?? "");
   if (cookies["parallel_session"]) {
     const token = cookies["parallel_session"];
-    const cognitoId = await ctx.auth.validateSession(token);
+    const cognitoId = await ctx.auth.validateSession(token, req);
     if (!cognitoId) {
       throw new Error();
     }
