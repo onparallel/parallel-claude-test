@@ -1,5 +1,8 @@
 node_modules
+
 client/.next
-client/out
+client/public/static/lang
+
 server/dist
 server/bin/localtunnel-dev.url
+server/lang/compiled

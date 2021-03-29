@@ -97,16 +97,6 @@ async function main() {
     { cwd: WORK_DIR, encoding: "utf-8" }
   );
 
-  console.log("Generating i18n files");
-  execSync(`ENV=${env} yarn generate-i18n-files`, {
-    cwd: `${buildDir}/client`,
-    encoding: "utf-8",
-  });
-  execSync(`ENV=${env} yarn generate-i18n-files`, {
-    cwd: `${buildDir}/server`,
-    encoding: "utf-8",
-  });
-
   console.log("Building the client");
   execSync(`ENV=${env} yarn build`, {
     cwd: `${buildDir}/client`,
