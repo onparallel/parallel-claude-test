@@ -958,6 +958,11 @@ type Organization implements Timestamps {
   createdAt: DateTime!
 
   """
+  Whether the organization has an SSO provider configured.
+  """
+  hasSsoProvider: Boolean!
+
+  """
   The ID of the organization.
   """
   id: GID!
@@ -2970,6 +2975,7 @@ type User implements Timestamps {
   The ID of the user.
   """
   id: GID!
+  isSsoUser: Boolean!
   isSuperAdmin: Boolean!
   lastActiveAt: DateTime
 

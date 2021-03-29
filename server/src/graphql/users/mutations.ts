@@ -16,7 +16,6 @@ import {
   argIsContextUserId,
   authenticate,
   authenticateAnd,
-  chain,
   ifArgDefined,
 } from "../helpers/authorize";
 import { ArgValidationError } from "../helpers/errors";
@@ -32,12 +31,15 @@ import {
   argUserHasActiveStatus,
   userHasAccessToUsers,
 } from "../petition/mutations/authorizers";
-import { contextUserIsAdmin } from "./authorizers";
+import { contextUserIsAdmin, orgDoesNotHaveSsoProvider } from "./authorizers";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
   description: "Updates the user with the provided data.",
-  authorize: chain(authenticate(), argIsContextUserId("id")),
+  authorize: authenticateAnd(
+    argIsContextUserId("id"),
+    orgDoesNotHaveSsoProvider()
+  ),
   args: {
     id: nonNull(globalIdArg("User")),
     data: nonNull(
@@ -74,7 +76,7 @@ export const changePassword = mutationField("changePassword", {
     name: "ChangePasswordResult",
     members: ["SUCCESS", "INCORRECT_PASSWORD", "INVALID_NEW_PASSWORD"],
   }),
-  authorize: authenticate(),
+  authorize: authenticateAnd(orgDoesNotHaveSsoProvider()),
   args: {
     password: nonNull(stringArg()),
     newPassword: nonNull(stringArg()),
@@ -129,7 +131,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
   description:
     "Creates a new user in the same organization as the context user",
   type: "User",
-  authorize: authenticateAnd(contextUserIsAdmin()),
+  authorize: authenticateAnd(contextUserIsAdmin(), orgDoesNotHaveSsoProvider()),
   args: {
     email: nonNull(stringArg()),
     firstName: nonNull(stringArg()),

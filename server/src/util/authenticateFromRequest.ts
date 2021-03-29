@@ -14,7 +14,7 @@ export async function authenticateFromRequest(
       throw new Error();
     }
     const user = await ctx.users.loadUserByCognitoId(cognitoId);
-    if (!user) {
+    if (!user || user.status === "INACTIVE") {
       throw new Error();
     }
     ctx.user = user;

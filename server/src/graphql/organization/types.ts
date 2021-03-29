@@ -77,6 +77,10 @@ export const Organization = objectType({
       description: "The status of the organization.",
       authorize: isOwnOrgOrSuperAdmin(),
     });
+    t.boolean("hasSsoProvider", {
+      description: "Whether the organization has an SSO provider configured.",
+      resolve: (o) => Boolean(o.sso_provider),
+    });
     t.int("userCount", {
       description: "The total number of users",
       authorize: isOwnOrgOrSuperAdmin(),

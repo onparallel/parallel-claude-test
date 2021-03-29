@@ -30,6 +30,7 @@ export type OrganizationUsersListTableHeaderProps = {
   me: AppLayout_UserFragment;
   search: string | null;
   selectedUsers: OrganizationUsers_UserFragment[];
+  hasSsoProvider: boolean;
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onCreateUser: () => void;
@@ -40,6 +41,7 @@ export function OrganizationUsersListTableHeader({
   me,
   search,
   selectedUsers,
+  hasSsoProvider,
   onSearchChange,
   onReload,
   onCreateUser,
@@ -128,16 +130,18 @@ export function OrganizationUsersListTableHeader({
           </Portal>
         </Menu>
       </Box>
-      <Button
-        colorScheme="purple"
-        leftIcon={<UserPlusIcon fontSize="18px" />}
-        onClick={onCreateUser}
-      >
-        <FormattedMessage
-          id="organization-users.create-user"
-          defaultMessage="Create user"
-        />
-      </Button>
+      {hasSsoProvider ? null : (
+        <Button
+          colorScheme="purple"
+          leftIcon={<UserPlusIcon fontSize="18px" />}
+          onClick={onCreateUser}
+        >
+          <FormattedMessage
+            id="organization-users.create-user"
+            defaultMessage="Create user"
+          />
+        </Button>
+      )}
     </Stack>
   );
 }

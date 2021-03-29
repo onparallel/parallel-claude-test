@@ -76,6 +76,7 @@ function OrganizationUsers() {
     })
   );
 
+  const hasSsoProvider = me.organization.hasSsoProvider;
   const userList = me.organization.users;
 
   const [selected, setSelected] = useState<string[]>([]);
@@ -233,6 +234,7 @@ function OrganizationUsers() {
               me={me}
               search={search}
               selectedUsers={selectedUsers}
+              hasSsoProvider={hasSsoProvider}
               onCreateUser={handleCreateUser}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
@@ -452,6 +454,7 @@ OrganizationUsers.getInitialProps = async ({
         me {
           organization {
             id
+            hasSsoProvider
             users(
               offset: $offset
               limit: $limit

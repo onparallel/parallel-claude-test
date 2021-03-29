@@ -1,6 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import {
-  Box,
+  Alert,
+  AlertIcon,
   Button,
   FormControl,
   FormErrorMessage,
@@ -71,19 +72,26 @@ function Account() {
         <FormattedMessage id="settings.account" defaultMessage="Account" />
       }
     >
-      <Box padding={4}>
+      <Stack padding={4} alignItems="stretch" flex="1" maxWidth="container.2xs">
         <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
           <FormattedMessage
             id="settings.account.name-header"
             defaultMessage="Name"
           />
         </Heading>
-        <Stack
-          maxWidth="container.xs"
-          as="form"
-          onSubmit={handleSubmit(onSaveName)}
-        >
-          <FormControl id="first-name" isInvalid={!!errors.firstName}>
+        <Alert>
+          <AlertIcon />
+          <FormattedMessage
+            id="settings.account.sso-user-explanation"
+            defaultMessage="SSO users are not able to change their name"
+          />
+        </Alert>
+        <Stack as="form" onSubmit={handleSubmit(onSaveName)}>
+          <FormControl
+            id="first-name"
+            isInvalid={!!errors.firstName}
+            isDisabled={me.isSsoUser}
+          >
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.first-name-label"
@@ -102,7 +110,11 @@ function Account() {
               </FormErrorMessage>
             )}
           </FormControl>
-          <FormControl id="last-name" isInvalid={!!errors.lastName}>
+          <FormControl
+            id="last-name"
+            isInvalid={!!errors.lastName}
+            isDisabled={me.isSsoUser}
+          >
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.last-name-label"
@@ -121,16 +133,14 @@ function Account() {
               </FormErrorMessage>
             )}
           </FormControl>
-          <Box>
-            <Button type="submit" colorScheme="purple">
-              <FormattedMessage
-                id="settings.account.update-name-button"
-                defaultMessage="Save changes"
-              />
-            </Button>
-          </Box>
+          <Button type="submit" colorScheme="purple" isDisabled={me.isSsoUser}>
+            <FormattedMessage
+              id="settings.account.update-name-button"
+              defaultMessage="Save changes"
+            />
+          </Button>
         </Stack>
-      </Box>
+      </Stack>
     </SettingsLayout>
   );
 }
@@ -140,6 +150,7 @@ Account.fragments = {
     fragment Account_User on User {
       firstName
       lastName
+      isSsoUser
       ...SettingsLayout_User
       ...useSettingsSections_User
     }

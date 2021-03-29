@@ -669,6 +669,7 @@ export interface NexusGenFieldTypes {
     // field return type
     _id: number; // Int!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    hasSsoProvider: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     identifier: string; // String!
     integrations: NexusGenRootTypes["OrgIntegration"][]; // [OrgIntegration!]!
@@ -1138,6 +1139,7 @@ export interface NexusGenFieldTypes {
     fullName: string | null; // String
     hasFeatureFlag: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    isSsoUser: boolean; // Boolean!
     isSuperAdmin: boolean; // Boolean!
     lastActiveAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastName: string | null; // String
@@ -1429,6 +1431,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     _id: "Int";
     createdAt: "DateTime";
+    hasSsoProvider: "Boolean";
     id: "GID";
     identifier: "String";
     integrations: "OrgIntegration";
@@ -1896,6 +1899,7 @@ export interface NexusGenFieldTypeNames {
     fullName: "String";
     hasFeatureFlag: "Boolean";
     id: "GID";
+    isSsoUser: "Boolean";
     isSuperAdmin: "Boolean";
     lastActiveAt: "DateTime";
     lastName: "String";

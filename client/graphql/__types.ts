@@ -861,6 +861,8 @@ export type Organization = Timestamps & {
   _id: Scalars["Int"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Whether the organization has an SSO provider configured. */
+  hasSsoProvider: Scalars["Boolean"];
   /** The ID of the organization. */
   id: Scalars["GID"];
   /** The unique text identifier of the organization. */
@@ -2010,6 +2012,7 @@ export type User = Timestamps & {
   hasFeatureFlag: Scalars["Boolean"];
   /** The ID of the user. */
   id: Scalars["GID"];
+  isSsoUser: Scalars["Boolean"];
   isSuperAdmin: Scalars["Boolean"];
   lastActiveAt?: Maybe<Scalars["DateTime"]>;
   /** The last name of the user. */
@@ -4364,7 +4367,10 @@ export type OrganizationUsersQueryVariables = Exact<{
 
 export type OrganizationUsersQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & {
-    organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
+    organization: { __typename?: "Organization" } & Pick<
+      Organization,
+      "id" | "hasSsoProvider"
+    > & {
         users: { __typename?: "UserPagination" } & Pick<
           UserPagination,
           "totalCount"
@@ -5138,7 +5144,7 @@ export type NewPetitionUserQuery = { __typename?: "Query" } & {
 
 export type Account_UserFragment = { __typename?: "User" } & Pick<
   User,
-  "firstName" | "lastName"
+  "firstName" | "lastName" | "isSsoUser"
 > &
   SettingsLayout_UserFragment &
   useSettingsSections_UserFragment;
@@ -5184,7 +5190,8 @@ export type Security_updatePasswordMutation = {
 export type SecurityQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SecurityQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & SettingsLayout_UserFragment &
+  me: { __typename?: "User" } & Pick<User, "isSsoUser"> &
+    SettingsLayout_UserFragment &
     useSettingsSections_UserFragment;
 };
 
@@ -7205,6 +7212,7 @@ export const Account_UserFragmentDoc = gql`
   fragment Account_User on User {
     firstName
     lastName
+    isSsoUser
     ...SettingsLayout_User
     ...useSettingsSections_User
   }
@@ -10792,6 +10800,7 @@ export const OrganizationUsersDocument = gql`
     me {
       organization {
         id
+        hasSsoProvider
         users(
           offset: $offset
           limit: $limit
@@ -13079,6 +13088,7 @@ export type Security_updatePasswordMutationHookResult = ReturnType<
 export const SecurityDocument = gql`
   query Security {
     me {
+      isSsoUser
       ...SettingsLayout_User
       ...useSettingsSections_User
     }

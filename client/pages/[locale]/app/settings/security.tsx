@@ -1,5 +1,7 @@
 import { gql, useMutation } from "@apollo/client";
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   FormControl,
@@ -7,6 +9,7 @@ import {
   FormLabel,
   Heading,
   Stack,
+  Text,
   useToast,
 } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -96,19 +99,26 @@ function Security() {
         <FormattedMessage id="settings.security" defaultMessage="Security" />
       }
     >
-      <Box padding={4}>
-        <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
+      <Stack padding={4} alignItems="stretch" flex="1" maxWidth="container.2xs">
+        <Heading as="h4" size="md" fontWeight="normal">
           <FormattedMessage
             id="settings.security.password-header"
             defaultMessage="Change password"
           />
         </Heading>
-        <Stack
-          as="form"
-          maxWidth="container.xs"
-          onSubmit={handleSubmit(onChangePassword)}
-        >
-          <FormControl id="password" isInvalid={!!errors.password}>
+        <Alert>
+          <AlertIcon />
+          <FormattedMessage
+            id="settings.security.sso-user-explanation"
+            defaultMessage="SSO users are not able to change passwords"
+          />
+        </Alert>
+        <Stack as="form" onSubmit={handleSubmit(onChangePassword)}>
+          <FormControl
+            id="password"
+            isInvalid={!!errors.password}
+            isDisabled={me.isSsoUser}
+          >
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.old-password-label"
@@ -133,7 +143,11 @@ function Security() {
               </FormErrorMessage>
             )}
           </FormControl>
-          <FormControl id="new-password" isInvalid={!!errors.newPassword}>
+          <FormControl
+            id="new-password"
+            isInvalid={!!errors.newPassword}
+            isDisabled={me.isSsoUser}
+          >
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.new-password-label"
@@ -155,7 +169,11 @@ function Security() {
               </FormErrorMessage>
             )}
           </FormControl>
-          <FormControl id="new-password2" isInvalid={!!errors.newPassword2}>
+          <FormControl
+            id="new-password2"
+            isInvalid={!!errors.newPassword2}
+            isDisabled={me.isSsoUser}
+          >
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.confirm-password-label"
@@ -177,16 +195,14 @@ function Security() {
               </FormErrorMessage>
             )}
           </FormControl>
-          <Box>
-            <Button type="submit" colorScheme="purple" mt="2">
-              <FormattedMessage
-                id="settings.account.change-password-button"
-                defaultMessage="Change password"
-              />
-            </Button>
-          </Box>
+          <Button type="submit" colorScheme="purple" isDisabled={me.isSsoUser}>
+            <FormattedMessage
+              id="settings.account.change-password-button"
+              defaultMessage="Change password"
+            />
+          </Button>
         </Stack>
-      </Box>
+      </Stack>
     </SettingsLayout>
   );
 }
@@ -209,6 +225,7 @@ Security.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery<SecurityQuery>(gql`
     query Security {
       me {
+        isSsoUser
         ...SettingsLayout_User
         ...useSettingsSections_User
       }
