@@ -260,6 +260,7 @@ export const RichTextEditor = forwardRef<
   } = usePlaceholders(placeholderOptions);
 
   const isMenuOpen = Boolean(target && values.length > 0);
+  const selected = isMenuOpen ? values[selectedIndex] : undefined;
 
   const handleChange = useCallback(
     (value) => {
@@ -269,8 +270,8 @@ export const RichTextEditor = forwardRef<
     [onChange, onChangePlaceholder]
   );
 
-  const placeholderMenuId = useId(undefined, "placeholder-menu");
-  const itemIdPrefix = useId(undefined, "placeholder-menu-item");
+  const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
+  const itemIdPrefix = useId(undefined, "rte-placeholder-menu-item");
 
   const menuRef = useRef<HTMLElement>(null);
   useRepositionPlaceholderMenu(isMenuOpen, target, editor, menuRef);
@@ -297,6 +298,11 @@ export const RichTextEditor = forwardRef<
             onKeyDownDeps={[selectedIndex, search, target]}
             style={style}
             plugins={plugins}
+            aria-controls={placeholderMenuId}
+            aria-autocomplete="list"
+            aria-activedescendant={
+              selected ? `${itemIdPrefix}-${selected.value}` : undefined
+            }
             {...props}
           />
         </Box>
