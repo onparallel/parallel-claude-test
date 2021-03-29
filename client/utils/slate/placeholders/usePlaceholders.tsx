@@ -1,7 +1,7 @@
 import {
   getNextIndex,
   getPreviousIndex,
-  isPointAtWordEnd,
+  getText,
 } from "@udecode/slate-plugins";
 import { KeyboardEvent, useCallback, useReducer } from "react";
 import { Editor, Range, Transforms } from "slate";
@@ -85,8 +85,10 @@ export function usePlaceholders(placeholders: Placeholder[] = []) {
       const beforeRange = before && Editor.range(editor, before, cursor);
       const beforeText = beforeRange && Editor.string(editor, beforeRange);
       const match = !!beforeText && beforeText.match(/#([a-z-]*)$/);
-
-      if (match && isPointAtWordEnd(editor, { at: cursor })) {
+      const after = Editor.after(editor, cursor);
+      const afterRange = Editor.range(editor, cursor, after);
+      const afterText = getText(editor, afterRange);
+      if (match && afterText.match(/^([^a-z]|$)/)) {
         // Get the range for the #xxx
         const beforeHash = Editor.before(editor, cursor, {
           unit: "character",

@@ -476,9 +476,13 @@ function PlaceholderButton(props: IconButtonWithTooltipProps) {
       variant="ghost"
       tabIndex={-1}
       onMouseDown={(event: MouseEvent) => {
-        event.stopPropagation();
-        Transforms.insertText(editor, "#", { at: editor.selection?.anchor });
-        ReactEditor.focus(editor);
+        event.preventDefault();
+        if (!editor.selection) {
+          ReactEditor.focus(editor);
+        }
+        setTimeout(() => {
+          Transforms.insertText(editor, "#", { at: editor.selection?.anchor });
+        }, 0);
       }}
       {...props}
     />
