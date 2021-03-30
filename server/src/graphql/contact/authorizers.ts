@@ -18,3 +18,18 @@ export function userHasAccessToContacts<
     return false;
   };
 }
+
+export function userHasAccessToContactGroups<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number[][]>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (_, args, ctx) => {
+    try {
+      const groups = args[argName] as number[][];
+      const uniqueIds = Array.from(new Set(groups.flat()));
+      return ctx.contacts.userHasAccessToContacts(ctx.user!, uniqueIds);
+    } catch {}
+    return false;
+  };
+}

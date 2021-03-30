@@ -11,7 +11,8 @@ import {
   stringArg,
 } from "@nexus/schema";
 import pMap from "p-map";
-import { countBy, pick } from "remeda";
+import { omit, pick, zip } from "remeda";
+import { ApiContext } from "../../../context";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
 import {
   CreatePetition,
@@ -29,6 +30,10 @@ import { withError } from "../../../util/promises/withError";
 import { isDefined } from "../../../util/remedaExtensions";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import { random } from "../../../util/token";
+import {
+  userHasAccessToContactGroups,
+  userHasAccessToContacts,
+} from "../../contact/authorizers";
 import {
   and,
   argIsDefined,
@@ -71,6 +76,7 @@ import {
   fieldIsNotFixed,
   fieldsBelongsToPetition,
   messageBelongToPetition,
+  petitionHasRepliableFields,
   petitionsArePublicTemplates,
   repliesBelongsToField,
   repliesBelongsToPetition,
@@ -984,18 +990,145 @@ export const fileUploadReplyDownloadLink = mutationField(
   }
 );
 
+/**
+ * creates the required accesses and messages to send a petition to a group of contacts
+ */
+async function presendPetition(
+  petition: Petition,
+  contactIds: number[],
+  args: {
+    remindersConfig?: any | null;
+    scheduledAt?: Date | null;
+    subject: string;
+    body: any;
+  },
+  ctx: ApiContext
+) {
+  try {
+    const accesses = await ctx.petitions.createAccesses(
+      petition.id,
+      contactIds.map((id) => ({
+        petition_id: petition.id,
+        contact_id: id,
+        reminders_left: 10,
+        reminders_active: Boolean(args.remindersConfig),
+        reminders_config: args.remindersConfig,
+        next_reminder_at: args.remindersConfig
+          ? calculateNextReminder(
+              args.scheduledAt ?? new Date(),
+              args.remindersConfig
+            )
+          : null,
+      })),
+      ctx.user!
+    );
+
+    const messages = await ctx.petitions.createMessages(
+      petition.id,
+      args.scheduledAt ?? null,
+      accesses.map((access) => ({
+        petition_access_id: access.id,
+        status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
+        email_subject: args.subject,
+        email_body: JSON.stringify(args.body),
+      })),
+      ctx.user!
+    );
+
+    const updatedPetition = await ctx.petitions.updatePetition(
+      petition.id,
+      { name: petition.name ?? args.subject, status: "PENDING" },
+      `User:${ctx.user!.id}`
+    );
+
+    return {
+      petition: updatedPetition,
+      accesses,
+      messages,
+      result: RESULT.SUCCESS,
+    };
+  } catch (error) {
+    ctx.logger.error(error);
+    return { result: RESULT.FAILURE, error };
+  }
+}
+
+export const batchSendPetition = mutationField("batchSendPetition", {
+  description:
+    "Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages",
+  type: nonNull(list(nonNull("SendPetitionResult"))),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    petitionHasRepliableFields("petitionId"),
+    userHasAccessToContactGroups("contactIdGroups")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    contactIdGroups: nonNull(
+      list(nonNull(list(nonNull(globalIdArg("Contact")))))
+    ),
+    subject: nonNull(stringArg()),
+    body: nonNull(jsonArg()),
+    scheduledAt: datetimeArg(),
+    remindersConfig: arg({ type: "RemindersConfigInput" }),
+  },
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.contactIdGroups, "contactIdGroups"),
+    maxLength((args) => args.subject, "subject", 255),
+    notEmptyString((args) => args.subject, "subject"),
+    validRichTextContent((args) => args.body, "body"),
+    validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
+  ),
+  resolve: async (_, args, ctx) => {
+    const petition = await ctx.petitions.loadPetition(args.petitionId);
+    if (!petition) {
+      throw new Error("Petition not available");
+    }
+    const clonedPetitions = await Promise.all(
+      args.contactIdGroups
+        .slice(1)
+        .map(() => ctx.petitions.clonePetition(args.petitionId, ctx.user!))
+    );
+
+    const results = await pMap(
+      zip([petition, ...clonedPetitions], args.contactIdGroups),
+      async ([petition, contactIds]) =>
+        await presendPetition(petition, contactIds, args, ctx),
+      { concurrency: 5 }
+    );
+
+    const successfulSends = results.filter((r) => r.result === "SUCCESS");
+    const messages = successfulSends.map((r) => r.messages!).flat();
+
+    if (!args.scheduledAt) {
+      await ctx.emails.sendPetitionMessageEmail(messages.map((m) => m.id));
+    }
+
+    successfulSends.map((s) =>
+      ctx.analytics.trackEvent(
+        "PETITION_SENT",
+        {
+          petition_id: s.petition!.id,
+          user_id: ctx.user!.id,
+          access_ids: s.accesses!.map((a) => a.id),
+        },
+        toGlobalId("User", ctx.user!.id)
+      )
+    );
+
+    return results.map((r) => omit(r, ["messages"]));
+  },
+});
+
 export const sendPetition = mutationField("sendPetition", {
   description:
     "Sends the petition and creates the corresponding accesses and messages.",
-  type: objectType({
-    name: "SendPetitionResult",
-    definition(t) {
-      t.field("result", { type: "Result" });
-      t.nullable.field("petition", { type: "Petition" });
-      t.nullable.list.nonNull.field("accesses", { type: "PetitionAccess" });
-    },
-  }),
-  authorize: chain(authenticate(), and(userHasAccessToPetitions("petitionId"))),
+  type: "SendPetitionResult",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    userHasAccessToContacts("contactIds"),
+    petitionHasRepliableFields("petitionId")
+  ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     contactIds: nonNull(list(nonNull(globalIdArg("Contact")))),
@@ -1012,59 +1145,31 @@ export const sendPetition = mutationField("sendPetition", {
     validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
   ),
   resolve: async (_, args, ctx) => {
-    try {
-      // Create necessary contacts
-      const [hasAccess, petition, fields] = await Promise.all([
-        ctx.contacts.userHasAccessToContacts(ctx.user!, args.contactIds),
-        ctx.petitions.loadPetition(args.petitionId),
-        ctx.petitions.loadFieldsForPetition(args.petitionId),
-      ]);
-      if (!hasAccess) {
-        throw new Error("No access to contacts");
-      }
-      if (!petition) {
-        throw new Error("Petition not available");
-      }
-      if (countBy(fields, (f) => f.type !== "HEADING") === 0) {
-        throw new Error("Petition has no repliable fields");
-      }
-      const accesses = await ctx.petitions.createAccesses(
-        args.petitionId,
-        args.contactIds.map((id) => ({
-          petition_id: args.petitionId,
-          contact_id: id,
-          reminders_left: 10,
-          reminders_active: Boolean(args.remindersConfig),
-          reminders_config: args.remindersConfig,
-          next_reminder_at: args.remindersConfig
-            ? calculateNextReminder(
-                args.scheduledAt ?? new Date(),
-                args.remindersConfig
-              )
-            : null,
-        })),
-        ctx.user!
-      );
-      const messages = await ctx.petitions.createMessages(
-        args.petitionId,
-        args.scheduledAt ?? null,
-        accesses.map((access) => ({
-          petition_access_id: access.id,
-          status: args.scheduledAt ? "SCHEDULED" : "PROCESSING",
-          email_subject: args.subject,
-          email_body: JSON.stringify(args.body),
-        })),
-        ctx.user!
-      );
+    const petition = await ctx.petitions.loadPetition(args.petitionId);
+    if (!petition) {
+      throw new Error("Petition not available");
+    }
+    const {
+      result,
+      error,
+      accesses,
+      messages,
+      petition: updatedPetition,
+    } = await presendPetition(petition, args.contactIds, args, ctx);
 
-      const updatedPetition = await ctx.petitions.updatePetition(
-        args.petitionId,
-        { name: petition.name ?? args.subject, status: "PENDING" },
-        `User:${ctx.user!.id}`
+    if (
+      result === "FAILURE" &&
+      error.constraint === "petition_access__petition_id_contact_id"
+    ) {
+      throw new WhitelistedError(
+        "This petition was already sent to some of the contacts",
+        "PETITION_ALREADY_SENT_ERROR"
       );
+    }
 
+    if (result === "SUCCESS") {
       if (!args.scheduledAt) {
-        await ctx.emails.sendPetitionMessageEmail(messages.map((s) => s.id));
+        await ctx.emails.sendPetitionMessageEmail(messages!.map((s) => s.id));
       }
 
       ctx.analytics.trackEvent(
@@ -1072,28 +1177,17 @@ export const sendPetition = mutationField("sendPetition", {
         {
           petition_id: args.petitionId,
           user_id: ctx.user!.id,
-          access_ids: accesses.map((a) => a.id),
+          access_ids: accesses!.map((a) => a.id),
         },
         toGlobalId("User", ctx.user!.id)
       );
-
-      return {
-        petition: updatedPetition,
-        accesses,
-        result: RESULT.SUCCESS,
-      };
-    } catch (error) {
-      ctx.logger.error(error);
-      if (error.constraint === "petition_access__petition_id_contact_id") {
-        throw new WhitelistedError(
-          "This petition was already sent to some of the contacts",
-          "PETITION_ALREADY_SENT_ERROR"
-        );
-      }
-      return {
-        result: RESULT.FAILURE,
-      };
     }
+
+    return {
+      petition: updatedPetition,
+      accesses,
+      result,
+    };
   },
 });
 

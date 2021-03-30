@@ -25,7 +25,7 @@ import { HelpPopover } from "./HelpPopover";
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
   recipientGroups: ContactSelectSelection[][];
-  setRecipientGroups: (groups: ContactSelectSelection[][]) => void;
+  onSetRecipientGroups: (groups: ContactSelectSelection[][]) => void;
   onSearchContacts: ContactSelectProps["onSearchContacts"];
   onCreateContact: ContactSelectProps["onCreateContact"];
   maxGroups?: number;
@@ -34,7 +34,7 @@ export function RecipientSelectGroups({
   showErrors,
   recipientGroups,
   maxGroups = Number.MAX_SAFE_INTEGER,
-  setRecipientGroups,
+  onSetRecipientGroups,
   onSearchContacts,
   onCreateContact,
 }: RecipientSelectGroupsProps) {
@@ -48,13 +48,13 @@ export function RecipientSelectGroups({
       if (!recipientGroups[groupNumber]) return;
       const newGroups = Array.from(recipientGroups);
       newGroups.splice(groupNumber, 1, recipients);
-      setRecipientGroups(newGroups);
+      onSetRecipientGroups(newGroups);
     },
     [recipientGroups]
   );
 
   const addRecipientGroup = useCallback(() => {
-    setRecipientGroups([...recipientGroups, []]);
+    onSetRecipientGroups([...recipientGroups, []]);
     setTimeout(() => {
       recipientsStackRef.current?.scrollTo({ top: 99999, behavior: "smooth" });
     }, 0);
@@ -62,7 +62,7 @@ export function RecipientSelectGroups({
 
   const deleteRecipientGroup = useCallback(
     (index: number) =>
-      setRecipientGroups(recipientGroups.filter((_, i) => i !== index)),
+      onSetRecipientGroups(recipientGroups.filter((_, i) => i !== index)),
     [recipientGroups]
   );
 

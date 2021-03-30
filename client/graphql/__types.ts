@@ -193,6 +193,8 @@ export type Mutation = {
   addPetitionUserPermission: Array<Petition>;
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
+  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
+  batchSendPetition: Array<SendPetitionResult>;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -354,6 +356,15 @@ export type MutationaddPetitionUserPermissionArgs = {
 export type MutationassignPetitionToUserArgs = {
   petitionId: Scalars["ID"];
   userId: Scalars["Int"];
+};
+
+export type MutationbatchSendPetitionArgs = {
+  body: Scalars["JSON"];
+  contactIdGroups: Array<Array<Scalars["GID"]>>;
+  petitionId: Scalars["GID"];
+  remindersConfig?: Maybe<RemindersConfigInput>;
+  scheduledAt?: Maybe<Scalars["DateTime"]>;
+  subject: Scalars["String"];
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -4456,26 +4467,31 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
       });
 };
 
-export type PetitionCompose_sendPetitionMutationVariables = Exact<{
+export type PetitionCompose_batchSendPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  contactIds: Array<Scalars["GID"]> | Scalars["GID"];
+  contactIdGroups:
+    | Array<Array<Scalars["GID"]> | Scalars["GID"]>
+    | Array<Scalars["GID"]>
+    | Scalars["GID"];
   subject: Scalars["String"];
   body: Scalars["JSON"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
 }>;
 
-export type PetitionCompose_sendPetitionMutation = {
+export type PetitionCompose_batchSendPetitionMutation = {
   __typename?: "Mutation";
 } & {
-  sendPetition: { __typename?: "SendPetitionResult" } & Pick<
-    SendPetitionResult,
-    "result"
-  > & {
-      petition?: Maybe<
-        { __typename?: "Petition" } & Pick<Petition, "id" | "status">
-      >;
-    };
+  batchSendPetition: Array<
+    { __typename?: "SendPetitionResult" } & Pick<
+      SendPetitionResult,
+      "result"
+    > & {
+        petition?: Maybe<
+          { __typename?: "Petition" } & Pick<Petition, "id" | "status">
+        >;
+      }
+  >;
 };
 
 export type PetitionComposeUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -10920,18 +10936,18 @@ export function usePetitionCompose_changePetitionFieldTypeMutation(
 export type PetitionCompose_changePetitionFieldTypeMutationHookResult = ReturnType<
   typeof usePetitionCompose_changePetitionFieldTypeMutation
 >;
-export const PetitionCompose_sendPetitionDocument = gql`
-  mutation PetitionCompose_sendPetition(
+export const PetitionCompose_batchSendPetitionDocument = gql`
+  mutation PetitionCompose_batchSendPetition(
     $petitionId: GID!
-    $contactIds: [GID!]!
+    $contactIdGroups: [[GID!]!]!
     $subject: String!
     $body: JSON!
     $remindersConfig: RemindersConfigInput
     $scheduledAt: DateTime
   ) {
-    sendPetition(
+    batchSendPetition(
       petitionId: $petitionId
-      contactIds: $contactIds
+      contactIdGroups: $contactIdGroups
       subject: $subject
       body: $body
       remindersConfig: $remindersConfig
@@ -10947,20 +10963,20 @@ export const PetitionCompose_sendPetitionDocument = gql`
 `;
 
 /**
- * __usePetitionCompose_sendPetitionMutation__
+ * __usePetitionCompose_batchSendPetitionMutation__
  *
- * To run a mutation, you first call `usePetitionCompose_sendPetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionCompose_sendPetitionMutation` returns a tuple that includes:
+ * To run a mutation, you first call `usePetitionCompose_batchSendPetitionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionCompose_batchSendPetitionMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [petitionComposeSendPetitionMutation, { data, loading, error }] = usePetitionCompose_sendPetitionMutation({
+ * const [petitionComposeBatchSendPetitionMutation, { data, loading, error }] = usePetitionCompose_batchSendPetitionMutation({
  *   variables: {
  *      petitionId: // value for 'petitionId'
- *      contactIds: // value for 'contactIds'
+ *      contactIdGroups: // value for 'contactIdGroups'
  *      subject: // value for 'subject'
  *      body: // value for 'body'
  *      remindersConfig: // value for 'remindersConfig'
@@ -10968,20 +10984,20 @@ export const PetitionCompose_sendPetitionDocument = gql`
  *   },
  * });
  */
-export function usePetitionCompose_sendPetitionMutation(
+export function usePetitionCompose_batchSendPetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    PetitionCompose_sendPetitionMutation,
-    PetitionCompose_sendPetitionMutationVariables
+    PetitionCompose_batchSendPetitionMutation,
+    PetitionCompose_batchSendPetitionMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    PetitionCompose_sendPetitionMutation,
-    PetitionCompose_sendPetitionMutationVariables
-  >(PetitionCompose_sendPetitionDocument, options);
+    PetitionCompose_batchSendPetitionMutation,
+    PetitionCompose_batchSendPetitionMutationVariables
+  >(PetitionCompose_batchSendPetitionDocument, options);
 }
-export type PetitionCompose_sendPetitionMutationHookResult = ReturnType<
-  typeof usePetitionCompose_sendPetitionMutation
+export type PetitionCompose_batchSendPetitionMutationHookResult = ReturnType<
+  typeof usePetitionCompose_batchSendPetitionMutation
 >;
 export const PetitionComposeUserDocument = gql`
   query PetitionComposeUser {

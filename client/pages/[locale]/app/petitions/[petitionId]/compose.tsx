@@ -54,11 +54,11 @@ import {
   UpdatePetitionInput,
   usePetitionComposeQuery,
   usePetitionComposeUserQuery,
+  usePetitionCompose_batchSendPetitionMutation,
   usePetitionCompose_changePetitionFieldTypeMutation,
   usePetitionCompose_clonePetitionFieldMutation,
   usePetitionCompose_createPetitionFieldMutation,
   usePetitionCompose_deletePetitionFieldMutation,
-  usePetitionCompose_sendPetitionMutation,
   usePetitionCompose_updateFieldPositionsMutation,
   usePetitionCompose_updatePetitionFieldMutation,
   usePetitionCompose_updatePetitionMutation,
@@ -356,7 +356,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   );
 
   const showErrorDialog = useErrorDialog();
-  const [sendPetition] = usePetitionCompose_sendPetitionMutation();
+  const [batchSendPetition] = usePetitionCompose_batchSendPetitionMutation();
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
   const handleNextClick = useCallback(async () => {
     if (petition?.__typename !== "Petition") {
@@ -437,22 +437,17 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         defaultRemindersConfig: petition.remindersConfig,
         onUpdatePetition: handleUpdatePetition,
       });
-      // const { data } = await sendPetition({
-      //   variables: {
-      //     petitionId: petition.id,
-      //     contactIds: recipientIds,
-      //     subject,
-      //     body,
-      //     remindersConfig,
-      //     scheduledAt: scheduledAt?.toISOString() ?? null,
-      //   },
-      //   update(client) {
-      //     // clear stale data
-      //     delete (client as any).data.data[petitionId].accesses;
-      //     delete (client as any).data.data[petitionId].recipients;
-      //   },
-      // });
-      if (data?.sendPetition.result !== "SUCCESS") {
+      const { data } = await batchSendPetition({
+        variables: {
+          petitionId: petition.id,
+          contactIdGroups: recipientIdGroups,
+          subject,
+          body,
+          remindersConfig,
+          scheduledAt: scheduledAt?.toISOString() ?? null,
+        },
+      });
+      if (data?.batchSendPetition.some((r) => r.result !== "SUCCESS")) {
         toast({
           isClosable: true,
           status: "error",
@@ -472,30 +467,46 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         toast({
           isClosable: true,
           status: "info",
-          title: intl.formatMessage({
-            id: "petition.petition-scheduled-toast.title",
-            defaultMessage: "Petition scheduled",
-          }),
+          title: intl.formatMessage(
+            {
+              id: "petition.petition-scheduled-toast.title",
+              defaultMessage:
+                "{count, plural, =1{Petition} other{Petitions}} scheduled",
+            },
+            { count: recipientIdGroups.length }
+          ),
           description: intl.formatMessage(
             {
               id: "petition.petition-scheduled-toast.description",
-              defaultMessage: "Your petition will be sent on {date}.",
+              defaultMessage:
+                "Your {count, plural, =1{petition} other{petitions}} will be sent on {date}.",
             },
-            { date: intl.formatTime(scheduledAt!, FORMATS.LLL) }
+            {
+              count: recipientIdGroups.length,
+              date: intl.formatTime(scheduledAt!, FORMATS.LLL),
+            }
           ),
         });
       } else {
         toast({
           isClosable: true,
           status: "success",
-          title: intl.formatMessage({
-            id: "petition.petition-sent-toast.title",
-            defaultMessage: "Petition sent",
-          }),
-          description: intl.formatMessage({
-            id: "petition.petition-sent-toast.description",
-            defaultMessage: "Your petition is on it's way.",
-          }),
+          title: intl.formatMessage(
+            {
+              id: "petition.petition-sent-toast.title",
+              defaultMessage:
+                "{count, plural, =1{Petition} other{Petitions}} sent",
+            },
+            { count: recipientIdGroups.length }
+          ),
+          description: intl.formatMessage(
+            {
+              id: "petition.petition-sent-toast.description",
+              defaultMessage:
+                "Your {count, plural, =1{petition is} other{petitions are}} on it's way.",
+            },
+            { count: recipientIdGroups.length }
+          ),
         });
       }
       router.push(`/${router.query.locale}/app/petitions`);
@@ -878,17 +889,17 @@ PetitionCompose.mutations = [
     ${PetitionCompose.fragments.PetitionField}
   `,
   gql`
-    mutation PetitionCompose_sendPetition(
+    mutation PetitionCompose_batchSendPetition(
       $petitionId: GID!
-      $contactIds: [GID!]!
+      $contactIdGroups: [[GID!]!]!
       $subject: String!
       $body: JSON!
       $remindersConfig: RemindersConfigInput
       $scheduledAt: DateTime
     ) {
-      sendPetition(
+      batchSendPetition(
         petitionId: $petitionId
-        contactIds: $contactIds
+        contactIdGroups: $contactIdGroups
         subject: $subject
         body: $body
         remindersConfig: $remindersConfig

@@ -102,6 +102,17 @@ function isMaybeListOfMaybeGlobalIdType(type: GraphQLInputType): boolean {
   return false;
 }
 
+function isMaybeListOfMaybeListOfMaybeGlobalIdType(
+  type: GraphQLInputType
+): boolean {
+  if (isListType(type)) {
+    return isMaybeListOfMaybeGlobalIdType(type.ofType);
+  } else if (isNonNullType(type)) {
+    return isMaybeListOfMaybeListOfMaybeGlobalIdType(type.ofType);
+  }
+  return false;
+}
+
 function getPrefixName(arg: core.AllNexusArgsDefs): string {
   if (arg instanceof core.NexusNonNullDef) {
     return getPrefixName(arg.ofNexusType);
@@ -141,6 +152,14 @@ export function globalIdPlugin() {
                   argValue as (string | null)[],
                   getPrefixName(argConfig)
                 ).ids
+              : argValue;
+          } else if (isMaybeListOfMaybeListOfMaybeGlobalIdType(type)) {
+            return isDefined(argValue)
+              ? (argValue as Array<(string | null)[]>).map((value) =>
+                  isDefined(value)
+                    ? fromGlobalIds(value, getPrefixName(argConfig)).ids
+                    : value
+                )
               : argValue;
           }
           return argValue;

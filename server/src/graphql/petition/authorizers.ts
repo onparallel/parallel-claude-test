@@ -3,6 +3,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { FeatureFlagName, PetitionUserPermissionType } from "../../db/__types";
 import { MaybeArray } from "../../util/types";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
+import { countBy } from "remeda";
 
 export function userHasAccessToPetitions<
   TypeName extends string,
@@ -247,6 +248,26 @@ export function userHasFeatureFlag<
   return async (_, args, ctx) => {
     try {
       return await ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, feature);
+    } catch {}
+    return false;
+  };
+}
+
+export function petitionHasRepliableFields<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(argNamePetitionId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const petitionId = (args[argNamePetitionId] as unknown) as number;
+      const fields = await ctx.petitions.loadFieldsForPetition(petitionId);
+
+      if (countBy(fields, (f) => f.type !== "HEADING") === 0) {
+        return false;
+      }
+
+      return true;
     } catch {}
     return false;
   };

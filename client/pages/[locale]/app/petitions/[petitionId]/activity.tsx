@@ -151,7 +151,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         .filter((a) => a.contact)
         .map((a) => a.contact!.id);
       const {
-        recipientIdGroups,
+        recipientIdGroups: [contactIds],
         subject,
         body,
         scheduledAt,
@@ -165,16 +165,16 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           ]);
         },
       });
-      // await sendPetition({
-      //   variables: {
-      //     petitionId,
-      //     contactIds: recipientIds,
-      //     subject,
-      //     body,
-      //     scheduledAt: scheduledAt?.toISOString() ?? null,
-      //     remindersConfig,
-      //   },
-      // });
+      await sendPetition({
+        variables: {
+          petitionId,
+          contactIds,
+          subject,
+          body,
+          scheduledAt: scheduledAt?.toISOString() ?? null,
+          remindersConfig,
+        },
+      });
       await refetch();
     } catch {}
   }, [petitionId, petition.accesses]);

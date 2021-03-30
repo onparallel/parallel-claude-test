@@ -593,3 +593,12 @@ export const FileUploadReplyDownloadLinkResult = objectType({
     t.nullable.string("url");
   },
 });
+
+export const SendPetitionResult = objectType({
+  name: "SendPetitionResult",
+  definition(t) {
+    t.field("result", { type: "Result" });
+    t.nullable.field("petition", { type: "Petition" });
+    t.nullable.list.nonNull.field("accesses", { type: "PetitionAccess" });
+  },
+});

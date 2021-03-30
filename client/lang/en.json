@@ -3116,13 +3116,13 @@
   },
   {
     "term": "petition.petition-scheduled-toast.description",
-    "definition": "Your petition will be sent on {date}.",
-    "context": "Your petition will be sent on {date}."
+    "definition": "Your {count, plural, =1{petition} other{petitions}} will be sent on {date}.",
+    "context": "Your {count, plural, =1{petition} other{petitions}} will be sent on {date}."
   },
   {
     "term": "petition.petition-scheduled-toast.title",
-    "definition": "Petition scheduled",
-    "context": "Petition scheduled"
+    "definition": "{count, plural, =1{Petition} other{Petitions}} scheduled",
+    "context": "{count, plural, =1{Petition} other{Petitions}} scheduled"
   },
   {
     "term": "petition.petition-send-error.description",
@@ -3136,13 +3136,13 @@
   },
   {
     "term": "petition.petition-sent-toast.description",
-    "definition": "Your petition is on it's way.",
-    "context": "Your petition is on it's way."
+    "definition": "Your {count, plural, =1{petition is} other{petitions are}} on it's way.",
+    "context": "Your {count, plural, =1{petition is} other{petitions are}} on it's way."
   },
   {
     "term": "petition.petition-sent-toast.title",
-    "definition": "Petition sent",
-    "context": "Petition sent"
+    "definition": "{count, plural, =1{Petition} other{Petitions}} sent",
+    "context": "{count, plural, =1{Petition} other{Petitions}} sent"
   },
   {
     "term": "petition.print-pdf.signatures-disclaimer",

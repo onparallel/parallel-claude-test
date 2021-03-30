@@ -3116,13 +3116,13 @@
   },
   {
     "term": "petition.petition-scheduled-toast.description",
-    "definition": "Tu petición ha sido programada para enviarse el {date}",
-    "context": "Your petition will be sent on {date}."
+    "definition": "{count, plural, =1{Tu petición ha sido programada} other{Tus peticiones han sido programadas}} para enviarse el {date}",
+    "context": "Your {count, plural, =1{petition} other{petitions}} will be sent on {date}."
   },
   {
     "term": "petition.petition-scheduled-toast.title",
-    "definition": "Petición programada",
-    "context": "Petition scheduled"
+    "definition": "{count, plural, =1{Petición programada} other{Peticiones programadas}}",
+    "context": "{count, plural, =1{Petition} other{Petitions}} scheduled"
   },
   {
     "term": "petition.petition-send-error.description",
@@ -3136,13 +3136,13 @@
   },
   {
     "term": "petition.petition-sent-toast.description",
-    "definition": "Tu petición está en camino.",
-    "context": "Your petition is on it's way."
+    "definition": "{count, plural, =1{Tu petición está} other{Tus peticiones están}} en camino.",
+    "context": "Your {count, plural, =1{petition is} other{petitions are}} on it's way."
   },
   {
     "term": "petition.petition-sent-toast.title",
-    "definition": "Petición enviada",
-    "context": "Petition sent"
+    "definition": "{count, plural, =1{Petición enviada} other{Peticiones enviadas}}.",
+    "context": "{count, plural, =1{Petition} other{Petitions}} sent"
   },
   {
     "term": "petition.print-pdf.signatures-disclaimer",
