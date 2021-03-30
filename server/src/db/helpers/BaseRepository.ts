@@ -2,7 +2,7 @@ import DataLoader from "dataloader";
 import { injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy } from "remeda";
-import { fromDataLoader, Loader } from "../../util/fromDataLoader";
+import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray, UnwrapPromise } from "../../util/types";
 import { TableCreateTypes, TablePrimaryKeys, TableTypes } from "../__types";
 

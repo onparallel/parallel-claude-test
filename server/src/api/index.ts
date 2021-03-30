@@ -2,7 +2,6 @@ import { ErrorRequestHandler, Router } from "express";
 import { Container } from "inversify";
 import morgan from "morgan";
 import { ApiContext } from "../context";
-import { AUTH, Auth } from "../services/auth";
 import { LOGGER, Logger } from "../services/logger";
 import { downloads } from "./downloads";
 import { api as publicApi } from "./public";
