@@ -13,6 +13,8 @@ import { OrganizationRepository } from "../db/repositories/OrganizationRepositor
 import { UserRepository } from "../db/repositories/UserRepository";
 import { random } from "../util/token";
 import { REDIS, Redis } from "./redis";
+import { parse as parseCookie } from "cookie";
+import { User } from "../db/__types";
 
 export interface IAuth {
   guessLogin: RequestHandler;
@@ -22,16 +24,14 @@ export interface IAuth {
   newPassword: RequestHandler;
   forgotPassword: RequestHandler;
   confirmForgotPassword: RequestHandler;
-  validateSession(
-    session: string,
-    req: IncomingMessage
-  ): Promise<string | null>;
+  validateSession(req: IncomingMessage): Promise<User | null>;
 }
 
 export const AUTH = Symbol.for("AUTH");
 
 interface CognitoSession {
   IdToken: string;
+  AccessToken: string;
   RefreshToken: string;
 }
 @injectable()
@@ -137,6 +137,7 @@ export class Auth implements IAuth {
       }
       const token = await this.storeSession({
         IdToken: tokens["id_token"],
+        AccessToken: tokens["access_token"],
         RefreshToken: tokens["refresh_token"],
       });
       this.setSession(res, token);
@@ -281,15 +282,22 @@ export class Auth implements IAuth {
   private async deleteSession(token: string) {
     await this.redis.delete(
       `session:${token}:idToken`,
+      `session:${token}:accessToken`,
       `session:${token}:refreshToken`
     );
   }
 
   /** Store session on Redis */
   private async storeSession(session: CognitoSession) {
+    console.log(session);
     const token = random(48);
     await Promise.all([
       this.redis.set(`session:${token}:idToken`, session.IdToken, this.EXPIRY),
+      this.redis.set(
+        `session:${token}:accessToken`,
+        session.AccessToken,
+        this.EXPIRY
+      ),
       this.redis.set(
         `session:${token}:refreshToken`,
         session.RefreshToken,
@@ -300,11 +308,15 @@ export class Auth implements IAuth {
   }
 
   private async updateSession(token: string, session: CognitoSession) {
-    await this.redis.set(
-      `session:${token}:idToken`,
-      session.IdToken,
-      this.EXPIRY
-    );
+    console.log(session);
+    await Promise.all([
+      this.redis.set(`session:${token}:idToken`, session.IdToken, this.EXPIRY),
+      this.redis.set(
+        `session:${token}:accessToken`,
+        session.AccessToken,
+        this.EXPIRY
+      ),
+    ]);
   }
 
   private getContextData(req: IncomingMessage): ContextDataType {
@@ -378,8 +390,17 @@ export class Auth implements IAuth {
       .promise();
   }
 
-  async validateSession(token: string, req: IncomingMessage) {
+  private getTokenFromRequest(req: IncomingMessage): string | null {
+    const cookies = parseCookie(req.headers.cookie ?? "");
+    return cookies["parallel_session"] ?? null;
+  }
+
+  async validateSession(req: IncomingMessage) {
     try {
+      const token = this.getTokenFromRequest(req);
+      if (!token) {
+        return null;
+      }
       const idToken = await this.redis.get(`session:${token}:idToken`);
       if (idToken === null) {
         return null;
@@ -395,17 +416,31 @@ export class Auth implements IAuth {
           return null;
         }
         const auth = await this.refreshToken(refreshToken, req);
-        console.log(auth);
         if (auth.AuthenticationResult) {
           await this.updateSession(token, auth.AuthenticationResult as any);
         } else {
-          console.log(auth);
           return null;
         }
       }
-      return cognitoId;
+      return this.users.loadUserByCognitoId(cognitoId);
     } catch (error) {
       return null;
     }
+  }
+
+  async changePassword(
+    req: IncomingMessage,
+    password: string,
+    newPassword: string
+  ) {
+    const token = this.getTokenFromRequest(req);
+    const accessToken = await this.redis.get(`session:${token}:accessToken`);
+    await this.cognito
+      .changePassword({
+        AccessToken: accessToken!,
+        PreviousPassword: password,
+        ProposedPassword: newPassword,
+      })
+      .promise();
   }
 }

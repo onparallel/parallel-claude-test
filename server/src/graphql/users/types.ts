@@ -53,10 +53,7 @@ export const User = objectType({
       },
     });
     t.boolean("isSsoUser", {
-      resolve: async (o, _, ctx) => {
-        const org = await ctx.organizations.loadOrg(o.org_id);
-        return Boolean(org?.sso_provider);
-      },
+      resolve: (o) => o.is_sso_user,
     });
     t.string("email", {
       description: "The email of the user.",

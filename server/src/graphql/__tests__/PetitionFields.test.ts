@@ -12,7 +12,7 @@ import {
   User,
 } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { userCognitoId } from "../../../test/mocks";
+import { USER_COGNITO_ID } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
@@ -37,7 +37,7 @@ describe("GraphQL/Petition Fields", () => {
     }));
 
     [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: userCognitoId,
+      cognito_id: USER_COGNITO_ID,
       first_name: "Harvey",
       last_name: "Specter",
     }));

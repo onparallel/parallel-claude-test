@@ -31,15 +31,16 @@ import {
   argUserHasActiveStatus,
   userHasAccessToUsers,
 } from "../petition/mutations/authorizers";
-import { contextUserIsAdmin, orgDoesNotHaveSsoProvider } from "./authorizers";
+import {
+  contextUserIsAdmin,
+  contextUserIsNotSso,
+  orgDoesNotHaveSsoProvider,
+} from "./authorizers";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
   description: "Updates the user with the provided data.",
-  authorize: authenticateAnd(
-    argIsContextUserId("id"),
-    orgDoesNotHaveSsoProvider()
-  ),
+  authorize: authenticateAnd(argIsContextUserId("id"), contextUserIsNotSso()),
   args: {
     id: nonNull(globalIdArg("User")),
     data: nonNull(
@@ -76,14 +77,14 @@ export const changePassword = mutationField("changePassword", {
     name: "ChangePasswordResult",
     members: ["SUCCESS", "INCORRECT_PASSWORD", "INVALID_NEW_PASSWORD"],
   }),
-  authorize: authenticateAnd(orgDoesNotHaveSsoProvider()),
+  authorize: authenticateAnd(contextUserIsNotSso()),
   args: {
     password: nonNull(stringArg()),
     newPassword: nonNull(stringArg()),
   },
   resolve: async (o, { password, newPassword }, ctx) => {
     try {
-      await ctx.cognito.changePassword(ctx.user!.email, password, newPassword);
+      await ctx.auth.changePassword(ctx.req, password, newPassword);
       return "SUCCESS";
     } catch (error) {
       switch (error.code) {

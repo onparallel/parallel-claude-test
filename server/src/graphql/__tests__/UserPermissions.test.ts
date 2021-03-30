@@ -5,7 +5,7 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, User } from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
-import { userCognitoId } from "../../../test/mocks";
+import { USER_COGNITO_ID } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/User Permissions", () => {
@@ -32,7 +32,7 @@ describe("GraphQL/User Permissions", () => {
     const [otherOrg] = await mocks.createRandomOrganizations(1);
 
     [loggedUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: userCognitoId,
+      cognito_id: USER_COGNITO_ID,
       first_name: "Harvey",
       last_name: "Specter",
       org_id: organization.id,

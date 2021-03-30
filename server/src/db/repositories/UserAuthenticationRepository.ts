@@ -1,3 +1,4 @@
+import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { hash, random } from "../../util/token";
@@ -12,7 +13,19 @@ export class UserAuthenticationRepository extends BaseRepository {
     super(knex);
   }
 
-  async validateApiKey(apiKey: string) {
+  private getApiKeyFromRequest(req: IncomingMessage): string | null {
+    const authorization = req.headers.authorization;
+    if (authorization?.startsWith("Bearer ")) {
+      return authorization.replace(/^Bearer /, "");
+    }
+    return null;
+  }
+
+  async validateApiKey(req: IncomingMessage) {
+    const apiKey = this.getApiKeyFromRequest(req);
+    if (!apiKey) {
+      return null;
+    }
     const tokenHash = await hash(apiKey, "");
     return await this.withTransaction(async (t) => {
       const [userId] = await this.from("user_authentication_token", t)

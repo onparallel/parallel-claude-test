@@ -18,6 +18,15 @@ export function contextUserIsAdmin<
   };
 }
 
+export function contextUserIsNotSso<
+  TypeName extends string,
+  FieldName extends string
+>(): FieldAuthorizeResolver<TypeName, FieldName> {
+  return (root, _, ctx) => {
+    return ctx.user!.is_sso_user === false;
+  };
+}
+
 export function orgDoesNotHaveSsoProvider<
   TypeName extends string,
   FieldName extends string

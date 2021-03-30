@@ -826,6 +826,7 @@ export interface User {
   last_active_at: Maybe<Date>; // timestamptz
   onboarding_status: any; // jsonb
   status: UserStatus; // user_status
+  is_sso_user: boolean; // bool
 }
 
 export type CreateUser = PartialProps<
@@ -842,6 +843,7 @@ export type CreateUser = PartialProps<
   | "last_active_at"
   | "onboarding_status"
   | "status"
+  | "is_sso_user"
 >;
 
 export interface UserAuthenticationToken {

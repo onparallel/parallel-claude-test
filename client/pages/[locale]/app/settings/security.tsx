@@ -2,14 +2,12 @@ import { gql, useMutation } from "@apollo/client";
 import {
   Alert,
   AlertIcon,
-  Box,
   Button,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -52,7 +50,14 @@ function Security() {
     formState: { errors },
     getValues,
     setError,
-  } = useForm<PasswordChangeFormData>();
+    reset,
+  } = useForm<PasswordChangeFormData>({
+    defaultValues: {
+      password: "",
+      newPassword: "",
+      newPassword2: "",
+    },
+  });
 
   async function onChangePassword({
     password,
@@ -63,10 +68,14 @@ function Security() {
     });
     if (data) {
       switch (data.changePassword) {
+        case "INVALID_NEW_PASSWORD":
+          setError("newPassword", { type: "invalid" });
+          break;
         case "INCORRECT_PASSWORD":
           setError("password", { type: "validate" });
           break;
         case "SUCCESS":
+          reset();
           toast({
             title: intl.formatMessage({
               id: "settings.security.password-change-toast-title",
@@ -106,13 +115,15 @@ function Security() {
             defaultMessage="Change password"
           />
         </Heading>
-        <Alert>
-          <AlertIcon />
-          <FormattedMessage
-            id="settings.security.sso-user-explanation"
-            defaultMessage="SSO users are not able to change passwords"
-          />
-        </Alert>
+        {me.isSsoUser ? (
+          <Alert>
+            <AlertIcon />
+            <FormattedMessage
+              id="settings.security.sso-user-explanation"
+              defaultMessage="SSO users are not able to change passwords"
+            />
+          </Alert>
+        ) : null}
         <Stack as="form" onSubmit={handleSubmit(onChangePassword)}>
           <FormControl
             id="password"
@@ -128,20 +139,19 @@ function Security() {
             <PasswordInput {...register("password", { required: true })} />
             {errors.password?.type === "required" && (
               <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.required-old-password-error"
-                  defaultMessage="Old password is required"
-                />
+                {errors.password?.type === "required" ? (
+                  <FormattedMessage
+                    id="generic.forms.required-old-password-error"
+                    defaultMessage="Old password is required"
+                  />
+                ) : errors.password?.type === "validate" ? (
+                  <FormattedMessage
+                    id="generic.forms.invalid-old-password-error"
+                    defaultMessage="Old password is incorrect"
+                  />
+                ) : null}
               </FormErrorMessage>
-            )}
-            {errors.password?.type === "validate" && (
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.invalid-old-password-error"
-                  defaultMessage="Old password is incorrect"
-                />
-              </FormErrorMessage>
-            )}
+            ) : null}
           </FormControl>
           <FormControl
             id="new-password"
@@ -162,10 +172,17 @@ function Security() {
             />
             {errors.newPassword && (
               <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.password-policy-error"
-                  defaultMessage="The password must have a least 8 characters"
-                />
+                {errors.newPassword?.type === "invalid" ? (
+                  <FormattedMessage
+                    id="generic.forms.invalid-password-policy-error"
+                    defaultMessage="Please choose a stronger password"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="generic.forms.password-policy-error"
+                    defaultMessage="The password must have a least 8 characters"
+                  />
+                )}
               </FormErrorMessage>
             )}
           </FormControl>

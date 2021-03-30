@@ -1,4 +1,5 @@
 import { injectable } from "inversify";
+import { UserRepository } from "../src/db/repositories/UserRepository";
 import { IAnalyticsService } from "../src/services/analytics";
 import { IAuth } from "../src/services/auth";
 import { IAws } from "../src/services/aws";
@@ -6,12 +7,13 @@ import { IEmailsService } from "../src/services/emails";
 import { IRedis } from "../src/services/redis";
 import { IStorage } from "../src/services/storage";
 
-export const userCognitoId = "test-cognito-id";
+export const USER_COGNITO_ID = "test-cognito-id";
 
 @injectable()
 export class MockAuth implements IAuth {
+  constructor(private users: UserRepository) {}
   async validateSession() {
-    return userCognitoId;
+    return await this.users.loadUserByCognitoId(USER_COGNITO_ID);
   }
   async guessLogin() {}
   async callback() {}

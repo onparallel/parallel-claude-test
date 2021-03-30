@@ -1,7 +1,7 @@
 import gql from "graphql-tag";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Contact, Organization, User } from "../../db/__types";
-import { userCognitoId } from "../../../test/mocks";
+import { USER_COGNITO_ID } from "../../../test/mocks";
 import faker from "faker";
 import { initServer, TestClient } from "./server";
 import { toGlobalId } from "../../util/globalId";
@@ -28,7 +28,7 @@ describe("GraphQL/Contacts", () => {
 
     // logged user
     [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: userCognitoId,
+      cognito_id: USER_COGNITO_ID,
       first_name: "Harvey",
       last_name: "Specter",
       org_id: organization.id,

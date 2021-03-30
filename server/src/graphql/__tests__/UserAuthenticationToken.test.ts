@@ -6,7 +6,7 @@ import {
   User,
   UserAuthenticationToken,
 } from "../../db/__types";
-import { userCognitoId } from "../../../test/mocks";
+import { USER_COGNITO_ID } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
 import { toGlobalId } from "../../util/globalId";
 import { Knex } from "knex";
@@ -32,7 +32,7 @@ describe("GraphQL/UserAuthenticationToken", () => {
 
     // logged user
     [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: userCognitoId,
+      cognito_id: USER_COGNITO_ID,
     }));
   });
 

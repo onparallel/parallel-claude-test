@@ -46,7 +46,7 @@ export class UserRepository extends BaseRepository {
       .update({
         ...data,
         updated_at: this.now(),
-        updated_by: `User:${user.id}`,
+        updated_by: `User:${updatedBy}`,
       })
       .whereIn("id", ids)
       .returning("*");

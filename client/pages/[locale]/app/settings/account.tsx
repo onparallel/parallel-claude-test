@@ -79,13 +79,15 @@ function Account() {
             defaultMessage="Name"
           />
         </Heading>
-        <Alert>
-          <AlertIcon />
-          <FormattedMessage
-            id="settings.account.sso-user-explanation"
-            defaultMessage="SSO users are not able to change their name"
-          />
-        </Alert>
+        {me.isSsoUser ? (
+          <Alert>
+            <AlertIcon />
+            <FormattedMessage
+              id="settings.account.sso-user-explanation"
+              defaultMessage="SSO users are not able to change their name"
+            />
+          </Alert>
+        ) : null}
         <Stack as="form" onSubmit={handleSubmit(onSaveName)}>
           <FormControl
             id="first-name"
