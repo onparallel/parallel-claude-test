@@ -10,7 +10,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  i18n:
+  setup:
+    name: Setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,7 +25,20 @@ jobs:
       - name: Install dependencies
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --production=false
+  i18n:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-yarn-cache-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-cache-
       - name: Check translations
+        if: steps.yarn-cache.outputs.cache-hit == 'true'
         run: |
           echo "Checking server translations..."
           yarn --cwd server/ extract-i18n-terms
@@ -34,6 +48,7 @@ jobs:
           yarn --cwd client/ generate-i18n-files
 
   linter:
+    needs: setup
     name: Linter
     runs-on: ubuntu-latest
     steps:
@@ -46,14 +61,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-cache-
 
-      - name: Install dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile --production=false
-
       - name: Run linter
+        if: steps.yarn-cache.outputs.cache-hit == 'true'
         run: yarn lint
 
   server-test-suite:
+    needs: setup
     name: Server Test Suite
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -68,9 +81,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-cache-
 
-      - name: Install dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
-        run: yarn install --frozen-lockfile --production=false
-
       - name: Run server test suite
+        if: steps.yarn-cache.outputs.cache-hit == 'true'
         run: yarn --cwd server/ test
