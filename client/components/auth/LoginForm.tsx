@@ -9,14 +9,15 @@ import {
   Input,
   Text,
 } from "@chakra-ui/react";
+import { LockIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { postJSON } from "@parallel/utils/rest";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
-import { LockIcon } from "@parallel/chakra/icons";
 
 export interface LoginData {
   email: string;
@@ -35,18 +36,31 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
   } = useForm<LoginData>();
   const [ssoUrl, setSsoUrl] = useState<string | undefined>(undefined);
   const email = watch("email");
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const passwordRegisterProps = useRegisterWithRef(
+    passwordRef,
+    register,
+    "password",
+    { required: true }
+  );
+  const buttonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     async function guessLogin() {
       const result = await postJSON<{ type: "SSO" | "PASSWORD"; url?: string }>(
         "/api/auth/guess-login",
         { email }
       );
+      if (result?.url && document.activeElement === passwordRef.current) {
+        buttonRef.current!.focus();
+      }
       if (result) {
         setSsoUrl(result?.url);
       }
     }
     if (EMAIL_REGEX.test(email)) {
       guessLogin().then();
+    } else {
+      setSsoUrl(undefined);
     }
   }, [email]);
   return (
@@ -118,7 +132,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
                 defaultMessage="Password"
               />
             </FormLabel>
-            <PasswordInput {...register("password", { required: true })} />
+            <PasswordInput {...passwordRegisterProps} />
             {errors.password && (
               <FormErrorMessage>
                 <FormattedMessage
@@ -130,6 +144,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           </FormControl>
         )}
         <Button
+          ref={buttonRef}
           marginTop={6}
           width="100%"
           colorScheme="purple"
