@@ -10,6 +10,7 @@ import {
   AlertIcon,
   Text,
   CloseButton,
+  Stack,
 } from "@chakra-ui/react";
 import { DeleteIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { useCallback, useRef, useState } from "react";
@@ -20,7 +21,6 @@ import {
   ContactSelectSelection,
 } from "./ContactSelect";
 import { HelpPopover } from "./HelpPopover";
-import { PaddedStack } from "./PaddedStack";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
@@ -78,8 +78,10 @@ export function RecipientSelectGroups({
 
   return (
     <>
-      <PaddedStack
-        overflowY="scroll"
+      <Stack
+        margin={-1}
+        padding={1}
+        overflowY="auto"
         maxHeight="240px"
         ref={recipientsStackRef}
       >
@@ -115,7 +117,7 @@ export function RecipientSelectGroups({
                   &nbsp;
                   <FormattedMessage
                     id="component.recipient-select-groups.recipients-nth-group"
-                    defaultMessage="({number}{number, select, 1{st} 2{nd} 3{rd} other{th}} petition)"
+                    defaultMessage="({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} petition)"
                     values={{ number: index + 1 }}
                   />
                 </>
@@ -175,7 +177,7 @@ export function RecipientSelectGroups({
             </FormErrorMessage>
           </FormControl>
         ))}
-      </PaddedStack>
+      </Stack>
       {recipientGroups.length < maxGroups ? (
         <Flex alignItems="center" marginTop={4}>
           <Flex as="button" alignItems="center" onClick={addRecipientGroup}>

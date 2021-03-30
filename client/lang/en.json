@@ -1081,8 +1081,8 @@
   },
   {
     "term": "component.recipient-select-groups.recipients-nth-group",
-    "definition": "({number}{number, select, 1{st} 2{nd} 3{rd} other{th}} petition)",
-    "context": "({number}{number, select, 1{st} 2{nd} 3{rd} other{th}} petition)"
+    "definition": "({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} petition)",
+    "context": "({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} petition)"
   },
   {
     "term": "component.recipient-select-groups.recipients-placeholder",
