@@ -5150,6 +5150,11 @@
     "context": "Name"
   },
   {
+    "term": "settings.account.sso-user-explanation",
+    "definition": "Los usuarios de SSO no pueden cambiar su nombre",
+    "context": "SSO users are not able to change their name"
+  },
+  {
     "term": "settings.account.update-name-button",
     "definition": "Guardar cambios",
     "context": "Save changes"
@@ -5198,6 +5203,11 @@
     "term": "settings.security.password-header",
     "definition": "Cambiar contraseña",
     "context": "Change password"
+  },
+  {
+    "term": "settings.security.sso-user-explanation",
+    "definition": "Los usuarios de SSO no pueden cambiar la constraseña",
+    "context": "SSO users are not able to change passwords"
   },
   {
     "term": "settings.title",
