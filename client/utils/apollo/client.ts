@@ -5,11 +5,13 @@ import {
   InMemoryCache,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
+import { onError } from "@apollo/client/link/error";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
-import { IncomingMessage } from "http";
-import { filter, indexBy, map, pipe } from "remeda";
-import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 import { createUploadLink } from "apollo-upload-client";
+import { parse as parseCookie, serialize as serializeCookie } from "cookie";
+import { IncomingMessage } from "http";
+import Router from "next/router";
+import { filter, indexBy, map, pipe } from "remeda";
 
 export interface CreateApolloClientOptions {
   req?: IncomingMessage;
@@ -79,8 +81,21 @@ export function createApolloClient(
     };
   });
 
+  const authErrorHandler = onError(({ graphQLErrors, operation }) => {
+    if (process.browser) {
+      // CurrentUser is the operation used in the login page, if we dont
+      // check for it we get into a redirect loop
+      if (
+        operation.operationName !== "CurrentUser" &&
+        graphQLErrors?.[0]?.extensions?.code === "UNAUTHENTICATED"
+      ) {
+        Router.push(`/${Router.query.locale ?? "en"}/login`);
+      }
+    }
+  });
+
   const client = new ApolloClient({
-    link: from([authLink, httpLink]),
+    link: from([authLink, authErrorHandler, httpLink]),
     ssrMode: !process.browser,
     cache: new InMemoryCache({
       dataIdFromObject: (o) => o.id as string,
