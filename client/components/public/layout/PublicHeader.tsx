@@ -20,8 +20,8 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { useWindowScroll } from "beautiful-react-hooks";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./PublicContainer";
 
@@ -41,7 +41,7 @@ export function PublicHeader(props: BoxProps) {
       wrapper={{
         as: "header",
         backgroundColor: "white",
-        boxShadow: isOpen ? { base: "md", [bp]: "none" } : "md",
+        boxShadow: "md",
         ...props,
       }}
     >
@@ -79,7 +79,8 @@ export function PublicHeader(props: BoxProps) {
           opacity={{ base: isOpen ? 1 : 0, [bp]: 1 }}
           overflow="hidden"
           transition="opacity 500ms"
-          padding={{ base: 0, [bp]: 2 }}
+          padding={{ base: 1, [bp]: 2 }}
+          margin={{ base: -1, [bp]: 0 }}
           paddingBottom={{ base: isOpen ? 4 : 2, [bp]: 2 }}
         >
           <PublicHeaderMenu
