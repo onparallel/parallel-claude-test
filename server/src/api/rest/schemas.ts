@@ -21,8 +21,7 @@ export function buildValidateSchema<T = any>(
 ): ValidateFunction<T>;
 export function buildValidateSchema<T = any>(schema: JsonSchema) {
   const ajv = new Ajv({ strict: false });
-  // need the "as any" until this lands https://github.com/ajv-validator/ajv-formats/pull/15
-  addFormats(ajv as any, ["date-time", "email", "uri"]);
+  addFormats(ajv, ["date-time", "email", "uri"]);
   ajv.addFormat("time-zone", isValidTimezone);
   ajv.addFormat("time", isValidTime);
   return ajv.compile<T>(schema);

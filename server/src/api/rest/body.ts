@@ -34,7 +34,7 @@ export function JsonBody<T>(
         if (!valid) {
           const error = validate.errors![0];
           throw new InvalidRequestBodyError(
-            `Property at ${error.dataPath} ${error.message}`
+            `Property at ${error.instancePath} ${error.message}`
           );
         }
       }

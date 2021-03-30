@@ -34,8 +34,8 @@
   },
   "dependencies": {
     "@nexus/schema": "^0.19.2",
-    "ajv": "^7.2.1",
-    "ajv-formats": "^1.5.1",
+    "ajv": "^8.0.1",
+    "ajv-formats": "^2.0.1",
     "amazon-cognito-identity-js": "^4.5.13",
     "analytics-node": "^4.0.1",
     "apollo-server-express": "^2.21.1",
