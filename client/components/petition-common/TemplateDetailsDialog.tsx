@@ -200,8 +200,6 @@ export function TemplateDetailsDialog({
                       id: "generic.more-options",
                       defaultMessage: "More options...",
                     })}
-                    borderTopLeftRadius={0}
-                    borderBottomLeftRadius={0}
                     minWidth={8}
                   />
                 </Tooltip>

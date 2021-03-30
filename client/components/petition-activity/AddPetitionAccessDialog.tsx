@@ -1,13 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Alert,
-  AlertIcon,
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-} from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -17,35 +9,38 @@ import {
   RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
+import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { emptyRTEValue } from "@parallel/utils/slate/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useCallback, useRef, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage } from "react-intl";
 import { noop, omit } from "remeda";
 import {
-  ContactSelect,
   ContactSelectProps,
   ContactSelectSelection,
 } from "../common/ContactSelect";
+import { RecipientSelectGroups } from "../common/RecipientSelectGroups";
 import { RichTextEditorValue } from "../common/RichTextEditor";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
 import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersConfig";
 import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
 
-export type AddPettionAccessDialogProps = {
-  onSearchContacts: ContactSelectProps["onSearchContacts"];
-  onCreateContact: ContactSelectProps["onCreateContact"];
+export type AddPetitionAccessDialogProps = {
+  onSearchContacts?: ContactSelectProps["onSearchContacts"];
+  onCreateContact?: ContactSelectProps["onCreateContact"];
   onUpdatePetition?: (data: UpdatePetitionInput) => void;
+  maxRecipientGroups?: number;
   defaultSubject?: Maybe<string>;
   defaultBody?: Maybe<RichTextEditorValue>;
   defaultRemindersConfig?: Maybe<RemindersConfig>;
 };
 
-export type AddPettionAccessDialogResult = {
-  recipientIds: string[];
+export type AddPetitionAccessDialogResult = {
+  recipientIdGroups: string[][];
   subject: string;
   body: RichTextEditorValue;
   remindersConfig: Maybe<RemindersConfig>;
@@ -56,14 +51,17 @@ export function AddPetitionAccessDialog({
   defaultSubject,
   defaultBody,
   defaultRemindersConfig,
+  maxRecipientGroups,
   onUpdatePetition = noop,
-  onSearchContacts,
-  onCreateContact,
+  onSearchContacts = useSearchContacts(),
+  onCreateContact = useCreateContact(),
   ...props
-}: DialogProps<AddPettionAccessDialogProps, AddPettionAccessDialogResult>) {
-  const intl = useIntl();
+}: DialogProps<AddPetitionAccessDialogProps, AddPetitionAccessDialogResult>) {
   const [showErrors, setShowErrors] = useState(false);
-  const [recipients, setRecipients] = useState<ContactSelectSelection[]>([]);
+  const [recipientGroups, setRecipientGroups] = useState<
+    ContactSelectSelection[][]
+  >([[]]);
+
   const [subject, setSubject] = useState(defaultSubject ?? "");
   const [body, setBody] = useState<RichTextEditorValue>(
     defaultBody ?? emptyRTEValue()
@@ -107,13 +105,12 @@ export function AddPetitionAccessDialog({
 
   const recipientsRef = useRef<HTMLInputElement>(null);
 
-  const validRecipients = recipients.filter((r) => !r.isInvalid);
-  const invalidRecipients = recipients.filter((r) => r.isInvalid);
   const isValid = Boolean(
     subject &&
       !isEmptyRTEValue(body) &&
-      validRecipients.length > 0 &&
-      invalidRecipients.length === 0
+      recipientGroups.every(
+        (g) => g.length > 0 && g.every((r) => !r.isInvalid && !r.isDeleted)
+      )
   );
 
   const showScheduleMessageDialog = useScheduleMessageDialog();
@@ -125,7 +122,9 @@ export function AddPetitionAccessDialog({
       }
       const scheduledAt = schedule ? await showScheduleMessageDialog({}) : null;
       props.onResolve({
-        recipientIds: recipients.map((r) => r.id),
+        recipientIdGroups: recipientGroups.map((group) =>
+          group.map((g) => g.id)
+        ),
         subject,
         body,
         remindersConfig,
@@ -148,57 +147,14 @@ export function AddPetitionAccessDialog({
       }
       body={
         <>
-          <FormControl
-            id="petition-recipients"
-            isInvalid={
-              (showErrors && recipients.length === 0) ||
-              invalidRecipients.length > 0
-            }
-          >
-            <FormLabel>
-              <FormattedMessage
-                id="petition.add-access.recipients-label"
-                defaultMessage="Recipients"
-              />
-            </FormLabel>
-            <ContactSelect
-              placeholder={intl.formatMessage({
-                id: "petition.add-access.recipients-placeholder",
-                defaultMessage: "Enter recipients...",
-              })}
-              onCreateContact={onCreateContact}
-              onSearchContacts={onSearchContacts}
-              value={recipients}
-              onChange={setRecipients}
-            />
-            <FormErrorMessage>
-              {invalidRecipients.length === 0 ? (
-                <FormattedMessage
-                  id="petition.add-access.required-recipients-error"
-                  defaultMessage="Please specify at least one recipient"
-                />
-              ) : (
-                <FormattedMessage
-                  id="petition.add-access.unknown-recipients"
-                  defaultMessage="We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
-                  values={{
-                    count: invalidRecipients.length,
-                    email: invalidRecipients[0].email,
-                  }}
-                />
-              )}
-            </FormErrorMessage>
-          </FormControl>
-          {validRecipients.length >= 2 && invalidRecipients.length === 0 ? (
-            <Alert status="info" marginTop={4}>
-              <AlertIcon />
-              <FormattedMessage
-                id="petition.add-access.same-petition-warning"
-                defaultMessage="All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively."
-                values={{ recipientCount: validRecipients.length }}
-              />
-            </Alert>
-          ) : null}
+          <RecipientSelectGroups
+            recipientGroups={recipientGroups}
+            setRecipientGroups={setRecipientGroups}
+            onSearchContacts={onSearchContacts}
+            onCreateContact={onCreateContact}
+            showErrors={showErrors}
+            maxGroups={maxRecipientGroups}
+          />
           <Box marginTop={2}>
             <MessageEmailEditor
               showErrors={showErrors}

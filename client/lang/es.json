@@ -1065,6 +1065,61 @@
     "context": "No options"
   },
   {
+    "term": "component.recipient-select-groups.add-recipient-group",
+    "definition": "Agregar grupo de destinatarios",
+    "context": "Add recipient group"
+  },
+  {
+    "term": "component.recipient-select-groups.delete-group.label",
+    "definition": "Eliminar grupo de destinatarios",
+    "context": "Delete recipient group"
+  },
+  {
+    "term": "component.recipient-select-groups.recipients-label",
+    "definition": "Destinatarios",
+    "context": "Recipients"
+  },
+  {
+    "term": "component.recipient-select-groups.recipients-nth-group",
+    "definition": "({number}ª petición)",
+    "context": "({number}{number, select, 1{st} 2{nd} 3{rd} other{th}} petition)"
+  },
+  {
+    "term": "component.recipient-select-groups.recipients-placeholder",
+    "definition": "Introduce destinatarios...",
+    "context": "Enter recipients..."
+  },
+  {
+    "term": "component.recipient-select-groups.recipients.collaborative-label",
+    "definition": "Los destinatarios responderán la misma petición.",
+    "context": "Recipients will reply to the same petition."
+  },
+  {
+    "term": "component.recipient-select-groups.recipients.groups-label",
+    "definition": "Añade grupos para que los destinatarios respondan diferentes peticiones.",
+    "context": "Add groups for recipients to reply to different petitions."
+  },
+  {
+    "term": "component.recipient-select-groups.required-recipients-group-1-error",
+    "definition": "Por favor, especifica al menos un destinatario",
+    "context": "Please specify at least one recipient"
+  },
+  {
+    "term": "component.recipient-select-groups.required-recipients-group-n-error",
+    "definition": "Por favor, especifica al menos un destinatario o elimina los grupos que no necesites",
+    "context": "Please specify at least one recipient or delete the groups you don't need"
+  },
+  {
+    "term": "component.recipient-select-groups.same-petition-warning",
+    "definition": "Todos los {recipientCount} destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa. Añade un <b>grupo de destinatarios</b> para enviar diferentes peticiones a cada grupo.",
+    "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively. Add a <b>recipient group</b> to send different petitions to each group."
+  },
+  {
+    "term": "component.recipient-select-groups.unknown-recipients",
+    "definition": "No hemos encontrado {count, plural, =1 {a {email}} other {algunos emails}} en tu lista de contactos.",
+    "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
+  },
+  {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
     "definition": "Añadir otra respuesta",
     "context": "Add another reply"
@@ -2818,31 +2873,6 @@
     "term": "petition.add-access.header",
     "definition": "¿A quién quieres enviárselo?",
     "context": "Who do you want to send it to?"
-  },
-  {
-    "term": "petition.add-access.recipients-label",
-    "definition": "Destinatarios",
-    "context": "Recipients"
-  },
-  {
-    "term": "petition.add-access.recipients-placeholder",
-    "definition": "Introduce destinatarios...",
-    "context": "Enter recipients..."
-  },
-  {
-    "term": "petition.add-access.required-recipients-error",
-    "definition": "Por favor, especifica al menos un destinatario",
-    "context": "Please specify at least one recipient"
-  },
-  {
-    "term": "petition.add-access.same-petition-warning",
-    "definition": "Todos los {recipientCount} destinatarios recibirán un enlace a la misma petición para rellenarla de forma colaborativa.",
-    "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively."
-  },
-  {
-    "term": "petition.add-access.unknown-recipients",
-    "definition": "No hemos encontrado {count, plural, =1 {a {email}} other {algunos emails}} en tu lista de contactos.",
-    "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
   },
   {
     "term": "petition.add-another-field-button",

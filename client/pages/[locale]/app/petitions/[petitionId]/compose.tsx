@@ -68,10 +68,8 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
-import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
-import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -357,9 +355,6 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const handleSearchContacts = useSearchContacts();
-  const handleCreateContact = useCreateContact();
-
   const showErrorDialog = useErrorDialog();
   const [sendPetition] = usePetitionCompose_sendPetitionMutation();
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
@@ -431,7 +426,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
     try {
       const {
-        recipientIds,
+        recipientIdGroups,
         subject,
         body,
         remindersConfig,
@@ -441,24 +436,22 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         defaultBody: petition.emailBody,
         defaultRemindersConfig: petition.remindersConfig,
         onUpdatePetition: handleUpdatePetition,
-        onCreateContact: handleCreateContact,
-        onSearchContacts: handleSearchContacts,
       });
-      const { data } = await sendPetition({
-        variables: {
-          petitionId: petition.id,
-          contactIds: recipientIds,
-          subject,
-          body,
-          remindersConfig,
-          scheduledAt: scheduledAt?.toISOString() ?? null,
-        },
-        update(client) {
-          // clear stale data
-          delete (client as any).data.data[petitionId].accesses;
-          delete (client as any).data.data[petitionId].recipients;
-        },
-      });
+      // const { data } = await sendPetition({
+      //   variables: {
+      //     petitionId: petition.id,
+      //     contactIds: recipientIds,
+      //     subject,
+      //     body,
+      //     remindersConfig,
+      //     scheduledAt: scheduledAt?.toISOString() ?? null,
+      //   },
+      //   update(client) {
+      //     // clear stale data
+      //     delete (client as any).data.data[petitionId].accesses;
+      //     delete (client as any).data.data[petitionId].recipients;
+      //   },
+      // });
       if (data?.sendPetition.result !== "SUCCESS") {
         toast({
           isClosable: true,

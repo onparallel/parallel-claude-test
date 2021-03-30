@@ -42,7 +42,6 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
-import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
@@ -145,7 +144,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
 
   const addPetitionAccessDialog = useAddPetitionAccessDialog();
   const handleSearchContacts = useSearchContacts();
-  const handleCreateContact = useCreateContact();
   const [sendPetition] = usePetitionsActivity_sendPetitionMutation();
   const handleAddPetitionAccess = useCallback(async () => {
     try {
@@ -153,13 +151,13 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         .filter((a) => a.contact)
         .map((a) => a.contact!.id);
       const {
-        recipientIds,
+        recipientIdGroups,
         subject,
         body,
         scheduledAt,
         remindersConfig,
       } = await addPetitionAccessDialog({
-        onCreateContact: handleCreateContact,
+        maxRecipientGroups: 1,
         onSearchContacts: async (search: string, exclude: string[]) => {
           return await handleSearchContacts(search, [
             ...exclude,
@@ -167,16 +165,16 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           ]);
         },
       });
-      await sendPetition({
-        variables: {
-          petitionId,
-          contactIds: recipientIds,
-          subject,
-          body,
-          scheduledAt: scheduledAt?.toISOString() ?? null,
-          remindersConfig,
-        },
-      });
+      // await sendPetition({
+      //   variables: {
+      //     petitionId,
+      //     contactIds: recipientIds,
+      //     subject,
+      //     body,
+      //     scheduledAt: scheduledAt?.toISOString() ?? null,
+      //     remindersConfig,
+      //   },
+      // });
       await refetch();
     } catch {}
   }, [petitionId, petition.accesses]);
