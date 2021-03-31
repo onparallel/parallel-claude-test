@@ -1,5 +1,13 @@
 import { gql } from "@apollo/client";
-import { Box, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Image,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -22,6 +30,7 @@ import {
   ContactSelectProps,
   ContactSelectSelection,
 } from "../common/ContactSelect";
+import { HelpPopover } from "../common/HelpPopover";
 import { RecipientSelectGroups } from "../common/RecipientSelectGroups";
 import { RichTextEditorValue } from "../common/RichTextEditor";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
@@ -140,10 +149,56 @@ export function AddPetitionAccessDialog({
       initialFocusRef={recipientsRef}
       size="2xl"
       header={
-        <FormattedMessage
-          id="petition.add-access.header"
-          defaultMessage="Who do you want to send it to?"
-        />
+        <Flex alignItems="center">
+          <FormattedMessage
+            id="petition.add-access.header"
+            defaultMessage="Who do you want to send it to?"
+          />
+          {maxRecipientGroups === 1 ? null : (
+            <HelpPopover popoverWidth="container.2xs" marginLeft={2}>
+              <Stack direction="row">
+                <Stack alignItems="flex-start">
+                  <Image
+                    height="40px"
+                    marginRight={2}
+                    src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/recipient-collaboration.svg`}
+                  />
+                  <Heading size="sm">
+                    <FormattedMessage
+                      id="component.add-petition-access-dialog.recipients-label"
+                      defaultMessage="Recipients"
+                    />
+                  </Heading>
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.add-petition-access-dialog.recipients-description"
+                      defaultMessage="Recipients will reply to the same petition in a collaborative way."
+                    />
+                  </Text>
+                </Stack>
+                <Stack alignItems="flex-start">
+                  <Image
+                    height="40px"
+                    marginRight={2}
+                    src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/recipient-groups.svg`}
+                  />
+                  <Heading size="sm">
+                    <FormattedMessage
+                      id="component.add-petition-access-dialog.recipient-groups-label"
+                      defaultMessage="Recipient groups"
+                    />
+                  </Heading>
+                  <Text fontSize="sm">
+                    <FormattedMessage
+                      id="component.add-petition-access-dialog.recipient-groups-description"
+                      defaultMessage="Recipients from different groups will reply to different petitions."
+                    />
+                  </Text>
+                </Stack>
+              </Stack>
+            </HelpPopover>
+          )}
+        </Flex>
       }
       body={
         <>
@@ -155,7 +210,7 @@ export function AddPetitionAccessDialog({
             showErrors={showErrors}
             maxGroups={maxRecipientGroups}
           />
-          <Box marginTop={2}>
+          <Box marginTop={4}>
             <MessageEmailEditor
               showErrors={showErrors}
               subject={subject}

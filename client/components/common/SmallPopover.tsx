@@ -1,4 +1,5 @@
 import {
+  BoxProps,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -15,10 +16,12 @@ export function SmallPopover({
   isDisabled,
   children,
   content,
+  width = "container.5xs",
   ...props
 }: {
   isDisabled?: boolean;
   content: ReactNode;
+  width?: BoxProps["width"];
 } & PopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverId = useId(id, "small-popover");
@@ -45,7 +48,9 @@ export function SmallPopover({
       </PopoverTrigger>
       <Portal>
         <PopoverContent>
-          <PopoverBody id={popoverId}>{content}</PopoverBody>
+          <PopoverBody id={popoverId} width={width}>
+            {content}
+          </PopoverBody>
           <PopoverArrow />
         </PopoverContent>
       </Portal>

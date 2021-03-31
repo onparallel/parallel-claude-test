@@ -15,6 +15,26 @@
     "context": "Admin panel"
   },
   {
+    "term": "component.add-petition-access-dialog.recipient-groups-description",
+    "definition": "Los destinatarios de grupos distintos responden peticiones diferentes.",
+    "context": "Recipients from different groups will reply to different petitions."
+  },
+  {
+    "term": "component.add-petition-access-dialog.recipient-groups-label",
+    "definition": "Grupos de destinatarios",
+    "context": "Recipient groups"
+  },
+  {
+    "term": "component.add-petition-access-dialog.recipients-description",
+    "definition": "Los destinatarios responderán a la misma petición colaborativamente.",
+    "context": "Recipients will reply to the same petition in a collaborative way."
+  },
+  {
+    "term": "component.add-petition-access-dialog.recipients-label",
+    "definition": "Destinatarios",
+    "context": "Recipients"
+  },
+  {
     "term": "component.burger-button.label-close",
     "definition": "Cerrar menú",
     "context": "Close menu"
@@ -1088,16 +1108,6 @@
     "term": "component.recipient-select-groups.recipients-placeholder",
     "definition": "Introduce destinatarios...",
     "context": "Enter recipients..."
-  },
-  {
-    "term": "component.recipient-select-groups.recipients.collaborative-label",
-    "definition": "Los destinatarios responderán la misma petición.",
-    "context": "Recipients will reply to the same petition."
-  },
-  {
-    "term": "component.recipient-select-groups.recipients.groups-label",
-    "definition": "Añade grupos para que los destinatarios respondan diferentes peticiones.",
-    "context": "Add groups for recipients to reply to different petitions."
   },
   {
     "term": "component.recipient-select-groups.required-recipients-group-1-error",

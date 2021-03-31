@@ -170,7 +170,10 @@ export const theme = extendTheme({
       baseStyle: (props) => {
         // Workaround until this is fixed https://github.com/chakra-ui/chakra-ui/issues/2481
         return deepmerge(base.components.Popover.baseStyle(props), {
-          popper: { maxW: "container.5xs" },
+          popper: {
+            width: "fit-content",
+            maxWidth: "fit-content",
+          },
         });
       },
     },

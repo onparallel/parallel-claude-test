@@ -74,7 +74,7 @@ export const UserAvatarList = Object.assign(
                         alignItems="center"
                         paddingX={4}
                       >
-                        <Avatar size="sm" name={user.fullName ?? undefined} />
+                        <Avatar size="xs" name={user.fullName ?? undefined} />
                         <Text flex="1" marginLeft={2} isTruncated>
                           {user.fullName}
                         </Text>

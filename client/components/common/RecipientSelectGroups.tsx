@@ -1,27 +1,29 @@
 import {
-  Image,
-  Flex,
-  FormControl,
-  FormLabel,
-  Box,
-  IconButton,
-  FormErrorMessage,
   Alert,
   AlertIcon,
-  Text,
+  Box,
+  Button,
+  Circle,
   CloseButton,
+  Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  IconButton,
+  Image,
   Stack,
+  Text,
 } from "@chakra-ui/react";
-import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
+import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import {
   ContactSelect,
   ContactSelectProps,
   ContactSelectSelection,
 } from "./ContactSelect";
 import { HelpPopover } from "./HelpPopover";
-import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
@@ -79,7 +81,7 @@ export function RecipientSelectGroups({
 
   return (
     <>
-      <Stack margin={-1} padding={1} overflowY="auto" maxHeight="240px">
+      <Stack margin={-1} padding={1} overflow="auto" maxHeight="240px">
         {recipientGroups.map((recipients, index) => (
           <FormControl
             ref={
@@ -99,31 +101,17 @@ export function RecipientSelectGroups({
                 id="component.recipient-select-groups.recipients-label"
                 defaultMessage="Recipients"
               />
-              {index === 0 ? (
-                <HelpPopover marginLeft={2} placement="right">
-                  <Flex fontSize="14px">
-                    <Image
-                      marginRight={2}
-                      src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/send-petition-collaboration.svg`}
-                    />
-                    <FormattedMessage
-                      id="component.recipient-select-groups.recipients.collaborative-label"
-                      defaultMessage="Recipients will reply to the same petition."
-                    ></FormattedMessage>
-                  </Flex>
-                </HelpPopover>
-              ) : (
+              {index > 0 ? (
                 <>
-                  &nbsp;
+                  {" "}
                   <FormattedMessage
                     id="component.recipient-select-groups.recipients-nth-group"
                     defaultMessage="({number, selectordinal, one{#st} two{#nd} few{#rd} other{#th}} petition)"
                     values={{ number: index + 1 }}
                   />
                 </>
-              )}
+              ) : null}
             </FormLabel>
-
             <Flex>
               <Box flex="1">
                 <ContactSelect
@@ -179,26 +167,23 @@ export function RecipientSelectGroups({
         ))}
       </Stack>
       {recipientGroups.length < maxGroups ? (
-        <Flex alignItems="center" marginTop={4}>
-          <Flex as="button" alignItems="center" onClick={addRecipientGroup}>
-            <PlusCircleIcon color="purple.600" marginRight={2} fontSize="lg" />
+        <Flex justifyContent="flex-start" alignItems="center" marginTop={4}>
+          <Button
+            variant="link"
+            color="gray.900"
+            fontWeight="normal"
+            leftIcon={
+              <Circle backgroundColor="purple.500" boxSize={5}>
+                <AddIcon color="white" fontSize="xs" />
+              </Circle>
+            }
+            onClick={addRecipientGroup}
+          >
             <FormattedMessage
               id="component.recipient-select-groups.add-recipient-group"
               defaultMessage="Add recipient group"
             />
-          </Flex>
-          <HelpPopover marginLeft={2} placement="right">
-            <Flex fontSize="14px">
-              <Image
-                marginRight={2}
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/send-petition-groups.svg`}
-              />
-              <FormattedMessage
-                id="component.recipient-select-groups.recipients.groups-label"
-                defaultMessage="Add groups for recipients to reply to different petitions."
-              ></FormattedMessage>
-            </Flex>
-          </HelpPopover>
+          </Button>
         </Flex>
       ) : null}
       {isAlertVisible &&
