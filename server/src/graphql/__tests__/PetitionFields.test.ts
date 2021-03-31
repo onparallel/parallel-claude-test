@@ -2108,7 +2108,7 @@ describe("GraphQL/Petition Fields", () => {
       fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
         type: "TEXT",
         options: {
-          multiline: faker.random.boolean(),
+          multiline: faker.datatype.boolean(),
           placeholder: faker.random.words(3),
         },
         validated: false,
@@ -2518,7 +2518,7 @@ describe("GraphQL/Petition Fields", () => {
       fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
         type: "TEXT",
         options: {
-          multiline: faker.random.boolean(),
+          multiline: faker.datatype.boolean(),
           placeholder: faker.random.words(3),
         },
         validated: false,

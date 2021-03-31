@@ -84,7 +84,7 @@ export class Mocks {
             first_name: firstName,
             last_name: lastName,
             email: faker.internet.email(firstName, lastName),
-            cognito_id: faker.random.uuid(),
+            cognito_id: faker.datatype.uuid(),
             ...builder?.(index),
           };
         })
@@ -336,12 +336,12 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
     case "FILE_UPLOAD": {
       return {
         accepts: [faker.random.arrayElement(["PDF", "IMAGE", "VIDEO"])],
-        multiple: faker.random.boolean(),
+        multiple: faker.datatype.boolean(),
       };
     }
     case "TEXT": {
       return {
-        multiline: faker.random.boolean(),
+        multiline: faker.datatype.boolean(),
         placeholder: faker.random.words(3),
       };
     }

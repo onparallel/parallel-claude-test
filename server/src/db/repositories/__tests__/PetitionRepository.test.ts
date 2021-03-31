@@ -145,7 +145,7 @@ describe("repositories/PetitionRepository", () => {
         petition1.id,
         10,
         (index) => ({
-          position: faker.random.number(10),
+          position: faker.datatype.number(10),
           deleted_at: new Date(),
         })
       );
@@ -274,7 +274,7 @@ describe("repositories/PetitionRepository", () => {
         petition1.id,
         10,
         (index) => ({
-          position: faker.random.number(10),
+          position: faker.datatype.number(10),
           deleted_at: new Date(),
         })
       );

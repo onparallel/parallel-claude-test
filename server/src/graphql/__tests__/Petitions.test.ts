@@ -205,7 +205,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = templates!.templates;
 
       // pick a random templateId that is not on first position of items array
-      const index = faker.random.number({ min: 1, max: items.length - 1 });
+      const index = faker.datatype.number({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition
@@ -331,7 +331,7 @@ describe("GraphQL/Petitions", () => {
       const { items } = templates!.publicTemplates;
 
       // pick a random templateId that is not on first position of items array
-      const index = faker.random.number({ min: 1, max: items.length - 1 });
+      const index = faker.datatype.number({ min: 1, max: items.length - 1 });
       const templateId = items[index].id;
 
       // use this random template to create a petition
