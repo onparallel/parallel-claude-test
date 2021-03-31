@@ -7,7 +7,7 @@ import {
   isScalarType,
 } from "graphql";
 import { mapValues, omit } from "remeda";
-import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 
 export type GlobalIdConfig = {
@@ -84,44 +84,38 @@ export function globalIdArg(
 
 const PREFIX_NAME = Symbol.for("PREFIX_NAME");
 
-function isMaybeGlobalIdType(type: GraphQLInputType): boolean {
+function mapGlobalIds(
+  type: GraphQLInputType,
+  value: any,
+  argConfig: core.AllNexusArgsDefs
+): any {
   if (isScalarType(type)) {
-    return type.name === "GID";
+    if (type.name === "GID" && isDefined(value)) {
+      return fromGlobalId(
+        value,
+        ((argConfig as core.NexusArgDef<any>).value as any)[PREFIX_NAME]
+      ).id;
+    } else {
+      return value;
+    }
   } else if (isNonNullType(type)) {
-    return isMaybeGlobalIdType(type.ofType);
-  }
-  return false;
-}
-
-function isMaybeListOfMaybeGlobalIdType(type: GraphQLInputType): boolean {
-  if (isListType(type)) {
-    return isMaybeGlobalIdType(type.ofType);
-  } else if (isNonNullType(type)) {
-    return isMaybeListOfMaybeGlobalIdType(type.ofType);
-  }
-  return false;
-}
-
-function isMaybeListOfMaybeListOfMaybeGlobalIdType(
-  type: GraphQLInputType
-): boolean {
-  if (isListType(type)) {
-    return isMaybeListOfMaybeGlobalIdType(type.ofType);
-  } else if (isNonNullType(type)) {
-    return isMaybeListOfMaybeListOfMaybeGlobalIdType(type.ofType);
-  }
-  return false;
-}
-
-function getPrefixName(arg: core.AllNexusArgsDefs): string {
-  if (arg instanceof core.NexusNonNullDef) {
-    return getPrefixName(arg.ofNexusType);
-  } else if (arg instanceof core.NexusListDef) {
-    return getPrefixName(arg.ofNexusType);
-  } else if (arg instanceof core.NexusArgDef && arg.name === "GID") {
-    return (arg.value as any)[PREFIX_NAME] as string;
+    return mapGlobalIds(
+      type.ofType,
+      value,
+      (argConfig as core.NexusNonNullDef<any>).ofNexusType
+    );
+  } else if (isListType(type)) {
+    return isDefined(value)
+      ? (value as any[]).map((item) =>
+          mapGlobalIds(
+            type.ofType,
+            item,
+            (argConfig as core.NexusListDef<any>).ofNexusType
+          )
+        )
+      : value;
   } else {
-    throw new Error("Missing prefixName on globalIdArg options");
+    return value;
   }
 }
 
@@ -142,27 +136,7 @@ export function globalIdPlugin() {
         const _args = mapValues(args ?? {}, (argValue, argName) => {
           const type = fieldConfig.args![argName as string].type;
           const argConfig = config.args[argName] as core.AllNexusArgsDefs;
-          if (isMaybeGlobalIdType(type)) {
-            return isDefined(argValue)
-              ? fromGlobalId(argValue as string, getPrefixName(argConfig)).id
-              : argValue;
-          } else if (isMaybeListOfMaybeGlobalIdType(type)) {
-            return isDefined(argValue)
-              ? fromGlobalIds(
-                  argValue as (string | null)[],
-                  getPrefixName(argConfig)
-                ).ids
-              : argValue;
-          } else if (isMaybeListOfMaybeListOfMaybeGlobalIdType(type)) {
-            return isDefined(argValue)
-              ? (argValue as Array<(string | null)[]>).map((value) =>
-                  isDefined(value)
-                    ? fromGlobalIds(value, getPrefixName(argConfig)).ids
-                    : value
-                )
-              : argValue;
-          }
-          return argValue;
+          return mapGlobalIds(type, argValue, argConfig);
         });
         const result = await next(root, _args, ctx, info);
         return config.type === "GID"
