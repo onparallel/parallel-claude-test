@@ -158,6 +158,7 @@ export function useReactSelectProps<
           <Flex
             alignItems="center"
             paddingRight={SIZES[size].paddingX}
+            paddingLeft={SIZES[size].paddingX / 2}
             color="gray.600"
           >
             <ChevronDownIcon display="block" position="relative" top="1px" />

@@ -172,7 +172,7 @@ export function RecipientViewPetitionFieldSelect({
               })
             }
           />
-          <Center height="100%" position="absolute" right={9} top={0}>
+          <Center height="100%" position="absolute" right="42px" top={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator
               isSaving={isSaving}
             />
@@ -245,7 +245,7 @@ export const RecipientViewPetitionFieldReplySelect = forwardRef<
               })
             }
           />
-          <Center height="100%" position="absolute" right={9} top={0}>
+          <Center height="100%" position="absolute" right="42px" top={0}>
             <RecipientViewPetitionFieldReplyStatusIndicator
               reply={reply}
               isSaving={isSaving}
