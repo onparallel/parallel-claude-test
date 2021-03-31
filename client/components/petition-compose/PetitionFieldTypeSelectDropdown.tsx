@@ -56,6 +56,7 @@ export const FIELD_TYPES: PetitionFieldType[] = [
   "FILE_UPLOAD",
   "TEXT",
   "SELECT",
+  "DYNAMIC_SELECT",
   "HEADING",
 ];
 

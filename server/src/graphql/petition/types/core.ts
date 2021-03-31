@@ -248,6 +248,7 @@ export const PetitionFieldType = enumType({
     { name: "TEXT", description: "A text field." },
     { name: "HEADING", description: "A heading field." },
     { name: "SELECT", description: "A select field." },
+    { name: "DYNAMIC_SELECT", description: "A dynamic select field." },
   ],
 });
 

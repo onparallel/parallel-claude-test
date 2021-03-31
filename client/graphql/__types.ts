@@ -1157,6 +1157,8 @@ export type PetitionFieldReplyStatus =
 
 /** Type of a petition field */
 export type PetitionFieldType =
+  /** A dynamic select field. */
+  | "DYNAMIC_SELECT"
   /** A file upload field. */
   | "FILE_UPLOAD"
   /** A heading field. */

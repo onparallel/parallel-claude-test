@@ -6,6 +6,8 @@ import { Maybe } from "./types";
 
 export type FileUploadAccepts = "PDF" | "IMAGE" | "VIDEO" | "DOCUMENT";
 
+export type DynamicSelectOption = [string, Array<DynamicSelectOption | string>];
+
 export type FieldOptions = {
   HEADING: {
     hasPageBreak: boolean;
@@ -20,6 +22,10 @@ export type FieldOptions = {
   SELECT: {
     values: string[];
     placeholder: Maybe<string>;
+  };
+  DYNAMIC_SELECT: {
+    values: DynamicSelectOption[];
+    labels: string[];
   };
 };
 
@@ -47,6 +53,8 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "petition.field-type.select",
           defaultMessage: "Dropdown",
         });
+      case "DYNAMIC_SELECT":
+        return "Dynamic select";
       default:
         throw new Error(`Missing PetitionFieldType "${type}"`);
     }

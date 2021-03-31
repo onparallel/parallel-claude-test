@@ -54,7 +54,12 @@ export type PetitionEventType =
 
 export type PetitionFieldReplyStatus = "APPROVED" | "PENDING" | "REJECTED";
 
-export type PetitionFieldType = "FILE_UPLOAD" | "HEADING" | "SELECT" | "TEXT";
+export type PetitionFieldType =
+  | "DYNAMIC_SELECT"
+  | "FILE_UPLOAD"
+  | "HEADING"
+  | "SELECT"
+  | "TEXT";
 
 export type PetitionMessageStatus =
   | "CANCELLED"

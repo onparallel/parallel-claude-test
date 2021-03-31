@@ -55,6 +55,44 @@ const SCHEMAS = {
       },
     },
   },
+  DYNAMIC_SELECT: {
+    definitions: {
+      option: {
+        type: "array",
+        minItems: 2,
+        additionalItems: false,
+        items: [
+          { type: "string" },
+          {
+            type: "array",
+            items: {
+              oneOf: [{ $ref: "#/definitions/option" }, { type: "string" }],
+            },
+          },
+        ],
+      },
+      root: {
+        type: "object",
+        required: ["values", "labels"],
+        additionalProperties: false,
+        properties: {
+          values: {
+            type: "array",
+            minItems: 1,
+            items: { $ref: "#/definitions/option" },
+          },
+          labels: {
+            type: "array",
+            minItems: 1,
+            items: {
+              type: "string",
+            },
+          },
+        },
+      },
+    },
+    $ref: "#/definitions/root",
+  },
 };
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
@@ -102,6 +140,16 @@ export function defaultFieldOptions(
         options: {
           values: [],
           placeholder: null,
+        },
+      };
+    }
+    case "DYNAMIC_SELECT": {
+      return {
+        optional: false,
+        multiple: false,
+        options: {
+          values: [],
+          labels: [],
         },
       };
     }
