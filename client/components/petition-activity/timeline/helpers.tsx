@@ -11,7 +11,7 @@ export function TimelineItem({ icon, children, ...props }: TimelineItemProps) {
     <Box
       display="flex"
       position="relative"
-      alignItems="stretch"
+      alignItems="center"
       background={`${colors.transparent} linear-gradient(${colors.gray[300]}, ${colors.gray[300]}) no-repeat 17px / 2px 100%`}
       paddingY={4}
       {...props}
