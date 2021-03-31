@@ -503,7 +503,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             {
               id: "petition.petition-sent-toast.description",
               defaultMessage:
-                "Your {count, plural, =1{petition is} other{petitions are}} on it's way.",
+                "Your {count, plural, =1{petition is on its} other{petitions are on their}} way.",
             },
             { count: recipientIdGroups.length }
           ),

@@ -1066,7 +1066,7 @@
   },
   {
     "term": "component.recipient-select-groups.add-recipient-group",
-    "definition": "Agregar grupo de destinatarios",
+    "definition": "Añadir grupo de destinatarios",
     "context": "Add recipient group"
   },
   {
@@ -3137,7 +3137,7 @@
   {
     "term": "petition.petition-sent-toast.description",
     "definition": "{count, plural, =1{Tu petición está} other{Tus peticiones están}} en camino.",
-    "context": "Your {count, plural, =1{petition is} other{petitions are}} on it's way."
+    "context": "Your {count, plural, =1{petition is on its} other{petitions are on their}} way."
   },
   {
     "term": "petition.petition-sent-toast.title",

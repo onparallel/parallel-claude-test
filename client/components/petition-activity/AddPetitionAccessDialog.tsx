@@ -149,7 +149,7 @@ export function AddPetitionAccessDialog({
         <>
           <RecipientSelectGroups
             recipientGroups={recipientGroups}
-            onSetRecipientGroups={setRecipientGroups}
+            onChangeRecipientGroups={setRecipientGroups}
             onSearchContacts={onSearchContacts}
             onCreateContact={onCreateContact}
             showErrors={showErrors}

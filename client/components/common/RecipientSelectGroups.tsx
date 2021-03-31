@@ -12,8 +12,8 @@ import {
   CloseButton,
   Stack,
 } from "@chakra-ui/react";
-import { DeleteIcon, PlusCircleFilledIcon } from "@parallel/chakra/icons";
-import { useCallback, useRef, useState } from "react";
+import { DeleteIcon, PlusCircleIcon } from "@parallel/chakra/icons";
+import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   ContactSelect,
@@ -21,11 +21,12 @@ import {
   ContactSelectSelection,
 } from "./ContactSelect";
 import { HelpPopover } from "./HelpPopover";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
   recipientGroups: ContactSelectSelection[][];
-  onSetRecipientGroups: (groups: ContactSelectSelection[][]) => void;
+  onChangeRecipientGroups: (groups: ContactSelectSelection[][]) => void;
   onSearchContacts: ContactSelectProps["onSearchContacts"];
   onCreateContact: ContactSelectProps["onCreateContact"];
   maxGroups?: number;
@@ -34,59 +35,58 @@ export function RecipientSelectGroups({
   showErrors,
   recipientGroups,
   maxGroups = Number.MAX_SAFE_INTEGER,
-  onSetRecipientGroups,
+  onChangeRecipientGroups,
   onSearchContacts,
   onCreateContact,
 }: RecipientSelectGroupsProps) {
   const intl = useIntl();
-  const recipientsStackRef = useRef<HTMLDivElement>(null);
+  const lastRecipientGroupRef = useRef<HTMLDivElement>(null);
 
   const [isAlertVisible, setAlertVisible] = useState(true);
 
-  const setRecipients = useCallback(
-    (groupNumber: number) => (recipients: ContactSelectSelection[]) => {
+  function setRecipients(groupNumber: number) {
+    return (recipients: ContactSelectSelection[]) => {
       if (!recipientGroups[groupNumber]) return;
       const newGroups = Array.from(recipientGroups);
       newGroups.splice(groupNumber, 1, recipients);
-      onSetRecipientGroups(newGroups);
-    },
-    [recipientGroups]
-  );
+      onChangeRecipientGroups(newGroups);
+    };
+  }
 
-  const addRecipientGroup = useCallback(() => {
-    onSetRecipientGroups([...recipientGroups, []]);
+  function addRecipientGroup() {
+    onChangeRecipientGroups([...recipientGroups, []]);
     setTimeout(() => {
-      recipientsStackRef.current?.scrollTo({ top: 99999, behavior: "smooth" });
+      if (lastRecipientGroupRef.current) {
+        scrollIntoView(lastRecipientGroupRef.current, {
+          scrollMode: "if-needed",
+          block: "start",
+        });
+      }
     }, 0);
-  }, [recipientGroups]);
+  }
 
-  const deleteRecipientGroup = useCallback(
-    (index: number) =>
-      onSetRecipientGroups(recipientGroups.filter((_, i) => i !== index)),
-    [recipientGroups]
-  );
+  function deleteRecipientGroup(index: number) {
+    onChangeRecipientGroups(recipientGroups.filter((_, i) => i !== index));
+  }
 
-  const validRecipients = useCallback(
-    (index: number) => recipientGroups[index].filter((r) => !r.isInvalid),
-    [recipientGroups]
-  );
+  function validRecipients(index: number) {
+    return recipientGroups[index].filter((r) => !r.isInvalid);
+  }
 
-  const invalidRecipients = useCallback(
-    (index: number) => recipientGroups[index].filter((r) => r.isInvalid),
-    [recipientGroups]
-  );
+  function invalidRecipients(index: number) {
+    return recipientGroups[index].filter((r) => r.isInvalid);
+  }
 
   return (
     <>
-      <Stack
-        margin={-1}
-        padding={1}
-        overflowY="auto"
-        maxHeight="240px"
-        ref={recipientsStackRef}
-      >
+      <Stack margin={-1} padding={1} overflowY="auto" maxHeight="240px">
         {recipientGroups.map((recipients, index) => (
           <FormControl
+            ref={
+              index === recipientGroups.length - 1
+                ? lastRecipientGroupRef
+                : null
+            }
             key={index}
             id={`petition-recipients-${index}`}
             isInvalid={
@@ -181,7 +181,7 @@ export function RecipientSelectGroups({
       {recipientGroups.length < maxGroups ? (
         <Flex alignItems="center" marginTop={4}>
           <Flex as="button" alignItems="center" onClick={addRecipientGroup}>
-            <PlusCircleFilledIcon marginRight={2} fontSize="lg" />
+            <PlusCircleIcon color="purple.600" marginRight={2} fontSize="lg" />
             <FormattedMessage
               id="component.recipient-select-groups.add-recipient-group"
               defaultMessage="Add recipient group"
