@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import {
-  ConditionFullIcon,
+  ConditionIcon,
   CopyIcon,
   DeleteIcon,
   DragHandleIcon,
@@ -536,7 +536,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
     <Stack ref={ref} direction="row" padding={1} {...props}>
       {canChangeVisibility || field.isFixed ? (
         <IconButtonWithTooltip
-          icon={<ConditionFullIcon />}
+          icon={<ConditionIcon />}
           isDisabled={
             field.type === "HEADING" &&
             (field.isFixed || field.options.hasPageBreak)
@@ -580,7 +580,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
             _hover={{ backgroundColor: "transparent" }}
             _active={{ backgroundColor: "transparent" }}
             as="div"
-            icon={<ConditionFullIcon />}
+            icon={<ConditionIcon />}
             aria-label={intl.formatMessage({
               id: "component.petition-compose-field.add-condition",
               defaultMessage: "Add condition",

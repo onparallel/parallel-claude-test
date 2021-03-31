@@ -34,7 +34,6 @@ interface PetitionContentsFieldIndicatorsProps<
   T extends PetitionContents_PetitionFieldFragment
 > {
   field: T;
-  isVisible: boolean;
 }
 
 type PetitionContentsSignatureStatus = "START" | PetitionSignatureRequestStatus;
@@ -245,9 +244,7 @@ function _PetitionContentsItem<
               </Text>
             )}
           </Text>
-          {fieldIndicators
-            ? createElement(fieldIndicators, { field, isVisible })
-            : null}
+          {fieldIndicators ? createElement(fieldIndicators, { field }) : null}
         </Stack>
       </Box>
     </>

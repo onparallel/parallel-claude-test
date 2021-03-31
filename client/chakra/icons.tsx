@@ -92,8 +92,8 @@ export const GlobeIcon = createIcon({
   ),
 });
 
-export const ConditionFullIcon = createIcon({
-  displayName: "ConditionFullIcon",
+export const ConditionIcon = createIcon({
+  displayName: "ConditionIcon",
   viewBox: "0 0 24 24",
   path: (
     <g
@@ -1307,23 +1307,6 @@ export const DownForwardArrowIcon = createIcon({
       <path d="M 15,19 22,12 15,5" />
       <path d="M 2,12 H 22" />
       <path d="M 2,12 V 5" />
-    </g>
-  ),
-});
-
-export const ConditionIcon = createIcon({
-  displayName: "ConditionIcon",
-  viewBox: "0 0 16 16",
-  path: (
-    <g
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z" />
-      <path d="M4 4C4 6.08842 4 8.92727 4 10.6014C4 11.3746 4.62589 12 5.39909 12C6.49335 12 8.13795 12 10 12" />
     </g>
   ),
 });

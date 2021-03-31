@@ -3,7 +3,6 @@ import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import {
   CheckIcon,
   CommentIcon,
-  ConditionIcon,
   DownloadIcon,
   ListIcon,
   RepeatIcon,
@@ -1185,10 +1184,8 @@ function ConfirmCancelOngoingSignature(props: DialogProps<{}, void>) {
 
 function PetitionContentsIndicators({
   field,
-  isVisible,
 }: {
   field: PetitionReplies_PetitionFieldFragment;
-  isVisible: boolean;
 }) {
   const intl = useIntl();
   return (
@@ -1230,9 +1227,6 @@ function PetitionContentsIndicators({
             hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
           />
         </Stack>
-      ) : null}
-      {field.visibility ? (
-        <ConditionIcon color={isVisible ? "purple.500" : "gray.500"} />
       ) : null}
     </>
   );
