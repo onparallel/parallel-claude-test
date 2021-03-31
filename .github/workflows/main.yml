@@ -38,7 +38,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-cache-
       - name: Check translations
-        if: steps.yarn-cache.outputs.cache-hit == 'true'
         run: |
           echo "Checking server translations..."
           yarn --cwd server/ extract-i18n-terms
@@ -62,7 +61,6 @@ jobs:
             ${{ runner.os }}-yarn-cache-
 
       - name: Run linter
-        if: steps.yarn-cache.outputs.cache-hit == 'true'
         run: yarn lint
 
   server-test-suite:
@@ -82,5 +80,4 @@ jobs:
             ${{ runner.os }}-yarn-cache-
 
       - name: Run server test suite
-        if: steps.yarn-cache.outputs.cache-hit == 'true'
         run: yarn --cwd server/ test
