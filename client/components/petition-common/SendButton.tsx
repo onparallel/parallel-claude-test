@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonGroup,
   IconButton,
   Menu,
   MenuButton,
@@ -13,58 +14,60 @@ import {
   PaperPlaneIcon,
   TimeIcon,
 } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import { MouseEvent } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { SplitButton, SplitButtonProps } from "../common/SplitButton";
+import { Divider } from "../common/Divider";
 
-export function SendButton({
-  onSendClick,
-  onScheduleClick,
-  ...props
-}: Omit<SplitButtonProps, "children"> & {
+export interface SendButtonProps {
   onSendClick: (event: MouseEvent) => void;
   onScheduleClick: (event: MouseEvent) => void;
-}) {
-  const intl = useIntl();
-  return (
-    <SplitButton dividerColor="purple.600" {...props}>
-      <Button
-        colorScheme="purple"
-        leftIcon={<PaperPlaneIcon fontSize="18px" />}
-        onClick={onSendClick}
-      >
-        <FormattedMessage id="generic.send" defaultMessage="Send" />
-      </Button>
-      <Menu placement="bottom-end">
-        <Tooltip
-          label={intl.formatMessage({
-            id: "generic.more-options",
-            defaultMessage: "More options...",
-          })}
+}
+
+export const SendButton = chakraForwardRef<"div", SendButtonProps>(
+  function SendButton({ onSendClick, onScheduleClick, ...props }, ref) {
+    const intl = useIntl();
+    return (
+      <ButtonGroup ref={ref} isAttached {...props}>
+        <Button
+          colorScheme="purple"
+          leftIcon={<PaperPlaneIcon fontSize="18px" />}
+          onClick={onSendClick}
         >
-          <MenuButton
-            as={IconButton}
-            colorScheme="purple"
-            icon={<ChevronDownIcon />}
-            aria-label={intl.formatMessage({
+          <FormattedMessage id="generic.send" defaultMessage="Send" />
+        </Button>
+        <Divider isVertical color="purple.600" />
+        <Menu placement="bottom-end">
+          <Tooltip
+            label={intl.formatMessage({
               id: "generic.more-options",
               defaultMessage: "More options...",
             })}
-            minWidth={8}
-          />
-        </Tooltip>
-        <Portal>
-          <MenuList minWidth={0}>
-            <MenuItem onClick={onScheduleClick as any}>
-              <TimeIcon marginRight={2} />
-              <FormattedMessage
-                id="component.send-button.schedule"
-                defaultMessage="Schedule send"
-              />
-            </MenuItem>
-          </MenuList>
-        </Portal>
-      </Menu>
-    </SplitButton>
-  );
-}
+          >
+            <MenuButton
+              as={IconButton}
+              colorScheme="purple"
+              icon={<ChevronDownIcon />}
+              aria-label={intl.formatMessage({
+                id: "generic.more-options",
+                defaultMessage: "More options...",
+              })}
+              minWidth={8}
+            />
+          </Tooltip>
+          <Portal>
+            <MenuList minWidth={0}>
+              <MenuItem onClick={onScheduleClick as any}>
+                <TimeIcon marginRight={2} />
+                <FormattedMessage
+                  id="component.send-button.schedule"
+                  defaultMessage="Schedule send"
+                />
+              </MenuItem>
+            </MenuList>
+          </Portal>
+        </Menu>
+      </ButtonGroup>
+    );
+  }
+);

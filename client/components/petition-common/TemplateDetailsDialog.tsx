@@ -2,6 +2,7 @@ import { gql, useApolloClient } from "@apollo/client";
 import {
   Box,
   Button,
+  ButtonGroup,
   Heading,
   IconButton,
   Menu,
@@ -39,11 +40,11 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { zip } from "remeda";
 import { BaseDialog } from "../common/BaseDialog";
 import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
-import { SplitButton } from "../common/SplitButton";
-import { zip } from "remeda";
+import { Divider } from "../common/Divider";
 
 export function useTemplateDetailsDialog() {
   const apollo = useApolloClient();
@@ -173,7 +174,7 @@ export function TemplateDetailsDialog({
             spacing={4}
             flexDirection={{ base: "column", md: "row-reverse" }}
           >
-            <SplitButton dividerColor="purple.600" alignSelf="center">
+            <ButtonGroup isAttached>
               <Button
                 justifyContent="left"
                 colorScheme="purple"
@@ -185,6 +186,7 @@ export function TemplateDetailsDialog({
                   defaultMessage="Use template"
                 />
               </Button>
+              <Divider isVertical color="purple.600" />
               <Menu placement="bottom-end">
                 <Tooltip
                   label={intl.formatMessage({
@@ -228,7 +230,7 @@ export function TemplateDetailsDialog({
                   </MenuList>
                 </Portal>
               </Menu>
-            </SplitButton>
+            </ButtonGroup>
             <Heading flex="1" size="md">
               <FormattedMessage
                 id="template-details.about"
