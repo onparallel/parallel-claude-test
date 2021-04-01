@@ -13,7 +13,7 @@ function Home() {
     <PublicLayout
       title={intl.formatMessage({
         id: "public.home.title",
-        defaultMessage: "Collect information efficiently",
+        defaultMessage: "Automate your workflows with clients",
       })}
     >
       <PublicMainHero />

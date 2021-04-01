@@ -38,7 +38,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
           >
             <FormattedMessage
               id="public.home.hero-title"
-              defaultMessage="Accelerate your team's work"
+              defaultMessage="Automate your workflows with clients"
             />
           </Heading>
           <Heading as="h2" size="md" fontWeight="light">
