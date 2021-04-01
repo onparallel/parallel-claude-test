@@ -1,6 +1,8 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  Button,
+  Center,
   FormControl,
   FormControlProps,
   FormLabel,
@@ -10,6 +12,7 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
+import { DownloadIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
@@ -17,11 +20,20 @@ import {
   PetitionFieldType,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { FieldOptions } from "@parallel/utils/petitionFields";
+import { importFromExcel } from "@parallel/utils/data-import/importFromExcel";
+import { useDynamicSelectValues } from "@parallel/utils/data-import/useDynamicSelectValues";
+import {
+  DynamicSelectOption,
+  FieldOptions,
+} from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, ReactNode, useState } from "react";
+import { ChangeEvent, ReactNode, useEffect, useState } from "react";
+import { FileRejection, useDropzone } from "react-dropzone";
 import { FormattedMessage } from "react-intl";
+import { useErrorDialog } from "../common/ErrorDialog";
+import { FileSize } from "../common/FileSize";
 import { HelpPopover } from "../common/HelpPopover";
+import { Link } from "../common/Link";
 import { SmallPopover } from "../common/SmallPopover";
 import { PetitionFieldTypeSelect } from "./PetitionFieldTypeSelectDropdown";
 
@@ -112,6 +124,8 @@ export function PetitionComposeFieldSettings({
           <TextSettings field={field} onFieldEdit={onFieldEdit} />
         ) : field.type === "SELECT" ? (
           <SelectOptionSettings field={field} onFieldEdit={onFieldEdit} />
+        ) : field.type === "DYNAMIC_SELECT" ? (
+          <DynamicSelectSettings field={field} onFieldEdit={onFieldEdit} />
         ) : null}
       </Stack>
     </Card>
@@ -188,7 +202,7 @@ function FileUploadSettings({
 
 function TextSettings({
   field,
-  onFieldEdit: onFieldEdit,
+  onFieldEdit,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
   const options = field.options as FieldOptions["TEXT"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
@@ -248,7 +262,7 @@ function TextSettings({
 
 function SelectOptionSettings({
   field,
-  onFieldEdit: onFieldEdit,
+  onFieldEdit,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
   const options = field.options as FieldOptions["SELECT"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
@@ -273,6 +287,165 @@ function SelectOptionSettings({
         onChange={handlePlaceholderChange}
       />
     </Stack>
+  );
+}
+
+function DynamicSelectSettings({
+  field,
+  onFieldEdit,
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
+  const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
+
+  function handleOptionsChange(options: FieldOptions["DYNAMIC_SELECT"]) {
+    onFieldEdit(field.id, { options });
+  }
+
+  function removeOptions() {
+    onFieldEdit(field.id, { options: { labels: [], values: [] } });
+  }
+
+  return (
+    <Stack spacing={4}>
+      <SettingsRow
+        flexDirection="column"
+        alignItems="start"
+        label={
+          <Text as="strong">
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.label"
+              defaultMessage="Import options from Excel"
+            />
+          </Text>
+        }
+        description={
+          <FormattedMessage
+            id="field-settings.dynamic-select.import-from-excel.description"
+            defaultMessage="Import listings to create related dropdowns. You can use the loading model as a guide."
+          />
+        }
+        controlId="dynamic-select-options"
+      >
+        <Stack width="100%">
+          {fieldOptions.labels.length > 0 ? (
+            <>
+              {fieldOptions.labels}
+              <Button onClick={removeOptions}>DELETE</Button>
+            </>
+          ) : (
+            <DynamicSelectOptionsDropzone
+              onOptionsChange={handleOptionsChange}
+            />
+          )}
+
+          <Text>
+            <FormattedMessage id="generic.download" defaultMessage="Download" />
+            &nbsp;
+            <Link href="">
+              <Text as="strong">
+                <FormattedMessage
+                  id="field-settings.dynamic-select.import-from-excel.download-model"
+                  defaultMessage="option loading model"
+                />
+                <DownloadIcon marginLeft={2} />
+              </Text>
+            </Link>
+          </Text>
+        </Stack>
+      </SettingsRow>
+    </Stack>
+  );
+}
+
+function DynamicSelectOptionsDropzone({
+  onOptionsChange,
+}: {
+  onOptionsChange: (options: FieldOptions["DYNAMIC_SELECT"]) => void;
+}) {
+  const MAX_FILESIZE = 1024 * 1024 * 10;
+
+  const [fileDropError, setFileDropError] = useState<string | null>(null);
+  const { labels, values, parseValues } = useDynamicSelectValues();
+
+  useEffect(() => {
+    if (labels && values) {
+      onOptionsChange({ labels, values });
+    }
+  }, [labels, values]);
+
+  const showErrorDialog = useErrorDialog();
+  async function handleFileDrop(accepted: File[], rejected: FileRejection[]) {
+    if (rejected.length > 0) {
+      setFileDropError(rejected[0].errors[0].code);
+    } else {
+      try {
+        parseValues(await importFromExcel(accepted[0]));
+      } catch (e) {
+        await showErrorDialog({
+          header: (
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.error-dialog-header"
+              defaultMessage="Import error"
+            />
+          ),
+          message: (
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.error-dialog-body"
+              defaultMessage="Please, review your file and make sure there are no empty cells between the listings."
+            />
+          ),
+        });
+      }
+    }
+  }
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    maxSize: MAX_FILESIZE,
+    multiple: false,
+    onDrop: handleFileDrop,
+  });
+
+  return (
+    <>
+      <Text fontSize="14px" color="gray.600" marginTop={1}>
+        <FormattedMessage
+          id="field-settings.dynamic-select.import-from-excel.attach-xlsx"
+          defaultMessage="Attach an .xlsx file like the one in the model."
+        />
+      </Text>
+      <Center
+        height="100px"
+        borderWidth={2}
+        borderStyle="dashed"
+        borderColor="gray.300"
+        borderRadius="md"
+        padding={4}
+        {...getRootProps()}
+      >
+        <input {...getInputProps()} />
+        <Text pointerEvents="none" fontSize="14px" color="gray.500">
+          <FormattedMessage
+            id="generic.dropzone-single.default"
+            defaultMessage="Drag the file here, or click to select it"
+          />
+        </Text>
+      </Center>
+      {fileDropError ? (
+        <Text color="red.500" fontSize="14px">
+          {fileDropError === "file-too-large" ? (
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.error-file-too-large"
+              defaultMessage="The file is too large. Maximum size allowed {size}"
+              values={{ size: <FileSize value={MAX_FILESIZE} /> }}
+            />
+          ) : fileDropError === "file-invalid-type" ? (
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.error-file-invalid-type"
+              defaultMessage="File type not allowed. Please, attach an .xlsx file"
+            />
+          ) : null}
+        </Text>
+      ) : null}
+    </>
   );
 }
 

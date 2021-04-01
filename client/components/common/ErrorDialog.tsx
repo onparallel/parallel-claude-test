@@ -9,10 +9,12 @@ import { FormattedMessage } from "react-intl";
 
 export type ErrorDialogProps = {
   message: ReactNode;
+  header?: ReactNode;
 };
 
 export function ErrorDialog({
   message,
+  header,
   ...props
 }: DialogProps<ErrorDialogProps>) {
   const focusRef = useRef(null);
@@ -22,10 +24,12 @@ export function ErrorDialog({
       closeOnEsc={true}
       closeOnOverlayClick={true}
       header={
-        <FormattedMessage
-          id="component.error-dialog.header"
-          defaultMessage="Error"
-        />
+        header ?? (
+          <FormattedMessage
+            id="component.error-dialog.header"
+            defaultMessage="Error"
+          />
+        )
       }
       body={message}
       confirm={

@@ -78,12 +78,10 @@ const SCHEMAS = {
         properties: {
           values: {
             type: "array",
-            minItems: 1,
             items: { $ref: "#/definitions/option" },
           },
           labels: {
             type: "array",
-            minItems: 1,
             items: {
               type: "string",
             },
