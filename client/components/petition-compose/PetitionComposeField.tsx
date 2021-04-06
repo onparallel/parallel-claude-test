@@ -494,45 +494,50 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           />
         </Box>
       ) : field.type === "DYNAMIC_SELECT" ? (
-        <Box marginTop={1}>
-          <Text as="h6" fontSize="sm">
-            <FormattedMessage
-              id="component.petition-compose-field.dynamic-select-labels-header"
-              defaultMessage="Uploaded lists"
-            />
-          </Text>
+        <Box marginTop={1} paddingLeft={2}>
           {field.options.labels?.length ? (
-            <List as={Stack} spacing={1} marginTop={1}>
-              {((field.options.labels ?? []) as string[]).map(
-                (label, index) => (
-                  <ListItem
-                    key={index}
-                    as={Stack}
-                    direction="row"
-                    alignItems="center"
-                  >
-                    <Center
-                      height="20px"
-                      width="26px"
-                      fontSize="xs"
-                      borderRadius="sm"
-                      border="1px solid"
-                      borderColor={color}
+            <>
+              <Text as="h6" fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-compose-field.dynamic-select-labels-header"
+                  defaultMessage="Uploaded lists:"
+                />
+              </Text>
+              <List as={Stack} spacing={1} marginTop={1}>
+                {((field.options.labels ?? []) as string[]).map(
+                  (label, index) => (
+                    <ListItem
+                      key={index}
+                      as={Stack}
+                      direction="row"
+                      alignItems="center"
                     >
-                      {fieldIndex}
-                      {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(index)}
-                    </Center>
-                    <Text as="span">{label}</Text>
-                  </ListItem>
-                )
-              )}
-            </List>
+                      <Center
+                        height="20px"
+                        width="26px"
+                        fontSize="xs"
+                        borderRadius="sm"
+                        border="1px solid"
+                        borderColor={color}
+                      >
+                        {fieldIndex}
+                        {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(index)}
+                      </Center>
+                      <Text as="span">{label}</Text>
+                    </ListItem>
+                  )
+                )}
+              </List>
+            </>
           ) : (
-            <Text textStyle="hint" fontSize="sm">
+            <Text color="gray.600" fontSize="sm">
               <FormattedMessage
                 id="component.petition-compose-field.dynamic-select-not-configured"
-                defaultMessage="This field has not been configured yet."
+                defaultMessage="Click on field settings to configure this field"
               />
+              <Text as="span" marginLeft={1} position="relative" top="-1px">
+                (<SettingsIcon />)
+              </Text>
             </Text>
           )}
         </Box>

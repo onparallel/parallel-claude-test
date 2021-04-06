@@ -510,6 +510,16 @@
     "context": "Drag to sort this petition fields"
   },
   {
+    "term": "component.petition-compose-field.dynamic-select-labels-header",
+    "definition": "Uploaded lists:",
+    "context": "Uploaded lists:"
+  },
+  {
+    "term": "component.petition-compose-field.dynamic-select-not-configured",
+    "definition": "Click on field settings to configure this field",
+    "context": "Click on field settings to configure this field"
+  },
+  {
     "term": "component.petition-compose-field.field-clone",
     "definition": "Clone field",
     "context": "Clone field"
