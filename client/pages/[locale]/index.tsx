@@ -4,8 +4,10 @@ import { PublicHeroPopularUseCases } from "@parallel/components/public/PublicHer
 import { PublicHowItWorksHero } from "@parallel/components/public/PublicHowItWorksHero";
 import { PublicMainHero } from "@parallel/components/public/PublicMainHero";
 import { PublicTrust } from "@parallel/components/public/PublicTrust";
+import { PublicDataProtection } from "@parallel/components/public/PublicDataProtection";
 import languages from "@parallel/lang/languages.json";
 import { FormattedMessage, useIntl } from "react-intl";
+import { PublicFigures } from "@parallel/components/public/PublicFigures";
 
 function Home() {
   const intl = useIntl();
@@ -18,7 +20,9 @@ function Home() {
     >
       <PublicMainHero />
       <PublicHeroPopularUseCases />
+      <PublicFigures />
       <PublicHowItWorksHero />
+      <PublicDataProtection />
       <PublicTrust />
       <PublicDemoCta>
         <FormattedMessage

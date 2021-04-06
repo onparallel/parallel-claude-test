@@ -3510,6 +3510,46 @@
     "context": "Cookie policy"
   },
   {
+    "term": "public.data-protection.description",
+    "definition": "Parallel sigue las <b>prácticas de la ISO/IEC 27001</b> en materia de Seguridad de la Gestión de la Información y los principios de privacidad y seguridad desde el diseño.",
+    "context": "Parallel follows <b>ISO/IEC 27001 practices</b> on Information Security Management System and the principles of privacy and security by design."
+  },
+  {
+    "term": "public.data-protection.security-link",
+    "definition": "Más información",
+    "context": "More information"
+  },
+  {
+    "term": "public.data-protection.title",
+    "definition": "Protegemos los datos de tus clientes",
+    "context": "We protect your clients' data"
+  },
+  {
+    "term": "public.figures.close-projects",
+    "definition": "aceleración del cierre de proyectos",
+    "context": "acceleration of project completion"
+  },
+  {
+    "term": "public.figures.reduce-emails",
+    "definition": "reducción de las comunicaciones innecesarias",
+    "context": "reduction of unnecessary communications"
+  },
+  {
+    "term": "public.figures.three-times",
+    "definition": "x3,7",
+    "context": "x3.7"
+  },
+  {
+    "term": "public.figures.time-saving",
+    "definition": "ahorro en tiempo de trabajo",
+    "context": "saving in working time"
+  },
+  {
+    "term": "public.figures.title",
+    "definition": "Las cifras nos avalan",
+    "context": "Figures that support us"
+  },
+  {
     "term": "public.footer.company",
     "definition": "Compañía",
     "context": "Company"
