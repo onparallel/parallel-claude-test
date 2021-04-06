@@ -1,10 +1,13 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  Center,
   FormControl,
   FormLabel,
   IconButton,
   Input,
+  List,
+  ListItem,
   Stack,
   Switch,
   Text,
@@ -27,6 +30,7 @@ import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { memo, useCallback, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
@@ -210,6 +214,7 @@ const _PetitionComposeField = chakraForwardRef<
           paddingBottom={10}
           paddingRight={4}
           field={field}
+          fieldIndex={fieldIndex}
           fields={fields}
           showError={showError}
           onFieldEdit={onFieldEdit}
@@ -237,6 +242,7 @@ const _PetitionComposeField = chakraForwardRef<
 type PetitionComposeFieldInnerProps = Pick<
   PetitionComposeFieldProps,
   | "field"
+  | "fieldIndex"
   | "fields"
   | "showError"
   | "onFieldEdit"
@@ -254,6 +260,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
 >(function PetitionComposeFieldInner(
   {
     field,
+    fieldIndex,
     fields,
     showError,
     onFieldEdit,
@@ -274,6 +281,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       input.setSelectionRange(0, 0);
     }
   }, []);
+  const color = usePetitionFieldTypeColor(field.type);
 
   const [description, setDescription] = useState(field.description);
   const descriptionRef = useRef<HTMLTextAreaElement>(null);
@@ -484,6 +492,49 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             onFocusNextField={onFocusNextField}
             onFocusDescription={focusDescription}
           />
+        </Box>
+      ) : field.type === "DYNAMIC_SELECT" ? (
+        <Box marginTop={1}>
+          <Text as="h6" fontSize="sm">
+            <FormattedMessage
+              id="component.petition-compose-field.dynamic-select-labels-header"
+              defaultMessage="Uploaded lists"
+            />
+          </Text>
+          {field.options.labels?.length ? (
+            <List as={Stack} spacing={1} marginTop={1}>
+              {((field.options.labels ?? []) as string[]).map(
+                (label, index) => (
+                  <ListItem
+                    key={index}
+                    as={Stack}
+                    direction="row"
+                    alignItems="center"
+                  >
+                    <Center
+                      height="20px"
+                      width="26px"
+                      fontSize="xs"
+                      borderRadius="sm"
+                      border="1px solid"
+                      borderColor={color}
+                    >
+                      {fieldIndex}
+                      {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(index)}
+                    </Center>
+                    <Text as="span">{label}</Text>
+                  </ListItem>
+                )
+              )}
+            </List>
+          ) : (
+            <Text textStyle="hint" fontSize="sm">
+              <FormattedMessage
+                id="component.petition-compose-field.dynamic-select-not-configured"
+                defaultMessage="This field has not been configured yet."
+              />
+            </Text>
+          )}
         </Box>
       ) : null}
       {field.visibility ? (

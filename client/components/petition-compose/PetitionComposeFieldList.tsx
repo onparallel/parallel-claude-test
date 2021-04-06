@@ -276,7 +276,7 @@ export const PetitionComposeFieldList = Object.assign(
                     : ref.type === "TEXT"
                     ? null
                     : ref.type === "SELECT"
-                    ? ref.fieldOptions.values[0] ?? null
+                    ? ref.options.values[0] ?? null
                     : null,
               };
               onFieldEdit(fieldId, {
