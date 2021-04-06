@@ -16,6 +16,7 @@ export interface PetitionFieldVisibilityCondition {
     When used to evaluate a field visibility, the field will be a number (coming from the database)
   */
   fieldId: number | string;
+  column?: number;
   modifier: "ANY" | "ALL" | "NONE" | "NUMBER_OF_REPLIES";
   operator:
     | "EQUAL"
@@ -28,7 +29,7 @@ export interface PetitionFieldVisibilityCondition {
     | "LESS_THAN_OR_EQUAL"
     | "GREATER_THAN"
     | "GREATER_THAN_OR_EQUAL";
-  value: string | number;
+  value: string | number | null;
 }
 
 type VisibilityField = {
@@ -77,25 +78,23 @@ function conditionIsMet(
   isVisible: boolean
 ) {
   const replies = isVisible ? (field.replies as any[]) : [];
-  switch (condition.modifier) {
+  const { operator, value, modifier } = condition;
+  function evaluator(reply: any) {
+    const _value =
+      condition.column !== undefined
+        ? reply.content.text[condition.column]
+        : reply.content.text;
+    return evaluatePredicate(_value, operator, value);
+  }
+  switch (modifier) {
     case "ANY":
-      return replies.some((r) =>
-        evaluatePredicate(r.content.text, condition.operator, condition.value)
-      );
+      return replies.some(evaluator);
     case "ALL":
-      return replies.every((r) =>
-        evaluatePredicate(r.content.text, condition.operator, condition.value)
-      );
+      return replies.every(evaluator);
     case "NONE":
-      return !replies.some((r) =>
-        evaluatePredicate(r.content.text, condition.operator, condition.value)
-      );
+      return !replies.some(evaluator);
     case "NUMBER_OF_REPLIES":
-      return evaluatePredicate(
-        replies.length,
-        condition.operator,
-        condition.value
-      );
+      return evaluatePredicate(replies.length, operator, value);
     default:
       return false;
   }

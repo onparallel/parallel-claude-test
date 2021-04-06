@@ -2017,7 +2017,7 @@ export type OnboardingTour_UserFragment = { __typename?: "User" } & Pick<
 
 export type PetitionFieldSelect_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "title">;
+} & Pick<PetitionField, "id" | "type" | "title" | "options">;
 
 export type PetitionSignatureCellContent_PetitionFragment = {
   __typename?: "Petition";
@@ -3146,9 +3146,8 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
 
 export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "multiple" | "isReadOnly"> & {
-    fieldOptions: PetitionField["options"];
-  } & PetitionFieldSelect_PetitionFieldFragment;
+} & Pick<PetitionField, "id" | "type" | "multiple" | "options" | "isReadOnly"> &
+  PetitionFieldSelect_PetitionFieldFragment;
 
 export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   __typename?: "PetitionTemplate";
@@ -5389,6 +5388,7 @@ export const PetitionFieldSelect_PetitionFieldFragmentDoc = gql`
     id
     type
     title
+    options
   }
 `;
 export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
@@ -5396,7 +5396,7 @@ export const PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc = gql`
     id
     type
     multiple
-    fieldOptions: options
+    options
     isReadOnly
     ...PetitionFieldSelect_PetitionField
   }

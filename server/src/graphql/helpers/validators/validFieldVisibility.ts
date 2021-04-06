@@ -43,6 +43,7 @@ const schema = {
             ],
           },
           value: { type: ["string", "integer", "null"] },
+          column: { type: "number" },
         },
       },
     },

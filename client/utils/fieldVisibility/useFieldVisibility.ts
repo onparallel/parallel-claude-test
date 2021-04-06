@@ -60,25 +60,23 @@ function conditionIsMet(
   isVisible: boolean
 ) {
   const replies = isVisible ? (field.replies as any[]) : [];
-  switch (condition.modifier) {
+  const { operator, value, modifier } = condition;
+  function evaluator(reply: any) {
+    const _value =
+      condition.column !== undefined
+        ? reply.content.text[condition.column]
+        : reply.content.text;
+    return evaluatePredicate(_value, operator, value);
+  }
+  switch (modifier) {
     case "ANY":
-      return replies.some((r) =>
-        evaluatePredicate(r.content.text, condition.operator, condition.value)
-      );
+      return replies.some(evaluator);
     case "ALL":
-      return replies.every((r) =>
-        evaluatePredicate(r.content.text, condition.operator, condition.value)
-      );
+      return replies.every(evaluator);
     case "NONE":
-      return !replies.some((r) =>
-        evaluatePredicate(r.content.text, condition.operator, condition.value)
-      );
+      return !replies.some(evaluator);
     case "NUMBER_OF_REPLIES":
-      return evaluatePredicate(
-        replies.length,
-        condition.operator,
-        condition.value
-      );
+      return evaluatePredicate(replies.length, operator, value);
     default:
       return false;
   }

@@ -18,15 +18,6 @@ import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSe
 import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import {
-  useInlineReactSelectProps,
-  useReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
-import { CustomSelectProps } from "@parallel/utils/react-select/types";
-import { Fragment, SetStateAction, useMemo, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select";
-import { pick, zip } from "remeda";
-import {
   PetitionFieldVisibility,
   PetitionFieldVisibilityCondition,
   PetitionFieldVisibilityConditionModifier,
@@ -34,11 +25,21 @@ import {
   PetitionFieldVisibilityOperator,
   PetitionFieldVisibilityType,
 } from "@parallel/utils/fieldVisibility/types";
-
-interface ValueProps<T> {
-  value: T | null;
-  onChange: (value: T) => void;
-}
+import {
+  DynamicSelectOption,
+  FieldOptions,
+} from "@parallel/utils/petitionFields";
+import {
+  useInlineReactSelectProps,
+  useReactSelectProps,
+} from "@parallel/utils/react-select/hooks";
+import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
+import { CustomSelectProps } from "@parallel/utils/react-select/types";
+import { ValueProps } from "@parallel/utils/ValueProps";
+import { Fragment, SetStateAction, useMemo, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+import Select from "react-select";
+import { pick, zip } from "remeda";
 
 export interface PetitionFieldVisibilityProps {
   fieldId: string;
@@ -62,7 +63,6 @@ export function PetitionFieldVisibilityEditor({
     const pairs = zip(fields, indices)
       .slice(0, index)
       .filter(([f]) => !f.isReadOnly)
-      // make sure to not include "options" or react-select breaks thinking you want groups
       .map(
         ([field, index]) =>
           [
@@ -72,7 +72,7 @@ export function PetitionFieldVisibilityEditor({
               "title",
               "multiple",
               "isReadOnly",
-              "fieldOptions",
+              "options",
             ]),
             index,
           ] as const
@@ -118,10 +118,10 @@ export function PetitionFieldVisibilityEditor({
   }
   const updateCondition = function (
     index: number,
-    data: Partial<PetitionFieldVisibilityCondition>
+    condition: PetitionFieldVisibilityCondition
   ) {
     setConditions((conditions) =>
-      conditions.map((c, i) => (i === index ? { ...c, ...data } : c))
+      conditions.map((c, i) => (i === index ? condition : c))
     );
   };
   const removeCondition = function (index: number) {
@@ -133,7 +133,7 @@ export function PetitionFieldVisibilityEditor({
       const field = fields.find((f) => f.id === last.fieldId)!;
       if (field.type === "SELECT") {
         // if the previous condition is of type SELECT try to get the next value
-        const values = field.fieldOptions.values as string[];
+        const values = field.options.values as string[];
         const index = Math.min(
           values.indexOf(last.value as string) + 1,
           values.length - 1
@@ -215,43 +215,48 @@ export function PetitionFieldVisibilityEditor({
               </Box>
               <PetitionFieldSelect
                 size="sm"
-                value={conditionField}
+                value={
+                  condition.column !== undefined &&
+                  conditionField.type === "DYNAMIC_SELECT"
+                    ? [conditionField, condition.column]
+                    : conditionField
+                }
+                expandFields
                 fields={_fields}
                 indices={_indices}
-                onChange={(field) => {
-                  if (
-                    field.type === conditionField.type &&
-                    field.multiple === conditionField.multiple
-                  ) {
-                    updateCondition(index, {
-                      ...condition,
-                      fieldId: field.id,
-                      value:
-                        field.type === "SELECT"
-                          ? field.fieldOptions.values?.includes(condition.value)
-                            ? condition.value
-                            : field.fieldOptions.values[0] ?? null
-                          : null,
-                    });
-                  } else {
-                    // default condition based on field
-                    updateCondition(index, {
-                      fieldId: field.id,
-                      modifier:
-                        field.type === "FILE_UPLOAD"
-                          ? "NUMBER_OF_REPLIES"
-                          : "ANY",
-                      operator: "EQUAL",
-                      value:
-                        field.type === "FILE_UPLOAD"
-                          ? 0
-                          : field.type === "TEXT"
-                          ? null
-                          : field.type === "SELECT"
-                          ? field.fieldOptions.values[0] ?? null
-                          : null,
-                    });
-                  }
+                onChange={(value) => {
+                  const [field, column] = Array.isArray(value)
+                    ? value
+                    : [value];
+                  // default condition based on field
+                  const hasReplies =
+                    field.type === "FILE_UPLOAD" ||
+                    (field.type === "DYNAMIC_SELECT" && column === undefined);
+                  const hasOptions =
+                    field.type === "SELECT" ||
+                    (field.type === "DYNAMIC_SELECT" && column !== undefined);
+                  const options = hasOptions
+                    ? field.type === "SELECT"
+                      ? (field.options as FieldOptions["SELECT"]).values
+                      : getDynamicSelectValues(
+                          (field.options as FieldOptions["DYNAMIC_SELECT"])
+                            .values,
+                          column!
+                        )
+                    : [];
+                  updateCondition(index, {
+                    fieldId: field.id,
+                    modifier: hasReplies ? "NUMBER_OF_REPLIES" : "ANY",
+                    operator: hasReplies ? "GREATER_THAN" : "EQUAL",
+                    value: hasReplies
+                      ? 0
+                      : hasOptions
+                      ? options.includes(condition.value as string)
+                        ? condition.value
+                        : options[0] ?? null
+                      : null,
+                    column,
+                  });
                 }}
               />
               {conditionField ? (
@@ -266,6 +271,7 @@ export function PetitionFieldVisibilityEditor({
                         const changedModifierType =
                           (next as any) + (prev as any) === 1;
                         updateCondition(index, {
+                          fieldId: condition.fieldId,
                           modifier,
                           operator: changedModifierType
                             ? "EQUAL"
@@ -319,7 +325,7 @@ PetitionFieldVisibilityEditor.fragments = {
       id
       type
       multiple
-      fieldOptions: options
+      options
       isReadOnly
       ...PetitionFieldSelect_PetitionField
     }
@@ -398,7 +404,7 @@ function ConditionMultipleFieldModifier({
 }
 
 interface ConditionPredicateProps
-  extends ValueProps<PetitionFieldVisibilityCondition> {
+  extends ValueProps<PetitionFieldVisibilityCondition, false> {
   field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
   showError: boolean;
 }
@@ -428,7 +434,10 @@ function ConditionPredicate({
         { label: "≤", value: "LESS_THAN_OR_EQUAL" },
         { label: "≥", value: "GREATER_THAN_OR_EQUAL" }
       );
-    } else if (field.type === "SELECT") {
+    } else if (
+      field.type === "SELECT" ||
+      (field.type === "DYNAMIC_SELECT" && condition.column !== undefined)
+    ) {
       options.push(
         {
           label: intl.formatMessage(
@@ -550,15 +559,13 @@ function ConditionPredicate({
     let operator:
       | PetitionFieldVisibilityConditionOperator
       | "HAVE_REPLY"
-      | "NOT_HAVE_REPLY" = condition!.operator;
-    if (!field.multiple && condition!.modifier === "NUMBER_OF_REPLIES") {
+      | "NOT_HAVE_REPLY" = condition.operator;
+    if (!field.multiple && condition.modifier === "NUMBER_OF_REPLIES") {
       operator =
-        condition!.operator === "GREATER_THAN"
-          ? "HAVE_REPLY"
-          : "NOT_HAVE_REPLY";
+        condition.operator === "GREATER_THAN" ? "HAVE_REPLY" : "NOT_HAVE_REPLY";
     }
     return options.find((o) => o.value === operator);
-  }, [options, condition!.operator, condition!.modifier, field.multiple]);
+  }, [options, condition.operator, condition.modifier, field.multiple]);
   const iprops = useInlineReactSelectProps<any, false, never>({ size: "sm" });
   const props = useReactSelectProps<any, false, never>({ size: "sm" });
   function handleChange({
@@ -571,35 +578,33 @@ function ConditionPredicate({
   }) {
     if (value === "HAVE_REPLY") {
       onChange({
-        ...condition!,
+        ...condition,
         modifier: "NUMBER_OF_REPLIES",
         operator: "GREATER_THAN",
         value: 0,
       });
     } else if (value === "NOT_HAVE_REPLY") {
       onChange({
-        ...condition!,
+        ...condition,
         modifier: "NUMBER_OF_REPLIES",
         operator: "EQUAL",
         value: 0,
       });
     } else {
       if (field.multiple) {
-        onChange({ ...condition!, operator: value });
+        onChange({ ...condition, operator: value });
       } else {
         onChange({
-          ...condition!,
+          ...condition,
           modifier: "ANY",
           operator: value,
           value:
-            condition!.modifier === "NUMBER_OF_REPLIES"
-              ? null
-              : condition!.value,
+            condition.modifier === "NUMBER_OF_REPLIES" ? null : condition.value,
         });
       }
     }
   }
-  return !field.multiple && condition!.modifier === "NUMBER_OF_REPLIES" ? (
+  return !field.multiple && condition.modifier === "NUMBER_OF_REPLIES" ? (
     <Box flex="1">
       <Select
         options={options}
@@ -627,104 +632,121 @@ function ConditionPredicate({
 }
 
 interface ConditionValueProps
-  extends ValueProps<PetitionFieldVisibilityCondition> {
+  extends ValueProps<PetitionFieldVisibilityCondition, false> {
   field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
   showError: boolean;
 }
 
-function ConditionValue({
+function ConditionValue(props: ConditionValueProps) {
+  const { field, value: condition } = props;
+  return (
+    <Box flex="1" minWidth={20}>
+      {condition.modifier === "NUMBER_OF_REPLIES" ? (
+        <ConditionValueNumber {...props} />
+      ) : field.type === "SELECT" ||
+        (field.type === "DYNAMIC_SELECT" && condition.column !== undefined) ? (
+        <ConditionValueSelect {...props} />
+      ) : (
+        <ConditionValueString {...props} />
+      )}
+    </Box>
+  );
+}
+
+function ConditionValueNumber({
+  value: condition,
+  onChange,
+}: ConditionValueProps) {
+  const intl = useIntl();
+  const [value, setValue] = useState((condition.value as number) ?? 0);
+  return (
+    <NumberInput
+      size="sm"
+      min={0}
+      value={value}
+      onChange={(_, value) => setValue(value)}
+      onBlur={() => onChange({ ...condition, value })}
+      keepWithinRange
+      clampValueOnBlur
+    >
+      <NumberInputField
+        type="number"
+        textAlign="right"
+        paddingRight={8}
+        backgroundColor="white"
+        placeholder={intl.formatMessage({
+          id: "generic.enter-a-value",
+          defaultMessage: "Enter a value",
+        })}
+      />
+      <NumberInputStepper>
+        <NumberIncrementStepper />
+        <NumberDecrementStepper />
+      </NumberInputStepper>
+    </NumberInput>
+  );
+}
+
+function ConditionValueSelect({
   field,
   showError,
   value: condition,
   onChange,
 }: ConditionValueProps) {
   const intl = useIntl();
-  const [value, setValue] = useState(condition!.value);
-
-  const numberValue = typeof value === "number" ? value : 0;
-  const stringValue = typeof value === "string" ? value : null;
-
-  return (
-    <Box flex="1" minWidth={20}>
-      {condition!.modifier === "NUMBER_OF_REPLIES" ? (
-        <NumberInput
-          size="sm"
-          min={0}
-          value={numberValue}
-          onChange={(_, value) => setValue(value)}
-          onBlur={() => onChange({ ...condition!, value: numberValue })}
-          keepWithinRange
-          clampValueOnBlur
-        >
-          <NumberInputField
-            type="number"
-            textAlign="right"
-            paddingRight={8}
-            backgroundColor="white"
-            placeholder={intl.formatMessage({
-              id: "generic.enter-a-value",
-              defaultMessage: "Enter a value",
-            })}
-          />
-          <NumberInputStepper>
-            <NumberIncrementStepper />
-            <NumberDecrementStepper />
-          </NumberInputStepper>
-        </NumberInput>
-      ) : field.type === "SELECT" ? (
-        <ConditionValueSelect
-          isInvalid={showError && condition!.value === null}
-          options={field.fieldOptions.values}
-          value={condition!.value as any}
-          onChange={(value) => onChange({ ...condition!, value })}
-        />
-      ) : (
-        <Input
-          size="sm"
-          onChange={(e) => setValue(e.target.value || null)}
-          onBlur={() => onChange({ ...condition!, value: stringValue })}
-          value={stringValue ?? ""}
-          backgroundColor="white"
-          isInvalid={showError && condition!.value === null}
-          placeholder={intl.formatMessage({
-            id: "generic.enter-a-value",
-            defaultMessage: "Enter a value",
-          })}
-        />
-      )}
-    </Box>
-  );
-}
-
-interface ConditionValueSelect extends CustomSelectProps<string> {
-  options: string[];
-}
-
-function ConditionValueSelect({
-  options,
-  value,
-  onChange,
-  ...props
-}: ConditionValueSelect) {
-  const intl = useIntl();
 
   const rsProps = useReactSelectProps<any, false, never>({
     size: "sm",
-    ...props,
+    isInvalid: showError && condition.value === null,
+    components: {
+      MenuList: OptimizedMenuList,
+    },
   });
-  const _options = useMemo(() => options.map(toSelectOption), [options]);
-  const _value = toSelectOption(value);
+  const _options = useMemo(() => {
+    const values =
+      field.type === "SELECT"
+        ? (field.options as FieldOptions["SELECT"]).values
+        : getDynamicSelectValues(
+            (field.options as FieldOptions["DYNAMIC_SELECT"]).values,
+            condition.column!
+          );
+    return values.map((value) => toSelectOption(value));
+  }, [field.type, field.options.values, condition.column]);
+  const _value = toSelectOption(condition.value as string | null);
 
   return (
     <Select
       options={_options}
       value={_value}
-      onChange={(value) => onChange(value.value)}
+      onChange={(value) => onChange({ ...condition, value: value.value })}
       placeholder={intl.formatMessage({
         id: "generic.select-an-option",
         defaultMessage: "Select an option",
       })}
       {...rsProps}
+    />
+  );
+}
+
+function ConditionValueString({
+  showError,
+  value: condition,
+  onChange,
+}: ConditionValueProps) {
+  const intl = useIntl();
+  const [value, setValue] = useState(condition.value as string | null);
+  return (
+    <Input
+      size="sm"
+      onChange={(e) => setValue(e.target.value || null)}
+      onBlur={() => onChange({ ...condition!, value })}
+      value={value ?? ""}
+      backgroundColor="white"
+      isInvalid={showError && value === null}
+      placeholder={intl.formatMessage({
+        id: "generic.enter-a-value",
+        defaultMessage: "Enter a value",
+      })}
     />
   );
 }
@@ -825,4 +847,22 @@ function VisibilityTypeSelect({
       {...rsProps}
     />
   );
+}
+
+function getDynamicSelectValues(
+  values: (string | DynamicSelectOption)[],
+  level: number
+): string[] {
+  if (level === 0) {
+    return Array.isArray(values[0])
+      ? (values as DynamicSelectOption[]).map(([value]) => value)
+      : (values as string[]);
+  } else {
+    if (!Array.isArray(values[0])) {
+      throw new Error("Invalid level");
+    }
+    return (values as DynamicSelectOption[]).flatMap(([, children]) =>
+      getDynamicSelectValues(children, level - 1)
+    );
+  }
 }

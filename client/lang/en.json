@@ -575,14 +575,14 @@
     "context": "Select a field"
   },
   {
-    "term": "component.petition-field-type-select-dropdown.file-upload-description-1",
-    "definition": "Collect documents or other files in an organized way.",
-    "context": "Collect documents or other files in an organized way."
+    "term": "component.petition-field-type-select-dropdown.dynamic-select-description",
+    "definition": "Drop-down menu that dinamically adapts its options based on the reply to the previous drop-down.",
+    "context": "Drop-down menu that dinamically adapts its options based on the reply to the previous drop-down."
   },
   {
-    "term": "component.petition-field-type-select-dropdown.file-upload-description-2",
-    "definition": "Using this option will allow the recipient to upload a file very easily.",
-    "context": "Using this option will allow the recipient to upload a file very easily."
+    "term": "component.petition-field-type-select-dropdown.file-upload-description",
+    "definition": "Allow the recipient to upload documents and files very easily.",
+    "context": "Allow the recipient to upload documents and files very easily."
   },
   {
     "term": "component.petition-field-type-select-dropdown.header",
@@ -590,24 +590,14 @@
     "context": "What do you need?"
   },
   {
-    "term": "component.petition-field-type-select-dropdown.heading-description-1",
-    "definition": "Organize your petitions in sections or pages with a heading.",
-    "context": "Organize your petitions in sections or pages with a heading."
+    "term": "component.petition-field-type-select-dropdown.heading-description",
+    "definition": "Organize your petitions in sections or pages with a heading. These fields are for information purposes only.",
+    "context": "Organize your petitions in sections or pages with a heading. These fields are for information purposes only."
   },
   {
-    "term": "component.petition-field-type-select-dropdown.heading-description-2",
-    "definition": "Sections are for information purposes only and do not collect information.",
-    "context": "Sections are for information purposes only and do not collect information."
-  },
-  {
-    "term": "component.petition-field-type-select-dropdown.select-description-1",
-    "definition": "Collect text replies through a drop-down menu of options.",
-    "context": "Collect text replies through a drop-down menu of options."
-  },
-  {
-    "term": "component.petition-field-type-select-dropdown.select-description-2",
-    "definition": "Using this option will allow the recipient to select from a predefined list of possible answers.",
-    "context": "Using this option will allow the recipient to select from a predefined list of possible answers."
+    "term": "component.petition-field-type-select-dropdown.select-description",
+    "definition": "Allow the recipient to select one or more options from a predefined list of possible answers.",
+    "context": "Allow the recipient to select one or more options from a predefined list of possible answers."
   },
   {
     "term": "component.petition-field-type-select-dropdown.text-description",
@@ -2975,6 +2965,11 @@
     "context": "Field settings"
   },
   {
+    "term": "petition.field-type.dynamic-select",
+    "definition": "Dynamic select",
+    "context": "Dynamic select"
+  },
+  {
     "term": "petition.field-type.file-upload",
     "definition": "Documents and files",
     "context": "Documents and files"
@@ -2986,8 +2981,8 @@
   },
   {
     "term": "petition.field-type.select",
-    "definition": "Dropdown",
-    "context": "Dropdown"
+    "definition": "Select",
+    "context": "Select"
   },
   {
     "term": "petition.field-type.text",

@@ -1,4 +1,5 @@
 import {
+  Box,
   CloseButton,
   Flex,
   Text,
@@ -198,6 +199,13 @@ export function useReactSelectProps<
             />
           </Text>
         ),
+        Option: ({ children, ...props }) => (
+          <Components.Option {...props}>
+            <Box flex="1" isTruncated>
+              {children}
+            </Box>
+          </Components.Option>
+        ),
         ...components,
       },
       styles: {
@@ -257,6 +265,12 @@ export function useReactSelectProps<
           minHeight: "32px",
           display: "flex",
           alignItems: "center",
+          fontSize: fontSizes[SIZES[size].fontSize],
+          whiteSpace: "nowrap",
+        }),
+        menu: (styles) => ({
+          ...styles,
+          overflow: "hidden", // when using OptimizedMenuList this is needed
         }),
         menuList: (styles) => ({
           ...styles,
@@ -333,10 +347,6 @@ export function useInlineReactSelectProps<
           width: "unset",
           left: "50%",
           transform: "translateX(-50%)",
-        }),
-        option: (styles, data) => ({
-          ...(rsProps.styles?.option?.(styles, data) ?? styles),
-          whiteSpace: "nowrap",
         }),
       },
     }),

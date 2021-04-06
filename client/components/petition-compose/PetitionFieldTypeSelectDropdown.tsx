@@ -10,7 +10,6 @@ import {
   MenuListProps,
   Portal,
   SelectProps,
-  Stack,
   Text,
   TextProps,
   useMenuContext,
@@ -167,16 +166,19 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
           ? `${fieldListWidth + descriptionWidth}px`
           : `${fieldListWidth}px`,
       }}
-      overflow="hidden"
-      maxHeight="232px"
+      overflow="auto"
+      maxHeight="240px"
       {...props}
     >
-      <Box flex="1">
+      <Box flex="1" position="relative">
         <Box
           display={{ base: "none", sm: showHeader ? "flex" : "none" }}
+          top={0}
+          position="sticky"
           alignItems="center"
           paddingX={4}
           height={12}
+          backgroundColor="white"
         >
           <Heading size="sm">
             <FormattedMessage
@@ -208,6 +210,8 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
       </Box>
       <Box
         display={{ base: "none", sm: showDescription ? "block" : "none" }}
+        position="sticky"
+        top={0}
         flex="1"
         minWidth={`${descriptionWidth}px`}
         backgroundColor="gray.50"
@@ -215,69 +219,16 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
         borderLeftColor="gray.200"
         paddingX={4}
         paddingY={3}
-        overflow="auto"
       >
         <Box>
-          <Heading as="h2" size="sm" marginBottom={2}>
-            <PetitionFieldTypeText as={"span" as any} type={activeType} />
-          </Heading>
-          <Box fontSize="sm" id={`field-description-${activeType}`}>
-            {activeType === "HEADING" ? (
-              <Stack>
-                <Text>
-                  <FormattedMessage
-                    id="component.petition-field-type-select-dropdown.heading-description-1"
-                    defaultMessage="Organize your petitions in sections or pages with a heading."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="component.petition-field-type-select-dropdown.heading-description-2"
-                    defaultMessage="Sections are for information purposes only and do not collect information."
-                  />
-                </Text>
-              </Stack>
-            ) : activeType === "TEXT" ? (
-              <Text>
-                <FormattedMessage
-                  id="component.petition-field-type-select-dropdown.text-description"
-                  defaultMessage="Obtain written information that is not stored in documents or other files."
-                />
-              </Text>
-            ) : activeType === "FILE_UPLOAD" ? (
-              <Stack>
-                <Text>
-                  <FormattedMessage
-                    id="component.petition-field-type-select-dropdown.file-upload-description-1"
-                    defaultMessage="Collect documents or other files in an organized way."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="component.petition-field-type-select-dropdown.file-upload-description-2"
-                    defaultMessage="Using this option will allow the recipient to upload a file very easily."
-                  />
-                </Text>
-              </Stack>
-            ) : activeType === "SELECT" ? (
-              <Stack>
-                <Text>
-                  <FormattedMessage
-                    id="component.petition-field-type-select-dropdown.select-description-1"
-                    defaultMessage="Collect text replies through a drop-down menu of options."
-                  />
-                </Text>
-                <Text>
-                  <FormattedMessage
-                    id="component.petition-field-type-select-dropdown.select-description-2"
-                    defaultMessage="Using this option will allow the recipient to select from a predefined list of possible answers."
-                  />
-                </Text>
-              </Stack>
-            ) : null}
-          </Box>
-          <AspectRatio ratio={490 / 212} marginTop={2}>
+          <AspectRatio
+            ratio={490 / 212}
+            marginBottom={1}
+            marginX={-2}
+            marginTop={-1}
+          >
             <Image
+              color="transparent"
               alt={intl.formatMessage(
                 {
                   id:
@@ -289,6 +240,37 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/${activeType}_${locale}.png`}
             />
           </AspectRatio>
+          <Heading as="h2" size="sm" marginBottom={1}>
+            <PetitionFieldTypeText as={"span" as any} type={activeType} />
+          </Heading>
+          <Box fontSize="sm" id={`field-description-${activeType}`}>
+            {activeType === "HEADING" ? (
+              <FormattedMessage
+                id="component.petition-field-type-select-dropdown.heading-description"
+                defaultMessage="Organize your petitions in sections or pages with a heading. These fields are for information purposes only."
+              />
+            ) : activeType === "TEXT" ? (
+              <FormattedMessage
+                id="component.petition-field-type-select-dropdown.text-description"
+                defaultMessage="Obtain written information that is not stored in documents or other files."
+              />
+            ) : activeType === "FILE_UPLOAD" ? (
+              <FormattedMessage
+                id="component.petition-field-type-select-dropdown.file-upload-description"
+                defaultMessage="Allow the recipient to upload documents and files very easily."
+              />
+            ) : activeType === "SELECT" ? (
+              <FormattedMessage
+                id="component.petition-field-type-select-dropdown.select-description"
+                defaultMessage="Allow the recipient to select one or more options from a predefined list of possible answers."
+              />
+            ) : activeType === "DYNAMIC_SELECT" ? (
+              <FormattedMessage
+                id="component.petition-field-type-select-dropdown.dynamic-select-description"
+                defaultMessage="Drop-down menu that dinamically adapts its options based on the reply to the previous drop-down."
+              />
+            ) : null}
+          </Box>
         </Box>
       </Box>
     </MenuList>

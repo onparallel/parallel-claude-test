@@ -13,6 +13,7 @@ export interface PetitionFieldVisibilityCondition {
   modifier: PetitionFieldVisibilityConditionModifier;
   operator: PetitionFieldVisibilityConditionOperator;
   value: string | number | null;
+  column?: number;
 }
 
 export type ConditionValue = string | number | null;

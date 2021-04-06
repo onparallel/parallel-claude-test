@@ -1135,7 +1135,7 @@ export const FieldFileUploadIcon = createIcon({
     <g
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -1154,7 +1154,7 @@ export const FieldTextIcon = createIcon({
     <g
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -1176,7 +1176,7 @@ export const FieldHeadingIcon = createIcon({
     <g
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -1274,6 +1274,29 @@ export const SignaturePlusIcon = createIcon({
   ),
 });
 
+export const FieldDynamicSelectIcon = createIcon({
+  displayName: "FieldDynamicSelectIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="1" y="1" width="22" height="11.444" rx="1.15183" />
+      <path d="M5 9.82732L7.52783 3L10.0557 9.82732" />
+      <path d="M15 6L17 8L19 6" />
+      <path d="M5.83224 7.99121H9.36949" />
+      <path d="M11.75 14.7824C11.75 14.4884 11.9884 14.25 12.2824 14.25H21.7176C22.0116 14.25 22.25 14.4884 22.25 14.7824V21.7176C22.25 22.0116 22.0116 22.25 21.7176 22.25H12.2824C11.9884 22.25 11.75 22.0116 11.75 21.7176V14.7824Z" />
+      <path d="M15 17.25L17 19.25L19 17.25" />
+      <path d="M8.2973 21.0946C9.01377 21.0946 9.59459 20.5138 9.59459 19.7973C9.59459 19.0808 9.01377 18.5 8.2973 18.5C7.58082 18.5 7 19.0808 7 19.7973C7 20.5138 7.58082 21.0946 8.2973 21.0946Z" />
+      <path d="M2.5 14.2001C2.5 15.999 2.5 18.5255 2.5 19.546C2.5 19.7968 2.70249 20 2.95326 20C3.61697 20 4.94471 20 6.5 20" />
+    </g>
+  ),
+});
+
 export const FieldSelectIcon = createIcon({
   displayName: "FieldSelectIcon",
   viewBox: "0 0 24 24",
@@ -1281,7 +1304,7 @@ export const FieldSelectIcon = createIcon({
     <g
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
