@@ -26,6 +26,12 @@ export type FieldOptions = {
   DYNAMIC_SELECT: {
     values: DynamicSelectOption[];
     labels: string[];
+    file?: {
+      id: string;
+      name: string;
+      size: number;
+      updatedAt: Date;
+    };
   };
 };
 

@@ -567,6 +567,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           <Box padding={{ base: 4 }} paddingLeft={{ md: 0 }}>
             {activeField ? (
               <PetitionComposeFieldSettings
+                petitionId={petition!.id}
                 key={activeField.id}
                 field={activeField}
                 onFieldEdit={handleFieldEdit}

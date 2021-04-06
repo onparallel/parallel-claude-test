@@ -7,7 +7,7 @@ export type PetitionFieldIndex = number | string;
  * Generates and increasing sequence of letter indices (same as Excel columns)
  * A, B, ... Z, AA, AB, ... AZ, BA ... ZZ, AAA, AAB, ...
  */
-function* letters() {
+export function* letters() {
   const symbols = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   let counter = 0;
   while (true) {

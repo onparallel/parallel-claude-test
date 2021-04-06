@@ -1,18 +1,16 @@
 import Excel from "exceljs";
+import { FileUpload } from "graphql-upload";
 
 /**
  * returns the contents of the first worksheet in the excel file
  * in a two-dimensional matrix of strings containing every cell with content.
  */
-export async function importFromExcel(file: File) {
+export async function importFromExcel(file: FileUpload) {
   const wb = new Excel.Workbook();
-  const reader = new FileReader();
-  return new Promise<string[][]>((resolve, reject) => {
-    reader.readAsArrayBuffer(file);
-    reader.onload = async () => {
-      const buffer = reader.result as ArrayBuffer;
-      const workbook = await wb.xlsx.load(buffer);
 
+  return new Promise<string[][]>(async (resolve, reject) => {
+    try {
+      const workbook = await wb.xlsx.read(file.createReadStream());
       const rows: string[][] = [];
       workbook.worksheets[0].eachRow({ includeEmpty: true }, (row) => {
         const cells: string[] = [];
@@ -22,7 +20,8 @@ export async function importFromExcel(file: File) {
         rows.push(cells);
       });
       resolve(rows);
-    };
-    reader.onerror = () => reject(reader.error);
+    } catch (e) {
+      reject(e);
+    }
   });
 }

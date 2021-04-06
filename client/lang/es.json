@@ -1465,6 +1465,51 @@
     "context": "Please try again later and if the error persists reach out to support for help."
   },
   {
+    "term": "field-settings.dynamic-select.import-from-excel.attach-xlsx",
+    "definition": "Adjunte un archivo .xlsx como el del modelo.",
+    "context": "Attach an .xlsx file like the one in the model."
+  },
+  {
+    "term": "field-settings.dynamic-select.import-from-excel.description",
+    "definition": "Importa listados para crear desplegables relacionados entre sí. Puedes utilizar el modelo de carga como guía.",
+    "context": "Import listings to create related dropdowns. You can use the importing model as a guide."
+  },
+  {
+    "term": "field-settings.dynamic-select.import-from-excel.download-model",
+    "definition": "Descargar <a>modelo de importación de opciones</a>",
+    "context": "Download <a>option loading model</a>"
+  },
+  {
+    "term": "field-settings.dynamic-select.import-from-excel.error-dialog-body",
+    "definition": "Por favor, revisa tu archivo y asegúrate de que no hay casillas vacías entre los listados.",
+    "context": "Please, review your file and make sure there are no empty cells between the listings."
+  },
+  {
+    "term": "field-settings.dynamic-select.import-from-excel.error-dialog-header",
+    "definition": "Error de importación",
+    "context": "Import error"
+  },
+  {
+    "term": "field-settings.dynamic-select.import-from-excel.error-file-invalid-type",
+    "definition": "Tipo de archivo no permitido. Por favor, adjunta un archivo .xlsx",
+    "context": "File type not allowed. Please, attach an .xlsx file"
+  },
+  {
+    "term": "field-settings.dynamic-select.import-from-excel.error-file-too-large",
+    "definition": "El archivo es demasiado grande. Tamaño máximo permitido {size}",
+    "context": "The file is too large. Maximum size allowed {size}"
+  },
+  {
+    "term": "field-settings.dynamic-select.import-from-excel.label",
+    "definition": "Importar opciones desde Excel",
+    "context": "Import options from Excel"
+  },
+  {
+    "term": "field-settings.dynamic-select.loaded-options.example",
+    "definition": "Por ejemplo:",
+    "context": "For example:"
+  },
+  {
     "term": "field-settings.file-multiple-description",
     "definition": "Activar esta opción permitirá al destinatario subir más de un archivo a este campo.",
     "context": "Enabling this allows the recipient to upload multiple files to this field."
@@ -1663,6 +1708,11 @@
     "term": "generic.dropzone-default",
     "definition": "Arrastra archivos aquí o haz click para seleccionarlos",
     "context": "Drag files here, or click to select them"
+  },
+  {
+    "term": "generic.dropzone-single.default",
+    "definition": "Arrastra el archivo aquí o haz click para seleccionarlo",
+    "context": "Drag the file here, or click to select it"
   },
   {
     "term": "generic.edit",

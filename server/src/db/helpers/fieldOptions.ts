@@ -1,5 +1,6 @@
 import { PetitionFieldType, CreatePetitionField } from "../__types";
 import Ajv from "ajv";
+import addFormats from "ajv-formats";
 
 const SCHEMAS = {
   TEXT: {
@@ -86,6 +87,16 @@ const SCHEMAS = {
               type: "string",
             },
           },
+          file: {
+            type: "object",
+            required: ["id", "name", "size", "updatedAt"],
+            properties: {
+              id: { type: "string" },
+              name: { type: "string" },
+              size: { type: "integer" },
+              updatedAt: { type: "string", format: "date-time" },
+            },
+          },
         },
       },
     },
@@ -95,6 +106,7 @@ const SCHEMAS = {
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
   const ajv = new Ajv();
+  addFormats(ajv, ["date-time"]);
   const valid = ajv.validate(SCHEMAS[type], options);
   if (!valid) {
     throw new Error(ajv.errorsText());

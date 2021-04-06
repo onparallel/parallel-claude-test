@@ -239,6 +239,8 @@ export type Mutation = {
   deletePetitionSubscription: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
+  dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Edits permissions on given petitions and users */
   editPetitionUserPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
@@ -330,6 +332,8 @@ export type Mutation = {
   updateUser: User;
   /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
   updateUserStatus: Array<User>;
+  /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
+  uploadDynamicSelectFieldFile: PetitionField;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
   verifyPublicAccess: PublicAccessVerification;
@@ -480,6 +484,11 @@ export type MutationdeletePetitionSubscriptionArgs = {
 export type MutationdeletePetitionsArgs = {
   force?: Maybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
+};
+
+export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationeditPetitionUserPermissionArgs = {
@@ -736,6 +745,12 @@ export type MutationupdateUserStatusArgs = {
   status: UserStatus;
   transferToUserId?: Maybe<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
+};
+
+export type MutationuploadDynamicSelectFieldFileArgs = {
+  fieldId: Scalars["GID"];
+  file: Scalars["Upload"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationvalidatePetitionFieldsArgs = {
@@ -3058,6 +3073,34 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
       > & { user: { __typename?: "User" } & Pick<User, "id"> }
     >;
   };
+
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  file: Scalars["Upload"];
+}>;
+
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
+  __typename?: "Mutation";
+} & {
+  uploadDynamicSelectFieldFile: { __typename?: "PetitionField" } & Pick<
+    PetitionField,
+    "id" | "options"
+  >;
+};
+
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+}>;
+
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
+  __typename?: "Mutation";
+} & {
+  dynamicSelectFieldFileDownloadLink: {
+    __typename?: "FileUploadReplyDownloadLinkResult";
+  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+};
 
 export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -7788,6 +7831,105 @@ export type useTemplateDetailsDialogPetitionQueryHookResult = ReturnType<
 >;
 export type useTemplateDetailsDialogPetitionLazyQueryHookResult = ReturnType<
   typeof useuseTemplateDetailsDialogPetitionLazyQuery
+>;
+export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
+  mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
+    $petitionId: GID!
+    $fieldId: GID!
+    $file: Upload!
+  ) {
+    uploadDynamicSelectFieldFile(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      file: $file
+    ) {
+      id
+      options
+    }
+  }
+`;
+
+/**
+ * __useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation__
+ *
+ * To run a mutation, you first call `useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [dynamicSelectSettingsUploadDynamicSelectFieldFileMutation, { data, loading, error }] = useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      fieldId: // value for 'fieldId'
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
+    DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
+    DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables
+  >(DynamicSelectSettings_uploadDynamicSelectFieldFileDocument, options);
+}
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationHookResult = ReturnType<
+  typeof useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation
+>;
+export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = gql`
+  mutation DynamicSelectSettings_dynamicSelectFieldFileDownloadLink(
+    $petitionId: GID!
+    $fieldId: GID!
+  ) {
+    dynamicSelectFieldFileDownloadLink(
+      petitionId: $petitionId
+      fieldId: $fieldId
+    ) {
+      result
+      url
+    }
+  }
+`;
+
+/**
+ * __useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation__
+ *
+ * To run a mutation, you first call `useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [dynamicSelectSettingsDynamicSelectFieldFileDownloadLinkMutation, { data, loading, error }] = useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *      fieldId: // value for 'fieldId'
+ *   },
+ * });
+ */
+export function useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
+    DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
+  >(DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument, options);
+}
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationHookResult = ReturnType<
+  typeof useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation
 >;
 export const ExportRepliesProgressDialog_PetitionRepliesDocument = gql`
   query ExportRepliesProgressDialog_PetitionReplies($petitionId: GID!) {

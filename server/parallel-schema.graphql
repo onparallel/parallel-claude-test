@@ -470,6 +470,14 @@ type Mutation {
   deletePetitions(force: Boolean = false, ids: [GID!]!): Result!
 
   """
+  generates a signed download link for the xlsx file containing the listings of a dynamic select field
+  """
+  dynamicSelectFieldFileDownloadLink(
+    fieldId: GID!
+    petitionId: GID!
+  ): FileUploadReplyDownloadLinkResult!
+
+  """
   Edits permissions on given petitions and users
   """
   editPetitionUserPermission(
@@ -819,6 +827,15 @@ type Mutation {
     transferToUserId: GID
     userIds: [GID!]!
   ): [User!]!
+
+  """
+  Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options
+  """
+  uploadDynamicSelectFieldFile(
+    fieldId: GID!
+    file: Upload!
+    petitionId: GID!
+  ): PetitionField!
 
   """
   Updates the validation of a field and sets the petition as closed if all fields are validated.

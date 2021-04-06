@@ -1,32 +1,28 @@
-import { useState } from "react";
-import { DynamicSelectOption } from "../petitionFields";
+export function parseDynamicSelectValues(data: string[][]) {
+  const cleanedData = cleanData(data);
+  validateData(cleanedData);
+  const [labels, ...entries] = cleanedData;
 
-export function useDynamicSelectValues() {
-  const [labels, setLabels] = useState<string[] | null>(null);
-  const [values, setValues] = useState<DynamicSelectOption[] | null>(null);
-
-  return {
-    labels,
-    values,
-    parseValues: (data: string[][]) => {
-      const cleanedData = cleanData(data);
-      validateData(cleanedData);
-      const [headers, ...entries] = cleanedData;
-      setLabels(headers);
-      setValues(parseEntries(entries));
-    },
-  };
+  return { labels, values: parseEntries(entries) };
 }
 
-/** removes empty cells at the end of each row */
+/** removes empty cells at the end of each row
+ * and empty rows at the bottom.
+ */
 function cleanData(data: string[][]): string[][] {
-  return data.map((row) => {
+  const partial = data.map((row) => {
     const realRowLength = row.reduce(
       (acc, cell) => (!!cell ? acc + 1 : acc),
       0
     );
     return row.slice(0, realRowLength);
   });
+
+  const lastRowWithData = partial.reduce(
+    (prevIndex, row, index) => (row.length > 0 ? index : prevIndex),
+    -1
+  );
+  return partial.slice(0, lastRowWithData);
 }
 
 function validateData(data: string[][]) {
@@ -42,7 +38,7 @@ function validateData(data: string[][]) {
   }
 }
 
-function parseEntries(data: string[][]): DynamicSelectOption[] {
+function parseEntries(data: string[][]): any {
   // take each different entry in first column of data array
   const entries = Array.from(new Set(data.map((row) => row[0])));
 
@@ -56,6 +52,6 @@ function parseEntries(data: string[][]): DynamicSelectOption[] {
       return [entry, parseEntries(entryData)];
     });
   } else {
-    return entries as any; // options in the last level
+    return entries; // options in the last level
   }
 }

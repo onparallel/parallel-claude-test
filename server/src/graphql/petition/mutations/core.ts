@@ -27,25 +27,32 @@ import {
 } from "../../../util/globalId";
 import { isDefined } from "../../../util/remedaExtensions";
 import { calculateNextReminder } from "../../../util/reminderUtils";
+import { random } from "../../../util/token";
 import {
   and,
   argIsDefined,
   authenticate,
+  authenticateAnd,
   chain,
   ifArgDefined,
   or,
 } from "../../helpers/authorize";
 import { datetimeArg } from "../../helpers/date";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { importFromExcel } from "../../helpers/importDataFromExcel";
 import { jsonArg, jsonObjectArg } from "../../helpers/json";
+import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectFieldValues";
 import { RESULT } from "../../helpers/result";
+import { uploadArg } from "../../helpers/upload";
 import {
   validateAnd,
   validateIf,
   validateOr,
 } from "../../helpers/validateArgs";
+import { contentType } from "../../helpers/validators/contentType";
 import { inRange } from "../../helpers/validators/inRange";
 import { jsonSchema } from "../../helpers/validators/jsonSchema";
+import { maxFileSize } from "../../helpers/validators/maxFileSize";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
@@ -56,6 +63,7 @@ import { validIsDefined } from "../../helpers/validators/validIsDefined";
 import { validRemindersConfig } from "../../helpers/validators/validRemindersConfig";
 import { validRichTextContent } from "../../helpers/validators/validRichTextContent";
 import { validSignatureConfig } from "../../helpers/validators/validSignatureConfig";
+import { fieldHasType } from "../../public/authorizers";
 import {
   accessesBelongToPetition,
   accessesBelongToValidContacts,
@@ -662,6 +670,115 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     );
   },
 });
+
+export const uploadDynamicSelectFile = mutationField(
+  "uploadDynamicSelectFieldFile",
+  {
+    description:
+      "Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options",
+    type: "PetitionField",
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId"),
+      fieldsBelongsToPetition("petitionId", "fieldId"),
+      fieldHasType("fieldId", ["DYNAMIC_SELECT"])
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      fieldId: nonNull(globalIdArg("PetitionField")),
+      file: nonNull(uploadArg()),
+    },
+    validateArgs: validateAnd(
+      contentType(
+        (args) => args.file,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "file"
+      ),
+      maxFileSize((args) => args.file, 1024 * 1024 * 10, "file")
+    ),
+    resolve: async (_, args, ctx) => {
+      const file = await args.file;
+
+      const { createReadStream, filename, mimetype } = file;
+      const data = await importFromExcel(file);
+      const { values, labels } = parseDynamicSelectValues(data);
+
+      const key = random(16);
+      const res = await ctx.aws.fileUploads.uploadFile(
+        key,
+        mimetype,
+        createReadStream()
+      );
+
+      const fileUpload = await ctx.files.createFileUpload(
+        {
+          content_type: mimetype,
+          filename,
+          path: key,
+          size: res["ContentLength"]!.toString(),
+          upload_complete: true,
+        },
+        `User:${ctx.user!.id}`
+      );
+
+      const options = {
+        values,
+        labels,
+        file: {
+          id: toGlobalId("FileUpload", fileUpload.id),
+          name: fileUpload.filename,
+          size: res["ContentLength"],
+          updatedAt: fileUpload.updated_at.toISOString(),
+        },
+      };
+      await ctx.petitions.validateFieldData(args.fieldId, { options });
+      const { field } = await ctx.petitions.updatePetitionField(
+        args.petitionId,
+        args.fieldId,
+        { options },
+        ctx.user!
+      );
+
+      return field;
+    },
+  }
+);
+
+export const dynamicSelectFieldFileDownloadLink = mutationField(
+  "dynamicSelectFieldFileDownloadLink",
+  {
+    description:
+      "generates a signed download link for the xlsx file containing the listings of a dynamic select field",
+    type: "FileUploadReplyDownloadLinkResult",
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId"),
+      fieldsBelongsToPetition("petitionId", "fieldId"),
+      fieldHasType("fieldId", ["DYNAMIC_SELECT"])
+    ),
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      fieldId: nonNull(globalIdArg("PetitionField")),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const field = await ctx.petitions.loadField(args.fieldId);
+        const fileId = field?.options.file?.id
+          ? fromGlobalId(field.options.file.id, "FileUpload").id
+          : null;
+        const file = await ctx.files.loadFileUpload(fileId as any);
+        return {
+          result: RESULT.SUCCESS,
+          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+            file!.path,
+            file!.filename,
+            "attachment"
+          ),
+        };
+      } catch {
+        return { result: RESULT.FAILURE };
+      }
+    },
+  }
+);
 
 export const validatePetitionFields = mutationField("validatePetitionFields", {
   description:

@@ -581,6 +581,7 @@ export interface NexusGenFieldTypes {
     deletePetitionReply: NexusGenEnums["Result"]; // Result!
     deletePetitionSubscription: NexusGenEnums["Result"]; // Result!
     deletePetitions: NexusGenEnums["Result"]; // Result!
+    dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     editPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
@@ -627,6 +628,7 @@ export interface NexusGenFieldTypes {
     updateSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
+    uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
@@ -1313,6 +1315,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitionReply: "Result";
     deletePetitionSubscription: "Result";
     deletePetitions: "Result";
+    dynamicSelectFieldFileDownloadLink: "FileUploadReplyDownloadLinkResult";
     editPetitionUserPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
@@ -1359,6 +1362,7 @@ export interface NexusGenFieldTypeNames {
     updateSimpleReply: "PetitionFieldReply";
     updateUser: "User";
     updateUserStatus: "User";
+    uploadDynamicSelectFieldFile: "PetitionField";
     validatePetitionFields: "PetitionAndPartialFields";
     verifyPublicAccess: "PublicAccessVerification";
   };
@@ -2078,6 +2082,11 @@ export interface NexusGenArgTypes {
       force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
     };
+    dynamicSelectFieldFileDownloadLink: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
     editPetitionUserPermission: {
       // args
       permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
@@ -2333,6 +2342,12 @@ export interface NexusGenArgTypes {
       status: NexusGenEnums["UserStatus"]; // UserStatus!
       transferToUserId?: NexusGenScalars["GID"] | null; // GID
       userIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    uploadDynamicSelectFieldFile: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      file: NexusGenScalars["Upload"]; // Upload!
+      petitionId: NexusGenScalars["GID"]; // GID!
     };
     validatePetitionFields: {
       // args

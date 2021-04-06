@@ -1,0 +1,368 @@
+import { gql } from "@apollo/client";
+import { Box, Center, Flex, Progress, Stack, Text } from "@chakra-ui/react";
+import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
+import {
+  useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
+  useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
+} from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
+import { letters } from "@parallel/utils/fieldIndices";
+import { FieldOptions } from "@parallel/utils/petitionFields";
+import { useMemo, useState } from "react";
+import { FileRejection, useDropzone } from "react-dropzone";
+import { FormattedMessage, useIntl } from "react-intl";
+import { DateTime } from "../common/DateTime";
+import { useErrorDialog } from "../common/ErrorDialog";
+import { FileName } from "../common/FileName";
+import { FileSize } from "../common/FileSize";
+import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
+import { NormalLink } from "../common/Link";
+import {
+  PetitionComposeFieldSettingsProps,
+  SettingsRow,
+} from "./PetitionComposeFieldSettings";
+
+export function DynamicSelectSettings({
+  petitionId,
+  field,
+  onFieldEdit,
+}: { petitionId: string } & Pick<
+  PetitionComposeFieldSettingsProps,
+  "field" | "onFieldEdit"
+>) {
+  const intl = useIntl();
+  const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
+
+  function handleRemoveOptions() {
+    onFieldEdit(field.id, { options: { labels: [], values: [] } });
+  }
+
+  const [
+    downloadLink,
+  ] = useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation();
+
+  async function handleDownloadListingsFile() {
+    try {
+      const _window = window.open(undefined, "_blank")!;
+      const { data } = await downloadLink({
+        variables: { petitionId, fieldId: field.id },
+      });
+      const { url, result } = data!.dynamicSelectFieldFileDownloadLink;
+      if (result === "SUCCESS") {
+        _window.location.href = url!;
+      } else {
+        _window.close();
+      }
+    } catch {}
+  }
+
+  return (
+    <Stack spacing={4}>
+      <SettingsRow
+        flexDirection="column"
+        alignItems="start"
+        label={
+          <Text as="strong">
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.label"
+              defaultMessage="Import options from Excel"
+            />
+          </Text>
+        }
+        description={
+          <FormattedMessage
+            id="field-settings.dynamic-select.import-from-excel.description"
+            defaultMessage="Import listings to create related dropdowns. You can use the importing model as a guide."
+          />
+        }
+        controlId="dynamic-select-options"
+      >
+        <Stack width="100%">
+          {fieldOptions.file ? (
+            <DynamicSelectLoadedOptions
+              options={fieldOptions}
+              onRemoveOptions={handleRemoveOptions}
+              onDownloadOptions={handleDownloadListingsFile}
+            />
+          ) : (
+            <DynamicSelectOptionsDropzone
+              petitionId={petitionId}
+              fieldId={field.id}
+            />
+          )}
+          <Text>
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.download-model"
+              defaultMessage="Download <a>option loading model</a>"
+              values={{
+                a: (chunks: any[]) => (
+                  <NormalLink
+                    fontWeight="bold"
+                    href={`${
+                      process.env.NEXT_PUBLIC_ASSETS_URL
+                    }/static/documents/import_model_${
+                      intl.locale ?? "en"
+                    }.xlsx`}
+                  >
+                    {chunks}
+                    <DownloadIcon marginLeft={2} />
+                  </NormalLink>
+                ),
+              }}
+            />
+          </Text>
+        </Stack>
+      </SettingsRow>
+    </Stack>
+  );
+}
+
+function UploadedFileData({
+  file,
+  onDownload,
+  onRemoveOptions,
+}: {
+  file?: { name: string; size: number; updatedAt: Date };
+  onDownload?: () => void;
+  onRemoveOptions?: () => void;
+}) {
+  const intl = useIntl();
+  return (
+    <Stack direction="row" alignItems="center" marginTop={2}>
+      <Center
+        boxSize={10}
+        borderRadius="md"
+        border="1px solid"
+        borderColor="gray.300"
+        color="gray.700"
+        fontSize="xs"
+        fontWeight="bold"
+      >
+        XLSX
+      </Center>
+
+      <Box flex="1" overflow="hidden">
+        {file ? (
+          <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
+            <FileName value={file.name} />
+            <Text as="span" marginX={2}>
+              -
+            </Text>
+            <Text as="span" fontSize="xs" color="gray.500">
+              <FileSize value={file.size} />
+            </Text>
+          </Flex>
+        ) : (
+          <Center height="18px">
+            <Progress
+              borderRadius="sm"
+              width="100%"
+              isIndeterminate
+              size="xs"
+              colorScheme="green"
+            />
+          </Center>
+        )}
+        {file && (
+          <Text fontSize="xs">
+            <DateTime
+              value={file.updatedAt}
+              format={FORMATS.LLL}
+              useRelativeTime
+            />
+          </Text>
+        )}
+      </Box>
+
+      <IconButtonWithTooltip
+        variant="ghost"
+        isDisabled={!file}
+        icon={<DownloadIcon />}
+        label={intl.formatMessage({
+          id: "generic.download",
+          defaultMessage: "Download",
+        })}
+        onClick={onDownload}
+      />
+      <IconButtonWithTooltip
+        variant="ghost"
+        isDisabled={!file}
+        icon={<DeleteIcon />}
+        label={intl.formatMessage({
+          id: "generic.delete",
+          defaultMessage: "Delete",
+        })}
+        onClick={onRemoveOptions}
+      />
+    </Stack>
+  );
+}
+
+interface DynamicSelectLoadedOptionsProps {
+  options: FieldOptions["DYNAMIC_SELECT"];
+  onRemoveOptions: () => void;
+  onDownloadOptions: () => void;
+}
+
+function DynamicSelectLoadedOptions({
+  options,
+  onRemoveOptions,
+  onDownloadOptions,
+}: DynamicSelectLoadedOptionsProps) {
+  const letter = letters();
+  const firstRowFlattened = useMemo(
+    () => options.values[0].flat(options.labels.length),
+    [options]
+  );
+
+  return (
+    <>
+      <UploadedFileData
+        file={options.file!}
+        onRemoveOptions={onRemoveOptions}
+        onDownload={onDownloadOptions}
+      />
+
+      <Stack fontSize="sm" color="gray.600" spacing={0}>
+        <FormattedMessage
+          id="field-settings.dynamic-select.loaded-options.example"
+          defaultMessage="For example:"
+        />
+        {options.labels.map((label, index) => (
+          <Text key={index}>
+            {letter.next().value})&nbsp;{label}:&nbsp;
+            {firstRowFlattened[index]}
+          </Text>
+        ))}
+      </Stack>
+    </>
+  );
+}
+
+function DynamicSelectOptionsDropzone({
+  petitionId,
+  fieldId,
+}: {
+  petitionId: string;
+  fieldId: string;
+}) {
+  const MAX_FILESIZE = 1024 * 1024 * 10; // 10 MB
+
+  const [fileDropError, setFileDropError] = useState<string | null>(null);
+
+  const [
+    uploadFile,
+    { loading },
+  ] = useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation();
+
+  const showErrorDialog = useErrorDialog();
+  async function handleFileDrop([file]: File[], rejected: FileRejection[]) {
+    if (rejected.length > 0) {
+      setFileDropError(rejected[0].errors[0].code);
+    } else {
+      try {
+        await uploadFile({ variables: { petitionId, fieldId, file } });
+      } catch {
+        await showErrorDialog({
+          header: (
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.error-dialog-header"
+              defaultMessage="Import error"
+            />
+          ),
+          message: (
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.error-dialog-body"
+              defaultMessage="Please, review your file and make sure there are no empty cells between the listings."
+            />
+          ),
+        });
+      }
+    }
+  }
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    maxSize: MAX_FILESIZE,
+    multiple: false,
+    onDrop: handleFileDrop,
+  });
+
+  return loading ? (
+    <UploadedFileData />
+  ) : (
+    <>
+      <Text fontSize="sm" color="gray.600" marginTop={1}>
+        <FormattedMessage
+          id="field-settings.dynamic-select.import-from-excel.attach-xlsx"
+          defaultMessage="Attach an .xlsx file like the one in the model."
+        />
+      </Text>
+      <Center
+        height="100px"
+        borderWidth={2}
+        borderStyle="dashed"
+        borderColor="gray.300"
+        borderRadius="md"
+        padding={4}
+        {...getRootProps()}
+      >
+        <input {...getInputProps()} />
+        <Text pointerEvents="none" fontSize="sm" color="gray.500">
+          <FormattedMessage
+            id="generic.dropzone-single.default"
+            defaultMessage="Drag the file here, or click to select it"
+          />
+        </Text>
+      </Center>
+      {fileDropError && (
+        <Text color="red.500" fontSize="sm">
+          {fileDropError === "file-too-large" ? (
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.error-file-too-large"
+              defaultMessage="The file is too large. Maximum size allowed {size}"
+              values={{ size: <FileSize value={MAX_FILESIZE} /> }}
+            />
+          ) : fileDropError === "file-invalid-type" ? (
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.error-file-invalid-type"
+              defaultMessage="File type not allowed. Please, attach an .xlsx file"
+            />
+          ) : null}
+        </Text>
+      )}
+    </>
+  );
+}
+
+DynamicSelectSettings.mutations = [
+  gql`
+    mutation DynamicSelectSettings_uploadDynamicSelectFieldFile(
+      $petitionId: GID!
+      $fieldId: GID!
+      $file: Upload!
+    ) {
+      uploadDynamicSelectFieldFile(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        file: $file
+      ) {
+        id
+        options
+      }
+    }
+  `,
+  gql`
+    mutation DynamicSelectSettings_dynamicSelectFieldFileDownloadLink(
+      $petitionId: GID!
+      $fieldId: GID!
+    ) {
+      dynamicSelectFieldFileDownloadLink(
+        petitionId: $petitionId
+        fieldId: $fieldId
+      ) {
+        result
+        url
+      }
+    }
+  `,
+];
