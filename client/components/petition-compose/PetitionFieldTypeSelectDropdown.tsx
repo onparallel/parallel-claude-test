@@ -151,7 +151,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
     forceUpdate?.();
   }, [isOpen, forceUpdate]);
 
-  const fieldListWidth = 230;
+  const fieldListWidth = 260;
   const descriptionWidth = 270;
 
   const { locale } = useIntl();
