@@ -90,27 +90,18 @@ export function DynamicSelectSettings({
               fieldId={field.id}
             />
           )}
-          <Text>
+          <NormalLink
+            fontWeight="bold"
+            href={`${
+              process.env.NEXT_PUBLIC_ASSETS_URL
+            }/static/documents/import_model_${intl.locale ?? "en"}.xlsx`}
+          >
             <FormattedMessage
               id="field-settings.dynamic-select.import-from-excel.download-model"
-              defaultMessage="Download <a>option loading model</a>"
-              values={{
-                a: (chunks: any[]) => (
-                  <NormalLink
-                    fontWeight="bold"
-                    href={`${
-                      process.env.NEXT_PUBLIC_ASSETS_URL
-                    }/static/documents/import_model_${
-                      intl.locale ?? "en"
-                    }.xlsx`}
-                  >
-                    {chunks}
-                    <DownloadIcon marginLeft={2} />
-                  </NormalLink>
-                ),
-              }}
+              defaultMessage="Download option loading model"
             />
-          </Text>
+            <DownloadIcon marginLeft={2} />
+          </NormalLink>
         </Stack>
       </SettingsRow>
     </Stack>

@@ -1476,8 +1476,8 @@
   },
   {
     "term": "field-settings.dynamic-select.import-from-excel.download-model",
-    "definition": "Download <a>option loading model</a>",
-    "context": "Download <a>option loading model</a>"
+    "definition": "Download option loading model",
+    "context": "Download option loading model"
   },
   {
     "term": "field-settings.dynamic-select.import-from-excel.error-dialog-body",
