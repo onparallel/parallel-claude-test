@@ -1,5 +1,5 @@
 import { Box, BoxProps, Center, Grid, Heading, Text } from "@chakra-ui/react";
-import { PropsWithChildren, ReactNode } from "react";
+import { PropsWithChildren } from "react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
 

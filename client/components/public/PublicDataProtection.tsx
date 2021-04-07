@@ -24,7 +24,6 @@ export function PublicDataProtection(props: BoxProps) {
       }}
     >
       <Grid
-        marginTop={16}
         justifyContent="space-evenly"
         gridGap={6}
         templateColumns={{
