@@ -35,3 +35,8 @@ export type PetitionFieldVisibilityConditionOperator =
   | "LESS_THAN_OR_EQUAL"
   | "GREATER_THAN"
   | "GREATER_THAN_OR_EQUAL";
+
+export type PseudoPetitionFieldVisibilityConditionOperator =
+  | PetitionFieldVisibilityConditionOperator
+  | "HAVE_REPLY"
+  | "NOT_HAVE_REPLY";

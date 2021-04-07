@@ -1,6 +1,5 @@
 import { forwardRef } from "react";
 import {
-  components,
   GroupTypeBase,
   MenuListComponentProps,
   OptionTypeBase,

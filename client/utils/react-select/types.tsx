@@ -7,6 +7,17 @@ import { Props as _AsyncSelectProps } from "react-select/async";
 import { Props as _AsyncCreatableSelectProps } from "react-select/async-creatable";
 import { ValueProps } from "../ValueProps";
 
+export interface OptionType<T extends string = string> {
+  value: T;
+  label: string;
+}
+
+export type OptionTypeValue<T extends OptionType<any>> = T extends OptionType<
+  infer U
+>
+  ? U
+  : never;
+
 export interface CustomSelectProps<
   T,
   IsMulti extends boolean = false,

@@ -80,3 +80,40 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
     DYNAMIC_SELECT: theme.colors.pink[600],
   } as Record<PetitionFieldType, string>)[type];
 }
+
+export function getDynamicSelectValues(
+  values: (string | DynamicSelectOption)[],
+  level: number
+): string[] {
+  if (level === 0) {
+    return Array.isArray(values[0])
+      ? (values as DynamicSelectOption[]).map(([value]) => value)
+      : (values as string[]);
+  } else {
+    if (!Array.isArray(values[0])) {
+      throw new Error("Invalid level");
+    }
+    return (values as DynamicSelectOption[]).flatMap(([, children]) =>
+      getDynamicSelectValues(children, level - 1)
+    );
+  }
+}
+
+export function getFirstDynamicSelectValue(
+  values: (string | DynamicSelectOption)[],
+  level: number
+): string {
+  if (level === 0) {
+    return Array.isArray(values[0])
+      ? (values as DynamicSelectOption[])[0][0]
+      : (values as string[])[0];
+  } else {
+    if (!Array.isArray(values[0])) {
+      throw new Error("Invalid level");
+    }
+    return getFirstDynamicSelectValue(
+      (values as DynamicSelectOption[])[0][1],
+      level - 1
+    );
+  }
+}

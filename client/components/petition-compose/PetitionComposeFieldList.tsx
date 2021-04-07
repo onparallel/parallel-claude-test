@@ -27,10 +27,9 @@ import {
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
-import {
-  PetitionFieldVisibility,
-  PetitionFieldVisibilityCondition,
-} from "@parallel/utils/fieldVisibility/types";
+import { defaultCondition } from "@parallel/utils/fieldVisibility/conditions";
+import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
+import { FieldOptions } from "@parallel/utils/petitionFields";
 import { Maybe } from "@parallel/utils/types";
 import { useEffectSkipFirst } from "@parallel/utils/useEffectSkipFirst";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
@@ -265,20 +264,14 @@ export const PetitionComposeFieldList = Object.assign(
                 .slice(0, index)
                 .reverse()
                 .find((f) => !f.isReadOnly)!;
-              const condition: PetitionFieldVisibilityCondition = {
-                fieldId: field.id,
-                modifier:
-                  field.type === "FILE_UPLOAD" ? "NUMBER_OF_REPLIES" : "ANY",
-                operator: "EQUAL",
-                value:
-                  field.type === "FILE_UPLOAD"
-                    ? 0
-                    : field.type === "TEXT"
-                    ? null
-                    : field.type === "SELECT"
-                    ? field.options.values[0] ?? null
-                    : null,
-              };
+
+              const condition = defaultCondition(
+                field.type === "DYNAMIC_SELECT" &&
+                  (field.options as FieldOptions["DYNAMIC_SELECT"]).labels
+                    ?.length
+                  ? [field, 0]
+                  : field
+              );
               onFieldEdit(fieldId, {
                 visibility: {
                   type: "SHOW",

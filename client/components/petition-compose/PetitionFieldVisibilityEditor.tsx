@@ -18,25 +18,39 @@ import { PetitionFieldSelect } from "@parallel/components/common/PetitionFieldSe
 import { PetitionFieldVisibilityEditor_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import {
+  defaultCondition,
+  updateConditionModifier,
+  updateConditionOperator,
+} from "@parallel/utils/fieldVisibility/conditions";
+import {
   PetitionFieldVisibility,
   PetitionFieldVisibilityCondition,
   PetitionFieldVisibilityConditionModifier,
-  PetitionFieldVisibilityConditionOperator,
   PetitionFieldVisibilityOperator,
   PetitionFieldVisibilityType,
+  PseudoPetitionFieldVisibilityConditionOperator,
 } from "@parallel/utils/fieldVisibility/types";
 import {
-  DynamicSelectOption,
   FieldOptions,
+  getDynamicSelectValues,
 } from "@parallel/utils/petitionFields";
 import {
   useInlineReactSelectProps,
   useReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
-import { CustomSelectProps } from "@parallel/utils/react-select/types";
+import {
+  CustomSelectProps,
+  OptionType,
+} from "@parallel/utils/react-select/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { Fragment, SetStateAction, useMemo, useState } from "react";
+import {
+  Fragment,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 import { pick, zip } from "remeda";
@@ -224,40 +238,9 @@ export function PetitionFieldVisibilityEditor({
                 expandFields
                 fields={_fields}
                 indices={_indices}
-                onChange={(value) => {
-                  const [field, column] = Array.isArray(value)
-                    ? value
-                    : [value];
-                  // default condition based on field
-                  const hasReplies =
-                    field.type === "FILE_UPLOAD" ||
-                    (field.type === "DYNAMIC_SELECT" && column === undefined);
-                  const hasOptions =
-                    field.type === "SELECT" ||
-                    (field.type === "DYNAMIC_SELECT" && column !== undefined);
-                  const options = hasOptions
-                    ? field.type === "SELECT"
-                      ? (field.options as FieldOptions["SELECT"]).values
-                      : getDynamicSelectValues(
-                          (field.options as FieldOptions["DYNAMIC_SELECT"])
-                            .values,
-                          column!
-                        )
-                    : [];
-                  updateCondition(index, {
-                    fieldId: field.id,
-                    modifier: hasReplies ? "NUMBER_OF_REPLIES" : "ANY",
-                    operator: hasReplies ? "GREATER_THAN" : "EQUAL",
-                    value: hasReplies
-                      ? 0
-                      : hasOptions
-                      ? options.includes(condition.value as string)
-                        ? condition.value
-                        : options[0] ?? null
-                      : null,
-                    column,
-                  });
-                }}
+                onChange={(value) =>
+                  updateCondition(index, defaultCondition(value))
+                }
               />
               {conditionField ? (
                 <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>
@@ -319,7 +302,7 @@ PetitionFieldVisibilityEditor.fragments = {
 };
 
 function ConditionMultipleFieldModifier({
-  value,
+  value: condition,
   field,
   onChange,
 }: ValueProps<PetitionFieldVisibilityCondition, false> & {
@@ -327,11 +310,11 @@ function ConditionMultipleFieldModifier({
 }) {
   const intl = useIntl();
   const options = useMemo<
-    { label: string; value: PetitionFieldVisibilityConditionModifier }[]
+    OptionType<PetitionFieldVisibilityConditionModifier>[]
   >(() => {
     if (
       field.type === "FILE_UPLOAD" ||
-      (field.type === "DYNAMIC_SELECT" && value.column === undefined)
+      (field.type === "DYNAMIC_SELECT" && condition.column === undefined)
     ) {
       return [
         {
@@ -376,18 +359,29 @@ function ConditionMultipleFieldModifier({
     }
   }, [field.type, intl.locale]);
   const _value = useMemo(
-    () => options.find((o) => o.value === value.modifier),
-    [options, value]
+    () => options.find((o) => o.value === condition.modifier),
+    [options, condition.modifier]
   );
-  const rsProps = useInlineReactSelectProps<any, false, never>({
+  const rsProps = useInlineReactSelectProps<
+    OptionType<PetitionFieldVisibilityConditionModifier>,
+    false,
+    never
+  >({
     size: "sm",
   });
+
+  const handleChange = useCallback(
+    (value: OptionType<PetitionFieldVisibilityConditionModifier> | null) => {
+      onChange(updateConditionModifier(condition, field, value!.value));
+    },
+    [onChange, condition, field]
+  );
 
   return (
     <Select
       options={options}
       value={_value}
-      onChange={(value) => onChange(value.value)}
+      onChange={handleChange}
       {...rsProps}
     />
   );
@@ -408,13 +402,7 @@ function ConditionPredicate({
   const intl = useIntl();
   const { modifier } = condition!;
   const options = useMemo(() => {
-    const options: {
-      label: string;
-      value:
-        | PetitionFieldVisibilityConditionOperator
-        | "HAVE_REPLY"
-        | "NOT_HAVE_REPLY";
-    }[] = [];
+    const options: OptionType<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
     if (field.multiple && modifier === "NUMBER_OF_REPLIES") {
       options.push(
         { label: "=", value: "EQUAL" },
@@ -547,56 +535,33 @@ function ConditionPredicate({
     }
     return options;
   }, [field.type, field.multiple, intl.locale, modifier]);
-
   const operator = useMemo(() => {
-    let operator:
-      | PetitionFieldVisibilityConditionOperator
-      | "HAVE_REPLY"
-      | "NOT_HAVE_REPLY" = condition.operator;
-    if (!field.multiple && condition.modifier === "NUMBER_OF_REPLIES") {
-      operator =
-        condition.operator === "GREATER_THAN" ? "HAVE_REPLY" : "NOT_HAVE_REPLY";
-    }
+    const operator =
+      !field.multiple && condition.modifier === "NUMBER_OF_REPLIES"
+        ? condition.operator === "GREATER_THAN"
+          ? "HAVE_REPLY"
+          : "NOT_HAVE_REPLY"
+        : condition.operator;
     return options.find((o) => o.value === operator);
   }, [options, condition.operator, condition.modifier, field.multiple]);
-  const iprops = useInlineReactSelectProps<any, false, never>({ size: "sm" });
-  const props = useReactSelectProps<any, false, never>({ size: "sm" });
-  function handleChange({
-    value,
-  }: {
-    value:
-      | PetitionFieldVisibilityConditionOperator
-      | "HAVE_REPLY"
-      | "NOT_HAVE_REPLY";
-  }) {
-    if (value === "HAVE_REPLY") {
-      onChange({
-        ...condition,
-        modifier: "NUMBER_OF_REPLIES",
-        operator: "GREATER_THAN",
-        value: 0,
-      });
-    } else if (value === "NOT_HAVE_REPLY") {
-      onChange({
-        ...condition,
-        modifier: "NUMBER_OF_REPLIES",
-        operator: "EQUAL",
-        value: 0,
-      });
-    } else {
-      if (field.multiple) {
-        onChange({ ...condition, operator: value });
-      } else {
-        onChange({
-          ...condition,
-          modifier: "ANY",
-          operator: value,
-          value:
-            condition.modifier === "NUMBER_OF_REPLIES" ? null : condition.value,
-        });
-      }
-    }
-  }
+  const iprops = useInlineReactSelectProps<
+    OptionType<PseudoPetitionFieldVisibilityConditionOperator>,
+    false,
+    never
+  >({ size: "sm" });
+  const props = useReactSelectProps<
+    OptionType<PseudoPetitionFieldVisibilityConditionOperator>,
+    false,
+    never
+  >({ size: "sm" });
+  const handleChange = useCallback(
+    function (
+      value: OptionType<PseudoPetitionFieldVisibilityConditionOperator> | null
+    ) {
+      onChange(updateConditionOperator(condition, field, value!.value));
+    },
+    [onChange, condition, field]
+  );
   return !field.multiple && condition.modifier === "NUMBER_OF_REPLIES" ? (
     <Box flex="1">
       <Select
@@ -614,42 +579,40 @@ function ConditionPredicate({
         onChange={handleChange}
         {...iprops}
       />
-      <ConditionValue
-        field={field}
-        showError={showError}
-        value={condition}
-        onChange={onChange}
-      />
+      <Box flex="1" minWidth={20}>
+        {condition.modifier === "NUMBER_OF_REPLIES" ? (
+          <ConditionPredicateValueNumber
+            field={field}
+            showError={showError}
+            value={condition}
+            onChange={onChange}
+          />
+        ) : field.type === "SELECT" ||
+          (field.type === "DYNAMIC_SELECT" &&
+            condition.column !== undefined) ? (
+          <ConditionPredicateValueSelect
+            field={field}
+            showError={showError}
+            value={condition}
+            onChange={onChange}
+          />
+        ) : (
+          <ConditionPredicateValueString
+            field={field}
+            showError={showError}
+            value={condition}
+            onChange={onChange}
+          />
+        )}
+      </Box>
     </>
   );
 }
 
-interface ConditionValueProps
-  extends ValueProps<PetitionFieldVisibilityCondition, false> {
-  field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
-  showError: boolean;
-}
-
-function ConditionValue(props: ConditionValueProps) {
-  const { field, value: condition } = props;
-  return (
-    <Box flex="1" minWidth={20}>
-      {condition.modifier === "NUMBER_OF_REPLIES" ? (
-        <ConditionValueNumber {...props} />
-      ) : field.type === "SELECT" ||
-        (field.type === "DYNAMIC_SELECT" && condition.column !== undefined) ? (
-        <ConditionValueSelect {...props} />
-      ) : (
-        <ConditionValueString {...props} />
-      )}
-    </Box>
-  );
-}
-
-function ConditionValueNumber({
+function ConditionPredicateValueNumber({
   value: condition,
   onChange,
-}: ConditionValueProps) {
+}: ConditionPredicateProps) {
   const intl = useIntl();
   const [value, setValue] = useState((condition.value as number) ?? 0);
   return (
@@ -680,12 +643,12 @@ function ConditionValueNumber({
   );
 }
 
-function ConditionValueSelect({
+function ConditionPredicateValueSelect({
   field,
   showError,
   value: condition,
   onChange,
-}: ConditionValueProps) {
+}: ConditionPredicateProps) {
   const intl = useIntl();
 
   const rsProps = useReactSelectProps<any, false, never>({
@@ -721,11 +684,11 @@ function ConditionValueSelect({
   );
 }
 
-function ConditionValueString({
+function ConditionPredicateValueString({
   showError,
   value: condition,
   onChange,
-}: ConditionValueProps) {
+}: ConditionPredicateProps) {
   const intl = useIntl();
   const [value, setValue] = useState(condition.value as string | null);
   return (
@@ -840,22 +803,4 @@ function VisibilityTypeSelect({
       {...rsProps}
     />
   );
-}
-
-function getDynamicSelectValues(
-  values: (string | DynamicSelectOption)[],
-  level: number
-): string[] {
-  if (level === 0) {
-    return Array.isArray(values[0])
-      ? (values as DynamicSelectOption[]).map(([value]) => value)
-      : (values as string[]);
-  } else {
-    if (!Array.isArray(values[0])) {
-      throw new Error("Invalid level");
-    }
-    return (values as DynamicSelectOption[]).flatMap(([, children]) =>
-      getDynamicSelectValues(children, level - 1)
-    );
-  }
 }
