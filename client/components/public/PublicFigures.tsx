@@ -1,5 +1,5 @@
 import { Box, BoxProps, Center, Grid, Heading, Text } from "@chakra-ui/react";
-import { ReactNode } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "./layout/PublicContainer";
 
@@ -30,64 +30,59 @@ export function PublicFigures(props: BoxProps) {
             md: "repeat(3, 1fr)",
           }}
         >
-          <Feature
-            header="75%"
-            description={
-              <FormattedMessage
-                id="public.figures.time-saving"
-                defaultMessage="saving in working time"
-              />
-            }
-          />
-          <Feature
-            header="98%"
-            description={
-              <FormattedMessage
-                id="public.figures.reduce-emails"
-                defaultMessage="reduction of unnecessary communications"
-              />
-            }
-          />
-          <Feature
-            header={
-              <FormattedMessage
-                id="public.figures.three-times"
-                defaultMessage="x3.7"
-              />
-            }
-            description={
-              <FormattedMessage
-                id="public.figures.close-projects"
-                defaultMessage="acceleration of project completion"
-              />
-            }
-          />
+          <Feature>
+            <FormattedMessage
+              id="public.figures.time-saving"
+              defaultMessage="<b>{value, number, ::percent}</b> saving in working time"
+              values={{
+                value: 0.75,
+                b: (chunks: any) => <FeatureStrong>{chunks}</FeatureStrong>,
+              }}
+            />
+          </Feature>
+          <Feature>
+            <FormattedMessage
+              id="public.figures.reduce-emails"
+              defaultMessage="<b>{value, number, ::percent}</b> reduction of unnecessary communications"
+              values={{
+                value: 0.98,
+                b: (chunks: any) => <FeatureStrong>{chunks}</FeatureStrong>,
+              }}
+            />
+          </Feature>
+          <Feature>
+            <FormattedMessage
+              id="public.figures.close-projects"
+              defaultMessage="<b>x{value, number}</b> acceleration of project completion"
+              values={{
+                value: 3.7,
+                b: (chunks: any) => <FeatureStrong>{chunks}</FeatureStrong>,
+              }}
+            />
+          </Feature>
         </Grid>
       </Center>
     </PublicContainer>
   );
 }
 
-interface FeatureProps extends BoxProps {
-  header: ReactNode;
-  description: ReactNode;
+function FeatureStrong({ children }: PropsWithChildren<{}>) {
+  return (
+    <Text as="strong" display="block" fontSize={40} color="purple.500">
+      {children}
+    </Text>
+  );
 }
 
-function Feature({ header, description, ...props }: FeatureProps) {
+function Feature({ children }: PropsWithChildren<{}>) {
   return (
     <Box
       padding={5}
       textAlign="left"
       borderRadius="lg"
       backgroundColor="gray.50"
-      {...props}
     >
-      <Heading as="h4" marginTop={2} size="2xl" textColor="#6059F7">
-        {header}
-      </Heading>
-      <Text marginTop={2} fontSize="md">
-        {description}
-      </Text>
+      {children}
     </Box>
   );
 }

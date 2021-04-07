@@ -8,17 +8,18 @@ import {
   Text,
 } from "@chakra-ui/react";
 import React from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Link } from "../common/Link";
 import { PublicContainer } from "./layout/PublicContainer";
 
 export function PublicDataProtection(props: BoxProps) {
+  const intl = useIntl();
   return (
     <PublicContainer
       wrapper={{
         paddingY: 16,
         marginY: { base: 8, md: 12, lg: 20 },
-        backgroundColor: "#FAFDFF",
+        backgroundColor: "gray.50",
         ...props,
       }}
     >
@@ -29,17 +30,16 @@ export function PublicDataProtection(props: BoxProps) {
         templateColumns={{
           base: "1fr",
           md: "repeat(2, 1fr)",
-          //lg: "repeat(3, 1fr)",
         }}
       >
-        <Box>
-          <Heading as="h2" size="xl" fontWeight="bold" marginBottom={8}>
+        <Stack spacing={6}>
+          <Heading as="h2" size="xl">
             <FormattedMessage
               id="public.data-protection.title"
               defaultMessage="We protect your clients' data"
             />
           </Heading>
-          <Text marginBottom={6}>
+          <Text>
             <FormattedMessage
               id="public.data-protection.description"
               defaultMessage="Parallel follows <b>ISO/IEC 27001 practices</b> on Information Security Management System and the principles of privacy and security by design."
@@ -54,7 +54,7 @@ export function PublicDataProtection(props: BoxProps) {
               defaultMessage="More information"
             />
           </Link>
-        </Box>
+        </Stack>
         <Stack
           justifyContent="space-evenly"
           alignItems="center"
@@ -64,16 +64,22 @@ export function PublicDataProtection(props: BoxProps) {
         >
           <Box>
             <Image
-              src="https://d0.awsstatic.com/logos/powered-by-aws.png"
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/powered-by-aws.png`}
               width="126px"
-              alt="Powered by AWS Cloud Computing"
+              alt={intl.formatMessage({
+                id: "public.powered-by-aws",
+                defaultMessage: "Powered by AWS Cloud Computing",
+              })}
             />
           </Box>
           <Box>
             <Image
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/gdpr.png`}
               width="214px"
-              alt="Powered by AWS Cloud Computing"
+              alt={intl.formatMessage({
+                id: "public.gdpr-compliant",
+                defaultMessage: "GDPR compliant",
+              })}
             />
           </Box>
         </Stack>

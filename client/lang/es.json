@@ -3526,23 +3526,18 @@
   },
   {
     "term": "public.figures.close-projects",
-    "definition": "aceleración del cierre de proyectos",
-    "context": "acceleration of project completion"
+    "definition": "<b>x{value, number}</b>aceleración del cierre de proyectos",
+    "context": "<b>x{value, number}</b> acceleration of project completion"
   },
   {
     "term": "public.figures.reduce-emails",
-    "definition": "reducción de las comunicaciones innecesarias",
-    "context": "reduction of unnecessary communications"
-  },
-  {
-    "term": "public.figures.three-times",
-    "definition": "x3,7",
-    "context": "x3.7"
+    "definition": "<b>{value, number, ::percent}</b> reducción de las comunicaciones innecesarias",
+    "context": "<b>{value, number, ::percent}</b> reduction of unnecessary communications"
   },
   {
     "term": "public.figures.time-saving",
-    "definition": "ahorro en tiempo de trabajo",
-    "context": "saving in working time"
+    "definition": "<b>{value, number, ::percent}</b> ahorro en tiempo de trabajo",
+    "context": "<b>{value, number, ::percent}</b> saving in working time"
   },
   {
     "term": "public.figures.title",
@@ -3673,6 +3668,11 @@
     "term": "public.forgot.title",
     "definition": "He olvidado mi contraseña",
     "context": "Forgot password"
+  },
+  {
+    "term": "public.gdpr-compliant",
+    "definition": "Conforme con GDPR",
+    "context": "GDPR compliant"
   },
   {
     "term": "public.home-link",
@@ -3963,6 +3963,11 @@
     "term": "public.people.title",
     "definition": "Para quién",
     "context": "For whom"
+  },
+  {
+    "term": "public.powered-by-aws",
+    "definition": "Utilizamos AWS Cloud Computing",
+    "context": "Powered by AWS Cloud Computing"
   },
   {
     "term": "public.privacy.title",
