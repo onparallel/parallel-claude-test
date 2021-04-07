@@ -263,25 +263,10 @@ export function PetitionFieldVisibilityEditor({
                 <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>
                   {conditionField.multiple ? (
                     <ConditionMultipleFieldModifier
-                      type={conditionField.type}
-                      value={condition.modifier}
-                      onChange={(modifier) => {
-                        const next = modifier === "NUMBER_OF_REPLIES";
-                        const prev = condition.modifier === "NUMBER_OF_REPLIES";
-                        const changedModifierType =
-                          (next as any) + (prev as any) === 1;
-                        updateCondition(index, {
-                          fieldId: condition.fieldId,
-                          modifier,
-                          operator: changedModifierType
-                            ? "EQUAL"
-                            : condition.operator,
-                          value: changedModifierType
-                            ? next
-                              ? 0
-                              : null
-                            : condition.value,
-                        });
+                      field={conditionField}
+                      value={condition}
+                      onChange={(condition) => {
+                        updateCondition(index, condition);
                       }}
                     />
                   ) : null}
@@ -334,15 +319,20 @@ PetitionFieldVisibilityEditor.fragments = {
 };
 
 function ConditionMultipleFieldModifier({
-  type,
   value,
+  field,
   onChange,
-}: CustomSelectProps<PetitionFieldVisibilityConditionModifier>) {
+}: ValueProps<PetitionFieldVisibilityCondition, false> & {
+  field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
+}) {
   const intl = useIntl();
   const options = useMemo<
     { label: string; value: PetitionFieldVisibilityConditionModifier }[]
   >(() => {
-    if (type === "FILE_UPLOAD") {
+    if (
+      field.type === "FILE_UPLOAD" ||
+      (field.type === "DYNAMIC_SELECT" && value.column === undefined)
+    ) {
       return [
         {
           label: intl.formatMessage({
@@ -384,11 +374,11 @@ function ConditionMultipleFieldModifier({
         },
       ];
     }
-  }, [type, intl.locale]);
-  const _value = useMemo(() => options.find((o) => o.value === value), [
-    options,
-    value,
-  ]);
+  }, [field.type, intl.locale]);
+  const _value = useMemo(
+    () => options.find((o) => o.value === value.modifier),
+    [options, value]
+  );
   const rsProps = useInlineReactSelectProps<any, false, never>({
     size: "sm",
   });
@@ -461,7 +451,10 @@ function ConditionPredicate({
           value: "NOT_EQUAL",
         }
       );
-    } else if (field.type !== "FILE_UPLOAD") {
+    } else if (
+      field.type !== "FILE_UPLOAD" &&
+      field.type !== "DYNAMIC_SELECT"
+    ) {
       options.push(
         {
           label: intl.formatMessage(
