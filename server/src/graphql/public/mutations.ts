@@ -379,7 +379,7 @@ export const publicCreateSimpleReply = mutationField(
       reply: nonNull(stringArg()),
     },
     authorize: chain(
-      fetchPetitionAccess("keycode"),
+      authenticatePublicAccess("keycode"),
       fieldBelongsToAccess("fieldId"),
       fieldHasType("fieldId", ["TEXT", "SELECT"])
     ),
@@ -443,6 +443,126 @@ export const publicUpdateSimpleReply = mutationField(
         ctx.petitions.updatePetitionFieldReply(
           args.replyId,
           { content: { text: args.reply }, status: "PENDING" },
+          `Contact:${ctx.contact!.id}`
+        ),
+        ctx.petitions.getLastEventForPetitionId(petitionId),
+      ]);
+      if (
+        event &&
+        (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
+        event.data.petition_field_reply_id === args.replyId &&
+        differenceInSeconds(new Date(), event.created_at) < 60
+      ) {
+        await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
+      } else {
+        await ctx.petitions.createEvent({
+          type: "REPLY_UPDATED",
+          petitionId,
+          data: {
+            petition_access_id: reply.petition_access_id!,
+            petition_field_id: reply.petition_field_id,
+            petition_field_reply_id: reply.id,
+          },
+        });
+      }
+      return reply;
+    },
+  }
+);
+
+export const publicCreateDynamicSelectReply = mutationField(
+  "publicCreateDynamicSelectReply",
+  {
+    description: "Creates a reply for a dynamic select field.",
+    type: "PublicPetitionFieldReply",
+    args: {
+      keycode: nonNull(idArg()),
+      fieldId: nonNull(globalIdArg("PetitionField")),
+      reply: nonNull(list(stringArg())),
+    },
+    authorize: chain(
+      authenticatePublicAccess("keycode"),
+      and(
+        fieldBelongsToAccess("fieldId"),
+        fieldHasType("fieldId", ["DYNAMIC_SELECT"])
+      )
+    ),
+    validateArgs: async (_, args, ctx, info) => {
+      const field = (await ctx.petitions.loadField(args.fieldId))!;
+      const [label, value] = args.reply;
+      if (field.type === "DYNAMIC_SELECT") {
+        // the submitted reply must match with the label and possible values of the first column
+        const options = field.options.values as Maybe<string[][]>;
+        const labels = field.options.labels as Maybe<string[]>;
+        const firstColumnOptions = options?.map((o) => o[0]) ?? [];
+        if (
+          !label ||
+          labels?.[0] !== label ||
+          !value ||
+          !firstColumnOptions.includes(value)
+        ) {
+          throw new ArgValidationError(info, "reply", "Invalid option");
+        }
+      }
+    },
+    resolve: async (_, args, ctx) => {
+      const field = (await ctx.petitions.loadField(args.fieldId))!;
+      return await ctx.petitions.createPetitionFieldReply(
+        {
+          petition_field_id: args.fieldId,
+          petition_access_id: ctx.access!.id,
+          type: field.type,
+          content: { columns: [args.reply] },
+        },
+        ctx.contact!
+      );
+    },
+  }
+);
+
+export const publicUpdateDynamicSelectReply = mutationField(
+  "publicUpdateDynamicSelectReply",
+  {
+    description: "Updates a reply for a dynamic select field.",
+    type: "PublicPetitionFieldReply",
+    args: {
+      keycode: nonNull(idArg()),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
+      reply: nonNull(list(nonNull(list(stringArg())))),
+    },
+    authorize: chain(
+      authenticatePublicAccess("keycode"),
+      replyBelongsToAccess("replyId")
+    ),
+    validateArgs: async (_, args, ctx, info) => {
+      // the new reply must match with the structure of the field options
+      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+      if (field.type === "DYNAMIC_SELECT") {
+        const labels = field.options.labels as string[];
+        let levelValues = field.options.values as any;
+        for (let level = 0; level < args.reply.length; level++) {
+          const [label, value] = args.reply[level];
+          if (
+            !label ||
+            label !== labels[level] ||
+            !value ||
+            !levelValues
+              .map((v: string | string[]) => (Array.isArray(v) ? v[0] : v))
+              .includes(value)
+          ) {
+            throw new ArgValidationError(info, "reply", "Invalid option");
+          } else {
+            levelValues = levelValues.find(([v]: string[]) => v === value)?.[1];
+          }
+        }
+      }
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionId = ctx.access!.petition_id;
+      const [reply, event] = await Promise.all([
+        ctx.petitions.updatePetitionFieldReply(
+          args.replyId,
+          { content: { columns: args.reply }, status: "PENDING" },
           `Contact:${ctx.contact!.id}`
         ),
         ctx.petitions.getLastEventForPetitionId(petitionId),

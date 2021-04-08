@@ -527,6 +527,15 @@ type Mutation {
   ): PublicPetition!
 
   """
+  Creates a reply for a dynamic select field.
+  """
+  publicCreateDynamicSelectReply(
+    fieldId: GID!
+    keycode: ID!
+    reply: [String]!
+  ): PublicPetitionFieldReply!
+
+  """
   Creates a reply to a file upload field.
   """
   publicCreateFileUploadReply(
@@ -612,6 +621,15 @@ type Mutation {
   Submits all unpublished comments.
   """
   publicSubmitUnpublishedComments(keycode: ID!): [PublicPetitionFieldComment!]!
+
+  """
+  Updates a reply for a dynamic select field.
+  """
+  publicUpdateDynamicSelectReply(
+    keycode: ID!
+    reply: [[String]!]!
+    replyId: GID!
+  ): PublicPetitionFieldReply!
 
   """
   Update a petition field comment.

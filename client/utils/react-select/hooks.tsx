@@ -353,3 +353,27 @@ export function useInlineReactSelectProps<
     [rsProps]
   ) as any;
 }
+
+export function useFieldSelectReactSelectProps(props: UseReactSelectProps) {
+  const _reactSelectProps = useReactSelectProps(props);
+  return useMemo<SelectProps>(
+    () =>
+      ({
+        ..._reactSelectProps,
+        styles: {
+          ..._reactSelectProps.styles,
+          menu: (styles, props) => ({
+            ...styles,
+            ..._reactSelectProps.styles!.menu?.(styles, props),
+            zIndex: 100,
+          }),
+          valueContainer: (styles, props) => ({
+            ...styles,
+            ..._reactSelectProps.styles!.valueContainer?.(styles, props),
+            paddingRight: 32,
+          }),
+        },
+      } as typeof _reactSelectProps),
+    [_reactSelectProps]
+  );
+}

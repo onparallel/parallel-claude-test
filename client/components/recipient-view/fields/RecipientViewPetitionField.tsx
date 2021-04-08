@@ -3,6 +3,7 @@ import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
+import { RecipientViewPetitionFieldDynamicSelect } from "./RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "./RecipientViewPetitionFieldHeading";
 import { RecipientViewPetitionFieldSelect } from "./RecipientViewPetitionFieldSelect";
@@ -28,6 +29,8 @@ export function RecipientViewPetitionField(
     <RecipientViewPetitionFieldSelect {...props} />
   ) : props.field.type === "FILE_UPLOAD" ? (
     <RecipientViewPetitionFieldFileUpload {...props} />
+  ) : props.field.type === "DYNAMIC_SELECT" ? (
+    <RecipientViewPetitionFieldDynamicSelect {...props} />
   ) : null;
 }
 

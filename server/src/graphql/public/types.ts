@@ -298,7 +298,8 @@ export const PublicPetitionFieldReply = objectType({
       resolve: async (root, _, ctx) => {
         switch (root.type) {
           case "TEXT":
-          case "SELECT": {
+          case "SELECT":
+          case "DYNAMIC_SELECT": {
             return root.content;
           }
           case "FILE_UPLOAD": {

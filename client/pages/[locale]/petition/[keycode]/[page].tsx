@@ -49,6 +49,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compose } from "@parallel/utils/compose";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
@@ -102,7 +103,7 @@ function RecipientView({
           (f, index) =>
             !visibility[index] ||
             f.optional ||
-            f.replies.length > 0 ||
+            completedFieldReplies(f).length > 0 ||
             f.isReadOnly
         );
         if (canFinalize) {
@@ -149,7 +150,7 @@ function RecipientView({
             }
             return (
               visibility[index] &&
-              field.replies.length === 0 &&
+              !completedFieldReplies(field).length &&
               !field.optional &&
               !field.isReadOnly
             );
@@ -427,7 +428,7 @@ function RecipientView({
                       }
                       isInvalid={
                         finalized &&
-                        field.replies.length === 0 &&
+                        completedFieldReplies(field).length === 0 &&
                         !field.optional
                       }
                       hasCommentsEnabled={petition.hasCommentsEnabled}

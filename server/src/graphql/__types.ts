@@ -588,6 +588,7 @@ export interface NexusGenFieldTypes {
     markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
+    publicCreateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicCreateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -599,6 +600,7 @@ export interface NexusGenFieldTypes {
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
     publicSubmitUnpublishedComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
+    publicUpdateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
@@ -1322,6 +1324,7 @@ export interface NexusGenFieldTypeNames {
     markPetitionFieldCommentsAsRead: "PetitionFieldComment";
     publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
+    publicCreateDynamicSelectReply: "PublicPetitionFieldReply";
     publicCreateFileUploadReply: "CreateFileUploadReply";
     publicCreatePetitionFieldComment: "PublicPetitionFieldComment";
     publicCreateSimpleReply: "PublicPetitionFieldReply";
@@ -1333,6 +1336,7 @@ export interface NexusGenFieldTypeNames {
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicSendVerificationCode: "VerificationCodeRequest";
     publicSubmitUnpublishedComments: "PublicPetitionFieldComment";
+    publicUpdateDynamicSelectReply: "PublicPetitionFieldReply";
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdateSimpleReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
@@ -2119,6 +2123,12 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       signer?: NexusGenInputs["PublicPetitionSignerData"] | null; // PublicPetitionSignerData
     };
+    publicCreateDynamicSelectReply: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      keycode: string; // ID!
+      reply: Array<string | null>; // [String]!
+    };
     publicCreateFileUploadReply: {
       // args
       data: NexusGenInputs["CreateFileUploadReplyInput"]; // CreateFileUploadReplyInput!
@@ -2179,6 +2189,12 @@ export interface NexusGenArgTypes {
     publicSubmitUnpublishedComments: {
       // args
       keycode: string; // ID!
+    };
+    publicUpdateDynamicSelectReply: {
+      // args
+      keycode: string; // ID!
+      reply: Array<Array<string | null>>; // [[String]!]!
+      replyId: NexusGenScalars["GID"]; // GID!
     };
     publicUpdatePetitionFieldComment: {
       // args

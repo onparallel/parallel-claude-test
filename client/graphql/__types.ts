@@ -255,6 +255,8 @@ export type Mutation = {
    * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
+  /** Creates a reply for a dynamic select field. */
+  publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: CreateFileUploadReply;
   /** Create a petition field comment. */
@@ -276,6 +278,8 @@ export type Mutation = {
   publicSendVerificationCode: VerificationCodeRequest;
   /** Submits all unpublished comments. */
   publicSubmitUnpublishedComments: Array<PublicPetitionFieldComment>;
+  /** Updates a reply for a dynamic select field. */
+  publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Updates a reply to a text or select field. */
@@ -523,6 +527,12 @@ export type MutationpublicCompletePetitionArgs = {
   signer?: Maybe<PublicPetitionSignerData>;
 };
 
+export type MutationpublicCreateDynamicSelectReplyArgs = {
+  fieldId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  reply: Array<Maybe<Scalars["String"]>>;
+};
+
 export type MutationpublicCreateFileUploadReplyArgs = {
   data: CreateFileUploadReplyInput;
   fieldId: Scalars["GID"];
@@ -582,6 +592,12 @@ export type MutationpublicSendVerificationCodeArgs = {
 
 export type MutationpublicSubmitUnpublishedCommentsArgs = {
   keycode: Scalars["ID"];
+};
+
+export type MutationpublicUpdateDynamicSelectReplyArgs = {
+  keycode: Scalars["ID"];
+  reply: Array<Array<Maybe<Scalars["String"]>>>;
+  replyId: Scalars["GID"];
 };
 
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
@@ -3517,7 +3533,10 @@ export type RecipientViewProgressFooter_PublicPetitionFragment = {
 
 export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-} & Pick<PublicPetitionField, "id" | "optional" | "isReadOnly"> & {
+} & Pick<
+  PublicPetitionField,
+  "id" | "type" | "options" | "optional" | "isReadOnly"
+> & {
     replies: Array<
       { __typename?: "PublicPetitionFieldReply" } & Pick<
         PublicPetitionFieldReply,
@@ -3730,6 +3749,37 @@ export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation 
   publicCreateSimpleReply: {
     __typename?: "PublicPetitionFieldReply";
   } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+};
+
+export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  reply: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCreateDynamicSelectReply: {
+    __typename?: "PublicPetitionFieldReply";
+  } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+};
+
+export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  reply:
+    | Array<Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>>
+    | Array<Maybe<Scalars["String"]>>
+    | Maybe<Scalars["String"]>;
+}>;
+
+export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicUpdateDynamicSelectReply: {
+    __typename?: "PublicPetitionFieldReply";
+  } & Pick<PublicPetitionFieldReply, "id" | "content" | "status" | "updatedAt">;
 };
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables = Exact<{
@@ -6933,6 +6983,8 @@ export const RecipientViewContentsCard_PublicPetitionFieldFragmentDoc = gql`
 export const RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewProgressFooter_PublicPetitionField on PublicPetitionField {
     id
+    type
+    options
     optional
     isReadOnly
     replies {
@@ -8911,6 +8963,116 @@ export function useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMu
 }
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationHookResult = ReturnType<
   typeof useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation
+>;
+export const RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument = gql`
+  mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(
+    $keycode: ID!
+    $fieldId: GID!
+    $reply: [String!]!
+  ) {
+    publicCreateDynamicSelectReply(
+      keycode: $keycode
+      fieldId: $fieldId
+      reply: $reply
+    ) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+`;
+
+/**
+ * __useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation__
+ *
+ * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewPetitionFieldMutationsPublicCreateDynamicSelectReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      fieldId: // value for 'fieldId'
+ *      reply: // value for 'reply'
+ *   },
+ * });
+ */
+export function useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation,
+    RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation,
+    RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables
+  >(
+    RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument,
+    options
+  );
+}
+export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation
+>;
+export const RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyDocument = gql`
+  mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
+    $keycode: ID!
+    $replyId: GID!
+    $reply: [[String]!]!
+  ) {
+    publicUpdateDynamicSelectReply(
+      keycode: $keycode
+      replyId: $replyId
+      reply: $reply
+    ) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * __useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation__
+ *
+ * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewPetitionFieldMutationsPublicUpdateDynamicSelectReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      replyId: // value for 'replyId'
+ *      reply: // value for 'reply'
+ *   },
+ * });
+ */
+export function useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation,
+    RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation,
+    RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables
+  >(
+    RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyDocument,
+    options
+  );
+}
+export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation
 >;
 export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateFileUploadReply(

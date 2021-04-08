@@ -3,11 +3,8 @@ import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
-import {
-  UseReactSelectProps,
-  useReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
-import { SelectProps } from "@parallel/utils/react-select/types";
+import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
@@ -191,7 +188,7 @@ interface RecipientViewPetitionFieldReplySelectProps {
   onDelete: () => void;
 }
 
-export const RecipientViewPetitionFieldReplySelect = forwardRef<
+const RecipientViewPetitionFieldReplySelect = forwardRef<
   SelectInstance,
   RecipientViewPetitionFieldReplySelectProps
 >(function RecipientViewPetitionFieldReplySelect(
@@ -269,31 +266,3 @@ export const RecipientViewPetitionFieldReplySelect = forwardRef<
     </Stack>
   );
 });
-
-function toSelectOption(value: string | null) {
-  return value === null ? null : { value, label: value };
-}
-
-function useFieldSelectReactSelectProps(props: UseReactSelectProps) {
-  const _reactSelectProps = useReactSelectProps(props);
-  return useMemo<SelectProps>(
-    () =>
-      ({
-        ..._reactSelectProps,
-        styles: {
-          ..._reactSelectProps.styles,
-          menu: (styles, props) => ({
-            ...styles,
-            ..._reactSelectProps.styles!.menu?.(styles, props),
-            zIndex: 100,
-          }),
-          valueContainer: (styles, props) => ({
-            ...styles,
-            ..._reactSelectProps.styles!.valueContainer?.(styles, props),
-            paddingRight: 32,
-          }),
-        },
-      } as typeof _reactSelectProps),
-    [_reactSelectProps]
-  );
-}

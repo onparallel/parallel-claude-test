@@ -17,6 +17,7 @@ import {
   RecipientViewPetitionFieldCard_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../../common/BreakLines";
@@ -49,7 +50,9 @@ export function RecipientViewPetitionFieldCard({
 }: RecipientViewPetitionFieldCardProps) {
   const intl = useIntl();
 
-  const isTextLikeType = ["TEXT", "SELECT"].includes(field.type);
+  const isTextLikeType = ["TEXT", "SELECT", "DYNAMIC_SELECT"].includes(
+    field.type
+  );
 
   const showFieldComments = usePetitionFieldCommentsDialog();
   async function handleCommentsButtonClick() {
@@ -144,13 +147,15 @@ export function RecipientViewPetitionFieldCard({
           <FormattedMessage
             id="component.recipient-view-petition-field-card.replies-submitted"
             defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
-            values={{ count: field.replies.length }}
+            values={{ count: completedFieldReplies(field).length }}
           />
         ) : field.type === "FILE_UPLOAD" ? (
           <FormattedMessage
             id="component.recipient-view-petition-field-card.files-uploaded"
             defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
-            values={{ count: field.replies.length }}
+            values={{
+              count: completedFieldReplies(field).length,
+            }}
           />
         ) : null}
       </Text>

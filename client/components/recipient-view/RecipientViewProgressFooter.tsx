@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 import { RecipientViewProgressFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
@@ -27,8 +28,9 @@ export function RecipientViewProgressFooter({
     let total = 0;
     for (const [field, isVisible] of zip(petition.fields, fieldVisibility)) {
       if (isVisible && !field.isReadOnly) {
-        replied += field.replies.length ? 1 : 0;
-        optional += field.optional && !field.replies.length ? 1 : 0;
+        replied += completedFieldReplies(field).length ? 1 : 0;
+        optional +=
+          field.optional && !completedFieldReplies(field).length ? 1 : 0;
         total += 1;
       }
     }
@@ -141,6 +143,8 @@ RecipientViewProgressFooter.fragments = {
     return gql`
       fragment RecipientViewProgressFooter_PublicPetitionField on PublicPetitionField {
         id
+        type
+        options
         optional
         isReadOnly
         replies {

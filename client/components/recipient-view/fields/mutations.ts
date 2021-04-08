@@ -8,6 +8,8 @@ import {
   useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation,
   useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
   useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
+  useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation,
+  useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { MutableRefObject, useCallback } from "react";
@@ -159,6 +161,113 @@ export function useCreateSimpleReply() {
       return data?.publicCreateSimpleReply;
     },
     [createSimpleReply]
+  );
+}
+
+const _publicCreateDynamicSelectReply = gql`
+  mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(
+    $keycode: ID!
+    $fieldId: GID!
+    $reply: [String!]!
+  ) {
+    publicCreateDynamicSelectReply(
+      keycode: $keycode
+      fieldId: $fieldId
+      reply: $reply
+    ) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+`;
+
+export function useCreateDynamicSelectReply() {
+  const [
+    createDynamicSelectReply,
+  ] = useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation();
+  return useCallback(
+    async function _createDynamicSelectReply({
+      petitionId,
+      keycode,
+      fieldId,
+      content,
+    }: {
+      petitionId: string;
+      keycode: string;
+      fieldId: string;
+      content: string[];
+    }) {
+      const { data } = await createDynamicSelectReply({
+        variables: {
+          keycode,
+          fieldId,
+          reply: content,
+        },
+        update(cache, { data }) {
+          updateFieldReplies(cache, fieldId, (replies) => [
+            ...replies,
+            pick(data!.publicCreateDynamicSelectReply, ["id", "__typename"]),
+          ]);
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+      return data?.publicCreateDynamicSelectReply;
+    },
+    [createDynamicSelectReply]
+  );
+}
+
+const _publicUpdateDynamicSelectReply = gql`
+  mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
+    $keycode: ID!
+    $replyId: GID!
+    $reply: [[String]!]!
+  ) {
+    publicUpdateDynamicSelectReply(
+      keycode: $keycode
+      replyId: $replyId
+      reply: $reply
+    ) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+`;
+
+export function useUpdateDynamicSelectReply() {
+  const [
+    updateDynamicSelectReply,
+  ] = useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation();
+  return useCallback(
+    async function _updateDynamicSelectReply({
+      petitionId,
+      keycode,
+      replyId,
+      content,
+    }: {
+      petitionId: string;
+      keycode: string;
+      replyId: string;
+      content: string[][];
+    }) {
+      await updateDynamicSelectReply({
+        variables: {
+          keycode,
+          replyId,
+          reply: content,
+        },
+        update(cache, { data }) {
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+    },
+    [updateDynamicSelectReply]
   );
 }
 
