@@ -136,6 +136,22 @@ async function* getPetitionFiles(
   const textReplies = new TextRepliesExcel(locale);
   const seen = new Set<string>();
   let headingCount = 0;
+
+  function addEmptyReply(field: any) {
+    textReplies.addRows(
+      [
+        {
+          title: field.title || "",
+          description: field.description?.slice(0, 200) || "",
+          answer: textReplies.labels.noAnswer,
+        },
+      ],
+      {
+        fontColorARGB: "FFA6A6A6",
+      }
+    );
+  }
+
   for (const [field, replies] of zip(fields, fieldReplies)) {
     if (field.type === "HEADING") {
       headingCount++;
@@ -178,18 +194,26 @@ async function* getPetitionFiles(
           }))
         );
       } else {
+        addEmptyReply(field);
+      }
+    } else if (field.type === "DYNAMIC_SELECT") {
+      if (replies.length > 0) {
         textReplies.addRows(
-          [
-            {
-              title: field.title || "",
+          replies.flatMap((r, i) =>
+            (r.content.labels as string[]).map((label, level) => ({
+              title:
+                field.title?.concat(
+                  ` (${label})`,
+                  field.multiple ? ` [${i + 1}]` : ""
+                ) || "",
               description: field.description?.slice(0, 200) || "",
-              answer: textReplies.labels.noAnswer,
-            },
-          ],
-          {
-            fontColorARGB: "FFA6A6A6",
-          }
+              answer:
+                r.content.columns[level]?.[1] || textReplies.labels.noAnswer,
+            }))
+          )
         );
+      } else {
+        addEmptyReply(field);
       }
     }
   }
