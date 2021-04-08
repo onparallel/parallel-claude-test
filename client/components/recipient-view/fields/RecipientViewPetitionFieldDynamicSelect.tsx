@@ -181,6 +181,7 @@ function RecipientViewPetitionFieldReplyDynamicSelect({
           content: updatedReply,
         });
         onReplyUpdated?.();
+        refs[level + 1].current?.focus();
       }
     }
   }
@@ -275,7 +276,8 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
     ((reply?.content.columns as string[][]) ?? [])
       .slice(0, level)
       .forEach((replied) => {
-        options = options.find((value: any) => value[0] === replied[1])[1];
+        options =
+          options.find((value: any) => value[0] === replied[1])?.[1] ?? [];
       });
     return options.map(
       (value: any) =>

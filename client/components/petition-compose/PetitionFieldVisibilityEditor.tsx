@@ -357,7 +357,7 @@ function ConditionMultipleFieldModifier({
         },
       ];
     }
-  }, [field.type, intl.locale]);
+  }, [field.type, condition.column, intl.locale]);
   const _value = useMemo(
     () => options.find((o) => o.value === condition.modifier),
     [options, condition.modifier]

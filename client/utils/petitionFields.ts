@@ -90,7 +90,7 @@ export function getDynamicSelectValues(
       ? (values as DynamicSelectOption[]).map(([value]) => value)
       : (values as string[]);
   } else {
-    if (!Array.isArray(values[0])) {
+    if (values.length && !Array.isArray(values[0])) {
       throw new Error("Invalid level");
     }
     return (values as DynamicSelectOption[]).flatMap(([, children]) =>
