@@ -14,7 +14,7 @@ import { getClientIp } from "request-ip";
 import { ApiContext } from "../../context";
 import { Petition } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { stallFor } from "../../util/stallFor";
+import { stallFor } from "../../util/promises/stallFor";
 import { random } from "../../util/token";
 import { Maybe } from "../../util/types";
 import { and, chain, checkClientServerToken } from "../helpers/authorize";

@@ -25,6 +25,7 @@ import {
   fromGlobalIds,
   toGlobalId,
 } from "../../../util/globalId";
+import { withError } from "../../../util/promises/withError";
 import { isDefined } from "../../../util/remedaExtensions";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import { random } from "../../../util/token";
@@ -41,7 +42,7 @@ import { datetimeArg } from "../../helpers/date";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { importFromExcel } from "../../helpers/importDataFromExcel";
 import { jsonArg, jsonObjectArg } from "../../helpers/json";
-import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectFieldValues";
+import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
 import { RESULT } from "../../helpers/result";
 import { uploadArg } from "../../helpers/upload";
 import {
@@ -698,21 +699,31 @@ export const uploadDynamicSelectFile = mutationField(
     resolve: async (_, args, ctx) => {
       const file = await args.file;
 
-      const { createReadStream, filename, mimetype } = file;
-      const data = await importFromExcel(file);
-      const { values, labels } = parseDynamicSelectValues(data);
+      const [importError, importResult] = await withError(
+        importFromExcel(file.createReadStream())
+      );
+      if (importError) {
+        throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
+      }
+      const [parseError, parseResult] = await withError(() =>
+        parseDynamicSelectValues(importResult!)
+      );
+      if (parseError) {
+        throw new WhitelistedError(parseError.message, "INVALID_FORMAT_ERROR");
+      }
+      const { labels, values } = parseResult!;
 
       const key = random(16);
       const res = await ctx.aws.fileUploads.uploadFile(
         key,
-        mimetype,
-        createReadStream()
+        file.mimetype,
+        file.createReadStream()
       );
 
       const fileUpload = await ctx.files.createFileUpload(
         {
-          content_type: mimetype,
-          filename,
+          content_type: file.mimetype,
+          filename: file.filename,
           path: key,
           size: res["ContentLength"]!.toString(),
           upload_complete: true,
