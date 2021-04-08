@@ -17,7 +17,7 @@ function cleanAndValidate(data: string[][]): string[][] {
   for (let r = 1; r < data.length; r++) {
     const row = data[r].slice(0, headers.length);
     if (row.every((c) => !c)) {
-      break;
+      continue;
     }
     const missing = row.findIndex((c) => !c);
     if (missing !== -1) {

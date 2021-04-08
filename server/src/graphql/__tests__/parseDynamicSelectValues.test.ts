@@ -1,6 +1,6 @@
 import { parseDynamicSelectValues } from "../helpers/parseDynamicSelectValues";
 
-describe.only("parseDynamicSelectValues", () => {
+describe("parseDynamicSelectValues", () => {
   it("parses data", () => {
     expect(
       parseDynamicSelectValues([
@@ -47,7 +47,7 @@ describe.only("parseDynamicSelectValues", () => {
     });
   });
 
-  it("stops on empty lines", () => {
+  it("skips empty lines", () => {
     expect(
       parseDynamicSelectValues([
         ["Comunidad autónoma", "Provincia", "Municipio"],
@@ -65,6 +65,8 @@ describe.only("parseDynamicSelectValues", () => {
         ["Castilla y León", "Soria", "El Burgo de Osma"],
         ["", "", ""],
         ["Castilla y León", "Soria", "Almazán"],
+        ["", "", ""],
+        ["", "", ""],
       ])
     ).toEqual({
       labels: ["Comunidad autónoma", "Provincia", "Municipio"],
@@ -88,7 +90,7 @@ describe.only("parseDynamicSelectValues", () => {
           "Castilla y León",
           [
             ["Burgos", ["Burgos", "Aranda de Duero", "Torresandino"]],
-            ["Soria", ["Soria", "El Burgo de Osma"]],
+            ["Soria", ["Soria", "El Burgo de Osma", "Almazán"]],
           ],
         ],
       ],
