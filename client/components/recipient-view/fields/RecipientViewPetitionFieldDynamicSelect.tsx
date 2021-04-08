@@ -76,8 +76,9 @@ export function RecipientViewPetitionFieldDynamicSelect({
     !isDisabled &&
     !showNewReply &&
     field.multiple &&
+    field.options.labels.length &&
     field.replies.every(
-      (reply) => reply.content.columns.length === field.options.labels.length
+      (reply) => reply.content.columns.length === reply.content.labels.length
     );
 
   return (
@@ -198,7 +199,7 @@ function RecipientViewPetitionFieldReplyDynamicSelect({
 
   return (
     <Stack {...props}>
-      {fieldOptions.labels
+      {((reply?.content.labels as string[]) ?? fieldOptions.labels)
         .slice(0, (reply?.content.columns.length ?? 0) + 1)
         .map((label, level) => (
           <RecipientViewPetitionFieldReplyDynamicSelectLevel

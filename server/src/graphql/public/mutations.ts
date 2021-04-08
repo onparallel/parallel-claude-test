@@ -512,7 +512,10 @@ export const publicCreateDynamicSelectReply = mutationField(
           petition_field_id: args.fieldId,
           petition_access_id: ctx.access!.id,
           type: field.type,
-          content: { columns: [args.reply] },
+          content: {
+            columns: [args.reply],
+            labels: field.options.labels,
+          },
         },
         ctx.contact!
       );
@@ -559,10 +562,17 @@ export const publicUpdateDynamicSelectReply = mutationField(
     },
     resolve: async (_, args, ctx) => {
       const petitionId = ctx.access!.petition_id;
+      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
       const [reply, event] = await Promise.all([
         ctx.petitions.updatePetitionFieldReply(
           args.replyId,
-          { content: { columns: args.reply }, status: "PENDING" },
+          {
+            content: {
+              columns: args.reply,
+              labels: field.options.labels,
+            },
+            status: "PENDING",
+          },
           `Contact:${ctx.contact!.id}`
         ),
         ctx.petitions.getLastEventForPetitionId(petitionId),
