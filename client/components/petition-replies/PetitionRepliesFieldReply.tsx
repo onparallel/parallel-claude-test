@@ -1,5 +1,13 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Stack, Text, VisuallyHidden } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  List,
+  ListItem,
+  Stack,
+  Text,
+  VisuallyHidden,
+} from "@chakra-ui/react";
 import {
   CheckIcon,
   CloseIcon,
@@ -32,144 +40,163 @@ export interface PetitionRepliesFieldReplyProps {
 
 export type PetitionRepliesFieldAction = "DOWNLOAD_FILE" | "PREVIEW_FILE";
 
-export const PetitionRepliesFieldReply = Object.assign(
-  chakraForwardRef<"div", PetitionRepliesFieldReplyProps>(
-    function PetitionRepliesFieldReply(
-      { reply, onUpdateStatus, onAction, ...props },
-      ref
-    ) {
-      const intl = useIntl();
-      const isTextLikeType = ["TEXT", "SELECT"].includes(reply.field!.type);
-      return (
-        <Flex ref={ref} {...props}>
-          <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">
-            {isTextLikeType ? (
-              <CopyToClipboardButton size="xs" text={reply.content.text} />
-            ) : reply.field!.type === "FILE_UPLOAD" ? (
-              <Stack spacing={1}>
-                <ReplyDownloadButton
-                  contentType={reply.content.contentType}
-                  onDownload={(preview) =>
-                    onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")
-                  }
-                />
-                {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
-                  <IconButtonWithTooltip
-                    size="xs"
-                    as="a"
-                    href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${reply.metadata.EXTERNAL_ID_CUATRECASAS}`}
-                    target="_href"
-                    icon={<NetDocumentsIcon fontSize="14px" />}
-                    label={intl.formatMessage({
-                      id:
-                        "petition-replies.petition-field-reply.netdocuments-link",
-                      defaultMessage: "Access file in NetDocuments",
-                    })}
-                    placement="right"
-                  />
-                ) : null}
-              </Stack>
-            ) : null}
-          </Box>
-          <Flex
-            flexDirection="column"
-            justifyContent="center"
-            flex="1"
-            marginLeft={2}
-          >
-            {isTextLikeType ? (
-              <BreakLines text={reply.content.text} />
-            ) : reply.field!.type === "FILE_UPLOAD" ? (
-              <Box>
-                <VisuallyHidden>
-                  {intl.formatMessage({
-                    id: "generic.file-name",
-                    defaultMessage: "File name",
-                  })}
-                </VisuallyHidden>
-                <Text as="span">{reply.content.filename}</Text>
-                <Text as="span" marginX={2}>
-                  -
-                </Text>
-                <Text
-                  as="span"
-                  aria-label={intl.formatMessage({
-                    id: "generic.file-size",
-                    defaultMessage: "File size",
-                  })}
-                  fontSize="sm"
-                  color="gray.500"
-                >
-                  <FileSize value={reply.content.size} />
-                </Text>
-              </Box>
-            ) : null}
-            <Box fontSize="sm">
-              <DateTime
-                as="span"
-                color="gray.500"
-                value={reply.createdAt}
-                format={FORMATS.LLL}
+export function PetitionRepliesFieldReply({
+  reply,
+  onUpdateStatus,
+  onAction,
+}: PetitionRepliesFieldReplyProps) {
+  const intl = useIntl();
+  const isTextLikeType = ["TEXT", "SELECT"].includes(reply.field!.type);
+  return (
+    <Flex>
+      <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">
+        {isTextLikeType ? (
+          <CopyToClipboardButton size="xs" text={reply.content.text} />
+        ) : reply.field!.type === "FILE_UPLOAD" ? (
+          <Stack spacing={1}>
+            <ReplyDownloadButton
+              contentType={reply.content.contentType}
+              onDownload={(preview) =>
+                onAction(preview ? "PREVIEW_FILE" : "DOWNLOAD_FILE")
+              }
+            />
+            {reply.metadata.EXTERNAL_ID_CUATRECASAS ? (
+              <IconButtonWithTooltip
+                size="xs"
+                as="a"
+                href={`https://eu.netdocuments.com/neWeb2/goid.aspx?id=${reply.metadata.EXTERNAL_ID_CUATRECASAS}`}
+                target="_href"
+                icon={<NetDocumentsIcon fontSize="14px" />}
+                label={intl.formatMessage({
+                  id: "petition-replies.petition-field-reply.netdocuments-link",
+                  defaultMessage: "Access file in NetDocuments",
+                })}
+                placement="right"
               />
-            </Box>
-          </Flex>
-          <Stack direction="row" spacing={1}>
-            <IconButtonWithTooltip
-              icon={<CheckIcon />}
-              label={intl.formatMessage({
-                id: "petition-replies.petition-field-reply.approve",
-                defaultMessage: "Approve",
-              })}
-              size="xs"
-              placement="bottom"
-              colorScheme={reply.status === "APPROVED" ? "green" : "gray"}
-              role="switch"
-              aria-checked={reply.status === "APPROVED"}
-              onClick={() =>
-                onUpdateStatus(
-                  reply.status === "APPROVED" ? "PENDING" : "APPROVED"
-                )
-              }
-            />
-            <IconButtonWithTooltip
-              icon={<CloseIcon />}
-              label={intl.formatMessage({
-                id: "petition-replies.petition-field-reply.reject",
-                defaultMessage: "Reject",
-              })}
-              size="xs"
-              placement="bottom"
-              role="switch"
-              colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
-              aria-checked={reply.status === "REJECTED"}
-              onClick={() =>
-                onUpdateStatus(
-                  reply.status === "REJECTED" ? "PENDING" : "REJECTED"
-                )
-              }
-            />
+            ) : null}
           </Stack>
-        </Flex>
-      );
-    }
-  ),
-  {
-    fragments: {
-      PetitionFieldReply: gql`
-        fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
-          id
-          content
-          status
-          createdAt
-          metadata
-          field {
-            type
+        ) : reply.field!.type === "DYNAMIC_SELECT" ? (
+          <Stack spacing={1}>
+            {(reply.content.columns as [string, string][]).map(
+              ([label, value], index) => (
+                <CopyToClipboardButton
+                  key={index}
+                  aria-label={intl.formatMessage(
+                    {
+                      id:
+                        "petition-replies.petition-field-reply.copy-dynamic-select-reply",
+                      defaultMessage: "Copy {label} to clipboard",
+                    },
+                    { label }
+                  )}
+                  size="xs"
+                  text={value}
+                />
+              )
+            )}
+          </Stack>
+        ) : null}
+      </Box>
+      <Flex
+        flexDirection="column"
+        justifyContent="center"
+        flex="1"
+        marginLeft={2}
+      >
+        {isTextLikeType ? (
+          <BreakLines text={reply.content.text} />
+        ) : reply.field!.type === "FILE_UPLOAD" ? (
+          <Box>
+            <VisuallyHidden>
+              {intl.formatMessage({
+                id: "generic.file-name",
+                defaultMessage: "File name",
+              })}
+            </VisuallyHidden>
+            <Text as="span">{reply.content.filename}</Text>
+            <Text as="span" marginX={2}>
+              -
+            </Text>
+            <Text
+              as="span"
+              aria-label={intl.formatMessage({
+                id: "generic.file-size",
+                defaultMessage: "File size",
+              })}
+              fontSize="sm"
+              color="gray.500"
+            >
+              <FileSize value={reply.content.size} />
+            </Text>
+          </Box>
+        ) : reply.field!.type === "DYNAMIC_SELECT" ? (
+          <List spacing={1}>
+            {(reply.content.columns as [string, string][]).map(
+              ([, value], index) => (
+                <ListItem key={index}>{value}</ListItem>
+              )
+            )}
+          </List>
+        ) : null}
+        <Box fontSize="sm">
+          <DateTime
+            as="span"
+            color="gray.500"
+            value={reply.createdAt}
+            format={FORMATS.LLL}
+          />
+        </Box>
+      </Flex>
+      <Stack direction="row" spacing={1}>
+        <IconButtonWithTooltip
+          icon={<CheckIcon />}
+          label={intl.formatMessage({
+            id: "petition-replies.petition-field-reply.approve",
+            defaultMessage: "Approve",
+          })}
+          size="xs"
+          placement="bottom"
+          colorScheme={reply.status === "APPROVED" ? "green" : "gray"}
+          role="switch"
+          aria-checked={reply.status === "APPROVED"}
+          onClick={() =>
+            onUpdateStatus(reply.status === "APPROVED" ? "PENDING" : "APPROVED")
           }
-        }
-      `,
-    },
-  }
-);
+        />
+        <IconButtonWithTooltip
+          icon={<CloseIcon />}
+          label={intl.formatMessage({
+            id: "petition-replies.petition-field-reply.reject",
+            defaultMessage: "Reject",
+          })}
+          size="xs"
+          placement="bottom"
+          role="switch"
+          colorScheme={reply.status === "REJECTED" ? "red" : "gray"}
+          aria-checked={reply.status === "REJECTED"}
+          onClick={() =>
+            onUpdateStatus(reply.status === "REJECTED" ? "PENDING" : "REJECTED")
+          }
+        />
+      </Stack>
+    </Flex>
+  );
+}
+
+PetitionRepliesFieldReply.fragments = {
+  PetitionFieldReply: gql`
+    fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
+      id
+      content
+      status
+      createdAt
+      metadata
+      field {
+        type
+      }
+    }
+  `,
+};
 
 const ReplyDownloadButton = chakraForwardRef<
   "button",

@@ -1,26 +1,22 @@
-import {
-  IconButton,
-  IconButtonProps,
-  Tooltip,
-  TooltipProps,
-} from "@chakra-ui/react";
+import { IconButton, Tooltip, TooltipProps } from "@chakra-ui/react";
 import { ClipboardIcon } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import copy from "clipboard-copy";
-import { memo, MouseEvent, useState } from "react";
+import { MouseEvent, useState } from "react";
 import { useIntl } from "react-intl";
 
 export type CopyToClipboardButtonProps = {
   text: string;
   placement?: TooltipProps["placement"];
-} & Omit<IconButtonProps, "icon" | "aria-label">;
+};
 
-export const CopyToClipboardButton = memo(function CopyToClipboardButton({
-  text,
-  placement,
-  onClick,
-  onMouseOut,
-  ...props
-}: CopyToClipboardButtonProps) {
+export const CopyToClipboardButton = chakraForwardRef<
+  "button",
+  CopyToClipboardButtonProps
+>(function CopyToClipboardButton(
+  { "aria-label": ariaLabel, text, placement, onClick, onMouseOut, ...props },
+  ref
+) {
   const intl = useIntl();
   const labels = {
     copy: intl.formatMessage({
@@ -48,13 +44,10 @@ export const CopyToClipboardButton = memo(function CopyToClipboardButton({
   }
 
   return (
-    <Tooltip
-      label={copied ? labels.copied : labels.copy}
-      aria-label={labels.copy}
-      placement={placement}
-    >
+    <Tooltip label={copied ? labels.copied : labels.copy} placement={placement}>
       <IconButton
-        aria-label={labels.copy}
+        ref={ref}
+        aria-label={ariaLabel ?? labels.copy}
         icon={<ClipboardIcon />}
         onClick={handleClick}
         onMouseOut={handleMouseOut}

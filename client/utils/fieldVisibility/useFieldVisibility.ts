@@ -64,7 +64,7 @@ function conditionIsMet(
   function evaluator(reply: any) {
     const _value =
       condition.column !== undefined
-        ? reply.content.text[condition.column]
+        ? reply.content.text?.[condition.column] ?? null
         : reply.content.text;
     return evaluatePredicate(_value, operator, value);
   }

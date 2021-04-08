@@ -11,7 +11,7 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { CommentIcon } from "@parallel/chakra/icons";
+import { ArrowForwardIcon, CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -201,6 +201,23 @@ export function PetitionRepliesField({
           </Text>
         )}
       </Box>
+      {field.type === "DYNAMIC_SELECT" ? (
+        <Stack
+          as="ol"
+          listStyleType="none"
+          direction="row"
+          alignItems="center"
+          fontSize="sm"
+          divider={<ArrowForwardIcon border="none" />}
+          marginBottom={2}
+        >
+          {(field.options.labels as string[])?.map((label, index) => (
+            <Box key={index} as="li">
+              {label}
+            </Box>
+          ))}
+        </Stack>
+      ) : null}
       {field.replies.length ? (
         <Stack spacing={4}>
           {field.replies.map((reply) => (
@@ -325,6 +342,7 @@ PetitionRepliesField.fragments = {
       title
       description
       validated
+      options
       replies {
         ...PetitionRepliesField_PetitionFieldReply
       }

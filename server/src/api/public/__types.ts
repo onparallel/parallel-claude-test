@@ -138,6 +138,7 @@ export type FeatureFlag =
   | "SKIP_FORWARD_SECURITY";
 
 export type FileUploadReplyDownloadLinkResult = {
+  filename: Maybe<Scalars["String"]>;
   result: Result;
   url: Maybe<Scalars["String"]>;
 };
@@ -220,6 +221,8 @@ export type Mutation = {
   deletePetitionSubscription: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
+  dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Edits permissions on given petitions and users */
   editPetitionUserPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
@@ -228,10 +231,11 @@ export type Mutation = {
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Marks the specified comments as read. */
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
-  /** Checks if a PetitionClosedNotification was already sent or not */
-  presendPetitionClosedNotification: Result;
   publicCheckVerificationCode: VerificationCodeCheck;
-  /** Marks a filled petition as COMPLETED. If the petition requires signature, starts the signing. Otherwise sends email to user. */
+  /**
+   * Marks a filled petition as COMPLETED.
+   * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
+   */
   publicCompletePetition: PublicPetition;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: CreateFileUploadReply;
@@ -268,8 +272,6 @@ export type Mutation = {
   resetSignaturitOrganizationBranding: SupportMethodResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
-  /** Sends a petition message to the specified contacts. */
-  sendMessages: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
   sendPetition: SendPetitionResult;
   /** Sends an email to all contacts of the petition confirming the replies are ok */
@@ -291,6 +293,8 @@ export type Mutation = {
   updateFieldPositions: PetitionBase;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
+  /** Updates the logo of an organization */
+  updateOrganizationLogo: Organization;
   /** Updates a petition. */
   updatePetition: PetitionBase;
   /** Updates a petition field. */
@@ -303,12 +307,15 @@ export type Mutation = {
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionUser */
   updatePetitionUserSubscription: Petition;
+  updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
   updateUserStatus: Array<User>;
+  /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
+  uploadDynamicSelectFieldFile: PetitionField;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
   verifyPublicAccess: PublicAccessVerification;
@@ -461,6 +468,11 @@ export type MutationdeletePetitionsArgs = {
   ids: Array<Scalars["GID"]>;
 };
 
+export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+};
+
 export type MutationeditPetitionUserPermissionArgs = {
   permissionType: PetitionUserPermissionType;
   petitionIds: Array<Scalars["GID"]>;
@@ -482,10 +494,6 @@ export type MutationmarkPetitionFieldCommentsAsReadArgs = {
   petitionId: Scalars["GID"];
 };
 
-export type MutationpresendPetitionClosedNotificationArgs = {
-  petitionId: Scalars["GID"];
-};
-
 export type MutationpublicCheckVerificationCodeArgs = {
   code: Scalars["String"];
   keycode: Scalars["ID"];
@@ -494,6 +502,7 @@ export type MutationpublicCheckVerificationCodeArgs = {
 
 export type MutationpublicCompletePetitionArgs = {
   keycode: Scalars["ID"];
+  signer?: Maybe<PublicPetitionSignerData>;
 };
 
 export type MutationpublicCreateFileUploadReplyArgs = {
@@ -593,14 +602,6 @@ export type MutationrevokeUserAuthTokenArgs = {
   authTokenIds: Array<Scalars["GID"]>;
 };
 
-export type MutationsendMessagesArgs = {
-  accessIds: Array<Scalars["GID"]>;
-  body: Scalars["JSON"];
-  petitionId: Scalars["GID"];
-  scheduledAt?: Maybe<Scalars["DateTime"]>;
-  subject: Scalars["String"];
-};
-
 export type MutationsendPetitionArgs = {
   body: Scalars["JSON"];
   contactIds: Array<Scalars["GID"]>;
@@ -620,10 +621,12 @@ export type MutationsendPetitionClosedNotificationArgs = {
 
 export type MutationsendRemindersArgs = {
   accessIds: Array<Scalars["GID"]>;
+  body?: Maybe<Scalars["JSON"]>;
   petitionId: Scalars["GID"];
 };
 
 export type MutationsignedPetitionDownloadLinkArgs = {
+  downloadAuditTrail?: Maybe<Scalars["Boolean"]>;
   petitionSignatureRequestId: Scalars["GID"];
   preview?: Maybe<Scalars["Boolean"]>;
 };
@@ -663,6 +666,11 @@ export type MutationupdateOnboardingStatusArgs = {
   status: OnboardingStatus;
 };
 
+export type MutationupdateOrganizationLogoArgs = {
+  file: Scalars["Upload"];
+  orgId: Scalars["GID"];
+};
+
 export type MutationupdatePetitionArgs = {
   data: UpdatePetitionInput;
   petitionId: Scalars["GID"];
@@ -699,6 +707,11 @@ export type MutationupdatePetitionUserSubscriptionArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationupdateSignatureRequestMetadataArgs = {
+  metadata: Scalars["JSONObject"];
+  petitionSignatureRequestId: Scalars["GID"];
+};
+
 export type MutationupdateSimpleReplyArgs = {
   petitionId: Scalars["GID"];
   reply: Scalars["String"];
@@ -714,6 +727,12 @@ export type MutationupdateUserStatusArgs = {
   status: UserStatus;
   transferToUserId?: Maybe<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
+};
+
+export type MutationuploadDynamicSelectFieldFileArgs = {
+  fieldId: Scalars["GID"];
+  file: Scalars["Upload"];
+  petitionId: Scalars["GID"];
 };
 
 export type MutationvalidatePetitionFieldsArgs = {
@@ -889,6 +908,11 @@ export type Petition = PetitionBase & {
 };
 
 /** A petition */
+export type PetitioncurrentSignatureRequestArgs = {
+  token?: Maybe<Scalars["String"]>;
+};
+
+/** A petition */
 export type PetitioneventsArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
@@ -1059,6 +1083,8 @@ export type PetitionField = {
   type: PetitionFieldType;
   /** Determines if the content of this field has been validated. */
   validated: Scalars["Boolean"];
+  /** A JSON object representing the conditions for the field to be visible */
+  visibility: Maybe<Scalars["JSONObject"]>;
 };
 
 /** A comment on a petition field */
@@ -1110,6 +1136,8 @@ export type PetitionFieldReplyStatus =
 
 /** Type of a petition field */
 export type PetitionFieldType =
+  /** A dynamic select field. */
+  | "DYNAMIC_SELECT"
   /** A file upload field. */
   | "FILE_UPLOAD"
   /** A heading field. */
@@ -1132,8 +1160,8 @@ export type PetitionMessage = CreatedAt & {
   createdAt: Scalars["DateTime"];
   /** Tells when the email was delivered. */
   deliveredAt: Maybe<Scalars["DateTime"]>;
-  /** The body of the petition message. */
-  emailBody: Maybe<Scalars["JSON"]>;
+  /** The body of the petition message on HTML format. */
+  emailBody: Maybe<Scalars["String"]>;
   /** The subject of the petition message. */
   emailSubject: Maybe<Scalars["JSON"]>;
   /** The ID of the petition message. */
@@ -1178,6 +1206,8 @@ export type PetitionReminder = CreatedAt & {
   access: PetitionAccess;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** The body of the message in HTML format. */
+  emailBody: Maybe<Scalars["String"]>;
   id: Scalars["GID"];
   /** The sender of this petition message. */
   sender: Maybe<User>;
@@ -1204,12 +1234,16 @@ export type PetitionSignatureCancelReason =
   | "REQUEST_ERROR";
 
 export type PetitionSignatureRequest = Timestamps & {
+  auditTrailFilename: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  /** Metadata for this signature request. */
+  metadata: Scalars["JSONObject"];
   petition: Petition;
   /** The signature configuration for the request. */
   signatureConfig: SignatureConfig;
+  signedDocumentFilename: Maybe<Scalars["String"]>;
   /** The status of the petition signature. */
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
@@ -1366,8 +1400,9 @@ export type PublicPetition = Timestamps & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The signers of the petition */
-  signers: Array<Maybe<PublicContact>>;
+  /** The signature config of the petition */
+  signature: Maybe<PublicSignatureConfig>;
+  signatureStatus: Maybe<PublicSignatureStatus>;
   /** The status of the petition. */
   status: PetitionStatus;
   /** Time when the resource was last updated. */
@@ -1408,6 +1443,8 @@ export type PublicPetitionField = {
   unreadCommentCount: Scalars["Int"];
   /** Determines if the content of this field has been validated. */
   validated: Scalars["Boolean"];
+  /** A JSON object representing the conditions for the field to be visible */
+  visibility: Maybe<Scalars["JSONObject"]>;
 };
 
 /** A comment on a petition field */
@@ -1439,6 +1476,23 @@ export type PublicPetitionFieldReply = Timestamps & {
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
+
+export type PublicPetitionSignerData = {
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  message?: Maybe<Scalars["String"]>;
+};
+
+/** The public signature settings of a petition */
+export type PublicSignatureConfig = {
+  /** If true, lets the user review the replies before starting the signature process */
+  review: Scalars["Boolean"];
+  /** The contacts that need to sign the generated document. */
+  signers: Array<Maybe<PublicContact>>;
+};
+
+export type PublicSignatureStatus = "COMPLETED" | "STARTED";
 
 /** A public view of a user */
 export type PublicUser = {
@@ -1675,6 +1729,8 @@ export type SignatureConfig = {
   contacts: Array<Maybe<Contact>>;
   /** The selected provider for the signature. */
   provider: Scalars["String"];
+  /** If true, lets the user review the replies before starting the signature process */
+  review: Scalars["Boolean"];
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** Title of the signature document */
@@ -1687,6 +1743,8 @@ export type SignatureConfigInput = {
   contactIds: Array<Scalars["ID"]>;
   /** The selected provider for the signature. */
   provider: Scalars["String"];
+  /** If true, lets the user review the replies before starting the signature process */
+  review: Scalars["Boolean"];
   /** The timezone used to generate the document. */
   timezone: Scalars["String"];
   /** The title of the signing document */
@@ -1732,6 +1790,7 @@ export type UpdatePetitionFieldInput = {
   optional?: Maybe<Scalars["Boolean"]>;
   options?: Maybe<Scalars["JSONObject"]>;
   title?: Maybe<Scalars["String"]>;
+  visibility?: Maybe<Scalars["JSONObject"]>;
 };
 
 export type UpdatePetitionInput = {

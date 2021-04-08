@@ -3273,7 +3273,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<
   PetitionField,
-  "id" | "type" | "title" | "description" | "validated"
+  "id" | "type" | "title" | "description" | "validated" | "options"
 > & {
     replies: Array<
       {
@@ -5136,10 +5136,6 @@ export type Thanks_PetitionLogoQuery = { __typename?: "Query" } & Pick<
   "publicOrgLogoUrl"
 >;
 
-export type defaultCondition_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "options">;
-
 export type useFieldVisibility_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
 } & Pick<PublicPetitionField, "id" | "visibility"> & {
@@ -6550,6 +6546,7 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     title
     description
     validated
+    options
     replies {
       ...PetitionRepliesField_PetitionFieldReply
     }
@@ -7130,13 +7127,6 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
     }
   }
   ${PetitionPdf_PetitionFieldFragmentDoc}
-`;
-export const defaultCondition_PetitionFieldFragmentDoc = gql`
-  fragment defaultCondition_PetitionField on PetitionField {
-    id
-    type
-    options
-  }
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {

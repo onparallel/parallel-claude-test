@@ -1,8 +1,8 @@
 import {
   enumType,
-  objectType,
   interfaceType,
   nullable,
+  objectType,
   stringArg,
 } from "@nexus/schema";
 import { extension } from "mime-types";
@@ -549,7 +549,8 @@ export const PetitionFieldReply = objectType({
       resolve: async (root, _, ctx) => {
         switch (root.type) {
           case "TEXT":
-          case "SELECT": {
+          case "SELECT":
+          case "DYNAMIC_SELECT": {
             return root.content;
           }
           case "FILE_UPLOAD": {
