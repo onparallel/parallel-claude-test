@@ -87,6 +87,8 @@ import {
   filterPetitionFields,
   PetitionFieldFilter,
 } from "@parallel/utils/filterPetitionFields";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
+import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
@@ -961,24 +963,22 @@ function useDownloadReplyFile() {
   const [mutate] = usePetitionReplies_fileUploadReplyDownloadLinkMutation();
   const showFailure = useFailureGeneratingLinkDialog();
   return useCallback(
-    async function downloadReplyFile(
+    function downloadReplyFile(
       petitionId: string,
       reply: Pick<PetitionFieldReply, "id" | "content">,
       preview: boolean
     ) {
-      const _window = window.open(undefined, "_blank")!;
-      const { data } = await mutate({
-        variables: { petitionId, replyId: reply.id, preview },
+      openNewWindow(async () => {
+        const { data } = await mutate({
+          variables: { petitionId, replyId: reply.id, preview },
+        });
+        const { url, result } = data!.fileUploadReplyDownloadLink;
+        if (result !== "SUCCESS") {
+          await withError(showFailure({ filename: reply.content.filename }));
+          throw new Error();
+        }
+        return url!;
       });
-      const { url, result } = data!.fileUploadReplyDownloadLink;
-      if (result === "SUCCESS") {
-        _window.location.href = url!;
-      } else {
-        _window.close();
-        try {
-          await showFailure({ filename: reply.content.filename });
-        } catch {}
-      }
     },
     [mutate]
   );

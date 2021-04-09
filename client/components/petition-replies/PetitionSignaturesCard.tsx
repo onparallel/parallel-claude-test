@@ -27,6 +27,7 @@ import {
   usePetitionSignaturesCard_startSignatureRequestMutation,
   usePetitionSignaturesCard_updatePetitionSignatureConfigMutation,
 } from "@parallel/graphql/__types";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useCallback } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
@@ -108,20 +109,17 @@ export function PetitionSignaturesCard({
   }, [startSignatureRequest, petition]);
 
   const handleDownloadSignedDoc = useCallback(
-    async (petitionSignatureRequestId: string) => {
-      try {
-        const _window = window.open(undefined, "_blank")!;
-
+    (petitionSignatureRequestId: string) => {
+      openNewWindow(async () => {
         const { data } = await downloadSignedDoc({
           variables: { petitionSignatureRequestId, preview: true },
         });
         const { url, result } = data!.signedPetitionDownloadLink;
-        if (result === "SUCCESS") {
-          _window.location.href = url!;
-        } else {
-          _window.close();
+        if (result !== "SUCCESS") {
+          throw new Error();
         }
-      } catch {}
+        return url!;
+      });
     },
     [downloadSignedDoc]
   );

@@ -1,12 +1,22 @@
 import { gql } from "@apollo/client";
-import { Box, Center, Flex, Progress, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Flex,
+  List,
+  ListItem,
+  Progress,
+  Stack,
+  Text,
+  useFormControl,
+} from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import {
-  useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
   useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
+  useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { letters } from "@parallel/utils/fieldIndices";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useMemo, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
@@ -41,19 +51,17 @@ export function DynamicSelectSettings({
     downloadLink,
   ] = useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation();
 
-  async function handleDownloadListingsFile() {
-    try {
-      const _window = window.open(undefined, "_blank")!;
+  function handleDownloadListingsFile() {
+    openNewWindow(async () => {
       const { data } = await downloadLink({
         variables: { petitionId, fieldId: field.id },
       });
       const { url, result } = data!.dynamicSelectFieldFileDownloadLink;
-      if (result === "SUCCESS") {
-        _window.location.href = url!;
-      } else {
-        _window.close();
+      if (result !== "SUCCESS") {
+        throw new Error();
       }
-    } catch {}
+      return url!;
+    });
   }
 
   return (
@@ -77,7 +85,7 @@ export function DynamicSelectSettings({
         }
         controlId="dynamic-select-options"
       >
-        <Stack width="100%">
+        <Stack alignSelf="stretch">
           {fieldOptions.file ? (
             <DynamicSelectLoadedOptions
               options={fieldOptions}
@@ -200,7 +208,6 @@ function DynamicSelectLoadedOptions({
   onRemoveOptions,
   onDownloadOptions,
 }: DynamicSelectLoadedOptionsProps) {
-  const letter = letters();
   const firstRowFlattened = useMemo(
     () => options.values[0].flat(options.labels.length),
     [options]
@@ -219,12 +226,13 @@ function DynamicSelectLoadedOptions({
           id="field-settings.dynamic-select.loaded-options.example"
           defaultMessage="For example:"
         />
-        {options.labels.map((label, index) => (
-          <Text key={index}>
-            {letter.next().value})&nbsp;{label}:&nbsp;
-            {firstRowFlattened[index]}
-          </Text>
-        ))}
+        <List as="ol" listStyleType="upper-alpha" listStylePos="inside">
+          {options.labels.map((label, index) => (
+            <ListItem key={index}>
+              {label}: {firstRowFlattened[index]}
+            </ListItem>
+          ))}
+        </List>
       </Stack>
     </>
   );
@@ -240,6 +248,8 @@ function DynamicSelectOptionsDropzone({
   const MAX_FILESIZE = 1024 * 1024 * 10; // 10 MB
 
   const [fileDropError, setFileDropError] = useState<string | null>(null);
+
+  const inputProps = useFormControl({});
 
   const [
     uploadFile,
@@ -297,7 +307,7 @@ function DynamicSelectOptionsDropzone({
         padding={4}
         {...getRootProps()}
       >
-        <input {...getInputProps()} />
+        <input {...inputProps} {...getInputProps()} />
         <Text pointerEvents="none" fontSize="sm" color="gray.500">
           <FormattedMessage
             id="generic.dropzone-single.default"

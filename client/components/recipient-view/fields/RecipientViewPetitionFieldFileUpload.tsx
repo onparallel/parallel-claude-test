@@ -30,7 +30,9 @@ import {
 } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
+import { withError } from "@parallel/utils/promises/withError";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -166,24 +168,22 @@ export function RecipientViewPetitionFieldReplyFileUpload({
     downloadFileUploadReply,
   ] = useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation();
   const showFailure = useFailureGeneratingLinkDialog();
-  async function handleDownloadClick() {
-    const _window = window.open(undefined, "_blank")!;
-    const { data } = await downloadFileUploadReply({
-      variables: {
-        keycode,
-        replyId: reply.id,
-        preview: false,
-      },
+  function handleDownloadClick() {
+    openNewWindow(async () => {
+      const { data } = await downloadFileUploadReply({
+        variables: {
+          keycode,
+          replyId: reply.id,
+          preview: false,
+        },
+      });
+      const { url, result } = data!.publicFileUploadReplyDownloadLink;
+      if (result !== "SUCCESS") {
+        await withError(showFailure({ filename: reply.content.filename }));
+        throw new Error();
+      }
+      return url!;
     });
-    const { url, result } = data!.publicFileUploadReplyDownloadLink;
-    if (result === "SUCCESS") {
-      _window.location.href = url!;
-    } else {
-      _window.close();
-      try {
-        await showFailure({ filename: reply.content.filename });
-      } catch {}
-    }
   }
   return (
     <Stack direction="row" alignItems="center" backgroundColor="white">

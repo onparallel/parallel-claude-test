@@ -50,10 +50,6 @@ export function RecipientViewPetitionFieldCard({
 }: RecipientViewPetitionFieldCardProps) {
   const intl = useIntl();
 
-  const isTextLikeType = ["TEXT", "SELECT", "DYNAMIC_SELECT"].includes(
-    field.type
-  );
-
   const showFieldComments = usePetitionFieldCommentsDialog();
   async function handleCommentsButtonClick() {
     try {
@@ -145,19 +141,19 @@ export function RecipientViewPetitionFieldCard({
         ) : null}
       </Box>
       <Text fontSize="sm" color="gray.500">
-        {isTextLikeType ? (
-          <FormattedMessage
-            id="component.recipient-view-petition-field-card.replies-submitted"
-            defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
-            values={{ count: fieldReplies.length }}
-          />
-        ) : field.type === "FILE_UPLOAD" ? (
+        {field.type === "FILE_UPLOAD" ? (
           <FormattedMessage
             id="component.recipient-view-petition-field-card.files-uploaded"
             defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
             values={{ count: fieldReplies.length }}
           />
-        ) : null}
+        ) : (
+          <FormattedMessage
+            id="component.recipient-view-petition-field-card.replies-submitted"
+            defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
+            values={{ count: fieldReplies.length }}
+          />
+        )}
       </Text>
       {children}
       {showAddNewReply ? (
