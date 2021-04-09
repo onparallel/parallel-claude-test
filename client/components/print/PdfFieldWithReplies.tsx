@@ -1,4 +1,4 @@
-import { Box, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { PetitionPdf_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
@@ -50,6 +50,22 @@ export function PdfFieldWithReplies({
                   }}
                 />
               </Text>
+            ) : field.type === "DYNAMIC_SELECT" ? (
+              <Stack spacing={0}>
+                {(reply.content.labels as string[]).map((label, i) => (
+                  <Flex key={i}>
+                    {label}:&nbsp;
+                    {reply.content.columns[i]?.[1] ?? (
+                      <Text fontStyle="italic">
+                        <FormattedMessage
+                          id="petition-signature.no-reply-submitted"
+                          defaultMessage="No replies have been submitted."
+                        />
+                      </Text>
+                    )}
+                  </Flex>
+                ))}
+              </Stack>
             ) : (
               <Text key={reply.id}>
                 <BreakLines text={reply.content.text} />
