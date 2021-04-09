@@ -2645,6 +2645,11 @@
     "context": "Approve"
   },
   {
+    "term": "petition-replies.petition-field-reply.copy-dynamic-select-reply",
+    "definition": "Copiar {label} al portapapeles",
+    "context": "Copy {label} to clipboard"
+  },
+  {
     "term": "petition-replies.petition-field-reply.file-download",
     "definition": "Descargar archivo",
     "context": "Download file"

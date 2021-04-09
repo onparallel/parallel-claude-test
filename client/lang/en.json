@@ -2645,6 +2645,11 @@
     "context": "Approve"
   },
   {
+    "term": "petition-replies.petition-field-reply.copy-dynamic-select-reply",
+    "definition": "Copy {label} to clipboard",
+    "context": "Copy {label} to clipboard"
+  },
+  {
     "term": "petition-replies.petition-field-reply.file-download",
     "definition": "Download file",
     "context": "Download file"
