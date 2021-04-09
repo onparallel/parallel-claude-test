@@ -120,22 +120,21 @@ export function PetitionFieldSelect<
       }
     });
     const [field, column]:
-      | [T | null]
+      | [T | null | undefined]
       | [T, number | undefined] = (Array.isArray(value)
       ? value
       : [value]) as any;
-    const _value =
-      field === null
-        ? null
-        : column !== undefined
-        ? options.find(
-            (o) =>
-              o.type === "DYNAMIC_SELECT_OPTION" &&
-              o.field.id === field.id &&
-              o.column === column
-          ) ?? null
-        : options.find((o) => o.type === "FIELD" && o.field.id === field.id) ??
-          null;
+    const _value = !field
+      ? null
+      : column !== undefined
+      ? options.find(
+          (o) =>
+            o.type === "DYNAMIC_SELECT_OPTION" &&
+            o.field.id === field.id &&
+            o.column === column
+        ) ?? null
+      : options.find((o) => o.type === "FIELD" && o.field.id === field.id) ??
+        null;
     return { options, _value };
   }, [fields, indices, expandFields, value]);
   const handleChange = useCallback(

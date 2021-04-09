@@ -182,7 +182,7 @@ export function PetitionFieldVisibilityEditor({
         {visibility.conditions.map((condition, index) => {
           const conditionField = _fields.find(
             (f) => f.id === condition.fieldId
-          )!;
+          );
           return (
             <Fragment key={index}>
               <Box fontSize="sm">
@@ -228,39 +228,43 @@ export function PetitionFieldVisibilityEditor({
                   </Stack>
                 )}
               </Box>
-              <PetitionFieldSelect
-                size="sm"
-                value={
-                  condition.column !== undefined &&
-                  conditionField.type === "DYNAMIC_SELECT"
-                    ? [conditionField, condition.column]
-                    : conditionField
-                }
-                expandFields
-                fields={_fields}
-                indices={_indices}
-                onChange={(value) =>
-                  updateCondition(index, defaultCondition(value))
-                }
-              />
               {conditionField ? (
-                <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>
-                  {conditionField.multiple ? (
-                    <ConditionMultipleFieldModifier
+                <>
+                  <PetitionFieldSelect
+                    size="sm"
+                    value={
+                      condition.column !== undefined &&
+                      conditionField.type === "DYNAMIC_SELECT"
+                        ? [conditionField, condition.column]
+                        : conditionField
+                    }
+                    expandFields
+                    fields={_fields}
+                    indices={_indices}
+                    onChange={(value) =>
+                      updateCondition(index, defaultCondition(value))
+                    }
+                  />
+                  <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>
+                    {conditionField.multiple ? (
+                      <ConditionMultipleFieldModifier
+                        field={conditionField}
+                        value={condition}
+                        onChange={(condition) => {
+                          updateCondition(index, condition);
+                        }}
+                      />
+                    ) : null}
+                    <ConditionPredicate
+                      showError={showError}
                       field={conditionField}
                       value={condition}
-                      onChange={(condition) => {
-                        updateCondition(index, condition);
-                      }}
+                      onChange={(condition) =>
+                        updateCondition(index, condition)
+                      }
                     />
-                  ) : null}
-                  <ConditionPredicate
-                    showError={showError}
-                    field={conditionField}
-                    value={condition}
-                    onChange={(condition) => updateCondition(index, condition)}
-                  />
-                </Stack>
+                  </Stack>
+                </>
               ) : (
                 <Box />
               )}
