@@ -34,11 +34,13 @@ function defaultConditionFieldValue<
   ) {
     return 0;
   } else if (field.type === "SELECT") {
-    return (field.options as FieldOptions["SELECT"]).values[0];
+    return (field.options as FieldOptions["SELECT"]).values[0] ?? null;
   } else if (field.type === "DYNAMIC_SELECT" && column !== undefined) {
-    return getFirstDynamicSelectValue(
-      (field.options as FieldOptions["DYNAMIC_SELECT"]).values,
-      column!
+    return (
+      getFirstDynamicSelectValue(
+        (field.options as FieldOptions["DYNAMIC_SELECT"]).values,
+        column!
+      ) ?? null
     );
   } else {
     return null;

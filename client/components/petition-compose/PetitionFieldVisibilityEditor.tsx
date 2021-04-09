@@ -662,6 +662,10 @@ function ConditionPredicateValueSelect({
     components: {
       MenuList: OptimizedMenuList,
     },
+    placeholder: intl.formatMessage({
+      id: "component.react-select.no-options",
+      defaultMessage: "No options",
+    }),
   });
   const _options = useMemo(() => {
     const values =
@@ -674,7 +678,6 @@ function ConditionPredicateValueSelect({
     return values.map((value) => toSelectOption(value));
   }, [field.type, field.options.values, condition.column]);
   const _value = toSelectOption(condition.value as string | null);
-
   return (
     <Select
       options={_options}
