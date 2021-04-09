@@ -3533,10 +3533,7 @@ export type RecipientViewProgressFooter_PublicPetitionFragment = {
 
 export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-} & Pick<
-  PublicPetitionField,
-  "id" | "type" | "options" | "optional" | "isReadOnly"
-> & {
+} & Pick<PublicPetitionField, "id" | "type" | "optional" | "isReadOnly"> & {
     replies: Array<
       { __typename?: "PublicPetitionFieldReply" } & Pick<
         PublicPetitionFieldReply,
@@ -6984,7 +6981,6 @@ export const RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc = gql`
   fragment RecipientViewProgressFooter_PublicPetitionField on PublicPetitionField {
     id
     type
-    options
     optional
     isReadOnly
     replies {

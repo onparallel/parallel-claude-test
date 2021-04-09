@@ -144,7 +144,6 @@ RecipientViewProgressFooter.fragments = {
       fragment RecipientViewProgressFooter_PublicPetitionField on PublicPetitionField {
         id
         type
-        options
         optional
         isReadOnly
         replies {

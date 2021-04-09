@@ -1,7 +1,8 @@
-import { PetitionField, PetitionFieldReply } from "@parallel/graphql/__types";
+import { PetitionFieldType } from "@parallel/graphql/__types";
 
-type PartialField = Pick<PetitionField, "type" | "options"> & {
-  replies: Pick<PetitionFieldReply, "content">[];
+type PartialField = {
+  type: PetitionFieldType;
+  replies: { content: any }[];
 };
 
 /** returns the field replies that are fully completed */
