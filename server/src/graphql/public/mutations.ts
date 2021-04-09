@@ -34,6 +34,7 @@ import {
   getContactAuthCookieValue,
   replyBelongsToAccess,
 } from "./authorizers";
+import { validateDynamicSelectReplyValues } from "./utils";
 
 function anonymizePart(part: string) {
   return part.length > 2
@@ -478,7 +479,7 @@ export const publicCreateDynamicSelectReply = mutationField(
     args: {
       keycode: nonNull(idArg()),
       fieldId: nonNull(globalIdArg("PetitionField")),
-      reply: nonNull(list(stringArg())),
+      reply: nonNull(list(nonNull(stringArg()))),
     },
     authorize: chain(
       authenticatePublicAccess("keycode"),
@@ -489,20 +490,8 @@ export const publicCreateDynamicSelectReply = mutationField(
     ),
     validateArgs: async (_, args, ctx, info) => {
       const field = (await ctx.petitions.loadField(args.fieldId))!;
-      const [label, value] = args.reply;
       if (field.type === "DYNAMIC_SELECT") {
-        // the submitted reply must match with the label and possible values of the first column
-        const options = field.options.values as Maybe<string[][]>;
-        const labels = field.options.labels as Maybe<string[]>;
-        const firstColumnOptions = options?.map((o) => o[0]) ?? [];
-        if (
-          !label ||
-          labels?.[0] !== label ||
-          !value ||
-          !firstColumnOptions.includes(value)
-        ) {
-          throw new ArgValidationError(info, "reply", "Invalid option");
-        }
+        validateDynamicSelectReplyValues(field, [args.reply], info);
       }
     },
     resolve: async (_, args, ctx) => {
@@ -531,7 +520,7 @@ export const publicUpdateDynamicSelectReply = mutationField(
     args: {
       keycode: nonNull(idArg()),
       replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      reply: nonNull(list(nonNull(list(stringArg())))),
+      reply: nonNull(list(nonNull(list(nonNull(stringArg()))))),
     },
     authorize: chain(
       authenticatePublicAccess("keycode"),
@@ -541,23 +530,7 @@ export const publicUpdateDynamicSelectReply = mutationField(
       // the new reply must match with the structure of the field options
       const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
       if (field.type === "DYNAMIC_SELECT") {
-        const labels = field.options.labels as string[];
-        let levelValues = field.options.values as any;
-        for (let level = 0; level < args.reply.length; level++) {
-          const [label, value] = args.reply[level];
-          if (
-            !label ||
-            label !== labels[level] ||
-            !value ||
-            !levelValues
-              .map((v: string | string[]) => (Array.isArray(v) ? v[0] : v))
-              .includes(value)
-          ) {
-            throw new ArgValidationError(info, "reply", "Invalid option");
-          } else {
-            levelValues = levelValues.find(([v]: string[]) => v === value)?.[1];
-          }
-        }
+        validateDynamicSelectReplyValues(field, args.reply, info);
       }
     },
     resolve: async (_, args, ctx) => {

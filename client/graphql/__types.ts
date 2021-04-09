@@ -530,7 +530,7 @@ export type MutationpublicCompletePetitionArgs = {
 export type MutationpublicCreateDynamicSelectReplyArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
-  reply: Array<Maybe<Scalars["String"]>>;
+  reply: Array<Scalars["String"]>;
 };
 
 export type MutationpublicCreateFileUploadReplyArgs = {
@@ -596,7 +596,7 @@ export type MutationpublicSubmitUnpublishedCommentsArgs = {
 
 export type MutationpublicUpdateDynamicSelectReplyArgs = {
   keycode: Scalars["ID"];
-  reply: Array<Array<Maybe<Scalars["String"]>>>;
+  reply: Array<Array<Scalars["String"]>>;
   replyId: Scalars["GID"];
 };
 
@@ -3769,9 +3769,9 @@ export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMu
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
   reply:
-    | Array<Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>>
-    | Array<Maybe<Scalars["String"]>>
-    | Maybe<Scalars["String"]>;
+    | Array<Array<Scalars["String"]> | Scalars["String"]>
+    | Array<Scalars["String"]>
+    | Scalars["String"];
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation = {
@@ -9022,7 +9022,7 @@ export const RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyD
   mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
     $keycode: ID!
     $replyId: GID!
-    $reply: [[String]!]!
+    $reply: [[String!]!]!
   ) {
     publicUpdateDynamicSelectReply(
       keycode: $keycode
