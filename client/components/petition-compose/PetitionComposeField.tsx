@@ -29,7 +29,7 @@ import {
 import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
-import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { memo, useCallback, useRef, useState } from "react";
@@ -316,6 +316,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     [field]
   );
 
+  const letter = letters();
+
   return (
     <Box {...props}>
       <Stack direction="row" marginBottom={1}>
@@ -521,7 +523,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                         borderColor={color}
                       >
                         {fieldIndex}
-                        {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(index)}
+                        {letter.next().value}
                       </Center>
                       <Text as="span">{label}</Text>
                     </ListItem>

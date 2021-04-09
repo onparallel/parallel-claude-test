@@ -27,10 +27,10 @@ export function RecipientViewProgressFooter({
     let optional = 0;
     let total = 0;
     for (const [field, isVisible] of zip(petition.fields, fieldVisibility)) {
+      const fieldReplies = completedFieldReplies(field);
       if (isVisible && !field.isReadOnly) {
-        replied += completedFieldReplies(field).length ? 1 : 0;
-        optional +=
-          field.optional && !completedFieldReplies(field).length ? 1 : 0;
+        replied += fieldReplies.length ? 1 : 0;
+        optional += field.optional && !fieldReplies.length ? 1 : 0;
         total += 1;
       }
     }

@@ -65,6 +65,8 @@ export function RecipientViewPetitionFieldCard({
     } catch {}
   }
 
+  const fieldReplies = completedFieldReplies(field);
+
   return (
     <Card
       id={`field-${field.id}`}
@@ -147,15 +149,13 @@ export function RecipientViewPetitionFieldCard({
           <FormattedMessage
             id="component.recipient-view-petition-field-card.replies-submitted"
             defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
-            values={{ count: completedFieldReplies(field).length }}
+            values={{ count: fieldReplies.length }}
           />
         ) : field.type === "FILE_UPLOAD" ? (
           <FormattedMessage
             id="component.recipient-view-petition-field-card.files-uploaded"
             defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
-            values={{
-              count: completedFieldReplies(field).length,
-            }}
+            values={{ count: fieldReplies.length }}
           />
         ) : null}
       </Text>
