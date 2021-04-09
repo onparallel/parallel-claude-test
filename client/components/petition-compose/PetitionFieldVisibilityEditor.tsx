@@ -53,7 +53,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import Select from "react-select";
+import Select, { createFilter } from "react-select";
 import { pick, zip } from "remeda";
 
 export interface PetitionFieldVisibilityProps {
@@ -683,6 +683,10 @@ function ConditionPredicateValueSelect({
       options={_options}
       value={_value}
       onChange={(value) => onChange({ ...condition, value: value.value })}
+      filterOption={createFilter({
+        // this improves search performance on long lists
+        ignoreAccents: _options.length > 1000 ? false : true,
+      })}
       placeholder={intl.formatMessage({
         id: "generic.select-an-option",
         defaultMessage: "Select an option",
