@@ -161,7 +161,7 @@ function RecipientViewPetitionFieldReplyDynamicSelect({
   useEffect(() => {
     const length = Object.keys(refs).length;
     refs[length - 1].current?.focus();
-  }, [Object.keys(refs)]);
+  }, [Object.keys(refs).length]);
 
   async function handleSubmitValue(value: string, level: number) {
     if (!reply) {
