@@ -61,8 +61,8 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
         });
       case "DYNAMIC_SELECT":
         return intl.formatMessage({
-          id: "petition.field-type.dynamic-select",
-          defaultMessage: "Dynamic select",
+          id: "petition.field-type.conditional-select",
+          defaultMessage: "Conditional select",
         });
       default:
         throw new Error(`Missing PetitionFieldType "${type}"`);

@@ -2980,9 +2980,9 @@
     "context": "Field settings"
   },
   {
-    "term": "petition.field-type.dynamic-select",
-    "definition": "Dynamic select",
-    "context": "Dynamic select"
+    "term": "petition.field-type.conditional-select",
+    "definition": "Conditional select",
+    "context": "Conditional select"
   },
   {
     "term": "petition.field-type.file-upload",
