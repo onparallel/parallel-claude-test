@@ -39,6 +39,7 @@ import {
   useReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
+import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
 import {
   CustomSelectProps,
   OptionType,
@@ -705,10 +706,6 @@ function ConditionPredicateValueString({
       })}
     />
   );
-}
-
-function toSelectOption(value: string | null) {
-  return value === null ? null : { value, label: value };
 }
 
 function VisibilityOperatorSelect({
