@@ -200,16 +200,17 @@ async function* getPetitionFiles(
       if (replies.length > 0) {
         textReplies.addRows(
           replies.flatMap((r, i) =>
-            (r.content.labels as string[]).map((label, level) => ({
-              title:
-                field.title?.concat(
-                  ` (${label})`,
-                  field.multiple ? ` [${i + 1}]` : ""
-                ) || "",
-              description: field.description?.slice(0, 200) || "",
-              answer:
-                r.content.columns[level]?.[1] || textReplies.labels.noAnswer,
-            }))
+            (r.content.columns as [string, string | null][]).map(
+              ([label, value]) => ({
+                title:
+                  field.title?.concat(
+                    ` (${label})`,
+                    field.multiple ? ` [${i + 1}]` : ""
+                  ) || "",
+                description: field.description?.slice(0, 200) || "",
+                answer: value ?? textReplies.labels.noAnswer,
+              })
+            )
           )
         );
       } else {

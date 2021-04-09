@@ -52,19 +52,21 @@ export function PdfFieldWithReplies({
               </Text>
             ) : field.type === "DYNAMIC_SELECT" ? (
               <Stack spacing={0}>
-                {(reply.content.labels as string[]).map((label, i) => (
-                  <Flex key={i}>
-                    {label}:&nbsp;
-                    {reply.content.columns[i]?.[1] ?? (
-                      <Text fontStyle="italic">
-                        <FormattedMessage
-                          id="petition-signature.no-reply-submitted"
-                          defaultMessage="No replies have been submitted."
-                        />
-                      </Text>
-                    )}
-                  </Flex>
-                ))}
+                {(reply.content.columns as [string, string | null][]).map(
+                  ([label, value], i) => (
+                    <Flex key={i}>
+                      {label}:&nbsp;
+                      {value ?? (
+                        <Text fontStyle="italic">
+                          <FormattedMessage
+                            id="petition-signature.no-reply-submitted"
+                            defaultMessage="No replies have been submitted."
+                          />
+                        </Text>
+                      )}
+                    </Flex>
+                  )
+                )}
               </Stack>
             ) : (
               <Text key={reply.id}>

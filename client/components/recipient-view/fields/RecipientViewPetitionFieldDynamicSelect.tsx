@@ -21,6 +21,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
+import { countBy } from "remeda";
 import {
   useCreateDynamicSelectReply,
   useDeletePetitionReply,
@@ -77,8 +78,10 @@ export function RecipientViewPetitionFieldDynamicSelect({
     !showNewReply &&
     field.multiple &&
     field.options.labels.length &&
-    field.replies.every(
-      (reply) => reply.content.columns.length === reply.content.labels.length
+    field.replies.every((reply) =>
+      reply.content.columns.every(
+        ([, value]: [string, string | null]) => !!value
+      )
     );
 
   return (
@@ -158,7 +161,7 @@ function RecipientViewPetitionFieldReplyDynamicSelect({
   useEffect(() => {
     const length = Object.keys(refs).length;
     refs[length - 1].current?.focus();
-  }, [Object.keys(refs).length]);
+  }, [Object.keys(refs)]);
 
   async function handleSubmitValue(value: string, level: number) {
     if (!reply) {
@@ -197,23 +200,32 @@ function RecipientViewPetitionFieldReplyDynamicSelect({
     onReplyDeleted?.();
   }
 
+  const repliedLabelsCount = reply
+    ? countBy(
+        reply.content.columns,
+        ([, value]: [string, string | null]) => !!value
+      )
+    : 0;
+
+  const options =
+    (reply?.content.columns as string[][]) ??
+    fieldOptions.labels.map((label) => [label, null]);
+
   return (
     <Stack {...props}>
-      {((reply?.content.labels as string[]) ?? fieldOptions.labels)
-        .slice(0, (reply?.content.columns.length ?? 0) + 1)
-        .map((label, level) => (
-          <RecipientViewPetitionFieldReplyDynamicSelectLevel
-            key={level}
-            ref={refs[level]}
-            label={label}
-            level={level}
-            field={field}
-            reply={reply}
-            isDisabled={isDisabled}
-            onValueSubmitted={(value) => handleSubmitValue(value, level)}
-            onDeleteReply={handleDeleteReply}
-          />
-        ))}
+      {options.slice(0, repliedLabelsCount + 1).map(([label], level) => (
+        <RecipientViewPetitionFieldReplyDynamicSelectLevel
+          key={level}
+          ref={refs[level]}
+          label={label}
+          level={level}
+          field={field}
+          reply={reply}
+          isDisabled={isDisabled}
+          onValueSubmitted={(value) => handleSubmitValue(value, level)}
+          onDeleteReply={handleDeleteReply}
+        />
+      ))}
     </Stack>
   );
 }
@@ -269,7 +281,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
         ((reply?.content.columns[level] as string[]) ?? [])[1] ?? null
       )
     );
-  }, [reply?.content.columns.length]);
+  }, [reply?.content.columns]);
 
   const selectOptions = useMemo(() => {
     let options = field.options.values;

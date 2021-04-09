@@ -168,7 +168,7 @@ const _publicCreateDynamicSelectReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(
     $keycode: ID!
     $fieldId: GID!
-    $reply: [String!]!
+    $reply: [String]!
   ) {
     publicCreateDynamicSelectReply(
       keycode: $keycode
@@ -223,7 +223,7 @@ const _publicUpdateDynamicSelectReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
     $keycode: ID!
     $replyId: GID!
-    $reply: [[String!]!]!
+    $reply: [[String]!]!
   ) {
     publicUpdateDynamicSelectReply(
       keycode: $keycode

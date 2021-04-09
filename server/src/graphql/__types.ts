@@ -2127,7 +2127,7 @@ export interface NexusGenArgTypes {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
-      reply: string[]; // [String!]!
+      reply: Array<string | null>; // [String]!
     };
     publicCreateFileUploadReply: {
       // args
@@ -2193,7 +2193,7 @@ export interface NexusGenArgTypes {
     publicUpdateDynamicSelectReply: {
       // args
       keycode: string; // ID!
-      reply: string[][]; // [[String!]!]!
+      reply: Array<Array<string | null>>; // [[String]!]!
       replyId: NexusGenScalars["GID"]; // GID!
     };
     publicUpdatePetitionFieldComment: {

@@ -479,7 +479,7 @@ export const publicCreateDynamicSelectReply = mutationField(
     args: {
       keycode: nonNull(idArg()),
       fieldId: nonNull(globalIdArg("PetitionField")),
-      reply: nonNull(list(nonNull(stringArg()))),
+      reply: nonNull(list(stringArg())),
     },
     authorize: chain(
       authenticatePublicAccess("keycode"),
@@ -496,15 +496,19 @@ export const publicCreateDynamicSelectReply = mutationField(
     },
     resolve: async (_, args, ctx) => {
       const field = (await ctx.petitions.loadField(args.fieldId))!;
+
+      // first column will have the reply, next columns will have null value
+      const columns = [args.reply].concat(
+        (field.options.labels as string[])
+          .slice(1)
+          .map((label) => [label, null])
+      );
       return await ctx.petitions.createPetitionFieldReply(
         {
           petition_field_id: args.fieldId,
           petition_access_id: ctx.access!.id,
           type: field.type,
-          content: {
-            columns: [args.reply],
-            labels: field.options.labels,
-          },
+          content: { columns },
         },
         ctx.contact!
       );
@@ -520,7 +524,7 @@ export const publicUpdateDynamicSelectReply = mutationField(
     args: {
       keycode: nonNull(idArg()),
       replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      reply: nonNull(list(nonNull(list(nonNull(stringArg()))))),
+      reply: nonNull(list(nonNull(list(stringArg())))),
     },
     authorize: chain(
       authenticatePublicAccess("keycode"),
@@ -536,14 +540,18 @@ export const publicUpdateDynamicSelectReply = mutationField(
     resolve: async (_, args, ctx) => {
       const petitionId = ctx.access!.petition_id;
       const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+
+      const columns = args.reply.concat(
+        (field.options.labels as string[])
+          .slice(args.reply.length)
+          .map((label) => [label, null])
+      );
+
       const [reply, event] = await Promise.all([
         ctx.petitions.updatePetitionFieldReply(
           args.replyId,
           {
-            content: {
-              columns: args.reply,
-              labels: field.options.labels,
-            },
+            content: { columns },
             status: "PENDING",
           },
           `Contact:${ctx.contact!.id}`

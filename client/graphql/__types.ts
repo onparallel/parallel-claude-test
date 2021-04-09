@@ -530,7 +530,7 @@ export type MutationpublicCompletePetitionArgs = {
 export type MutationpublicCreateDynamicSelectReplyArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
-  reply: Array<Scalars["String"]>;
+  reply: Array<Maybe<Scalars["String"]>>;
 };
 
 export type MutationpublicCreateFileUploadReplyArgs = {
@@ -596,7 +596,7 @@ export type MutationpublicSubmitUnpublishedCommentsArgs = {
 
 export type MutationpublicUpdateDynamicSelectReplyArgs = {
   keycode: Scalars["ID"];
-  reply: Array<Array<Scalars["String"]>>;
+  reply: Array<Array<Maybe<Scalars["String"]>>>;
   replyId: Scalars["GID"];
 };
 
@@ -3751,7 +3751,7 @@ export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation 
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
   fieldId: Scalars["GID"];
-  reply: Array<Scalars["String"]> | Scalars["String"];
+  reply: Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>;
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation = {
@@ -3766,9 +3766,9 @@ export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMu
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
   reply:
-    | Array<Array<Scalars["String"]> | Scalars["String"]>
-    | Array<Scalars["String"]>
-    | Scalars["String"];
+    | Array<Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>>
+    | Array<Maybe<Scalars["String"]>>
+    | Maybe<Scalars["String"]>;
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation = {
@@ -8964,7 +8964,7 @@ export const RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyD
   mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(
     $keycode: ID!
     $fieldId: GID!
-    $reply: [String!]!
+    $reply: [String]!
   ) {
     publicCreateDynamicSelectReply(
       keycode: $keycode
@@ -9018,7 +9018,7 @@ export const RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyD
   mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
     $keycode: ID!
     $replyId: GID!
-    $reply: [[String!]!]!
+    $reply: [[String]!]!
   ) {
     publicUpdateDynamicSelectReply(
       keycode: $keycode

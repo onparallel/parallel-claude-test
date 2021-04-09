@@ -4,7 +4,7 @@ import { ArgValidationError } from "../helpers/errors";
 
 export function validateDynamicSelectReplyValues(
   field: PetitionField,
-  reply: string[][],
+  reply: Array<Array<string | null>>,
   info: GraphQLResolveInfo
 ) {
   const labels = field.options.labels as string[];

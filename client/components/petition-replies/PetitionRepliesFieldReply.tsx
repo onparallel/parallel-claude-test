@@ -77,22 +77,23 @@ export function PetitionRepliesFieldReply({
           </Stack>
         ) : reply.field!.type === "DYNAMIC_SELECT" ? (
           <Stack spacing={1}>
-            {(reply.content.columns as [string, string][]).map(
-              ([label, value], index) => (
-                <CopyToClipboardButton
-                  key={index}
-                  aria-label={intl.formatMessage(
-                    {
-                      id:
-                        "petition-replies.petition-field-reply.copy-dynamic-select-reply",
-                      defaultMessage: "Copy {label} to clipboard",
-                    },
-                    { label }
-                  )}
-                  size="xs"
-                  text={value}
-                />
-              )
+            {(reply.content.columns as [string, string | null][]).map(
+              ([label, value], index) =>
+                value ? (
+                  <CopyToClipboardButton
+                    key={index}
+                    aria-label={intl.formatMessage(
+                      {
+                        id:
+                          "petition-replies.petition-field-reply.copy-dynamic-select-reply",
+                        defaultMessage: "Copy {label} to clipboard",
+                      },
+                      { label }
+                    )}
+                    size="xs"
+                    text={value}
+                  />
+                ) : null
             )}
           </Stack>
         ) : null}
