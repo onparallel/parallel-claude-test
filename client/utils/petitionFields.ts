@@ -6,7 +6,7 @@ import { Maybe } from "./types";
 
 export type FileUploadAccepts = "PDF" | "IMAGE" | "VIDEO" | "DOCUMENT";
 
-export type DynamicSelectOption = [string, Array<DynamicSelectOption | string>];
+export type DynamicSelectOption = [string, string[] | DynamicSelectOption[]];
 
 export type FieldOptions = {
   HEADING: {

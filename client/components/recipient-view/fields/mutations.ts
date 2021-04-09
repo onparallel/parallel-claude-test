@@ -61,12 +61,12 @@ const _publicUpdateSimpleReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicUpdateSimpleReply(
     $keycode: ID!
     $replyId: GID!
-    $reply: String!
+    $value: String!
   ) {
     publicUpdateSimpleReply(
       keycode: $keycode
       replyId: $replyId
-      reply: $reply
+      value: $value
     ) {
       id
       content
@@ -85,18 +85,18 @@ export function useUpdateSimpleReply() {
       petitionId,
       keycode,
       replyId,
-      content,
+      value,
     }: {
       petitionId: string;
       keycode: string;
       replyId: string;
-      content: string;
+      value: string;
     }) {
       await updateSimpleReply({
         variables: {
           keycode,
           replyId,
-          reply: content,
+          value,
         },
         update(cache, { data }) {
           if (data) {
@@ -113,12 +113,12 @@ const _publicCreateSimpleReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateSimpleReply(
     $keycode: ID!
     $fieldId: GID!
-    $reply: String!
+    $value: String!
   ) {
     publicCreateSimpleReply(
       keycode: $keycode
       fieldId: $fieldId
-      reply: $reply
+      value: $value
     ) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
@@ -135,18 +135,18 @@ export function useCreateSimpleReply() {
       petitionId,
       keycode,
       fieldId,
-      content,
+      value,
     }: {
       petitionId: string;
       keycode: string;
       fieldId: string;
-      content: string;
+      value: string;
     }) {
       const { data } = await createSimpleReply({
         variables: {
           keycode,
           fieldId,
-          reply: content,
+          value,
         },
         update(cache, { data }) {
           updateFieldReplies(cache, fieldId, (replies) => [
@@ -168,12 +168,12 @@ const _publicCreateDynamicSelectReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(
     $keycode: ID!
     $fieldId: GID!
-    $reply: [String]!
+    $value: [[String]!]!
   ) {
     publicCreateDynamicSelectReply(
       keycode: $keycode
       fieldId: $fieldId
-      reply: $reply
+      value: $value
     ) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
@@ -190,18 +190,18 @@ export function useCreateDynamicSelectReply() {
       petitionId,
       keycode,
       fieldId,
-      content,
+      value,
     }: {
       petitionId: string;
       keycode: string;
       fieldId: string;
-      content: string[];
+      value: [string, string | null][];
     }) {
       const { data } = await createDynamicSelectReply({
         variables: {
           keycode,
           fieldId,
-          reply: content,
+          value,
         },
         update(cache, { data }) {
           updateFieldReplies(cache, fieldId, (replies) => [
@@ -223,12 +223,12 @@ const _publicUpdateDynamicSelectReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
     $keycode: ID!
     $replyId: GID!
-    $reply: [[String]!]!
+    $value: [[String]!]!
   ) {
     publicUpdateDynamicSelectReply(
       keycode: $keycode
       replyId: $replyId
-      reply: $reply
+      value: $value
     ) {
       id
       content
@@ -247,18 +247,18 @@ export function useUpdateDynamicSelectReply() {
       petitionId,
       keycode,
       replyId,
-      content,
+      value,
     }: {
       petitionId: string;
       keycode: string;
       replyId: string;
-      content: string[][];
+      value: [string, string | null][];
     }) {
       await updateDynamicSelectReply({
         variables: {
           keycode,
           replyId,
-          reply: content,
+          value,
         },
         update(cache, { data }) {
           if (data) {

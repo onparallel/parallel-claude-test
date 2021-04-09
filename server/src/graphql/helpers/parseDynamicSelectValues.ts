@@ -28,7 +28,7 @@ function cleanAndValidate(data: string[][]): string[][] {
   return rows;
 }
 
-export type DynamicSelectOption = [string, Array<DynamicSelectOption | string>];
+export type DynamicSelectOption = [string, DynamicSelectOption[] | string[]];
 
 function parseEntries(
   data: string[][],

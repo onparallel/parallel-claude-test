@@ -532,7 +532,7 @@ type Mutation {
   publicCreateDynamicSelectReply(
     fieldId: GID!
     keycode: ID!
-    reply: [String]!
+    value: [[String]!]!
   ): PublicPetitionFieldReply!
 
   """
@@ -559,7 +559,7 @@ type Mutation {
   publicCreateSimpleReply(
     fieldId: GID!
     keycode: ID!
-    reply: String!
+    value: String!
   ): PublicPetitionFieldReply!
 
   """
@@ -627,8 +627,8 @@ type Mutation {
   """
   publicUpdateDynamicSelectReply(
     keycode: ID!
-    reply: [[String]!]!
     replyId: GID!
+    value: [[String]!]!
   ): PublicPetitionFieldReply!
 
   """
@@ -646,8 +646,8 @@ type Mutation {
   """
   publicUpdateSimpleReply(
     keycode: ID!
-    reply: String!
     replyId: GID!
+    value: String!
   ): PublicPetitionFieldReply!
 
   """

@@ -33,6 +33,7 @@ import {
   fieldHasType,
   getContactAuthCookieValue,
   replyBelongsToAccess,
+  replyIsForFieldOfType,
 } from "./authorizers";
 import { validateDynamicSelectReplyValues } from "./utils";
 
@@ -377,7 +378,7 @@ export const publicCreateSimpleReply = mutationField(
     args: {
       keycode: nonNull(idArg()),
       fieldId: nonNull(globalIdArg("PetitionField")),
-      reply: nonNull(stringArg()),
+      value: nonNull(stringArg()),
     },
     authorize: chain(
       authenticatePublicAccess("keycode"),
@@ -388,7 +389,7 @@ export const publicCreateSimpleReply = mutationField(
       const field = (await ctx.petitions.loadField(args.fieldId))!;
       if (field.type === "SELECT") {
         const options = field.options.values as Maybe<string[]>;
-        if (!options?.includes(args.reply)) {
+        if (!options?.includes(args.value)) {
           throw new ArgValidationError(info, "reply", "Invalid option");
         }
       }
@@ -400,7 +401,7 @@ export const publicCreateSimpleReply = mutationField(
           petition_field_id: args.fieldId,
           petition_access_id: ctx.access!.id,
           type: field.type,
-          content: { text: args.reply },
+          content: { text: args.value },
         },
         ctx.contact!
       );
@@ -416,26 +417,22 @@ export const publicUpdateSimpleReply = mutationField(
     args: {
       keycode: nonNull(idArg()),
       replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      reply: nonNull(stringArg()),
+      value: nonNull(stringArg()),
     },
     authorize: chain(
       authenticatePublicAccess("keycode"),
-      replyBelongsToAccess("replyId")
+      and(
+        replyBelongsToAccess("replyId"),
+        replyIsForFieldOfType("replyId", ["TEXT", "SELECT"])
+      )
     ),
     validateArgs: async (_, args, ctx, info) => {
       const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
       if (field.type === "SELECT") {
         const options = field.options.values as Maybe<string[]>;
-        if (!options?.includes(args.reply)) {
-          throw new ArgValidationError(info, "reply", "Invalid option");
+        if (!options?.includes(args.value)) {
+          throw new ArgValidationError(info, "value", "Invalid option");
         }
-      }
-      if (!["TEXT", "SELECT"].includes(field.type)) {
-        throw new ArgValidationError(
-          info,
-          "replyId",
-          `Reply ${args.replyId} does not belong to a TEXT or SELECT field`
-        );
       }
     },
     resolve: async (_, args, ctx) => {
@@ -443,7 +440,7 @@ export const publicUpdateSimpleReply = mutationField(
       const [reply, event] = await Promise.all([
         ctx.petitions.updatePetitionFieldReply(
           args.replyId,
-          { content: { text: args.reply }, status: "PENDING" },
+          { content: { text: args.value }, status: "PENDING" },
           `Contact:${ctx.contact!.id}`
         ),
         ctx.petitions.getLastEventForPetitionId(petitionId),
@@ -479,7 +476,7 @@ export const publicCreateDynamicSelectReply = mutationField(
     args: {
       keycode: nonNull(idArg()),
       fieldId: nonNull(globalIdArg("PetitionField")),
-      reply: nonNull(list(stringArg())),
+      value: nonNull(list(nonNull(list(stringArg())))),
     },
     authorize: chain(
       authenticatePublicAccess("keycode"),
@@ -489,26 +486,21 @@ export const publicCreateDynamicSelectReply = mutationField(
       )
     ),
     validateArgs: async (_, args, ctx, info) => {
-      const field = (await ctx.petitions.loadField(args.fieldId))!;
-      if (field.type === "DYNAMIC_SELECT") {
-        validateDynamicSelectReplyValues(field, [args.reply], info);
+      try {
+        const field = (await ctx.petitions.loadField(args.fieldId))!;
+        validateDynamicSelectReplyValues(field, args.value);
+      } catch (error) {
+        throw new ArgValidationError(info, "value", error.message);
       }
     },
     resolve: async (_, args, ctx) => {
       const field = (await ctx.petitions.loadField(args.fieldId))!;
-
-      // first column will have the reply, next columns will have null value
-      const columns = [args.reply].concat(
-        (field.options.labels as string[])
-          .slice(1)
-          .map((label) => [label, null])
-      );
       return await ctx.petitions.createPetitionFieldReply(
         {
           petition_field_id: args.fieldId,
           petition_access_id: ctx.access!.id,
           type: field.type,
-          content: { columns },
+          content: { columns: args.value },
         },
         ctx.contact!
       );
@@ -524,34 +516,30 @@ export const publicUpdateDynamicSelectReply = mutationField(
     args: {
       keycode: nonNull(idArg()),
       replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      reply: nonNull(list(nonNull(list(stringArg())))),
+      value: nonNull(list(nonNull(list(stringArg())))),
     },
     authorize: chain(
       authenticatePublicAccess("keycode"),
-      replyBelongsToAccess("replyId")
+      and(
+        replyBelongsToAccess("replyId"),
+        replyIsForFieldOfType("replyId", "DYNAMIC_SELECT")
+      )
     ),
     validateArgs: async (_, args, ctx, info) => {
-      // the new reply must match with the structure of the field options
-      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-      if (field.type === "DYNAMIC_SELECT") {
-        validateDynamicSelectReplyValues(field, args.reply, info);
+      try {
+        const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+        validateDynamicSelectReplyValues(field, args.value);
+      } catch (error) {
+        throw new ArgValidationError(info, "reply", error.message);
       }
     },
     resolve: async (_, args, ctx) => {
       const petitionId = ctx.access!.petition_id;
-      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-
-      const columns = args.reply.concat(
-        (field.options.labels as string[])
-          .slice(args.reply.length)
-          .map((label) => [label, null])
-      );
-
       const [reply, event] = await Promise.all([
         ctx.petitions.updatePetitionFieldReply(
           args.replyId,
           {
-            content: { columns },
+            content: { columns: args.value },
             status: "PENDING",
           },
           `Contact:${ctx.contact!.id}`

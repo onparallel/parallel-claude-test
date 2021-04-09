@@ -2127,7 +2127,7 @@ export interface NexusGenArgTypes {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
-      reply: Array<string | null>; // [String]!
+      value: Array<Array<string | null>>; // [[String]!]!
     };
     publicCreateFileUploadReply: {
       // args
@@ -2145,7 +2145,7 @@ export interface NexusGenArgTypes {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
-      reply: string; // String!
+      value: string; // String!
     };
     publicDelegateAccessToContact: {
       // args
@@ -2193,8 +2193,8 @@ export interface NexusGenArgTypes {
     publicUpdateDynamicSelectReply: {
       // args
       keycode: string; // ID!
-      reply: Array<Array<string | null>>; // [[String]!]!
       replyId: NexusGenScalars["GID"]; // GID!
+      value: Array<Array<string | null>>; // [[String]!]!
     };
     publicUpdatePetitionFieldComment: {
       // args
@@ -2206,8 +2206,8 @@ export interface NexusGenArgTypes {
     publicUpdateSimpleReply: {
       // args
       keycode: string; // ID!
-      reply: string; // String!
       replyId: NexusGenScalars["GID"]; // GID!
+      value: string; // String!
     };
     reactivateAccesses: {
       // args

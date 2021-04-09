@@ -66,8 +66,8 @@ export function RecipientViewPetitionFieldText({
 
   const updateSimpleReply = useUpdateSimpleReply();
   const handleUpdate = useMemoFactory(
-    (replyId: string) => async (content: string) => {
-      await updateSimpleReply({ petitionId, replyId, keycode, content });
+    (replyId: string) => async (value: string) => {
+      await updateSimpleReply({ petitionId, replyId, keycode, value });
     },
     [keycode, updateSimpleReply]
   );
@@ -103,8 +103,8 @@ export function RecipientViewPetitionFieldText({
 
   const createSimpleReply = useCreateSimpleReply();
   const debouncedOnChange = useDebouncedCallback(
-    async (content: string, focusCreatedReply: boolean) => {
-      if (!content) {
+    async (value: string, focusCreatedReply: boolean) => {
+      if (!value) {
         return;
       }
       setIsSaving(true);
@@ -113,7 +113,7 @@ export function RecipientViewPetitionFieldText({
           petitionId,
           keycode,
           fieldId: field.id,
-          content,
+          value,
         });
         if (reply) {
           const selection = pick(newReplyRef.current!, [

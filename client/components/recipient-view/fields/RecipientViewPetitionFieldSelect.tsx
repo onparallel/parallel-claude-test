@@ -59,8 +59,8 @@ export function RecipientViewPetitionFieldSelect({
   const updateSimpleReply = useUpdateSimpleReply();
 
   const handleUpdate = useMemoFactory(
-    (replyId: string) => async (content: string) => {
-      await updateSimpleReply({ petitionId, replyId, keycode, content });
+    (replyId: string) => async (value: string) => {
+      await updateSimpleReply({ petitionId, replyId, keycode, value });
     },
     [keycode, updateSimpleReply]
   );
@@ -87,7 +87,7 @@ export function RecipientViewPetitionFieldSelect({
         petitionId,
         keycode,
         fieldId: field.id,
-        content: value.value,
+        value: value.value,
       });
       if (reply) {
         setShowNewReply(false);

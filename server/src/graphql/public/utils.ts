@@ -1,27 +1,39 @@
-import { GraphQLResolveInfo } from "graphql";
 import { PetitionField } from "../../db/__types";
-import { ArgValidationError } from "../helpers/errors";
+import { DynamicSelectOption } from "../helpers/parseDynamicSelectValues";
 
 export function validateDynamicSelectReplyValues(
   field: PetitionField,
-  reply: Array<Array<string | null>>,
-  info: GraphQLResolveInfo
+  reply: (string | null)[][]
 ) {
+  console.log("LOLLLLLLLLL");
+  const levels = field.options.labels.length;
   const labels = field.options.labels as string[];
-  let levelValues = field.options.values as any;
-  for (let level = 0; level < reply.length; level++) {
-    const [label, value] = reply[level];
-    if (
-      !label ||
-      label !== labels[level] ||
-      !value ||
-      !levelValues
-        .map((v: string | string[]) => (Array.isArray(v) ? v[0] : v))
-        .includes(value)
-    ) {
-      throw new ArgValidationError(info, "reply", "Invalid option");
+  let values = field.options.values as string[] | DynamicSelectOption[];
+  for (let level = 0; level < levels; level++) {
+    if (reply[level][0] !== labels[level]) {
+      throw new Error(`Invalid label at level ${level}`);
+    }
+    if (reply[level][1] === null) {
+      if (!reply.slice(level + 1).every(([, value]) => value === null)) {
+        console.log(reply, level);
+        throw new Error("Invalid values after null");
+      }
+    } else if (level === levels - 1) {
+      if (!((values as unknown) as string[]).includes(reply[level][1]!)) {
+        throw new Error(`Invalid value at level ${level}`);
+      }
     } else {
-      levelValues = levelValues.find(([v]: string[]) => v === value)?.[1];
+      if (
+        !(values as DynamicSelectOption[]).some(
+          ([value]) => value === reply[level][1]
+        )
+      ) {
+        throw new Error(`Invalid value at level ${level}`);
+      }
+      values =
+        (values as DynamicSelectOption[]).find(
+          ([value]) => value === reply[level][1]
+        )?.[1] ?? [];
     }
   }
 }

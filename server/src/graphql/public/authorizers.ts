@@ -108,6 +108,22 @@ export function fieldHasType<
   };
 }
 
+export function replyIsForFieldOfType<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, number>
+>(
+  argReplyId: TArg,
+  fieldType: MaybeArray<PetitionFieldType>
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    const field = (await ctx.petitions.loadFieldForReply(
+      (args[argReplyId] as unknown) as number
+    ))!;
+    return unMaybeArray(fieldType).includes(field.type);
+  };
+}
+
 export function fieldBelongsToAccess<
   TypeName extends string,
   FieldName extends string,

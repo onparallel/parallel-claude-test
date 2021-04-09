@@ -530,7 +530,7 @@ export type MutationpublicCompletePetitionArgs = {
 export type MutationpublicCreateDynamicSelectReplyArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
-  reply: Array<Maybe<Scalars["String"]>>;
+  value: Array<Array<Maybe<Scalars["String"]>>>;
 };
 
 export type MutationpublicCreateFileUploadReplyArgs = {
@@ -548,7 +548,7 @@ export type MutationpublicCreatePetitionFieldCommentArgs = {
 export type MutationpublicCreateSimpleReplyArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
-  reply: Scalars["String"];
+  value: Scalars["String"];
 };
 
 export type MutationpublicDelegateAccessToContactArgs = {
@@ -596,8 +596,8 @@ export type MutationpublicSubmitUnpublishedCommentsArgs = {
 
 export type MutationpublicUpdateDynamicSelectReplyArgs = {
   keycode: Scalars["ID"];
-  reply: Array<Array<Maybe<Scalars["String"]>>>;
   replyId: Scalars["GID"];
+  value: Array<Array<Maybe<Scalars["String"]>>>;
 };
 
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
@@ -609,8 +609,8 @@ export type MutationpublicUpdatePetitionFieldCommentArgs = {
 
 export type MutationpublicUpdateSimpleReplyArgs = {
   keycode: Scalars["ID"];
-  reply: Scalars["String"];
   replyId: Scalars["GID"];
+  value: Scalars["String"];
 };
 
 export type MutationreactivateAccessesArgs = {
@@ -3722,7 +3722,7 @@ export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutatio
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
-  reply: Scalars["String"];
+  value: Scalars["String"];
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation = {
@@ -3737,7 +3737,7 @@ export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation 
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
   fieldId: Scalars["GID"];
-  reply: Scalars["String"];
+  value: Scalars["String"];
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation = {
@@ -3751,7 +3751,10 @@ export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation 
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
   fieldId: Scalars["GID"];
-  reply: Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>;
+  value:
+    | Array<Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>>
+    | Array<Maybe<Scalars["String"]>>
+    | Maybe<Scalars["String"]>;
 }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation = {
@@ -3765,7 +3768,7 @@ export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMu
 export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables = Exact<{
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
-  reply:
+  value:
     | Array<Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>>
     | Array<Maybe<Scalars["String"]>>
     | Maybe<Scalars["String"]>;
@@ -8854,12 +8857,12 @@ export const RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument
   mutation RecipientViewPetitionFieldMutations_publicUpdateSimpleReply(
     $keycode: ID!
     $replyId: GID!
-    $reply: String!
+    $value: String!
   ) {
     publicUpdateSimpleReply(
       keycode: $keycode
       replyId: $replyId
-      reply: $reply
+      value: $value
     ) {
       id
       content
@@ -8884,7 +8887,7 @@ export const RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument
  *   variables: {
  *      keycode: // value for 'keycode'
  *      replyId: // value for 'replyId'
- *      reply: // value for 'reply'
+ *      value: // value for 'value'
  *   },
  * });
  */
@@ -8910,12 +8913,12 @@ export const RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument
   mutation RecipientViewPetitionFieldMutations_publicCreateSimpleReply(
     $keycode: ID!
     $fieldId: GID!
-    $reply: String!
+    $value: String!
   ) {
     publicCreateSimpleReply(
       keycode: $keycode
       fieldId: $fieldId
-      reply: $reply
+      value: $value
     ) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
@@ -8938,7 +8941,7 @@ export const RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument
  *   variables: {
  *      keycode: // value for 'keycode'
  *      fieldId: // value for 'fieldId'
- *      reply: // value for 'reply'
+ *      value: // value for 'value'
  *   },
  * });
  */
@@ -8964,12 +8967,12 @@ export const RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyD
   mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(
     $keycode: ID!
     $fieldId: GID!
-    $reply: [String]!
+    $value: [[String]!]!
   ) {
     publicCreateDynamicSelectReply(
       keycode: $keycode
       fieldId: $fieldId
-      reply: $reply
+      value: $value
     ) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
@@ -8992,7 +8995,7 @@ export const RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyD
  *   variables: {
  *      keycode: // value for 'keycode'
  *      fieldId: // value for 'fieldId'
- *      reply: // value for 'reply'
+ *      value: // value for 'value'
  *   },
  * });
  */
@@ -9018,12 +9021,12 @@ export const RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyD
   mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
     $keycode: ID!
     $replyId: GID!
-    $reply: [[String]!]!
+    $value: [[String]!]!
   ) {
     publicUpdateDynamicSelectReply(
       keycode: $keycode
       replyId: $replyId
-      reply: $reply
+      value: $value
     ) {
       id
       content
@@ -9048,7 +9051,7 @@ export const RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyD
  *   variables: {
  *      keycode: // value for 'keycode'
  *      replyId: // value for 'replyId'
- *      reply: // value for 'reply'
+ *      value: // value for 'value'
  *   },
  * });
  */

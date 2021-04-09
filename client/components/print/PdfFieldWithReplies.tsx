@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Heading, Stack, Text } from "@chakra-ui/react";
 import { PetitionPdf_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
@@ -54,8 +54,8 @@ export function PdfFieldWithReplies({
               <Stack spacing={0}>
                 {(reply.content.columns as [string, string | null][]).map(
                   ([label, value], i) => (
-                    <Flex key={i}>
-                      {label}:&nbsp;
+                    <Text key={i}>
+                      {label}:{" "}
                       {value ?? (
                         <Text fontStyle="italic">
                           <FormattedMessage
@@ -64,7 +64,7 @@ export function PdfFieldWithReplies({
                           />
                         </Text>
                       )}
-                    </Flex>
+                    </Text>
                   )
                 )}
               </Stack>
