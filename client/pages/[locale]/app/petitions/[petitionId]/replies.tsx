@@ -300,7 +300,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const showDownloadAll = petition.fields.some(
     (f) =>
-      ["FILE_UPLOAD", "TEXT", "SELECT"].includes(f.type) && f.replies.length > 0
+      ["FILE_UPLOAD", "TEXT", "SELECT", "DYNAMIC_SELECT"].includes(f.type) && f.replies.length > 0
   );
 
   let pendingComments = 0;
