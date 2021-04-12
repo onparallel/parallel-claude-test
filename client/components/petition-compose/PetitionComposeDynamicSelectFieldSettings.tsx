@@ -78,10 +78,12 @@ export function DynamicSelectSettings({
           </Text>
         }
         description={
-          <FormattedMessage
-            id="field-settings.dynamic-select.import-from-excel.description"
-            defaultMessage="Import listings to create related dropdowns. You can use the importing model as a guide."
-          />
+          <Text fontSize="sm">
+            <FormattedMessage
+              id="field-settings.dynamic-select.import-from-excel.description"
+              defaultMessage="Import listings to create related dropdowns. You can use the importing model as a guide."
+            />
+          </Text>
         }
         controlId="dynamic-select-options"
       >
