@@ -14,6 +14,7 @@ import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { useAssignMemoRef } from "@parallel/utils/assignRef";
+import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import {
   DynamicSelectOption,
   FieldOptions,
@@ -120,12 +121,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
     field.multiple &&
     field.options.labels.length &&
     field.replies.length > 0 &&
-    field.replies.every((reply) =>
-      reply.content.columns.every(
-        ([, value]: [string, string | null]) => !!value
-      )
-    );
-
+    completedFieldReplies(field).length === field.replies.length;
   return (
     <RecipientViewPetitionFieldCard
       keycode={keycode}
@@ -332,7 +328,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
           <Select
             {...reactSelectProps}
             ref={ref}
-            value={value ?? toSelectOption(optimistic)}
+            value={optimistic ? toSelectOption(optimistic) : value}
             options={options}
             onChange={handleOptionChange}
             placeholder={
