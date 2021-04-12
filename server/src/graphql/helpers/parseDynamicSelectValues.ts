@@ -19,6 +19,9 @@ function cleanAndValidate(data: string[][]): string[][] {
     if (row.every((c) => !c)) {
       continue;
     }
+    if (row.length !== headers.length) {
+      throw new Error(`Not enough data at row ${r}`);
+    }
     const missing = row.findIndex((c) => !c);
     if (missing !== -1) {
       throw new Error(`Missing value at (${r}, ${missing})`);

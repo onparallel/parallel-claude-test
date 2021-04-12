@@ -117,6 +117,19 @@ describe("parseDynamicSelectValues", () => {
     ).toThrowError("Missing value at (4, 1)");
   });
 
+  it("throws on incomplete row", () => {
+    expect(() =>
+      parseDynamicSelectValues([
+        ["Comunidad autónoma", "Provincia", "Municipio"],
+        ["Cataluña", "Barcelona", "Barcelona"],
+        ["Cataluña", "Barcelona", "L'hospitalet de Llobregat"],
+        ["Cataluña", "Barcelona", "Badalona"],
+        ["Cataluña", "Barcelona", "Terrassa"],
+        ["Cataluña", "Tarragona"],
+      ])
+    ).toThrowError("Not enough data at row 5");
+  });
+
   it("throws when not enough columns", () => {
     expect(() =>
       parseDynamicSelectValues([
