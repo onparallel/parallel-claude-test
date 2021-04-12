@@ -320,8 +320,17 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
     }
     setIsSaving(false);
   }
+
+  // if the user modified the labels on the field settings
+  // and the recipient tries to update an option with outdated labels, backend will throw error.
+  // so we disable the outdated selectors to avoid throwing error
+  const labelsAreOutdated =
+    (reply &&
+      reply.content.columns[level][0] !== field.options.labels[level]) ??
+    false;
+
   return (
-    <FormControl id={reactSelectProps.inputId}>
+    <FormControl id={reactSelectProps.inputId} isDisabled={labelsAreOutdated}>
       <FormLabel>{label}</FormLabel>
       <Flex alignItems="center">
         <Box flex="1" position="relative">
@@ -337,6 +346,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
                 defaultMessage="Select an option"
               />
             }
+            isDisabled={labelsAreOutdated}
           />
           {reply && value && (
             <Center height="100%" position="absolute" right="42px" top={0}>
