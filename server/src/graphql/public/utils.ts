@@ -5,7 +5,6 @@ export function validateDynamicSelectReplyValues(
   field: PetitionField,
   reply: (string | null)[][]
 ) {
-  console.log("LOLLLLLLLLL");
   const levels = field.options.labels.length;
   const labels = field.options.labels as string[];
   let values = field.options.values as string[] | DynamicSelectOption[];
@@ -15,7 +14,6 @@ export function validateDynamicSelectReplyValues(
     }
     if (reply[level][1] === null) {
       if (!reply.slice(level + 1).every(([, value]) => value === null)) {
-        console.log(reply, level);
         throw new Error("Invalid values after null");
       }
     } else if (level === levels - 1) {

@@ -299,8 +299,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, [petitionId, petition.fields]);
 
   const showDownloadAll = petition.fields.some(
-    (f) =>
-      ["FILE_UPLOAD", "TEXT", "SELECT", "DYNAMIC_SELECT"].includes(f.type) && f.replies.length > 0
+    (f) => !f.isReadOnly && f.replies.length > 0
   );
 
   let pendingComments = 0;
