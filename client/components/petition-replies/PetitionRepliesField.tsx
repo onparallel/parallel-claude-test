@@ -201,34 +201,40 @@ export function PetitionRepliesField({
           </Text>
         )}
       </Box>
-      {field.type === "DYNAMIC_SELECT" ? (
-        <Stack
-          as="ol"
-          listStyleType="none"
-          direction="row"
-          alignItems="center"
-          fontSize="sm"
-          divider={<ArrowForwardIcon border="none" />}
-          marginBottom={2}
-        >
-          {(field.options.labels as string[])?.map((label, index) => (
-            <Box key={index} as="li">
-              {label}
-            </Box>
-          ))}
-        </Stack>
-      ) : null}
       {field.replies.length ? (
-        <Stack spacing={4}>
-          {field.replies.map((reply) => (
-            <PetitionRepliesFieldReply
-              key={reply.id}
-              reply={reply}
-              onAction={(action) => onAction(action, reply)}
-              onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
-            />
-          ))}
-        </Stack>
+        <>
+          {field.type === "DYNAMIC_SELECT" ? (
+            <Stack
+              as="ol"
+              listStyleType="none"
+              direction="row"
+              alignItems="center"
+              fontSize="sm"
+              divider={<ArrowForwardIcon border="none" />}
+              marginBottom={2}
+            >
+              {(field.replies[0].content.columns as string[][])?.map(
+                ([label], index) => (
+                  <Box key={index} as="li">
+                    {label}
+                  </Box>
+                )
+              )}
+            </Stack>
+          ) : null}
+          <Stack spacing={4}>
+            {field.replies.map((reply) => (
+              <PetitionRepliesFieldReply
+                key={reply.id}
+                reply={reply}
+                onAction={(action) => onAction(action, reply)}
+                onUpdateStatus={(status) =>
+                  onUpdateReplyStatus(reply.id, status)
+                }
+              />
+            ))}
+          </Stack>
+        </>
       ) : isVisible ? (
         <Box paddingY={4}>
           <Text textStyle="hint" textAlign="center">
@@ -342,7 +348,6 @@ PetitionRepliesField.fragments = {
       title
       description
       validated
-      options
       replies {
         ...PetitionRepliesField_PetitionFieldReply
       }

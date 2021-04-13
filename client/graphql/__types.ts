@@ -3289,7 +3289,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<
   PetitionField,
-  "id" | "type" | "title" | "description" | "validated" | "options"
+  "id" | "type" | "title" | "description" | "validated"
 > & {
     replies: Array<
       {
@@ -6596,7 +6596,6 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     title
     description
     validated
-    options
     replies {
       ...PetitionRepliesField_PetitionFieldReply
     }
