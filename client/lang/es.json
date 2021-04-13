@@ -16,7 +16,7 @@
   },
   {
     "term": "component.add-petition-access-dialog.recipient-groups-description",
-    "definition": "Los destinatarios de grupos distintos responden peticiones diferentes.",
+    "definition": "Los destinatarios de grupos distintos responderán peticiones diferentes.",
     "context": "Recipients from different groups will reply to different petitions."
   },
   {
