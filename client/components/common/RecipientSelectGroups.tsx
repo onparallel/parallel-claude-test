@@ -10,7 +10,6 @@ import {
   FormErrorMessage,
   FormLabel,
   IconButton,
-  Image,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -23,7 +22,6 @@ import {
   ContactSelectProps,
   ContactSelectSelection,
 } from "./ContactSelect";
-import { HelpPopover } from "./HelpPopover";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
