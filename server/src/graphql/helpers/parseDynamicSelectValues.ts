@@ -1,8 +1,18 @@
 import { range, takeWhile } from "remeda";
 
+function sortRows(rowA: string[], rowB: string[]): number {
+  if (rowA.length === 0) return 0;
+  const result = rowA[0].localeCompare(rowB[0]);
+  if (result === 0) {
+    return sortRows(rowA.slice(1), rowB.slice(1));
+  } else {
+    return result;
+  }
+}
+
 export function parseDynamicSelectValues(data: string[][]) {
   const [labels, ...entries] = cleanAndValidate(data);
-  return { labels, values: parseEntries(entries) };
+  return { labels, values: parseEntries(entries.sort(sortRows)) };
 }
 
 /**

@@ -276,7 +276,7 @@ function DynamicSelectOptionsDropzone({
           message: (
             <FormattedMessage
               id="field-settings.dynamic-select.import-from-excel.error-dialog-body"
-              defaultMessage="Please, review your file and make sure there are no empty cells between the listings."
+              defaultMessage="Please, review your file and make sure there are no empty cells on the listing."
             />
           ),
         });

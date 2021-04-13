@@ -1481,8 +1481,8 @@
   },
   {
     "term": "field-settings.dynamic-select.import-from-excel.error-dialog-body",
-    "definition": "Por favor, revisa tu archivo y asegúrate de que no hay casillas vacías entre los listados.",
-    "context": "Please, review your file and make sure there are no empty cells between the listings."
+    "definition": "Por favor, revisa tu archivo y asegúrate de que no hay casillas vacías en el listado.",
+    "context": "Please, review your file and make sure there are no empty cells on the listing."
   },
   {
     "term": "field-settings.dynamic-select.import-from-excel.error-dialog-header",

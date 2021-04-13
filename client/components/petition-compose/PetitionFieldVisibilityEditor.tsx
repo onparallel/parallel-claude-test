@@ -323,15 +323,23 @@ function ConditionMultipleFieldModifier({
     ) {
       return [
         {
-          label: intl.formatMessage({
-            id: "component.petition-field-visibility-editor.number-of-files",
-            defaultMessage: "no. of files",
-          }),
+          label:
+            field.type === "FILE_UPLOAD"
+              ? intl.formatMessage({
+                  id:
+                    "component.petition-field-visibility-editor.number-of-files",
+                  defaultMessage: "no. of files",
+                })
+              : intl.formatMessage({
+                  id:
+                    "component.petition-field-visibility-editor.number-of-replies",
+                  defaultMessage: "no. of replies",
+                }),
           value: "NUMBER_OF_REPLIES",
         },
       ];
     } else {
-      return [
+      const options: any[] = [
         {
           label: intl.formatMessage({
             id: "component.petition-field-visibility-editor.any",
@@ -353,14 +361,18 @@ function ConditionMultipleFieldModifier({
           }),
           value: "NONE",
         },
-        {
+      ];
+      // do not show "number of replies" option for dynamic select sub-columns
+      if (field.type !== "DYNAMIC_SELECT") {
+        options.push({
           label: intl.formatMessage({
             id: "component.petition-field-visibility-editor.number-of-replies",
             defaultMessage: "no. of replies",
           }),
           value: "NUMBER_OF_REPLIES",
-        },
-      ];
+        });
+      }
+      return options;
     }
   }, [field.type, condition.column, intl.locale]);
   const _value = useMemo(

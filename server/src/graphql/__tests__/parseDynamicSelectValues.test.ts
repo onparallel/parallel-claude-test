@@ -5,42 +5,42 @@ describe("parseDynamicSelectValues", () => {
     expect(
       parseDynamicSelectValues([
         ["Comunidad autónoma", "Provincia", "Municipio"],
+        ["Castilla y León", "Burgos", "Aranda de Duero"],
+        ["Castilla y León", "Burgos", "Burgos"],
+        ["Castilla y León", "Burgos", "Torresandino"],
+        ["Castilla y León", "Soria", "El Burgo de Osma"],
+        ["Castilla y León", "Soria", "Soria"],
+        ["Cataluña", "Barcelona", "Badalona"],
         ["Cataluña", "Barcelona", "Barcelona"],
         ["Cataluña", "Barcelona", "L'hospitalet de Llobregat"],
-        ["Cataluña", "Barcelona", "Badalona"],
         ["Cataluña", "Barcelona", "Terrassa"],
+        ["Cataluña", "Tarragona", "Salou"],
         ["Cataluña", "Tarragona", "Tarragona"],
         ["Cataluña", "Tarragona", "Valls"],
-        ["Cataluña", "Tarragona", "Salou"],
-        ["Castilla y León", "Burgos", "Burgos"],
-        ["Castilla y León", "Burgos", "Aranda de Duero"],
-        ["Castilla y León", "Burgos", "Torresandino"],
-        ["Castilla y León", "Soria", "Soria"],
-        ["Castilla y León", "Soria", "El Burgo de Osma"],
       ])
     ).toEqual({
       labels: ["Comunidad autónoma", "Provincia", "Municipio"],
       values: [
+        [
+          "Castilla y León",
+          [
+            ["Burgos", ["Aranda de Duero", "Burgos", "Torresandino"]],
+            ["Soria", ["El Burgo de Osma", "Soria"]],
+          ],
+        ],
         [
           "Cataluña",
           [
             [
               "Barcelona",
               [
+                "Badalona",
                 "Barcelona",
                 "L'hospitalet de Llobregat",
-                "Badalona",
                 "Terrassa",
               ],
             ],
-            ["Tarragona", ["Tarragona", "Valls", "Salou"]],
-          ],
-        ],
-        [
-          "Castilla y León",
-          [
-            ["Burgos", ["Burgos", "Aranda de Duero", "Torresandino"]],
-            ["Soria", ["Soria", "El Burgo de Osma"]],
+            ["Tarragona", ["Salou", "Tarragona", "Valls"]],
           ],
         ],
       ],
@@ -51,20 +51,20 @@ describe("parseDynamicSelectValues", () => {
     expect(
       parseDynamicSelectValues([
         ["Comunidad autónoma", "Provincia", "Municipio"],
+        ["Castilla y León", "Burgos", "Aranda de Duero"],
+        ["", "", ""],
+        ["Castilla y León", "Burgos", "Burgos"],
+        ["Castilla y León", "Burgos", "Torresandino"],
+        ["Castilla y León", "Soria", "El Burgo de Osma"],
+        ["Castilla y León", "Soria", "Soria"],
+        ["Cataluña", "Barcelona", "Badalona"],
         ["Cataluña", "Barcelona", "Barcelona"],
         ["Cataluña", "Barcelona", "L'hospitalet de Llobregat"],
-        ["Cataluña", "Barcelona", "Badalona"],
         ["Cataluña", "Barcelona", "Terrassa"],
+        ["Cataluña", "Tarragona", "Salou"],
+        ["", "", ""],
         ["Cataluña", "Tarragona", "Tarragona"],
         ["Cataluña", "Tarragona", "Valls"],
-        ["Cataluña", "Tarragona", "Salou"],
-        ["Castilla y León", "Burgos", "Burgos"],
-        ["Castilla y León", "Burgos", "Aranda de Duero"],
-        ["Castilla y León", "Burgos", "Torresandino"],
-        ["Castilla y León", "Soria", "Soria"],
-        ["Castilla y León", "Soria", "El Burgo de Osma"],
-        ["", "", ""],
-        ["Castilla y León", "Soria", "Almazán"],
         ["", "", ""],
         ["", "", ""],
       ])
@@ -72,25 +72,71 @@ describe("parseDynamicSelectValues", () => {
       labels: ["Comunidad autónoma", "Provincia", "Municipio"],
       values: [
         [
+          "Castilla y León",
+          [
+            ["Burgos", ["Aranda de Duero", "Burgos", "Torresandino"]],
+            ["Soria", ["El Burgo de Osma", "Soria"]],
+          ],
+        ],
+        [
           "Cataluña",
           [
             [
               "Barcelona",
               [
+                "Badalona",
                 "Barcelona",
                 "L'hospitalet de Llobregat",
-                "Badalona",
                 "Terrassa",
               ],
             ],
-            ["Tarragona", ["Tarragona", "Valls", "Salou"]],
+            ["Tarragona", ["Salou", "Tarragona", "Valls"]],
           ],
         ],
+      ],
+    });
+  });
+
+  it("sorts the listings alphabetically", () => {
+    expect(
+      parseDynamicSelectValues([
+        ["Comunidad autónoma", "Provincia", "Municipio"],
+        ["Cataluña", "Barcelona", "Barcelona"],
+        ["Castilla y León", "Soria", "Soria"],
+        ["Cataluña", "Barcelona", "L'hospitalet de Llobregat"],
+        ["Cataluña", "Tarragona", "Tarragona"],
+        ["Cataluña", "Tarragona", "Valls"],
+        ["Cataluña", "Tarragona", "Salou"],
+        ["Castilla y León", "Burgos", "Burgos"],
+        ["Cataluña", "Barcelona", "Badalona"],
+        ["Castilla y León", "Burgos", "Aranda de Duero"],
+        ["Castilla y León", "Burgos", "Torresandino"],
+        ["Cataluña", "Barcelona", "Terrassa"],
+        ["Castilla y León", "Soria", "El Burgo de Osma"],
+      ])
+    ).toEqual({
+      labels: ["Comunidad autónoma", "Provincia", "Municipio"],
+      values: [
         [
           "Castilla y León",
           [
-            ["Burgos", ["Burgos", "Aranda de Duero", "Torresandino"]],
-            ["Soria", ["Soria", "El Burgo de Osma", "Almazán"]],
+            ["Burgos", ["Aranda de Duero", "Burgos", "Torresandino"]],
+            ["Soria", ["El Burgo de Osma", "Soria"]],
+          ],
+        ],
+        [
+          "Cataluña",
+          [
+            [
+              "Barcelona",
+              [
+                "Badalona",
+                "Barcelona",
+                "L'hospitalet de Llobregat",
+                "Terrassa",
+              ],
+            ],
+            ["Tarragona", ["Salou", "Tarragona", "Valls"]],
           ],
         ],
       ],
