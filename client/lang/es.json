@@ -1266,7 +1266,7 @@
   },
   {
     "term": "component.signature-config-dialog.title-placeholder",
-    "definition": "Ingresa un título...",
+    "definition": "Escribe un título...",
     "context": "Enter a title..."
   },
   {
