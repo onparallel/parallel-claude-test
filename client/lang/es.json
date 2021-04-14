@@ -16,8 +16,8 @@
   },
   {
     "term": "component.add-petition-access-dialog.recipient-groups-description",
-    "definition": "Los destinatarios de grupos distintos responderán peticiones diferentes.",
-    "context": "Recipients from different groups will reply to different petitions."
+    "definition": "Cada grupo responderá peticiones diferentes.",
+    "context": "Each group will reply to different petitions."
   },
   {
     "term": "component.add-petition-access-dialog.recipient-groups-label",
@@ -26,8 +26,8 @@
   },
   {
     "term": "component.add-petition-access-dialog.recipients-description",
-    "definition": "Los destinatarios responderán a la misma petición colaborativamente.",
-    "context": "Recipients will reply to the same petition in a collaborative way."
+    "definition": "Responderán a la misma petición colaborativamente.",
+    "context": "Will reply to the same petition collaboratively."
   },
   {
     "term": "component.add-petition-access-dialog.recipients-label",

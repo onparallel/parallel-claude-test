@@ -16,8 +16,8 @@
   },
   {
     "term": "component.add-petition-access-dialog.recipient-groups-description",
-    "definition": "Recipients from different groups will reply to different petitions.",
-    "context": "Recipients from different groups will reply to different petitions."
+    "definition": "Each group will reply to different petitions.",
+    "context": "Each group will reply to different petitions."
   },
   {
     "term": "component.add-petition-access-dialog.recipient-groups-label",
@@ -26,8 +26,8 @@
   },
   {
     "term": "component.add-petition-access-dialog.recipients-description",
-    "definition": "Recipients will reply to the same petition in a collaborative way.",
-    "context": "Recipients will reply to the same petition in a collaborative way."
+    "definition": "Will reply to the same petition collaboratively.",
+    "context": "Will reply to the same petition collaboratively."
   },
   {
     "term": "component.add-petition-access-dialog.recipients-label",

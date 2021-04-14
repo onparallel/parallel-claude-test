@@ -157,7 +157,7 @@ export function AddPetitionAccessDialog({
           {maxRecipientGroups === 1 ? null : (
             <HelpPopover popoverWidth="container.2xs" marginLeft={2}>
               <Stack direction="row">
-                <Stack alignItems="flex-start">
+                <Stack flex="1" alignItems="flex-start">
                   <Image
                     height="40px"
                     marginRight={2}
@@ -172,11 +172,11 @@ export function AddPetitionAccessDialog({
                   <Text fontSize="sm">
                     <FormattedMessage
                       id="component.add-petition-access-dialog.recipients-description"
-                      defaultMessage="Recipients will reply to the same petition in a collaborative way."
+                      defaultMessage="Will reply to the same petition collaboratively."
                     />
                   </Text>
                 </Stack>
-                <Stack alignItems="flex-start">
+                <Stack flex="1" alignItems="flex-start">
                   <Image
                     height="40px"
                     marginRight={2}
@@ -191,7 +191,7 @@ export function AddPetitionAccessDialog({
                   <Text fontSize="sm">
                     <FormattedMessage
                       id="component.add-petition-access-dialog.recipient-groups-description"
-                      defaultMessage="Recipients from different groups will reply to different petitions."
+                      defaultMessage="Each group will reply to different petitions."
                     />
                   </Text>
                 </Stack>
