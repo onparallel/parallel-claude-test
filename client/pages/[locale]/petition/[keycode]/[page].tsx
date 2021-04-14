@@ -300,24 +300,51 @@ function RecipientView({
                 >
                   <AlertIcon color="yellow.400" />
                   <AlertDescription>
-                    <Text>
-                      <FormattedMessage
-                        id="recipient-view.petition-requires-signature-alert-1"
-                        defaultMessage="This petition requires an <b>eSignature</b> to be completed."
-                        values={{
-                          b: (chunks: any[]) => <b>{chunks}</b>,
-                        }}
-                      />
-                    </Text>
-                    <Text>
-                      <FormattedMessage
-                        id="recipient-view.petition-requires-signature-alert-2"
-                        defaultMessage="We will send the <b>document to sign</b> once the replies have been reviewed and validated."
-                        values={{
-                          b: (chunks: any[]) => <b>{chunks}</b>,
-                        }}
-                      />
-                    </Text>
+                    {petition.signature.review ? (
+                      <>
+                        <Text>
+                          <FormattedMessage
+                            id="recipient-view.petition-requires-signature-alert-1"
+                            defaultMessage="This petition requires an <b>eSignature</b> to be completed."
+                            values={{
+                              b: (chunks: any[]) => <b>{chunks}</b>,
+                            }}
+                          />
+                        </Text>
+                        <Text>
+                          <FormattedMessage
+                            id="recipient-view.petition-requires-signature-alert-2"
+                            defaultMessage="We will send the <b>document to sign</b> once the replies have been reviewed and validated."
+                            values={{
+                              b: (chunks: any[]) => <b>{chunks}</b>,
+                            }}
+                          />
+                        </Text>
+                      </>
+                    ) : (
+                      <Text>
+                        {petition.signature.signers.length > 0 ? (
+                          <FormattedMessage
+                            id="recipient-view.petition-signature-request-sent-alert"
+                            defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and # more}} in order to finalize the petition."
+                            values={{
+                              b: (chunks: any[]) => <b>{chunks}</b>,
+                              name: petition.signature.signers[0]!.fullName,
+                              email: petition.signature.signers[0]!.email,
+                              count: petition.signature.signers.length - 1,
+                            }}
+                          />
+                        ) : (
+                          <FormattedMessage
+                            id="recipient-view.petition-signature-request-sent-alert.unknown-signer"
+                            defaultMessage="<b>We have sent the document to sign</b> to the specified person in order to finalize the petition."
+                            values={{
+                              b: (chunks: any[]) => <b>{chunks}</b>,
+                            }}
+                          />
+                        )}
+                      </Text>
+                    )}
                     <FormattedMessage
                       id="recipient-view.petition-completed-alert-2"
                       defaultMessage="If you want to make any changes don't forget to hit the <b>Finalize</b> button again."
