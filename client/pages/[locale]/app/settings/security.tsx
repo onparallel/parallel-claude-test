@@ -137,21 +137,19 @@ function Security() {
               />
             </FormLabel>
             <PasswordInput {...register("password", { required: true })} />
-            {errors.password?.type === "required" && (
-              <FormErrorMessage>
-                {errors.password?.type === "required" ? (
-                  <FormattedMessage
-                    id="generic.forms.required-old-password-error"
-                    defaultMessage="Old password is required"
-                  />
-                ) : errors.password?.type === "validate" ? (
-                  <FormattedMessage
-                    id="generic.forms.invalid-old-password-error"
-                    defaultMessage="Old password is incorrect"
-                  />
-                ) : null}
-              </FormErrorMessage>
-            ) : null}
+            <FormErrorMessage>
+              {errors.password?.type === "required" ? (
+                <FormattedMessage
+                  id="generic.forms.required-old-password-error"
+                  defaultMessage="Old password is required"
+                />
+              ) : errors.password?.type === "validate" ? (
+                <FormattedMessage
+                  id="generic.forms.invalid-old-password-error"
+                  defaultMessage="Old password is incorrect"
+                />
+              ) : null}
+            </FormErrorMessage>
           </FormControl>
           <FormControl
             id="new-password"
@@ -170,21 +168,19 @@ function Security() {
                 validate: (value) => value.length >= 8,
               })}
             />
-            {errors.newPassword && (
-              <FormErrorMessage>
-                {errors.newPassword?.type === "invalid" ? (
-                  <FormattedMessage
-                    id="generic.forms.invalid-password-policy-error"
-                    defaultMessage="Please choose a stronger password"
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="generic.forms.password-policy-error"
-                    defaultMessage="The password must have a least 8 characters"
-                  />
-                )}
-              </FormErrorMessage>
-            )}
+            <FormErrorMessage>
+              {errors.newPassword?.type === "invalid" ? (
+                <FormattedMessage
+                  id="generic.forms.invalid-password-policy-error"
+                  defaultMessage="Please choose a stronger password"
+                />
+              ) : (
+                <FormattedMessage
+                  id="generic.forms.password-policy-error"
+                  defaultMessage="The password must have a least 8 characters"
+                />
+              )}
+            </FormErrorMessage>
           </FormControl>
           <FormControl
             id="new-password2"
@@ -203,14 +199,12 @@ function Security() {
                 validate: (value) => value === getValues().newPassword,
               })}
             />
-            {errors.newPassword2 && (
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.passwords-must-match"
-                  defaultMessage="Passwords must match"
-                />
-              </FormErrorMessage>
-            )}
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.passwords-must-match"
+                defaultMessage="Passwords must match"
+              />
+            </FormErrorMessage>
           </FormControl>
           <Button type="submit" colorScheme="purple" isDisabled={me.isSsoUser}>
             <FormattedMessage

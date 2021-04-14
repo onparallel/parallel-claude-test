@@ -62,14 +62,12 @@ export function PasswordChangeForm({
               validate: (value) => value.length >= 8,
             })}
           />
-          {errors.password && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.password-policy-error"
-                defaultMessage="The password must have a least 8 characters"
-              />
-            </FormErrorMessage>
-          )}
+          <FormErrorMessage>
+            <FormattedMessage
+              id="generic.forms.password-policy-error"
+              defaultMessage="The password must have a least 8 characters"
+            />
+          </FormErrorMessage>
         </FormControl>
         <Button
           marginTop={6}

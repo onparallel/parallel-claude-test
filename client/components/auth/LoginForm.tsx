@@ -53,14 +53,10 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
       if (result?.url && document.activeElement === passwordRef.current) {
         buttonRef.current!.focus();
       }
-      if (result) {
-        setSsoUrl(result?.url);
-      }
+      setSsoUrl(result?.url);
     }
     if (EMAIL_REGEX.test(email)) {
       guessLogin().then();
-    } else {
-      setSsoUrl(undefined);
     }
   }, [email]);
   return (
@@ -103,14 +99,12 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
               pattern: EMAIL_REGEX,
             })}
           />
-          {errors.email && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.invalid-email-error"
-                defaultMessage="Please, enter a valid email"
-              />
-            </FormErrorMessage>
-          )}
+          <FormErrorMessage>
+            <FormattedMessage
+              id="generic.forms.invalid-email-error"
+              defaultMessage="Please, enter a valid email"
+            />
+          </FormErrorMessage>
         </FormControl>
         {ssoUrl ? (
           <Center marginTop={2} height="72px">

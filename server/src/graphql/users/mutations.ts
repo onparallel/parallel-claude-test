@@ -27,15 +27,12 @@ import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArray";
 import { validEmail } from "../helpers/validators/validEmail";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
+import { orgDoesNotHaveSsoProvider } from "../organization/authorizers";
 import {
   argUserHasActiveStatus,
   userHasAccessToUsers,
 } from "../petition/mutations/authorizers";
-import {
-  contextUserIsAdmin,
-  contextUserIsNotSso,
-  orgDoesNotHaveSsoProvider,
-} from "./authorizers";
+import { contextUserIsAdmin, contextUserIsNotSso } from "./authorizers";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",

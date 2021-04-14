@@ -77,22 +77,20 @@ export function PasswordResetForm({
             />
           </FormLabel>
           <Input {...register("verificationCode", { required: true })} />
-          {errors.verificationCode?.type === "validate" && (
-            <FormErrorMessage>
+          <FormErrorMessage>
+            {errors.verificationCode?.type === "validate" && (
               <FormattedMessage
                 id="generic.forms.invalid-verification-code"
                 defaultMessage="The verification code is invalid"
               />
-            </FormErrorMessage>
-          )}
-          {errors.verificationCode?.type === "required" && (
-            <FormErrorMessage>
+            )}
+            {errors.verificationCode?.type === "required" && (
               <FormattedMessage
                 id="generic.forms.required-verification-code"
                 defaultMessage="The verification code is required"
               />
-            </FormErrorMessage>
-          )}
+            )}
+          </FormErrorMessage>
         </FormControl>
         <FormControl
           id="password"
@@ -110,22 +108,20 @@ export function PasswordResetForm({
               validate: (value) => value.length >= 8,
             })}
           />
-          {errors.password && (
-            <FormErrorMessage>
+          <FormErrorMessage>
+            {errors.password && (
               <FormattedMessage
                 id="generic.forms.password-policy-error"
                 defaultMessage="The password must have a least 8 characters"
               />
-            </FormErrorMessage>
-          )}
-          {isInvalidPassword ? (
-            <FormErrorMessage>
+            )}
+            {isInvalidPassword ? (
               <FormattedMessage
                 id="generic.forms.invalid-password-policy-error"
                 defaultMessage="Please choose a stronger password"
               />
-            </FormErrorMessage>
-          ) : null}
+            ) : null}
+          </FormErrorMessage>
         </FormControl>
         <FormControl
           id="password-confirm"
@@ -144,14 +140,12 @@ export function PasswordResetForm({
               validate: (value) => value === getValues().password,
             })}
           />
-          {errors.passwordConfirm && (
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.passwords-must-match"
-                defaultMessage="Passwords must match"
-              />
-            </FormErrorMessage>
-          )}
+          <FormErrorMessage>
+            <FormattedMessage
+              id="generic.forms.passwords-must-match"
+              defaultMessage="Passwords must match"
+            />
+          </FormErrorMessage>
         </FormControl>
         <Button
           marginTop={6}

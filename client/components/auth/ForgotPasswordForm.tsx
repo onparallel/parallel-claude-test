@@ -65,22 +65,19 @@ export function ForgotPasswordForm({
               pattern: EMAIL_REGEX,
             })}
           />
-          {isExternalUserError ? (
-            <FormErrorMessage>
+          <FormErrorMessage>
+            {isExternalUserError ? (
               <FormattedMessage
                 id="generic.forms.sso-user-error"
                 defaultMessage="Your account uses SSO. To reset your password, please contact your team admin."
               />
-            </FormErrorMessage>
-          ) : null}
-          {errors.email && (
-            <FormErrorMessage>
+            ) : errors.email ? (
               <FormattedMessage
                 id="generic.forms.invalid-email-error"
                 defaultMessage="Please, enter a valid email"
               />
-            </FormErrorMessage>
-          )}
+            ) : null}
+          </FormErrorMessage>
         </FormControl>
         <Button
           marginTop={6}

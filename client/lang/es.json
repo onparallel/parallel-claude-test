@@ -3996,7 +3996,7 @@
   },
   {
     "term": "public.forgot-password.reset-required-toast-description",
-    "definition": "Se requiere que restablezcas una contraseña.",
+    "definition": "Se requiere que restablezcas la contraseña.",
     "context": "A password reset is required."
   },
   {
@@ -5206,7 +5206,7 @@
   },
   {
     "term": "settings.security.sso-user-explanation",
-    "definition": "Los usuarios de SSO no pueden cambiar la constraseña",
+    "definition": "Los usuarios de SSO no pueden cambiar la contraseña",
     "context": "SSO users are not able to change passwords"
   },
   {

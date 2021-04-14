@@ -55,7 +55,7 @@ export class Auth implements IAuth {
     const [, domain] = email.split("@");
     try {
       const org = await this.orgs.loadOrgByDomain(domain);
-      if (org && org.sso_provider) {
+      if (org?.sso_provider) {
         const url = new URL(
           `https://${this.config.cognito.domain}/oauth2/authorize`
         );
@@ -163,7 +163,6 @@ export class Auth implements IAuth {
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
         res.status(401).send({ error: "NewPasswordRequired" });
       } else {
-        console.log(auth);
         res.status(401).send({ error: "UnknownError" });
       }
     } catch (error) {
@@ -185,7 +184,6 @@ export class Auth implements IAuth {
       const { email, password, newPassword } = req.body;
       const auth = await this.initiateAuth(email, password, req);
       if (auth.ChallengeName !== "NEW_PASSWORD_REQUIRED") {
-        console.log(auth);
         return res.status(401).send({ error: "UnknownError" });
       }
       const challenge = await this.respondToNewPasswordRequiredChallenge(
@@ -201,11 +199,9 @@ export class Auth implements IAuth {
         this.setSession(res, token);
         res.status(201).send({});
       } else {
-        console.log(auth);
         res.status(401).send({ error: "UnknownError" });
       }
     } catch (error) {
-      console.log(error);
       next(error);
     }
   }
@@ -221,7 +217,6 @@ export class Auth implements IAuth {
         .promise();
       res.status(204).send();
     } catch (error) {
-      console.log(error);
       switch (error.code) {
         case "NotAuthorizedException":
           res.status(401).send({ error: "ExternalUser" });
@@ -289,7 +284,6 @@ export class Auth implements IAuth {
 
   /** Store session on Redis */
   private async storeSession(session: CognitoSession) {
-    console.log(session);
     const token = random(48);
     await Promise.all([
       this.redis.set(`session:${token}:idToken`, session.IdToken, this.EXPIRY),
@@ -308,7 +302,6 @@ export class Auth implements IAuth {
   }
 
   private async updateSession(token: string, session: CognitoSession) {
-    console.log(session);
     await Promise.all([
       this.redis.set(`session:${token}:idToken`, session.IdToken, this.EXPIRY),
       this.redis.set(

@@ -1,7 +1,7 @@
 import { gql } from "graphql-request";
 import { Knex } from "knex";
 import { sortBy } from "remeda";
-import { userCognitoId } from "../../../test/mocks";
+import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, Tag } from "../../db/__types";
@@ -36,7 +36,7 @@ describe("GraphQL/Tags", () => {
     [otherOrg] = await mocks.createRandomOrganizations(1);
 
     const [user] = await mocks.createRandomUsers(organization.id, 1, () => ({
-      cognito_id: userCognitoId,
+      cognito_id: USER_COGNITO_ID,
       first_name: "Harvey",
       last_name: "Specter",
       org_id: organization.id,

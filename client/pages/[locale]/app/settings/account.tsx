@@ -103,14 +103,12 @@ function Account() {
             <Input
               {...register("firstName", { required: true, maxLength: 255 })}
             />
-            {errors.firstName && (
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.required-first-name-error"
-                  defaultMessage="First name is required"
-                />
-              </FormErrorMessage>
-            )}
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.required-first-name-error"
+                defaultMessage="First name is required"
+              />
+            </FormErrorMessage>
           </FormControl>
           <FormControl
             id="last-name"
@@ -126,14 +124,12 @@ function Account() {
             <Input
               {...register("lastName", { required: true, maxLength: 255 })}
             />
-            {errors.lastName && (
-              <FormErrorMessage>
-                <FormattedMessage
-                  id="generic.forms.required-last-name-error"
-                  defaultMessage="Last name is required"
-                />
-              </FormErrorMessage>
-            )}
+            <FormErrorMessage>
+              <FormattedMessage
+                id="generic.forms.required-last-name-error"
+                defaultMessage="Last name is required"
+              />
+            </FormErrorMessage>
           </FormControl>
           <Button type="submit" colorScheme="purple" isDisabled={me.isSsoUser}>
             <FormattedMessage
