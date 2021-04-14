@@ -687,7 +687,9 @@ function ConditionPredicateValueSelect({
             (field.options as FieldOptions["DYNAMIC_SELECT"]).values,
             condition.column!
           );
-    return uniq(values).map((value) => toSelectOption(value));
+    return uniq(values)
+      .sort((a, b) => a.localeCompare(b))
+      .map((value) => toSelectOption(value));
   }, [field.type, field.options.values, condition.column]);
   const _value = toSelectOption(condition.value as string | null);
   return (
