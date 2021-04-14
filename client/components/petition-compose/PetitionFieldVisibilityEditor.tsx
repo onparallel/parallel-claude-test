@@ -54,7 +54,7 @@ import {
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { createFilter } from "react-select";
-import { pick, zip } from "remeda";
+import { pick, uniq, zip } from "remeda";
 
 export interface PetitionFieldVisibilityProps {
   fieldId: string;
@@ -687,7 +687,7 @@ function ConditionPredicateValueSelect({
             (field.options as FieldOptions["DYNAMIC_SELECT"]).values,
             condition.column!
           );
-    return values.map((value) => toSelectOption(value));
+    return uniq(values).map((value) => toSelectOption(value));
   }, [field.type, field.options.values, condition.column]);
   const _value = toSelectOption(condition.value as string | null);
   return (
