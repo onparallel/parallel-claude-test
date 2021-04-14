@@ -532,7 +532,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               </List>
             </>
           ) : (
-            <Text color="gray.600" fontSize="sm">
+            <Text color={showError ? "red.500" : "gray.600"} fontSize="sm">
               <FormattedMessage
                 id="component.petition-compose-field.dynamic-select-not-configured"
                 defaultMessage="Click on field settings to configure this field"

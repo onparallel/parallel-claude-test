@@ -68,13 +68,15 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
+import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
+import { validatePetitionFields } from "@parallel/utils/validatePetitionFields";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { countBy, zip } from "remeda";
+import { zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 type PetitionComposeProps = UnwrapPromise<
@@ -362,66 +364,22 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     if (petition?.__typename !== "Petition") {
       throw new Error("Can't send a template");
     }
-    if (countBy(petition.fields, (f) => f.type !== "HEADING") === 0) {
-      try {
-        await showErrorDialog({
-          message: (
-            <FormattedMessage
-              id="petition.no-fields-error"
-              defaultMessage="Please add at least one field with information you want to ask."
-            />
-          ),
-        });
-        const element = document.getElementById("menu-button-add-field");
-        element && element.click();
-      } finally {
-        return;
-      }
-    }
-    const fieldWithoutTitle = petition.fields.find((f) => !f.title);
-    if (fieldWithoutTitle) {
-      try {
-        setShowErrors(true);
-        const node = document.querySelector(`#field-${fieldWithoutTitle.id}`);
-        await scrollIntoView(node!, { block: "center", behavior: "smooth" });
-        await showErrorDialog({
-          message: (
-            <FormattedMessage
-              id="petition.no-fields-without-title-error"
-              defaultMessage="Please add a title to every field."
-            />
-          ),
-        });
-      } finally {
-        return;
-      }
-    }
 
-    const selectFieldWithoutOptions = petition.fields.find(
-      (f) =>
-        f.type === "SELECT" &&
-        (!f.options.values ||
-          !Array.isArray(f.options.values) ||
-          f.options.values.length < 2)
+    const { error, errorMessage, field } = validatePetitionFields(
+      petition.fields
     );
-    if (selectFieldWithoutOptions) {
-      try {
-        setShowErrors(true);
-        const node = document.querySelector(
-          `#field-${selectFieldWithoutOptions.id}`
-        );
+    if (error) {
+      setShowErrors(true);
+      await withError(showErrorDialog({ message: errorMessage }));
+      if (error === "NO_REPLIABLE_FIELDS") {
+        document
+          .querySelector<HTMLButtonElement>(".big-add-field-button")
+          ?.click();
+      } else if (field) {
+        const node = document.querySelector(`#field-${field.id}`);
         await scrollIntoView(node!, { block: "center", behavior: "smooth" });
-        await showErrorDialog({
-          message: (
-            <FormattedMessage
-              id="petition.no-select-fields-without-options-error"
-              defaultMessage="Please add two or more options to all Dropdown fields."
-            />
-          ),
-        });
-      } finally {
-        return;
       }
+      return;
     }
 
     try {

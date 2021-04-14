@@ -5380,6 +5380,10 @@ export type useSettingsSections_UserFragment = { __typename?: "User" } & {
   hasApiTokens: User["hasFeatureFlag"];
 };
 
+export type validatePetitionFields_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+} & Pick<PetitionField, "id" | "title" | "type" | "options">;
+
 export const PetitionTemplateHeader_UserFragmentDoc = gql`
   fragment PetitionTemplateHeader_User on User {
     id
@@ -7198,6 +7202,14 @@ export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
     id
     name
+  }
+`;
+export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
+  fragment validatePetitionFields_PetitionField on PetitionField {
+    id
+    title
+    type
+    options
   }
 `;
 export const WithAdminOrganizationRoleDocument = gql`

@@ -3015,6 +3015,11 @@
     "context": "Deadline"
   },
   {
+    "term": "petition.dynamic-select-field-without-options-error",
+    "definition": "Please configure the options for the conditional select fields.",
+    "context": "Please configure the options for the conditional select fields."
+  },
+  {
     "term": "petition.field-settings",
     "definition": "Field settings",
     "context": "Field settings"

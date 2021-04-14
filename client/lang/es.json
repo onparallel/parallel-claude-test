@@ -3015,6 +3015,11 @@
     "context": "Deadline"
   },
   {
+    "term": "petition.dynamic-select-field-without-options-error",
+    "definition": "Por favor, configura las opciones para los campos de desplegable condicional.",
+    "context": "Please configure the options for the conditional select fields."
+  },
+  {
     "term": "petition.field-settings",
     "definition": "Ajustes de campo",
     "context": "Field settings"
