@@ -9,6 +9,7 @@ import {
   InputProps,
   Stack,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -257,7 +258,9 @@ function useContactPetitionAccessesColumns() {
           CellContent: ({ row: { petition } }) => (
             <>
               {petition!.name ? (
-                ellipsis(petition!.name, 50)
+                <Tooltip label={petition!.name}>
+                  {ellipsis(petition!.name, 50)}
+                </Tooltip>
               ) : (
                 <Text as="span" textStyle="hint" whiteSpace="nowrap">
                   <FormattedMessage

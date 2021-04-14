@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text, Tooltip } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
@@ -50,7 +50,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           CellContent: ({ row }) => (
             <>
               {row.name ? (
-                ellipsis(row.name!, 50)
+                <Tooltip label={row.name}>{ellipsis(row.name!, 50)}</Tooltip>
               ) : (
                 <Text as="span" textStyle="hint" whiteSpace="nowrap">
                   {type === "PETITION" ? (
