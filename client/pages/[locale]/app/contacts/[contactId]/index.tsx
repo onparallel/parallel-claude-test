@@ -9,7 +9,6 @@ import {
   InputProps,
   Stack,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
 import { EditIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -21,6 +20,7 @@ import { PetitionSignatureCellContent } from "@parallel/components/common/Petiti
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
+import { TextWithOverflow } from "@parallel/components/common/TextWithOverflow";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   withApolloData,
@@ -42,7 +42,7 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -258,34 +258,20 @@ function useContactPetitionAccessesColumns() {
             maxWidth: 0,
             minWidth: "30%",
           },
-          CellContent: ({ row }) => {
-            const ref = useRef<HTMLElement>(null);
-            const [isOverflown, setIsOverflown] = useState(false);
-            useEffect(() => {
-              setIsOverflown(
-                ref.current!.scrollWidth > ref.current!.clientWidth
-              );
-            }, []);
-            return (
-              <Tooltip
-                label={row.petition.name}
-                isDisabled={!row.petition.name || !isOverflown}
-              >
-                <Box isTruncated ref={ref as any}>
-                  {row.petition.name ? (
-                    row.petition.name
-                  ) : (
-                    <Text as="span" textStyle="hint" whiteSpace="nowrap">
-                      <FormattedMessage
-                        id="generic.untitled-petition"
-                        defaultMessage="Untitled petition"
-                      />
-                    </Text>
-                  )}
-                </Box>
-              </Tooltip>
-            );
-          },
+          CellContent: ({ row }) => (
+            <TextWithOverflow tooltipText={row.petition?.name}>
+              {row.petition?.name ? (
+                row.petition.name
+              ) : (
+                <Text as="span" textStyle="hint" whiteSpace="nowrap">
+                  <FormattedMessage
+                    id="generic.untitled-petition"
+                    defaultMessage="Untitled petition"
+                  />
+                </Text>
+              )}
+            </TextWithOverflow>
+          ),
         },
         {
           key: "status",

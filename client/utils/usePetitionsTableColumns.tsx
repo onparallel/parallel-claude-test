@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Text, Tooltip } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
@@ -16,8 +16,9 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
-import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { TextWithOverflow } from "@parallel/components/common/TextWithOverflow";
 
 export type PetitionsTableColumnsSelection = usePetitionsTableColumns_PetitionBaseFragment;
 export type PetitionsTableColumnsContext = {
@@ -46,38 +47,27 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
             maxWidth: 0,
             minWidth: "30%",
           },
-          CellContent: ({ row }) => {
-            const ref = useRef<HTMLElement>(null);
-            const [isOverflown, setIsOverflown] = useState(false);
-            useEffect(() => {
-              setIsOverflown(
-                ref.current!.scrollWidth > ref.current!.clientWidth
-              );
-            }, []);
-            return (
-              <Tooltip label={row.name} isDisabled={!row.name || !isOverflown}>
-                <Box isTruncated ref={ref as any}>
-                  {row.name ? (
-                    row.name
+          CellContent: ({ row }) => (
+            <TextWithOverflow tooltipText={row.name}>
+              {row.name ? (
+                row.name
+              ) : (
+                <Text as="span" textStyle="hint" whiteSpace="nowrap">
+                  {type === "PETITION" ? (
+                    <FormattedMessage
+                      id="generic.untitled-petition"
+                      defaultMessage="Untitled petition"
+                    />
                   ) : (
-                    <Text as="span" textStyle="hint" whiteSpace="nowrap">
-                      {type === "PETITION" ? (
-                        <FormattedMessage
-                          id="generic.untitled-petition"
-                          defaultMessage="Untitled petition"
-                        />
-                      ) : (
-                        <FormattedMessage
-                          id="generic.untitled-template"
-                          defaultMessage="Untitled template"
-                        />
-                      )}
-                    </Text>
+                    <FormattedMessage
+                      id="generic.untitled-template"
+                      defaultMessage="Untitled template"
+                    />
                   )}
-                </Box>
-              </Tooltip>
-            );
-          },
+                </Text>
+              )}
+            </TextWithOverflow>
+          ),
         },
         ...(type === "PETITION"
           ? ([
