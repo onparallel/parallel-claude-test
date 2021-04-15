@@ -341,25 +341,23 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         </Box>
       }
     >
-      <Box minWidth="container.lg">
-        <PetitionAccessesTable
-          id="petition-accesses"
-          margin={4}
-          petition={petition}
-          onSendReminders={handleSendReminders}
-          onAddPetitionAccess={handleAddPetitionAccess}
-          onReactivateAccess={handleReactivateAccess}
-          onDeactivateAccess={handleDeactivateAccess}
-          onConfigureReminders={handleConfigureReminders}
+      <PetitionAccessesTable
+        id="petition-accesses"
+        margin={4}
+        petition={petition}
+        onSendReminders={handleSendReminders}
+        onAddPetitionAccess={handleAddPetitionAccess}
+        onReactivateAccess={handleReactivateAccess}
+        onDeactivateAccess={handleDeactivateAccess}
+        onConfigureReminders={handleConfigureReminders}
+      />
+      <Box margin={4}>
+        <PetitionActivityTimeline
+          id="petition-activity-timeline"
+          userId={me.id}
+          events={petition.events.items}
+          onCancelScheduledMessage={handleCancelScheduledMessage}
         />
-        <Box margin={4}>
-          <PetitionActivityTimeline
-            id="petition-activity-timeline"
-            userId={me.id}
-            events={petition.events.items}
-            onCancelScheduledMessage={handleCancelScheduledMessage}
-          />
-        </Box>
       </Box>
     </PetitionLayout>
   );

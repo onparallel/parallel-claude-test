@@ -16,7 +16,7 @@ import {
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
-import { MouseEvent, useMemo } from "react";
+import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export type PetitionsTableColumnsSelection = usePetitionsTableColumns_PetitionBaseFragment;
@@ -43,31 +43,41 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   defaultMessage: "Template name",
                 }),
           cellProps: {
-            isTruncated: true,
             maxWidth: 0,
             minWidth: "30%",
           },
-          CellContent: ({ row }) => (
-            <>
-              {row.name ? (
-                <Tooltip label={row.name}>{ellipsis(row.name!, 50)}</Tooltip>
-              ) : (
-                <Text as="span" textStyle="hint" whiteSpace="nowrap">
-                  {type === "PETITION" ? (
-                    <FormattedMessage
-                      id="generic.untitled-petition"
-                      defaultMessage="Untitled petition"
-                    />
+          CellContent: ({ row }) => {
+            const ref = useRef<HTMLElement>(null);
+            const [isOverflown, setIsOverflown] = useState(false);
+            useEffect(() => {
+              setIsOverflown(
+                ref.current!.scrollWidth > ref.current!.clientWidth
+              );
+            }, []);
+            return (
+              <Tooltip label={row.name} isDisabled={!row.name || !isOverflown}>
+                <Box isTruncated ref={ref as any}>
+                  {row.name ? (
+                    row.name
                   ) : (
-                    <FormattedMessage
-                      id="generic.untitled-template"
-                      defaultMessage="Untitled template"
-                    />
+                    <Text as="span" textStyle="hint" whiteSpace="nowrap">
+                      {type === "PETITION" ? (
+                        <FormattedMessage
+                          id="generic.untitled-petition"
+                          defaultMessage="Untitled petition"
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id="generic.untitled-template"
+                          defaultMessage="Untitled template"
+                        />
+                      )}
+                    </Text>
                   )}
-                </Text>
-              )}
-            </>
-          ),
+                </Box>
+              </Tooltip>
+            );
+          },
         },
         ...(type === "PETITION"
           ? ([

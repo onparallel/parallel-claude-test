@@ -50,7 +50,13 @@ export function TablePage<T, TContext = unknown>({
           {header}
         </Box>
       ) : null}
-      <Flex flexDirection="column" minHeight="300px" position="relative">
+      <Flex
+        flexDirection="column"
+        minHeight="300px"
+        minWidth="0"
+        position="relative"
+        overflowX="auto"
+      >
         {loading ? (
           <Flex
             position="absolute"

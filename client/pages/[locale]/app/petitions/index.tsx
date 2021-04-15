@@ -199,11 +199,7 @@ function Petitions() {
       }
       user={me}
     >
-      <Box
-        padding={4}
-        paddingBottom={{ base: 4, md: 24 }}
-        minWidth="container.lg"
-      >
+      <Box padding={4} paddingBottom={{ base: 4, md: 24 }}>
         <TablePage
           columns={columns}
           rows={petitions.items}

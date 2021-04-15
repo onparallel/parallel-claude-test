@@ -146,11 +146,7 @@ function Contacts() {
       })}
       user={me}
     >
-      <Box
-        padding={4}
-        paddingBottom={{ base: 4, md: 24 }}
-        minWidth="container.lg"
-      >
+      <Box padding={4} paddingBottom={{ base: 4, md: 24 }}>
         <TablePage
           columns={columns}
           rows={contacts.items}
@@ -269,7 +265,12 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           defaultMessage: "Created at",
         }),
         CellContent: ({ row: { createdAt } }) => (
-          <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime />
+          <DateTime
+            value={createdAt}
+            format={FORMATS.LLL}
+            useRelativeTime
+            whiteSpace="nowrap"
+          />
         ),
       },
     ],

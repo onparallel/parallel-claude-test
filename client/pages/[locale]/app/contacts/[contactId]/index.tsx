@@ -40,10 +40,9 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
-import { ellipsis } from "@parallel/utils/ellipsis";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -255,22 +254,38 @@ function useContactPetitionAccessesColumns() {
             id: "petitions.header.name",
             defaultMessage: "Petition name",
           }),
-          CellContent: ({ row: { petition } }) => (
-            <>
-              {petition!.name ? (
-                <Tooltip label={petition!.name}>
-                  {ellipsis(petition!.name, 50)}
-                </Tooltip>
-              ) : (
-                <Text as="span" textStyle="hint" whiteSpace="nowrap">
-                  <FormattedMessage
-                    id="generic.untitled-petition"
-                    defaultMessage="Untitled petition"
-                  />
-                </Text>
-              )}
-            </>
-          ),
+          cellProps: {
+            maxWidth: 0,
+            minWidth: "30%",
+          },
+          CellContent: ({ row }) => {
+            const ref = useRef<HTMLElement>(null);
+            const [isOverflown, setIsOverflown] = useState(false);
+            useEffect(() => {
+              setIsOverflown(
+                ref.current!.scrollWidth > ref.current!.clientWidth
+              );
+            }, []);
+            return (
+              <Tooltip
+                label={row.petition.name}
+                isDisabled={!row.petition.name || !isOverflown}
+              >
+                <Box isTruncated ref={ref as any}>
+                  {row.petition.name ? (
+                    row.petition.name
+                  ) : (
+                    <Text as="span" textStyle="hint" whiteSpace="nowrap">
+                      <FormattedMessage
+                        id="generic.untitled-petition"
+                        defaultMessage="Untitled petition"
+                      />
+                    </Text>
+                  )}
+                </Box>
+              </Tooltip>
+            );
+          },
         },
         {
           key: "status",

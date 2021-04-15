@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import {
+  Box,
   BoxProps,
   Button,
   Flex,
@@ -149,15 +150,17 @@ export function PetitionAccessesTable({
           })}
         </Button>
       </Stack>
-      <Table
-        columns={columns}
-        context={context}
-        rows={petition.accesses ?? []}
-        rowKeyProp="id"
-        isSelectable
-        onSelectionChange={setSelection}
-        marginBottom={2}
-      />
+      <Box overflowX="auto">
+        <Table
+          columns={columns}
+          context={context}
+          rows={petition.accesses ?? []}
+          rowKeyProp="id"
+          isSelectable
+          onSelectionChange={setSelection}
+          marginBottom={2}
+        />
+      </Box>
     </Card>
   );
 }
@@ -219,20 +222,24 @@ function usePetitionAccessesColumns(): TableColumn<
           row: { nextReminderAt, remindersLeft, remindersActive },
         }) => {
           return remindersActive && nextReminderAt ? (
-            <DateTime value={nextReminderAt} format={FORMATS.LLL} />
-          ) : remindersLeft ? (
-            <Text textStyle="hint">
-              <FormattedMessage
-                id="petitions.reminders-not-set"
-                defaultMessage="Not set"
-              />
-            </Text>
+            <DateTime
+              value={nextReminderAt}
+              format={FORMATS.LLL}
+              whiteSpace="nowrap"
+            />
           ) : (
-            <Text textStyle="hint">
-              <FormattedMessage
-                id="petitions.no-reminders-left"
-                defaultMessage="No reminders left"
-              />
+            <Text textStyle="hint" whiteSpace="nowrap">
+              {remindersLeft ? (
+                <FormattedMessage
+                  id="petitions.reminders-not-set"
+                  defaultMessage="Not set"
+                />
+              ) : (
+                <FormattedMessage
+                  id="petitions.no-reminders-left"
+                  defaultMessage="No reminders left"
+                />
+              )}
             </Text>
           );
         },
@@ -243,11 +250,11 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.reminders-sent-header",
           defaultMessage: "Reminders sent",
         }),
-        CellContent: ({ row: { reminderCount, nextReminderAt } }) => {
+        CellContent: ({ row: { reminderCount } }) => {
           return reminderCount ? (
             <FormattedNumber value={reminderCount} />
           ) : (
-            <Text textStyle="hint">
+            <Text textStyle="hint" whiteSpace="nowrap">
               <FormattedMessage
                 id="petition-accesses.no-reminders-sent"
                 defaultMessage="No reminders sent"
@@ -263,7 +270,11 @@ function usePetitionAccessesColumns(): TableColumn<
           defaultMessage: "Created at",
         }),
         CellContent: ({ row: { createdAt } }) => (
-          <DateTime value={createdAt} format={FORMATS.LLL} />
+          <DateTime
+            value={createdAt}
+            format={FORMATS.LLL}
+            whiteSpace="nowrap"
+          />
         ),
       },
       {
