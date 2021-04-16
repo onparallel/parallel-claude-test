@@ -139,6 +139,11 @@ export interface NexusGenInputs {
     signatureConfig?: NexusGenInputs["SignatureConfigInput"] | null; // SignatureConfigInput
     skipForwardSecurity?: boolean | null; // Boolean
   };
+  UpdateTagInput: {
+    // input type
+    color?: string | null; // String
+    name?: string | null; // String
+  };
   UpdateUserInput: {
     // input type
     firstName?: string | null; // String
@@ -399,6 +404,12 @@ export interface NexusGenObjects {
     message?: string | null; // String
     result: NexusGenEnums["Result"]; // Result!
   };
+  Tag: db.Tag;
+  TagPagination: {
+    // root type
+    items: NexusGenRootTypes["Tag"][]; // [Tag!]!
+    totalCount: number; // Int!
+  };
   User: db.User;
   UserAuthenticationToken: db.UserAuthenticationToken;
   UserAuthenticationTokenPagination: {
@@ -573,6 +584,7 @@ export interface NexusGenFieldTypes {
     createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     createPetitionSubscription: NexusGenRootTypes["Subscription"]; // Subscription!
     createSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    createTag: NexusGenRootTypes["Tag"]; // Tag!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
@@ -582,6 +594,7 @@ export interface NexusGenFieldTypes {
     deletePetitionReply: NexusGenEnums["Result"]; // Result!
     deletePetitionSubscription: NexusGenEnums["Result"]; // Result!
     deletePetitions: NexusGenEnums["Result"]; // Result!
+    deleteTag: NexusGenEnums["Result"]; // Result!
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     editPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
@@ -616,7 +629,9 @@ export interface NexusGenFieldTypes {
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    tagPetition: NexusGenEnums["Result"]; // Result!
     transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    untagPetition: NexusGenEnums["Result"]; // Result!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
@@ -629,6 +644,7 @@ export interface NexusGenFieldTypes {
     updatePetitionUserSubscription: NexusGenRootTypes["Petition"]; // Petition!
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     updateSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
+    updateTag: NexusGenRootTypes["Tag"]; // Tag!
     updateUser: NexusGenRootTypes["User"]; // User!
     updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -1006,6 +1022,7 @@ export interface NexusGenFieldTypes {
     petitions: NexusGenRootTypes["PetitionBasePagination"]; // PetitionBasePagination!
     publicOrgLogoUrl: string | null; // String
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
+    tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
   };
   ReminderSentEvent: {
     // field return type
@@ -1088,6 +1105,18 @@ export interface NexusGenFieldTypes {
     // field return type
     message: string | null; // String
     result: NexusGenEnums["Result"]; // Result!
+  };
+  Tag: {
+    // field return type
+    color: string; // String!
+    id: NexusGenScalars["GID"]; // GID!
+    name: string; // String!
+    organization_id: NexusGenScalars["GID"]; // GID!
+  };
+  TagPagination: {
+    // field return type
+    items: NexusGenRootTypes["Tag"][]; // [Tag!]!
+    totalCount: number; // Int!
   };
   User: {
     // field return type
@@ -1310,6 +1339,7 @@ export interface NexusGenFieldTypeNames {
     createPetitionFieldComment: "PetitionFieldComment";
     createPetitionSubscription: "Subscription";
     createSimpleReply: "PetitionFieldReply";
+    createTag: "Tag";
     createUser: "SupportMethodResponse";
     deactivateAccesses: "PetitionAccess";
     deleteContacts: "Result";
@@ -1319,6 +1349,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitionReply: "Result";
     deletePetitionSubscription: "Result";
     deletePetitions: "Result";
+    deleteTag: "Result";
     dynamicSelectFieldFileDownloadLink: "FileUploadReplyDownloadLinkResult";
     editPetitionUserPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
@@ -1353,7 +1384,9 @@ export interface NexusGenFieldTypeNames {
     startSignatureRequest: "PetitionSignatureRequest";
     submitUnpublishedComments: "PetitionFieldComment";
     switchAutomaticReminders: "PetitionAccess";
+    tagPetition: "Result";
     transferPetitionOwnership: "Petition";
+    untagPetition: "Result";
     updateContact: "Contact";
     updateFieldPositions: "PetitionBase";
     updateOnboardingStatus: "User";
@@ -1366,6 +1399,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionUserSubscription: "Petition";
     updateSignatureRequestMetadata: "PetitionSignatureRequest";
     updateSimpleReply: "PetitionFieldReply";
+    updateTag: "Tag";
     updateUser: "User";
     updateUserStatus: "User";
     uploadDynamicSelectFieldFile: "PetitionField";
@@ -1741,6 +1775,7 @@ export interface NexusGenFieldTypeNames {
     petitions: "PetitionBasePagination";
     publicOrgLogoUrl: "String";
     publicTemplates: "PetitionTemplatePagination";
+    tags: "TagPagination";
   };
   ReminderSentEvent: {
     // field return type name
@@ -1823,6 +1858,18 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     message: "String";
     result: "Result";
+  };
+  Tag: {
+    // field return type name
+    color: "String";
+    id: "GID";
+    name: "String";
+    organization_id: "GID";
+  };
+  TagPagination: {
+    // field return type name
+    items: "Tag";
+    totalCount: "Int";
   };
   User: {
     // field return type name
@@ -2049,6 +2096,11 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       reply: string; // String!
     };
+    createTag: {
+      // args
+      color: string; // String!
+      name: string; // String!
+    };
     createUser: {
       // args
       email: string; // String!
@@ -2096,6 +2148,10 @@ export interface NexusGenArgTypes {
       // args
       force?: boolean | null; // Boolean
       ids: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    deleteTag: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
     };
     dynamicSelectFieldFileDownloadLink: {
       // args
@@ -2287,10 +2343,20 @@ export interface NexusGenArgTypes {
       remindersConfig?: NexusGenInputs["RemindersConfigInput"] | null; // RemindersConfigInput
       start: boolean; // Boolean!
     };
+    tagPetition: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      tagId: NexusGenScalars["GID"]; // GID!
+    };
     transferPetitionOwnership: {
       // args
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
       userId: NexusGenScalars["GID"]; // GID!
+    };
+    untagPetition: {
+      // args
+      petitionId: NexusGenScalars["GID"]; // GID!
+      tagId: NexusGenScalars["GID"]; // GID!
     };
     updateContact: {
       // args
@@ -2358,6 +2424,11 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       reply: string; // String!
       replyId: NexusGenScalars["GID"]; // GID!
+    };
+    updateTag: {
+      // args
+      data: NexusGenInputs["UpdateTagInput"]; // UpdateTagInput!
+      id: NexusGenScalars["GID"]; // GID!
     };
     updateUser: {
       // args
@@ -2484,6 +2555,7 @@ export interface NexusGenArgTypes {
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryPetitions_OrderBy"][] | null; // [QueryPetitions_OrderBy!]
       status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
+      tagId?: NexusGenScalars["GID"] | null; // GID
       type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
     publicOrgLogoUrl: {
@@ -2494,6 +2566,12 @@ export interface NexusGenArgTypes {
       // args
       limit?: number | null; // Int
       locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
+      offset?: number | null; // Int
+      search?: string | null; // String
+    };
+    tags: {
+      // args
+      limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
     };

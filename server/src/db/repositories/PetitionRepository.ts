@@ -213,19 +213,21 @@ export class PetitionRepository extends BaseRepository {
       status?: PetitionStatus | null;
       type?: PetitionType;
       locale?: "en" | "es" | null;
+      tagId?: number | null;
     } & PageOpts
   ) {
     const petitionType = opts.type || "PETITION";
     return await this.loadPageAndCount(
       this.from("petition")
         .leftJoin("petition_user", "petition.id", "petition_user.petition_id")
+        .leftJoin("petition_tag", "petition.id", "petition_tag.petition_id")
         .where({
           "petition_user.user_id": userId,
           is_template: petitionType === "TEMPLATE",
           "petition_user.deleted_at": null,
         })
         .mmodify((q) => {
-          const { search, status, locale } = opts;
+          const { search, status, locale, tagId } = opts;
           if (locale) {
             q.where("locale", locale);
           }
@@ -243,6 +245,10 @@ export class PetitionRepository extends BaseRepository {
           }
           if (status && petitionType === "PETITION") {
             q.where("status", status);
+          }
+
+          if (tagId) {
+            q.where("petition_tag.tag_id", tagId);
           }
 
           const hasOrderByLastUsed = opts.sortBy?.some(

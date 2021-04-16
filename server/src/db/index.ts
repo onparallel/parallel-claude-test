@@ -12,6 +12,7 @@ import { ReportingRepository } from "./repositories/ReportingRepository";
 import { UserAuthenticationRepository } from "./repositories/UserAuthenticationRepository";
 import { PetitionEventSubscriptionRepository } from "./repositories/PetitionEventSubscriptionRepository";
 import { UserRepository } from "./repositories/UserRepository";
+import { TagRepository } from "./repositories/TagRepository";
 
 export const dbModule = new ContainerModule((bind) => {
   bind<Knex>(KNEX).toDynamicValue(createKnex).inSingletonScope();
@@ -30,4 +31,5 @@ export const dbModule = new ContainerModule((bind) => {
   bind<PetitionEventSubscriptionRepository>(
     PetitionEventSubscriptionRepository
   ).toSelf();
+  bind<TagRepository>(TagRepository).toSelf();
 });

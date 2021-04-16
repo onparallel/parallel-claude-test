@@ -115,9 +115,11 @@ export interface TableTypes {
   petition_message: PetitionMessage;
   petition_reminder: PetitionReminder;
   petition_signature_request: PetitionSignatureRequest;
+  petition_tag: PetitionTag;
   petition_user: PetitionUser;
   petition_user_notification: PetitionUserNotification;
   public_file_upload: PublicFileUpload;
+  tag: Tag;
   temporary_file: TemporaryFile;
   user: User;
   user_authentication_token: UserAuthenticationToken;
@@ -146,9 +148,11 @@ export interface TableCreateTypes {
   petition_message: CreatePetitionMessage;
   petition_reminder: CreatePetitionReminder;
   petition_signature_request: CreatePetitionSignatureRequest;
+  petition_tag: CreatePetitionTag;
   petition_user: CreatePetitionUser;
   petition_user_notification: CreatePetitionUserNotification;
   public_file_upload: CreatePublicFileUpload;
+  tag: CreateTag;
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
   user_authentication_token: CreateUserAuthenticationToken;
@@ -177,9 +181,11 @@ export interface TablePrimaryKeys {
   petition_message: "id";
   petition_reminder: "id";
   petition_signature_request: "id";
+  petition_tag: "id";
   petition_user: "id";
   petition_user_notification: "id";
   public_file_upload: "id";
+  tag: "id";
   temporary_file: "id";
   user: "id";
   user_authentication_token: "id";
@@ -686,6 +692,14 @@ export type CreatePetitionSignatureRequest = PartialProps<
   | "metadata"
 >;
 
+export interface PetitionTag {
+  id: number; // int4
+  petition_id: number; // int4
+  tag_id: number; // int4
+}
+
+export type CreatePetitionTag = PartialProps<Omit<PetitionTag, "id">>;
+
 export interface PetitionUser {
   id: number; // int4
   petition_id: number; // int4
@@ -743,6 +757,29 @@ export interface PublicFileUpload {
 
 export type CreatePublicFileUpload = PartialProps<
   Omit<PublicFileUpload, "id">,
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
+export interface Tag {
+  id: number; // int4
+  organization_id: number; // int4
+  name: string; // varchar
+  color: string; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateTag = PartialProps<
+  Omit<Tag, "id">,
   | "created_at"
   | "created_by"
   | "updated_at"

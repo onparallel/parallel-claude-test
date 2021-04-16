@@ -35,6 +35,11 @@ export const PetitionStatus = enumType({
   ],
 });
 
+export const PetitionBaseType = enumType({
+  name: "PetitionBaseType",
+  members: ["PETITION", "TEMPLATE"],
+});
+
 export const PetitionProgress = objectType({
   name: "PetitionProgress",
   description: "The progress of a petition.",

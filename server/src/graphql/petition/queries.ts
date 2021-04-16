@@ -1,11 +1,4 @@
-import {
-  arg,
-  queryField,
-  enumType,
-  stringArg,
-  nonNull,
-  nullable,
-} from "@nexus/schema";
+import { arg, queryField, stringArg, nonNull, nullable } from "@nexus/schema";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import {
   userHasAccessToPetitions,
@@ -22,24 +15,16 @@ export const petitionsQuery = queryField((t) => {
     description: "The petitions of the user",
     authorize: authenticate(),
     additionalArgs: {
-      status: arg({
-        type: "PetitionStatus",
-      }),
-      type: arg({
-        type: enumType({
-          name: "PetitionBaseType",
-          members: ["PETITION", "TEMPLATE"],
-        }),
-      }),
-      locale: arg({
-        type: "PetitionLocale",
-      }),
+      status: "PetitionStatus",
+      locale: "PetitionLocale",
+      type: "PetitionBaseType",
+      tagId: globalIdArg("Tag"),
     },
     searchable: true,
     sortableBy: ["createdAt", "name", "lastUsedAt" as any],
     resolve: async (
       _,
-      { offset, limit, search, sortBy, status, type, locale },
+      { offset, limit, search, sortBy, status, type, locale, tagId },
       ctx
     ) => {
       const columnMap = {
@@ -52,6 +37,7 @@ export const petitionsQuery = queryField((t) => {
         search,
         offset,
         locale,
+        tagId,
         type: type || "PETITION",
         sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
           const [field, order] = parseSortBy(value);

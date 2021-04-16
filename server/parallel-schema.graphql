@@ -398,6 +398,11 @@ type Mutation {
   ): PetitionFieldReply!
 
   """
+  Creates a tag linked to the user's organization
+  """
+  createTag(color: String!, name: String!): Tag!
+
+  """
   Creates a new user in the specified organization.
   """
   createUser(
@@ -480,6 +485,11 @@ type Mutation {
   Delete petitions.
   """
   deletePetitions(force: Boolean = false, ids: [GID!]!): Result!
+
+  """
+  Removes the tag from every petition and soft-deletes it
+  """
+  deleteTag(id: GID!): Result!
 
   """
   generates a signed download link for the xlsx file containing the listings of a dynamic select field
@@ -756,9 +766,19 @@ type Mutation {
   ): [PetitionAccess!]!
 
   """
+  Tags a petition
+  """
+  tagPetition(petitionId: GID!, tagId: GID!): Result!
+
+  """
   Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.
   """
   transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [Petition!]!
+
+  """
+  Removes the given tag from the given petition
+  """
+  untagPetition(petitionId: GID!, tagId: GID!): Result!
 
   """
   Updates a contact.
@@ -843,6 +863,11 @@ type Mutation {
     reply: String!
     replyId: GID!
   ): PetitionFieldReply!
+
+  """
+  Updates the name and color of a given tag
+  """
+  updateTag(data: UpdateTagInput!, id: GID!): Tag!
 
   """
   Updates the user with the provided data.
@@ -2495,6 +2520,7 @@ type Query {
     """
     sortBy: [QueryPetitions_OrderBy!]
     status: PetitionStatus
+    tagId: GID
     type: PetitionBaseType
   ): PetitionBasePagination!
   publicOrgLogoUrl(id: GID!): String
@@ -2519,6 +2545,26 @@ type Query {
     """
     search: String
   ): PetitionTemplatePagination!
+
+  """
+  Tags of the user organization
+  """
+  tags(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+  ): TagPagination!
 }
 
 """
@@ -2754,6 +2800,28 @@ type SupportMethodResponse {
   result: Result!
 }
 
+type Tag {
+  """
+  The color of the tag in hex format (example: #FFFFFF)
+  """
+  color: String!
+  id: GID!
+  name: String!
+  organization_id: GID!
+}
+
+type TagPagination {
+  """
+  The requested slice of items.
+  """
+  items: [Tag!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
 interface Timestamps {
   """
   Time when the resource was created.
@@ -2792,6 +2860,11 @@ input UpdatePetitionInput {
   remindersConfig: RemindersConfigInput
   signatureConfig: SignatureConfigInput
   skipForwardSecurity: Boolean
+}
+
+input UpdateTagInput {
+  color: String
+  name: String
 }
 
 input UpdateUserInput {
