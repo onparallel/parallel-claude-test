@@ -19,6 +19,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import {
   ContactSelect,
+  ContactSelectInstance,
   ContactSelectProps,
   ContactSelectSelection,
 } from "./ContactSelect";
@@ -40,7 +41,8 @@ export function RecipientSelectGroups({
   onCreateContact,
 }: RecipientSelectGroupsProps) {
   const intl = useIntl();
-  const lastRecipientGroupRef = useRef<HTMLDivElement>(null);
+  const lastRecipientGroupSelectRef = useRef<ContactSelectInstance>(null);
+  const lastRecipientGroupFormControlRef = useRef<HTMLDivElement>(null);
 
   const [isAlertVisible, setAlertVisible] = useState(true);
 
@@ -56,13 +58,14 @@ export function RecipientSelectGroups({
   function addRecipientGroup() {
     onChangeRecipientGroups([...recipientGroups, []]);
     setTimeout(() => {
-      if (lastRecipientGroupRef.current) {
-        scrollIntoView(lastRecipientGroupRef.current, {
+      if (lastRecipientGroupSelectRef.current) {
+        lastRecipientGroupSelectRef.current.focus();
+        scrollIntoView(lastRecipientGroupFormControlRef.current!, {
           scrollMode: "if-needed",
           block: "start",
         });
       }
-    }, 0);
+    }, 100);
   }
 
   function deleteRecipientGroup(index: number) {
@@ -82,13 +85,13 @@ export function RecipientSelectGroups({
       <Stack margin={-1} padding={1} overflow="auto" maxHeight="240px">
         {recipientGroups.map((recipients, index) => (
           <FormControl
-            ref={
-              index === recipientGroups.length - 1
-                ? lastRecipientGroupRef
-                : null
-            }
             key={index}
             id={`petition-recipients-${index}`}
+            ref={
+              index === recipientGroups.length - 1
+                ? lastRecipientGroupFormControlRef
+                : null
+            }
             isInvalid={
               showErrors &&
               (recipients.length === 0 || invalidRecipients(index).length > 0)
@@ -113,6 +116,11 @@ export function RecipientSelectGroups({
             <Flex>
               <Box flex="1">
                 <ContactSelect
+                  ref={
+                    index === recipientGroups.length - 1
+                      ? lastRecipientGroupSelectRef
+                      : null
+                  }
                   placeholder={intl.formatMessage({
                     id:
                       "component.recipient-select-groups.recipients-placeholder",

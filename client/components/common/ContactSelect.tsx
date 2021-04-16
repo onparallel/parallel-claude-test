@@ -45,11 +45,13 @@ export interface ContactSelectProps
   ) => Promise<ContactSelectSelection[]>;
 }
 
+export type ContactSelectInstance = AsyncCreatableSelect<
+  ContactSelectSelection,
+  true
+>;
+
 export const ContactSelect = Object.assign(
-  forwardRef<
-    AsyncCreatableSelect<ContactSelectSelection, true>,
-    ContactSelectProps
-  >(function (
+  forwardRef<ContactSelectInstance, ContactSelectProps>(function (
     { value, onSearchContacts, onCreateContact, onChange, ...props },
     ref
   ) {
