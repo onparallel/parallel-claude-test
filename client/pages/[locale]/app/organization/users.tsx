@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Text, Tooltip, useToast } from "@chakra-ui/react";
+import { Badge, Flex, Text, Tooltip, useToast } from "@chakra-ui/react";
 import { ForbiddenIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -35,6 +35,7 @@ import {
   sorting,
   string,
   useQueryState,
+  values,
 } from "@parallel/utils/queryState";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -42,13 +43,12 @@ import { useOrganizationSections } from "@parallel/utils/useOrganizationSections
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-const PAGE_SIZE = 10;
-
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   search: string(),
+  items: values([10, 25, 50]).orDefault(10),
   sort: sorting(SORTING).orDefault({
     field: "createdAt",
     direction: "ASC",
@@ -66,8 +66,8 @@ function OrganizationUsers() {
   } = useAssertQueryOrPreviousData(
     useOrganizationUsersQuery({
       variables: {
-        offset: PAGE_SIZE * (state.page - 1),
-        limit: PAGE_SIZE,
+        offset: state.items * (state.page - 1),
+        limit: state.items,
         search: state.search,
         sortBy: [
           `${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy,
@@ -208,8 +208,9 @@ function OrganizationUsers() {
         />
       }
     >
-      <Box flex="1" padding={4}>
+      <Flex flexDirection="1" flex="1" padding={4}>
         <TablePage
+          flex="1"
           isSelectable
           isHighlightable
           columns={columns}
@@ -217,11 +218,14 @@ function OrganizationUsers() {
           rowKeyProp="id"
           loading={loading}
           page={state.page}
-          pageSize={PAGE_SIZE}
+          pageSize={state.items}
           totalCount={userList.totalCount}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+          onPageSizeChange={(items) =>
+            setQueryState((s) => ({ ...s, items, page: 1 }))
+          }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <OrganizationUsersListTableHeader
@@ -235,7 +239,7 @@ function OrganizationUsers() {
             />
           }
         />
-      </Box>
+      </Flex>
     </SettingsLayout>
   );
 }
@@ -435,7 +439,7 @@ OrganizationUsers.getInitialProps = async ({
   fetchQuery,
   ...context
 }: WithApolloDataContext) => {
-  const { page, search, sort } = parseQuery(context.query, QUERY_STATE);
+  const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
   await fetchQuery<OrganizationUsersQuery>(
     gql`
       query OrganizationUsers(
@@ -468,8 +472,8 @@ OrganizationUsers.getInitialProps = async ({
     `,
     {
       variables: {
-        offset: PAGE_SIZE * (page - 1),
-        limit: PAGE_SIZE,
+        offset: items * (page - 1),
+        limit: items,
         search,
         sortBy: [
           `${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy,

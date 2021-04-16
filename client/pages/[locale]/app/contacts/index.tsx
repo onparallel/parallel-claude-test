@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Button, Flex, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import {
@@ -7,6 +7,7 @@ import {
   useDialog,
   withDialogs,
 } from "@parallel/components/common/DialogProvider";
+import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import {
@@ -25,29 +26,27 @@ import {
   useContactsUserQuery,
   useContacts_deleteContactsMutation,
 } from "@parallel/graphql/__types";
-import { clearCache } from "@parallel/utils/apollo/clearCache";
 import {
   assertQuery,
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/assertQuery";
+import { clearCache } from "@parallel/utils/apollo/clearCache";
+import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import {
   integer,
   parseQuery,
   sorting,
   string,
   useQueryState,
+  values,
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
-import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
+import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { withOnboarding } from "@parallel/components/common/OnboardingTour";
-import { compose } from "@parallel/utils/compose";
-import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
-
-const PAGE_SIZE = 10;
 
 const SORTING = [
   "firstName",
@@ -60,6 +59,7 @@ const SORTING = [
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   search: string(),
+  items: values([10, 25, 50]).orDefault(10),
   sort: sorting(SORTING).orDefault({
     field: "firstName",
     direction: "ASC",
@@ -81,8 +81,8 @@ function Contacts() {
   } = useAssertQueryOrPreviousData(
     useContactsQuery({
       variables: {
-        offset: PAGE_SIZE * (state.page - 1),
-        limit: PAGE_SIZE,
+        offset: state.items * (state.page - 1),
+        limit: state.items,
         search: state.search,
         sortBy: [
           `${state.sort.field}_${state.sort.direction}` as QueryContacts_OrderBy,
@@ -146,8 +146,9 @@ function Contacts() {
       })}
       user={me}
     >
-      <Box padding={4} paddingBottom={{ base: 4, md: 24 }}>
+      <Flex flexDirection="column" flex="1" padding={4}>
         <TablePage
+          flex="1"
           columns={columns}
           rows={contacts.items}
           rowKeyProp={"id"}
@@ -156,16 +157,18 @@ function Contacts() {
           loading={loading}
           onRowClick={handleRowClick}
           page={state.page}
-          pageSize={PAGE_SIZE}
+          pageSize={state.items}
           totalCount={contacts.totalCount}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+          onPageSizeChange={(items) =>
+            setQueryState((s) => ({ ...s, items, page: 1 }))
+          }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <ContactListHeader
               search={state.search}
-              // showActions={Boolean(selected?.length)}
               showActions={false}
               onSearchChange={handleSearchChange}
               onReload={() => refetch()}
@@ -197,7 +200,7 @@ function Contacts() {
             ) : null
           }
         />
-      </Box>
+      </Flex>
     </AppLayout>
   );
 }
@@ -352,7 +355,7 @@ Contacts.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
-  const { page, search, sort } = parseQuery(query, QUERY_STATE);
+  const { page, items, search, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     fetchQuery<ContactsQuery, ContactsQueryVariables>(
       gql`
@@ -375,8 +378,8 @@ Contacts.getInitialProps = async ({
       `,
       {
         variables: {
-          offset: PAGE_SIZE * (page - 1),
-          limit: PAGE_SIZE,
+          offset: items * (page - 1),
+          limit: items,
           search,
           sortBy: [`${sort.field}_${sort.direction}` as QueryContacts_OrderBy],
         },

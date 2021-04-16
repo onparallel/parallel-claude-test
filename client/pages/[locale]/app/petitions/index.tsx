@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Stack, Text } from "@chakra-ui/react";
+import { Flex, Stack, Text } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
@@ -31,25 +31,26 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
-  enums,
   integer,
   parseQuery,
   sorting,
   string,
   useQueryState,
+  values,
 } from "@parallel/utils/queryState";
+import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
-
-const PAGE_SIZE = 10;
 
 const SORTING = ["name", "createdAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
-  status: enums<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]),
-  type: enums<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault("PETITION"),
+  items: values([10, 25, 50]).orDefault(10),
+  status: values<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]),
+  type: values<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault(
+    "PETITION"
+  ),
   search: string(),
   sort: sorting(SORTING).orDefault({
     field: "createdAt",
@@ -71,8 +72,8 @@ function Petitions() {
   } = useAssertQueryOrPreviousData(
     usePetitionsQuery({
       variables: {
-        offset: PAGE_SIZE * (state.page - 1),
-        limit: PAGE_SIZE,
+        offset: state.items * (state.page - 1),
+        limit: state.items,
         search: state.search,
         status: state.status,
         type: state.type,
@@ -199,8 +200,9 @@ function Petitions() {
       }
       user={me}
     >
-      <Box padding={4} paddingBottom={{ base: 4, md: 24 }}>
+      <Flex flexDirection="column" flex="1" padding={4}>
         <TablePage
+          flex="1"
           columns={columns}
           rows={petitions.items}
           context={context}
@@ -210,11 +212,14 @@ function Petitions() {
           loading={loading}
           onRowClick={handleRowClick}
           page={state.page}
-          pageSize={PAGE_SIZE}
+          pageSize={state.items}
           totalCount={petitions.totalCount}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+          onPageSizeChange={(items) =>
+            setQueryState((s) => ({ ...s, items, page: 1 }))
+          }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <PetitionListHeader
@@ -262,7 +267,7 @@ function Petitions() {
             ) : null
           }
         />
-      </Box>
+      </Flex>
     </AppLayout>
   );
 }
@@ -316,7 +321,10 @@ Petitions.getInitialProps = async ({
     }
     ${Petitions.fragments.User}
   `);
-  const { page, search, sort, status, type } = parseQuery(query, QUERY_STATE);
+  const { page, search, sort, status, type, items } = parseQuery(
+    query,
+    QUERY_STATE
+  );
   await fetchQuery<PetitionsQuery, PetitionsQueryVariables>(
     gql`
       query Petitions(
@@ -343,8 +351,8 @@ Petitions.getInitialProps = async ({
     `,
     {
       variables: {
-        offset: PAGE_SIZE * (page - 1),
-        limit: PAGE_SIZE,
+        offset: items * (page - 1),
+        limit: items,
         search,
         sortBy: [`${sort.field}_${sort.direction}` as QueryPetitions_OrderBy],
         type,

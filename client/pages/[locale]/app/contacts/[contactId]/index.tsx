@@ -206,7 +206,7 @@ function Contact({ contactId }: ContactProps) {
             </Flex>
           </Card>
           <Card marginTop={4} id="contact-petitions">
-            <CardHeader>
+            <CardHeader omitDivider>
               <FormattedMessage
                 id="contact.petitions-header"
                 defaultMessage="Petitions sent{name, select, null {} other { to {name}}}"
@@ -287,10 +287,10 @@ function useContactPetitionAccessesColumns() {
         {
           key: "signature",
           align: "center",
-          Header: () => <Box as="th" width="1px" />,
-          cellProps: { paddingLeft: 0, width: "1px" },
+          headerProps: { padding: 0, width: 8 },
+          cellProps: { padding: 0 },
           CellContent: ({ row: { petition }, context }) => (
-            <Flex alignItems="center">
+            <Flex alignItems="center" paddingRight="2">
               <PetitionSignatureCellContent
                 petition={petition!}
                 user={context!.user}

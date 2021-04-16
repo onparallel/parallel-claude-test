@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Stack } from "@chakra-ui/react";
+import { Badge, Box, Flex, Stack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -30,26 +30,25 @@ import {
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
-  enums,
   integer,
   parseQuery,
   sorting,
   string,
   useQueryState,
+  values,
 } from "@parallel/utils/queryState";
 import { useAdminSections } from "@parallel/utils/useAdminSections";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
 
-const PAGE_SIZE = 10;
-
 const SORTING = ["name", "createdAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
+  items: values([10, 25, 50]).orDefault(10),
   search: string(),
-  status: enums<OrganizationStatus>(["DEV", "DEMO", "ACTIVE", "CHURNED"]),
+  status: values<OrganizationStatus>(["DEV", "DEMO", "ACTIVE", "CHURNED"]),
   sort: sorting(SORTING).orDefault({
     field: "createdAt",
     direction: "ASC",
@@ -71,8 +70,8 @@ function AdminOrganizations() {
   } = useAssertQueryOrPreviousData(
     useAdminOrganizationsQuery({
       variables: {
-        offset: PAGE_SIZE * (state.page - 1),
-        limit: PAGE_SIZE,
+        offset: state.items * (state.page - 1),
+        limit: state.items,
         search: state.search,
         status: state.status,
         sortBy: [
@@ -125,19 +124,22 @@ function AdminOrganizations() {
         />
       }
     >
-      <Box flex="1" padding={4}>
+      <Flex flexDirection="column" flex="1" padding={4}>
         <TablePage
+          flex="1"
           columns={columns}
           rows={organizations.items}
           rowKeyProp={"id"}
           isHighlightable
           loading={loading}
-          // onRowClick={handleRowClick}
           page={state.page}
-          pageSize={PAGE_SIZE}
+          pageSize={state.items}
           totalCount={organizations.totalCount}
           sort={state.sort}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+          onPageSizeChange={(items) =>
+            setQueryState((s) => ({ ...s, items, page: 1 }))
+          }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <Stack direction="row" padding={2}>
@@ -160,7 +162,7 @@ function AdminOrganizations() {
             </Stack>
           }
         />
-      </Box>
+      </Flex>
     </SettingsLayout>
   );
 }
@@ -280,7 +282,7 @@ AdminOrganizations.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
-  const { page, search, status, sort } = parseQuery(query, QUERY_STATE);
+  const { page, items, search, status, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     fetchQuery<AdminOrganizationsQuery>(
       gql`
@@ -308,8 +310,8 @@ AdminOrganizations.getInitialProps = async ({
       `,
       {
         variables: {
-          offset: PAGE_SIZE * (page - 1),
-          limit: PAGE_SIZE,
+          offset: items * (page - 1),
+          limit: items,
           search,
           sortBy: [
             `${sort.field}_${sort.direction}` as QueryOrganizations_OrderBy,

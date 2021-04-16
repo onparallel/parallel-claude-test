@@ -66,9 +66,11 @@ export function string() {
   });
 }
 
-export function enums<T extends string>(values: T[]) {
-  return new QueryItem<T | null>((value) => {
-    return values.includes(value as any) ? (value as T) : null;
+export function values<T>(values: T[]): QueryItem<T | null>;
+export function values<T extends string>(values: T[]): QueryItem<T | null>;
+export function values(values: any[]): QueryItem<any> {
+  return new QueryItem<any>((value) => {
+    return values.find((v) => v == value) ?? null;
   });
 }
 

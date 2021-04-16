@@ -1365,6 +1365,11 @@
     "context": "No results"
   },
   {
+    "term": "component.table.page-size",
+    "definition": "{items} filas",
+    "context": "{items} items"
+  },
+  {
     "term": "component.table.prev-page-button",
     "definition": "Anterior",
     "context": "Previous"

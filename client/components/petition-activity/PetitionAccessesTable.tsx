@@ -4,7 +4,6 @@ import {
   BoxProps,
   Button,
   Flex,
-  Heading,
   Menu,
   MenuButton,
   MenuItem,
@@ -29,11 +28,10 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, FormattedNumber, useIntl } from "react-intl";
-import { Card } from "../common/Card";
+import { Card, GenericCardHeader } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
 import { DateTime } from "../common/DateTime";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { Spacer } from "../common/Spacer";
 import { Table, TableColumn } from "../common/Table";
 
 export interface PetitionAccessesTable extends BoxProps {
@@ -85,71 +83,67 @@ export function PetitionAccessesTable({
 
   return (
     <Card {...props}>
-      <Stack
-        direction="row"
-        padding={2}
-        paddingLeft={4}
-        alignItems="center"
-        borderBottom="1px solid"
-        borderBottomColor="gray.200"
+      <GenericCardHeader
+        omitDivider
+        rightAction={
+          <Stack direction="row">
+            {showActions ? (
+              <Menu>
+                <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
+                  <FormattedMessage
+                    id="generic.actions-button"
+                    defaultMessage="Actions"
+                  />
+                </MenuButton>
+                <Portal>
+                  <MenuList minWidth="160px">
+                    <MenuItem
+                      isDisabled={
+                        petition.status !== "PENDING" ||
+                        selected.some((a) => a.status === "INACTIVE")
+                      }
+                      onClick={handleSendReminders}
+                    >
+                      <BellIcon marginRight={2} />
+                      <FormattedMessage
+                        id="petition-accesses.send-reminder"
+                        defaultMessage="Send reminder"
+                      />
+                    </MenuItem>
+                    <MenuItem
+                      isDisabled={
+                        petition.status !== "PENDING" ||
+                        selected.some((a) => a.status === "INACTIVE")
+                      }
+                      onClick={handleConfigureReminders}
+                    >
+                      <SettingsIcon marginRight={2} />
+                      <FormattedMessage
+                        id="petition-accesses.reminder-settings"
+                        defaultMessage="Reminder settings"
+                      />
+                    </MenuItem>
+                  </MenuList>
+                </Portal>
+              </Menu>
+            ) : null}
+            <Button
+              leftIcon={<UserPlusIcon fontSize="18px" />}
+              onClick={onAddPetitionAccess}
+            >
+              {intl.formatMessage({
+                id: "petition.add-contact-button",
+                defaultMessage: "Add access",
+              })}
+            </Button>
+          </Stack>
+        }
       >
-        <Heading fontSize="lg">
-          <FormattedMessage
-            id="petition-access.header"
-            defaultMessage="Petition access control"
-          />
-        </Heading>
-        <Spacer />
-        {showActions ? (
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-              <FormattedMessage
-                id="generic.actions-button"
-                defaultMessage="Actions"
-              />
-            </MenuButton>
-            <Portal>
-              <MenuList minWidth="160px">
-                <MenuItem
-                  isDisabled={
-                    petition.status !== "PENDING" ||
-                    selected.some((a) => a.status === "INACTIVE")
-                  }
-                  onClick={handleSendReminders}
-                >
-                  <BellIcon marginRight={2} />
-                  <FormattedMessage
-                    id="petition-accesses.send-reminder"
-                    defaultMessage="Send reminder"
-                  />
-                </MenuItem>
-                <MenuItem
-                  isDisabled={
-                    petition.status !== "PENDING" ||
-                    selected.some((a) => a.status === "INACTIVE")
-                  }
-                  onClick={handleConfigureReminders}
-                >
-                  <SettingsIcon marginRight={2} />
-                  <FormattedMessage
-                    id="petition-accesses.reminder-settings"
-                    defaultMessage="Reminder settings"
-                  />
-                </MenuItem>
-              </MenuList>
-            </Portal>
-          </Menu>
-        ) : null}
-        <Button
-          leftIcon={<UserPlusIcon fontSize="18px" />}
-          onClick={onAddPetitionAccess}
-        >
-          {intl.formatMessage({
-            id: "petition.add-contact-button",
-            defaultMessage: "Add access",
-          })}
-        </Button>
-      </Stack>
+        <FormattedMessage
+          id="petition-access.header"
+          defaultMessage="Petition access control"
+        />
+      </GenericCardHeader>
       <Box overflowX="auto">
         <Table
           columns={columns}

@@ -7,6 +7,7 @@ import {
   HTMLChakraProps,
   IconButton,
 } from "@chakra-ui/react";
+import { getColor } from "@chakra-ui/theme-tools";
 import {
   ArrowUpDownIcon,
   ChevronDownIcon,
@@ -53,7 +54,8 @@ export interface TableProps<TRow, TContext = unknown>
   onSortChange?: (sort: TableSorting<any>) => void;
 }
 
-export interface TableHeaderProps<TRow, TContext = unknown> {
+export interface TableHeaderProps<TRow, TContext = unknown>
+  extends HTMLChakraProps<"th"> {
   column: TableColumn<TRow, TContext>;
   context?: TContext;
   sort: TableSorting<any> | undefined;
@@ -81,6 +83,7 @@ export interface TableColumn<TRow, TContext = unknown> {
   isSortable?: true;
   header: string;
   Header?: ComponentType<TableHeaderProps<TRow, TContext>>;
+  headerProps?: HTMLChakraProps<"th">;
   CellContent: ComponentType<TableCellProps<TRow, TContext>>;
   cellProps?: HTMLChakraProps<"td">;
 }
@@ -248,13 +251,23 @@ function _Table<TRow, TContext = unknown>({
   }, [columns, isSelectable, isExpandable]);
 
   return (
-    <Box as="table" style={{ tableLayout: "auto", width: "100%" }} {...props}>
-      <Box as="thead">
+    <Box
+      as="table"
+      style={{ tableLayout: "auto", width: "100%" }}
+      borderBottom="1px solid"
+      borderBottomColor={colors.border}
+      {...props}
+    >
+      <Box as="thead" position="sticky" top="0" zIndex="1">
         <Box
           as="tr"
           backgroundColor={colors.header}
-          borderBottom="1px solid"
-          borderBottomColor={colors.border}
+          sx={{
+            boxShadow: (theme) => {
+              const color = getColor(theme, colors.border);
+              return `0 1px 0 ${color}, inset 0 1px 0 ${color}`;
+            },
+          }}
         >
           {columns.map((column) => {
             return column.Header ? (
@@ -278,6 +291,7 @@ function _Table<TRow, TContext = unknown>({
                 allSelected={allSelected}
                 anySelected={anySelected}
                 onToggleAll={toggleAll}
+                {...(column.headerProps ?? {})}
               />
             );
           })}
@@ -375,8 +389,8 @@ function _Row<TRow, TContext = unknown>({
         {...(isExpandable
           ? {}
           : {
-              borderBottom: "1px solid",
-              borderBottomColor: colors.border,
+              borderTop: "1px solid",
+              borderTopColor: colors.border,
             })}
         onClick={(event) => onRowClick?.(row, event)}
       >
@@ -397,7 +411,7 @@ function _Row<TRow, TContext = unknown>({
         })}
       </Box>
       {isExpandable ? (
-        <Box as="tr" borderBottom="1px solid" borderBottomColor={colors.border}>
+        <Box as="tr" borderTop="1px solid" borderTopColor={colors.border}>
           <Box as="td" padding={0} colSpan={columns.length}>
             <Collapse in={isExpanded}>
               <Box borderTop="1px solid" borderTopColor={colors.border} />
@@ -434,6 +448,11 @@ export function DefaultHeader({
   column,
   sort,
   onSortByClick,
+  context,
+  allSelected,
+  anySelected,
+  onToggleAll,
+  ...props
 }: TableHeaderProps<any>) {
   const intl = useIntl();
   return (
@@ -473,6 +492,7 @@ export function DefaultHeader({
           },
         },
       }}
+      {...props}
     >
       <Flex alignItems="center" justifyContent={column.align ?? "left"}>
         {column.header}

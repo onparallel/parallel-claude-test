@@ -70,6 +70,7 @@ export interface GenericCardHeaderProps {
   as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
   size?: HeadingProps["size"];
   rightAction?: ReactNode;
+  omitDivider?: boolean;
 }
 
 export function GenericCardHeader({
@@ -77,6 +78,7 @@ export function GenericCardHeader({
   size: size = "sm",
   children,
   rightAction,
+  omitDivider,
 }: GenericCardHeaderProps) {
   return (
     <>
@@ -92,7 +94,7 @@ export function GenericCardHeader({
         </Heading>
         {rightAction}
       </Stack>
-      <Divider />
+      {omitDivider ? null : <Divider />}
     </>
   );
 }

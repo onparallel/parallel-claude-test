@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
-import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
+import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { TableColumn } from "@parallel/components/common/Table";
+import { TextWithOverflow } from "@parallel/components/common/TextWithOverflow";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   PetitionBaseType,
@@ -18,7 +19,6 @@ import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { TextWithOverflow } from "@parallel/components/common/TextWithOverflow";
 
 export type PetitionsTableColumnsSelection = usePetitionsTableColumns_PetitionBaseFragment;
 export type PetitionsTableColumnsContext = {
@@ -130,10 +130,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
               {
                 key: "signature",
                 align: "center",
-                Header: () => <Box as="th" width="1px" />,
-                cellProps: { paddingLeft: 0, width: "1px" },
+                headerProps: { padding: 0, width: 8 },
+                cellProps: { padding: 0 },
                 CellContent: ({ row, context }) => (
-                  <Flex alignItems="center">
+                  <Flex alignItems="center" paddingRight="2">
                     <PetitionSignatureCellContent
                       petition={row}
                       user={context!.user}

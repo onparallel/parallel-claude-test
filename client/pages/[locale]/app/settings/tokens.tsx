@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -33,16 +33,17 @@ import {
   sorting,
   string,
   useQueryState,
+  values,
 } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useSettingsSections } from "@parallel/utils/useSettingsSections";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-const PAGE_SIZE = 10;
 const SORTING = ["tokenName", "createdAt", "lastUsedAt"] as const;
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
+  items: values([10, 25, 50]).orDefault(10),
   search: string(),
   sort: sorting(SORTING).orDefault({
     field: "createdAt",
@@ -61,8 +62,8 @@ function Tokens() {
   } = useAssertQueryOrPreviousData(
     useTokensQuery({
       variables: {
-        offset: PAGE_SIZE * (state.page - 1),
-        limit: PAGE_SIZE,
+        offset: state.items * (state.page - 1),
+        limit: state.items,
         search: state.search,
         sortBy: [
           `${state.sort.field}_${state.sort.direction}` as UserAuthenticationTokens_OrderBy,
@@ -139,7 +140,7 @@ function Tokens() {
         />
       }
     >
-      <Box flex="1" padding={4}>
+      <Flex flexDirection="column" flex="1" padding={4}>
         <Text marginBottom={4}>
           <FormattedMessage
             id="settings.api-tokens.explainer"
@@ -154,6 +155,7 @@ function Tokens() {
           />
         </Text>
         <TablePage
+          flex="1"
           isSelectable
           isHighlightable
           columns={columns}
@@ -161,11 +163,14 @@ function Tokens() {
           rowKeyProp="id"
           loading={loading}
           page={state.page}
-          pageSize={PAGE_SIZE}
+          pageSize={state.items}
           totalCount={authTokens.totalCount}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
+          onPageSizeChange={(items) =>
+            setQueryState((s) => ({ ...s, items, page: 1 }))
+          }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <Stack direction="row" padding={2}>
@@ -208,7 +213,7 @@ function Tokens() {
             </Stack>
           }
         />
-      </Box>
+      </Flex>
     </SettingsLayout>
   );
 }
@@ -311,7 +316,7 @@ Tokens.getInitialProps = async ({
   fetchQuery,
   ...context
 }: WithApolloDataContext) => {
-  const { page, search, sort } = parseQuery(context.query, QUERY_STATE);
+  const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
 
   await fetchQuery<TokensQuery>(
     gql`
@@ -344,8 +349,8 @@ Tokens.getInitialProps = async ({
     `,
     {
       variables: {
-        offset: PAGE_SIZE * (page - 1),
-        limit: PAGE_SIZE,
+        offset: items * (page - 1),
+        limit: items,
         search,
         sortBy: [
           `${sort.field}_${sort.direction}` as UserAuthenticationTokens_OrderBy,
