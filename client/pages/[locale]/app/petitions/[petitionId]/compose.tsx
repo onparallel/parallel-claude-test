@@ -111,12 +111,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
-    if (activeFieldId) {
-      return (
-        (petition!.fields as any[]).find((f) => f.id === activeFieldId) ?? null
-      );
-    }
-    return null;
+    return activeFieldId
+      ? petition!.fields?.find((f) => f.id === activeFieldId) ?? null
+      : null;
   }, [activeFieldId, petition!.fields]);
   const activeFieldElement = useMemo(() => {
     return activeFieldId

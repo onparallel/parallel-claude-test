@@ -344,14 +344,20 @@ export const PetitionComposeFieldList = Object.assign(
     const fieldMouseHandlers = useMemoFactory(
       (fieldId) =>
         ({
-          onFocus() {
+          onFocus(e) {
+            // see comment for onBlur below
             clearTimeout(timeoutRef.current);
             if (fieldId !== focusedFieldIdRef.current) {
               setFocusedFieldId(fieldId);
             }
-            // if field settings are visible change them the focused field
+            // if field settings are visible change them to the focused field
             const { fields, active } = fieldsDataRef.current!;
-            if (active && fieldId !== active) {
+            if (
+              active &&
+              fieldId !== active &&
+              // avoid calling onFieldSettingsClick when clicking on the field settings button
+              !e.target.classList.contains("field-settings-button")
+            ) {
               const field = fields.find((f) => f.id === fieldId)!;
               if (field.type === "HEADING" && field.isFixed) {
                 // pass
@@ -361,6 +367,15 @@ export const PetitionComposeFieldList = Object.assign(
             }
           },
           onBlur() {
+            /**
+             * When moving from a field to another the following happens synchronously:
+             * - old active field -> blur event
+             * - new active field -> focus event
+             * To prevent hiding and showing the settings which would cause a bit of flickering
+             * we deactivate with a setTimeout that is cancelled on the focus event.
+             * This way instead of oldActiveId -> null -> newActiveId we oldActiveId -> newActiveId
+             * directly
+             */
             timeoutRef.current = window.setTimeout(() =>
               setFocusedFieldId(null)
             );
@@ -385,6 +400,8 @@ export const PetitionComposeFieldList = Object.assign(
             }
           },
           onMouseLeave() {
+            // Something very similar to the focus/blur situation happens here, see comment
+            // for the onBlur handler above.
             if (!isMenuOpenedRef.current) {
               timeoutRef.current = window.setTimeout(() =>
                 setHoveredFieldId(null)

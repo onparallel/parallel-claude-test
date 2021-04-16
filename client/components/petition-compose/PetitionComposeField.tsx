@@ -659,6 +659,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
         onClick={onCloneField}
       />
       <IconButtonWithTooltip
+        className="field-settings-button"
         icon={<SettingsIcon />}
         isDisabled={field.isFixed}
         size="sm"
