@@ -95,6 +95,7 @@ export async function petitionReminder(
         missingFieldCount: missing.length,
         bodyHtml: bodyJson ? slate.toHtml(bodyJson) : null,
         bodyPlainText: bodyJson ? slate.toPlainText(bodyJson) : null,
+        deadline: petition.deadline,
         keycode: access.keycode,
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,

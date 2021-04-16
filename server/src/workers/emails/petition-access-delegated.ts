@@ -71,6 +71,7 @@ export async function petitionAccessDelegated(
         petitionOwner.last_name
       )!,
       petitionOwnerEmail: petitionOwner.email,
+      deadline: petition.deadline,
       bodyHtml: toHtml(payload.message_body),
       bodyPlainText: toPlainText(payload.message_body),
       keycode: newAccess.keycode,

@@ -3,10 +3,12 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
+import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
 import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
 import { disclaimer, greetingFormal } from "../common/texts";
+import { FORMATS } from "../utils/dates";
 
 export type PetitionReminderProps = {
   contactFullName: string;
@@ -15,6 +17,7 @@ export type PetitionReminderProps = {
   missingFieldCount: number;
   bodyHtml: string | null;
   bodyPlainText: string | null;
+  deadline: Date | null;
   keycode: string;
 } & LayoutProps;
 
@@ -44,6 +47,7 @@ const email: Email<PetitionReminderProps> = {
       senderEmail,
       bodyPlainText,
       missingFieldCount,
+      deadline,
       keycode,
       parallelUrl,
     }: PetitionReminderProps,
@@ -61,6 +65,21 @@ const email: Email<PetitionReminderProps> = {
       )}
       
       ${bodyPlainText}
+      ${
+        deadline
+          ? outdent`
+          
+          ${intl.formatMessage(
+            {
+              id: "generic.submit-text.with-deadline",
+              defaultMessage:
+                "This information has been requested to be submitted before {deadline}",
+            },
+            { deadline: intl.formatDate(deadline, FORMATS.LLL) }
+          )}
+            `
+          : ""
+      }
       ${
         missingFieldCount.toString() === "0"
           ? outdent`
@@ -92,6 +111,7 @@ const email: Email<PetitionReminderProps> = {
     senderName,
     senderEmail,
     bodyHtml,
+    deadline,
     keycode,
     missingFieldCount,
     parallelUrl,
@@ -138,6 +158,21 @@ const email: Email<PetitionReminderProps> = {
         ) : null}
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
+            {deadline ? (
+              <MjmlText>
+                <FormattedMessage
+                  id="generic.submit-text.with-deadline"
+                  defaultMessage="This information has been requested to be submitted before {deadline}"
+                  values={{
+                    deadline: (
+                      <span style={{ textDecoration: "underline" }}>
+                        <DateTime value={deadline} format={FORMATS.LLL} />
+                      </span>
+                    ),
+                  }}
+                />
+              </MjmlText>
+            ) : null}
             {missingFieldCount.toString() === "0" ? (
               <MjmlText>
                 <FormattedMessage

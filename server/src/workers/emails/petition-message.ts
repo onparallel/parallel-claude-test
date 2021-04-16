@@ -63,6 +63,7 @@ export async function petitionMessage(
       subject: message.email_subject,
       bodyHtml: slate.toHtml(bodyJson),
       bodyPlainText: slate.toPlainText(bodyJson),
+      deadline: petition.deadline,
       keycode: access.keycode,
       assetsUrl: context.config.misc.assetsUrl,
       parallelUrl: context.config.misc.parallelUrl,

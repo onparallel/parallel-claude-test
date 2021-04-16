@@ -102,12 +102,7 @@
   {
     "term": "generic.submit-text.with-deadline",
     "definition": "Le mostramos la información que ha sido solicitada para antes del {deadline}:",
-    "context": "This is the information that has been requested to be submitted before {deadline}:"
-  },
-  {
-    "term": "generic.submit-text.without-deadline",
-    "definition": "Le mostramos la información que ha sido solicitada:",
-    "context": "This is the information that has been requested:"
+    "context": "This information has been requested to be submitted before {deadline}"
   },
   {
     "term": "generic.untitled-field",
