@@ -155,7 +155,12 @@ export function AddPetitionAccessDialog({
             defaultMessage="Who do you want to send it to?"
           />
           {maxRecipientGroups === 1 ? null : (
-            <HelpPopover popoverWidth="container.2xs" marginLeft={2}>
+            <HelpPopover
+              popoverWidth="container.2xs"
+              marginLeft={2}
+              color="blue.200"
+              _hover={{ color: "blue.300" }}
+            >
               <Stack direction="row">
                 <Stack flex="1" alignItems="flex-start">
                   <Image
