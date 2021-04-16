@@ -15,27 +15,6 @@
         "subject": "Hola!",
         "bodyHtml": "<p style=\"margin:0\"><span>hola </span><span></span><span>, enviame los </span><span>documentos </span><span style=\"font-weight:bold\">siguientes </span><span style=\"font-weight:bold;text-decoration:underline\">super guays</span></p><p style=\"margin:0\"><span>hmmm</span></p><ul style=\"margin:0;margin-left:24px;padding-left:0\"><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-weight:bold;text-decoration:underline\">foto</span></p></li><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-style:italic\">pasaporte</span></p><ul style=\"margin:0;margin-left:24px;padding-left:0\"><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-weight:bold;text-decoration:underline\">foto</span></p></li><li style=\"margin-left:0\"><p style=\"margin:0\"><span style=\"font-style:italic\">pasaporte</span></p></li></ul></li></ul>",
         "bodyPlainText": "hola Derek, enviame los documentos siguientes super guays\\nhmmm\\n  - foto\\n  - pasaporte\\n    - foto\\n    - pasaporte",
-        "showFields": true,
-        "fields": [
-          { "position": 0, "id": 123, "title": "Title 1", "type": "HEADING" },
-          { "position": 1, "id": 1223, "title": "DNI", "type": "TEXT" },
-          { "position": 2, "id": 123, "title": "Title 2", "type": "HEADING" },
-          {
-            "position": 3,
-            "id": 235,
-            "title": "Escrituras",
-            "type": "FILE_UPLOAD"
-          },
-          {
-            "position": 4,
-            "id": 345,
-            "title": "Certificado de rentas del trabajo",
-            "type": "FILE_UPLOAD"
-          },
-          { "position": 5, "id": 1243, "title": "Title 3", "type": "HEADING" },
-          { "position": 6, "id": 32, "title": "Prueba", "type": "TEXT" },
-          { "position": 7, "id": 6905, "title": "", "type": "TEXT" }
-        ],
         "keycode": "asdfghjkl",
         "parallelUrl": "https://www.onparallel.com",
         "assetsUrl": "https://static.onparallel.com",
@@ -49,8 +28,6 @@
         "subject": { "control": { "type": "text" } },
         "bodyHtml": { "control": { "type": "text" } },
         "bodyPlainText": { "control": { "type": "text" } },
-        "showFields": { "control": { "type": "boolean" } },
-        "fields": { "control": { "type": "object" } },
         "keycode": { "control": { "type": "text" } },
         "parallelUrl": { "control": { "type": "text" } },
         "assetsUrl": { "control": { "type": "text" } },

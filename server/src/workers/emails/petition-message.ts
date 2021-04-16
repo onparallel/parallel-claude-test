@@ -1,4 +1,3 @@
-import { pick } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/components/PetitionMessage";
@@ -18,13 +17,10 @@ export async function petitionMessage(
       `Petition message not found for id ${payload.petition_message_id}`
     );
   }
-  const [petition, sender, access, fields] = await Promise.all([
+  const [petition, sender, access] = await Promise.all([
     context.petitions.loadPetition(message.petition_id),
     context.users.loadUser(message.sender_id),
     context.petitions.loadAccess(message.petition_access_id),
-    context.petitions.loadFieldsForPetitionWithNullVisibility(
-      message.petition_id
-    ),
   ]);
   if (!petition) {
     throw new Error(
@@ -67,9 +63,6 @@ export async function petitionMessage(
       subject: message.email_subject,
       bodyHtml: slate.toHtml(bodyJson),
       bodyPlainText: slate.toPlainText(bodyJson),
-      showFields: !petition.hide_recipient_view_contents,
-      fields: fields.map(pick(["id", "title", "position", "type"])),
-      deadline: petition.deadline,
       keycode: access.keycode,
       assetsUrl: context.config.misc.assetsUrl,
       parallelUrl: context.config.misc.parallelUrl,

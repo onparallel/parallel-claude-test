@@ -1,4 +1,3 @@
-import { pick } from "remeda";
 import { WorkerContext } from "../../context";
 import { buildEmail } from "../../emails/buildEmail";
 import AccessDelegatedEmail from "../../emails/components/AccessDelegatedEmail";
@@ -15,11 +14,8 @@ export async function petitionAccessDelegated(
   },
   context: WorkerContext
 ) {
-  const [petition, fields, newAccess, originalAccess] = await Promise.all([
+  const [petition, newAccess, originalAccess] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
-    context.petitions.loadFieldsForPetitionWithNullVisibility(
-      payload.petition_id
-    ),
     context.petitions.loadAccess(payload.new_access_id),
     context.petitions.loadAccess(payload.original_access_id),
   ]);
@@ -75,10 +71,8 @@ export async function petitionAccessDelegated(
         petitionOwner.last_name
       )!,
       petitionOwnerEmail: petitionOwner.email,
-      fields: fields.map(pick(["id", "title", "position", "type"])),
       bodyHtml: toHtml(payload.message_body),
       bodyPlainText: toPlainText(payload.message_body),
-      deadline: petition.deadline,
       keycode: newAccess.keycode,
       assetsUrl: context.config.misc.assetsUrl,
       parallelUrl: context.config.misc.parallelUrl,

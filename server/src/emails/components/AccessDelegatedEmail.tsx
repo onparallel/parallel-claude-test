@@ -3,16 +3,10 @@ import outdent from "outdent";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
-import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
 import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import {
-  PetitionFieldList,
-  PetitionFieldListProps,
-} from "../common/PetitionFieldList";
-import { disclaimer, greetingFormal, petitionFieldList } from "../common/texts";
-import { FORMATS } from "../utils/dates";
+import { disclaimer, greetingFormal } from "../common/texts";
 
 export type AccessDelegatedEmailProps = {
   fullName: string | null;
@@ -20,10 +14,8 @@ export type AccessDelegatedEmailProps = {
   senderEmail: string;
   petitionOwnerFullName: string;
   petitionOwnerEmail: string;
-  fields: PetitionFieldListProps["fields"];
   bodyHtml: string;
   bodyPlainText: string;
-  deadline: Date | null;
   keycode: string;
 } & LayoutProps;
 
@@ -55,9 +47,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       senderEmail,
       petitionOwnerFullName,
       petitionOwnerEmail,
-      fields,
       bodyPlainText,
-      deadline,
       keycode,
       parallelUrl,
     },
@@ -76,24 +66,6 @@ const email: Email<AccessDelegatedEmailProps> = {
 
       ${bodyPlainText}
 
-      ${
-        deadline
-          ? intl.formatMessage(
-              {
-                id: "generic.submit-text.with-deadline",
-                defaultMessage:
-                  "This is the information that has been requested to be submitted before {deadline}:",
-              },
-              { deadline: intl.formatDate(deadline, FORMATS.LLL) }
-            )
-          : intl.formatMessage({
-              id: "generic.submit-text.without-deadline",
-              defaultMessage:
-                "This is the information that has been requested:",
-            })
-      }
-      ${petitionFieldList({ fields }, intl)}
-
       ${intl.formatMessage({
         id: "generic.complete-information-click-link",
         defaultMessage:
@@ -110,9 +82,7 @@ const email: Email<AccessDelegatedEmailProps> = {
     senderEmail,
     petitionOwnerFullName,
     petitionOwnerEmail,
-    fields,
     bodyHtml,
-    deadline,
     keycode,
     parallelUrl,
     assetsUrl,
@@ -158,32 +128,6 @@ const email: Email<AccessDelegatedEmailProps> = {
         </MjmlSection>
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
-            {fields.length > 10 && (
-              <CompleteInfoButton
-                href={`${parallelUrl}/${locale}/petition/${keycode}`}
-              />
-            )}
-            <MjmlText>
-              {deadline ? (
-                <FormattedMessage
-                  id="generic.submit-text.with-deadline"
-                  defaultMessage="This is the information that has been requested to be submitted before {deadline}:"
-                  values={{
-                    deadline: (
-                      <span style={{ textDecoration: "underline" }}>
-                        <DateTime value={deadline} format={FORMATS.LLL} />
-                      </span>
-                    ),
-                  }}
-                />
-              ) : (
-                <FormattedMessage
-                  id="generic.submit-text.without-deadline"
-                  defaultMessage="This is the information that has been requested:"
-                />
-              )}
-            </MjmlText>
-            <PetitionFieldList fields={fields} />
             <MjmlSpacer height="10px" />
             <CompleteInfoButton
               href={`${parallelUrl}/${locale}/petition/${keycode}`}

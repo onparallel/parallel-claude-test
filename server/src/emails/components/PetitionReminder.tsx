@@ -3,25 +3,18 @@ import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
-import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
 import { GreetingFormal } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import {
-  PetitionFieldList,
-  PetitionFieldListProps,
-} from "../common/PetitionFieldList";
-import { disclaimer, greetingFormal, petitionFieldList } from "../common/texts";
-import { FORMATS } from "../utils/dates";
+import { disclaimer, greetingFormal } from "../common/texts";
 
 export type PetitionReminderProps = {
   contactFullName: string;
   senderName: string;
   senderEmail: string;
-  fields: PetitionFieldListProps["fields"];
+  missingFieldCount: number;
   bodyHtml: string | null;
   bodyPlainText: string | null;
-  deadline: Date | null;
   keycode: string;
 } & LayoutProps;
 
@@ -49,9 +42,8 @@ const email: Email<PetitionReminderProps> = {
       contactFullName,
       senderName,
       senderEmail,
-      fields,
       bodyPlainText,
-      deadline,
+      missingFieldCount,
       keycode,
       parallelUrl,
     }: PetitionReminderProps,
@@ -69,37 +61,22 @@ const email: Email<PetitionReminderProps> = {
       )}
       
       ${bodyPlainText}
-
       ${
-        fields.length > 0
+        missingFieldCount.toString() === "0"
           ? outdent`
-            ${
-              deadline
-                ? intl.formatMessage(
-                    {
-                      id: "generic.submit-text.with-deadline",
-                      defaultMessage:
-                        "This is the information that has been requested to be submitted before {deadline}:",
-                    },
-                    { deadline: intl.formatDate(deadline, FORMATS.LLL) }
-                  )
-                : intl.formatMessage({
-                    id: "generic.submit-text.without-deadline",
-                    defaultMessage:
-                      "This is the information that has been requested:",
-                  })
-            }
-            ${petitionFieldList({ fields }, intl)}`
-          : intl.formatMessage(
-              {
-                id: "reminder.click-finalize",
-                defaultMessage:
-                  "If you already submitted all the information, click <b>Finalize</b> on the page.",
-              },
-              { b: (chunks: any[]) => chunks }
-            )
-      }
 
+          ${intl.formatMessage(
+            {
+              id: "reminder.click-finalize",
+              defaultMessage:
+                "If you already submitted all the information, click <b>Finalize</b> on the page.",
+            },
+            { b: (chunks: any[]) => chunks }
+          )}
+          
+          `
+          : ""
+      }
       ${intl.formatMessage({
         id: "generic.complete-information-click-link",
         defaultMessage:
@@ -114,10 +91,9 @@ const email: Email<PetitionReminderProps> = {
     contactFullName,
     senderName,
     senderEmail,
-    fields,
     bodyHtml,
-    deadline,
     keycode,
+    missingFieldCount,
     parallelUrl,
     assetsUrl,
     logoUrl,
@@ -162,36 +138,7 @@ const email: Email<PetitionReminderProps> = {
         ) : null}
         <MjmlSection paddingTop="10px">
           <MjmlColumn>
-            {fields.length > 0 ? (
-              <>
-                {fields.length > 10 && (
-                  <CompleteInfoButton
-                    href={`${parallelUrl}/${locale}/petition/${keycode}`}
-                  />
-                )}
-                <MjmlText>
-                  {deadline ? (
-                    <FormattedMessage
-                      id="generic.submit-text.with-deadline"
-                      defaultMessage="This is the information that has been requested to be submitted before {deadline}:"
-                      values={{
-                        deadline: (
-                          <span style={{ textDecoration: "underline" }}>
-                            <DateTime value={deadline} format={FORMATS.LLL} />
-                          </span>
-                        ),
-                      }}
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="generic.submit-text.without-deadline"
-                      defaultMessage="This is the information that has been requested:"
-                    />
-                  )}
-                </MjmlText>
-                <PetitionFieldList fields={fields} />
-              </>
-            ) : (
+            {missingFieldCount.toString() === "0" ? (
               <MjmlText>
                 <FormattedMessage
                   id="reminder.click-finalize"
@@ -201,7 +148,7 @@ const email: Email<PetitionReminderProps> = {
                   }}
                 />
               </MjmlText>
-            )}
+            ) : null}
             <MjmlSpacer height="10px" />
             <CompleteInfoButton
               href={`${parallelUrl}/${locale}/petition/${keycode}`}

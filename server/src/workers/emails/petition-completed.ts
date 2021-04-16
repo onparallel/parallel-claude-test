@@ -1,9 +1,10 @@
-import { pick } from "remeda";
+import { pick, zip } from "remeda";
 import { WorkerContext } from "../../context";
 import { Contact, EmailLog, PetitionAccess } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionCompleted from "../../emails/components/PetitionCompleted";
 import { buildFrom } from "../../emails/utils/buildFrom";
+import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
@@ -44,7 +45,7 @@ export async function petitionCompleted(
   const [petition, permissions, fields] = await Promise.all([
     context.petitions.loadPetition(petitionId),
     context.petitions.loadUserPermissions(petitionId),
-    context.petitions.loadFieldsForPetitionWithNullVisibility(petitionId),
+    context.petitions.loadFieldsForPetition(petitionId),
   ]);
 
   if (!petition) {
@@ -65,6 +66,23 @@ export async function petitionCompleted(
     );
   }
 
+  const fieldIds = fields.map((f) => f.id);
+  const fieldReplies = await context.petitions.loadRepliesForField(fieldIds);
+  const repliesByFieldId = Object.fromEntries(
+    fieldIds.map((id, index) => [id, fieldReplies[index]])
+  );
+  const fieldsWithReplies = fields.map((f) => ({
+    ...f,
+    replies: repliesByFieldId[f.id],
+  }));
+
+  const visibleFields = zip(
+    fieldsWithReplies,
+    evaluateFieldVisibility(fieldsWithReplies)
+  )
+    .filter(([, isVisible]) => isVisible)
+    .map(([field]) => field);
+
   const emails: EmailLog[] = [];
   const subscribed = permissions.filter((p) => p && p.is_subscribed);
   for (const permission of subscribed) {
@@ -78,7 +96,7 @@ export async function petitionCompleted(
         petitionName: petition.name,
         contactNameOrEmail:
           fullName(contact.first_name, contact.last_name) || contact.email,
-        fields: fields.map(pick(["id", "title", "position", "type"])),
+        fields: visibleFields.map(pick(["id", "title", "position", "type"])),
         assetsUrl: context.config.misc.assetsUrl,
         parallelUrl: context.config.misc.parallelUrl,
         logoUrl:
