@@ -66,7 +66,7 @@ const email: Email<PetitionMessageProps> = {
            {
              id: "generic.submit-text.with-deadline",
              defaultMessage:
-               "This information has been requested to be submitted before {deadline}",
+               "This information has been requested to be submitted before {deadline}.",
            },
            { deadline: intl.formatDate(deadline, FORMATS.LLL) }
          )}
@@ -138,7 +138,7 @@ const email: Email<PetitionMessageProps> = {
               <MjmlText>
                 <FormattedMessage
                   id="generic.submit-text.with-deadline"
-                  defaultMessage="This information has been requested to be submitted before {deadline}"
+                  defaultMessage="This information has been requested to be submitted before {deadline}."
                   values={{
                     deadline: (
                       <span style={{ textDecoration: "underline" }}>
