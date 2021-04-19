@@ -1,4 +1,11 @@
-import { arg, queryField, stringArg, nonNull, nullable } from "@nexus/schema";
+import {
+  arg,
+  queryField,
+  stringArg,
+  nonNull,
+  nullable,
+  inputObjectType,
+} from "@nexus/schema";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import {
   userHasAccessToPetitions,
@@ -15,30 +22,34 @@ export const petitionsQuery = queryField((t) => {
     description: "The petitions of the user",
     authorize: authenticate(),
     additionalArgs: {
-      status: "PetitionStatus",
-      locale: "PetitionLocale",
-      type: "PetitionBaseType",
-      tagId: globalIdArg("Tag"),
+      filters: inputObjectType({
+        name: "PetitionFilters",
+        definition(t) {
+          t.nullable.field("status", {
+            type: "PetitionStatus",
+          });
+          t.nullable.field("locale", {
+            type: "PetitionLocale",
+          });
+          t.nullable.field("type", {
+            type: "PetitionBaseType",
+          });
+          t.nullable.list.nonNull.id("tagIds");
+        },
+      }).asArg(),
     },
     searchable: true,
     sortableBy: ["createdAt", "name", "lastUsedAt" as any],
-    resolve: async (
-      _,
-      { offset, limit, search, sortBy, status, type, locale, tagId },
-      ctx
-    ) => {
+    resolve: async (_, { offset, limit, search, sortBy, filters }, ctx) => {
       const columnMap = {
         createdAt: "created_at",
         name: "name",
         lastUsedAt: "last_used_at",
       } as const;
       return await ctx.petitions.loadPetitionsForUser(ctx.user!.id, {
-        status,
         search,
         offset,
-        locale,
-        tagId,
-        type: type || "PETITION",
+        filters,
         sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
           const [field, order] = parseSortBy(value);
           return { column: columnMap[field], order };

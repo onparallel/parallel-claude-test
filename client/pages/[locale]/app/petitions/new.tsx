@@ -94,8 +94,11 @@ function NewPetition() {
       variables: {
         offset: 0,
         limit: 2,
-        locale: null,
         search: null,
+        filters: {
+          locale: null,
+          type: "TEMPLATE",
+        },
       },
     })
   );
@@ -149,7 +152,7 @@ function NewPetition() {
       debouncedTemplatesRefetch.immediate({
         offset: 0,
         limit: 2,
-        locale,
+        filters: { locale, type: "TEMPLATE" },
       });
     },
     [search, debouncedPublicTemplatesRefetch, debouncedTemplatesRefetch]
@@ -735,22 +738,21 @@ NewPetition.getInitialProps = async ({
           $offset: Int!
           $limit: Int!
           $search: String
-          $locale: PetitionLocale
+          $filters: PetitionFilters
         ) {
           templates: petitions(
             offset: $offset
             limit: $limit
             search: $search
-            locale: $locale
             sortBy: [lastUsedAt_DESC]
-            type: TEMPLATE
+            filters: $filters
           ) {
             items {
               ...NewPetition_PetitionTemplate
             }
             totalCount
           }
-          hasTemplates: petitions(type: TEMPLATE) {
+          hasTemplates: petitions(filters: { type: TEMPLATE }) {
             totalCount
           }
         }
@@ -761,7 +763,10 @@ NewPetition.getInitialProps = async ({
           offset: 0,
           limit: 2,
           search: null,
-          locale: null,
+          filters: {
+            locale: null,
+            type: "TEMPLATE",
+          },
         },
       }
     ),

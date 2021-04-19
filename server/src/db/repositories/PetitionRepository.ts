@@ -19,6 +19,7 @@ import {
   PetitionFieldVisibility,
 } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
+import { fromGlobalIds } from "../../util/globalId";
 import { keyBuilder } from "../../util/keyBuilder";
 import { isDefined } from "../../util/remedaExtensions";
 import {
@@ -65,6 +66,14 @@ import {
 } from "../__types";
 
 type PetitionType = "PETITION" | "TEMPLATE";
+type PetitionLocale = "en" | "es";
+
+type PetitionFilters = {
+  status?: PetitionStatus | null;
+  locale?: PetitionLocale | null;
+  type?: PetitionType | null;
+  tagIds?: string[] | null;
+};
 @injectable()
 export class PetitionRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: Aws) {
@@ -210,13 +219,10 @@ export class PetitionRepository extends BaseRepository {
     opts: {
       search?: string | null;
       sortBy?: SortBy<keyof Petition | "last_used_at">[];
-      status?: PetitionStatus | null;
-      type?: PetitionType;
-      locale?: "en" | "es" | null;
-      tagId?: number | null;
+      filters?: PetitionFilters | null;
     } & PageOpts
   ) {
-    const petitionType = opts.type || "PETITION";
+    const petitionType = opts.filters?.type || "PETITION";
     return await this.loadPageAndCount(
       this.from("petition")
         .leftJoin("petition_user", "petition.id", "petition_user.petition_id")
@@ -227,9 +233,9 @@ export class PetitionRepository extends BaseRepository {
           "petition_user.deleted_at": null,
         })
         .mmodify((q) => {
-          const { search, status, locale, tagId } = opts;
-          if (locale) {
-            q.where("locale", locale);
+          const { search, filters } = opts;
+          if (filters?.locale) {
+            q.where("locale", filters.locale);
           }
           if (search) {
             q.andWhere((q2) => {
@@ -243,12 +249,13 @@ export class PetitionRepository extends BaseRepository {
               }
             });
           }
-          if (status && petitionType === "PETITION") {
-            q.where("status", status);
+          if (filters?.status && petitionType === "PETITION") {
+            q.where("status", filters.status);
           }
 
-          if (tagId) {
-            q.where("petition_tag.tag_id", tagId);
+          const tagIds = filters?.tagIds || [];
+          if (tagIds.length > 0) {
+            q.whereIn("petition_tag.tag_id", fromGlobalIds(tagIds, "Tag").ids);
           }
 
           const hasOrderByLastUsed = opts.sortBy?.some(
@@ -2917,7 +2924,7 @@ export class PetitionRepository extends BaseRepository {
   async loadPublicTemplates(
     opts: {
       search?: string | null;
-      locale?: "en" | "es" | null;
+      locale?: PetitionLocale | null;
     } & PageOpts,
     userId: number
   ) {

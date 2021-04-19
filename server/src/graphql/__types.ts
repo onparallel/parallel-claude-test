@@ -89,6 +89,13 @@ export interface NexusGenInputs {
     filename: string; // String!
     size: number; // Int!
   };
+  PetitionFilters: {
+    // input type
+    locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
+    status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
+    tagIds?: string[] | null; // [ID!]
+    type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
+  };
   PublicPetitionSignerData: {
     // input type
     email: string; // String!
@@ -2549,14 +2556,11 @@ export interface NexusGenArgTypes {
     };
     petitions: {
       // args
+      filters?: NexusGenInputs["PetitionFilters"] | null; // PetitionFilters
       limit?: number | null; // Int
-      locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
       offset?: number | null; // Int
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryPetitions_OrderBy"][] | null; // [QueryPetitions_OrderBy!]
-      status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
-      tagId?: NexusGenScalars["GID"] | null; // GID
-      type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
     };
     publicOrgLogoUrl: {
       // args

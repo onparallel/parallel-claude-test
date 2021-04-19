@@ -224,6 +224,8 @@ export type Mutation = {
   createPetitionSubscription: Subscription;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
+  /** Creates a tag linked to the user's organization */
+  createTag: Tag;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Deactivates the specified active petition accesses. */
@@ -241,6 +243,8 @@ export type Mutation = {
   deletePetitionSubscription: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  /** Removes the tag from every petition and soft-deletes it */
+  deleteTag: Result;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Edits permissions on given petitions and users */
@@ -309,8 +313,12 @@ export type Mutation = {
   submitUnpublishedComments: Array<PetitionFieldComment>;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
+  /** Tags a petition */
+  tagPetition: Result;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<Petition>;
+  /** Removes the given tag from the given petition */
+  untagPetition: Result;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates the positions of the petition fields */
@@ -334,6 +342,8 @@ export type Mutation = {
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
+  /** Updates the name and color of a given tag */
+  updateTag: Tag;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
@@ -453,6 +463,11 @@ export type MutationcreateSimpleReplyArgs = {
   reply: Scalars["String"];
 };
 
+export type MutationcreateTagArgs = {
+  color: Scalars["String"];
+  name: Scalars["String"];
+};
+
 export type MutationcreateUserArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
@@ -499,6 +514,10 @@ export type MutationdeletePetitionSubscriptionArgs = {
 export type MutationdeletePetitionsArgs = {
   force?: Maybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
+};
+
+export type MutationdeleteTagArgs = {
+  id: Scalars["GID"];
 };
 
 export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
@@ -691,9 +710,19 @@ export type MutationswitchAutomaticRemindersArgs = {
   start: Scalars["Boolean"];
 };
 
+export type MutationtagPetitionArgs = {
+  petitionId: Scalars["GID"];
+  tagId: Scalars["GID"];
+};
+
 export type MutationtransferPetitionOwnershipArgs = {
   petitionIds: Array<Scalars["GID"]>;
   userId: Scalars["GID"];
+};
+
+export type MutationuntagPetitionArgs = {
+  petitionId: Scalars["GID"];
+  tagId: Scalars["GID"];
 };
 
 export type MutationupdateContactArgs = {
@@ -761,6 +790,11 @@ export type MutationupdateSimpleReplyArgs = {
   petitionId: Scalars["GID"];
   reply: Scalars["String"];
   replyId: Scalars["GID"];
+};
+
+export type MutationupdateTagArgs = {
+  data: UpdateTagInput;
+  id: Scalars["GID"];
 };
 
 export type MutationupdateUserArgs = {
@@ -1210,6 +1244,13 @@ export type PetitionFieldType =
   /** A text field. */
   | "TEXT";
 
+export type PetitionFilters = {
+  locale?: Maybe<PetitionLocale>;
+  status?: Maybe<PetitionStatus>;
+  tagIds?: Maybe<Array<Scalars["ID"]>>;
+  type?: Maybe<PetitionBaseType>;
+};
+
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "en" | "es";
 
@@ -1621,6 +1662,8 @@ export type Query = {
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
+  /** Tags of the user organization */
+  tags: TagPagination;
 };
 
 export type QueryaccessArgs = {
@@ -1682,13 +1725,11 @@ export type QuerypetitionFieldCommentsArgs = {
 };
 
 export type QuerypetitionsArgs = {
+  filters?: Maybe<PetitionFilters>;
   limit?: Maybe<Scalars["Int"]>;
-  locale?: Maybe<PetitionLocale>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
-  status?: Maybe<PetitionStatus>;
-  type?: Maybe<PetitionBaseType>;
 };
 
 export type QuerypublicOrgLogoUrlArgs = {
@@ -1698,6 +1739,12 @@ export type QuerypublicOrgLogoUrlArgs = {
 export type QuerypublicTemplatesArgs = {
   limit?: Maybe<Scalars["Int"]>;
   locale?: Maybe<PetitionLocale>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+};
+
+export type QuerytagsArgs = {
+  limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
 };
@@ -1868,6 +1915,23 @@ export type SupportMethodResponse = {
   result: Result;
 };
 
+export type Tag = {
+  __typename?: "Tag";
+  /** The color of the tag in hex format (example: #FFFFFF) */
+  color: Scalars["String"];
+  id: Scalars["GID"];
+  name: Scalars["String"];
+  organization_id: Scalars["GID"];
+};
+
+export type TagPagination = {
+  __typename?: "TagPagination";
+  /** The requested slice of items. */
+  items: Array<Tag>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
 export type Timestamps = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -1901,6 +1965,11 @@ export type UpdatePetitionInput = {
   remindersConfig?: Maybe<RemindersConfigInput>;
   signatureConfig?: Maybe<SignatureConfigInput>;
   skipForwardSecurity?: Maybe<Scalars["Boolean"]>;
+};
+
+export type UpdateTagInput = {
+  color?: Maybe<Scalars["String"]>;
+  name?: Maybe<Scalars["String"]>;
 };
 
 export type UpdateUserInput = {
@@ -4813,9 +4882,8 @@ export type PetitionsQueryVariables = Exact<{
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
-  status?: Maybe<PetitionStatus>;
-  type?: Maybe<PetitionBaseType>;
   hasPetitionSignature: Scalars["Boolean"];
+  filters?: Maybe<PetitionFilters>;
 }>;
 
 export type PetitionsQuery = { __typename?: "Query" } & {
@@ -4858,7 +4926,7 @@ export type NewPetitionTemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  locale?: Maybe<PetitionLocale>;
+  filters?: Maybe<PetitionFilters>;
 }>;
 
 export type NewPetitionTemplatesQuery = { __typename?: "Query" } & {
@@ -11880,17 +11948,15 @@ export const PetitionsDocument = gql`
     $limit: Int!
     $search: String
     $sortBy: [QueryPetitions_OrderBy!]
-    $status: PetitionStatus
-    $type: PetitionBaseType
     $hasPetitionSignature: Boolean!
+    $filters: PetitionFilters
   ) {
     petitions(
       offset: $offset
       limit: $limit
       search: $search
       sortBy: $sortBy
-      type: $type
-      status: $status
+      filters: $filters
     ) {
       ...Petitions_PetitionBasePagination
     }
@@ -11914,9 +11980,8 @@ export const PetitionsDocument = gql`
  *      limit: // value for 'limit'
  *      search: // value for 'search'
  *      sortBy: // value for 'sortBy'
- *      status: // value for 'status'
- *      type: // value for 'type'
  *      hasPetitionSignature: // value for 'hasPetitionSignature'
+ *      filters: // value for 'filters'
  *   },
  * });
  */
@@ -12021,22 +12086,21 @@ export const NewPetitionTemplatesDocument = gql`
     $offset: Int!
     $limit: Int!
     $search: String
-    $locale: PetitionLocale
+    $filters: PetitionFilters
   ) {
     templates: petitions(
       offset: $offset
       limit: $limit
       search: $search
-      locale: $locale
       sortBy: [lastUsedAt_DESC]
-      type: TEMPLATE
+      filters: $filters
     ) {
       items {
         ...NewPetition_PetitionTemplate
       }
       totalCount
     }
-    hasTemplates: petitions(type: TEMPLATE) {
+    hasTemplates: petitions(filters: { type: TEMPLATE }) {
       totalCount
     }
   }
@@ -12058,7 +12122,7 @@ export const NewPetitionTemplatesDocument = gql`
  *      offset: // value for 'offset'
  *      limit: // value for 'limit'
  *      search: // value for 'search'
- *      locale: // value for 'locale'
+ *      filters: // value for 'filters'
  *   },
  * });
  */

@@ -75,8 +75,10 @@ function Petitions() {
         offset: state.items * (state.page - 1),
         limit: state.items,
         search: state.search,
-        status: state.status,
-        type: state.type,
+        filters: {
+          status: state.status,
+          type: state.type,
+        },
         sortBy: [
           `${state.sort.field}_${state.sort.direction}` as QueryPetitions_OrderBy,
         ],
@@ -332,17 +334,15 @@ Petitions.getInitialProps = async ({
         $limit: Int!
         $search: String
         $sortBy: [QueryPetitions_OrderBy!]
-        $status: PetitionStatus
-        $type: PetitionBaseType
         $hasPetitionSignature: Boolean!
+        $filters: PetitionFilters
       ) {
         petitions(
           offset: $offset
           limit: $limit
           search: $search
           sortBy: $sortBy
-          type: $type
-          status: $status
+          filters: $filters
         ) {
           ...Petitions_PetitionBasePagination
         }
@@ -355,8 +355,7 @@ Petitions.getInitialProps = async ({
         limit: items,
         search,
         sortBy: [`${sort.field}_${sort.direction}` as QueryPetitions_OrderBy],
-        type,
-        status,
+        filters: { type, status },
         hasPetitionSignature: me.hasPetitionSignature,
       },
     }
