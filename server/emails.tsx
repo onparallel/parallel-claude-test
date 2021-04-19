@@ -32,6 +32,8 @@ async function parseArgs(req: Request) {
         return req.query[key as string] === "true";
       case "date":
         return new Date(req.query[key as string] as string);
+      case "number":
+        return parseInt(req.query[key as string] as string, 10);
       default:
         return req.query[key as string];
     }

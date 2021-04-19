@@ -81,7 +81,7 @@ const email: Email<PetitionReminderProps> = {
           : ""
       }
       ${
-        missingFieldCount.toString() === "0"
+        missingFieldCount === 0
           ? outdent`
 
           ${intl.formatMessage(
@@ -173,7 +173,7 @@ const email: Email<PetitionReminderProps> = {
                 />
               </MjmlText>
             ) : null}
-            {missingFieldCount.toString() === "0" ? (
+            {missingFieldCount === 0 ? (
               <MjmlText>
                 <FormattedMessage
                   id="reminder.click-finalize"
