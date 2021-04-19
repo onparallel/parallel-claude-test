@@ -61,11 +61,12 @@ export function RecipientSelectGroups({
       if (lastRecipientGroupSelectRef.current) {
         lastRecipientGroupSelectRef.current.focus();
         scrollIntoView(lastRecipientGroupFormControlRef.current!, {
+          duration: 0,
           scrollMode: "if-needed",
           block: "start",
         });
       }
-    }, 100);
+    });
   }
 
   function deleteRecipientGroup(index: number) {
@@ -82,7 +83,17 @@ export function RecipientSelectGroups({
 
   return (
     <>
-      <Stack margin={-1} padding={1} overflow="auto" maxHeight="240px">
+      <Stack
+        margin={-1}
+        padding={1}
+        overflow="auto"
+        maxHeight="240px"
+        _after={{
+          content: "''",
+          display: "block",
+          paddingBottom: "1px",
+        }}
+      >
         {recipientGroups.map((recipients, index) => (
           <FormControl
             key={index}
