@@ -718,6 +718,7 @@ export interface NexusGenFieldTypes {
     skipForwardSecurity: boolean; // Boolean!
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
     subscriptions: NexusGenRootTypes["Subscription"][]; // [Subscription!]!
+    tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
   };
@@ -890,6 +891,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     skipForwardSecurity: boolean; // Boolean!
+    tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
   };
@@ -1213,6 +1215,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
     skipForwardSecurity: boolean; // Boolean!
+    tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
     userPermissions: NexusGenRootTypes["PetitionUserPermission"][]; // [PetitionUserPermission!]!
   };
@@ -1471,6 +1474,7 @@ export interface NexusGenFieldTypeNames {
     skipForwardSecurity: "Boolean";
     status: "PetitionStatus";
     subscriptions: "Subscription";
+    tags: "Tag";
     updatedAt: "DateTime";
     userPermissions: "PetitionUserPermission";
   };
@@ -1643,6 +1647,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     owner: "User";
     skipForwardSecurity: "Boolean";
+    tags: "Tag";
     updatedAt: "DateTime";
     userPermissions: "PetitionUserPermission";
   };
@@ -1966,6 +1971,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     owner: "User";
     skipForwardSecurity: "Boolean";
+    tags: "Tag";
     updatedAt: "DateTime";
     userPermissions: "PetitionUserPermission";
   };

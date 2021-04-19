@@ -1215,6 +1215,11 @@ type Petition implements PetitionBase {
   subscriptions: [Subscription!]!
 
   """
+  The tags linked to the petition
+  """
+  tags: [Tag!]!
+
+  """
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
@@ -1387,6 +1392,11 @@ interface PetitionBase {
   Whether to skip the forward security check on the recipient view.
   """
   skipForwardSecurity: Boolean!
+
+  """
+  The tags linked to the petition
+  """
+  tags: [Tag!]!
 
   """
   Time when the resource was last updated.
@@ -1988,6 +1998,11 @@ type PetitionTemplate implements PetitionBase {
   Whether to skip the forward security check on the recipient view.
   """
   skipForwardSecurity: Boolean!
+
+  """
+  The tags linked to the petition
+  """
+  tags: [Tag!]!
 
   """
   Time when the resource was last updated.

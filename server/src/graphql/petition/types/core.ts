@@ -136,6 +136,13 @@ export const PetitionBase = interfaceType({
       description: "Time when the resource was last updated.",
       resolve: (o) => o.updated_at,
     });
+    t.nonNull.list.field("tags", {
+      type: "Tag",
+      description: "The tags linked to the petition",
+      resolve: async (root, _, ctx) => {
+        return await ctx.tags.loadTagsByPetitionId(root.id);
+      },
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   rootTyping: "db.Petition",
