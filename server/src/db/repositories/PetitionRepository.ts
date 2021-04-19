@@ -1519,6 +1519,17 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
+      // copy original tag ids to cloned petition
+      await this.raw(
+        /* sql */ `
+        with tag_ids as (select tag_id from petition_tag where petition_id = ?)
+        insert into petition_tag(petition_id, tag_id)
+        select ?, tag_id from tag_ids
+      `,
+        [petitionId, cloned.id],
+        t
+      );
+
       return cloned;
     });
   }
