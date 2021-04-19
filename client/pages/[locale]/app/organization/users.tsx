@@ -208,7 +208,7 @@ function OrganizationUsers() {
         />
       }
     >
-      <Flex flexDirection="1" flex="1" padding={4}>
+      <Flex flex="1" padding={4}>
         <TablePage
           flex="1"
           isSelectable
