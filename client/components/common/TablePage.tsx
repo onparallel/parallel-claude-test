@@ -209,7 +209,7 @@ export function TablePage<T, TContext = unknown>({
                     variant={item.isCurrent ? "solid" : "ghost"}
                     size="sm"
                     onClick={
-                      item.isCurrent
+                      !item.isCurrent
                         ? () => onPageChange?.(item.value)
                         : undefined
                     }
