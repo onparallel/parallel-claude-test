@@ -770,23 +770,9 @@ export interface Tag {
   organization_id: number; // int4
   name: string; // varchar
   color: string; // varchar
-  created_at: Date; // timestamptz
-  created_by: Maybe<string>; // varchar
-  updated_at: Date; // timestamptz
-  updated_by: Maybe<string>; // varchar
-  deleted_at: Maybe<Date>; // timestamptz
-  deleted_by: Maybe<string>; // varchar
 }
 
-export type CreateTag = PartialProps<
-  Omit<Tag, "id">,
-  | "created_at"
-  | "created_by"
-  | "updated_at"
-  | "updated_by"
-  | "deleted_at"
-  | "deleted_by"
->;
+export type CreateTag = PartialProps<Omit<Tag, "id">>;
 
 export interface TemporaryFile {
   id: number; // int4

@@ -10,22 +10,17 @@ export class TagRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadTag = this.buildLoadById("tag", "id", (q) =>
-    q.whereNull("deleted_at")
-  );
+  readonly loadTag = this.buildLoadById("tag", "id");
 
   readonly loadTagsByOrganizationId = this.buildLoadMultipleBy(
     "tag",
-    "organization_id",
-    (q) => q.whereNull("deleted_at")
+    "organization_id"
   );
 
   async createTag(data: Omit<CreateTag, "organization_id">, user: User) {
     const [tag] = await this.insert("tag", {
       ...data,
       organization_id: user.org_id,
-      created_by: `User:${user.id}`,
-      updated_by: `User:${user.id}`,
     });
 
     return tag;
@@ -33,30 +28,18 @@ export class TagRepository extends BaseRepository {
 
   async updateTag(
     tagId: number,
-    data: Partial<Omit<CreateTag, "organization_id">>,
-    user: User
+    data: Partial<Omit<CreateTag, "organization_id">>
   ) {
     const [tag] = await this.from("tag")
       .where("id", tagId)
       .whereNull("deleted_at")
-      .update(
-        {
-          ...data,
-          updated_by: `User:${user.id}`,
-        },
-        "*"
-      );
+      .update(data, "*");
 
     return tag;
   }
 
-  async deleteTag(tagId: number, user: User, t?: Knex.Transaction) {
-    await this.from("tag", t)
-      .where("id", tagId)
-      .update({
-        deleted_at: this.now(),
-        deleted_by: `User:${user.id}`,
-      });
+  async deleteTag(tagId: number, t?: Knex.Transaction) {
+    await this.from("tag", t).where("id", tagId).delete();
   }
 
   async tagPetition(tagId: number, petitionId: number) {

@@ -68,7 +68,7 @@ export const updateTag = mutationField("updateTag", {
       data.name = args.data.name;
     }
     try {
-      return await ctx.tags.updateTag(args.id, data, ctx.user!);
+      return await ctx.tags.updateTag(args.id, data);
     } catch (error) {
       if (error.constraint !== "tag__organization_id__name__unique") {
         throw error;
@@ -89,7 +89,7 @@ export const deleteTag = mutationField("deleteTag", {
     try {
       await ctx.tags.withTransaction(async (t) => {
         await ctx.tags.removeTagFromPetitions(id, t);
-        await ctx.tags.deleteTag(id, ctx.user!, t);
+        await ctx.tags.deleteTag(id, t);
       });
       return RESULT.SUCCESS;
     } catch {
