@@ -21,6 +21,8 @@ export interface AppLayoutProps extends BoxProps {
   user: AppLayout_UserFragment;
 }
 
+declare const zE: any;
+
 export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
   /* Onboarding tour callbacks */
   const [
@@ -40,6 +42,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       } else {
         toggle(true);
       }
+      zE(() => zE.hide());
     },
     [isRunning, toggle]
   );

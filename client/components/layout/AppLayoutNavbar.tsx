@@ -31,7 +31,6 @@ import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
@@ -44,6 +43,8 @@ export interface AppLayoutNavbarProps extends BoxProps {
   onOnboardingClick: () => void;
 }
 
+declare const zE: any;
+
 export const AppLayoutNavbar = Object.assign(
   memo(function AppLayoutNavbar({
     isMobile,
@@ -51,9 +52,9 @@ export const AppLayoutNavbar = Object.assign(
     onOnboardingClick,
     ...props
   }: AppLayoutNavbarProps) {
-    const { pathname, query } = useRouter();
     const intl = useIntl();
     const router = useRouter();
+    const { pathname, query } = router;
     const createPetition = useCreatePetition();
     const goToPetition = useGoToPetition();
     const handleCreatePetition = useCallback(async () => {
@@ -246,19 +247,53 @@ export const AppLayoutNavbar = Object.assign(
           <>
             <Spacer />
             <Stack>
-              <Flex justifyContent="center">
-                <IconButtonWithTooltip
+              <Menu id="help-menu" placement={isMobile ? "top-start" : "right"}>
+                <Tooltip
                   label={intl.formatMessage({
-                    id: "navbar.start-tour",
-                    defaultMessage: "Guide me around",
+                    id: "navbar.help-menu",
+                    defaultMessage: "Help menu",
                   })}
-                  icon={<HelpOutlineIcon fontSize="20px" />}
-                  variant="ghost"
-                  placement="right"
-                  isRound
-                  onClick={onOnboardingClick}
-                />
-              </Flex>
+                  placement={isMobile ? "top" : "right"}
+                >
+                  <Flex justifyContent="center">
+                    <MenuButton
+                      as={IconButton}
+                      icon={<HelpOutlineIcon fontSize="20px" />}
+                      isRound
+                      variant="ghost"
+                      aria-label={intl.formatMessage({
+                        id: "navbar.help-menu",
+                        defaultMessage: "Help menu",
+                      })}
+                    />
+                  </Flex>
+                </Tooltip>
+                <Portal>
+                  <MenuList>
+                    <MenuGroup>
+                      <MenuItem
+                        onClick={() => {
+                          zE(function () {
+                            zE("webWidget", "setLocale", router.query.locale);
+                            zE.activate({ hideOnClose: true });
+                          });
+                        }}
+                      >
+                        <FormattedMessage
+                          id="navbar.help-center"
+                          defaultMessage="Help center"
+                        />
+                      </MenuItem>
+                      <MenuItem onClick={onOnboardingClick}>
+                        <FormattedMessage
+                          id="navbar.start-tour"
+                          defaultMessage="Guide me around"
+                        />
+                      </MenuItem>
+                    </MenuGroup>
+                  </MenuList>
+                </Portal>
+              </Menu>
               <Flex justifyContent="center" alignItems="center">
                 <UserMenu
                   placement="right-end"

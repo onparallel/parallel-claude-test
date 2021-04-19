@@ -5,6 +5,7 @@ import {
   I18nProvider,
 } from "@parallel/components/common/I18nProvider";
 import { Hubspot } from "@parallel/components/scripts/Hubspot";
+import { Zendesk } from "@parallel/components/scripts/Zendesk";
 import PlausibleProvider from "next-plausible";
 import { AppProps } from "next/app";
 import { createElement, useEffect } from "react";
@@ -36,6 +37,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
           <Hubspot />
         </>
       ) : null}
+      <Zendesk />
       {[
         [
           PlausibleProvider,

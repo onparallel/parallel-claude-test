@@ -2305,6 +2305,16 @@
     "context": "Use a template"
   },
   {
+    "term": "navbar.help-center",
+    "definition": "Centro de ayuda",
+    "context": "Help center"
+  },
+  {
+    "term": "navbar.help-menu",
+    "definition": "Menú de ayuda",
+    "context": "Help menu"
+  },
+  {
     "term": "navbar.petitions-link",
     "definition": "Peticiones",
     "context": "Petitions"
