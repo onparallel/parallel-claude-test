@@ -101,8 +101,8 @@ export const AppLayoutNavbar = Object.assign(
     );
     function handleLocaleChange(locale: string) {
       router.push(
-        resolveUrl(router.pathname, {
-          ...router.query,
+        resolveUrl(pathname, {
+          ...query,
           locale,
         })
       );
@@ -274,7 +274,7 @@ export const AppLayoutNavbar = Object.assign(
                       <MenuItem
                         onClick={() => {
                           zE(function () {
-                            zE("webWidget", "setLocale", router.query.locale);
+                            zE("webWidget", "setLocale", query.locale);
                             zE.activate({ hideOnClose: true });
                           });
                         }}
