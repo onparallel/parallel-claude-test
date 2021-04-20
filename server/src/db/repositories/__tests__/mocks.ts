@@ -24,6 +24,8 @@ import {
   CreateFeatureFlag,
   FileUpload,
   CreateFileUpload,
+  Tag,
+  CreateTag,
 } from "../../__types";
 import { hash, random } from "../../../util/token";
 
@@ -227,6 +229,23 @@ export class Mocks {
             ...builder?.(index),
           };
         })
+      )
+      .returning("*");
+  }
+
+  async createRandomTags(
+    orgId: number,
+    amount?: number,
+    builder?: (index: number) => Partial<Tag>
+  ) {
+    return await this.knex<Tag>("tag")
+      .insert(
+        range(0, amount || 1).map<CreateTag>((index) => ({
+          color: "#000000",
+          name: faker.commerce.product(),
+          organization_id: orgId,
+          ...builder?.(index),
+        }))
       )
       .returning("*");
   }

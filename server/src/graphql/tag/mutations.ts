@@ -25,7 +25,7 @@ export const createTag = mutationField("createTag", {
   },
   resolve: async (_, { name, color }, ctx) => {
     try {
-      return await ctx.tags.createTag({ name, color }, ctx.user!);
+      return await ctx.tags.createTag({ name, color }, ctx.user!.org_id);
     } catch (error) {
       if (error.constraint === "tag__organization_id__name__unique") {
         throw new WhitelistedError(

@@ -19,7 +19,7 @@ import {
   PetitionFieldVisibility,
 } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
-import { fromGlobalIds } from "../../util/globalId";
+import { fromGlobalId } from "../../util/globalId";
 import { keyBuilder } from "../../util/keyBuilder";
 import { isDefined } from "../../util/remedaExtensions";
 import {
@@ -226,7 +226,6 @@ export class PetitionRepository extends BaseRepository {
     return await this.loadPageAndCount(
       this.from("petition")
         .leftJoin("petition_user", "petition.id", "petition_user.petition_id")
-        .leftJoin("petition_tag", "petition.id", "petition_tag.petition_id")
         .where({
           "petition_user.user_id": userId,
           is_template: petitionType === "TEMPLATE",
@@ -254,9 +253,12 @@ export class PetitionRepository extends BaseRepository {
           }
 
           const tagIds = filters?.tagIds || [];
-          if (tagIds.length > 0) {
-            q.whereIn("petition_tag.tag_id", fromGlobalIds(tagIds, "Tag").ids);
-          }
+          tagIds.map((tagId, i) => {
+            q.joinRaw(
+              `join petition_tag pt${i} on (pt${i}.petition_id = petition.id and pt${i}.tag_id = ?)`,
+              [fromGlobalId(tagId, "Tag").id]
+            );
+          });
 
           const hasOrderByLastUsed = opts.sortBy?.some(
             (o) => o.column === "last_used_at"

@@ -5,7 +5,7 @@ import { groupBy, omit } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateTag, Tag, User } from "../__types";
+import { CreateTag, Tag } from "../__types";
 
 @injectable()
 export class TagRepository extends BaseRepository {
@@ -38,10 +38,10 @@ export class TagRepository extends BaseRepository {
     })
   );
 
-  async createTag(data: Omit<CreateTag, "organization_id">, user: User) {
+  async createTag(data: Omit<CreateTag, "organization_id">, orgId: number) {
     const [tag] = await this.insert("tag", {
       ...data,
-      organization_id: user.org_id,
+      organization_id: orgId,
     });
 
     return tag;

@@ -1,6 +1,12 @@
 import { initServer, TestClient } from "./server";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, User, Petition, PetitionField } from "../../db/__types";
+import {
+  Organization,
+  User,
+  Petition,
+  PetitionField,
+  Tag,
+} from "../../db/__types";
 import { userCognitoId } from "../../../test/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
@@ -41,6 +47,8 @@ describe("GraphQL/Petitions", () => {
 
   let fields: PetitionField[];
 
+  let tags: Tag[];
+
   beforeAll(async () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
@@ -76,6 +84,13 @@ describe("GraphQL/Petitions", () => {
       10,
       petitionsBuilder(organization.id)
     );
+
+    tags = await mocks.createRandomTags(organization.id, 3);
+    await mocks.knex("petition_tag").insert([
+      { petition_id: petitions[0].id, tag_id: tags[0].id },
+      { petition_id: petitions[0].id, tag_id: tags[1].id },
+      { petition_id: petitions[1].id, tag_id: tags[0].id },
+    ]);
 
     fields = await mocks.createRandomPetitionFields(petitions[0].id, 2, () => ({
       type: "TEXT",
@@ -150,11 +165,68 @@ describe("GraphQL/Petitions", () => {
       expect(data!.petitions.totalCount).toBe(6);
     });
 
+    it("filters petition by single tag", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query($filters: PetitionFilters) {
+            petitions(filters: $filters, limit: 10) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          filters: {
+            tagIds: [toGlobalId("Tag", tags[0].id)],
+          },
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.petitions).toEqual({
+        totalCount: 2,
+        items: [petitions[0], petitions[1]].map((p) => ({
+          id: toGlobalId("Petition", p.id),
+        })),
+      });
+    });
+
+    it("filters petition by multiple tags", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query($filters: PetitionFilters) {
+            petitions(filters: $filters, limit: 10) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          filters: {
+            tagIds: [
+              toGlobalId("Tag", tags[0].id),
+              toGlobalId("Tag", tags[1].id),
+            ],
+          },
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.petitions).toEqual({
+        totalCount: 1,
+        items: [{ id: toGlobalId("Petition", petitions[0].id) }],
+      });
+    });
+
     it("fetches a limited amount of petitions", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query($limit: Int, $type: PetitionBaseType) {
-            petitions(limit: $limit, type: $type) {
+            petitions(limit: $limit, filters: { type: $type }) {
               totalCount
               items {
                 id
@@ -173,7 +245,7 @@ describe("GraphQL/Petitions", () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query($limit: Int, $type: PetitionBaseType) {
-            petitions(limit: $limit, type: $type) {
+            petitions(limit: $limit, filters: { type: $type }) {
               totalCount
             }
           }
@@ -190,8 +262,8 @@ describe("GraphQL/Petitions", () => {
           query {
             templates: petitions(
               limit: 100
-              type: TEMPLATE
               sortBy: [lastUsedAt_DESC]
+              filters: { type: TEMPLATE }
             ) {
               items {
                 id
@@ -233,7 +305,7 @@ describe("GraphQL/Petitions", () => {
             templates: petitions(
               limit: 100
               sortBy: [lastUsedAt_DESC]
-              type: TEMPLATE
+              filters: { type: TEMPLATE }
             ) {
               items {
                 id
@@ -856,7 +928,7 @@ describe("GraphQL/Petitions", () => {
       const { data } = await testClient.query({
         query: gql`
           query($type: PetitionBaseType) {
-            petitions(type: $type) {
+            petitions(filters: { type: $type }) {
               totalCount
             }
           }
@@ -879,7 +951,7 @@ describe("GraphQL/Petitions", () => {
       const { data: newData } = await testClient.query({
         query: gql`
           query($type: PetitionBaseType) {
-            petitions(type: $type) {
+            petitions(filters: { type: $type }) {
               totalCount
             }
           }
