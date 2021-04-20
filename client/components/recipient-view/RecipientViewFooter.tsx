@@ -34,7 +34,10 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
           defaultMessage="Powered by {parallel}"
           values={{
             parallel: (
-              <NakedLink href="/" passHref>
+              <NakedLink
+                href="/?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
+                passHref
+              >
                 <Box as="a" marginLeft="10px" position="relative" top="-1px">
                   <Logo display="inline-block" width="100px" />
                 </Box>
@@ -53,14 +56,17 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
       >
         <ListItem>
           <NormalLink
-            href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
+            href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients`}
             isExternal
           >
             <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />
           </NormalLink>
         </ListItem>
         <ListItem>
-          <Link href="/security" target="_blank">
+          <Link
+            href="/security?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
+            target="_blank"
+          >
             <FormattedMessage
               id="recipient-view.security-link"
               defaultMessage="About security"
@@ -68,7 +74,10 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
           </Link>
         </ListItem>
         <ListItem>
-          <Link href="/legal/terms" target="_blank">
+          <Link
+            href="/legal/terms?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
+            target="_blank"
+          >
             <FormattedMessage
               id="public.terms.title"
               defaultMessage="Terms & Conditions"

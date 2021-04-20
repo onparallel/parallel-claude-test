@@ -105,7 +105,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               width="120px"
               alt="Parallel"
               src={`${assetsUrl}/static/emails/logo.png`}
-              href="https://www.onparallel.com"
+              href="https://www.onparallel.com/?utm_source=parallel&utm_medium=email&utm_campaign=recipients"
             />
             <MjmlSocial align="center" icon-padding="1px">
               <MjmlSocialElement
@@ -129,7 +129,10 @@ export const Layout: FC<LayoutProps> = function Layout({
               {`Parallel Solutions, S.L. - C/Almogàvers 165, 59.203, 08018 Barcelona, Spain`}
             </MjmlText>
             <MjmlText align="center" fontSize="12px">
-              <a className="link" href={`${parallelUrl}/${locale}/legal/terms`}>
+              <a
+                className="link"
+                href={`${parallelUrl}/${locale}/legal/terms?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
+              >
                 <FormattedMessage
                   id="layout.terms-and-conditions-link"
                   defaultMessage="Terms and conditions"
@@ -138,7 +141,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               <span>&nbsp;|&nbsp;</span>
               <a
                 className="link"
-                href={`${parallelUrl}/${locale}/legal/privacy`}
+                href={`${parallelUrl}/${locale}/legal/privacy?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
               >
                 <FormattedMessage
                   id="layout.privacy-link"
