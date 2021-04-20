@@ -10,6 +10,7 @@ import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { validateAnd } from "../helpers/validateArgs";
+import { maxLength } from "../helpers/validators/maxLength";
 import { userHasAccessToPetitions } from "../petition/authorizers";
 import { userHasAccessToTags } from "./authorizers";
 import { validateHexColor } from "./validators";
@@ -18,7 +19,10 @@ export const createTag = mutationField("createTag", {
   description: "Creates a tag linked to the user's organization",
   type: "Tag",
   authorize: authenticate(),
-  validateArgs: validateHexColor((args) => args.color, "color"),
+  validateArgs: validateAnd(
+    validateHexColor((args) => args.color, "color"),
+    maxLength((args) => args.name, "name", 100)
+  ),
   args: {
     name: nonNull(stringArg()),
     color: nonNull(stringArg()),
@@ -44,7 +48,8 @@ export const updateTag = mutationField("updateTag", {
   type: "Tag",
   authorize: authenticateAnd(userHasAccessToTags((args) => args.id)),
   validateArgs: validateAnd(
-    validateHexColor((args) => args.data.color, "data.color")
+    validateHexColor((args) => args.data.color, "data.color"),
+    maxLength((args) => args.data.name, "data.name", 100)
   ),
   args: {
     id: nonNull(globalIdArg("Tag")),
