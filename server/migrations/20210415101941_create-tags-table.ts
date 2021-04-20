@@ -1,4 +1,5 @@
 import { Knex } from "knex";
+import { timestamps } from "./helpers/timestamps";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema
@@ -7,11 +8,12 @@ export async function up(knex: Knex): Promise<void> {
       t.integer("organization_id").notNullable().references("organization.id");
       t.string("name").notNullable();
       t.string("color").notNullable();
-      t.unique(
-        ["organization_id", "name"],
-        "tag__organization_id__name__unique"
-      );
+      timestamps(t);
     })
+    .raw(
+      /* sql */ `
+      create unique index "tag__organization_id__name__unique" on "tag" ("organization_id", "name") where "deleted_at" is null`
+    )
     .createTable("petition_tag", (t) => {
       t.increments("id");
       t.integer("petition_id").notNullable().references("petition.id");
@@ -20,6 +22,7 @@ export async function up(knex: Knex): Promise<void> {
         ["petition_id", "tag_id"],
         "petition_tag__petition_id__tag_id__unique"
       );
+      timestamps(t, { updated: false, deleted: false });
     });
 }
 

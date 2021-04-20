@@ -29,7 +29,7 @@ export const createTag = mutationField("createTag", {
   },
   resolve: async (_, { name, color }, ctx) => {
     try {
-      return await ctx.tags.createTag({ name, color }, ctx.user!.org_id);
+      return await ctx.tags.createTag({ name, color }, ctx.user!);
     } catch (error) {
       if (error.constraint === "tag__organization_id__name__unique") {
         throw new WhitelistedError(
@@ -73,7 +73,7 @@ export const updateTag = mutationField("updateTag", {
       data.name = args.data.name;
     }
     try {
-      return await ctx.tags.updateTag(args.id, data);
+      return await ctx.tags.updateTag(args.id, data, ctx.user!);
     } catch (error) {
       if (error.constraint !== "tag__organization_id__name__unique") {
         throw error;
@@ -93,8 +93,8 @@ export const deleteTag = mutationField("deleteTag", {
   resolve: async (_, { id }, ctx) => {
     try {
       await ctx.tags.withTransaction(async (t) => {
-        await ctx.tags.removeTagFromPetitions(id, t);
-        await ctx.tags.deleteTag(id, t);
+        await ctx.tags.untagPetition(id, undefined, t);
+        await ctx.tags.deleteTag(id, ctx.user!, t);
       });
       return RESULT.SUCCESS;
     } catch {
@@ -116,7 +116,7 @@ export const tagPetition = mutationField("tagPetition", {
   ),
   resolve: async (_, args, ctx) => {
     try {
-      await ctx.tags.tagPetition(args.tagId, args.petitionId);
+      await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
       return RESULT.SUCCESS;
     } catch (error) {
       if (error.constraint === "petition_tag__petition_id__tag_id__unique") {
