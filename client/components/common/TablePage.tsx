@@ -286,7 +286,7 @@ function usePagination({
     pages.push({
       type: "NEXT",
       value: current + 1,
-      isDisabled: current === total,
+      isDisabled: total === 0 || current === total,
     });
     return pages;
   }, [current, pageSize, totalCount]);
