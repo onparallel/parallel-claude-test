@@ -175,6 +175,8 @@ export type Mutation = {
   addPetitionUserPermission: Array<Petition>;
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
+  /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
+  batchSendPetition: Array<SendPetitionResult>;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -204,6 +206,8 @@ export type Mutation = {
   createPetitionSubscription: Subscription;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
+  /** Creates a tag linked to the user's organization */
+  createTag: Tag;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
   /** Deactivates the specified active petition accesses. */
@@ -221,6 +225,8 @@ export type Mutation = {
   deletePetitionSubscription: Result;
   /** Delete petitions. */
   deletePetitions: Result;
+  /** Removes the tag from every petition and soft-deletes it */
+  deleteTag: Result;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Edits permissions on given petitions and users */
@@ -237,6 +243,8 @@ export type Mutation = {
    * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
+  /** Creates a reply for a dynamic select field. */
+  publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
   publicCreateFileUploadReply: CreateFileUploadReply;
   /** Create a petition field comment. */
@@ -258,6 +266,8 @@ export type Mutation = {
   publicSendVerificationCode: VerificationCodeRequest;
   /** Submits all unpublished comments. */
   publicSubmitUnpublishedComments: Array<PublicPetitionFieldComment>;
+  /** Updates a reply for a dynamic select field. */
+  publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
   publicUpdatePetitionFieldComment: PublicPetitionFieldComment;
   /** Updates a reply to a text or select field. */
@@ -285,8 +295,12 @@ export type Mutation = {
   submitUnpublishedComments: Array<PetitionFieldComment>;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
+  /** Tags a petition */
+  tagPetition: Result;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<Petition>;
+  /** Removes the given tag from the given petition */
+  untagPetition: Result;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates the positions of the petition fields */
@@ -310,6 +324,8 @@ export type Mutation = {
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
+  /** Updates the name and color of a given tag */
+  updateTag: Tag;
   /** Updates the user with the provided data. */
   updateUser: User;
   /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
@@ -332,6 +348,15 @@ export type MutationaddPetitionUserPermissionArgs = {
 export type MutationassignPetitionToUserArgs = {
   petitionId: Scalars["ID"];
   userId: Scalars["Int"];
+};
+
+export type MutationbatchSendPetitionArgs = {
+  body: Scalars["JSON"];
+  contactIdGroups: Array<Array<Scalars["GID"]>>;
+  petitionId: Scalars["GID"];
+  remindersConfig?: Maybe<RemindersConfigInput>;
+  scheduledAt?: Maybe<Scalars["DateTime"]>;
+  subject: Scalars["String"];
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -420,6 +445,11 @@ export type MutationcreateSimpleReplyArgs = {
   reply: Scalars["String"];
 };
 
+export type MutationcreateTagArgs = {
+  color: Scalars["String"];
+  name: Scalars["String"];
+};
+
 export type MutationcreateUserArgs = {
   email: Scalars["String"];
   firstName: Scalars["String"];
@@ -468,6 +498,10 @@ export type MutationdeletePetitionsArgs = {
   ids: Array<Scalars["GID"]>;
 };
 
+export type MutationdeleteTagArgs = {
+  id: Scalars["GID"];
+};
+
 export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
@@ -505,6 +539,12 @@ export type MutationpublicCompletePetitionArgs = {
   signer?: Maybe<PublicPetitionSignerData>;
 };
 
+export type MutationpublicCreateDynamicSelectReplyArgs = {
+  fieldId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  value: Array<Array<Maybe<Scalars["String"]>>>;
+};
+
 export type MutationpublicCreateFileUploadReplyArgs = {
   data: CreateFileUploadReplyInput;
   fieldId: Scalars["GID"];
@@ -520,7 +560,7 @@ export type MutationpublicCreatePetitionFieldCommentArgs = {
 export type MutationpublicCreateSimpleReplyArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
-  reply: Scalars["String"];
+  value: Scalars["String"];
 };
 
 export type MutationpublicDelegateAccessToContactArgs = {
@@ -566,6 +606,12 @@ export type MutationpublicSubmitUnpublishedCommentsArgs = {
   keycode: Scalars["ID"];
 };
 
+export type MutationpublicUpdateDynamicSelectReplyArgs = {
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  value: Array<Array<Maybe<Scalars["String"]>>>;
+};
+
 export type MutationpublicUpdatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   keycode: Scalars["ID"];
@@ -575,8 +621,8 @@ export type MutationpublicUpdatePetitionFieldCommentArgs = {
 
 export type MutationpublicUpdateSimpleReplyArgs = {
   keycode: Scalars["ID"];
-  reply: Scalars["String"];
   replyId: Scalars["GID"];
+  value: Scalars["String"];
 };
 
 export type MutationreactivateAccessesArgs = {
@@ -646,9 +692,19 @@ export type MutationswitchAutomaticRemindersArgs = {
   start: Scalars["Boolean"];
 };
 
+export type MutationtagPetitionArgs = {
+  petitionId: Scalars["GID"];
+  tagId: Scalars["GID"];
+};
+
 export type MutationtransferPetitionOwnershipArgs = {
   petitionIds: Array<Scalars["GID"]>;
   userId: Scalars["GID"];
+};
+
+export type MutationuntagPetitionArgs = {
+  petitionId: Scalars["GID"];
+  tagId: Scalars["GID"];
 };
 
 export type MutationupdateContactArgs = {
@@ -716,6 +772,11 @@ export type MutationupdateSimpleReplyArgs = {
   petitionId: Scalars["GID"];
   reply: Scalars["String"];
   replyId: Scalars["GID"];
+};
+
+export type MutationupdateTagArgs = {
+  data: UpdateTagInput;
+  id: Scalars["GID"];
 };
 
 export type MutationupdateUserArgs = {
@@ -901,6 +962,8 @@ export type Petition = PetitionBase & {
   status: PetitionStatus;
   /** The subscriptions linked to the petition. */
   subscriptions: Array<Subscription>;
+  /** The tags linked to the petition */
+  tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -999,6 +1062,8 @@ export type PetitionBase = {
   owner: User;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
+  /** The tags linked to the petition */
+  tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -1146,6 +1211,13 @@ export type PetitionFieldType =
   | "SELECT"
   /** A text field. */
   | "TEXT";
+
+export type PetitionFilters = {
+  locale?: Maybe<PetitionLocale>;
+  status?: Maybe<PetitionStatus>;
+  tagIds?: Maybe<Array<Scalars["ID"]>>;
+  type?: Maybe<PetitionBaseType>;
+};
 
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "en" | "es";
@@ -1300,6 +1372,8 @@ export type PetitionTemplate = PetitionBase & {
   owner: User;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
+  /** The tags linked to the petition */
+  tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -1537,6 +1611,8 @@ export type Query = {
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
+  /** Tags of the user organization */
+  tags: TagPagination;
 };
 
 export type QueryaccessArgs = {
@@ -1598,13 +1674,11 @@ export type QuerypetitionFieldCommentsArgs = {
 };
 
 export type QuerypetitionsArgs = {
+  filters?: Maybe<PetitionFilters>;
   limit?: Maybe<Scalars["Int"]>;
-  locale?: Maybe<PetitionLocale>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
-  status?: Maybe<PetitionStatus>;
-  type?: Maybe<PetitionBaseType>;
 };
 
 export type QuerypublicOrgLogoUrlArgs = {
@@ -1614,6 +1688,12 @@ export type QuerypublicOrgLogoUrlArgs = {
 export type QuerypublicTemplatesArgs = {
   limit?: Maybe<Scalars["Int"]>;
   locale?: Maybe<PetitionLocale>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+};
+
+export type QuerytagsArgs = {
+  limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
 };
@@ -1772,6 +1852,21 @@ export type SupportMethodResponse = {
   result: Result;
 };
 
+export type Tag = {
+  /** The color of the tag in hex format (example: #FFFFFF) */
+  color: Scalars["String"];
+  id: Scalars["GID"];
+  name: Scalars["String"];
+  organization_id: Scalars["GID"];
+};
+
+export type TagPagination = {
+  /** The requested slice of items. */
+  items: Array<Tag>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
 export type Timestamps = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -1805,6 +1900,11 @@ export type UpdatePetitionInput = {
   remindersConfig?: Maybe<RemindersConfigInput>;
   signatureConfig?: Maybe<SignatureConfigInput>;
   skipForwardSecurity?: Maybe<Scalars["Boolean"]>;
+};
+
+export type UpdateTagInput = {
+  color?: Maybe<Scalars["String"]>;
+  name?: Maybe<Scalars["String"]>;
 };
 
 export type UpdateUserInput = {

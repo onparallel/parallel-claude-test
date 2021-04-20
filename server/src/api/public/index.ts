@@ -256,8 +256,7 @@ api
               offset: $offset
               limit: $limit
               sortBy: $sortBy
-              status: $status
-              type: PETITION
+              filters: { status: $status, type: PETITION }
             ) {
               items {
                 ...Petition
@@ -1170,7 +1169,7 @@ api.path("/templates").get(
             offset: $offset
             limit: $limit
             sortBy: $sortBy
-            type: TEMPLATE
+            filters: { type: TEMPLATE }
           ) {
             items {
               ...Template
