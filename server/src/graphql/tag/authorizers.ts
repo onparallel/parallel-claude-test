@@ -1,16 +1,27 @@
+import { core } from "@nexus/schema";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
-import { Arg } from "../helpers/authorize";
+import { unMaybeArray } from "../../util/arrays";
+import { fromGlobalIds } from "../../util/globalId";
+import { MaybeArray } from "../../util/types";
 
-export function userHasAccessToTag<
+export function userHasAccessToTags<
   TypeName extends string,
   FieldName extends string,
-  TArg extends Arg<TypeName, FieldName, number>
->(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  TArg extends string | number
+>(
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => MaybeArray<TArg>
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const tagId = (args[argName] as unknown) as number;
-      const tag = await ctx.tags.loadTag(tagId);
-      return tag?.organization_id === ctx.user!.org_id;
+      const tagIds = unMaybeArray(prop(args));
+
+      const ids =
+        typeof tagIds[0] === "string"
+          ? fromGlobalIds(tagIds as string[], "Tag").ids
+          : (tagIds as number[]);
+
+      const tags = await ctx.tags.loadTag(ids);
+      return tags.every((tag) => tag?.organization_id === ctx.user!.org_id);
     } catch {}
     return false;
   };

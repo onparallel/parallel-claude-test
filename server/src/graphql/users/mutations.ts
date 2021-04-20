@@ -168,7 +168,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     contextUserIsAdmin(),
     userHasAccessToUsers("userIds"),
     ifArgDefined(
-      "transferToUserId",
+      (args) => args.transferToUserId,
       and(
         userHasAccessToUsers("transferToUserId" as any),
         argUserHasActiveStatus("transferToUserId" as any)

@@ -11,7 +11,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { validateAnd } from "../helpers/validateArgs";
 import { userHasAccessToPetitions } from "../petition/authorizers";
-import { userHasAccessToTag } from "./authorizers";
+import { userHasAccessToTags } from "./authorizers";
 import { validateHexColor } from "./validators";
 
 export const createTag = mutationField("createTag", {
@@ -42,7 +42,7 @@ export const createTag = mutationField("createTag", {
 export const updateTag = mutationField("updateTag", {
   description: "Updates the name and color of a given tag",
   type: "Tag",
-  authorize: authenticateAnd(userHasAccessToTag("id")),
+  authorize: authenticateAnd(userHasAccessToTags((args) => args.id)),
   validateArgs: validateAnd(
     validateHexColor((args) => args.data.color, "data.color")
   ),
@@ -81,7 +81,7 @@ export const updateTag = mutationField("updateTag", {
 export const deleteTag = mutationField("deleteTag", {
   description: "Removes the tag from every petition and soft-deletes it",
   type: "Result",
-  authorize: authenticateAnd(userHasAccessToTag("id")),
+  authorize: authenticateAnd(userHasAccessToTags((args) => args.id)),
   args: {
     id: nonNull(globalIdArg("Tag")),
   },
@@ -106,7 +106,7 @@ export const tagPetition = mutationField("tagPetition", {
     petitionId: nonNull(globalIdArg("Petition")),
   },
   authorize: authenticateAnd(
-    userHasAccessToTag("tagId"),
+    userHasAccessToTags((args) => args.tagId),
     userHasAccessToPetitions("petitionId")
   ),
   resolve: async (_, args, ctx) => {
@@ -132,7 +132,7 @@ export const untagPetition = mutationField("untagPetition", {
     petitionId: nonNull(globalIdArg("Petition")),
   },
   authorize: authenticateAnd(
-    userHasAccessToTag("tagId"),
+    userHasAccessToTags((args) => args.tagId),
     userHasAccessToPetitions("petitionId")
   ),
   resolve: async (_, args, ctx) => {

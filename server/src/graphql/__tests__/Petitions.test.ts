@@ -48,6 +48,7 @@ describe("GraphQL/Petitions", () => {
   let fields: PetitionField[];
 
   let tags: Tag[];
+  let privateTag: Tag;
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -85,12 +86,14 @@ describe("GraphQL/Petitions", () => {
       petitionsBuilder(organization.id)
     );
 
-    tags = await mocks.createRandomTags(organization.id, 3);
+    tags = await mocks.createRandomTags(organization.id, 11);
     await mocks.knex("petition_tag").insert([
       { petition_id: petitions[0].id, tag_id: tags[0].id },
       { petition_id: petitions[0].id, tag_id: tags[1].id },
       { petition_id: petitions[1].id, tag_id: tags[0].id },
     ]);
+
+    [privateTag] = await mocks.createRandomTags(otherOrg.id, 1);
 
     fields = await mocks.createRandomPetitionFields(petitions[0].id, 2, () => ({
       type: "TEXT",
@@ -220,6 +223,52 @@ describe("GraphQL/Petitions", () => {
         totalCount: 1,
         items: [{ id: toGlobalId("Petition", petitions[0].id) }],
       });
+    });
+
+    it("should not allow to filter by a tag id in another organization", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query($filters: PetitionFilters) {
+            petitions(filters: $filters, limit: 10) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          filters: {
+            tagIds: [toGlobalId("Tag", privateTag.id)],
+          },
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to filter by more than 10 tags", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query($filters: PetitionFilters) {
+            petitions(filters: $filters, limit: 10) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          filters: {
+            tagIds: tags.map((tag) => toGlobalId("Tag", tag.id)),
+          },
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
     });
 
     it("fetches a limited amount of petitions", async () => {

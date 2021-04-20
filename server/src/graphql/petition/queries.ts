@@ -6,7 +6,13 @@ import {
   nullable,
   inputObjectType,
 } from "@nexus/schema";
-import { authenticate, authenticateAnd, or } from "../helpers/authorize";
+import {
+  authenticate,
+  authenticateAnd,
+  chain,
+  ifArgDefined,
+  or,
+} from "../helpers/authorize";
 import {
   userHasAccessToPetitions,
   petitionsArePublicTemplates,
@@ -15,12 +21,21 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { decode } from "jsonwebtoken";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { validateAuthTokenPayload } from "./validations";
+import { userHasAccessToTags } from "../tag/authorizers";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
     type: "PetitionBase",
     description: "The petitions of the user",
-    authorize: authenticate(),
+    authorize: authenticateAnd(
+      ifArgDefined(
+        (args) => args.filters?.tagIds,
+        chain(
+          (_, args) => args.filters!.tagIds!.length <= 10,
+          userHasAccessToTags((args) => args.filters!.tagIds!)
+        )
+      )
+    ),
     additionalArgs: {
       filters: inputObjectType({
         name: "PetitionFilters",
