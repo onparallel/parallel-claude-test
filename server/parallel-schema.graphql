@@ -768,7 +768,7 @@ type Mutation {
   """
   Tags a petition
   """
-  tagPetition(petitionId: GID!, tagId: GID!): Result!
+  tagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
 
   """
   Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.
@@ -778,7 +778,7 @@ type Mutation {
   """
   Removes the given tag from the given petition
   """
-  untagPetition(petitionId: GID!, tagId: GID!): Result!
+  untagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
 
   """
   Updates a contact.

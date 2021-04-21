@@ -105,7 +105,7 @@ export const deleteTag = mutationField("deleteTag", {
 
 export const tagPetition = mutationField("tagPetition", {
   description: "Tags a petition",
-  type: "Result",
+  type: "PetitionBase",
   args: {
     tagId: nonNull(globalIdArg("Tag")),
     petitionId: nonNull(globalIdArg("Petition")),
@@ -117,21 +117,23 @@ export const tagPetition = mutationField("tagPetition", {
   resolve: async (_, args, ctx) => {
     try {
       await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
-      return RESULT.SUCCESS;
+      return await ctx.petitions.loadPetition(args.petitionId);
     } catch (error) {
       if (error.constraint === "petition_tag__petition_id__tag_id__unique") {
         throw new WhitelistedError(
           `Petition ${args.petitionId} is already tagged with tag ${args.tagId}`,
           "PETITION_ALREADY_TAGGED"
         );
-      } else throw error;
+      } else {
+        throw error;
+      }
     }
   },
 });
 
 export const untagPetition = mutationField("untagPetition", {
   description: "Removes the given tag from the given petition",
-  type: "Result",
+  type: "PetitionBase",
   args: {
     tagId: nonNull(globalIdArg("Tag")),
     petitionId: nonNull(globalIdArg("Petition")),
@@ -142,6 +144,6 @@ export const untagPetition = mutationField("untagPetition", {
   ),
   resolve: async (_, args, ctx) => {
     await ctx.tags.untagPetition(args.tagId, args.petitionId);
-    return RESULT.SUCCESS;
+    return await ctx.petitions.loadPetition(args.petitionId);
   },
 });

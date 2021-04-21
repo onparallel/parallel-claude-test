@@ -636,9 +636,9 @@ export interface NexusGenFieldTypes {
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
-    tagPetition: NexusGenEnums["Result"]; // Result!
+    tagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
-    untagPetition: NexusGenEnums["Result"]; // Result!
+    untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
@@ -1394,9 +1394,9 @@ export interface NexusGenFieldTypeNames {
     startSignatureRequest: "PetitionSignatureRequest";
     submitUnpublishedComments: "PetitionFieldComment";
     switchAutomaticReminders: "PetitionAccess";
-    tagPetition: "Result";
+    tagPetition: "PetitionBase";
     transferPetitionOwnership: "Petition";
-    untagPetition: "Result";
+    untagPetition: "PetitionBase";
     updateContact: "Contact";
     updateFieldPositions: "PetitionBase";
     updateOnboardingStatus: "User";
