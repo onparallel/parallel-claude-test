@@ -248,6 +248,34 @@ describe("GraphQL/Petitions", () => {
       expect(data).toBeNull();
     });
 
+    it("filters petitions with tags when passing an empty tagIds array", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query($filters: PetitionFilters) {
+            petitions(filters: $filters, limit: 100, offset: 0) {
+              totalCount
+              items {
+                id
+              }
+            }
+          }
+        `,
+        variables: { filters: { tagIds: [] } },
+      });
+
+      const expectedPetitions = petitions.filter(
+        (p) =>
+          !p.is_template && p.id !== petitions[0].id && p.id !== petitions[1].id
+      );
+      expect(errors).toBeUndefined();
+      expect(data.petitions).toEqual({
+        totalCount: 4,
+        items: expectedPetitions.map((p) => ({
+          id: toGlobalId("Petition", p.id),
+        })),
+      });
+    });
+
     it("should not allow to filter by more than 10 tags", async () => {
       const { errors, data } = await testClient.query({
         query: gql`

@@ -252,13 +252,20 @@ export class PetitionRepository extends BaseRepository {
             q.where("status", filters.status);
           }
 
-          const tagIds = filters?.tagIds || [];
-          tagIds.map((tagId, i) => {
-            q.joinRaw(
-              `join petition_tag pt${i} on (pt${i}.petition_id = petition.id and pt${i}.tag_id = ?)`,
-              [fromGlobalId(tagId, "Tag").id]
-            );
-          });
+          if (filters?.tagIds) {
+            if (filters.tagIds.length > 0) {
+              filters.tagIds.map((tagId, i) => {
+                q.joinRaw(
+                  `join petition_tag pt${i} on (pt${i}.petition_id = petition.id and pt${i}.tag_id = ?)`,
+                  [fromGlobalId(tagId, "Tag").id]
+                );
+              });
+            } else {
+              q.whereRaw(
+                `petition.id not in (select petition_id from petition_tag)`
+              );
+            }
+          }
 
           const hasOrderByLastUsed = opts.sortBy?.some(
             (o) => o.column === "last_used_at"
