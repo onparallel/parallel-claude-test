@@ -255,7 +255,7 @@ export const AppLayoutNavbar = Object.assign(
                   })}
                   placement={isMobile ? "top" : "right"}
                 >
-                  <Flex justifyContent="center">
+                  <Flex justifyContent="center" margin="auto">
                     <MenuButton
                       as={IconButton}
                       icon={<HelpOutlineIcon fontSize="20px" />}
