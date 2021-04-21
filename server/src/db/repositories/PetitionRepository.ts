@@ -2627,6 +2627,7 @@ export class PetitionRepository extends BaseRepository {
       [fromPetitionId, user.id, ...toPetitionIds],
       t
     );
+  }
 
   async addPetitionUserPermissions(
     petitionIds: number[],
