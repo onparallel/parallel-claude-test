@@ -276,7 +276,7 @@ export function useReactSelectProps<
           ...styles,
           padding: "0.5rem 0",
         }),
-        singleValue: (styles, props) => omit(styles, ["color"]),
+        singleValue: (styles) => omit(styles, ["color"]),
         multiValue: (styles, { data }) => ({
           ...styles,
           backgroundColor: data.isInvalid ? colors.red[200] : colors.gray[200],

@@ -258,7 +258,7 @@ function _Table<TRow, TContext = unknown>({
       borderBottomColor={colors.border}
       {...props}
     >
-      <Box as="thead" position="sticky" top="0" zIndex="1">
+      <Box as="thead" position="sticky" top="0" zIndex="10">
         <Box
           as="tr"
           backgroundColor={colors.header}

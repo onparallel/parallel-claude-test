@@ -314,11 +314,11 @@ export type Mutation = {
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
-  tagPetition: Result;
+  tagPetition: PetitionBase;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<Petition>;
   /** Removes the given tag from the given petition */
-  untagPetition: Result;
+  untagPetition: PetitionBase;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates the positions of the petition fields */
@@ -985,6 +985,8 @@ export type Petition = PetitionBase & {
   status: PetitionStatus;
   /** The subscriptions linked to the petition. */
   subscriptions: Array<Subscription>;
+  /** The tags linked to the petition */
+  tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -1087,6 +1089,8 @@ export type PetitionBase = {
   owner: User;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
+  /** The tags linked to the petition */
+  tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -1410,6 +1414,8 @@ export type PetitionTemplate = PetitionBase & {
   owner: User;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
+  /** The tags linked to the petition */
+  tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
   /** The permissions linked to the petition */
@@ -2139,6 +2145,96 @@ export type PetitionStatusCellContent_PetitionFragment = {
     >;
   };
 
+export type PetitionTagListCellContent_TagFragment = {
+  __typename?: "Tag";
+} & Pick<Tag, "id"> &
+  Tag_TagFragment;
+
+export type PetitionTagListCellContent_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id"> & {
+    tags: Array<
+      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+    >;
+  };
+
+export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id"> & {
+    tags: Array<
+      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+    >;
+  };
+
+export type PetitionTagListCellContent_PetitionBaseFragment =
+  | PetitionTagListCellContent_PetitionBase_Petition_Fragment
+  | PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment;
+
+export type PetitionTagListCellContent_tagsQueryVariables = Exact<{
+  search?: Maybe<Scalars["String"]>;
+}>;
+
+export type PetitionTagListCellContent_tagsQuery = { __typename?: "Query" } & {
+  tags: { __typename?: "TagPagination" } & {
+    items: Array<
+      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+    >;
+  };
+};
+
+export type PetitionTagListCellContent_tagPetitionMutationVariables = Exact<{
+  tagId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionTagListCellContent_tagPetitionMutation = {
+  __typename?: "Mutation";
+} & {
+  tagPetition:
+    | ({ __typename?: "Petition" } & Pick<Petition, "id"> & {
+          tags: Array<
+            { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
+          tags: Array<
+            { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+          >;
+        });
+};
+
+export type PetitionTagListCellContent_untagPetitionMutationVariables = Exact<{
+  tagId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionTagListCellContent_untagPetitionMutation = {
+  __typename?: "Mutation";
+} & {
+  untagPetition:
+    | ({ __typename?: "Petition" } & Pick<Petition, "id"> & {
+          tags: Array<
+            { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+          >;
+        })
+    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
+          tags: Array<
+            { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+          >;
+        });
+};
+
+export type PetitionTagListCellContent_createTagMutationVariables = Exact<{
+  name: Scalars["String"];
+  color: Scalars["String"];
+}>;
+
+export type PetitionTagListCellContent_createTagMutation = {
+  __typename?: "Mutation";
+} & {
+  createTag: { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment;
+};
+
 export type ShareButton_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & {
@@ -2162,6 +2258,34 @@ export type ShareButton_PetitionBase_PetitionTemplate_Fragment = {
 export type ShareButton_PetitionBaseFragment =
   | ShareButton_PetitionBase_Petition_Fragment
   | ShareButton_PetitionBase_PetitionTemplate_Fragment;
+
+export type Tag_TagFragment = { __typename?: "Tag" } & Pick<
+  Tag,
+  "name" | "color"
+>;
+
+export type TagEditDialog_TagFragment = { __typename?: "Tag" } & Pick<
+  Tag,
+  "id"
+> &
+  Tag_TagFragment;
+
+export type TagEditDialog_tagsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type TagEditDialog_tagsQuery = { __typename?: "Query" } & {
+  tags: { __typename?: "TagPagination" } & {
+    items: Array<{ __typename?: "Tag" } & TagEditDialog_TagFragment>;
+  };
+};
+
+export type TagEditDialog_updateTagMutationVariables = Exact<{
+  id: Scalars["GID"];
+  data: UpdateTagInput;
+}>;
+
+export type TagEditDialog_updateTagMutation = { __typename?: "Mutation" } & {
+  updateTag: { __typename?: "Tag" } & TagEditDialog_TagFragment;
+};
 
 export type UserAvatarList_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -5392,7 +5516,8 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
         }
     >;
   } & PetitionStatusCellContent_PetitionFragment &
-  PetitionSignatureCellContent_PetitionFragment;
+  PetitionSignatureCellContent_PetitionFragment &
+  PetitionTagListCellContent_PetitionBase_Petition_Fragment;
 
 export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
@@ -5406,7 +5531,7 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
             UserAvatarList_UserFragment;
         }
     >;
-  };
+  } & PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment;
 
 export type usePetitionsTableColumns_PetitionBaseFragment =
   | usePetitionsTableColumns_PetitionBase_Petition_Fragment
@@ -5452,6 +5577,19 @@ export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "title" | "type" | "options">;
 
+export const Tag_TagFragmentDoc = gql`
+  fragment Tag_Tag on Tag {
+    name
+    color
+  }
+`;
+export const TagEditDialog_TagFragmentDoc = gql`
+  fragment TagEditDialog_Tag on Tag {
+    id
+    ...Tag_Tag
+  }
+  ${Tag_TagFragmentDoc}
+`;
 export const PetitionTemplateHeader_UserFragmentDoc = gql`
   fragment PetitionTemplateHeader_User on User {
     id
@@ -6875,6 +7013,22 @@ export const PetitionReplies_deletePetitionFieldComment_PetitionFieldFragmentDoc
     }
   }
 `;
+export const PetitionTagListCellContent_TagFragmentDoc = gql`
+  fragment PetitionTagListCellContent_Tag on Tag {
+    id
+    ...Tag_Tag
+  }
+  ${Tag_TagFragmentDoc}
+`;
+export const PetitionTagListCellContent_PetitionBaseFragmentDoc = gql`
+  fragment PetitionTagListCellContent_PetitionBase on PetitionBase {
+    id
+    tags {
+      ...PetitionTagListCellContent_Tag
+    }
+  }
+  ${PetitionTagListCellContent_TagFragmentDoc}
+`;
 export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
   fragment usePetitionsTableColumns_PetitionBase on PetitionBase {
     id
@@ -6887,6 +7041,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
         ...UserAvatarList_User
       }
     }
+    ...PetitionTagListCellContent_PetitionBase
     ... on Petition {
       accesses {
         status
@@ -6902,6 +7057,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
     }
   }
   ${UserAvatarList_UserFragmentDoc}
+  ${PetitionTagListCellContent_PetitionBaseFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
   ${PetitionStatusCellContent_PetitionFragmentDoc}
   ${PetitionSignatureCellContent_PetitionFragmentDoc}
@@ -7280,6 +7436,302 @@ export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
     options
   }
 `;
+export const PetitionTagListCellContent_tagsDocument = gql`
+  query PetitionTagListCellContent_tags($search: String) {
+    tags(search: $search) {
+      items {
+        ...PetitionTagListCellContent_Tag
+      }
+    }
+  }
+  ${PetitionTagListCellContent_TagFragmentDoc}
+`;
+
+/**
+ * __usePetitionTagListCellContent_tagsQuery__
+ *
+ * To run a query within a React component, call `usePetitionTagListCellContent_tagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePetitionTagListCellContent_tagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePetitionTagListCellContent_tagsQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *   },
+ * });
+ */
+export function usePetitionTagListCellContent_tagsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PetitionTagListCellContent_tagsQuery,
+    PetitionTagListCellContent_tagsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PetitionTagListCellContent_tagsQuery,
+    PetitionTagListCellContent_tagsQueryVariables
+  >(PetitionTagListCellContent_tagsDocument, options);
+}
+export function usePetitionTagListCellContent_tagsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionTagListCellContent_tagsQuery,
+    PetitionTagListCellContent_tagsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PetitionTagListCellContent_tagsQuery,
+    PetitionTagListCellContent_tagsQueryVariables
+  >(PetitionTagListCellContent_tagsDocument, options);
+}
+export type PetitionTagListCellContent_tagsQueryHookResult = ReturnType<
+  typeof usePetitionTagListCellContent_tagsQuery
+>;
+export type PetitionTagListCellContent_tagsLazyQueryHookResult = ReturnType<
+  typeof usePetitionTagListCellContent_tagsLazyQuery
+>;
+export const PetitionTagListCellContent_tagPetitionDocument = gql`
+  mutation PetitionTagListCellContent_tagPetition(
+    $tagId: GID!
+    $petitionId: GID!
+  ) {
+    tagPetition(tagId: $tagId, petitionId: $petitionId) {
+      id
+      tags {
+        ...PetitionTagListCellContent_Tag
+      }
+    }
+  }
+  ${PetitionTagListCellContent_TagFragmentDoc}
+`;
+
+/**
+ * __usePetitionTagListCellContent_tagPetitionMutation__
+ *
+ * To run a mutation, you first call `usePetitionTagListCellContent_tagPetitionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionTagListCellContent_tagPetitionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionTagListCellContentTagPetitionMutation, { data, loading, error }] = usePetitionTagListCellContent_tagPetitionMutation({
+ *   variables: {
+ *      tagId: // value for 'tagId'
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function usePetitionTagListCellContent_tagPetitionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionTagListCellContent_tagPetitionMutation,
+    PetitionTagListCellContent_tagPetitionMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionTagListCellContent_tagPetitionMutation,
+    PetitionTagListCellContent_tagPetitionMutationVariables
+  >(PetitionTagListCellContent_tagPetitionDocument, options);
+}
+export type PetitionTagListCellContent_tagPetitionMutationHookResult = ReturnType<
+  typeof usePetitionTagListCellContent_tagPetitionMutation
+>;
+export const PetitionTagListCellContent_untagPetitionDocument = gql`
+  mutation PetitionTagListCellContent_untagPetition(
+    $tagId: GID!
+    $petitionId: GID!
+  ) {
+    untagPetition(tagId: $tagId, petitionId: $petitionId) {
+      id
+      tags {
+        ...PetitionTagListCellContent_Tag
+      }
+    }
+  }
+  ${PetitionTagListCellContent_TagFragmentDoc}
+`;
+
+/**
+ * __usePetitionTagListCellContent_untagPetitionMutation__
+ *
+ * To run a mutation, you first call `usePetitionTagListCellContent_untagPetitionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionTagListCellContent_untagPetitionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionTagListCellContentUntagPetitionMutation, { data, loading, error }] = usePetitionTagListCellContent_untagPetitionMutation({
+ *   variables: {
+ *      tagId: // value for 'tagId'
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function usePetitionTagListCellContent_untagPetitionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionTagListCellContent_untagPetitionMutation,
+    PetitionTagListCellContent_untagPetitionMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionTagListCellContent_untagPetitionMutation,
+    PetitionTagListCellContent_untagPetitionMutationVariables
+  >(PetitionTagListCellContent_untagPetitionDocument, options);
+}
+export type PetitionTagListCellContent_untagPetitionMutationHookResult = ReturnType<
+  typeof usePetitionTagListCellContent_untagPetitionMutation
+>;
+export const PetitionTagListCellContent_createTagDocument = gql`
+  mutation PetitionTagListCellContent_createTag(
+    $name: String!
+    $color: String!
+  ) {
+    createTag(name: $name, color: $color) {
+      ...PetitionTagListCellContent_Tag
+    }
+  }
+  ${PetitionTagListCellContent_TagFragmentDoc}
+`;
+
+/**
+ * __usePetitionTagListCellContent_createTagMutation__
+ *
+ * To run a mutation, you first call `usePetitionTagListCellContent_createTagMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionTagListCellContent_createTagMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionTagListCellContentCreateTagMutation, { data, loading, error }] = usePetitionTagListCellContent_createTagMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      color: // value for 'color'
+ *   },
+ * });
+ */
+export function usePetitionTagListCellContent_createTagMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionTagListCellContent_createTagMutation,
+    PetitionTagListCellContent_createTagMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionTagListCellContent_createTagMutation,
+    PetitionTagListCellContent_createTagMutationVariables
+  >(PetitionTagListCellContent_createTagDocument, options);
+}
+export type PetitionTagListCellContent_createTagMutationHookResult = ReturnType<
+  typeof usePetitionTagListCellContent_createTagMutation
+>;
+export const TagEditDialog_tagsDocument = gql`
+  query TagEditDialog_tags {
+    tags {
+      items {
+        ...TagEditDialog_Tag
+      }
+    }
+  }
+  ${TagEditDialog_TagFragmentDoc}
+`;
+
+/**
+ * __useTagEditDialog_tagsQuery__
+ *
+ * To run a query within a React component, call `useTagEditDialog_tagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTagEditDialog_tagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTagEditDialog_tagsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useTagEditDialog_tagsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    TagEditDialog_tagsQuery,
+    TagEditDialog_tagsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    TagEditDialog_tagsQuery,
+    TagEditDialog_tagsQueryVariables
+  >(TagEditDialog_tagsDocument, options);
+}
+export function useTagEditDialog_tagsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    TagEditDialog_tagsQuery,
+    TagEditDialog_tagsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    TagEditDialog_tagsQuery,
+    TagEditDialog_tagsQueryVariables
+  >(TagEditDialog_tagsDocument, options);
+}
+export type TagEditDialog_tagsQueryHookResult = ReturnType<
+  typeof useTagEditDialog_tagsQuery
+>;
+export type TagEditDialog_tagsLazyQueryHookResult = ReturnType<
+  typeof useTagEditDialog_tagsLazyQuery
+>;
+export const TagEditDialog_updateTagDocument = gql`
+  mutation TagEditDialog_updateTag($id: GID!, $data: UpdateTagInput!) {
+    updateTag(id: $id, data: $data) {
+      ...TagEditDialog_Tag
+    }
+  }
+  ${TagEditDialog_TagFragmentDoc}
+`;
+
+/**
+ * __useTagEditDialog_updateTagMutation__
+ *
+ * To run a mutation, you first call `useTagEditDialog_updateTagMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTagEditDialog_updateTagMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [tagEditDialogUpdateTagMutation, { data, loading, error }] = useTagEditDialog_updateTagMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useTagEditDialog_updateTagMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    TagEditDialog_updateTagMutation,
+    TagEditDialog_updateTagMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    TagEditDialog_updateTagMutation,
+    TagEditDialog_updateTagMutationVariables
+  >(TagEditDialog_updateTagDocument, options);
+}
+export type TagEditDialog_updateTagMutationHookResult = ReturnType<
+  typeof useTagEditDialog_updateTagMutation
+>;
 export const WithAdminOrganizationRoleDocument = gql`
   query WithAdminOrganizationRole {
     me {

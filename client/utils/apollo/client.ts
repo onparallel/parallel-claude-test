@@ -93,11 +93,18 @@ export function createApolloClient(
             },
           },
         },
-        Petition: {
+        PetitionBase: {
           fields: {
             fields: {
               merge: mergeArraysBy(["id"]),
             },
+            tags: {
+              merge: mergeArraysBy(["id"]),
+            },
+          },
+        },
+        Petition: {
+          fields: {
             userPermissions: {
               merge: mergeArraysBy(["user", "id"]),
             },

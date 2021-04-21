@@ -20,7 +20,7 @@ import { PetitionSignatureCellContent } from "@parallel/components/common/Petiti
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
-import { TextWithOverflow } from "@parallel/components/common/TextWithOverflow";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   withApolloData,
@@ -254,23 +254,22 @@ function useContactPetitionAccessesColumns() {
             id: "petitions.header.name",
             defaultMessage: "Petition name",
           }),
+          headerProps: {
+            width: "30%",
+            minWidth: "240px",
+          },
           cellProps: {
             maxWidth: 0,
-            minWidth: "30%",
           },
           CellContent: ({ row }) => (
-            <TextWithOverflow tooltipText={row.petition?.name}>
-              {row.petition?.name ? (
-                row.petition.name
-              ) : (
-                <Text as="span" textStyle="hint" whiteSpace="nowrap">
-                  <FormattedMessage
-                    id="generic.untitled-petition"
-                    defaultMessage="Untitled petition"
-                  />
-                </Text>
-              )}
-            </TextWithOverflow>
+            <OverflownText textStyle={row.petition?.name ? undefined : "hint"}>
+              {row.petition?.name
+                ? row.petition.name
+                : intl.formatMessage({
+                    id: "generic.untitled-petition",
+                    defaultMessage: "Untitled petition",
+                  })}
+            </OverflownText>
           ),
         },
         {

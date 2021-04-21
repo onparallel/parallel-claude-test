@@ -1,12 +1,12 @@
 import { gql } from "@apollo/client";
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { TableColumn } from "@parallel/components/common/Table";
-import { TextWithOverflow } from "@parallel/components/common/TextWithOverflow";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   PetitionBaseType,
@@ -19,11 +19,26 @@ import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { PetitionTagListCellContent } from "@parallel/components/common/PetitionTagListCellContent";
 
-export type PetitionsTableColumnsSelection = usePetitionsTableColumns_PetitionBaseFragment;
 export type PetitionsTableColumnsContext = {
   user: usePetitionsTableColumns_UserFragment;
 };
+
+type PetitionBaseTableColumn = TableColumn<
+  usePetitionsTableColumns_PetitionBaseFragment,
+  PetitionsTableColumnsContext
+>;
+
+type PetitionTableColumn = TableColumn<
+  usePetitionsTableColumns_PetitionBase_Petition_Fragment,
+  PetitionsTableColumnsContext
+>;
+
+type PetitionTemplateTableColumn = TableColumn<
+  usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
+  PetitionsTableColumnsContext
+>;
 
 export function usePetitionsTableColumns(type: PetitionBaseType) {
   const intl = useIntl();
@@ -43,30 +58,27 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   id: "petitions.header.template-name",
                   defaultMessage: "Template name",
                 }),
+          headerProps: {
+            width: "30%",
+            minWidth: "240px",
+          },
           cellProps: {
             maxWidth: 0,
-            minWidth: "30%",
           },
           CellContent: ({ row }) => (
-            <TextWithOverflow tooltipText={row.name}>
-              {row.name ? (
-                row.name
-              ) : (
-                <Text as="span" textStyle="hint" whiteSpace="nowrap">
-                  {type === "PETITION" ? (
-                    <FormattedMessage
-                      id="generic.untitled-petition"
-                      defaultMessage="Untitled petition"
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="generic.untitled-template"
-                      defaultMessage="Untitled template"
-                    />
-                  )}
-                </Text>
-              )}
-            </TextWithOverflow>
+            <OverflownText textStyle={row.name ? undefined : "hint"}>
+              {row.name
+                ? row.name
+                : type === "PETITION"
+                ? intl.formatMessage({
+                    id: "generic.untitled-petition",
+                    defaultMessage: "Untitled petition",
+                  })
+                : intl.formatMessage({
+                    id: "generic.untitled-template",
+                    defaultMessage: "Untitled template",
+                  })}
+            </OverflownText>
           ),
         },
         ...(type === "PETITION"
@@ -122,6 +134,9 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   id: "petitions.header.status",
                   defaultMessage: "Status",
                 }),
+                headerProps: {
+                  minWidth: "180px",
+                },
                 align: "center",
                 CellContent: ({ row }) => (
                   <PetitionStatusCellContent petition={row} />
@@ -141,10 +156,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   </Flex>
                 ),
               },
-            ] as TableColumn<
-              usePetitionsTableColumns_PetitionBase_Petition_Fragment,
-              PetitionsTableColumnsContext
-            >[])
+            ] as PetitionTableColumn[])
           : ([
               {
                 key: "description",
@@ -163,10 +175,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   );
                 },
               },
-            ] as TableColumn<
-              usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
-              PetitionsTableColumnsContext
-            >[])),
+            ] as PetitionTemplateTableColumn[])),
         {
           key: "sharedWith",
           header: intl.formatMessage({
@@ -194,14 +203,32 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
               value={createdAt}
               format={FORMATS.LLL}
               useRelativeTime
+              fontSize="sm"
               whiteSpace="nowrap"
             />
           ),
         },
-      ] as TableColumn<
-        PetitionsTableColumnsSelection,
-        PetitionsTableColumnsContext
-      >[],
+        {
+          key: "tags",
+          header: intl.formatMessage({
+            id: "petitions.header.tags",
+            defaultMessage: "Tags",
+          }),
+          cellProps: {
+            maxWidth: 0,
+            padding: 0,
+            minWidth: "min-content",
+            _last: { paddingRight: 0 },
+          },
+          headerProps: {
+            width: "30%",
+            minWidth: "300px",
+          },
+          CellContent: ({ row }) => {
+            return <PetitionTagListCellContent petition={row} />;
+          },
+        },
+      ] as PetitionBaseTableColumn[],
     [intl.locale, type]
   );
 }
@@ -219,6 +246,7 @@ usePetitionsTableColumns.fragments = {
           ...UserAvatarList_User
         }
       }
+      ...PetitionTagListCellContent_PetitionBase
       ... on Petition {
         accesses {
           status
@@ -234,6 +262,7 @@ usePetitionsTableColumns.fragments = {
       }
     }
     ${UserAvatarList.fragments.User}
+    ${PetitionTagListCellContent.fragments.PetitionBase}
     ${ContactLink.fragments.Contact}
     ${PetitionStatusCellContent.fragments.Petition}
     ${PetitionSignatureCellContent.fragments.Petition}
