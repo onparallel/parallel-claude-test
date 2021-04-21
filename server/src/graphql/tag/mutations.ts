@@ -117,7 +117,7 @@ export const tagPetition = mutationField("tagPetition", {
   resolve: async (_, args, ctx) => {
     try {
       await ctx.tags.tagPetition(args.tagId, args.petitionId, ctx.user!);
-      return await ctx.petitions.loadPetition(args.petitionId);
+      return (await ctx.petitions.loadPetition(args.petitionId))!;
     } catch (error) {
       if (error.constraint === "petition_tag__petition_id__tag_id__unique") {
         throw new WhitelistedError(
@@ -144,6 +144,6 @@ export const untagPetition = mutationField("untagPetition", {
   ),
   resolve: async (_, args, ctx) => {
     await ctx.tags.untagPetition(args.tagId, args.petitionId);
-    return await ctx.petitions.loadPetition(args.petitionId);
+    return (await ctx.petitions.loadPetition(args.petitionId))!;
   },
 });

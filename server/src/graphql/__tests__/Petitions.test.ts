@@ -12,8 +12,9 @@ import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
-import { omit } from "remeda";
+import { omit, sortBy } from "remeda";
 import faker from "faker";
+import { deleteAllData } from "../../util/knexUtils";
 
 const petitionsBuilder = (orgId: number) => (
   index: number
@@ -55,6 +56,8 @@ describe("GraphQL/Petitions", () => {
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
 
+    await deleteAllData(knex);
+
     // main organization
     [organization] = await mocks.createRandomOrganizations(1, () => ({
       identifier: "parallel",
@@ -87,11 +90,8 @@ describe("GraphQL/Petitions", () => {
     );
 
     tags = await mocks.createRandomTags(organization.id, 11);
-    await mocks.knex("petition_tag").insert([
-      { petition_id: petitions[0].id, tag_id: tags[0].id },
-      { petition_id: petitions[0].id, tag_id: tags[1].id },
-      { petition_id: petitions[1].id, tag_id: tags[0].id },
-    ]);
+    await mocks.tagPetitions([petitions[0].id, petitions[1].id], tags[0].id);
+    await mocks.tagPetitions([petitions[0].id], tags[1].id);
 
     [privateTag] = await mocks.createRandomTags(otherOrg.id, 1);
 
@@ -190,7 +190,7 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data!.petitions).toEqual({
         totalCount: 2,
-        items: [petitions[0], petitions[1]].map((p) => ({
+        items: sortBy(petitions.slice(0, 2), (p) => p.id).map((p) => ({
           id: toGlobalId("Petition", p.id),
         })),
       });
@@ -510,7 +510,7 @@ describe("GraphQL/Petitions", () => {
       expect(data!.publicTemplates.totalCount).toBe(1);
     });
 
-    it("fetches all public templates with descrpition matching search query", async () => {
+    it("fetches all public templates with description matching search query", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
           query($search: String) {

@@ -12,7 +12,11 @@ export const tagsQuery = queryField((t) => {
       let items = await ctx.tags.loadTagsByOrganizationId(ctx.user!.org_id);
 
       if (args.search) {
-        const fuse = new Fuse(items, { keys: ["name"] });
+        const fuse = new Fuse(items, {
+          keys: ["name"],
+          threshold: 0.4,
+          shouldSort: false,
+        });
         items = fuse.search(args.search).map((r) => r.item);
       }
 

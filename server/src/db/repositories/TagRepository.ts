@@ -98,7 +98,12 @@ export class TagRepository extends BaseRepository {
     t?: Knex.Transaction
   ) {
     await this.from("petition_tag", t)
-      .where({ tag_id: tagId, petition_id: petitionId })
+      .where({ tag_id: tagId })
+      .mmodify((q) => {
+        if (petitionId) {
+          q.where({ petition_id: petitionId });
+        }
+      })
       .delete();
   }
 }

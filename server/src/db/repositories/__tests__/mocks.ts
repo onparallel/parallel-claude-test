@@ -250,6 +250,15 @@ export class Mocks {
       .returning("*");
   }
 
+  async tagPetitions(petitionIds: number[], tagId: number) {
+    await this.knex("petition_tag").insert(
+      petitionIds.map((petitionId) => ({
+        petition_id: petitionId,
+        tag_id: tagId,
+      }))
+    );
+  }
+
   async createPetitionAccess(
     petitionId: number,
     ownerId: number,
