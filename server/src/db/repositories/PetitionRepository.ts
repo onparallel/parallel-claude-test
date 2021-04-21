@@ -2616,17 +2616,17 @@ export class PetitionRepository extends BaseRepository {
   ) {
     await this.raw(
       /* sql */ `
-      with petition_users as 
-      (select user_id from petition_user where petition_id = ? and user_id <> ? and deleted_at is null)
-      insert into petition_user(petition_id, user_id, permission_type)
-      ${toPetitionIds
-        .map(() => "(select ?, pu.user_id, 'WRITE' from petition_users pu)")
-        .join(" union ")}
-      `,
+        with
+          u as (select user_id from petition_user where petition_id = ? and user_id != ? and deleted_at is null),
+          p as (select * from (values ${toPetitionIds
+            .map(() => "(?::int)")
+            .join(",")}) as t (petition_id))
+        insert into petition_user(petition_id, user_id, permission_type)
+        select p.petition_id, u.user_id, 'WRITE' from u cross join p
+        `,
       [fromPetitionId, user.id, ...toPetitionIds],
       t
     );
-  }
 
   async addPetitionUserPermissions(
     petitionIds: number[],
