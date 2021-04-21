@@ -1090,6 +1090,13 @@ export const batchSendPetition = mutationField("batchSendPetition", {
         .map(() => ctx.petitions.clonePetition(args.petitionId, ctx.user!))
     );
 
+    // copy the user permissions of the original petition to the cloned ones
+    await ctx.petitions.copyPetitionPermissions(
+      args.petitionId,
+      clonedPetitions.map((p) => p.id),
+      ctx.user!
+    );
+
     const results = await pMap(
       zip([petition, ...clonedPetitions], args.contactIdGroups),
       async ([petition, contactIds]) =>

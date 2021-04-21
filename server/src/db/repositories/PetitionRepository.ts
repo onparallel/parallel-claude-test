@@ -2605,6 +2605,29 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
+  /**
+   * grab the permissions of the other users on `fromPetitionIds` and set them into `toPetitionIds` with WRITE access
+   */
+  async copyPetitionPermissions(
+    fromPetitionId: number,
+    toPetitionIds: number[],
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    await this.raw(
+      /* sql */ `
+      with petition_users as 
+      (select user_id from petition_user where petition_id = ? and user_id <> ? and deleted_at is null)
+      insert into petition_user(petition_id, user_id, permission_type)
+      ${toPetitionIds
+        .map(() => "(select ?, pu.user_id, 'WRITE' from petition_users pu)")
+        .join(" union ")}
+      `,
+      [fromPetitionId, user.id, ...toPetitionIds],
+      t
+    );
+  }
+
   async addPetitionUserPermissions(
     petitionIds: number[],
     userIds: number[],
