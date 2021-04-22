@@ -8,6 +8,12 @@ import {
   CloseButton,
   Flex,
   ListItem,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Portal,
   Stack,
   Text,
   UnorderedList,
@@ -42,6 +48,7 @@ import {
   RecipientView_PublicPetitionFieldFragment,
   RecipientView_PublicPetitionFragment,
   RecipientView_PublicUserFragment,
+  SimpleContactInfoList_PublicContactFragment,
   usePublicPetitionQuery,
   useRecipientView_publicCompletePetitionMutation,
   useRecipientView_submitUnpublishedCommentsMutation,
@@ -60,6 +67,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
+import { SimpleContactInfoList } from "@parallel/components/common/SimpleContactInfoList";
 
 type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
@@ -326,9 +334,37 @@ function RecipientView({
                         {petition.signature.signers.length > 0 ? (
                           <FormattedMessage
                             id="recipient-view.petition-signature-request-sent-alert"
-                            defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and # more}} in order to finalize the petition."
+                            defaultMessage="<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the petition."
                             values={{
                               b: (chunks: any[]) => <b>{chunks}</b>,
+                              a: (chunks: any[]) => (
+                                <Popover trigger="hover">
+                                  <PopoverTrigger>
+                                    <Text
+                                      display="initial"
+                                      textDecoration="underline"
+                                      color="purple.600"
+                                      cursor="pointer"
+                                    >
+                                      {chunks}
+                                    </Text>
+                                  </PopoverTrigger>
+                                  <Portal>
+                                    <PopoverContent>
+                                      <PopoverBody padding={0}>
+                                        <SimpleContactInfoList<SimpleContactInfoList_PublicContactFragment>
+                                          contacts={
+                                            petition.signature!.signers.slice(
+                                              1
+                                            ) as any
+                                          }
+                                        />
+                                        <PopoverArrow />
+                                      </PopoverBody>
+                                    </PopoverContent>
+                                  </Portal>
+                                </Popover>
+                              ),
                               name: petition.signature.signers[0]!.fullName,
                               email: petition.signature.signers[0]!.email,
                               count: petition.signature.signers.length - 1,

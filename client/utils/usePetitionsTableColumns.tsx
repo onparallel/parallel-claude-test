@@ -1,5 +1,12 @@
 import { gql } from "@apollo/client";
-import { Flex } from "@chakra-ui/react";
+import {
+  Flex,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+} from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
@@ -10,6 +17,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   PetitionBaseType,
+  SimpleContactInfoList_ContactFragment,
   usePetitionsTableColumns_PetitionBaseFragment,
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
@@ -20,6 +28,7 @@ import { ellipsis } from "@parallel/utils/ellipsis";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionTagListCellContent } from "@parallel/components/common/PetitionTagListCellContent";
+import { SimpleContactInfoList } from "@parallel/components/common/SimpleContactInfoList";
 
 export type PetitionsTableColumnsContext = {
   user: usePetitionsTableColumns_UserFragment;
@@ -114,12 +123,25 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                         ),
                         more: rest.length,
                         a: (chunks: any[]) => (
-                          <Link
-                            href={`/app/petitions/${row.id}/activity`}
-                            onClick={(e: MouseEvent) => e.stopPropagation()}
-                          >
-                            {chunks}
-                          </Link>
+                          <Popover trigger="hover">
+                            <PopoverTrigger>
+                              <Link
+                                href={`/app/petitions/${row.id}/activity`}
+                                onClick={(e: MouseEvent) => e.stopPropagation()}
+                              >
+                                {chunks}
+                              </Link>
+                            </PopoverTrigger>
+                            <PopoverContent>
+                              <PopoverBody padding={0}>
+                                <SimpleContactInfoList<SimpleContactInfoList_ContactFragment>
+                                  contacts={recipients as any}
+                                  isClickable
+                                />
+                                <PopoverArrow />
+                              </PopoverBody>
+                            </PopoverContent>
+                          </Popover>
                         ),
                       }}
                     />

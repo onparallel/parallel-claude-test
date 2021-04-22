@@ -2286,6 +2286,14 @@ export type ShareButton_PetitionBaseFragment =
   | ShareButton_PetitionBase_Petition_Fragment
   | ShareButton_PetitionBase_PetitionTemplate_Fragment;
 
+export type SimpleContactInfoList_ContactFragment = {
+  __typename?: "Contact";
+} & Pick<Contact, "id" | "email" | "fullName">;
+
+export type SimpleContactInfoList_PublicContactFragment = {
+  __typename?: "PublicContact";
+} & Pick<PublicContact, "id" | "email" | "fullName">;
+
 export type Tag_TagFragment = { __typename?: "Tag" } & Pick<
   Tag,
   "name" | "color"
@@ -5638,6 +5646,20 @@ export const PetitionTagFilter_TagFragmentDoc = gql`
     ...Tag_Tag
   }
   ${Tag_TagFragmentDoc}
+`;
+export const SimpleContactInfoList_ContactFragmentDoc = gql`
+  fragment SimpleContactInfoList_Contact on Contact {
+    id
+    email
+    fullName
+  }
+`;
+export const SimpleContactInfoList_PublicContactFragmentDoc = gql`
+  fragment SimpleContactInfoList_PublicContact on PublicContact {
+    id
+    email
+    fullName
+  }
 `;
 export const TagEditDialog_TagFragmentDoc = gql`
   fragment TagEditDialog_Tag on Tag {
