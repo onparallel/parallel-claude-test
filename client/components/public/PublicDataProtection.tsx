@@ -19,7 +19,7 @@ export function PublicDataProtection(props: BoxProps) {
       wrapper={{
         paddingY: 16,
         marginY: { base: 8, md: 12, lg: 20 },
-        backgroundColor: "gray.50",
+        backgroundColor: "gray.75",
         ...props,
       }}
     >

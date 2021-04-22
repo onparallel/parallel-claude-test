@@ -80,7 +80,7 @@ function Feature({ children }: PropsWithChildren<{}>) {
       padding={5}
       textAlign="left"
       borderRadius="lg"
-      backgroundColor="gray.50"
+      backgroundColor="gray.75"
     >
       {children}
     </Box>
