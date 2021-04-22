@@ -135,11 +135,11 @@ describe("GraphQL/Contacts", () => {
     });
   });
 
-  it("sorts results by first name ascending by default", async () => {
+  it("sorts results by first name ascending", async () => {
     const { data, errors } = await testClient.query({
       query: gql`
         query {
-          contacts(limit: 100) {
+          contacts(limit: 100, sortBy: firstName_ASC) {
             items {
               id
               email

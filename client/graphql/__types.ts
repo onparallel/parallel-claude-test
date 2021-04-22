@@ -1248,7 +1248,7 @@ export type PetitionFieldType =
   /** A text field. */
   | "TEXT";
 
-export type PetitionFilters = {
+export type PetitionFilter = {
   locale?: Maybe<PetitionLocale>;
   status?: Maybe<PetitionStatus>;
   tagIds?: Maybe<Array<Scalars["ID"]>>;
@@ -1731,7 +1731,7 @@ export type QuerypetitionFieldCommentsArgs = {
 };
 
 export type QuerypetitionsArgs = {
-  filters?: Maybe<PetitionFilters>;
+  filters?: Maybe<PetitionFilter>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
@@ -1925,6 +1925,8 @@ export type Tag = {
   __typename?: "Tag";
   /** The color of the tag in hex format (example: #FFFFFF) */
   color: Scalars["String"];
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   name: Scalars["String"];
   organization_id: Scalars["GID"];
@@ -2145,6 +2147,24 @@ export type PetitionStatusCellContent_PetitionFragment = {
     >;
   };
 
+export type PetitionTagFilter_TagFragment = { __typename?: "Tag" } & Pick<
+  Tag,
+  "id"
+> &
+  Tag_TagFragment;
+
+export type PetitionTagFilter_tagsQueryVariables = Exact<{
+  search?: Maybe<Scalars["String"]>;
+}>;
+
+export type PetitionTagFilter_tagsQuery = { __typename?: "Query" } & {
+  tags: { __typename?: "TagPagination" } & {
+    items: Array<
+      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+    >;
+  };
+};
+
 export type PetitionTagListCellContent_TagFragment = {
   __typename?: "Tag";
 } & Pick<Tag, "id"> &
@@ -2266,7 +2286,7 @@ export type Tag_TagFragment = { __typename?: "Tag" } & Pick<
 
 export type TagEditDialog_TagFragment = { __typename?: "Tag" } & Pick<
   Tag,
-  "id"
+  "id" | "createdAt"
 > &
   Tag_TagFragment;
 
@@ -5007,7 +5027,7 @@ export type PetitionsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
   hasPetitionSignature: Scalars["Boolean"];
-  filters?: Maybe<PetitionFilters>;
+  filters?: Maybe<PetitionFilter>;
 }>;
 
 export type PetitionsQuery = { __typename?: "Query" } & {
@@ -5050,7 +5070,7 @@ export type NewPetitionTemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   search?: Maybe<Scalars["String"]>;
-  filters?: Maybe<PetitionFilters>;
+  filters?: Maybe<PetitionFilter>;
 }>;
 
 export type NewPetitionTemplatesQuery = { __typename?: "Query" } & {
@@ -5583,10 +5603,18 @@ export const Tag_TagFragmentDoc = gql`
     color
   }
 `;
+export const PetitionTagFilter_TagFragmentDoc = gql`
+  fragment PetitionTagFilter_Tag on Tag {
+    id
+    ...Tag_Tag
+  }
+  ${Tag_TagFragmentDoc}
+`;
 export const TagEditDialog_TagFragmentDoc = gql`
   fragment TagEditDialog_Tag on Tag {
     id
     ...Tag_Tag
+    createdAt
   }
   ${Tag_TagFragmentDoc}
 `;
@@ -7436,6 +7464,63 @@ export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
     options
   }
 `;
+export const PetitionTagFilter_tagsDocument = gql`
+  query PetitionTagFilter_tags($search: String) {
+    tags(search: $search) {
+      items {
+        ...PetitionTagListCellContent_Tag
+      }
+    }
+  }
+  ${PetitionTagListCellContent_TagFragmentDoc}
+`;
+
+/**
+ * __usePetitionTagFilter_tagsQuery__
+ *
+ * To run a query within a React component, call `usePetitionTagFilter_tagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePetitionTagFilter_tagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePetitionTagFilter_tagsQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *   },
+ * });
+ */
+export function usePetitionTagFilter_tagsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PetitionTagFilter_tagsQuery,
+    PetitionTagFilter_tagsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PetitionTagFilter_tagsQuery,
+    PetitionTagFilter_tagsQueryVariables
+  >(PetitionTagFilter_tagsDocument, options);
+}
+export function usePetitionTagFilter_tagsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionTagFilter_tagsQuery,
+    PetitionTagFilter_tagsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PetitionTagFilter_tagsQuery,
+    PetitionTagFilter_tagsQueryVariables
+  >(PetitionTagFilter_tagsDocument, options);
+}
+export type PetitionTagFilter_tagsQueryHookResult = ReturnType<
+  typeof usePetitionTagFilter_tagsQuery
+>;
+export type PetitionTagFilter_tagsLazyQueryHookResult = ReturnType<
+  typeof usePetitionTagFilter_tagsLazyQuery
+>;
 export const PetitionTagListCellContent_tagsDocument = gql`
   query PetitionTagListCellContent_tags($search: String) {
     tags(search: $search) {
@@ -12401,7 +12486,7 @@ export const PetitionsDocument = gql`
     $search: String
     $sortBy: [QueryPetitions_OrderBy!]
     $hasPetitionSignature: Boolean!
-    $filters: PetitionFilters
+    $filters: PetitionFilter
   ) {
     petitions(
       offset: $offset
@@ -12538,7 +12623,7 @@ export const NewPetitionTemplatesDocument = gql`
     $offset: Int!
     $limit: Int!
     $search: String
-    $filters: PetitionFilters
+    $filters: PetitionFilter
   ) {
     templates: petitions(
       offset: $offset

@@ -89,7 +89,7 @@ export interface NexusGenInputs {
     filename: string; // String!
     size: number; // Int!
   };
-  PetitionFilters: {
+  PetitionFilter: {
     // input type
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
@@ -1118,6 +1118,7 @@ export interface NexusGenFieldTypes {
   Tag: {
     // field return type
     color: string; // String!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     name: string; // String!
     organization_id: NexusGenScalars["GID"]; // GID!
@@ -1874,6 +1875,7 @@ export interface NexusGenFieldTypeNames {
   Tag: {
     // field return type name
     color: "String";
+    createdAt: "DateTime";
     id: "GID";
     name: "String";
     organization_id: "GID";
@@ -2562,7 +2564,7 @@ export interface NexusGenArgTypes {
     };
     petitions: {
       // args
-      filters?: NexusGenInputs["PetitionFilters"] | null; // PetitionFilters
+      filters?: NexusGenInputs["PetitionFilter"] | null; // PetitionFilter
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String

@@ -65,7 +65,11 @@ describe("GraphQL/UserAuthenticationToken", () => {
         query: gql`
           query me {
             me {
-              authenticationTokens(limit: 10, offset: 0) {
+              authenticationTokens(
+                limit: 10
+                offset: 0
+                sortBy: createdAt_DESC
+              ) {
                 totalCount
                 items {
                   tokenName
@@ -107,7 +111,11 @@ describe("GraphQL/UserAuthenticationToken", () => {
         query: gql`
           query me {
             me {
-              authenticationTokens(limit: 10, offset: 0) {
+              authenticationTokens(
+                limit: 10
+                offset: 0
+                sortBy: createdAt_DESC
+              ) {
                 totalCount
                 items {
                   tokenName

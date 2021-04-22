@@ -38,7 +38,7 @@ export const petitionsQuery = queryField((t) => {
     ),
     additionalArgs: {
       filters: inputObjectType({
-        name: "PetitionFilters",
+        name: "PetitionFilter",
         definition(t) {
           t.nullable.field("status", {
             type: "PetitionStatus",
@@ -65,7 +65,7 @@ export const petitionsQuery = queryField((t) => {
         search,
         offset,
         filters,
-        sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
+        sortBy: sortBy?.map((value) => {
           const [field, order] = parseSortBy(value);
           return { column: columnMap[field], order };
         }),

@@ -738,7 +738,7 @@ NewPetition.getInitialProps = async ({
           $offset: Int!
           $limit: Int!
           $search: String
-          $filters: PetitionFilters
+          $filters: PetitionFilter
         ) {
           templates: petitions(
             offset: $offset

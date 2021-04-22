@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { getOperationName } from "@apollo/client/utilities";
 import {
   Box,
   Button,
@@ -20,24 +21,39 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ReactNode, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import Select, { components, Props as SelectProps } from "react-select";
-import { pick } from "remeda";
+import { maxBy, pick } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
+import { PetitionTagFilter } from "./PetitionTagFilter";
 import { Tag } from "./Tag";
 import { TagColorSelect } from "./TagColorSelect";
 
 type TagSelection = TagEditDialog_TagFragment;
 
 export function TagEditDialog({ ...props }: DialogProps) {
-  const { data } = useTagEditDialog_tagsQuery();
+  const { data } = useTagEditDialog_tagsQuery({
+    fetchPolicy: "cache-and-network",
+  });
   const [tag, setTag] = useState<TagSelection | null>(null);
-  const [updateTag] = useTagEditDialog_updateTagMutation();
+  const [updateTag] = useTagEditDialog_updateTagMutation({
+    refetchQueries: [getOperationName(PetitionTagFilter.queries.tags)!],
+  });
   useEffect(() => {
-    if (data && data.tags.items.length > 0) {
-      const tag = data.tags.items[0];
-      setTag({ ...tag });
+    if (data && data.tags.items.length > 0 && tag === null) {
+      const selected = maxBy(data.tags.items, (t) =>
+        new Date(t.createdAt).valueOf()
+      );
+      setTag({ ...selected! });
     }
   }, [data]);
+  useEffect(() => {
+    if (data) {
+      const selected = maxBy(data.tags.items, (t) =>
+        new Date(t.createdAt).valueOf()
+      );
+      setTag({ ...selected! });
+    }
+  }, []);
   const handleTagChange = useDebouncedCallback(
     async function (tag: TagSelection) {
       await updateTag({
@@ -96,7 +112,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
                   setTag({ ...tag!, name });
                   handleTagChange({ ...tag!, name });
                 }}
-                onBlur={(e) => handleTagChange.immediateIfPending(tag)}
+                onBlur={() => handleTagChange.immediateIfPending(tag!)}
               />
             </FormControl>
             <FormControl as={NoElement}>
@@ -109,8 +125,8 @@ export function TagEditDialog({ ...props }: DialogProps) {
               <TagColorSelect
                 value={tag?.color ?? null}
                 onChange={(color) => {
-                  setTag({ ...tag!, color });
-                  handleTagChange.immediate({ ...tag!, color });
+                  setTag({ ...tag!, color: color! });
+                  handleTagChange.immediate({ ...tag!, color: color! });
                 }}
               />
             </FormControl>
@@ -137,6 +153,7 @@ TagEditDialog.fragments = {
       fragment TagEditDialog_Tag on Tag {
         id
         ...Tag_Tag
+        createdAt
       }
       ${Tag.fragments.Tag}
     `;
@@ -198,12 +215,13 @@ function TagSelect({
       valueContainer: (styles) => ({
         ...styles,
         flexWrap: "nowrap",
+        paddingLeft: "1rem",
+        paddingRight: "1rem",
       }),
       option: (styles, { isFocused, theme }) => ({
         ...styles,
         display: "flex",
         padding: "0.25rem 1rem",
-        // backgroundColor: isFocused ? theme.colors.neutral5 : undefined,
       }),
     },
   });

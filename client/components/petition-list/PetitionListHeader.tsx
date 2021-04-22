@@ -16,21 +16,22 @@ import {
   PaperPlaneIcon,
   RepeatIcon,
 } from "@parallel/chakra/icons";
+import { PetitionFilter } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import {
-  PetitionListFilter,
-  PetitionListFilterProps,
-} from "../common/PetitionListFilter";
+import { PetitionListFilter } from "../common/PetitionListFilter";
+import { PetitionTagFilter } from "../common/PetitionTagFilter";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
-export type PetitionListHeaderProps = PetitionListFilterProps & {
+export type PetitionListHeaderProps = {
   search: string | null;
+  filter: PetitionFilter;
   selectedCount: number;
   onSearchChange: (value: string | null) => void;
+  onFilterChange: (value: PetitionFilter) => void;
   onDeleteClick: () => void;
   onCloneAsTemplateClick: () => void;
   onUseTemplateClick: () => void;
@@ -39,9 +40,8 @@ export type PetitionListHeaderProps = PetitionListFilterProps & {
 };
 
 export function PetitionListHeader({
-  type,
-  status,
   search: _search,
+  filter,
   selectedCount,
   onSearchChange,
   onDeleteClick,
@@ -83,9 +83,17 @@ export function PetitionListHeader({
       />
       <Box>
         <PetitionListFilter
-          status={status}
-          type={type}
-          onFilterChange={onFilterChange}
+          status={filter.status ?? null}
+          type={filter.type!}
+          onFilterChange={({ status, type }) =>
+            onFilterChange({ ...filter, status, type })
+          }
+        />
+      </Box>
+      <Box>
+        <PetitionTagFilter
+          value={filter.tagIds ?? null}
+          onChange={(tagIds) => onFilterChange({ ...filter, tagIds })}
         />
       </Box>
       <Spacer />
@@ -105,7 +113,7 @@ export function PetitionListHeader({
             <MenuList minWidth="160px">
               <MenuItem onClick={onCloneClick} isDisabled={selectedCount === 0}>
                 <CopyIcon marginRight={2} />
-                {type === "PETITION" ? (
+                {filter.type === "PETITION" ? (
                   <FormattedMessage
                     id="component.petition-list-header.clone-petition-label"
                     defaultMessage="Clone {count, plural, =1{petition} other{petitions}}"
@@ -119,7 +127,7 @@ export function PetitionListHeader({
                   />
                 )}
               </MenuItem>
-              {type === "PETITION" ? (
+              {filter.type === "PETITION" ? (
                 <MenuItem
                   onClick={onCloneAsTemplateClick}
                   isDisabled={selectedCount !== 1}
@@ -149,7 +157,7 @@ export function PetitionListHeader({
                 isDisabled={selectedCount === 0}
               >
                 <DeleteIcon marginRight={2} />
-                {type === "PETITION" ? (
+                {filter.type === "PETITION" ? (
                   <FormattedMessage
                     id="component.petition-list-header.delete-petition-label"
                     defaultMessage="Delete {count, plural, =1{petition} other{petitions}}"

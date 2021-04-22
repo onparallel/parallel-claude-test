@@ -12,6 +12,7 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
   PetitionBaseType,
+  PetitionFilter,
   PetitionsQuery,
   PetitionsQueryVariables,
   PetitionStatus,
@@ -33,6 +34,7 @@ import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions
 import {
   integer,
   parseQuery,
+  QueryItem,
   sorting,
   string,
   useQueryState,
@@ -52,6 +54,15 @@ const QUERY_STATE = {
     "PETITION"
   ),
   search: string(),
+  tags: new QueryItem<string[] | null>(
+    (value) =>
+      typeof value === "string"
+        ? value === "NO_TAGS"
+          ? []
+          : value.split(",")
+        : null,
+    (value) => (value.length === 0 ? "NO_TAGS" : value.join(","))
+  ),
   sort: sorting(SORTING).orDefault({
     field: "createdAt",
     direction: "DESC",
@@ -78,6 +89,7 @@ function Petitions() {
         filters: {
           status: state.status,
           type: state.type,
+          tagIds: state.tags,
         },
         sortBy: [
           `${state.sort.field}_${state.sort.direction}` as QueryPetitions_OrderBy,
@@ -97,14 +109,12 @@ function Petitions() {
     }));
   }
 
-  function handleFilterChange({
-    status,
-    type,
-  }: Pick<typeof state, "status" | "type">) {
+  function handleFilterChange(filter: PetitionFilter) {
     setQueryState((current) => ({
       ...current,
-      status,
-      type,
+      status: filter.status,
+      type: filter.type ?? undefined,
+      tags: filter.tagIds,
       page: 1,
     }));
   }
@@ -225,9 +235,12 @@ function Petitions() {
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <PetitionListHeader
+              filter={{
+                status: state.status,
+                type: state.type,
+                tagIds: state.tags,
+              }}
               search={state.search}
-              status={state.status}
-              type={state.type}
               selectedCount={selected.length}
               onSearchChange={handleSearchChange}
               onFilterChange={handleFilterChange}
@@ -323,7 +336,7 @@ Petitions.getInitialProps = async ({
     }
     ${Petitions.fragments.User}
   `);
-  const { page, search, sort, status, type, items } = parseQuery(
+  const { page, search, sort, status, type, items, tags } = parseQuery(
     query,
     QUERY_STATE
   );
@@ -335,7 +348,7 @@ Petitions.getInitialProps = async ({
         $search: String
         $sortBy: [QueryPetitions_OrderBy!]
         $hasPetitionSignature: Boolean!
-        $filters: PetitionFilters
+        $filters: PetitionFilter
       ) {
         petitions(
           offset: $offset
@@ -355,7 +368,7 @@ Petitions.getInitialProps = async ({
         limit: items,
         search,
         sortBy: [`${sort.field}_${sort.direction}` as QueryPetitions_OrderBy],
-        filters: { type, status },
+        filters: { type, status, tagIds: tags },
         hasPetitionSignature: me.hasPetitionSignature,
       },
     }

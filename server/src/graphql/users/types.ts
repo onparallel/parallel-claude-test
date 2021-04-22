@@ -112,7 +112,7 @@ export const User = objectType({
             offset,
             limit,
             search,
-            sortBy: (sortBy || ["createdAt_DESC"]).map((value) => {
+            sortBy: sortBy?.map((value) => {
               const [field, order] = parseSortBy(value);
               return { column: columnMap[field], order };
             }),

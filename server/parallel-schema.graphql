@@ -1679,7 +1679,7 @@ enum PetitionFieldType {
   TEXT
 }
 
-input PetitionFilters {
+input PetitionFilter {
   locale: PetitionLocale
   status: PetitionStatus
   tagIds: [ID!]
@@ -2521,7 +2521,7 @@ type Query {
   The petitions of the user
   """
   petitions(
-    filters: PetitionFilters
+    filters: PetitionFilter
 
     """
     Number of elements to take from the list.
@@ -2825,6 +2825,11 @@ type Tag {
   The color of the tag in hex format (example: #FFFFFF)
   """
   color: String!
+
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
   id: GID!
   name: String!
   organization_id: GID!

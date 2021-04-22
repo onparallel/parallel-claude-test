@@ -171,7 +171,7 @@ describe("GraphQL/Petitions", () => {
     it("filters petition by single tag", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilters) {
+          query($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
@@ -199,7 +199,7 @@ describe("GraphQL/Petitions", () => {
     it("filters petition by multiple tags", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilters) {
+          query($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
@@ -228,7 +228,7 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to filter by a tag id in another organization", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilters) {
+          query($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
@@ -251,7 +251,7 @@ describe("GraphQL/Petitions", () => {
     it("filters petitions with tags when passing an empty tagIds array", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilters) {
+          query($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 100, offset: 0) {
               totalCount
               items {
@@ -279,7 +279,7 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to filter by more than 10 tags", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilters) {
+          query($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {

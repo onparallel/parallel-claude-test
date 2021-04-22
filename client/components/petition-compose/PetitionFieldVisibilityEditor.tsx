@@ -189,7 +189,7 @@ export function PetitionFieldVisibilityEditor({
                 {index === 0 ? (
                   <VisibilityTypeSelect
                     value={visibility.type}
-                    onChange={setVisibilityType}
+                    onChange={(type) => setVisibilityType(type!)}
                   />
                 ) : (
                   <Stack direction="row">
@@ -207,7 +207,9 @@ export function PetitionFieldVisibilityEditor({
                       <Box flex="1">
                         <VisibilityOperatorSelect
                           value={visibility.operator}
-                          onChange={setVisibilityOperator}
+                          onChange={(operator) =>
+                            setVisibilityOperator(operator!)
+                          }
                         />
                       </Box>
                     ) : (
@@ -242,7 +244,7 @@ export function PetitionFieldVisibilityEditor({
                     fields={_fields}
                     indices={_indices}
                     onChange={(value) =>
-                      updateCondition(index, defaultCondition(value))
+                      updateCondition(index, defaultCondition(value!))
                     }
                   />
                   <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>

@@ -1,13 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Flex,
-  Menu,
-  MenuButton,
-  MenuItemOption,
-  MenuList,
-  Portal,
-} from "@chakra-ui/react";
+import { Button, Menu, MenuButton, MenuList, Portal } from "@chakra-ui/react";
 import { FilterIcon } from "@parallel/chakra/icons";
 import {
   defaultFieldsFilter,
@@ -15,8 +6,8 @@ import {
   PetitionFieldFilterType,
 } from "@parallel/utils/filterPetitionFields";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { ReactElement } from "react";
 import { FormattedMessage } from "react-intl";
+import { CheckboxMenuItemOption } from "@parallel/components/common/CheckboxMenuItemOptionProps";
 
 type PetitionRepliesFilterButtonProps = ValueProps<PetitionFieldFilter, false>;
 
@@ -87,36 +78,5 @@ export function PetitionRepliesFilterButton({
         </MenuList>
       </Portal>
     </Menu>
-  );
-}
-
-interface CheckboxMenuItemOptionProps extends ValueProps<boolean, false> {
-  children?: ReactElement;
-}
-
-function CheckboxMenuItemOption({
-  children,
-  value,
-  onChange,
-}: CheckboxMenuItemOptionProps) {
-  return (
-    <MenuItemOption
-      icon={<></>}
-      iconSpacing={0}
-      isChecked={value}
-      type="checkbox"
-      onClick={() => onChange(!value)}
-    >
-      <Flex alignItems="center">
-        <Checkbox
-          role="presentation"
-          pointerEvents="none"
-          colorScheme="purple"
-          isChecked={value}
-          marginRight={2}
-        />
-        {children}
-      </Flex>
-    </MenuItemOption>
   );
 }

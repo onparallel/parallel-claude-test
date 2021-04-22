@@ -119,7 +119,7 @@ export const Organization = objectType({
           search,
           excludeIds: exclude,
           includeInactive,
-          sortBy: (sortBy || ["createdAt_ASC"]).map((value) => {
+          sortBy: sortBy?.map((value) => {
             const [field, order] = parseSortBy(value);
             return { column: columnMap[field], order };
           }),

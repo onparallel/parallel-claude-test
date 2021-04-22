@@ -68,7 +68,7 @@ import {
 type PetitionType = "PETITION" | "TEMPLATE";
 type PetitionLocale = "en" | "es";
 
-type PetitionFilters = {
+type PetitionFilter = {
   status?: PetitionStatus | null;
   locale?: PetitionLocale | null;
   type?: PetitionType | null;
@@ -219,7 +219,7 @@ export class PetitionRepository extends BaseRepository {
     opts: {
       search?: string | null;
       sortBy?: SortBy<keyof Petition | "last_used_at">[];
-      filters?: PetitionFilters | null;
+      filters?: PetitionFilter | null;
     } & PageOpts
   ) {
     const petitionType = opts.filters?.type || "PETITION";
@@ -261,8 +261,16 @@ export class PetitionRepository extends BaseRepository {
                 );
               });
             } else {
+              // exclude petitions with tags
               q.whereRaw(
-                `petition.id not in (select petition_id from petition_tag)`
+                /* sql */ `
+                petition.id not in (
+                  select distinct pt.petition_id
+                    from petition_user pu
+                    join petition_tag pt on pt.petition_id = pu.petition_id
+                    where pu.user_id = ? and pu.deleted_at is null
+                )`,
+                [userId]
               );
             }
           }
@@ -1538,9 +1546,8 @@ export class PetitionRepository extends BaseRepository {
       // copy original tag ids to cloned petition
       await this.raw(
         /* sql */ `
-        with tag_ids as (select tag_id from petition_tag where petition_id = ?)
-        insert into petition_tag(petition_id, tag_id)
-        select ?, tag_id from tag_ids
+        insert into petition_tag (petition_id, tag_id)
+        select ?, tag_id from petition_tag where petition_id = ?
       `,
         [petitionId, cloned.id],
         t

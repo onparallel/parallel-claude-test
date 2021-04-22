@@ -1212,7 +1212,7 @@ export type PetitionFieldType =
   /** A text field. */
   | "TEXT";
 
-export type PetitionFilters = {
+export type PetitionFilter = {
   locale?: Maybe<PetitionLocale>;
   status?: Maybe<PetitionStatus>;
   tagIds?: Maybe<Array<Scalars["ID"]>>;
@@ -1674,7 +1674,7 @@ export type QuerypetitionFieldCommentsArgs = {
 };
 
 export type QuerypetitionsArgs = {
-  filters?: Maybe<PetitionFilters>;
+  filters?: Maybe<PetitionFilter>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;

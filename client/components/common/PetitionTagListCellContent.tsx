@@ -1,6 +1,15 @@
 import { gql, useApolloClient } from "@apollo/client";
-import { Box, Button, Flex, List, ListItem, Stack } from "@chakra-ui/react";
-import { EditIcon } from "@parallel/chakra/icons";
+import {
+  Box,
+  Button,
+  Circle,
+  Flex,
+  List,
+  ListItem,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { AddIcon, EditIcon } from "@parallel/chakra/icons";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Tag } from "@parallel/components/common/Tag";
 import {
@@ -15,7 +24,7 @@ import {
 } from "@parallel/graphql/__types";
 import { forwardRef, MouseEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ActionMeta, components } from "react-select";
+import { ActionMeta, components, createFilter } from "react-select";
 import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
 } from "react-select/async-creatable";
@@ -153,7 +162,7 @@ export function PetitionTagListCellContent({
             ref={selectRef}
             value={petition.tags}
             placeholder={intl.formatMessage({
-              id: "components.petition-tag-list-cell-content.placeholder",
+              id: "components.petition-tag-list-cell-content.add-tags",
               defaultMessage: "Add tags",
             })}
             defaultOptions={data?.tags.items ?? []}
@@ -173,11 +182,39 @@ export function PetitionTagListCellContent({
           flex="1"
           paddingX={2}
           paddingRight={5}
+          alignItems="center"
         >
+          {petition.tags.length === 0 ? (
+            <Stack
+              direction="row"
+              alignItems="center"
+              display="none"
+              sx={{
+                "td:hover &": {
+                  display: "flex",
+                },
+              }}
+            >
+              <Circle
+                border="1px solid"
+                borderColor="gray.400"
+                boxSize="16px"
+                role="presentation"
+              >
+                <AddIcon fontSize="8px" color="gray.600" />
+              </Circle>
+              <Text as="div" whiteSpace="nowrap" fontSize="sm" color="gray.400">
+                <FormattedMessage
+                  id="components.petition-tag-list-cell-content.add-tags"
+                  defaultMessage="Add tags"
+                />
+              </Text>
+            </Stack>
+          ) : null}
           {sample.map((tag) => (
             <Tag
               key={tag.id}
-              flex="1 1 100px"
+              flex="1 1 10px"
               minWidth="0"
               maxWidth="max-content"
               as="li"
@@ -401,6 +438,7 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
           paddingRight: "0.375rem",
           paddingTop: "8.5px",
           paddingBottom: "8.5px",
+          fontSize: "14px",
         }),
         control: (styles, { isFocused, theme }: any) => ({
           ...styles,
@@ -415,6 +453,7 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
           ...styles,
           display: "flex",
           padding: "0.25rem 1rem",
+          fontSize: "14px",
         }),
         menuList: (styles) => ({
           ...styles,
@@ -448,7 +487,10 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
         value={value}
         onChange={handleChange}
         onMenuOpen={() => setNewTagColor(randomColor())}
-        onCreateOption={(name) => onCreateTag({ name, color: newTagColor })}
+        onCreateOption={(name) => {
+          onCreateTag({ name, color: newTagColor });
+          setNewTagColor(randomColor());
+        }}
         {...props}
       />
     );

@@ -48,7 +48,7 @@ export const organizationQueries = queryField((t) => {
         offset,
         limit,
         status,
-        sortBy: (sortBy || ["createdAt_ASC"]).map((value) => {
+        sortBy: sortBy?.map((value) => {
           const [field, order] = parseSortBy(value);
           return { column: columnMap[field], order };
         }),
