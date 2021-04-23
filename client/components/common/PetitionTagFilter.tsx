@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Checkbox, Skeleton, Text } from "@chakra-ui/react";
+import { Center, Checkbox, Skeleton, Text } from "@chakra-ui/react";
+import { CloseIcon } from "@parallel/chakra/icons";
 import {
   PetitionTagFilter_TagFragment,
   usePetitionTagFilter_tagsQuery,
@@ -35,6 +36,9 @@ export function PetitionTagFilter({ value, onChange }: PetitionTagFilterProps) {
             const value = props.selectProps.value;
             return props.data.__type === "CLEAR_FILTER" ? (
               <components.Option {...props}>
+                <Center boxSize="16px" marginRight={2} alignSelf="center">
+                  <CloseIcon fontSize="12px" />
+                </Center>
                 <FormattedMessage
                   id="components.petition-tag-filter.clear-filter"
                   defaultMessage="Clear filter"
@@ -71,40 +75,49 @@ export function PetitionTagFilter({ value, onChange }: PetitionTagFilterProps) {
           },
           ValueContainer: ({ children, ...props }) => {
             const value = props.selectProps.value;
+            const input =
+              (children as any[])?.find((c) => c?.type === components.Input) ??
+              null;
             return (
               <components.ValueContainer {...props}>
-                {value === null ? (
-                  <Text whiteSpace="nowrap" fontWeight="bold">
-                    <FormattedMessage
-                      id="components.petition-tag-filter.no-filter"
-                      defaultMessage="No filter"
-                    />
-                  </Text>
-                ) : value.length === 0 ? (
-                  <Text whiteSpace="nowrap" fontWeight="bold">
-                    <FormattedMessage
-                      id="components.petition-tag-filter.without-tags"
-                      defaultMessage="Without tags"
-                    />
-                  </Text>
-                ) : value.length === 1 ? (
-                  props.getValue()[0] ? (
-                    <Tag tag={props.getValue()[0]} minWidth="0" />
-                  ) : (
-                    <Skeleton borderRadius="full" height="24px" width="80px" />
-                  )
-                ) : (
-                  <Text color="purple.600">
-                    <FormattedMessage
-                      id="components.petition-tag-filter.n-tags"
-                      defaultMessage="{count} tags"
-                      values={{ count: value.length }}
-                    />
-                  </Text>
-                )}
-                {Children.map(children, (child: any) =>
-                  child?.type === components.Input ? child : null
-                )}
+                {(children as any[])?.[0] ? (
+                  <>
+                    {value === null ? (
+                      <Text whiteSpace="nowrap" fontWeight="bold">
+                        <FormattedMessage
+                          id="components.petition-tag-filter.no-filter"
+                          defaultMessage="Filter by tags"
+                        />
+                      </Text>
+                    ) : value.length === 0 ? (
+                      <Text whiteSpace="nowrap" fontWeight="bold">
+                        <FormattedMessage
+                          id="components.petition-tag-filter.without-tags"
+                          defaultMessage="Without tags"
+                        />
+                      </Text>
+                    ) : value.length === 1 ? (
+                      props.getValue()[0] ? (
+                        <Tag tag={props.getValue()[0]} minWidth="0" />
+                      ) : (
+                        <Skeleton
+                          borderRadius="full"
+                          height="24px"
+                          width="80px"
+                        />
+                      )
+                    ) : (
+                      <Text color="purple.600">
+                        <FormattedMessage
+                          id="components.petition-tag-filter.n-tags"
+                          defaultMessage="{count} tags"
+                          values={{ count: value.length }}
+                        />
+                      </Text>
+                    )}
+                  </>
+                ) : null}
+                {input}
               </components.ValueContainer>
             );
           },
