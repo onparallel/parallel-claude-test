@@ -22,20 +22,21 @@ import {
   usePetitionTagListCellContent_tagsQuery,
   usePetitionTagListCellContent_untagPetitionMutation,
 } from "@parallel/graphql/__types";
+import { clearCache } from "@parallel/utils/apollo/clearCache";
+import { withError } from "@parallel/utils/promises/withError";
+import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
+import useMergedRef from "@react-hook/merged-ref";
 import { forwardRef, MouseEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ActionMeta, components, createFilter } from "react-select";
+import { ActionMeta, components } from "react-select";
 import AsyncCreatableSelect, {
   Props as AsyncCreatableSelectProps,
 } from "react-select/async-creatable";
 import { omit, pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
-import { useTagEditDialog } from "./TagEditDialog";
-import { withError } from "@parallel/utils/promises/withError";
-import useMergedRef from "@react-hook/merged-ref";
 import { DEFAULT_COLORS } from "./TagColorSelect";
+import { useTagEditDialog } from "./TagEditDialog";
 
 type TagSelection = PetitionTagListCellContent_TagFragment;
 
@@ -101,6 +102,9 @@ export function PetitionTagListCellContent({
           tags: [...petition.tags, tag],
         },
       },
+      update(cache) {
+        clearCache(cache, /\$ROOT_QUERY\.petitions\(.*tagIds":\[/);
+      },
     });
   }
 
@@ -114,6 +118,9 @@ export function PetitionTagListCellContent({
           ...pick(petition, ["__typename", "id"]),
           tags: petition.tags.filter((t) => t.id !== tag.id),
         },
+      },
+      update(cache) {
+        clearCache(cache, /\$ROOT_QUERY\.petitions\(.*tagIds":\[/);
       },
     });
   }
