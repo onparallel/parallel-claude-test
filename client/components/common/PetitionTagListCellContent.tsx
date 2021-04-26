@@ -536,7 +536,10 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
         closeMenuOnSelect={false}
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}
-        isValidNewOption={(value) => value.trim().length > 0}
+        isValidNewOption={(value, _, options) => {
+          const name = value.trim().replace(/\s+/g, " ");
+          return name.length > 0 && !options.some((o) => o.name === name);
+        }}
         value={value}
         onChange={handleChange}
         onMenuOpen={() => setNewTagColor(randomColor())}
