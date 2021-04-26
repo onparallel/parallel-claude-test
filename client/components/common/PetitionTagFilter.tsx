@@ -7,7 +7,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import { Children, useMemo } from "react";
+import { useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 import Select, { ActionMeta, components, createFilter } from "react-select";
 import { Tag } from "./Tag";
