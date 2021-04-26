@@ -1465,6 +1465,11 @@
     "context": "Write something to create the first one."
   },
   {
+    "term": "components.petition-tag-list-cell-content.no-options-3",
+    "definition": "Type to create a new tag",
+    "context": "Type to create a new tag"
+  },
+  {
     "term": "components.petition-tag-list-cell-content.tags-create",
     "definition": "Create {tag}",
     "context": "Create {tag}"
