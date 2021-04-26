@@ -81,6 +81,15 @@ export const theme = extendTheme({
         },
       },
     },
+    Menu: {
+      baseStyle: {
+        item: {
+          _focus: {
+            background: "gray.75",
+          },
+        },
+      },
+    },
     NumberInput: {
       sizes: {
         sm: {

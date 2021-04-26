@@ -129,7 +129,7 @@ export function useReactSelectProps<
         colors: {
           ...theme.colors,
           primary: colors.blue[500],
-          primary25: colors.gray[100],
+          primary25: colors.gray[75],
           neutral0: colors.white,
           neutral5: colors.gray[50],
           neutral10: colors.gray[100],
