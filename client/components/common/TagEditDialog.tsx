@@ -24,7 +24,6 @@ import Select, { components, Props as SelectProps } from "react-select";
 import { maxBy, pick } from "remeda";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
-import { PetitionTagFilter } from "./PetitionTagFilter";
 import { Tag } from "./Tag";
 import { TagColorSelect } from "./TagColorSelect";
 
@@ -36,9 +35,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
   });
   const isDisabled = !data || data.tags.items.length === 0;
   const [tag, setTag] = useState<TagSelection | null>(null);
-  const [updateTag] = useTagEditDialog_updateTagMutation({
-    refetchQueries: [getOperationName(PetitionTagFilter.queries.tags)!],
-  });
+  const [updateTag] = useTagEditDialog_updateTagMutation();
   useEffect(() => {
     if (data && data.tags.items.length > 0 && tag === null) {
       const selected = maxBy(data.tags.items, (t) =>

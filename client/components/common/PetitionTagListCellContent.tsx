@@ -48,11 +48,7 @@ export function PetitionTagListCellContent({
   const selectWrapperRef = useRef<HTMLDivElement>(null);
   const selectRef = useRef<TagSelectInstance>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const { data, refetch } = usePetitionTagListCellContent_tagsQuery({
-    // cache-and-network seems to be broken :/
-    // https://github.com/apollographql/apollo-client/issues/5597
-    fetchPolicy: "network-only",
-  });
+  const { data, refetch } = usePetitionTagListCellContent_tagsQuery();
   const intl = useIntl();
   const apollo = useApolloClient();
   const loadOptions = useDebouncedAsync(
@@ -401,7 +397,10 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
                         marginLeft="0.5rem"
                         flex="0 1 auto"
                         minWidth="0"
-                        tag={{ name: props.data.value, color: newTagColor }}
+                        tag={{
+                          name: props.data.value.trim().replace(/\s+/g, " "),
+                          color: newTagColor,
+                        }}
                       />
                     ),
                   }}
@@ -418,30 +417,43 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
             </components.Option>
           );
         },
-        NoOptionsMessage: (props) => (
-          <Stack
-            direction="column"
-            spacing={1}
-            textStyle="hint"
-            fontSize="sm"
-            paddingX={2}
-            paddingY={4}
-            textAlign="center"
-          >
-            <Text>
-              <FormattedMessage
-                id="components.petition-tag-list-cell-content.no-options-1"
-                defaultMessage="Your organization doesn't have any tags yet."
-              />
-            </Text>
-            <Text>
-              <FormattedMessage
-                id="components.petition-tag-list-cell-content.no-options-2"
-                defaultMessage="Write something to create the first one."
-              />
-            </Text>
-          </Stack>
-        ),
+        NoOptionsMessage: (props) => {
+          return (
+            <Stack
+              direction="column"
+              spacing={1}
+              textStyle="hint"
+              fontSize="sm"
+              paddingX={2}
+              paddingY={4}
+              textAlign="center"
+            >
+              {props.options.length === 0 && !props.selectProps.inputValue ? (
+                <>
+                  <Text>
+                    <FormattedMessage
+                      id="components.petition-tag-list-cell-content.no-options-1"
+                      defaultMessage="Your organization doesn't have any tags yet."
+                    />
+                  </Text>
+                  <Text>
+                    <FormattedMessage
+                      id="components.petition-tag-list-cell-content.no-options-2"
+                      defaultMessage="Write something to create the first one."
+                    />
+                  </Text>
+                </>
+              ) : (
+                <Text as="div">
+                  <FormattedMessage
+                    id="components.petition-tag-list-cell-content.no-options-3"
+                    defaultMessage="Type to create a new tag"
+                  />
+                </Text>
+              )}
+            </Stack>
+          );
+        },
         MenuList: ({ children, ...props }) => (
           <components.MenuList {...props}>
             {children}
@@ -524,6 +536,7 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
         closeMenuOnSelect={false}
         getOptionValue={(o) => o.id}
         getOptionLabel={(o) => o.name}
+        isValidNewOption={(value) => value.trim().length > 0}
         value={value}
         onChange={handleChange}
         onMenuOpen={() => setNewTagColor(randomColor())}

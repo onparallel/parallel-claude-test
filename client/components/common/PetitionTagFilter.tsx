@@ -195,7 +195,7 @@ export function PetitionTagFilter({ value, onChange }: PetitionTagFilterProps) {
     <Select
       {...rsProps}
       isMulti
-      isClearable={false}
+      isClearable={true}
       filterOption={filterOption}
       closeMenuOnSelect={false}
       hideSelectedOptions={false}
