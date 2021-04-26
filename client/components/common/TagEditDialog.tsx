@@ -53,9 +53,11 @@ export function TagEditDialog({ ...props }: DialogProps) {
   }, []);
   const handleTagChange = useDebouncedCallback(
     async function (tag: TagSelection) {
-      await updateTag({
-        variables: { id: tag.id, data: pick(tag, ["name", "color"]) },
-      });
+      if (tag.name.trim().length > 0) {
+        await updateTag({
+          variables: { id: tag.id, data: pick(tag, ["name", "color"]) },
+        });
+      }
     },
     300,
     []
