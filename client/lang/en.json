@@ -1455,6 +1455,16 @@
     "context": "Edit tags"
   },
   {
+    "term": "components.petition-tag-list-cell-content.no-options-1",
+    "definition": "Your organization doesn't have any tags yet.",
+    "context": "Your organization doesn't have any tags yet."
+  },
+  {
+    "term": "components.petition-tag-list-cell-content.no-options-2",
+    "definition": "Write something to create the first one.",
+    "context": "Write something to create the first one."
+  },
+  {
     "term": "components.petition-tag-list-cell-content.tags-create",
     "definition": "Create {tag}",
     "context": "Create {tag}"

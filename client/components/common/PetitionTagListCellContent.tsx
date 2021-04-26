@@ -411,29 +411,55 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
             </components.Option>
           );
         },
+        NoOptionsMessage: (props) => (
+          <Stack
+            direction="column"
+            spacing={1}
+            textStyle="hint"
+            fontSize="sm"
+            paddingX={2}
+            paddingY={4}
+            textAlign="center"
+          >
+            <Text>
+              <FormattedMessage
+                id="components.petition-tag-list-cell-content.no-options-1"
+                defaultMessage="Your organization doesn't have any tags yet."
+              />
+            </Text>
+            <Text>
+              <FormattedMessage
+                id="components.petition-tag-list-cell-content.no-options-2"
+                defaultMessage="Write something to create the first one."
+              />
+            </Text>
+          </Stack>
+        ),
         MenuList: ({ children, ...props }) => (
           <components.MenuList {...props}>
             {children}
-            <Box
-              position="sticky"
-              bottom="0"
-              padding={2}
-              backgroundColor="white"
-            >
-              <Button
-                width="100%"
-                size="sm"
-                variant="outline"
-                fontWeight="normal"
-                leftIcon={<EditIcon position="relative" top="-1px" />}
-                onClick={() => onEditTags()}
+            {props.selectProps.defaultOptions?.length > 0 ? (
+              <Box
+                position="sticky"
+                bottom="0"
+                padding={2}
+                backgroundColor="white"
               >
-                <FormattedMessage
-                  id="components.petition-tag-list-cell-content.edit-tags"
-                  defaultMessage="Edit tags"
-                />
-              </Button>
-            </Box>
+                <Button
+                  width="100%"
+                  size="sm"
+                  variant="outline"
+                  fontWeight="normal"
+                  leftIcon={<EditIcon position="relative" top="-1px" />}
+                  onClick={() => onEditTags()}
+                >
+                  <FormattedMessage
+                    id="components.petition-tag-list-cell-content.edit-tags"
+                    defaultMessage="Edit tags"
+                  />
+                </Button>
+              </Box>
+            ) : null}
           </components.MenuList>
         ),
       },

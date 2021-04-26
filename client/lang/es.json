@@ -1455,6 +1455,16 @@
     "context": "Edit tags"
   },
   {
+    "term": "components.petition-tag-list-cell-content.no-options-1",
+    "definition": "Tu organización aún no ha creado etiquetas.",
+    "context": "Your organization doesn't have any tags yet."
+  },
+  {
+    "term": "components.petition-tag-list-cell-content.no-options-2",
+    "definition": "Escribe para crear la primera.",
+    "context": "Write something to create the first one."
+  },
+  {
     "term": "components.petition-tag-list-cell-content.tags-create",
     "definition": "Crear {tag}",
     "context": "Create {tag}"

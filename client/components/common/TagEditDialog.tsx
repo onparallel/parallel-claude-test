@@ -34,6 +34,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
   const { data } = useTagEditDialog_tagsQuery({
     fetchPolicy: "cache-and-network",
   });
+  const isDisabled = !data || data.tags.items.length === 0;
   const [tag, setTag] = useState<TagSelection | null>(null);
   const [updateTag] = useTagEditDialog_updateTagMutation({
     refetchQueries: [getOperationName(PetitionTagFilter.queries.tags)!],
@@ -79,7 +80,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
       }
       body={
         <Box>
-          <FormControl>
+          <FormControl isDisabled={isDisabled}>
             <FormLabel>
               <FormattedMessage
                 id="components.tag-edit-dialog.tag-label"
@@ -98,7 +99,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
             gridRowGap={2}
             marginTop={4}
           >
-            <FormControl as={NoElement}>
+            <FormControl as={NoElement} isDisabled={isDisabled}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
                   id="components.tag-edit-dialog.name-label"
@@ -115,7 +116,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
                 onBlur={() => handleTagChange.immediateIfPending(tag!)}
               />
             </FormControl>
-            <FormControl as={NoElement}>
+            <FormControl as={NoElement} isDisabled={isDisabled}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
                   id="components.tag-edit-dialog.color-label"
