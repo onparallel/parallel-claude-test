@@ -1380,6 +1380,11 @@
     "context": "Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}"
   },
   {
+    "term": "component.tag.remove-tag",
+    "definition": "Quitar etiqueta \"{tag}\"",
+    "context": "Remove tag \"{tag}\""
+  },
+  {
     "term": "component.template-header.clone-label",
     "definition": "Clonar plantilla",
     "context": "Clone template"
@@ -1420,6 +1425,46 @@
     "context": "Search for existing users"
   },
   {
+    "term": "components.petition-tag-filter.clear-filter",
+    "definition": "Quitar filtro",
+    "context": "Clear filter"
+  },
+  {
+    "term": "components.petition-tag-filter.n-tags",
+    "definition": "{count} etiquetas",
+    "context": "{count} tags"
+  },
+  {
+    "term": "components.petition-tag-filter.no-filter",
+    "definition": "Filtrar por etiquetas",
+    "context": "Filter by tags"
+  },
+  {
+    "term": "components.petition-tag-filter.without-tags",
+    "definition": "Sin etiquetas",
+    "context": "Without tags"
+  },
+  {
+    "term": "components.petition-tag-list-cell-content.add-tags",
+    "definition": "Añadir etiquetas",
+    "context": "Add tags"
+  },
+  {
+    "term": "components.petition-tag-list-cell-content.edit-tags",
+    "definition": "Editar etiquetas",
+    "context": "Edit tags"
+  },
+  {
+    "term": "components.petition-tag-list-cell-content.tags-create",
+    "definition": "Crear {tag}",
+    "context": "Create {tag}"
+  },
+  {
+    "term": "components.petition-tag-list-cell-content.tags-x-more",
+    "definition": "y <b>{extra} más</b>",
+    "context": "and <b>{extra} more</b>"
+  },
+  {
     "term": "components.table.change-sorting",
     "definition": "Cambiar ordenación para \"{column}\"",
     "context": "Change sorting for \"{column}\""
@@ -1428,6 +1473,26 @@
     "term": "components.table.sort by",
     "definition": "Ordenar por \"{column}\"",
     "context": "Sort by \"{column}\""
+  },
+  {
+    "term": "components.tag-edit-dialog.color-label",
+    "definition": "Color",
+    "context": "Color"
+  },
+  {
+    "term": "components.tag-edit-dialog.header",
+    "definition": "Editar etiquetas",
+    "context": "Edit tags"
+  },
+  {
+    "term": "components.tag-edit-dialog.name-label",
+    "definition": "Editar texto",
+    "context": "Edit text"
+  },
+  {
+    "term": "components.tag-edit-dialog.tag-label",
+    "definition": "Etiqueta",
+    "context": "Tag"
   },
   {
     "term": "contact.edit-details-button",
@@ -1713,6 +1778,41 @@
     "term": "generic.collapse",
     "definition": "Contraer",
     "context": "Collapse"
+  },
+  {
+    "term": "generic.color.blue",
+    "definition": "azul",
+    "context": "blue"
+  },
+  {
+    "term": "generic.color.brown",
+    "definition": "marrón",
+    "context": "brown"
+  },
+  {
+    "term": "generic.color.gray",
+    "definition": "gris",
+    "context": "gray"
+  },
+  {
+    "term": "generic.color.green",
+    "definition": "verde",
+    "context": "green"
+  },
+  {
+    "term": "generic.color.purple",
+    "definition": "Lila",
+    "context": "purple"
+  },
+  {
+    "term": "generic.color.red",
+    "definition": "rojo",
+    "context": "red"
+  },
+  {
+    "term": "generic.color.yellow",
+    "definition": "amarillo",
+    "context": "yellow"
   },
   {
     "term": "generic.comments-button-label",
@@ -3343,6 +3443,11 @@
     "term": "petitions.header.status",
     "definition": "Estado",
     "context": "Status"
+  },
+  {
+    "term": "petitions.header.tags",
+    "definition": "Etiquetas",
+    "context": "Tags"
   },
   {
     "term": "petitions.header.template-name",
