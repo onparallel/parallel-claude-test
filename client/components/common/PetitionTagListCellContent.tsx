@@ -1,4 +1,5 @@
 import { gql, useApolloClient } from "@apollo/client";
+import { getOperationName } from "@apollo/client/utilities";
 import {
   Box,
   Button,
@@ -27,7 +28,7 @@ import { withError } from "@parallel/utils/promises/withError";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import useMergedRef from "@react-hook/merged-ref";
-import { forwardRef, MouseEvent, useRef, useState } from "react";
+import { forwardRef, MouseEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ActionMeta, components } from "react-select";
 import AsyncCreatableSelect, {
@@ -49,7 +50,9 @@ export function PetitionTagListCellContent({
   const selectRef = useRef<TagSelectInstance>(null);
   const [isEditing, setIsEditing] = useState(false);
   const { data, refetch } = usePetitionTagListCellContent_tagsQuery({
-    fetchPolicy: "cache-and-network",
+    // cache-and-network seems to be broken :/
+    // https://github.com/apollographql/apollo-client/issues/5597
+    fetchPolicy: "network-only",
   });
   const intl = useIntl();
   const apollo = useApolloClient();
@@ -133,11 +136,7 @@ export function PetitionTagListCellContent({
 
   const [createTag] = usePetitionTagListCellContent_createTagMutation();
   const handleCreateTag = async (tag: Pick<TagSelection, "name" | "color">) => {
-    const [, result] = await withError(
-      createTag({
-        variables: tag,
-      })
-    );
+    const [, result] = await withError(createTag({ variables: tag }));
     if (result) {
       await handleAddTag(result.data!.createTag);
     }
@@ -367,6 +366,13 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
   ) {
     const [newTagColor, setNewTagColor] = useState(randomColor());
     const innerRef = useRef<TagSelectInstance>();
+    useEffect(() => {
+      // react-select is not updating defaultOptions
+      // https://github.com/JedWatson/react-select/issues/4012
+      innerRef.current?.setState({
+        defaultOptions: props.defaultOptions as any,
+      });
+    }, [innerRef.current, props.defaultOptions]);
     const _ref = useMergedRef(ref, innerRef);
     const rsProps = useReactSelectProps<TagSelection, true, never>({
       components: {
