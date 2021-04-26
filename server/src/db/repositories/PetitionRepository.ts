@@ -1549,7 +1549,7 @@ export class PetitionRepository extends BaseRepository {
         insert into petition_tag (petition_id, tag_id)
         select ?, tag_id from petition_tag where petition_id = ?
       `,
-        [petitionId, cloned.id],
+        [cloned.id, petitionId],
         t
       );
 
