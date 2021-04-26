@@ -11,6 +11,7 @@ import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { validateAnd } from "../helpers/validateArgs";
 import { maxLength } from "../helpers/validators/maxLength";
+import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { userHasAccessToPetitions } from "../petition/authorizers";
 import { userHasAccessToTags } from "./authorizers";
 import { validateHexColor } from "./validators";
@@ -21,15 +22,22 @@ export const createTag = mutationField("createTag", {
   authorize: authenticate(),
   validateArgs: validateAnd(
     validateHexColor((args) => args.color, "color"),
+    notEmptyString((args) => args.name, "name"),
     maxLength((args) => args.name, "name", 100)
   ),
   args: {
     name: nonNull(stringArg()),
     color: nonNull(stringArg()),
   },
-  resolve: async (_, { name, color }, ctx) => {
+  resolve: async (_, args, ctx) => {
     try {
-      return await ctx.tags.createTag({ name, color }, ctx.user!);
+      return await ctx.tags.createTag(
+        {
+          name: args.name.trim(),
+          color: args.color,
+        },
+        ctx.user!
+      );
     } catch (error) {
       if (error.constraint === "tag__organization_id__name__unique") {
         throw new WhitelistedError(
@@ -49,6 +57,7 @@ export const updateTag = mutationField("updateTag", {
   authorize: authenticateAnd(userHasAccessToTags((args) => args.id)),
   validateArgs: validateAnd(
     validateHexColor((args) => args.data.color, "data.color"),
+    notEmptyString((args) => args.data.name, "data.name"),
     maxLength((args) => args.data.name, "data.name", 100)
   ),
   args: {
@@ -69,8 +78,8 @@ export const updateTag = mutationField("updateTag", {
       data.color = args.data.color;
     }
 
-    if (args.data.name) {
-      data.name = args.data.name;
+    if (args.data.name?.trim()) {
+      data.name = args.data.name.trim();
     }
     try {
       return await ctx.tags.updateTag(args.id, data, ctx.user!);

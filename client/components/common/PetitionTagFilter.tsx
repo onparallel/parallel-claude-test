@@ -125,7 +125,8 @@ export function PetitionTagFilter({ value, onChange }: PetitionTagFilterProps) {
         styles: {
           container: (styles) => ({
             ...styles,
-            width: "180px",
+            minWidth: "180px",
+            maxWidth: "210px",
           }),
           valueContainer: (styles) => ({
             ...styles,

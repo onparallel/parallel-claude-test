@@ -391,20 +391,22 @@ const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
         Option: (props) => {
           return props.data.__isNew__ ? (
             <components.Option {...props}>
-              <FormattedMessage
-                id="components.petition-tag-list-cell-content.tags-create"
-                defaultMessage="Create {tag}"
-                values={{
-                  tag: (
-                    <Tag
-                      marginLeft="0.5rem"
-                      flex="0 1 auto"
-                      minWidth="0"
-                      tag={{ name: props.data.value, color: newTagColor }}
-                    />
-                  ),
-                }}
-              />
+              <Flex alignItems="baseline">
+                <FormattedMessage
+                  id="components.petition-tag-list-cell-content.tags-create"
+                  defaultMessage="Create {tag}"
+                  values={{
+                    tag: (
+                      <Tag
+                        marginLeft="0.5rem"
+                        flex="0 1 auto"
+                        minWidth="0"
+                        tag={{ name: props.data.value, color: newTagColor }}
+                      />
+                    ),
+                  }}
+                />
+              </Flex>
             </components.Option>
           ) : (
             <components.Option {...props}>

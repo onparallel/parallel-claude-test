@@ -12,7 +12,7 @@ export function notEmptyString<
   argName: string
 ) {
   return ((_, args, ctx, info) => {
-    const value = prop(args);
+    const value = prop(args)?.trim();
     if (!value) {
       throw new ArgValidationError(info, argName, `Value can't be empty.`);
     }

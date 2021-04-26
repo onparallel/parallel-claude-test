@@ -89,6 +89,9 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   id: "petitions.header.recipient",
                   defaultMessage: "Recipient",
                 }),
+                cellProps: {
+                  minWidth: "200px",
+                },
                 CellContent: ({ row }) => {
                   const recipients = row.accesses
                     .filter((a) => a.status === "ACTIVE")
@@ -215,7 +218,6 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
             defaultMessage: "Tags",
           }),
           cellProps: {
-            maxWidth: 0,
             padding: 0,
             minWidth: "min-content",
             _last: { paddingRight: 0 },
