@@ -155,7 +155,7 @@ export function PetitionTagFilter({ value, onChange }: PetitionTagFilterProps) {
           if ((action.option as any).__type === "CLEAR_FILTER") {
             onChange(null);
           } else if ((action.option as any).__type === "WITHOUT_TAGS") {
-            onChange([]);
+            onChange(value?.length === 0 ? null : []);
           } else {
             onChange([...(value ?? []), action.option.id]);
           }
