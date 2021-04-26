@@ -1017,8 +1017,8 @@ export interface NexusGenFieldTypes {
     // field return type
     access: NexusGenRootTypes["PublicPetitionAccess"] | null; // PublicPetitionAccess
     contact: NexusGenRootTypes["Contact"] | null; // Contact
-    contactByEmail: NexusGenRootTypes["Contact"] | null; // Contact
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
+    contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     emailIsAvailable: boolean; // Boolean!
     globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -1774,8 +1774,8 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     access: "PublicPetitionAccess";
     contact: "Contact";
-    contactByEmail: "Contact";
     contacts: "ContactPagination";
+    contactsByEmail: "Contact";
     emailIsAvailable: "Boolean";
     globalIdDecode: "SupportMethodResponse";
     globalIdEncode: "SupportMethodResponse";
@@ -2512,10 +2512,6 @@ export interface NexusGenArgTypes {
       // args
       id: NexusGenScalars["GID"]; // GID!
     };
-    contactByEmail: {
-      // args
-      email: string; // String!
-    };
     contacts: {
       // args
       exclude?: NexusGenScalars["GID"][] | null; // [GID!]
@@ -2523,6 +2519,10 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       search?: string | null; // String
       sortBy?: NexusGenEnums["QueryContacts_OrderBy"][] | null; // [QueryContacts_OrderBy!]
+    };
+    contactsByEmail: {
+      // args
+      emails: string[]; // [String!]!
     };
     emailIsAvailable: {
       // args

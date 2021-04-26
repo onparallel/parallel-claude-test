@@ -296,11 +296,11 @@ export type Mutation = {
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
-  tagPetition: Result;
+  tagPetition: PetitionBase;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<Petition>;
   /** Removes the given tag from the given petition */
-  untagPetition: Result;
+  untagPetition: PetitionBase;
   /** Updates a contact. */
   updateContact: Contact;
   /** Updates the positions of the petition fields */
@@ -1589,9 +1589,10 @@ export type PublicUserOrContact = PublicContact | PublicUser;
 export type Query = {
   access: Maybe<PublicPetitionAccess>;
   contact: Maybe<Contact>;
-  contactByEmail: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
+  /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
+  contactsByEmail: Array<Maybe<Contact>>;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
   /** Decodes the given Global ID into an entity in the database. */
@@ -1623,16 +1624,16 @@ export type QuerycontactArgs = {
   id: Scalars["GID"];
 };
 
-export type QuerycontactByEmailArgs = {
-  email: Scalars["String"];
-};
-
 export type QuerycontactsArgs = {
   exclude?: Maybe<Array<Scalars["GID"]>>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
+};
+
+export type QuerycontactsByEmailArgs = {
+  emails: Array<Scalars["String"]>;
 };
 
 export type QueryemailIsAvailableArgs = {
@@ -1855,6 +1856,8 @@ export type SupportMethodResponse = {
 export type Tag = {
   /** The color of the tag in hex format (example: #FFFFFF) */
   color: Scalars["String"];
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   name: Scalars["String"];
   organization_id: Scalars["GID"];
@@ -2135,7 +2138,7 @@ export type CreatePetitionRecipients_ContactQueryVariables = Exact<{
 }>;
 
 export type CreatePetitionRecipients_ContactQuery = {
-  contact: Maybe<Pick<Contact, "id" | "firstName" | "lastName">>;
+  contacts: Array<Maybe<Pick<Contact, "id" | "firstName" | "lastName">>>;
 };
 
 export type CreatePetitionRecipients_updateContactMutationVariables = Exact<{

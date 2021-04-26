@@ -1,4 +1,5 @@
-import { list, nonNull, queryField, stringArg } from "@nexus/schema";
+import { list, nonNull, nullable, queryField, stringArg } from "@nexus/schema";
+import pMap from "p-map";
 import { SortBy } from "../../db/helpers/utils";
 import { Contact } from "../../db/__types";
 import { authenticate, chain } from "../helpers/authorize";
@@ -73,18 +74,25 @@ export const contactQueries = queryField((t) => {
     },
   });
 
-  t.nullable.field("contactByEmail", {
-    type: "Contact",
+  t.nullable.field("contactsByEmail", {
+    description:
+      "Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts",
+    type: nonNull(list(nullable("Contact"))),
     args: {
-      email: nonNull(stringArg()),
+      emails: nonNull(list(nonNull(stringArg()))),
     },
-    validateArgs: validEmail((args) => args.email, "email"),
-    authorize: chain(authenticate()),
-    resolve: async (root, args, ctx) => {
-      return await ctx.contacts.loadContactByEmail({
-        orgId: ctx.user!.org_id,
-        email: args.email,
-      });
+    validateArgs: validEmail((args) => args.emails, "emails"),
+    authorize: authenticate(),
+    resolve: async (_, args, ctx) => {
+      return pMap(
+        args.emails,
+        (email) =>
+          ctx.contacts.loadContactByEmail({
+            email,
+            orgId: ctx.user!.org_id,
+          }),
+        { concurrency: 5 }
+      );
     },
   });
 });

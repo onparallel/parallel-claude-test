@@ -2420,7 +2420,6 @@ union PublicUserOrContact = PublicContact | PublicUser
 type Query {
   access(keycode: ID!): PublicPetitionAccess
   contact(id: GID!): Contact
-  contactByEmail(email: String!): Contact
 
   """
   The contacts of the user
@@ -2448,6 +2447,11 @@ type Query {
     """
     sortBy: [QueryContacts_OrderBy!]
   ): ContactPagination!
+
+  """
+  Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts
+  """
+  contactsByEmail(emails: [String!]!): [Contact]!
 
   """
   Checks if the provided email is available to be registered as a user on Parallel

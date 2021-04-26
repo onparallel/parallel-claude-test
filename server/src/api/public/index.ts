@@ -530,13 +530,15 @@ api
             return item;
           } else {
             const { email, ...data } = item;
-            const { contact } = await client.request<
+            const {
+              contacts: [contact],
+            } = await client.request<
               CreatePetitionRecipients_ContactQuery,
               CreatePetitionRecipients_ContactQueryVariables
             >(
               gql`
                 query CreatePetitionRecipients_Contact($email: String!) {
-                  contact: contactByEmail(email: $email) {
+                  contacts: contactsByEmail(emails: [$email]) {
                     id
                     firstName
                     lastName
