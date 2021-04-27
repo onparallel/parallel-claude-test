@@ -1451,7 +1451,7 @@
   },
   {
     "term": "components.multiple-emails-pasted-dialog.message-1",
-    "definition": "Has pegado desde el portapapeles multiples correos electrónicos.",
+    "definition": "Has pegado desde el portapapeles múltiples correos electrónicos.",
     "context": "You have pasted multiple emails from the clipboard."
   },
   {
