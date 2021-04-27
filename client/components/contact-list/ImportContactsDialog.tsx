@@ -154,9 +154,7 @@ export function ImportContactsDialog(
           <Box marginTop={4} marginBottom={2}>
             <NormalLink
               fontWeight="bold"
-              href={`${
-                process.env.NEXT_PUBLIC_ASSETS_URL
-              }/static/documents/import_model_${intl.locale ?? "en"}.xlsx`}
+              href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/documents/contact_import_model.xlsx`}
             >
               <FormattedMessage
                 id="contacts.import-from-excel.download-model"
