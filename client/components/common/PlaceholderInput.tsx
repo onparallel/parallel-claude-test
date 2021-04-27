@@ -7,7 +7,6 @@ import {
   usePopper,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import {
   Placeholder,
   PlaceholderMenu,
@@ -23,7 +22,13 @@ import {
   withSingleLine,
 } from "@parallel/utils/slate/withSingleLine";
 import { EditablePlugins } from "@udecode/slate-plugins";
-import { MouseEvent, useCallback, useEffect, useMemo } from "react";
+import {
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+} from "react";
 import { useIntl } from "react-intl";
 import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
@@ -63,7 +68,7 @@ export const PlaceholderInput = chakraForwardRef<
     return [PlaceholderPlugin(placeholders)];
   }, [placeholders]);
 
-  useAssignMemoRef(
+  useImperativeHandle(
     ref,
     () => ({
       focus: () => {

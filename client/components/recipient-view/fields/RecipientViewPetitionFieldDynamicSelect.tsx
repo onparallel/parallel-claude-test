@@ -13,7 +13,6 @@ import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
-import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import {
   DynamicSelectOption,
@@ -25,7 +24,13 @@ import { OptionType } from "@parallel/utils/react-select/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import { forwardRef, useMemo, useRef, useState } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 import { countBy } from "remeda";
@@ -188,7 +193,7 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
 ) {
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
   const refs = useMultipleRefs<SelectInstance>();
-  useAssignMemoRef(
+  useImperativeHandle(
     ref,
     () => ({
       focus(level?: number) {

@@ -26,13 +26,18 @@ import {
   PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
-import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
-import { memo, useCallback, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { FormattedMessage, useIntl } from "react-intl";
 import { GrowingTextarea } from "../common/GrowingTextarea";
@@ -298,7 +303,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     selectFieldOptionsRef.current?.focus(atStart ? "START" : undefined);
   }, []);
 
-  useAssignMemoRef(
+  useImperativeHandle(
     ref,
     () =>
       ({

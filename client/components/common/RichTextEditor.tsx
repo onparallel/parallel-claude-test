@@ -15,7 +15,6 @@ import {
   SharpIcon,
   UnderlineIcon,
 } from "@parallel/chakra/icons";
-import { useAssignMemoRef } from "@parallel/utils/assignRef";
 import {
   Placeholder,
   PlaceholderMenu,
@@ -54,6 +53,7 @@ import {
   RefObject,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
   useRef,
 } from "react";
@@ -211,7 +211,7 @@ export const RichTextEditor = forwardRef<
     []
   );
 
-  useAssignMemoRef(
+  useImperativeHandle(
     ref,
     () => ({
       focus: () => {
