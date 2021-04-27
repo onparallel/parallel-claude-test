@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   Box,
   ListItem,
+  Progress,
   Stack,
   Tab,
   TabList,
@@ -17,6 +18,7 @@ import {
   ListIcon,
   SettingsIcon,
 } from "@parallel/chakra/icons";
+import { useBlockingDialog } from "@parallel/components/common/BlockingDialog";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
@@ -357,6 +359,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const showErrorDialog = useErrorDialog();
   const [batchSendPetition] = usePetitionCompose_batchSendPetitionMutation();
   const showAddPetitionAccessDialog = useAddPetitionAccessDialog();
+  const showLongBatchSendDialog = useBlockingDialog();
   const handleNextClick = useCallback(async () => {
     if (petition?.__typename !== "Petition") {
       throw new Error("Can't send a template");
@@ -391,8 +394,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         defaultBody: petition.emailBody,
         defaultRemindersConfig: petition.remindersConfig,
         onUpdatePetition: handleUpdatePetition,
+        canAddRecipientGroups: true,
       });
-      const { data } = await batchSendPetition({
+      const task = batchSendPetition({
         variables: {
           petitionId: petition.id,
           contactIdGroups: recipientIdGroups,
@@ -402,6 +406,31 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           scheduledAt: scheduledAt?.toISOString() ?? null,
         },
       });
+      if (recipientIdGroups.length > 20) {
+        await withError(
+          showLongBatchSendDialog({
+            task,
+            header: (
+              <FormattedMessage
+                id="petition.long-batch-send-dialog.header"
+                defaultMessage="Sending petitions"
+              />
+            ),
+            body: (
+              <Stack spacing={4}>
+                <Text>
+                  <FormattedMessage
+                    id="petition.long-batch-send-dialog.message"
+                    defaultMessage="We are sending your petitions. It might take a little bit, please wait."
+                  />
+                </Text>
+                <Progress isIndeterminate size="sm" borderRadius="full" />
+              </Stack>
+            ),
+          })
+        );
+      }
+      const { data } = await task;
       if (data?.batchSendPetition.some((r) => r.result !== "SUCCESS")) {
         toast({
           isClosable: true,

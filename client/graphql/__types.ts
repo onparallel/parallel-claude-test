@@ -1646,9 +1646,10 @@ export type Query = {
   __typename?: "Query";
   access?: Maybe<PublicPetitionAccess>;
   contact?: Maybe<Contact>;
-  contactByEmail?: Maybe<Contact>;
   /** The contacts of the user */
   contacts: ContactPagination;
+  /** Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts */
+  contactsByEmail: Array<Maybe<Contact>>;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
   /** Decodes the given Global ID into an entity in the database. */
@@ -1680,16 +1681,16 @@ export type QuerycontactArgs = {
   id: Scalars["GID"];
 };
 
-export type QuerycontactByEmailArgs = {
-  email: Scalars["String"];
-};
-
 export type QuerycontactsArgs = {
   exclude?: Maybe<Array<Scalars["GID"]>>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
+};
+
+export type QuerycontactsByEmailArgs = {
+  emails: Array<Scalars["String"]>;
 };
 
 export type QueryemailIsAvailableArgs = {
@@ -2485,6 +2486,18 @@ export type AddPetitionAccessDialog_PetitionFragment = {
       >
     >;
   };
+
+export type AddPetitionAccessDialog_contactsByEmailQueryVariables = Exact<{
+  emails: Array<Scalars["String"]> | Scalars["String"];
+}>;
+
+export type AddPetitionAccessDialog_contactsByEmailQuery = {
+  __typename?: "Query";
+} & {
+  contactsByEmail: Array<
+    Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
+  >;
+};
 
 export type MessageEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
@@ -8169,6 +8182,61 @@ export type CreateUserDialog_emailIsAvailableQueryHookResult = ReturnType<
 >;
 export type CreateUserDialog_emailIsAvailableLazyQueryHookResult = ReturnType<
   typeof useCreateUserDialog_emailIsAvailableLazyQuery
+>;
+export const AddPetitionAccessDialog_contactsByEmailDocument = gql`
+  query AddPetitionAccessDialog_contactsByEmail($emails: [String!]!) {
+    contactsByEmail(emails: $emails) {
+      ...ContactSelect_Contact
+    }
+  }
+  ${ContactSelect_ContactFragmentDoc}
+`;
+
+/**
+ * __useAddPetitionAccessDialog_contactsByEmailQuery__
+ *
+ * To run a query within a React component, call `useAddPetitionAccessDialog_contactsByEmailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAddPetitionAccessDialog_contactsByEmailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAddPetitionAccessDialog_contactsByEmailQuery({
+ *   variables: {
+ *      emails: // value for 'emails'
+ *   },
+ * });
+ */
+export function useAddPetitionAccessDialog_contactsByEmailQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    AddPetitionAccessDialog_contactsByEmailQuery,
+    AddPetitionAccessDialog_contactsByEmailQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    AddPetitionAccessDialog_contactsByEmailQuery,
+    AddPetitionAccessDialog_contactsByEmailQueryVariables
+  >(AddPetitionAccessDialog_contactsByEmailDocument, options);
+}
+export function useAddPetitionAccessDialog_contactsByEmailLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    AddPetitionAccessDialog_contactsByEmailQuery,
+    AddPetitionAccessDialog_contactsByEmailQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    AddPetitionAccessDialog_contactsByEmailQuery,
+    AddPetitionAccessDialog_contactsByEmailQueryVariables
+  >(AddPetitionAccessDialog_contactsByEmailDocument, options);
+}
+export type AddPetitionAccessDialog_contactsByEmailQueryHookResult = ReturnType<
+  typeof useAddPetitionAccessDialog_contactsByEmailQuery
+>;
+export type AddPetitionAccessDialog_contactsByEmailLazyQueryHookResult = ReturnType<
+  typeof useAddPetitionAccessDialog_contactsByEmailLazyQuery
 >;
 export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
   mutation PetitionSettings_cancelPetitionSignatureRequest(

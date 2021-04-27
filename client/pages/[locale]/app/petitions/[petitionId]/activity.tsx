@@ -157,7 +157,6 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         scheduledAt,
         remindersConfig,
       } = await addPetitionAccessDialog({
-        maxRecipientGroups: 1,
         onSearchContacts: async (search: string, exclude: string[]) => {
           return await handleSearchContacts(search, [
             ...exclude,

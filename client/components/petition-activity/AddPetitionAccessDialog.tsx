@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import {
   Box,
   Button,
@@ -14,6 +14,8 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogProvider";
 import {
+  AddPetitionAccessDialog_contactsByEmailQuery,
+  AddPetitionAccessDialog_contactsByEmailQueryVariables,
   RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
@@ -27,6 +29,7 @@ import { useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { noop, omit } from "remeda";
 import {
+  ContactSelect,
   ContactSelectProps,
   ContactSelectSelection,
 } from "../common/ContactSelect";
@@ -42,7 +45,7 @@ export type AddPetitionAccessDialogProps = {
   onSearchContacts?: ContactSelectProps["onSearchContacts"];
   onCreateContact?: ContactSelectProps["onCreateContact"];
   onUpdatePetition?: (data: UpdatePetitionInput) => void;
-  maxRecipientGroups?: number;
+  canAddRecipientGroups?: boolena;
   defaultSubject?: Maybe<string>;
   defaultBody?: Maybe<RichTextEditorValue>;
   defaultRemindersConfig?: Maybe<RemindersConfig>;
@@ -60,8 +63,9 @@ export function AddPetitionAccessDialog({
   defaultSubject,
   defaultBody,
   defaultRemindersConfig,
-  maxRecipientGroups,
+  canAddRecipientGroups,
   onUpdatePetition = noop,
+  // TODO: fix this
   onSearchContacts = useSearchContacts(),
   onCreateContact = useCreateContact(),
   ...props
@@ -80,6 +84,9 @@ export function AddPetitionAccessDialog({
   >(
     defaultRemindersConfig ? omit(defaultRemindersConfig, ["__typename"]) : null
   );
+
+  const handleSearchContactsByEmail = useSearchContactsByEmail();
+
   const [updateSubject, updateBody, updateRemindersConfig] = [
     useDebouncedCallback(onUpdatePetition, 500, [onUpdatePetition]),
     useDebouncedCallback(onUpdatePetition, 500, [onUpdatePetition]),
@@ -154,7 +161,7 @@ export function AddPetitionAccessDialog({
             id="petition.add-access.header"
             defaultMessage="Who do you want to send it to?"
           />
-          {maxRecipientGroups === 1 ? null : (
+          {canAddRecipientGroups ? (
             <HelpPopover
               popoverWidth="container.2xs"
               marginLeft={2}
@@ -202,7 +209,7 @@ export function AddPetitionAccessDialog({
                 </Stack>
               </Stack>
             </HelpPopover>
-          )}
+          ) : null}
         </Flex>
       }
       body={
@@ -212,8 +219,9 @@ export function AddPetitionAccessDialog({
             onChangeRecipientGroups={setRecipientGroups}
             onSearchContacts={onSearchContacts}
             onCreateContact={onCreateContact}
+            onSearchContactsByEmail={handleSearchContactsByEmail}
             showErrors={showErrors}
-            maxGroups={maxRecipientGroups}
+            canAddRecipientGroups={canAddRecipientGroups}
           />
           <Box marginTop={4}>
             <MessageEmailEditor
@@ -262,6 +270,32 @@ AddPetitionAccessDialog.fragments = {
   `,
 };
 
+AddPetitionAccessDialog.queries = {
+  contactsByEmail: gql`
+    query AddPetitionAccessDialog_contactsByEmail($emails: [String!]!) {
+      contactsByEmail(emails: $emails) {
+        ...ContactSelect_Contact
+      }
+    }
+    ${ContactSelect.fragments.Contact}
+  `,
+};
+
 export function useAddPetitionAccessDialog() {
   return useDialog(AddPetitionAccessDialog);
+}
+
+function useSearchContactsByEmail() {
+  const apollo = useApolloClient();
+  return useCallback(async function (emails: string[]) {
+    const result = await apollo.query<
+      AddPetitionAccessDialog_contactsByEmailQuery,
+      AddPetitionAccessDialog_contactsByEmailQueryVariables
+    >({
+      query: AddPetitionAccessDialog.queries.contactsByEmail,
+      variables: { emails },
+      fetchPolicy: "no-cache",
+    });
+    return result.data.contactsByEmail;
+  }, []);
 }

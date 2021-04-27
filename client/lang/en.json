@@ -1190,6 +1190,21 @@
     "context": "Enter your answer"
   },
   {
+    "term": "component.recpient-select-groups.unknown-contacts-header",
+    "definition": "Unknown contacts",
+    "context": "Unknown contacts"
+  },
+  {
+    "term": "component.recpient-select-groups.unknown-contacts-message-1",
+    "definition": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first.",
+    "context": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
+  },
+  {
+    "term": "component.recpient-select-groups.unknown-contacts-message-2",
+    "definition": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one.",
+    "context": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
+  },
+  {
     "term": "component.referenced-field-dialog.confirm",
     "definition": "Remove conditions",
     "context": "Remove conditions"
@@ -1423,6 +1438,31 @@
     "term": "component.user-select.search-hint",
     "definition": "Search for existing users",
     "context": "Search for existing users"
+  },
+  {
+    "term": "components.multiple-emails-pasted-dialog.header",
+    "definition": "Multiple emails",
+    "context": "Multiple emails"
+  },
+  {
+    "term": "components.multiple-emails-pasted-dialog.message-1",
+    "definition": "You have pasted multiple emails from the clipboard.",
+    "context": "You have pasted multiple emails from the clipboard."
+  },
+  {
+    "term": "components.multiple-emails-pasted-dialog.message-2",
+    "definition": "Do you want to add them to <b>separate groups</b> (they will fill different petitions) or <b>group them in the same petition</b>?",
+    "context": "Do you want to add them to <b>separate groups</b> (they will fill different petitions) or <b>group them in the same petition</b>?"
+  },
+  {
+    "term": "components.multiple-emails-pasted-dialog.same-group",
+    "definition": "All in the same petition",
+    "context": "All in the same petition"
+  },
+  {
+    "term": "components.multiple-emails-pasted-dialog.separate-groups",
+    "definition": "Add to separate groups",
+    "context": "Add to separate groups"
   },
   {
     "term": "components.petition-tag-filter.clear-filter",
@@ -3213,6 +3253,16 @@
     "term": "petition.header.replies-tab",
     "definition": "Replies",
     "context": "Replies"
+  },
+  {
+    "term": "petition.long-batch-send-dialog.header",
+    "definition": "Sending petitions",
+    "context": "Sending petitions"
+  },
+  {
+    "term": "petition.long-batch-send-dialog.message",
+    "definition": "We are sending your petitions. It might take a little bit, please wait.",
+    "context": "We are sending your petitions. It might take a little bit, please wait."
   },
   {
     "term": "petition.message-sent.toast-description",

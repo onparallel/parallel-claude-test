@@ -10,43 +10,56 @@ import {
   FormErrorMessage,
   FormLabel,
   IconButton,
+  Radio,
+  RadioGroup,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon } from "@parallel/chakra/icons";
+import { withError } from "@parallel/utils/promises/withError";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { uniqBy } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { ConfirmDialog } from "./ConfirmDialog";
 import {
   ContactSelect,
   ContactSelectInstance,
   ContactSelectProps,
   ContactSelectSelection,
 } from "./ContactSelect";
+import { DialogProps, useDialog } from "./DialogProvider";
+import { useErrorDialog } from "./ErrorDialog";
+import { Link } from "./Link";
 
 interface RecipientSelectGroupsProps {
   showErrors?: boolean;
   recipientGroups: ContactSelectSelection[][];
   onChangeRecipientGroups: (groups: ContactSelectSelection[][]) => void;
+  onSearchContactsByEmail: (
+    emails: string[]
+  ) => Promise<(ContactSelectSelection | null)[]>;
   onSearchContacts: ContactSelectProps["onSearchContacts"];
   onCreateContact: ContactSelectProps["onCreateContact"];
-  maxGroups?: number;
+  canAddRecipientGroups?: boolean;
 }
 export function RecipientSelectGroups({
   showErrors,
   recipientGroups,
-  maxGroups = Number.MAX_SAFE_INTEGER,
+  canAddRecipientGroups,
   onChangeRecipientGroups,
   onSearchContacts,
+  onSearchContactsByEmail,
   onCreateContact,
 }: RecipientSelectGroupsProps) {
   const intl = useIntl();
-  const lastRecipientGroupSelectRef = useRef<ContactSelectInstance>(null);
-  const lastRecipientGroupFormControlRef = useRef<HTMLDivElement>(null);
+  const recipientGroupSelectRef = useMultipleRefs<ContactSelectInstance>();
+  const recipientGroupFormControlRef = useMultipleRefs<HTMLDivElement>();
 
   const [isAlertVisible, setAlertVisible] = useState(true);
 
-  function setRecipients(groupNumber: number) {
+  function handleRecipientsChange(groupNumber: number) {
     return (recipients: ContactSelectSelection[]) => {
       if (!recipientGroups[groupNumber]) return;
       const newGroups = Array.from(recipientGroups);
@@ -55,18 +68,80 @@ export function RecipientSelectGroups({
     };
   }
 
+  const showErrorDialog = useErrorDialog();
+  const showMultipleEmailsDialog = useDialog(MultipleEmailsPastedDialog);
+  async function handlePasteEmails(groupNumber: number, emails: string[]) {
+    const contacts = await onSearchContactsByEmail(emails);
+    if (contacts.some((c) => c === null)) {
+      await withError(
+        showErrorDialog({
+          header: (
+            <FormattedMessage
+              id="component.recpient-select-groups.unknown-contacts-header"
+              defaultMessage="Unknown contacts"
+            />
+          ),
+          message: (
+            <Stack>
+              <Text>
+                <FormattedMessage
+                  id="component.recpient-select-groups.unknown-contacts-message-1"
+                  defaultMessage="An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
+                />
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="component.recpient-select-groups.unknown-contacts-message-2"
+                  defaultMessage="You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
+                  values={{
+                    a: (chunks: any[]) => (
+                      <Link href="/app/contacts">{chunks}</Link>
+                    ),
+                  }}
+                />
+              </Text>
+            </Stack>
+          ),
+        })
+      );
+      return;
+    }
+    const [, result] = await withError(showMultipleEmailsDialog({}));
+    if (result === "SEPARATE_GROUPS") {
+      onChangeRecipientGroups([
+        ...recipientGroups.slice(0, groupNumber),
+        ...recipientGroups
+          .slice(groupNumber, groupNumber + contacts.length)
+          .map((group, index) => {
+            const contact = contacts[index]!;
+            return group.some((c) => c.id === contact.id)
+              ? group
+              : [...group, contact];
+          }),
+        ...(recipientGroups.length > groupNumber + contacts.length
+          ? recipientGroups.slice(groupNumber + contacts.length)
+          : contacts
+              .slice(recipientGroups.length - groupNumber)
+              .map((contact) => [contact!])),
+      ]);
+      focusRecipientGroup(groupNumber + contacts.length - 1);
+    } else if (result === "SAME_GROUP") {
+      onChangeRecipientGroups(
+        recipientGroups.map((group, index) =>
+          index === groupNumber
+            ? uniqBy(
+                [...group, ...(contacts as ContactSelectSelection[])],
+                (c) => c.id
+              )
+            : group
+        )
+      );
+    }
+  }
+
   function addRecipientGroup() {
     onChangeRecipientGroups([...recipientGroups, []]);
-    setTimeout(() => {
-      if (lastRecipientGroupSelectRef.current) {
-        lastRecipientGroupSelectRef.current.focus();
-        scrollIntoView(lastRecipientGroupFormControlRef.current!, {
-          duration: 0,
-          scrollMode: "if-needed",
-          block: "start",
-        });
-      }
-    });
+    focusRecipientGroup(recipientGroups.length);
   }
 
   function deleteRecipientGroup(index: number) {
@@ -79,6 +154,28 @@ export function RecipientSelectGroups({
 
   function invalidRecipients(index: number) {
     return recipientGroups[index].filter((r) => r.isInvalid);
+  }
+
+  function focusRecipientGroup(index: number) {
+    setTimeout(() => {
+      if (recipientGroupSelectRef[index].current) {
+        recipientGroupSelectRef[index].current?.focus();
+        scrollIntoView(recipientGroupFormControlRef[index].current!, {
+          duration: 0,
+          scrollMode: "if-needed",
+          block: "start",
+        });
+      }
+    });
+  }
+
+  async function handleCreateContact(
+    groupNumber: number,
+    data: { defaultEmail?: string }
+  ) {
+    const contact = await onCreateContact(data);
+    setTimeout(() => recipientGroupSelectRef[groupNumber].current?.focus());
+    return contact;
   }
 
   return (
@@ -98,11 +195,7 @@ export function RecipientSelectGroups({
           <FormControl
             key={index}
             id={`petition-recipients-${index}`}
-            ref={
-              index === recipientGroups.length - 1
-                ? lastRecipientGroupFormControlRef
-                : null
-            }
+            ref={recipientGroupFormControlRef[index]}
             isInvalid={
               showErrors &&
               (recipients.length === 0 || invalidRecipients(index).length > 0)
@@ -127,20 +220,23 @@ export function RecipientSelectGroups({
             <Flex>
               <Box flex="1">
                 <ContactSelect
-                  ref={
-                    index === recipientGroups.length - 1
-                      ? lastRecipientGroupSelectRef
-                      : null
-                  }
+                  ref={recipientGroupSelectRef[index]}
                   placeholder={intl.formatMessage({
                     id:
                       "component.recipient-select-groups.recipients-placeholder",
                     defaultMessage: "Enter recipients...",
                   })}
-                  onCreateContact={onCreateContact}
-                  onSearchContacts={onSearchContacts}
                   value={recipients}
-                  onChange={setRecipients(index)}
+                  onChange={handleRecipientsChange(index)}
+                  onCreateContact={async (data: any) =>
+                    await handleCreateContact(index, data)
+                  }
+                  onSearchContacts={onSearchContacts}
+                  onPasteEmails={
+                    canAddRecipientGroups
+                      ? (emails: string[]) => handlePasteEmails(index, emails)
+                      : undefined
+                  }
                 />
               </Box>
               {index > 0 ? (
@@ -183,7 +279,7 @@ export function RecipientSelectGroups({
           </FormControl>
         ))}
       </Stack>
-      {recipientGroups.length < maxGroups ? (
+      {canAddRecipientGroups ? (
         <Flex justifyContent="flex-start" alignItems="center" marginTop={4}>
           <Button
             variant="link"
@@ -223,5 +319,73 @@ export function RecipientSelectGroups({
         </Alert>
       ) : null}
     </>
+  );
+}
+
+type MultipleEmailsPastedAction = "SAME_GROUP" | "SEPARATE_GROUPS";
+
+function MultipleEmailsPastedDialog(
+  props: DialogProps<{}, MultipleEmailsPastedAction>
+) {
+  const [action, setAction] = useState<MultipleEmailsPastedAction>(
+    "SEPARATE_GROUPS"
+  );
+  const initialFocusRef = useRef<HTMLElement>(null);
+  return (
+    <ConfirmDialog
+      {...props}
+      initialFocusRef={initialFocusRef}
+      size="xl"
+      content={{ as: "form", onSubmit: () => props.onResolve(action) }}
+      header={
+        <FormattedMessage
+          id="components.multiple-emails-pasted-dialog.header"
+          defaultMessage="Multiple emails"
+        />
+      }
+      body={
+        <>
+          <Stack>
+            <Text>
+              <FormattedMessage
+                id="components.multiple-emails-pasted-dialog.message-1"
+                defaultMessage="You have pasted multiple emails from the clipboard."
+              />
+            </Text>
+            <Text>
+              <FormattedMessage
+                id="components.multiple-emails-pasted-dialog.message-2"
+                defaultMessage="Do you want to add them to <b>separate groups</b> (they will fill different petitions) or <b>group them in the same petition</b>?"
+                values={{ b: (chunks: any) => <Box as="strong">{chunks}</Box> }}
+              />
+            </Text>
+          </Stack>
+          <RadioGroup
+            marginTop={4}
+            as={Stack}
+            onChange={(value) => setAction(value as MultipleEmailsPastedAction)}
+            value={action}
+          >
+            <Radio value="SEPARATE_GROUPS" ref={initialFocusRef as any}>
+              <FormattedMessage
+                id="components.multiple-emails-pasted-dialog.separate-groups"
+                defaultMessage="Add to separate groups"
+              />
+            </Radio>
+            <Radio value="SAME_GROUP">
+              <FormattedMessage
+                id="components.multiple-emails-pasted-dialog.same-group"
+                defaultMessage="All in the same petition"
+              />
+            </Radio>
+          </RadioGroup>
+        </>
+      }
+      confirm={
+        <Button colorScheme="purple" type="submit">
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+        </Button>
+      }
+    />
   );
 }

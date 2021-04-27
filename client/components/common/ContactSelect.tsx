@@ -11,9 +11,9 @@ import { useExistingContactToast } from "@parallel/utils/useExistingContactToast
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import {
+  ClipboardEvent,
   forwardRef,
   KeyboardEvent,
-  memo,
   ReactNode,
   useMemo,
   useRef,
@@ -43,6 +43,7 @@ export interface ContactSelectProps
     search: string,
     exclude: string[]
   ) => Promise<ContactSelectSelection[]>;
+  onPasteEmails?: (emails: string[]) => void;
 }
 
 export type ContactSelectInstance = AsyncCreatableSelect<
@@ -52,7 +53,14 @@ export type ContactSelectInstance = AsyncCreatableSelect<
 
 export const ContactSelect = Object.assign(
   forwardRef<ContactSelectInstance, ContactSelectProps>(function (
-    { value, onSearchContacts, onCreateContact, onChange, ...props },
+    {
+      value,
+      onSearchContacts,
+      onCreateContact,
+      onPasteEmails,
+      onChange,
+      ...props
+    },
     ref
   ) {
     const errorToast = useExistingContactToast();
@@ -165,6 +173,7 @@ export const ContactSelect = Object.assign(
         onCreateOption={handleCreate}
         loadOptions={loadOptions}
         defaultOptions={options}
+        {...{ onPasteEmails }}
         {...reactSelectProps}
       />
     );
@@ -187,98 +196,14 @@ function useContactSelectReactSelectProps(
 ): AsyncCreatableSelectProps<ContactSelectSelection, true, never> {
   const reactSelectProps = useMemoReactSelectProps<
     ContactSelectSelection,
-    true
+    true,
+    never
   >(
     () => ({
       ...props,
       components: {
-        ...props.components,
-        NoOptionsMessage: memo(({ selectProps }) => {
-          const search = selectProps.inputValue;
-          return (
-            <Box textAlign="center" color="gray.400" padding={4}>
-              <UserPlusIcon boxSize={8} />
-              {search ? (
-                <>
-                  <Text as="div" marginTop={2}>
-                    <FormattedMessage
-                      id="component.contact-select.no-options"
-                      defaultMessage="We could not find any existing contacts for <em>{search}</em>"
-                      values={{
-                        search,
-                        em: (chunks: any[]) => <em>{chunks}</em>,
-                      }}
-                    />
-                  </Text>
-                  <Text as="div" marginTop={2}>
-                    <FormattedMessage
-                      id="component.contact-select.enter-email"
-                      defaultMessage="You can also enter a valid email."
-                    />
-                  </Text>
-                </>
-              ) : (
-                <Text as="div" marginTop={2}>
-                  <FormattedMessage
-                    id="component.contact-select.search-hint"
-                    defaultMessage="Search for existing contacts or enter a valid email."
-                  />
-                </Text>
-              )}
-            </Box>
-          );
-        }),
-        MultiValueLabel: memo(
-          ({
-            data,
-            children,
-            ...props
-          }: {
-            data: ContactSelectSelection;
-            children: ReactNode;
-          }) => {
-            const { fullName, email, isDeleted } = data;
-            return (
-              <components.MultiValueLabel {...(props as any)}>
-                <Text as="span" marginLeft={1}>
-                  {isDeleted ? (
-                    <DeletedContact color="red.600" />
-                  ) : fullName ? (
-                    `${fullName} <${email}>`
-                  ) : (
-                    email
-                  )}
-                </Text>
-              </components.MultiValueLabel>
-            );
-          }
-        ),
-        Option: ({ children, ...props }) => {
-          if ((props.data as any).__isNew__) {
-            return (
-              <components.Option {...props}>
-                {children} {/* from formatCreateLabel */}
-              </components.Option>
-            );
-          } else {
-            const contact = props.data as ContactSelectSelection;
-            return (
-              <components.Option {...props}>
-                {contact.fullName ? (
-                  <Text as="span" verticalAlign="baseline">
-                    <Text as="span">{contact.fullName}</Text>
-                    <Text as="span" display="inline-block" width={2} />
-                    <Text as="span" fontSize="sm" color="gray.500">
-                      {contact.email}
-                    </Text>
-                  </Text>
-                ) : (
-                  <Text as="span">{contact.email}</Text>
-                )}
-              </components.Option>
-            );
-          }
-        },
+        ...(props.components as any),
+        ..._components,
       },
     }),
     [props]
@@ -319,3 +244,118 @@ function useContactSelectReactSelectProps(
     [reactSelectProps]
   );
 }
+
+const _components: AsyncCreatableSelectProps<
+  ContactSelectSelection,
+  true,
+  never
+>["components"] = {
+  NoOptionsMessage: ({ selectProps }) => {
+    const search = selectProps.inputValue;
+    return (
+      <Box textAlign="center" color="gray.400" padding={4}>
+        <UserPlusIcon boxSize={8} />
+        {search ? (
+          <>
+            <Text as="div" marginTop={2}>
+              <FormattedMessage
+                id="component.contact-select.no-options"
+                defaultMessage="We could not find any existing contacts for <em>{search}</em>"
+                values={{
+                  search,
+                  em: (chunks: any[]) => <em>{chunks}</em>,
+                }}
+              />
+            </Text>
+            <Text as="div" marginTop={2}>
+              <FormattedMessage
+                id="component.contact-select.enter-email"
+                defaultMessage="You can also enter a valid email."
+              />
+            </Text>
+          </>
+        ) : (
+          <Text as="div" marginTop={2}>
+            <FormattedMessage
+              id="component.contact-select.search-hint"
+              defaultMessage="Search for existing contacts or enter a valid email."
+            />
+          </Text>
+        )}
+      </Box>
+    );
+  },
+  MultiValueLabel: ({
+    data,
+    children,
+    ...props
+  }: {
+    data: ContactSelectSelection;
+    children: ReactNode;
+  }) => {
+    const { fullName, email, isDeleted } = data;
+    return (
+      <components.MultiValueLabel {...(props as any)}>
+        <Text as="span" marginLeft={1}>
+          {isDeleted ? (
+            <DeletedContact color="red.600" />
+          ) : fullName ? (
+            `${fullName} <${email}>`
+          ) : (
+            email
+          )}
+        </Text>
+      </components.MultiValueLabel>
+    );
+  },
+  Option: ({ children, ...props }) => {
+    if ((props.data as any).__isNew__) {
+      return (
+        <components.Option {...props}>
+          {children} {/* from formatCreateLabel */}
+        </components.Option>
+      );
+    } else {
+      const contact = props.data as ContactSelectSelection;
+      return (
+        <components.Option {...props}>
+          {contact.fullName ? (
+            <Text as="span" verticalAlign="baseline">
+              <Text as="span">{contact.fullName}</Text>
+              <Text as="span" display="inline-block" width={2} />
+              <Text as="span" fontSize="sm" color="gray.500">
+                {contact.email}
+              </Text>
+            </Text>
+          ) : (
+            <Text as="span">{contact.email}</Text>
+          )}
+        </components.Option>
+      );
+    }
+  },
+  Input: (props) => {
+    const { onPasteEmails } = (props as any).selectProps;
+    return (
+      <components.Input
+        {...props}
+        {...{
+          onPaste:
+            onPasteEmails &&
+            ((e: ClipboardEvent<HTMLInputElement>) => {
+              if (e.clipboardData.types.includes("text/plain")) {
+                const text = e.clipboardData.getData("text/plain");
+                const emails = text
+                  .split(/\s+/g)
+                  .filter((part) => part.match(EMAIL_REGEX));
+                if (emails.length > 1) {
+                  e.preventDefault();
+                  onPasteEmails(emails);
+                }
+              }
+            }),
+        }}
+      />
+    );
+  },
+};
