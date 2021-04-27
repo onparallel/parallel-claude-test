@@ -210,6 +210,11 @@
     "context": "Delete selected"
   },
   {
+    "term": "component.contact-list-header.import-contacts-button",
+    "definition": "Importar contactos",
+    "context": "Import contacts"
+  },
+  {
     "term": "component.contact-select.create-new-contact",
     "definition": "Crear nuevo contacto para: <b>{email}</b>",
     "context": "Create new contact for: <b>{email}</b>"
@@ -1125,6 +1130,21 @@
     "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively. Add a <b>recipient group</b> to send different petitions to each group."
   },
   {
+    "term": "component.recipient-select-groups.unknown-contacts-header",
+    "definition": "Contactos no encontrados",
+    "context": "Unknown contacts"
+  },
+  {
+    "term": "component.recipient-select-groups.unknown-contacts-message-1",
+    "definition": "Se ha pegado desde el portapapeles un correo electrónico desconocido. Cuando pegues contactos desde el portapapeles, asegúrate de que estos contactos existan primero.",
+    "context": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
+  },
+  {
+    "term": "component.recipient-select-groups.unknown-contacts-message-2",
+    "definition": "Puedes importarlos vía Excel en la <a>página de contactos</a>. También puedes añadirlos aquí introduciendo sus correos uno a uno.",
+    "context": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
+  },
+  {
     "term": "component.recipient-select-groups.unknown-recipients",
     "definition": "No hemos encontrado {count, plural, =1 {a {email}} other {algunos emails}} en tu lista de contactos.",
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
@@ -1188,21 +1208,6 @@
     "term": "component.recipient-view-petition-field-reply.text-placeholder",
     "definition": "Su respuesta",
     "context": "Enter your answer"
-  },
-  {
-    "term": "component.recpient-select-groups.unknown-contacts-header",
-    "definition": "Contactos no encontrados",
-    "context": "Unknown contacts"
-  },
-  {
-    "term": "component.recpient-select-groups.unknown-contacts-message-1",
-    "definition": "Se ha pegado desde el portapapeles un correo electrónico desconocido. Cuando pegues contactos desde el portapapeles, aegurate de que estos contactos existan primero.",
-    "context": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
-  },
-  {
-    "term": "component.recpient-select-groups.unknown-contacts-message-2",
-    "definition": "Puedes importarlos vía Excel en la <a>página de contactos</a>. También puedes añadirlos aquí introduciend sus correos uno a uno.",
-    "context": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
   },
   {
     "term": "component.referenced-field-dialog.confirm",
@@ -1595,6 +1600,26 @@
     "context": "Last name"
   },
   {
+    "term": "contacts.import-from-excel.attach-xlsx",
+    "definition": "Adjunta un <b>archivo .xlsx</b> como el del modelo para añadir tus contactos.",
+    "context": "Attach an <b>.xlsx file</b> like the one in the model to add your contacts."
+  },
+  {
+    "term": "contacts.import-from-excel.download-model",
+    "definition": "Descargar modelo de importación de contactos",
+    "context": "Download contact loading model"
+  },
+  {
+    "term": "contacts.import-from-excel.header",
+    "definition": "Importar contactos desde Excel",
+    "context": "Import contacts from Excel"
+  },
+  {
+    "term": "contacts.import-from-excel.import-error.body",
+    "definition": "Por favor, revisa tu archivo y asegúrate de que el formato coincide con el del modelo de importación.",
+    "context": "Please, review your file and make sure it matches the format on the loading model."
+  },
+  {
     "term": "contacts.no-contacts",
     "definition": "No tienes contactos todavía. ¡Empieza por añadir uno!",
     "context": "You have no contacts yet. Start by creating one now!"
@@ -1605,9 +1630,24 @@
     "context": "There's no contacts matching your search"
   },
   {
+    "term": "contacts.successful-import-toast.title",
+    "definition": "¡{count, plural, =1{# contacto importado} other{# contactos importados}} correctamente!",
+    "context": "{count, plural, =1{# contact} other{# contacts}} imported successfully!"
+  },
+  {
     "term": "contacts.title",
     "definition": "Contactos",
     "context": "Contacts"
+  },
+  {
+    "term": "dropzone.error.file-invalid-type",
+    "definition": "Tipo de archivo no permitido. Por favor, adjunta un archivo {extension}",
+    "context": "File type not allowed. Please, attach an {extension} file"
+  },
+  {
+    "term": "dropzone.error.file-too-large",
+    "definition": "El archivo es demasiado grande. Tamaño máximo permitido {size}",
+    "context": "The file is too large. Maximum size allowed {size}"
   },
   {
     "term": "error.404.header",
@@ -1678,16 +1718,6 @@
     "term": "field-settings.dynamic-select.import-from-excel.error-dialog-header",
     "definition": "Error de importación",
     "context": "Import error"
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.error-file-invalid-type",
-    "definition": "Tipo de archivo no permitido. Por favor, adjunta un archivo .xlsx",
-    "context": "File type not allowed. Please, attach an .xlsx file"
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.error-file-too-large",
-    "definition": "El archivo es demasiado grande. Tamaño máximo permitido {size}",
-    "context": "The file is too large. Maximum size allowed {size}"
   },
   {
     "term": "field-settings.dynamic-select.import-from-excel.label",
@@ -2153,6 +2183,11 @@
     "term": "generic.i-understand",
     "definition": "Ok, entiendo",
     "context": "I understand"
+  },
+  {
+    "term": "generic.import-error",
+    "definition": "Error de importación",
+    "context": "Import error"
   },
   {
     "term": "generic.inactive-user.tooltip",

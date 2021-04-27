@@ -321,14 +321,15 @@ function DynamicSelectOptionsDropzone({
         <Text color="red.500" fontSize="sm">
           {fileDropError === "file-too-large" ? (
             <FormattedMessage
-              id="field-settings.dynamic-select.import-from-excel.error-file-too-large"
+              id="dropzone.error.file-too-large"
               defaultMessage="The file is too large. Maximum size allowed {size}"
               values={{ size: <FileSize value={MAX_FILESIZE} /> }}
             />
           ) : fileDropError === "file-invalid-type" ? (
             <FormattedMessage
-              id="field-settings.dynamic-select.import-from-excel.error-file-invalid-type"
-              defaultMessage="File type not allowed. Please, attach an .xlsx file"
+              id="dropzone.error.file-invalid-type"
+              defaultMessage="File type not allowed. Please, attach an {extension} file"
+              values={{ extension: ".xlsx" }}
             />
           ) : null}
         </Text>

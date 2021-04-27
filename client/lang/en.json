@@ -210,6 +210,11 @@
     "context": "Delete selected"
   },
   {
+    "term": "component.contact-list-header.import-contacts-button",
+    "definition": "Import contacts",
+    "context": "Import contacts"
+  },
+  {
     "term": "component.contact-select.create-new-contact",
     "definition": "Create new contact for: <b>{email}</b>",
     "context": "Create new contact for: <b>{email}</b>"
@@ -1125,6 +1130,21 @@
     "context": "All {recipientCount} recipients will receive a link to the same petition so they can fill it out collaboratively. Add a <b>recipient group</b> to send different petitions to each group."
   },
   {
+    "term": "component.recipient-select-groups.unknown-contacts-header",
+    "definition": "Unknown contacts",
+    "context": "Unknown contacts"
+  },
+  {
+    "term": "component.recipient-select-groups.unknown-contacts-message-1",
+    "definition": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first.",
+    "context": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
+  },
+  {
+    "term": "component.recipient-select-groups.unknown-contacts-message-2",
+    "definition": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one.",
+    "context": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
+  },
+  {
     "term": "component.recipient-select-groups.unknown-recipients",
     "definition": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list.",
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
@@ -1188,21 +1208,6 @@
     "term": "component.recipient-view-petition-field-reply.text-placeholder",
     "definition": "Enter your answer",
     "context": "Enter your answer"
-  },
-  {
-    "term": "component.recpient-select-groups.unknown-contacts-header",
-    "definition": "Unknown contacts",
-    "context": "Unknown contacts"
-  },
-  {
-    "term": "component.recpient-select-groups.unknown-contacts-message-1",
-    "definition": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first.",
-    "context": "An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
-  },
-  {
-    "term": "component.recpient-select-groups.unknown-contacts-message-2",
-    "definition": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one.",
-    "context": "You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
   },
   {
     "term": "component.referenced-field-dialog.confirm",
@@ -1595,6 +1600,26 @@
     "context": "Last name"
   },
   {
+    "term": "contacts.import-from-excel.attach-xlsx",
+    "definition": "Attach an <b>.xlsx file</b> like the one in the model to add your contacts.",
+    "context": "Attach an <b>.xlsx file</b> like the one in the model to add your contacts."
+  },
+  {
+    "term": "contacts.import-from-excel.download-model",
+    "definition": "Download contact loading model",
+    "context": "Download contact loading model"
+  },
+  {
+    "term": "contacts.import-from-excel.header",
+    "definition": "Import contacts from Excel",
+    "context": "Import contacts from Excel"
+  },
+  {
+    "term": "contacts.import-from-excel.import-error.body",
+    "definition": "Please, review your file and make sure it matches the format on the loading model.",
+    "context": "Please, review your file and make sure it matches the format on the loading model."
+  },
+  {
     "term": "contacts.no-contacts",
     "definition": "You have no contacts yet. Start by creating one now!",
     "context": "You have no contacts yet. Start by creating one now!"
@@ -1605,9 +1630,24 @@
     "context": "There's no contacts matching your search"
   },
   {
+    "term": "contacts.successful-import-toast.title",
+    "definition": "{count, plural, =1{# contact} other{# contacts}} imported successfully!",
+    "context": "{count, plural, =1{# contact} other{# contacts}} imported successfully!"
+  },
+  {
     "term": "contacts.title",
     "definition": "Contacts",
     "context": "Contacts"
+  },
+  {
+    "term": "dropzone.error.file-invalid-type",
+    "definition": "File type not allowed. Please, attach an {extension} file",
+    "context": "File type not allowed. Please, attach an {extension} file"
+  },
+  {
+    "term": "dropzone.error.file-too-large",
+    "definition": "The file is too large. Maximum size allowed {size}",
+    "context": "The file is too large. Maximum size allowed {size}"
   },
   {
     "term": "error.404.header",
@@ -1678,16 +1718,6 @@
     "term": "field-settings.dynamic-select.import-from-excel.error-dialog-header",
     "definition": "Import error",
     "context": "Import error"
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.error-file-invalid-type",
-    "definition": "File type not allowed. Please, attach an .xlsx file",
-    "context": "File type not allowed. Please, attach an .xlsx file"
-  },
-  {
-    "term": "field-settings.dynamic-select.import-from-excel.error-file-too-large",
-    "definition": "The file is too large. Maximum size allowed {size}",
-    "context": "The file is too large. Maximum size allowed {size}"
   },
   {
     "term": "field-settings.dynamic-select.import-from-excel.label",
@@ -2153,6 +2183,11 @@
     "term": "generic.i-understand",
     "definition": "I understand",
     "context": "I understand"
+  },
+  {
+    "term": "generic.import-error",
+    "definition": "Import error",
+    "context": "Import error"
   },
   {
     "term": "generic.inactive-user.tooltip",

@@ -55,14 +55,13 @@ import {
   validateIf,
   validateOr,
 } from "../../helpers/validateArgs";
-import { contentType } from "../../helpers/validators/contentType";
 import { inRange } from "../../helpers/validators/inRange";
 import { jsonSchema } from "../../helpers/validators/jsonSchema";
-import { maxFileSize } from "../../helpers/validators/maxFileSize";
 import { maxLength } from "../../helpers/validators/maxLength";
 import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import { notEmptyObject } from "../../helpers/validators/notEmptyObject";
 import { notEmptyString } from "../../helpers/validators/notEmptyString";
+import { validateFile } from "../../helpers/validators/validateFile";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { validFieldVisibilityJson } from "../../helpers/validators/validFieldVisibility";
 import { validIsDefined } from "../../helpers/validators/validIsDefined";
@@ -694,13 +693,14 @@ export const uploadDynamicSelectFile = mutationField(
       fieldId: nonNull(globalIdArg("PetitionField")),
       file: nonNull(uploadArg()),
     },
-    validateArgs: validateAnd(
-      contentType(
-        (args) => args.file,
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "file"
-      ),
-      maxFileSize((args) => args.file, 1024 * 1024 * 10, "file")
+    validateArgs: validateFile(
+      (args) => args.file,
+      {
+        contentType:
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        maxSize: 1024 * 1024 * 10,
+      },
+      "file"
     ),
     resolve: async (_, args, ctx) => {
       const file = await args.file;

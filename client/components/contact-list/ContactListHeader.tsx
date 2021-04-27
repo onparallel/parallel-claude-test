@@ -27,6 +27,7 @@ export interface ContactListHeaderProps {
   onReload: () => void;
   onDeleteClick: () => void;
   onCreateClick: () => void;
+  onImportClick: () => void;
 }
 
 export function ContactListHeader({
@@ -36,6 +37,7 @@ export function ContactListHeader({
   onReload,
   onCreateClick,
   onDeleteClick,
+  onImportClick,
 }: ContactListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
@@ -89,6 +91,12 @@ export function ContactListHeader({
           </Menu>
         </Box>
       ) : null}
+      <Button variant="outline" onClick={onImportClick}>
+        <FormattedMessage
+          id="component.contact-list-header.import-contacts-button"
+          defaultMessage="Import contacts"
+        />
+      </Button>
       <Button colorScheme="purple" onClick={onCreateClick} id="pw-new-contact">
         <FormattedMessage
           id="component.contact-list-header.create-contact-button"

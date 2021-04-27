@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Button, Flex, Text } from "@chakra-ui/react";
+import { Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
 import {
@@ -15,6 +15,7 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
+import { ImportContactsDialog } from "@parallel/components/contact-list/ImportContactsDialog";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   ContactsQuery,
@@ -34,6 +35,7 @@ import { clearCache } from "@parallel/utils/apollo/clearCache";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
+import { withError } from "@parallel/utils/promises/withError";
 import {
   integer,
   parseQuery,
@@ -136,6 +138,26 @@ function Contacts() {
     } catch {}
   }
 
+  const showImportContactsDialog = useDialog(ImportContactsDialog);
+  const showToast = useToast();
+  async function handleImportClick() {
+    const [error, data] = await withError(showImportContactsDialog({}));
+    if (!error) {
+      await refetch();
+      showToast({
+        title: intl.formatMessage(
+          {
+            id: "contacts.successful-import-toast.title",
+            defaultMessage:
+              "{count, plural, =1{# contact} other{# contacts}} imported successfully!",
+          },
+          { count: data!.count }
+        ),
+        status: "success",
+      });
+    }
+  }
+
   const columns = useContactsColumns();
 
   return (
@@ -174,6 +196,7 @@ function Contacts() {
               onReload={() => refetch()}
               onCreateClick={handleCreateClick}
               onDeleteClick={handleDeleteClick}
+              onImportClick={handleImportClick}
             />
           }
           body={

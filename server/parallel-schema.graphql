@@ -263,6 +263,11 @@ type Mutation {
   ): [SendPetitionResult!]!
 
   """
+  Load contacts from an excel file, creating the ones not found on database
+  """
+  bulkCreateContacts(file: Upload!): [Contact!]!
+
+  """
   Cancels a scheduled petition message.
   """
   cancelScheduledMessage(messageId: GID!, petitionId: GID!): PetitionMessage

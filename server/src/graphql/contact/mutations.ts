@@ -1,9 +1,16 @@
 import { inputObjectType, list, mutationField, nonNull } from "@nexus/schema";
+import pMap from "p-map";
+import { uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";
+import { withError } from "../../util/promises/withError";
 import { authenticate, chain } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
+import { importFromExcel } from "../helpers/importDataFromExcel";
+import { parseContactList } from "../helpers/parseContactList";
+import { uploadArg } from "../helpers/upload";
 import { notEmptyObject } from "../helpers/validators/notEmptyObject";
+import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
 import { userHasAccessToContacts } from "./authorizers";
 
@@ -93,5 +100,64 @@ export const deleteContacts = mutationField("deleteContacts", {
     );
     // await ctx.contacts.deleteContactById(args.ids, ctx.user!);
     // return RESULT.SUCCESS;
+  },
+});
+
+export const bulkCreateContacts = mutationField("bulkCreateContacts", {
+  description:
+    "Load contacts from an excel file, creating the ones not found on database",
+  type: list("Contact"),
+  authorize: authenticate(),
+  args: {
+    file: nonNull(uploadArg()),
+  },
+  validateArgs: validateFile(
+    (args) => args.file,
+    {
+      contentType:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      maxSize: 1024 * 1024 * 10,
+    },
+    "file"
+  ),
+  resolve: async (_, args, ctx) => {
+    const file = await args.file;
+
+    const [importError, importResult] = await withError(
+      importFromExcel(file.createReadStream())
+    );
+    if (importError) {
+      throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
+    }
+    const [parseError, parsedContacts] = await withError(() =>
+      parseContactList(importResult!)
+    );
+    if (parseError) {
+      throw new WhitelistedError(parseError.message, "INVALID_FORMAT_ERROR");
+    }
+
+    if (!parsedContacts || parsedContacts.length === 0) {
+      throw new WhitelistedError(
+        "No contacts found on file",
+        "NO_CONTACTS_FOUND_ERROR"
+      );
+    }
+
+    const contacts = await pMap(
+      parsedContacts,
+      (parsed) =>
+        ctx.contacts.loadOrCreate(
+          {
+            email: parsed.email,
+            firstName: parsed.firstName,
+            lastName: parsed.lastName,
+            orgId: ctx.user!.org_id,
+          },
+          ctx.user!
+        ),
+      { concurrency: 10 }
+    );
+
+    return uniqBy(contacts, (c) => c.email);
   },
 });

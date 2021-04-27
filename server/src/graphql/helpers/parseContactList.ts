@@ -1,0 +1,26 @@
+import { EMAIL_REGEX } from "./validators/validEmail";
+
+type ParsedContact = {
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
+export function parseContactList(data: string[][]): ParsedContact[] {
+  return data
+    .filter((row) => row.every((c) => !!c))
+    .map((row) => {
+      const entry = row.filter((cell) => !!cell);
+      if (entry.length !== 3) {
+        throw new Error("Not enough data");
+      }
+
+      const [firstName, lastName, email] = entry;
+
+      if (!EMAIL_REGEX.test(email)) {
+        throw new Error(`${email} is not a valid email`);
+      }
+
+      return { firstName, lastName, email };
+    });
+}

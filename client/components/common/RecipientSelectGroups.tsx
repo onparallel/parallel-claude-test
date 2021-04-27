@@ -77,7 +77,7 @@ export function RecipientSelectGroups({
         showErrorDialog({
           header: (
             <FormattedMessage
-              id="component.recpient-select-groups.unknown-contacts-header"
+              id="component.recipient-select-groups.unknown-contacts-header"
               defaultMessage="Unknown contacts"
             />
           ),
@@ -85,13 +85,13 @@ export function RecipientSelectGroups({
             <Stack>
               <Text>
                 <FormattedMessage
-                  id="component.recpient-select-groups.unknown-contacts-message-1"
+                  id="component.recipient-select-groups.unknown-contacts-message-1"
                   defaultMessage="An unknown contact was pasted. When adding contacts in bulk, please make sure these contacts exists first."
                 />
               </Text>
               <Text>
                 <FormattedMessage
-                  id="component.recpient-select-groups.unknown-contacts-message-2"
+                  id="component.recipient-select-groups.unknown-contacts-message-2"
                   defaultMessage="You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
                   values={{
                     a: (chunks: any[]) => (

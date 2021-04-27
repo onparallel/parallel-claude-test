@@ -195,6 +195,8 @@ export type Mutation = {
   assignPetitionToUser: SupportMethodResponse;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
   batchSendPetition: Array<SendPetitionResult>;
+  /** Load contacts from an excel file, creating the ones not found on database */
+  bulkCreateContacts: Array<Contact>;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage?: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -375,6 +377,10 @@ export type MutationbatchSendPetitionArgs = {
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
   subject: Scalars["String"];
+};
+
+export type MutationbulkCreateContactsArgs = {
+  file: Scalars["Upload"];
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -2342,6 +2348,16 @@ export type WithSuperAdminAccessQueryVariables = Exact<{
 
 export type WithSuperAdminAccessQuery = { __typename?: "Query" } & {
   me: { __typename?: "User" } & Pick<User, "isSuperAdmin">;
+};
+
+export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
+  file: Scalars["Upload"];
+}>;
+
+export type ImportContactsDialog_bulkCreateContactsMutation = {
+  __typename?: "Mutation";
+} & {
+  bulkCreateContacts: Array<{ __typename?: "Contact" } & Pick<Contact, "id">>;
 };
 
 export type AppLayout_UserFragment = { __typename?: "User" } & Pick<
@@ -7990,6 +8006,46 @@ export type WithSuperAdminAccessQueryHookResult = ReturnType<
 >;
 export type WithSuperAdminAccessLazyQueryHookResult = ReturnType<
   typeof useWithSuperAdminAccessLazyQuery
+>;
+export const ImportContactsDialog_bulkCreateContactsDocument = gql`
+  mutation ImportContactsDialog_bulkCreateContacts($file: Upload!) {
+    bulkCreateContacts(file: $file) {
+      id
+    }
+  }
+`;
+
+/**
+ * __useImportContactsDialog_bulkCreateContactsMutation__
+ *
+ * To run a mutation, you first call `useImportContactsDialog_bulkCreateContactsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useImportContactsDialog_bulkCreateContactsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [importContactsDialogBulkCreateContactsMutation, { data, loading, error }] = useImportContactsDialog_bulkCreateContactsMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useImportContactsDialog_bulkCreateContactsMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    ImportContactsDialog_bulkCreateContactsMutation,
+    ImportContactsDialog_bulkCreateContactsMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    ImportContactsDialog_bulkCreateContactsMutation,
+    ImportContactsDialog_bulkCreateContactsMutationVariables
+  >(ImportContactsDialog_bulkCreateContactsDocument, options);
+}
+export type ImportContactsDialog_bulkCreateContactsMutationHookResult = ReturnType<
+  typeof useImportContactsDialog_bulkCreateContactsMutation
 >;
 export const AppLayout_updateOnboardingStatusDocument = gql`
   mutation AppLayout_updateOnboardingStatus(
