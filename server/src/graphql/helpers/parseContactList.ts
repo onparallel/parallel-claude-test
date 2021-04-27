@@ -8,6 +8,7 @@ type ParsedContact = {
 
 export function parseContactList(data: string[][]): ParsedContact[] {
   return data
+    .slice(1) // first row is column headers
     .filter((row) => row.every((c) => !!c))
     .map((row) => {
       const entry = row.filter((cell) => !!cell);
