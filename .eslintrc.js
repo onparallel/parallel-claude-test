@@ -13,7 +13,12 @@ module.exports = {
     "prettier",
   ],
   rules: {
-    "prettier/prettier": "error",
+    "prettier/prettier": [
+      "error",
+      {
+        endOfLine: "auto",
+      },
+    ],
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/naming-convention": [

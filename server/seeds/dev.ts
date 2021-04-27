@@ -48,6 +48,14 @@ export async function seed(knex: Knex): Promise<any> {
       first_name: "Mariano",
       last_name: "Rodriguez",
     },
+    {
+      org_id: orgIds[0],
+      cognito_id: "013f5bce-5459-4e7c-bc64-773a4ffcd084",
+      email: "konstantin@onparallel.com",
+      organization_role: "ADMIN",
+      first_name: "Konstantin",
+      last_name: "Klykov",
+    },
   ];
   const userIds = await knex<User>("user").insert(users, "id");
   await knex<Organization>("organization")
@@ -89,6 +97,14 @@ export async function seed(knex: Knex): Promise<any> {
     {
       org_id: orgIds[0],
       email: "santialbo@gmail.com",
+      created_by: `User:${userIds[2]}`,
+      updated_by: `User:${userIds[2]}`,
+    },
+    {
+      org_id: orgIds[0],
+      first_name: "konstantin",
+      last_name: "Klykov",
+      email: "konstantin@onparallel.com",
       created_by: `User:${userIds[2]}`,
       updated_by: `User:${userIds[2]}`,
     },
