@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Grid,
   Input,
@@ -15,6 +16,7 @@ import {
   useTagEditDialog_tagsQuery,
   useTagEditDialog_updateTagMutation,
 } from "@parallel/graphql/__types";
+import { withError } from "@parallel/utils/promises/withError";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ReactNode, useEffect, useState } from "react";
@@ -34,6 +36,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
   });
   const isDisabled = !data || data.tags.items.length === 0;
   const [tag, setTag] = useState<TagSelection | null>(null);
+  const [error, setError] = useState<string | undefined>();
   const [updateTag] = useTagEditDialog_updateTagMutation();
   useEffect(() => {
     if (data && data.tags.items.length > 0 && tag === null) {
@@ -54,9 +57,14 @@ export function TagEditDialog({ ...props }: DialogProps) {
   const handleTagChange = useDebouncedCallback(
     async function (tag: TagSelection) {
       if (tag.name.trim().length > 0) {
-        await updateTag({
-          variables: { id: tag.id, data: pick(tag, ["name", "color"]) },
-        });
+        const [error] = await withError(
+          updateTag({
+            variables: { id: tag.id, data: pick(tag, ["name", "color"]) },
+          })
+        );
+        if (error) {
+          setError((error as any).graphQLErrors?.[0]?.extensions?.code);
+        }
       }
     },
     300,
@@ -97,7 +105,11 @@ export function TagEditDialog({ ...props }: DialogProps) {
             gridRowGap={2}
             marginTop={4}
           >
-            <FormControl as={NoElement} isDisabled={isDisabled}>
+            <FormControl
+              as={NoElement}
+              isDisabled={isDisabled}
+              isInvalid={!!error}
+            >
               <FormLabel marginBottom="0">
                 <FormattedMessage
                   id="components.tag-edit-dialog.name-label"
@@ -113,6 +125,14 @@ export function TagEditDialog({ ...props }: DialogProps) {
                 }}
                 onBlur={() => handleTagChange.immediateIfPending(tag!)}
               />
+              {error === "TAG_ALREADY_EXISTS" ? (
+                <FormErrorMessage gridColumn="2" marginTop={0}>
+                  <FormattedMessage
+                    id="components.tag-edit-dialog.existing-tag"
+                    defaultMessage="A tag with the same name already exists"
+                  />
+                </FormErrorMessage>
+              ) : null}
             </FormControl>
             <FormControl as={NoElement} isDisabled={isDisabled}>
               <FormLabel marginBottom="0">

@@ -84,10 +84,14 @@ export const updateTag = mutationField("updateTag", {
     try {
       return await ctx.tags.updateTag(args.id, data, ctx.user!);
     } catch (error) {
-      if (error.constraint !== "tag__organization_id__name__unique") {
+      if (error.constraint === "tag__organization_id__name__unique") {
+        throw new WhitelistedError(
+          "The organization already has a tag with this name",
+          "TAG_ALREADY_EXISTS"
+        );
+      } else {
         throw error;
       }
-      return (await ctx.tags.loadTag(args.id))!;
     }
   },
 });

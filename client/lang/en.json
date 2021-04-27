@@ -1540,6 +1540,11 @@
     "context": "Color"
   },
   {
+    "term": "components.tag-edit-dialog.existing-tag",
+    "definition": "A tag with the same name already exists",
+    "context": "A tag with the same name already exists"
+  },
+  {
     "term": "components.tag-edit-dialog.header",
     "definition": "Edit tags",
     "context": "Edit tags"
