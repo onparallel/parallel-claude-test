@@ -45,7 +45,7 @@ export type AddPetitionAccessDialogProps = {
   onSearchContacts?: ContactSelectProps["onSearchContacts"];
   onCreateContact?: ContactSelectProps["onCreateContact"];
   onUpdatePetition?: (data: UpdatePetitionInput) => void;
-  canAddRecipientGroups?: boolena;
+  canAddRecipientGroups?: boolean;
   defaultSubject?: Maybe<string>;
   defaultBody?: Maybe<RichTextEditorValue>;
   defaultRemindersConfig?: Maybe<RemindersConfig>;
