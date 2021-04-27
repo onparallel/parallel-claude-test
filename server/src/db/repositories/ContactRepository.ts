@@ -126,7 +126,7 @@ export class ContactRepository extends BaseRepository {
       ON CONFLICT (org_id, email) WHERE deleted_at is NULL
       DO UPDATE SET
         first_name = EXCLUDED.first_name,
-        last_name = EXCLUDED.first_name
+        last_name = EXCLUDED.last_name
       RETURNING *;`,
       [
         this.from("contact").insert(
