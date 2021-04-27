@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { useImportContactsDialog_bulkCreateContactsMutation } from "@parallel/graphql/__types";
+import { withError } from "@parallel/utils/promises/withError";
 import { useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -42,28 +43,32 @@ export function ImportContactsDialog(
     if (rejected.length > 0) {
       setFileDropError(rejected[0].errors[0].code);
     } else {
-      try {
-        setIsUploading(true);
-        const contacts = await bulkCreateContacts({
+      setIsUploading(true);
+      const [error, result] = await withError(
+        bulkCreateContacts({
           variables: { file },
-        });
-        props.onResolve({ count: contacts.data!.bulkCreateContacts.length });
-      } catch {
-        setIsUploading(false);
-        await showErrorDialog({
-          header: (
-            <FormattedMessage
-              id="generic.import-error"
-              defaultMessage="Import error"
-            />
-          ),
-          message: (
-            <FormattedMessage
-              id="contacts.import-from-excel.import-error.body"
-              defaultMessage="Please, review your file and make sure it matches the format on the loading model."
-            />
-          ),
-        });
+        })
+      );
+      setIsUploading(false);
+      if (error) {
+        await withError(
+          showErrorDialog({
+            header: (
+              <FormattedMessage
+                id="generic.import-error"
+                defaultMessage="Import error"
+              />
+            ),
+            message: (
+              <FormattedMessage
+                id="contacts.import-from-excel.import-error.body"
+                defaultMessage="Please, review your file and make sure it matches the format on the loading model."
+              />
+            ),
+          })
+        );
+      } else {
+        props.onResolve({ count: result!.data!.bulkCreateContacts.length });
       }
     }
   }

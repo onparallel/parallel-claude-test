@@ -356,7 +356,9 @@ function MultipleEmailsPastedDialog(
               <FormattedMessage
                 id="components.multiple-emails-pasted-dialog.message-2"
                 defaultMessage="Do you want to add them to <b>separate groups</b> (they will fill different petitions) or <b>group them in the same petition</b>?"
-                values={{ b: (chunks: any) => <Box as="strong">{chunks}</Box> }}
+                values={{
+                  b: (chunks: any) => <Text as="strong">{chunks}</Text>,
+                }}
               />
             </Text>
           </Stack>

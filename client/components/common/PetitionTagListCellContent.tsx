@@ -247,9 +247,9 @@ export function PetitionTagListCellContent({
                         </Stack>
                       }
                     >
-                      <Box as="strong" color="purple.500" fontWeight="normal">
+                      <Text as="strong" color="purple.500" fontWeight="normal">
                         {chunks}
-                      </Box>
+                      </Text>
                     </SmallPopover>
                   ),
                 }}

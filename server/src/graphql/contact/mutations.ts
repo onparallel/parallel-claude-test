@@ -1,6 +1,6 @@
 import { inputObjectType, list, mutationField, nonNull } from "@nexus/schema";
 import pMap from "p-map";
-import { uniqBy } from "remeda";
+import { chunk, uniqBy } from "remeda";
 import { CreateContact } from "../../db/__types";
 import { withError } from "../../util/promises/withError";
 import { authenticate, chain } from "../helpers/authorize";
@@ -143,20 +143,25 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
       );
     }
 
-    const contacts = await pMap(
-      parsedContacts,
-      (parsed) =>
-        ctx.contacts.loadOrCreate(
-          {
-            email: parsed.email,
-            firstName: parsed.firstName,
-            lastName: parsed.lastName,
-            orgId: ctx.user!.org_id,
-          },
-          ctx.user!
+    const contacts = (
+      await pMap(
+        chunk(
+          uniqBy(parsedContacts, (c) => c.email),
+          50
         ),
-      { concurrency: 10 }
-    );
+        (chunk) =>
+          ctx.contacts.createOrUpdate(
+            chunk.map((parsed) => ({
+              email: parsed.email,
+              firstName: parsed.firstName,
+              lastName: parsed.lastName,
+              orgId: ctx.user!.org_id,
+            })),
+            `User:${ctx.user!.id}`
+          ),
+        { concurrency: 1 }
+      )
+    ).flat();
 
     return uniqBy(contacts, (c) => c.email);
   },

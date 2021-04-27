@@ -88,15 +88,15 @@ export class ContactRepository extends BaseRepository {
       firstName: string;
       lastName: string;
     },
-    doneBy: Contact
+    createdBy: string
   ) {
-    const {
-      rows: [contact],
-    } = await this.knex.raw<{ rows: Contact[] }>(
+    const [contact] = await this.raw<Contact>(
       /* sql */ `
       ? 
       ON CONFLICT (org_id, email) WHERE deleted_at is NULL
-      DO UPDATE SET email=EXCLUDED.email -- need to do an update for the RETURNING to return the row
+      DO UPDATE SET
+        -- need to do an update for the RETURNING to return the row
+        email=EXCLUDED.email
       RETURNING *;`,
       [
         this.from("contact").insert({
@@ -104,12 +104,43 @@ export class ContactRepository extends BaseRepository {
           org_id: orgId,
           first_name: firstName,
           last_name: lastName,
-          created_at: this.now(),
-          created_by: `Contact:${doneBy.id}`,
+          created_by: createdBy,
         }),
       ]
     );
     return contact;
+  }
+
+  async createOrUpdate(
+    contacts: {
+      email: string;
+      orgId: number;
+      firstName: string;
+      lastName: string;
+    }[],
+    updatedBy: string
+  ) {
+    return await this.raw<Contact>(
+      /* sql */ `
+      ? 
+      ON CONFLICT (org_id, email) WHERE deleted_at is NULL
+      DO UPDATE SET
+        first_name = EXCLUDED.first_name,
+        last_name = EXCLUDED.first_name
+      RETURNING *;`,
+      [
+        this.from("contact").insert(
+          contacts.map((contact) => ({
+            email: contact.email,
+            org_id: contact.orgId,
+            first_name: contact.firstName,
+            last_name: contact.lastName,
+            created_by: updatedBy,
+            updated_by: updatedBy,
+          }))
+        ),
+      ]
+    );
   }
 
   async userHasAccessToContacts(user: User, contactIds: number[]) {
