@@ -173,6 +173,7 @@ const Month = memo(function Month({
                     borderRadius="40px"
                     aria-label={intl.formatDate(date, FORMATS.LL)}
                     onClick={() => onDateSelected?.(date)}
+                    {...(isToday(date) ? { "aria-current": "date" } : {})}
                   >
                     <FormattedDate value={date} day="numeric" />
                   </Button>
