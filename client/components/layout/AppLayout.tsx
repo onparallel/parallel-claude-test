@@ -90,11 +90,14 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           },
         }}
       >
-        <AppLayoutNavbar
-          user={user}
-          onOnboardingClick={handleOnboardingClick}
-          zIndex="2"
-        />
+        <Flex flexDirection="column" overflowY="auto" overflowX="hidden">
+          <AppLayoutNavbar
+            user={user}
+            onOnboardingClick={handleOnboardingClick}
+            flex="1"
+            zIndex="2"
+          />
+        </Flex>
         <Flex
           flex="1"
           flexDirection="column"

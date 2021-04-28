@@ -24,9 +24,7 @@ export function AppLayoutNavbarLink({
   return isAvailable ? (
     <Link
       href={href!}
-      borderX={!isMobile ? "4px solid" : undefined}
-      borderY={isMobile ? "4px solid" : undefined}
-      borderColor="transparent"
+      position="relative"
       display="block"
       userSelect="none"
       _focus={{
@@ -39,8 +37,20 @@ export function AppLayoutNavbarLink({
       _active={{
         textDecoration: "none",
       }}
-      borderTopColor={isMobile && isActive ? "purple.600" : "transparent"}
-      borderRightColor={!isMobile && isActive ? "purple.600" : "transparent"}
+      _after={
+        isActive
+          ? {
+              display: "block",
+              position: "absolute",
+              content: "''",
+              ...(isMobile
+                ? { height: "4px", width: "100%", top: 0, left: 0 }
+                : { width: "4px", height: "100%", right: 0, top: 0 }),
+              backgroundColor: "purple.600",
+            }
+          : {}
+      }
+      {...(isActive ? { "aria-current": "page" } : {})}
     >
       <AppLayoutNavbarLinkContent icon={icon} isMobile={isMobile}>
         {children}
