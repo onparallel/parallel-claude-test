@@ -1,3 +1,4 @@
+import { withError } from "@parallel/utils/promises/withError";
 import Head from "next/head";
 import Router from "next/router";
 import { useEffect } from "react";
@@ -6,7 +7,7 @@ declare const zE: any;
 
 export const Zendesk = () => {
   useEffect(() => {
-    const hide = () => zE(() => zE.hide());
+    const hide = () => withError(zE(() => zE.hide()));
     Router.events.on("routeChangeStart", hide);
     window.addEventListener("load", hide);
     return () => {

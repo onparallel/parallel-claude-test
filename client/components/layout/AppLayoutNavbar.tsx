@@ -28,6 +28,7 @@ import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { resolveUrl } from "@parallel/utils/next";
+import { withError } from "@parallel/utils/promises/withError";
 import { useRouter } from "next/router";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -104,6 +105,15 @@ export const AppLayoutNavbar = Object.assign(
         resolveUrl(pathname, {
           ...query,
           locale,
+        })
+      );
+    }
+
+    function handleHelpCenterClick() {
+      withError(
+        zE(function () {
+          zE("webWidget", "setLocale", query.locale);
+          zE.activate({ hideOnClose: true });
         })
       );
     }
@@ -271,14 +281,7 @@ export const AppLayoutNavbar = Object.assign(
                 <Portal>
                   <MenuList>
                     <MenuGroup>
-                      <MenuItem
-                        onClick={() => {
-                          zE(function () {
-                            zE("webWidget", "setLocale", query.locale);
-                            zE.activate({ hideOnClose: true });
-                          });
-                        }}
-                      >
+                      <MenuItem onClick={handleHelpCenterClick}>
                         <FormattedMessage
                           id="navbar.help-center"
                           defaultMessage="Help center"
