@@ -6,7 +6,6 @@ import {
   OnboardingStatus,
   useAppLayout_updateOnboardingStatusMutation,
 } from "@parallel/graphql/__types";
-import { withError } from "@parallel/utils/promises/withError";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
 import Router from "next/router";
@@ -43,7 +42,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       } else {
         toggle(true);
       }
-      withError(zE(() => zE.hide()));
+      zE?.(() => zE.hide());
     },
     [isRunning, toggle]
   );
