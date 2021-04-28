@@ -8,17 +8,16 @@ import {
   ModalHeader,
   Spinner,
   Text,
-  useFormControl,
 } from "@chakra-ui/react";
 import { DownloadIcon } from "@parallel/chakra/icons";
 import { useImportContactsDialog_bulkCreateContactsMutation } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
 import { useState } from "react";
-import { FileRejection, useDropzone } from "react-dropzone";
+import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BaseDialog } from "../common/BaseDialog";
-
 import { DialogProps } from "../common/DialogProvider";
+import { Dropzone } from "../common/Dropzone";
 import { useErrorDialog } from "../common/ErrorDialog";
 import { FileSize } from "../common/FileSize";
 import { NormalLink } from "../common/Link";
@@ -28,7 +27,6 @@ const MAX_FILESIZE = 1024 * 1024 * 10;
 export function ImportContactsDialog(
   props: DialogProps<{}, { count: number }>
 ) {
-  const inputProps = useFormControl({});
   const intl = useIntl();
 
   const [fileDropError, setFileDropError] = useState<string | null>(null);
@@ -73,14 +71,6 @@ export function ImportContactsDialog(
     }
   }
 
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    maxSize: MAX_FILESIZE,
-    multiple: false,
-    onDrop: handleFileDrop,
-    disabled: isUploading,
-  });
-
   return (
     <BaseDialog
       size="lg"
@@ -112,17 +102,16 @@ export function ImportContactsDialog(
               }}
             />
           </Text>
-          <Center
+          <Dropzone
+            as={Center}
             marginY={2}
             height="100px"
-            borderWidth={2}
-            borderStyle="dashed"
-            borderColor="gray.300"
-            borderRadius="md"
-            padding={4}
-            {...getRootProps()}
+            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            maxSize={MAX_FILESIZE}
+            multiple={false}
+            onDrop={handleFileDrop}
+            disabled={isUploading}
           >
-            <input {...inputProps} {...getInputProps()} />
             {isUploading ? (
               <Spinner
                 thickness="4px"
@@ -131,14 +120,14 @@ export function ImportContactsDialog(
                 color="purple.500"
               />
             ) : (
-              <Text pointerEvents="none" fontSize="sm" color="gray.500">
+              <Text pointerEvents="none" fontSize="sm">
                 <FormattedMessage
                   id="generic.dropzone-single.default"
                   defaultMessage="Drag the file here, or click to select it"
                 />
               </Text>
             )}
-          </Center>
+          </Dropzone>
           {fileDropError && (
             <Text color="red.500" fontSize="sm">
               {fileDropError === "file-too-large" ? (

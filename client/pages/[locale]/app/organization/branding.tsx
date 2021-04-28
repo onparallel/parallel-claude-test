@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { Dropzone } from "@parallel/components/common/Dropzone";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
@@ -27,7 +28,7 @@ import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useRef, useState } from "react";
-import { FileRejection, useDropzone } from "react-dropzone";
+import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const MAX_FILE_SIZE = 50 * 1024;
@@ -75,12 +76,6 @@ function OrganizationBranding() {
     }
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop: handleLogoUpload,
-    accept: ["image/png"],
-    maxSize: MAX_FILE_SIZE,
-    multiple: false,
-  });
   return (
     <SettingsLayout
       title={intl.formatMessage({
@@ -120,11 +115,11 @@ function OrganizationBranding() {
           </HelpPopover>
         </Heading>
         <Card padding={4}>
-          <Box
-            border="1px dashed gray"
-            borderRadius="md"
-            padding={4}
-            {...getRootProps()}
+          <Dropzone
+            onDrop={handleLogoUpload}
+            accept={["image/png"]}
+            maxSize={MAX_FILE_SIZE}
+            multiple={false}
           >
             {loading ? (
               <Center height="150px" width="300px">
@@ -148,8 +143,7 @@ function OrganizationBranding() {
                 fallback={<Box height="150px" width="300px" />}
               />
             )}
-            <input {...getInputProps()} />
-          </Box>
+          </Dropzone>
 
           <Flex marginTop={4}>
             <Button

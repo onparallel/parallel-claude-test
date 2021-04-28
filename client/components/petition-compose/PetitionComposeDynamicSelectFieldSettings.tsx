@@ -8,7 +8,6 @@ import {
   Progress,
   Stack,
   Text,
-  useFormControl,
 } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import {
@@ -19,9 +18,10 @@ import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useMemo, useState } from "react";
-import { FileRejection, useDropzone } from "react-dropzone";
+import { FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { DateTime } from "../common/DateTime";
+import { Dropzone } from "../common/Dropzone";
 import { useErrorDialog } from "../common/ErrorDialog";
 import { FileName } from "../common/FileName";
 import { FileSize } from "../common/FileSize";
@@ -251,8 +251,6 @@ function DynamicSelectOptionsDropzone({
 
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
-  const inputProps = useFormControl({});
-
   const [
     uploadFile,
     { loading },
@@ -283,12 +281,6 @@ function DynamicSelectOptionsDropzone({
       }
     }
   }
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    maxSize: MAX_FILESIZE,
-    multiple: false,
-    onDrop: handleFileDrop,
-  });
 
   return loading ? (
     <UploadedFileData />
@@ -300,23 +292,21 @@ function DynamicSelectOptionsDropzone({
           defaultMessage="Attach an .xlsx file like the one in the model."
         />
       </Text>
-      <Center
+      <Dropzone
         height="100px"
-        borderWidth={2}
-        borderStyle="dashed"
-        borderColor="gray.300"
-        borderRadius="md"
-        padding={4}
-        {...getRootProps()}
+        as={Center}
+        accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        maxSize={MAX_FILESIZE}
+        multiple={false}
+        onDrop={handleFileDrop}
       >
-        <input {...inputProps} {...getInputProps()} />
-        <Text pointerEvents="none" fontSize="sm" color="gray.500">
+        <Text pointerEvents="none" fontSize="sm">
           <FormattedMessage
             id="generic.dropzone-single.default"
             defaultMessage="Drag the file here, or click to select it"
           />
         </Text>
-      </Center>
+      </Dropzone>
       {fileDropError && (
         <Text color="red.500" fontSize="sm">
           {fileDropError === "file-too-large" ? (

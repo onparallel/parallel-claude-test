@@ -19,6 +19,7 @@ import {
   HelpOutlineIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
+import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -28,14 +29,12 @@ import {
   RecipientViewPetitionField_PublicPetitionFieldFragment,
   useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation,
 } from "@parallel/graphql/__types";
-import { generateCssStripe } from "@parallel/utils/css";
 import { FORMATS } from "@parallel/utils/dates";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useRef, useState } from "react";
-import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useCreateFileUploadReply, useDeletePetitionReply } from "./mutations";
 import {
@@ -321,94 +320,62 @@ function PetitionFieldFileUploadDropzone({
     : undefined;
   const _isDisabled =
     isDisabled || (!field.multiple && field.replies.length > 0);
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragReject,
-  } = useDropzone({
-    accept,
-    onDrop: onCreateReply,
-    multiple: field.multiple,
-    disabled: _isDisabled,
-  });
   return (
-    <Flex
-      color={
-        isDragActive ? (isDragReject ? "red.500" : "gray.600") : "gray.500"
-      }
-      border="2px dashed"
-      borderColor={
-        isDragActive ? (isDragReject ? "red.500" : "gray.400") : "gray.300"
-      }
-      cursor="pointer"
-      borderRadius="md"
-      flexDirection="column"
-      justifyContent="center"
-      minHeight="100px"
-      padding={4}
-      textAlign="center"
-      {...(_isDisabled
-        ? {
-            opacity: 0.4,
-            cursor: "not-allowed",
-          }
-        : {})}
-      sx={
-        isDragActive
-          ? generateCssStripe({
-              size: "1rem",
-              color: isDragReject ? "red.50" : "gray.50",
-            })
-          : {}
-      }
+    <Dropzone
+      as={Center}
       {...props}
-      {...getRootProps()}
+      minHeight="100px"
+      textAlign="center"
+      accept={accept}
+      onDrop={onCreateReply}
+      multiple={field.multiple}
+      disabled={_isDisabled}
     >
-      <input disabled={_isDisabled} {...getInputProps()} />
-      <Box pointerEvents="none">
-        {isDragActive && isDragReject ? (
-          <>
+      {({ isDragActive, isDragReject }) => (
+        <Box pointerEvents="none">
+          {isDragActive && isDragReject ? (
+            <>
+              <FormattedMessage
+                id="generic.dropzone-allowed-types"
+                defaultMessage="Only the following file types are allowed:"
+              />
+              <List paddingLeft={4}>
+                {accepts!.map((type) => (
+                  <ListItem listStyleType="disc" key={type}>
+                    {type === "DOCUMENT" ? (
+                      <FormattedMessage
+                        id="generic.file-types.document"
+                        defaultMessage="Documents (.pdf, .doc, .docx)"
+                      />
+                    ) : type === "IMAGE" ? (
+                      <FormattedMessage
+                        id="generic.file-types.image"
+                        defaultMessage="Images (.jpeg, .png, etc.)"
+                      />
+                    ) : type === "VIDEO" ? (
+                      <FormattedMessage
+                        id="generic.file-types.video"
+                        defaultMessage="Videos (.mp4, .avi, etc.)"
+                      />
+                    ) : type === "PDF" ? (
+                      <FormattedMessage
+                        id="generic.file-types.pdf"
+                        defaultMessage="PDF Documents"
+                      />
+                    ) : null}
+                  </ListItem>
+                ))}
+              </List>
+            </>
+          ) : (
             <FormattedMessage
-              id="generic.dropzone-allowed-types"
-              defaultMessage="Only the following file types are allowed:"
+              id="generic.dropzone-default"
+              defaultMessage="Drag files here, or click to select them"
             />
-            <List paddingLeft={4}>
-              {accepts!.map((type) => (
-                <ListItem listStyleType="disc" key={type}>
-                  {type === "DOCUMENT" ? (
-                    <FormattedMessage
-                      id="generic.file-types.document"
-                      defaultMessage="Documents (.pdf, .doc, .docx)"
-                    />
-                  ) : type === "IMAGE" ? (
-                    <FormattedMessage
-                      id="generic.file-types.image"
-                      defaultMessage="Images (.jpeg, .png, etc.)"
-                    />
-                  ) : type === "VIDEO" ? (
-                    <FormattedMessage
-                      id="generic.file-types.video"
-                      defaultMessage="Videos (.mp4, .avi, etc.)"
-                    />
-                  ) : type === "PDF" ? (
-                    <FormattedMessage
-                      id="generic.file-types.pdf"
-                      defaultMessage="PDF Documents"
-                    />
-                  ) : null}
-                </ListItem>
-              ))}
-            </List>
-          </>
-        ) : (
-          <FormattedMessage
-            id="generic.dropzone-default"
-            defaultMessage="Drag files here, or click to select them"
-          />
-        )}
-      </Box>
-    </Flex>
+          )}
+        </Box>
+      )}
+    </Dropzone>
   );
 }
 
