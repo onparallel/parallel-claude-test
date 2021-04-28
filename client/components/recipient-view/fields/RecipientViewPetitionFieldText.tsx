@@ -255,11 +255,9 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.text ?? "");
   const [isSaving, setIsSaving] = useState(false);
-
   const options = field.options as FieldOptions["TEXT"];
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
-      console.log("debouncedUpdateReply: ", value);
       setIsSaving(true);
       try {
         await onUpdate(value.trim());

@@ -383,7 +383,7 @@ export const publicCreateSimpleReply = mutationField(
     authorize: chain(
       authenticatePublicAccess("keycode"),
       fieldBelongsToAccess("fieldId"),
-      fieldHasType("fieldId", ["TEXT", "SELECT"])
+      fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT"])
     ),
     validateArgs: async (_, args, ctx, info) => {
       const field = (await ctx.petitions.loadField(args.fieldId))!;
@@ -423,7 +423,7 @@ export const publicUpdateSimpleReply = mutationField(
       authenticatePublicAccess("keycode"),
       and(
         replyBelongsToAccess("replyId"),
-        replyIsForFieldOfType("replyId", ["TEXT", "SELECT"])
+        replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"])
       )
     ),
     validateArgs: async (_, args, ctx, info) => {

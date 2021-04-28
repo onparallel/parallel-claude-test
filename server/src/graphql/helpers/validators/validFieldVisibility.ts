@@ -124,7 +124,10 @@ function validateCondition(
         `Invalid value type ${typeof c.value} for modifier ${c.modifier}`
       );
     } else {
-      if (referencedField.type === "TEXT") {
+      if (
+        referencedField.type === "TEXT" ||
+        referencedField.type === "SHORT_TEXT"
+      ) {
         assertOneOf(
           c.operator,
           [

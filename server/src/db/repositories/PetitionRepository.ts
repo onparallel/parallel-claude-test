@@ -712,6 +712,7 @@ export class PetitionRepository extends BaseRepository {
           ([
             "HEADING",
             "TEXT",
+            "SHORT_TEXT",
             "FILE_UPLOAD",
             "SELECT",
           ] as PetitionFieldType[]).map((type, index) => ({

@@ -573,11 +573,11 @@ export const PetitionFieldReply = objectType({
             );
             return file
               ? {
-                filename: file.filename,
-                size: file.size,
-                contentType: file.content_type,
-                extension: extension(file.content_type) || null,
-              }
+                  filename: file.filename,
+                  size: file.size,
+                  contentType: file.content_type,
+                  extension: extension(file.content_type) || null,
+                }
               : {};
           }
           default:

@@ -183,7 +183,7 @@ async function* getPetitionFiles(
           } as ZipFileInput;
         }
       }
-    } else if (["TEXT", "SELECT"].includes(field.type)) {
+    } else if (["TEXT", "SHORT_TEXT", "SELECT"].includes(field.type)) {
       if (replies.length > 0) {
         textReplies.addRows(
           replies.map((r, i) => ({
