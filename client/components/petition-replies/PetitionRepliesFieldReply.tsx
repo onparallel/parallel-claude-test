@@ -46,7 +46,9 @@ export function PetitionRepliesFieldReply({
   onAction,
 }: PetitionRepliesFieldReplyProps) {
   const intl = useIntl();
-  const isTextLikeType = ["TEXT", "SELECT"].includes(reply.field!.type);
+  const isTextLikeType = ["TEXT", "SHORT_TEXT", "SELECT"].includes(
+    reply.field!.type
+  );
   return (
     <Flex>
       <Box paddingRight={2} borderRight="2px solid" borderColor="gray.200">

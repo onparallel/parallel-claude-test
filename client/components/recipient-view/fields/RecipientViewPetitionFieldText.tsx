@@ -259,6 +259,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   const options = field.options as FieldOptions["TEXT"];
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
+      console.log("debouncedUpdateReply: ", value);
       setIsSaving(true);
       try {
         await onUpdate(value.trim());

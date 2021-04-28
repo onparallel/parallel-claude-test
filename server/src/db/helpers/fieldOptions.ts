@@ -16,6 +16,19 @@ const SCHEMAS = {
       },
     },
   },
+  SHORT_TEXT: {
+    type: "object",
+    required: ["multiline", "placeholder"],
+    additionalProperties: false,
+    properties: {
+      multiline: {
+        type: "boolean",
+      },
+      placeholder: {
+        type: ["string", "null"],
+      },
+    },
+  },
   FILE_UPLOAD: {
     type: "object",
     required: ["accepts"],
@@ -132,6 +145,15 @@ export function defaultFieldOptions(
         multiple: false,
         options: {
           multiline: true,
+          placeholder: null,
+        },
+      };
+    case "SHORT_TEXT":
+      return {
+        optional: false,
+        multiple: false,
+        options: {
+          multiline: false,
           placeholder: null,
         },
       };

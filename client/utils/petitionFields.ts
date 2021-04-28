@@ -15,6 +15,10 @@ export type FieldOptions = {
   FILE_UPLOAD: {
     accepts: Maybe<FileUploadAccepts[]>;
   };
+  SHORT_TEXT: {
+    multiline: boolean;
+    placeholder: Maybe<string>;
+  };
   TEXT: {
     multiline: boolean;
     placeholder: Maybe<string>;
@@ -44,10 +48,15 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "petition.field-type.file-upload",
           defaultMessage: "Documents and files",
         });
+      case "SHORT_TEXT":
+        return intl.formatMessage({
+          id: "petition.field-type.short-text",
+          defaultMessage: "Short replies",
+        });
       case "TEXT":
         return intl.formatMessage({
           id: "petition.field-type.text",
-          defaultMessage: "Text reply",
+          defaultMessage: "Text replies",
         });
       case "HEADING":
         return intl.formatMessage({
@@ -75,6 +84,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
   return ({
     FILE_UPLOAD: theme.colors.teal[400],
     TEXT: theme.colors.yellow[400],
+    SHORT_TEXT: theme.colors.yellow[500],
     HEADING: theme.colors.blue[400],
     SELECT: theme.colors.pink[400],
     DYNAMIC_SELECT: theme.colors.pink[600],

@@ -23,7 +23,7 @@ export function RecipientViewPetitionField(
 ) {
   return props.field.type === "HEADING" ? (
     <RecipientViewPetitionFieldHeading field={props.field} />
-  ) : props.field.type === "TEXT" ? (
+  ) : props.field.type === "TEXT" || props.field.type === "SHORT_TEXT" ? (
     <RecipientViewPetitionFieldText {...props} />
   ) : props.field.type === "SELECT" ? (
     <RecipientViewPetitionFieldSelect {...props} />

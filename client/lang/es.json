@@ -636,8 +636,13 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.text-description",
-    "definition": "Obtén información escrita que no está almacenada en documentos u otros archivos.",
-    "context": "Obtain written information that is not stored in documents or other files."
+    "definition": "Permiten al destinatario escribir todo lo que necesite.<i>Ej: Descripciones, comentarios...</i>",
+    "context": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.short-text-description",
+    "definition": "Permiten al destinatario escribir información breve.<i>Ej: Nombre, DNI/NIE...</i>",
+    "context": "Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
@@ -3261,8 +3266,13 @@
   },
   {
     "term": "petition.field-type.text",
-    "definition": "Respuesta de texto",
-    "context": "Text reply"
+    "definition": "Respuestas de texto",
+    "context": "Text replies"
+  },
+  {
+    "term": "petition.field-type.short-text",
+    "definition": "Respuestas cortas",
+    "context": "Short replies"
   },
   {
     "term": "petition.finalize-start-signature.body-1",

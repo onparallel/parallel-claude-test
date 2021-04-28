@@ -111,7 +111,7 @@ export function PetitionComposeFieldSettings({
           <HeadingSettings field={field} onFieldEdit={onFieldEdit} />
         ) : field.type === "FILE_UPLOAD" ? (
           <FileUploadSettings field={field} onFieldEdit={onFieldEdit} />
-        ) : field.type === "TEXT" ? (
+        ) : field.type === "TEXT" || field.type === "SHORT_TEXT" ? (
           <TextSettings field={field} onFieldEdit={onFieldEdit} />
         ) : field.type === "SELECT" ? (
           <SelectOptionSettings field={field} onFieldEdit={onFieldEdit} />
@@ -217,36 +217,6 @@ function TextSettings({
 
   return (
     <Stack spacing={4}>
-      <SettingsRow
-        label={
-          <FormattedMessage
-            id="field-settings.text-multiline-label"
-            defaultMessage="Multi-line"
-          />
-        }
-        description={
-          <Text fontSize="sm">
-            <FormattedMessage
-              id="field-settings.text-multiline-description"
-              defaultMessage="Enabling this will display a multi-line input field instead of a single line."
-            />
-          </Text>
-        }
-        controlId="text-multiline"
-      >
-        <Switch
-          height="20px"
-          display="block"
-          id="text-multiline"
-          color="green"
-          isChecked={options.multiline}
-          onChange={(event) =>
-            onFieldEdit(field.id, {
-              options: { ...field.options, multiline: event.target.checked },
-            })
-          }
-        />
-      </SettingsRow>
       <SettingsRowPlaceholder
         placeholder={placeholder}
         onChange={handlePlaceholderChange}

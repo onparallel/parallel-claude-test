@@ -53,6 +53,7 @@ export const PetitionFieldTypeSelect = chakraForwardRef<
 
 export const FIELD_TYPES: PetitionFieldType[] = [
   "FILE_UPLOAD",
+  "SHORT_TEXT",
   "TEXT",
   "SELECT",
   "DYNAMIC_SELECT",
@@ -238,6 +239,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
                 },
                 { type: activeTypeLabel }
               )}
+              loading="eager"
               src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/field-types/${activeType}_${locale}.png`}
             />
           </AspectRatio>
@@ -253,7 +255,26 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
             ) : activeType === "TEXT" ? (
               <FormattedMessage
                 id="component.petition-field-type-select-dropdown.text-description"
-                defaultMessage="Obtain written information that is not stored in documents or other files."
+                defaultMessage="Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>"
+                values={{
+                  i: (chunks: any[]) => (
+                    <Text mt={1} as="p">
+                      <i>{chunks}</i>
+                    </Text>
+                  ),
+                }}
+              />
+            ) : activeType === "SHORT_TEXT" ? (
+              <FormattedMessage
+                id="component.petition-field-type-select-dropdown.short-text-description"
+                defaultMessage="Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>"
+                values={{
+                  i: (chunks: any[]) => (
+                    <Text mt={1} as="p">
+                      <i>{chunks}</i>
+                    </Text>
+                  ),
+                }}
               />
             ) : activeType === "FILE_UPLOAD" ? (
               <FormattedMessage

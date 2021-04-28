@@ -59,6 +59,7 @@ export type PetitionFieldType =
   | "FILE_UPLOAD"
   | "HEADING"
   | "SELECT"
+  | "SHORT_TEXT"
   | "TEXT";
 
 export type PetitionMessageStatus =
@@ -601,8 +602,8 @@ export interface PetitionFieldReply {
   deleted_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
   status: PetitionFieldReplyStatus; // petition_field_reply_status
-  metadata: any; // jsonb
   user_id: Maybe<number>; // int4
+  metadata: any; // jsonb
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -615,8 +616,8 @@ export type CreatePetitionFieldReply = PartialProps<
   | "deleted_by"
   | "petition_access_id"
   | "status"
-  | "metadata"
   | "user_id"
+  | "metadata"
 >;
 
 export interface PetitionMessage {

@@ -1251,6 +1251,8 @@ export type PetitionFieldType =
   | "HEADING"
   /** A select field. */
   | "SELECT"
+  /** A short text field. */
+  | "SHORT_TEXT"
   /** A text field. */
   | "TEXT";
 

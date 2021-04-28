@@ -636,8 +636,13 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.text-description",
-    "definition": "Obtain written information that is not stored in documents or other files.",
-    "context": "Obtain written information that is not stored in documents or other files."
+    "definition": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>",
+    "context": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.short-text-description",
+    "definition": "Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>",
+    "context": "Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
@@ -3261,8 +3266,13 @@
   },
   {
     "term": "petition.field-type.text",
-    "definition": "Text reply",
-    "context": "Text reply"
+    "definition": "Text replies",
+    "context": "Text replies"
+  },
+  {
+    "term": "petition.field-type.short-text",
+    "definition": "Short replies",
+    "context": "Short replies"
   },
   {
     "term": "petition.finalize-start-signature.body-1",

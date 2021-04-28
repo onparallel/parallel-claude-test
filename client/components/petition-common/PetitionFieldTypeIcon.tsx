@@ -20,6 +20,7 @@ export const PetitionFieldTypeIcon = chakraForwardRef<
 >(function PetitionFieldTypeIcon({ type, ...props }, ref) {
   const icon = ({
     FILE_UPLOAD: FieldFileUploadIcon,
+    SHORT_TEXT: FieldTextIcon,
     TEXT: FieldTextIcon,
     HEADING: FieldHeadingIcon,
     SELECT: FieldSelectIcon,

@@ -258,6 +258,7 @@ export const PetitionFieldType = enumType({
   members: [
     { name: "FILE_UPLOAD", description: "A file upload field." },
     { name: "TEXT", description: "A text field." },
+    { name: "SHORT_TEXT", description: "A short text field." },
     { name: "HEADING", description: "A heading field." },
     { name: "SELECT", description: "A select field." },
     { name: "DYNAMIC_SELECT", description: "A dynamic select field." },
@@ -561,6 +562,7 @@ export const PetitionFieldReply = objectType({
       resolve: async (root, _, ctx) => {
         switch (root.type) {
           case "TEXT":
+          case "SHORT_TEXT":
           case "SELECT":
           case "DYNAMIC_SELECT": {
             return root.content;
@@ -571,11 +573,11 @@ export const PetitionFieldReply = objectType({
             );
             return file
               ? {
-                  filename: file.filename,
-                  size: file.size,
-                  contentType: file.content_type,
-                  extension: extension(file.content_type) || null,
-                }
+                filename: file.filename,
+                size: file.size,
+                contentType: file.content_type,
+                extension: extension(file.content_type) || null,
+              }
               : {};
           }
           default:
