@@ -62,7 +62,7 @@ export function TablePage<T, TContext = unknown>({
       {header ? header : null}
       <Flex
         flexDirection="column"
-        flex="1 1 0"
+        flex="0 1 auto"
         minWidth="0"
         position="relative"
         overflowX="auto"
@@ -87,7 +87,14 @@ export function TablePage<T, TContext = unknown>({
           </Flex>
         ) : null}
         {body ? (
-          body
+          <Flex
+            flexDirection="column"
+            borderTop="1px solid"
+            borderTopColor={colors.border}
+            flex="1 1 300px"
+          >
+            {body}
+          </Flex>
         ) : (
           <Table
             columns={columns}
@@ -105,6 +112,7 @@ export function TablePage<T, TContext = unknown>({
         )}
       </Flex>
       <Stack
+        flexShrink={0}
         direction={{ base: "column", sm: "row" }}
         spacing={{ base: 2, sm: 4 }}
         paddingY={2}

@@ -208,9 +208,10 @@ function OrganizationUsers() {
         />
       }
     >
-      <Flex flex="1" padding={4}>
+      <Flex flexDirection="column" flex="1" minHeight={0} padding={4}>
         <TablePage
-          flex="1"
+          flex="0 1 auto"
+          minHeight={0}
           isSelectable
           isHighlightable
           columns={columns}

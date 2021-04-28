@@ -168,9 +168,10 @@ function Contacts() {
       })}
       user={me}
     >
-      <Flex flexDirection="column" flex="1" padding={4}>
+      <Flex flexDirection="column" flex="1" minHeight={0} padding={4}>
         <TablePage
-          flex="1"
+          flex="0 1 auto"
+          minHeight={0}
           columns={columns}
           rows={contacts.items}
           rowKeyProp={"id"}
@@ -202,7 +203,12 @@ function Contacts() {
           body={
             contacts.totalCount === 0 && !loading ? (
               state.search ? (
-                <Flex flex="1" alignItems="center" justifyContent="center">
+                <Flex
+                  flex="1"
+                  alignItems="center"
+                  justifyContent="center"
+                  height="300px"
+                >
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
                       id="contacts.no-results"
@@ -211,7 +217,12 @@ function Contacts() {
                   </Text>
                 </Flex>
               ) : (
-                <Flex flex="1" alignItems="center" justifyContent="center">
+                <Flex
+                  flex="1"
+                  alignItems="center"
+                  justifyContent="center"
+                  height="300px"
+                >
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="contacts.no-contacts"
