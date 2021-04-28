@@ -242,7 +242,7 @@ export class Mocks {
       .insert(
         range(0, amount || 1).map<CreateTag>((index) => ({
           color: "#000000",
-          name: faker.random.words(),
+          name: faker.random.words(3),
           organization_id: orgId,
           ...builder?.(index),
         }))
