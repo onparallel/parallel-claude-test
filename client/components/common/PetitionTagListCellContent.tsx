@@ -184,6 +184,7 @@ export function PetitionTagListCellContent({
           paddingX={2}
           paddingRight={5}
           alignItems="center"
+          maxWidth="400px"
         >
           {petition.tags.length === 0 ? (
             <Stack
