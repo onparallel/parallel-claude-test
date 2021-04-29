@@ -1,6 +1,8 @@
+import { ReactNode } from "react";
+
 interface IfProps {
   condition: any;
-  children: any;
+  children: ReactNode;
 }
 
 export const If = ({ condition, children }: IfProps) => (
