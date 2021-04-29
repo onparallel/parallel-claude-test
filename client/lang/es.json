@@ -641,7 +641,7 @@
   },
   {
     "term": "component.petition-field-type-select-dropdown.short-text-description",
-    "definition": "Permiten al destinatario escribir información breve.<i>Ej: Nombre, DNI/NIE...</i>",
+    "definition": "Permiten al destinatario responder de forma breve.<i>Ej: Nombre, DNI/NIE...</i>",
     "context": "Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>"
   },
   {

@@ -369,7 +369,11 @@ function randomPetitionFieldOptions(type: PetitionFieldType) {
     }
     case "TEXT": {
       return {
-        multiline: faker.datatype.boolean(),
+        placeholder: faker.random.words(3),
+      };
+    }
+    case "SHORT_TEXT": {
+      return {
         placeholder: faker.random.words(3),
       };
     }

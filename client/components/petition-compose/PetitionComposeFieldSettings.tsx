@@ -199,7 +199,10 @@ function TextSettings({
   field,
   onFieldEdit,
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
-  const options = field.options as FieldOptions["TEXT"];
+  const options =
+    field.type === "TEXT"
+      ? (field.options as FieldOptions["TEXT"])
+      : (field.options as FieldOptions["SHORT_TEXT"]);
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
   const handlePlaceholderChange = function (

@@ -3,6 +3,7 @@ import { DeleteIcon } from "@parallel/chakra/icons";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
+import { If } from "@parallel/utils/conditions";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -62,7 +63,10 @@ export function RecipientViewPetitionFieldText({
   const newReplyRef = useRef<AnyInputElement>(null);
   const replyRefs = useMultipleRefs<AnyInputElement>();
 
-  const options = field.options as FieldOptions["TEXT"];
+  const options =
+    field.type === "TEXT"
+      ? (field.options as FieldOptions["TEXT"])
+      : (field.options as FieldOptions["SHORT_TEXT"]);
 
   const updateSimpleReply = useUpdateSimpleReply();
   const handleUpdate = useMemoFactory(
@@ -195,7 +199,7 @@ export function RecipientViewPetitionFieldText({
       showAddNewReply={!isDisabled && !showNewReply && field.multiple}
       onAddNewReply={handleAddNewReply}
     >
-      {field.replies.length ? (
+      <If condition={field.replies.length}>
         <List as={Stack} marginTop={2}>
           <AnimatePresence initial={false}>
             {field.replies.map((reply) => (
@@ -217,10 +221,14 @@ export function RecipientViewPetitionFieldText({
             ))}
           </AnimatePresence>
         </List>
-      ) : null}
-      {(field.multiple && showNewReply) || field.replies.length === 0 ? (
+      </If>
+      <If
+        condition={
+          (field.multiple && showNewReply) || field.replies.length === 0
+        }
+      >
         <Flex flex="1" position="relative" marginTop={2}>
-          {field.options.multiline ? (
+          {field.type === "TEXT" ? (
             <GrowingTextarea {...inputProps} />
           ) : (
             <Input {...inputProps} />
@@ -231,7 +239,7 @@ export function RecipientViewPetitionFieldText({
             />
           </Center>
         </Flex>
-      ) : null}
+      </If>
     </RecipientViewPetitionFieldCard>
   );
 }
@@ -255,7 +263,11 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   const intl = useIntl();
   const [value, setValue] = useState(reply.content.text ?? "");
   const [isSaving, setIsSaving] = useState(false);
-  const options = field.options as FieldOptions["TEXT"];
+  const options =
+    field.type === "TEXT"
+      ? (field.options as FieldOptions["TEXT"])
+      : (field.options as FieldOptions["SHORT_TEXT"]);
+
   const debouncedUpdateReply = useDebouncedCallback(
     async (value: string) => {
       setIsSaving(true);
@@ -267,6 +279,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
     1000,
     [onUpdate]
   );
+
   const props = {
     id: `reply-${field.id}-${reply.id}`,
     ref: ref as any,
@@ -302,10 +315,11 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
         defaultMessage: "Enter your answer",
       }),
   };
+
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        {options.multiline ? (
+        {field.type === "TEXT" ? (
           <GrowingTextarea {...props} />
         ) : (
           <Input {...props} />

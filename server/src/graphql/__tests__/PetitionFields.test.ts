@@ -123,7 +123,6 @@ describe("GraphQL/Petition Fields", () => {
               optional: false,
               multiple: false,
               options: {
-                multiline: true,
                 placeholder: null,
               },
               isReadOnly: false,
@@ -1078,7 +1077,7 @@ describe("GraphQL/Petition Fields", () => {
             description: "this is the new description",
             multiple: true,
             optional: true,
-            options: { placeholder: "enter text here...", multiline: false },
+            options: { placeholder: "enter text here..." },
             title: "new title",
             visibility: {
               type: "SHOW",
@@ -1101,7 +1100,7 @@ describe("GraphQL/Petition Fields", () => {
           id: fieldGIDs[4],
           title: "new title",
           description: "this is the new description",
-          options: { placeholder: "enter text here...", multiline: false },
+          options: { placeholder: "enter text here..." },
           optional: true,
           multiple: true,
           visibility: {
@@ -1374,7 +1373,6 @@ describe("GraphQL/Petition Fields", () => {
           data: {
             options: {
               placeholder: "new placeholder",
-              multiline: true,
             },
           },
         },
@@ -1384,7 +1382,6 @@ describe("GraphQL/Petition Fields", () => {
         field: {
           options: {
             placeholder: "new placeholder",
-            multiline: true,
           },
           validated: false,
         },
@@ -1642,7 +1639,7 @@ describe("GraphQL/Petition Fields", () => {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: fieldGIDs[1],
           data: {
-            options: { placeholder: "foo", multiline: false, extra: false },
+            options: { placeholder: "foo", extra: false },
           },
         },
       });
@@ -1777,7 +1774,6 @@ describe("GraphQL/Petition Fields", () => {
           optional: false,
           multiple: false,
           options: {
-            multiline: true,
             placeholder: null,
           },
         },
@@ -2108,7 +2104,6 @@ describe("GraphQL/Petition Fields", () => {
       fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
         type: "TEXT",
         options: {
-          multiline: faker.datatype.boolean(),
           placeholder: faker.random.words(3),
         },
         validated: false,
@@ -2518,7 +2513,6 @@ describe("GraphQL/Petition Fields", () => {
       fields = await mocks.createRandomPetitionFields(petition.id, 3, () => ({
         type: "TEXT",
         options: {
-          multiline: faker.datatype.boolean(),
           placeholder: faker.random.words(3),
         },
         validated: false,

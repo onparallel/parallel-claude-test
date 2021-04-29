@@ -16,11 +16,9 @@ export type FieldOptions = {
     accepts: Maybe<FileUploadAccepts[]>;
   };
   SHORT_TEXT: {
-    multiline: boolean;
     placeholder: Maybe<string>;
   };
   TEXT: {
-    multiline: boolean;
     placeholder: Maybe<string>;
   };
   SELECT: {

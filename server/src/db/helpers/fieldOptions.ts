@@ -5,12 +5,9 @@ import addFormats from "ajv-formats";
 const SCHEMAS = {
   TEXT: {
     type: "object",
-    required: ["multiline", "placeholder"],
+    required: ["placeholder"],
     additionalProperties: false,
     properties: {
-      multiline: {
-        type: "boolean",
-      },
       placeholder: {
         type: ["string", "null"],
       },
@@ -18,12 +15,9 @@ const SCHEMAS = {
   },
   SHORT_TEXT: {
     type: "object",
-    required: ["multiline", "placeholder"],
+    required: ["placeholder"],
     additionalProperties: false,
     properties: {
-      multiline: {
-        type: "boolean",
-      },
       placeholder: {
         type: ["string", "null"],
       },
@@ -144,7 +138,6 @@ export function defaultFieldOptions(
         optional: false,
         multiple: false,
         options: {
-          multiline: true,
           placeholder: null,
         },
       };
@@ -153,7 +146,6 @@ export function defaultFieldOptions(
         optional: false,
         multiple: false,
         options: {
-          multiline: false,
           placeholder: null,
         },
       };
