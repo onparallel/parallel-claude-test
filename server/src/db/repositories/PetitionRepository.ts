@@ -223,13 +223,16 @@ export class PetitionRepository extends BaseRepository {
     } & PageOpts
   ) {
     const petitionType = opts.filters?.type || "PETITION";
+    const hasOrderByLastUsed =
+      petitionType === "TEMPLATE" &&
+      opts.sortBy?.some((o) => o.column === "last_used_at");
     return await this.loadPageAndCount(
       this.from("petition")
-        .leftJoin("petition_user", "petition.id", "petition_user.petition_id")
+        .leftJoin({ pu: "petition_user" }, "petition.id", "pu.petition_id")
         .where({
-          "petition_user.user_id": userId,
+          "pu.user_id": userId,
           is_template: petitionType === "TEMPLATE",
-          "petition_user.deleted_at": null,
+          "pu.deleted_at": null,
         })
         .mmodify((q) => {
           const { search, filters } = opts;
@@ -237,9 +240,27 @@ export class PetitionRepository extends BaseRepository {
             q.where("locale", filters.locale);
           }
           if (search) {
+            if (petitionType === "PETITION") {
+              q.joinRaw(/* sql */ `
+                left join petition_access pa on petition.id = pa.petition_id and pa.status = 'ACTIVE'
+                left join contact c on pa.contact_id = c.id and c.deleted_at is null
+              `);
+            }
             q.andWhere((q2) => {
               q2.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
-              if (petitionType === "TEMPLATE") {
+              if (petitionType === "PETITION") {
+                q2.or
+                  .whereIlike(
+                    this.knex.raw(`concat(c.first_name, ' ', c.last_name)`),
+                    `%${escapeLike(search, "\\")}%`,
+                    "\\"
+                  )
+                  .or.whereIlike(
+                    "c.email",
+                    `%${escapeLike(search, "\\")}%`,
+                    "\\"
+                  );
+              } else {
                 q2.or.whereIlike(
                   "template_description",
                   `%${escapeLike(search, "\\")}%`,
@@ -254,7 +275,7 @@ export class PetitionRepository extends BaseRepository {
 
           if (filters?.tagIds) {
             if (filters.tagIds.length > 0) {
-              filters.tagIds.map((tagId, i) => {
+              filters.tagIds.forEach((tagId, i) => {
                 q.joinRaw(
                   `join petition_tag pt${i} on (pt${i}.petition_id = petition.id and pt${i}.tag_id = ?)`,
                   [fromGlobalId(tagId, "Tag").id]
@@ -275,20 +296,17 @@ export class PetitionRepository extends BaseRepository {
             }
           }
 
-          const hasOrderByLastUsed = opts.sortBy?.some(
-            (o) => o.column === "last_used_at"
-          );
-          if (hasOrderByLastUsed && petitionType === "TEMPLATE") {
+          if (hasOrderByLastUsed) {
             q.leftJoin(
               this.knex.raw(
                 /* sql */ `(
-                  SELECT
-                    p.from_template_id AS template_id,
-                    MAX(p.created_at) AS last_used_at
-                  FROM petition AS p
-                    WHERE created_by = ?
-                    GROUP BY p.from_template_id
-                ) AS lj
+                  select
+                    p.from_template_id as template_id,
+                    max(p.created_at) as last_used_at
+                  from petition as p
+                    where created_by = ?
+                    group by p.from_template_id
+                ) as lj
                 `,
                 [`User:${userId}`]
               ),
@@ -296,7 +314,10 @@ export class PetitionRepository extends BaseRepository {
               "petition.id"
             ).orderByRaw(
               opts
-                .sortBy!.map((s) => `${s.column} ${s.order} NULLS LAST`)
+                .sortBy!.map((s) => {
+                  const table = s.column === "last_used_at" ? "lj" : "petition";
+                  return `${table}.${s.column} ${s.order} NULLS LAST`;
+                })
                 .join(", ")
             );
           } else if (opts.sortBy?.length) {
@@ -307,7 +328,11 @@ export class PetitionRepository extends BaseRepository {
         // default order by to ensure result consistency
         // applies after any previously specified order by
         .orderBy("petition.id")
-        .select("petition.*"),
+        .distinct(
+          "petition.*",
+          // when using distinct pg requires any order by clause to be included on the select
+          ...(hasOrderByLastUsed ? ["lj.last_used_at"] : [])
+        ),
       opts
     );
   }

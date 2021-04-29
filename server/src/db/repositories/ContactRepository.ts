@@ -173,7 +173,7 @@ export class ContactRepository extends BaseRepository {
           if (search) {
             q.andWhere((q2) => {
               q2.whereIlike(
-                this.knex.raw(`concat("first_name", ' ', "last_name")`) as any,
+                this.knex.raw(`concat("first_name", ' ', "last_name")`),
                 `%${escapeLike(search, "\\")}%`,
                 "\\"
               ).or.whereIlike("email", `%${escapeLike(search, "\\")}%`, "\\");

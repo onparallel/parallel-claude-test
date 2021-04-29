@@ -17,7 +17,7 @@ declare module "knex" {
     }
     interface WhereLike<TRecord = any, TResult = unknown[]> {
       (
-        columnName: keyof TRecord,
+        columnName: keyof TRecord | Raw,
         pattern: string,
         escape?: string
       ): QueryBuilder<TRecord, TResult>;
