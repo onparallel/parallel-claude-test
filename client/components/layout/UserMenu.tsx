@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
 import {
   Avatar,
   Button,
@@ -19,7 +19,6 @@ import {
   UserIcon,
 } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
-import { postJSON } from "@parallel/utils/rest";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -34,12 +33,9 @@ export interface UserMenuProps {
 export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
-  const apollo = useApolloClient();
 
   async function handleLogoutClick() {
-    await postJSON("/api/auth/logout");
-    await apollo.clearStore();
-    router.push(`/${router.query.locale}/login`);
+    window.location.href = `/api/auth/logout`;
   }
   const locales = useSupportedLocales();
 

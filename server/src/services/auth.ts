@@ -257,11 +257,22 @@ export class Auth implements IAuth {
     }
   }
 
+  async logoutCallback(req: Request, res: Response, next: NextFunction) {
+    res.redirect(302, `/?url=${encodeURIComponent("/login")}`);
+  }
+
   async logout(req: Request, res: Response, next: NextFunction) {
+    const url = new URL(`https://${this.config.cognito.domain}/logout`);
+    for (const [name, value] of Object.entries({
+      logout_uri: `${this.config.misc.parallelUrl}/api/auth/logout/callback`,
+      client_id: this.config.cognito.clientId,
+    })) {
+      url.searchParams.append(name, value);
+    }
     const cookie = req.cookies["parallel_session"];
     await this.deleteSession(cookie);
     res.clearCookie("parallel_session");
-    res.status(204).send();
+    res.redirect(302, url.href);
   }
 
   private setSession(res: Response, token: string) {

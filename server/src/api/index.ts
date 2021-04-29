@@ -42,8 +42,11 @@ export function api(container: Container) {
         .post("/login", (req, res, next) =>
           req.context.auth.login(req, res, next)
         )
-        .post("/logout", (req, res, next) =>
+        .get("/logout", (req, res, next) =>
           req.context.auth.logout(req, res, next)
+        )
+        .get("/logout/callback", (req, res, next) =>
+          req.context.auth.logoutCallback(req, res, next)
         )
         .post("/new-password", (req, res, next) =>
           req.context.auth.newPassword(req, res, next)
