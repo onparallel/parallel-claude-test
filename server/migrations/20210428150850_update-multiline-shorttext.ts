@@ -2,7 +2,7 @@ import { Knex } from "knex";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
-    UPDATE petition_field SET type = 'SHORT_TEXT' WHERE options->>'multiline' = 'false';
+    UPDATE petition_field SET type = 'SHORT_TEXT' WHERE (options->>'multiline')::boolean = false;
     UPDATE petition_field_reply SET type = 'SHORT_TEXT' FROM (SELECT id FROM petition_field WHERE type = 'SHORT_TEXT') AS subquery WHERE petition_field_reply.petition_field_id = subquery.id;
     UPDATE petition_field SET options = options::jsonb - 'multiline' WHERE type = 'SHORT_TEXT' OR type = 'TEXT';
   `);
