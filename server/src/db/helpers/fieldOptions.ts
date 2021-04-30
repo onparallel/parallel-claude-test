@@ -1,4 +1,8 @@
-import { PetitionFieldType, CreatePetitionField } from "../__types";
+import {
+  PetitionFieldType,
+  CreatePetitionField,
+  PetitionField,
+} from "../__types";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
@@ -121,8 +125,11 @@ export function validateFieldOptions(type: PetitionFieldType, options: any) {
 }
 
 export function defaultFieldOptions(
-  type: PetitionFieldType
+  type: PetitionFieldType,
+  field?: PetitionField
 ): Partial<CreatePetitionField> {
+  const { options } = field || {};
+
   switch (type) {
     case "HEADING": {
       return {
@@ -138,7 +145,7 @@ export function defaultFieldOptions(
         optional: false,
         multiple: false,
         options: {
-          placeholder: null,
+          placeholder: options?.placeholder || null,
         },
       };
     case "SHORT_TEXT":
@@ -146,7 +153,7 @@ export function defaultFieldOptions(
         optional: false,
         multiple: false,
         options: {
-          placeholder: null,
+          placeholder: options?.placeholder || null,
         },
       };
     case "FILE_UPLOAD":
@@ -163,7 +170,7 @@ export function defaultFieldOptions(
         multiple: false,
         options: {
           values: [],
-          placeholder: null,
+          placeholder: options?.placeholder || null,
         },
       };
     }

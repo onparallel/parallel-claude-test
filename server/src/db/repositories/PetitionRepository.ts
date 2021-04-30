@@ -34,7 +34,7 @@ import {
   defaultFieldOptions,
   validateFieldOptions,
 } from "../helpers/fieldOptions";
-import { escapeLike, SortBy } from "../helpers/utils";
+import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
   Contact,
@@ -2606,14 +2606,33 @@ export class PetitionRepository extends BaseRepository {
     user: User
   ) {
     return this.withTransaction(async (t) => {
-      await this.from("petition_field_reply", t)
-        .where({
-          petition_field_id: fieldId,
-        })
-        .update({
-          deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
-        });
+      const [field] = (await this.from("petition_field", t).where({
+        id: fieldId,
+      })) as PetitionField[];
+
+      if (isValueCompatible(field.type, type)) {
+        await this.from("petition_field_reply", t)
+          .where({
+            petition_field_id: fieldId,
+            deleted_at: null,
+          })
+          .update({
+            type: type,
+            updated_at: this.now(),
+            updated_by: `User:${user.id}`,
+            status: "PENDING",
+          });
+      } else {
+        await this.from("petition_field_reply", t)
+          .where({
+            petition_field_id: fieldId,
+            deleted_at: null,
+          })
+          .update({
+            deleted_at: this.now(),
+            deleted_by: `User:${user.id}`,
+          });
+      }
 
       return await this.updatePetitionField(
         petitionId,
@@ -2621,7 +2640,7 @@ export class PetitionRepository extends BaseRepository {
         {
           type,
           validated: false,
-          ...defaultFieldOptions(type),
+          ...defaultFieldOptions(type, field),
         },
         user,
         t
