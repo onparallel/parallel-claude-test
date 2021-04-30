@@ -187,7 +187,7 @@ export function PetitionSharingDialog({
                   name="users"
                   control={control}
                   rules={{ minLength: 1 }}
-                  render={({ onChange, onBlur, value }) => (
+                  render={({ field: { onChange, onBlur, value } }) => (
                     <UserMultiSelect
                       ref={usersRef}
                       value={value}
@@ -228,8 +228,7 @@ export function PetitionSharingDialog({
             </Stack>
             <Stack display={hasUsers ? "flex" : "none"}>
               <Checkbox
-                name="notify"
-                ref={register}
+                {...register("notify")}
                 colorScheme="purple"
                 defaultIsChecked
               >
@@ -241,7 +240,7 @@ export function PetitionSharingDialog({
               <PaddedCollapse in={notify}>
                 <GrowingTextarea
                   name="message"
-                  ref={useMergedRef(messageRef, register)}
+                  ref={useMergedRef(messageRef, register("message").ref)}
                   maxHeight="30vh"
                   aria-label={intl.formatMessage({
                     id: "petition-sharing.message-placeholder",

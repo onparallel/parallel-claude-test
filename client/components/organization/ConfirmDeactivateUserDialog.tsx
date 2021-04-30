@@ -25,7 +25,11 @@ function ConfirmDeactivateUserDialog({
 >) {
   const intl = useIntl();
 
-  const { control, errors, handleSubmit } = useForm<{
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<{
     user: UserSelectSelection | null;
   }>({
     mode: "all",
@@ -91,7 +95,7 @@ function ConfirmDeactivateUserDialog({
             name="user"
             control={control}
             rules={{ required: true }}
-            render={({ onChange, onBlur, value }) => (
+            render={({ field: { onChange, onBlur, value } }) => (
               <UserSingleSelect
                 ref={userSelectRef}
                 value={value}

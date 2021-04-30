@@ -17,9 +17,11 @@ import { ContactSelect } from "../common/ContactSelect";
 export function SignerSelectDialog(
   props: DialogProps<{}, Pick<SignatureConfigInput, "contactIds">>
 ) {
-  const { control, handleSubmit, errors } = useForm<
-    Pick<SignatureConfig, "contacts">
-  >({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Pick<SignatureConfig, "contacts">>({
     mode: "onChange",
     defaultValues: {
       contacts: [],
@@ -61,7 +63,7 @@ export function SignerSelectDialog(
             rules={{
               validate: (value) => value.length > 0,
             }}
-            render={({ onChange, value }) => (
+            render={({ field: { onChange, value } }) => (
               <ContactSelect
                 value={value}
                 onChange={onChange}

@@ -132,10 +132,9 @@ function Contact({ contactId }: ContactProps) {
                   />
                 </FormLabel>
                 <ToggleInput
+                  {...register("firstName")}
                   isEditing={isEditing}
-                  name="firstName"
                   isDisabled={loading}
-                  ref={register()}
                 >
                   {contact!.firstName}
                 </ToggleInput>
@@ -148,10 +147,9 @@ function Contact({ contactId }: ContactProps) {
                   />
                 </FormLabel>
                 <ToggleInput
+                  {...register("lastName")}
                   isEditing={isEditing}
-                  name="lastName"
                   isDisabled={loading}
-                  ref={register()}
                 >
                   {contact!.lastName}
                 </ToggleInput>

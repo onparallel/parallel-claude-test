@@ -46,7 +46,7 @@ function Security() {
   const {
     handleSubmit,
     register,
-    errors,
+    formState: { errors },
     getValues,
     setError,
   } = useForm<PasswordChangeFormData>();
@@ -115,7 +115,7 @@ function Security() {
                 defaultMessage="Old password"
               />
             </FormLabel>
-            <PasswordInput name="password" ref={register({ required: true })} />
+            <PasswordInput {...register("password", { required: true })} />
             {errors.password?.type === "required" && (
               <FormErrorMessage>
                 <FormattedMessage
@@ -141,8 +141,7 @@ function Security() {
               />
             </FormLabel>
             <PasswordInput
-              name="newPassword"
-              ref={register({
+              {...register("newPassword", {
                 required: true,
                 validate: (value) => value.length >= 8,
               })}
@@ -164,8 +163,7 @@ function Security() {
               />
             </FormLabel>
             <PasswordInput
-              name="newPassword2"
-              ref={register({
+              {...register("newPassword2", {
                 required: true,
                 validate: (value) => value === getValues().newPassword,
               })}

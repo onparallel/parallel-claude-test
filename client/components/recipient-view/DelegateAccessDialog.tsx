@@ -72,7 +72,7 @@ function DelegateAccessDialog({
     control,
     handleSubmit,
     register,
-    errors,
+    formState: { errors },
   } = useForm<DelegateAccessDialogData>({
     mode: "onChange",
     defaultValues: {
@@ -89,10 +89,15 @@ function DelegateAccessDialog({
     shouldFocusError: true,
   });
 
+  const emailInputRegisterProps = register("email", {
+    required: true,
+    pattern: EMAIL_REGEX,
+  });
+
   return (
     <ConfirmDialog
       size="xl"
-      initialFocusRef={emailRef as any}
+      initialFocusRef={emailRef}
       hasCloseButton
       {...props}
       content={{
@@ -141,10 +146,8 @@ function DelegateAccessDialog({
               />
             </FormLabel>
             <Input
-              ref={useMergedRef(
-                emailRef,
-                register({ required: true, pattern: EMAIL_REGEX })
-              )}
+              {...emailInputRegisterProps}
+              ref={useMergedRef(emailRef, emailInputRegisterProps.ref)}
               type="email"
               name="email"
               placeholder={intl.formatMessage({
@@ -168,7 +171,7 @@ function DelegateAccessDialog({
                 defaultMessage="First name"
               />
             </FormLabel>
-            <Input name="firstName" ref={register({ required: true })} />
+            <Input {...register("firstName", { required: true })} />
             {errors.firstName && (
               <FormErrorMessage>
                 <FormattedMessage
@@ -185,7 +188,7 @@ function DelegateAccessDialog({
                 defaultMessage="Last name"
               />
             </FormLabel>
-            <Input name="lastName" ref={register({ required: true })} />
+            <Input {...register("lastName", { required: true })} />
             {errors.lastName && (
               <FormErrorMessage>
                 <FormattedMessage
@@ -208,7 +211,7 @@ function DelegateAccessDialog({
               rules={{
                 validate: { required: (value) => !isEmptyRTEValue(value) },
               }}
-              render={({ value, onChange }) => (
+              render={({ field: { value, onChange } }) => (
                 <RichTextEditor
                   value={value}
                   onChange={onChange}

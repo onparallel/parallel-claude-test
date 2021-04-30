@@ -47,7 +47,7 @@ export function SignatureConfigDialog({
 
   const {
     control,
-    errors,
+    formState: { errors },
     handleSubmit,
     register,
     watch,
@@ -72,6 +72,7 @@ export function SignatureConfigDialog({
 
   const review = watch("review");
 
+  const titleInputRegisterProps = register("title", { required: true });
   const titleInputRef = useRef<HTMLInputElement>(null);
 
   const reviewBeforeSendOptions = useMemo(
@@ -154,7 +155,7 @@ export function SignatureConfigDialog({
             <Controller
               name="provider"
               control={control}
-              render={({ onChange, value }) => (
+              render={({ field: { onChange, value } }) => (
                 <Select
                   {...reactSelectProps}
                   value={providers.find((p) => p.value === value)}
@@ -179,8 +180,8 @@ export function SignatureConfigDialog({
               </HelpPopover>
             </FormLabel>
             <Input
-              ref={useMergedRef(titleInputRef, register({ required: true }))}
-              name="title"
+              {...titleInputRegisterProps}
+              ref={useMergedRef(titleInputRef, titleInputRegisterProps.ref)}
               placeholder={intl.formatMessage({
                 id: "component.signature-config-dialog.title-placeholder",
                 defaultMessage: "Enter a title...",
@@ -197,7 +198,7 @@ export function SignatureConfigDialog({
             <Controller
               name="review"
               control={control}
-              render={({ onChange, value: review }) => (
+              render={({ field: { onChange, value: review } }) => (
                 <>
                   <Select
                     {...reactSelectProps}
@@ -242,7 +243,7 @@ export function SignatureConfigDialog({
                   (contacts.length > 0 &&
                     contacts.every((c) => !c.isInvalid && !c.isDeleted)),
               }}
-              render={({ onChange, value }) => (
+              render={({ field: { onChange, value } }) => (
                 <ContactSelect
                   value={value}
                   onChange={onChange}

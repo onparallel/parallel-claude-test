@@ -13,7 +13,8 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogProvider";
 import { useGenerateNewTokenDialog_generateUserAuthTokenMutation } from "@parallel/graphql/__types";
-import { useState } from "react";
+import useMergedRef from "@react-hook/merged-ref";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
@@ -21,7 +22,12 @@ import { CopyToClipboardButton } from "../common/CopyToClipboardButton";
 export function GenerateNewTokenDialog(props: DialogProps) {
   const intl = useIntl();
   const [apiKey, setApiKey] = useState<string | null>(null);
-  const { handleSubmit, register, errors, setError } = useForm<{
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    setError,
+  } = useForm<{
     tokenName: string;
   }>({
     mode: "onChange",
@@ -48,11 +54,14 @@ export function GenerateNewTokenDialog(props: DialogProps) {
     }
   }
 
+  const inputRegisterProps = register("tokenName", { required: true });
+  const tokenInputRef = useRef<HTMLInputElement>(null);
   return (
     <ConfirmDialog
       size="lg"
       closeOnEsc={!apiKey}
       closeOnOverlayClick={!apiKey}
+      initialFocusRef={tokenInputRef}
       content={{
         as: "form",
         onSubmit: handleSubmit(submit),
@@ -100,7 +109,8 @@ export function GenerateNewTokenDialog(props: DialogProps) {
             </Text>
             <FormControl isInvalid={!!errors.tokenName}>
               <Input
-                name="tokenName"
+                {...inputRegisterProps}
+                ref={useMergedRef(inputRegisterProps.ref, tokenInputRef)}
                 aria-label={intl.formatMessage({
                   id: "component.generate-new-token-dialog.token-name-label",
                   defaultMessage: "Token name",
@@ -109,7 +119,6 @@ export function GenerateNewTokenDialog(props: DialogProps) {
                   id: "component.generate-new-token-dialog.token-name-label",
                   defaultMessage: "Token name",
                 })}
-                ref={register({ required: true })}
               />
               <FormErrorMessage>
                 {errors.tokenName?.type === "unavailable" ? (

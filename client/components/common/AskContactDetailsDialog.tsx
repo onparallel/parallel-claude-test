@@ -32,7 +32,11 @@ export function AskContactDetailsDialog({
   ...props
 }: DialogProps<AskContactDetailsDialogResult, ContactDetailsFormData>) {
   const intl = useIntl();
-  const { handleSubmit, register, errors } = useForm<ContactDetailsFormData>({
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<ContactDetailsFormData>({
     defaultValues: { email: defaultEmail ?? "", firstName: "", lastName: "" },
   });
   const emailRef = useRef<HTMLInputElement>(null);
@@ -44,6 +48,13 @@ export function AskContactDetailsDialog({
       lastName: data.lastName || null,
     });
   }
+
+  const emailRegisterProps = register("email", {
+    required: true,
+    pattern: EMAIL_REGEX,
+  });
+
+  const firstNameRegisterProps = register("firstName");
   return (
     <ConfirmDialog
       id="pw-add-contact"
@@ -69,12 +80,9 @@ export function AskContactDetailsDialog({
               />
             </FormLabel>
             <Input
-              ref={useMergedRef(
-                emailRef,
-                register({ required: true, pattern: EMAIL_REGEX })
-              )}
+              {...emailRegisterProps}
+              ref={useMergedRef(emailRegisterProps.ref, emailRef)}
               type="email"
-              name="email"
               placeholder={intl.formatMessage({
                 id: "generic.forms.email-placeholder",
                 defaultMessage: "name@example.com",
@@ -96,7 +104,10 @@ export function AskContactDetailsDialog({
                 defaultMessage="First name"
               />
             </FormLabel>
-            <Input name="firstName" ref={useMergedRef(register(), nameRef)} />
+            <Input
+              {...firstNameRegisterProps}
+              ref={useMergedRef(firstNameRegisterProps.ref, nameRef)}
+            />
           </FormControl>
           <FormControl id="contact-last-name">
             <FormLabel>
@@ -105,7 +116,7 @@ export function AskContactDetailsDialog({
                 defaultMessage="Last name"
               />
             </FormLabel>
-            <Input name="lastName" ref={register()} />
+            <Input {...register("lastName")} />
           </FormControl>
         </Stack>
       }

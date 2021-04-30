@@ -39,7 +39,11 @@ function Account() {
   } = assertQuery(useAccountQuery());
   const sections = useSettingsSections(me);
 
-  const { handleSubmit, register, errors } = useForm<NameChangeFormData>({
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<NameChangeFormData>({
     defaultValues: {
       firstName: me.firstName ?? undefined,
       lastName: me.lastName ?? undefined,
@@ -87,9 +91,7 @@ function Account() {
               />
             </FormLabel>
             <Input
-              name="firstName"
-              maxLength={255}
-              ref={register({ required: true })}
+              {...register("firstName", { required: true, maxLength: 255 })}
             />
             {errors.firstName && (
               <FormErrorMessage>
@@ -108,9 +110,7 @@ function Account() {
               />
             </FormLabel>
             <Input
-              name="lastName"
-              maxLength={255}
-              ref={register({ required: true })}
+              {...register("lastName", { required: true, maxLength: 255 })}
             />
             {errors.lastName && (
               <FormErrorMessage>

@@ -29,7 +29,7 @@ import { GrowingTextarea } from "../common/GrowingTextarea";
 import { PaddedCollapse } from "../common/PaddedCollapse";
 
 type CompleteSignerInfoDialogData = {
-  signer: "myself" | "other" | null;
+  signer?: "myself" | "other";
   email: string;
   firstName: string;
   lastName: string;
@@ -76,13 +76,12 @@ function CompleteSignerInfoDialog({
   const {
     handleSubmit,
     register,
-    errors,
+    formState: { errors },
     control,
     watch,
   } = useForm<CompleteSignerInfoDialogData>({
     mode: "onChange",
     defaultValues: {
-      signer: null,
       message: messages[intl.locale as PetitionLocale](
         organization,
         contact.firstName ?? ""
@@ -101,10 +100,18 @@ function CompleteSignerInfoDialog({
     }
   }, [signer, showMessage]);
 
+  const emailRegisterProps = register("email", {
+    required: signer === "other",
+    pattern: EMAIL_REGEX,
+  });
+
+  const messageRegisterProps = register("message", {
+    required: signer === "other" && showMessage,
+  });
   return (
     <ConfirmDialog
       size="xl"
-      initialFocusRef={emailRef as any}
+      initialFocusRef={emailRef}
       hasCloseButton
       {...props}
       content={{
@@ -150,7 +157,7 @@ function CompleteSignerInfoDialog({
               name="signer"
               control={control}
               rules={{ required: true }}
-              render={({ onChange, value }) => (
+              render={({ field: { onChange, value } }) => (
                 <RadioGroup onChange={onChange} value={value}>
                   <Stack>
                     <Radio
@@ -201,15 +208,9 @@ function CompleteSignerInfoDialog({
                   />
                 </FormLabel>
                 <Input
-                  ref={useMergedRef(
-                    emailRef,
-                    register({
-                      required: signer === "other",
-                      pattern: EMAIL_REGEX,
-                    })
-                  )}
+                  {...emailRegisterProps}
+                  ref={useMergedRef(emailRef, emailRegisterProps.ref)}
                   type="email"
-                  name="email"
                   placeholder={intl.formatMessage({
                     id: "generic.forms.email-placeholder",
                     defaultMessage: "name@example.com",
@@ -234,8 +235,7 @@ function CompleteSignerInfoDialog({
                     />
                   </FormLabel>
                   <Input
-                    name="firstName"
-                    ref={register({ required: signer === "other" })}
+                    {...register("firstName", { required: signer === "other" })}
                   />
                   <FormErrorMessage>
                     <FormattedMessage
@@ -255,8 +255,7 @@ function CompleteSignerInfoDialog({
                     />
                   </FormLabel>
                   <Input
-                    name="lastName"
-                    ref={register({ required: signer === "other" })}
+                    {...register("lastName", { required: signer === "other" })}
                   />
                   <FormErrorMessage>
                     <FormattedMessage
@@ -282,14 +281,9 @@ function CompleteSignerInfoDialog({
               <PaddedCollapse in={showMessage}>
                 <FormControl isInvalid={showMessage && !!errors.message}>
                   <GrowingTextarea
-                    name="message"
                     height="172px"
-                    ref={useMergedRef(
-                      messageRef,
-                      register({
-                        required: signer === "other" && showMessage,
-                      })
-                    )}
+                    {...messageRegisterProps}
+                    ref={useMergedRef(messageRef, messageRegisterProps.ref)}
                     placeholder={intl.formatMessage({
                       id: "component.message-email-editor.body-placeholder",
                       defaultMessage: "Write a message to include in the email",

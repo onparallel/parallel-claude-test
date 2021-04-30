@@ -185,7 +185,11 @@ interface LoginFormProps {
 }
 
 function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
-  const { handleSubmit, register, errors } = useForm<LoginFormData>();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<LoginFormData>();
   return (
     <>
       <Box marginBottom={6} textAlign="center">
@@ -211,9 +215,8 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             />
           </FormLabel>
           <Input
-            name="email"
             type="email"
-            ref={register({
+            {...register("email", {
               required: true,
               pattern: EMAIL_REGEX,
             })}
@@ -234,7 +237,7 @@ function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
               defaultMessage="Password"
             />
           </FormLabel>
-          <PasswordInput name="password" ref={register({ required: true })} />
+          <PasswordInput {...register("password", { required: true })} />
           {errors.password && (
             <FormErrorMessage>
               <FormattedMessage
@@ -283,7 +286,11 @@ function PasswordChangeForm({
   onBackToLogin,
   isSubmitting,
 }: PasswordChangeFormProps) {
-  const { handleSubmit, register, errors } = useForm<PasswordChangeData>({
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<PasswordChangeData>({
     mode: "onBlur",
   });
   return (
@@ -311,8 +318,7 @@ function PasswordChangeForm({
             />
           </FormLabel>
           <PasswordInput
-            name="password1"
-            ref={register({
+            {...register("password1", {
               required: true,
               validate: (value) => value.length >= 8,
             })}

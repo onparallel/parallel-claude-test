@@ -41,18 +41,15 @@ export function CreateUserDialog({
   ...props
 }: DialogProps<{}, CreateUserDialogData>) {
   const intl = useIntl();
-  const {
-    handleSubmit,
-    register,
-    errors,
-    formState,
-  } = useForm<CreateUserDialogData>({
+  const { handleSubmit, register, formState } = useForm<CreateUserDialogData>({
     mode: "onChange",
     defaultValues: {
       email: "",
       role: "NORMAL",
     },
   });
+
+  const { errors } = formState;
 
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -90,6 +87,12 @@ export function CreateUserDialog({
     }
   };
 
+  const emailRegisterProps = register("email", {
+    required: true,
+    pattern: EMAIL_REGEX,
+    validate: { emailIsAvailable },
+  });
+
   return (
     <ConfirmDialog
       hasCloseButton
@@ -115,15 +118,8 @@ export function CreateUserDialog({
             </FormLabel>
             <InputGroup>
               <Input
-                ref={useMergedRef(
-                  emailRef,
-                  register({
-                    required: true,
-                    pattern: EMAIL_REGEX,
-                    validate: { emailIsAvailable },
-                  })
-                )}
-                name="email"
+                {...emailRegisterProps}
+                ref={useMergedRef(emailRef, emailRegisterProps.ref)}
                 placeholder={intl.formatMessage({
                   id: "generic.forms.email-placeholder",
                   defaultMessage: "name@example.com",
@@ -170,7 +166,7 @@ export function CreateUserDialog({
                 defaultMessage="First name"
               />
             </FormLabel>
-            <Input ref={register({ required: true })} name="firstName" />
+            <Input {...register("firstName", { required: true })} />
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.invalid-user-first-name-error"
@@ -185,7 +181,7 @@ export function CreateUserDialog({
                 defaultMessage="Last name"
               />
             </FormLabel>
-            <Input ref={register({ required: true })} name="lastName" />
+            <Input {...register("lastName", { required: true })} />
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.invalid-user-last-name-error"
@@ -200,7 +196,7 @@ export function CreateUserDialog({
                 defaultMessage="Organization role"
               />
             </FormLabel>
-            <Select name="role" ref={register({ required: true })}>
+            <Select {...register("role", { required: true })}>
               <option value="NORMAL">
                 {intl.formatMessage({
                   id: "organization.role.normal",

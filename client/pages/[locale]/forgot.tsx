@@ -126,7 +126,11 @@ function ForgotPasswordForm({
   onSubmit,
   isSubmitting,
 }: ForgotPasswordFormProps) {
-  const { handleSubmit, register, errors } = useForm<ForgotPasswordFormData>();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<ForgotPasswordFormData>();
   return (
     <>
       <Box marginBottom={6} textAlign="center">
@@ -152,9 +156,8 @@ function ForgotPasswordForm({
             />
           </FormLabel>
           <Input
-            name="email"
             type="email"
-            ref={register({
+            {...register("email", {
               required: true,
               pattern: EMAIL_REGEX,
             })}
@@ -215,7 +218,7 @@ function PasswordResetForm({
   const {
     handleSubmit,
     register,
-    errors,
+    formState: { errors },
     getValues,
     setError,
     clearErrors,
@@ -254,7 +257,7 @@ function PasswordResetForm({
               defaultMessage="Verification code"
             />
           </FormLabel>
-          <Input name="verificationCode" ref={register({ required: true })} />
+          <Input {...register("verificationCode", { required: true })} />
           {errors.verificationCode?.type === "validate" && (
             <FormErrorMessage>
               <FormattedMessage
@@ -280,8 +283,7 @@ function PasswordResetForm({
             />
           </FormLabel>
           <PasswordInput
-            name="password1"
-            ref={register({
+            {...register("password1", {
               required: true,
               validate: (value) => value.length >= 8,
             })}
@@ -307,8 +309,7 @@ function PasswordResetForm({
             />
           </FormLabel>
           <PasswordInput
-            name="password2"
-            ref={register({
+            {...register("password2", {
               required: true,
               validate: (value) => value === getValues().password1,
             })}
