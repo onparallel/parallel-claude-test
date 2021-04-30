@@ -270,7 +270,7 @@ export class PetitionRepository extends BaseRepository {
             });
           }
           if (filters?.status && petitionType === "PETITION") {
-            q.where("status", filters.status);
+            q.where("petition.status", filters.status);
           }
 
           if (filters?.tagIds) {

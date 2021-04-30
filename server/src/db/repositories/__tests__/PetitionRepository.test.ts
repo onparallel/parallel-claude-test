@@ -48,6 +48,18 @@ describe("repositories/PetitionRepository", () => {
         15,
         (i) => ({ name: i % 3 === 0 ? "good petition" : "bad petition" })
       );
+      const [contact] = await mocks.createRandomContacts(org.id, 1, () => ({
+        email: "jesse.pinkman@gmail.com",
+        first_name: "Jesse",
+        last_name: "Pinkman",
+      }));
+
+      await mocks.createPetitionAccess(
+        _petitions[0].id,
+        user.id,
+        [contact.id],
+        user.id
+      );
     });
 
     test("returns an empty page without options", async () => {
@@ -79,6 +91,26 @@ describe("repositories/PetitionRepository", () => {
           .filter((p) => (p.name ?? "").toLowerCase().includes("good"))
           .slice(2, 2 + 5)
       );
+    });
+
+    test("searches petition by recipient name", async () => {
+      const result = await petitions.loadPetitionsForUser(user.id, {
+        offset: 0,
+        limit: 10,
+        search: "jesse pinkm",
+      });
+      expect(result.totalCount).toBe(1);
+      expect(result.items).toMatchObject([_petitions[0]]);
+    });
+
+    test("searches petition by recipient email", async () => {
+      const result = await petitions.loadPetitionsForUser(user.id, {
+        offset: 0,
+        limit: 10,
+        search: "jesse.pinkman@gmail.com",
+      });
+      expect(result.totalCount).toBe(1);
+      expect(result.items).toMatchObject([_petitions[0]]);
     });
   });
 
