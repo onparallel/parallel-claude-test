@@ -1,4 +1,4 @@
-import { Box, Text, Tooltip } from "@chakra-ui/react";
+import { Box, Text, Tooltip, useBreakpointValue } from "@chakra-ui/react";
 import { cloneElement, ReactElement, ReactNode } from "react";
 import { useIntl } from "react-intl";
 import { Link } from "../common/Link";
@@ -8,7 +8,6 @@ export interface AppLayoutNavbarLinkProps {
   isActive?: boolean;
   icon: ReactElement;
   isAvailable?: boolean;
-  isMobile?: boolean;
   children: ReactNode;
 }
 
@@ -17,10 +16,10 @@ export function AppLayoutNavbarLink({
   isActive,
   icon,
   isAvailable,
-  isMobile,
   children,
 }: AppLayoutNavbarLinkProps) {
   const intl = useIntl();
+  const isMobile = useBreakpointValue({ base: true, sm: false });
   return isAvailable ? (
     <Link
       href={href!}
@@ -34,25 +33,36 @@ export function AppLayoutNavbarLink({
       _hover={{
         color: "purple.700",
       }}
-      _active={{
-        textDecoration: "none",
-      }}
-      _after={
-        isActive
-          ? {
+      sx={{
+        "&[aria-current]": {
+          textDecoration: "none",
+          _after: {
+            base: {
               display: "block",
               position: "absolute",
               content: "''",
-              ...(isMobile
-                ? { height: "4px", width: "100%", top: 0, left: 0 }
-                : { width: "4px", height: "100%", right: 0, top: 0 }),
+              height: "4px",
+              width: "100%",
+              top: 0,
+              left: 0,
               backgroundColor: "purple.600",
-            }
-          : {}
-      }
+            },
+            sm: {
+              display: "block",
+              position: "absolute",
+              content: "''",
+              width: "4px",
+              height: "100%",
+              left: 0,
+              top: 0,
+              backgroundColor: "purple.600",
+            },
+          },
+        },
+      }}
       {...(isActive ? { "aria-current": "page" } : {})}
     >
-      <AppLayoutNavbarLinkContent icon={icon} isMobile={isMobile}>
+      <AppLayoutNavbarLinkContent icon={icon}>
         {children}
       </AppLayoutNavbarLinkContent>
     </Link>
@@ -62,16 +72,10 @@ export function AppLayoutNavbarLink({
         id: "navbar.coming-soon",
         defaultMessage: "Coming soon",
       })}
-      placement="right"
+      placement={isMobile ? "top" : "right"}
     >
-      <Box
-        opacity={0.5}
-        cursor="default"
-        borderX={!isMobile ? "4px solid" : undefined}
-        borderY={isMobile ? "4px solid" : undefined}
-        borderColor="transparent"
-      >
-        <AppLayoutNavbarLinkContent icon={icon} isDisabled isMobile={isMobile}>
+      <Box opacity={0.5} cursor="default" borderColor="transparent">
+        <AppLayoutNavbarLinkContent icon={icon} isDisabled>
           {children}
         </AppLayoutNavbarLinkContent>
       </Box>
@@ -82,19 +86,17 @@ export function AppLayoutNavbarLink({
 function AppLayoutNavbarLinkContent({
   icon,
   isDisabled,
-  isMobile,
   children,
 }: {
   icon: ReactElement;
   isDisabled?: boolean;
-  isMobile?: boolean;
   children: ReactNode;
 }) {
   return (
     <Box
       textAlign="center"
-      paddingY={isMobile ? 2 : 3}
-      paddingX={isMobile ? "6px" : undefined}
+      paddingX={{ base: 1.5, sm: 0 }}
+      paddingY={{ base: 2, sm: 3 }}
       sx={
         isDisabled
           ? {}

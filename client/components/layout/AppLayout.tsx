@@ -84,13 +84,21 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
         alignItems="stretch"
         overflow="hidden"
         height="100vh"
+        width="100vw"
         sx={{
           "@supports (-webkit-touch-callout: none)": {
             height: "-webkit-fill-available",
           },
         }}
+        flexDirection={{ base: "column-reverse", sm: "row" }}
       >
-        <Flex flexDirection="column" overflowY="auto" overflowX="hidden">
+        <Flex
+          flexDirection={{ base: "row", sm: "column" }}
+          flexShrink={0}
+          borderWidth={{ base: "1px 0 0 0", sm: "0 1px 0 0" }}
+          borderColor="gray.200"
+          overflow={{ base: "auto hidden", sm: "hidden auto" }}
+        >
           <AppLayoutNavbar
             user={user}
             onOnboardingClick={handleOnboardingClick}
@@ -101,7 +109,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
         <Flex
           flex="1"
           flexDirection="column"
-          maxHeight="100vh"
+          minHeight="0"
           minWidth="0"
           backgroundColor="gray.50"
         >
@@ -127,11 +135,6 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
               </Center>
             )}
           </Flex>
-          <AppLayoutNavbar
-            isMobile
-            user={user}
-            onOnboardingClick={handleOnboardingClick}
-          />
         </Flex>
       </Flex>
       <OnboardingTour
