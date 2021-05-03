@@ -101,6 +101,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 }),
                 cellProps: {
                   minWidth: "200px",
+                  whiteSpace: "nowrap",
                 },
                 CellContent: ({ row }) => {
                   const recipients = row.accesses
