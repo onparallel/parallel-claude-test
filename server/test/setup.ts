@@ -11,7 +11,7 @@ export default async function () {
 
   await waitUntilReady(dc);
 
-  // Run migrations
+  // Run migrations, added Env like param
   execSync("knex migrate:latest", { env: { NODE_ENV: "test" } });
 }
 
