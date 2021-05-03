@@ -125,13 +125,14 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
   ref
 ) {
   const intl = useIntl();
-  const ownRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const _ref = useMergedRef(ref, innerRef);
   const [activeType, setActiveType] = useState<PetitionFieldType>("HEADING");
   const activeTypeLabel = usePetitionFieldTypeLabel(activeType);
 
   // Until we can set the roles via props
   useEffect(() => {
-    const menu = ownRef.current!;
+    const menu = innerRef.current!;
     menu.setAttribute("role", role);
     const itemRole = ({
       menu: "menuitem",
@@ -157,7 +158,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
   const { locale } = useIntl();
   return (
     <MenuList
-      ref={useMergedRef(ref, ownRef)}
+      ref={_ref}
       display="flex"
       paddingY={0}
       minWidth={{

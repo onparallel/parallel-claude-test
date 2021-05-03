@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { PetitionLocale } from "@parallel/graphql/__types";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { plainTextToRTEValue } from "@parallel/utils/slate/plainTextToRTEValue";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -21,13 +22,13 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
-import { RichTextEditor, RichTextEditorValue } from "../common/RichTextEditor";
+import { RichTextEditor } from "../common/RichTextEditor";
 
 type DelegateAccessDialogData = {
   email: string;
   firstName: string;
   lastName: string;
-  messageBody: RichTextEditorValue;
+  messageBody: any;
 };
 
 const messages: Record<
@@ -66,7 +67,6 @@ function DelegateAccessDialog({
   DelegateAccessDialogData
 >) {
   const intl = useIntl();
-  const emailRef = useRef<HTMLInputElement>(null);
 
   const {
     control,
@@ -89,7 +89,8 @@ function DelegateAccessDialog({
     shouldFocusError: true,
   });
 
-  const emailInputRegisterProps = register("email", {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
     pattern: EMAIL_REGEX,
   });
@@ -146,8 +147,7 @@ function DelegateAccessDialog({
               />
             </FormLabel>
             <Input
-              {...emailInputRegisterProps}
-              ref={useMergedRef(emailRef, emailInputRegisterProps.ref)}
+              {...emailRegisterProps}
               type="email"
               name="email"
               placeholder={intl.formatMessage({

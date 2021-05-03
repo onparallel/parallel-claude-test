@@ -13,15 +13,14 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogProvider";
 import {
-  SignatureConfig,
   SignatureConfigDialog_OrgIntegrationFragment,
   SignatureConfigDialog_PetitionFragment,
   SignatureConfigInput,
 } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
-import useMergedRef from "@react-hook/merged-ref";
 import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -51,7 +50,12 @@ export function SignatureConfigDialog({
     handleSubmit,
     register,
     watch,
-  } = useForm<SignatureConfig>({
+  } = useForm<{
+    contacts: ContactSelectSelection[];
+    provider: string;
+    review: boolean;
+    title: string;
+  }>({
     mode: "onChange",
     defaultValues: {
       contacts:
@@ -72,8 +76,10 @@ export function SignatureConfigDialog({
 
   const review = watch("review");
 
-  const titleInputRegisterProps = register("title", { required: true });
-  const titleInputRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const titleRegisterProps = useRegisterWithRef(titleRef, register, "title", {
+    required: true,
+  });
 
   const reviewBeforeSendOptions = useMemo(
     () => [
@@ -117,7 +123,7 @@ export function SignatureConfigDialog({
 
   return (
     <ConfirmDialog
-      initialFocusRef={titleInputRef}
+      initialFocusRef={titleRef}
       size="xl"
       content={{
         as: "form",
@@ -180,8 +186,7 @@ export function SignatureConfigDialog({
               </HelpPopover>
             </FormLabel>
             <Input
-              {...titleInputRegisterProps}
-              ref={useMergedRef(titleInputRef, titleInputRegisterProps.ref)}
+              {...titleRegisterProps}
               placeholder={intl.formatMessage({
                 id: "component.signature-config-dialog.title-placeholder",
                 defaultMessage: "Enter a title...",

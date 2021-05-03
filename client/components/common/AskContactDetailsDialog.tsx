@@ -11,8 +11,8 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import useMergedRef from "@react-hook/merged-ref";
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -39,8 +39,6 @@ export function AskContactDetailsDialog({
   } = useForm<ContactDetailsFormData>({
     defaultValues: { email: defaultEmail ?? "", firstName: "", lastName: "" },
   });
-  const emailRef = useRef<HTMLInputElement>(null);
-  const nameRef = useRef<HTMLInputElement>(null);
   function onCreateContact(data: ContactDetailsFormData) {
     props.onResolve({
       email: data.email,
@@ -49,17 +47,23 @@ export function AskContactDetailsDialog({
     });
   }
 
-  const emailRegisterProps = register("email", {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
     pattern: EMAIL_REGEX,
   });
 
-  const firstNameRegisterProps = register("firstName");
+  const firstNameRef = useRef<HTMLInputElement>(null);
+  const firstNameRegisterProps = useRegisterWithRef(
+    firstNameRef,
+    register,
+    "firstName"
+  );
   return (
     <ConfirmDialog
       id="pw-add-contact"
       closeOnOverlayClick={false}
-      initialFocusRef={defaultEmail ? nameRef : emailRef}
+      initialFocusRef={defaultEmail ? firstNameRef : emailRef}
       content={{
         as: "form",
         onSubmit: handleSubmit(onCreateContact),
@@ -81,7 +85,6 @@ export function AskContactDetailsDialog({
             </FormLabel>
             <Input
               {...emailRegisterProps}
-              ref={useMergedRef(emailRegisterProps.ref, emailRef)}
               type="email"
               placeholder={intl.formatMessage({
                 id: "generic.forms.email-placeholder",
@@ -104,10 +107,7 @@ export function AskContactDetailsDialog({
                 defaultMessage="First name"
               />
             </FormLabel>
-            <Input
-              {...firstNameRegisterProps}
-              ref={useMergedRef(firstNameRegisterProps.ref, nameRef)}
-            />
+            <Input {...firstNameRegisterProps} />
           </FormControl>
           <FormControl id="contact-last-name">
             <FormLabel>

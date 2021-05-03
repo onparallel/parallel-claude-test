@@ -13,6 +13,7 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogProvider";
 import { useGenerateNewTokenDialog_generateUserAuthTokenMutation } from "@parallel/graphql/__types";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import useMergedRef from "@react-hook/merged-ref";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -54,14 +55,19 @@ export function GenerateNewTokenDialog(props: DialogProps) {
     }
   }
 
-  const inputRegisterProps = register("tokenName", { required: true });
-  const tokenInputRef = useRef<HTMLInputElement>(null);
+  const tokenNameRef = useRef<HTMLInputElement>(null);
+  const tokenNameRegisterProps = useRegisterWithRef(
+    tokenNameRef,
+    register,
+    "tokenName",
+    { required: true }
+  );
   return (
     <ConfirmDialog
       size="lg"
       closeOnEsc={!apiKey}
       closeOnOverlayClick={!apiKey}
-      initialFocusRef={tokenInputRef}
+      initialFocusRef={tokenNameRef}
       content={{
         as: "form",
         onSubmit: handleSubmit(submit),
@@ -109,8 +115,7 @@ export function GenerateNewTokenDialog(props: DialogProps) {
             </Text>
             <FormControl isInvalid={!!errors.tokenName}>
               <Input
-                {...inputRegisterProps}
-                ref={useMergedRef(inputRegisterProps.ref, tokenInputRef)}
+                {...tokenNameRegisterProps}
                 aria-label={intl.formatMessage({
                   id: "component.generate-new-token-dialog.token-name-label",
                   defaultMessage: "Token name",

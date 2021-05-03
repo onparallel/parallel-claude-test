@@ -31,8 +31,8 @@ import {
   usePetitionSharingModal_removePetitionUserPermissionMutation,
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
-import useMergedRef from "@react-hook/merged-ref";
 import { usePreviousValue } from "beautiful-react-hooks";
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -101,6 +101,11 @@ export function PetitionSharingDialog({
 
   const usersRef = useRef<UserSelectInstance<true>>(null);
   const messageRef = useRef<HTMLInputElement>(null);
+  const messageRegisterProps = useRegisterWithRef(
+    messageRef,
+    register,
+    "message"
+  );
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
@@ -239,8 +244,7 @@ export function PetitionSharingDialog({
               </Checkbox>
               <PaddedCollapse in={notify}>
                 <GrowingTextarea
-                  name="message"
-                  ref={useMergedRef(messageRef, register("message").ref)}
+                  {...messageRegisterProps}
                   maxHeight="30vh"
                   aria-label={intl.formatMessage({
                     id: "petition-sharing.message-placeholder",

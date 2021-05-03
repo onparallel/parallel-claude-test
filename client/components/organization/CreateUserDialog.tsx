@@ -23,6 +23,7 @@ import {
   CreateUserDialog_emailIsAvailableQuery,
   CreateUserDialog_emailIsAvailableQueryVariables,
 } from "@parallel/graphql/__types";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useDebouncedAsync } from "@parallel/utils/useDebouncedAsync";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
@@ -50,8 +51,6 @@ export function CreateUserDialog({
   });
 
   const { errors } = formState;
-
-  const emailRef = useRef<HTMLInputElement>(null);
 
   const apollo = useApolloClient();
   const debouncedEmailIsAvailable = useDebouncedAsync(
@@ -87,7 +86,8 @@ export function CreateUserDialog({
     }
   };
 
-  const emailRegisterProps = register("email", {
+  const emailRef = useRef<HTMLInputElement>(null);
+  const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
     pattern: EMAIL_REGEX,
     validate: { emailIsAvailable },
@@ -119,7 +119,6 @@ export function CreateUserDialog({
             <InputGroup>
               <Input
                 {...emailRegisterProps}
-                ref={useMergedRef(emailRef, emailRegisterProps.ref)}
                 placeholder={intl.formatMessage({
                   id: "generic.forms.email-placeholder",
                   defaultMessage: "name@example.com",

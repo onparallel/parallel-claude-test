@@ -74,6 +74,7 @@ export const ContactSelect = Object.assign(
       isDisabled: props.isDisabled || isCreating,
     });
     const innerRef = useRef<any>();
+    const _ref = useMergedRef(ref, innerRef);
 
     const [inputValue, setInputValue] = useState("");
 
@@ -163,7 +164,7 @@ export const ContactSelect = Object.assign(
 
     return (
       <AsyncCreatableSelect<ContactSelectSelection, true, never>
-        ref={useMergedRef(ref, innerRef)}
+        ref={_ref}
         value={value}
         isMulti
         onChange={onChange as any}

@@ -207,6 +207,7 @@ const ReplyDownloadButton = chakraForwardRef<
   const isPreviewable =
     contentType === "application/pdf" || contentType.startsWith("image/");
   const innerRef = useRef<HTMLElement>(null);
+  const _ref = useMergedRef(ref, innerRef);
   const isMouseOver = useIsMouseOver(innerRef);
   const isShiftDown = useIsGlobalKeyDown("Shift");
   const mode: "PREVIEW" | "DOWNLOAD" = isPreviewable
@@ -216,7 +217,7 @@ const ReplyDownloadButton = chakraForwardRef<
     : "DOWNLOAD";
   return (
     <IconButtonWithTooltip
-      ref={useMergedRef(ref, innerRef)}
+      ref={_ref}
       {...props}
       size="xs"
       icon={mode === "PREVIEW" ? <EyeIcon /> : <DownloadIcon />}

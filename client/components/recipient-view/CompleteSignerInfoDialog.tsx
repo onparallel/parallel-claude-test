@@ -15,6 +15,7 @@ import {
   PetitionLocale,
   useCompleteSignerInfoDialog_PublicContactFragment,
 } from "@parallel/graphql/__types";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import useMergedRef from "@react-hook/merged-ref";
 import autosize from "autosize";
@@ -72,7 +73,6 @@ function CompleteSignerInfoDialog({
   Omit<CompleteSignerInfoDialogData, "signer">
 >) {
   const intl = useIntl();
-  const emailRef = useRef<HTMLInputElement>(null);
   const {
     handleSubmit,
     register,
@@ -100,14 +100,19 @@ function CompleteSignerInfoDialog({
     }
   }, [signer, showMessage]);
 
-  const emailRegisterProps = register("email", {
+  const messageRegisterProps = useRegisterWithRef(
+    messageRef,
+    register,
+    "message",
+    { required: signer === "other" && showMessage }
+  );
+
+  const emailRef = useRef<HTMLInputElement>(null);
+  const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: signer === "other",
     pattern: EMAIL_REGEX,
   });
 
-  const messageRegisterProps = register("message", {
-    required: signer === "other" && showMessage,
-  });
   return (
     <ConfirmDialog
       size="xl"
@@ -209,7 +214,6 @@ function CompleteSignerInfoDialog({
                 </FormLabel>
                 <Input
                   {...emailRegisterProps}
-                  ref={useMergedRef(emailRef, emailRegisterProps.ref)}
                   type="email"
                   placeholder={intl.formatMessage({
                     id: "generic.forms.email-placeholder",
@@ -283,7 +287,6 @@ function CompleteSignerInfoDialog({
                   <GrowingTextarea
                     height="172px"
                     {...messageRegisterProps}
-                    ref={useMergedRef(messageRef, messageRegisterProps.ref)}
                     placeholder={intl.formatMessage({
                       id: "component.message-email-editor.body-placeholder",
                       defaultMessage: "Write a message to include in the email",
