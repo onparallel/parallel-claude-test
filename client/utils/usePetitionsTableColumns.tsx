@@ -6,6 +6,7 @@ import {
   PopoverBody,
   PopoverContent,
   PopoverTrigger,
+  Portal,
 } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -132,15 +133,17 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                                 {chunks}
                               </Link>
                             </PopoverTrigger>
-                            <PopoverContent>
-                              <PopoverBody padding={0}>
-                                <SimpleContactInfoList<SimpleContactInfoList_ContactFragment>
-                                  contacts={recipients as any}
-                                  isClickable
-                                />
-                                <PopoverArrow />
-                              </PopoverBody>
-                            </PopoverContent>
+                            <Portal>
+                              <PopoverContent>
+                                <PopoverBody padding={0}>
+                                  <SimpleContactInfoList<SimpleContactInfoList_ContactFragment>
+                                    contacts={recipients as any}
+                                    isClickable
+                                  />
+                                  <PopoverArrow />
+                                </PopoverBody>
+                              </PopoverContent>
+                            </Portal>
                           </Popover>
                         ),
                       }}
