@@ -8,3 +8,7 @@ export async function up(knex: Knex): Promise<void> {
 export async function down(knex: Knex): Promise<void> {
   await removeFieldType(knex, "SHORT_TEXT");
 }
+
+export const config = {
+  transaction: false,
+};

@@ -87,13 +87,6 @@ type PetitionComposeProps = UnwrapPromise<
 
 type FieldSelection = PetitionCompose_PetitionFieldFragment;
 
-const isValueCompatible = (oldType: string, newType: string) => {
-  return (
-    ["TEXT", "SHORT_TEXT", "SELECT"].includes(oldType) &&
-    ["TEXT", "SHORT_TEXT"].includes(newType)
-  );
-};
-
 function PetitionCompose({ petitionId }: PetitionComposeProps) {
   const router = useRouter();
   const intl = useIntl();
@@ -340,10 +333,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         return;
       } catch {}
       try {
-        if (!isValueCompatible(field.type, type)) {
-          await confirmChangeFieldType({});
-        }
-
+        await confirmChangeFieldType({});
         await changePetitionFieldType({
           variables: { petitionId, fieldId, type, force: true },
         });
@@ -876,6 +866,9 @@ PetitionCompose.mutations = [
         }
         petition {
           id
+          ... on Petition {
+            status
+          }
           updatedAt
         }
       }

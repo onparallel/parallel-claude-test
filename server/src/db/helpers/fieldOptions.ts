@@ -5,6 +5,7 @@ import {
 } from "../__types";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
+import { isOptionsCompatible } from "./utils";
 
 const SCHEMAS = {
   TEXT: {
@@ -128,7 +129,13 @@ export function defaultFieldOptions(
   type: PetitionFieldType,
   field?: PetitionField
 ): Partial<CreatePetitionField> {
-  const { options } = field || {};
+  let { options, multiple, optional } = field || {};
+
+  if (!field || !isOptionsCompatible(field.type, type)) {
+    options = {};
+    optional = false;
+    multiple = false;
+  }
 
   switch (type) {
     case "HEADING": {
@@ -142,16 +149,16 @@ export function defaultFieldOptions(
     }
     case "TEXT":
       return {
-        optional: false,
-        multiple: false,
+        optional: optional || false,
+        multiple: multiple || false,
         options: {
           placeholder: options?.placeholder || null,
         },
       };
     case "SHORT_TEXT":
       return {
-        optional: false,
-        multiple: false,
+        optional: optional || false,
+        multiple: multiple || false,
         options: {
           placeholder: options?.placeholder || null,
         },
@@ -166,8 +173,8 @@ export function defaultFieldOptions(
       };
     case "SELECT": {
       return {
-        optional: false,
-        multiple: false,
+        optional: optional || false,
+        multiple: multiple || false,
         options: {
           values: [],
           placeholder: options?.placeholder || null,
@@ -176,8 +183,8 @@ export function defaultFieldOptions(
     }
     case "DYNAMIC_SELECT": {
       return {
-        optional: false,
-        multiple: false,
+        optional: optional || false,
+        multiple: multiple || false,
         options: {
           values: [],
           labels: [],

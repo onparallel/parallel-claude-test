@@ -12,7 +12,7 @@ export default async function () {
   await waitUntilReady(dc);
 
   // Run migrations
-  execSync("NODE_ENV=test knex migrate:latest");
+  execSync("knex migrate:latest", { env: { NODE_ENV: "test" } });
 }
 
 function waitUntilReady(process: ChildProcessWithoutNullStreams) {

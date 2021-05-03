@@ -4706,7 +4706,7 @@ export type PetitionCompose_changePetitionFieldTypeMutation = {
           PetitionCompose_PetitionFieldFragment;
         petition: { __typename?: "Petition" } & Pick<
           Petition,
-          "id" | "updatedAt"
+          "status" | "id" | "updatedAt"
         >;
       })
     | ({ __typename?: "PetitionTemplateAndField" } & {
@@ -11659,6 +11659,9 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
       }
       petition {
         id
+        ... on Petition {
+          status
+        }
         updatedAt
       }
     }

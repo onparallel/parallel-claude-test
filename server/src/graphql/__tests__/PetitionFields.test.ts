@@ -1736,7 +1736,7 @@ describe("GraphQL/Petition Fields", () => {
       await mocks.createRandomTextReply(fieldWithReply.id, access.id);
     });
 
-    it("changes field type to TEXT and sets its default options", async () => {
+    it("changes field type to SHORT_TEXT and sets its default options merging with existents", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation(
@@ -1762,7 +1762,7 @@ describe("GraphQL/Petition Fields", () => {
         variables: {
           petitionId: toGlobalId("Petition", userPetition.id),
           fieldId: toGlobalId("PetitionField", field.id),
-          type: "TEXT",
+          type: "SHORT_TEXT",
         },
       });
 
@@ -1770,12 +1770,10 @@ describe("GraphQL/Petition Fields", () => {
       expect(data!.changePetitionFieldType).toEqual({
         field: {
           id: toGlobalId("PetitionField", field.id),
-          type: "TEXT",
-          optional: false,
-          multiple: false,
-          options: {
-            placeholder: null,
-          },
+          type: "SHORT_TEXT",
+          optional: field.optional,
+          multiple: field.multiple,
+          options: field.options,
         },
       });
     });
@@ -1864,6 +1862,49 @@ describe("GraphQL/Petition Fields", () => {
           options: {
             accepts: null,
           },
+        },
+      });
+    });
+
+    it("changes field type and persists its replies", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation(
+            $petitionId: GID!
+            $fieldId: GID!
+            $type: PetitionFieldType!
+            $force: Boolean
+          ) {
+            changePetitionFieldType(
+              fieldId: $fieldId
+              petitionId: $petitionId
+              type: $type
+              force: $force
+            ) {
+              field {
+                id
+                type
+                replies {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", userPetition.id),
+          fieldId: toGlobalId("PetitionField", fieldWithReply.id),
+          type: "SHORT_TEXT",
+          force: true,
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.changePetitionFieldType).toEqual({
+        field: {
+          id: toGlobalId("PetitionField", fieldWithReply.id),
+          type: "SHORT_TEXT",
+          replies: [{ id: expect.any(String) }],
         },
       });
     });

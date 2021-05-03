@@ -14,6 +14,7 @@ import pMap from "p-map";
 import { omit, pick, zip } from "remeda";
 import { ApiContext } from "../../../context";
 import { defaultFieldOptions } from "../../../db/helpers/fieldOptions";
+import { isValueCompatible } from "../../../db/helpers/utils";
 import {
   CreatePetition,
   CreatePetitionField,
@@ -1406,7 +1407,15 @@ export const changePetitionFieldType = mutationField(
       const replies = await ctx.petitions.loadRepliesForField(args.fieldId, {
         cache: false,
       });
-      if (!args.force && replies.length > 0) {
+
+      const field = await ctx.petitions.loadField(args.fieldId);
+
+      if (
+        field &&
+        !args.force &&
+        replies.length > 0 &&
+        !isValueCompatible(field.type, args.type)
+      ) {
         throw new WhitelistedError(
           "The petition field has replies.",
           "FIELD_HAS_REPLIES_ERROR"

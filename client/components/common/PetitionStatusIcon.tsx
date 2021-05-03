@@ -18,32 +18,37 @@ export const PetitionStatusIcon = chakraForwardRef<
   PetitionStatusIconProps
 >(function PetitionStatusIcon({ status, ...props }, ref) {
   const intl = useIntl();
+
+  const getTooltipLabel = () => {
+    switch (status) {
+      case "DRAFT":
+        return intl.formatMessage({
+          id: "generic.petition-status.draft",
+          defaultMessage: "Draft",
+        });
+      case "PENDING":
+        return intl.formatMessage({
+          id: "generic.petition-status.pending",
+          defaultMessage: "Pending",
+        });
+      case "COMPLETED":
+        return intl.formatMessage({
+          id: "generic.petition-status.completed",
+          defaultMessage: "Completed",
+        });
+      case "CLOSED":
+        return intl.formatMessage({
+          id: "generic.petition-status.closed",
+          defaultMessage: "Closed",
+        });
+      default:
+        return null;
+    }
+  };
+
   return (
-    <Tooltip
-      label={
-        status === "DRAFT"
-          ? intl.formatMessage({
-              id: "generic.petition-status.draft",
-              defaultMessage: "Draft",
-            })
-          : status === "PENDING"
-          ? intl.formatMessage({
-              id: "generic.petition-status.pending",
-              defaultMessage: "Pending",
-            })
-          : status === "COMPLETED"
-          ? intl.formatMessage({
-              id: "generic.petition-status.completed",
-              defaultMessage: "Completed",
-            })
-          : status === "CLOSED"
-          ? intl.formatMessage({
-              id: "generic.petition-status.closed",
-              defaultMessage: "Closed",
-            })
-          : null
-      }
-    >
+    <Tooltip label={getTooltipLabel()}>
+      {/* TODO: Substituir por el futuro componente SWITCH de conditions.jsx*/}
       {status === "DRAFT" ? (
         <EditIcon ref={ref} boxSize="18px" color="gray.500" {...props} />
       ) : status === "PENDING" ? (
