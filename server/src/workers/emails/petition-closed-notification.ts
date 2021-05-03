@@ -1,13 +1,14 @@
+import sanitize from "sanitize-filename";
+import { URLSearchParams } from "url";
 import { WorkerContext } from "../../context";
+import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
 import PetitionClosedNotification from "../../emails/components/PetitionClosedNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { EmailLog } from "../../db/__types";
-import { URLSearchParams } from "url";
-import { random } from "../../util/token";
-import sanitize from "sanitize-filename";
 import { slateParser } from "../../util/slate";
+import { random } from "../../util/token";
+import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionClosedNotification(
   payload: {
@@ -32,16 +33,7 @@ export async function petitionClosedNotification(
     throw new Error(`User not found for user_id ${payload.user_id}`);
   }
 
-  const [org, logoUrl] = await Promise.all([
-    context.organizations.loadOrg(sender.org_id),
-    context.organizations.getOrgLogoUrl(sender.org_id),
-  ]);
-  if (!org) {
-    throw new Error(
-      `Organization not found for sender.org_id ${sender.org_id}`
-    );
-  }
-
+  const layoutProps = await getLayoutProps(sender.org_id, context);
   const emails: EmailLog[] = [];
   for (const accessId of payload.petition_access_ids) {
     const access = await context.petitions.loadAccess(accessId);
@@ -56,11 +48,7 @@ export async function petitionClosedNotification(
         senderEmail: sender.email,
         bodyHtml: slate.toHtml(payload.message),
         bodyPlainText: slate.toPlainText(payload.message),
-        assetsUrl: context.config.misc.assetsUrl,
-        parallelUrl: context.config.misc.parallelUrl,
-        logoUrl:
-          logoUrl ?? `${context.config.misc.assetsUrl}/static/emails/logo.png`,
-        logoAlt: logoUrl ? org.name : "Parallel",
+        ...layoutProps,
       },
       { locale: petition.locale }
     );

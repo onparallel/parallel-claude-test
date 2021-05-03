@@ -21,6 +21,7 @@ import SignatureCancelledEmail from "../emails/components/SignatureCancelledEmai
 import { OrgIntegration } from "../db/__types";
 import { downloadImageBase64 } from "../util/images";
 import { toGlobalId } from "../util/globalId";
+import { omit } from "remeda";
 
 type SignerBox = {
   email?: string;
@@ -35,8 +36,12 @@ type SignerBox = {
 export type SignatureOptions = {
   locale: string;
   templateData?: {
+    senderFirstName: string;
+    documentName: string;
     logoUrl: string;
     logoAlt: string;
+    parallelUrl: string;
+    assetsUrl: string;
   };
   events_url?: string;
   signingMode?: "parallel" | "sequential";
@@ -230,6 +235,10 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
   private async buildSignaturItBrandingTemplates(
     opts: SignatureOptions
   ): Promise<BrandingParams["templates"]> {
+    const layoutProps = omit(opts.templateData!, [
+      "documentName",
+      "senderFirstName",
+    ]);
     const [
       { html: signatureRequestedEmail },
       { html: signatureCompletedEmail },
@@ -242,10 +251,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
           signerName: "{{signer_name}}",
           documentName: "{{filename}}",
           emailBody: "{{email_body}}",
-          logoUrl: opts.templateData?.logoUrl ?? "",
-          logoAlt: opts.templateData?.logoAlt ?? "",
-          parallelUrl: this.config.misc.parallelUrl,
-          assetsUrl: this.config.misc.assetsUrl,
+          ...layoutProps,
         },
         { locale: opts.locale }
       ),
@@ -255,10 +261,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
           documentName: "{{filename}}",
-          logoUrl: opts.templateData?.logoUrl ?? "",
-          logoAlt: opts.templateData?.logoAlt ?? "",
-          parallelUrl: this.config.misc.parallelUrl,
-          assetsUrl: this.config.misc.assetsUrl,
+          ...layoutProps,
         },
         { locale: opts.locale }
       ),
@@ -268,10 +271,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
           signatureProvider: "Signaturit",
           signerName: "{{signer_name}}",
           documentName: "{{filename}}",
-          logoUrl: opts.templateData?.logoUrl ?? "",
-          logoAlt: opts.templateData?.logoAlt ?? "",
-          parallelUrl: this.config.misc.parallelUrl,
-          assetsUrl: this.config.misc.assetsUrl,
+          ...layoutProps,
         },
         { locale: opts.locale }
       ),

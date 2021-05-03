@@ -8,6 +8,7 @@ import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { Maybe } from "../../util/types";
+import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionCompleted(
   payload: {
@@ -56,15 +57,7 @@ export async function petitionCompleted(
     return;
   }
 
-  const [org, logoUrl] = await Promise.all([
-    context.organizations.loadOrg(petition.org_id),
-    context.organizations.getOrgLogoUrl(petition.org_id),
-  ]);
-  if (!org) {
-    throw new Error(
-      `Organization not found for granter.org_id ${petition.org_id}`
-    );
-  }
+  const layoutProps = await getLayoutProps(petition.org_id, context);
 
   const fieldIds = fields.map((f) => f.id);
   const fieldReplies = await context.petitions.loadRepliesForField(fieldIds);
@@ -97,11 +90,7 @@ export async function petitionCompleted(
         contactNameOrEmail:
           fullName(contact.first_name, contact.last_name) || contact.email,
         fields: visibleFields.map(pick(["id", "title", "position", "type"])),
-        assetsUrl: context.config.misc.assetsUrl,
-        parallelUrl: context.config.misc.parallelUrl,
-        logoUrl:
-          logoUrl ?? `${context.config.misc.assetsUrl}/static/emails/logo.png`,
-        logoAlt: logoUrl ? org.name : "Parallel",
+        ...layoutProps,
       },
       { locale: petition.locale }
     );

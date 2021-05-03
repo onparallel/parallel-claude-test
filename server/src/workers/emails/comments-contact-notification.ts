@@ -6,6 +6,7 @@ import PetitionCommentsContactNotification from "../../emails/components/Petitio
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { isDefined } from "../../util/remedaExtensions";
+import { getLayoutProps } from "../helpers/getLayoutProps";
 
 /**
   from contact/user to all accesses in `petition_access_ids` arg
@@ -27,15 +28,7 @@ export async function commentsContactNotification(
       `Petition not found for petition_id ${payload.petition_id}`
     );
   }
-  const [org, logoUrl] = await Promise.all([
-    context.organizations.loadOrg(petition.org_id),
-    context.organizations.getOrgLogoUrl(petition.org_id),
-  ]);
-  if (!org) {
-    throw new Error(
-      `Organization not found for petition.org_id ${petition.org_id}`
-    );
-  }
+  const layoutProps = await getLayoutProps(petition.org_id, context);
   const comments = (
     await context.petitions.loadPetitionFieldComment(
       payload.petition_field_comment_ids
@@ -105,11 +98,7 @@ export async function commentsContactNotification(
         contactFullName: fullName(contact.first_name, contact.last_name),
         keycode: access.keycode,
         fields,
-        assetsUrl: context.config.misc.assetsUrl,
-        parallelUrl: context.config.misc.parallelUrl,
-        logoUrl:
-          logoUrl ?? `${context.config.misc.assetsUrl}/static/emails/logo.png`,
-        logoAlt: logoUrl ? org.name : "Parallel",
+        ...layoutProps,
       },
       { locale: petition.locale }
     );

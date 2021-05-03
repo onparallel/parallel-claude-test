@@ -9,6 +9,7 @@ import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 import { Maybe } from "../../util/types";
+import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionSharingNotification(
   payload: {
@@ -38,15 +39,8 @@ export async function petitionSharingNotification(
     (p) => p.id
   );
   const petitionsById = indexBy(petitions.filter(isDefined), (p) => p.id);
-  const [org, logoUrl] = await Promise.all([
-    context.organizations.loadOrg(user.org_id),
-    context.organizations.getOrgLogoUrl(user.org_id),
-  ]);
-  if (!org) {
-    throw new Error(`Org not found for org_id ${user.org_id}`);
-  }
-
   const emails: EmailLog[] = [];
+  const layoutProps = await getLayoutProps(user.org_id, context);
 
   for (const permission of permissions) {
     if (permission) {
@@ -63,12 +57,7 @@ export async function petitionSharingNotification(
           ownerName: fullName(user.first_name, user.last_name)!,
           ownerEmail: user.email,
           message: payload.message,
-          assetsUrl: context.config.misc.assetsUrl,
-          parallelUrl: context.config.misc.parallelUrl,
-          logoUrl:
-            logoUrl ??
-            `${context.config.misc.assetsUrl}/static/emails/logo.png`,
-          logoAlt: logoUrl ? org.name : "Parallel",
+          ...layoutProps,
         },
         { locale: petition.locale }
       );

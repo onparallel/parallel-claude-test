@@ -4,6 +4,7 @@ import AccessDelegatedEmail from "../../emails/components/AccessDelegatedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toHtml, toPlainText } from "../../util/slate";
+import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionAccessDelegated(
   payload: {
@@ -33,19 +34,12 @@ export async function petitionAccessDelegated(
     );
   }
 
-  const [contact, delegator, petitionOwner, org, logoUrl] = await Promise.all([
+  const [contact, delegator, petitionOwner] = await Promise.all([
     context.contacts.loadContact(newAccess.contact_id),
     context.contacts.loadContact(originalAccess.contact_id),
     context.users.loadUser(originalAccess.granter_id),
-    context.organizations.loadOrg(petition.org_id),
-    context.organizations.getOrgLogoUrl(petition.org_id),
   ]);
 
-  if (!org) {
-    throw new Error(
-      `Organization ${petition.org_id} not found for petition with id ${petition.id}`
-    );
-  }
   if (!contact) {
     throw new Error(
       `Contact ${newAccess.contact_id} not found for petition_access with id ${newAccess.id}`
@@ -75,11 +69,7 @@ export async function petitionAccessDelegated(
       bodyHtml: toHtml(payload.message_body),
       bodyPlainText: toPlainText(payload.message_body),
       keycode: newAccess.keycode,
-      assetsUrl: context.config.misc.assetsUrl,
-      parallelUrl: context.config.misc.parallelUrl,
-      logoUrl:
-        logoUrl ?? `${context.config.misc.assetsUrl}/static/emails/logo.png`,
-      logoAlt: logoUrl ? org.name : "Parallel",
+      ...(await getLayoutProps(petition.org_id, context)),
     },
     { locale: petition.locale }
   );

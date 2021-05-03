@@ -11,6 +11,7 @@ import { removeKeys } from "../util/remedaExtensions";
 import { random } from "../util/token";
 import { calculateSignatureBoxPositions } from "./helpers/calculateSignatureBoxPositions";
 import { createQueueWorker } from "./helpers/createQueueWorker";
+import { getLayoutProps } from "./helpers/getLayoutProps";
 
 type PetitionSignatureConfig = {
   provider: string;
@@ -284,20 +285,10 @@ async function fetchTemplateData(petition: Petition, ctx: WorkerContext) {
   if (!user) {
     throw new Error(`Can't find OWNER of petition with id ${petition.id}`);
   }
-
-  const [org, logoUrl] = await Promise.all([
-    ctx.organizations.loadOrg(petition.org_id),
-    ctx.organizations.getOrgLogoUrl(petition.org_id),
-  ]);
-  if (!org) {
-    throw new Error(`Org with id ${petition.org_id} not found`);
-  }
-
   const signatureConfig = petition.signature_config as PetitionSignatureConfig;
   return {
     senderFirstName: user.first_name ?? "",
-    logoUrl: logoUrl ?? `${ctx.config.misc.assetsUrl}/static/emails/logo.png`,
-    logoAlt: org.identifier,
     documentName: signatureConfig.title,
+    ...(await getLayoutProps(petition.org_id, ctx)),
   };
 }

@@ -4,6 +4,7 @@ import PetitionMessage from "../../emails/components/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { slateParser } from "../../util/slate";
+import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionMessage(
   payload: { petition_message_id: number },
@@ -37,16 +38,7 @@ export async function petitionMessage(
       `Petition access not found for petition_message.petition_access_id ${message.petition_access_id}`
     );
   }
-  const [contact, org, logoUrl] = await Promise.all([
-    context.contacts.loadContact(access.contact_id),
-    context.organizations.loadOrg(sender.org_id),
-    context.organizations.getOrgLogoUrl(sender.org_id),
-  ]);
-  if (!org) {
-    throw new Error(
-      `Organization not found for user.org_id ${access.contact_id}`
-    );
-  }
+  const contact = await context.contacts.loadContact(access.contact_id);
   if (!contact) {
     throw new Error(
       `Contact not found for petition_access.contact_id ${access.contact_id}`
@@ -65,11 +57,7 @@ export async function petitionMessage(
       bodyPlainText: slate.toPlainText(bodyJson),
       deadline: petition.deadline,
       keycode: access.keycode,
-      assetsUrl: context.config.misc.assetsUrl,
-      parallelUrl: context.config.misc.parallelUrl,
-      logoUrl:
-        logoUrl ?? `${context.config.misc.assetsUrl}/static/emails/logo.png`,
-      logoAlt: logoUrl ? org.name : "Parallel",
+      ...(await getLayoutProps(sender.org_id, context)),
     },
     { locale: petition.locale }
   );

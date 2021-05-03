@@ -356,6 +356,7 @@ export interface Organization {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   public_file_logo_id: Maybe<number>; // int4
+  custom_host: Maybe<string>; // varchar
 }
 
 export type CreateOrganization = PartialProps<
@@ -367,6 +368,7 @@ export type CreateOrganization = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "public_file_logo_id"
+  | "custom_host"
 >;
 
 export interface OrgIntegration {

@@ -32,7 +32,6 @@ export type LayoutProps = {
 
 export const Layout: FC<LayoutProps> = function Layout({
   title,
-  parallelUrl,
   logoUrl,
   logoAlt,
   assetsUrl,
@@ -105,7 +104,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               width="120px"
               alt="Parallel"
               src={`${assetsUrl}/static/emails/logo.png`}
-              href="https://www.onparallel.com/?utm_source=parallel&utm_medium=email&utm_campaign=recipients"
+              href="https://www.onparallel.com?utm_source=parallel&utm_medium=email&utm_campaign=recipients"
             />
             <MjmlSocial align="center" icon-padding="1px">
               <MjmlSocialElement
@@ -131,7 +130,7 @@ export const Layout: FC<LayoutProps> = function Layout({
             <MjmlText align="center" fontSize="12px">
               <a
                 className="link"
-                href={`${parallelUrl}/${locale}/legal/terms?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
+                href={`https://www.onparallel.com/${locale}/legal/terms?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
               >
                 <FormattedMessage
                   id="layout.terms-and-conditions-link"
@@ -141,7 +140,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               <span>&nbsp;|&nbsp;</span>
               <a
                 className="link"
-                href={`${parallelUrl}/${locale}/legal/privacy?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
+                href={`https://www.onparallel.com/${locale}/legal/privacy?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
               >
                 <FormattedMessage
                   id="layout.privacy-link"

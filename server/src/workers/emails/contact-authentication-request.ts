@@ -4,6 +4,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import ContactAuthenticationRequest from "../../emails/components/ContactAuthenticationRequest";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
+import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function contactAuthenticationRequest(
   payload: { contact_authentication_request_id: number },
@@ -37,15 +38,6 @@ export async function contactAuthenticationRequest(
       `Petition not found for petition_access.petition_id ${access.petition_id}`
     );
   }
-  const [org, logoUrl] = await Promise.all([
-    context.organizations.loadOrg(petition.org_id),
-    context.organizations.getOrgLogoUrl(petition.org_id),
-  ]);
-  if (!org) {
-    throw new Error(
-      `Organization not found for user.org_id ${access.contact_id}`
-    );
-  }
   const ua = request.user_agent ? new UAParser(request.user_agent) : null;
   const { html, text, subject, from } = await buildEmail(
     ContactAuthenticationRequest,
@@ -54,11 +46,7 @@ export async function contactAuthenticationRequest(
       code: request.code,
       browserName: ua?.getBrowser()?.name ?? "Unknown",
       osName: ua?.getOS()?.name ?? "Unknown",
-      assetsUrl: context.config.misc.assetsUrl,
-      parallelUrl: context.config.misc.parallelUrl,
-      logoUrl:
-        logoUrl ?? `${context.config.misc.assetsUrl}/static/emails/logo.png`,
-      logoAlt: logoUrl ? org.name : "Parallel",
+      ...(await getLayoutProps(petition.org_id, context)),
     },
     { locale: petition.locale }
   );
