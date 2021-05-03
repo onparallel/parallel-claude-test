@@ -42,7 +42,11 @@ export function SimpleContactInfoList<T extends Contact | PublicContact>({
             isClickable && c.id === hoveredContactId ? "gray.75" : "transparent"
           }
         >
-          <Flex direction="column" padding={2}>
+          <Flex
+            direction="column"
+            padding={2}
+            cursor={isClickable ? "pointer" : "unset"}
+          >
             <Text color={isClickable ? "purple.600" : "gray.800"}>
               {c.fullName}
             </Text>
