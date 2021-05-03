@@ -14,7 +14,6 @@ import {
 } from "@parallel/components/common/DialogProvider";
 import { useGenerateNewTokenDialog_generateUserAuthTokenMutation } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import useMergedRef from "@react-hook/merged-ref";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";

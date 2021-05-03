@@ -15,7 +15,6 @@ import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterW
 import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { plainTextToRTEValue } from "@parallel/utils/slate/plainTextToRTEValue";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
-import useMergedRef from "@react-hook/merged-ref";
 import outdent from "outdent";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
