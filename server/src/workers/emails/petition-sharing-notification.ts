@@ -1,4 +1,4 @@
-import { indexBy, uniq, zip } from "remeda";
+import { indexBy, uniq } from "remeda";
 import { WorkerContext } from "../../context";
 import { EmailLog } from "../../db/__types";
 import { buildEmail } from "../../emails/buildEmail";
@@ -38,15 +38,12 @@ export async function petitionSharingNotification(
     (p) => p.id
   );
   const petitionsById = indexBy(petitions.filter(isDefined), (p) => p.id);
-  const orgIds = uniq(petitions.map((p) => p!.org_id));
-  const [orgs, logos] = await Promise.all([
-    context.organizations.loadOrg(orgIds),
-    context.organizations.getOrgLogoUrl(orgIds),
+  const [org, logoUrl] = await Promise.all([
+    context.organizations.loadOrg(user.org_id),
+    context.organizations.getOrgLogoUrl(user.org_id),
   ]);
-  const orgsById = indexBy(orgs.filter(isDefined), (o) => o.id);
-  const logosByOrgId = Object.fromEntries(zip(orgIds, logos));
-  if (!user) {
-    throw new Error(`User not found for user_id ${payload.user_id}`);
+  if (!org) {
+    throw new Error(`Org not found for org_id ${user.org_id}`);
   }
 
   const emails: EmailLog[] = [];
@@ -55,8 +52,6 @@ export async function petitionSharingNotification(
     if (permission) {
       const permissionUser = permissionUsersById[permission.user_id];
       const petition = petitionsById[permission.petition_id];
-      const org = orgsById[petition.org_id];
-      const logoUrl = logosByOrgId[petition.org_id];
       const { html, text, subject, from } = await buildEmail(
         petition.is_template
           ? TemplateSharingNotification
