@@ -25,6 +25,7 @@ import {
   useDialog,
   withDialogs,
 } from "@parallel/components/common/DialogProvider";
+import { SimpleContactInfoList } from "@parallel/components/common/SimpleContactInfoList";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   RedirectError,
@@ -48,15 +49,14 @@ import {
   RecipientView_PublicPetitionFieldFragment,
   RecipientView_PublicPetitionFragment,
   RecipientView_PublicUserFragment,
-  SimpleContactInfoList_PublicContactFragment,
   usePublicPetitionQuery,
   useRecipientView_publicCompletePetitionMutation,
   useRecipientView_submitUnpublishedCommentsMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
-import { compose } from "@parallel/utils/compose";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { compose } from "@parallel/utils/compose";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
 import { groupFieldsByPages } from "@parallel/utils/groupFieldsByPage";
 import { resolveUrl } from "@parallel/utils/next";
@@ -67,7 +67,6 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
-import { SimpleContactInfoList } from "@parallel/components/common/SimpleContactInfoList";
 
 type RecipientViewProps = UnwrapPromise<
   ReturnType<typeof RecipientView.getInitialProps>
