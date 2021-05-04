@@ -1,62 +1,56 @@
 import { gql } from "@apollo/client";
-import { Flex, Stack, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import {
   SimpleContactInfoList_ContactFragment,
   SimpleContactInfoList_PublicContactFragment,
 } from "@parallel/graphql/__types";
-import { useGoToContact } from "@parallel/utils/goToContact";
-import { useState } from "react";
+import { FormattedMessage } from "react-intl";
 
-type Contact = SimpleContactInfoList_ContactFragment;
-type PublicContact = SimpleContactInfoList_PublicContactFragment;
-interface SimpleContactInfoListProps<T extends Contact | PublicContact> {
+type ContactSelection =
+  | SimpleContactInfoList_ContactFragment
+  | SimpleContactInfoList_PublicContactFragment;
+interface SimpleContactInfoListProps<T extends ContactSelection> {
   contacts: Array<T>;
-  isClickable?: boolean;
+  onContactClick?: (contactId: string) => void;
 }
-export function SimpleContactInfoList<T extends Contact | PublicContact>({
+export function SimpleContactInfoList<T extends ContactSelection>({
   contacts,
-  isClickable,
+  onContactClick,
 }: SimpleContactInfoListProps<T>) {
-  const goToContact = useGoToContact();
-  const [hoveredContactId, setHoveredContactId] = useState<string | null>(null);
-  function handleContactClick() {
-    if (isClickable && hoveredContactId) {
-      goToContact(hoveredContactId);
-    }
-  }
+  const isClickable = Boolean(onContactClick);
   return (
-    <Stack
+    <Box
       onClick={(e) => e.stopPropagation()}
-      spacing={0}
       overflowY="auto"
       maxHeight="180px"
+      paddingY={2}
     >
       {contacts.map((c) => (
-        <Flex
-          height="62px"
+        <Box
           key={c.id}
-          direction="column"
-          onClick={handleContactClick}
-          onMouseOver={() => setHoveredContactId(c.id)}
-          backgroundColor={
-            isClickable && c.id === hoveredContactId ? "gray.75" : "transparent"
-          }
+          onClick={onContactClick && (() => onContactClick?.(c.id))}
+          paddingX={4}
+          paddingY={0.5}
+          backgroundColor="white"
+          role={isClickable ? "link" : undefined}
+          _hover={isClickable ? { backgroundColor: "gray.75" } : {}}
+          cursor={isClickable ? "pointer" : "unset"}
         >
-          <Flex
-            direction="column"
-            padding={2}
-            cursor={isClickable ? "pointer" : "unset"}
-          >
-            <Text color={isClickable ? "purple.600" : "gray.800"}>
+          {c.fullName ? (
+            <Box isTruncated color={isClickable ? "purple.600" : "gray.800"}>
               {c.fullName}
-            </Text>
-            <Text color="gray.600" fontSize="sm">
-              {c.email}
-            </Text>
-          </Flex>
-        </Flex>
+            </Box>
+          ) : (
+            <Box textStyle="hint">
+              <FormattedMessage id="generic.no-name" defaultMessage="No name" />
+            </Box>
+          )}
+          <Box isTruncated color="gray.600" fontSize="xs">
+            {c.email}
+          </Box>
+        </Box>
       ))}
-    </Stack>
+    </Box>
   );
 }
 

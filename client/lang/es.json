@@ -2250,6 +2250,11 @@
     "context": "No description"
   },
   {
+    "term": "generic.no-name",
+    "definition": "Sin nombre",
+    "context": "No name"
+  },
+  {
     "term": "generic.not-specified",
     "definition": "Sin especificar",
     "context": "Not specified"

@@ -14,11 +14,12 @@ import { Link } from "@parallel/components/common/Link";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
+import { PetitionTagListCellContent } from "@parallel/components/common/PetitionTagListCellContent";
+import { SimpleContactInfoList } from "@parallel/components/common/SimpleContactInfoList";
 import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   PetitionBaseType,
-  SimpleContactInfoList_ContactFragment,
   usePetitionsTableColumns_PetitionBaseFragment,
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
@@ -28,8 +29,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PetitionTagListCellContent } from "@parallel/components/common/PetitionTagListCellContent";
-import { SimpleContactInfoList } from "@parallel/components/common/SimpleContactInfoList";
+import { useGoToContact } from "./goToContact";
 
 export type PetitionsTableColumnsContext = {
   user: usePetitionsTableColumns_UserFragment;
@@ -106,11 +106,12 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 CellContent: ({ row }) => {
                   const recipients = row.accesses
                     .filter((a) => a.status === "ACTIVE")
-                    .map((a) => a.contact);
+                    .map((a) => a.contact!);
                   if (recipients.length === 0) {
                     return null;
                   }
                   const [contact, ...rest] = recipients;
+                  const goToContact = useGoToContact();
 
                   return contact && rest.length ? (
                     <FormattedMessage
@@ -136,12 +137,12 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                             </PopoverTrigger>
                             <Portal>
                               <PopoverContent>
+                                <PopoverArrow />
                                 <PopoverBody padding={0}>
-                                  <SimpleContactInfoList<SimpleContactInfoList_ContactFragment>
-                                    contacts={recipients as any}
-                                    isClickable
+                                  <SimpleContactInfoList
+                                    contacts={recipients}
+                                    onContactClick={goToContact}
                                   />
-                                  <PopoverArrow />
                                 </PopoverBody>
                               </PopoverContent>
                             </Portal>

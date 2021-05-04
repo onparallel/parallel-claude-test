@@ -351,15 +351,13 @@ function RecipientView({
                                   </PopoverTrigger>
                                   <Portal>
                                     <PopoverContent>
+                                      <PopoverArrow />
                                       <PopoverBody padding={0}>
-                                        <SimpleContactInfoList<SimpleContactInfoList_PublicContactFragment>
-                                          contacts={
-                                            petition.signature!.signers.slice(
-                                              1
-                                            ) as any
-                                          }
+                                        <SimpleContactInfoList
+                                          contacts={petition
+                                            .signature!.signers.map((c) => c!)
+                                            .slice(1)}
                                         />
-                                        <PopoverArrow />
                                       </PopoverBody>
                                     </PopoverContent>
                                   </Portal>
