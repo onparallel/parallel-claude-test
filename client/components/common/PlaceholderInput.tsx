@@ -17,6 +17,7 @@ import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placehold
 import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
 import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
+import { CustomElement } from "@parallel/utils/slate/types";
 import {
   useSingleLine,
   withSingleLine,
@@ -95,7 +96,7 @@ export const PlaceholderInput = chakraForwardRef<
   const { onKeyDown: onKeyDownFixDeleteAll } = useFixDeleteAll();
 
   const handleChange = useCallback(
-    (value) => {
+    (value: CustomElement[]) => {
       onChangePlaceholder(editor);
       onChangeSelection(editor.selection);
       onChange(slateNodesToTextWithPlaceholders(value));
@@ -150,7 +151,11 @@ export const PlaceholderInput = chakraForwardRef<
         alignItems="center"
         {...getReferenceProps({ ...props, ...inputStyles })}
       >
-        <Slate editor={editor} value={slateValue} onChange={handleChange}>
+        <Slate
+          editor={editor}
+          value={slateValue}
+          onChange={handleChange as any}
+        >
           <EditablePlugins
             plugins={plugins}
             readOnly={isDisabled}

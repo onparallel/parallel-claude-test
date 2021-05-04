@@ -11,6 +11,7 @@ import {
 import { ReactNode, useEffect, useRef } from "react";
 import { RenderElementProps, useFocused, useSelected } from "slate-react";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
+import { PlaceholderElement } from "../types";
 
 export type Placeholder = {
   value: string;
@@ -22,13 +23,15 @@ export function PlaceholderPlugin(placeholders: Placeholder[]): SlatePlugin {
     renderElementDeps: [placeholders],
     renderElement: getRenderElement({
       type: "placeholder",
-      component: ({ children, attributes, element }: RenderElementProps) => {
+      component: (props: RenderElementProps) => {
+        const { children, attributes } = props;
+        const element = props.element as PlaceholderElement;
         const placeholder = placeholders.find(
           (p) => p.value === element.placeholder
         );
         return placeholder ? (
           <PlaceholderToken
-            value={element.placeholder as string}
+            value={element.placeholder}
             label={placeholder.label}
             attributes={attributes}
           >
@@ -39,7 +42,7 @@ export function PlaceholderPlugin(placeholders: Placeholder[]): SlatePlugin {
       rootProps: {},
       hotkey: undefined as any,
       defaultType: undefined as any,
-    }),
+    }) as any,
     deserialize: {
       element: getNodeDeserializer({
         type: "placeholder",

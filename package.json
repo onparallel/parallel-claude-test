@@ -27,5 +27,11 @@
   },
   "dependencies": {
     "patch-package": "^6.4.7"
+  },
+  "_resolutions_why": {
+    "@apollo/client": "@types/apollo-upload-client is depending on an old version which is causing build issues"
+  },
+  "resolutions": {
+    "@apollo/client": "^3.3.16"
   }
 }

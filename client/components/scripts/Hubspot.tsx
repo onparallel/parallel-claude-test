@@ -1,46 +1,15 @@
-import { memo, useEffect } from "react";
 import Head from "next/head";
-import Router from "next/router";
-
-declare const HubSpotConversations: any;
+import { memo } from "react";
 
 export const Hubspot = memo(() => {
-  useEffect(() => {
-    function handler() {
-      if (typeof HubSpotConversations !== "undefined") {
-        HubSpotConversations.widget.refresh();
-      }
-    }
-    Router.events.on("routeChangeComplete", handler);
-    return () => {
-      Router.events.off("routeChangeComplete", handler);
-    };
-  }, []);
   return (
-    <>
-      <Head>
-        <script
-          id="hs-script-loader"
-          async
-          defer
-          src="//js.hs-scripts.com/6692004.js"
-        ></script>
-      </Head>
-      <style jsx global>
-        {
-          /* css */ `
-            /* hide the hubspot widget on small screens */
-            div#hubspot-messages-iframe-container {
-              display: none !important;
-            }
-            @media screen and (min-width: 30em) {
-              body:not(.hide-hubspot) div#hubspot-messages-iframe-container {
-                display: block !important;
-              }
-            }
-          `
-        }
-      </style>
-    </>
+    <Head>
+      <script
+        id="hs-script-loader"
+        async
+        defer
+        src="//js.hs-scripts.com/6692004.js"
+      ></script>
+    </Head>
   );
 });

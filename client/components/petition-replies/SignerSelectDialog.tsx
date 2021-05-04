@@ -4,15 +4,12 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
-import {
-  SignatureConfig,
-  SignatureConfigInput,
-} from "@parallel/graphql/__types";
+import { SignatureConfigInput } from "@parallel/graphql/__types";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { ContactSelect } from "../common/ContactSelect";
+import { ContactSelect, ContactSelectSelection } from "../common/ContactSelect";
 
 export function SignerSelectDialog(
   props: DialogProps<{}, Pick<SignatureConfigInput, "contactIds">>
@@ -21,7 +18,7 @@ export function SignerSelectDialog(
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<Pick<SignatureConfig, "contacts">>({
+  } = useForm<{ contacts: ContactSelectSelection[] }>({
     mode: "onChange",
     defaultValues: {
       contacts: [],

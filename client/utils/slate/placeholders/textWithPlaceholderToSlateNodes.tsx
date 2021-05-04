@@ -1,10 +1,11 @@
 import escapeStringRegexp from "escape-string-regexp";
+import { CustomElement, CustomText } from "../types";
 import { Placeholder } from "./PlaceholderPlugin";
 
 export function textWithPlaceholderToSlateNodes(
   value: string,
   placeholders: Placeholder[]
-) {
+): CustomElement[] {
   return value.split("\n").map((line) => {
     const parts = line.split(
       new RegExp(
@@ -14,7 +15,7 @@ export function textWithPlaceholderToSlateNodes(
         "g"
       )
     );
-    const children = [];
+    const children: (CustomElement | CustomText)[] = [];
     for (const part of parts) {
       if (part.startsWith("#") && part.endsWith("#")) {
         const value = part.slice(1, -1);

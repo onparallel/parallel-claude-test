@@ -1,5 +1,5 @@
-import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
+import { ParagraphElement } from "./types";
 
-export function emptyRTEValue(): RichTextEditorValue {
-  return [{ children: [{ text: "" }] }];
+export function emptyRTEValue(): ParagraphElement[] {
+  return [{ type: "paragraph", children: [{ text: "" }] }];
 }

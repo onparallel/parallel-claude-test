@@ -15,6 +15,7 @@ function DeveloperApi({
           name="description"
           content="Integrate Parallel into your workflow"
         />
+        <link rel="stylesheet" href="/static/styles/api.css" />
       </Head>
       <RedocStandalone
         spec={spec}
@@ -42,36 +43,6 @@ function DeveloperApi({
           } as any,
         }}
       />
-      <style jsx global>{
-        /* css */ `
-          button > svg {
-            display: inline;
-          }
-          /* override generated markdown styles */
-          pre + p,
-          p + h1,
-          p + h2,
-          p + pre,
-          p + ul,
-          p + p {
-            margin-top: 1rem !important;
-          }
-          li + li {
-            margin-top: 0.5rem;
-          }
-          .security-details {
-            margin: 0 !important;
-          }
-          h3 {
-            font-size: 1.2em !important;
-          }
-          h2,
-          h3 {
-            margin-top: 1rem !important;
-            margin-bottom: 0.5rem !important;
-          }
-        `
-      }</style>
     </>
   );
 }

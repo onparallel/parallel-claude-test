@@ -22,6 +22,7 @@ import {
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
+import { CustomElement } from "@parallel/utils/slate/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
   AutoformatRule,
@@ -59,7 +60,7 @@ import {
 } from "react";
 import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
-import { createEditor, Editor, Node, Range, Transforms } from "slate";
+import { createEditor, Editor, Range, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import { ReactEditor, Slate, useSlate, withReact } from "slate-react";
 import {
@@ -148,7 +149,7 @@ export interface RichTextEditorProps
   placeholderOptions?: Placeholder[];
 }
 
-export type RichTextEditorValue = Node[];
+export type RichTextEditorValue = CustomElement[];
 
 export interface RichTextEditorInstance {
   focus(): void;
@@ -243,7 +244,7 @@ export const RichTextEditor = forwardRef<
     () =>
       ({
         padding: "12px 16px",
-        minHeight: "120px",
+        minHeight: "120px !important",
       } as CSSProperties),
     []
   );
@@ -285,13 +286,25 @@ export const RichTextEditor = forwardRef<
         "aria-describedby",
       ])}
       {...inputStyles}
+      overflow="hidden"
     >
       <Slate editor={editor} value={value} onChange={handleChange}>
         <Toolbar
           isDisabled={formControl.disabled || formControl.readOnly}
           hasPlaceholders={placeholderOptions.length > 0}
         />
-        <Box maxHeight="360px" overflow="auto">
+        <Box
+          maxHeight="360px"
+          overflow="auto"
+          sx={{
+            '[contenteditable="false"]': {
+              width: "auto !important",
+            },
+            "& > div": {
+              minHeight: "120px !important",
+            },
+          }}
+        >
           <EditablePlugins
             readOnly={formControl.disabled || formControl.readOnly}
             onKeyDown={[onKeyDownPlaceholder]}
@@ -484,7 +497,7 @@ function PlaceholderButton(props: IconButtonWithTooltipProps) {
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
         if (!editor.selection) {
-          ReactEditor.focus(editor);
+          ReactEditor.focus(editor as any);
         }
         setTimeout(() => {
           Transforms.insertText(editor, "#", { at: editor.selection?.anchor });

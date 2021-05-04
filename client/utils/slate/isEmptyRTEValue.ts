@@ -1,11 +1,13 @@
-import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
-import { Element, Text } from "slate";
+import { CustomElement } from "./types";
 
-export function isEmptyRTEValue(content: RichTextEditorValue) {
-  return content?.every(
-    (block) =>
-      (block.children as Element) &&
-      (block.children as Element).length === 1 &&
-      ((block.children as Element)[0] as Text)?.text === ""
+export function isEmptyRTEValue(content: CustomElement[]) {
+  return content?.every((element) => isEmptyParagraph(element));
+}
+
+export function isEmptyParagraph(element: CustomElement) {
+  return (
+    element.type === "paragraph" &&
+    element.children.length === 1 &&
+    (element.children[0] as any)?.text === ""
   );
 }

@@ -5,17 +5,19 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
+import { isEmptyParagraph } from "@parallel/utils/slate/isEmptyRTEValue";
+import { ParagraphElement } from "@parallel/utils/slate/types";
 import { isSelectionExpanded, pipe } from "@udecode/slate-plugins";
 import {
   forwardRef,
+  KeyboardEvent,
   useCallback,
   useMemo,
   useState,
-  KeyboardEvent,
 } from "react";
 import { FormattedMessage } from "react-intl";
 import { shallowEqualArrays } from "shallow-equal";
-import { createEditor, Editor, Node, Point, Transforms } from "slate";
+import { createEditor, Editor, Point, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import {
   Editable,
@@ -36,7 +38,7 @@ export interface SelectTypeFieldOptionsProps extends EditableProps {
 }
 
 function renderElement({ attributes, children, element }: RenderElementProps) {
-  const isEmpty = !element.children[0].text;
+  const isEmpty = isEmptyParagraph(element);
   return (
     <Text
       as="div"
@@ -76,8 +78,9 @@ export type SelectTypeFieldOptionsRef = {
   editor: Editor;
 };
 
-function valuesToSlateNodes(values: string[]) {
+function valuesToSlateNodes(values: string[]): ParagraphElement[] {
   return (values.length ? values : [""]).map((option) => ({
+    type: "paragraph",
     children: [{ text: option }],
   }));
 }
@@ -99,7 +102,7 @@ export const SelectTypeFieldOptions = Object.assign(
         () => pipe(createEditor(), withHistory, withReact),
         []
       );
-      const [value, onChange] = useState<Node[]>(
+      const [value, onChange] = useState<ParagraphElement[]>(
         valuesToSlateNodes(field.options.values ?? [])
       );
       assignRef(
@@ -161,7 +164,7 @@ export const SelectTypeFieldOptions = Object.assign(
         }
       }, [field.options.values, value, onFieldEdit, onChange]);
       return (
-        <Slate editor={editor} value={value} onChange={onChange}>
+        <Slate editor={editor} value={value} onChange={onChange as any}>
           <Box maxHeight="200px" overflow="auto" fontSize="sm">
             <Editable
               renderElement={renderElement}
