@@ -37,7 +37,10 @@ export function SimpleContactInfoList<T extends ContactSelection>({
           cursor={isClickable ? "pointer" : "unset"}
         >
           {c.fullName ? (
-            <Box isTruncated color={isClickable ? "purple.600" : "gray.800"}>
+            <Box
+              whiteSpace="nowrap"
+              color={isClickable ? "purple.600" : "gray.800"}
+            >
               {c.fullName}
             </Box>
           ) : (
@@ -45,7 +48,7 @@ export function SimpleContactInfoList<T extends ContactSelection>({
               <FormattedMessage id="generic.no-name" defaultMessage="No name" />
             </Box>
           )}
-          <Box isTruncated color="gray.600" fontSize="xs">
+          <Box whiteSpace="nowrap" color="gray.600" fontSize="xs">
             {c.email}
           </Box>
         </Box>
