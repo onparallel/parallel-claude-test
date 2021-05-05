@@ -104,7 +104,7 @@ export const Layout: FC<LayoutProps> = function Layout({
               width="120px"
               alt="Parallel"
               src={`${assetsUrl}/static/emails/logo.png`}
-              href="https://www.onparallel.com?utm_source=parallel&utm_medium=email&utm_campaign=recipients"
+              href={`https://www.onparallel.com/${locale}?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
             />
             <MjmlSocial align="center" icon-padding="1px">
               <MjmlSocialElement
