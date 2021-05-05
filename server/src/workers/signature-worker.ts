@@ -92,8 +92,6 @@ async function startSignatureProcess(
       recipients
     );
 
-    const templateData = await fetchTemplateData(petition, ctx);
-
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 
     // send request to signature client
@@ -103,7 +101,7 @@ async function startSignatureProcess(
       recipients,
       {
         locale: petition.locale as "en" | "es",
-        templateData,
+        templateData: await getLayoutProps(petition.org_id, ctx),
         signingMode: "parallel",
         signatureBoxPositions,
         initialMessage: settings.message,
@@ -278,17 +276,4 @@ async function fetchPetitionSignature(
   }
 
   return signature;
-}
-
-async function fetchTemplateData(petition: Petition, ctx: WorkerContext) {
-  const user = await ctx.petitions.loadPetitionOwners(petition.id);
-  if (!user) {
-    throw new Error(`Can't find OWNER of petition with id ${petition.id}`);
-  }
-  const signatureConfig = petition.signature_config as PetitionSignatureConfig;
-  return {
-    senderFirstName: user.first_name ?? "",
-    documentName: signatureConfig.title,
-    ...(await getLayoutProps(petition.org_id, ctx)),
-  };
 }
