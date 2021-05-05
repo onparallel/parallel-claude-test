@@ -19,7 +19,7 @@ function cleanAndValidate(data: string[][]): string[][] {
   }
   const rows = [headers];
   for (let r = 1; r < data.length; r++) {
-    const row = data[r].slice(0, headers.length);
+    const row = data[r].slice(0, headers.length).map((t) => t.trim());
     if (row.every((c) => !c)) {
       continue;
     }

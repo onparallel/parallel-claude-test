@@ -16,7 +16,9 @@ export function parseContactList(data: string[][]): ParsedContact[] {
         throw new Error("Not enough data");
       }
 
-      const [firstName, lastName, email] = entry;
+      const firstName = entry[0].trim();
+      const lastName = entry[1].trim();
+      const email = entry[2].trim().toLowerCase();
 
       if (!EMAIL_REGEX.test(email)) {
         throw new Error(`${email} is not a valid email`);
