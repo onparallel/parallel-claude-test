@@ -80,7 +80,7 @@ make install
 popd > /dev/null
 mv nginx.service /lib/systemd/system/nginx.service
 mv nginx.conf /etc/nginx/nginx.conf
-mv nginx.common.conf /etc/nginx/nginx.conf
+mv nginx.common.conf /etc/nginx/nginx.common.conf
 echo 'parallel:$apr1$wY1qv83a$ErfofKvlFLeIZ4r4ijEDw/' >>.htpasswd
 mv .htpasswd /etc/nginx/.htpasswd
 adduser --system --no-create-home --user-group --shell /sbin/nologin nginx
