@@ -4,7 +4,9 @@ import { ReactEditor } from "slate-react";
 
 type SimpleElement<T extends string> = BaseElement & { type: T };
 
-export interface ParagraphElement extends SimpleElement<"paragraph"> {}
+export interface ParagraphElement extends BaseElement {
+  type?: "paragraph";
+}
 export interface BulletedListElement extends SimpleElement<"bulleted-list"> {}
 export interface ListItemElement extends SimpleElement<"list-item"> {}
 export interface PlaceholderElement extends SimpleElement<"placeholder"> {
@@ -23,9 +25,11 @@ export interface CustomText extends BaseText {
   italic?: boolean;
 }
 
+export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
+
 declare module "slate" {
   interface CustomTypes {
-    Editor: BaseEditor & ReactEditor & HistoryEditor;
+    Editor: CustomEditor;
     Element: CustomElement;
     Text: CustomText;
   }

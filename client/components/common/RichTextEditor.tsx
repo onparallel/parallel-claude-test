@@ -22,7 +22,7 @@ import {
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
-import { CustomElement } from "@parallel/utils/slate/types";
+import { CustomEditor, CustomElement } from "@parallel/utils/slate/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
   AutoformatRule,
@@ -413,7 +413,7 @@ const Toolbar = memo(function _Toolbar({
 function useRepositionPlaceholderMenu(
   isMenuOpen: boolean,
   target: Range | null,
-  editor: ReactEditor,
+  editor: CustomEditor,
   menuRef: RefObject<HTMLElement>
 ) {
   useEffect(() => {

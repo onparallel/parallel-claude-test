@@ -1,10 +1,10 @@
-import { ReactEditor } from "slate-react";
+import { pipe, withInlineVoid } from "@udecode/slate-plugins";
+import { CustomEditor } from "../types";
 import { Placeholder } from "./PlaceholderPlugin";
 import { textWithPlaceholderToSlateNodes } from "./textWithPlaceholderToSlateNodes";
-import { pipe, withInlineVoid } from "@udecode/slate-plugins";
 
 export function withPlaceholders(placeholders: Placeholder[]) {
-  return <T extends ReactEditor>(editor: T) =>
+  return <T extends CustomEditor>(editor: T) =>
     pipe(
       editor,
       withInlineVoid({
