@@ -22,7 +22,7 @@ export const userQueries = queryField((t) => {
     validateArgs: validEmail((args) => args.email, "email"),
     authorize: authenticateAnd(contextUserIsAdmin()),
     resolve: async (_, { email }, ctx) => {
-      return !(await ctx.users.loadUserByEmail(email));
+      return !(await ctx.users.loadUserByEmail(email.trim().toLowerCase()));
     },
   });
 });

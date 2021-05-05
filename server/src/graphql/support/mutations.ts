@@ -8,6 +8,8 @@ import {
 } from "@nexus/schema";
 import { fromGlobalId } from "../../util/globalId";
 import { RESULT } from "../helpers/result";
+import { validateAnd } from "../helpers/validateArgs";
+import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
 import { validEmail } from "../helpers/validators/validEmail";
 import { supportMethodAccess } from "./authorizers";
 
@@ -123,26 +125,27 @@ export const createUser = mutationField("createUser", {
     ),
     organizationId: nonNull(intArg({ description: "ID of the organization" })),
   },
-  validateArgs: validEmail((args) => args.email, "email"),
+  validateArgs: validateAnd(
+    validEmail((args) => args.email, "email"),
+    emailIsAvailable((args) => args.email, "email")
+  ),
   authorize: supportMethodAccess(),
   resolve: async (_, args, ctx) => {
     try {
+      const email = args.email.trim().toLowerCase();
       const org = await ctx.organizations.loadOrg(args.organizationId);
       if (!org) {
         throw new Error(
           `Organization with id ${args.organizationId} does not exist.`
         );
       }
-      const cognitoId = await ctx.aws.createCognitoUser(
-        args.email,
-        args.password
-      );
+      const cognitoId = await ctx.aws.createCognitoUser(email, args.password);
       const user = await ctx.users.createUser(
         {
           cognito_id: cognitoId!,
           org_id: args.organizationId,
           organization_role: args.role,
-          email: args.email,
+          email,
           first_name: args.firstName,
           last_name: args.lastName,
         },

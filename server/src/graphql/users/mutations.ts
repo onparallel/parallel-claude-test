@@ -141,17 +141,14 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     emailIsAvailable((args) => args.email, "email")
   ),
   resolve: async (_, args, ctx) => {
-    const cognitoId = await ctx.aws.createCognitoUser(
-      args.email,
-      undefined,
-      true
-    );
+    const email = args.email.trim().toLowerCase();
+    const cognitoId = await ctx.aws.createCognitoUser(email, undefined, true);
     return await ctx.users.createUser(
       {
         cognito_id: cognitoId!,
         org_id: ctx.user!.org_id,
         organization_role: args.role,
-        email: args.email,
+        email,
         first_name: args.firstName,
         last_name: args.lastName,
       },
