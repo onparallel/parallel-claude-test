@@ -35,8 +35,10 @@ export function orgDoesNotHaveSsoProvider<
   FieldName extends string
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
-    const org = await ctx.organizations.loadOrg(ctx.user!.org_id);
-    if (org?.sso_provider) {
+    const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
+      ctx.user!.org_id
+    );
+    if (integrations.find((i) => i.type === "SSO")) {
       throw new WhitelistedError(
         "Can't create users on organizations with a SSO provider",
         "SSO_PROVIDER_ENABLED"

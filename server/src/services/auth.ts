@@ -15,6 +15,10 @@ import { random } from "../util/token";
 import { REDIS, Redis } from "./redis";
 import { parse as parseCookie } from "cookie";
 import { User } from "../db/__types";
+import {
+  IntegrationRepository,
+  IntegrationSettings,
+} from "../db/repositories/IntegrationRepository";
 
 export interface IAuth {
   guessLogin: RequestHandler;
@@ -47,6 +51,7 @@ export class Auth implements IAuth {
     @inject(CONFIG) private config: Config,
     @inject(REDIS) private redis: Redis,
     private orgs: OrganizationRepository,
+    private integrations: IntegrationRepository,
     private users: UserRepository
   ) {}
 
@@ -54,13 +59,14 @@ export class Auth implements IAuth {
     const { email } = req.body;
     const [, domain] = email.split("@");
     try {
-      const org = await this.orgs.loadOrgByDomain(domain);
-      if (org?.sso_provider) {
+      const sso = await this.integrations.loadSSOIntegrationByDomain(domain);
+      if (sso) {
         const url = new URL(
           `https://${this.config.cognito.domain}/oauth2/authorize`
         );
         for (const [name, value] of Object.entries({
-          identity_provider: org.sso_provider,
+          identity_provider: (sso.settings as IntegrationSettings<"SSO">)
+            .COGNITO_PROVIDER,
           redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
           response_type: "code",
           client_id: this.config.cognito.clientId,
@@ -98,13 +104,21 @@ export class Auth implements IAuth {
       const firstName = payload["given_name"] as string;
       const lastName = payload["family_name"] as string;
       const email = payload["email"] as string;
+      const externalId = payload["identities"][0].userId as string;
       const existing = await this.users.loadUserByEmail(email);
-      const org = existing
-        ? await this.orgs.loadOrg(existing.org_id)
-        : await this.orgs.loadOrgByDomain(email.split("@")[1]);
-      if (!org) {
-        throw new Error("missing org for domain");
+      const [, domain] = email.split("@");
+      const orgId = existing
+        ? existing.org_id
+        : (await this.integrations.loadSSOIntegrationByDomain(domain))?.org_id;
+      if (!orgId) {
+        throw new Error(`can't find SSO integration for domain ${domain}`);
       }
+
+      const org = await this.orgs.loadOrg(orgId);
+      if (!org) {
+        throw new Error(`can't find organization with id ${orgId}`);
+      }
+
       if (!existing) {
         await this.users.createUser(
           {
@@ -114,6 +128,7 @@ export class Auth implements IAuth {
             cognito_id: cognitoId,
             org_id: org.id,
             is_sso_user: true,
+            external_id: externalId,
           },
           `OrganizationSSO:${org.id}`
         );
@@ -121,7 +136,8 @@ export class Auth implements IAuth {
         if (
           existing.first_name !== firstName ||
           existing.last_name !== lastName ||
-          existing.cognito_id !== cognitoId
+          existing.cognito_id !== cognitoId ||
+          existing.external_id !== externalId
         ) {
           await this.users.updateUserById(
             existing.id,
@@ -129,6 +145,7 @@ export class Auth implements IAuth {
               first_name: firstName,
               last_name: lastName,
               cognito_id: cognitoId,
+              external_id: externalId,
               is_sso_user: true,
             },
             `OrganizationSSO:${org.id}`
@@ -265,6 +282,7 @@ export class Auth implements IAuth {
     const url = new URL(`https://${this.config.cognito.domain}/logout`);
     for (const [name, value] of Object.entries({
       logout_uri: `${this.config.misc.parallelUrl}/api/auth/logout/callback`,
+      redirect_uri: `${this.config.misc.parallelUrl}/login`,
       client_id: this.config.cognito.clientId,
     })) {
       url.searchParams.append(name, value);

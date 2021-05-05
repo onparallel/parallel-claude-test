@@ -4326,7 +4326,14 @@ export type OrganizationSettingsQuery = { __typename?: "Query" } & {
 
 export type OrganizationUsers_UserFragment = { __typename?: "User" } & Pick<
   User,
-  "id" | "fullName" | "email" | "role" | "createdAt" | "lastActiveAt" | "status"
+  | "id"
+  | "fullName"
+  | "email"
+  | "role"
+  | "createdAt"
+  | "lastActiveAt"
+  | "status"
+  | "isSsoUser"
 >;
 
 export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
@@ -6050,6 +6057,7 @@ export const OrganizationUsers_UserFragmentDoc = gql`
     createdAt
     lastActiveAt
     status
+    isSsoUser
   }
 `;
 export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`

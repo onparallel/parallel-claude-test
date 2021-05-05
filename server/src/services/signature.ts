@@ -8,7 +8,7 @@ import SignaturitSDK, {
 } from "signaturit-sdk";
 import {
   IntegrationRepository,
-  SignatureIntegrationSettings,
+  IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
 import { getBaseWebhookUrl } from "../workers/helpers/getBaseWebhookUrl";
 import { CONFIG, Config } from "./../config";
@@ -63,7 +63,7 @@ type SignatureResponse = {
 
 export type Recipient = { email: string; name: string };
 
-type SignaturitIntegrationSettings = SignatureIntegrationSettings<"SIGNATURIT">;
+type SignaturitIntegrationSettings = IntegrationSettings<"SIGNATURE">;
 
 export interface ISignatureClient {
   startSignatureRequest: (
@@ -117,7 +117,7 @@ export class SignatureService {
           default:
             break;
         }
-        this.integrationRepository.updateOrgIntegrationSettings<"SIGNATURIT">(
+        this.integrationRepository.updateOrgIntegrationSettings<"SIGNATURE">(
           integration.id,
           settings
         );

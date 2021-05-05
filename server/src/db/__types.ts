@@ -17,7 +17,7 @@ export type FeatureFlagName =
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
-export type IntegrationType = "SIGNATURE";
+export type IntegrationType = "SIGNATURE" | "SSO" | "USER_PROVISIONING";
 
 export type OrganizationStatus = "ACTIVE" | "CHURNED" | "DEMO" | "DEV";
 
@@ -356,6 +356,7 @@ export interface Organization {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   public_file_logo_id: Maybe<number>; // int4
+  custom_host: Maybe<string>; // varchar
 }
 
 export type CreateOrganization = PartialProps<
@@ -367,6 +368,7 @@ export type CreateOrganization = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "public_file_logo_id"
+  | "custom_host"
 >;
 
 export interface OrgIntegration {
@@ -827,6 +829,7 @@ export interface User {
   onboarding_status: any; // jsonb
   status: UserStatus; // user_status
   is_sso_user: boolean; // bool
+  external_id: Maybe<string>; // varchar
 }
 
 export type CreateUser = PartialProps<
@@ -844,6 +847,7 @@ export type CreateUser = PartialProps<
   | "onboarding_status"
   | "status"
   | "is_sso_user"
+  | "external_id"
 >;
 
 export interface UserAuthenticationToken {

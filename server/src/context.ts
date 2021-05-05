@@ -8,7 +8,7 @@ import { OrganizationRepository } from "./db/repositories/OrganizationRepository
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { ReportingRepository } from "./db/repositories/ReportingRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
-import { Contact, PetitionAccess, User } from "./db/__types";
+import { Contact, Organization, PetitionAccess, User } from "./db/__types";
 import { AUTH, Auth } from "./services/auth";
 import { Aws, AWS_SERVICE } from "./services/aws";
 import { EMAILS, EmailsService } from "./services/emails";
@@ -29,6 +29,7 @@ export class ApiContext {
   user: User | null = null;
   contact: Contact | null = null;
   access: PetitionAccess | null = null;
+  organization: Organization | null = null;
   req!: express.Request;
   constructor(
     @inject(LOGGER) public logger: Logger,

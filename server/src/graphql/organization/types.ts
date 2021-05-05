@@ -79,7 +79,12 @@ export const Organization = objectType({
     });
     t.boolean("hasSsoProvider", {
       description: "Whether the organization has an SSO provider configured.",
-      resolve: (o) => Boolean(o.sso_provider),
+      resolve: async (o, _, ctx) => {
+        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
+          o.id
+        );
+        return integrations.some((i) => i.type === "SSO");
+      },
     });
     t.int("userCount", {
       description: "The total number of users",

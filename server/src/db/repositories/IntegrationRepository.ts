@@ -1,18 +1,23 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { hash } from "../../util/token";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
+import { IntegrationType, OrgIntegration } from "../__types";
 
-type SignatureIntegrationProviders = "SIGNATURIT";
-
-export type SignatureIntegrationSettings<
-  K extends SignatureIntegrationProviders
-> = {
-  SIGNATURIT: {
+export type IntegrationSettings<K extends IntegrationType> = {
+  SIGNATURE: {
     API_KEY: string;
     ENVIRONMENT?: "production" | "sandbox";
     EN_BRANDING_ID?: string;
     ES_BRANDING_ID?: string;
+  };
+  SSO: {
+    EMAIL_DOMAINS: string[];
+    COGNITO_PROVIDER: string;
+  };
+  USER_PROVISIONING: {
+    AUTH_KEY_HASH: string;
   };
 }[K];
 
@@ -28,9 +33,38 @@ export class IntegrationRepository extends BaseRepository {
     (q) => q.where("is_enabled", true)
   );
 
-  async updateOrgIntegrationSettings<K extends SignatureIntegrationProviders>(
+  async loadProvisioningIntegrationByAuthKey(key: string) {
+    const hashed = await hash(key, "");
+    const [integration] = await this.raw<OrgIntegration | undefined>(
+      /* sql */ `
+      select * from org_integration
+      where ((settings ->> 'AUTH_KEY_HASH') = ?) 
+      and "type" = 'USER_PROVISIONING' 
+      and is_enabled is true;
+    `,
+      [hashed]
+    );
+
+    return integration;
+  }
+
+  async loadSSOIntegrationByDomain(domain: string) {
+    const [integration] = await this.raw<OrgIntegration | undefined>(
+      /* sql */ `
+        select * from org_integration
+        where settings#>'{EMAIL_DOMAINS}' \\?| array[?]
+        and type = 'SSO'
+        and is_enabled is true;
+      `,
+      [domain]
+    );
+
+    return integration;
+  }
+
+  async updateOrgIntegrationSettings<K extends IntegrationType>(
     integrationId: number,
-    settings: SignatureIntegrationSettings<K>
+    settings: IntegrationSettings<K>
   ) {
     return await this.from("org_integration")
       .where("id", integrationId)

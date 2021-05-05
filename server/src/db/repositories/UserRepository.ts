@@ -35,6 +35,10 @@ export class UserRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
+  readonly loadUserByExternalId = this.buildLoadBy("user", "external_id", (q) =>
+    q.whereNull("deleted_at")
+  );
+
   async updateUserById(
     id: MaybeArray<number>,
     data: Partial<CreateUser>,
@@ -46,9 +50,25 @@ export class UserRepository extends BaseRepository {
       .update({
         ...data,
         updated_at: this.now(),
-        updated_by: `User:${updatedBy}`,
+        updated_by: updatedBy,
       })
       .whereIn("id", ids)
+      .returning("*");
+  }
+
+  async updateUserByExternalId(
+    externalId: string,
+    data: Partial<CreateUser>,
+    updatedBy: string,
+    t?: Knex.Transaction
+  ) {
+    return await this.from("user", t)
+      .update({
+        ...data,
+        updated_at: this.now(),
+        updated_by: updatedBy,
+      })
+      .where("external_id", externalId)
       .returning("*");
   }
 

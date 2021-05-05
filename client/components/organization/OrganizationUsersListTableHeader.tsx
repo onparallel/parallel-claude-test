@@ -20,6 +20,7 @@ import {
   OrganizationUsers_UserFragment,
   UserStatus,
 } from "@parallel/graphql/__types";
+import { withError } from "@parallel/utils/promises/withError";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useErrorDialog } from "../common/ErrorDialog";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -54,15 +55,29 @@ export function OrganizationUsersListTableHeader({
   const showErrorDialog = useErrorDialog();
   const handleUpdateSelectedUsersStatus = async (newStatus: UserStatus) => {
     if (selectedUsers.some((u) => u.id === me.id)) {
-      try {
-        await showErrorDialog({
+      await withError(
+        showErrorDialog({
           message: intl.formatMessage({
-            id: "organization-users.update-user-status.error",
+            id:
+              "organization-users.update-user-status.error.deactivate-own-user",
             defaultMessage:
               "You can't deactivate your own user. Please, remove it from the selection and try again.",
           }),
-        });
-      } catch {}
+        })
+      );
+    } else if (selectedUsers.some((u) => u.isSsoUser)) {
+      await withError(
+        showErrorDialog({
+          message: intl.formatMessage(
+            {
+              id: "organization-users.update-user-status.error.update-sso-user",
+              defaultMessage:
+                "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider.",
+            },
+            { count: selectedUsers.length }
+          ),
+        })
+      );
     } else {
       onUpdateUserStatus(
         selectedUsers.map((u) => u.id),

@@ -32,7 +32,11 @@ import {
   argUserHasActiveStatus,
   userHasAccessToUsers,
 } from "../petition/mutations/authorizers";
-import { contextUserIsAdmin, contextUserIsNotSso } from "./authorizers";
+import {
+  contextUserIsAdmin,
+  contextUserIsNotSso,
+  userIsNotSSO,
+} from "./authorizers";
 
 export const updateUser = mutationField("updateUser", {
   type: "User",
@@ -164,6 +168,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
   authorize: authenticateAnd(
     contextUserIsAdmin(),
     userHasAccessToUsers("userIds"),
+    userIsNotSSO("userIds"),
     ifArgDefined(
       (args) => args.transferToUserId,
       and(

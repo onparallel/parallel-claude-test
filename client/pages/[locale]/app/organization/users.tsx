@@ -396,6 +396,7 @@ OrganizationUsers.fragments = {
         createdAt
         lastActiveAt
         status
+        isSsoUser
       }
     `;
   },
