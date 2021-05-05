@@ -100,7 +100,7 @@ export class ContactRepository extends BaseRepository {
       RETURNING *;`,
       [
         this.from("contact").insert({
-          email,
+          email: email.toLowerCase().trim(),
           org_id: orgId,
           first_name: firstName,
           last_name: lastName,
@@ -131,7 +131,7 @@ export class ContactRepository extends BaseRepository {
       [
         this.from("contact").insert(
           contacts.map((contact) => ({
-            email: contact.email,
+            email: contact.email.toLowerCase().trim(),
             org_id: contact.orgId,
             first_name: contact.firstName,
             last_name: contact.lastName,
@@ -212,11 +212,12 @@ export class ContactRepository extends BaseRepository {
   }
 
   async createContact(
-    data: Omit<CreateContact, "org_id">,
+    { email, ...data }: Omit<CreateContact, "org_id">,
     userOrContact: User | Contact,
     createdBy: string
   ) {
     const [row] = await this.insert("contact", {
+      email: email.toLowerCase().trim(),
       ...data,
       org_id: userOrContact.org_id,
       created_by: createdBy,
