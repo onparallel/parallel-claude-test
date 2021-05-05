@@ -612,6 +612,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
       "PETITION_COMPLETED",
       {
         access_id: ctx.access!.id,
+        org_id: petition.org_id,
         petition_id: petition.id,
         requiresSignature: !!signatureConfig,
       },

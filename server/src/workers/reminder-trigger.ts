@@ -31,18 +31,24 @@ createCronWorker("reminder-trigger", async (context) => {
     );
     await context.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
 
-    batch.forEach((access) => {
-      context.analytics.trackEvent(
-        "REMINDER_EMAIL_SENT",
-        {
-          petition_id: access.petition_id,
-          user_id: access.granter_id,
-          access_id: access.id,
-          sent_count: 10 - access.reminders_left + 1,
-          type: "AUTOMATIC",
-        },
-        toGlobalId("User", access.granter_id)
-      );
-    });
+    await pMap(
+      batch,
+      async (access) => {
+        const granter = await context.users.loadUser(access.granter_id);
+        context.analytics.trackEvent(
+          "REMINDER_EMAIL_SENT",
+          {
+            petition_id: access.petition_id,
+            org_id: granter!.org_id,
+            user_id: access.granter_id,
+            access_id: access.id,
+            sent_count: 10 - access.reminders_left + 1,
+            type: "AUTOMATIC",
+          },
+          toGlobalId("User", access.granter_id)
+        );
+      },
+      { concurrency: 5 }
+    );
   }
 });

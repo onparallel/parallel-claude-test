@@ -134,6 +134,7 @@ export const createPetition = mutationField("createPetition", {
           "TEMPLATE_USED",
           {
             template_id: petitionId,
+            org_id: ctx.user!.org_id,
             user_id: ctx.user!.id,
           },
           toGlobalId("User", ctx.user!.id)
@@ -143,6 +144,7 @@ export const createPetition = mutationField("createPetition", {
           "PETITION_CLONED",
           {
             from_petition_id: petitionId,
+            org_id: petition.org_id,
             petition_id: petition.id,
             user_id: ctx.user!.id,
             type: petition.is_template ? "TEMPLATE" : "PETITION",
@@ -165,6 +167,7 @@ export const createPetition = mutationField("createPetition", {
         "PETITION_CREATED",
         {
           petition_id: petition.id,
+          org_id: petition.org_id,
           user_id: ctx.user!.id,
           type: isTemplate ? "TEMPLATE" : "PETITION",
         },
@@ -231,6 +234,7 @@ export const clonePetitions = mutationField("clonePetitions", {
           "PETITION_CLONED",
           {
             from_petition_id: petitionId,
+            org_id: cloned.org_id,
             petition_id: cloned.id,
             user_id: ctx.user!.id,
             type: cloned.is_template ? "TEMPLATE" : "PETITION",
@@ -855,6 +859,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
         "PETITION_CLOSED",
         {
           petition_id: petition.id,
+          org_id: petition.org_id,
           user_id: ctx.user!.id,
         },
         toGlobalId("User", ctx.user!.id)
@@ -1119,6 +1124,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
         "PETITION_SENT",
         {
           petition_id: s.petition!.id,
+          org_id: s.petition!.org_id,
           user_id: ctx.user!.id,
           access_ids: s.accesses!.map((a) => a.id),
         },
@@ -1186,6 +1192,7 @@ export const sendPetition = mutationField("sendPetition", {
         "PETITION_SENT",
         {
           petition_id: args.petitionId,
+          org_id: ctx.user!.org_id,
           user_id: ctx.user!.id,
           access_ids: accesses!.map((a) => a.id),
         },
@@ -1248,6 +1255,7 @@ export const sendReminders = mutationField("sendReminders", {
             {
               petition_id: args.petitionId,
               user_id: ctx.user!.id,
+              org_id: ctx.user!.org_id,
               access_id: access.id,
               sent_count: 10 - access.reminders_left + 1,
               type: "MANUAL",

@@ -20,12 +20,14 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
   /** User creates a petition/template from scratch */
   PETITION_CREATED: {
     petition_id: number;
+    org_id: number;
     user_id: number;
     type: "PETITION" | "TEMPLATE";
   };
   /** User clones a petition/template */
   PETITION_CLONED: {
     petition_id: number;
+    org_id: number;
     from_petition_id: number;
     user_id: number;
     type: "PETITION" | "TEMPLATE";
@@ -33,23 +35,27 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
   /** User uses a template to create a petition */
   TEMPLATE_USED: {
     user_id: number;
+    org_id: number;
     template_id: number;
   };
   /** User sends petition to accesses */
   PETITION_SENT: {
     petition_id: number;
+    org_id: number;
     user_id: number;
     access_ids: number[];
   };
   /** User closes the petition */
   PETITION_CLOSED: {
     petition_id: number;
+    org_id: number;
     user_id: number;
   };
   /** recipient completes the petition */
   PETITION_COMPLETED_BY_RECIPIENT: {
     user_id: number;
     petition_id: number;
+    org_id: number;
     access_id: number;
   };
   /**
@@ -58,6 +64,7 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
    */
   PETITION_COMPLETED: {
     petition_id: number;
+    org_id: number;
     access_id: number;
     requiresSignature: boolean;
   };
@@ -67,6 +74,7 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
   REMINDER_EMAIL_SENT: {
     user_id: number;
     petition_id: number;
+    org_id: number;
     access_id: number;
     sent_count: number;
     type: "AUTOMATIC" | "MANUAL";
