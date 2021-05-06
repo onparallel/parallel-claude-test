@@ -101,7 +101,7 @@ export function RecipientViewHeader({
       if (contact.email === c.email)
         return (
           <Text key={i} as="span" whiteSpace="nowrap" marginRight={1}>
-            {`${c.fullName || c.email};`}
+            {`${c.fullName || c.email}${recipients.length > 1 ? ";" : ""}`}
           </Text>
         );
       else return <Contact key={i} contact={c} semicolon={true} />;
