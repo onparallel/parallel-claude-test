@@ -13,6 +13,7 @@ import { AddIcon, CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { Linkify } from "@parallel/components/common/Linkify";
 import {
   RecipientViewPetitionFieldCard_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
@@ -136,7 +137,9 @@ export function RecipientViewPetitionFieldCard({
             overflowWrap="anywhere"
             marginBottom={2}
           >
-            <BreakLines text={field.description} />
+            <Linkify>
+              <BreakLines>{field.description}</BreakLines>
+            </Linkify>
           </Text>
         ) : null}
       </Box>

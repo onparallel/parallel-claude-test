@@ -593,7 +593,7 @@ const TemplateCard = memo(function TemplateCard({
       </Heading>
       {template.description ? (
         <Text fontSize="sm" noOfLines={2}>
-          <BreakLines text={template.description} />
+          <BreakLines>{template.description}</BreakLines>
         </Text>
       ) : (
         <Text fontSize="sm" fontStyle="italic">

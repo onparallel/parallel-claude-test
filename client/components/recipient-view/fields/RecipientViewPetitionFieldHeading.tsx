@@ -1,5 +1,6 @@
 import { Heading, Stack, Text } from "@chakra-ui/react";
 import { BreakLines } from "@parallel/components/common/BreakLines";
+import { Linkify } from "@parallel/components/common/Linkify";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
@@ -35,7 +36,9 @@ export function RecipientViewPetitionFieldHeading({
       )}
       {field.description ? (
         <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
-          <BreakLines text={field.description} />
+          <Linkify>
+            <BreakLines>{field.description}</BreakLines>
+          </Linkify>
         </Text>
       ) : null}
     </Stack>

@@ -16,7 +16,7 @@ export function PdfFieldWithReplies({
           <Heading size="lg">{field.title ?? "-"}</Heading>
           {field.description ? (
             <Text paddingLeft="2mm" fontStyle="italic">
-              <BreakLines text={field.description} />
+              <BreakLines>{field.description}</BreakLines>
             </Text>
           ) : null}
         </Stack>
@@ -30,7 +30,7 @@ export function PdfFieldWithReplies({
           <Text fontWeight="bold">{field.title ?? "-"}</Text>
           {field.description ? (
             <Text paddingLeft="2mm" fontStyle="italic">
-              <BreakLines text={field.description} />
+              <BreakLines>{field.description}</BreakLines>
             </Text>
           ) : null}
           {field.replies.map((reply) =>
@@ -70,7 +70,7 @@ export function PdfFieldWithReplies({
               </Stack>
             ) : (
               <Text key={reply.id}>
-                <BreakLines text={reply.content.text} />
+                <BreakLines>{reply.content.text}</BreakLines>
               </Text>
             )
           )}

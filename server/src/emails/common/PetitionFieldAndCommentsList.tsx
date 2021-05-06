@@ -52,7 +52,7 @@ export function PetitionFieldAndComments({
                 padding="8px 16px"
               >
                 <MjmlText padding="0" lineHeight="24px">
-                  <BreakLines text={content} />
+                  <BreakLines>{content}</BreakLines>
                 </MjmlText>
               </MjmlColumn>
             </MjmlSection>

@@ -107,7 +107,7 @@ export function PetitionRepliesFieldReply({
         marginLeft={2}
       >
         {isTextLikeType ? (
-          <BreakLines text={reply.content.text} />
+          <BreakLines>{reply.content.text}</BreakLines>
         ) : reply.field!.type === "FILE_UPLOAD" ? (
           <Box>
             <VisuallyHidden>

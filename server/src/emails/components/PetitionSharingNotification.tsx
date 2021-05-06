@@ -139,7 +139,7 @@ const email: Email<PetitionSharingNotificationProps> = {
               padding="8px 16px"
             >
               <MjmlText padding="0" lineHeight="24px">
-                <BreakLines text={message} />
+                <BreakLines>{message}</BreakLines>
               </MjmlText>
             </MjmlColumn>
           </MjmlSection>

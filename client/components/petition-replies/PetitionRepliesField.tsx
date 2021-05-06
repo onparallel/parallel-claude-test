@@ -99,7 +99,7 @@ export function PetitionRepliesField({
       </Flex>
       {field.description ? (
         <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
-          <BreakLines text={field.description} />
+          <BreakLines>{field.description}</BreakLines>
         </Text>
       ) : null}
     </Stack>
@@ -190,7 +190,7 @@ export function PetitionRepliesField({
       <Box marginBottom={2}>
         {field.description ? (
           <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
-            <BreakLines text={field.description} />
+            <BreakLines>{field.description}</BreakLines>
           </Text>
         ) : (
           <Text fontSize="sm" textStyle="hint">

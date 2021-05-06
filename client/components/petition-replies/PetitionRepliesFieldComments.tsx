@@ -464,7 +464,7 @@ function FieldComment({
         </Box>
       ) : (
         <Box fontSize="sm">
-          <BreakLines text={content} />
+          <BreakLines>{content}</BreakLines>
         </Box>
       )}
     </Box>

@@ -240,7 +240,7 @@ export function TemplateDetailsDialog({
           </Stack>
           {template.description ? (
             <Text>
-              <BreakLines text={template.description} />
+              <BreakLines>{template.description}</BreakLines>
             </Text>
           ) : (
             <Text textAlign="center" textStyle="hint">
