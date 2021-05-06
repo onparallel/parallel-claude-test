@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { json, NextFunction, Request, Response, Router } from "express";
 import { CreateUser, User } from "../db/__types";
 import { isDefined } from "../util/remedaExtensions";
 
@@ -28,7 +28,7 @@ function toScimUser(user: User) {
   };
 }
 
-export async function authenticateOrganization(
+async function authenticateOrganization(
   req: Request,
   res: Response,
   next: NextFunction
@@ -56,7 +56,7 @@ export async function authenticateOrganization(
 /**
  *  make sure the organization triggering an action has access to the user
  */
-export async function validateExternalId(
+async function validateExternalId(
   req: Request,
   res: Response,
   next: NextFunction
@@ -82,8 +82,15 @@ export async function validateExternalId(
   }
 }
 
-export const scim = Router()
-  .get("/Users", async (req, res) => {
+export const scim = Router().use(
+  json({ type: "application/scim+json" }),
+  authenticateOrganization,
+  validateExternalId
+);
+
+scim
+  .route("/Users")
+  .get(async (req, res) => {
     const externalId = getExternalId(req.query.filter);
     let totalResults = 0;
     const users: User[] = [];
@@ -112,68 +119,10 @@ export const scim = Router()
       })
       .end();
   })
-  .get("/Users/:externalId", async (req, res) => {
-    const user = await req.context.users.loadUserByExternalId(
-      req.params.externalId
-    );
-    res.json(toScimUser(user!)).end();
-  })
-  .patch("/Users/:externalId", async (req, res) => {
-    const data: Partial<CreateUser> = {};
-    req.body.Operations.forEach((op: any) => {
-      if (op.op === "Replace") {
-        switch (op.path) {
-          case "name.givenName":
-            data.first_name = op.value;
-            break;
-          case "name.familyName":
-            data.last_name = op.value;
-            break;
-          case "active":
-            data.status = op.value === "True" ? "ACTIVE" : "INACTIVE";
-            break;
-          default:
-            break;
-        }
-      }
-    });
-    const [user] = await req.context.users.updateUserByExternalId(
-      req.params.externalId,
-      data,
-      `OrganizationSSO:${req.context.organization!.id}`
-    );
-    res.json(toScimUser(user)).end();
-  })
-  .put("/Users/:externalId", async (req, res) => {
-    const data: Partial<CreateUser> = {};
-    if (isDefined(req.body.name.givenName)) {
-      data.first_name = req.body.name.givenName;
-    }
-    if (isDefined(req.body.name.familyName)) {
-      data.last_name = req.body.name.familyName;
-    }
-    if (isDefined(req.body.active)) {
-      data.status = req.body.active === "True" ? "ACTIVE" : "INACTIVE";
-    }
-
-    const [user] = await req.context.users.updateUserByExternalId(
-      req.params.externalId,
-      data,
-      `OrganizationSSO:${req.context.organization!.id}`
-    );
-    res.json(toScimUser(user)).end();
-  })
-  .delete("/Users/:externalId", async (req, res) => {
-    await req.context.users.updateUserByExternalId(
-      req.params.externalId,
-      { status: "INACTIVE" },
-      `OrganizationSSO:${req.context.organization!.id}`
-    );
-    res.sendStatus(204).end();
-  })
-
-  // use the CREATE endpoint just for reactivating disabled users
-  .post("/Users", async (req, res) => {
+  /**
+   * Use the CREATE endpoint just for reactivating disabled users
+   */
+  .post(async (req, res) => {
     const {
       externalId,
       active,
@@ -199,4 +148,66 @@ export const scim = Router()
       // fake an "OK" response to provider
       res.json({ ...req.body, id: externalId }).end();
     }
+  });
+
+scim
+  .route("/Users/:externalId")
+  .get(async (req, res) => {
+    const user = await req.context.users.loadUserByExternalId(
+      req.params.externalId
+    );
+    res.json(toScimUser(user!)).end();
+  })
+  .patch(async (req, res) => {
+    const data: Partial<CreateUser> = {};
+    req.body.Operations.forEach((op: any) => {
+      if (op.op === "Replace") {
+        switch (op.path) {
+          case "name.givenName":
+            data.first_name = op.value;
+            break;
+          case "name.familyName":
+            data.last_name = op.value;
+            break;
+          case "active":
+            data.status = op.value === "True" ? "ACTIVE" : "INACTIVE";
+            break;
+          default:
+            break;
+        }
+      }
+    });
+    const [user] = await req.context.users.updateUserByExternalId(
+      req.params.externalId,
+      data,
+      `OrganizationSSO:${req.context.organization!.id}`
+    );
+    res.json(toScimUser(user)).end();
+  })
+  .put(async (req, res) => {
+    const data: Partial<CreateUser> = {};
+    if (isDefined(req.body.name.givenName)) {
+      data.first_name = req.body.name.givenName;
+    }
+    if (isDefined(req.body.name.familyName)) {
+      data.last_name = req.body.name.familyName;
+    }
+    if (isDefined(req.body.active)) {
+      data.status = req.body.active === "True" ? "ACTIVE" : "INACTIVE";
+    }
+
+    const [user] = await req.context.users.updateUserByExternalId(
+      req.params.externalId,
+      data,
+      `OrganizationSSO:${req.context.organization!.id}`
+    );
+    res.json(toScimUser(user)).end();
+  })
+  .delete(async (req, res) => {
+    await req.context.users.updateUserByExternalId(
+      req.params.externalId,
+      { status: "INACTIVE" },
+      `OrganizationSSO:${req.context.organization!.id}`
+    );
+    res.sendStatus(204).end();
   });

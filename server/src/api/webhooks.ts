@@ -1,12 +1,11 @@
-import { json, Router } from "express";
-import bodyParser from "body-parser";
+import { Router, urlencoded } from "express";
+import { fromGlobalId } from "../util/globalId";
+import { scim } from "./scim";
 import {
-  signaturItEventHandler,
   SignaturItEventBody,
+  signaturItEventHandler,
   validateSignaturitRequest,
 } from "./webhook-event-handlers/signaturit-event-handler";
-import { fromGlobalId } from "../util/globalId";
-import { scim, authenticateOrganization, validateExternalId } from "./scim";
 
 export const webhooks = Router()
   .get("/ping", async (_, res) => {
@@ -15,7 +14,7 @@ export const webhooks = Router()
   })
   .post(
     "/signaturit/:petitionId/events",
-    bodyParser.urlencoded({ extended: true }),
+    urlencoded({ extended: true }),
     validateSignaturitRequest,
     async (req, res, next) => {
       try {
@@ -30,10 +29,4 @@ export const webhooks = Router()
     }
   )
   // SCIM endpoints for User Provisioning
-  .use(
-    "/scim",
-    json({ type: "application/scim+json" }),
-    authenticateOrganization,
-    validateExternalId,
-    scim
-  );
+  .use("/scim", scim);

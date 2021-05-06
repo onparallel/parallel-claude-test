@@ -1,10 +1,9 @@
 import "./init";
 import { ApolloServer } from "apollo-server-express";
 import { ApolloServerPlugin } from "apollo-server-plugin-base";
-import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express from "express";
+import express, { json } from "express";
 import { api } from "./api";
 import { createContainer } from "./container";
 import { ApiContext } from "./context";
@@ -17,7 +16,7 @@ import { graphqlUploadExpress } from "graphql-upload";
 const app = express();
 const container = createContainer();
 
-app.use("/api", bodyParser.json(), cors(), cookieParser(), api(container));
+app.use("/api", json(), cors(), cookieParser(), api(container));
 
 app.use("/graphql", graphqlUploadExpress());
 const server = new ApolloServer({
