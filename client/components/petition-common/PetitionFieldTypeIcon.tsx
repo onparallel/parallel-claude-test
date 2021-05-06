@@ -5,6 +5,7 @@ import {
   FieldHeadingIcon,
   FieldSelectIcon,
   FieldTextIcon,
+  FieldShortTextIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { PetitionFieldType } from "@parallel/graphql/__types";
@@ -20,7 +21,7 @@ export const PetitionFieldTypeIcon = chakraForwardRef<
 >(function PetitionFieldTypeIcon({ type, ...props }, ref) {
   const icon = ({
     FILE_UPLOAD: FieldFileUploadIcon,
-    SHORT_TEXT: FieldTextIcon,
+    SHORT_TEXT: FieldShortTextIcon,
     TEXT: FieldTextIcon,
     HEADING: FieldHeadingIcon,
     SELECT: FieldSelectIcon,

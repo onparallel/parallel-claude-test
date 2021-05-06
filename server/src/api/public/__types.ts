@@ -177,6 +177,8 @@ export type Mutation = {
   assignPetitionToUser: SupportMethodResponse;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
   batchSendPetition: Array<SendPetitionResult>;
+  /** Load contacts from an excel file, creating the ones not found on database */
+  bulkCreateContacts: Array<Contact>;
   /** Cancels a scheduled petition message. */
   cancelScheduledMessage: Maybe<PetitionMessage>;
   cancelSignatureRequest: PetitionSignatureRequest;
@@ -357,6 +359,10 @@ export type MutationbatchSendPetitionArgs = {
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
   subject: Scalars["String"];
+};
+
+export type MutationbulkCreateContactsArgs = {
+  file: Scalars["Upload"];
 };
 
 export type MutationcancelScheduledMessageArgs = {
@@ -1209,6 +1215,8 @@ export type PetitionFieldType =
   | "HEADING"
   /** A select field. */
   | "SELECT"
+  /** A short text field. */
+  | "SHORT_TEXT"
   /** A text field. */
   | "TEXT";
 

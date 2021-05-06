@@ -1171,17 +1171,33 @@ export const FieldTextIcon = createIcon({
     <g
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="1.83333"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="m 19,5 h 3 v 14 h -3" />
-      <path d="M 16,2 V 22" />
-      <path d="m 14,2 h 4" />
-      <path d="m 14,22 h 4" />
-      <path d="M 13,19 H 2 V 5 h 11" />
-      <path d="m 5,16 3,-8 3,8" />
-      <path d="m 6,14 h 4" />
+      <path d="M21.5099 10.7559L11.2099 10.7559" />
+      <path d="M2.27493 19.9668H21.8459" />
+      <path d="M2 15.3633H21.571" />
+      <path d="M2.27493 11.9074L5.08107 5L7.88721 11.9074" />
+      <path d="M3.40021 10.0381L6.77634 10.0381" />
+    </g>
+  ),
+});
+
+export const FieldShortTextIcon = createIcon({
+  displayName: "FieldTextIcon",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2.64999 16.7634L6.81909 6.50098L10.9882 16.7634" />
+      <path d="M19.2281 15.6087C18.6 16.9502 13.65 17.7876 13.65 14.2565C13.65 10.7255 16.95 10.4066 19.15 11.1271C19.15 12.6071 19.15 14.9762 19.15 15.1283C19.15 16.6858 21.35 16.9502 21.35 16.9502" />
+      <path d="M4.32188 14.0918L9.33783 14.0918" />
     </g>
   ),
 });
@@ -1193,15 +1209,14 @@ export const FieldHeadingIcon = createIcon({
     <g
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="2.6"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="m2 20h20" />
-      <path d="m22 15h-7" />
-      <path d="m15 10h7" />
-      <path d="m3 15 4-11 4 11" />
-      <path d="m4 12h6" />
+      <path d="M8.25357 19L8.30002 6" />
+      <path d="M2.85001 5H13.85" />
+      <path d="M17.6875 19V10" />
+      <path d="M14.25 10.001H21.125" />
     </g>
   ),
 });
