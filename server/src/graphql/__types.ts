@@ -373,6 +373,7 @@ export interface NexusGenObjects {
   PublicPetitionField: db.PetitionField;
   PublicPetitionFieldComment: db.PetitionFieldComment;
   PublicPetitionFieldReply: db.PetitionFieldReply;
+  PublicPetitionMessage: db.PetitionMessage;
   PublicSignatureConfig: {
     contactIds: number[];
     review?: boolean;
@@ -964,6 +965,7 @@ export interface NexusGenFieldTypes {
     // field return type
     contact: NexusGenRootTypes["PublicContact"] | null; // PublicContact
     granter: NexusGenRootTypes["PublicUser"] | null; // PublicUser
+    message: NexusGenRootTypes["PublicPetitionMessage"] | null; // PublicPetitionMessage
     petition: NexusGenRootTypes["PublicPetition"] | null; // PublicPetition
   };
   PublicPetitionField: {
@@ -1000,6 +1002,13 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     status: NexusGenEnums["PetitionFieldReplyStatus"]; // PetitionFieldReplyStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  PublicPetitionMessage: {
+    // field return type
+    body: NexusGenScalars["JSONObject"]; // JSONObject!
+    id: NexusGenScalars["GID"]; // GID!
+    status: string; // String!
+    subject: string | null; // String
   };
   PublicSignatureConfig: {
     // field return type
@@ -1724,6 +1733,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     contact: "PublicContact";
     granter: "PublicUser";
+    message: "PublicPetitionMessage";
     petition: "PublicPetition";
   };
   PublicPetitionField: {
@@ -1760,6 +1770,13 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     status: "PetitionFieldReplyStatus";
     updatedAt: "DateTime";
+  };
+  PublicPetitionMessage: {
+    // field return type name
+    body: "JSONObject";
+    id: "GID";
+    status: "String";
+    subject: "String";
   };
   PublicSignatureConfig: {
     // field return type name

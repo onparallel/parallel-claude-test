@@ -37,6 +37,7 @@ import { RecipientViewPetitionField } from "@parallel/components/recipient-view/
 import { RecipientViewContactCard } from "@parallel/components/recipient-view/RecipientViewContactCard";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
+import { RecipientViewHeader } from "@parallel/components/recipient-view/RecipientViewHeader";
 import { useRecipientViewHelpDialog } from "@parallel/components/recipient-view/RecipientViewHelpModal";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
@@ -92,7 +93,6 @@ function RecipientView({
     petition.fields,
     currentPage
   );
-
   const [showAlert, setShowAlert] = useState(true);
 
   const [finalized, setFinalized] = useState(false);
@@ -239,6 +239,11 @@ function RecipientView({
         flexDirection="column"
         alignItems="center"
       >
+        <RecipientViewHeader
+          sender={granter}
+          contact={contact}
+          keycode={keycode}
+        ></RecipientViewHeader>
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
           {showAlert && ["COMPLETED", "CLOSED"].includes(petition.status) ? (
             !petition.signature ||
@@ -397,22 +402,24 @@ function RecipientView({
             )
           ) : null}
           {pendingComments ? (
-            <Box backgroundColor="yellow.100" boxShadow="sm">
-              <Flex
+            <Alert backgroundColor="yellow.100" boxShadow="sm">
+              <Stack
                 maxWidth="container.lg"
                 alignItems="center"
                 marginX="auto"
                 width="100%"
                 paddingX={4}
                 paddingY={2}
+                direction={{ base: "column", [breakpoint]: "row" }}
               >
-                <Text flex="1" color="yellow.900">
+                <AlertDescription flex="1" color="yellow.900">
                   <FormattedMessage
                     id="recipient-view.submit-unpublished-comments-text"
                     defaultMessage="You have some pending comments. Submit them at once to notify {sender} in a single email."
                     values={{ sender: <b>{granter.fullName}</b> }}
                   />
-                </Text>
+                </AlertDescription>
+
                 <Button
                   colorScheme="yellow"
                   size="sm"
@@ -426,8 +433,8 @@ function RecipientView({
                     values={{ commentCount: pendingComments }}
                   />
                 </Button>
-              </Flex>
-            </Box>
+              </Stack>
+            </Alert>
           ) : null}
           <ResizeObserver onResize={readjustHeight} />
         </Box>
@@ -449,12 +456,6 @@ function RecipientView({
               position={{ base: "relative", [breakpoint]: "sticky" }}
               top={{ base: 0, [breakpoint]: `${sidebarTop}px` }}
             >
-              <RecipientViewSenderCard sender={granter} />
-              <RecipientViewContactCard
-                contact={contact}
-                keycode={keycode}
-                organizationName={granter.organization.name}
-              />
               {petition.isRecipientViewContentsHidden ? null : (
                 <RecipientViewContentsCard
                   currentPage={currentPage}
@@ -623,7 +624,7 @@ function ReviewBeforeSignDialog({
     />
   );
 }
-
+// TODO: Añadir propiedad de message a PublicPetitionAccess
 RecipientView.fragments = {
   get PublicPetitionAccess() {
     return gql`
@@ -638,6 +639,9 @@ RecipientView.fragments = {
           ...RecipientViewContactCard_PublicContact
           ...useCompleteSignerInfoDialog_PublicContact
         }
+        message {
+          ...RecipientView_PublicPetitionMessage
+        }
         ...RecipientViewPetitionField_PublicPetitionAccess
       }
       ${this.PublicPetition}
@@ -645,6 +649,7 @@ RecipientView.fragments = {
       ${RecipientViewContactCard.fragments.PublicContact}
       ${useCompleteSignerInfoDialog.fragments.PublicContact}
       ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
+      ${this.PublicPetitionMessage}
     `;
   },
   get PublicPetition() {
@@ -704,6 +709,16 @@ RecipientView.fragments = {
       }
       ${RecipientViewSenderCard.fragments.PublicUser}
       ${RecipientViewContentsCard.fragments.PublicUser}
+    `;
+  },
+  get PublicPetitionMessage() {
+    return gql`
+      fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
+        id
+        subject
+        body
+        status
+      }
     `;
   },
 };
@@ -800,6 +815,7 @@ RecipientView.getInitialProps = async ({
   if (!result.data?.access?.petition) {
     throw new Error();
   }
+  console.log(result);
   const pageCount =
     result.data.access.petition.fields.filter(
       (f) => f.type === "HEADING" && f.options!.hasPageBreak

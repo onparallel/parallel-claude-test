@@ -512,6 +512,11 @@ export class PetitionRepository extends BaseRepository {
     "email_log_id"
   );
 
+  readonly loadMessagesByPetitionAccessId = this.buildLoadMultipleBy(
+    "petition_message",
+    "petition_access_id"
+  );
+
   async createMessages(
     petitionId: number,
     scheduledAt: Date | null,

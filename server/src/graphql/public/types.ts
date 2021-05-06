@@ -3,6 +3,7 @@ import { extension } from "mime-types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 
+//TODO: Añadir propiedad PublicPetitionMessage (crear)
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
   rootTyping: "db.PetitionAccess",
@@ -24,6 +25,14 @@ export const PublicPetitionAccess = objectType({
       type: "PublicContact",
       resolve: async (root, _, ctx) => {
         return await ctx.contacts.loadContact(root.contact_id);
+      },
+    });
+    t.nullable.field("message", {
+      type: "PublicPetitionMessage",
+      resolve: async (root, _, ctx) => {
+        return (
+          await ctx.petitions.loadMessagesByPetitionAccessId(root.petition_id)
+        ).pop();
       },
     });
   },
@@ -111,6 +120,30 @@ export const PublicPetition = objectType({
             : "STARTED"
           : null;
       },
+    });
+  },
+});
+
+export const PublicPetitionMessage = objectType({
+  name: "PublicPetitionMessage",
+  rootTyping: "db.PetitionMessage",
+  description: "A public message in a petition",
+  definition(t) {
+    t.globalId("id", {
+      description: "The ID of the message.",
+      prefixName: "Message",
+    });
+    t.nullable.string("subject", {
+      description: "Subject of a email.",
+      resolve: (m) => m.email_subject,
+    });
+    t.jsonObject("body", {
+      description: "Body of email.",
+      resolve: async (m) => m.email_body,
+    });
+    t.string("status", {
+      description: "Status of a message",
+      resolve: (m) => m.status,
     });
   },
 });

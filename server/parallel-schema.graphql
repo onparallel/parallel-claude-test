@@ -2231,6 +2231,7 @@ A public view of a petition access
 type PublicPetitionAccess {
   contact: PublicContact
   granter: PublicUser
+  message: PublicPetitionMessage
   petition: PublicPetition
 }
 
@@ -2366,6 +2367,31 @@ type PublicPetitionFieldReply implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+"""
+A public message in a petition
+"""
+type PublicPetitionMessage {
+  """
+  Body of email.
+  """
+  body: JSONObject!
+
+  """
+  The ID of the message.
+  """
+  id: GID!
+
+  """
+  Status of a message
+  """
+  status: String!
+
+  """
+  Subject of a email.
+  """
+  subject: String
 }
 
 input PublicPetitionSignerData {

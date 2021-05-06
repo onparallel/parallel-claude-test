@@ -149,18 +149,18 @@ export function defaultFieldOptions(
     }
     case "TEXT":
       return {
-        optional: optional || false,
-        multiple: multiple || false,
+        optional: optional ?? false,
+        multiple: multiple ?? false,
         options: {
-          placeholder: options?.placeholder || null,
+          placeholder: options?.placeholder ?? null,
         },
       };
     case "SHORT_TEXT":
       return {
-        optional: optional || false,
-        multiple: multiple || false,
+        optional: optional ?? false,
+        multiple: multiple ?? false,
         options: {
-          placeholder: options?.placeholder || null,
+          placeholder: options?.placeholder ?? null,
         },
       };
     case "FILE_UPLOAD":
@@ -173,18 +173,18 @@ export function defaultFieldOptions(
       };
     case "SELECT": {
       return {
-        optional: optional || false,
-        multiple: multiple || false,
+        optional: optional ?? false,
+        multiple: multiple ?? false,
         options: {
           values: [],
-          placeholder: options?.placeholder || null,
+          placeholder: options?.placeholder ?? null,
         },
       };
     }
     case "DYNAMIC_SELECT": {
       return {
-        optional: optional || false,
-        multiple: multiple || false,
+        optional: optional ?? false,
+        multiple: multiple ?? false,
         options: {
           values: [],
           labels: [],

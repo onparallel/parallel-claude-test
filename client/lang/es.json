@@ -4920,6 +4920,31 @@
     "context": "Delegate access"
   },
   {
+    "term": "recipient-view.invite-collaborator",
+    "definition": "Invitar colaborador",
+    "context": "Invite collaborator"
+  },
+  {
+    "term": "recipient-view.requested-by",
+    "definition": "Solicitado por",
+    "context": "Requested by"
+  },
+  {
+    "term": "recipient-view.petition-subject",
+    "definition": "Motivo",
+    "context": "Subject"
+  },
+  {
+    "term": "recipient-view.in-order-to",
+    "definition": "Para",
+    "context": "To"
+  },
+  {
+    "term": "recipient-view.request-information",
+    "definition": "Información de la petición",
+    "context": "Request information"
+  },
+  {
     "term": "recipient-view.delegate-access-dialog.subtitle-1",
     "definition": "Por favor, rellene los datos de la persona a la que quiere delegar su acceso.",
     "context": "Please fill out the contact details of the person you want to delegate your access."

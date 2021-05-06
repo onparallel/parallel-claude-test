@@ -4920,6 +4920,31 @@
     "context": "Delegate access"
   },
   {
+    "term": "recipient-view.invite-collaborator",
+    "definition": "Invite collaborator",
+    "context": "Invite collaborator"
+  },
+  {
+    "term": "recipient-view.requested-by",
+    "definition": "Requested by",
+    "context": "Requested by"
+  },
+  {
+    "term": "recipient-view.petition-subject",
+    "definition": "Subject",
+    "context": "Subject"
+  },
+  {
+    "term": "recipient-view.in-order-to",
+    "definition": "To",
+    "context": "To"
+  },
+  {
+    "term": "recipient-view.request-information",
+    "definition": "Request information",
+    "context": "Request information"
+  },
+  {
     "term": "recipient-view.delegate-access-dialog.subtitle-1",
     "definition": "Please fill out the contact details of the person you want to delegate your access.",
     "context": "Please fill out the contact details of the person you want to delegate your access."
