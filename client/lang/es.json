@@ -3276,8 +3276,8 @@
   },
   {
     "term": "petition.field-type.text",
-    "definition": "Respuestas de texto",
-    "context": "Text replies"
+    "definition": "Respuestas largas",
+    "context": "Long replies"
   },
   {
     "term": "petition.finalize-start-signature.body-1",

@@ -54,7 +54,7 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
       case "TEXT":
         return intl.formatMessage({
           id: "petition.field-type.text",
-          defaultMessage: "Text replies",
+          defaultMessage: "Long replies",
         });
       case "HEADING":
         return intl.formatMessage({
@@ -81,8 +81,8 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
   const theme = useTheme();
   return ({
     FILE_UPLOAD: theme.colors.teal[400],
-    TEXT: theme.colors.yellow[400],
-    SHORT_TEXT: theme.colors.yellow[500],
+    TEXT: theme.colors.yellow[500],
+    SHORT_TEXT: theme.colors.yellow[400],
     HEADING: theme.colors.blue[400],
     SELECT: theme.colors.pink[400],
     DYNAMIC_SELECT: theme.colors.pink[600],
