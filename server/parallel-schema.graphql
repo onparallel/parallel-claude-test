@@ -2209,6 +2209,11 @@ type PublicPetition implements Timestamps {
   locale: PetitionLocale!
 
   """
+  The recipitions of the petition
+  """
+  recipients: [PublicContact!]!
+
+  """
   The signature config of the petition
   """
   signature: PublicSignatureConfig
@@ -2374,19 +2379,9 @@ A public message in a petition
 """
 type PublicPetitionMessage {
   """
-  Body of email.
-  """
-  body: JSONObject!
-
-  """
   The ID of the message.
   """
   id: GID!
-
-  """
-  Status of a message
-  """
-  status: String!
 
   """
   Subject of a email.

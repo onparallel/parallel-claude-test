@@ -956,6 +956,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    recipients: NexusGenRootTypes["PublicContact"][]; // [PublicContact!]!
     signature: NexusGenRootTypes["PublicSignatureConfig"] | null; // PublicSignatureConfig
     signatureStatus: NexusGenEnums["PublicSignatureStatus"] | null; // PublicSignatureStatus
     status: NexusGenEnums["PetitionStatus"]; // PetitionStatus!
@@ -1005,9 +1006,7 @@ export interface NexusGenFieldTypes {
   };
   PublicPetitionMessage: {
     // field return type
-    body: NexusGenScalars["JSONObject"]; // JSONObject!
     id: NexusGenScalars["GID"]; // GID!
-    status: string; // String!
     subject: string | null; // String
   };
   PublicSignatureConfig: {
@@ -1724,6 +1723,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
+    recipients: "PublicContact";
     signature: "PublicSignatureConfig";
     signatureStatus: "PublicSignatureStatus";
     status: "PetitionStatus";
@@ -1773,9 +1773,7 @@ export interface NexusGenFieldTypeNames {
   };
   PublicPetitionMessage: {
     // field return type name
-    body: "JSONObject";
     id: "GID";
-    status: "String";
     subject: "String";
   };
   PublicSignatureConfig: {

@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Accordion,
   AccordionButton,
@@ -17,9 +18,10 @@ import {
 import { CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import {
-  RecipientViewContactCard_PublicContactFragment,
-  RecipientViewSenderCard_PublicUserFragment,
-  useRecipientViewContactCard_publicDelegateAccessToContactMutation,
+  PublicPetitionMessage,
+  RecipientViewHeader_PublicContactFragment,
+  RecipientViewHeader_PublicUserFragment,
+  useRecipientViewHeader_publicDelegateAccessToContactMutation,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
@@ -32,8 +34,8 @@ function Contact({
   ...props
 }: {
   contact:
-    | RecipientViewContactCard_PublicContactFragment
-    | RecipientViewSenderCard_PublicUserFragment;
+    | RecipientViewHeader_PublicContactFragment
+    | RecipientViewHeader_PublicUserFragment;
   isFull?: boolean;
   semicolon?: boolean;
 }) {
@@ -55,15 +57,21 @@ function Contact({
 }
 
 interface RecipientViewHeaderProps extends CardProps {
-  sender: RecipientViewSenderCard_PublicUserFragment;
-  contact: RecipientViewContactCard_PublicContactFragment;
+  sender: RecipientViewHeader_PublicUserFragment;
+  contact: RecipientViewHeader_PublicContactFragment;
+  recipients: RecipientViewHeader_PublicContactFragment[];
+  message: PublicPetitionMessage;
   keycode: string;
+  isClosed: boolean;
 }
 
 export function RecipientViewHeader({
   sender,
   contact,
+  message,
+  recipients,
   keycode,
+  isClosed,
   ...props
 }: RecipientViewHeaderProps) {
   const intl = useIntl();
@@ -71,7 +79,7 @@ export function RecipientViewHeader({
   const showDelegateAccessDialog = useDelegateAccessDialog();
   const [
     publicDelegateAccessToContact,
-  ] = useRecipientViewContactCard_publicDelegateAccessToContactMutation();
+  ] = useRecipientViewHeader_publicDelegateAccessToContactMutation();
 
   const dividerOrientation = useBreakpointValue({
     base: {
@@ -88,35 +96,8 @@ export function RecipientViewHeader({
     },
   });
 
-  const getContactsTo = () => {
-    const contacts = [
-      {
-        id: "3123",
-        fullName: "Konstantin Klykov",
-        email: "konstantin@onparallel.com",
-      },
-      {
-        id: "1232242141241313",
-        fullName: "Konstantin Klykov 2",
-        email: "konstantin2@onparallel.com",
-      },
-      {
-        id: "1232312321313",
-        fullName: "Konstantin Klykov 3",
-        email: "konstantin3@onparallel.com",
-      },
-      {
-        id: "12322213123121313",
-        fullName: "Konstantin Klykov 4",
-        email: "konstantin4@onparallel.com",
-      },
-      {
-        id: "123421421412421221313",
-        fullName: "Konstantin Klykov 5",
-        email: "konstantin5@onparallel.com",
-      },
-    ];
-    return contacts.map((c, i) => {
+  const getRecipients = () => {
+    return recipients.map((c, i) => {
       if (contact.email === c.email)
         return (
           <Text key={i} as="span" whiteSpace="nowrap" marginRight={1}>
@@ -192,7 +173,7 @@ export function RecipientViewHeader({
             <Logo width="152px" height="40px" />
           )}
         </Flex>
-        <Accordion width="100%" allowMultiple>
+        <Accordion width="100%" allowMultiple defaultIndex={[isClosed ? 1 : 0]}>
           <AccordionItem justifyContent="center">
             <AccordionButton
               maxWidth="container.lg"
@@ -248,7 +229,7 @@ export function RecipientViewHeader({
                         />
                         :
                       </Text>
-                      Asunto del correo
+                      {message.subject}
                     </Box>
                   </SimpleGrid>
                 </Box>
@@ -262,7 +243,7 @@ export function RecipientViewHeader({
                         />
                         :
                       </Text>
-                      {getContactsTo()}
+                      {getRecipients()}
                     </Flex>
                     <Flex alignItems="center">
                       <Button variant="link" onClick={handleDelegateAccess}>
@@ -294,3 +275,56 @@ export function RecipientViewHeader({
     </Box>
   );
 }
+
+RecipientViewHeader.fragments = {
+  PublicContact: gql`
+    fragment RecipientViewHeader_PublicContact on PublicContact {
+      id
+      fullName
+      firstName
+      email
+    }
+  `,
+  PublicUser: gql`
+    fragment RecipientViewHeader_PublicUser on PublicUser {
+      id
+      firstName
+      fullName
+      email
+      organization {
+        name
+        identifier
+        logoUrl
+      }
+    }
+  `,
+};
+
+RecipientViewHeader.mutations = [
+  gql`
+    mutation RecipientViewHeader_publicDelegateAccessToContact(
+      $keycode: ID!
+      $email: String!
+      $firstName: String!
+      $lastName: String!
+      $messageBody: JSON!
+    ) {
+      publicDelegateAccessToContact(
+        keycode: $keycode
+        email: $email
+        firstName: $firstName
+        lastName: $lastName
+        messageBody: $messageBody
+      ) {
+        petition {
+          id
+          recipients {
+            id
+            fullName
+            email
+          }
+        }
+      }
+    }
+  `,
+];

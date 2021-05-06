@@ -1534,6 +1534,8 @@ export type PublicPetition = Timestamps & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** The recipitions of the petition */
+  recipients: Array<PublicContact>;
   /** The signature config of the petition */
   signature?: Maybe<PublicSignatureConfig>;
   signatureStatus?: Maybe<PublicSignatureStatus>;
@@ -1548,6 +1550,7 @@ export type PublicPetitionAccess = {
   __typename?: "PublicPetitionAccess";
   contact?: Maybe<PublicContact>;
   granter?: Maybe<PublicUser>;
+  message?: Maybe<PublicPetitionMessage>;
   petition?: Maybe<PublicPetition>;
 };
 
@@ -1613,6 +1616,15 @@ export type PublicPetitionFieldReply = Timestamps & {
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+};
+
+/** A public message in a petition */
+export type PublicPetitionMessage = {
+  __typename?: "PublicPetitionMessage";
+  /** The ID of the message. */
+  id: Scalars["GID"];
+  /** Subject of a email. */
+  subject?: Maybe<Scalars["String"]>;
 };
 
 export type PublicPetitionSignerData = {
@@ -3781,6 +3793,44 @@ export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
     >;
   } & useFieldVisibility_PublicPetitionFieldFragment;
 
+export type RecipientViewHeader_PublicContactFragment = {
+  __typename?: "PublicContact";
+} & Pick<PublicContact, "id" | "fullName" | "firstName" | "email">;
+
+export type RecipientViewHeader_PublicUserFragment = {
+  __typename?: "PublicUser";
+} & Pick<PublicUser, "id" | "firstName" | "fullName" | "email"> & {
+    organization: { __typename?: "PublicOrganization" } & Pick<
+      PublicOrganization,
+      "name" | "identifier" | "logoUrl"
+    >;
+  };
+
+export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  messageBody: Scalars["JSON"];
+}>;
+
+export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
+  __typename?: "Mutation";
+} & {
+  publicDelegateAccessToContact: { __typename?: "PublicPetitionAccess" } & {
+    petition?: Maybe<
+      { __typename?: "PublicPetition" } & Pick<PublicPetition, "id"> & {
+          recipients: Array<
+            { __typename?: "PublicContact" } & Pick<
+              PublicContact,
+              "id" | "fullName" | "email"
+            >
+          >;
+        }
+    >;
+  };
+};
+
 export type RecipientViewProgressFooter_PublicPetitionFragment = {
   __typename?: "PublicPetition";
 } & Pick<PublicPetition, "status"> & {
@@ -5268,7 +5318,16 @@ export type RecipientView_PublicPetitionAccessFragment = {
     } & RecipientViewContactCard_PublicContactFragment &
       useCompleteSignerInfoDialog_PublicContactFragment
   >;
+  message?: Maybe<
+    {
+      __typename?: "PublicPetitionMessage";
+    } & RecipientView_PublicPetitionMessageFragment
+  >;
 } & RecipientViewPetitionField_PublicPetitionAccessFragment;
+
+export type RecipientView_PublicPetitionMessageFragment = {
+  __typename?: "PublicPetitionMessage";
+} & Pick<PublicPetitionMessage, "id" | "subject">;
 
 export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
@@ -5296,6 +5355,12 @@ export type RecipientView_PublicPetitionFragment = {
           >
         >;
       }
+    >;
+    recipients: Array<
+      { __typename?: "PublicContact" } & Pick<
+        PublicContact,
+        "id" | "fullName" | "email"
+      >
     >;
   } & RecipientViewContentsCard_PublicPetitionFragment &
   RecipientViewProgressFooter_PublicPetitionFragment;
@@ -5843,6 +5908,27 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   }
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
+`;
+export const RecipientViewHeader_PublicContactFragmentDoc = gql`
+  fragment RecipientViewHeader_PublicContact on PublicContact {
+    id
+    fullName
+    firstName
+    email
+  }
+`;
+export const RecipientViewHeader_PublicUserFragmentDoc = gql`
+  fragment RecipientViewHeader_PublicUser on PublicUser {
+    id
+    firstName
+    fullName
+    email
+    organization {
+      name
+      identifier
+      logoUrl
+    }
+  }
 `;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment on PublicPetitionFieldComment {
@@ -7387,6 +7473,11 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
         ...RecipientView_PublicContact
       }
     }
+    recipients {
+      id
+      fullName
+      email
+    }
     signatureStatus
     ...RecipientViewContentsCard_PublicPetition
     ...RecipientViewProgressFooter_PublicPetition
@@ -7437,6 +7528,12 @@ export const useCompleteSignerInfoDialog_PublicContactFragmentDoc = gql`
     email
   }
 `;
+export const RecipientView_PublicPetitionMessageFragmentDoc = gql`
+  fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
+    id
+    subject
+  }
+`;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccess on PublicPetitionAccess {
     granter {
@@ -7471,12 +7568,16 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
       ...RecipientViewContactCard_PublicContact
       ...useCompleteSignerInfoDialog_PublicContact
     }
+    message {
+      ...RecipientView_PublicPetitionMessage
+    }
     ...RecipientViewPetitionField_PublicPetitionAccess
   }
   ${RecipientView_PublicPetitionFragmentDoc}
   ${RecipientView_PublicUserFragmentDoc}
   ${RecipientViewContactCard_PublicContactFragmentDoc}
   ${useCompleteSignerInfoDialog_PublicContactFragmentDoc}
+  ${RecipientView_PublicPetitionMessageFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
 `;
 export const PetitionPdf_PetitionFieldFragmentDoc = gql`
@@ -9274,6 +9375,69 @@ export function useRecipientViewContactCard_publicDelegateAccessToContactMutatio
 }
 export type RecipientViewContactCard_publicDelegateAccessToContactMutationHookResult = ReturnType<
   typeof useRecipientViewContactCard_publicDelegateAccessToContactMutation
+>;
+export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
+  mutation RecipientViewHeader_publicDelegateAccessToContact(
+    $keycode: ID!
+    $email: String!
+    $firstName: String!
+    $lastName: String!
+    $messageBody: JSON!
+  ) {
+    publicDelegateAccessToContact(
+      keycode: $keycode
+      email: $email
+      firstName: $firstName
+      lastName: $lastName
+      messageBody: $messageBody
+    ) {
+      petition {
+        id
+        recipients {
+          id
+          fullName
+          email
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useRecipientViewHeader_publicDelegateAccessToContactMutation__
+ *
+ * To run a mutation, you first call `useRecipientViewHeader_publicDelegateAccessToContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientViewHeader_publicDelegateAccessToContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewHeaderPublicDelegateAccessToContactMutation, { data, loading, error }] = useRecipientViewHeader_publicDelegateAccessToContactMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      email: // value for 'email'
+ *      firstName: // value for 'firstName'
+ *      lastName: // value for 'lastName'
+ *      messageBody: // value for 'messageBody'
+ *   },
+ * });
+ */
+export function useRecipientViewHeader_publicDelegateAccessToContactMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RecipientViewHeader_publicDelegateAccessToContactMutation,
+    RecipientViewHeader_publicDelegateAccessToContactMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RecipientViewHeader_publicDelegateAccessToContactMutation,
+    RecipientViewHeader_publicDelegateAccessToContactMutationVariables
+  >(RecipientViewHeader_publicDelegateAccessToContactDocument, options);
+}
+export type RecipientViewHeader_publicDelegateAccessToContactMutationHookResult = ReturnType<
+  typeof useRecipientViewHeader_publicDelegateAccessToContactMutation
 >;
 export const RecipientViewPetitionFieldCommentsDocument = gql`
   query RecipientViewPetitionFieldComments(

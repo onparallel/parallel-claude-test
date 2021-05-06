@@ -1482,7 +1482,8 @@ export type PublicPetition = Timestamps & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  message: Maybe<PublicPetitionMessage>;
+  /** The recipitions of the petition */
+  recipients: Array<PublicContact>;
   /** The signature config of the petition */
   signature: Maybe<PublicSignatureConfig>;
   signatureStatus: Maybe<PublicSignatureStatus>;
@@ -1496,6 +1497,7 @@ export type PublicPetition = Timestamps & {
 export type PublicPetitionAccess = {
   contact: Maybe<PublicContact>;
   granter: Maybe<PublicUser>;
+  message: Maybe<PublicPetitionMessage>;
   petition: Maybe<PublicPetition>;
 };
 
@@ -1562,12 +1564,8 @@ export type PublicPetitionFieldReply = Timestamps & {
 
 /** A public message in a petition */
 export type PublicPetitionMessage = {
-  /** Body of email. */
-  body: Scalars["JSONObject"];
   /** The ID of the message. */
   id: Scalars["GID"];
-  /** Status of a message */
-  status: Scalars["String"];
   /** Subject of a email. */
   subject: Maybe<Scalars["String"]>;
 };

@@ -88,6 +88,8 @@ function RecipientView({
   const granter = access!.granter!;
   const contact = access!.contact!;
   const signers = petition!.signature?.signers ?? [];
+  const recipients = petition!.recipients!;
+  const message = access!.message!;
 
   const { fields, pages, visibility } = useGetPageFields(
     petition.fields,
@@ -242,7 +244,13 @@ function RecipientView({
         <RecipientViewHeader
           sender={granter}
           contact={contact}
+          message={message}
+          recipients={recipients}
           keycode={keycode}
+          isClosed={
+            (showAlert && ["COMPLETED", "CLOSED"].includes(petition.status)) ||
+            (pendingComments ? true : false)
+          }
         ></RecipientViewHeader>
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
           {showAlert && ["COMPLETED", "CLOSED"].includes(petition.status) ? (
@@ -624,7 +632,6 @@ function ReviewBeforeSignDialog({
     />
   );
 }
-// TODO: Añadir propiedad de message a PublicPetitionAccess
 RecipientView.fragments = {
   get PublicPetitionAccess() {
     return gql`
@@ -652,6 +659,14 @@ RecipientView.fragments = {
       ${this.PublicPetitionMessage}
     `;
   },
+  get PublicPetitionMessage() {
+    return gql`
+      fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
+        id
+        subject
+      }
+    `;
+  },
   get PublicPetition() {
     return gql`
       fragment RecipientView_PublicPetition on PublicPetition {
@@ -667,6 +682,11 @@ RecipientView.fragments = {
           signers {
             ...RecipientView_PublicContact
           }
+        }
+        recipients {
+          id
+          fullName
+          email
         }
         signatureStatus
         ...RecipientViewContentsCard_PublicPetition
@@ -709,16 +729,6 @@ RecipientView.fragments = {
       }
       ${RecipientViewSenderCard.fragments.PublicUser}
       ${RecipientViewContentsCard.fragments.PublicUser}
-    `;
-  },
-  get PublicPetitionMessage() {
-    return gql`
-      fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
-        id
-        subject
-        body
-        status
-      }
     `;
   },
 };
@@ -815,7 +825,6 @@ RecipientView.getInitialProps = async ({
   if (!result.data?.access?.petition) {
     throw new Error();
   }
-  console.log(result);
   const pageCount =
     result.data.access.petition.fields.filter(
       (f) => f.type === "HEADING" && f.options!.hasPageBreak

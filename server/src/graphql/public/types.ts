@@ -1,9 +1,9 @@
 import { core, enumType, objectType, unionType } from "@nexus/schema";
 import { extension } from "mime-types";
+import { Contact } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 
-//TODO: Añadir propiedad PublicPetitionMessage (crear)
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
   rootTyping: "db.PetitionAccess",
@@ -30,9 +30,10 @@ export const PublicPetitionAccess = objectType({
     t.nullable.field("message", {
       type: "PublicPetitionMessage",
       resolve: async (root, _, ctx) => {
-        return (
-          await ctx.petitions.loadMessagesByPetitionAccessId(root.petition_id)
-        ).pop();
+        const messages = await ctx.petitions.loadMessagesByPetitionAccessId(
+          root.id
+        );
+        return messages[0];
       },
     });
   },
@@ -82,6 +83,19 @@ export const PublicPetition = objectType({
       type: "PetitionStatus",
       description: "The status of the petition.",
       resolve: (o) => o.status!,
+    });
+    t.list.field("recipients", {
+      type: "PublicContact",
+      description: "The recipitions of the petition",
+      resolve: async (root, _, ctx) => {
+        const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
+        const contactIds = accesses
+          .filter((a) => a.status === "ACTIVE")
+          .map((a) => a.contact_id);
+        return await (ctx.contacts.loadContact(contactIds) as Promise<
+          Contact[]
+        >);
+      },
     });
     t.boolean("hasCommentsEnabled", {
       description: "Whether comments are enabled or not.",
@@ -136,14 +150,6 @@ export const PublicPetitionMessage = objectType({
     t.nullable.string("subject", {
       description: "Subject of a email.",
       resolve: (m) => m.email_subject,
-    });
-    t.jsonObject("body", {
-      description: "Body of email.",
-      resolve: async (m) => m.email_body,
-    });
-    t.string("status", {
-      description: "Status of a message",
-      resolve: (m) => m.status,
     });
   },
 });
