@@ -728,16 +728,6 @@ RecipientView.fragments = {
       ${RecipientViewContentsCard.fragments.PublicUser}
     `;
   },
-  get PublicPetitionMessage() {
-    return gql`
-      fragment RecipientView_PublicPetitionMessage on PublicPetitionMessage {
-        id
-        subject
-        body
-        status
-      }
-    `;
-  },
 };
 
 RecipientView.mutations = [
@@ -832,7 +822,6 @@ RecipientView.getInitialProps = async ({
   if (!result.data?.access?.petition) {
     throw new Error();
   }
-  console.log(result);
   const pageCount =
     result.data.access.petition.fields.filter(
       (f) => f.type === "HEADING" && f.options!.hasPageBreak
