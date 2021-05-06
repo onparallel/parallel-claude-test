@@ -604,8 +604,8 @@ export interface PetitionFieldReply {
   deleted_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
   status: PetitionFieldReplyStatus; // petition_field_reply_status
-  user_id: Maybe<number>; // int4
   metadata: any; // jsonb
+  user_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -618,8 +618,8 @@ export type CreatePetitionFieldReply = PartialProps<
   | "deleted_by"
   | "petition_access_id"
   | "status"
-  | "user_id"
   | "metadata"
+  | "user_id"
 >;
 
 export interface PetitionMessage {
