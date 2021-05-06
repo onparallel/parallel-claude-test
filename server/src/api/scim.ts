@@ -1,4 +1,5 @@
 import { json, NextFunction, Request, Response, Router } from "express";
+import { pick } from "remeda";
 import { CreateUser, User } from "../db/__types";
 import { isDefined } from "../util/remedaExtensions";
 
@@ -82,8 +83,16 @@ async function validateExternalId(
   }
 }
 
+async function logRequest(req: Request, _: Response, next: NextFunction) {
+  req.context.logger.info(
+    pick(req, ["method", "url", "query", "body", "params", "headers"])
+  );
+  next();
+}
+
 export const scim = Router().use(
   json({ type: "application/scim+json" }),
+  logRequest,
   authenticateOrganization,
   validateExternalId
 );
