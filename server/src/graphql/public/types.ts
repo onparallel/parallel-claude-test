@@ -4,6 +4,7 @@ import { Contact } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 
+//TODO: Añadir propiedad PublicPetitionMessage (crear)
 export const PublicPetitionAccess = objectType({
   name: "PublicPetitionAccess",
   rootTyping: "db.PetitionAccess",
