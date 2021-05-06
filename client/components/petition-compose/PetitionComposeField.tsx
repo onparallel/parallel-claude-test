@@ -475,6 +475,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             case "ArrowDown":
               if (currentLine === totalLines - 1) {
                 if (field.type === "SELECT") {
+                  event.preventDefault();
                   focusSelectOptions(true);
                 } else {
                   onFocusNextField();
