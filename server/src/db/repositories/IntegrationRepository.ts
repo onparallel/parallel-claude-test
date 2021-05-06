@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { hash } from "../../util/token";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
 import { IntegrationType, OrgIntegration } from "../__types";
@@ -17,7 +16,7 @@ export type IntegrationSettings<K extends IntegrationType> = {
     COGNITO_PROVIDER: string;
   };
   USER_PROVISIONING: {
-    AUTH_KEY_HASH: string;
+    AUTH_KEY: string;
   };
 }[K];
 
@@ -34,15 +33,14 @@ export class IntegrationRepository extends BaseRepository {
   );
 
   async loadProvisioningIntegrationByAuthKey(key: string) {
-    const hashed = await hash(key, "");
     const [integration] = await this.raw<OrgIntegration | undefined>(
       /* sql */ `
       select * from org_integration
-      where ((settings ->> 'AUTH_KEY_HASH') = ?) 
+      where ((settings ->> 'AUTH_KEY') = ?) 
       and "type" = 'USER_PROVISIONING' 
       and is_enabled is true;
     `,
-      [hashed]
+      [key]
     );
 
     return integration;

@@ -61,9 +61,10 @@ export async function validateExternalId(
   res: Response,
   next: NextFunction
 ) {
-  const externalId = getExternalId(req.query.filter) ?? req.params.externalId;
+  const externalId = req.params?.externalId ?? req.body?.externalId;
   if (!externalId) {
     next();
+    return;
   }
 
   const user = await req.context.users.loadUserByExternalId(externalId);
@@ -88,8 +89,10 @@ export const scim = Router()
     const users: User[] = [];
     if (externalId) {
       const user = await req.context.users.loadUserByExternalId(externalId);
-      totalResults = 1;
-      users.push(user!);
+      if (user) {
+        totalResults = 1;
+        users.push(user!);
+      }
     } else {
       const data = await req.context.organizations.loadOrgUsers(
         req.context.organization!.id,

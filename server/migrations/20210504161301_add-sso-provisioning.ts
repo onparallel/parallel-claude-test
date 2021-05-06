@@ -13,8 +13,8 @@ export async function up(knex: Knex): Promise<void> {
   await addIntegrationType(knex, "USER_PROVISIONING");
 
   await knex.raw(/* sql */ `
-    create index org_integration___user_provisioning_auth_key_hash__index
-    on org_integration (((settings ->> 'AUTH_KEY_HASH')::text))
+    create index org_integration___user_provisioning_auth_key__index
+    on org_integration (((settings ->> 'AUTH_KEY')::text))
     where type = 'USER_PROVISIONING';
   `);
 }
@@ -25,7 +25,7 @@ export async function down(knex: Knex): Promise<void> {
   });
 
   await knex.raw(/* sql */ `
-    drop index org_integration___user_provisioning_auth_key_hash__index;
+    drop index org_integration___user_provisioning_auth_key__index;
     drop index org_integration___sso_email_domains__index;
   `);
 
