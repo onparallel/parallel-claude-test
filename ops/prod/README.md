@@ -3,6 +3,8 @@
 The server image is built by copying all files inside `ops/prod/image` in a vanilla Amazon Linux instance and running
 
 ```
+cd ops/prod/image
+scp * ec2-user@[IP]:~
 sudo bash build.sh
 ```
 
