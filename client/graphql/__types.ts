@@ -5875,14 +5875,6 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 `;
-export const RecipientViewHeader_PublicContactFragmentDoc = gql`
-  fragment RecipientViewHeader_PublicContact on PublicContact {
-    id
-    fullName
-    firstName
-    email
-  }
-`;
 export const RecipientViewHeader_PublicUserFragmentDoc = gql`
   fragment RecipientViewHeader_PublicUser on PublicUser {
     id
