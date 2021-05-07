@@ -1185,7 +1185,7 @@ export const FieldTextIcon = createIcon({
 });
 
 export const FieldShortTextIcon = createIcon({
-  displayName: "FieldTextIcon",
+  displayName: "FieldShortTextIcon",
   viewBox: "0 0 24 24",
   path: (
     <g

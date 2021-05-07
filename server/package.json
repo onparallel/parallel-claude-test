@@ -28,7 +28,7 @@
     "worker:signature": "yarn ts-node-dev --project tsconfig.worker.json --no-notify --transpile-only --respawn src/workers/signature-worker.ts",
     "localtunnel": "ts-node ./bin/launch-localtunnel.ts",
     "emails": "concurrently \"ts-node-dev --watch ./emails.tsx --ignore-watch ./src --files ./emails.tsx --respawn\" \"start-storybook --port 60000 --quiet\"",
-    "postinstall": "yarn --cwd .. patch-package",
+    "postinstall": "cd .. && yarn patch-package",
     "generate-graphql-types": "graphql-codegen",
     "run-ts-script": "ts-node --project tsconfig.json --transpile-only"
   },
