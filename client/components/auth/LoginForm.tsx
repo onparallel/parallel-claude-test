@@ -2,11 +2,13 @@ import {
   Box,
   Button,
   Center,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
   Input,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import { LockIcon } from "@parallel/chakra/icons";
@@ -35,13 +37,14 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
     watch,
   } = useForm<LoginData>();
   const [ssoUrl, setSsoUrl] = useState<string | undefined>(undefined);
+  const [forcePassword, setForcePassword] = useState(false);
   const email = watch("email");
   const passwordRef = useRef<HTMLInputElement>(null);
   const passwordRegisterProps = useRegisterWithRef(
     passwordRef,
     register,
     "password",
-    { required: true }
+    { required: !ssoUrl }
   );
   const buttonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
@@ -106,7 +109,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             />
           </FormErrorMessage>
         </FormControl>
-        {ssoUrl ? (
+        {ssoUrl && !forcePassword ? (
           <Center marginTop={2} height="72px">
             <LockIcon marginRight={2} />
             <FormattedMessage
@@ -153,14 +156,43 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           )}
         </Button>
       </form>
-      <Box marginTop={4} textAlign="center">
-        <Link href="/forgot">
-          <FormattedMessage
-            id="public.login.forgot-password-link"
-            defaultMessage="I forgot my password"
-          />
-        </Link>
-      </Box>
+      <Flex
+        flexDirection="row"
+        marginTop={4}
+        justifyContent={ssoUrl && forcePassword ? "space-between" : "center"}
+      >
+        {ssoUrl && !forcePassword ? (
+          <Button
+            variant="link"
+            onClick={() => {
+              setForcePassword(true);
+              setTimeout(() => passwordRef.current?.focus());
+            }}
+          >
+            <FormattedMessage
+              id="public.login.login-with-password"
+              defaultMessage="Login with password"
+            />
+          </Button>
+        ) : (
+          <>
+            {forcePassword ? (
+              <Button variant="link" onClick={() => setForcePassword(false)}>
+                <FormattedMessage
+                  id="public.login.login-with-sso"
+                  defaultMessage="Login with sso"
+                />
+              </Button>
+            ) : null}
+            <Link href="/forgot">
+              <FormattedMessage
+                id="public.login.forgot-password-link"
+                defaultMessage="I forgot my password"
+              />
+            </Link>
+          </>
+        )}
+      </Flex>
     </>
   );
 }
