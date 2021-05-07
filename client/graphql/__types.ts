@@ -5875,19 +5875,6 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 `;
-export const RecipientViewHeader_PublicUserFragmentDoc = gql`
-  fragment RecipientViewHeader_PublicUser on PublicUser {
-    id
-    firstName
-    fullName
-    email
-    organization {
-      name
-      identifier
-      logoUrl
-    }
-  }
-`;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment on PublicPetitionFieldComment {
     id
