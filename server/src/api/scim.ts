@@ -35,7 +35,7 @@ async function authenticateOrganization(
   next: NextFunction
 ) {
   try {
-    const match = req.headers.authorization?.match(/Bearer (.*)/);
+    const match = req.headers.authorization?.match(/^Bearer (.*)$/);
     if (!match) {
       return res.status(401).end();
     }

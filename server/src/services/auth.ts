@@ -282,7 +282,6 @@ export class Auth implements IAuth {
     const url = new URL(`https://${this.config.cognito.domain}/logout`);
     for (const [name, value] of Object.entries({
       logout_uri: `${this.config.misc.parallelUrl}/api/auth/logout/callback`,
-      redirect_uri: `${this.config.misc.parallelUrl}/login`,
       client_id: this.config.cognito.clientId,
     })) {
       url.searchParams.append(name, value);
