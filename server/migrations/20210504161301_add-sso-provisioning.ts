@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
   });
 
   await knex.raw(/* sql */ `
-    create unique index "user__external_id__org_id" on "user" ("external_id", "org_id") where "deleted_at" is null`);
+    create unique index "user__org_id__external_id" on "user" ("org_id", "external_id") where "deleted_at" is null`);
 
   await addIntegrationType(knex, "USER_PROVISIONING");
 
