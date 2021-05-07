@@ -71,10 +71,17 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           />
         </Heading>
         <Text>
-          <FormattedMessage
-            id="public.login.explanation"
-            defaultMessage="Login using your email and password"
-          />
+          {ssoUrl && !forcePassword ? (
+            <FormattedMessage
+              id="public.login.explanation-with-sso"
+              defaultMessage="Login using Single sign-on"
+            />
+          ) : (
+            <FormattedMessage
+              id="public.login.explanation-with-password"
+              defaultMessage="Login using your email and password"
+            />
+          )}
         </Text>
       </Box>
       <form
@@ -148,7 +155,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           type="submit"
           id="pw-login-submit"
         >
-          {ssoUrl ? (
+          {ssoUrl && !forcePassword ? (
             <FormattedMessage id="generic.continue" defaultMessage="Continue" />
           ) : (
             <FormattedMessage id="public.login-button" defaultMessage="Login" />
@@ -179,7 +186,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
               <Button variant="link" onClick={() => setForcePassword(false)}>
                 <FormattedMessage
                   id="public.login.login-with-sso"
-                  defaultMessage="Login with sso"
+                  defaultMessage="Login with SSO"
                 />
               </Button>
             ) : null}

@@ -635,14 +635,14 @@
     "context": "Allow the recipient to select one or more options from a predefined list of possible answers."
   },
   {
-    "term": "component.petition-field-type-select-dropdown.text-description",
-    "definition": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>",
-    "context": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>"
-  },
-  {
     "term": "component.petition-field-type-select-dropdown.short-text-description",
     "definition": "Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>",
     "context": "Allow the recipient to reply briefly.<i>e.g: Name, ID number...</i>"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.text-description",
+    "definition": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>",
+    "context": "Allow the recipient to write down everything they need.<i>e.g: Descriptions, observations...</i>"
   },
   {
     "term": "component.petition-field-type-select-dropdown.thumbnail-alt",
@@ -1773,16 +1773,6 @@
     "term": "field-settings.multiple-label",
     "definition": "Allow more than one reply",
     "context": "Allow more than one reply"
-  },
-  {
-    "term": "field-settings.text-multiline-description",
-    "definition": "Enabling this will display a multi-line input field instead of a single line.",
-    "context": "Enabling this will display a multi-line input field instead of a single line."
-  },
-  {
-    "term": "field-settings.text-multiline-label",
-    "definition": "Multi-line",
-    "context": "Multi-line"
   },
   {
     "term": "field-settings.text-placeholder-description",
@@ -3280,14 +3270,14 @@
     "context": "Select"
   },
   {
-    "term": "petition.field-type.text",
-    "definition": "Text replies",
-    "context": "Text replies"
-  },
-  {
     "term": "petition.field-type.short-text",
     "definition": "Short replies",
     "context": "Short replies"
+  },
+  {
+    "term": "petition.field-type.text",
+    "definition": "Text replies",
+    "context": "Text replies"
   },
   {
     "term": "petition.finalize-start-signature.body-1",
@@ -4190,9 +4180,14 @@
     "context": "Go back to login"
   },
   {
-    "term": "public.login.explanation",
+    "term": "public.login.explanation-with-password",
     "definition": "Login using your email and password",
     "context": "Login using your email and password"
+  },
+  {
+    "term": "public.login.explanation-with-sso",
+    "definition": "Login using Single sign-on",
+    "context": "Login using Single sign-on"
   },
   {
     "term": "public.login.forgot-password-link",
@@ -4213,6 +4208,16 @@
     "term": "public.login.invalid-login.title",
     "definition": "Invalid login",
     "context": "Invalid login"
+  },
+  {
+    "term": "public.login.login-with-password",
+    "definition": "Login with password",
+    "context": "Login with password"
+  },
+  {
+    "term": "public.login.login-with-sso",
+    "definition": "Login with SSO",
+    "context": "Login with SSO"
   },
   {
     "term": "public.login.meta-description",
