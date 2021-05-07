@@ -68,8 +68,11 @@ async function validateExternalId(
     return;
   }
 
-  const user = await req.context.users.loadUserByExternalId(externalId);
-  if (user?.org_id !== req.context.organization!.id) {
+  const user = await req.context.users.loadUserByExternalId({
+    externalId,
+    orgId: req.context.organization!.id,
+  });
+  if (!user) {
     return res
       .status(404)
       .json({
@@ -100,11 +103,14 @@ export const scim = Router().use(
 scim
   .route("/Users")
   .get(async (req, res) => {
-    const externalId = getExternalId(req.query.filter);
+    const externalId: string = getExternalId(req.query.filter);
     let totalResults = 0;
     const users: User[] = [];
     if (externalId) {
-      const user = await req.context.users.loadUserByExternalId(externalId);
+      const user = await req.context.users.loadUserByExternalId({
+        externalId,
+        orgId: req.context.organization!.id,
+      });
       if (user) {
         totalResults = 1;
         users.push(user!);
@@ -141,7 +147,10 @@ scim
       active: boolean;
       name: { givenName: string; familyName: string };
     } = req.body;
-    let user = await req.context.users.loadUserByExternalId(externalId);
+    let user = await req.context.users.loadUserByExternalId({
+      externalId,
+      orgId: req.context.organization!.id,
+    });
     if (user && user.status === "INACTIVE" && user.is_sso_user) {
       [user] = await req.context.users.updateUserById(
         user.id,
@@ -162,9 +171,10 @@ scim
 scim
   .route("/Users/:externalId")
   .get(async (req, res) => {
-    const user = await req.context.users.loadUserByExternalId(
-      req.params.externalId
-    );
+    const user = await req.context.users.loadUserByExternalId({
+      externalId: req.params.externalId,
+      orgId: req.context.organization!.id,
+    });
     res.json(toScimUser(user!)).end();
   })
   .patch(async (req, res) => {
@@ -188,6 +198,7 @@ scim
     });
     const [user] = await req.context.users.updateUserByExternalId(
       req.params.externalId,
+      req.context.organization!.id,
       data,
       `OrganizationSSO:${req.context.organization!.id}`
     );
@@ -207,6 +218,7 @@ scim
 
     const [user] = await req.context.users.updateUserByExternalId(
       req.params.externalId,
+      req.context.organization!.id,
       data,
       `OrganizationSSO:${req.context.organization!.id}`
     );
@@ -215,6 +227,7 @@ scim
   .delete(async (req, res) => {
     await req.context.users.updateUserByExternalId(
       req.params.externalId,
+      req.context.organization!.id,
       { status: "INACTIVE" },
       `OrganizationSSO:${req.context.organization!.id}`
     );

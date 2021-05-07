@@ -182,7 +182,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
           </Button>
         ) : (
           <>
-            {forcePassword ? (
+            {ssoUrl && forcePassword ? (
               <Button variant="link" onClick={() => setForcePassword(false)}>
                 <FormattedMessage
                   id="public.login.login-with-sso"

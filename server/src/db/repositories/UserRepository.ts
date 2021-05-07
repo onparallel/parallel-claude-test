@@ -35,9 +35,23 @@ export class UserRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadUserByExternalId = this.buildLoadBy("user", "external_id", (q) =>
-    q.whereNull("deleted_at")
-  );
+  async loadUserByExternalId({
+    orgId,
+    externalId,
+  }: {
+    orgId: number;
+    externalId: string;
+  }): Promise<User | undefined> {
+    const [user] = await this.from("user")
+      .where({
+        deleted_at: null,
+        external_id: externalId,
+        org_id: orgId,
+      })
+      .returning("*");
+
+    return user;
+  }
 
   async updateUserById(
     id: MaybeArray<number>,
@@ -58,6 +72,7 @@ export class UserRepository extends BaseRepository {
 
   async updateUserByExternalId(
     externalId: string,
+    orgId: number,
     data: Partial<CreateUser>,
     updatedBy: string,
     t?: Knex.Transaction
@@ -68,7 +83,11 @@ export class UserRepository extends BaseRepository {
         updated_at: this.now(),
         updated_by: updatedBy,
       })
-      .where("external_id", externalId)
+      .where({
+        external_id: externalId,
+        org_id: orgId,
+        deleted_at: null,
+      })
       .returning("*");
   }
 
