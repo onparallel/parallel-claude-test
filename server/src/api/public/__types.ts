@@ -1497,7 +1497,7 @@ export type PublicPetition = Timestamps & {
 export type PublicPetitionAccess = {
   contact: Maybe<PublicContact>;
   granter: Maybe<PublicUser>;
-  message: Maybe<PublicPetitionMessage>;
+  message: PublicPetitionMessage;
   petition: Maybe<PublicPetition>;
 };
 

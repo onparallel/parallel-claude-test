@@ -9,6 +9,7 @@ import {
   Button,
   Flex,
   Heading,
+  Img,
   SimpleGrid,
   Text,
   Tooltip,
@@ -18,7 +19,7 @@ import {
 import { CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import {
-  PublicPetitionMessage,
+  RecipientView_PublicPetitionMessageFragment,
   RecipientViewHeader_PublicContactFragment,
   RecipientViewHeader_PublicUserFragment,
   useRecipientViewHeader_publicDelegateAccessToContactMutation,
@@ -60,7 +61,7 @@ interface RecipientViewHeaderProps extends CardProps {
   sender: RecipientViewHeader_PublicUserFragment;
   contact: RecipientViewHeader_PublicContactFragment;
   recipients: RecipientViewHeader_PublicContactFragment[];
-  message: PublicPetitionMessage;
+  message: RecipientView_PublicPetitionMessageFragment;
   keycode: string;
   isClosed: boolean;
 }
@@ -158,16 +159,11 @@ export function RecipientViewHeader({
           justifyContent="left"
         >
           {sender.organization.logoUrl ? (
-            <Box
-              role="img"
+            <Img
+              src={sender.organization.logoUrl}
               aria-label={sender.organization.name}
-              width="200px"
-              margin="auto"
+              width="auto"
               height="40px"
-              backgroundImage={`url("${sender.organization.logoUrl}")`}
-              backgroundSize="contain"
-              backgroundPosition="center"
-              backgroundRepeat="no-repeat"
             />
           ) : (
             <Logo width="152px" height="40px" />

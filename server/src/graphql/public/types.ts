@@ -27,7 +27,7 @@ export const PublicPetitionAccess = objectType({
         return await ctx.contacts.loadContact(root.contact_id);
       },
     });
-    t.nullable.field("message", {
+    t.field("message", {
       type: "PublicPetitionMessage",
       resolve: async (root, _, ctx) => {
         const messages = await ctx.petitions.loadMessagesByPetitionAccessId(

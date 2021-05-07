@@ -2236,7 +2236,7 @@ A public view of a petition access
 type PublicPetitionAccess {
   contact: PublicContact
   granter: PublicUser
-  message: PublicPetitionMessage
+  message: PublicPetitionMessage!
   petition: PublicPetition
 }
 

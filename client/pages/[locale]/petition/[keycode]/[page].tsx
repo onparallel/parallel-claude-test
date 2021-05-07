@@ -34,14 +34,12 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { useCompleteSignerInfoDialog } from "@parallel/components/recipient-view/CompleteSignerInfoDialog";
 import { RecipientViewPetitionField } from "@parallel/components/recipient-view/fields/RecipientViewPetitionField";
-import { RecipientViewContactCard } from "@parallel/components/recipient-view/RecipientViewContactCard";
 import { RecipientViewContentsCard } from "@parallel/components/recipient-view/RecipientViewContentsCard";
 import { RecipientViewFooter } from "@parallel/components/recipient-view/RecipientViewFooter";
 import { RecipientViewHeader } from "@parallel/components/recipient-view/RecipientViewHeader";
 import { useRecipientViewHelpDialog } from "@parallel/components/recipient-view/RecipientViewHelpModal";
 import { RecipientViewPagination } from "@parallel/components/recipient-view/RecipientViewPagination";
 import { RecipientViewProgressFooter } from "@parallel/components/recipient-view/RecipientViewProgressFooter";
-import { RecipientViewSenderCard } from "@parallel/components/recipient-view/RecipientViewSenderCard";
 import {
   PublicPetitionQuery,
   PublicPetitionQueryVariables,
@@ -643,7 +641,7 @@ RecipientView.fragments = {
           ...RecipientView_PublicUser
         }
         contact {
-          ...RecipientViewContactCard_PublicContact
+          ...RecipientViewHeader_PublicContact
           ...useCompleteSignerInfoDialog_PublicContact
         }
         message {
@@ -653,7 +651,7 @@ RecipientView.fragments = {
       }
       ${this.PublicPetition}
       ${this.PublicUser}
-      ${RecipientViewContactCard.fragments.PublicContact}
+      ${RecipientViewHeader.fragments.PublicContact}
       ${useCompleteSignerInfoDialog.fragments.PublicContact}
       ${RecipientViewPetitionField.fragments.PublicPetitionAccess}
       ${this.PublicPetitionMessage}
@@ -684,9 +682,7 @@ RecipientView.fragments = {
           }
         }
         recipients {
-          id
-          fullName
-          email
+          ...RecipientViewHeader_PublicContact
         }
         signatureStatus
         ...RecipientViewContentsCard_PublicPetition
@@ -697,6 +693,7 @@ RecipientView.fragments = {
       ${this.PublicContact}
       ${RecipientViewContentsCard.fragments.PublicPetition}
       ${RecipientViewProgressFooter.fragments.PublicPetition}
+      ${RecipientViewHeader.fragments.PublicContact}
     `;
   },
   get PublicContact() {
@@ -724,10 +721,10 @@ RecipientView.fragments = {
   get PublicUser() {
     return gql`
       fragment RecipientView_PublicUser on PublicUser {
-        ...RecipientViewSenderCard_PublicUser
+        ...RecipientViewHeader_PublicUser
         ...RecipientViewContentsCard_PublicUser
       }
-      ${RecipientViewSenderCard.fragments.PublicUser}
+      ${RecipientViewHeader.fragments.PublicUser}
       ${RecipientViewContentsCard.fragments.PublicUser}
     `;
   },

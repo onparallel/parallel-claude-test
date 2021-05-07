@@ -1550,7 +1550,7 @@ export type PublicPetitionAccess = {
   __typename?: "PublicPetitionAccess";
   contact?: Maybe<PublicContact>;
   granter?: Maybe<PublicUser>;
-  message?: Maybe<PublicPetitionMessage>;
+  message: PublicPetitionMessage;
   petition?: Maybe<PublicPetition>;
 };
 
@@ -5318,11 +5318,9 @@ export type RecipientView_PublicPetitionAccessFragment = {
     } & RecipientViewContactCard_PublicContactFragment &
       useCompleteSignerInfoDialog_PublicContactFragment
   >;
-  message?: Maybe<
-    {
-      __typename?: "PublicPetitionMessage";
-    } & RecipientView_PublicPetitionMessageFragment
-  >;
+  message: {
+    __typename?: "PublicPetitionMessage";
+  } & RecipientView_PublicPetitionMessageFragment;
 } & RecipientViewPetitionField_PublicPetitionAccessFragment;
 
 export type RecipientView_PublicPetitionMessageFragment = {
@@ -5357,10 +5355,9 @@ export type RecipientView_PublicPetitionFragment = {
       }
     >;
     recipients: Array<
-      { __typename?: "PublicContact" } & Pick<
-        PublicContact,
-        "id" | "fullName" | "email"
-      >
+      {
+        __typename?: "PublicContact";
+      } & RecipientViewHeader_PublicContactFragment
     >;
   } & RecipientViewContentsCard_PublicPetitionFragment &
   RecipientViewProgressFooter_PublicPetitionFragment;
@@ -5908,14 +5905,6 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   }
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
-`;
-export const RecipientViewHeader_PublicContactFragmentDoc = gql`
-  fragment RecipientViewHeader_PublicContact on PublicContact {
-    id
-    fullName
-    firstName
-    email
-  }
 `;
 export const RecipientViewHeader_PublicUserFragmentDoc = gql`
   fragment RecipientViewHeader_PublicUser on PublicUser {
@@ -7437,6 +7426,14 @@ export const RecipientView_PublicContactFragmentDoc = gql`
     email
   }
 `;
+export const RecipientViewHeader_PublicContactFragmentDoc = gql`
+  fragment RecipientViewHeader_PublicContact on PublicContact {
+    id
+    fullName
+    firstName
+    email
+  }
+`;
 export const RecipientViewContentsCard_PublicPetitionFragmentDoc = gql`
   fragment RecipientViewContentsCard_PublicPetition on PublicPetition {
     status
@@ -7474,9 +7471,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
       }
     }
     recipients {
-      id
-      fullName
-      email
+      ...RecipientViewHeader_PublicContact
     }
     signatureStatus
     ...RecipientViewContentsCard_PublicPetition
@@ -7484,6 +7479,7 @@ export const RecipientView_PublicPetitionFragmentDoc = gql`
   }
   ${RecipientView_PublicPetitionFieldFragmentDoc}
   ${RecipientView_PublicContactFragmentDoc}
+  ${RecipientViewHeader_PublicContactFragmentDoc}
   ${RecipientViewContentsCard_PublicPetitionFragmentDoc}
   ${RecipientViewProgressFooter_PublicPetitionFragmentDoc}
 `;
