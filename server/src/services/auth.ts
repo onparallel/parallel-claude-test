@@ -61,18 +61,25 @@ export class Auth implements IAuth {
     try {
       const sso = await this.integrations.loadSSOIntegrationByDomain(domain);
       if (sso) {
+        const org = (await this.orgs.loadOrg(sso.org_id))!;
         const url = new URL(
           `https://${this.config.cognito.domain}/oauth2/authorize`
         );
+        const provider = (sso.settings as IntegrationSettings<"SSO">)
+          .COGNITO_PROVIDER;
         for (const [name, value] of Object.entries({
-          identity_provider: (sso.settings as IntegrationSettings<"SSO">)
-            .COGNITO_PROVIDER,
+          identity_provider: provider,
           redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
           response_type: "code",
           client_id: this.config.cognito.clientId,
           scope: "aws.cognito.signin.user.admin email openid profile",
+          state: org.custom_host
+            ? Buffer.from(JSON.stringify({ org_id: org.id })).toString("base64")
+            : undefined,
         })) {
-          url.searchParams.append(name, value);
+          if (value !== undefined) {
+            url.searchParams.append(name, value);
+          }
         }
         res.json({ type: "SSO", url: url.href });
       } else {
@@ -86,6 +93,27 @@ export class Auth implements IAuth {
   async callback(req: Request, res: Response, next: NextFunction) {
     try {
       const url = new URL(`https://${this.config.cognito.domain}/oauth2/token`);
+      if (req.query.state) {
+        const state = JSON.parse(
+          Buffer.from(req.query.state as string, "base64").toString("ascii")
+        );
+        if (typeof state?.org_id !== "number") {
+          throw new Error("Invalid state");
+        }
+        const org = await this.orgs.loadOrg(state.org_id);
+        if (!org || !org.custom_host) {
+          throw new Error("Invalid state");
+        }
+        res.redirect(
+          302,
+          `https://${
+            org.custom_host
+          }/api/auth/callback?code=${encodeURIComponent(
+            req.query.code as string
+          )}`
+        );
+        return;
+      }
       for (const [name, value] of Object.entries({
         grant_type: "authorization_code",
         client_id: this.config.cognito.clientId,
@@ -158,12 +186,7 @@ export class Auth implements IAuth {
         RefreshToken: tokens["refresh_token"],
       });
       this.setSession(res, token);
-      res.redirect(
-        302,
-        `${this.config.misc.parallelUrl}?url=${encodeURIComponent(
-          "/app/petitions"
-        )}`
-      );
+      res.redirect(302, `/?url=${encodeURIComponent("/app/petitions")}`);
     } catch (error) {
       next(error);
     }

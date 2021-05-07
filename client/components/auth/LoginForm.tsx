@@ -8,7 +8,6 @@ import {
   FormLabel,
   Heading,
   Input,
-  Stack,
   Text,
 } from "@chakra-ui/react";
 import { LockIcon } from "@parallel/chakra/icons";
