@@ -86,7 +86,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
       </Box>
       <form
         onSubmit={handleSubmit((data) => {
-          if (ssoUrl) {
+          if (ssoUrl && !forcePassword) {
             window.location.href = ssoUrl;
           } else {
             onSubmit(data);
