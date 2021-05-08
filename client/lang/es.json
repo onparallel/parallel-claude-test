@@ -820,6 +820,16 @@
     "context": "Templates"
   },
   {
+    "term": "component.petition-list-header.share-petition-label",
+    "definition": "Compartir {count, plural, =1{petición} other{peticiones}}",
+    "context": "Share {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.petition-list-header.share-template-label",
+    "definition": "Compartir {count, plural, =1{plantilla} other{plantillas}}",
+    "context": "Share {count, plural, =1{template} other{templates}}"
+  },
+  {
     "term": "component.petition-list-header.clone-petition-label",
     "definition": "Clonar {count, plural, =1{petición} other{peticiones}}",
     "context": "Clone {count, plural, =1{petition} other{petitions}}"

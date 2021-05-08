@@ -20,6 +20,7 @@ import { PetitionFilter } from "@parallel/graphql/__types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { UserArrowIcon } from "../../chakra/icons";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { PetitionListFilter } from "../common/PetitionListFilter";
 import { PetitionTagFilter } from "../common/PetitionTagFilter";
@@ -37,6 +38,7 @@ export type PetitionListHeaderProps = {
   onUseTemplateClick: () => void;
   onReload: () => void;
   onCloneClick: () => void;
+  onShareClick: () => void;
 };
 
 export function PetitionListHeader({
@@ -50,6 +52,7 @@ export function PetitionListHeader({
   onReload,
   onCloneClick,
   onFilterChange,
+  onShareClick,
 }: PetitionListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
@@ -111,6 +114,22 @@ export function PetitionListHeader({
           </MenuButton>
           <Portal>
             <MenuList minWidth="160px">
+              <MenuItem onClick={onShareClick} isDisabled={selectedCount === 0}>
+                <UserArrowIcon marginRight={2} />
+                {filter.type === "PETITION" ? (
+                  <FormattedMessage
+                    id="component.petition-list-header.share-petition-label"
+                    defaultMessage="Share {count, plural, =1{petition} other{petitions}}"
+                    values={{ count: selectedCount }}
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="component.petition-list-header.share-template-label"
+                    defaultMessage="Share {count, plural, =1{template} other{templates}}"
+                    values={{ count: selectedCount }}
+                  />
+                )}
+              </MenuItem>
               <MenuItem onClick={onCloneClick} isDisabled={selectedCount === 0}>
                 <CopyIcon marginRight={2} />
                 {filter.type === "PETITION" ? (

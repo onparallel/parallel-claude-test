@@ -3313,6 +3313,41 @@ export type PetitionSharingModal_PetitionUserPermissionsQuery = {
   >;
 };
 
+export type PetitionsSharingModal_addPetitionsUserPermissionMutationVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
+  permissionType: PetitionUserPermissionTypeRW;
+  notify?: Maybe<Scalars["Boolean"]>;
+  message?: Maybe<Scalars["String"]>;
+}>;
+
+export type PetitionsSharingModal_addPetitionsUserPermissionMutation = {
+  __typename?: "Mutation";
+} & {
+  addPetitionUserPermission: Array<
+    {
+      __typename?: "Petition";
+    } & PetitionSharingModal_Petition_Petition_Fragment
+  >;
+};
+
+export type PetitionsSharingModal_PetitionsUserPermissionsQueryVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
+
+export type PetitionsSharingModal_PetitionsUserPermissionsQuery = {
+  __typename?: "Query";
+} & {
+  petition?: Maybe<
+    | ({
+        __typename?: "Petition";
+      } & PetitionSharingModal_Petition_Petition_Fragment)
+    | ({
+        __typename?: "PetitionTemplate";
+      } & PetitionSharingModal_Petition_PetitionTemplate_Fragment)
+  >;
+};
+
 export type SignatureConfigDialog_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "name" | "status"> & {
@@ -8669,6 +8704,118 @@ export type PetitionSharingModal_PetitionUserPermissionsQueryHookResult = Return
 >;
 export type PetitionSharingModal_PetitionUserPermissionsLazyQueryHookResult = ReturnType<
   typeof usePetitionSharingModal_PetitionUserPermissionsLazyQuery
+>;
+export const PetitionsSharingModal_addPetitionsUserPermissionDocument = gql`
+  mutation PetitionsSharingModal_addPetitionsUserPermission(
+    $petitionIds: [GID!]!
+    $userIds: [GID!]!
+    $permissionType: PetitionUserPermissionTypeRW!
+    $notify: Boolean
+    $message: String
+  ) {
+    addPetitionUserPermission(
+      petitionIds: $petitionIds
+      userIds: $userIds
+      permissionType: $permissionType
+      notify: $notify
+      message: $message
+    ) {
+      ...PetitionSharingModal_Petition
+    }
+  }
+  ${PetitionSharingModal_PetitionFragmentDoc}
+`;
+
+/**
+ * __usePetitionsSharingModal_addPetitionsUserPermissionMutation__
+ *
+ * To run a mutation, you first call `usePetitionsSharingModal_addPetitionsUserPermissionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `usePetitionsSharingModal_addPetitionsUserPermissionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [petitionsSharingModalAddPetitionsUserPermissionMutation, { data, loading, error }] = usePetitionsSharingModal_addPetitionsUserPermissionMutation({
+ *   variables: {
+ *      petitionIds: // value for 'petitionIds'
+ *      userIds: // value for 'userIds'
+ *      permissionType: // value for 'permissionType'
+ *      notify: // value for 'notify'
+ *      message: // value for 'message'
+ *   },
+ * });
+ */
+export function usePetitionsSharingModal_addPetitionsUserPermissionMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionsSharingModal_addPetitionsUserPermissionMutation,
+    PetitionsSharingModal_addPetitionsUserPermissionMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionsSharingModal_addPetitionsUserPermissionMutation,
+    PetitionsSharingModal_addPetitionsUserPermissionMutationVariables
+  >(PetitionsSharingModal_addPetitionsUserPermissionDocument, options);
+}
+export type PetitionsSharingModal_addPetitionsUserPermissionMutationHookResult = ReturnType<
+  typeof usePetitionsSharingModal_addPetitionsUserPermissionMutation
+>;
+export const PetitionsSharingModal_PetitionsUserPermissionsDocument = gql`
+  query PetitionsSharingModal_PetitionsUserPermissions($petitionId: GID!) {
+    petition(id: $petitionId) {
+      ...PetitionSharingModal_Petition
+    }
+  }
+  ${PetitionSharingModal_PetitionFragmentDoc}
+`;
+
+/**
+ * __usePetitionsSharingModal_PetitionsUserPermissionsQuery__
+ *
+ * To run a query within a React component, call `usePetitionsSharingModal_PetitionsUserPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePetitionsSharingModal_PetitionsUserPermissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePetitionsSharingModal_PetitionsUserPermissionsQuery({
+ *   variables: {
+ *      petitionId: // value for 'petitionId'
+ *   },
+ * });
+ */
+export function usePetitionsSharingModal_PetitionsUserPermissionsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    PetitionsSharingModal_PetitionsUserPermissionsQuery,
+    PetitionsSharingModal_PetitionsUserPermissionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PetitionsSharingModal_PetitionsUserPermissionsQuery,
+    PetitionsSharingModal_PetitionsUserPermissionsQueryVariables
+  >(PetitionsSharingModal_PetitionsUserPermissionsDocument, options);
+}
+export function usePetitionsSharingModal_PetitionsUserPermissionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionsSharingModal_PetitionsUserPermissionsQuery,
+    PetitionsSharingModal_PetitionsUserPermissionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PetitionsSharingModal_PetitionsUserPermissionsQuery,
+    PetitionsSharingModal_PetitionsUserPermissionsQueryVariables
+  >(PetitionsSharingModal_PetitionsUserPermissionsDocument, options);
+}
+export type PetitionsSharingModal_PetitionsUserPermissionsQueryHookResult = ReturnType<
+  typeof usePetitionsSharingModal_PetitionsUserPermissionsQuery
+>;
+export type PetitionsSharingModal_PetitionsUserPermissionsLazyQueryHookResult = ReturnType<
+  typeof usePetitionsSharingModal_PetitionsUserPermissionsLazyQuery
 >;
 export const useTemplateDetailsDialogPetitionDocument = gql`
   query useTemplateDetailsDialogPetition($templateId: GID!) {

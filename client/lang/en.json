@@ -820,6 +820,16 @@
     "context": "Templates"
   },
   {
+    "term": "component.petition-list-header.share-petition-label",
+    "definition": "Share {count, plural, =1{petition} other{petitions}}",
+    "context": "Share {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.petition-list-header.share-template-label",
+    "definition": "Share {count, plural, =1{template} other{templates}}",
+    "context": "Share {count, plural, =1{template} other{templates}}"
+  },
+  {
     "term": "component.petition-list-header.clone-petition-label",
     "definition": "Clone {count, plural, =1{petition} other{petitions}}",
     "context": "Clone {count, plural, =1{petition} other{petitions}}"
