@@ -1705,7 +1705,7 @@ export type QuerypetitionsArgs = {
 };
 
 export type QuerypetitionsByIdArgs = {
-  ids: Array<Maybe<Scalars["GID"]>>;
+  ids: Array<Scalars["GID"]>;
 };
 
 export type QuerypublicOrgLogoUrlArgs = {
