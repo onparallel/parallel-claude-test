@@ -4181,7 +4181,7 @@
   },
   {
     "term": "public.login.explanation-with-password",
-    "definition": "Accede mediante tu correo electrónico y constraseña",
+    "definition": "Accede mediante tu correo electrónico y contraseña",
     "context": "Login using your email and password"
   },
   {
