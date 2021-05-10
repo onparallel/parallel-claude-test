@@ -9325,69 +9325,6 @@ export function useRecipientViewHeader_publicDelegateAccessToContactMutation(
 export type RecipientViewHeader_publicDelegateAccessToContactMutationHookResult = ReturnType<
   typeof useRecipientViewHeader_publicDelegateAccessToContactMutation
 >;
-export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
-  mutation RecipientViewHeader_publicDelegateAccessToContact(
-    $keycode: ID!
-    $email: String!
-    $firstName: String!
-    $lastName: String!
-    $messageBody: JSON!
-  ) {
-    publicDelegateAccessToContact(
-      keycode: $keycode
-      email: $email
-      firstName: $firstName
-      lastName: $lastName
-      messageBody: $messageBody
-    ) {
-      petition {
-        id
-        recipients {
-          id
-          fullName
-          email
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useRecipientViewHeader_publicDelegateAccessToContactMutation__
- *
- * To run a mutation, you first call `useRecipientViewHeader_publicDelegateAccessToContactMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewHeader_publicDelegateAccessToContactMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewHeaderPublicDelegateAccessToContactMutation, { data, loading, error }] = useRecipientViewHeader_publicDelegateAccessToContactMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      email: // value for 'email'
- *      firstName: // value for 'firstName'
- *      lastName: // value for 'lastName'
- *      messageBody: // value for 'messageBody'
- *   },
- * });
- */
-export function useRecipientViewHeader_publicDelegateAccessToContactMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RecipientViewHeader_publicDelegateAccessToContactMutation,
-    RecipientViewHeader_publicDelegateAccessToContactMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RecipientViewHeader_publicDelegateAccessToContactMutation,
-    RecipientViewHeader_publicDelegateAccessToContactMutationVariables
-  >(RecipientViewHeader_publicDelegateAccessToContactDocument, options);
-}
-export type RecipientViewHeader_publicDelegateAccessToContactMutationHookResult = ReturnType<
-  typeof useRecipientViewHeader_publicDelegateAccessToContactMutation
->;
 export const RecipientViewPetitionFieldCommentsDocument = gql`
   query RecipientViewPetitionFieldComments(
     $keycode: ID!
