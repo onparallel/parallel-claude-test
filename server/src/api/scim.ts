@@ -87,7 +87,7 @@ async function validateExternalId(
 }
 
 async function logRequest(req: Request, _: Response, next: NextFunction) {
-  req.context.logger.info(
+  console.log(
     pick(req, ["method", "url", "query", "body", "params", "headers"])
   );
   next();
@@ -115,17 +115,6 @@ scim
         totalResults = 1;
         users.push(user!);
       }
-    } else {
-      const data = await req.context.organizations.loadOrgUsers(
-        req.context.organization!.id,
-        {
-          includeInactive: true,
-          offset: 0,
-          limit: 100,
-        }
-      );
-      totalResults = data.totalCount;
-      users.push(...data.items);
     }
     res
       .json({
@@ -159,7 +148,7 @@ scim
           first_name: givenName,
           last_name: familyName,
         },
-        `OrganizationSSO:${req.context.organization!.id}`
+        `Provisioning:${req.context.organization!.id}`
       );
       res.json(toScimUser(user)).end();
     } else {
@@ -200,7 +189,7 @@ scim
       req.params.externalId,
       req.context.organization!.id,
       data,
-      `OrganizationSSO:${req.context.organization!.id}`
+      `Provisioning:${req.context.organization!.id}`
     );
     res.json(toScimUser(user)).end();
   })
@@ -220,7 +209,7 @@ scim
       req.params.externalId,
       req.context.organization!.id,
       data,
-      `OrganizationSSO:${req.context.organization!.id}`
+      `Provisioning:${req.context.organization!.id}`
     );
     res.json(toScimUser(user)).end();
   })
@@ -229,7 +218,7 @@ scim
       req.params.externalId,
       req.context.organization!.id,
       { status: "INACTIVE" },
-      `OrganizationSSO:${req.context.organization!.id}`
+      `Provisioning:${req.context.organization!.id}`
     );
     res.sendStatus(204).end();
   });
