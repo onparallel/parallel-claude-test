@@ -1630,6 +1630,7 @@ export type Query = {
   petitionFieldComments: Array<PublicPetitionFieldComment>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
+  petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
@@ -1701,6 +1702,10 @@ export type QuerypetitionsArgs = {
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
+};
+
+export type QuerypetitionsByIdArgs = {
+  ids: Array<Maybe<Scalars["GID"]>>;
 };
 
 export type QuerypublicOrgLogoUrlArgs = {

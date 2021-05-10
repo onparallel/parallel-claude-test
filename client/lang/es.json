@@ -3060,6 +3060,21 @@
     "context": "Notify users"
   },
   {
+    "term": "petition-sharing.insufficient-permissions",
+    "definition": "No tiene permisos para poder compartir las peticiones seleccionadas.",
+    "context": "You do not have permission to share the selected requests."
+  },
+  {
+    "term": "petition-sharing.insufficient-permissions-list",
+    "definition": "La siguiente petición se ha descartado y no se podrá compartir por falta de permisos:",
+    "context": "The following request has been discarded and cannot be shared due to lack of permissions:"
+  },
+  {
+    "term": "petition-sharing.insufficient-permissions-list-plural",
+    "definition": "Las siguientes peticiones seleccionadas se han descartado y no se podrán compartir por falta de permisos:",
+    "context": "The following selected requests have been discarded and cannot be shared due to lack of permissions:"
+  },
+  {
     "term": "petition-sharing.owner",
     "definition": "Propietario",
     "context": "Owner"

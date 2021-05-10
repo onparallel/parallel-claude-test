@@ -5,6 +5,7 @@ import {
   nonNull,
   nullable,
   inputObjectType,
+  list,
 } from "@nexus/schema";
 import {
   authenticate,
@@ -85,6 +86,19 @@ export const petitionQuery = queryField("petition", {
   ),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.loadPetition(args.id);
+  },
+});
+
+export const petitionsByIdQuery = queryField("petitionsById", {
+  type: list(nullable("PetitionBase")),
+  args: {
+    ids: nonNull(list(nonNull(globalIdArg("Petition")))),
+  },
+  authorize: authenticateAnd(
+    or(userHasAccessToPetitions("ids"), petitionsArePublicTemplates("ids"))
+  ),
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.loadPetition(args.ids);
   },
 });
 

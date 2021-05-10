@@ -8,12 +8,23 @@ import {
   Stack,
   Text,
   useToast,
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Flex,
+  UnorderedList,
+  ListItem,
+  Center,
+  Spinner,
 } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import {
   PetitionActivityDocument,
+  usePetitionsSharingModal_PetitionsUserPermissionsQuery,
   usePetitionsSharingModal_addPetitionsUserPermissionMutation,
+  Petition,
 } from "@parallel/graphql/__types";
+import { If } from "@parallel/utils/conditions";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -49,21 +60,36 @@ export function PetitionsSharingDialog({
 }>) {
   const intl = useIntl();
   const toast = useToast();
-  // const { data } = usePetitionSharingModal_PetitionUserPermissionsQuery({
-  //   variables: { petitionId },
-  //   fetchPolicy: "cache-and-network",
-  // });
-  // const userPermissions = data?.petition?.userPermissions;
-  // const isOwner = userPermissions?.some(
-  //   (up) => up.permissionType === "OWNER" && up.user.id === userId
-  // );
 
-  // const prev = usePreviousValue(userPermissions);
-  // useEffect(() => {
-  //   if (userPermissions && !prev) {
-  //     setTimeout(() => usersRef.current?.focus());
-  //   }
-  // }, [userPermissions, prev]);
+  const [hasUsers, setHasUsers] = useState(false);
+  const [petitionsOwned, setPetitionsOwned] = useState<Array<Petition>>([]);
+  const [petitionsRW, setPetitionsRW] = useState<Array<Petition>>([]);
+
+  const { data } = usePetitionsSharingModal_PetitionsUserPermissionsQuery({
+    variables: { petitionIds },
+    fetchPolicy: "cache-and-network",
+  });
+
+  const petitionsById = data?.petitionsById as Array<Petition>;
+
+  useEffect(() => {
+    if (petitionsById) {
+      setPetitionsOwned(
+        petitionsById.filter((petition) =>
+          petition.userPermissions.some(
+            (up) => up.permissionType === "OWNER" && up.user.id === userId
+          )
+        )
+      );
+      setPetitionsRW(
+        petitionsById.filter((petition) =>
+          petition.userPermissions.some(
+            (up) => up.permissionType !== "OWNER" && up.user.id === userId
+          )
+        )
+      );
+    }
+  }, [petitionsById]);
 
   const {
     handleSubmit,
@@ -78,7 +104,6 @@ export function PetitionsSharingDialog({
       message: "",
     },
   });
-  const [hasUsers, setHasUsers] = useState(false);
 
   const usersRef = useRef<UserSelectInstance<true>>(null);
   const messageRef = useRef<HTMLInputElement>(null);
@@ -105,7 +130,7 @@ export function PetitionsSharingDialog({
       try {
         await addPetitionUserPermission({
           variables: {
-            petitionIds,
+            petitionIds: petitionsOwned.map((p) => p.id),
             userIds: users.map((u) => u.id),
             permissionType: "WRITE",
             notify,
@@ -160,76 +185,131 @@ export function PetitionsSharingDialog({
         </Stack>
       }
       body={
-        <Stack>
-          <Stack direction="row">
-            <Box flex="1">
-              <Controller
-                name="users"
-                control={control}
-                rules={{ minLength: 1 }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <UserMultiSelect
-                    ref={usersRef}
-                    value={value}
-                    onKeyDown={(e: KeyboardEvent) => {
-                      if (
-                        e.key === "Enter" &&
-                        !(e.target as HTMLInputElement).value
-                      ) {
-                        e.preventDefault();
+        petitionsById ? (
+          <Stack>
+            <Stack direction="row">
+              <Box flex="1">
+                <Controller
+                  name="users"
+                  control={control}
+                  rules={{ minLength: 1 }}
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <UserMultiSelect
+                      ref={usersRef}
+                      value={value}
+                      onKeyDown={(e: KeyboardEvent) => {
+                        if (
+                          e.key === "Enter" &&
+                          !(e.target as HTMLInputElement).value
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(users: UserSelectSelection[]) => {
+                        onChange(users);
+                        setHasUsers(Boolean(users?.length));
+                      }}
+                      onBlur={onBlur}
+                      onSearchUsers={handleSearchUsers}
+                      isDisabled={!petitionsOwned.length}
+                      placeholder={
+                        petitionsOwned.length
+                          ? intl.formatMessage({
+                              id: "petition-sharing.input-placeholder",
+                              defaultMessage:
+                                "Add users from your organization",
+                            })
+                          : intl.formatMessage({
+                              id:
+                                "petition-sharing.input-placeholder-not-owner",
+                              defaultMessage:
+                                "Only the petition owner can share it",
+                            })
                       }
-                    }}
-                    onChange={(users: UserSelectSelection[]) => {
-                      onChange(users);
-                      setHasUsers(Boolean(users?.length));
-                    }}
-                    onBlur={onBlur}
-                    onSearchUsers={handleSearchUsers}
-                    isDisabled={false}
-                    placeholder={
-                      true
-                        ? intl.formatMessage({
-                            id: "petition-sharing.input-placeholder",
-                            defaultMessage: "Add users from your organization",
-                          })
-                        : intl.formatMessage({
-                            id: "petition-sharing.input-placeholder-not-owner",
-                            defaultMessage:
-                              "Only the petition owner can share it",
-                          })
-                    }
-                  />
-                )}
-              />
-            </Box>
+                    />
+                  )}
+                />
+              </Box>
+            </Stack>
+            <Stack display={hasUsers ? "flex" : "none"}>
+              <Checkbox
+                {...register("notify")}
+                colorScheme="purple"
+                defaultIsChecked
+              >
+                <FormattedMessage
+                  id="petition-sharing.notify-checkbox"
+                  defaultMessage="Notify users"
+                />
+              </Checkbox>
+              <PaddedCollapse in={notify}>
+                <GrowingTextarea
+                  {...messageRegisterProps}
+                  maxHeight="30vh"
+                  aria-label={intl.formatMessage({
+                    id: "petition-sharing.message-placeholder",
+                    defaultMessage: "Message",
+                  })}
+                  placeholder={intl.formatMessage({
+                    id: "petition-sharing.message-placeholder",
+                    defaultMessage: "Message",
+                  })}
+                />
+              </PaddedCollapse>
+            </Stack>
+            <Stack display={petitionsRW.length ? "flex" : "none"}>
+              <Alert
+                status="warning"
+                backgroundColor="orange.100"
+                borderRadius="md"
+              >
+                <Flex alignItems="center" justifyContent="flex-start">
+                  <AlertIcon color="yellow.500" />
+                  <AlertDescription>
+                    <If condition={petitionsRW.length !== petitionIds.length}>
+                      <Text>
+                        {petitionsRW.length > 1 ? (
+                          <FormattedMessage
+                            id="petition-sharing.insufficient-permissions-list-plural"
+                            defaultMessage="The following selected requests have been discarded and cannot be shared due to lack of permissions:"
+                          />
+                        ) : (
+                          <FormattedMessage
+                            id="petition-sharing.insufficient-permissions-list"
+                            defaultMessage="The following request has been discarded and cannot be shared due to lack of permissions:"
+                          />
+                        )}
+                      </Text>
+                      <UnorderedList paddingLeft={2}>
+                        {petitionsRW.map((petition) => (
+                          <ListItem key={petition.id}>{petition.name}</ListItem>
+                        ))}
+                      </UnorderedList>
+                    </If>
+                    <If condition={petitionsRW.length === petitionIds.length}>
+                      <Text>
+                        <FormattedMessage
+                          id="petition-sharing.insufficient-permissions"
+                          defaultMessage="You do not have permission to share the selected requests."
+                        />
+                      </Text>
+                    </If>
+                  </AlertDescription>
+                </Flex>
+              </Alert>
+            </Stack>
           </Stack>
-          <Stack display={hasUsers ? "flex" : "none"}>
-            <Checkbox
-              {...register("notify")}
-              colorScheme="purple"
-              defaultIsChecked
-            >
-              <FormattedMessage
-                id="petition-sharing.notify-checkbox"
-                defaultMessage="Notify users"
-              />
-            </Checkbox>
-            <PaddedCollapse in={notify}>
-              <GrowingTextarea
-                {...messageRegisterProps}
-                maxHeight="30vh"
-                aria-label={intl.formatMessage({
-                  id: "petition-sharing.message-placeholder",
-                  defaultMessage: "Message",
-                })}
-                placeholder={intl.formatMessage({
-                  id: "petition-sharing.message-placeholder",
-                  defaultMessage: "Message",
-                })}
-              />
-            </PaddedCollapse>
-          </Stack>
-        </Stack>
+        ) : (
+          <Center minHeight={64}>
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="purple.500"
+              size="xl"
+            />
+          </Center>
+        )
       }
       confirm={
         hasUsers ? (
@@ -253,14 +333,14 @@ export function PetitionsSharingDialog({
 PetitionsSharingDialog.fragments = {
   get Petition() {
     return gql`
-      fragment PetitionSharingModal_Petition on PetitionBase {
+      fragment PetitionsSharingModal_Petition on PetitionBase {
         id
         name
         userPermissions {
           permissionType
           user {
             id
-            ...PetitionSharingModal_User
+            ...PetitionsSharingModal_User
           }
         }
       }
@@ -269,7 +349,7 @@ PetitionsSharingDialog.fragments = {
   },
   get User() {
     return gql`
-      fragment PetitionSharingModal_User on User {
+      fragment PetitionsSharingModal_User on User {
         id
         email
         fullName
@@ -296,7 +376,7 @@ PetitionsSharingDialog.mutations = [
         notify: $notify
         message: $message
       ) {
-        ...PetitionSharingModal_Petition
+        ...PetitionsSharingModal_Petition
       }
     }
     ${PetitionsSharingDialog.fragments.Petition}
@@ -305,9 +385,11 @@ PetitionsSharingDialog.mutations = [
 
 PetitionsSharingDialog.queries = [
   gql`
-    query PetitionsSharingModal_PetitionsUserPermissions($petitionId: GID!) {
-      petition(id: $petitionId) {
-        ...PetitionSharingModal_Petition
+    query PetitionsSharingModal_PetitionsUserPermissions(
+      $petitionIds: [GID!]!
+    ) {
+      petitionsById(ids: $petitionIds) {
+        ...PetitionsSharingModal_Petition
       }
     }
     ${PetitionsSharingDialog.fragments.Petition}

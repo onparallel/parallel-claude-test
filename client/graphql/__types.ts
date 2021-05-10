@@ -1688,6 +1688,7 @@ export type Query = {
   petitionFieldComments: Array<PublicPetitionFieldComment>;
   /** The petitions of the user */
   petitions: PetitionBasePagination;
+  petitionsById: Array<Maybe<PetitionBase>>;
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
@@ -1759,6 +1760,10 @@ export type QuerypetitionsArgs = {
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
+};
+
+export type QuerypetitionsByIdArgs = {
+  ids: Array<Scalars["GID"]>;
 };
 
 export type QuerypublicOrgLogoUrlArgs = {
@@ -3313,6 +3318,44 @@ export type PetitionSharingModal_PetitionUserPermissionsQuery = {
   >;
 };
 
+export type PetitionsSharingModal_Petition_Petition_Fragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "id" | "name"> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & {
+          user: { __typename?: "User" } & Pick<User, "id"> &
+            PetitionsSharingModal_UserFragment;
+        }
+    >;
+  };
+
+export type PetitionsSharingModal_Petition_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "name"> & {
+    userPermissions: Array<
+      { __typename?: "PetitionUserPermission" } & Pick<
+        PetitionUserPermission,
+        "permissionType"
+      > & {
+          user: { __typename?: "User" } & Pick<User, "id"> &
+            PetitionsSharingModal_UserFragment;
+        }
+    >;
+  };
+
+export type PetitionsSharingModal_PetitionFragment =
+  | PetitionsSharingModal_Petition_Petition_Fragment
+  | PetitionsSharingModal_Petition_PetitionTemplate_Fragment;
+
+export type PetitionsSharingModal_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "email" | "fullName"
+> &
+  UserSelect_UserFragment;
+
 export type PetitionsSharingModal_addPetitionsUserPermissionMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
   userIds: Array<Scalars["GID"]> | Scalars["GID"];
@@ -3327,24 +3370,26 @@ export type PetitionsSharingModal_addPetitionsUserPermissionMutation = {
   addPetitionUserPermission: Array<
     {
       __typename?: "Petition";
-    } & PetitionSharingModal_Petition_Petition_Fragment
+    } & PetitionsSharingModal_Petition_Petition_Fragment
   >;
 };
 
 export type PetitionsSharingModal_PetitionsUserPermissionsQueryVariables = Exact<{
-  petitionId: Scalars["GID"];
+  petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type PetitionsSharingModal_PetitionsUserPermissionsQuery = {
   __typename?: "Query";
 } & {
-  petition?: Maybe<
-    | ({
-        __typename?: "Petition";
-      } & PetitionSharingModal_Petition_Petition_Fragment)
-    | ({
-        __typename?: "PetitionTemplate";
-      } & PetitionSharingModal_Petition_PetitionTemplate_Fragment)
+  petitionsById: Array<
+    Maybe<
+      | ({
+          __typename?: "Petition";
+        } & PetitionsSharingModal_Petition_Petition_Fragment)
+      | ({
+          __typename?: "PetitionTemplate";
+        } & PetitionsSharingModal_Petition_PetitionTemplate_Fragment)
+    >
   >;
 };
 
@@ -5785,6 +5830,29 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
     }
   }
   ${PetitionSharingModal_UserFragmentDoc}
+`;
+export const PetitionsSharingModal_UserFragmentDoc = gql`
+  fragment PetitionsSharingModal_User on User {
+    id
+    email
+    fullName
+    ...UserSelect_User
+  }
+  ${UserSelect_UserFragmentDoc}
+`;
+export const PetitionsSharingModal_PetitionFragmentDoc = gql`
+  fragment PetitionsSharingModal_Petition on PetitionBase {
+    id
+    name
+    userPermissions {
+      permissionType
+      user {
+        id
+        ...PetitionsSharingModal_User
+      }
+    }
+  }
+  ${PetitionsSharingModal_UserFragmentDoc}
 `;
 export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
   fragment TemplateDetailsDialog_PetitionTemplate on PetitionTemplate {
@@ -8720,10 +8788,10 @@ export const PetitionsSharingModal_addPetitionsUserPermissionDocument = gql`
       notify: $notify
       message: $message
     ) {
-      ...PetitionSharingModal_Petition
+      ...PetitionsSharingModal_Petition
     }
   }
-  ${PetitionSharingModal_PetitionFragmentDoc}
+  ${PetitionsSharingModal_PetitionFragmentDoc}
 `;
 
 /**
@@ -8763,12 +8831,12 @@ export type PetitionsSharingModal_addPetitionsUserPermissionMutationHookResult =
   typeof usePetitionsSharingModal_addPetitionsUserPermissionMutation
 >;
 export const PetitionsSharingModal_PetitionsUserPermissionsDocument = gql`
-  query PetitionsSharingModal_PetitionsUserPermissions($petitionId: GID!) {
-    petition(id: $petitionId) {
-      ...PetitionSharingModal_Petition
+  query PetitionsSharingModal_PetitionsUserPermissions($petitionIds: [GID!]!) {
+    petitionsById(ids: $petitionIds) {
+      ...PetitionsSharingModal_Petition
     }
   }
-  ${PetitionSharingModal_PetitionFragmentDoc}
+  ${PetitionsSharingModal_PetitionFragmentDoc}
 `;
 
 /**
@@ -8783,7 +8851,7 @@ export const PetitionsSharingModal_PetitionsUserPermissionsDocument = gql`
  * @example
  * const { data, loading, error } = usePetitionsSharingModal_PetitionsUserPermissionsQuery({
  *   variables: {
- *      petitionId: // value for 'petitionId'
+ *      petitionIds: // value for 'petitionIds'
  *   },
  * });
  */
