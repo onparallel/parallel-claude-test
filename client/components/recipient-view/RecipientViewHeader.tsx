@@ -186,7 +186,7 @@ export function RecipientViewHeader({
                 <Heading as="h2" flex="1" size="sm" textAlign="left">
                   <FormattedMessage
                     id="recipient-view.request-information"
-                    defaultMessage="Requested by"
+                    defaultMessage="Request information"
                   />
                 </Heading>
                 <AccordionIcon boxSize={6} />

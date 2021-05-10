@@ -4895,21 +4895,6 @@
     "context": "Petition completed!"
   },
   {
-    "term": "recipient-view.contact",
-    "definition": "Contacto",
-    "context": "Contact"
-  },
-  {
-    "term": "recipient-view.contact-email",
-    "definition": "Email del contacto",
-    "context": "Contact email"
-  },
-  {
-    "term": "recipient-view.contact.to",
-    "definition": "Para:",
-    "context": "To:"
-  },
-  {
     "term": "recipient-view.contents-header",
     "definition": "Contenido",
     "context": "Contents"
@@ -4918,31 +4903,6 @@
     "term": "recipient-view.delegate-access",
     "definition": "Delegar acceso",
     "context": "Delegate access"
-  },
-  {
-    "term": "recipient-view.invite-collaborator",
-    "definition": "Invitar colaborador",
-    "context": "Invite collaborator"
-  },
-  {
-    "term": "recipient-view.requested-by",
-    "definition": "Solicitado por",
-    "context": "Requested by"
-  },
-  {
-    "term": "recipient-view.petition-subject",
-    "definition": "Motivo",
-    "context": "Subject"
-  },
-  {
-    "term": "recipient-view.in-order-to",
-    "definition": "Para",
-    "context": "To"
-  },
-  {
-    "term": "recipient-view.request-information",
-    "definition": "Información de la petición",
-    "context": "Request information"
   },
   {
     "term": "recipient-view.delegate-access-dialog.subtitle-1",
@@ -5010,14 +4970,19 @@
     "context": "See more frequently asked questions"
   },
   {
+    "term": "recipient-view.in-order-to",
+    "definition": "Para",
+    "context": "To"
+  },
+  {
+    "term": "recipient-view.invite-collaborator",
+    "definition": "Invitar colaborador",
+    "context": "Invite collaborator"
+  },
+  {
     "term": "recipient-view.need-help",
     "definition": "Ayuda",
     "context": "Help"
-  },
-  {
-    "term": "recipient-view.organization",
-    "definition": "Organización",
-    "context": "Business"
   },
   {
     "term": "recipient-view.petition-closed-alert",
@@ -5065,6 +5030,11 @@
     "context": "<b>We have sent the document to sign</b> to the specified person in order to finalize the petition."
   },
   {
+    "term": "recipient-view.petition-subject",
+    "definition": "Motivo",
+    "context": "Subject"
+  },
+  {
     "term": "recipient-view.powered-by",
     "definition": "Powered by {parallel}",
     "context": "Powered by {parallel}"
@@ -5083,6 +5053,16 @@
     "term": "recipient-view.remaining-attempts",
     "definition": "Tiene {attempts, plural, =1{un intento más} other{# intentos más}}",
     "context": "You have {attempts, plural, =1{one more attempt} other{# more attempts}}"
+  },
+  {
+    "term": "recipient-view.request-information",
+    "definition": "Información de la petición",
+    "context": "Request information"
+  },
+  {
+    "term": "recipient-view.requested-by",
+    "definition": "Solicitado por",
+    "context": "Requested by"
   },
   {
     "term": "recipient-view.review-before-sign.body-1",
@@ -5108,16 +5088,6 @@
     "term": "recipient-view.send-code",
     "definition": "Enviar código de verificación",
     "context": "Send verification code"
-  },
-  {
-    "term": "recipient-view.sender",
-    "definition": "Remitente",
-    "context": "Sender"
-  },
-  {
-    "term": "recipient-view.sender-email",
-    "definition": "Correo electrónico del remitente",
-    "context": "Sender email"
   },
   {
     "term": "recipient-view.submit-and-sign-button-short",
