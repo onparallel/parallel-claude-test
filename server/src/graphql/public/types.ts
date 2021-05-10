@@ -92,9 +92,7 @@ export const PublicPetition = objectType({
         const contactIds = accesses
           .filter((a) => a.status === "ACTIVE")
           .map((a) => a.contact_id);
-        return await (ctx.contacts.loadContact(contactIds) as Promise<
-          Contact[]
-        >);
+        return (await ctx.contacts.loadContact(contactIds)) as Contact[];
       },
     });
     t.boolean("hasCommentsEnabled", {
