@@ -841,6 +841,8 @@ export type Organization = Timestamps & {
   _id: Scalars["Int"];
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
+  /** Whether the organization has an SSO provider configured. */
+  hasSsoProvider: Scalars["Boolean"];
   /** The ID of the organization. */
   id: Scalars["GID"];
   /** The unique text identifier of the organization. */
@@ -1949,6 +1951,7 @@ export type User = Timestamps & {
   hasFeatureFlag: Scalars["Boolean"];
   /** The ID of the user. */
   id: Scalars["GID"];
+  isSsoUser: Scalars["Boolean"];
   isSuperAdmin: Scalars["Boolean"];
   lastActiveAt: Maybe<Scalars["DateTime"]>;
   /** The last name of the user. */

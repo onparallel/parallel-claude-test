@@ -82,6 +82,7 @@ class MyDocument extends Document<MyDocumentProps> {
                 "Array.prototype.flatMap",
                 "Object.fromEntries",
                 ...[
+                  "Intl.ListFormat",
                   "Intl.NumberFormat",
                   "Intl.DateTimeFormat",
                   "Intl.PluralRules",

@@ -10,6 +10,12 @@ import {
   Flex,
   Heading,
   Img,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Portal,
   SimpleGrid,
   Text,
   Tooltip,
@@ -24,33 +30,32 @@ import {
   RecipientViewHeader_PublicUserFragment,
   useRecipientViewHeader_publicDelegateAccessToContactMutation,
 } from "@parallel/graphql/__types";
+import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { FormattedMessage, useIntl } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
+import { SimpleContactInfoList } from "../common/SimpleContactInfoList";
 import { useDelegateAccessDialog } from "./DelegateAccessDialog";
 
 function Contact({
   contact,
   isFull,
-  semicolon,
   ...props
 }: {
   contact:
     | RecipientViewHeader_PublicContactFragment
     | RecipientViewHeader_PublicUserFragment;
   isFull?: boolean;
-  semicolon?: boolean;
 }) {
   return (
     <Tooltip label={contact.email}>
       <Text
         as="span"
         whiteSpace="nowrap"
-        marginRight={1}
         color="purple.600"
         _hover={{ color: "purple.800" }}
         {...props}
       >
-        {`${contact.fullName || contact.email}${semicolon ? ";" : ""}`}
+        {`${contact.fullName || contact.email}`}
         {isFull && contact.fullName ? `<${contact.email}>` : null}
       </Text>
     </Tooltip>
@@ -96,18 +101,6 @@ export function RecipientViewHeader({
       marginLeft: 6,
     },
   });
-
-  const getRecipients = () => {
-    return recipients.map((c, i) => {
-      if (contact.email === c.email)
-        return (
-          <Text key={i} as="span" whiteSpace="nowrap" marginRight={1}>
-            {`${c.fullName || c.email}${recipients.length > 1 ? ";" : ""}`}
-          </Text>
-        );
-      else return <Contact key={i} contact={c} semicolon={true} />;
-    });
-  };
 
   const handleDelegateAccess = async () => {
     try {
@@ -189,8 +182,8 @@ export function RecipientViewHeader({
                     defaultMessage="Request information"
                   />
                 </Heading>
-                <AccordionIcon boxSize={6} />
               </Flex>
+              <AccordionIcon boxSize={6} />
             </AccordionButton>
 
             <AccordionPanel
@@ -205,64 +198,107 @@ export function RecipientViewHeader({
                 flexDirection={{ base: "column", md: "row" }}
                 width="100%"
               >
-                <Box flex="1">
-                  <SimpleGrid columns={1} spacing={2}>
-                    <Box>
-                      <Text as="span" marginRight={2}>
+                <SimpleGrid
+                  flex="1"
+                  templateRows="auto minmax(0, 1fr)"
+                  columns={1}
+                  spacing={2}
+                >
+                  <Box>
+                    <Text as="span" marginRight={2}>
+                      <FormattedMessage
+                        id="recipient-view.requested-by"
+                        defaultMessage="Requested by"
+                      />
+                      :
+                    </Text>
+                    <Contact contact={sender} />
+                  </Box>
+                  <Box>
+                    <Text as="span" marginRight={2}>
+                      <FormattedMessage
+                        id="recipient-view.petition-subject"
+                        defaultMessage="Subject"
+                      />
+                      :
+                    </Text>
+                    {message.subject}
+                  </Box>
+                </SimpleGrid>
+                <SimpleGrid
+                  flex="2"
+                  columns={1}
+                  spacing={2}
+                  {...dividerOrientation}
+                >
+                  <Box flexWrap="wrap">
+                    <Text as="span" whiteSpace="nowrap" marginRight={2}>
+                      <FormattedMessage
+                        id="recipient-view.in-order-to"
+                        defaultMessage="To"
+                      />
+                      :
+                    </Text>
+                    <EnumerateList
+                      maxItems={7}
+                      values={recipients}
+                      renderItem={({ value }, index) => {
+                        if (contact.email === value.email)
+                          return (
+                            <Text key={index} as="span" whiteSpace="nowrap">
+                              {`${value.fullName || value.email}`}
+                            </Text>
+                          );
+                        else return <Contact key={index} contact={value} />;
+                      }}
+                      renderOther={({ children, remaining }) => {
+                        return (
+                          <Popover key="other" trigger="hover">
+                            <PopoverTrigger>
+                              <Text
+                                display="initial"
+                                textDecoration="underline"
+                                color="purple.600"
+                                cursor="pointer"
+                              >
+                                {children}
+                              </Text>
+                            </PopoverTrigger>
+                            <Portal>
+                              <PopoverContent>
+                                <PopoverArrow />
+                                <PopoverBody padding={0}>
+                                  <SimpleContactInfoList contacts={remaining} />
+                                </PopoverBody>
+                              </PopoverContent>
+                            </Portal>
+                          </Popover>
+                        );
+                      }}
+                      type="conjunction"
+                    />
+                  </Box>
+                  <Flex alignItems="center">
+                    <Button variant="link" onClick={handleDelegateAccess}>
+                      <Text fontWeight="bold">
                         <FormattedMessage
-                          id="recipient-view.requested-by"
-                          defaultMessage="Requested by"
+                          id="recipient-view.invite-collaborator"
+                          defaultMessage="Invite collaborator"
                         />
-                        :
                       </Text>
-                      <Contact contact={sender} />
-                    </Box>
-                    <Box>
-                      <Text as="span" marginRight={2}>
-                        <FormattedMessage
-                          id="recipient-view.petition-subject"
-                          defaultMessage="Subject"
-                        />
-                        :
-                      </Text>
-                      {message.subject}
-                    </Box>
-                  </SimpleGrid>
-                </Box>
-                <Box flex="2" {...dividerOrientation}>
-                  <SimpleGrid columns={1} spacing={2}>
-                    <Flex flexWrap="wrap">
-                      <Text as="span" whiteSpace="nowrap" marginRight={2}>
-                        <FormattedMessage
-                          id="recipient-view.in-order-to"
-                          defaultMessage="To"
-                        />
-                        :
-                      </Text>
-                      {getRecipients()}
-                    </Flex>
-                    <Flex alignItems="center">
-                      <Button variant="link" onClick={handleDelegateAccess}>
-                        <Text fontWeight="bold">
-                          <FormattedMessage
-                            id="recipient-view.invite-collaborator"
-                            defaultMessage="Invite collaborator"
-                          />
-                        </Text>
-                      </Button>
-                      <HelpPopover
-                        color="gray.300"
-                        _hover={{ color: "gray.400" }}
-                        marginLeft={2}
-                      >
-                        <FormattedMessage
-                          id="recipient-view.delegate-access.help"
-                          defaultMessage="Use this option to request someone else to complete the information for you."
-                        />
-                      </HelpPopover>
-                    </Flex>
-                  </SimpleGrid>
-                </Box>
+                    </Button>
+                    <HelpPopover
+                      color="gray.300"
+                      _hover={{ color: "gray.400" }}
+                      marginLeft={2}
+                    >
+                      <FormattedMessage
+                        id="recipient-view.delegate-access.help"
+                        defaultMessage="Use this option to request someone else to complete the information for you."
+                      />
+                    </HelpPopover>
+                  </Flex>
+                </SimpleGrid>
               </Flex>
             </AccordionPanel>
           </AccordionItem>

@@ -2270,6 +2270,11 @@
     "context": "Notifications"
   },
   {
+    "term": "generic.n-more",
+    "definition": "{count} más",
+    "context": "{count} more"
+  },
+  {
     "term": "generic.omit",
     "definition": "Omitir",
     "context": "Omit"

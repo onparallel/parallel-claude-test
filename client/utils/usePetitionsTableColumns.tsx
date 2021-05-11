@@ -28,7 +28,8 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { MouseEvent, useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
+import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
 
 export type PetitionsTableColumnsContext = {
@@ -110,50 +111,42 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   if (recipients.length === 0) {
                     return null;
                   }
-                  const [contact, ...rest] = recipients;
                   const goToContact = useGoToContact();
 
-                  return contact && rest.length ? (
-                    <FormattedMessage
-                      id="petitions.recipients"
-                      defaultMessage="{contact} and <a>{more} more</a>"
-                      values={{
-                        contact: (
-                          <ContactLink
-                            contact={contact}
-                            onClick={(e: MouseEvent) => e.stopPropagation()}
-                          />
-                        ),
-                        more: rest.length,
-                        a: (chunks: any[]) => (
-                          <Popover trigger="hover">
-                            <PopoverTrigger>
-                              <Link
-                                href={`/app/petitions/${row.id}/activity`}
-                                onClick={(e: MouseEvent) => e.stopPropagation()}
-                              >
-                                {chunks}
-                              </Link>
-                            </PopoverTrigger>
-                            <Portal>
-                              <PopoverContent>
-                                <PopoverArrow />
-                                <PopoverBody padding={0}>
-                                  <SimpleContactInfoList
-                                    contacts={recipients}
-                                    onContactClick={goToContact}
-                                  />
-                                </PopoverBody>
-                              </PopoverContent>
-                            </Portal>
-                          </Popover>
-                        ),
-                      }}
-                    />
-                  ) : (
-                    <ContactLink
-                      contact={contact}
-                      onClick={(e: MouseEvent) => e.stopPropagation()}
+                  return (
+                    <EnumerateList
+                      values={recipients}
+                      maxItems={1}
+                      renderItem={({ value }, index) => (
+                        <ContactLink
+                          key={index}
+                          contact={value}
+                          onClick={(e: MouseEvent) => e.stopPropagation()}
+                        />
+                      )}
+                      renderOther={({ children, remaining }) => (
+                        <Popover key="other" trigger="hover">
+                          <PopoverTrigger>
+                            <Link
+                              href={`/app/petitions/${row.id}/activity`}
+                              onClick={(e: MouseEvent) => e.stopPropagation()}
+                            >
+                              {children}
+                            </Link>
+                          </PopoverTrigger>
+                          <Portal>
+                            <PopoverContent>
+                              <PopoverArrow />
+                              <PopoverBody padding={0}>
+                                <SimpleContactInfoList
+                                  contacts={remaining}
+                                  onContactClick={goToContact}
+                                />
+                              </PopoverBody>
+                            </PopoverContent>
+                          </Portal>
+                        </Popover>
+                      )}
                     />
                   );
                 },

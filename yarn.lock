@@ -2035,6 +2035,13 @@
   dependencies:
     tslib "^2.1.0"
 
+"@formatjs/ecma402-abstract@1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.7.1.tgz#1459a9dad654d5d5ec34765965b8e4f22ad6ff81"
+  integrity sha512-FjewVLB2DVEVCvvC7IMffzXVhysvi442i6ed0H7qcrT6xtUpO4vr0oZgpOmsv6D9I4Io0GVebIuySwteS/k3gg==
+  dependencies:
+    tslib "^2.1.0"
+
 "@formatjs/fast-memoize@1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@formatjs/fast-memoize/-/fast-memoize-1.1.1.tgz#3006b58aca1e39a98aca213356b42da5d173f26b"
@@ -2071,6 +2078,14 @@
   integrity sha512-kKT8g+uoPdjyyQNZPlbnTo1juNhnHROTljhukx7m8Vm/W6ahtFVwFRgyMbOcaGvGH2p7Rfus4Tg/NQ6mFI2giA==
   dependencies:
     "@formatjs/ecma402-abstract" "1.7.0"
+    tslib "^2.1.0"
+
+"@formatjs/intl-listformat@^5.0.17":
+  version "5.0.17"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-listformat/-/intl-listformat-5.0.17.tgz#baa4474a95bab26d5dd0c1a4aad246ed193e5505"
+  integrity sha512-3WU1cmcoGk1zgNR7BoD/GIOaIJSjWa6GXArEOPiE+ocM6ZgYIYsDcjfQOso0z2NNN1k8CPOlfzWY4olwdKAtxQ==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.7.1"
     tslib "^2.1.0"
 
 "@formatjs/intl@1.10.5":

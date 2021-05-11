@@ -452,7 +452,7 @@ function RecipientView({
           paddingX={4}
         >
           <Box
-            flex="1"
+            flex={{ base: 0, [breakpoint]: 1 }}
             minWidth={0}
             marginRight={{ base: 0, [breakpoint]: 4 }}
             marginBottom={4}
@@ -515,7 +515,7 @@ function RecipientView({
             <RecipientViewFooter marginTop={12} />
           </Flex>
         </Flex>
-        <Spacer />
+
         {petition.status !== "CLOSED" && (
           <RecipientViewProgressFooter
             petition={petition}
