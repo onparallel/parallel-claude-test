@@ -184,11 +184,15 @@ function Petitions() {
         await showPetitionSharingDialog({
           userId: me.id,
           petitionId: selected[0],
+          isTemplate:
+            petitions.items[0].__typename === "Petition" ? false : true,
         });
       } else {
         await showPetitionsSharingDialog({
           userId: me.id,
           petitionIds: selected,
+          isTemplates:
+            petitions.items[0].__typename === "Petition" ? false : true,
         });
       }
     } catch {}

@@ -820,16 +820,6 @@
     "context": "Templates"
   },
   {
-    "term": "component.petition-list-header.share-petition-label",
-    "definition": "Compartir {count, plural, =1{petición} other{peticiones}}",
-    "context": "Share {count, plural, =1{petition} other{petitions}}"
-  },
-  {
-    "term": "component.petition-list-header.share-template-label",
-    "definition": "Compartir {count, plural, =1{plantilla} other{plantillas}}",
-    "context": "Share {count, plural, =1{template} other{templates}}"
-  },
-  {
     "term": "component.petition-list-header.clone-petition-label",
     "definition": "Clonar {count, plural, =1{petición} other{peticiones}}",
     "context": "Clone {count, plural, =1{petition} other{petitions}}"
@@ -853,6 +843,16 @@
     "term": "component.petition-list-header.save-as-template-label",
     "definition": "Guardar como plantilla",
     "context": "Save as template"
+  },
+  {
+    "term": "component.petition-list-header.share-petition-label",
+    "definition": "Compartir {count, plural, =1{petición} other{peticiones}}",
+    "context": "Share {count, plural, =1{petition} other{petitions}}"
+  },
+  {
+    "term": "component.petition-list-header.share-template-label",
+    "definition": "Compartir {count, plural, =1{plantilla} other{plantillas}}",
+    "context": "Share {count, plural, =1{template} other{templates}}"
   },
   {
     "term": "component.petition-list-header.use-template-label",
@@ -3050,6 +3050,16 @@
     "context": "Only the petition owner can share it"
   },
   {
+    "term": "petition-sharing.insufficient-permissions",
+    "definition": "No tiene permisos para poder compartir las peticiones seleccionadas.",
+    "context": "You do not have permission to share the selected petitions."
+  },
+  {
+    "term": "petition-sharing.insufficient-permissions-list",
+    "definition": "{count, plural, =1 {La siguiente petición se ha descartado y no se podrá} other {Las siguientes peticiónes se han descartado y no se podrán}} compartir por falta de permisos:",
+    "context": "The following {count, plural, =1 {petition has} other {petitions have}} been ignored and cannot be shared due to lack of permissions:"
+  },
+  {
     "term": "petition-sharing.message-placeholder",
     "definition": "Mensaje",
     "context": "Message"
@@ -3058,21 +3068,6 @@
     "term": "petition-sharing.notify-checkbox",
     "definition": "Notificar a los usuarios",
     "context": "Notify users"
-  },
-  {
-    "term": "petition-sharing.insufficient-permissions",
-    "definition": "No tiene permisos para poder compartir las peticiones seleccionadas.",
-    "context": "You do not have permission to share the selected requests."
-  },
-  {
-    "term": "petition-sharing.insufficient-permissions-list",
-    "definition": "La siguiente petición se ha descartado y no se podrá compartir por falta de permisos:",
-    "context": "The following request has been discarded and cannot be shared due to lack of permissions:"
-  },
-  {
-    "term": "petition-sharing.insufficient-permissions-list-plural",
-    "definition": "Las siguientes peticiones seleccionadas se han descartado y no se podrán compartir por falta de permisos:",
-    "context": "The following selected requests have been discarded and cannot be shared due to lack of permissions:"
   },
   {
     "term": "petition-sharing.owner",
@@ -3086,8 +3081,8 @@
   },
   {
     "term": "petition-sharing.success-title",
-    "definition": "Petición compartida",
-    "context": "Petition shared"
+    "definition": "{count, plural, =1 {Petición compartida} other {Peticiones compartidas}}",
+    "context": "{count, plural, =1 {Petition} other {Petitions}} shared"
   },
   {
     "term": "petition-sharing.write",
@@ -5298,6 +5293,21 @@
     "term": "template-details.use-template",
     "definition": "Utilizar plantilla",
     "context": "Use template"
+  },
+  {
+    "term": "template-sharing.insufficient-permissions",
+    "definition": "No tiene permisos para poder compartir las plantillas seleccionadas.",
+    "context": "You do not have permission to share the selected templates."
+  },
+  {
+    "term": "template-sharing.insufficient-permissions-list",
+    "definition": "{count, plural, =1 {La siguiente plantilla se ha descartado y no se podrá} other {Las siguientes plantillas se han descartado y no se podrán}} compartir por falta de permisos:",
+    "context": "The following {count, plural, =1 {template has} other {templates have}} been ignored and cannot be shared due to lack of permissions:"
+  },
+  {
+    "term": "template-sharing.success-title",
+    "definition": "{count, plural, =1 {Plantilla compartida} other {Plantillas compartidas}} shared",
+    "context": "{count, plural, =1 {Template} other {Templates}} shared"
   },
   {
     "term": "template.description-edit.header",

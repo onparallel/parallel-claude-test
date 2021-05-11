@@ -53,10 +53,12 @@ export function usePetitionsSharingDialog() {
 export function PetitionsSharingDialog({
   userId,
   petitionIds,
+  isTemplates,
   ...props
 }: DialogProps<{
   userId: string;
   petitionIds: string[];
+  isTemplates?: boolean;
 }>) {
   const intl = useIntl();
   const toast = useToast();
@@ -121,6 +123,32 @@ export function PetitionsSharingDialog({
     [_handleSearchUsers]
   );
 
+  const getSuccesTitle = () => {
+    const template = intl.formatMessage(
+      {
+        id: "template-sharing.success-title",
+        defaultMessage:
+          "{count, plural, =1 {Template} other {Templates}} shared",
+      },
+      {
+        count: petitionsOwned.length,
+      }
+    );
+
+    const petition = intl.formatMessage(
+      {
+        id: "petition-sharing.success-title",
+        defaultMessage:
+          "{count, plural, =1 {Petition} other {Petitions}} shared",
+      },
+      {
+        count: petitionsOwned.length,
+      }
+    );
+
+    return isTemplates ? template : petition;
+  };
+
   const [
     addPetitionUserPermission,
   ] = usePetitionsSharingModal_addPetitionsUserPermissionMutation();
@@ -139,10 +167,7 @@ export function PetitionsSharingDialog({
           refetchQueries: [getOperationName(PetitionActivityDocument)!],
         });
         toast({
-          title: intl.formatMessage({
-            id: "petition-sharing.success-title",
-            defaultMessage: "Petition shared",
-          }),
+          title: getSuccesTitle(),
           status: "success",
           duration: 3000,
           isClosable: true,
@@ -268,15 +293,17 @@ export function PetitionsSharingDialog({
                   <AlertDescription>
                     <If condition={petitionsRW.length !== petitionIds.length}>
                       <Text>
-                        {petitionsRW.length > 1 ? (
+                        {isTemplates ? (
                           <FormattedMessage
-                            id="petition-sharing.insufficient-permissions-list-plural"
-                            defaultMessage="The following selected requests have been discarded and cannot be shared due to lack of permissions:"
+                            id="template-sharing.insufficient-permissions-list"
+                            defaultMessage="The following {count, plural, =1 {template has} other {templates have}} been ignored and cannot be shared due to lack of permissions:"
+                            values={{ count: petitionsRW.length }}
                           />
                         ) : (
                           <FormattedMessage
                             id="petition-sharing.insufficient-permissions-list"
-                            defaultMessage="The following request has been discarded and cannot be shared due to lack of permissions:"
+                            defaultMessage="The following {count, plural, =1 {petition has} other {petitions have}} been ignored and cannot be shared due to lack of permissions:"
+                            values={{ count: petitionsRW.length }}
                           />
                         )}
                       </Text>
@@ -288,10 +315,17 @@ export function PetitionsSharingDialog({
                     </If>
                     <If condition={petitionsRW.length === petitionIds.length}>
                       <Text>
-                        <FormattedMessage
-                          id="petition-sharing.insufficient-permissions"
-                          defaultMessage="You do not have permission to share the selected requests."
-                        />
+                        {isTemplates ? (
+                          <FormattedMessage
+                            id="petition-sharing.insufficient-permissions"
+                            defaultMessage="You do not have permission to share the selected petitions."
+                          />
+                        ) : (
+                          <FormattedMessage
+                            id="template-sharing.insufficient-permissions"
+                            defaultMessage="You do not have permission to share the selected templates."
+                          />
+                        )}
                       </Text>
                     </If>
                   </AlertDescription>

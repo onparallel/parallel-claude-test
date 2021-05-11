@@ -61,10 +61,12 @@ export function usePetitionSharingDialog() {
 export function PetitionSharingDialog({
   userId,
   petitionId,
+  isTemplate,
   ...props
 }: DialogProps<{
   userId: string;
   petitionId: string;
+  isTemplate: boolean;
 }>) {
   const intl = useIntl();
   const toast = useToast();
@@ -124,6 +126,32 @@ export function PetitionSharingDialog({
     addPetitionUserPermission,
   ] = usePetitionSharingModal_addPetitionUserPermissionMutation();
 
+  const getSuccesTitle = () => {
+    const template = intl.formatMessage(
+      {
+        id: "template-sharing.success-title",
+        defaultMessage:
+          "{count, plural, =1 {Template} other {Templates}} shared",
+      },
+      {
+        count: 1,
+      }
+    );
+
+    const petition = intl.formatMessage(
+      {
+        id: "petition-sharing.success-title",
+        defaultMessage:
+          "{count, plural, =1 {Petition} other {Petitions}} shared",
+      },
+      {
+        count: 1,
+      }
+    );
+
+    return isTemplate ? template : petition;
+  };
+
   const handleAddUserPermissions = handleSubmit(
     async ({ users, notify, message }) => {
       try {
@@ -138,10 +166,7 @@ export function PetitionSharingDialog({
           refetchQueries: [getOperationName(PetitionActivityDocument)!],
         });
         toast({
-          title: intl.formatMessage({
-            id: "petition-sharing.success-title",
-            defaultMessage: "Petition shared",
-          }),
+          title: getSuccesTitle(),
           status: "success",
           duration: 3000,
           isClosable: true,
