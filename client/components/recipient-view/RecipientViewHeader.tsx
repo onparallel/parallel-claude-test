@@ -193,11 +193,7 @@ export function RecipientViewHeader({
               marginY={0}
               paddingBottom={4}
             >
-              <Flex
-                flex="1"
-                flexDirection={{ base: "column", md: "row" }}
-                width="100%"
-              >
+              <Flex flexDirection={{ base: "column", md: "row" }} width="100%">
                 <SimpleGrid
                   flex="1"
                   templateRows="auto minmax(0, 1fr)"
@@ -257,9 +253,8 @@ export function RecipientViewHeader({
                             <PopoverTrigger>
                               <Text
                                 display="initial"
-                                textDecoration="underline"
                                 color="purple.600"
-                                cursor="pointer"
+                                _hover={{ color: "purple.800" }}
                               >
                                 {children}
                               </Text>
