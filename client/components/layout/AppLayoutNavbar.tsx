@@ -108,7 +108,7 @@ export const AppLayoutNavbar = Object.assign(
     }
 
     function handleHelpCenterClick() {
-      zE?.(function () {
+      (window as any).zE?.(function () {
         zE("webWidget", "setLocale", query.locale);
         zE.activate({ hideOnClose: true });
       });

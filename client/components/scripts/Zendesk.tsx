@@ -6,7 +6,7 @@ declare const zE: any;
 
 export const Zendesk = () => {
   useEffect(() => {
-    const hide = () => zE?.(() => zE.hide());
+    const hide = () => (window as any).zE?.(() => zE.hide());
     Router.events.on("routeChangeStart", hide);
     window.addEventListener("load", hide);
     return () => {

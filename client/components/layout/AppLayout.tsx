@@ -42,7 +42,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       } else {
         toggle(true);
       }
-      zE?.(() => zE.hide());
+      (window as any).zE?.(() => zE.hide());
     },
     [isRunning, toggle]
   );
