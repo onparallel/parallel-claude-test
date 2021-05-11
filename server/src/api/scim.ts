@@ -1,5 +1,4 @@
 import { json, NextFunction, Request, Response, Router } from "express";
-import { pick } from "remeda";
 import { CreateUser, User } from "../db/__types";
 import { isDefined } from "../util/remedaExtensions";
 
