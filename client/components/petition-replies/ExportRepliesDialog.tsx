@@ -230,7 +230,7 @@ export function ExportRepliesDialog({
             </Stack>
           ) : null}
           {example[0] !== null ? (
-            <Box>
+            <Stack>
               <Checkbox
                 marginLeft={1}
                 isChecked={rename}
@@ -270,7 +270,7 @@ export function ExportRepliesDialog({
                   </Text>
                 </Box>
               </PaddedCollapse>
-            </Box>
+            </Stack>
           ) : null}
         </Stack>
       }
