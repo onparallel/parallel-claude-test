@@ -87,9 +87,14 @@ async function validateExternalId(
 }
 
 async function logRequest(req: Request, _: Response, next: NextFunction) {
-  console.log(
-    pick(req, ["method", "url", "query", "body", "params", "headers"])
-  );
+  try {
+    console.log({
+      url: req.url,
+      method: req.method,
+      body: JSON.stringify(req.body),
+      authorization: req.header("authorization"),
+    });
+  } catch {}
   next();
 }
 
