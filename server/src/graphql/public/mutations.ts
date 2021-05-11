@@ -24,7 +24,6 @@ import { jsonArg } from "../helpers/json";
 import { RESULT } from "../helpers/result";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
-import { userIsCommentAuthor } from "../petition/mutations/authorizers";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
@@ -696,8 +695,7 @@ export const publicUpdatePetitionFieldComment = mutationField(
       authenticatePublicAccess("keycode"),
       and(
         fieldBelongsToAccess("petitionFieldId"),
-        commentsBelongsToAccess("petitionFieldCommentId"),
-        userIsCommentAuthor("petitionFieldCommentId")
+        commentsBelongsToAccess("petitionFieldCommentId")
       )
     ),
     args: {
