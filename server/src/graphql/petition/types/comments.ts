@@ -52,9 +52,9 @@ export const PetitionFieldComment = objectType({
           : null;
       },
     });
-    t.nullable.datetime("publishedAt", {
-      description: "Time when the comment was published.",
-      resolve: (o) => o.published_at,
+    t.datetime("createdAt", {
+      description: "Time when the comment was created.",
+      resolve: (o) => o.created_at,
     });
     t.boolean("isUnread", {
       description: "Whether the comment has been read or not.",
@@ -69,8 +69,8 @@ export const PetitionFieldComment = objectType({
     });
     t.boolean("isEdited", {
       description: "Whether the comment has been edited after being published.",
-      resolve: async (root, _, ctx) => {
-        return root.published_at ? root.updated_at > root.published_at : false;
+      resolve: async (root) => {
+        return root.updated_at > root.created_at;
       },
     });
     t.boolean("isInternal", {

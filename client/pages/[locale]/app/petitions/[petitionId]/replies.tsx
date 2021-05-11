@@ -20,7 +20,6 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
 import { ShareButton } from "@parallel/components/common/ShareButton";
-import { Spacer } from "@parallel/components/common/Spacer";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -71,7 +70,6 @@ import {
   usePetitionReplies_fileUploadReplyDownloadLinkMutation,
   usePetitionReplies_markPetitionFieldCommentsAsReadMutation,
   usePetitionReplies_sendPetitionClosedNotificationMutation,
-  usePetitionReplies_submitUnpublishedCommentsMutation,
   usePetitionReplies_updatePetitionFieldCommentMutation,
   usePetitionReplies_updatePetitionFieldRepliesStatusMutation,
   usePetitionReplies_updatePetitionMutation,
@@ -302,13 +300,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     (f) => !f.isReadOnly && f.replies.length > 0
   );
 
-  let pendingComments = 0;
-  for (const field of petition.fields) {
-    for (const comment of field.comments) {
-      pendingComments += comment.publishedAt ? 0 : 1;
-    }
-  }
-
   const createPetitionFieldComment = useCreatePetitionFieldComment();
   async function handleAddComment(content: string, isInternal?: boolean) {
     await createPetitionFieldComment({
@@ -340,14 +331,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       petitionId,
       petitionFieldId: activeFieldId!,
       petitionFieldCommentId,
-    });
-  }
-
-  const [submitUnpublishedComments, { loading: isSubmitting }] =
-    usePetitionReplies_submitUnpublishedCommentsMutation();
-  async function handleSubmitUnpublished() {
-    await submitUnpublishedComments({
-      variables: { petitionId },
     });
   }
 
@@ -525,12 +508,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         </Box>
       }
     >
-      <Stack
-        direction="row"
-        paddingX={4}
-        paddingY={2}
-        backgroundColor={pendingComments ? "yellow.50" : "white"}
-      >
+      <Stack direction="row" paddingX={4} paddingY={2}>
         <IconButtonWithTooltip
           onClick={() => refetch()}
           icon={<RepeatIcon />}
@@ -578,20 +556,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             <FormattedMessage
               id="petition-replies.export-replies"
               defaultMessage="Export replies"
-            />
-          </Button>
-        ) : null}
-        <Spacer />
-        {pendingComments ? (
-          <Button
-            colorScheme="yellow"
-            isDisabled={isSubmitting}
-            onClick={handleSubmitUnpublished}
-          >
-            <FormattedMessage
-              id="petition-replies.submit-comments"
-              defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
-              values={{ commentCount: pendingComments }}
             />
           </Button>
         ) : null}
@@ -875,14 +839,6 @@ PetitionReplies.mutations = [
         petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
       )
-    }
-  `,
-  gql`
-    mutation PetitionReplies_submitUnpublishedComments($petitionId: GID!) {
-      submitUnpublishedComments(petitionId: $petitionId) {
-        id
-        publishedAt
-      }
     }
   `,
   gql`
@@ -1213,7 +1169,6 @@ function PetitionContentsIndicators({
           </Stack>
           <RecipientViewCommentsBadge
             hasUnreadComments={field.comments.some((c) => c.isUnread)}
-            hasUnpublishedComments={field.comments.some((c) => !c.publishedAt)}
           />
         </Stack>
       ) : null}

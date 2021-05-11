@@ -263,9 +263,8 @@ export function PetitionRepliesFieldComments({
 
 function FieldComment({
   comment: {
-    id,
+    createdAt,
     author,
-    publishedAt,
     isUnread,
     isEdited,
     content: _content,
@@ -320,13 +319,7 @@ function FieldComment({
       paddingX={4}
       paddingY={2}
       backgroundColor={
-        !publishedAt
-          ? "yellow.50"
-          : isUnread
-          ? "purple.50"
-          : isInternal
-          ? "gray.50"
-          : "white"
+        isUnread ? "purple.50" : isInternal ? "gray.50" : "white"
       }
     >
       <Box fontSize="sm" display="flex" alignItems="center">
@@ -365,42 +358,20 @@ function FieldComment({
             </Badge>
           </SmallPopover>
         )}
-        {publishedAt ? (
-          <>
-            <DateTime
-              color="gray.500"
-              value={publishedAt}
-              format={FORMATS["L+LT"]}
-              useRelativeTime
+        <DateTime
+          color="gray.500"
+          value={createdAt}
+          format={FORMATS["L+LT"]}
+          useRelativeTime
+        />
+        {isEdited ? (
+          <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
+            <FormattedMessage
+              id="generic.edited-comment-indicator"
+              defaultMessage="Edited"
             />
-            {isEdited ? (
-              <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
-                <FormattedMessage
-                  id="generic.edited-comment-indicator"
-                  defaultMessage="Edited"
-                />
-              </Text>
-            ) : null}
-          </>
-        ) : (
-          <SmallPopover
-            content={
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="petition-replies.pending-comment-popover"
-                  defaultMessage="Send all your pending comments at once to notify in a single email"
-                />
-              </Text>
-            }
-          >
-            <Badge colorScheme="yellow" variant="outline" cursor="default">
-              <FormattedMessage
-                id="petition-replies.comment-pending.label"
-                defaultMessage="Pending"
-              />
-            </Badge>
-          </SmallPopover>
-        )}
+          </Text>
+        ) : null}
         <Spacer />
         <Menu placement="bottom-end">
           <Tooltip
@@ -512,7 +483,7 @@ PetitionRepliesFieldComments.fragments = {
           }
         }
         content
-        publishedAt
+        createdAt
         isUnread
         isEdited
         isInternal @include(if: $hasInternalComments)

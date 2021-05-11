@@ -199,8 +199,7 @@ export const PublicPetitionField = objectType({
       type: "PublicPetitionFieldComment",
       description: "The comments for this field.",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPetitionFieldCommentsForFieldAndAccess({
-          accessId: ctx.access!.id,
+        return await ctx.petitions.loadPetitionFieldCommentsForField({
           petitionId: root.petition_id,
           petitionFieldId: root.id,
         });
@@ -208,29 +207,17 @@ export const PublicPetitionField = objectType({
     });
     t.nonNull.int("commentCount", {
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPetitionFieldCommentCountForFieldAndAccess(
-          {
-            accessId: ctx.access!.id,
+        return (
+          await ctx.petitions.loadPetitionFieldCommentsForField({
             petitionId: root.petition_id,
             petitionFieldId: root.id,
-          }
-        );
+          })
+        ).length;
       },
     });
     t.nonNull.int("unreadCommentCount", {
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadPetitionFieldUnreadCommentCountForFieldAndAccess(
-          {
-            accessId: ctx.access!.id,
-            petitionId: root.petition_id,
-            petitionFieldId: root.id,
-          }
-        );
-      },
-    });
-    t.nonNull.int("unpublishedCommentCount", {
-      resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPetitionFieldUnpublishedCommentCountForFieldAndAccess(
           {
             accessId: ctx.access!.id,
             petitionId: root.petition_id,
@@ -443,9 +430,9 @@ export const PublicPetitionFieldComment = objectType({
           : null;
       },
     });
-    t.nullable.datetime("publishedAt", {
-      description: "Time when the comment was published.",
-      resolve: (o) => o.published_at,
+    t.datetime("createdAt", {
+      description: "Time when the comment was created.",
+      resolve: (o) => o.created_at,
     });
     t.boolean("isUnread", {
       description: "Whether the comment has been read or not.",

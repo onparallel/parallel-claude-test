@@ -124,7 +124,6 @@ export function RecipientViewPetitionFieldCard({
           <CommentsButton
             commentCount={field.commentCount}
             hasUnreadComments={field.unreadCommentCount > 0}
-            hasUnpublishedComments={field.unpublishedCommentCount > 0}
             onClick={handleCommentsButtonClick}
           />
         ) : null}
@@ -201,7 +200,6 @@ RecipientViewPetitionFieldCard.fragments = {
           ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         }
         commentCount
-        unpublishedCommentCount
         unreadCommentCount
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
       }
@@ -225,14 +223,10 @@ RecipientViewPetitionFieldCard.fragments = {
 interface CommentsButtonProps extends ButtonProps {
   commentCount: number;
   hasUnreadComments: boolean;
-  hasUnpublishedComments: boolean;
 }
 
 const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
-  function CommentsButton(
-    { commentCount, hasUnreadComments, hasUnpublishedComments, ...props },
-    ref
-  ) {
+  function CommentsButton({ commentCount, hasUnreadComments, ...props }, ref) {
     const intl = useIntl();
     const common = {
       size: "sm",
@@ -251,7 +245,6 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
       <Button ref={ref} rightIcon={<CommentIcon fontSize="16px" />} {...common}>
         <RecipientViewCommentsBadge
           hasUnreadComments={hasUnreadComments}
-          hasUnpublishedComments={hasUnpublishedComments}
           marginRight={2}
         />
         {intl.formatNumber(commentCount)}

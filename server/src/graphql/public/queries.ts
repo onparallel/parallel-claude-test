@@ -26,8 +26,7 @@ export const commentsQuery = queryField("petitionFieldComments", {
   },
   description: "The comments for this field.",
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.loadPetitionFieldCommentsForFieldAndAccess({
-      accessId: ctx.access!.id,
+    return await ctx.petitions.loadPetitionFieldCommentsForField({
       petitionId: ctx.access!.petition_id,
       petitionFieldId: args.petitionFieldId,
     });

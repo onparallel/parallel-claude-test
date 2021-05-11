@@ -45,7 +45,7 @@ export function RecipientViewContentsCard({
         />
       </Heading>
       <Stack as={List} spacing={1} marginBottom={4}>
-        {pages.map(({ title, ...badge }, index) => (
+        {pages.map(({ title, hasUnreadComments }, index) => (
           <ListItem key={index}>
             <Text
               as="h2"
@@ -57,7 +57,7 @@ export function RecipientViewContentsCard({
             >
               {hasCommentsEnabled && index + 1 !== currentPage ? (
                 <RecipientViewCommentsBadge
-                  {...badge}
+                  hasUnreadComments={hasUnreadComments}
                   position="absolute"
                   left="0"
                   top="50%"
@@ -105,9 +105,6 @@ export function RecipientViewContentsCard({
                     >
                       {hasCommentsEnabled ? (
                         <RecipientViewCommentsBadge
-                          hasUnpublishedComments={
-                            field.unpublishedCommentCount > 0
-                          }
                           hasUnreadComments={field.unreadCommentCount > 0}
                           position="absolute"
                           left="0"
@@ -167,7 +164,6 @@ function useGetPagesAndFields(
 ) {
   const pages: {
     title: Maybe<string>;
-    hasUnpublishedComments?: boolean;
     hasUnreadComments?: boolean;
   }[] = [];
   const fieldVisibility = useFieldVisibility(fields);
@@ -183,8 +179,6 @@ function useGetPagesAndFields(
     const currentPage = pages[pages.length - 1];
     currentPage.hasUnreadComments =
       currentPage.hasUnreadComments || field.unreadCommentCount > 0;
-    currentPage.hasUnpublishedComments =
-      currentPage.hasUnpublishedComments || field.unpublishedCommentCount > 0;
     if (page === 0 && isVisible) {
       _fields.push(field);
     } else {
@@ -226,7 +220,6 @@ RecipientViewContentsCard.fragments = {
           id
         }
         commentCount
-        unpublishedCommentCount
         unreadCommentCount
         ...useFieldVisibility_PublicPetitionField
       }

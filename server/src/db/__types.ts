@@ -575,7 +575,7 @@ export interface PetitionFieldComment {
   content: string; // text
   user_id: Maybe<number>; // int4
   petition_access_id: Maybe<number>; // int4
-  published_at: Maybe<Date>; // timestamptz
+  notified_at: Maybe<Date>; // timestamptz
   created_at: Date; // timestamptz
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
@@ -590,7 +590,7 @@ export type CreatePetitionFieldComment = PartialProps<
   | "petition_field_reply_id"
   | "user_id"
   | "petition_access_id"
-  | "published_at"
+  | "notified_at"
   | "created_at"
   | "created_by"
   | "updated_at"

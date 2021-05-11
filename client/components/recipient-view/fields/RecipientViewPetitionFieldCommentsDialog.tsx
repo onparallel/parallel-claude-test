@@ -350,13 +350,7 @@ function FieldComment({
     <Box
       paddingX={6}
       paddingY={2}
-      backgroundColor={
-        !comment.publishedAt
-          ? "yellow.50"
-          : comment.isUnread
-          ? "purple.50"
-          : "white"
-      }
+      backgroundColor={comment.isUnread ? "purple.50" : "white"}
     >
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box as="strong" marginRight={2}>
@@ -368,32 +362,13 @@ function FieldComment({
             <DeletedContact />
           )}
         </Box>
-        {comment.publishedAt ? (
-          <DateTime
-            color="gray.500"
-            value={comment.publishedAt}
-            format={FORMATS.LLL}
-            useRelativeTime
-          />
-        ) : (
-          <SmallPopover
-            content={
-              <Text fontSize="sm">
-                <FormattedMessage
-                  id="petition-replies.pending-comment-popover"
-                  defaultMessage="Send all your pending comments at once to notify in a single email"
-                />
-              </Text>
-            }
-          >
-            <Badge colorScheme="yellow" variant="outline" cursor="default">
-              <FormattedMessage
-                id="petition-replies.comment-pending.label"
-                defaultMessage="Pending"
-              />
-            </Badge>
-          </SmallPopover>
-        )}
+
+        <DateTime
+          color="gray.500"
+          value={comment.createdAt}
+          format={FORMATS.LLL}
+          useRelativeTime
+        />
         <Spacer />
         {contactId === comment.author?.id ? (
           <Menu placement="bottom-end">
@@ -498,7 +473,7 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
           }
         }
         content
-        publishedAt
+        createdAt
         isUnread
       }
     `;
@@ -610,7 +585,6 @@ function useCreatePetitionFieldComment() {
               (field) => ({
                 ...field,
                 commentCount: field.commentCount + 1,
-                unpublishedCommentCount: field.unpublishedCommentCount + 1,
               })
             );
           }
@@ -718,9 +692,6 @@ function useDeletePetitionFieldComment() {
                 (field) => ({
                   ...field,
                   commentCount: field.commentCount - 1,
-                  unpublishedCommentCount:
-                    field.unpublishedCommentCount -
-                    (removed.publishedAt ? 0 : 1),
                 })
               );
             }
@@ -765,7 +736,6 @@ function updatePetitionFieldCommentCounts(
       fragment: gql`
         fragment RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts on PublicPetitionField {
           commentCount
-          unpublishedCommentCount
           unreadCommentCount
         }
       `,

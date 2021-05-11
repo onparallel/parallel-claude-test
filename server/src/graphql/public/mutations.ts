@@ -740,45 +740,6 @@ export const publicUpdatePetitionFieldComment = mutationField(
   }
 );
 
-export const publicSubmitUnpublishedComments = mutationField(
-  "publicSubmitUnpublishedComments",
-  {
-    description: "Submits all unpublished comments.",
-    type: list(nonNull("PublicPetitionFieldComment")),
-    authorize: authenticatePublicAccess("keycode"),
-    args: {
-      keycode: nonNull(idArg()),
-    },
-    resolve: async (_, args, ctx) => {
-      const { comments, userIds, accessIds } =
-        await ctx.petitions.publishPetitionFieldCommentsForAccess(
-          ctx.access!.petition_id,
-          ctx.access!
-        );
-      await Promise.all([
-        // send email to all contacts with active access
-        ctx.emails.sendPetitionCommentsContactNotificationEmail(
-          ctx.access!.petition_id,
-          "PetitionAccess",
-          ctx.access!.id,
-          comments.map(prop("id")),
-          accessIds
-        ),
-        // send email to all subscribed users
-        ctx.emails.sendPetitionCommentsUserNotificationEmail(
-          ctx.access!.petition_id,
-          "PetitionAccess",
-          ctx.access!.id,
-          comments.map(prop("id")),
-          userIds
-        ),
-      ]);
-
-      return comments;
-    },
-  }
-);
-
 export const publicMarkPetitionFieldCommentsAsRead = mutationField(
   "publicMarkPetitionFieldCommentsAsRead",
   {

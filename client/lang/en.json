@@ -3130,11 +3130,6 @@
     "context": "My last name"
   },
   {
-    "term": "petition-replies.comment-pending.label",
-    "definition": "Pending",
-    "context": "Pending"
-  },
-  {
     "term": "petition-replies.export-replies",
     "definition": "Export replies",
     "context": "Export replies"
@@ -3185,11 +3180,6 @@
     "context": "Notify that it is correct"
   },
   {
-    "term": "petition-replies.pending-comment-popover",
-    "definition": "Send all your pending comments at once to notify in a single email",
-    "context": "Send all your pending comments at once to notify in a single email"
-  },
-  {
     "term": "petition-replies.petition-field-reply.approve",
     "definition": "Approve",
     "context": "Approve"
@@ -3228,11 +3218,6 @@
     "term": "petition-replies.petition-field.no-replies",
     "definition": "There are no replies to this field yet",
     "context": "There are no replies to this field yet"
-  },
-  {
-    "term": "petition-replies.submit-comments",
-    "definition": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
-    "context": "Submit {commentCount, plural, =1 {# comment} other{# comments}}"
   },
   {
     "term": "petition-replies.validate-field-button",
@@ -5333,26 +5318,6 @@
     "term": "recipient-view.submit-button-short",
     "definition": "Finalize",
     "context": "Finalize"
-  },
-  {
-    "term": "recipient-view.submit-unpublished-comments-button",
-    "definition": "Submit {commentCount, plural, =1 {# comment} other{# comments}}",
-    "context": "Submit {commentCount, plural, =1 {# comment} other{# comments}}"
-  },
-  {
-    "term": "recipient-view.submit-unpublished-comments-text",
-    "definition": "You have some pending comments. Submit them at once to notify {sender} in a single email.",
-    "context": "You have some pending comments. Submit them at once to notify {sender} in a single email."
-  },
-  {
-    "term": "recipient-view.unpublished-comments",
-    "definition": "There's unpublished comments",
-    "context": "There's unpublished comments"
-  },
-  {
-    "term": "recipient-view.unread-and-unpublished-comments",
-    "definition": "There's unread and unpublished comments",
-    "context": "There's unread and unpublished comments"
   },
   {
     "term": "recipient-view.unread-comments",

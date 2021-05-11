@@ -305,8 +305,6 @@ export type Mutation = {
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   publicSendVerificationCode: VerificationCodeRequest;
-  /** Submits all unpublished comments. */
-  publicSubmitUnpublishedComments: Array<PublicPetitionFieldComment>;
   /** Updates a reply for a dynamic select field. */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
@@ -334,8 +332,6 @@ export type Mutation = {
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadReplyDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
-  /** Submits all unpublished comments. */
-  submitUnpublishedComments: Array<PetitionFieldComment>;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
@@ -673,10 +669,6 @@ export type MutationpublicSendVerificationCodeArgs = {
   keycode: Scalars["ID"];
 };
 
-export type MutationpublicSubmitUnpublishedCommentsArgs = {
-  keycode: Scalars["ID"];
-};
-
 export type MutationpublicUpdateDynamicSelectReplyArgs = {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
@@ -755,10 +747,6 @@ export type MutationsignedPetitionDownloadLinkArgs = {
 };
 
 export type MutationstartSignatureRequestArgs = {
-  petitionId: Scalars["GID"];
-};
-
-export type MutationsubmitUnpublishedCommentsArgs = {
   petitionId: Scalars["GID"];
 };
 
@@ -1246,6 +1234,8 @@ export type PetitionFieldComment = {
   author: Maybe<UserOrPetitionAccess>;
   /** The content of the comment. */
   content: Scalars["String"];
+  /** Time when the comment was created. */
+  createdAt: Scalars["DateTime"];
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
   /** Whether the comment has been edited after being published. */
@@ -1254,8 +1244,6 @@ export type PetitionFieldComment = {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** Time when the comment was published. */
-  publishedAt: Maybe<Scalars["DateTime"]>;
   /** The reply the comment is refering to. */
   reply: Maybe<PetitionFieldReply>;
 };
@@ -1639,7 +1627,6 @@ export type PublicPetitionField = {
   title: Maybe<Scalars["String"]>;
   /** The type of the petition field. */
   type: PetitionFieldType;
-  unpublishedCommentCount: Scalars["Int"];
   unreadCommentCount: Scalars["Int"];
   /** Determines if the content of this field has been validated. */
   validated: Scalars["Boolean"];
@@ -1653,12 +1640,12 @@ export type PublicPetitionFieldComment = {
   author: Maybe<PublicUserOrContact>;
   /** The content of the comment. */
   content: Scalars["String"];
+  /** Time when the comment was created. */
+  createdAt: Scalars["DateTime"];
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** Time when the comment was published. */
-  publishedAt: Maybe<Scalars["DateTime"]>;
   /** The reply the comment is refering to. */
   reply: Maybe<PublicPetitionFieldReply>;
 };

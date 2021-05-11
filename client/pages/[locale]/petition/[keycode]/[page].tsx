@@ -40,14 +40,11 @@ import {
   PublicPetitionSignerData,
   RecipientView_PublicContactFragment,
   RecipientView_PublicPetitionFieldFragment,
-  RecipientView_PublicPetitionFragment,
   RecipientView_PublicUserFragment,
   usePublicPetitionQuery,
   useRecipientView_publicCompletePetitionMutation,
-  useRecipientView_submitUnpublishedCommentsMutation,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
-import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { compose } from "@parallel/utils/compose";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
@@ -166,47 +163,6 @@ function RecipientView({
     [petition.fields, visibility, granter, router.query]
   );
 
-  const [submitUnpublishedComments, { loading: isSubmitting }] =
-    useRecipientView_submitUnpublishedCommentsMutation();
-  async function handleSubmitUnpublished() {
-    await submitUnpublishedComments({
-      variables: { keycode },
-      update(client, { data }) {
-        if (data) {
-          updateFragment<RecipientView_PublicPetitionFragment>(client, {
-            fragment: RecipientView.fragments.PublicPetition,
-            fragmentName: "RecipientView_PublicPetition",
-            id: petition.id,
-            data: (cached) => ({
-              ...cached!,
-              fields: cached!.fields.map((field) =>
-                field.unpublishedCommentCount
-                  ? { ...field, unpublishedCommentCount: 0 }
-                  : field
-              ),
-            }),
-          });
-        }
-      },
-    });
-  }
-
-  const pendingComments = petition.hasCommentsEnabled
-    ? fields.reduce((acc, f) => acc + f.unpublishedCommentCount, 0)
-    : 0;
-
-  // Prevent closing when theres pending comments
-  useEffect(() => {
-    if (pendingComments) {
-      window.addEventListener("beforeunload", handler);
-      return () => window.removeEventListener("beforeunload", handler);
-    }
-    function handler(event: BeforeUnloadEvent) {
-      event.returnValue = "";
-      event.preventDefault();
-    }
-  }, [pendingComments]);
-
   const [sidebarTop, setSidebarTop] = useState(0);
   const readjustHeight = useCallback(function (rect: DOMRect) {
     setSidebarTop(rect.height + 16);
@@ -238,8 +194,7 @@ function RecipientView({
           recipients={recipients}
           keycode={keycode}
           isClosed={
-            (showAlert && ["COMPLETED", "CLOSED"].includes(petition.status)) ||
-            (pendingComments ? true : false)
+            showAlert && ["COMPLETED", "CLOSED"].includes(petition.status)
           }
         ></RecipientViewHeader>
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
@@ -388,41 +343,6 @@ function RecipientView({
                 />
               </Alert>
             )
-          ) : null}
-          {pendingComments ? (
-            <Alert backgroundColor="yellow.100" boxShadow="sm">
-              <Stack
-                maxWidth="container.lg"
-                alignItems="center"
-                marginX="auto"
-                width="100%"
-                paddingX={4}
-                paddingY={2}
-                direction={{ base: "column", [breakpoint]: "row" }}
-              >
-                <AlertDescription flex="1" color="yellow.900">
-                  <FormattedMessage
-                    id="recipient-view.submit-unpublished-comments-text"
-                    defaultMessage="You have some pending comments. Submit them at once to notify {sender} in a single email."
-                    values={{ sender: <b>{granter.fullName}</b> }}
-                  />
-                </AlertDescription>
-
-                <Button
-                  colorScheme="yellow"
-                  size="sm"
-                  marginLeft={4}
-                  onClick={handleSubmitUnpublished}
-                  isDisabled={isSubmitting}
-                >
-                  <FormattedMessage
-                    id="recipient-view.submit-unpublished-comments-button"
-                    defaultMessage="Submit {commentCount, plural, =1 {# comment} other{# comments}}"
-                    values={{ commentCount: pendingComments }}
-                  />
-                </Button>
-              </Stack>
-            </Alert>
           ) : null}
           <ResizeObserver onResize={readjustHeight} />
         </Box>
@@ -721,14 +641,6 @@ RecipientView.mutations = [
       publicCompletePetition(keycode: $keycode, signer: $signer) {
         id
         status
-      }
-    }
-  `,
-  gql`
-    mutation RecipientView_submitUnpublishedComments($keycode: ID!) {
-      publicSubmitUnpublishedComments(keycode: $keycode) {
-        id
-        publishedAt
       }
     }
   `,

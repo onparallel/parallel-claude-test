@@ -710,11 +710,6 @@ type Mutation {
   publicSendVerificationCode(keycode: ID!): VerificationCodeRequest!
 
   """
-  Submits all unpublished comments.
-  """
-  publicSubmitUnpublishedComments(keycode: ID!): [PublicPetitionFieldComment!]!
-
-  """
   Updates a reply for a dynamic select field.
   """
   publicUpdateDynamicSelectReply(
@@ -825,11 +820,6 @@ type Mutation {
     preview: Boolean
   ): FileUploadReplyDownloadLinkResult!
   startSignatureRequest(petitionId: GID!): PetitionSignatureRequest!
-
-  """
-  Submits all unpublished comments.
-  """
-  submitUnpublishedComments(petitionId: GID!): [PetitionFieldComment!]!
 
   """
   Switches automatic reminders for the specified petition accesses.
@@ -1655,6 +1645,11 @@ type PetitionFieldComment {
   content: String!
 
   """
+  Time when the comment was created.
+  """
+  createdAt: DateTime!
+
+  """
   The ID of the petition field comment.
   """
   id: GID!
@@ -1673,11 +1668,6 @@ type PetitionFieldComment {
   Whether the comment has been read or not.
   """
   isUnread: Boolean!
-
-  """
-  Time when the comment was published.
-  """
-  publishedAt: DateTime
 
   """
   The reply the comment is refering to.
@@ -2448,7 +2438,6 @@ type PublicPetitionField {
   The type of the petition field.
   """
   type: PetitionFieldType!
-  unpublishedCommentCount: Int!
   unreadCommentCount: Int!
 
   """
@@ -2477,6 +2466,11 @@ type PublicPetitionFieldComment {
   content: String!
 
   """
+  Time when the comment was created.
+  """
+  createdAt: DateTime!
+
+  """
   The ID of the petition field comment.
   """
   id: GID!
@@ -2485,11 +2479,6 @@ type PublicPetitionFieldComment {
   Whether the comment has been read or not.
   """
   isUnread: Boolean!
-
-  """
-  Time when the comment was published.
-  """
-  publishedAt: DateTime
 
   """
   The reply the comment is refering to.

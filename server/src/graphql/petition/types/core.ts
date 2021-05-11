@@ -366,16 +366,11 @@ export const PetitionField = objectType({
           ctx.user!.id,
           "INTERNAL_COMMENTS"
         );
-        const comments =
-          await ctx.petitions.loadPetitionFieldCommentsForFieldAndUser({
-            userId: ctx.user!.id,
-            petitionId: root.petition_id,
-            petitionFieldId: root.id,
-          });
-
-        return loadInternalComments
-          ? comments
-          : comments.filter((c) => !c.is_internal);
+        return await ctx.petitions.loadPetitionFieldCommentsForField({
+          loadInternalComments,
+          petitionId: root.petition_id,
+          petitionFieldId: root.id,
+        });
       },
     });
     t.int("position");

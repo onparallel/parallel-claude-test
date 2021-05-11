@@ -327,8 +327,6 @@ export interface Mutation {
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
   publicSendVerificationCode: VerificationCodeRequest;
-  /** Submits all unpublished comments. */
-  publicSubmitUnpublishedComments: Array<PublicPetitionFieldComment>;
   /** Updates a reply for a dynamic select field. */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
@@ -356,8 +354,6 @@ export interface Mutation {
   /** Generates a download link for the signed PDF petition. */
   signedPetitionDownloadLink: FileUploadReplyDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
-  /** Submits all unpublished comments. */
-  submitUnpublishedComments: Array<PetitionFieldComment>;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
@@ -695,10 +691,6 @@ export interface MutationpublicSendVerificationCodeArgs {
   keycode: Scalars["ID"];
 }
 
-export interface MutationpublicSubmitUnpublishedCommentsArgs {
-  keycode: Scalars["ID"];
-}
-
 export interface MutationpublicUpdateDynamicSelectReplyArgs {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
@@ -777,10 +769,6 @@ export interface MutationsignedPetitionDownloadLinkArgs {
 }
 
 export interface MutationstartSignatureRequestArgs {
-  petitionId: Scalars["GID"];
-}
-
-export interface MutationsubmitUnpublishedCommentsArgs {
   petitionId: Scalars["GID"];
 }
 
@@ -1285,6 +1273,8 @@ export interface PetitionFieldComment {
   author?: Maybe<UserOrPetitionAccess>;
   /** The content of the comment. */
   content: Scalars["String"];
+  /** Time when the comment was created. */
+  createdAt: Scalars["DateTime"];
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
   /** Whether the comment has been edited after being published. */
@@ -1293,8 +1283,6 @@ export interface PetitionFieldComment {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** Time when the comment was published. */
-  publishedAt?: Maybe<Scalars["DateTime"]>;
   /** The reply the comment is refering to. */
   reply?: Maybe<PetitionFieldReply>;
 }
@@ -1696,7 +1684,6 @@ export interface PublicPetitionField {
   title?: Maybe<Scalars["String"]>;
   /** The type of the petition field. */
   type: PetitionFieldType;
-  unpublishedCommentCount: Scalars["Int"];
   unreadCommentCount: Scalars["Int"];
   /** Determines if the content of this field has been validated. */
   validated: Scalars["Boolean"];
@@ -1711,12 +1698,12 @@ export interface PublicPetitionFieldComment {
   author?: Maybe<PublicUserOrContact>;
   /** The content of the comment. */
   content: Scalars["String"];
+  /** Time when the comment was created. */
+  createdAt: Scalars["DateTime"];
   /** The ID of the petition field comment. */
   id: Scalars["GID"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** Time when the comment was published. */
-  publishedAt?: Maybe<Scalars["DateTime"]>;
   /** The reply the comment is refering to. */
   reply?: Maybe<PublicPetitionFieldReply>;
 }
@@ -3997,7 +3984,7 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     __typename?: "PetitionFieldComment";
     id: string;
     isUnread: boolean;
-    publishedAt?: Maybe<string>;
+    createdAt: string;
   }>;
 };
 
@@ -4038,7 +4025,7 @@ export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
   id: string;
   content: string;
-  publishedAt?: Maybe<string>;
+  createdAt: string;
   isUnread: boolean;
   isEdited: boolean;
   isInternal?: Maybe<boolean>;
@@ -4190,7 +4177,6 @@ export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
   optional: boolean;
   isReadOnly: boolean;
   commentCount: number;
-  unpublishedCommentCount: number;
   unreadCommentCount: number;
   replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
 } & useFieldVisibility_PublicPetitionFieldFragment;
@@ -4285,7 +4271,6 @@ export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
   multiple: boolean;
   validated: boolean;
   commentCount: number;
-  unpublishedCommentCount: number;
   unreadCommentCount: number;
   replies: Array<
     {
@@ -4318,7 +4303,7 @@ export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentF
     __typename?: "PublicPetitionFieldComment";
     id: string;
     content: string;
-    publishedAt?: Maybe<string>;
+    createdAt: string;
     isUnread: boolean;
     author?: Maybe<
       | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
@@ -4397,7 +4382,6 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentC
   {
     __typename?: "PublicPetitionField";
     commentCount: number;
-    unpublishedCommentCount: number;
     unreadCommentCount: number;
   };
 
@@ -5547,18 +5531,6 @@ export type PetitionReplies_deletePetitionFieldCommentMutation = {
   deletePetitionFieldComment: Result;
 };
 
-export type PetitionReplies_submitUnpublishedCommentsMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-}>;
-
-export type PetitionReplies_submitUnpublishedCommentsMutation = {
-  submitUnpublishedComments: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    publishedAt?: Maybe<string>;
-  }>;
-};
-
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables =
   Exact<{
     petitionId: Scalars["GID"];
@@ -5942,18 +5914,6 @@ export type RecipientView_publicCompletePetitionMutation = {
     id: string;
     status: PetitionStatus;
   };
-};
-
-export type RecipientView_submitUnpublishedCommentsMutationVariables = Exact<{
-  keycode: Scalars["ID"];
-}>;
-
-export type RecipientView_submitUnpublishedCommentsMutation = {
-  publicSubmitUnpublishedComments: Array<{
-    __typename?: "PublicPetitionFieldComment";
-    id: string;
-    publishedAt?: Maybe<string>;
-  }>;
 };
 
 export type PublicPetitionQueryVariables = Exact<{
@@ -6527,14 +6487,13 @@ export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
       }
     }
     content
-    publishedAt
+    createdAt
     isUnread
   }
 `;
 export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCounts on PublicPetitionField {
     commentCount
-    unpublishedCommentCount
     unreadCommentCount
   }
 `;
@@ -7737,7 +7696,7 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
     comments {
       id
       isUnread
-      publishedAt
+      createdAt
     }
   }
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
@@ -7756,7 +7715,7 @@ export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
       }
     }
     content
-    publishedAt
+    createdAt
     isUnread
     isEdited
     isInternal @include(if: $hasInternalComments)
@@ -8102,7 +8061,6 @@ export const RecipientViewPetitionFieldCard_PublicPetitionFieldFragmentDoc = gql
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
     commentCount
-    unpublishedCommentCount
     unreadCommentCount
     ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
   }
@@ -8137,7 +8095,6 @@ export const RecipientViewContentsCard_PublicPetitionFieldFragmentDoc = gql`
       id
     }
     commentCount
-    unpublishedCommentCount
     unreadCommentCount
     ...useFieldVisibility_PublicPetitionField
   }
@@ -11804,28 +11761,6 @@ export function usePetitionReplies_deletePetitionFieldCommentMutation(
 }
 export type PetitionReplies_deletePetitionFieldCommentMutationHookResult =
   ReturnType<typeof usePetitionReplies_deletePetitionFieldCommentMutation>;
-export const PetitionReplies_submitUnpublishedCommentsDocument = gql`
-  mutation PetitionReplies_submitUnpublishedComments($petitionId: GID!) {
-    submitUnpublishedComments(petitionId: $petitionId) {
-      id
-      publishedAt
-    }
-  }
-`;
-export function usePetitionReplies_submitUnpublishedCommentsMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    PetitionReplies_submitUnpublishedCommentsMutation,
-    PetitionReplies_submitUnpublishedCommentsMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    PetitionReplies_submitUnpublishedCommentsMutation,
-    PetitionReplies_submitUnpublishedCommentsMutationVariables
-  >(PetitionReplies_submitUnpublishedCommentsDocument, options);
-}
-export type PetitionReplies_submitUnpublishedCommentsMutationHookResult =
-  ReturnType<typeof usePetitionReplies_submitUnpublishedCommentsMutation>;
 export const PetitionReplies_markPetitionFieldCommentsAsReadDocument = gql`
   mutation PetitionReplies_markPetitionFieldCommentsAsRead(
     $petitionId: GID!
@@ -12513,28 +12448,6 @@ export function useRecipientView_publicCompletePetitionMutation(
 export type RecipientView_publicCompletePetitionMutationHookResult = ReturnType<
   typeof useRecipientView_publicCompletePetitionMutation
 >;
-export const RecipientView_submitUnpublishedCommentsDocument = gql`
-  mutation RecipientView_submitUnpublishedComments($keycode: ID!) {
-    publicSubmitUnpublishedComments(keycode: $keycode) {
-      id
-      publishedAt
-    }
-  }
-`;
-export function useRecipientView_submitUnpublishedCommentsMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    RecipientView_submitUnpublishedCommentsMutation,
-    RecipientView_submitUnpublishedCommentsMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    RecipientView_submitUnpublishedCommentsMutation,
-    RecipientView_submitUnpublishedCommentsMutationVariables
-  >(RecipientView_submitUnpublishedCommentsDocument, options);
-}
-export type RecipientView_submitUnpublishedCommentsMutationHookResult =
-  ReturnType<typeof useRecipientView_submitUnpublishedCommentsMutation>;
 export const PublicPetitionDocument = gql`
   query PublicPetition($keycode: ID!) {
     access(keycode: $keycode) {

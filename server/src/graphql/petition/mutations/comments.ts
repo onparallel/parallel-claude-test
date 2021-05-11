@@ -58,7 +58,7 @@ export const createPetitionFieldComment = mutationField(
           "COMMENTS_NOT_ENABLED"
         );
       }
-      const comment = await ctx.petitions.createPetitionFieldCommentFromUser(
+      return await ctx.petitions.createPetitionFieldCommentFromUser(
         {
           petitionId: args.petitionId,
           petitionFieldId: args.petitionFieldId,
@@ -68,24 +68,6 @@ export const createPetitionFieldComment = mutationField(
         },
         ctx.user!
       );
-      // on internal comment, send email to subscribed users as soon as the comment is created
-      if (args.isInternal) {
-        const userIds = (
-          await ctx.petitions.loadSubscribedUsersOnPetition(args.petitionId)
-        )
-          .map((u) => u.id)
-          .filter((id) => id !== ctx.user!.id);
-
-        await ctx.emails.sendPetitionCommentsUserNotificationEmail(
-          args.petitionId,
-          "User",
-          ctx.user!.id,
-          [comment.id],
-          userIds
-        );
-      }
-
-      return comment;
     },
   }
 );
@@ -146,44 +128,6 @@ export const updatePetitionFieldComment = mutationField(
         args.content,
         ctx.user!
       );
-    },
-  }
-);
-
-export const submitUnpublishedComments = mutationField(
-  "submitUnpublishedComments",
-  {
-    description: "Submits all unpublished comments.",
-    type: list(nonNull("PetitionFieldComment")),
-    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-    },
-    resolve: async (_, args, ctx) => {
-      const { comments, userIds, accessIds } =
-        await ctx.petitions.publishPetitionFieldCommentsForUser(
-          args.petitionId,
-          ctx.user!
-        );
-      await Promise.all([
-        // send email to all contacts with active access
-        ctx.emails.sendPetitionCommentsContactNotificationEmail(
-          args.petitionId,
-          "User",
-          ctx.user!.id,
-          comments.map(prop("id")),
-          accessIds
-        ),
-        // send email to all subscribed users
-        ctx.emails.sendPetitionCommentsUserNotificationEmail(
-          args.petitionId,
-          "User",
-          ctx.user!.id,
-          comments.map(prop("id")),
-          userIds
-        ),
-      ]);
-      return comments;
     },
   }
 );

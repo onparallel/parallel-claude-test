@@ -682,7 +682,6 @@ export interface NexusGenFieldTypes {
     publicFileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
-    publicSubmitUnpublishedComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicUpdateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -697,7 +696,6 @@ export interface NexusGenFieldTypes {
     sendReminders: NexusGenEnums["Result"]; // Result!
     signedPetitionDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
-    submitUnpublishedComments: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     tagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
@@ -876,11 +874,11 @@ export interface NexusGenFieldTypes {
     // field return type
     author: NexusGenRootTypes["UserOrPetitionAccess"] | null; // UserOrPetitionAccess
     content: string; // String!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     isEdited: boolean; // Boolean!
     isInternal: boolean; // Boolean!
     isUnread: boolean; // Boolean!
-    publishedAt: NexusGenScalars["DateTime"] | null; // DateTime
     reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
   };
   PetitionFieldReply: {
@@ -1059,7 +1057,6 @@ export interface NexusGenFieldTypes {
     replies: NexusGenRootTypes["PublicPetitionFieldReply"][]; // [PublicPetitionFieldReply!]!
     title: string | null; // String
     type: NexusGenEnums["PetitionFieldType"]; // PetitionFieldType!
-    unpublishedCommentCount: number; // Int!
     unreadCommentCount: number; // Int!
     validated: boolean; // Boolean!
     visibility: NexusGenScalars["JSONObject"] | null; // JSONObject
@@ -1068,9 +1065,9 @@ export interface NexusGenFieldTypes {
     // field return type
     author: NexusGenRootTypes["PublicUserOrContact"] | null; // PublicUserOrContact
     content: string; // String!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     isUnread: boolean; // Boolean!
-    publishedAt: NexusGenScalars["DateTime"] | null; // DateTime
     reply: NexusGenRootTypes["PublicPetitionFieldReply"] | null; // PublicPetitionFieldReply
   };
   PublicPetitionFieldReply: {
@@ -1533,7 +1530,6 @@ export interface NexusGenFieldTypeNames {
     publicFileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicSendVerificationCode: "VerificationCodeRequest";
-    publicSubmitUnpublishedComments: "PublicPetitionFieldComment";
     publicUpdateDynamicSelectReply: "PublicPetitionFieldReply";
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdateSimpleReply: "PublicPetitionFieldReply";
@@ -1548,7 +1544,6 @@ export interface NexusGenFieldTypeNames {
     sendReminders: "Result";
     signedPetitionDownloadLink: "FileUploadReplyDownloadLinkResult";
     startSignatureRequest: "PetitionSignatureRequest";
-    submitUnpublishedComments: "PetitionFieldComment";
     switchAutomaticReminders: "PetitionAccess";
     tagPetition: "PetitionBase";
     transferPetitionOwnership: "Petition";
@@ -1723,11 +1718,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     author: "UserOrPetitionAccess";
     content: "String";
+    createdAt: "DateTime";
     id: "GID";
     isEdited: "Boolean";
     isInternal: "Boolean";
     isUnread: "Boolean";
-    publishedAt: "DateTime";
     reply: "PetitionFieldReply";
   };
   PetitionFieldReply: {
@@ -1904,7 +1899,6 @@ export interface NexusGenFieldTypeNames {
     replies: "PublicPetitionFieldReply";
     title: "String";
     type: "PetitionFieldType";
-    unpublishedCommentCount: "Int";
     unreadCommentCount: "Int";
     validated: "Boolean";
     visibility: "JSONObject";
@@ -1913,9 +1907,9 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     author: "PublicUserOrContact";
     content: "String";
+    createdAt: "DateTime";
     id: "GID";
     isUnread: "Boolean";
-    publishedAt: "DateTime";
     reply: "PublicPetitionFieldReply";
   };
   PublicPetitionFieldReply: {
@@ -2501,10 +2495,6 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
     };
-    publicSubmitUnpublishedComments: {
-      // args
-      keycode: string; // ID!
-    };
     publicUpdateDynamicSelectReply: {
       // args
       keycode: string; // ID!
@@ -2583,10 +2573,6 @@ export interface NexusGenArgTypes {
       preview?: boolean | null; // Boolean
     };
     startSignatureRequest: {
-      // args
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
-    submitUnpublishedComments: {
       // args
       petitionId: NexusGenScalars["GID"]; // GID!
     };

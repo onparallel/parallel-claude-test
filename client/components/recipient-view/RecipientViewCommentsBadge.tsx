@@ -1,54 +1,36 @@
 import { Box, BoxProps, Tooltip } from "@chakra-ui/react";
+import { If } from "@parallel/utils/conditions";
 import { useIntl } from "react-intl";
 
 export interface RecipientViewCommentsBadgeProps extends BoxProps {
   hasUnreadComments?: boolean;
-  hasUnpublishedComments?: boolean;
   isReversedPurple?: boolean;
 }
 
 export function RecipientViewCommentsBadge({
   hasUnreadComments,
-  hasUnpublishedComments,
   isReversedPurple,
   ...props
 }: RecipientViewCommentsBadgeProps) {
   const intl = useIntl();
-  const label = hasUnreadComments
-    ? hasUnpublishedComments
-      ? intl.formatMessage({
-          id: "recipient-view.unread-and-unpublished-comments",
-          defaultMessage: "There's unread and unpublished comments",
-        })
-      : intl.formatMessage({
-          id: "recipient-view.unread-comments",
-          defaultMessage: "There's unread comments",
-        })
-    : intl.formatMessage({
-        id: "recipient-view.unpublished-comments",
-        defaultMessage: "There's unpublished comments",
-      });
-  return hasUnreadComments || hasUnpublishedComments ? (
-    <Box display="inline-block" aria-label={label} role="img" {...props}>
-      <Tooltip label={label}>
-        <Box
-          width="4px"
-          height="4px"
-          {...(!hasUnreadComments
-            ? { borderColor: "yellow.500" }
-            : !hasUnpublishedComments
-            ? { borderColor: isReversedPurple ? "white" : "purple.500" }
-            : {
-                borderLeftColor: "yellow.500",
-                borderTopColor: "yellow.500",
-                borderRightColor: isReversedPurple ? "white" : "purple.500",
-                borderBottomColor: isReversedPurple ? "white" : "purple.500",
-              })}
-          borderWidth="4px"
-          transform="rotate(-45deg)"
-          borderRadius="9999px"
-        />
-      </Tooltip>
-    </Box>
-  ) : null;
+  const label = intl.formatMessage({
+    id: "recipient-view.unread-comments",
+    defaultMessage: "There's unread comments",
+  });
+  return (
+    <If condition={hasUnreadComments}>
+      <Box display="inline-block" aria-label={label} role="img" {...props}>
+        <Tooltip label={label}>
+          <Box
+            width="4px"
+            height="4px"
+            borderColor={isReversedPurple ? "white" : "purple.500"}
+            borderWidth="4px"
+            transform="rotate(-45deg)"
+            borderRadius="9999px"
+          />
+        </Tooltip>
+      </Box>
+    </If>
+  );
 }

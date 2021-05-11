@@ -179,9 +179,6 @@ export function PetitionRepliesField({
               isActive={isShowingComments}
               commentCount={field.comments.length}
               hasUnreadComments={field.comments.some((c) => c.isUnread)}
-              hasUnpublishedComments={field.comments.some(
-                (c) => !c.publishedAt
-              )}
               onClick={onToggleComments}
             />
           </Flex>
@@ -261,19 +258,12 @@ export function PetitionRepliesField({
 interface CommentsButtonProps extends ButtonProps {
   commentCount: number;
   hasUnreadComments: boolean;
-  hasUnpublishedComments: boolean;
   isActive: boolean;
 }
 
 const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
   function CommentsButton(
-    {
-      commentCount,
-      hasUnreadComments,
-      hasUnpublishedComments,
-      isActive,
-      ...props
-    },
+    { commentCount, hasUnreadComments, isActive, ...props },
     ref
   ) {
     const intl = useIntl();
@@ -316,7 +306,6 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
           </Text>
         </Stack>
         <RecipientViewCommentsBadge
-          hasUnpublishedComments={hasUnpublishedComments}
           hasUnreadComments={hasUnreadComments}
           isReversedPurple={isActive}
           marginRight={2}
@@ -354,7 +343,7 @@ PetitionRepliesField.fragments = {
       comments {
         id
         isUnread
-        publishedAt
+        createdAt
       }
     }
     fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
