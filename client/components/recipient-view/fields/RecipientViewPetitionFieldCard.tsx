@@ -165,7 +165,8 @@ export function RecipientViewPetitionFieldCard({
             variant="outline"
             isRound
             label={intl.formatMessage({
-              id: "component.recipient-view-petition-field-card.add-another-reply",
+              id:
+                "component.recipient-view-petition-field-card.add-another-reply",
               defaultMessage: "Add another reply",
             })}
             onClick={onAddNewReply}

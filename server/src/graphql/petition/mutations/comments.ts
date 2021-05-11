@@ -12,7 +12,6 @@ import {
   ifArgDefined,
   ifArgEquals,
 } from "../../helpers/authorize";
-import { RESULT } from "../../helpers/result";
 import {
   commentsBelongsToPetition,
   fieldsBelongsToPetition,
@@ -30,7 +29,7 @@ export const createPetitionFieldComment = mutationField(
   "createPetitionFieldComment",
   {
     description: "Create a petition field comment.",
-    type: "PetitionFieldComment",
+    type: "PetitionField",
     authorize: chain(
       authenticate(),
       and(
@@ -58,7 +57,7 @@ export const createPetitionFieldComment = mutationField(
           "COMMENTS_NOT_ENABLED"
         );
       }
-      return await ctx.petitions.createPetitionFieldCommentFromUser(
+      await ctx.petitions.createPetitionFieldCommentFromUser(
         {
           petitionId: args.petitionId,
           petitionFieldId: args.petitionFieldId,
@@ -68,6 +67,7 @@ export const createPetitionFieldComment = mutationField(
         },
         ctx.user!
       );
+      return (await ctx.petitions.loadField(args.petitionFieldId))!;
     },
   }
 );
@@ -76,7 +76,7 @@ export const deletePetitionFieldComment = mutationField(
   "deletePetitionFieldComment",
   {
     description: "Delete a petition field comment.",
-    type: "Result",
+    type: "PetitionField",
     authorize: chain(
       authenticate(),
       and(
@@ -97,7 +97,7 @@ export const deletePetitionFieldComment = mutationField(
         args.petitionFieldCommentId,
         ctx.user!
       );
-      return RESULT.SUCCESS;
+      return (await ctx.petitions.loadField(args.petitionFieldId))!;
     },
   }
 );
@@ -106,7 +106,7 @@ export const updatePetitionFieldComment = mutationField(
   "updatePetitionFieldComment",
   {
     description: "Update a petition field comment.",
-    type: "PetitionFieldComment",
+    type: "PetitionField",
     authorize: chain(
       authenticate(),
       and(
@@ -123,11 +123,12 @@ export const updatePetitionFieldComment = mutationField(
       content: nonNull(stringArg()),
     },
     resolve: async (_, args, ctx) => {
-      return await ctx.petitions.updatePetitionFieldCommentFromUser(
+      await ctx.petitions.updatePetitionFieldCommentFromUser(
         args.petitionFieldCommentId,
         args.content,
         ctx.user!
       );
+      return (await ctx.petitions.loadField(args.petitionFieldId))!;
     },
   }
 );

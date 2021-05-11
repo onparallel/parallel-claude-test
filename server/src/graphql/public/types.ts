@@ -122,8 +122,9 @@ export const PublicPetition = objectType({
         members: ["STARTED", "COMPLETED"],
       }),
       resolve: async (root, _, ctx) => {
-        const signature =
-          await ctx.petitions.loadLatestPetitionSignatureByPetitionId(root.id);
+        const signature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
+          root.id
+        );
 
         return signature
           ? signature.status === "COMPLETED"

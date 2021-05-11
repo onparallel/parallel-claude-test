@@ -260,7 +260,7 @@ export interface Mutation {
   /** Creates a petition field */
   createPetitionField: PetitionBaseAndField;
   /** Create a petition field comment. */
-  createPetitionFieldComment: PetitionFieldComment;
+  createPetitionFieldComment: PetitionField;
   /** Creates a new subscription on a petition */
   createPetitionSubscription: Subscription;
   /** Creates a reply to a text or select field. */
@@ -280,7 +280,7 @@ export interface Mutation {
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
   /** Delete a petition field comment. */
-  deletePetitionFieldComment: Result;
+  deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: Result;
   deletePetitionSubscription: Result;
@@ -375,7 +375,7 @@ export interface Mutation {
   /** Updates a petition field. */
   updatePetitionField: PetitionBaseAndField;
   /** Update a petition field comment. */
-  updatePetitionFieldComment: PetitionFieldComment;
+  updatePetitionFieldComment: PetitionField;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
   /** Updates the metada of the specified petition field reply */
@@ -4001,6 +4001,7 @@ export type PetitionRepliesFieldComments_UserFragment = {
 
 export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   __typename?: "PetitionField";
+  id: string;
   title?: Maybe<string>;
   type: PetitionFieldType;
   comments: Array<
@@ -5501,8 +5502,8 @@ export type PetitionReplies_createPetitionFieldCommentMutationVariables =
 
 export type PetitionReplies_createPetitionFieldCommentMutation = {
   createPetitionFieldComment: {
-    __typename?: "PetitionFieldComment";
-  } & PetitionRepliesFieldComments_PetitionFieldCommentFragment;
+    __typename?: "PetitionField";
+  } & PetitionRepliesFieldComments_PetitionFieldFragment;
 };
 
 export type PetitionReplies_updatePetitionFieldCommentMutationVariables =
@@ -5516,8 +5517,8 @@ export type PetitionReplies_updatePetitionFieldCommentMutationVariables =
 
 export type PetitionReplies_updatePetitionFieldCommentMutation = {
   updatePetitionFieldComment: {
-    __typename?: "PetitionFieldComment";
-  } & PetitionRepliesFieldComments_PetitionFieldCommentFragment;
+    __typename?: "PetitionField";
+  } & PetitionRepliesFieldComments_PetitionFieldFragment;
 };
 
 export type PetitionReplies_deletePetitionFieldCommentMutationVariables =
@@ -5525,10 +5526,13 @@ export type PetitionReplies_deletePetitionFieldCommentMutationVariables =
     petitionId: Scalars["GID"];
     petitionFieldId: Scalars["GID"];
     petitionFieldCommentId: Scalars["GID"];
+    hasInternalComments: Scalars["Boolean"];
   }>;
 
 export type PetitionReplies_deletePetitionFieldCommentMutation = {
-  deletePetitionFieldComment: Result;
+  deletePetitionFieldComment: {
+    __typename?: "PetitionField";
+  } & PetitionRepliesFieldComments_PetitionFieldFragment;
 };
 
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables =
@@ -5577,20 +5581,6 @@ export type PetitionReplies_sendPetitionClosedNotificationMutationVariables =
 
 export type PetitionReplies_sendPetitionClosedNotificationMutation = {
   sendPetitionClosedNotification: { __typename?: "Petition"; id: string };
-};
-
-export type PetitionReplies_createPetitionFieldComment_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  comments: Array<
-    {
-      __typename?: "PetitionFieldComment";
-    } & PetitionRepliesFieldComments_PetitionFieldCommentFragment
-  >;
-};
-
-export type PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
 };
 
 export type PetitionRepliesUserQueryVariables = Exact<{ [key: string]: never }>;
@@ -7731,6 +7721,7 @@ export const PetitionRepliesFieldComments_PetitionFieldReplyFragmentDoc = gql`
 `;
 export const PetitionRepliesFieldComments_PetitionFieldFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
+    id
     title
     type
     comments {
@@ -7868,21 +7859,6 @@ export const PetitionReplies_UserFragmentDoc = gql`
   ${PetitionRepliesFieldComments_UserFragmentDoc}
   ${ExportRepliesDialog_UserFragmentDoc}
   ${PetitionSignaturesCard_UserFragmentDoc}
-`;
-export const PetitionReplies_createPetitionFieldComment_PetitionFieldFragmentDoc = gql`
-  fragment PetitionReplies_createPetitionFieldComment_PetitionField on PetitionField {
-    comments {
-      ...PetitionRepliesFieldComments_PetitionFieldComment
-    }
-  }
-  ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
-`;
-export const PetitionReplies_deletePetitionFieldComment_PetitionFieldFragmentDoc = gql`
-  fragment PetitionReplies_deletePetitionFieldComment_PetitionField on PetitionField {
-    comments {
-      id
-    }
-  }
 `;
 export const PetitionTagListCellContent_TagFragmentDoc = gql`
   fragment PetitionTagListCellContent_Tag on Tag {
@@ -11682,10 +11658,10 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
       content: $content
       isInternal: $isInternal
     ) {
-      ...PetitionRepliesFieldComments_PetitionFieldComment
+      ...PetitionRepliesFieldComments_PetitionField
     }
   }
-  ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
+  ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
 `;
 export function usePetitionReplies_createPetitionFieldCommentMutation(
   baseOptions?: Apollo.MutationHookOptions<
@@ -11715,10 +11691,10 @@ export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
       petitionFieldCommentId: $petitionFieldCommentId
       content: $content
     ) {
-      ...PetitionRepliesFieldComments_PetitionFieldComment
+      ...PetitionRepliesFieldComments_PetitionField
     }
   }
-  ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
+  ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
 `;
 export function usePetitionReplies_updatePetitionFieldCommentMutation(
   baseOptions?: Apollo.MutationHookOptions<
@@ -11739,13 +11715,17 @@ export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
     $petitionId: GID!
     $petitionFieldId: GID!
     $petitionFieldCommentId: GID!
+    $hasInternalComments: Boolean!
   ) {
     deletePetitionFieldComment(
       petitionId: $petitionId
       petitionFieldId: $petitionFieldId
       petitionFieldCommentId: $petitionFieldCommentId
-    )
+    ) {
+      ...PetitionRepliesFieldComments_PetitionField
+    }
   }
+  ${PetitionRepliesFieldComments_PetitionFieldFragmentDoc}
 `;
 export function usePetitionReplies_deletePetitionFieldCommentMutation(
   baseOptions?: Apollo.MutationHookOptions<

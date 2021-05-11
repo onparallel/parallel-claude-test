@@ -1,4 +1,4 @@
-import { gql, useApolloClient } from "@apollo/client";
+import { gql } from "@apollo/client";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import {
   CheckIcon,
@@ -49,17 +49,11 @@ import { RecipientViewCommentsBadge } from "@parallel/components/recipient-view/
 import {
   PetitionFieldReply,
   PetitionFieldReplyStatus,
-  PetitionRepliesFieldComments_PetitionFieldCommentFragment,
   PetitionRepliesQuery,
   PetitionRepliesQueryVariables,
   PetitionRepliesUserQuery,
-  PetitionReplies_createPetitionFieldCommentMutationVariables,
-  PetitionReplies_createPetitionFieldComment_PetitionFieldFragment,
-  PetitionReplies_deletePetitionFieldCommentMutationVariables,
-  PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment,
   PetitionReplies_PetitionFieldFragment,
   PetitionReplies_PetitionFragment,
-  PetitionReplies_updatePetitionFieldCommentMutationVariables,
   PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,
   PetitionStatus,
   UpdatePetitionInput,
@@ -300,37 +294,47 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     (f) => !f.isReadOnly && f.replies.length > 0
   );
 
-  const createPetitionFieldComment = useCreatePetitionFieldComment();
+  const [createPetitionFieldComment] =
+    usePetitionReplies_createPetitionFieldCommentMutation();
   async function handleAddComment(content: string, isInternal?: boolean) {
     await createPetitionFieldComment({
-      petitionId,
-      petitionFieldId: activeFieldId!,
-      content,
-      isInternal,
-      hasInternalComments: me.hasInternalComments,
+      variables: {
+        petitionId,
+        petitionFieldId: activeFieldId!,
+        content,
+        isInternal,
+        hasInternalComments: me.hasInternalComments,
+      },
     });
   }
 
-  const updatePetitionFieldComment = useUpdatePetitionFieldComment();
+  const [updatePetitionFieldComment] =
+    usePetitionReplies_updatePetitionFieldCommentMutation();
   async function handleUpdateComment(
     petitionFieldCommentId: string,
     content: string
   ) {
     await updatePetitionFieldComment({
-      petitionId,
-      petitionFieldId: activeFieldId!,
-      petitionFieldCommentId,
-      content,
-      hasInternalComments: me.hasInternalComments,
+      variables: {
+        petitionId,
+        petitionFieldId: activeFieldId!,
+        petitionFieldCommentId,
+        content,
+        hasInternalComments: me.hasInternalComments,
+      },
     });
   }
 
-  const deletePetitionFieldComment = useDeletePetitionFieldComment();
+  const [deletePetitionFieldComment] =
+    usePetitionReplies_deletePetitionFieldCommentMutation();
   async function handleDeleteComment(petitionFieldCommentId: string) {
     await deletePetitionFieldComment({
-      petitionId,
-      petitionFieldId: activeFieldId!,
-      petitionFieldCommentId,
+      variables: {
+        petitionId,
+        petitionFieldId: activeFieldId!,
+        petitionFieldCommentId,
+        hasInternalComments: me.hasInternalComments,
+      },
     });
   }
 
@@ -804,10 +808,10 @@ PetitionReplies.mutations = [
         content: $content
         isInternal: $isInternal
       ) {
-        ...PetitionRepliesFieldComments_PetitionFieldComment
+        ...PetitionRepliesFieldComments_PetitionField
       }
     }
-    ${PetitionRepliesFieldComments.fragments.PetitionFieldComment}
+    ${PetitionRepliesFieldComments.fragments.PetitionField}
   `,
   gql`
     mutation PetitionReplies_updatePetitionFieldComment(
@@ -823,23 +827,27 @@ PetitionReplies.mutations = [
         petitionFieldCommentId: $petitionFieldCommentId
         content: $content
       ) {
-        ...PetitionRepliesFieldComments_PetitionFieldComment
+        ...PetitionRepliesFieldComments_PetitionField
       }
     }
-    ${PetitionRepliesFieldComments.fragments.PetitionFieldComment}
+    ${PetitionRepliesFieldComments.fragments.PetitionField}
   `,
   gql`
     mutation PetitionReplies_deletePetitionFieldComment(
       $petitionId: GID!
       $petitionFieldId: GID!
       $petitionFieldCommentId: GID!
+      $hasInternalComments: Boolean!
     ) {
       deletePetitionFieldComment(
         petitionId: $petitionId
         petitionFieldId: $petitionFieldId
         petitionFieldCommentId: $petitionFieldCommentId
-      )
+      ) {
+        ...PetitionRepliesFieldComments_PetitionField
+      }
     }
+    ${PetitionRepliesFieldComments.fragments.PetitionField}
   `,
   gql`
     mutation PetitionReplies_markPetitionFieldCommentsAsRead(
@@ -926,136 +934,6 @@ function useDownloadReplyFile() {
       });
     },
     [mutate]
-  );
-}
-
-function useCreatePetitionFieldComment() {
-  const [createPetitionFieldComment] =
-    usePetitionReplies_createPetitionFieldCommentMutation();
-  return useCallback(
-    async (
-      variables: PetitionReplies_createPetitionFieldCommentMutationVariables
-    ) => {
-      await createPetitionFieldComment({
-        variables,
-        update(client, { data }) {
-          if (!data) {
-            return;
-          }
-          const options = {
-            fragment: gql`
-              fragment PetitionReplies_createPetitionFieldComment_PetitionField on PetitionField {
-                comments {
-                  ...PetitionRepliesFieldComments_PetitionFieldComment
-                }
-              }
-              ${PetitionRepliesFieldComments.fragments.PetitionFieldComment}
-            `,
-            fragmentName:
-              "PetitionReplies_createPetitionFieldComment_PetitionField",
-            id: variables.petitionFieldId,
-            variables: pick(variables, ["hasInternalComments"]),
-          };
-          const field =
-            client.readFragment<PetitionReplies_createPetitionFieldComment_PetitionFieldFragment>(
-              options
-            );
-          client.writeFragment<PetitionReplies_createPetitionFieldComment_PetitionFieldFragment>(
-            {
-              ...options,
-              data: {
-                ...field,
-                comments: [
-                  ...field!.comments,
-                  data!.createPetitionFieldComment,
-                ],
-              },
-            }
-          );
-        },
-      });
-    },
-    [createPetitionFieldComment]
-  );
-}
-
-function useUpdatePetitionFieldComment() {
-  const [updatePetitionFieldComment] =
-    usePetitionReplies_updatePetitionFieldCommentMutation();
-  const apollo = useApolloClient();
-  return useCallback(
-    async (
-      variables: PetitionReplies_updatePetitionFieldCommentMutationVariables
-    ) => {
-      await updatePetitionFieldComment({
-        variables,
-        optimisticResponse: () => {
-          const comment =
-            apollo.readFragment<PetitionRepliesFieldComments_PetitionFieldCommentFragment>(
-              {
-                fragment:
-                  PetitionRepliesFieldComments.fragments.PetitionFieldComment,
-                id: variables.petitionFieldCommentId,
-                fragmentName:
-                  "PetitionRepliesFieldComments_PetitionFieldComment",
-                variables: pick(variables, ["hasInternalComments"]),
-              }
-            );
-          return {
-            updatePetitionFieldComment: {
-              ...comment!,
-              content: variables.content,
-            },
-          };
-        },
-      });
-    },
-    [updatePetitionFieldComment]
-  );
-}
-
-function useDeletePetitionFieldComment() {
-  const [deletePetitionFieldComment] =
-    usePetitionReplies_deletePetitionFieldCommentMutation();
-  return useCallback(
-    async (
-      variables: PetitionReplies_deletePetitionFieldCommentMutationVariables
-    ) => {
-      await deletePetitionFieldComment({
-        variables,
-        update(client, { data }) {
-          if (!data) {
-            return;
-          }
-          const options = {
-            fragment: gql`
-              fragment PetitionReplies_deletePetitionFieldComment_PetitionField on PetitionField {
-                comments {
-                  id
-                }
-              }
-            `,
-            id: variables.petitionFieldId,
-          };
-          const field =
-            client.readFragment<PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment>(
-              options
-            );
-          client.writeFragment<PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment>(
-            {
-              ...options,
-              data: {
-                ...field,
-                comments: field!.comments.filter(
-                  (c) => c.id !== variables.petitionFieldCommentId
-                ),
-              },
-            }
-          );
-        },
-      });
-    },
-    [deletePetitionFieldComment]
   );
 }
 

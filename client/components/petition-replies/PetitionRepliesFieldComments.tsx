@@ -452,6 +452,7 @@ PetitionRepliesFieldComments.fragments = {
   get PetitionField() {
     return gql`
       fragment PetitionRepliesFieldComments_PetitionField on PetitionField {
+        id
         title
         type
         comments {

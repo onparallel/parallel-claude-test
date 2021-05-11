@@ -648,7 +648,7 @@ export interface NexusGenFieldTypes {
     createOrganizationUser: NexusGenRootTypes["User"]; // User!
     createPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     createPetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
-    createPetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
+    createPetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     createPetitionSubscription: NexusGenRootTypes["Subscription"]; // Subscription!
     createSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
@@ -658,7 +658,7 @@ export interface NexusGenFieldTypes {
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     deletePetitionField: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-    deletePetitionFieldComment: NexusGenEnums["Result"]; // Result!
+    deletePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     deletePetitionReply: NexusGenEnums["Result"]; // Result!
     deletePetitionSubscription: NexusGenEnums["Result"]; // Result!
     deletePetitions: NexusGenEnums["Result"]; // Result!
@@ -706,7 +706,7 @@ export interface NexusGenFieldTypes {
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
-    updatePetitionFieldComment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
+    updatePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
@@ -1496,7 +1496,7 @@ export interface NexusGenFieldTypeNames {
     createOrganizationUser: "User";
     createPetition: "PetitionBase";
     createPetitionField: "PetitionBaseAndField";
-    createPetitionFieldComment: "PetitionFieldComment";
+    createPetitionFieldComment: "PetitionField";
     createPetitionSubscription: "Subscription";
     createSimpleReply: "PetitionFieldReply";
     createTag: "Tag";
@@ -1506,7 +1506,7 @@ export interface NexusGenFieldTypeNames {
     deleteContacts: "Result";
     deletePetition: "SupportMethodResponse";
     deletePetitionField: "PetitionBase";
-    deletePetitionFieldComment: "Result";
+    deletePetitionFieldComment: "PetitionField";
     deletePetitionReply: "Result";
     deletePetitionSubscription: "Result";
     deletePetitions: "Result";
@@ -1554,7 +1554,7 @@ export interface NexusGenFieldTypeNames {
     updateOrganizationLogo: "Organization";
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionBaseAndField";
-    updatePetitionFieldComment: "PetitionFieldComment";
+    updatePetitionFieldComment: "PetitionField";
     updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionPermissionSubscription: "Petition";

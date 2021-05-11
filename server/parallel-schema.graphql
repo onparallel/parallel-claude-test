@@ -434,7 +434,7 @@ type Mutation {
     petitionFieldId: GID!
     petitionFieldReplyId: GID
     petitionId: GID!
-  ): PetitionFieldComment!
+  ): PetitionField!
 
   """
   Creates a new subscription on a petition
@@ -537,7 +537,7 @@ type Mutation {
     petitionFieldCommentId: GID!
     petitionFieldId: GID!
     petitionId: GID!
-  ): Result!
+  ): PetitionField!
 
   """
   Deletes a reply to a petition field.
@@ -888,7 +888,7 @@ type Mutation {
     petitionFieldCommentId: GID!
     petitionFieldId: GID!
     petitionId: GID!
-  ): PetitionFieldComment!
+  ): PetitionField!
 
   """
   Updates the status of a petition field reply and sets the petition as closed if all fields are validated.
