@@ -10,7 +10,6 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
-import { usePetitionsSharingDialog } from "@parallel/components/petition-common/PetitionsSharingDialog";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
   PetitionBaseType,
@@ -176,25 +175,14 @@ function Petitions() {
   );
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
-  const showPetitionsSharingDialog = usePetitionsSharingDialog();
 
   const handlePetitionSharingClick = async function () {
     try {
-      if (selected.length === 1) {
-        await showPetitionSharingDialog({
-          userId: me.id,
-          petitionId: selected[0],
-          isTemplate:
-            petitions.items[0].__typename === "Petition" ? false : true,
-        });
-      } else {
-        await showPetitionsSharingDialog({
-          userId: me.id,
-          petitionIds: selected,
-          isTemplates:
-            petitions.items[0].__typename === "Petition" ? false : true,
-        });
-      }
+      await showPetitionSharingDialog({
+        userId: me.id,
+        petitionIds: selected,
+        isTemplate: petitions.items[0].__typename === "Petition" ? false : true,
+      });
     } catch {}
   };
 

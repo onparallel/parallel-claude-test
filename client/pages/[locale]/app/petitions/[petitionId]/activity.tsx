@@ -316,7 +316,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     try {
       await showPetitionSharingDialog({
         userId: me.id,
-        petitionId: petition.id,
+        petitionIds: [petition.id],
       });
     } catch {}
   };

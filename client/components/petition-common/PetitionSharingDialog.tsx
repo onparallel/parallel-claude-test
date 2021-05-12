@@ -1,6 +1,9 @@
 import { gql } from "@apollo/client";
 import { getOperationName } from "@apollo/client/utilities";
 import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
   Avatar,
   Box,
   Button,
@@ -8,6 +11,7 @@ import {
   Checkbox,
   Circle,
   Flex,
+  ListItem,
   Menu,
   MenuButton,
   MenuItem,
@@ -16,6 +20,7 @@ import {
   Spinner,
   Stack,
   Text,
+  UnorderedList,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -24,10 +29,11 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
+  Petition,
   PetitionActivityDocument,
   PetitionSharingModal_UserFragment,
   usePetitionSharingModal_addPetitionUserPermissionMutation,
-  usePetitionSharingModal_PetitionUserPermissionsQuery,
+  usePetitionSharingModal_PetitionsUserPermissionsQuery,
   usePetitionSharingModal_removePetitionUserPermissionMutation,
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
@@ -60,26 +66,30 @@ export function usePetitionSharingDialog() {
 
 export function PetitionSharingDialog({
   userId,
-  petitionId,
+  petitionIds,
   isTemplate,
   ...props
 }: DialogProps<{
   userId: string;
-  petitionId: string;
+  petitionIds: string[];
   isTemplate?: boolean;
 }>) {
   const intl = useIntl();
   const toast = useToast();
-  const { data } = usePetitionSharingModal_PetitionUserPermissionsQuery({
-    variables: { petitionId },
+  const [hasUsers, setHasUsers] = useState(false);
+  const [petitionsOwned, setPetitionsOwned] = useState<Array<Petition>>([]);
+  const [petitionsRW, setPetitionsRW] = useState<Array<Petition>>([]);
+
+  const { data } = usePetitionSharingModal_PetitionsUserPermissionsQuery({
+    variables: { petitionIds },
     fetchPolicy: "cache-and-network",
   });
-  const userPermissions = data?.petition?.userPermissions;
-  const isOwner = userPermissions?.some(
-    (up) => up.permissionType === "OWNER" && up.user.id === userId
-  );
 
+  const petitionId = petitionIds[0];
+  const petitionsById = data?.petitionsById as Array<Petition>;
+  const userPermissions = petitionsById && petitionsById[0].userPermissions;
   const prev = usePreviousValue(userPermissions);
+
   useEffect(() => {
     if (userPermissions && !prev) {
       setTimeout(() => usersRef.current?.focus());
@@ -99,7 +109,25 @@ export function PetitionSharingDialog({
       message: "",
     },
   });
-  const [hasUsers, setHasUsers] = useState(false);
+
+  useEffect(() => {
+    if (petitionsById) {
+      setPetitionsOwned(
+        petitionsById.filter((petition) =>
+          petition.userPermissions.some(
+            (up) => up.permissionType === "OWNER" && up.user.id === userId
+          )
+        )
+      );
+      setPetitionsRW(
+        petitionsById.filter((petition) =>
+          petition.userPermissions.some(
+            (up) => up.permissionType !== "OWNER" && up.user.id === userId
+          )
+        )
+      );
+    }
+  }, [petitionsById]);
 
   const usersRef = useRef<UserSelectInstance<true>>(null);
   const messageRef = useRef<HTMLInputElement>(null);
@@ -109,15 +137,17 @@ export function PetitionSharingDialog({
     "message"
   );
 
+  const usersToExlude =
+    petitionIds.length === 1
+      ? userPermissions?.map((up) => up.user.id) ?? []
+      : [userId];
+
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, exclude: string[]) => {
-      return await _handleSearchUsers(search, [
-        ...exclude,
-        ...(data?.petition?.userPermissions.map((up) => up.user.id) ?? []),
-      ]);
+      return await _handleSearchUsers(search, [...exclude, ...usersToExlude]);
     },
-    [_handleSearchUsers, data?.petition?.userPermissions]
+    [_handleSearchUsers, userPermissions]
   );
   const handleRemoveUserPermission = useRemoveUserPermission();
   const handleTransferPetitionOwnership = useTransferPetitionOwnership();
@@ -134,7 +164,7 @@ export function PetitionSharingDialog({
           "{count, plural, =1 {Template} other {Templates}} shared",
       },
       {
-        count: 1,
+        count: petitionsOwned.length,
       }
     );
 
@@ -145,7 +175,7 @@ export function PetitionSharingDialog({
           "{count, plural, =1 {Petition} other {Petitions}} shared",
       },
       {
-        count: 1,
+        count: petitionsOwned.length,
       }
     );
 
@@ -157,7 +187,7 @@ export function PetitionSharingDialog({
       try {
         await addPetitionUserPermission({
           variables: {
-            petitionId,
+            petitionIds: petitionsOwned.map((p) => p.id),
             userIds: users.map((u) => u.id),
             permissionType: "WRITE",
             notify,
@@ -209,7 +239,7 @@ export function PetitionSharingDialog({
         </Stack>
       }
       body={
-        userPermissions ? (
+        petitionsById ? (
           <Stack>
             <Stack direction="row">
               <Box flex="1">
@@ -235,9 +265,9 @@ export function PetitionSharingDialog({
                       }}
                       onBlur={onBlur}
                       onSearchUsers={handleSearchUsers}
-                      isDisabled={!isOwner}
+                      isDisabled={!petitionsOwned.length}
                       placeholder={
-                        isOwner
+                        petitionsOwned.length
                           ? intl.formatMessage({
                               id: "petition-sharing.input-placeholder",
                               defaultMessage:
@@ -282,7 +312,10 @@ export function PetitionSharingDialog({
                 />
               </PaddedCollapse>
             </Stack>
-            <Stack display={hasUsers ? "none" : "flex"} paddingTop={2}>
+            <Stack
+              display={hasUsers || petitionIds.length !== 1 ? "none" : "flex"}
+              paddingTop={2}
+            >
               {userPermissions.map(({ user, permissionType }) => (
                 <Flex key={user.id} alignItems="center">
                   <Avatar role="presentation" name={user.fullName!} size="sm" />
@@ -304,7 +337,7 @@ export function PetitionSharingDialog({
                       {user.email}
                     </Text>
                   </Box>
-                  {permissionType === "OWNER" || !isOwner ? (
+                  {permissionType === "OWNER" || !petitionsOwned.length ? (
                     <Box
                       paddingX={3}
                       fontWeight="bold"
@@ -356,6 +389,63 @@ export function PetitionSharingDialog({
                   )}
                 </Flex>
               ))}
+            </Stack>
+            <Stack
+              display={
+                petitionsRW.length && petitionIds.length !== 1 ? "flex" : "none"
+              }
+            >
+              <Alert
+                status="warning"
+                backgroundColor="orange.100"
+                borderRadius="md"
+              >
+                <Flex alignItems="center" justifyContent="flex-start">
+                  <AlertIcon color="yellow.500" />
+                  <AlertDescription>
+                    {petitionsRW.length !== petitionIds.length ? (
+                      <>
+                        <Text>
+                          {isTemplate ? (
+                            <FormattedMessage
+                              id="template-sharing.insufficient-permissions-list"
+                              defaultMessage="The following {count, plural, =1 {template has} other {templates have}} been ignored and cannot be shared due to lack of permissions:"
+                              values={{ count: petitionsRW.length }}
+                            />
+                          ) : (
+                            <FormattedMessage
+                              id="petition-sharing.insufficient-permissions-list"
+                              defaultMessage="The following {count, plural, =1 {petition has} other {petitions have}} been ignored and cannot be shared due to lack of permissions:"
+                              values={{ count: petitionsRW.length }}
+                            />
+                          )}
+                        </Text>
+                        <UnorderedList paddingLeft={2}>
+                          {petitionsRW.map((petition) => (
+                            <ListItem key={petition.id}>
+                              {petition.name}
+                            </ListItem>
+                          ))}
+                        </UnorderedList>
+                      </>
+                    ) : (
+                      <Text>
+                        {isTemplate ? (
+                          <FormattedMessage
+                            id="template-sharing.insufficient-permissions"
+                            defaultMessage="You do not have permission to share the selected templates."
+                          />
+                        ) : (
+                          <FormattedMessage
+                            id="petition-sharing.insufficient-permissions"
+                            defaultMessage="You do not have permission to share the selected petitions."
+                          />
+                        )}
+                      </Text>
+                    )}
+                  </AlertDescription>
+                </Flex>
+              </Alert>
             </Stack>
           </Stack>
         ) : (
@@ -422,14 +512,14 @@ PetitionSharingDialog.fragments = {
 PetitionSharingDialog.mutations = [
   gql`
     mutation PetitionSharingModal_addPetitionUserPermission(
-      $petitionId: GID!
+      $petitionIds: [GID!]!
       $userIds: [GID!]!
       $permissionType: PetitionUserPermissionTypeRW!
       $notify: Boolean
       $message: String
     ) {
       addPetitionUserPermission(
-        petitionIds: [$petitionId]
+        petitionIds: $petitionIds
         userIds: $userIds
         permissionType: $permissionType
         notify: $notify
@@ -469,8 +559,8 @@ PetitionSharingDialog.mutations = [
 
 PetitionSharingDialog.queries = [
   gql`
-    query PetitionSharingModal_PetitionUserPermissions($petitionId: GID!) {
-      petition(id: $petitionId) {
+    query PetitionSharingModal_PetitionsUserPermissions($petitionIds: [GID!]!) {
+      petitionsById(ids: $petitionIds) {
         ...PetitionSharingModal_Petition
       }
     }

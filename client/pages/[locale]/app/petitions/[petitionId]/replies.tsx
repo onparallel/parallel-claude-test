@@ -495,7 +495,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     try {
       await showPetitionSharingDialog({
         userId: me.id,
-        petitionId: petition.id,
+        petitionIds: [petition.id],
       });
     } catch {}
   };

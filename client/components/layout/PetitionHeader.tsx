@@ -124,7 +124,7 @@ export function PetitionHeader({
     try {
       await showPetitionSharingDialog({
         userId: user.id,
-        petitionId: petition.id,
+        petitionIds: [petition.id],
       });
     } catch {}
   };
