@@ -1,6 +1,10 @@
-import gql from "graphql-tag";
 import faker from "faker";
+import gql from "graphql-tag";
+import { Knex } from "knex";
 import { pick } from "remeda";
+import { USER_COGNITO_ID } from "../../../test/mocks";
+import { defaultFieldOptions } from "../../db/helpers/fieldOptions";
+import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Contact,
@@ -9,13 +13,11 @@ import {
   PetitionAccess,
   PetitionField,
   PetitionFieldReply,
+  PetitionFieldType,
   User,
 } from "../../db/__types";
 import { toGlobalId } from "../../util/globalId";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
-import { Knex } from "knex";
-import { KNEX } from "../../db/knex";
 
 describe("GraphQL/Petition Fields", () => {
   let testClient: TestClient;
@@ -1025,21 +1027,19 @@ describe("GraphQL/Petition Fields", () => {
         user.id,
         1
       );
-      const types = ["HEADING", "TEXT", "FILE_UPLOAD"];
+      const types: PetitionFieldType[] = ["HEADING", "TEXT", "FILE_UPLOAD"];
       fields = await mocks.createRandomPetitionFields(
         userPetition.id,
         5,
-        (index) => ({
-          type: types[index % types.length] as
-            | "HEADING"
-            | "TEXT"
-            | "FILE_UPLOAD",
-          is_fixed: index === 0,
-          validated: true,
-          options: {
-            hasPageBreak: index === 0,
-          },
-        })
+        (index) => {
+          const type = types[index % types.length];
+          return {
+            type,
+            is_fixed: index === 0,
+            validated: true,
+            options: defaultFieldOptions(type).options,
+          };
+        }
       );
 
       fieldGIDs = fields.map((f) => toGlobalId("PetitionField", f.id));
