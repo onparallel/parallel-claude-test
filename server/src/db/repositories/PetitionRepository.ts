@@ -1186,6 +1186,7 @@ export class PetitionRepository extends BaseRepository {
       throw new Error("Petition field not found");
     }
     validateFieldOptions(field?.type, data.options);
+    return field;
   }
 
   readonly loadRepliesForField = fromDataLoader(

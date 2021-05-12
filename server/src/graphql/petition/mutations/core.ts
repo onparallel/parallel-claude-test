@@ -653,8 +653,10 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     }
     if (isDefined(options)) {
       try {
-        await ctx.petitions.validateFieldData(args.fieldId, { options });
-        data.options = options;
+        const field = await ctx.petitions.validateFieldData(args.fieldId, {
+          options,
+        });
+        data.options = { ...field.options, ...options };
       } catch (e) {
         throw new ArgValidationError(info, "data.options", e.toString());
       }
