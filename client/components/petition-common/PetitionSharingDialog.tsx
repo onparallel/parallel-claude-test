@@ -66,7 +66,7 @@ export function PetitionSharingDialog({
 }: DialogProps<{
   userId: string;
   petitionId: string;
-  isTemplate: boolean;
+  isTemplate?: boolean;
 }>) {
   const intl = useIntl();
   const toast = useToast();
