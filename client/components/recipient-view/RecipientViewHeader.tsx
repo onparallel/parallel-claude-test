@@ -7,6 +7,8 @@ import {
   AccordionPanel,
   Box,
   Button,
+  Divider,
+  DividerProps,
   Flex,
   Heading,
   Img,
@@ -16,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Portal,
-  SimpleGrid,
+  Stack,
   Text,
   Tooltip,
   useBreakpointValue,
@@ -25,9 +27,9 @@ import {
 import { CardProps } from "@parallel/components/common/Card";
 import { Logo } from "@parallel/components/common/Logo";
 import {
-  RecipientView_PublicPetitionMessageFragment,
   RecipientViewHeader_PublicContactFragment,
   RecipientViewHeader_PublicUserFragment,
+  RecipientView_PublicPetitionMessageFragment,
   useRecipientViewHeader_publicDelegateAccessToContactMutation,
 } from "@parallel/graphql/__types";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
@@ -87,19 +89,9 @@ export function RecipientViewHeader({
     publicDelegateAccessToContact,
   ] = useRecipientViewHeader_publicDelegateAccessToContactMutation();
 
-  const dividerOrientation = useBreakpointValue({
-    base: {
-      borderTop: "1px solid",
-      borderColor: "gray.200",
-      paddingTop: 4,
-      marginTop: 4,
-    },
-    md: {
-      borderLeft: "1px solid",
-      borderColor: "gray.200",
-      paddingLeft: 6,
-      marginLeft: 6,
-    },
+  const dividerOrientation = useBreakpointValue<DividerProps["orientation"]>({
+    base: "horizontal",
+    md: "vertical",
   });
 
   const handleDelegateAccess = async () => {
@@ -193,13 +185,15 @@ export function RecipientViewHeader({
               marginY={0}
               paddingBottom={4}
             >
-              <Flex flexDirection={{ base: "column", md: "row" }} width="100%">
-                <SimpleGrid
-                  flex="1"
-                  templateRows="auto minmax(0, 1fr)"
-                  columns={1}
-                  spacing={2}
-                >
+              <Stack
+                direction={{ base: "column", md: "row" }}
+                alignItems="stretch"
+                spacing={4}
+                divider={
+                  <Divider height="auto" orientation={dividerOrientation} />
+                }
+              >
+                <Stack flex="1">
                   <Box>
                     <Text as="span" marginRight={2}>
                       <FormattedMessage
@@ -220,13 +214,8 @@ export function RecipientViewHeader({
                     </Text>
                     {message.subject}
                   </Box>
-                </SimpleGrid>
-                <SimpleGrid
-                  flex="2"
-                  columns={1}
-                  spacing={2}
-                  {...dividerOrientation}
-                >
+                </Stack>
+                <Stack flex="2">
                   <Box flexWrap="wrap">
                     <Text as="span" whiteSpace="nowrap" marginRight={2}>
                       <FormattedMessage
@@ -293,8 +282,8 @@ export function RecipientViewHeader({
                       />
                     </HelpPopover>
                   </Flex>
-                </SimpleGrid>
-              </Flex>
+                </Stack>
+              </Stack>
             </AccordionPanel>
           </AccordionItem>
         </Accordion>
