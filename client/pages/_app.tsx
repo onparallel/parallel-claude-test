@@ -27,17 +27,8 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
     }
   }, []);
 
-  const loadTrackingScripts =
-    process.env.NODE_ENV === "production" &&
-    !router.pathname.startsWith("/[locale]/print");
   return (
     <>
-      {loadTrackingScripts ? (
-        <>
-          <Hubspot />
-        </>
-      ) : null}
-      <Zendesk />
       {[
         [
           PlausibleProvider,

@@ -9,7 +9,7 @@ export const Hubspot = memo(() => {
         async
         defer
         src="//js.hs-scripts.com/6692004.js"
-      ></script>
+      />
     </Head>
   );
 });

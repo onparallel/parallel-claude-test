@@ -14,6 +14,7 @@ import {
   OnboardingTour,
   OnboardingTourContext,
 } from "../common/OnboardingTour";
+import { Zendesk } from "../scripts/Zendesk";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
 export interface AppLayoutProps extends BoxProps {
@@ -80,6 +81,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
       </Head>
+      <Zendesk />
       <Flex
         alignItems="stretch"
         overflow="hidden"
@@ -141,6 +143,11 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
         onUpdateTour={handleUpdateTour}
         status={user.onboardingStatus as any}
       />
+      <style global jsx>{`
+        body #hubspot-messages-iframe-container {
+          display: none !important;
+        }
+      `}</style>
     </>
   );
 }
