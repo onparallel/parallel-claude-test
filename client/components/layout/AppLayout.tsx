@@ -14,7 +14,6 @@ import {
   OnboardingTour,
   OnboardingTourContext,
 } from "../common/OnboardingTour";
-import { Zendesk } from "../scripts/Zendesk";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
 export interface AppLayoutProps extends BoxProps {
@@ -51,6 +50,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
   const [isLoading, setIsLoading] = useState(false);
   const timeoutRef = useRef<number>();
   useEffect(() => {
+    // show spinner if a page takes more than 1s to load
     Router.events.on("routeChangeStart", handleRouteChangeStart);
     Router.events.on("routeChangeComplete", handleRouteChangeComplete);
     return () => {
@@ -72,6 +72,15 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       }
     }
   }, []);
+  useEffect(() => {
+    const hide = () => (window as any).zE?.(() => zE.hide());
+    Router.events.on("routeChangeStart", hide);
+    window.addEventListener("load", hide);
+    return () => {
+      Router.events.off("routeChangeStart", hide);
+      window.removeEventListener("load", hide);
+    };
+  }, []);
   return (
     <>
       <Head>
@@ -80,8 +89,14 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
+        <script
+          id="ze-snippet"
+          async
+          defer
+          src="//static.zdassets.com/ekr/snippet.js?key=f96da31d-cc9a-4568-a1f9-4d2ae55939f5"
+          onLoad={"zE(() => zE.hide())" as any}
+        />
       </Head>
-      <Zendesk />
       <Flex
         alignItems="stretch"
         overflow="hidden"
