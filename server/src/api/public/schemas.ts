@@ -359,10 +359,9 @@ const _PetitionFieldReply = {
     },
     type: {
       type: "string",
-      enum: ["TEXT", "FILE"],
+      enum: ["TEXT", "SHORT_TEXT", "FILE_UPLOAD", "SELECT", "DYNAMIC_SELECT"],
+      description: "The type of the field this reply originated from",
       example: "TEXT",
-      // TODO implement discriminators to select content based on this prop
-      // https://redoc.ly/docs/resources/discriminator/
     },
     content: {
       oneOf: [
@@ -393,6 +392,17 @@ const _PetitionFieldReply = {
               description: "The content-type of the file",
               example: "image/jpeg",
             },
+          },
+        },
+        {
+          title: "Dynamic select reply",
+          description:
+            "An array of tuples where the first element is the name of the field and the second element is the reply",
+          type: "array",
+          minItems: 2,
+          items: {
+            type: "array",
+            items: [{ type: "string" }, { type: "string" }],
           },
         },
       ],

@@ -102,6 +102,7 @@ import {
   GetTemplates_TemplatesQueryVariables,
   GetTemplate_TemplateQuery,
   GetTemplate_TemplateQueryVariables,
+  PetitionFieldType,
   PetitionReplies_RepliesQuery,
   PetitionReplies_RepliesQueryVariables,
   RemoveUserPermission_removePetitionUserPermissionMutation,
@@ -689,19 +690,17 @@ api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
       response.petition!.fields.flatMap((field) =>
         field.replies.map((reply) => ({
           id: reply.id,
-          ...(field.type === "FILE_UPLOAD"
-            ? {
-                type: "FILE" as const,
-                content: reply.content as {
+          type: field.type as Exclude<PetitionFieldType, "HEADING">,
+          content:
+            field.type === "FILE_UPLOAD"
+              ? (reply.content as {
                   filename: string;
                   contentType: string;
                   size: number;
-                },
-              }
-            : {
-                type: "TEXT" as const,
-                content: reply.content.text as string,
-              }),
+                })
+              : field.type === "DYNAMIC_SELECT"
+              ? (reply.content.columns as [string, string][])
+              : (reply.content.text as string),
           fieldId: field.id,
           updatedAt: reply.updatedAt,
           createdAt: reply.createdAt,
