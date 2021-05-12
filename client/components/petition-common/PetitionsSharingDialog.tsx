@@ -118,7 +118,7 @@ export function PetitionsSharingDialog({
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, exclude: string[]) => {
-      return await _handleSearchUsers(search, [...exclude]);
+      return await _handleSearchUsers(search, [...exclude, userId]);
     },
     [_handleSearchUsers]
   );
