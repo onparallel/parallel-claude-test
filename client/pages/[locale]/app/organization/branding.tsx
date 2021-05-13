@@ -28,7 +28,7 @@ import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useRef, useState } from "react";
-import { FileRejection } from "react-dropzone";
+import { DropzoneRef, FileRejection } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const MAX_FILE_SIZE = 50 * 1024;
@@ -41,7 +41,7 @@ function OrganizationBranding() {
   } = useAssertQueryOrPreviousData(useOrganizationBrandingQuery());
 
   const sections = useOrganizationSections();
-  const imageRef = useRef<HTMLImageElement>(null);
+  const dropzoneRef = useRef<DropzoneRef>(null);
 
   const [logoSrc, setLogoSrc] = useState<string>(
     me.organization.logoUrl ??
@@ -114,31 +114,37 @@ function OrganizationBranding() {
         </Heading>
         <Card padding={4}>
           <Dropzone
+            ref={dropzoneRef}
+            as={Center}
             onDrop={handleLogoUpload}
             accept={["image/png"]}
             maxSize={MAX_FILE_SIZE}
             multiple={false}
+            height="150px"
+            width="300px"
+            textAlign="center"
           >
             {loading ? (
-              <Center height="150px" width="300px">
-                <Spinner
-                  thickness="4px"
-                  speed="0.65s"
-                  emptyColor="gray.200"
-                  color="purple.500"
-                  size="xl"
-                />
-              </Center>
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="purple.500"
+                size="xl"
+              />
             ) : (
               <Image
-                ref={imageRef}
                 boxSize="300px"
                 height="150px"
                 objectFit="contain"
-                borderRadius="md"
-                alt={me.organization.identifier}
+                alt={me.organization.name}
                 src={logoSrc}
-                fallback={<Box height="150px" width="300px" />}
+                fallback={
+                  <FormattedMessage
+                    id="organization.branding.image-error"
+                    defaultMessage="Error loading image. Please upload again."
+                  />
+                }
               />
             )}
           </Dropzone>
@@ -147,7 +153,7 @@ function OrganizationBranding() {
             <Button
               flex="1"
               colorScheme="purple"
-              onClick={() => imageRef.current?.click()}
+              onClick={() => dropzoneRef.current?.open()}
             >
               <FormattedMessage
                 id="organization.branding.upload-logo"
@@ -183,7 +189,7 @@ OrganizationBranding.getInitialProps = async ({
           organization {
             id
             logoUrl
-            identifier
+            name
           }
         }
       }

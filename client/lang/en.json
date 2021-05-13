@@ -2235,6 +2235,11 @@
     "context": "More options..."
   },
   {
+    "term": "generic.n-more",
+    "definition": "{count} more",
+    "context": "{count} more"
+  },
+  {
     "term": "generic.never-active",
     "definition": "Never active",
     "context": "Never active"
@@ -2278,11 +2283,6 @@
     "term": "generic.notifications",
     "definition": "Notifications",
     "context": "Notifications"
-  },
-  {
-    "term": "generic.n-more",
-    "definition": "{count} more",
-    "context": "{count} more"
   },
   {
     "term": "generic.omit",
@@ -2673,6 +2673,11 @@
     "term": "organization-users.update-user-status.error.update-sso-user",
     "definition": "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider.",
     "context": "{count, plural, =1{The user you selected is} other{Some of the users you selected are}} managed by a SSO provider. Please, update its status directly on the provider."
+  },
+  {
+    "term": "organization.branding.image-error",
+    "definition": "Error loading image. Please upload again.",
+    "context": "Error loading image. Please upload again."
   },
   {
     "term": "organization.branding.logo-error",
@@ -3623,11 +3628,6 @@
     "term": "petitions.no-templates",
     "definition": "You have no templates yet. Start by creating one now!",
     "context": "You have no templates yet. Start by creating one now!"
-  },
-  {
-    "term": "petitions.recipients",
-    "definition": "{contact} and <a>{more} more</a>",
-    "context": "{contact} and <a>{more} more</a>"
   },
   {
     "term": "petitions.reminders-not-set",
