@@ -510,9 +510,8 @@ const _publicMarkPetitionFieldCommentsAsRead = gql`
 `;
 
 function useMarkPetitionFieldCommentsAsRead() {
-  const [
-    markPetitionFieldCommentsAsRead,
-  ] = useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation();
+  const [markPetitionFieldCommentsAsRead] =
+    useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation();
   return useCallback(async function ({
     petitionFieldId,
     ...variables
@@ -558,9 +557,8 @@ const _publicCreatePetitionFieldComment = gql`
 `;
 
 function useCreatePetitionFieldComment() {
-  const [
-    createPetitionFieldComment,
-  ] = useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation();
+  const [createPetitionFieldComment] =
+    useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation();
   return useCallback(
     async (
       variables: RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables
@@ -616,9 +614,8 @@ const _publicUpdatePetitionFieldComment = gql`
 `;
 
 function useUpdatePetitionFieldComment() {
-  const [
-    updatePetitionFieldComment,
-  ] = useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation();
+  const [updatePetitionFieldComment] =
+    useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation();
   const apollo = useApolloClient();
   return useCallback(
     async (
@@ -627,14 +624,15 @@ function useUpdatePetitionFieldComment() {
       await updatePetitionFieldComment({
         variables,
         optimisticResponse: () => {
-          const comment = apollo.readFragment<RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment>(
-            {
-              fragment:
-                RecipientViewPetitionFieldCommentsDialog.fragments
-                  .PublicPetitionFieldComment,
-              id: variables.petitionFieldCommentId,
-            }
-          );
+          const comment =
+            apollo.readFragment<RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment>(
+              {
+                fragment:
+                  RecipientViewPetitionFieldCommentsDialog.fragments
+                    .PublicPetitionFieldComment,
+                id: variables.petitionFieldCommentId,
+              }
+            );
           return {
             publicUpdatePetitionFieldComment: {
               ...comment!,
@@ -663,9 +661,8 @@ const _deletePetitionFieldComment = gql`
 `;
 
 function useDeletePetitionFieldComment() {
-  const [
-    deletePetitionFieldComment,
-  ] = useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation();
+  const [deletePetitionFieldComment] =
+    useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation();
   return useCallback(
     async (
       variables: RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables
