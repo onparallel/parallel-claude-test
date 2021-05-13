@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Badge, Box, Flex, Stack } from "@chakra-ui/react";
+import { Badge, Box, Flex, Heading, Stack } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -118,10 +118,12 @@ function AdminOrganizations() {
         <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
       }
       header={
-        <FormattedMessage
-          id="admin.organizations"
-          defaultMessage="Organizations"
-        />
+        <Heading as="h3" size="md">
+          <FormattedMessage
+            id="admin.organizations"
+            defaultMessage="Organizations"
+          />
+        </Heading>
       }
     >
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4}>

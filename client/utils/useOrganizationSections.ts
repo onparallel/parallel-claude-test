@@ -19,6 +19,13 @@ export function useOrganizationSections() {
         }),
         path: "/app/organization/users",
       },
+      {
+        title: intl.formatMessage({
+          id: "organization.groups.title",
+          defaultMessage: "Groups",
+        }),
+        path: "/app/organization/groups",
+      },
     ],
     [intl.locale]
   );

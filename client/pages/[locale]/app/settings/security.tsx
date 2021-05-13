@@ -105,7 +105,9 @@ function Security() {
         <FormattedMessage id="settings.title" defaultMessage="Settings" />
       }
       header={
-        <FormattedMessage id="settings.security" defaultMessage="Security" />
+        <Heading as="h3" size="md">
+          <FormattedMessage id="settings.security" defaultMessage="Security" />
+        </Heading>
       }
     >
       <Stack padding={4} alignItems="stretch" flex="1" maxWidth="container.2xs">

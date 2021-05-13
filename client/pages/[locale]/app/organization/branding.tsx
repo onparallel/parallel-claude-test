@@ -90,10 +90,12 @@ function OrganizationBranding() {
         />
       }
       header={
-        <FormattedMessage
-          id="organization.branding.title"
-          defaultMessage="Branding"
-        />
+        <Heading as="h3" size="md">
+          <FormattedMessage
+            id="organization.branding.title"
+            defaultMessage="Branding"
+          />
+        </Heading>
       }
     >
       <Box padding={4}>

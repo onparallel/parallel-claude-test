@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { RepeatIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -134,10 +134,12 @@ function Tokens() {
         <FormattedMessage id="settings.title" defaultMessage="Settings" />
       }
       header={
-        <FormattedMessage
-          id="settings.api-tokens"
-          defaultMessage="API Tokens"
-        />
+        <Heading as="h3" size="md">
+          <FormattedMessage
+            id="settings.api-tokens"
+            defaultMessage="API Tokens"
+          />
+        </Heading>
       }
     >
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4}>

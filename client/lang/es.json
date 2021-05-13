@@ -2670,6 +2670,11 @@
     "context": "New petition"
   },
   {
+    "term": "organization-group.header.name",
+    "definition": "",
+    "context": "Name"
+  },
+  {
     "term": "organization-users.activate",
     "definition": "Activar {count, plural, =1{usuario} other {usuarios}}",
     "context": "Activate {count, plural, =1{user} other {users}}"
@@ -2778,6 +2783,11 @@
     "term": "organization.confirm-deactivate.user-select.input-placeholder",
     "definition": "Selecciona un usuario en tu organización",
     "context": "Select a user from your organization"
+  },
+  {
+    "term": "organization.groups.title",
+    "definition": "Grupos",
+    "context": "Groups"
   },
   {
     "term": "organization.role.admin",

@@ -101,9 +101,7 @@ export function SettingsLayout({
                     display={{ base: "flex", md: "none" }}
                   />
                 </NakedLink>
-                <Heading as="h3" size="md">
-                  {header}
-                </Heading>
+                {header}
               </Flex>
               <Flex flex="1" minHeight={0} overflow="auto">
                 {children}

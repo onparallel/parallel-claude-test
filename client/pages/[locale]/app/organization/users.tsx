@@ -1,5 +1,12 @@
 import { gql } from "@apollo/client";
-import { Badge, Flex, Text, Tooltip, useToast } from "@chakra-ui/react";
+import {
+  Badge,
+  Flex,
+  Heading,
+  Text,
+  Tooltip,
+  useToast,
+} from "@chakra-ui/react";
 import { ForbiddenIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -202,10 +209,12 @@ function OrganizationUsers() {
         />
       }
       header={
-        <FormattedMessage
-          id="organization.users.title"
-          defaultMessage="Users"
-        />
+        <Heading as="h3" size="md">
+          <FormattedMessage
+            id="organization.users.title"
+            defaultMessage="Users"
+          />
+        </Heading>
       }
     >
       <Flex flexDirection="column" flex="1" minHeight={0} padding={4}>

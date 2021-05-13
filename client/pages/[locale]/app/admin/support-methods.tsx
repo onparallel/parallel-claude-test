@@ -66,10 +66,12 @@ function AdminSupportMethods({
         <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
       }
       header={
-        <FormattedMessage
-          id="admin.support-methods"
-          defaultMessage="Support methods"
-        />
+        <Heading as="h3" size="md">
+          <FormattedMessage
+            id="admin.support-methods"
+            defaultMessage="Support methods"
+          />
+        </Heading>
       }
     >
       <Box marginX="auto" width="100%" maxWidth="container.md" paddingX={4}>

@@ -69,7 +69,9 @@ function Account() {
         <FormattedMessage id="settings.title" defaultMessage="Settings" />
       }
       header={
-        <FormattedMessage id="settings.account" defaultMessage="Account" />
+        <Heading as="h3" size="md">
+          <FormattedMessage id="settings.account" defaultMessage="Account" />
+        </Heading>
       }
     >
       <Stack padding={4} alignItems="stretch" flex="1" maxWidth="container.2xs">

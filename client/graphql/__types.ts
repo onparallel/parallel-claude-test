@@ -4473,6 +4473,18 @@ export type OrganizationBrandingQuery = { __typename?: "Query" } & {
   } & SettingsLayout_UserFragment;
 };
 
+export type OrganizationGroups_GroupFragment = { __typename?: "User" } & Pick<
+  User,
+  | "id"
+  | "fullName"
+  | "email"
+  | "role"
+  | "createdAt"
+  | "lastActiveAt"
+  | "status"
+  | "isSsoUser"
+>;
+
 export type OrganizationSettingsQueryVariables = Exact<{
   [key: string]: never;
 }>;
@@ -6219,6 +6231,18 @@ export const Contacts_UserFragmentDoc = gql`
     ...AppLayout_User
   }
   ${AppLayout_UserFragmentDoc}
+`;
+export const OrganizationGroups_GroupFragmentDoc = gql`
+  fragment OrganizationGroups_Group on User {
+    id
+    fullName
+    email
+    role
+    createdAt
+    lastActiveAt
+    status
+    isSsoUser
+  }
 `;
 export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
