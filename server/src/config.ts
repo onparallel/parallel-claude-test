@@ -70,6 +70,9 @@ export function buildConfig() {
       "reminder-trigger": Object.freeze({
         rule: process.env.WORKERS_REMINDER_TRIGGER_RULE!,
       }),
+      "petition-notifications": Object.freeze({
+        rule: process.env.WORKERS_PETITION_NOTIFICATIONS_RULE!,
+      }),
       reporting: Object.freeze({
         rule: process.env.WORKERS_REPORTING_RULE!,
       }),

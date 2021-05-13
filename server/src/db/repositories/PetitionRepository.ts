@@ -1896,6 +1896,44 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at")
   );
 
+  async loadUnprocessedCommentCreatedUserNotifications() {
+    return await this.raw<PetitionUserNotification>(/* sql */ `
+      SELECT * from petition_user_notification 
+      where email_notification_sent_at is null
+      and is_read = false
+      and type = 'COMMENT_CREATED'
+      order by created_at desc
+    `);
+  }
+
+  async loadUnprocessedCommentCreatedContactNotifications() {
+    return await this.raw<PetitionContactNotification>(/* sql */ `
+      SELECT * from petition_contact_notification 
+      where email_notification_sent_at is null
+      and is_read = false
+      and type = 'COMMENT_CREATED'
+      order by created_at desc
+    `);
+  }
+
+  async updatePetitionUserNotifications(
+    petitionUserNotificationIds: number[],
+    data: Partial<CreatePetitionUserNotification>
+  ) {
+    return await this.from("petition_user_notification")
+      .whereIn("id", petitionUserNotificationIds)
+      .update(data, "*");
+  }
+
+  async updatePetitionContactNotifications(
+    petitionContactNotificationIds: number[],
+    data: Partial<CreatePetitionContactNotification>
+  ) {
+    return await this.from("petition_contact_notification")
+      .whereIn("id", petitionContactNotificationIds)
+      .update(data, "*");
+  }
+
   readonly getPetitionFieldCommentIsUnreadForUser = fromDataLoader(
     new DataLoader<
       {
