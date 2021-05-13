@@ -92,26 +92,21 @@ export function ExportRepliesProgressDialog({
 }: DialogProps<ExportRepliesProgressDialogProps>) {
   const intl = useIntl();
   const [progress, setProgress] = useState(0);
-  const [state, setState] = useState<"LOADING" | "UPLOADING" | "FINISHED">(
-    "LOADING"
-  );
+  const [state, setState] =
+    useState<"LOADING" | "UPLOADING" | "FINISHED">("LOADING");
   const { data } = useExportRepliesProgressDialog_PetitionRepliesQuery({
     variables: { petitionId },
   });
   const isRunning = useRef(false);
   const placeholdersRename = useFilenamePlaceholdersRename();
-  const [
-    fileUploadReplyDownloadLink,
-  ] = useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation();
-  const [
-    signedPetitionDownloadLink,
-  ] = useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation();
-  const [
-    updatePetitionFieldReplyMetadata,
-  ] = useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation();
-  const [
-    updateSignatureRequestMetadata,
-  ] = useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation();
+  const [fileUploadReplyDownloadLink] =
+    useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation();
+  const [signedPetitionDownloadLink] =
+    useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation();
+  const [updatePetitionFieldReplyMetadata] =
+    useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation();
+  const [updateSignatureRequestMetadata] =
+    useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation();
   const { current: abort } = useRef(new AbortController());
   const showAlreadyExported = useDialog(AlreadyExportedDialog);
   const showErrorDialog = useErrorDialog();

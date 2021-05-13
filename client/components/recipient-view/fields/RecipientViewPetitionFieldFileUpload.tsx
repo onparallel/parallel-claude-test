@@ -163,9 +163,8 @@ export function RecipientViewPetitionFieldReplyFileUpload({
   onRemove,
 }: RecipientViewPetitionFieldReplyFileUploadProps) {
   const intl = useIntl();
-  const [
-    downloadFileUploadReply,
-  ] = useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation();
+  const [downloadFileUploadReply] =
+    useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation();
   const showFailure = useFailureGeneratingLinkDialog();
   function handleDownloadClick() {
     openNewWindow(async () => {
@@ -237,8 +236,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
           {reply.status === "APPROVED" ? (
             <Tooltip
               label={intl.formatMessage({
-                id:
-                  "component.recipient-view-petition-field-reply.approved-file",
+                id: "component.recipient-view-petition-field-reply.approved-file",
                 defaultMessage: "This file has been approved",
               })}
             >
@@ -247,8 +245,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
           ) : (
             <Tooltip
               label={intl.formatMessage({
-                id:
-                  "component.recipient-view-petition-field-reply.rejected-file",
+                id: "component.recipient-view-petition-field-reply.rejected-file",
                 defaultMessage: "This file has been rejected",
               })}
             >
@@ -276,8 +273,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         size="md"
         placement="bottom"
         label={intl.formatMessage({
-          id:
-            "component.recipient-view-petition-field-reply.remove-reply-label",
+          id: "component.recipient-view-petition-field-reply.remove-reply-label",
           defaultMessage: "Remove reply",
         })}
       />

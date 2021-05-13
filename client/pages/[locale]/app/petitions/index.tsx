@@ -190,12 +190,14 @@ function Petitions() {
     goToPetition(
       row.id,
       row.__typename === "Petition"
-        ? ({
-            DRAFT: "compose",
-            PENDING: "replies",
-            COMPLETED: "replies",
-            CLOSED: "replies",
-          } as const)[row.status]
+        ? (
+            {
+              DRAFT: "compose",
+              PENDING: "replies",
+              COMPLETED: "replies",
+              CLOSED: "replies",
+            } as const
+          )[row.status]
         : "compose"
     );
   }, []);

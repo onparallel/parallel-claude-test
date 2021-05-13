@@ -338,20 +338,17 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             placeholder={
               field.type === "HEADING"
                 ? intl.formatMessage({
-                    id:
-                      "component.petition-compose-field.heading-title-placeholder",
+                    id: "component.petition-compose-field.heading-title-placeholder",
                     defaultMessage:
                       "Enter an introductory title for this section...",
                   })
                 : field.type === "FILE_UPLOAD"
                 ? intl.formatMessage({
-                    id:
-                      "component.petition-compose-field.file-upload-title-placeholder",
+                    id: "component.petition-compose-field.file-upload-title-placeholder",
                     defaultMessage: "Describe the file(s) that you need...",
                   })
                 : intl.formatMessage({
-                    id:
-                      "component.petition-compose-field.generic-title-placeholder",
+                    id: "component.petition-compose-field.generic-title-placeholder",
                     defaultMessage: "Ask for the information that you need...",
                   })
             }
@@ -369,7 +366,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             onBlur={() => {
               const trimmed = title?.trim() ?? null;
               setNativeValue(titleRef.current!, trimmed ?? "");
-              titleRef.current!.selectionStart = titleRef.current!.selectionEnd = 0;
+              titleRef.current!.selectionStart =
+                titleRef.current!.selectionEnd = 0;
               if (field.title !== trimmed) {
                 onFieldEdit({ title: trimmed });
               }

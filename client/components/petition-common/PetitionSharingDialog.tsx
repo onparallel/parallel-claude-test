@@ -93,19 +93,15 @@ export function PetitionSharingDialog({
     }
   }, [userPermissions, prev]);
 
-  const {
-    handleSubmit,
-    register,
-    control,
-    watch,
-  } = useForm<PetitionSharingDialogData>({
-    mode: "onChange",
-    defaultValues: {
-      users: [],
-      notify: true,
-      message: "",
-    },
-  });
+  const { handleSubmit, register, control, watch } =
+    useForm<PetitionSharingDialogData>({
+      mode: "onChange",
+      defaultValues: {
+        users: [],
+        notify: true,
+        message: "",
+      },
+    });
 
   const petitionsOwned =
     petitionsById?.filter((petition) =>
@@ -143,9 +139,8 @@ export function PetitionSharingDialog({
   const handleRemoveUserPermission = useRemoveUserPermission();
   const handleTransferPetitionOwnership = useTransferPetitionOwnership();
 
-  const [
-    addPetitionUserPermission,
-  ] = usePetitionSharingModal_addPetitionUserPermissionMutation();
+  const [addPetitionUserPermission] =
+    usePetitionSharingModal_addPetitionUserPermissionMutation();
 
   const getSuccesTitle = () => {
     const template = intl.formatMessage(
@@ -265,8 +260,7 @@ export function PetitionSharingDialog({
                                 "Add users from your organization",
                             })
                           : intl.formatMessage({
-                              id:
-                                "petition-sharing.input-placeholder-not-owner",
+                              id: "petition-sharing.input-placeholder-not-owner",
                               defaultMessage:
                                 "Only the petition owner can share it",
                             })
@@ -563,9 +557,8 @@ function useRemoveUserPermission() {
   const confirmRemoveUserPermission = useDialog(
     ConfirmRemoveUserPermissionDialog
   );
-  const [
-    removePetitionUserPermission,
-  ] = usePetitionSharingModal_removePetitionUserPermissionMutation();
+  const [removePetitionUserPermission] =
+    usePetitionSharingModal_removePetitionUserPermissionMutation();
   return useCallback(
     async (petitionId: string, user: PetitionSharingModal_UserFragment) => {
       try {
@@ -620,9 +613,8 @@ function useTransferPetitionOwnership() {
   const confirmTransferPetitionOwnership = useDialog(
     ConfirmTransferPetitionOwnershipDialog
   );
-  const [
-    transferPetitionOwnership,
-  ] = usePetitionSharingModal_transferPetitionOwnershipMutation();
+  const [transferPetitionOwnership] =
+    usePetitionSharingModal_transferPetitionOwnershipMutation();
   return useCallback(
     async (petitionId: string, user: PetitionSharingModal_UserFragment) => {
       try {

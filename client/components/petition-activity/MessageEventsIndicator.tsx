@@ -48,8 +48,7 @@ export function MessageEventsIndicator({
             deliveredAt
               ? intl.formatMessage(
                   {
-                    id:
-                      "component.message-events-indicator.delivered-explanation",
+                    id: "component.message-events-indicator.delivered-explanation",
                     defaultMessage: "The email was delivered on {date}",
                   },
                   {
@@ -60,8 +59,7 @@ export function MessageEventsIndicator({
                   }
                 )
               : intl.formatMessage({
-                  id:
-                    "component.message-events-indicator.not-delivered-explanation",
+                  id: "component.message-events-indicator.not-delivered-explanation",
                   defaultMessage:
                     "We haven't confirmed the delivery of the email.",
                 })
@@ -90,8 +88,7 @@ export function MessageEventsIndicator({
                   }
                 )
               : intl.formatMessage({
-                  id:
-                    "component.message-events-indicator.not-opened-explanation",
+                  id: "component.message-events-indicator.not-opened-explanation",
                   defaultMessage:
                     "We haven't confirmed that the email has been opened yet.",
                 })

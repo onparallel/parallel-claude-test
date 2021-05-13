@@ -11,7 +11,7 @@ export function userHasAccessToAuthTokens<
   return async (_, args, ctx) => {
     try {
       const userAuthTokenIds = unMaybeArray(
-        (args[argName] as unknown) as MaybeArray<number>
+        args[argName] as unknown as MaybeArray<number>
       );
       return await ctx.userAuthentication.userHasAccessToAuthTokens(
         userAuthTokenIds,

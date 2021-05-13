@@ -13,7 +13,8 @@ interface ErrorBody {
 
 export abstract class HttpError
   extends Error
-  implements ResponseWrapper<ErrorBody> {
+  implements ResponseWrapper<ErrorBody>
+{
   constructor(
     public status: number,
     public code: string,

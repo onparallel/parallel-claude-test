@@ -23,16 +23,18 @@ function BookDemo() {
     query.locale
       ? {
           target: "#form-container",
-          ...({
-            es: {
-              portalId: "6692004",
-              formId: "4b9ef922-fd64-4407-9f50-3b46e38b67ab",
-            },
-            en: {
-              portalId: "6692004",
-              formId: "2d514566-d722-4e0a-93f3-a39322da9374",
-            },
-          } as any)[query.locale as string],
+          ...(
+            {
+              es: {
+                portalId: "6692004",
+                formId: "4b9ef922-fd64-4407-9f50-3b46e38b67ab",
+              },
+              en: {
+                portalId: "6692004",
+                formId: "2d514566-d722-4e0a-93f3-a39322da9374",
+              },
+            } as any
+          )[query.locale as string],
         }
       : null
   );

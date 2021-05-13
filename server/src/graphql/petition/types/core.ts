@@ -353,13 +353,12 @@ export const PetitionField = objectType({
           ctx.user!.id,
           "INTERNAL_COMMENTS"
         );
-        const comments = await ctx.petitions.loadPetitionFieldCommentsForFieldAndUser(
-          {
+        const comments =
+          await ctx.petitions.loadPetitionFieldCommentsForFieldAndUser({
             userId: ctx.user!.id,
             petitionId: root.petition_id,
             petitionFieldId: root.id,
-          }
-        );
+          });
 
         return loadInternalComments
           ? comments

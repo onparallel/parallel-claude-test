@@ -103,8 +103,7 @@ function ConfirmDeactivateUserDialog({
                 onBlur={onBlur}
                 onSearchUsers={handleSearchUsers}
                 placeholder={intl.formatMessage({
-                  id:
-                    "organization.confirm-deactivate.user-select.input-placeholder",
+                  id: "organization.confirm-deactivate.user-select.input-placeholder",
                   defaultMessage: "Select a user from your organization",
                 })}
               />

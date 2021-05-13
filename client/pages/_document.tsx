@@ -51,9 +51,8 @@ class MyDocument extends Document<MyDocumentProps> {
     ctx.renderPage = () =>
       renderPage({
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        enhanceApp: (App) => (props) => (
-          <App {...props} {...{ locale, messages }} />
-        ),
+        enhanceApp: (App) => (props) =>
+          <App {...props} {...{ locale, messages }} />,
       });
     const initialProps = await Document.getInitialProps(ctx);
     return { ...initialProps, locale, messages };

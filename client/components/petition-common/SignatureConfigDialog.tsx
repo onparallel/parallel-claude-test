@@ -257,13 +257,11 @@ export function SignatureConfigDialog({
                   placeholder={
                     petitionIsCompleted
                       ? intl.formatMessage({
-                          id:
-                            "component.signature-config-dialog.contact-select.placeholder-required",
+                          id: "component.signature-config-dialog.contact-select.placeholder-required",
                           defaultMessage: "Select the signers",
                         })
                       : intl.formatMessage({
-                          id:
-                            "component.signature-config-dialog.contact-select.placeholder-optional",
+                          id: "component.signature-config-dialog.contact-select.placeholder-optional",
                           defaultMessage: "Let the recipient choose",
                         })
                   }

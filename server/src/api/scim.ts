@@ -38,9 +38,10 @@ async function authenticateOrganization(
     if (!match) {
       return res.status(401).end();
     }
-    const integration = await req.context.integrations.loadProvisioningIntegrationByAuthKey(
-      match[1]
-    );
+    const integration =
+      await req.context.integrations.loadProvisioningIntegrationByAuthKey(
+        match[1]
+      );
     if (!integration) {
       return res.status(401).end();
     }

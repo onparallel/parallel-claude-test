@@ -116,17 +116,24 @@ export type ReplyUpdatedEvent = GenericPetitionEvent<"REPLY_UPDATED">;
 export type ReplyDeletedEvent = GenericPetitionEvent<"REPLY_DELETED">;
 export type CommentPublishedEvent = GenericPetitionEvent<"COMMENT_PUBLISHED">;
 export type CommentDeletedEvent = GenericPetitionEvent<"COMMENT_DELETED">;
-export type UserPermissionAddedEvent = GenericPetitionEvent<"USER_PERMISSION_ADDED">;
-export type UserPermissionRemovedEvent = GenericPetitionEvent<"USER_PERMISSION_REMOVED">;
-export type UserPermissionEditedEvent = GenericPetitionEvent<"USER_PERMISSION_EDITED">;
-export type OwnershipTransferredEvent = GenericPetitionEvent<"OWNERSHIP_TRANSFERRED">;
+export type UserPermissionAddedEvent =
+  GenericPetitionEvent<"USER_PERMISSION_ADDED">;
+export type UserPermissionRemovedEvent =
+  GenericPetitionEvent<"USER_PERMISSION_REMOVED">;
+export type UserPermissionEditedEvent =
+  GenericPetitionEvent<"USER_PERMISSION_EDITED">;
+export type OwnershipTransferredEvent =
+  GenericPetitionEvent<"OWNERSHIP_TRANSFERRED">;
 export type PetitionClosedEvent = GenericPetitionEvent<"PETITION_CLOSED">;
-export type PetitionClosedNotifiedEvent = GenericPetitionEvent<"PETITION_CLOSED_NOTIFIED">;
+export type PetitionClosedNotifiedEvent =
+  GenericPetitionEvent<"PETITION_CLOSED_NOTIFIED">;
 export type PetitionReopenedEvent = GenericPetitionEvent<"PETITION_REOPENED">;
 
 export type SignatureStartedEvent = GenericPetitionEvent<"SIGNATURE_STARTED">;
-export type SignatureCompletedEvent = GenericPetitionEvent<"SIGNATURE_COMPLETED">;
-export type SignatureCancelledEvent = GenericPetitionEvent<"SIGNATURE_CANCELLED">;
+export type SignatureCompletedEvent =
+  GenericPetitionEvent<"SIGNATURE_COMPLETED">;
+export type SignatureCancelledEvent =
+  GenericPetitionEvent<"SIGNATURE_CANCELLED">;
 
 export type PetitionEvent =
   | PetitionCreatedEvent

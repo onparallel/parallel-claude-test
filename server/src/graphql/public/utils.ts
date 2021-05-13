@@ -17,7 +17,7 @@ export function validateDynamicSelectReplyValues(
         throw new Error("Invalid values after null");
       }
     } else if (level === levels - 1) {
-      if (!((values as unknown) as string[]).includes(reply[level][1]!)) {
+      if (!(values as unknown as string[]).includes(reply[level][1]!)) {
         throw new Error(`Invalid value at level ${level}`);
       }
     } else {

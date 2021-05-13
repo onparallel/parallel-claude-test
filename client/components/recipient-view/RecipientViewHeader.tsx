@@ -85,9 +85,8 @@ export function RecipientViewHeader({
   const intl = useIntl();
   const toast = useToast();
   const showDelegateAccessDialog = useDelegateAccessDialog();
-  const [
-    publicDelegateAccessToContact,
-  ] = useRecipientViewHeader_publicDelegateAccessToContactMutation();
+  const [publicDelegateAccessToContact] =
+    useRecipientViewHeader_publicDelegateAccessToContactMutation();
 
   const dividerOrientation = useBreakpointValue<DividerProps["orientation"]>({
     base: "horizontal",

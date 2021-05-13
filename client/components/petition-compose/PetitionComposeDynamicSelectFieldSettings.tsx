@@ -47,9 +47,8 @@ export function DynamicSelectSettings({
     onFieldEdit(field.id, { options: { labels: [], values: [] } });
   }
 
-  const [
-    downloadLink,
-  ] = useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation();
+  const [downloadLink] =
+    useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation();
 
   function handleDownloadListingsFile() {
     openNewWindow(async () => {
@@ -251,10 +250,8 @@ function DynamicSelectOptionsDropzone({
 
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
-  const [
-    uploadFile,
-    { loading },
-  ] = useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation();
+  const [uploadFile, { loading }] =
+    useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation();
 
   const showErrorDialog = useErrorDialog();
   async function handleFileDrop([file]: File[], rejected: FileRejection[]) {

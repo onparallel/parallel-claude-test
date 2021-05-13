@@ -51,7 +51,8 @@ export function getFieldIndices(
 export function useFieldIndices(
   fields: Pick<PetitionField, "type">[]
 ): PetitionFieldIndex[] {
-  return useMemo(() => getFieldIndices(fields), [
-    fields.map((f) => f.type).join(","),
-  ]);
+  return useMemo(
+    () => getFieldIndices(fields),
+    [fields.map((f) => f.type).join(",")]
+  );
 }

@@ -27,10 +27,11 @@ function PetitionPdf({ token }: { token: string }) {
     })
   );
 
-  const tokenPayload = jwtDecode<{
-    documentTitle?: string;
-    showSignatureBoxes?: boolean;
-  }>(token);
+  const tokenPayload =
+    jwtDecode<{
+      documentTitle?: string;
+      showSignatureBoxes?: boolean;
+    }>(token);
 
   const petition = data.petitionAuthToken;
 

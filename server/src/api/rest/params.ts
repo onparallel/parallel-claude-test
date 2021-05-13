@@ -140,13 +140,8 @@ function _numberParam(integer: boolean) {
   ): RestParameter<
     GeneratedParameterType<number, TRequired, TArray, TDefaultValue>
   > {
-    const {
-      minimum,
-      exclusiveMinimum,
-      maximum,
-      exclusiveMaximum,
-      multipleOf,
-    } = options;
+    const { minimum, exclusiveMinimum, maximum, exclusiveMaximum, multipleOf } =
+      options;
     return {
       parse: buildParse(options, (value) => {
         const result = integer ? parseInt(value) : parseFloat(value);

@@ -35,63 +35,55 @@ export class ReportingRepository extends BaseRepository {
       await pMap(
         chunk(petitionIds, 100),
         async (batch) => {
-          const [
-            petitions,
-            fields,
-            accesses,
-            petitionOwners,
-          ] = await Promise.all([
-            this.from("petition")
-              .whereIn("id", batch)
-              .select(
-                "id",
-                "name",
-                "status",
-                "created_at",
-                "updated_at",
-                "created_by"
-              ),
-            this.from("petition_field")
-              .whereIn("petition_id", batch)
-              .whereNull("deleted_at")
-              .groupBy("petition_id")
-              .select(
-                "petition_id",
-                ...[
-                  "TEXT",
-                  "SHORT_TEXT",
-                  "FILE_UPLOAD",
-                  "HEADING",
-                ].map((type) =>
-                  this.knex.raw(
-                    `sum((type = '${type}')::int)::int as ${type.toLowerCase()}_fields`
+          const [petitions, fields, accesses, petitionOwners] =
+            await Promise.all([
+              this.from("petition")
+                .whereIn("id", batch)
+                .select(
+                  "id",
+                  "name",
+                  "status",
+                  "created_at",
+                  "updated_at",
+                  "created_by"
+                ),
+              this.from("petition_field")
+                .whereIn("petition_id", batch)
+                .whereNull("deleted_at")
+                .groupBy("petition_id")
+                .select(
+                  "petition_id",
+                  ...["TEXT", "SHORT_TEXT", "FILE_UPLOAD", "HEADING"].map(
+                    (type) =>
+                      this.knex.raw(
+                        `sum((type = '${type}')::int)::int as ${type.toLowerCase()}_fields`
+                      )
                   )
-                )
-              ),
-            this.from("petition_access")
-              .whereIn("petition_id", batch)
-              .groupBy("petition_id")
-              .select(
-                "petition_id",
-                this.knex.raw("min(created_at) as sent_at")
-              ),
-            this.from("petition_user")
-              .whereIn("petition_id", batch)
-              .where({
-                deleted_at: null,
-                permission_type: "OWNER",
-              })
-              .select("user_id as owner_id", "petition_id"),
-          ]);
+                ),
+              this.from("petition_access")
+                .whereIn("petition_id", batch)
+                .groupBy("petition_id")
+                .select(
+                  "petition_id",
+                  this.knex.raw("min(created_at) as sent_at")
+                ),
+              this.from("petition_user")
+                .whereIn("petition_id", batch)
+                .where({
+                  deleted_at: null,
+                  permission_type: "OWNER",
+                })
+                .select("user_id as owner_id", "petition_id"),
+            ]);
           const fieldsByPetitionId = indexBy(
-            (fields as unknown) as (Pick<PetitionField, "petition_id"> & {
+            fields as unknown as (Pick<PetitionField, "petition_id"> & {
               text_fields: number;
               file_upload_fields: number;
             })[],
             (f) => f.petition_id
           );
           const accessesByPetitionId = indexBy(
-            (accesses as unknown) as (Pick<PetitionAccess, "petition_id"> & {
+            accesses as unknown as (Pick<PetitionAccess, "petition_id"> & {
               sent_at: Date;
             })[],
             (f) => f.petition_id

@@ -82,12 +82,14 @@ function Contact({ contactId }: ContactProps) {
   function handleRowClick(row: PetitionAccessSelection) {
     goToPetition(
       row.petition!.id,
-      ({
-        DRAFT: "compose",
-        PENDING: "replies",
-        COMPLETED: "replies",
-        CLOSED: "replies",
-      } as const)[row.petition!.status]
+      (
+        {
+          DRAFT: "compose",
+          PENDING: "replies",
+          COMPLETED: "replies",
+          CLOSED: "replies",
+        } as const
+      )[row.petition!.status]
     );
   }
 

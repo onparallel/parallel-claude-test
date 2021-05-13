@@ -68,15 +68,11 @@ function RecipientViewVerify({
     step: "REQUEST",
   });
 
-  const [
-    sendVerificationCode,
-    { loading: isSendingCode },
-  ] = usepublicSendVerificationCodeMutation();
+  const [sendVerificationCode, { loading: isSendingCode }] =
+    usepublicSendVerificationCodeMutation();
 
-  const [
-    publicCheckVerificationCode,
-    { loading: isVerifyingCode },
-  ] = usepublicCheckVerificationCodeMutation({});
+  const [publicCheckVerificationCode, { loading: isVerifyingCode }] =
+    usepublicCheckVerificationCodeMutation({});
 
   async function handleSendVerificationCode() {
     const { data } = await sendVerificationCode({

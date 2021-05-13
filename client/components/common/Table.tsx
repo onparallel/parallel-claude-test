@@ -102,13 +102,8 @@ function _Table<TRow, TContext = unknown>({
   onSortChange,
   ...props
 }: TableProps<TRow, TContext>) {
-  const {
-    selection,
-    allSelected,
-    anySelected,
-    toggle,
-    toggleAll,
-  } = useSelectionState(rows, rowKeyProp);
+  const { selection, allSelected, anySelected, toggle, toggleAll } =
+    useSelectionState(rows, rowKeyProp);
   const colors = useTableColors();
 
   useEffect(() => {

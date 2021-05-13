@@ -74,20 +74,16 @@ export function PetitionSignaturesCard({
     current = null;
   }
 
-  const [
-    cancelSignatureRequest,
-  ] = usePetitionSignaturesCard_cancelSignatureRequestMutation();
-  const [
-    startSignatureRequest,
-  ] = usePetitionSignaturesCard_startSignatureRequestMutation();
+  const [cancelSignatureRequest] =
+    usePetitionSignaturesCard_cancelSignatureRequestMutation();
+  const [startSignatureRequest] =
+    usePetitionSignaturesCard_startSignatureRequestMutation();
 
-  const [
-    updateSignatureConfig,
-  ] = usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
+  const [updateSignatureConfig] =
+    usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
 
-  const [
-    downloadSignedDoc,
-  ] = usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
+  const [downloadSignedDoc] =
+    usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
 
   const handleCancelSignatureProcess = useCallback(
     async (petitionSignatureRequestId: string) => {

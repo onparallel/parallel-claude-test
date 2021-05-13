@@ -36,10 +36,8 @@ export function GenerateNewTokenDialog(props: DialogProps) {
     },
   });
 
-  const [
-    generateUserAuthToken,
-    { loading },
-  ] = useGenerateNewTokenDialog_generateUserAuthTokenMutation();
+  const [generateUserAuthToken, { loading }] =
+    useGenerateNewTokenDialog_generateUserAuthTokenMutation();
 
   async function submit({ tokenName }: { tokenName: string }) {
     try {

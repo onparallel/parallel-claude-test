@@ -29,11 +29,12 @@ function Login() {
   const { data } = useCurrentUserQuery();
   const [showContinueAs, setShowContinueAs] = useState(Boolean(data?.me));
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [passwordChange, setPasswordChange] = useState<{
-    type: "CHANGE" | "RESET";
-    email: string;
-    password?: string;
-  } | null>(null);
+  const [passwordChange, setPasswordChange] =
+    useState<{
+      type: "CHANGE" | "RESET";
+      email: string;
+      password?: string;
+    } | null>(null);
   const [verificationCodeStatus, setVerificationCodeStatus] = useState({
     hasVerificationCodeError: false,
     isInvalidPassword: false,

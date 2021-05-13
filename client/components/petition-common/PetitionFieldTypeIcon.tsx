@@ -19,13 +19,15 @@ export const PetitionFieldTypeIcon = chakraForwardRef<
   "svg",
   PetitionFieldTypeIconProps
 >(function PetitionFieldTypeIcon({ type, ...props }, ref) {
-  const icon = ({
-    FILE_UPLOAD: FieldFileUploadIcon,
-    SHORT_TEXT: FieldShortTextIcon,
-    TEXT: FieldTextIcon,
-    HEADING: FieldHeadingIcon,
-    SELECT: FieldSelectIcon,
-    DYNAMIC_SELECT: FieldDynamicSelectIcon,
-  } as Record<PetitionFieldType, ElementType>)[type];
+  const icon = (
+    {
+      FILE_UPLOAD: FieldFileUploadIcon,
+      SHORT_TEXT: FieldShortTextIcon,
+      TEXT: FieldTextIcon,
+      HEADING: FieldHeadingIcon,
+      SELECT: FieldSelectIcon,
+      DYNAMIC_SELECT: FieldDynamicSelectIcon,
+    } as Record<PetitionFieldType, ElementType>
+  )[type];
   return <Icon as={icon} {...props} ref={ref} />;
 });

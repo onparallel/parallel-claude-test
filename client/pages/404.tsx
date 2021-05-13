@@ -22,10 +22,12 @@ export default function Custom404() {
     ) {
       setLocale(locale);
       setSupportUrl(
-        ({
-          en: "https://support.onparallel.com/hc/en-us",
-          es: "https://support.onparallel.com/hc/es",
-        } as any)[locale]
+        (
+          {
+            en: "https://support.onparallel.com/hc/en-us",
+            es: "https://support.onparallel.com/hc/es",
+          } as any
+        )[locale]
       );
     }
   }, []);

@@ -213,9 +213,8 @@ async function fetchOrgSignatureIntegration(
   provider: string,
   ctx: WorkerContext
 ): Promise<OrgIntegration> {
-  const orgIntegrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
-    orgId
-  );
+  const orgIntegrations =
+    await ctx.integrations.loadEnabledIntegrationsForOrgId(orgId);
 
   const orgSignatureIntegration = orgIntegrations.find(
     (i) => i.type === "SIGNATURE" && i.provider === provider.toUpperCase()

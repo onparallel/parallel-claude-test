@@ -135,10 +135,12 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
   useEffect(() => {
     const menu = innerRef.current!;
     menu.setAttribute("role", role);
-    const itemRole = ({
-      menu: "menuitem",
-      listbox: "option",
-    } as Record<string, string>)[role];
+    const itemRole = (
+      {
+        menu: "menuitem",
+        listbox: "option",
+      } as Record<string, string>
+    )[role];
     for (const item of Array.from(menu.querySelectorAll("[role='menuitem']"))) {
       item.setAttribute("role", itemRole);
     }
@@ -233,8 +235,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
               color="transparent"
               alt={intl.formatMessage(
                 {
-                  id:
-                    "component.petition-field-type-select-dropdown.thumbnail-alt",
+                  id: "component.petition-field-type-select-dropdown.thumbnail-alt",
                   defaultMessage: 'Thumbnail for field type "{type}"',
                 },
                 { type: activeTypeLabel }

@@ -160,14 +160,11 @@ export const submitUnpublishedComments = mutationField(
       petitionId: nonNull(globalIdArg("Petition")),
     },
     resolve: async (_, args, ctx) => {
-      const {
-        comments,
-        userIds,
-        accessIds,
-      } = await ctx.petitions.publishPetitionFieldCommentsForUser(
-        args.petitionId,
-        ctx.user!
-      );
+      const { comments, userIds, accessIds } =
+        await ctx.petitions.publishPetitionFieldCommentsForUser(
+          args.petitionId,
+          ctx.user!
+        );
       await Promise.all([
         // send email to all contacts with active access
         ctx.emails.sendPetitionCommentsContactNotificationEmail(

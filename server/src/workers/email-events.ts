@@ -17,11 +17,13 @@ createQueueWorker(
     if (!emailLogId) {
       return;
     }
-    const event = ({
-      Delivery: "delivery",
-      Bounce: "bounce",
-      Open: "open",
-    } as any)[payload.eventType];
+    const event = (
+      {
+        Delivery: "delivery",
+        Bounce: "bounce",
+        Open: "open",
+      } as any
+    )[payload.eventType];
     await context.emailLogs.createEmailEvent({
       email_log_id: emailLogId,
       event,

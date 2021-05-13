@@ -23,17 +23,16 @@ export function withAdminOrganizationRole<P = {}>(
           `Please, place "withAdminOrganizationRole" before "withApolloData" in the "compose" argument list.`
         );
       }
-      const {
-        data,
-      } = await context.apollo.query<WithAdminOrganizationRoleQuery>({
-        query: gql`
-          query WithAdminOrganizationRole {
-            me {
-              role
+      const { data } =
+        await context.apollo.query<WithAdminOrganizationRoleQuery>({
+          query: gql`
+            query WithAdminOrganizationRole {
+              me {
+                role
+              }
             }
-          }
-        `,
-      });
+          `,
+        });
       if (data?.me?.role === "ADMIN") {
         return await getInitialProps?.(context);
       } else {

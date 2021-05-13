@@ -9,9 +9,8 @@ import {
 } from "react";
 import { IntlConfig, IntlProvider } from "react-intl";
 
-const SetLocaleProvider = createContext<((locale: string) => void) | undefined>(
-  undefined
-);
+const SetLocaleProvider =
+  createContext<((locale: string) => void) | undefined>(undefined);
 
 export function useSetLocale() {
   return useContext(SetLocaleProvider)!;

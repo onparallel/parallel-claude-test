@@ -12,9 +12,8 @@ export interface PageOpts {
 }
 
 type TableNames = keyof TableTypes;
-type TableKey<
-  TName extends TableNames
-> = TableTypes[TName][TablePrimaryKeys[TName]] & (string | number);
+type TableKey<TName extends TableNames> =
+  TableTypes[TName][TablePrimaryKeys[TName]] & (string | number);
 
 type QueryBuilderFunction<TRecord, TResult = TRecord> = (
   q: Knex.QueryBuilder<TRecord, TResult>
@@ -59,9 +58,10 @@ export class BaseRepository {
     data: MaybeArray<TableCreateTypes[TName]>,
     transaction?: Knex.Transaction
   ) {
-    return (transaction
-      ? transaction<TableTypes[TName]>(tableName)
-      : this.knex<TableTypes[TName]>(tableName)
+    return (
+      transaction
+        ? transaction<TableTypes[TName]>(tableName)
+        : this.knex<TableTypes[TName]>(tableName)
     ).insert(data as any, "*");
   }
 

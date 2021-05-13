@@ -86,8 +86,7 @@ export function PetitionRepliesFieldReply({
                     key={index}
                     aria-label={intl.formatMessage(
                       {
-                        id:
-                          "petition-replies.petition-field-reply.copy-dynamic-select-reply",
+                        id: "petition-replies.petition-field-reply.copy-dynamic-select-reply",
                         defaultMessage: "Copy {label} to clipboard",
                       },
                       { label }

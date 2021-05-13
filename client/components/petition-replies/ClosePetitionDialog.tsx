@@ -140,8 +140,7 @@ export function ClosePetitionDialog({
                   value={message}
                   onChange={setMessage}
                   placeholder={intl.formatMessage({
-                    id:
-                      "component.close-petition-dialog.notify-recipient.message-placeholder",
+                    id: "component.close-petition-dialog.notify-recipient.message-placeholder",
                     defaultMessage: "Add a message to include in the email",
                   })}
                   placeholderOptions={placeholderOptions}

@@ -70,7 +70,8 @@ export function RecipientViewPetitionFieldDynamicSelect({
     Record<string, boolean>
   >({});
   const newReplyRef = useRef<SelectInstance>(null);
-  const replyRefs = useMultipleRefs<RecipientViewPetitionFieldReplyDynamicSelectInstance>();
+  const replyRefs =
+    useMultipleRefs<RecipientViewPetitionFieldReplyDynamicSelectInstance>();
 
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
 
@@ -373,8 +374,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
               size="md"
               placement="bottom"
               label={intl.formatMessage({
-                id:
-                  "component.recipient-view-petition-field-reply.remove-reply-label",
+                id: "component.recipient-view-petition-field-reply.remove-reply-label",
                 defaultMessage: "Remove reply",
               })}
             />

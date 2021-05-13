@@ -9,13 +9,10 @@ export function withFeatureFlag(featureFlag: FeatureFlag) {
     Component: NextComponentType<WithApolloDataContext, P, P>
   ): NextComponentType<WithApolloDataContext, P, P> {
     const { getInitialProps, displayName, ...rest } = Component;
-    const WithFeatureFlag: NextComponentType<
-      WithApolloDataContext,
-      P,
-      P
-    > = function (props) {
-      return <Component {...props} />;
-    };
+    const WithFeatureFlag: NextComponentType<WithApolloDataContext, P, P> =
+      function (props) {
+        return <Component {...props} />;
+      };
     return Object.assign(WithFeatureFlag, rest, {
       displayName: `WithFeatureFlag(${featureFlag})(${
         displayName ?? Component.name

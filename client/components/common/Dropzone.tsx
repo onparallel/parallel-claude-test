@@ -76,9 +76,8 @@ export const Dropzone = chakraForwardRef<"div", DropzoneProps, DropzoneRef>(
         delete dropZoneOptions[key as keyof typeof dropZoneOptions];
       }
     }
-    const { open, getRootProps, getInputProps, ...state } = useDropzone(
-      dropZoneOptions
-    );
+    const { open, getRootProps, getInputProps, ...state } =
+      useDropzone(dropZoneOptions);
     useImperativeHandle(ref, () => ({ open }), [open]);
     return (
       <Box

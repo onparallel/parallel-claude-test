@@ -630,14 +630,8 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     )
   ),
   resolve: async (_, args, ctx, info) => {
-    const {
-      title,
-      description,
-      optional,
-      multiple,
-      options,
-      visibility,
-    } = args.data;
+    const { title, description, optional, multiple, options, visibility } =
+      args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
       data.title = title?.trim() || null;
@@ -1468,9 +1462,8 @@ export const sendPetitionClosedNotification = mutationField(
     authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
     validateArgs: validRichTextContent((args) => args.emailBody, "emailBody"),
     resolve: async (_, args, ctx) => {
-      const shouldSendNotification = await ctx.petitions.shouldNotifyPetitionClosed(
-        args.petitionId
-      );
+      const shouldSendNotification =
+        await ctx.petitions.shouldNotifyPetitionClosed(args.petitionId);
       if (!shouldSendNotification && !args.force) {
         throw new WhitelistedError(
           "You already notified the contacts",

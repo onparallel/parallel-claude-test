@@ -57,7 +57,7 @@ export function fetchPetitionAccess<
   TArg extends Arg<TypeName, FieldName, string>
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const keycode = (args[argKeycode] as unknown) as string;
+    const keycode = args[argKeycode] as unknown as string;
     const access = await ctx.petitions.loadAccessByKeycode(keycode);
     if (!access) {
       throw new PublicPetitionNotAvailableError(
@@ -100,7 +100,7 @@ export function fieldHasType<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const fieldId = (args[argFieldId] as unknown) as number;
+      const fieldId = args[argFieldId] as unknown as number;
       const field = (await ctx.petitions.loadField(fieldId))!;
       return unMaybeArray(fieldType).includes(field.type);
     } catch {}
@@ -118,7 +118,7 @@ export function replyIsForFieldOfType<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const field = (await ctx.petitions.loadFieldForReply(
-      (args[argReplyId] as unknown) as number
+      args[argReplyId] as unknown as number
     ))!;
     return unMaybeArray(fieldType).includes(field.type);
   };
@@ -133,7 +133,7 @@ export function fieldBelongsToAccess<
     try {
       return await ctx.petitions.fieldsBelongToPetition(
         ctx.access!.petition_id,
-        [(args[argFieldId] as unknown) as number]
+        [args[argFieldId] as unknown as number]
       );
     } catch {}
     return false;
@@ -149,7 +149,7 @@ export function replyBelongsToAccess<
     try {
       return await ctx.petitions.repliesBelongsToPetition(
         ctx.access!.petition_id,
-        [(args[argReplyId] as unknown) as number]
+        [args[argReplyId] as unknown as number]
       );
     } catch {}
     return false;

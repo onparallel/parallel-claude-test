@@ -71,12 +71,10 @@ function _PetitionSettings({
   const showConfirmSignatureConfigChanged = useDialog(
     ConfirmSignatureConfigChanged
   );
-  const [
-    cancelSignatureRequest,
-  ] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
-  const [
-    startSignatureRequest,
-  ] = usePetitionSettings_startPetitionSignatureRequestMutation();
+  const [cancelSignatureRequest] =
+    usePetitionSettings_cancelPetitionSignatureRequestMutation();
+  const [startSignatureRequest] =
+    usePetitionSettings_startPetitionSignatureRequestMutation();
 
   async function handleConfigureSignatureClick() {
     if (petition.__typename !== "Petition") {

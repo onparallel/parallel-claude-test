@@ -139,9 +139,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     return () => document.body.classList.remove("hide-hubspot");
   }, [Boolean(activeFieldId)]);
 
-  const [
-    markPetitionFieldCommentsAsRead,
-  ] = usePetitionReplies_markPetitionFieldCommentsAsReadMutation();
+  const [markPetitionFieldCommentsAsRead] =
+    usePetitionReplies_markPetitionFieldCommentsAsReadMutation();
   useEffect(() => {
     if (activeFieldId) {
       const timeout = setTimeout(async () => {
@@ -160,9 +159,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const [state, wrapper] = usePetitionState();
   const [updatePetition] = usePetitionReplies_updatePetitionMutation();
-  const [
-    validatePetitionFields,
-  ] = usePetitionReplies_validatePetitionFieldsMutation();
+  const [validatePetitionFields] =
+    usePetitionReplies_validatePetitionFieldsMutation();
   const downloadReplyFile = useDownloadReplyFile();
 
   const handleValidateToggle = useCallback(
@@ -208,7 +206,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     [petition]
   );
 
-  const updatePetitionFieldRepliesStatus = useUpdatePetitionFieldRepliesStatus();
+  const updatePetitionFieldRepliesStatus =
+    useUpdatePetitionFieldRepliesStatus();
   async function handleUpdateRepliesStatus(
     petitionFieldId: string,
     petitionFieldReplyIds: string[],
@@ -343,10 +342,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     });
   }
 
-  const [
-    submitUnpublishedComments,
-    { loading: isSubmitting },
-  ] = usePetitionReplies_submitUnpublishedCommentsMutation();
+  const [submitUnpublishedComments, { loading: isSubmitting }] =
+    usePetitionReplies_submitUnpublishedCommentsMutation();
   async function handleSubmitUnpublished() {
     await submitUnpublishedComments({
       variables: { petitionId },
@@ -364,10 +361,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const indices = useFieldIndices(petition.fields);
 
   const showClosePetitionDialog = useClosePetitionDialog();
-  const [
-    sendPetitionClosedNotification,
-  ] = usePetitionReplies_sendPetitionClosedNotificationMutation();
-  const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
+  const [sendPetitionClosedNotification] =
+    usePetitionReplies_sendPetitionClosedNotificationMutation();
+  const petitionAlreadyNotifiedDialog =
+    useConfirmResendCompletedNotificationDialog();
   const handleFinishPetition = useCallback(
     async ({ requiredMessage }: { requiredMessage: boolean }) => {
       const petitionClosedNotificationToast = {
@@ -438,9 +435,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     ConfirmCancelOngoingSignature
   );
 
-  const [
-    cancelSignatureRequest,
-  ] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
+  const [cancelSignatureRequest] =
+    usePetitionSettings_cancelPetitionSignatureRequestMutation();
 
   const handleClosePetition = useCallback(async () => {
     try {
@@ -500,9 +496,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     } catch {}
   };
 
-  const [filter, setFilter] = useState<PetitionFieldFilter>(
-    defaultFieldsFilter
-  );
+  const [filter, setFilter] =
+    useState<PetitionFieldFilter>(defaultFieldsFilter);
 
   const petitionSignatureStatus =
     petition.signatureConfig?.review &&
@@ -984,9 +979,8 @@ function useDownloadReplyFile() {
 }
 
 function useCreatePetitionFieldComment() {
-  const [
-    createPetitionFieldComment,
-  ] = usePetitionReplies_createPetitionFieldCommentMutation();
+  const [createPetitionFieldComment] =
+    usePetitionReplies_createPetitionFieldCommentMutation();
   return useCallback(
     async (
       variables: PetitionReplies_createPetitionFieldCommentMutationVariables
@@ -1011,9 +1005,10 @@ function useCreatePetitionFieldComment() {
             id: variables.petitionFieldId,
             variables: pick(variables, ["hasInternalComments"]),
           };
-          const field = client.readFragment<PetitionReplies_createPetitionFieldComment_PetitionFieldFragment>(
-            options
-          );
+          const field =
+            client.readFragment<PetitionReplies_createPetitionFieldComment_PetitionFieldFragment>(
+              options
+            );
           client.writeFragment<PetitionReplies_createPetitionFieldComment_PetitionFieldFragment>(
             {
               ...options,
@@ -1034,9 +1029,8 @@ function useCreatePetitionFieldComment() {
 }
 
 function useUpdatePetitionFieldComment() {
-  const [
-    updatePetitionFieldComment,
-  ] = usePetitionReplies_updatePetitionFieldCommentMutation();
+  const [updatePetitionFieldComment] =
+    usePetitionReplies_updatePetitionFieldCommentMutation();
   const apollo = useApolloClient();
   return useCallback(
     async (
@@ -1045,15 +1039,17 @@ function useUpdatePetitionFieldComment() {
       await updatePetitionFieldComment({
         variables,
         optimisticResponse: () => {
-          const comment = apollo.readFragment<PetitionRepliesFieldComments_PetitionFieldCommentFragment>(
-            {
-              fragment:
-                PetitionRepliesFieldComments.fragments.PetitionFieldComment,
-              id: variables.petitionFieldCommentId,
-              fragmentName: "PetitionRepliesFieldComments_PetitionFieldComment",
-              variables: pick(variables, ["hasInternalComments"]),
-            }
-          );
+          const comment =
+            apollo.readFragment<PetitionRepliesFieldComments_PetitionFieldCommentFragment>(
+              {
+                fragment:
+                  PetitionRepliesFieldComments.fragments.PetitionFieldComment,
+                id: variables.petitionFieldCommentId,
+                fragmentName:
+                  "PetitionRepliesFieldComments_PetitionFieldComment",
+                variables: pick(variables, ["hasInternalComments"]),
+              }
+            );
           return {
             updatePetitionFieldComment: {
               ...comment!,
@@ -1068,9 +1064,8 @@ function useUpdatePetitionFieldComment() {
 }
 
 function useDeletePetitionFieldComment() {
-  const [
-    deletePetitionFieldComment,
-  ] = usePetitionReplies_deletePetitionFieldCommentMutation();
+  const [deletePetitionFieldComment] =
+    usePetitionReplies_deletePetitionFieldCommentMutation();
   return useCallback(
     async (
       variables: PetitionReplies_deletePetitionFieldCommentMutationVariables
@@ -1091,9 +1086,10 @@ function useDeletePetitionFieldComment() {
             `,
             id: variables.petitionFieldId,
           };
-          const field = client.readFragment<PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment>(
-            options
-          );
+          const field =
+            client.readFragment<PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment>(
+              options
+            );
           client.writeFragment<PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment>(
             {
               ...options,
@@ -1113,9 +1109,8 @@ function useDeletePetitionFieldComment() {
 }
 
 function useUpdatePetitionFieldRepliesStatus() {
-  const [
-    updatePetitionFieldRepliesStatus,
-  ] = usePetitionReplies_updatePetitionFieldRepliesStatusMutation();
+  const [updatePetitionFieldRepliesStatus] =
+    usePetitionReplies_updatePetitionFieldRepliesStatusMutation();
   return useCallback(
     async (
       variables: PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables,

@@ -40,20 +40,22 @@ export function PetitionLayout({
   const title = useMemo(
     () =>
       petition.__typename === "Petition"
-        ? ({
-            compose: intl.formatMessage({
-              id: "petition.header.compose-tab",
-              defaultMessage: "Compose",
-            }),
-            replies: intl.formatMessage({
-              id: "petition.header.replies-tab",
-              defaultMessage: "Replies",
-            }),
-            activity: intl.formatMessage({
-              id: "petition.header.activity-tab",
-              defaultMessage: "Activity",
-            }),
-          } as Record<PetitionHeaderProps["section"], string>)[section!]
+        ? (
+            {
+              compose: intl.formatMessage({
+                id: "petition.header.compose-tab",
+                defaultMessage: "Compose",
+              }),
+              replies: intl.formatMessage({
+                id: "petition.header.replies-tab",
+                defaultMessage: "Replies",
+              }),
+              activity: intl.formatMessage({
+                id: "petition.header.activity-tab",
+                defaultMessage: "Activity",
+              }),
+            } as Record<PetitionHeaderProps["section"], string>
+          )[section!]
         : intl.formatMessage({
             id: "generic.template",
             defaultMessage: "Template",

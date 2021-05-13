@@ -209,9 +209,8 @@ export const updateUserStatus = mutationField("updateUserStatus", {
         `User:${ctx.user!.id}`
       );
     } else {
-      const permissionsByUserId = await ctx.petitions.loadUserPermissionsByUserId(
-        userIds
-      );
+      const permissionsByUserId =
+        await ctx.petitions.loadUserPermissionsByUserId(userIds);
       return await pMap(
         zip(userIds, permissionsByUserId),
         async ([userId, userPermissions]) => {

@@ -714,13 +714,15 @@ export class PetitionRepository extends BaseRepository {
         ),
         this.insert(
           "petition_field",
-          ([
-            "HEADING",
-            "TEXT",
-            "SHORT_TEXT",
-            "FILE_UPLOAD",
-            "SELECT",
-          ] as PetitionFieldType[]).map((type, index) => ({
+          (
+            [
+              "HEADING",
+              "TEXT",
+              "SHORT_TEXT",
+              "FILE_UPLOAD",
+              "SELECT",
+            ] as PetitionFieldType[]
+          ).map((type, index) => ({
             ...defaultFieldOptions(type),
             petition_id: petition.id,
             type,
@@ -1896,20 +1898,21 @@ export class PetitionRepository extends BaseRepository {
     )
   );
 
-  readonly loadPetitionFieldUnpublishedCommentCountForFieldAndAccess = fromDataLoader(
-    new DataLoader<
-      { accessId: number; petitionId: number; petitionFieldId: number },
-      number,
-      string
-    >(
-      async (ids) => {
-        const rows = await this.raw<{
-          petition_id: number;
-          petition_field_id: number;
-          petition_access_id: number;
-          unpublished_count: number;
-        }>(
-          /* sql */ `
+  readonly loadPetitionFieldUnpublishedCommentCountForFieldAndAccess =
+    fromDataLoader(
+      new DataLoader<
+        { accessId: number; petitionId: number; petitionFieldId: number },
+        number,
+        string
+      >(
+        async (ids) => {
+          const rows = await this.raw<{
+            petition_id: number;
+            petition_field_id: number;
+            petition_access_id: number;
+            unpublished_count: number;
+          }>(
+            /* sql */ `
           select
             pfc.petition_id,
             pfc.petition_field_id,
@@ -1935,40 +1938,45 @@ export class PetitionRepository extends BaseRepository {
             pfc.petition_field_id,
             pfc.petition_access_id
           `,
-          ids.flatMap((x) => [x.petitionId, x.petitionFieldId, x.accessId])
-        );
+            ids.flatMap((x) => [x.petitionId, x.petitionFieldId, x.accessId])
+          );
 
-        const rowsById = indexBy(
-          rows,
-          keyBuilder(["petition_id", "petition_field_id", "petition_access_id"])
-        );
+          const rowsById = indexBy(
+            rows,
+            keyBuilder([
+              "petition_id",
+              "petition_field_id",
+              "petition_access_id",
+            ])
+          );
 
-        return ids
-          .map(keyBuilder(["petitionId", "petitionFieldId", "accessId"]))
-          .map((key) => {
-            return rowsById[key]?.unpublished_count ?? 0;
-          });
-      },
-      {
-        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
-      }
-    )
-  );
+          return ids
+            .map(keyBuilder(["petitionId", "petitionFieldId", "accessId"]))
+            .map((key) => {
+              return rowsById[key]?.unpublished_count ?? 0;
+            });
+        },
+        {
+          cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
+        }
+      )
+    );
 
-  readonly loadPetitionFieldUnreadCommentCountForFieldAndAccess = fromDataLoader(
-    new DataLoader<
-      { accessId: number; petitionId: number; petitionFieldId: number },
-      number,
-      string
-    >(
-      async (ids) => {
-        const rows = await this.raw<{
-          petition_id: number;
-          petition_field_id: number;
-          petition_access_id: number;
-          unread_count: number;
-        }>(
-          /* sql */ `
+  readonly loadPetitionFieldUnreadCommentCountForFieldAndAccess =
+    fromDataLoader(
+      new DataLoader<
+        { accessId: number; petitionId: number; petitionFieldId: number },
+        number,
+        string
+      >(
+        async (ids) => {
+          const rows = await this.raw<{
+            petition_id: number;
+            petition_field_id: number;
+            petition_access_id: number;
+            unread_count: number;
+          }>(
+            /* sql */ `
           select
             pcn.petition_id,
             (pcn.data ->> 'petition_field_id')::int as petition_field_id,
@@ -1993,25 +2001,35 @@ export class PetitionRepository extends BaseRepository {
             pcn.petition_access_id
 
         `,
-          [...ids.flatMap((x) => [x.petitionId, x.accessId, x.petitionFieldId])]
-        );
+            [
+              ...ids.flatMap((x) => [
+                x.petitionId,
+                x.accessId,
+                x.petitionFieldId,
+              ]),
+            ]
+          );
 
-        const rowsById = indexBy(
-          rows,
-          keyBuilder(["petition_id", "petition_field_id", "petition_access_id"])
-        );
+          const rowsById = indexBy(
+            rows,
+            keyBuilder([
+              "petition_id",
+              "petition_field_id",
+              "petition_access_id",
+            ])
+          );
 
-        return ids
-          .map(keyBuilder(["petitionId", "petitionFieldId", "accessId"]))
-          .map((key) => {
-            return rowsById[key]?.unread_count ?? 0;
-          });
-      },
-      {
-        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
-      }
-    )
-  );
+          return ids
+            .map(keyBuilder(["petitionId", "petitionFieldId", "accessId"]))
+            .map((key) => {
+              return rowsById[key]?.unread_count ?? 0;
+            });
+        },
+        {
+          cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
+        }
+      )
+    );
 
   private sortComments(comments: PetitionFieldComment[]) {
     return comments.slice(0).sort((a, b) => {

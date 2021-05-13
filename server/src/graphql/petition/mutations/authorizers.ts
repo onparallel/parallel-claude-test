@@ -51,7 +51,7 @@ export function userIsCommentAuthor<
 >(argNameCommentId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     const comment = await ctx.petitions.loadPetitionFieldComment(
-      (args[argNameCommentId] as unknown) as number
+      args[argNameCommentId] as unknown as number
     );
     return (comment && comment.user_id === ctx.user!.id) ?? false;
   };

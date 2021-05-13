@@ -38,9 +38,11 @@ export function getDefaultInputTypeValue(
     case "NON_NULL":
       return getDefaultInputTypeValue(type.ofType, schemaTypes);
     case "ENUM":
-      return (schemaTypes.find(
-        (t) => t.kind === type.kind && t.name === type.name
-      ) as IntrospectionEnumType).enumValues[0].name;
+      return (
+        schemaTypes.find(
+          (t) => t.kind === type.kind && t.name === type.name
+        ) as IntrospectionEnumType
+      ).enumValues[0].name;
     case "INPUT_OBJECT":
       return getDefaultInputObjectTypeValue(
         type as IntrospectionNamedTypeRef<IntrospectionInputObjectType>,

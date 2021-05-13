@@ -79,14 +79,16 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
 
 export function usePetitionFieldTypeColor(type: PetitionFieldType) {
   const theme = useTheme();
-  return ({
-    FILE_UPLOAD: theme.colors.teal[400],
-    TEXT: theme.colors.yellow[500],
-    SHORT_TEXT: theme.colors.yellow[400],
-    HEADING: theme.colors.blue[400],
-    SELECT: theme.colors.pink[400],
-    DYNAMIC_SELECT: theme.colors.pink[600],
-  } as Record<PetitionFieldType, string>)[type];
+  return (
+    {
+      FILE_UPLOAD: theme.colors.teal[400],
+      TEXT: theme.colors.yellow[500],
+      SHORT_TEXT: theme.colors.yellow[400],
+      HEADING: theme.colors.blue[400],
+      SELECT: theme.colors.pink[400],
+      DYNAMIC_SELECT: theme.colors.pink[600],
+    } as Record<PetitionFieldType, string>
+  )[type];
 }
 
 export function getDynamicSelectValues(

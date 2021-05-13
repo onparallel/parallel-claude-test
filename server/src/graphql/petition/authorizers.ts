@@ -98,7 +98,7 @@ export function fieldIsNotFixed<
   return async (_, args, ctx) => {
     try {
       const field = await ctx.petitions.loadField(
-        (args[argNameFieldId] as unknown) as number
+        args[argNameFieldId] as unknown as number
       );
       return !field!.is_fixed;
     } catch {}
@@ -118,7 +118,7 @@ export function fieldsBelongsToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.fieldsBelongToPetition(
-        (args[argNamePetitionId] as unknown) as number,
+        args[argNamePetitionId] as unknown as number,
         unMaybeArray(args[argNameFieldIds] as MaybeArray<number>)
       );
     } catch {}
@@ -138,7 +138,7 @@ export function repliesBelongsToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.repliesBelongsToPetition(
-        (args[argNamePetitionId] as unknown) as number,
+        args[argNamePetitionId] as unknown as number,
         unMaybeArray(args[argNameReplyIds] as MaybeArray<number>)
       );
     } catch {}
@@ -158,7 +158,7 @@ export function repliesBelongsToField<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.repliesBelongsToField(
-        (args[argNameFieldId] as unknown) as number,
+        args[argNameFieldId] as unknown as number,
         unMaybeArray(args[argNameReplyIds] as MaybeArray<number>)
       );
     } catch {}
@@ -178,7 +178,7 @@ export function accessesBelongToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.accessesBelongToPetition(
-        (args[argNamePetitionId] as unknown) as number,
+        args[argNamePetitionId] as unknown as number,
         unMaybeArray(args[argNameAccessIds] as MaybeArray<number>)
       );
     } catch {}
@@ -198,8 +198,8 @@ export function messageBelongToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.messagesBelongToPetition(
-        (args[argNamePetitionId] as unknown) as number,
-        [(args[argNameMessageId] as unknown) as number]
+        args[argNamePetitionId] as unknown as number,
+        [args[argNameMessageId] as unknown as number]
       );
     } catch {}
     return false;
@@ -218,7 +218,7 @@ export function commentsBelongsToPetition<
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.commentsBelongToPetition(
-        (args[argNamePetitionId] as unknown) as number,
+        args[argNamePetitionId] as unknown as number,
         unMaybeArray(args[argNameCommentIds] as MaybeArray<number>)
       );
     } catch {}
@@ -260,7 +260,7 @@ export function petitionHasRepliableFields<
 >(argNamePetitionId: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const petitionId = (args[argNamePetitionId] as unknown) as number;
+      const petitionId = args[argNamePetitionId] as unknown as number;
       const fields = await ctx.petitions.loadFieldsForPetition(petitionId);
 
       if (countBy(fields, (f) => f.type !== "HEADING") === 0) {

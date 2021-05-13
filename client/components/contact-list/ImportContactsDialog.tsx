@@ -34,9 +34,8 @@ export function ImportContactsDialog(
 
   const showErrorDialog = useErrorDialog();
 
-  const [
-    bulkCreateContacts,
-  ] = useImportContactsDialog_bulkCreateContactsMutation();
+  const [bulkCreateContacts] =
+    useImportContactsDialog_bulkCreateContactsMutation();
   async function handleFileDrop([file]: File[], rejected: FileRejection[]) {
     if (rejected.length > 0) {
       setFileDropError(rejected[0].errors[0].code);

@@ -136,8 +136,7 @@ function LegalIndustry() {
                       "Always accessible, no downloads or installs needed.",
                   }),
                   intl.formatMessage({
-                    id:
-                      "public.services.collaboration.centralize-conversations",
+                    id: "public.services.collaboration.centralize-conversations",
                     defaultMessage:
                       "Centralize conversations in a single place.",
                   }),

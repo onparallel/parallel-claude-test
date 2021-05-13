@@ -48,10 +48,8 @@ function OrganizationBranding() {
       `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`
   );
   const showErrorDialog = useErrorDialog();
-  const [
-    updateLogo,
-    { loading },
-  ] = useOrganizationBranding_updateOrgLogoMutation();
+  const [updateLogo, { loading }] =
+    useOrganizationBranding_updateOrgLogoMutation();
   const handleLogoUpload = async (files: File[], rejected: FileRejection[]) => {
     if (rejected.length > 0) {
       await showErrorDialog({

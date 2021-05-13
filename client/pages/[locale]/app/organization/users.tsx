@@ -114,9 +114,8 @@ function OrganizationUsers() {
     [debouncedOnSearchChange]
   );
 
-  const [
-    createOrganizationUser,
-  ] = useOrganizationUsers_createOrganizationUserMutation();
+  const [createOrganizationUser] =
+    useOrganizationUsers_createOrganizationUserMutation();
   const showCreateUserDialog = useCreateUserDialog();
   const handleCreateUser = async () => {
     try {
@@ -317,10 +316,12 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
         CellContent: ({ row }) => (
           <Badge
             colorScheme={
-              ({
-                ADMIN: "green",
-                NORMAL: "gray",
-              } as Record<OrganizationRole, string>)[row.role]
+              (
+                {
+                  ADMIN: "green",
+                  NORMAL: "gray",
+                } as Record<OrganizationRole, string>
+              )[row.role]
             }
           >
             {row.role === "ADMIN" ? (

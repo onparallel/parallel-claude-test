@@ -20,7 +20,7 @@ export class QueryItem<T> {
 
   orDefault(value: T) {
     this.defaultValue = value;
-    return (this as unknown) as QueryItem<NonNullable<T>>;
+    return this as unknown as QueryItem<NonNullable<T>>;
   }
 
   isDefault(value: NonNullable<T>) {

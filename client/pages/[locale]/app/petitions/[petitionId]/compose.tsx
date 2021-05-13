@@ -148,9 +148,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [
-    updateFieldPositions,
-  ] = usePetitionCompose_updateFieldPositionsMutation();
+  const [updateFieldPositions] =
+    usePetitionCompose_updateFieldPositionsMutation();
   const handleUpdateFieldPositions = useCallback(
     wrapper(async function (fieldIds: string[]) {
       await updateFieldPositions({ variables: { petitionId, fieldIds } });
@@ -170,9 +169,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [
-    deletePetitionField,
-  ] = usePetitionCompose_deletePetitionFieldMutation();
+  const [deletePetitionField] =
+    usePetitionCompose_deletePetitionFieldMutation();
   const confirmDelete = useConfirmDeleteFieldDialog();
   const handleDeleteField = useCallback(
     wrapper(async function (fieldId: string) {
@@ -211,9 +209,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [
-    updatePetitionField,
-  ] = usePetitionCompose_updatePetitionFieldMutation();
+  const [updatePetitionField] =
+    usePetitionCompose_updatePetitionFieldMutation();
   const _handleFieldEdit = useCallback(
     async function (fieldId: string, data: UpdatePetitionFieldInput) {
       const { fields } = petitionDataRef.current!;
@@ -287,9 +284,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const showReferencedFieldDialog = useReferencedFieldDialog();
   const confirmChangeFieldType = useConfirmChangeFieldTypeDialog();
-  const [
-    changePetitionFieldType,
-  ] = usePetitionCompose_changePetitionFieldTypeMutation();
+  const [changePetitionFieldType] =
+    usePetitionCompose_changePetitionFieldTypeMutation();
   const handleFieldTypeChange = useCallback(
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
       const { fields, indices } = petitionDataRef.current!;
@@ -342,9 +338,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [
-    createPetitionField,
-  ] = usePetitionCompose_createPetitionFieldMutation();
+  const [createPetitionField] =
+    usePetitionCompose_createPetitionFieldMutation();
   const handleAddField = useCallback(
     wrapper(async function (type: PetitionFieldType, position?: number) {
       const { data } = await createPetitionField({
@@ -383,19 +378,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
 
     try {
-      const {
-        recipientIdGroups,
-        subject,
-        body,
-        remindersConfig,
-        scheduledAt,
-      } = await showAddPetitionAccessDialog({
-        defaultSubject: petition.emailSubject,
-        defaultBody: petition.emailBody,
-        defaultRemindersConfig: petition.remindersConfig,
-        onUpdatePetition: handleUpdatePetition,
-        canAddRecipientGroups: true,
-      });
+      const { recipientIdGroups, subject, body, remindersConfig, scheduledAt } =
+        await showAddPetitionAccessDialog({
+          defaultSubject: petition.emailSubject,
+          defaultBody: petition.emailBody,
+          defaultRemindersConfig: petition.remindersConfig,
+          onUpdatePetition: handleUpdatePetition,
+          canAddRecipientGroups: true,
+        });
       const task = batchSendPetition({
         variables: {
           petitionId: petition.id,

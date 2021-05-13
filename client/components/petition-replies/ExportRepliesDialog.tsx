@@ -66,9 +66,8 @@ export function ExportRepliesDialog({
       ? [{ type: "EXPORT_CUATRECASAS" as const, isEnabled: false }]
       : []),
   ]);
-  const [selectedOption, setSelectedOption] = useState<ExportType>(
-    "DOWNLOAD_ZIP"
-  );
+  const [selectedOption, setSelectedOption] =
+    useState<ExportType>("DOWNLOAD_ZIP");
   const messages: Record<ExportType, { title: string; description: string }> = {
     DOWNLOAD_ZIP: {
       title: intl.formatMessage({
@@ -76,8 +75,7 @@ export function ExportRepliesDialog({
         defaultMessage: "Download files as a ZIP",
       }),
       description: intl.formatMessage({
-        id:
-          "component.export-replies-dialog.download-files-and-replies-description",
+        id: "component.export-replies-dialog.download-files-and-replies-description",
         defaultMessage:
           "Download all files including text replies in Excel format.",
       }),

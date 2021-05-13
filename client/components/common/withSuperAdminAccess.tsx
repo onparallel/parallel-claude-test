@@ -8,13 +8,10 @@ export function withSuperAdminAccess<P = {}>(
   Component: NextComponentType<WithApolloDataContext, P, P>
 ): NextComponentType<WithApolloDataContext, P, P> {
   const { getInitialProps, displayName, ...rest } = Component;
-  const WithSuperAdminAccess: NextComponentType<
-    WithApolloDataContext,
-    P,
-    P
-  > = function (props) {
-    return <Component {...props} />;
-  };
+  const WithSuperAdminAccess: NextComponentType<WithApolloDataContext, P, P> =
+    function (props) {
+      return <Component {...props} />;
+    };
   return Object.assign(WithSuperAdminAccess, rest, {
     displayName: `WithSuperAdminAccess(${displayName ?? Component.name})`,
     getInitialProps: async (context: WithApolloDataContext) => {

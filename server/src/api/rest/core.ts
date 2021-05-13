@@ -115,9 +115,8 @@ export interface OperationResolver<
   ): PathResolver<TContext, TPath, TParams>;
 }
 
-type RestResponseReturnType<
-  TResponses extends RestResponses<any>
-> = TResponses[keyof TResponses] extends RestResponse<infer U> ? U : never;
+type RestResponseReturnType<TResponses extends RestResponses<any>> =
+  TResponses[keyof TResponses] extends RestResponse<infer U> ? U : never;
 
 const methods: RestMethod[] = [
   "get",
@@ -188,13 +187,8 @@ const _PathResolver: any = (function () {
         TBody
       >
     ) {
-      const {
-        body,
-        query,
-        responses,
-        excludeFromSpec,
-        ...spec
-      } = operationOptions;
+      const { body, query, responses, excludeFromSpec, ...spec } =
+        operationOptions;
       if (!excludeFromSpec) {
         this.spec[method] = spec;
         if (body?.spec) {
@@ -214,9 +208,8 @@ const _PathResolver: any = (function () {
       this.router[method](this.path, async (req, res, next) => {
         const response: ResponseWrapper<any> = await (async () => {
           try {
-            const context: RestApiContext<TContext> = ((await this.apiOptions.context?.(
-              { req, res }
-            )) ?? {}) as any;
+            const context: RestApiContext<TContext> =
+              ((await this.apiOptions.context?.({ req, res })) ?? {}) as any;
             context.params = await pProps(
               this.pathOptions?.params ?? ({} as RestParameters<any>),
               async (param, name) => {

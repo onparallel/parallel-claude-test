@@ -50,9 +50,8 @@ function AdminSupportMethods({
     });
   }, [supportMethods, search]);
 
-  const [selected, setSelected] = useState<
-    Maybe<UnwrapArray<typeof supportMethods>>
-  >(null);
+  const [selected, setSelected] =
+    useState<Maybe<UnwrapArray<typeof supportMethods>>>(null);
 
   return (
     <SettingsLayout

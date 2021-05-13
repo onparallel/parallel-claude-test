@@ -24,7 +24,7 @@ export function contextUserBelongsToOrg<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      return ctx.user!.org_id === ((args[argName] as unknown) as number);
+      return ctx.user!.org_id === (args[argName] as unknown as number);
     } catch {}
     return false;
   };

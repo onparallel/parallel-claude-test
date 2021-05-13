@@ -222,8 +222,7 @@ export function RecipientSelectGroups({
                 <ContactSelect
                   ref={recipientGroupSelectRef[index]}
                   placeholder={intl.formatMessage({
-                    id:
-                      "component.recipient-select-groups.recipients-placeholder",
+                    id: "component.recipient-select-groups.recipients-placeholder",
                     defaultMessage: "Enter recipients...",
                   })}
                   value={recipients}
@@ -327,9 +326,8 @@ type MultipleEmailsPastedAction = "SAME_GROUP" | "SEPARATE_GROUPS";
 function MultipleEmailsPastedDialog(
   props: DialogProps<{}, MultipleEmailsPastedAction>
 ) {
-  const [action, setAction] = useState<MultipleEmailsPastedAction>(
-    "SEPARATE_GROUPS"
-  );
+  const [action, setAction] =
+    useState<MultipleEmailsPastedAction>("SEPARATE_GROUPS");
   const initialFocusRef = useRef<HTMLElement>(null);
   return (
     <ConfirmDialog

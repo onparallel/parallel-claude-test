@@ -23,10 +23,12 @@ import { Spacer } from "../common/Spacer";
 export function RecipientViewHelpDialog(props: DialogProps<{}, void>) {
   const intl = useIntl();
   const router = useRouter();
-  const supportUrl = ({
-    en: "https://support.onparallel.com/hc/en-us",
-    es: "https://support.onparallel.com/hc/es",
-  } as any)[router.query.locale as any];
+  const supportUrl = (
+    {
+      en: "https://support.onparallel.com/hc/en-us",
+      es: "https://support.onparallel.com/hc/es",
+    } as any
+  )[router.query.locale as any];
   return (
     <BaseDialog {...props} size="3xl">
       <ModalContent>

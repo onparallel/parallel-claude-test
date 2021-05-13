@@ -11,9 +11,10 @@ export async function validateSignaturitRequest(
   next: NextFunction
 ) {
   const body = req.body as SignaturItEventBody;
-  const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
-    `SIGNATURIT/${body.document.signature.id}`
-  );
+  const signature =
+    await req.context.petitions.loadPetitionSignatureByExternalId(
+      `SIGNATURIT/${body.document.signature.id}`
+    );
 
   if (signature && signature.status !== "CANCELLED") {
     next();
@@ -72,17 +73,18 @@ async function documentDeclined(
     email: data.document.email,
   });
 
-  const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
-    `SIGNATURIT/${data.document.signature.id}`,
-    {
-      status: "CANCELLED",
-      cancel_reason: "DECLINED_BY_SIGNER",
-      cancel_data: {
-        contact_id: contact?.id,
-        decline_reason: data.document.decline_reason,
-      },
-    }
-  );
+  const signatureRequest =
+    await ctx.petitions.updatePetitionSignatureByExternalId(
+      `SIGNATURIT/${data.document.signature.id}`,
+      {
+        status: "CANCELLED",
+        cancel_reason: "DECLINED_BY_SIGNER",
+        cancel_data: {
+          contact_id: contact?.id,
+          decline_reason: data.document.decline_reason,
+        },
+      }
+    );
 
   await appendEventLogs(petitionId, data, ctx);
 
@@ -160,13 +162,14 @@ async function documentCompleted(
     ctx
   );
 
-  const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
-    `SIGNATURIT/${signatureId}`,
-    {
-      status: "COMPLETED",
-      file_upload_id: signedDoc.id,
-    }
-  );
+  const signatureRequest =
+    await ctx.petitions.updatePetitionSignatureByExternalId(
+      `SIGNATURIT/${signatureId}`,
+      {
+        status: "COMPLETED",
+        file_upload_id: signedDoc.id,
+      }
+    );
 
   await Promise.all([
     ctx.emails.sendPetitionCompletedEmail(petition.id, {

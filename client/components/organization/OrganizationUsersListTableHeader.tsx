@@ -58,8 +58,7 @@ export function OrganizationUsersListTableHeader({
       await withError(
         showErrorDialog({
           message: intl.formatMessage({
-            id:
-              "organization-users.update-user-status.error.deactivate-own-user",
+            id: "organization-users.update-user-status.error.deactivate-own-user",
             defaultMessage:
               "You can't deactivate your own user. Please, remove it from the selection and try again.",
           }),

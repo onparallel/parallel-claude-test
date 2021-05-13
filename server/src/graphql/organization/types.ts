@@ -80,9 +80,8 @@ export const Organization = objectType({
     t.boolean("hasSsoProvider", {
       description: "Whether the organization has an SSO provider configured.",
       resolve: async (o, _, ctx) => {
-        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
-          o.id
-        );
+        const integrations =
+          await ctx.integrations.loadEnabledIntegrationsForOrgId(o.id);
         return integrations.some((i) => i.type === "SSO");
       },
     });
@@ -145,9 +144,8 @@ export const Organization = objectType({
       },
       authorize: isOwnOrgOrSuperAdmin(),
       resolve: async (root, { type }, ctx) => {
-        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
-          root.id
-        );
+        const integrations =
+          await ctx.integrations.loadEnabledIntegrationsForOrgId(root.id);
         return type
           ? integrations.filter((i) => i.type === type)
           : integrations;

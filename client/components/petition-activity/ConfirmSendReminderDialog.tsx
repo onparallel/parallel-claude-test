@@ -66,8 +66,7 @@ export function ConfirmSendReminderDialog({
                 value={message}
                 onChange={setMessage}
                 placeholder={intl.formatMessage({
-                  id:
-                    "component.confirm-send-reminder-dialog.message-placeholder",
+                  id: "component.confirm-send-reminder-dialog.message-placeholder",
                   defaultMessage: "Add a message to include in the email",
                 })}
                 placeholderOptions={placeholderOptions}

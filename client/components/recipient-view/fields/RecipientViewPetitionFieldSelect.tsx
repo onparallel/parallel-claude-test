@@ -116,9 +116,10 @@ export function RecipientViewPetitionFieldSelect({
     )
   );
 
-  const values = useMemo(() => options.values.map(toSelectOption), [
-    options.values,
-  ]);
+  const values = useMemo(
+    () => options.values.map(toSelectOption),
+    [options.values]
+  );
 
   return (
     <RecipientViewPetitionFieldCard
@@ -163,8 +164,7 @@ export function RecipientViewPetitionFieldSelect({
             placeholder={
               options.placeholder ??
               intl.formatMessage({
-                id:
-                  "component.recipient-view-petition-field-reply.select-placeholder",
+                id: "component.recipient-view-petition-field-reply.select-placeholder",
                 defaultMessage: "Select an option",
               })
             }
@@ -211,9 +211,10 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
     )
   );
 
-  const values = useMemo(() => options.values.map(toSelectOption), [
-    options.values,
-  ]);
+  const values = useMemo(
+    () => options.values.map(toSelectOption),
+    [options.values]
+  );
 
   async function handleOnChange(value: any) {
     setValue(value);
@@ -258,8 +259,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
         size="md"
         placement="bottom"
         label={intl.formatMessage({
-          id:
-            "component.recipient-view-petition-field-reply.remove-reply-label",
+          id: "component.recipient-view-petition-field-reply.remove-reply-label",
           defaultMessage: "Remove reply",
         })}
       />

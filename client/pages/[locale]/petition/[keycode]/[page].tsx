@@ -172,10 +172,8 @@ function RecipientView({
     [petition.fields, visibility, granter, router.query]
   );
 
-  const [
-    submitUnpublishedComments,
-    { loading: isSubmitting },
-  ] = useRecipientView_submitUnpublishedCommentsMutation();
+  const [submitUnpublishedComments, { loading: isSubmitting }] =
+    useRecipientView_submitUnpublishedCommentsMutation();
   async function handleSubmitUnpublished() {
     await submitUnpublishedComments({
       variables: { keycode },

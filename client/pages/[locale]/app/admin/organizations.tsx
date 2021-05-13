@@ -207,12 +207,14 @@ function useOrganizationColumns() {
         CellContent: ({ row }) => (
           <Badge
             colorScheme={
-              ({
-                DEV: "gray",
-                DEMO: "yellow",
-                ACTIVE: "green",
-                CHURNED: "red",
-              } as Record<OrganizationStatus, string>)[row.status]
+              (
+                {
+                  DEV: "gray",
+                  DEMO: "yellow",
+                  ACTIVE: "green",
+                  CHURNED: "red",
+                } as Record<OrganizationStatus, string>
+              )[row.status]
             }
           >
             {row.status}

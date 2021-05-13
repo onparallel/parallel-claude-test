@@ -29,14 +29,10 @@ export function PaneWithFlyout({
       setFlyoutOffset(0);
       return;
     }
-    const {
-      top: paneTop,
-      height: paneHeight,
-    } = paneRef.current!.getBoundingClientRect();
-    const {
-      height: alignWithHeight,
-      top: alignWithTop,
-    } = alignWith.getBoundingClientRect();
+    const { top: paneTop, height: paneHeight } =
+      paneRef.current!.getBoundingClientRect();
+    const { height: alignWithHeight, top: alignWithTop } =
+      alignWith.getBoundingClientRect();
     const { height: flyoutHeight } = flyoutRef.current.getBoundingClientRect();
     const offset =
       alignWithTop - paneTop + alignWithHeight / 2 - flyoutHeight / 2;

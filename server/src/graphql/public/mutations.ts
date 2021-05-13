@@ -124,10 +124,8 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         type: "ACCESS_OPENED",
         data: { petition_access_id: ctx.access!.id },
       });
-      const {
-        cookieValue,
-        contactAuthentication,
-      } = await ctx.contacts.createContactAuthentication(contactId);
+      const { cookieValue, contactAuthentication } =
+        await ctx.contacts.createContactAuthentication(contactId);
       await ctx.contacts.addContactAuthenticationLogAccessEntry(
         contactAuthentication.id,
         logEntry
@@ -158,14 +156,12 @@ export const publicSendVerificationCode = mutationField(
     },
     resolve: async (_, args, ctx) => {
       return await stallFor(async function () {
-        const {
-          token,
-          request,
-        } = await ctx.contacts.createContactAuthenticationRequest({
-          petition_access_id: ctx.access!.id,
-          user_agent: ctx.req!.headers["user-agent"] ?? null,
-          ip: getClientIp(ctx.req),
-        });
+        const { token, request } =
+          await ctx.contacts.createContactAuthenticationRequest({
+            petition_access_id: ctx.access!.id,
+            user_agent: ctx.req!.headers["user-agent"] ?? null,
+            ip: getClientIp(ctx.req),
+          });
         await ctx.emails.sendContactAuthenticationRequestEmail(request.id);
         return {
           token,
@@ -201,10 +197,8 @@ export const publicCheckVerificationCode = mutationField(
             args.token,
             args.code
           );
-          const {
-            contactAuthentication,
-            cookieValue,
-          } = await ctx.contacts.createContactAuthentication(ctx.contact!.id);
+          const { contactAuthentication, cookieValue } =
+            await ctx.contacts.createContactAuthentication(ctx.contact!.id);
           await ctx.contacts.addContactAuthenticationLogAccessEntry(
             contactAuthentication.id,
             {
@@ -724,14 +718,11 @@ export const publicSubmitUnpublishedComments = mutationField(
       keycode: nonNull(idArg()),
     },
     resolve: async (_, args, ctx) => {
-      const {
-        comments,
-        userIds,
-        accessIds,
-      } = await ctx.petitions.publishPetitionFieldCommentsForAccess(
-        ctx.access!.petition_id,
-        ctx.access!
-      );
+      const { comments, userIds, accessIds } =
+        await ctx.petitions.publishPetitionFieldCommentsForAccess(
+          ctx.access!.petition_id,
+          ctx.access!
+        );
       await Promise.all([
         // send email to all contacts with active access
         ctx.emails.sendPetitionCommentsContactNotificationEmail(

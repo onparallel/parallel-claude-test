@@ -328,13 +328,11 @@ function ConditionMultipleFieldModifier({
           label:
             field.type === "FILE_UPLOAD"
               ? intl.formatMessage({
-                  id:
-                    "component.petition-field-visibility-editor.number-of-files",
+                  id: "component.petition-field-visibility-editor.number-of-files",
                   defaultMessage: "no. of files",
                 })
               : intl.formatMessage({
-                  id:
-                    "component.petition-field-visibility-editor.number-of-replies",
+                  id: "component.petition-field-visibility-editor.number-of-replies",
                   defaultMessage: "no. of replies",
                 }),
           value: "NUMBER_OF_REPLIES",
@@ -421,7 +419,8 @@ function ConditionPredicate({
   const intl = useIntl();
   const { modifier } = condition!;
   const options = useMemo(() => {
-    const options: OptionType<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
+    const options: OptionType<PseudoPetitionFieldVisibilityConditionOperator>[] =
+      [];
     if (field.multiple && modifier === "NUMBER_OF_REPLIES") {
       options.push(
         { label: "=", value: "EQUAL" },
@@ -477,8 +476,7 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id:
-                "component.petition-field-visibility-editor.not-equal-default",
+              id: "component.petition-field-visibility-editor.not-equal-default",
               defaultMessage:
                 "{modifier, select, ALL {are not equal to} other {is not equal to}}",
             },
@@ -489,8 +487,7 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id:
-                "component.petition-field-visibility-editor.start-with-default",
+              id: "component.petition-field-visibility-editor.start-with-default",
               defaultMessage:
                 "{modifier, select, ALL {start with} other {starts with}}",
             },
@@ -523,8 +520,7 @@ function ConditionPredicate({
         {
           label: intl.formatMessage(
             {
-              id:
-                "component.petition-field-visibility-editor.not-contain-default",
+              id: "component.petition-field-visibility-editor.not-contain-default",
               defaultMessage:
                 "{modifier, select, ALL {do not contain} other {does not contain}}",
             },
@@ -767,10 +763,10 @@ function VisibilityOperatorSelect({
     ],
     [intl.locale]
   );
-  const _value = useMemo(() => _options.find((o) => o.value === value), [
-    value,
-    _options,
-  ]);
+  const _value = useMemo(
+    () => _options.find((o) => o.value === value),
+    [value, _options]
+  );
 
   return (
     <Select
@@ -814,10 +810,10 @@ function VisibilityTypeSelect({
     ],
     [intl.locale]
   );
-  const _value = useMemo(() => _options.find((o) => o.value === value), [
-    value,
-    _options,
-  ]);
+  const _value = useMemo(
+    () => _options.find((o) => o.value === value),
+    [value, _options]
+  );
 
   return (
     <Select

@@ -25,7 +25,7 @@
     "eslint-plugin-react": "^7.23.2",
     "npm-check-updates": "^11.5.7",
     "postinstall-postinstall": "^2.1.0",
-    "prettier": "^2.2.1"
+    "prettier": "^2.3.0"
   },
   "dependencies": {
     "patch-package": "^6.4.7"

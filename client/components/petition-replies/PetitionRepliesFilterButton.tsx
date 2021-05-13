@@ -20,9 +20,9 @@ export function PetitionRepliesFilterButton({
       onChange({ ...value, [filter]: isChecked });
     };
   };
-  const isActive = (Object.keys(
-    defaultFieldsFilter
-  ) as PetitionFieldFilterType[]).some((t) => value[t]);
+  const isActive = (
+    Object.keys(defaultFieldsFilter) as PetitionFieldFilterType[]
+  ).some((t) => value[t]);
   return (
     <Menu closeOnSelect={false}>
       <MenuButton

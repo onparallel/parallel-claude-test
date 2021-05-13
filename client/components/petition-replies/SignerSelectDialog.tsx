@@ -67,8 +67,7 @@ export function SignerSelectDialog(
                 onSearchContacts={handleSearchContacts}
                 onCreateContact={handleCreateContact}
                 placeholder={intl.formatMessage({
-                  id:
-                    "component.signature-config-dialog.contact-select.placeholder-required",
+                  id: "component.signature-config-dialog.contact-select.placeholder-required",
                   defaultMessage: "Select the signers",
                 })}
               />

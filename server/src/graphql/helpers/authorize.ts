@@ -29,7 +29,7 @@ export function checkClientServerToken<
 >(tokenArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
     return ctx.security.checkClientServerToken(
-      (args[tokenArg] as unknown) as string
+      args[tokenArg] as unknown as string
     );
   };
 }
@@ -43,11 +43,8 @@ export function authenticateAnd<
   return chain(authenticate(), and(...resolvers));
 }
 
-export type Arg<
-  TypeName extends string,
-  FieldName extends string,
-  Type = any
-> = KeysOfType<core.ArgsValue<TypeName, FieldName>, Type>;
+export type Arg<TypeName extends string, FieldName extends string, Type = any> =
+  KeysOfType<core.ArgsValue<TypeName, FieldName>, Type>;
 
 export function argIsContextUserId<
   TypeName extends string,
@@ -56,7 +53,7 @@ export function argIsContextUserId<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return (_, args, ctx) => {
     try {
-      return ctx.user!.id === ((args[argName] as unknown) as number);
+      return ctx.user!.id === (args[argName] as unknown as number);
     } catch {}
     return false;
   };

@@ -178,10 +178,10 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     } catch {}
   }, [petitionId, petition.accesses]);
 
-  const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
-  const [
-    cancelScheduledMessage,
-  ] = usePetitionActivity_cancelScheduledMessageMutation();
+  const confirmCancelScheduledMessage =
+    useConfirmCancelScheduledMessageDialog();
+  const [cancelScheduledMessage] =
+    usePetitionActivity_cancelScheduledMessageMutation();
   const handleCancelScheduledMessage = useCallback(
     async (messageId: string) => {
       try {
@@ -235,9 +235,8 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     [petitionId, petition.accesses]
   );
 
-  const [
-    switchReminders,
-  ] = usePetitionActivity_switchAutomaticRemindersMutation();
+  const [switchReminders] =
+    usePetitionActivity_switchAutomaticRemindersMutation();
   const configureRemindersDialog = useConfigureRemindersDialog();
   const handleConfigureReminders = useCallback(
     async (accessIds: string[]) => {

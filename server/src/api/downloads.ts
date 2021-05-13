@@ -223,9 +223,8 @@ async function* getPetitionFiles(
     yield await textReplies.export();
   }
 
-  const latestPetitionSignature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
-    petitionId
-  );
+  const latestPetitionSignature =
+    await ctx.petitions.loadLatestPetitionSignatureByPetitionId(petitionId);
 
   if (latestPetitionSignature?.status === "COMPLETED") {
     if (isDefined(latestPetitionSignature.file_upload_id)) {

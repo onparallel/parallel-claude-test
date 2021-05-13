@@ -89,9 +89,8 @@ export function RecipientViewPetitionFieldText({
         const index = field.replies.findIndex((r) => r.id === replyId);
         if (index > 0) {
           const prevId = field.replies[index - 1].id;
-          replyRefs[prevId].current!.selectionStart = replyRefs[
-            prevId
-          ].current!.value.length;
+          replyRefs[prevId].current!.selectionStart =
+            replyRefs[prevId].current!.value.length;
           replyRefs[prevId].current!.focus();
         }
       }
@@ -342,8 +341,7 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
         size="md"
         placement="bottom"
         label={intl.formatMessage({
-          id:
-            "component.recipient-view-petition-field-reply.remove-reply-label",
+          id: "component.recipient-view-petition-field-reply.remove-reply-label",
           defaultMessage: "Remove reply",
         })}
       />

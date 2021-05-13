@@ -26,11 +26,10 @@ const _publicDeletePetitionReply = gql`
 `;
 
 export function useDeletePetitionReply() {
-  const [
-    deletePetitionReply,
-  ] = useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation({
-    optimisticResponse: { publicDeletePetitionReply: "SUCCESS" },
-  });
+  const [deletePetitionReply] =
+    useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation({
+      optimisticResponse: { publicDeletePetitionReply: "SUCCESS" },
+    });
   return useCallback(
     async function _deletePetitionReply({
       petitionId,
@@ -77,9 +76,8 @@ const _publicUpdateSimpleReply = gql`
 `;
 
 export function useUpdateSimpleReply() {
-  const [
-    updateSimpleReply,
-  ] = useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation();
+  const [updateSimpleReply] =
+    useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation();
   return useCallback(
     async function _updateSimpleReply({
       petitionId,
@@ -127,9 +125,8 @@ const _publicCreateSimpleReply = gql`
 `;
 
 export function useCreateSimpleReply() {
-  const [
-    createSimpleReply,
-  ] = useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation();
+  const [createSimpleReply] =
+    useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation();
   return useCallback(
     async function _createSimpleReply({
       petitionId,
@@ -182,9 +179,8 @@ const _publicCreateDynamicSelectReply = gql`
 `;
 
 export function useCreateDynamicSelectReply() {
-  const [
-    createDynamicSelectReply,
-  ] = useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation();
+  const [createDynamicSelectReply] =
+    useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation();
   return useCallback(
     async function _createDynamicSelectReply({
       petitionId,
@@ -239,9 +235,8 @@ const _publicUpdateDynamicSelectReply = gql`
 `;
 
 export function useUpdateDynamicSelectReply() {
-  const [
-    updateDynamicSelectReply,
-  ] = useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation();
+  const [updateDynamicSelectReply] =
+    useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation();
   return useCallback(
     async function _updateDynamicSelectReply({
       petitionId,
@@ -305,13 +300,11 @@ const _publicFileUploadReplyComplete = gql`
 export function useCreateFileUploadReply(
   uploads: MutableRefObject<Record<string, XMLHttpRequest>>
 ) {
-  const [
-    createFileUploadReply,
-  ] = useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation();
+  const [createFileUploadReply] =
+    useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation();
   const apollo = useApolloClient();
-  const [
-    fileUploadReplyComplete,
-  ] = useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation();
+  const [fileUploadReplyComplete] =
+    useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation();
 
   return useCallback(
     async function _createFileUploadReply({

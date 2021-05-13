@@ -85,9 +85,8 @@ type AsyncUserSelectProps<IsMulti extends boolean> = AsyncSelectProps<
 function useUserSelectReactSelectProps<IsMulti extends boolean>(
   props: UseReactSelectProps
 ): AsyncUserSelectProps<IsMulti> {
-  const reactSelectProps = useReactSelectProps<UserSelectSelection, IsMulti>(
-    props
-  );
+  const reactSelectProps =
+    useReactSelectProps<UserSelectSelection, IsMulti>(props);
   return useMemo<AsyncUserSelectProps<IsMulti>>(
     () => ({
       ...reactSelectProps,

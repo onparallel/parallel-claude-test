@@ -107,9 +107,8 @@ export function PetitionHeader({
     petition.userPermissions.find((up) => up.user.id === user.id)
       ?.isSubscribed ?? false;
 
-  const [
-    updatePetitionUserSubscription,
-  ] = usePetitionHeader_updatePetitionUserSubscriptionMutation();
+  const [updatePetitionUserSubscription] =
+    usePetitionHeader_updatePetitionUserSubscriptionMutation();
   const handleUpdateUserPermission = async function (isSubscribed: boolean) {
     await updatePetitionUserSubscription({
       variables: {

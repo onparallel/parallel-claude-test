@@ -39,9 +39,8 @@ export function PetitionFieldSelect<
   ...props
 }: PetitionFieldSelectProps<T, ExpandFields>) {
   const intl = useIntl();
-  const rsProps = useReactSelectProps<PetitionFieldSelectOption<T>, any, never>(
-    props
-  );
+  const rsProps =
+    useReactSelectProps<PetitionFieldSelectOption<T>, any, never>(props);
   const fieldSelectProps = useMemo<
     SelectProps<PetitionFieldSelectOption<T>, any, never>
   >(
@@ -119,11 +118,9 @@ export function PetitionFieldSelect<
         return [{ type: "FIELD", field, fieldIndex }];
       }
     });
-    const [field, column]:
-      | [T | null | undefined]
-      | [T, number | undefined] = (Array.isArray(value)
-      ? value
-      : [value]) as any;
+    const [field, column]: [T | null | undefined] | [T, number | undefined] = (
+      Array.isArray(value) ? value : [value]
+    ) as any;
     const _value = !field
       ? null
       : column !== undefined

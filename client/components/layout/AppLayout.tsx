@@ -25,9 +25,8 @@ declare const zE: any;
 
 export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
   /* Onboarding tour callbacks */
-  const [
-    updateOnboardingStatus,
-  ] = useAppLayout_updateOnboardingStatusMutation();
+  const [updateOnboardingStatus] =
+    useAppLayout_updateOnboardingStatusMutation();
   const handleUpdateTour = async function (
     key: OnboardingKey,
     status: OnboardingStatus
