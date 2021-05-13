@@ -173,7 +173,7 @@ export function PetitionSharingDialog({
       try {
         await addPetitionUserPermission({
           variables: {
-            petitionIds: petitionsOwned.map((p) => p.id),
+            petitionIds: petitionsOwned.map((p) => p!.id),
             userIds: users.map((u) => u.id),
             permissionType: "WRITE",
             notify,
