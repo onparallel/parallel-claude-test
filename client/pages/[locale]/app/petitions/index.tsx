@@ -181,7 +181,7 @@ function Petitions() {
       await showPetitionSharingDialog({
         userId: me.id,
         petitionIds: selected,
-        isTemplate: petitions.items[0].__typename === "Petition" ? false : true,
+        isTemplate: petitions.items[0].__typename === "PetitionTemplate",
       });
     } catch {}
   };

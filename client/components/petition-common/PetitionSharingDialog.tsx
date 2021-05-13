@@ -29,7 +29,6 @@ import {
   UserArrowIcon,
 } from "@parallel/chakra/icons";
 import {
-  Petition,
   PetitionActivityDocument,
   PetitionSharingModal_UserFragment,
   usePetitionSharingModal_addPetitionUserPermissionMutation,
@@ -77,8 +76,6 @@ export function PetitionSharingDialog({
   const intl = useIntl();
   const toast = useToast();
   const [hasUsers, setHasUsers] = useState(false);
-  const [petitionsOwned, setPetitionsOwned] = useState<Array<Petition>>([]);
-  const [petitionsRW, setPetitionsRW] = useState<Array<Petition>>([]);
 
   const { data } = usePetitionSharingModal_PetitionsUserPermissionsQuery({
     variables: { petitionIds },
@@ -86,8 +83,8 @@ export function PetitionSharingDialog({
   });
 
   const petitionId = petitionIds[0];
-  const petitionsById = data?.petitionsById as Array<Petition>;
-  const userPermissions = petitionsById && petitionsById[0].userPermissions;
+  const petitionsById = data?.petitionsById;
+  const userPermissions = petitionsById?.[0]?.userPermissions;
   const prev = usePreviousValue(userPermissions);
 
   useEffect(() => {
@@ -110,24 +107,18 @@ export function PetitionSharingDialog({
     },
   });
 
-  useEffect(() => {
-    if (petitionsById) {
-      setPetitionsOwned(
-        petitionsById.filter((petition) =>
-          petition.userPermissions.some(
-            (up) => up.permissionType === "OWNER" && up.user.id === userId
-          )
-        )
-      );
-      setPetitionsRW(
-        petitionsById.filter((petition) =>
-          petition.userPermissions.some(
-            (up) => up.permissionType !== "OWNER" && up.user.id === userId
-          )
-        )
-      );
-    }
-  }, [petitionsById]);
+  const petitionsOwned =
+    petitionsById?.filter((petition) =>
+      petition?.userPermissions.some(
+        (up) => up.permissionType === "OWNER" && up.user.id === userId
+      )
+    ) ?? [];
+  const petitionsRW =
+    petitionsById?.filter((petition) =>
+      petition?.userPermissions.some(
+        (up) => up.permissionType !== "OWNER" && up.user.id === userId
+      )
+    ) ?? [];
 
   const usersRef = useRef<UserSelectInstance<true>>(null);
   const messageRef = useRef<HTMLInputElement>(null);
@@ -137,7 +128,7 @@ export function PetitionSharingDialog({
     "message"
   );
 
-  const usersToExlude =
+  const usersToExclude =
     petitionIds.length === 1
       ? userPermissions?.map((up) => up.user.id) ?? []
       : [userId];
@@ -145,7 +136,7 @@ export function PetitionSharingDialog({
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (search: string, exclude: string[]) => {
-      return await _handleSearchUsers(search, [...exclude, ...usersToExlude]);
+      return await _handleSearchUsers(search, [...exclude, ...usersToExclude]);
     },
     [_handleSearchUsers, userPermissions]
   );
@@ -316,7 +307,7 @@ export function PetitionSharingDialog({
               display={hasUsers || petitionIds.length !== 1 ? "none" : "flex"}
               paddingTop={2}
             >
-              {userPermissions.map(({ user, permissionType }) => (
+              {userPermissions?.map(({ user, permissionType }) => (
                 <Flex key={user.id} alignItems="center">
                   <Avatar role="presentation" name={user.fullName!} size="sm" />
                   <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
@@ -422,8 +413,8 @@ export function PetitionSharingDialog({
                         </Text>
                         <UnorderedList paddingLeft={2}>
                           {petitionsRW.map((petition) => (
-                            <ListItem key={petition.id}>
-                              {petition.name}
+                            <ListItem key={petition!.id}>
+                              {petition!.name}
                             </ListItem>
                           ))}
                         </UnorderedList>
