@@ -12,8 +12,6 @@ import {
 import { closing, greetingFormal } from "../common/texts";
 
 export type PetitionCommentsContactNotificationProps = {
-  authorName: string | null;
-  authorEmail: string;
   contactFullName: string | null;
   keycode: string;
   fields: PetitionFieldAndCommentsProps["fields"];
@@ -26,34 +24,31 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
       defaultMessage: "Parallel team",
     });
   },
-  subject({ authorName }, intl: IntlShape) {
-    return intl.formatMessage(
-      {
-        id: "petition-comments-contact-notification.subject",
-        defaultMessage: "{ name } commented on your petition",
-      },
-      { name: authorName }
-    );
+  subject(_, intl: IntlShape) {
+    return intl.formatMessage({
+      id: "petition-comments-contact-notification.subject",
+      defaultMessage: "You have new comments on your petition",
+    });
   },
   text(
     {
-      authorName,
-      authorEmail,
+      fields,
       contactFullName,
       keycode,
       parallelUrl,
     }: PetitionCommentsContactNotificationProps,
     intl: IntlShape
   ) {
+    const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
     return outdent`
       ${greetingFormal({ fullName: contactFullName }, intl)}
       ${intl.formatMessage(
         {
           id: "petition-comments-contact-notification.intro-text",
           defaultMessage:
-            "{ name } ({ email }) has included comments to the information. You can review them below:",
+            "You have {count, plural, =1{# new comment} other{# new comments}} on your petition:",
         },
-        { name: authorName, email: authorEmail }
+        { count: commentCount }
       )}
 
       ${intl.formatMessage({
@@ -67,8 +62,6 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     `;
   },
   html({
-    authorName,
-    authorEmail,
     contactFullName,
     keycode,
     fields,
@@ -78,6 +71,8 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     logoAlt,
   }: PetitionCommentsContactNotificationProps) {
     const { locale } = useIntl();
+    const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
+
     return (
       <Layout
         assetsUrl={assetsUrl}
@@ -92,11 +87,8 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
             <MjmlText>
               <FormattedMessage
                 id="petition-comments-contact-notification.intro-text"
-                defaultMessage="{ name } ({ email }) has included comments to the information. You can review them below:"
-                values={{
-                  name: <b>{authorName}</b>,
-                  email: <b>{authorEmail}</b>,
-                }}
+                defaultMessage="You have {count, plural, =1{# new comment} other{# new comments}} on your petition:"
+                values={{ count: commentCount }}
               />
             </MjmlText>
           </MjmlColumn>

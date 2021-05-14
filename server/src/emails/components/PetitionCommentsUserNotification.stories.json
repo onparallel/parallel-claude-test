@@ -10,7 +10,6 @@
       },
       "args": {
         "userName": "Santi",
-        "authorNameOrEmail": "Derek",
         "petitionName": "Declaración de la renta",
         "petitionId": "1234567890",
         "fields": [
@@ -21,11 +20,21 @@
             "comments": [
               {
                 "id": 1,
-                "content": "De dónde saco esto tio?\\nNo lo encuentro por ningun lado"
+                "content": "De dónde saco esto tio?\nNo lo encuentro por ningún lado",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano"
+                },
+                "createdAt": "2022-12-11T17:29:24.601Z"
               },
               {
                 "id": 2,
-                "content": "Ni caso, ya lo encontré"
+                "content": "Ni caso, ya lo encontré 😅",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano"
+                },
+                "createdAt": "2022-12-11T17:31:24.601Z"
               }
             ]
           },
@@ -36,7 +45,48 @@
             "comments": [
               {
                 "id": 3,
-                "content": "Ya sale en el borrador"
+                "content": "Ya sale en el borrador",
+                "author": {
+                  "id": "User:2",
+                  "name": "Derek"
+                },
+                "createdAt": "2022-12-11T17:40:24.601Z"
+              },
+              {
+                "id": 4,
+                "content": "Cualquier cosa me avisas",
+                "author": {
+                  "id": "User:2",
+                  "name": "Derek"
+                },
+                "createdAt": "2022-12-11T17:40:30.601Z"
+              },
+              {
+                "id": 5,
+                "content": "Ostia que chulo este sistema de comentarios 😎",
+                "author": {
+                  "id": "User:3",
+                  "name": "Angela"
+                },
+                "createdAt": "2022-12-11T17:45:30.601Z"
+              },
+              {
+                "id": 6,
+                "content": "Ok!",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano"
+                },
+                "createdAt": "2022-12-11T17:51:30.601Z"
+              },
+              {
+                "id": 7,
+                "content": "Ya está todo",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano"
+                },
+                "createdAt": "2022-12-11T17:52:30.601Z"
               }
             ]
           }
@@ -48,7 +98,6 @@
       },
       "argsTypes": {
         "userName": { "control": { "type": "text" } },
-        "authorNameOrEmail": { "control": { "type": "text" } },
         "petitionName": { "control": { "type": "text" } },
         "petitionId": { "control": { "type": "text" } },
         "fields": { "control": { "type": "object" } },

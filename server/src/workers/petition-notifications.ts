@@ -15,28 +15,36 @@ type PetitionNotification =
 
 const WORKER_CONFIG = {
   COMMENT_CREATED: {
-    SECONDS_BEFORE_NOTIFY: 15,
+    SECONDS_BEFORE_NOTIFY: 60 * 15,
   },
 };
 
+function shouldBeProcessed(notifications: PetitionNotification[]) {
+  const lastNotification = sortBy(
+    notifications,
+    (n) => n.created_at
+  ).reverse()[0];
+
+  return (
+    addSeconds(
+      lastNotification.created_at,
+      WORKER_CONFIG.COMMENT_CREATED.SECONDS_BEFORE_NOTIFY
+    ).getTime() < Date.now()
+  );
+}
+
 function processCommentCreatedUserNotification(context: WorkerContext) {
   return async (notifications: PetitionUserNotification[]) => {
-    const lastNotification = sortBy(
-      notifications,
-      (n) => n.created_at
-    ).reverse()[0];
+    if (shouldBeProcessed(notifications)) {
+      const petitionId = notifications[0].petition_id;
+      const userId = notifications[0].user_id;
 
-    if (
-      addSeconds(
-        lastNotification.created_at,
-        WORKER_CONFIG.COMMENT_CREATED.SECONDS_BEFORE_NOTIFY
-      ).getTime() < Date.now()
-    ) {
-      const userId = lastNotification.user_id;
-      const petitionId = lastNotification.petition_id;
-      console.log(
-        `User ${userId} has ${notifications.length} new comments on petition ${petitionId}`
+      await context.emails.sendPetitionCommentsUserNotificationEmail(
+        petitionId,
+        userId,
+        notifications.map((n) => n.data.petition_field_comment_id)
       );
+
       await context.petitions.updatePetitionUserNotifications(
         notifications.map((n) => n.id),
         {
@@ -49,21 +57,14 @@ function processCommentCreatedUserNotification(context: WorkerContext) {
 
 function processCommentCreatedContactNotification(context: WorkerContext) {
   return async (notifications: PetitionContactNotification[]) => {
-    const lastNotification = sortBy(
-      notifications,
-      (n) => n.created_at
-    ).reverse()[0];
+    if (shouldBeProcessed(notifications)) {
+      const petitionId = notifications[0].petition_id;
+      const accessId = notifications[0].petition_access_id;
 
-    if (
-      addSeconds(
-        lastNotification.created_at,
-        WORKER_CONFIG.COMMENT_CREATED.SECONDS_BEFORE_NOTIFY
-      ).getTime() < Date.now()
-    ) {
-      const accessId = lastNotification.petition_access_id;
-      const petitionId = lastNotification.petition_id;
-      console.log(
-        `Access ${accessId} has ${notifications.length} new comments on petition ${petitionId}`
+      await context.emails.sendPetitionCommentsContactNotificationEmail(
+        petitionId,
+        accessId,
+        notifications.map((n) => n.data.petition_field_comment_id)
       );
 
       await context.petitions.updatePetitionContactNotifications(

@@ -19,17 +19,13 @@ export interface IEmailsService {
   ): Promise<void>;
   sendPetitionCommentsContactNotificationEmail(
     petitionId: number,
-    author: "User" | "PetitionAccess",
-    authorId: number,
-    commentIds: number[],
-    accessIds: number[]
+    accessIds: number,
+    commentIds: number[]
   ): Promise<void>;
   sendPetitionCommentsUserNotificationEmail(
     petitionId: number,
-    author: "User" | "PetitionAccess",
-    authorId: number,
-    commentIds: number[],
-    userIds: number[]
+    userId: number,
+    commentIds: number[]
   ): Promise<void>;
   sendPetitionSharingNotificationEmail(
     userId: number,
@@ -118,54 +114,36 @@ export class EmailsService implements IEmailsService {
 
   async sendPetitionCommentsContactNotificationEmail(
     petitionId: number,
-    author: "User" | "PetitionAccess",
-    authorId: number,
-    commentIds: number[],
-    accessIds: number[]
+    accessId: number,
+    commentIds: number[]
   ) {
-    return await this.enqueueEmail(
-      "comments-contact-notification",
-      Object.assign(
-        {
-          id: this.buildQueueId("PetitionFieldCommentContact", [
-            ...commentIds,
-            ...accessIds,
-          ]),
-          petition_id: petitionId,
-          petition_field_comment_ids: commentIds,
-          petition_access_ids: accessIds,
-        },
-        author === "User"
-          ? { author, user_id: authorId }
-          : { author, petition_access_id: authorId }
-      )
-    );
+    return await this.enqueueEmail("comments-contact-notification", {
+      id: this.buildQueueId("PetitionFieldCommentContact", [
+        petitionId,
+        accessId,
+        ...commentIds,
+      ]),
+      petition_id: petitionId,
+      petition_field_comment_ids: commentIds,
+      petition_access_id: accessId,
+    });
   }
 
   async sendPetitionCommentsUserNotificationEmail(
     petitionId: number,
-    author: "User" | "PetitionAccess",
-    authorId: number,
-    commentIds: number[],
-    userIds: number[]
+    userId: number,
+    commentIds: number[]
   ) {
-    return await this.enqueueEmail(
-      "comments-user-notification",
-      Object.assign(
-        {
-          id: this.buildQueueId("PetitionFieldCommentUser", [
-            ...commentIds,
-            ...userIds,
-          ]),
-          petition_id: petitionId,
-          petition_field_comment_ids: commentIds,
-          user_ids: userIds,
-        },
-        author === "User"
-          ? { author, user_id: authorId }
-          : { author, petition_access_id: authorId }
-      )
-    );
+    return await this.enqueueEmail("comments-user-notification", {
+      id: this.buildQueueId("PetitionFieldCommentUser", [
+        petitionId,
+        userId,
+        ...commentIds,
+      ]),
+      user_id: userId,
+      petition_id: petitionId,
+      petition_field_comment_ids: commentIds,
+    });
   }
 
   async sendPetitionSharingNotificationEmail(

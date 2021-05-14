@@ -181,13 +181,13 @@
   },
   {
     "term": "petition-comments-contact-notification.intro-text",
-    "definition": "{ name } ({ email }) ha incluido comentarios sobre la información indicada. Puede revisarlos a continuación:",
-    "context": "{ name } ({ email }) has included comments to the information. You can review them below:"
+    "definition": "Tiene {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en su petición:",
+    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on your petition:"
   },
   {
     "term": "petition-comments-contact-notification.subject",
-    "definition": "{ name } comentó en tu petición",
-    "context": "{ name } commented on your petition"
+    "definition": "Tiene comentarios nuevos en su petición",
+    "context": "You have new comments on your petition"
   },
   {
     "term": "petition-comments-user-notification.access-button",
@@ -201,13 +201,13 @@
   },
   {
     "term": "petition-comments-user-notification.intro-text",
-    "definition": "{ nameOrEmail } comentó en { petitionName, select, null {tu petición} other {{petitionName}}}:",
-    "context": "{ nameOrEmail } commented on { petitionName, select, null {your petition} other {{petitionName}}}:"
+    "definition": "Tienes {count, plural, =1{# comentario nuevo} other{# comentarios nuevos}} en { petitionName, select, null {tu petición} other {{petitionName}}}:",
+    "context": "You have {count, plural, =1{# new comment} other{# new comments}} on { petitionName, select, null {your petition} other {{petitionName}}}:"
   },
   {
     "term": "petition-comments-user-notification.subject",
-    "definition": "{ nameOrEmail } comentó en { petitionName, select, null {tu petición} other {{petitionName}}}:",
-    "context": "{ nameOrEmail } commented on { petitionName, select, null {your petition} other {{petitionName}}}"
+    "definition": "Tienes comentarios nuevos en { petitionName, select, null {tu petición} other {{petitionName}}}",
+    "context": "You have new comments on { petitionName, select, null {your petition} other {{petitionName}}}"
   },
   {
     "term": "petition-completed.access-button",

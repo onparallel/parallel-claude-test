@@ -10,8 +10,6 @@
       },
       "args": {
         "contactFullName": "Santi Albo",
-        "authorName": "Derek",
-        "authorEmail": "derek@onparallel.com",
         "keycode": "1234567890",
         "fields": [
           {
@@ -21,11 +19,21 @@
             "comments": [
               {
                 "id": 1,
-                "content": "De dónde saco esto tio?\\n No lo encuentro por ningun lado"
+                "content": "De dónde saco esto tio?\n No lo encuentro por ningun lado",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano"
+                },
+                "createdAt": "2022-12-11T17:29:24.601Z"
               },
               {
                 "id": 2,
-                "content": "Ni caso, ya lo encontré"
+                "content": "Ni caso, ya lo encontré",
+                "author": {
+                  "id": "Access:1",
+                  "name": "Mariano"
+                },
+                "createdAt": "2022-12-11T17:30:24.601Z"
               }
             ]
           },
@@ -36,7 +44,12 @@
             "comments": [
               {
                 "id": 3,
-                "content": "Ya sale en el borrador"
+                "content": "Ya sale en el borrador",
+                "author": {
+                  "id": "User:1",
+                  "name": "Derek"
+                },
+                "createdAt": "2022-12-11T17:41:24.601Z"
               }
             ]
           }
@@ -48,8 +61,6 @@
       },
       "argsTypes": {
         "contactFullName": { "control": { "type": "text" } },
-        "authorName": { "control": { "type": "text" } },
-        "authorEmail": { "control": { "type": "text" } },
         "keycode": { "control": { "type": "text" } },
         "fields": { "control": { "type": "object" } },
         "parallelUrl": { "control": { "type": "text" } },
