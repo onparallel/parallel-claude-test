@@ -47,7 +47,7 @@ import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { PaddedCollapse } from "../common/PaddedCollapse";
 import {
-  UserMultiSelect,
+  UserSelect,
   UserSelectInstance,
   UserSelectSelection,
 } from "../common/UserSelect";
@@ -234,8 +234,9 @@ export function PetitionSharingDialog({
                   control={control}
                   rules={{ minLength: 1 }}
                   render={({ field: { onChange, onBlur, value } }) => (
-                    <UserMultiSelect
+                    <UserSelect
                       ref={usersRef}
+                      isMulti
                       value={value}
                       onKeyDown={(e: KeyboardEvent) => {
                         if (
@@ -245,12 +246,12 @@ export function PetitionSharingDialog({
                           e.preventDefault();
                         }
                       }}
-                      onChange={(users: UserSelectSelection[]) => {
+                      onChange={(users) => {
                         onChange(users);
                         setHasUsers(Boolean(users?.length));
                       }}
                       onBlur={onBlur}
-                      onSearchUsers={handleSearchUsers}
+                      onSearch={handleSearchUsers}
                       isDisabled={!petitionsOwned.length}
                       placeholder={
                         petitionsOwned.length
@@ -489,7 +490,7 @@ PetitionSharingDialog.fragments = {
         fullName
         ...UserSelect_User
       }
-      ${UserMultiSelect.fragments.User}
+      ${UserSelect.fragments.User}
     `;
   },
 };

@@ -6,7 +6,16 @@ import {
   UseReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncSelectProps } from "@parallel/utils/react-select/types";
-import { forwardRef, memo, ReactNode, useCallback, useMemo } from "react";
+import {
+  ForwardedRef,
+  forwardRef,
+  memo,
+  ReactElement,
+  ReactNode,
+  RefAttributes,
+  useCallback,
+  useMemo,
+} from "react";
 import { FormattedMessage } from "react-intl";
 import { components } from "react-select";
 import AsyncSelect, { Props as AsyncSelectProps } from "react-select/async";
@@ -20,61 +29,63 @@ export type UserSelectInstance<IsMulti extends boolean> = AsyncSelect<
   never
 >;
 
-interface UserSelectProps<IsMulti extends boolean>
+interface UserSelectProps<IsMulti extends boolean = false>
   extends UseReactSelectProps,
     CustomAsyncSelectProps<UserSelectSelection, IsMulti, never> {
-  onSearchUsers: (
+  isMulti?: IsMulti;
+  onSearch: (
     search: string,
     exclude: string[]
   ) => Promise<UserSelectSelection[]>;
 }
-const fragments = {
-  User: gql`
-    fragment UserSelect_User on User {
-      id
-      fullName
-      email
-    }
-  `,
-};
 
-function userSelect<IsMulti extends boolean>(isMulti: IsMulti) {
-  return forwardRef<UserSelectInstance<IsMulti>, UserSelectProps<IsMulti>>(
-    function ({ value, onSearchUsers, onChange, ...props }, ref) {
-      const loadOptions = useCallback(
-        async (search) => {
-          const exclude = [];
-          if (isMulti) {
-            for (const user of (value ?? []) as UserSelectSelection[]) {
-              exclude.push(user.id);
-            }
-          } else if (value) {
-            exclude.push((value as UserSelectSelection).id);
+export const UserSelect = Object.assign(
+  forwardRef(function UserSelect<IsMulti extends boolean = false>(
+    { value, onSearch, onChange, isMulti, ...props }: UserSelectProps<IsMulti>,
+    ref: ForwardedRef<UserSelectInstance<IsMulti>>
+  ) {
+    const loadOptions = useCallback(
+      async (search) => {
+        const exclude = [];
+        if (isMulti) {
+          for (const user of (value ?? []) as UserSelectSelection[]) {
+            exclude.push(user.id);
           }
-          return await onSearchUsers(search, exclude);
-        },
-        [onSearchUsers, value]
-      );
+        } else if (value) {
+          exclude.push((value as UserSelectSelection).id);
+        }
+        return await onSearch(search, exclude);
+      },
+      [onSearch, value]
+    );
 
-      const reactSelectProps = useUserSelectReactSelectProps<IsMulti>(props);
+    const reactSelectProps = useUserSelectReactSelectProps<IsMulti>(props);
 
-      return (
-        <AsyncSelect<UserSelectSelection, IsMulti, never>
-          ref={ref}
-          value={value}
-          onChange={onChange as any}
-          isMulti={isMulti}
-          loadOptions={loadOptions}
-          {...reactSelectProps}
-        />
-      );
-    }
-  );
-}
-
-export const UserMultiSelect = Object.assign(userSelect(true), { fragments });
-
-export const UserSingleSelect = Object.assign(userSelect(false), { fragments });
+    return (
+      <AsyncSelect<UserSelectSelection, IsMulti, never>
+        ref={ref}
+        value={value}
+        onChange={onChange as any}
+        isMulti={isMulti ?? (false as any)}
+        loadOptions={loadOptions}
+        {...reactSelectProps}
+      />
+    );
+  }) as <IsMulti extends boolean = false>(
+    props: UserSelectProps<IsMulti> & RefAttributes<UserSelectInstance<IsMulti>>
+  ) => ReactElement | null,
+  {
+    fragments: {
+      User: gql`
+        fragment UserSelect_User on User {
+          id
+          fullName
+          email
+        }
+      `,
+    },
+  }
+);
 
 type AsyncUserSelectProps<IsMulti extends boolean> = AsyncSelectProps<
   UserSelectSelection,

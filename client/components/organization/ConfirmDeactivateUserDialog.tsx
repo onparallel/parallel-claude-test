@@ -10,9 +10,9 @@ import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
+  UserSelect,
   UserSelectInstance,
   UserSelectSelection,
-  UserSingleSelect,
 } from "../common/UserSelect";
 
 function ConfirmDeactivateUserDialog({
@@ -96,12 +96,12 @@ function ConfirmDeactivateUserDialog({
             control={control}
             rules={{ required: true }}
             render={({ field: { onChange, onBlur, value } }) => (
-              <UserSingleSelect
+              <UserSelect
                 ref={userSelectRef}
                 value={value}
                 onChange={onChange}
                 onBlur={onBlur}
-                onSearchUsers={handleSearchUsers}
+                onSearch={handleSearchUsers}
                 placeholder={intl.formatMessage({
                   id: "organization.confirm-deactivate.user-select.input-placeholder",
                   defaultMessage: "Select a user from your organization",
