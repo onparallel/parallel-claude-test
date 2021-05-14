@@ -1899,7 +1899,7 @@ export class PetitionRepository extends BaseRepository {
   async loadUnprocessedCommentCreatedUserNotifications() {
     return await this.raw<PetitionUserNotification>(/* sql */ `
       SELECT * from petition_user_notification 
-      where email_notification_sent_at is null
+      where processed_at is null
       and is_read = false
       and type = 'COMMENT_CREATED'
       order by created_at desc
@@ -1909,7 +1909,7 @@ export class PetitionRepository extends BaseRepository {
   async loadUnprocessedCommentCreatedContactNotifications() {
     return await this.raw<PetitionContactNotification>(/* sql */ `
       SELECT * from petition_contact_notification 
-      where email_notification_sent_at is null
+      where processed_at is null
       and is_read = false
       and type = 'COMMENT_CREATED'
       order by created_at desc

@@ -9,27 +9,27 @@ export async function up(knex: Knex): Promise<void> {
 
   await knex.schema
     .alterTable("petition_user_notification", (t) => {
-      t.timestamp("email_notification_sent_at");
+      t.timestamp("processed_at");
     })
     .alterTable("petition_contact_notification", (t) => {
-      t.timestamp("email_notification_sent_at");
+      t.timestamp("processed_at");
     });
 
   // to avoid spamming emails when the new cronjob starts
   await knex.raw(/* sql */ `
-    UPDATE petition_user_notification set email_notification_sent_at = "created_at";
+    UPDATE petition_user_notification set processed_at = "created_at";
   `);
   await knex.raw(/* sql */ `
-    UPDATE petition_contact_notification set email_notification_sent_at = "created_at";
+    UPDATE petition_contact_notification set processed_at = "created_at";
   `);
 }
 
 export async function down(knex: Knex): Promise<void> {
   await knex.schema
     .alterTable("petition_user_notification", (t) => {
-      t.dropColumn("email_notification_sent_at");
+      t.dropColumn("processed_at");
     })
     .alterTable("petition_contact_notification", (t) => {
-      t.dropColumn("email_notification_sent_at");
+      t.dropColumn("processed_at");
     });
 }

@@ -485,12 +485,12 @@ export interface PetitionContactNotification {
   data: Maybe<any>; // jsonb
   is_read: boolean; // bool
   created_at: Date; // timestamptz
-  email_notification_sent_at: Maybe<Date>; // timestamptz
+  processed_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionContactNotification = PartialProps<
   Omit<PetitionContactNotification, "id">,
-  "data" | "is_read" | "created_at" | "email_notification_sent_at"
+  "data" | "is_read" | "created_at" | "processed_at"
 >;
 
 export interface PetitionEvent {
@@ -583,6 +583,7 @@ export interface PetitionFieldComment {
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
   is_internal: boolean; // bool
+  published_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionFieldComment = PartialProps<
@@ -597,6 +598,7 @@ export type CreatePetitionFieldComment = PartialProps<
   | "deleted_at"
   | "deleted_by"
   | "is_internal"
+  | "published_at"
 >;
 
 export interface PetitionFieldReply {
@@ -755,12 +757,12 @@ export interface PetitionUserNotification {
   data: Maybe<any>; // jsonb
   is_read: boolean; // bool
   created_at: Date; // timestamptz
-  email_notification_sent_at: Maybe<Date>; // timestamptz
+  processed_at: Maybe<Date>; // timestamptz
 }
 
 export type CreatePetitionUserNotification = PartialProps<
   Omit<PetitionUserNotification, "id">,
-  "data" | "is_read" | "created_at" | "email_notification_sent_at"
+  "data" | "is_read" | "created_at" | "processed_at"
 >;
 
 export interface PublicFileUpload {

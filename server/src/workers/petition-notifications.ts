@@ -53,7 +53,7 @@ function processCommentCreatedUserNotification(context: WorkerContext) {
       await context.petitions.updatePetitionUserNotifications(
         notifications.map((n) => n.id),
         {
-          email_notification_sent_at: new Date(),
+          processed_at: new Date(),
         }
       );
     }
@@ -75,7 +75,7 @@ function processCommentCreatedContactNotification(context: WorkerContext) {
       await context.petitions.updatePetitionContactNotifications(
         notifications.map((n) => n.id),
         {
-          email_notification_sent_at: new Date(),
+          processed_at: new Date(),
         }
       );
     }
