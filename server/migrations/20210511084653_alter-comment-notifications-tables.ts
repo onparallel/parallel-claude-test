@@ -26,17 +26,10 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   await knex.schema
-    .alterTable("petition_field_comment", (t) => {
-      t.timestamp("published_at");
-    })
     .alterTable("petition_user_notification", (t) => {
       t.dropColumn("email_notification_sent_at");
     })
     .alterTable("petition_contact_notification", (t) => {
       t.dropColumn("email_notification_sent_at");
     });
-
-  await knex.raw(/* sql */ `
-    UPDATE petition_field_comment set published_at = "created_at" where published_at is null and deleted_at is null;
-  `);
 }
