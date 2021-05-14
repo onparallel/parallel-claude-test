@@ -62,7 +62,7 @@ const QUERY_STATE = {
   }),
 };
 
-function OrganizationUsers() {
+function OrganizationGroupMembers() {
   const intl = useIntl();
   const toast = useToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
@@ -198,8 +198,8 @@ function OrganizationUsers() {
   return (
     <SettingsLayout
       title={intl.formatMessage({
-        id: "organization.users.title",
-        defaultMessage: "Users",
+        id: "organization.groups.title",
+        defaultMessage: "Groups",
       })}
       basePath="/app/organization"
       sections={sections}
@@ -213,11 +213,12 @@ function OrganizationUsers() {
       header={
         <Heading as="h3" size="md">
           <FormattedMessage
-            id="organization.users.title"
-            defaultMessage="Users"
+            id="organization.groups.title"
+            defaultMessage="Groups"
           />
         </Heading>
       }
+      includesPath={true}
     >
       <Flex
         flexDirection="column"
@@ -321,65 +322,6 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
         CellContent: ({ row }) => <>{row.email}</>,
       },
       {
-        key: "role",
-        header: intl.formatMessage({
-          id: "organization-users.header.user-role",
-          defaultMessage: "Role",
-        }),
-        cellProps: {
-          width: "1px",
-          textAlign: "center",
-        },
-        CellContent: ({ row }) => (
-          <Badge
-            colorScheme={
-              (
-                {
-                  ADMIN: "green",
-                  NORMAL: "gray",
-                } as Record<OrganizationRole, string>
-              )[row.role]
-            }
-          >
-            {row.role === "ADMIN" ? (
-              <FormattedMessage
-                id="organization-users.admin-role"
-                defaultMessage="Admin"
-              />
-            ) : (
-              <FormattedMessage
-                id="organization-users.normal-role"
-                defaultMessage="Normal"
-              />
-            )}
-          </Badge>
-        ),
-      },
-      {
-        key: "lastActiveAt",
-        header: intl.formatMessage({
-          id: "generic.last-active-at",
-          defaultMessage: "Last active at",
-        }),
-        isSortable: true,
-        CellContent: ({ row }) =>
-          row.lastActiveAt ? (
-            <DateTime
-              value={row.lastActiveAt}
-              format={FORMATS.LLL}
-              useRelativeTime
-              whiteSpace="nowrap"
-            />
-          ) : (
-            <Text textStyle="hint">
-              <FormattedMessage
-                id="generic.never-active"
-                defaultMessage="Never active"
-              />
-            </Text>
-          ),
-      },
-      {
         key: "createdAt",
         isSortable: true,
         header: intl.formatMessage({
@@ -403,7 +345,7 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
   );
 }
 
-OrganizationUsers.fragments = {
+OrganizationGroupMembers.fragments = {
   get User() {
     return gql`
       fragment OrganizationUsers_User on User {
@@ -420,7 +362,7 @@ OrganizationUsers.fragments = {
   },
 };
 
-OrganizationUsers.mutations = [
+OrganizationGroupMembers.mutations = [
   gql`
     mutation OrganizationUsers_createOrganizationUser(
       $firstName: String!
@@ -437,7 +379,7 @@ OrganizationUsers.mutations = [
         ...OrganizationUsers_User
       }
     }
-    ${OrganizationUsers.fragments.User}
+    ${OrganizationGroupMembers.fragments.User}
   `,
   gql`
     mutation OrganizationUsers_updateUserStatus(
@@ -457,7 +399,7 @@ OrganizationUsers.mutations = [
   `,
 ];
 
-OrganizationUsers.getInitialProps = async ({
+OrganizationGroupMembers.getInitialProps = async ({
   fetchQuery,
   ...context
 }: WithApolloDataContext) => {
@@ -491,7 +433,7 @@ OrganizationUsers.getInitialProps = async ({
         }
       }
       ${SettingsLayout.fragments.User}
-      ${OrganizationUsers.fragments.User}
+      ${OrganizationGroupMembers.fragments.User}
     `,
     {
       variables: {
@@ -510,4 +452,4 @@ export default compose(
   withAdminOrganizationRole,
   withDialogs,
   withApolloData
-)(OrganizationUsers);
+)(OrganizationGroupMembers);

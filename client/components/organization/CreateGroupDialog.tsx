@@ -35,6 +35,8 @@ export function CreateGroupDialog({
 
   const nameRef = useRef<HTMLInputElement>(null);
 
+  console.log("GROUPS DIALOG RERENDER");
+
   return (
     <ConfirmDialog
       hasCloseButton
@@ -45,7 +47,7 @@ export function CreateGroupDialog({
       initialFocusRef={nameRef}
       header={
         <FormattedMessage
-          id="organization-groups.create-group"
+          id="organization-groups.create-group-title"
           defaultMessage="New working group"
         />
       }
@@ -70,8 +72,8 @@ export function CreateGroupDialog({
           <FormControl id="create-user-role">
             <FormLabel>
               <FormattedMessage
-                id="generic.forms.organization-role-label"
-                defaultMessage="Organization role"
+                id="organization-groups.members"
+                defaultMessage="Members"
               />
             </FormLabel>
           </FormControl>
@@ -79,10 +81,7 @@ export function CreateGroupDialog({
       }
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
-          <FormattedMessage
-            id="organization-groups.members"
-            defaultMessage="Members"
-          />
+          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }
       {...props}

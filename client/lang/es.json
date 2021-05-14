@@ -2135,6 +2135,11 @@
     "context": "Please, enter a valid email"
   },
   {
+    "term": "generic.forms.invalid-group-name-error",
+    "definition": "",
+    "context": "Please, enter the group name"
+  },
+  {
     "term": "generic.forms.invalid-old-password-error",
     "definition": "La contraseña actual es incorrecta",
     "context": "Old password is incorrect"
@@ -2670,9 +2675,34 @@
     "context": "New petition"
   },
   {
+    "term": "organization-group.header.members",
+    "definition": "",
+    "context": "Members"
+  },
+  {
     "term": "organization-group.header.name",
     "definition": "",
     "context": "Name"
+  },
+  {
+    "term": "organization-groups.create-group",
+    "definition": "",
+    "context": "Create group"
+  },
+  {
+    "term": "organization-groups.create-group-title",
+    "definition": "",
+    "context": "New working group"
+  },
+  {
+    "term": "organization-groups.group-name",
+    "definition": "",
+    "context": "Group name"
+  },
+  {
+    "term": "organization-groups.members",
+    "definition": "",
+    "context": "Members"
   },
   {
     "term": "organization-users.activate",
@@ -2783,6 +2813,16 @@
     "term": "organization.confirm-deactivate.user-select.input-placeholder",
     "definition": "Selecciona un usuario en tu organización",
     "context": "Select a user from your organization"
+  },
+  {
+    "term": "organization.group-created-success.toast-description",
+    "definition": "",
+    "context": "Group {name} succefuly created."
+  },
+  {
+    "term": "organization.group-created-success.toast-title",
+    "definition": "",
+    "context": "Group created successfully."
   },
   {
     "term": "organization.groups.title",

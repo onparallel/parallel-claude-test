@@ -16,6 +16,7 @@ export type SettingsLayoutProps = {
   sections: { title: string; path: string }[];
   sectionsHeader: ReactNode;
   isBase?: boolean;
+  includesPath?: boolean;
   header?: ReactNode;
   children?: ReactNode;
 };
@@ -23,6 +24,7 @@ export type SettingsLayoutProps = {
 export function SettingsLayout({
   basePath,
   isBase,
+  includesPath,
   title,
   user,
   sections,
@@ -67,7 +69,11 @@ export function SettingsLayout({
             </Heading>
           </Flex>
           {sections.map((section, index) => (
-            <SettingsLayoutMenuItem key={index} path={section.path}>
+            <SettingsLayoutMenuItem
+              key={index}
+              path={section.path}
+              includesPath={includesPath ?? false}
+            >
               {section.title}
             </SettingsLayoutMenuItem>
           ))}
@@ -126,14 +132,20 @@ SettingsLayout.fragments = {
 interface SettingsLayoutMenuItemProps {
   path: string;
   children: ReactNode;
+  includesPath: boolean;
 }
 
 function SettingsLayoutMenuItem({
   path,
   children,
+  includesPath,
 }: SettingsLayoutMenuItemProps) {
   const { pathname } = useRouter();
-  const active = pathname === `/[locale]${path}`;
+
+  const active = includesPath
+    ? pathname.includes(`/[locale]${path}`)
+    : pathname === `/[locale]${path}`;
+
   return (
     <NakedLink href={path}>
       <Box

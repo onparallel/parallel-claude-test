@@ -13,20 +13,21 @@ import { UserListPopover } from "./UserListPopover";
 interface UserAvatarListProps {
   users: UserAvatarList_UserFragment[];
   size?: string;
+  max?: number;
 }
 
 export const UserAvatarList = Object.assign(
   chakraForwardRef<"div", UserAvatarListProps>(function UserAvatarList(
-    { users, size = "xs" },
+    { users, size = "xs", max = 3 },
     ref
   ) {
     const styles = useMultiStyleConfig("Avatar", { size });
-    const max = 3;
     const slice = users.length === max + 1 ? [...users] : users.slice(0, max);
     slice.reverse();
     const excess =
       users.length > slice.length ? users.length - slice.length : null;
 
+    console.log(users);
     return (
       <Flex
         ref={ref}

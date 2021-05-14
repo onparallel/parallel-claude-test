@@ -14,12 +14,7 @@ import {
   UserCheckIcon,
   UserXIcon,
 } from "@parallel/chakra/icons";
-import {
-  AppLayout_UserFragment,
-  OrganizationGroups_GroupFragment,
-  UserStatus,
-} from "@parallel/graphql/__types";
-import { If } from "@parallel/utils/conditions";
+import { AppLayout_UserFragment, UserStatus } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
@@ -28,8 +23,7 @@ import { Spacer } from "../common/Spacer";
 export type OrganizationGroupsListTableHeaderProps = {
   me: AppLayout_UserFragment;
   search: string | null;
-  selectedGroups: OrganizationGroups_GroupFragment[];
-  hasSsoProvider: boolean;
+  selectedGroups: any[];
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onCreateGroup: () => void;
@@ -55,6 +49,8 @@ export function OrganizationGroupsListTableHeader({
       newStatus
     );
   };
+
+  console.log("GROUPS TABLE HEADER RERENDER");
 
   return (
     <Stack direction="row" padding={2}>
@@ -117,14 +113,12 @@ export function OrganizationGroupsListTableHeader({
           </Portal>
         </Menu>
       </Box>
-      <If condition={me.isSuperAdmin}>
-        <Button colorScheme="purple" onClick={onCreateGroup}>
-          <FormattedMessage
-            id="organization-groups.create-group"
-            defaultMessage="Create group"
-          />
-        </Button>
-      </If>
+      <Button colorScheme="purple" onClick={onCreateGroup}>
+        <FormattedMessage
+          id="organization-groups.create-group"
+          defaultMessage="Create group"
+        />
+      </Button>
     </Stack>
   );
 }

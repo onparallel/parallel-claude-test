@@ -4,7 +4,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { withApolloData } from "@parallel/components/common/withApolloData";
 import { compose } from "@parallel/utils/compose";
 import {
   integer,
@@ -17,12 +16,13 @@ import { useOrganizationSections } from "@parallel/utils/useOrganizationSections
 import { DateTime } from "@parallel/components/common/DateTime";
 import { useCallback, useMemo, useState } from "react";
 import { FORMATS } from "@parallel/utils/dates";
-import gql from "graphql-tag";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCreateGroupDialog } from "@parallel/components/organization/CreateGroupDialog";
+import { TableColumn } from "@parallel/components/common/Table";
+import { withApolloData } from "@parallel/components/common/withApolloData";
 
 const SORTING = ["groupName", "members", "createdAt"] as const;
 
@@ -36,26 +36,85 @@ const QUERY_STATE = {
   }),
 };
 
+const loading = false;
+const refetch = () => {
+  console.log("Refetch function");
+};
+const me = {
+  fullName: "Konstantin Klykov",
+  id: "yQQfqcU7",
+  isSuperAdmin: true,
+  onboardingStatus: {
+    CONTACT_LIST: { SKIPPED: true },
+    PETITIONS_LIST: { SKIPPED: true },
+    PETITION_COMPOSE: { SKIPPED: true },
+    PETITION_REVIEW: { SKIPPED: true },
+  },
+  organization: {
+    hasSsoProvider: false,
+    id: "yw7RQt2cQ4XDHdrbtL3",
+    groups: {
+      totalCount: 3,
+      items: [
+        {
+          id: "1",
+          name: "group 1",
+          users: [
+            { fullName: "fake 1 user", id: "1SgRex7YxU", __typename: "User" },
+            { fullName: "fake 2 user", id: "2SgRex7YxU", __typename: "User" },
+            { fullName: "fake 3 user", id: "3SgRex7YxU", __typename: "User" },
+          ],
+          createdAt: "2021-05-14T08:02:31.861Z",
+        },
+        {
+          id: "2",
+          name: "group 2",
+          users: [
+            { fullName: "fake 1 user", id: "1SgRex7YxU", __typename: "User" },
+            { fullName: "fake 2 user", id: "2SgRex7YxU", __typename: "User" },
+            { fullName: "fake 3 user", id: "3SgRex7YxU", __typename: "User" },
+            { fullName: "fake 4 user", id: "4SgRex7YxU", __typename: "User" },
+            { fullName: "fake 5 user", id: "5SgRex7YxU", __typename: "User" },
+            { fullName: "fake 6 user", id: "6SgRex7YxU", __typename: "User" },
+            { fullName: "fake 7 user", id: "7SgRex7YxU", __typename: "User" },
+          ],
+          createdAt: "2021-05-14T08:02:31.861Z",
+        },
+        {
+          id: "3",
+          name: "group 3",
+          users: [
+            { fullName: "fake 1 user", id: "1SgRex7YxU", __typename: "User" },
+            { fullName: "fake 2 user", id: "2SgRex7YxU", __typename: "User" },
+            { fullName: "fake 3 user", id: "3SgRex7YxU", __typename: "User" },
+            { fullName: "fake 4 user", id: "4SgRex7YxU", __typename: "User" },
+            { fullName: "fake 5 user", id: "5SgRex7YxU", __typename: "User" },
+            { fullName: "fake 6 user", id: "6SgRex7YxU", __typename: "User" },
+            { fullName: "fake 7 user", id: "7SgRex7YxU", __typename: "User" },
+            { fullName: "fake 8 user", id: "8SgRex7YxU", __typename: "User" },
+            { fullName: "fake 9 user", id: "9SgRex7YxU", __typename: "User" },
+            { fullName: "fake 3 user", id: "3SgRex7YxU21", __typename: "User" },
+            { fullName: "fake 4 user", id: "4SgRex7YxU22", __typename: "User" },
+            { fullName: "fake 5 user", id: "5SgRex7YxU23", __typename: "User" },
+            { fullName: "fake 6 user", id: "6SgRex7YxU24", __typename: "User" },
+            { fullName: "fake 7 user", id: "7SgRex7YxU25", __typename: "User" },
+            { fullName: "fake 8 user", id: "8SgRex7YxU26", __typename: "User" },
+            { fullName: "fake 9 user", id: "9SgRex7YxU27", __typename: "User" },
+          ],
+          createdAt: "2021-05-14T08:02:31.861Z",
+        },
+      ],
+    },
+  },
+} as any;
+
 function OrganizationGroups() {
   const intl = useIntl();
   const toast = useToast();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [selected, setSelected] = useState<string[]>([]);
 
-  const me = {
-    organization: {
-      groups: {
-        items: [
-          {
-            id: "1",
-            name: "bla bla",
-            memebers: [],
-          },
-        ],
-        totalCount: 1,
-      },
-    },
-  };
+  console.log("GROUPS RERENDER");
 
   const groupList = me.organization.groups;
 
@@ -145,16 +204,22 @@ function OrganizationGroups() {
         </Heading>
       }
     >
-      <Flex flexDirection="column" flex="1" minHeight={0} padding={4}>
+      <Flex
+        flexDirection="column"
+        flex="1"
+        minHeight={0}
+        padding={4}
+        backgroundColor={"gray.50"}
+      >
         <TablePage
           flex="0 1 auto"
           minHeight={0}
           isSelectable
           isHighlightable
           columns={columns}
-          rows={[]}
+          rows={groupList.items}
           rowKeyProp="id"
-          loading={false}
+          loading={loading}
           page={state.page}
           pageSize={state.items}
           totalCount={1}
@@ -170,7 +235,7 @@ function OrganizationGroups() {
               me={me}
               search={search}
               selectedGroups={selectedGroups}
-              onReload={() => {}}
+              onReload={() => refetch()}
               onSearchChange={handleSearchChange}
               onCreateGroup={handleCreateGroup}
               onUpdateGroupStatus={() => {}}
@@ -182,7 +247,7 @@ function OrganizationGroups() {
   );
 }
 
-function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_GroupFragment>[] {
+function useOrganizationGroupsTableColumns(): TableColumn<any>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -212,13 +277,10 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Gro
           id: "organization-group.header.members",
           defaultMessage: "Members",
         }),
-        align: "center",
-        cellProps: { width: "1%" },
-        CellContent: ({ row: { petition }, column }) => (
+        align: "left",
+        CellContent: ({ row: { users }, column }) => (
           <Flex justifyContent={column.align}>
-            <UserAvatarList
-              users={petition!.userPermissions.map((p) => p.user)}
-            />
+            <UserAvatarList users={users} max={10} />
           </Flex>
         ),
       },
@@ -246,59 +308,12 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Gro
   );
 }
 
-OrganizationGroups.fragments = {
-  get Group() {
-    return gql`
-      fragment OrganizationGroups_Group on User {
-        id
-        fullName
-        email
-        role
-        createdAt
-        lastActiveAt
-        status
-        isSsoUser
-      }
-    `;
-  },
-};
-
-// OrganizationGroups.mutations = [
-//   gql`
-//     mutation OrganizationGroups_createOrganizationGroup(
-//       $firstName: String!
-//       $lastName: String!
-//       $email: String!
-//       $role: OrganizationRole!
-//     ) {
-//       createOrganizationGroup(
-//         email: $email
-//         firstName: $firstName
-//         lastName: $lastName
-//         role: $role
-//       ) {
-//         ...OrganizationGroups_Group
-//       }
-//     }
-//     ${OrganizationGroups.fragments.Group}
-//   `,
-//   gql`
-//     mutation OrganizationGroups_updateGroupStatus(
-//       $userIds: [GID!]!
-//       $newStatus: UserStatus!
-//       $transferToUserId: GID
-//     ) {
-//       updateGroupStatus(
-//         userIds: $userIds
-//         status: $newStatus
-//         transferToUserId: $transferToUserId
-//       ) {
-//         id
-//         status
-//       }
-//     }
-//   `,
-// ];
+// OrganizationGroups.getInitialProps = async ({
+//   fetchQuery,
+//   ...context
+// }: WithApolloDataContext) => {
+//   const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
+// };
 
 export default compose(
   withAdminOrganizationRole,
