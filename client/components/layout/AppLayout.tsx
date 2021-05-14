@@ -93,7 +93,6 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           async
           defer
           src="//static.zdassets.com/ekr/snippet.js?key=f96da31d-cc9a-4568-a1f9-4d2ae55939f5"
-          onLoad={"zE(() => zE.hide())" as any}
         />
       </Head>
       <Flex
@@ -160,6 +159,9 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       <style global jsx>{`
         body #hubspot-messages-iframe-container {
           display: none !important;
+        }
+        body iframe#launcher {
+          display: none;
         }
       `}</style>
     </>
