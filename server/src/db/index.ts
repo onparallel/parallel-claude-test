@@ -7,12 +7,13 @@ import { FeatureFlagRepository } from "./repositories/FeatureFlagRepository";
 import { FileRepository } from "./repositories/FileRepository";
 import { IntegrationRepository } from "./repositories/IntegrationRepository";
 import { OrganizationRepository } from "./repositories/OrganizationRepository";
+import { PetitionEventSubscriptionRepository } from "./repositories/PetitionEventSubscriptionRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
 import { ReportingRepository } from "./repositories/ReportingRepository";
-import { UserAuthenticationRepository } from "./repositories/UserAuthenticationRepository";
-import { PetitionEventSubscriptionRepository } from "./repositories/PetitionEventSubscriptionRepository";
-import { UserRepository } from "./repositories/UserRepository";
 import { TagRepository } from "./repositories/TagRepository";
+import { UserAuthenticationRepository } from "./repositories/UserAuthenticationRepository";
+import { UserGroupRepository } from "./repositories/UserGroupRepository";
+import { UserRepository } from "./repositories/UserRepository";
 
 export const dbModule = new ContainerModule((bind) => {
   bind<Knex>(KNEX).toDynamicValue(createKnex).inSingletonScope();
@@ -28,6 +29,7 @@ export const dbModule = new ContainerModule((bind) => {
   bind<UserRepository>(UserRepository).toSelf();
   bind<ReportingRepository>(ReportingRepository).toSelf();
   bind<UserAuthenticationRepository>(UserAuthenticationRepository).toSelf();
+  bind<UserGroupRepository>(UserGroupRepository).toSelf();
   bind<PetitionEventSubscriptionRepository>(
     PetitionEventSubscriptionRepository
   ).toSelf();

@@ -4,7 +4,6 @@ export const Tag = objectType({
   name: "Tag",
   definition(t) {
     t.globalId("id", { prefixName: "Tag" });
-    t.globalId("organization_id", { prefixName: "Organization" });
     t.nonNull.string("name");
     t.nonNull.string("color", {
       description: "The color of the tag in hex format (example: #FFFFFF)",

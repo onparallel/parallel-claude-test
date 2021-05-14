@@ -23,6 +23,7 @@ import { SECURITY, SecurityService } from "./services/security";
 import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
 import { PetitionEventSubscriptionRepository } from "./db/repositories/PetitionEventSubscriptionRepository";
 import { TagRepository } from "./db/repositories/TagRepository";
+import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 
 @injectable()
 export class ApiContext {
@@ -52,6 +53,7 @@ export class ApiContext {
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository,
     public readonly userAuthentication: UserAuthenticationRepository,
+    public readonly userGroups: UserGroupRepository,
     public readonly subscriptions: PetitionEventSubscriptionRepository,
     public readonly tags: TagRepository
   ) {}

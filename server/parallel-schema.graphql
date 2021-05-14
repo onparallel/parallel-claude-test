@@ -236,6 +236,11 @@ type Mutation {
   ): [Petition!]!
 
   """
+  Add users to a user group
+  """
+  addUsersToUserGroup(userGroupId: GID!, userIds: [GID!]!): UserGroup!
+
+  """
   Clones the petition and assigns the given user as owner and creator.
   """
   assignPetitionToUser(
@@ -403,7 +408,7 @@ type Mutation {
   ): PetitionFieldReply!
 
   """
-  Creates a tag linked to the user's organization
+  Creates a tag in the user's organization
   """
   createTag(color: String!, name: String!): Tag!
 
@@ -441,6 +446,11 @@ type Mutation {
     """
     role: OrganizationRole!
   ): SupportMethodResponse!
+
+  """
+  Creates a group in the user's organization
+  """
+  createUserGroup(name: String!): UserGroup!
 
   """
   Deactivates the specified active petition accesses.
@@ -495,6 +505,11 @@ type Mutation {
   Removes the tag from every petition and soft-deletes it
   """
   deleteTag(id: GID!): Result!
+
+  """
+  Removes the tag from every petition and soft-deletes it
+  """
+  deleteUserGroup(id: GID!): Result!
 
   """
   generates a signed download link for the xlsx file containing the listings of a dynamic select field
@@ -696,6 +711,11 @@ type Mutation {
   ): [Petition!]!
 
   """
+  Removes users from a user group
+  """
+  removeUsersFromGroup(userGroupId: GID!, userIds: [GID!]!): UserGroup!
+
+  """
   Reopens the petition
   """
   reopenPetition(petitionId: GID!): Petition!
@@ -878,6 +898,11 @@ type Mutation {
   Updates the user with the provided data.
   """
   updateUser(data: UpdateUserInput!, id: GID!): User!
+
+  """
+  Updates the name of a given user group
+  """
+  updateUserGroup(data: UpdateUserGroupInput!, id: GID!): UserGroup!
 
   """
   Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org.
@@ -2608,7 +2633,7 @@ type Query {
   ): PetitionTemplatePagination!
 
   """
-  Tags of the user organization
+  Paginated list of tags in the organization
   """
   tags(
     """
@@ -2626,6 +2651,31 @@ type Query {
     """
     search: String
   ): TagPagination!
+
+  """
+  Paginated list of user groups in the organization
+  """
+  userGroups(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+
+    """
+    Optional text to search in the collection.
+    """
+    search: String
+
+    """
+    Sorting to use on the collection
+    """
+    sortBy: [QueryUserGroups_OrderBy!]
+  ): UserGroupPagination!
 }
 
 """
@@ -2662,6 +2712,16 @@ enum QueryPetitions_OrderBy {
   createdAt_DESC
   lastUsedAt_ASC
   lastUsedAt_DESC
+  name_ASC
+  name_DESC
+}
+
+"""
+Order to use on Query.userGroups
+"""
+enum QueryUserGroups_OrderBy {
+  createdAt_ASC
+  createdAt_DESC
   name_ASC
   name_DESC
 }
@@ -2873,7 +2933,6 @@ type Tag {
   createdAt: DateTime!
   id: GID!
   name: String!
-  organization_id: GID!
 }
 
 type TagPagination {
@@ -2930,6 +2989,10 @@ input UpdatePetitionInput {
 
 input UpdateTagInput {
   color: String
+  name: String
+}
+
+input UpdateUserGroupInput {
   name: String
 }
 
@@ -3052,6 +3115,33 @@ enum UserAuthenticationTokens_OrderBy {
   lastUsedAt_DESC
   tokenName_ASC
   tokenName_DESC
+}
+
+type UserGroup implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+  id: GID!
+  members: [User!]!
+  name: String!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+type UserGroupPagination {
+  """
+  The requested slice of items.
+  """
+  items: [UserGroup!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 union UserOrPetitionAccess = PetitionAccess | User

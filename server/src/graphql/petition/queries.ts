@@ -1,42 +1,29 @@
 import {
   arg,
-  queryField,
-  stringArg,
-  nonNull,
-  nullable,
   inputObjectType,
   list,
+  nonNull,
+  nullable,
+  queryField,
+  stringArg,
 } from "@nexus/schema";
-import {
-  authenticate,
-  authenticateAnd,
-  chain,
-  ifArgDefined,
-  or,
-} from "../helpers/authorize";
-import {
-  userHasAccessToPetitions,
-  petitionsArePublicTemplates,
-} from "./authorizers";
-import { globalIdArg } from "../helpers/globalIdPlugin";
 import { decode } from "jsonwebtoken";
+import { fromGlobalIds } from "../../util/globalId";
+import { authenticate, authenticateAnd, or } from "../helpers/authorize";
+import { WhitelistedError } from "../helpers/errors";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
+import {
+  petitionsArePublicTemplates,
+  userHasAccessToPetitions,
+} from "./authorizers";
 import { validateAuthTokenPayload } from "./validations";
-import { userHasAccessToTags } from "../tag/authorizers";
 
 export const petitionsQuery = queryField((t) => {
   t.paginationField("petitions", {
     type: "PetitionBase",
     description: "The petitions of the user",
-    authorize: authenticateAnd(
-      ifArgDefined(
-        (args) => args.filters?.tagIds,
-        chain(
-          (_, args) => args.filters!.tagIds!.length <= 10,
-          userHasAccessToTags((args) => args.filters!.tagIds!)
-        )
-      )
-    ),
+    authorize: authenticate(),
     additionalArgs: {
       filters: inputObjectType({
         name: "PetitionFilter",
@@ -57,6 +44,18 @@ export const petitionsQuery = queryField((t) => {
     searchable: true,
     sortableBy: ["createdAt", "name", "lastUsedAt" as any],
     resolve: async (_, { offset, limit, search, sortBy, filters }, ctx) => {
+      // move this to validator if it grows in complexity
+      if (filters?.tagIds) {
+        if (filters.tagIds.length > 10) {
+          throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
+        }
+        const tags = await ctx.tags.loadTag(
+          fromGlobalIds(filters?.tagIds, "Tag").ids
+        );
+        if (!tags.every((tag) => tag?.organization_id === ctx.user!.org_id)) {
+          throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
+        }
+      }
       const columnMap = {
         createdAt: "created_at",
         name: "name",

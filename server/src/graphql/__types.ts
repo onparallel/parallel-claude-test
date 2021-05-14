@@ -151,6 +151,10 @@ export interface NexusGenInputs {
     color?: string | null; // String
     name?: string | null; // String
   };
+  UpdateUserGroupInput: {
+    // input type
+    name?: string | null; // String
+  };
   UpdateUserInput: {
     // input type
     firstName?: string | null; // String
@@ -227,6 +231,11 @@ export interface NexusGenEnums {
     | "createdAt_DESC"
     | "lastUsedAt_ASC"
     | "lastUsedAt_DESC"
+    | "name_ASC"
+    | "name_DESC";
+  QueryUserGroups_OrderBy:
+    | "createdAt_ASC"
+    | "createdAt_DESC"
     | "name_ASC"
     | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
@@ -425,6 +434,12 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
     totalCount: number; // Int!
   };
+  UserGroup: db.UserGroup;
+  UserGroupPagination: {
+    // root type
+    items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
+    totalCount: number; // Int!
+  };
   UserPagination: {
     // root type
     items: NexusGenRootTypes["User"][]; // [User!]!
@@ -575,6 +590,7 @@ export interface NexusGenFieldTypes {
   Mutation: {
     // field return type
     addPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    addUsersToUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     assignPetitionToUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     batchSendPetition: NexusGenRootTypes["SendPetitionResult"][]; // [SendPetitionResult!]!
     bulkCreateContacts: NexusGenRootTypes["Contact"][]; // [Contact!]!
@@ -595,6 +611,7 @@ export interface NexusGenFieldTypes {
     createSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createTag: NexusGenRootTypes["Tag"]; // Tag!
     createUser: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    createUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     deactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     deleteContacts: NexusGenEnums["Result"]; // Result!
     deletePetition: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -604,6 +621,7 @@ export interface NexusGenFieldTypes {
     deletePetitionSubscription: NexusGenEnums["Result"]; // Result!
     deletePetitions: NexusGenEnums["Result"]; // Result!
     deleteTag: NexusGenEnums["Result"]; // Result!
+    deleteUserGroup: NexusGenEnums["Result"]; // Result!
     dynamicSelectFieldFileDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
     editPetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadReplyDownloadLinkResult"]; // FileUploadReplyDownloadLinkResult!
@@ -628,6 +646,7 @@ export interface NexusGenFieldTypes {
     publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     removePetitionUserPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
+    removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
@@ -655,6 +674,7 @@ export interface NexusGenFieldTypes {
     updateSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateTag: NexusGenRootTypes["Tag"]; // Tag!
     updateUser: NexusGenRootTypes["User"]; // User!
+    updateUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
@@ -1043,6 +1063,7 @@ export interface NexusGenFieldTypes {
     publicOrgLogoUrl: string | null; // String
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
+    userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
   };
   ReminderSentEvent: {
     // field return type
@@ -1132,7 +1153,6 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     name: string; // String!
-    organization_id: NexusGenScalars["GID"]; // GID!
   };
   TagPagination: {
     // field return type
@@ -1168,6 +1188,19 @@ export interface NexusGenFieldTypes {
   UserAuthenticationTokenPagination: {
     // field return type
     items: NexusGenRootTypes["UserAuthenticationToken"][]; // [UserAuthenticationToken!]!
+    totalCount: number; // Int!
+  };
+  UserGroup: {
+    // field return type
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    members: NexusGenRootTypes["User"][]; // [User!]!
+    name: string; // String!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  UserGroupPagination: {
+    // field return type
+    items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     totalCount: number; // Int!
   };
   UserPagination: {
@@ -1345,6 +1378,7 @@ export interface NexusGenFieldTypeNames {
   Mutation: {
     // field return type name
     addPetitionUserPermission: "Petition";
+    addUsersToUserGroup: "UserGroup";
     assignPetitionToUser: "SupportMethodResponse";
     batchSendPetition: "SendPetitionResult";
     bulkCreateContacts: "Contact";
@@ -1365,6 +1399,7 @@ export interface NexusGenFieldTypeNames {
     createSimpleReply: "PetitionFieldReply";
     createTag: "Tag";
     createUser: "SupportMethodResponse";
+    createUserGroup: "UserGroup";
     deactivateAccesses: "PetitionAccess";
     deleteContacts: "Result";
     deletePetition: "SupportMethodResponse";
@@ -1374,6 +1409,7 @@ export interface NexusGenFieldTypeNames {
     deletePetitionSubscription: "Result";
     deletePetitions: "Result";
     deleteTag: "Result";
+    deleteUserGroup: "Result";
     dynamicSelectFieldFileDownloadLink: "FileUploadReplyDownloadLinkResult";
     editPetitionUserPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadReplyDownloadLinkResult";
@@ -1398,6 +1434,7 @@ export interface NexusGenFieldTypeNames {
     publicUpdateSimpleReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
     removePetitionUserPermission: "Petition";
+    removeUsersFromGroup: "UserGroup";
     reopenPetition: "Petition";
     resetSignaturitOrganizationBranding: "SupportMethodResponse";
     revokeUserAuthToken: "Result";
@@ -1425,6 +1462,7 @@ export interface NexusGenFieldTypeNames {
     updateSimpleReply: "PetitionFieldReply";
     updateTag: "Tag";
     updateUser: "User";
+    updateUserGroup: "UserGroup";
     updateUserStatus: "User";
     uploadDynamicSelectFieldFile: "PetitionField";
     validatePetitionFields: "PetitionAndPartialFields";
@@ -1811,6 +1849,7 @@ export interface NexusGenFieldTypeNames {
     publicOrgLogoUrl: "String";
     publicTemplates: "PetitionTemplatePagination";
     tags: "TagPagination";
+    userGroups: "UserGroupPagination";
   };
   ReminderSentEvent: {
     // field return type name
@@ -1900,7 +1939,6 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
     name: "String";
-    organization_id: "GID";
   };
   TagPagination: {
     // field return type name
@@ -1936,6 +1974,19 @@ export interface NexusGenFieldTypeNames {
   UserAuthenticationTokenPagination: {
     // field return type name
     items: "UserAuthenticationToken";
+    totalCount: "Int";
+  };
+  UserGroup: {
+    // field return type name
+    createdAt: "DateTime";
+    id: "GID";
+    members: "User";
+    name: "String";
+    updatedAt: "DateTime";
+  };
+  UserGroupPagination: {
+    // field return type name
+    items: "UserGroup";
     totalCount: "Int";
   };
   UserPagination: {
@@ -2032,6 +2083,11 @@ export interface NexusGenArgTypes {
       notify?: boolean | null; // Boolean
       permissionType: NexusGenEnums["PetitionUserPermissionTypeRW"]; // PetitionUserPermissionTypeRW!
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    addUsersToUserGroup: {
+      // args
+      userGroupId: NexusGenScalars["GID"]; // GID!
       userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     assignPetitionToUser: {
@@ -2152,6 +2208,10 @@ export interface NexusGenArgTypes {
       password: string; // String!
       role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     };
+    createUserGroup: {
+      // args
+      name: string; // String!
+    };
     deactivateAccesses: {
       // args
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -2192,6 +2252,10 @@ export interface NexusGenArgTypes {
       ids: NexusGenScalars["GID"][]; // [GID!]!
     };
     deleteTag: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
+    };
+    deleteUserGroup: {
       // args
       id: NexusGenScalars["GID"]; // GID!
     };
@@ -2328,6 +2392,11 @@ export interface NexusGenArgTypes {
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
       removeAll?: boolean | null; // Boolean
       userIds?: NexusGenScalars["GID"][] | null; // [GID!]
+    };
+    removeUsersFromGroup: {
+      // args
+      userGroupId: NexusGenScalars["GID"]; // GID!
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     reopenPetition: {
       // args
@@ -2477,6 +2546,11 @@ export interface NexusGenArgTypes {
       data: NexusGenInputs["UpdateUserInput"]; // UpdateUserInput!
       id: NexusGenScalars["GID"]; // GID!
     };
+    updateUserGroup: {
+      // args
+      data: NexusGenInputs["UpdateUserGroupInput"]; // UpdateUserGroupInput!
+      id: NexusGenScalars["GID"]; // GID!
+    };
     updateUserStatus: {
       // args
       status: NexusGenEnums["UserStatus"]; // UserStatus!
@@ -2618,6 +2692,13 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       search?: string | null; // String
     };
+    userGroups: {
+      // args
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+      search?: string | null; // String
+      sortBy?: NexusGenEnums["QueryUserGroups_OrderBy"][] | null; // [QueryUserGroups_OrderBy!]
+    };
   };
   User: {
     authenticationTokens: {
@@ -2676,7 +2757,8 @@ export interface NexusGenAbstractTypeMembers {
     | "PublicPetition"
     | "PublicPetitionFieldReply"
     | "Subscription"
-    | "User";
+    | "User"
+    | "UserGroup";
 }
 
 export interface NexusGenTypeInterfaces {
@@ -2719,6 +2801,7 @@ export interface NexusGenTypeInterfaces {
   Subscription: "Timestamps";
   User: "Timestamps";
   UserAuthenticationToken: "CreatedAt";
+  UserGroup: "Timestamps";
   UserPermissionAddedEvent: "PetitionEvent";
   UserPermissionEditedEvent: "PetitionEvent";
   UserPermissionRemovedEvent: "PetitionEvent";

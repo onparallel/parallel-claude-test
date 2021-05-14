@@ -31,6 +31,10 @@ export * from "./support/queries";
 export * from "./user-auth-token/mutations";
 export * from "./user-auth-token/types";
 
+export * from "./user-group/types";
+export * from "./user-group/mutations";
+export * from "./user-group/queries";
+
 export * from "./tag/queries";
 export * from "./tag/mutations";
 export * from "./tag/types";

@@ -124,6 +124,8 @@ export interface TableTypes {
   temporary_file: TemporaryFile;
   user: User;
   user_authentication_token: UserAuthenticationToken;
+  user_group: UserGroup;
+  user_group_member: UserGroupMember;
 }
 
 export interface TableCreateTypes {
@@ -157,6 +159,8 @@ export interface TableCreateTypes {
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
   user_authentication_token: CreateUserAuthenticationToken;
+  user_group: CreateUserGroup;
+  user_group_member: CreateUserGroupMember;
 }
 
 export interface TablePrimaryKeys {
@@ -190,6 +194,8 @@ export interface TablePrimaryKeys {
   temporary_file: "id";
   user: "id";
   user_authentication_token: "id";
+  user_group: "id";
+  user_group_member: "id";
 }
 
 export interface Contact {
@@ -604,8 +610,8 @@ export interface PetitionFieldReply {
   deleted_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
   status: PetitionFieldReplyStatus; // petition_field_reply_status
-  user_id: Maybe<number>; // int4
   metadata: any; // jsonb
+  user_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -618,8 +624,8 @@ export type CreatePetitionFieldReply = PartialProps<
   | "deleted_by"
   | "petition_access_id"
   | "status"
-  | "user_id"
   | "metadata"
+  | "user_id"
 >;
 
 export interface PetitionMessage {
@@ -865,4 +871,41 @@ export interface UserAuthenticationToken {
 export type CreateUserAuthenticationToken = PartialProps<
   Omit<UserAuthenticationToken, "id">,
   "last_used_at" | "created_at" | "created_by" | "deleted_at" | "deleted_by"
+>;
+
+export interface UserGroup {
+  id: number; // int4
+  org_id: number; // int4
+  name: string; // varchar
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateUserGroup = PartialProps<
+  Omit<UserGroup, "id">,
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+>;
+
+export interface UserGroupMember {
+  id: number; // int4
+  user_group_id: number; // int4
+  user_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreateUserGroupMember = PartialProps<
+  Omit<UserGroupMember, "id">,
+  "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;

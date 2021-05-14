@@ -61,12 +61,12 @@ export class OrganizationRepository extends BaseRepository {
                   // nullable columns
                   if (["last_active_at"].includes(s.column)) {
                     const nulls = s.order === "asc" ? "FIRST" : "LAST";
-                    return `${s.column} ${s.order} NULLS ${nulls}`;
+                    return `"${s.column}" ${s.order} NULLS ${nulls}`;
                   } else if (s.column === "full_name") {
                     const nulls = s.order === "asc" ? "FIRST" : "LAST";
-                    return `first_name ${s.order} NULLS ${nulls}, last_name ${s.order} NULLS ${nulls}`;
+                    return `"first_name" ${s.order} NULLS ${nulls}, "last_name" ${s.order} NULLS ${nulls}`;
                   } else {
-                    return `${s.column} ${s.order}`;
+                    return `"${s.column}" ${s.order}`;
                   }
                 })
                 .join(", ")

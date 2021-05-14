@@ -5,7 +5,7 @@ import Fuse from "fuse.js";
 export const tagsQuery = queryField((t) => {
   t.paginationField("tags", {
     type: "Tag",
-    description: "Tags of the user organization",
+    description: "Paginated list of tags in the organization",
     authorize: authenticate(),
     searchable: true,
     resolve: async (_, args, ctx) => {

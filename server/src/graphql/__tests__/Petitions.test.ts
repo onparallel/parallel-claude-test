@@ -1,34 +1,34 @@
-import { initServer, TestClient } from "./server";
+import faker from "faker";
+import gql from "graphql-tag";
+import { Knex } from "knex";
+import { omit, sortBy } from "remeda";
+import { USER_COGNITO_ID } from "../../../test/mocks";
+import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
-  User,
   Petition,
   PetitionField,
   Tag,
+  User,
 } from "../../db/__types";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
-import gql from "graphql-tag";
-import { Knex } from "knex";
-import { KNEX } from "../../db/knex";
-import { omit, sortBy } from "remeda";
-import faker from "faker";
 import { deleteAllData } from "../../util/knexUtils";
+import { initServer, TestClient } from "./server";
 
-const petitionsBuilder = (orgId: number) => (
-  index: number
-): Partial<Petition> => ({
-  is_template: index > 5,
-  status: index > 5 ? null : "DRAFT",
-  template_public: index > 7,
-  org_id: orgId,
-  created_at: new Date(),
-  created_by: "User:1",
-  locale: "en",
-  name: index > 5 ? `Template ${index}` : `Petition ${index}`,
-  template_description: index > 5 ? `Template description ${index}` : null,
-});
+function petitionsBuilder(orgId: number) {
+  return (index: number): Partial<Petition> => ({
+    is_template: index > 5,
+    status: index > 5 ? null : "DRAFT",
+    template_public: index > 7,
+    org_id: orgId,
+    created_at: new Date(),
+    created_by: "User:1",
+    locale: "en",
+    name: index > 5 ? `Template ${index}` : `Petition ${index}`,
+    template_description: index > 5 ? `Template description ${index}` : null,
+  });
+}
 
 describe("GraphQL/Petitions", () => {
   let testClient: TestClient;
@@ -156,7 +156,7 @@ describe("GraphQL/Petitions", () => {
     it("fetches all user petitions", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($limit: Int) {
+          query ($limit: Int) {
             petitions(limit: $limit) {
               totalCount
             }
@@ -171,7 +171,7 @@ describe("GraphQL/Petitions", () => {
     it("filters petition by single tag", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilter) {
+          query ($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
@@ -199,7 +199,7 @@ describe("GraphQL/Petitions", () => {
     it("filters petition by multiple tags", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilter) {
+          query ($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
@@ -228,7 +228,7 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to filter by a tag id in another organization", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilter) {
+          query ($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
@@ -244,14 +244,14 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("INVALID_FILTER");
       expect(data).toBeNull();
     });
 
     it("filters petitions with tags when passing an empty tagIds array", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilter) {
+          query ($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 100, offset: 0) {
               totalCount
               items {
@@ -279,7 +279,7 @@ describe("GraphQL/Petitions", () => {
     it("should not allow to filter by more than 10 tags", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($filters: PetitionFilter) {
+          query ($filters: PetitionFilter) {
             petitions(filters: $filters, limit: 10) {
               totalCount
               items {
@@ -295,14 +295,14 @@ describe("GraphQL/Petitions", () => {
         },
       });
 
-      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(errors).toContainGraphQLError("INVALID_FILTER");
       expect(data).toBeNull();
     });
 
     it("fetches a limited amount of petitions", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($limit: Int, $type: PetitionBaseType) {
+          query ($limit: Int, $type: PetitionBaseType) {
             petitions(limit: $limit, filters: { type: $type }) {
               totalCount
               items {
@@ -321,7 +321,7 @@ describe("GraphQL/Petitions", () => {
     it("fetches only templates", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($limit: Int, $type: PetitionBaseType) {
+          query ($limit: Int, $type: PetitionBaseType) {
             petitions(limit: $limit, filters: { type: $type }) {
               totalCount
             }
@@ -360,7 +360,7 @@ describe("GraphQL/Petitions", () => {
       // use this random template to create a petition
       await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID) {
+          mutation ($petitionId: GID) {
             createPetition(
               type: PETITION
               petitionId: $petitionId
@@ -404,7 +404,7 @@ describe("GraphQL/Petitions", () => {
     it("fetches a single petition from logged user", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($petitionId: GID!) {
+          query ($petitionId: GID!) {
             petition(id: $petitionId) {
               name
               owner {
@@ -425,7 +425,7 @@ describe("GraphQL/Petitions", () => {
     it("fetches a public template from another organization", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($petitionId: GID!) {
+          query ($petitionId: GID!) {
             petition(id: $petitionId) {
               owner {
                 id
@@ -486,7 +486,7 @@ describe("GraphQL/Petitions", () => {
       // use this random template to create a petition
       await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID) {
+          mutation ($petitionId: GID) {
             createPetition(
               type: PETITION
               petitionId: $petitionId
@@ -526,7 +526,7 @@ describe("GraphQL/Petitions", () => {
     it("fetches all public templates with name matching search query", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($search: String) {
+          query ($search: String) {
             publicTemplates(search: $search) {
               totalCount
             }
@@ -541,7 +541,7 @@ describe("GraphQL/Petitions", () => {
     it("fetches all public templates with description matching search query", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($search: String) {
+          query ($search: String) {
             publicTemplates(search: $search) {
               totalCount
             }
@@ -557,7 +557,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error when trying to fetch a private petition from other user", async () => {
       const { errors, data } = await testClient.query({
         query: gql`
-          query($petitionId: GID!) {
+          query ($petitionId: GID!) {
             petition(id: $petitionId) {
               id
             }
@@ -598,7 +598,7 @@ describe("GraphQL/Petitions", () => {
     it("creates a petition from scratch with given name", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($name: String, $locale: PetitionLocale!) {
+          mutation ($name: String, $locale: PetitionLocale!) {
             createPetition(name: $name, locale: $locale) {
               name
               locale
@@ -653,7 +653,7 @@ describe("GraphQL/Petitions", () => {
     it("creates a template from scratch with given name", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $name: String
             $locale: PetitionLocale!
             $type: PetitionBaseType
@@ -714,7 +714,7 @@ describe("GraphQL/Petitions", () => {
       const base = petitions[3];
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $locale: PetitionLocale!
             $petitionId: GID
             $type: PetitionBaseType
@@ -750,7 +750,7 @@ describe("GraphQL/Petitions", () => {
     it("creates a template based on a public template from other organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $locale: PetitionLocale!
             $petitionId: GID
             $type: PetitionBaseType
@@ -792,7 +792,7 @@ describe("GraphQL/Petitions", () => {
     it("creates a petition based on a public template", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $name: String
             $locale: PetitionLocale!
             $petitionId: GID
@@ -836,7 +836,7 @@ describe("GraphQL/Petitions", () => {
     it("creates a petition and subscribes to its events with a given URL", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID, $eventsUrl: String) {
+          mutation ($petitionId: GID, $eventsUrl: String) {
             createPetition(petitionId: $petitionId, eventsUrl: $eventsUrl) {
               id
               owner {
@@ -871,7 +871,7 @@ describe("GraphQL/Petitions", () => {
     it("ignores name and locale parameters when creating a petition from a valid petitionId", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $locale: PetitionLocale!
             $name: String
             $petitionId: GID
@@ -906,7 +906,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error when trying to create a petition based on a private petition from other organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $locale: PetitionLocale!
             $petitionId: GID
             $type: PetitionBaseType
@@ -938,7 +938,7 @@ describe("GraphQL/Petitions", () => {
       const petitionGID = toGlobalId("Petition", petition.id);
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionIds: [GID!]!) {
+          mutation ($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
               name
               locale
@@ -970,7 +970,7 @@ describe("GraphQL/Petitions", () => {
     it("clones a valid list of petitions", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionIds: [GID!]!) {
+          mutation ($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
               id
             }
@@ -987,7 +987,7 @@ describe("GraphQL/Petitions", () => {
     it("clones a public template and saves it as private", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionIds: [GID!]!) {
+          mutation ($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
               name
               ... on PetitionTemplate {
@@ -1012,7 +1012,7 @@ describe("GraphQL/Petitions", () => {
     it("inserts a new petition when cloning", async () => {
       const { data } = await testClient.query({
         query: gql`
-          query($type: PetitionBaseType) {
+          query ($type: PetitionBaseType) {
             petitions(filters: { type: $type }) {
               totalCount
             }
@@ -1024,7 +1024,7 @@ describe("GraphQL/Petitions", () => {
 
       await testClient.mutate({
         mutation: gql`
-          mutation($petitionIds: [GID!]!) {
+          mutation ($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
               id
             }
@@ -1035,7 +1035,7 @@ describe("GraphQL/Petitions", () => {
 
       const { data: newData } = await testClient.query({
         query: gql`
-          query($type: PetitionBaseType) {
+          query ($type: PetitionBaseType) {
             petitions(filters: { type: $type }) {
               totalCount
             }
@@ -1052,7 +1052,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error when passing an empty array of ids", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionIds: [GID!]!) {
+          mutation ($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
               id
             }
@@ -1068,7 +1068,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error when an petition on the list is not accessible for session user", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionIds: [GID!]!) {
+          mutation ($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
               id
             }
@@ -1084,7 +1084,7 @@ describe("GraphQL/Petitions", () => {
     it("updates referenced fieldIds on visibility conditions when cloning a petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionIds: [GID!]!) {
+          mutation ($petitionIds: [GID!]!) {
             clonePetitions(petitionIds: $petitionIds) {
               fields {
                 id
@@ -1147,7 +1147,7 @@ describe("GraphQL/Petitions", () => {
     it("deletes a user petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($ids: [GID!]!, $force: Boolean) {
+          mutation ($ids: [GID!]!, $force: Boolean) {
             deletePetitions(ids: $ids, force: $force)
           }
         `,
@@ -1162,7 +1162,7 @@ describe("GraphQL/Petitions", () => {
       const sharedByMe = petitionsToDelete[0];
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($ids: [GID!]!, $force: Boolean) {
+          mutation ($ids: [GID!]!, $force: Boolean) {
             deletePetitions(ids: $ids, force: $force)
           }
         `,
@@ -1179,7 +1179,7 @@ describe("GraphQL/Petitions", () => {
       const sharedByMe = petitionsToDelete[0];
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($ids: [GID!]!, $force: Boolean) {
+          mutation ($ids: [GID!]!, $force: Boolean) {
             deletePetitions(ids: $ids, force: $force)
           }
         `,
@@ -1214,7 +1214,7 @@ describe("GraphQL/Petitions", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($ids: [GID!]!, $force: Boolean) {
+          mutation ($ids: [GID!]!, $force: Boolean) {
             deletePetitions(ids: $ids, force: $force)
           }
         `,
@@ -1244,7 +1244,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error when trying to delete a private petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($ids: [GID!]!, $force: Boolean) {
+          mutation ($ids: [GID!]!, $force: Boolean) {
             deletePetitions(ids: $ids, force: $force)
           }
         `,
@@ -1260,7 +1260,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error if passing an empty array of ids", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($ids: [GID!]!, $force: Boolean) {
+          mutation ($ids: [GID!]!, $force: Boolean) {
             deletePetitions(ids: $ids, force: $force)
           }
         `,
@@ -1274,7 +1274,7 @@ describe("GraphQL/Petitions", () => {
       const shared = petitionsToDelete[0];
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($ids: [GID!]!, $force: Boolean) {
+          mutation ($ids: [GID!]!, $force: Boolean) {
             deletePetitions(ids: $ids, force: $force)
           }
         `,
@@ -1297,7 +1297,7 @@ describe("GraphQL/Petitions", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $petitionId: GID!
             $name: String
             $locale: PetitionLocale
@@ -1344,7 +1344,7 @@ describe("GraphQL/Petitions", () => {
     it("updates petition with valid remindersConfig", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $remindersConfig: RemindersConfigInput) {
+          mutation ($petitionId: GID!, $remindersConfig: RemindersConfigInput) {
             updatePetition(
               petitionId: $petitionId
               data: { remindersConfig: $remindersConfig }
@@ -1390,7 +1390,7 @@ describe("GraphQL/Petitions", () => {
     it("updates template description with given value", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $description: String) {
+          mutation ($petitionId: GID!, $description: String) {
             updatePetition(
               petitionId: $petitionId
               data: { description: $description }
@@ -1420,7 +1420,7 @@ describe("GraphQL/Petitions", () => {
     it("trims name, description and emailSubject before updating petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $petitionId: GID!
             $name: String
             $description: String
@@ -1468,7 +1468,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error when trying to update petition with empty data", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!) {
+          mutation ($petitionId: GID!) {
             updatePetition(petitionId: $petitionId, data: {}) {
               id
             }
@@ -1486,7 +1486,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error when trying to update a private petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!) {
+          mutation ($petitionId: GID!) {
             updatePetition(petitionId: $petitionId, data: { name: "foo" }) {
               id
             }
@@ -1504,7 +1504,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error when trying to update a not owned public template", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!) {
+          mutation ($petitionId: GID!) {
             updatePetition(petitionId: $petitionId, data: { name: "foo" }) {
               id
             }
@@ -1522,7 +1522,7 @@ describe("GraphQL/Petitions", () => {
     it("sends error when trying to update email body with invalid value", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $emailBody: JSON) {
+          mutation ($petitionId: GID!, $emailBody: JSON) {
             updatePetition(
               petitionId: $petitionId
               data: { emailBody: $emailBody }
