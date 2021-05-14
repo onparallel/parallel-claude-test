@@ -38,12 +38,17 @@ function processCommentCreatedUserNotification(context: WorkerContext) {
     if (shouldBeProcessed(notifications)) {
       const petitionId = notifications[0].petition_id;
       const userId = notifications[0].user_id;
-
-      await context.emails.sendPetitionCommentsUserNotificationEmail(
-        petitionId,
+      const isSubscribed = await context.petitions.isUserSubscribedToPetition(
         userId,
-        notifications.map((n) => n.data.petition_field_comment_id)
+        petitionId
       );
+      if (isSubscribed) {
+        await context.emails.sendPetitionCommentsUserNotificationEmail(
+          petitionId,
+          userId,
+          notifications.map((n) => n.data.petition_field_comment_id)
+        );
+      }
 
       await context.petitions.updatePetitionUserNotifications(
         notifications.map((n) => n.id),

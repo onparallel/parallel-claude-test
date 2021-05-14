@@ -2108,14 +2108,14 @@ export class PetitionRepository extends BaseRepository {
       // Create contact and user notifications
       const [accesses, users] = await Promise.all([
         data.isInternal ? [] : this.loadAccessesForPetition(data.petitionId),
-        this.loadSubscribedUsersOnPetition(data.petitionId),
+        this.loadUsersOnPetition(data.petitionId),
       ]);
 
       //every active access
       const accessIds = accesses
         .filter((a) => a.status === "ACTIVE")
         .map((a) => a.id);
-      // every subscribed user, except the one sending the notification
+      // every user with permissions on the petition, except the one sending the notification
       const userIds = users.filter((u) => u.id !== user.id).map((u) => u.id);
 
       const contactNotifications = accessIds.map(
@@ -2198,11 +2198,11 @@ export class PetitionRepository extends BaseRepository {
 
       // Create notifications and events
       const [users, accesses] = await Promise.all([
-        this.loadSubscribedUsersOnPetition(data.petitionId),
+        this.loadUsersOnPetition(data.petitionId),
         this.loadAccessesForPetition(data.petitionId),
       ]);
 
-      // every subscribed user
+      // every user with permission on the petition
       const userIds = users.map((u) => u.id);
       // all active accesses, except the one sending the notification
       const accessIds = accesses
@@ -3216,14 +3216,27 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(ids).size;
   }
 
-  async loadSubscribedUsersOnPetition(petitionId: number) {
+  async loadUsersOnPetition(petitionId: number) {
     return await this.from("user")
       .join("petition_permission", "user.id", "petition_permission.user_id")
       .where("petition_permission.petition_id", petitionId)
-      .where("petition_permission.is_subscribed", true)
       .whereNull("petition_permission.deleted_at")
       .whereNull("user.deleted_at")
       .select<User[]>("user.*");
+  }
+
+  async isUserSubscribedToPetition(userId: number, petitionId: number) {
+    const [permission] = await this.from("petition_permission")
+      .join("user", "user.id", "petition_permission.user_id")
+      .where({
+        "petition_permission.user_id": userId,
+        "petition_permission.petition_id": petitionId,
+      })
+      .whereNull("petition_permission.deleted_at")
+      .whereNull("user.deleted_at")
+      .select<PetitionPermission[]>("petition_permission.*");
+
+    return permission.is_subscribed;
   }
 
   async updatePetitionPermissionSubscription(
