@@ -46,6 +46,12 @@ export function SettingsLayout({
       [sections, router.query.locale]
     )
   );
+
+  const activeSection =
+    sections.find((section) =>
+      router.pathname.includes(`/[locale]${section.path}`)
+    ) ?? sections[0];
+
   return (
     <AppLayout title={title} user={user}>
       <Flex flex="1" maxHeight="100vh">
@@ -79,7 +85,10 @@ export function SettingsLayout({
           ))}
         </Box>
         <Flex
-          display={{ base: isBase ? "none" : "flex", md: "flex" }}
+          display={{
+            base: isBase ? "none" : "flex",
+            md: "flex",
+          }}
           direction="column"
           flex="1"
           backgroundColor="white"
@@ -94,7 +103,7 @@ export function SettingsLayout({
                 borderBottom="1px solid"
                 borderBottomColor="gray.100"
               >
-                <NakedLink href={basePath}>
+                <NakedLink href={includesPath ? activeSection.path : basePath}>
                   <IconButton
                     as="a"
                     icon={<ArrowBackIcon />}
@@ -104,7 +113,10 @@ export function SettingsLayout({
                       defaultMessage: "Go back",
                     })}
                     marginRight={2}
-                    display={{ base: "flex", md: "none" }}
+                    display={{
+                      base: "flex",
+                      md: includesPath ? "flex" : "none",
+                    }}
                   />
                 </NakedLink>
                 {header}

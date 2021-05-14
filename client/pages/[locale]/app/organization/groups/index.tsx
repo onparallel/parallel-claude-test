@@ -238,7 +238,8 @@ function OrganizationGroups() {
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
               onCreateGroup={handleCreateGroup}
-              onUpdateGroupStatus={() => {}}
+              onCloneGroup={() => {}}
+              onRemoveGroup={() => {}}
             />
           }
         />

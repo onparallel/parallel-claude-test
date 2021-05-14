@@ -2685,6 +2685,16 @@
     "context": "Name"
   },
   {
+    "term": "organization-groups.add-member",
+    "definition": "",
+    "context": "Add member"
+  },
+  {
+    "term": "organization-groups.clone-group",
+    "definition": "",
+    "context": "Clone {count, plural, =1{group} other {groups}}"
+  },
+  {
     "term": "organization-groups.create-group",
     "definition": "",
     "context": "Create group"
@@ -2703,6 +2713,16 @@
     "term": "organization-groups.members",
     "definition": "",
     "context": "Members"
+  },
+  {
+    "term": "organization-groups.remove-from-group",
+    "definition": "",
+    "context": "Remove from group"
+  },
+  {
+    "term": "organization-groups.remove-group",
+    "definition": "",
+    "context": "Remove {count, plural, =1{group} other {groups}}"
   },
   {
     "term": "organization-users.activate",

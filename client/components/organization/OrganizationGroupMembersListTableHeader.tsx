@@ -10,42 +10,40 @@ import {
 } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
-  CopyIcon,
-  DeleteIcon,
   RepeatIcon,
+  UserPlusIcon,
+  UserXIcon,
 } from "@parallel/chakra/icons";
-import { AppLayout_UserFragment } from "@parallel/graphql/__types";
+import {
+  AppLayout_UserFragment,
+  OrganizationUsers_UserFragment,
+} from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
-export type OrganizationGroupsListTableHeaderProps = {
+export type OrganizationGroupMembersListTableHeaderProps = {
   me: AppLayout_UserFragment;
   search: string | null;
-  selectedGroups: any[];
+  selectedUsers: OrganizationUsers_UserFragment[];
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
-  onCreateGroup: () => void;
-  onCloneGroup: () => void;
-  onRemoveGroup: () => void;
+  onAddMember: () => void;
+  onRemoveMember: (userIds: string[]) => void;
 };
 
-export function OrganizationGroupsListTableHeader({
+export function OrganizationGroupMembersListTableHeader({
   me,
   search,
-  selectedGroups,
+  selectedUsers,
   onSearchChange,
   onReload,
-  onCreateGroup,
-  onCloneGroup,
-  onRemoveGroup,
-}: OrganizationGroupsListTableHeaderProps) {
+  onAddMember,
+  onRemoveMember,
+}: OrganizationGroupMembersListTableHeaderProps) {
   const intl = useIntl();
-
-  const showActions = selectedGroups.length > 0;
-
-  console.log("GROUPS TABLE HEADER RERENDER");
+  const showActions = selectedUsers.length > 0;
 
   return (
     <Stack direction="row" padding={2}>
@@ -80,30 +78,26 @@ export function OrganizationGroupsListTableHeader({
           </MenuButton>
           <Portal>
             <MenuList minWidth="160px">
-              <MenuItem onClick={() => onCloneGroup()}>
-                <CopyIcon marginRight={2} />
+              <MenuItem onClick={() => onRemoveMember} color="red.500">
+                <UserXIcon marginRight={2} />
                 <FormattedMessage
-                  id="organization-groups.clone-group"
-                  defaultMessage="Clone {count, plural, =1{group} other {groups}}"
-                  values={{ count: selectedGroups.length }}
-                />
-              </MenuItem>
-              <MenuItem onClick={() => onRemoveGroup()} color="red.500">
-                <DeleteIcon marginRight={2} />
-                <FormattedMessage
-                  id="organization-groups.remove-group"
-                  defaultMessage="Remove {count, plural, =1{group} other {groups}}"
-                  values={{ count: selectedGroups.length }}
+                  id="organization-groups.remove-from-group"
+                  defaultMessage="Remove from group"
+                  values={{ count: selectedUsers.length }}
                 />
               </MenuItem>
             </MenuList>
           </Portal>
         </Menu>
       </Box>
-      <Button colorScheme="purple" onClick={onCreateGroup}>
+      <Button
+        colorScheme="purple"
+        leftIcon={<UserPlusIcon fontSize="18px" />}
+        onClick={onAddMember}
+      >
         <FormattedMessage
-          id="organization-groups.create-group"
-          defaultMessage="Create group"
+          id="organization-groups.add-member"
+          defaultMessage="Add member"
         />
       </Button>
     </Stack>

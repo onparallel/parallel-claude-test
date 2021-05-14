@@ -1,37 +1,46 @@
 import { gql } from "@apollo/client";
 import {
-  Badge,
+  Editable,
+  EditableInput,
+  EditablePreview,
   Flex,
   Heading,
+  IconButton,
+  Menu,
+  MenuButton,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+  Portal,
   Text,
   Tooltip,
   useToast,
 } from "@chakra-ui/react";
-import { ForbiddenIcon } from "@parallel/chakra/icons";
+import {
+  CopyIcon,
+  DeleteIcon,
+  ForbiddenIcon,
+  MoreVerticalIcon,
+  UserArrowIcon,
+} from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { UserSelectSelection } from "@parallel/components/common/UserSelect";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useConfirmActivateUsersDialog } from "@parallel/components/organization/ConfirmActivateUsersDialog";
-import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/ConfirmDeactivateUserDialog";
 import { useCreateUserDialog } from "@parallel/components/organization/CreateUserDialog";
-import { OrganizationUsersListTableHeader } from "@parallel/components/organization/OrganizationUsersListTableHeader";
+import { OrganizationGroupMembersListTableHeader } from "@parallel/components/organization/OrganizationGroupMembersListTableHeader";
 import {
-  OrganizationRole,
   OrganizationUsersQuery,
   OrganizationUsers_OrderBy,
   OrganizationUsers_UserFragment,
   useOrganizationUsersQuery,
-  useOrganizationUsers_createOrganizationUserMutation,
-  useOrganizationUsers_updateUserStatusMutation,
-  UserStatus,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -44,7 +53,6 @@ import {
   useQueryState,
   values,
 } from "@parallel/utils/queryState";
-import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useCallback, useMemo, useState } from "react";
@@ -83,9 +91,6 @@ function OrganizationGroupMembers() {
     })
   );
 
-  console.log(me);
-
-  const hasSsoProvider = me.organization.hasSsoProvider;
   const userList = me.organization.users;
 
   const [selected, setSelected] = useState<string[]>([]);
@@ -123,18 +128,18 @@ function OrganizationGroupMembers() {
     [debouncedOnSearchChange]
   );
 
-  const [createOrganizationUser] =
-    useOrganizationUsers_createOrganizationUserMutation();
+  const handleChangeGroupName = () => {};
+
   const showCreateUserDialog = useCreateUserDialog();
-  const handleCreateUser = async () => {
+  const handleAddMember = async () => {
     try {
       const newUser = await showCreateUserDialog({});
-      await createOrganizationUser({
-        variables: newUser,
-        update: () => {
-          refetch();
-        },
-      });
+      //   await createOrganizationUser({
+      //     variables: newUser,
+      //     update: () => {
+      //       refetch();
+      //     },
+      //   });
       toast({
         title: intl.formatMessage({
           id: "organization.user-created-success.toast-title",
@@ -155,45 +160,7 @@ function OrganizationGroupMembers() {
     } catch {}
   };
 
-  const showConfirmActivateUserDialog = useConfirmActivateUsersDialog();
-  const showConfirmDeactivateUserDialog = useConfirmDeactivateUserDialog();
-  const [updateUserStatus] = useOrganizationUsers_updateUserStatusMutation();
-  const handleUpdateUserStatus = async (
-    userIds: string[],
-    newStatus: UserStatus
-  ) => {
-    try {
-      let transferToUser: Maybe<UserSelectSelection> = null;
-      if (newStatus === "ACTIVE") {
-        await showConfirmActivateUserDialog({ count: userIds.length });
-      } else if (newStatus === "INACTIVE") {
-        transferToUser = await showConfirmDeactivateUserDialog({
-          selected: userIds,
-          me,
-        });
-      }
-      await updateUserStatus({
-        variables: {
-          newStatus,
-          userIds,
-          transferToUserId: transferToUser?.id,
-        },
-      });
-      toast({
-        title: intl.formatMessage({
-          id: "generic.success",
-          defaultMessage: "Success",
-        }),
-        description: intl.formatMessage({
-          id: "organization.user-updated-success.toast-title",
-          defaultMessage: "User updated successfully.",
-        }),
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-      });
-    } catch {}
-  };
+  const handleRemoveMember = async () => {};
 
   return (
     <SettingsLayout
@@ -211,12 +178,58 @@ function OrganizationGroupMembers() {
         />
       }
       header={
-        <Heading as="h3" size="md">
-          <FormattedMessage
-            id="organization.groups.title"
-            defaultMessage="Groups"
-          />
-        </Heading>
+        <Flex width="100%" justifyContent="space-between" alignItems="center">
+          <Heading as="h3" size="md">
+            <Editable
+              defaultValue="Some group name"
+              onSubmit={handleChangeGroupName}
+            >
+              <EditablePreview paddingY={1} paddingX={2} />
+              <EditableInput paddingY={1} paddingX={2} maxLength={255} />
+            </Editable>
+          </Heading>
+
+          <Menu>
+            <Tooltip
+              placement="left"
+              label={intl.formatMessage({
+                id: "generic.more-options",
+                defaultMessage: "More options...",
+              })}
+              whiteSpace="nowrap"
+            >
+              <MenuButton
+                as={IconButton}
+                variant="outline"
+                icon={<MoreVerticalIcon />}
+                marginLeft={4}
+                aria-label={intl.formatMessage({
+                  id: "generic.more-options",
+                  defaultMessage: "More options...",
+                })}
+              />
+            </Tooltip>
+            <Portal>
+              <MenuList>
+                <MenuItem onClick={() => {}}>
+                  <CopyIcon marginRight={2} />
+                  <FormattedMessage
+                    id="component.template-header.clone-label"
+                    defaultMessage="Clone template"
+                  />
+                </MenuItem>
+                <MenuDivider />
+                <MenuItem color="red.500" onClick={() => {}}>
+                  <DeleteIcon marginRight={2} />
+                  <FormattedMessage
+                    id="component.petition-template.delete-label"
+                    defaultMessage="Delete template"
+                  />
+                </MenuItem>
+              </MenuList>
+            </Portal>
+          </Menu>
+        </Flex>
       }
       includesPath={true}
     >
@@ -247,15 +260,14 @@ function OrganizationGroupMembers() {
           }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
-            <OrganizationUsersListTableHeader
+            <OrganizationGroupMembersListTableHeader
               me={me}
               search={search}
               selectedUsers={selectedUsers}
-              hasSsoProvider={hasSsoProvider}
-              onCreateUser={handleCreateUser}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
-              onUpdateUserStatus={handleUpdateUserStatus}
+              onAddMember={handleAddMember}
+              onRemoveMember={handleRemoveMember}
             />
           }
         />

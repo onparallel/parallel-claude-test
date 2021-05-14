@@ -11,31 +11,43 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
-import { useRef } from "react";
-import { useForm } from "react-hook-form";
-import { FormattedMessage } from "react-intl";
+import { useSearchUsers } from "@parallel/utils/useSearchUsers";
+import { useCallback, useRef } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
+import { UserMultiSelect, UserSelectSelection } from "../common/UserSelect";
 
 interface CreateGroupDialogData {
   name: string;
-  members: string[];
+  users: string[];
 }
 
 export function CreateGroupDialog({
   ...props
 }: DialogProps<{}, CreateGroupDialogData>) {
-  const { handleSubmit, register, formState } = useForm<CreateGroupDialogData>({
-    mode: "onChange",
-    defaultValues: {
-      name: "",
-      members: [],
-    },
-  });
+  const { handleSubmit, register, formState, control } =
+    useForm<CreateGroupDialogData>({
+      mode: "onChange",
+      defaultValues: {
+        name: "",
+        users: [],
+      },
+    });
 
   const { errors } = formState;
 
+  const intl = useIntl();
   const nameRef = useRef<HTMLInputElement>(null);
 
   console.log("GROUPS DIALOG RERENDER");
+
+  const _handleSearchUsers = useSearchUsers();
+  const handleSearchUsers = useCallback(
+    async (search: string, exclude: string[]) => {
+      return await _handleSearchUsers(search, [...exclude]);
+    },
+    [_handleSearchUsers]
+  );
 
   return (
     <ConfirmDialog
@@ -60,7 +72,7 @@ export function CreateGroupDialog({
                 defaultMessage="Group name"
               />
             </FormLabel>
-            <Input {...register("name", { required: true })} />
+            <Input {...register("name", { required: true })} ref={nameRef} />
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.invalid-group-name-error"
@@ -68,14 +80,40 @@ export function CreateGroupDialog({
               />
             </FormErrorMessage>
           </FormControl>
-
-          <FormControl id="create-user-role">
+          <FormControl id="create-group-name">
             <FormLabel>
               <FormattedMessage
                 id="organization-groups.members"
                 defaultMessage="Members"
               />
             </FormLabel>
+            <Controller
+              name="users"
+              control={control}
+              rules={{ minLength: 1 }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <UserMultiSelect
+                  value={value}
+                  onKeyDown={(e: KeyboardEvent) => {
+                    if (
+                      e.key === "Enter" &&
+                      !(e.target as HTMLInputElement).value
+                    ) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(users: UserSelectSelection[]) => {
+                    onChange(users);
+                  }}
+                  onBlur={onBlur}
+                  onSearchUsers={handleSearchUsers}
+                  placeholder={intl.formatMessage({
+                    id: "petition-sharing.input-placeholder",
+                    defaultMessage: "Add users from your organization",
+                  })}
+                />
+              )}
+            />
           </FormControl>
         </Stack>
       }
