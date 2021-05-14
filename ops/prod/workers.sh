@@ -9,6 +9,7 @@ if [[ "$COMMAND" == "start" ]]; then
   sudo systemctl ${COMMAND} parallel-signature-worker-queue.service
   sudo systemctl ${COMMAND} parallel-reminder-trigger-cron.service
   sudo systemctl ${COMMAND} parallel-scheduled-trigger-cron.service
+  sudo systemctl ${COMMAND} parallel-petition-notifications-cron.service
   if [[ "$ENV" == "production" ]]; then
     sudo systemctl ${COMMAND} parallel-reporting-cron.service
   fi
