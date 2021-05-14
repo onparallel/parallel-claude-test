@@ -7,6 +7,7 @@ import { buildFrom } from "../../emails/utils/buildFrom";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
+import { isDefined } from "../../util/remedaExtensions";
 import { Maybe } from "../../util/types";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
@@ -77,14 +78,19 @@ export async function petitionCompleted(
     .map(([field]) => field);
 
   const emails: EmailLog[] = [];
-  const subscribed = permissions.filter((p) => p && p.is_subscribed);
-  for (const permission of subscribed) {
-    const user = await context.users.loadUser(permission.user_id!);
+
+  const subscribedUserIds = permissions
+    .filter((p) => p.is_subscribed)
+    .map((p) => p.user_id!);
+  const subscribedUsers = (
+    await context.users.loadUser(subscribedUserIds)
+  ).filter(isDefined);
+  for (const user of subscribedUsers) {
     const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
       {
         isSigned: Boolean(payload.signer_contact_id ?? false),
-        name: user!.first_name,
+        name: user.first_name,
         petitionId: toGlobalId("Petition", petitionId),
         petitionName: petition.name,
         contactNameOrEmail:
