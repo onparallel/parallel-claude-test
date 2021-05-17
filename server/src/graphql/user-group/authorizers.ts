@@ -11,8 +11,8 @@ export function userHasAccessToUserGroup<
   return async (_, args, ctx) => {
     try {
       const userGroupIds = unMaybeArray(args[argName]) as unknown as number[];
-      const userGroups = await ctx.tags.loadTag(userGroupIds);
-      return userGroups.every((ug) => ug?.organization_id === ctx.user!.org_id);
+      const userGroups = await ctx.userGroups.loadUserGroup(userGroupIds);
+      return userGroups.every((ug) => ug?.org_id === ctx.user!.org_id);
     } catch {}
     return false;
   };

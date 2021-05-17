@@ -92,6 +92,25 @@ export class UserGroupRepository extends BaseRepository {
     return row;
   }
 
+  async deleteUserGroup(userGroupId: number, deletedBy: string) {
+    await this.withTransaction(async (t) => {
+      await this.from("user_group_member", t)
+        .where({
+          user_group_id: userGroupId,
+          deleted_at: null,
+        })
+        .update({ deleted_at: this.now(), deleted_by: deletedBy });
+
+      await this.from("user_group", t)
+        .where({
+          id: userGroupId,
+          deleted_at: null,
+        })
+        .update({ deleted_at: this.now(), deleted_by: deletedBy });
+    });
+    //TODO manage petition permissions
+  }
+
   async removeUsersFromGroup(
     userGroupId: number,
     userIds: MaybeArray<number>,

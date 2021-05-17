@@ -5,7 +5,7 @@ import {
   nonNull,
   stringArg,
 } from "@nexus/schema";
-import { CreateTag } from "../../db/__types";
+import { CreateUserGroup } from "../../db/__types";
 import { authenticateAnd } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -69,7 +69,7 @@ export const updateUserGroup = mutationField("updateUserGroup", {
     ),
   },
   resolve: async (_, args, ctx) => {
-    const data: Partial<CreateTag> = {};
+    const data: Partial<CreateUserGroup> = {};
     if (args.data.name?.trim()) {
       data.name = args.data.name.trim();
     }
@@ -94,7 +94,7 @@ export const updateUserGroup = mutationField("updateUserGroup", {
 });
 
 export const deleteUserGroup = mutationField("deleteUserGroup", {
-  description: "Removes the tag from every petition and soft-deletes it",
+  description: "Deletes a group",
   type: "Result",
   authorize: authenticateAnd(userHasAccessToUserGroup("id")),
   args: {
@@ -102,10 +102,7 @@ export const deleteUserGroup = mutationField("deleteUserGroup", {
   },
   resolve: async (_, { id }, ctx) => {
     try {
-      await ctx.tags.withTransaction(async (t) => {
-        await ctx.tags.untagPetition(id, undefined, t);
-        await ctx.tags.deleteTag(id, ctx.user!, t);
-      });
+      await ctx.userGroups.deleteUserGroup(id, `User:${ctx.user!.id}`);
       return RESULT.SUCCESS;
     } catch {
       return RESULT.FAILURE;

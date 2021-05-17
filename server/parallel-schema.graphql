@@ -507,7 +507,7 @@ type Mutation {
   deleteTag(id: GID!): Result!
 
   """
-  Removes the tag from every petition and soft-deletes it
+  Deletes a group
   """
   deleteUserGroup(id: GID!): Result!
 
