@@ -170,7 +170,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     userHasAccessToUsers("userIds"),
     userIsNotSSO("userIds"),
     ifArgDefined(
-      (args) => args.transferToUserId,
+      "transferToUserId",
       and(
         userHasAccessToUsers("transferToUserId" as any),
         argUserHasActiveStatus("transferToUserId" as any)

@@ -37,7 +37,7 @@ export const createPetitionFieldComment = mutationField(
         userHasAccessToPetitions("petitionId"),
         fieldsBelongsToPetition("petitionId", "petitionFieldId"),
         ifArgDefined(
-          (args) => args.petitionFieldReplyId,
+          "petitionFieldReplyId",
           repliesBelongsToPetition("petitionId", "petitionFieldReplyId" as any)
         ),
         ifArgEquals("isInternal", true, userHasFeatureFlag("INTERNAL_COMMENTS"))

@@ -95,7 +95,7 @@ export const createPetition = mutationField("createPetition", {
   authorize: chain(
     authenticate(),
     ifArgDefined(
-      (args) => args.petitionId,
+      "petitionId",
       or(
         userHasAccessToPetitions("petitionId" as never),
         petitionsArePublicTemplates("petitionId" as never)

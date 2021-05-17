@@ -176,10 +176,7 @@ export const removePetitionUserPermission = mutationField(
       authenticate(),
       and(
         userHasAccessToPetitions("petitionIds", ["OWNER"]),
-        ifArgDefined(
-          (args) => args.userIds,
-          userHasAccessToUsers("userIds" as never)
-        )
+        ifArgDefined("userIds", userHasAccessToUsers("userIds" as never))
       )
     ),
     args: {
