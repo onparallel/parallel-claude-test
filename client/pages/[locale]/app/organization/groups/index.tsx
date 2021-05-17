@@ -23,6 +23,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCreateGroupDialog } from "@parallel/components/organization/CreateGroupDialog";
 import { TableColumn } from "@parallel/components/common/Table";
 import { withApolloData } from "@parallel/components/common/withApolloData";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 
 const SORTING = ["groupName", "members", "createdAt"] as const;
 
@@ -58,7 +59,7 @@ const me = {
       items: [
         {
           id: "1",
-          name: "group 1",
+          name: "Grupo HR",
           users: [
             { fullName: "fake 1 user", id: "1SgRex7YxU", __typename: "User" },
             { fullName: "fake 2 user", id: "2SgRex7YxU", __typename: "User" },
@@ -68,7 +69,7 @@ const me = {
         },
         {
           id: "2",
-          name: "group 2",
+          name: "GROUP IT - Nombre de grupo largo",
           users: [
             { fullName: "fake 1 user", id: "1SgRex7YxU", __typename: "User" },
             { fullName: "fake 2 user", id: "2SgRex7YxU", __typename: "User" },
@@ -82,7 +83,7 @@ const me = {
         },
         {
           id: "3",
-          name: "group 3",
+          name: "GROUP 02 - Nombre de grupo muy muy muy largo",
           users: [
             { fullName: "fake 1 user", id: "1SgRex7YxU", __typename: "User" },
             { fullName: "fake 2 user", id: "2SgRex7YxU", __typename: "User" },
@@ -259,17 +260,15 @@ function useOrganizationGroupsTableColumns(): TableColumn<any>[] {
           id: "organization-group.header.name",
           defaultMessage: "Name",
         }),
+        headerProps: {
+          width: "30%",
+          minWidth: "240px",
+        },
+        cellProps: {
+          maxWidth: 0,
+        },
         CellContent: ({ row }) => {
-          return (
-            <Text
-              as="span"
-              display="inline-flex"
-              whiteSpace="nowrap"
-              alignItems="center"
-            >
-              <Text as="span">{row.name}</Text>
-            </Text>
-          );
+          return <OverflownText>{row.name}</OverflownText>;
         },
       },
       {
