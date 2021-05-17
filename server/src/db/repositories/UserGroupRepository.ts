@@ -52,10 +52,10 @@ export class UserGroupRepository extends BaseRepository {
         /* sql */ `
         select u.*, ugm.user_group_id
         from user_group_member ugm
-          join user u on u.id = ugm.user_id
+          join "user" u on u.id = ugm.user_id
         where ugm.user_group_id in (${ids.map(() => "?").join(", ")})
           and ugm.deleted_at is null
-        order by ugm.user_group_id asc ugm.created_at asc
+        order by ugm.user_group_id asc, ugm.created_at asc
       `,
         [...ids]
       );
