@@ -30,7 +30,7 @@ export type OrganizationGroupMembersListTableHeaderProps = {
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onAddMember: () => void;
-  onRemoveMember: (userIds: string[]) => void;
+  onRemoveMember: (userIds: OrganizationUsers_UserFragment[]) => void;
 };
 
 export function OrganizationGroupMembersListTableHeader({
@@ -78,7 +78,10 @@ export function OrganizationGroupMembersListTableHeader({
           </MenuButton>
           <Portal>
             <MenuList minWidth="160px">
-              <MenuItem onClick={() => onRemoveMember} color="red.500">
+              <MenuItem
+                onClick={() => onRemoveMember(selectedUsers)}
+                color="red.500"
+              >
                 <UserXIcon marginRight={2} />
                 <FormattedMessage
                   id="organization-groups.remove-from-group"

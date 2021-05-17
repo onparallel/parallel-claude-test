@@ -2690,6 +2690,11 @@
     "context": "Add member"
   },
   {
+    "term": "organization-groups.add-member-title",
+    "definition": "Add new users to group",
+    "context": "Add new users to group"
+  },
+  {
     "term": "organization-groups.clone-group",
     "definition": "Clone {count, plural, =1{group} other {groups}}",
     "context": "Clone {count, plural, =1{group} other {groups}}"
@@ -2713,6 +2718,11 @@
     "term": "organization-groups.members",
     "definition": "Members",
     "context": "Members"
+  },
+  {
+    "term": "organization-groups.remove",
+    "definition": "Remove from group",
+    "context": "Remove from group"
   },
   {
     "term": "organization-groups.remove-from-group",
@@ -2835,6 +2845,16 @@
     "context": "Select a user from your organization"
   },
   {
+    "term": "organization.confirm-remove-member.body",
+    "definition": "Are you sure you want to <b>remove from group</b> the selected {count, plural, =1{user} other {users}}? If continue they will lose access to the petitions shared with this group.",
+    "context": "Are you sure you want to <b>remove from group</b> the selected {count, plural, =1{user} other {users}}? If continue they will lose access to the petitions shared with this group."
+  },
+  {
+    "term": "organization.confirm-remove-member.confirm",
+    "definition": "Yes, remove from group",
+    "context": "Yes, remove from group"
+  },
+  {
     "term": "organization.group-created-success.toast-description",
     "definition": "Group {name} succefuly created.",
     "context": "Group {name} succefuly created."
@@ -2843,6 +2863,11 @@
     "term": "organization.group-created-success.toast-title",
     "definition": "Group created successfully.",
     "context": "Group created successfully."
+  },
+  {
+    "term": "organization.groups.edit-name",
+    "definition": "Edit name",
+    "context": "Edit name"
   },
   {
     "term": "organization.groups.title",

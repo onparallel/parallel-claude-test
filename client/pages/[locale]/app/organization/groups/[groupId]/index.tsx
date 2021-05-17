@@ -21,11 +21,9 @@ import {
   DeleteIcon,
   ForbiddenIcon,
   MoreVerticalIcon,
-  UserArrowIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
-import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
@@ -34,7 +32,7 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { useCreateUserDialog } from "@parallel/components/organization/CreateUserDialog";
+import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/ConfirmRemoveMemberDialog";
 import { OrganizationGroupMembersListTableHeader } from "@parallel/components/organization/OrganizationGroupMembersListTableHeader";
 import {
   OrganizationUsersQuery,
@@ -57,6 +55,7 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { useAddMemberGroupDialog } from "@parallel/components/organization/AddMemberGroupDialog";
 
 const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
 
@@ -130,10 +129,10 @@ function OrganizationGroupMembers() {
 
   const handleChangeGroupName = () => {};
 
-  const showCreateUserDialog = useCreateUserDialog();
+  const showAddMemberDialog = useAddMemberGroupDialog();
   const handleAddMember = async () => {
     try {
-      const newUser = await showCreateUserDialog({});
+      const newMember = await showAddMemberDialog({});
       //   await createOrganizationUser({
       //     variables: newUser,
       //     update: () => {
@@ -145,14 +144,11 @@ function OrganizationGroupMembers() {
           id: "organization.user-created-success.toast-title",
           defaultMessage: "User created successfully.",
         }),
-        description: intl.formatMessage(
-          {
-            id: "organization.user-created-success.toast-description",
-            defaultMessage:
-              "We have sent an email to {email} with instructions to register in Parallel.",
-          },
-          { email: newUser.email }
-        ),
+        description: intl.formatMessage({
+          id: "organization.user-created-success.toast-description",
+          defaultMessage:
+            "We have sent an email to with instructions to register in Parallel.",
+        }),
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -160,7 +156,14 @@ function OrganizationGroupMembers() {
     } catch {}
   };
 
-  const handleRemoveMember = async () => {};
+  const showConfirmRemoveMemberDialog = useConfirmRemoveMemberDialog();
+
+  const handleRemoveMember = async (
+    members: OrganizationUsers_UserFragment[]
+  ) => {
+    const selected = members.map((m) => m.fullName!) ?? [];
+    await showConfirmRemoveMemberDialog({ selected });
+  };
 
   return (
     <SettingsLayout
@@ -180,13 +183,20 @@ function OrganizationGroupMembers() {
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
           <Heading as="h3" size="md">
-            <Editable
-              defaultValue="Some group name"
-              onSubmit={handleChangeGroupName}
+            <Tooltip
+              label={intl.formatMessage({
+                id: "organization.groups.edit-name",
+                defaultMessage: "Edit name",
+              })}
             >
-              <EditablePreview paddingY={1} paddingX={2} />
-              <EditableInput paddingY={1} paddingX={2} maxLength={255} />
-            </Editable>
+              <Editable
+                defaultValue="Some group name"
+                onSubmit={handleChangeGroupName}
+              >
+                <EditablePreview paddingY={1} paddingX={2} />
+                <EditableInput paddingY={1} paddingX={2} maxLength={255} />
+              </Editable>
+            </Tooltip>
           </Heading>
 
           <Menu>
@@ -214,16 +224,16 @@ function OrganizationGroupMembers() {
                 <MenuItem onClick={() => {}}>
                   <CopyIcon marginRight={2} />
                   <FormattedMessage
-                    id="component.template-header.clone-label"
-                    defaultMessage="Clone template"
+                    id="component.group-header.clone-label"
+                    defaultMessage="Clone group"
                   />
                 </MenuItem>
                 <MenuDivider />
                 <MenuItem color="red.500" onClick={() => {}}>
                   <DeleteIcon marginRight={2} />
                   <FormattedMessage
-                    id="component.petition-template.delete-label"
-                    defaultMessage="Delete template"
+                    id="component.group-header.delete-label"
+                    defaultMessage="Delete group"
                   />
                 </MenuItem>
               </MenuList>

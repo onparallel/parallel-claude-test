@@ -1,11 +1,4 @@
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -17,24 +10,19 @@ import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { UserMultiSelect, UserSelectSelection } from "../common/UserSelect";
 
-interface CreateGroupDialogData {
-  name: string;
+interface AddMemberGroupDialogData {
   users: string[];
 }
 
-export function CreateGroupDialog({
+export function AddMemberGroupDialog({
   ...props
-}: DialogProps<{}, CreateGroupDialogData>) {
-  const { handleSubmit, register, formState, control } =
-    useForm<CreateGroupDialogData>({
-      mode: "onChange",
-      defaultValues: {
-        name: "",
-        users: [],
-      },
-    });
-
-  const { errors } = formState;
+}: DialogProps<{}, AddMemberGroupDialogData>) {
+  const { handleSubmit, control } = useForm<AddMemberGroupDialogData>({
+    mode: "onChange",
+    defaultValues: {
+      users: [],
+    },
+  });
 
   const intl = useIntl();
   const nameRef = useRef<HTMLInputElement>(null);
@@ -59,32 +47,17 @@ export function CreateGroupDialog({
       initialFocusRef={nameRef}
       header={
         <FormattedMessage
-          id="organization-groups.create-group-title"
-          defaultMessage="New working group"
+          id="organization-groups.add-member-title"
+          defaultMessage="Add new users to group "
         />
       }
       body={
         <Stack>
-          <FormControl id="create-group-name" isInvalid={!!errors.name}>
+          <FormControl id="add-users">
             <FormLabel>
               <FormattedMessage
-                id="organization-groups.group-name"
-                defaultMessage="Group name"
-              />
-            </FormLabel>
-            <Input {...register("name", { required: true })} ref={nameRef} />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.invalid-group-name-error"
-                defaultMessage="Please, enter the group name"
-              />
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl id="create-group-members">
-            <FormLabel>
-              <FormattedMessage
-                id="organization-groups.members"
-                defaultMessage="Members"
+                id="organization-groups.users"
+                defaultMessage="Users"
               />
             </FormLabel>
             <Controller
@@ -127,6 +100,6 @@ export function CreateGroupDialog({
   );
 }
 
-export function useCreateGroupDialog() {
-  return useDialog(CreateGroupDialog);
+export function useAddMemberGroupDialog() {
+  return useDialog(AddMemberGroupDialog);
 }
