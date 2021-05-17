@@ -3,21 +3,12 @@ import {
   Avatar,
   Box,
   Flex,
-  List,
-  ListItem,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
-  Stack,
-  Text,
   Tooltip,
   useMultiStyleConfig,
 } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { UserAvatarList_UserFragment } from "@parallel/graphql/__types";
+import { UserListPopover } from "./UserListPopover";
 
 interface UserAvatarListProps {
   users: UserAvatarList_UserFragment[];
@@ -45,46 +36,17 @@ export const UserAvatarList = Object.assign(
         alignItems="center"
       >
         {excess && (
-          <Popover trigger="hover">
-            <PopoverTrigger>
-              <Flex
-                alignItems="center"
-                fontSize="2xs"
-                borderRadius="full"
-                paddingLeft="8px"
-                sx={styles.excessLabel}
-              >
-                <Box as="span">+{excess}</Box>
-              </Flex>
-            </PopoverTrigger>
-            <Portal>
-              <PopoverContent>
-                <PopoverArrow />
-                <PopoverBody
-                  paddingX={0}
-                  paddingY={2}
-                  overflow="auto"
-                  maxHeight="300px"
-                >
-                  <Stack as={List}>
-                    {users.map((user) => (
-                      <Flex
-                        key={user.id}
-                        as={ListItem}
-                        alignItems="center"
-                        paddingX={4}
-                      >
-                        <Avatar size="xs" name={user.fullName ?? undefined} />
-                        <Text flex="1" marginLeft={2} isTruncated>
-                          {user.fullName}
-                        </Text>
-                      </Flex>
-                    ))}
-                  </Stack>
-                </PopoverBody>
-              </PopoverContent>
-            </Portal>
-          </Popover>
+          <UserListPopover users={users}>
+            <Flex
+              alignItems="center"
+              fontSize="2xs"
+              borderRadius="full"
+              paddingLeft="8px"
+              sx={styles.excessLabel}
+            >
+              <Box as="span">+{excess}</Box>
+            </Flex>
+          </UserListPopover>
         )}
         {slice.map(({ id, fullName }) => (
           <Tooltip key={id} label={fullName!} isDisabled={!fullName}>
@@ -127,7 +89,9 @@ export const UserAvatarList = Object.assign(
         fragment UserAvatarList_User on User {
           id
           fullName
+          ...UserListPopover_User
         }
+        ${UserListPopover.fragments.User}
       `,
     },
   }

@@ -107,13 +107,19 @@ export function or<TypeName extends string, FieldName extends string>(
   };
 }
 
-export function ifArgDefined<TypeName extends string, FieldName extends string>(
-  prop: (args: core.ArgsValue<TypeName, FieldName>) => any,
+export function ifArgDefined<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName>
+>(
+  prop: TArg | ((args: core.ArgsValue<TypeName, FieldName>) => any),
   thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>,
   elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    if (isDefined(prop(args))) {
+    const value =
+      typeof prop === "string" ? (args as any)[prop] : (prop as any)(args);
+    if (isDefined(value)) {
       return await thenAuthorizer(root, args, ctx, info);
     } else if (elseAuthorizer) {
       return await elseAuthorizer(root, args, ctx, info);

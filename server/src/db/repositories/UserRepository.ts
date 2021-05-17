@@ -2,12 +2,14 @@ import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { CreateUser, User } from "../__types";
+import { CreateUser, User, UserGroup } from "../__types";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import DataLoader from "dataloader";
 import { indexBy } from "remeda";
 import { MaybeArray } from "../../util/types";
 import { unMaybeArray } from "../../util/arrays";
+import { escapeLike } from "../helpers/utils";
+import { number } from "yargs";
 
 @injectable()
 export class UserRepository extends BaseRepository {
@@ -119,5 +121,59 @@ export class UserRepository extends BaseRepository {
       updated_by: createdBy,
     });
     return row;
+  }
+
+  async searchUsers(
+    orgId: number,
+    search: string,
+    opts: {
+      includeGroups: boolean;
+      includeInactive: boolean;
+      excludeUsers: number[];
+      excludeUserGroups: number[];
+    }
+  ) {
+    const [users, userGroups] = await Promise.all([
+      this.from("user")
+        .where({
+          org_id: orgId,
+          deleted_at: null,
+          ...(opts.includeInactive ? {} : { status: "ACTIVE" }),
+        })
+        .mmodify((q) => {
+          if (opts.excludeUsers.length > 0) {
+            q.whereNotIn("id", opts.excludeUsers);
+          }
+          q.andWhere((q) => {
+            q.whereIlike(
+              this.knex.raw(`concat("first_name", ' ', "last_name")`) as any,
+              `%${escapeLike(search, "\\")}%`,
+              "\\"
+            ).or.whereIlike("email", `%${escapeLike(search, "\\")}%`, "\\");
+          });
+        })
+        .select<({ __type: "User" } & User)[]>(
+          "*",
+          this.knex.raw(`'User' as __type`)
+        ),
+      opts.includeGroups
+        ? this.from("user_group")
+            .where({
+              org_id: orgId,
+              deleted_at: null,
+            })
+            .mmodify((q) => {
+              if (opts.excludeUserGroups.length > 0) {
+                q.whereNotIn("id", opts.excludeUserGroups);
+              }
+            })
+            .whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\")
+            .select<({ __type: "UserGroup" } & UserGroup)[]>(
+              "*",
+              this.knex.raw(`'UserGroup' as __type`)
+            )
+        : undefined,
+    ]);
+    return [...(userGroups ?? []), ...users];
   }
 }

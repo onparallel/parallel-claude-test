@@ -2633,6 +2633,17 @@ type Query {
   ): PetitionTemplatePagination!
 
   """
+  Search users and user groups
+  """
+  searchUsers(
+    excludeUserGroups: [GID!]
+    excludeUsers: [GID!]
+    includeGroups: Boolean
+    includeInactive: Boolean
+    search: String!
+  ): [UserOrUserGroup!]!
+
+  """
   Paginated list of tags in the organization
   """
   tags(
@@ -3145,6 +3156,8 @@ type UserGroupPagination {
 }
 
 union UserOrPetitionAccess = PetitionAccess | User
+
+union UserOrUserGroup = User | UserGroup
 
 type UserPagination {
   """

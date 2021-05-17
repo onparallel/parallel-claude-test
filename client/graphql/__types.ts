@@ -191,6 +191,8 @@ export type Mutation = {
   __typename?: "Mutation";
   /** Adds permissions on given petitions and users */
   addPetitionUserPermission: Array<Petition>;
+  /** Add users to a user group */
+  addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
@@ -226,10 +228,12 @@ export type Mutation = {
   createPetitionSubscription: Subscription;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
-  /** Creates a tag linked to the user's organization */
+  /** Creates a tag in the user's organization */
   createTag: Tag;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
+  /** Creates a group in the user's organization */
+  createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
@@ -247,6 +251,8 @@ export type Mutation = {
   deletePetitions: Result;
   /** Removes the tag from every petition and soft-deletes it */
   deleteTag: Result;
+  /** Deletes a group */
+  deleteUserGroup: Result;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Edits permissions on given petitions and users */
@@ -296,6 +302,8 @@ export type Mutation = {
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes permissions on given petitions and users */
   removePetitionUserPermission: Array<Petition>;
+  /** Removes users from a user group */
+  removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
   reopenPetition: Petition;
   /** Removes the Signaturit Branding Ids of selected organization. */
@@ -348,6 +356,8 @@ export type Mutation = {
   updateTag: Tag;
   /** Updates the user with the provided data. */
   updateUser: User;
+  /** Updates the name of a given user group */
+  updateUserGroup: UserGroup;
   /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
   updateUserStatus: Array<User>;
   /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
@@ -362,6 +372,11 @@ export type MutationaddPetitionUserPermissionArgs = {
   notify?: Maybe<Scalars["Boolean"]>;
   permissionType: PetitionUserPermissionTypeRW;
   petitionIds: Array<Scalars["GID"]>;
+  userIds: Array<Scalars["GID"]>;
+};
+
+export type MutationaddUsersToUserGroupArgs = {
+  userGroupId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
 };
 
@@ -483,6 +498,10 @@ export type MutationcreateUserArgs = {
   role: OrganizationRole;
 };
 
+export type MutationcreateUserGroupArgs = {
+  name: Scalars["String"];
+};
+
 export type MutationdeactivateAccessesArgs = {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -523,6 +542,10 @@ export type MutationdeletePetitionsArgs = {
 };
 
 export type MutationdeleteTagArgs = {
+  id: Scalars["GID"];
+};
+
+export type MutationdeleteUserGroupArgs = {
   id: Scalars["GID"];
 };
 
@@ -658,6 +681,11 @@ export type MutationremovePetitionUserPermissionArgs = {
   petitionIds: Array<Scalars["GID"]>;
   removeAll?: Maybe<Scalars["Boolean"]>;
   userIds?: Maybe<Array<Scalars["GID"]>>;
+};
+
+export type MutationremoveUsersFromGroupArgs = {
+  userGroupId: Scalars["GID"];
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationreopenPetitionArgs = {
@@ -805,6 +833,11 @@ export type MutationupdateTagArgs = {
 
 export type MutationupdateUserArgs = {
   data: UpdateUserInput;
+  id: Scalars["GID"];
+};
+
+export type MutationupdateUserGroupArgs = {
+  data: UpdateUserGroupInput;
   id: Scalars["GID"];
 };
 
@@ -1692,8 +1725,12 @@ export type Query = {
   publicOrgLogoUrl?: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
-  /** Tags of the user organization */
+  /** Search users and user groups */
+  searchUsers: Array<UserOrUserGroup>;
+  /** Paginated list of tags in the organization */
   tags: TagPagination;
+  /** Paginated list of user groups in the organization */
+  userGroups: UserGroupPagination;
 };
 
 export type QueryaccessArgs = {
@@ -1777,10 +1814,25 @@ export type QuerypublicTemplatesArgs = {
   search?: Maybe<Scalars["String"]>;
 };
 
+export type QuerysearchUsersArgs = {
+  excludeUserGroups?: Maybe<Array<Scalars["GID"]>>;
+  excludeUsers?: Maybe<Array<Scalars["GID"]>>;
+  includeGroups?: Maybe<Scalars["Boolean"]>;
+  includeInactive?: Maybe<Scalars["Boolean"]>;
+  search: Scalars["String"];
+};
+
 export type QuerytagsArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
+};
+
+export type QueryuserGroupsArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryUserGroups_OrderBy>>;
 };
 
 /** Order to use on Query.contacts */
@@ -1809,6 +1861,13 @@ export type QueryPetitions_OrderBy =
   | "createdAt_DESC"
   | "lastUsedAt_ASC"
   | "lastUsedAt_DESC"
+  | "name_ASC"
+  | "name_DESC";
+
+/** Order to use on Query.userGroups */
+export type QueryUserGroups_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
   | "name_ASC"
   | "name_DESC";
 
@@ -1957,7 +2016,6 @@ export type Tag = {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   name: Scalars["String"];
-  organization_id: Scalars["GID"];
 };
 
 export type TagPagination = {
@@ -2005,6 +2063,10 @@ export type UpdatePetitionInput = {
 
 export type UpdateTagInput = {
   color?: Maybe<Scalars["String"]>;
+  name?: Maybe<Scalars["String"]>;
+};
+
+export type UpdateUserGroupInput = {
   name?: Maybe<Scalars["String"]>;
 };
 
@@ -2082,7 +2144,28 @@ export type UserAuthenticationTokens_OrderBy =
   | "tokenName_ASC"
   | "tokenName_DESC";
 
+export type UserGroup = Timestamps & {
+  __typename?: "UserGroup";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  members: Array<User>;
+  name: Scalars["String"];
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+};
+
+export type UserGroupPagination = {
+  __typename?: "UserGroupPagination";
+  /** The requested slice of items. */
+  items: Array<UserGroup>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
 export type UserOrPetitionAccess = PetitionAccess | User;
+
+export type UserOrUserGroup = User | UserGroup;
 
 export type UserPagination = {
   __typename?: "UserPagination";
@@ -2208,7 +2291,9 @@ export type PetitionTagListCellContent_PetitionBase_Petition_Fragment = {
   };
 
 export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment =
-  { __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
+  {
+    __typename?: "PetitionTemplate";
+  } & Pick<PetitionTemplate, "id"> & {
       tags: Array<
         { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
       >;
@@ -2307,11 +2392,11 @@ export type ShareButton_PetitionBaseFragment =
   | ShareButton_PetitionBase_Petition_Fragment
   | ShareButton_PetitionBase_PetitionTemplate_Fragment;
 
-export type SimpleContactInfoList_ContactFragment = {
+export type ContactListPopover_ContactFragment = {
   __typename?: "Contact";
 } & Pick<Contact, "id" | "email" | "fullName">;
 
-export type SimpleContactInfoList_PublicContactFragment = {
+export type ContactListPopover_PublicContactFragment = {
   __typename?: "PublicContact";
 } & Pick<PublicContact, "id" | "email" | "fullName">;
 
@@ -2346,12 +2431,23 @@ export type TagEditDialog_updateTagMutation = { __typename?: "Mutation" } & {
 export type UserAvatarList_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id" | "fullName"
+> &
+  UserListPopover_UserFragment;
+
+export type UserListPopover_UserFragment = { __typename?: "User" } & Pick<
+  User,
+  "id" | "fullName"
 >;
 
 export type UserSelect_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id" | "fullName" | "email"
 >;
+
+export type UserSelect_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
+  UserGroup,
+  "id" | "name"
+> & { members: Array<{ __typename?: "User" } & UserSelect_UserFragment> };
 
 export type WithAdminOrganizationRoleQueryVariables = Exact<{
   [key: string]: never;
@@ -2668,41 +2764,51 @@ export type PetitionActivityTimeline_PetitionFragment = {
 };
 
 export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment =
-  { __typename?: "AccessActivatedEvent" } & Pick<AccessActivatedEvent, "id"> &
+  {
+    __typename?: "AccessActivatedEvent";
+  } & Pick<AccessActivatedEvent, "id"> &
     TimelineAccessActivatedEvent_AccessActivatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment =
-  { __typename?: "AccessDeactivatedEvent" } & Pick<
-    AccessDeactivatedEvent,
-    "id"
-  > &
+  {
+    __typename?: "AccessDeactivatedEvent";
+  } & Pick<AccessDeactivatedEvent, "id"> &
     TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment =
-  { __typename?: "AccessDelegatedEvent" } & Pick<AccessDelegatedEvent, "id"> &
+  {
+    __typename?: "AccessDelegatedEvent";
+  } & Pick<AccessDelegatedEvent, "id"> &
     TimelineAccessDelegatedEvent_AccessDelegatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment =
-  { __typename?: "AccessOpenedEvent" } & Pick<AccessOpenedEvent, "id"> &
+  {
+    __typename?: "AccessOpenedEvent";
+  } & Pick<AccessOpenedEvent, "id"> &
     TimelineAccessOpenedEvent_AccessOpenedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment =
-  { __typename?: "CommentDeletedEvent" } & Pick<CommentDeletedEvent, "id"> &
+  {
+    __typename?: "CommentDeletedEvent";
+  } & Pick<CommentDeletedEvent, "id"> &
     TimelineCommentDeletedEvent_CommentDeletedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment =
-  { __typename?: "CommentPublishedEvent" } & Pick<CommentPublishedEvent, "id"> &
+  {
+    __typename?: "CommentPublishedEvent";
+  } & Pick<CommentPublishedEvent, "id"> &
     TimelineCommentPublishedEvent_CommentPublishedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment =
-  { __typename?: "MessageCancelledEvent" } & Pick<MessageCancelledEvent, "id"> &
+  {
+    __typename?: "MessageCancelledEvent";
+  } & Pick<MessageCancelledEvent, "id"> &
     TimelineMessageCancelledEvent_MessageCancelledEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment =
-  { __typename?: "MessageScheduledEvent" } & Pick<
-    MessageScheduledEvent,
-    "id"
-  > & {
+  {
+    __typename?: "MessageScheduledEvent";
+  } & Pick<MessageScheduledEvent, "id"> & {
       message: { __typename?: "PetitionMessage" } & Pick<PetitionMessage, "id">;
     } & TimelineMessageScheduledEvent_MessageScheduledEventFragment;
 
@@ -2712,91 +2818,99 @@ export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
   TimelineMessageSentEvent_MessageSentEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment =
-  { __typename?: "OwnershipTransferredEvent" } & Pick<
-    OwnershipTransferredEvent,
-    "id"
-  > &
+  {
+    __typename?: "OwnershipTransferredEvent";
+  } & Pick<OwnershipTransferredEvent, "id"> &
     TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment =
-  { __typename?: "PetitionClosedEvent" } & Pick<PetitionClosedEvent, "id"> &
+  {
+    __typename?: "PetitionClosedEvent";
+  } & Pick<PetitionClosedEvent, "id"> &
     TimelinePetitionClosedEvent_PetitionClosedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment =
-  { __typename?: "PetitionClosedNotifiedEvent" } & Pick<
-    PetitionClosedNotifiedEvent,
-    "id"
-  > &
+  {
+    __typename?: "PetitionClosedNotifiedEvent";
+  } & Pick<PetitionClosedNotifiedEvent, "id"> &
     TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment =
-  { __typename?: "PetitionCompletedEvent" } & Pick<
-    PetitionCompletedEvent,
-    "id"
-  > &
+  {
+    __typename?: "PetitionCompletedEvent";
+  } & Pick<PetitionCompletedEvent, "id"> &
     TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment =
-  { __typename?: "PetitionCreatedEvent" } & Pick<PetitionCreatedEvent, "id"> &
+  {
+    __typename?: "PetitionCreatedEvent";
+  } & Pick<PetitionCreatedEvent, "id"> &
     TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment =
-  { __typename?: "PetitionReopenedEvent" } & Pick<PetitionReopenedEvent, "id"> &
+  {
+    __typename?: "PetitionReopenedEvent";
+  } & Pick<PetitionReopenedEvent, "id"> &
     TimelinePetitionReopenedEvent_PetitionReopenedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment =
-  { __typename?: "ReminderSentEvent" } & Pick<ReminderSentEvent, "id"> &
+  {
+    __typename?: "ReminderSentEvent";
+  } & Pick<ReminderSentEvent, "id"> &
     TimelineReminderSentEvent_ReminderSentEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment =
-  { __typename?: "ReplyCreatedEvent" } & Pick<ReplyCreatedEvent, "id"> &
+  {
+    __typename?: "ReplyCreatedEvent";
+  } & Pick<ReplyCreatedEvent, "id"> &
     TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment =
-  { __typename?: "ReplyDeletedEvent" } & Pick<ReplyDeletedEvent, "id"> &
+  {
+    __typename?: "ReplyDeletedEvent";
+  } & Pick<ReplyDeletedEvent, "id"> &
     TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment =
-  { __typename?: "ReplyUpdatedEvent" } & Pick<ReplyUpdatedEvent, "id"> &
+  {
+    __typename?: "ReplyUpdatedEvent";
+  } & Pick<ReplyUpdatedEvent, "id"> &
     TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment =
-  { __typename?: "SignatureCancelledEvent" } & Pick<
-    SignatureCancelledEvent,
-    "id"
-  > &
+  {
+    __typename?: "SignatureCancelledEvent";
+  } & Pick<SignatureCancelledEvent, "id"> &
     TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment =
-  { __typename?: "SignatureCompletedEvent" } & Pick<
-    SignatureCompletedEvent,
-    "id"
-  > &
+  {
+    __typename?: "SignatureCompletedEvent";
+  } & Pick<SignatureCompletedEvent, "id"> &
     TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment =
-  { __typename?: "SignatureStartedEvent" } & Pick<SignatureStartedEvent, "id"> &
+  {
+    __typename?: "SignatureStartedEvent";
+  } & Pick<SignatureStartedEvent, "id"> &
     TimelineSignatureStartedEvent_SignatureStartedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment =
-  { __typename?: "UserPermissionAddedEvent" } & Pick<
-    UserPermissionAddedEvent,
-    "id"
-  > &
+  {
+    __typename?: "UserPermissionAddedEvent";
+  } & Pick<UserPermissionAddedEvent, "id"> &
     TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment =
-  { __typename?: "UserPermissionEditedEvent" } & Pick<
-    UserPermissionEditedEvent,
-    "id"
-  > &
+  {
+    __typename?: "UserPermissionEditedEvent";
+  } & Pick<UserPermissionEditedEvent, "id"> &
     TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment =
-  { __typename?: "UserPermissionRemovedEvent" } & Pick<
-    UserPermissionRemovedEvent,
-    "id"
-  > &
+  {
+    __typename?: "UserPermissionRemovedEvent";
+  } & Pick<UserPermissionRemovedEvent, "id"> &
     TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEventFragment =
@@ -2984,10 +3098,9 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
   };
 
 export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment =
-  { __typename?: "OwnershipTransferredEvent" } & Pick<
-    OwnershipTransferredEvent,
-    "createdAt"
-  > & {
+  {
+    __typename?: "OwnershipTransferredEvent";
+  } & Pick<OwnershipTransferredEvent, "createdAt"> & {
       user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
       owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
       previousOwner?: Maybe<
@@ -3002,10 +3115,9 @@ export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
   };
 
 export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment =
-  { __typename?: "PetitionClosedNotifiedEvent" } & Pick<
-    PetitionClosedNotifiedEvent,
-    "createdAt"
-  > & {
+  {
+    __typename?: "PetitionClosedNotifiedEvent";
+  } & Pick<PetitionClosedNotifiedEvent, "createdAt"> & {
       user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
       access: { __typename?: "PetitionAccess" } & {
         contact?: Maybe<
@@ -3123,10 +3235,9 @@ export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
 } & Pick<SignatureStartedEvent, "createdAt">;
 
 export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment =
-  { __typename?: "UserPermissionAddedEvent" } & Pick<
-    UserPermissionAddedEvent,
-    "permissionType" | "createdAt"
-  > & {
+  {
+    __typename?: "UserPermissionAddedEvent";
+  } & Pick<UserPermissionAddedEvent, "permissionType" | "createdAt"> & {
       user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
       permissionUser?: Maybe<
         { __typename?: "User" } & UserReference_UserFragment
@@ -3134,10 +3245,9 @@ export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment =
     };
 
 export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment =
-  { __typename?: "UserPermissionEditedEvent" } & Pick<
-    UserPermissionEditedEvent,
-    "permissionType" | "createdAt"
-  > & {
+  {
+    __typename?: "UserPermissionEditedEvent";
+  } & Pick<UserPermissionEditedEvent, "permissionType" | "createdAt"> & {
       user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
       permissionUser?: Maybe<
         { __typename?: "User" } & UserReference_UserFragment
@@ -3145,10 +3255,9 @@ export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment 
     };
 
 export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment =
-  { __typename?: "UserPermissionRemovedEvent" } & Pick<
-    UserPermissionRemovedEvent,
-    "createdAt"
-  > & {
+  {
+    __typename?: "UserPermissionRemovedEvent";
+  } & Pick<UserPermissionRemovedEvent, "createdAt"> & {
       user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
       permissionUser?: Maybe<
         { __typename?: "User" } & UserReference_UserFragment
@@ -3581,7 +3690,9 @@ export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation
   }>;
 
 export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     updatePetitionFieldReplyMetadata: {
       __typename?: "PetitionFieldReply";
     } & Pick<PetitionFieldReply, "id" | "metadata">;
@@ -3594,7 +3705,9 @@ export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVa
   }>;
 
 export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     updateSignatureRequestMetadata: {
       __typename?: "PetitionSignatureRequest";
     } & Pick<PetitionSignatureRequest, "id" | "metadata">;
@@ -3921,7 +4034,9 @@ export type RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment = {
 >;
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment =
-  { __typename?: "PublicPetitionAccess" } & {
+  {
+    __typename?: "PublicPetitionAccess";
+  } & {
     granter?: Maybe<
       { __typename?: "PublicUser" } & Pick<PublicUser, "fullName">
     >;
@@ -3931,13 +4046,14 @@ export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragmen
   };
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment =
-  { __typename?: "PublicPetitionField" } & Pick<
-    PublicPetitionField,
-    "id" | "title"
-  >;
+  {
+    __typename?: "PublicPetitionField";
+  } & Pick<PublicPetitionField, "id" | "title">;
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment =
-  { __typename?: "PublicPetitionFieldComment" } & Pick<
+  {
+    __typename?: "PublicPetitionFieldComment";
+  } & Pick<
     PublicPetitionFieldComment,
     "id" | "content" | "publishedAt" | "isUnread"
   > & {
@@ -3972,7 +4088,9 @@ export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAs
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicMarkPetitionFieldCommentsAsRead: Array<
       { __typename?: "PublicPetitionFieldComment" } & Pick<
         PublicPetitionFieldComment,
@@ -3989,7 +4107,9 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicCreatePetitionFieldComment: {
       __typename?: "PublicPetitionFieldComment";
     } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
@@ -4004,7 +4124,9 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentM
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicUpdatePetitionFieldComment: {
       __typename?: "PublicPetitionFieldComment";
     } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
@@ -4018,13 +4140,14 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation =
-  { __typename?: "Mutation" } & Pick<
-    Mutation,
-    "publicDeletePetitionFieldComment"
-  >;
+  {
+    __typename?: "Mutation";
+  } & Pick<Mutation, "publicDeletePetitionFieldComment">;
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment =
-  { __typename?: "PublicPetitionField" } & Pick<
+  {
+    __typename?: "PublicPetitionField";
+  } & Pick<
     PublicPetitionField,
     "commentCount" | "unpublishedCommentCount" | "unreadCommentCount"
   >;
@@ -4037,7 +4160,9 @@ export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLi
   }>;
 
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicFileUploadReplyDownloadLink: {
       __typename?: "FileUploadReplyDownloadLinkResult";
     } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
@@ -4050,7 +4175,9 @@ export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutatio
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation =
-  { __typename?: "Mutation" } & Pick<Mutation, "publicDeletePetitionReply">;
+  {
+    __typename?: "Mutation";
+  } & Pick<Mutation, "publicDeletePetitionReply">;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables =
   Exact<{
@@ -4060,7 +4187,9 @@ export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationV
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicUpdateSimpleReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
       PublicPetitionFieldReply,
       "id" | "content" | "status" | "updatedAt"
@@ -4075,7 +4204,9 @@ export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationV
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicCreateSimpleReply: {
       __typename?: "PublicPetitionFieldReply";
     } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
@@ -4092,7 +4223,9 @@ export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMu
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicCreateDynamicSelectReply: {
       __typename?: "PublicPetitionFieldReply";
     } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
@@ -4109,7 +4242,9 @@ export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMu
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicUpdateDynamicSelectReply: {
       __typename?: "PublicPetitionFieldReply";
     } & Pick<
@@ -4126,7 +4261,9 @@ export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutat
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicCreateFileUploadReply: {
       __typename?: "CreateFileUploadReply";
     } & Pick<CreateFileUploadReply, "endpoint"> & {
@@ -4143,14 +4280,18 @@ export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMut
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation =
-  { __typename?: "Mutation" } & {
+  {
+    __typename?: "Mutation";
+  } & {
     publicFileUploadReplyComplete: {
       __typename?: "PublicPetitionFieldReply";
     } & Pick<PublicPetitionFieldReply, "id" | "content">;
   };
 
 export type RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment =
-  { __typename?: "PublicPetitionField" } & {
+  {
+    __typename?: "PublicPetitionField";
+  } & {
     replies: Array<
       { __typename?: "PublicPetitionFieldReply" } & Pick<
         PublicPetitionFieldReply,
@@ -4160,13 +4301,14 @@ export type RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitio
   };
 
 export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
-  { __typename?: "PublicPetitionFieldReply" } & Pick<
-    PublicPetitionFieldReply,
-    "content"
-  >;
+  {
+    __typename?: "PublicPetitionFieldReply";
+  } & Pick<PublicPetitionFieldReply, "content">;
 
 export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment =
-  { __typename?: "PublicPetition" } & Pick<PublicPetition, "status">;
+  {
+    __typename?: "PublicPetition";
+  } & Pick<PublicPetition, "status">;
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables =
   Exact<{
@@ -5643,7 +5785,9 @@ export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
 } & Pick<Petition, "id" | "name">;
 
 export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment =
-  { __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">;
+  {
+    __typename?: "PetitionTemplate";
+  } & Pick<PetitionTemplate, "id" | "name">;
 
 export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
   | ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment
@@ -5713,21 +5857,23 @@ export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
   };
 };
 
-export type SearchUsersQueryVariables = Exact<{
+export type useSearchUsers_searchUsersQueryVariables = Exact<{
   search: Scalars["String"];
-  exclude: Array<Scalars["GID"]> | Scalars["GID"];
+  excludeUsers?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  excludeUserGroups?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  includeGroups?: Maybe<Scalars["Boolean"]>;
+  includeInactive?: Maybe<Scalars["Boolean"]>;
 }>;
 
-export type SearchUsersQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & {
-    organization: { __typename?: "Organization" } & {
-      users: { __typename?: "UserPagination" } & {
-        items: Array<
-          { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">
-        >;
-      };
-    };
-  };
+export type useSearchUsers_searchUsersQuery = { __typename?: "Query" } & {
+  searchUsers: Array<
+    | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "email">)
+    | ({ __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
+          members: Array<
+            { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">
+          >;
+        })
+  >;
 };
 
 export type useSettingsSections_UserFragment = { __typename?: "User" } & {
@@ -5751,15 +5897,15 @@ export const PetitionTagFilter_TagFragmentDoc = gql`
   }
   ${Tag_TagFragmentDoc}
 `;
-export const SimpleContactInfoList_ContactFragmentDoc = gql`
-  fragment SimpleContactInfoList_Contact on Contact {
+export const ContactListPopover_ContactFragmentDoc = gql`
+  fragment ContactListPopover_Contact on Contact {
     id
     email
     fullName
   }
 `;
-export const SimpleContactInfoList_PublicContactFragmentDoc = gql`
-  fragment SimpleContactInfoList_PublicContact on PublicContact {
+export const ContactListPopover_PublicContactFragmentDoc = gql`
+  fragment ContactListPopover_PublicContact on PublicContact {
     id
     email
     fullName
@@ -5773,16 +5919,26 @@ export const TagEditDialog_TagFragmentDoc = gql`
   }
   ${Tag_TagFragmentDoc}
 `;
-export const PetitionTemplateHeader_UserFragmentDoc = gql`
-  fragment PetitionTemplateHeader_User on User {
-    id
-  }
-`;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
     fullName
     email
+  }
+`;
+export const UserSelect_UserGroupFragmentDoc = gql`
+  fragment UserSelect_UserGroup on UserGroup {
+    id
+    name
+    members {
+      ...UserSelect_User
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+`;
+export const PetitionTemplateHeader_UserFragmentDoc = gql`
+  fragment PetitionTemplateHeader_User on User {
+    id
   }
 `;
 export const PetitionSharingModal_UserFragmentDoc = gql`
@@ -6039,11 +6195,19 @@ export const Contact_Contact_ProfileFragmentDoc = gql`
     lastName
   }
 `;
+export const UserListPopover_UserFragmentDoc = gql`
+  fragment UserListPopover_User on User {
+    id
+    fullName
+  }
+`;
 export const UserAvatarList_UserFragmentDoc = gql`
   fragment UserAvatarList_User on User {
     id
     fullName
+    ...UserListPopover_User
   }
+  ${UserListPopover_UserFragmentDoc}
 `;
 export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
   fragment PetitionStatusCellContent_Petition on Petition {
@@ -14032,16 +14196,33 @@ export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
 export type PetitionComposeSearchContactsLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeSearchContactsLazyQuery
 >;
-export const SearchUsersDocument = gql`
-  query SearchUsers($search: String!, $exclude: [GID!]!) {
-    me {
-      organization {
-        users(search: $search, limit: 10, exclude: $exclude) {
-          items {
-            id
-            fullName
-            email
-          }
+export const useSearchUsers_searchUsersDocument = gql`
+  query useSearchUsers_searchUsers(
+    $search: String!
+    $excludeUsers: [GID!]
+    $excludeUserGroups: [GID!]
+    $includeGroups: Boolean
+    $includeInactive: Boolean
+  ) {
+    searchUsers(
+      search: $search
+      excludeUsers: $excludeUsers
+      excludeUserGroups: $excludeUserGroups
+      includeGroups: $includeGroups
+      includeInactive: $includeInactive
+    ) {
+      ... on User {
+        id
+        fullName
+        email
+      }
+      ... on UserGroup {
+        id
+        name
+        members {
+          id
+          fullName
+          email
         }
       }
     }
@@ -14049,47 +14230,52 @@ export const SearchUsersDocument = gql`
 `;
 
 /**
- * __useSearchUsersQuery__
+ * __useuseSearchUsers_searchUsersQuery__
  *
- * To run a query within a React component, call `useSearchUsersQuery` and pass it any options that fit your needs.
- * When your component renders, `useSearchUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useuseSearchUsers_searchUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useuseSearchUsers_searchUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useSearchUsersQuery({
+ * const { data, loading, error } = useuseSearchUsers_searchUsersQuery({
  *   variables: {
  *      search: // value for 'search'
- *      exclude: // value for 'exclude'
+ *      excludeUsers: // value for 'excludeUsers'
+ *      excludeUserGroups: // value for 'excludeUserGroups'
+ *      includeGroups: // value for 'includeGroups'
+ *      includeInactive: // value for 'includeInactive'
  *   },
  * });
  */
-export function useSearchUsersQuery(
+export function useuseSearchUsers_searchUsersQuery(
   baseOptions: Apollo.QueryHookOptions<
-    SearchUsersQuery,
-    SearchUsersQueryVariables
+    useSearchUsers_searchUsersQuery,
+    useSearchUsers_searchUsersQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<SearchUsersQuery, SearchUsersQueryVariables>(
-    SearchUsersDocument,
-    options
-  );
+  return Apollo.useQuery<
+    useSearchUsers_searchUsersQuery,
+    useSearchUsers_searchUsersQueryVariables
+  >(useSearchUsers_searchUsersDocument, options);
 }
-export function useSearchUsersLazyQuery(
+export function useuseSearchUsers_searchUsersLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    SearchUsersQuery,
-    SearchUsersQueryVariables
+    useSearchUsers_searchUsersQuery,
+    useSearchUsers_searchUsersQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<SearchUsersQuery, SearchUsersQueryVariables>(
-    SearchUsersDocument,
-    options
-  );
+  return Apollo.useLazyQuery<
+    useSearchUsers_searchUsersQuery,
+    useSearchUsers_searchUsersQueryVariables
+  >(useSearchUsers_searchUsersDocument, options);
 }
-export type SearchUsersQueryHookResult = ReturnType<typeof useSearchUsersQuery>;
-export type SearchUsersLazyQueryHookResult = ReturnType<
-  typeof useSearchUsersLazyQuery
+export type useSearchUsers_searchUsersQueryHookResult = ReturnType<
+  typeof useuseSearchUsers_searchUsersQuery
+>;
+export type useSearchUsers_searchUsersLazyQueryHookResult = ReturnType<
+  typeof useuseSearchUsers_searchUsersLazyQuery
 >;

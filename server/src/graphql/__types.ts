@@ -484,6 +484,9 @@ export interface NexusGenUnions {
   UserOrPetitionAccess:
     | ({ __type: "User" } & NexusGenRootTypes["User"])
     | ({ __type: "PetitionAccess" } & NexusGenRootTypes["PetitionAccess"]);
+  UserOrUserGroup:
+    | ({ __type: "User" } & NexusGenRootTypes["User"])
+    | ({ __type: "UserGroup" } & NexusGenRootTypes["UserGroup"]);
 }
 
 export type NexusGenRootTypes = NexusGenInterfaces &
@@ -1062,6 +1065,7 @@ export interface NexusGenFieldTypes {
     petitionsById: Array<NexusGenRootTypes["PetitionBase"] | null>; // [PetitionBase]!
     publicOrgLogoUrl: string | null; // String
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
+    searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
   };
@@ -1848,6 +1852,7 @@ export interface NexusGenFieldTypeNames {
     petitionsById: "PetitionBase";
     publicOrgLogoUrl: "String";
     publicTemplates: "PetitionTemplatePagination";
+    searchUsers: "UserOrUserGroup";
     tags: "TagPagination";
     userGroups: "UserGroupPagination";
   };
@@ -2686,6 +2691,14 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
       search?: string | null; // String
     };
+    searchUsers: {
+      // args
+      excludeUserGroups?: NexusGenScalars["GID"][] | null; // [GID!]
+      excludeUsers?: NexusGenScalars["GID"][] | null; // [GID!]
+      includeGroups?: boolean | null; // Boolean
+      includeInactive?: boolean | null; // Boolean
+      search: string; // String!
+    };
     tags: {
       // args
       limit?: number | null; // Int
@@ -2718,6 +2731,7 @@ export interface NexusGenArgTypes {
 export interface NexusGenAbstractTypeMembers {
   PublicUserOrContact: "PublicContact" | "PublicUser";
   UserOrPetitionAccess: "PetitionAccess" | "User";
+  UserOrUserGroup: "User" | "UserGroup";
   CreatedAt: "PetitionMessage" | "PetitionReminder" | "UserAuthenticationToken";
   PetitionBase: "Petition" | "PetitionTemplate";
   PetitionBaseAndField: "PetitionAndField" | "PetitionTemplateAndField";
@@ -2828,7 +2842,8 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "PetitionEvent"
   | "PublicUserOrContact"
   | "Timestamps"
-  | "UserOrPetitionAccess";
+  | "UserOrPetitionAccess"
+  | "UserOrUserGroup";
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {

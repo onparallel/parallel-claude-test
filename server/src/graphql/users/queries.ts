@@ -1,6 +1,19 @@
-import { nonNull, queryField, stringArg } from "@nexus/schema";
-import { authenticate, authenticateAnd } from "../helpers/authorize";
+import {
+  booleanArg,
+  list,
+  nonNull,
+  queryField,
+  stringArg,
+} from "@nexus/schema";
+import {
+  authenticate,
+  authenticateAnd,
+  ifArgDefined,
+} from "../helpers/authorize";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validEmail } from "../helpers/validators/validEmail";
+import { userHasAccessToUsers } from "../petition/mutations/authorizers";
+import { userHasAccessToUserGroup } from "../user-group/authorizers";
 import { contextUserIsAdmin } from "./authorizers";
 
 export const userQueries = queryField((t) => {
@@ -25,4 +38,36 @@ export const userQueries = queryField((t) => {
       return !(await ctx.users.loadUserByEmail(email.trim().toLowerCase()));
     },
   });
+});
+
+export const searchUsers = queryField("searchUsers", {
+  type: list("UserOrUserGroup"),
+  description: "Search users and user groups",
+  authorize: authenticateAnd(
+    ifArgDefined("excludeUsers", userHasAccessToUsers("excludeUsers" as never)),
+    ifArgDefined(
+      "excludeUserGroups",
+      userHasAccessToUserGroup("excludeUserGroups" as never)
+    )
+  ),
+  args: {
+    search: nonNull(stringArg()),
+    excludeUsers: list(nonNull(globalIdArg("User"))),
+    excludeUserGroups: list(nonNull(globalIdArg("UserGroup"))),
+    includeGroups: booleanArg(),
+    includeInactive: booleanArg(),
+  },
+  resolve: async (
+    _,
+    { search, includeGroups, includeInactive, excludeUsers, excludeUserGroups },
+    ctx
+  ) => {
+    console.log(excludeUsers);
+    return await ctx.users.searchUsers(ctx.user!.org_id, search, {
+      includeGroups: includeGroups ?? false,
+      includeInactive: includeInactive ?? false,
+      excludeUsers: excludeUsers ?? [],
+      excludeUserGroups: excludeUserGroups ?? [],
+    });
+  },
 });

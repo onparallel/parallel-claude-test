@@ -51,8 +51,10 @@ const result: PossibleTypesResultData = {
       "PublicPetitionFieldReply",
       "Subscription",
       "User",
+      "UserGroup",
     ],
     UserOrPetitionAccess: ["PetitionAccess", "User"],
+    UserOrUserGroup: ["User", "UserGroup"],
   },
 };
 export default result;

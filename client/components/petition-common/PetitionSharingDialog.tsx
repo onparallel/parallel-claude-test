@@ -131,8 +131,16 @@ export function PetitionSharingDialog({
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
-    async (search: string, exclude: string[]) => {
-      return await _handleSearchUsers(search, [...exclude, ...usersToExclude]);
+    async (
+      search: string,
+      excludeUsers: string[],
+      excludeUserGroups: string[]
+    ) => {
+      return await _handleSearchUsers(search, {
+        includeGroups: true,
+        excludeUsers: [...excludeUsers, ...usersToExclude],
+        excludeUserGroups: excludeUserGroups,
+      });
     },
     [_handleSearchUsers, userPermissions]
   );

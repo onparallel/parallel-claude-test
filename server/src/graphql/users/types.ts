@@ -1,4 +1,4 @@
-import { arg, enumType, nonNull, objectType } from "@nexus/schema";
+import { arg, enumType, nonNull, objectType, unionType } from "@nexus/schema";
 import { rootIsContextUser } from "./authorizers";
 import { fullName } from "../../util/fullName";
 import { parseSortBy } from "../helpers/paginationPlugin";
@@ -124,4 +124,21 @@ export const User = objectType({
       },
     });
   },
+});
+
+export const UserOrUserGroup = unionType({
+  name: "UserOrUserGroup",
+  definition(t) {
+    t.members("User", "UserGroup");
+  },
+  resolveType: (o) => {
+    if (["User", "UserGroup"].includes(o.__type)) {
+      return o.__type;
+    }
+    throw new Error("Missing __type on UserOrUserGroup");
+  },
+  rootTyping: /* ts */ `
+    | ({__type: "User"} & NexusGenRootTypes["User"])
+    | ({__type: "UserGroup"} & NexusGenRootTypes["UserGroup"])
+  `,
 });

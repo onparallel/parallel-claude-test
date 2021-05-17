@@ -1,23 +1,56 @@
 import { gql, useApolloClient } from "@apollo/client";
 import {
-  SearchUsersQuery,
-  SearchUsersQueryVariables,
+  useSearchUsers_searchUsersQuery,
+  useSearchUsers_searchUsersQueryVariables,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 
 export function useSearchUsers() {
   const client = useApolloClient();
-  return useCallback(async (search: string, exclude: string[]) => {
-    const { data } = await client.query<
-      SearchUsersQuery,
-      SearchUsersQueryVariables
-    >({
-      query: gql`
-        query SearchUsers($search: String!, $exclude: [GID!]!) {
-          me {
-            organization {
-              users(search: $search, limit: 10, exclude: $exclude) {
-                items {
+  return useCallback(
+    async (
+      search: string,
+      options: {
+        excludeUsers?: string[];
+        excludeUserGroups?: string[];
+        includeGroups?: boolean;
+        includeInactive?: boolean;
+      } = {}
+    ) => {
+      const {
+        excludeUsers,
+        excludeUserGroups,
+        includeGroups,
+        includeInactive,
+      } = options;
+      const { data } = await client.query<
+        useSearchUsers_searchUsersQuery,
+        useSearchUsers_searchUsersQueryVariables
+      >({
+        query: gql`
+          query useSearchUsers_searchUsers(
+            $search: String!
+            $excludeUsers: [GID!]
+            $excludeUserGroups: [GID!]
+            $includeGroups: Boolean
+            $includeInactive: Boolean
+          ) {
+            searchUsers(
+              search: $search
+              excludeUsers: $excludeUsers
+              excludeUserGroups: $excludeUserGroups
+              includeGroups: $includeGroups
+              includeInactive: $includeInactive
+            ) {
+              ... on User {
+                id
+                fullName
+                email
+              }
+              ... on UserGroup {
+                id
+                name
+                members {
                   id
                   fullName
                   email
@@ -25,11 +58,18 @@ export function useSearchUsers() {
               }
             }
           }
-        }
-      `,
-      variables: { search, exclude },
-      fetchPolicy: "no-cache",
-    });
-    return data!.me.organization.users.items;
-  }, []);
+        `,
+        variables: {
+          search,
+          excludeUsers,
+          excludeUserGroups,
+          includeGroups,
+          includeInactive,
+        },
+        fetchPolicy: "no-cache",
+      });
+      return data!.searchUsers;
+    },
+    []
+  );
 }
