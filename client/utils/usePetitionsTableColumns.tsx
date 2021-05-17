@@ -1,21 +1,13 @@
 import { gql } from "@apollo/client";
-import {
-  Flex,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
-} from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
+import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { PetitionTagListCellContent } from "@parallel/components/common/PetitionTagListCellContent";
-import { SimpleContactInfoList } from "@parallel/components/common/SimpleContactInfoList";
 import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
@@ -125,27 +117,18 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                         />
                       )}
                       renderOther={({ children, remaining }) => (
-                        <Popover key="other" trigger="hover">
-                          <PopoverTrigger>
-                            <Link
-                              href={`/app/petitions/${row.id}/activity`}
-                              onClick={(e: MouseEvent) => e.stopPropagation()}
-                            >
-                              {children}
-                            </Link>
-                          </PopoverTrigger>
-                          <Portal>
-                            <PopoverContent>
-                              <PopoverArrow />
-                              <PopoverBody padding={0}>
-                                <SimpleContactInfoList
-                                  contacts={remaining}
-                                  onContactClick={goToContact}
-                                />
-                              </PopoverBody>
-                            </PopoverContent>
-                          </Portal>
-                        </Popover>
+                        <ContactListPopover
+                          key="other"
+                          contacts={remaining}
+                          onContactClick={goToContact}
+                        >
+                          <Link
+                            href={`/app/petitions/${row.id}/activity`}
+                            onClick={(e: MouseEvent) => e.stopPropagation()}
+                          >
+                            {children}
+                          </Link>
+                        </ContactListPopover>
                       )}
                     />
                   );

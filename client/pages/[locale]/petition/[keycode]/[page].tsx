@@ -8,24 +8,18 @@ import {
   CloseButton,
   Flex,
   ListItem,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
   Stack,
   Text,
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import {
   DialogProps,
   useDialog,
   withDialogs,
 } from "@parallel/components/common/DialogProvider";
-import { SimpleContactInfoList } from "@parallel/components/common/SimpleContactInfoList";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   RedirectError,
@@ -346,30 +340,20 @@ function RecipientView({
                             values={{
                               b: (chunks: any[]) => <b>{chunks}</b>,
                               a: (chunks: any[]) => (
-                                <Popover trigger="hover">
-                                  <PopoverTrigger>
-                                    <Text
-                                      display="initial"
-                                      textDecoration="underline"
-                                      color="purple.600"
-                                      cursor="pointer"
-                                    >
-                                      {chunks}
-                                    </Text>
-                                  </PopoverTrigger>
-                                  <Portal>
-                                    <PopoverContent>
-                                      <PopoverArrow />
-                                      <PopoverBody padding={0}>
-                                        <SimpleContactInfoList
-                                          contacts={petition
-                                            .signature!.signers.map((c) => c!)
-                                            .slice(1)}
-                                        />
-                                      </PopoverBody>
-                                    </PopoverContent>
-                                  </Portal>
-                                </Popover>
+                                <ContactListPopover
+                                  contacts={petition
+                                    .signature!.signers.map((c) => c!)
+                                    .slice(1)}
+                                >
+                                  <Text
+                                    display="initial"
+                                    textDecoration="underline"
+                                    color="purple.600"
+                                    cursor="pointer"
+                                  >
+                                    {chunks}
+                                  </Text>
+                                </ContactListPopover>
                               ),
                               name: petition.signature.signers[0]!.fullName,
                               email: petition.signature.signers[0]!.email,

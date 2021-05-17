@@ -12,12 +12,6 @@ import {
   Flex,
   Heading,
   Img,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverContent,
-  PopoverTrigger,
-  Portal,
   Stack,
   Text,
   Tooltip,
@@ -34,8 +28,8 @@ import {
 } from "@parallel/graphql/__types";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { FormattedMessage, useIntl } from "react-intl";
+import { ContactListPopover } from "../common/ContactListPopover";
 import { HelpPopover } from "../common/HelpPopover";
-import { SimpleContactInfoList } from "../common/SimpleContactInfoList";
 import { useDelegateAccessDialog } from "./DelegateAccessDialog";
 
 function Contact({
@@ -238,25 +232,15 @@ export function RecipientViewHeader({
                       }}
                       renderOther={({ children, remaining }) => {
                         return (
-                          <Popover key="other" trigger="hover">
-                            <PopoverTrigger>
-                              <Text
-                                display="initial"
-                                color="purple.600"
-                                _hover={{ color: "purple.800" }}
-                              >
-                                {children}
-                              </Text>
-                            </PopoverTrigger>
-                            <Portal>
-                              <PopoverContent>
-                                <PopoverArrow />
-                                <PopoverBody padding={0}>
-                                  <SimpleContactInfoList contacts={remaining} />
-                                </PopoverBody>
-                              </PopoverContent>
-                            </Portal>
-                          </Popover>
+                          <ContactListPopover key="other" contacts={remaining}>
+                            <Text
+                              display="initial"
+                              color="purple.600"
+                              _hover={{ color: "purple.800" }}
+                            >
+                              {children}
+                            </Text>
+                          </ContactListPopover>
                         );
                       }}
                       type="conjunction"

@@ -2221,6 +2221,14 @@ export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
   "id" | "fullName" | "email"
 >;
 
+export type ContactListPopover_ContactFragment = {
+  __typename?: "Contact";
+} & Pick<Contact, "id" | "email" | "fullName">;
+
+export type ContactListPopover_PublicContactFragment = {
+  __typename?: "PublicContact";
+} & Pick<PublicContact, "id" | "email" | "fullName">;
+
 export type ContactSelect_ContactFragment = { __typename?: "Contact" } & Pick<
   Contact,
   "id" | "fullName" | "email"
@@ -2290,14 +2298,13 @@ export type PetitionTagListCellContent_PetitionBase_Petition_Fragment = {
     >;
   };
 
-export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment =
-  {
-    __typename?: "PetitionTemplate";
-  } & Pick<PetitionTemplate, "id"> & {
-      tags: Array<
-        { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-      >;
-    };
+export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id"> & {
+    tags: Array<
+      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+    >;
+  };
 
 export type PetitionTagListCellContent_PetitionBaseFragment =
   | PetitionTagListCellContent_PetitionBase_Petition_Fragment
@@ -2391,14 +2398,6 @@ export type ShareButton_PetitionBase_PetitionTemplate_Fragment = {
 export type ShareButton_PetitionBaseFragment =
   | ShareButton_PetitionBase_Petition_Fragment
   | ShareButton_PetitionBase_PetitionTemplate_Fragment;
-
-export type ContactListPopover_ContactFragment = {
-  __typename?: "Contact";
-} & Pick<Contact, "id" | "email" | "fullName">;
-
-export type ContactListPopover_PublicContactFragment = {
-  __typename?: "PublicContact";
-} & Pick<PublicContact, "id" | "email" | "fullName">;
 
 export type Tag_TagFragment = { __typename?: "Tag" } & Pick<
   Tag,
@@ -2551,11 +2550,10 @@ export type PetitionHeader_reopenPetitionMutation = {
   >;
 };
 
-export type PetitionHeader_updatePetitionUserSubscriptionMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    isSubscribed: Scalars["Boolean"];
-  }>;
+export type PetitionHeader_updatePetitionUserSubscriptionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  isSubscribed: Scalars["Boolean"];
+}>;
 
 export type PetitionHeader_updatePetitionUserSubscriptionMutation = {
   __typename?: "Mutation";
@@ -2763,155 +2761,131 @@ export type PetitionActivityTimeline_PetitionFragment = {
   };
 };
 
-export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment =
-  {
-    __typename?: "AccessActivatedEvent";
-  } & Pick<AccessActivatedEvent, "id"> &
-    TimelineAccessActivatedEvent_AccessActivatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment = {
+  __typename?: "AccessActivatedEvent";
+} & Pick<AccessActivatedEvent, "id"> &
+  TimelineAccessActivatedEvent_AccessActivatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment =
-  {
-    __typename?: "AccessDeactivatedEvent";
-  } & Pick<AccessDeactivatedEvent, "id"> &
-    TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment = {
+  __typename?: "AccessDeactivatedEvent";
+} & Pick<AccessDeactivatedEvent, "id"> &
+  TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment =
-  {
-    __typename?: "AccessDelegatedEvent";
-  } & Pick<AccessDelegatedEvent, "id"> &
-    TimelineAccessDelegatedEvent_AccessDelegatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment = {
+  __typename?: "AccessDelegatedEvent";
+} & Pick<AccessDelegatedEvent, "id"> &
+  TimelineAccessDelegatedEvent_AccessDelegatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment =
-  {
-    __typename?: "AccessOpenedEvent";
-  } & Pick<AccessOpenedEvent, "id"> &
-    TimelineAccessOpenedEvent_AccessOpenedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment = {
+  __typename?: "AccessOpenedEvent";
+} & Pick<AccessOpenedEvent, "id"> &
+  TimelineAccessOpenedEvent_AccessOpenedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment =
-  {
-    __typename?: "CommentDeletedEvent";
-  } & Pick<CommentDeletedEvent, "id"> &
-    TimelineCommentDeletedEvent_CommentDeletedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment = {
+  __typename?: "CommentDeletedEvent";
+} & Pick<CommentDeletedEvent, "id"> &
+  TimelineCommentDeletedEvent_CommentDeletedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment =
-  {
-    __typename?: "CommentPublishedEvent";
-  } & Pick<CommentPublishedEvent, "id"> &
-    TimelineCommentPublishedEvent_CommentPublishedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment = {
+  __typename?: "CommentPublishedEvent";
+} & Pick<CommentPublishedEvent, "id"> &
+  TimelineCommentPublishedEvent_CommentPublishedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment =
-  {
-    __typename?: "MessageCancelledEvent";
-  } & Pick<MessageCancelledEvent, "id"> &
-    TimelineMessageCancelledEvent_MessageCancelledEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment = {
+  __typename?: "MessageCancelledEvent";
+} & Pick<MessageCancelledEvent, "id"> &
+  TimelineMessageCancelledEvent_MessageCancelledEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment =
-  {
-    __typename?: "MessageScheduledEvent";
-  } & Pick<MessageScheduledEvent, "id"> & {
-      message: { __typename?: "PetitionMessage" } & Pick<PetitionMessage, "id">;
-    } & TimelineMessageScheduledEvent_MessageScheduledEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment = {
+  __typename?: "MessageScheduledEvent";
+} & Pick<MessageScheduledEvent, "id"> & {
+    message: { __typename?: "PetitionMessage" } & Pick<PetitionMessage, "id">;
+  } & TimelineMessageScheduledEvent_MessageScheduledEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
   __typename?: "MessageSentEvent";
 } & Pick<MessageSentEvent, "id"> &
   TimelineMessageSentEvent_MessageSentEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment =
-  {
-    __typename?: "OwnershipTransferredEvent";
-  } & Pick<OwnershipTransferredEvent, "id"> &
-    TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment = {
+  __typename?: "OwnershipTransferredEvent";
+} & Pick<OwnershipTransferredEvent, "id"> &
+  TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment =
-  {
-    __typename?: "PetitionClosedEvent";
-  } & Pick<PetitionClosedEvent, "id"> &
-    TimelinePetitionClosedEvent_PetitionClosedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment = {
+  __typename?: "PetitionClosedEvent";
+} & Pick<PetitionClosedEvent, "id"> &
+  TimelinePetitionClosedEvent_PetitionClosedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment =
-  {
-    __typename?: "PetitionClosedNotifiedEvent";
-  } & Pick<PetitionClosedNotifiedEvent, "id"> &
-    TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment = {
+  __typename?: "PetitionClosedNotifiedEvent";
+} & Pick<PetitionClosedNotifiedEvent, "id"> &
+  TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment =
-  {
-    __typename?: "PetitionCompletedEvent";
-  } & Pick<PetitionCompletedEvent, "id"> &
-    TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment = {
+  __typename?: "PetitionCompletedEvent";
+} & Pick<PetitionCompletedEvent, "id"> &
+  TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment =
-  {
-    __typename?: "PetitionCreatedEvent";
-  } & Pick<PetitionCreatedEvent, "id"> &
-    TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment = {
+  __typename?: "PetitionCreatedEvent";
+} & Pick<PetitionCreatedEvent, "id"> &
+  TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment =
-  {
-    __typename?: "PetitionReopenedEvent";
-  } & Pick<PetitionReopenedEvent, "id"> &
-    TimelinePetitionReopenedEvent_PetitionReopenedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment = {
+  __typename?: "PetitionReopenedEvent";
+} & Pick<PetitionReopenedEvent, "id"> &
+  TimelinePetitionReopenedEvent_PetitionReopenedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment =
-  {
-    __typename?: "ReminderSentEvent";
-  } & Pick<ReminderSentEvent, "id"> &
-    TimelineReminderSentEvent_ReminderSentEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment = {
+  __typename?: "ReminderSentEvent";
+} & Pick<ReminderSentEvent, "id"> &
+  TimelineReminderSentEvent_ReminderSentEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment =
-  {
-    __typename?: "ReplyCreatedEvent";
-  } & Pick<ReplyCreatedEvent, "id"> &
-    TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment = {
+  __typename?: "ReplyCreatedEvent";
+} & Pick<ReplyCreatedEvent, "id"> &
+  TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment =
-  {
-    __typename?: "ReplyDeletedEvent";
-  } & Pick<ReplyDeletedEvent, "id"> &
-    TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment = {
+  __typename?: "ReplyDeletedEvent";
+} & Pick<ReplyDeletedEvent, "id"> &
+  TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment =
-  {
-    __typename?: "ReplyUpdatedEvent";
-  } & Pick<ReplyUpdatedEvent, "id"> &
-    TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment = {
+  __typename?: "ReplyUpdatedEvent";
+} & Pick<ReplyUpdatedEvent, "id"> &
+  TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment =
-  {
-    __typename?: "SignatureCancelledEvent";
-  } & Pick<SignatureCancelledEvent, "id"> &
-    TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment = {
+  __typename?: "SignatureCancelledEvent";
+} & Pick<SignatureCancelledEvent, "id"> &
+  TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment =
-  {
-    __typename?: "SignatureCompletedEvent";
-  } & Pick<SignatureCompletedEvent, "id"> &
-    TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment = {
+  __typename?: "SignatureCompletedEvent";
+} & Pick<SignatureCompletedEvent, "id"> &
+  TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment =
-  {
-    __typename?: "SignatureStartedEvent";
-  } & Pick<SignatureStartedEvent, "id"> &
-    TimelineSignatureStartedEvent_SignatureStartedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment = {
+  __typename?: "SignatureStartedEvent";
+} & Pick<SignatureStartedEvent, "id"> &
+  TimelineSignatureStartedEvent_SignatureStartedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment =
-  {
-    __typename?: "UserPermissionAddedEvent";
-  } & Pick<UserPermissionAddedEvent, "id"> &
-    TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment = {
+  __typename?: "UserPermissionAddedEvent";
+} & Pick<UserPermissionAddedEvent, "id"> &
+  TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment =
-  {
-    __typename?: "UserPermissionEditedEvent";
-  } & Pick<UserPermissionEditedEvent, "id"> &
-    TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment = {
+  __typename?: "UserPermissionEditedEvent";
+} & Pick<UserPermissionEditedEvent, "id"> &
+  TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment;
 
-export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment =
-  {
-    __typename?: "UserPermissionRemovedEvent";
-  } & Pick<UserPermissionRemovedEvent, "id"> &
-    TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
+export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment = {
+  __typename?: "UserPermissionRemovedEvent";
+} & Pick<UserPermissionRemovedEvent, "id"> &
+  TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
@@ -3097,16 +3071,13 @@ export type TimelineMessageSentEvent_MessageSentEventFragment = {
       SentPetitionMessageDialog_PetitionMessageFragment;
   };
 
-export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment =
-  {
-    __typename?: "OwnershipTransferredEvent";
-  } & Pick<OwnershipTransferredEvent, "createdAt"> & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      previousOwner?: Maybe<
-        { __typename?: "User" } & UserReference_UserFragment
-      >;
-    };
+export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment = {
+  __typename?: "OwnershipTransferredEvent";
+} & Pick<OwnershipTransferredEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    previousOwner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  };
 
 export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
   __typename?: "PetitionClosedEvent";
@@ -3114,17 +3085,14 @@ export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
   };
 
-export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment =
-  {
-    __typename?: "PetitionClosedNotifiedEvent";
-  } & Pick<PetitionClosedNotifiedEvent, "createdAt"> & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      access: { __typename?: "PetitionAccess" } & {
-        contact?: Maybe<
-          { __typename?: "Contact" } & ContactLink_ContactFragment
-        >;
-      };
+export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment = {
+  __typename?: "PetitionClosedNotifiedEvent";
+} & Pick<PetitionClosedNotifiedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    access: { __typename?: "PetitionAccess" } & {
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
+  };
 
 export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
   __typename?: "PetitionCompletedEvent";
@@ -3234,35 +3202,32 @@ export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
   __typename?: "SignatureStartedEvent";
 } & Pick<SignatureStartedEvent, "createdAt">;
 
-export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment =
-  {
-    __typename?: "UserPermissionAddedEvent";
-  } & Pick<UserPermissionAddedEvent, "permissionType" | "createdAt"> & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      permissionUser?: Maybe<
-        { __typename?: "User" } & UserReference_UserFragment
-      >;
-    };
+export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment = {
+  __typename?: "UserPermissionAddedEvent";
+} & Pick<UserPermissionAddedEvent, "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionUser?: Maybe<
+      { __typename?: "User" } & UserReference_UserFragment
+    >;
+  };
 
-export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment =
-  {
-    __typename?: "UserPermissionEditedEvent";
-  } & Pick<UserPermissionEditedEvent, "permissionType" | "createdAt"> & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      permissionUser?: Maybe<
-        { __typename?: "User" } & UserReference_UserFragment
-      >;
-    };
+export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment = {
+  __typename?: "UserPermissionEditedEvent";
+} & Pick<UserPermissionEditedEvent, "permissionType" | "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionUser?: Maybe<
+      { __typename?: "User" } & UserReference_UserFragment
+    >;
+  };
 
-export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment =
-  {
-    __typename?: "UserPermissionRemovedEvent";
-  } & Pick<UserPermissionRemovedEvent, "createdAt"> & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      permissionUser?: Maybe<
-        { __typename?: "User" } & UserReference_UserFragment
-      >;
-    };
+export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment = {
+  __typename?: "UserPermissionRemovedEvent";
+} & Pick<UserPermissionRemovedEvent, "createdAt"> & {
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionUser?: Maybe<
+      { __typename?: "User" } & UserReference_UserFragment
+    >;
+  };
 
 export type PetitionContents_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -3318,10 +3283,9 @@ export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
   | PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
 
-export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-  }>;
+export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+}>;
 
 export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
   __typename?: "Mutation";
@@ -3332,10 +3296,9 @@ export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
   >;
 };
 
-export type PetitionSettings_startPetitionSignatureRequestMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-  }>;
+export type PetitionSettings_startPetitionSignatureRequestMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
 
 export type PetitionSettings_startPetitionSignatureRequestMutation = {
   __typename?: "Mutation";
@@ -3384,14 +3347,13 @@ export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
 > &
   UserSelect_UserFragment;
 
-export type PetitionSharingModal_addPetitionUserPermissionMutationVariables =
-  Exact<{
-    petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
-    userIds: Array<Scalars["GID"]> | Scalars["GID"];
-    permissionType: PetitionUserPermissionTypeRW;
-    notify?: Maybe<Scalars["Boolean"]>;
-    message?: Maybe<Scalars["String"]>;
-  }>;
+export type PetitionSharingModal_addPetitionUserPermissionMutationVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
+  userIds: Array<Scalars["GID"]> | Scalars["GID"];
+  permissionType: PetitionUserPermissionTypeRW;
+  notify?: Maybe<Scalars["Boolean"]>;
+  message?: Maybe<Scalars["String"]>;
+}>;
 
 export type PetitionSharingModal_addPetitionUserPermissionMutation = {
   __typename?: "Mutation";
@@ -3403,11 +3365,10 @@ export type PetitionSharingModal_addPetitionUserPermissionMutation = {
   >;
 };
 
-export type PetitionSharingModal_removePetitionUserPermissionMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    userId: Scalars["GID"];
-  }>;
+export type PetitionSharingModal_removePetitionUserPermissionMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  userId: Scalars["GID"];
+}>;
 
 export type PetitionSharingModal_removePetitionUserPermissionMutation = {
   __typename?: "Mutation";
@@ -3419,11 +3380,10 @@ export type PetitionSharingModal_removePetitionUserPermissionMutation = {
   >;
 };
 
-export type PetitionSharingModal_transferPetitionOwnershipMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    userId: Scalars["GID"];
-  }>;
+export type PetitionSharingModal_transferPetitionOwnershipMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  userId: Scalars["GID"];
+}>;
 
 export type PetitionSharingModal_transferPetitionOwnershipMutation = {
   __typename?: "Mutation";
@@ -3435,10 +3395,9 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
   >;
 };
 
-export type PetitionSharingModal_PetitionsUserPermissionsQueryVariables =
-  Exact<{
-    petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
-  }>;
+export type PetitionSharingModal_PetitionsUserPermissionsQueryVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
 
 export type PetitionSharingModal_PetitionsUserPermissionsQuery = {
   __typename?: "Query";
@@ -3510,12 +3469,11 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
     >;
   };
 
-export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    fieldId: Scalars["GID"];
-    file: Scalars["Upload"];
-  }>;
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  file: Scalars["Upload"];
+}>;
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
   __typename?: "Mutation";
@@ -3526,11 +3484,10 @@ export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
   >;
 };
 
-export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    fieldId: Scalars["GID"];
-  }>;
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+}>;
 
 export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
   __typename?: "Mutation";
@@ -3654,11 +3611,10 @@ export type ExportRepliesProgressDialog_PetitionRepliesQuery = {
   >;
 };
 
-export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    replyId: Scalars["GID"];
-  }>;
+export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+}>;
 
 export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
   __typename?: "Mutation";
@@ -3668,11 +3624,10 @@ export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
 };
 
-export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-    downloadAuditTrail?: Maybe<Scalars["Boolean"]>;
-  }>;
+export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  downloadAuditTrail?: Maybe<Scalars["Boolean"]>;
+}>;
 
 export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
   __typename?: "Mutation";
@@ -3682,36 +3637,32 @@ export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "filename" | "url">;
 };
 
-export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    replyId: Scalars["GID"];
-    metadata: Scalars["JSONObject"];
-  }>;
+export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  metadata: Scalars["JSONObject"];
+}>;
 
-export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    updatePetitionFieldReplyMetadata: {
-      __typename?: "PetitionFieldReply";
-    } & Pick<PetitionFieldReply, "id" | "metadata">;
-  };
+export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation = {
+  __typename?: "Mutation";
+} & {
+  updatePetitionFieldReplyMetadata: {
+    __typename?: "PetitionFieldReply";
+  } & Pick<PetitionFieldReply, "id" | "metadata">;
+};
 
-export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-    metadata: Scalars["JSONObject"];
-  }>;
+export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  metadata: Scalars["JSONObject"];
+}>;
 
-export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    updateSignatureRequestMetadata: {
-      __typename?: "PetitionSignatureRequest";
-    } & Pick<PetitionSignatureRequest, "id" | "metadata">;
-  };
+export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation = {
+  __typename?: "Mutation";
+} & {
+  updateSignatureRequestMetadata: {
+    __typename?: "PetitionSignatureRequest";
+  } & Pick<PetitionSignatureRequest, "id" | "metadata">;
+};
 
 export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -3829,11 +3780,10 @@ export type PetitionSignaturesCard_PetitionSignatureRequestFragment = {
     };
   };
 
-export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    signatureConfig?: Maybe<SignatureConfigInput>;
-  }>;
+export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  signatureConfig?: Maybe<SignatureConfigInput>;
+}>;
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
   __typename?: "Mutation";
@@ -3843,10 +3793,9 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
     | { __typename?: "PetitionTemplate" };
 };
 
-export type PetitionSignaturesCard_cancelSignatureRequestMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-  }>;
+export type PetitionSignaturesCard_cancelSignatureRequestMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+}>;
 
 export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
   __typename?: "Mutation";
@@ -3857,10 +3806,9 @@ export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
   >;
 };
 
-export type PetitionSignaturesCard_startSignatureRequestMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-  }>;
+export type PetitionSignaturesCard_startSignatureRequestMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+}>;
 
 export type PetitionSignaturesCard_startSignatureRequestMutation = {
   __typename?: "Mutation";
@@ -3871,11 +3819,10 @@ export type PetitionSignaturesCard_startSignatureRequestMutation = {
   >;
 };
 
-export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables =
-  Exact<{
-    petitionSignatureRequestId: Scalars["GID"];
-    preview?: Maybe<Scalars["Boolean"]>;
-  }>;
+export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables = Exact<{
+  petitionSignatureRequestId: Scalars["GID"];
+  preview?: Maybe<Scalars["Boolean"]>;
+}>;
 
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   __typename?: "Mutation";
@@ -3938,14 +3885,13 @@ export type RecipientViewHeader_PublicUserFragment = {
     >;
   };
 
-export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    email: Scalars["String"];
-    firstName: Scalars["String"];
-    lastName: Scalars["String"];
-    messageBody: Scalars["JSON"];
-  }>;
+export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  email: Scalars["String"];
+  firstName: Scalars["String"];
+  lastName: Scalars["String"];
+  messageBody: Scalars["JSON"];
+}>;
 
 export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
   __typename?: "Mutation";
@@ -4033,38 +3979,31 @@ export type RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment = {
   "id" | "status" | "content" | "createdAt" | "updatedAt"
 >;
 
-export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment =
-  {
-    __typename?: "PublicPetitionAccess";
-  } & {
-    granter?: Maybe<
-      { __typename?: "PublicUser" } & Pick<PublicUser, "fullName">
-    >;
-    contact?: Maybe<
-      { __typename?: "PublicContact" } & Pick<PublicContact, "id">
+export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment = {
+  __typename?: "PublicPetitionAccess";
+} & {
+  granter?: Maybe<{ __typename?: "PublicUser" } & Pick<PublicUser, "fullName">>;
+  contact?: Maybe<{ __typename?: "PublicContact" } & Pick<PublicContact, "id">>;
+};
+
+export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & Pick<PublicPetitionField, "id" | "title">;
+
+export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment = {
+  __typename?: "PublicPetitionFieldComment";
+} & Pick<
+  PublicPetitionFieldComment,
+  "id" | "content" | "publishedAt" | "isUnread"
+> & {
+    author?: Maybe<
+      | ({ __typename?: "PublicContact" } & Pick<
+          PublicContact,
+          "id" | "fullName"
+        >)
+      | ({ __typename?: "PublicUser" } & Pick<PublicUser, "id" | "fullName">)
     >;
   };
-
-export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment =
-  {
-    __typename?: "PublicPetitionField";
-  } & Pick<PublicPetitionField, "id" | "title">;
-
-export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment =
-  {
-    __typename?: "PublicPetitionFieldComment";
-  } & Pick<
-    PublicPetitionFieldComment,
-    "id" | "content" | "publishedAt" | "isUnread"
-  > & {
-      author?: Maybe<
-        | ({ __typename?: "PublicContact" } & Pick<
-            PublicContact,
-            "id" | "fullName"
-          >)
-        | ({ __typename?: "PublicUser" } & Pick<PublicUser, "id" | "fullName">)
-      >;
-    };
 
 export type RecipientViewPetitionFieldCommentsQueryVariables = Exact<{
   keycode: Scalars["ID"];
@@ -4081,239 +4020,208 @@ export type RecipientViewPetitionFieldCommentsQuery = {
   >;
 };
 
-export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    petitionFieldCommentIds: Array<Scalars["GID"]> | Scalars["GID"];
-  }>;
+export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  petitionFieldCommentIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
 
-export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicMarkPetitionFieldCommentsAsRead: Array<
-      { __typename?: "PublicPetitionFieldComment" } & Pick<
-        PublicPetitionFieldComment,
-        "id" | "isUnread"
-      >
-    >;
-  };
-
-export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    petitionFieldId: Scalars["GID"];
-    content: Scalars["String"];
-  }>;
-
-export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicCreatePetitionFieldComment: {
-      __typename?: "PublicPetitionFieldComment";
-    } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
-  };
-
-export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    petitionFieldId: Scalars["GID"];
-    petitionFieldCommentId: Scalars["GID"];
-    content: Scalars["String"];
-  }>;
-
-export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicUpdatePetitionFieldComment: {
-      __typename?: "PublicPetitionFieldComment";
-    } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
-  };
-
-export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    petitionFieldId: Scalars["GID"];
-    petitionFieldCommentId: Scalars["GID"];
-  }>;
-
-export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation =
-  {
-    __typename?: "Mutation";
-  } & Pick<Mutation, "publicDeletePetitionFieldComment">;
-
-export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment =
-  {
-    __typename?: "PublicPetitionField";
-  } & Pick<
-    PublicPetitionField,
-    "commentCount" | "unpublishedCommentCount" | "unreadCommentCount"
+export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation = {
+  __typename?: "Mutation";
+} & {
+  publicMarkPetitionFieldCommentsAsRead: Array<
+    { __typename?: "PublicPetitionFieldComment" } & Pick<
+      PublicPetitionFieldComment,
+      "id" | "isUnread"
+    >
   >;
+};
 
-export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    replyId: Scalars["GID"];
-    preview?: Maybe<Scalars["Boolean"]>;
-  }>;
+export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
+  content: Scalars["String"];
+}>;
 
-export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicFileUploadReplyDownloadLink: {
-      __typename?: "FileUploadReplyDownloadLinkResult";
-    } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
-  };
+export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCreatePetitionFieldComment: {
+    __typename?: "PublicPetitionFieldComment";
+  } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
+};
 
-export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables =
-  Exact<{
-    replyId: Scalars["GID"];
-    keycode: Scalars["ID"];
-  }>;
+export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
+  content: Scalars["String"];
+}>;
 
-export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation =
-  {
-    __typename?: "Mutation";
-  } & Pick<Mutation, "publicDeletePetitionReply">;
+export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation = {
+  __typename?: "Mutation";
+} & {
+  publicUpdatePetitionFieldComment: {
+    __typename?: "PublicPetitionFieldComment";
+  } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
+};
 
-export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    replyId: Scalars["GID"];
-    value: Scalars["String"];
-  }>;
+export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
+}>;
 
-export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicUpdateSimpleReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
-      PublicPetitionFieldReply,
-      "id" | "content" | "status" | "updatedAt"
-    >;
-  };
+export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "publicDeletePetitionFieldComment">;
 
-export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    fieldId: Scalars["GID"];
-    value: Scalars["String"];
-  }>;
+export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment = {
+  __typename?: "PublicPetitionField";
+} & Pick<
+  PublicPetitionField,
+  "commentCount" | "unpublishedCommentCount" | "unreadCommentCount"
+>;
 
-export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicCreateSimpleReply: {
-      __typename?: "PublicPetitionFieldReply";
-    } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-  };
+export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  preview?: Maybe<Scalars["Boolean"]>;
+}>;
 
-export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    fieldId: Scalars["GID"];
-    value:
-      | Array<Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>>
-      | Array<Maybe<Scalars["String"]>>
-      | Maybe<Scalars["String"]>;
-  }>;
+export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation = {
+  __typename?: "Mutation";
+} & {
+  publicFileUploadReplyDownloadLink: {
+    __typename?: "FileUploadReplyDownloadLinkResult";
+  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+};
 
-export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicCreateDynamicSelectReply: {
-      __typename?: "PublicPetitionFieldReply";
-    } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-  };
+export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables = Exact<{
+  replyId: Scalars["GID"];
+  keycode: Scalars["ID"];
+}>;
 
-export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    replyId: Scalars["GID"];
-    value:
-      | Array<Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>>
-      | Array<Maybe<Scalars["String"]>>
-      | Maybe<Scalars["String"]>;
-  }>;
+export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation = {
+  __typename?: "Mutation";
+} & Pick<Mutation, "publicDeletePetitionReply">;
 
-export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicUpdateDynamicSelectReply: {
-      __typename?: "PublicPetitionFieldReply";
-    } & Pick<
-      PublicPetitionFieldReply,
-      "id" | "content" | "status" | "updatedAt"
-    >;
-  };
+export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  value: Scalars["String"];
+}>;
 
-export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    fieldId: Scalars["GID"];
-    data: CreateFileUploadReplyInput;
-  }>;
+export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicUpdateSimpleReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
+    PublicPetitionFieldReply,
+    "id" | "content" | "status" | "updatedAt"
+  >;
+};
 
-export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicCreateFileUploadReply: {
-      __typename?: "CreateFileUploadReply";
-    } & Pick<CreateFileUploadReply, "endpoint"> & {
-        reply: {
-          __typename?: "PublicPetitionFieldReply";
-        } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-      };
-  };
+export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  value: Scalars["String"];
+}>;
 
-export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables =
-  Exact<{
-    keycode: Scalars["ID"];
-    replyId: Scalars["GID"];
-  }>;
-
-export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation =
-  {
-    __typename?: "Mutation";
-  } & {
-    publicFileUploadReplyComplete: {
-      __typename?: "PublicPetitionFieldReply";
-    } & Pick<PublicPetitionFieldReply, "id" | "content">;
-  };
-
-export type RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment =
-  {
-    __typename?: "PublicPetitionField";
-  } & {
-    replies: Array<
-      { __typename?: "PublicPetitionFieldReply" } & Pick<
-        PublicPetitionFieldReply,
-        "id"
-      >
-    >;
-  };
-
-export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
-  {
+export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCreateSimpleReply: {
     __typename?: "PublicPetitionFieldReply";
-  } & Pick<PublicPetitionFieldReply, "content">;
+  } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+};
 
-export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment =
-  {
-    __typename?: "PublicPetition";
-  } & Pick<PublicPetition, "status">;
+export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  value:
+    | Array<Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>>
+    | Array<Maybe<Scalars["String"]>>
+    | Maybe<Scalars["String"]>;
+}>;
 
-export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables =
-  Exact<{
-    tokenName: Scalars["String"];
-  }>;
+export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCreateDynamicSelectReply: {
+    __typename?: "PublicPetitionFieldReply";
+  } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+};
+
+export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  value:
+    | Array<Array<Maybe<Scalars["String"]>> | Maybe<Scalars["String"]>>
+    | Array<Maybe<Scalars["String"]>>
+    | Maybe<Scalars["String"]>;
+}>;
+
+export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicUpdateDynamicSelectReply: {
+    __typename?: "PublicPetitionFieldReply";
+  } & Pick<PublicPetitionFieldReply, "id" | "content" | "status" | "updatedAt">;
+};
+
+export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  fieldId: Scalars["GID"];
+  data: CreateFileUploadReplyInput;
+}>;
+
+export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation = {
+  __typename?: "Mutation";
+} & {
+  publicCreateFileUploadReply: { __typename?: "CreateFileUploadReply" } & Pick<
+    CreateFileUploadReply,
+    "endpoint"
+  > & {
+      reply: {
+        __typename?: "PublicPetitionFieldReply";
+      } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+    };
+};
+
+export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+}>;
+
+export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation = {
+  __typename?: "Mutation";
+} & {
+  publicFileUploadReplyComplete: {
+    __typename?: "PublicPetitionFieldReply";
+  } & Pick<PublicPetitionFieldReply, "id" | "content">;
+};
+
+export type RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment = {
+  __typename?: "PublicPetitionField";
+} & {
+  replies: Array<
+    { __typename?: "PublicPetitionFieldReply" } & Pick<
+      PublicPetitionFieldReply,
+      "id"
+    >
+  >;
+};
+
+export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment = {
+  __typename?: "PublicPetitionFieldReply";
+} & Pick<PublicPetitionFieldReply, "content">;
+
+export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment = {
+  __typename?: "PublicPetition";
+} & Pick<PublicPetition, "status">;
+
+export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables = Exact<{
+  tokenName: Scalars["String"];
+}>;
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
   __typename?: "Mutation";
@@ -5082,12 +4990,11 @@ export type PetitionReplies_validatePetitionFieldsMutation = {
   };
 };
 
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    replyId: Scalars["GID"];
-    preview?: Maybe<Scalars["Boolean"]>;
-  }>;
+export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  replyId: Scalars["GID"];
+  preview?: Maybe<Scalars["Boolean"]>;
+}>;
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
   __typename?: "Mutation";
@@ -5097,15 +5004,14 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
   } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
 };
 
-export type PetitionReplies_createPetitionFieldCommentMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldId: Scalars["GID"];
-    petitionFieldReplyId?: Maybe<Scalars["GID"]>;
-    content: Scalars["String"];
-    isInternal?: Maybe<Scalars["Boolean"]>;
-    hasInternalComments: Scalars["Boolean"];
-  }>;
+export type PetitionReplies_createPetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldReplyId?: Maybe<Scalars["GID"]>;
+  content: Scalars["String"];
+  isInternal?: Maybe<Scalars["Boolean"]>;
+  hasInternalComments: Scalars["Boolean"];
+}>;
 
 export type PetitionReplies_createPetitionFieldCommentMutation = {
   __typename?: "Mutation";
@@ -5115,14 +5021,13 @@ export type PetitionReplies_createPetitionFieldCommentMutation = {
   } & PetitionRepliesFieldComments_PetitionFieldCommentFragment;
 };
 
-export type PetitionReplies_updatePetitionFieldCommentMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldId: Scalars["GID"];
-    petitionFieldCommentId: Scalars["GID"];
-    content: Scalars["String"];
-    hasInternalComments: Scalars["Boolean"];
-  }>;
+export type PetitionReplies_updatePetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
+  content: Scalars["String"];
+  hasInternalComments: Scalars["Boolean"];
+}>;
 
 export type PetitionReplies_updatePetitionFieldCommentMutation = {
   __typename?: "Mutation";
@@ -5132,12 +5037,11 @@ export type PetitionReplies_updatePetitionFieldCommentMutation = {
   } & PetitionRepliesFieldComments_PetitionFieldCommentFragment;
 };
 
-export type PetitionReplies_deletePetitionFieldCommentMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldId: Scalars["GID"];
-    petitionFieldCommentId: Scalars["GID"];
-  }>;
+export type PetitionReplies_deletePetitionFieldCommentMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldCommentId: Scalars["GID"];
+}>;
 
 export type PetitionReplies_deletePetitionFieldCommentMutation = {
   __typename?: "Mutation";
@@ -5158,11 +5062,10 @@ export type PetitionReplies_submitUnpublishedCommentsMutation = {
   >;
 };
 
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldCommentIds: Array<Scalars["GID"]> | Scalars["GID"];
-  }>;
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldCommentIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
 
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
   __typename?: "Mutation";
@@ -5175,13 +5078,12 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
   >;
 };
 
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldId: Scalars["GID"];
-    petitionFieldReplyIds: Array<Scalars["GID"]> | Scalars["GID"];
-    status: PetitionFieldReplyStatus;
-  }>;
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  petitionFieldId: Scalars["GID"];
+  petitionFieldReplyIds: Array<Scalars["GID"]> | Scalars["GID"];
+  status: PetitionFieldReplyStatus;
+}>;
 
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   __typename?: "Mutation";
@@ -5203,14 +5105,13 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
   };
 };
 
-export type PetitionReplies_sendPetitionClosedNotificationMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    emailBody: Scalars["JSON"];
-    attachPdfExport: Scalars["Boolean"];
-    pdfExportTitle?: Maybe<Scalars["String"]>;
-    force?: Maybe<Scalars["Boolean"]>;
-  }>;
+export type PetitionReplies_sendPetitionClosedNotificationMutationVariables = Exact<{
+  petitionId: Scalars["GID"];
+  emailBody: Scalars["JSON"];
+  attachPdfExport: Scalars["Boolean"];
+  pdfExportTitle?: Maybe<Scalars["String"]>;
+  force?: Maybe<Scalars["Boolean"]>;
+}>;
 
 export type PetitionReplies_sendPetitionClosedNotificationMutation = {
   __typename?: "Mutation";
@@ -5784,10 +5685,9 @@ export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name">;
 
-export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment =
-  {
-    __typename?: "PetitionTemplate";
-  } & Pick<PetitionTemplate, "id" | "name">;
+export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & Pick<PetitionTemplate, "id" | "name">;
 
 export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
   | ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment
@@ -5884,19 +5784,6 @@ export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
 } & Pick<PetitionField, "id" | "title" | "type" | "options">;
 
-export const Tag_TagFragmentDoc = gql`
-  fragment Tag_Tag on Tag {
-    name
-    color
-  }
-`;
-export const PetitionTagFilter_TagFragmentDoc = gql`
-  fragment PetitionTagFilter_Tag on Tag {
-    id
-    ...Tag_Tag
-  }
-  ${Tag_TagFragmentDoc}
-`;
 export const ContactListPopover_ContactFragmentDoc = gql`
   fragment ContactListPopover_Contact on Contact {
     id
@@ -5910,6 +5797,19 @@ export const ContactListPopover_PublicContactFragmentDoc = gql`
     email
     fullName
   }
+`;
+export const Tag_TagFragmentDoc = gql`
+  fragment Tag_Tag on Tag {
+    name
+    color
+  }
+`;
+export const PetitionTagFilter_TagFragmentDoc = gql`
+  fragment PetitionTagFilter_Tag on Tag {
+    id
+    ...Tag_Tag
+  }
+  ${Tag_TagFragmentDoc}
 `;
 export const TagEditDialog_TagFragmentDoc = gql`
   fragment TagEditDialog_Tag on Tag {
@@ -7958,8 +7858,9 @@ export function usePetitionTagListCellContent_tagPetitionMutation(
     PetitionTagListCellContent_tagPetitionMutationVariables
   >(PetitionTagListCellContent_tagPetitionDocument, options);
 }
-export type PetitionTagListCellContent_tagPetitionMutationHookResult =
-  ReturnType<typeof usePetitionTagListCellContent_tagPetitionMutation>;
+export type PetitionTagListCellContent_tagPetitionMutationHookResult = ReturnType<
+  typeof usePetitionTagListCellContent_tagPetitionMutation
+>;
 export const PetitionTagListCellContent_untagPetitionDocument = gql`
   mutation PetitionTagListCellContent_untagPetition(
     $tagId: GID!
@@ -8005,8 +7906,9 @@ export function usePetitionTagListCellContent_untagPetitionMutation(
     PetitionTagListCellContent_untagPetitionMutationVariables
   >(PetitionTagListCellContent_untagPetitionDocument, options);
 }
-export type PetitionTagListCellContent_untagPetitionMutationHookResult =
-  ReturnType<typeof usePetitionTagListCellContent_untagPetitionMutation>;
+export type PetitionTagListCellContent_untagPetitionMutationHookResult = ReturnType<
+  typeof usePetitionTagListCellContent_untagPetitionMutation
+>;
 export const PetitionTagListCellContent_createTagDocument = gql`
   mutation PetitionTagListCellContent_createTag(
     $name: String!
@@ -8348,8 +8250,9 @@ export function useImportContactsDialog_bulkCreateContactsMutation(
     ImportContactsDialog_bulkCreateContactsMutationVariables
   >(ImportContactsDialog_bulkCreateContactsDocument, options);
 }
-export type ImportContactsDialog_bulkCreateContactsMutationHookResult =
-  ReturnType<typeof useImportContactsDialog_bulkCreateContactsMutation>;
+export type ImportContactsDialog_bulkCreateContactsMutationHookResult = ReturnType<
+  typeof useImportContactsDialog_bulkCreateContactsMutation
+>;
 export const AppLayout_updateOnboardingStatusDocument = gql`
   mutation AppLayout_updateOnboardingStatus(
     $key: OnboardingKey!
@@ -8487,8 +8390,9 @@ export function usePetitionHeader_updatePetitionUserSubscriptionMutation(
     PetitionHeader_updatePetitionUserSubscriptionMutationVariables
   >(PetitionHeader_updatePetitionUserSubscriptionDocument, options);
 }
-export type PetitionHeader_updatePetitionUserSubscriptionMutationHookResult =
-  ReturnType<typeof usePetitionHeader_updatePetitionUserSubscriptionMutation>;
+export type PetitionHeader_updatePetitionUserSubscriptionMutationHookResult = ReturnType<
+  typeof usePetitionHeader_updatePetitionUserSubscriptionMutation
+>;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {
     emailIsAvailable(email: $email)
@@ -8593,8 +8497,9 @@ export function useAddPetitionAccessDialog_contactsByEmailLazyQuery(
 export type AddPetitionAccessDialog_contactsByEmailQueryHookResult = ReturnType<
   typeof useAddPetitionAccessDialog_contactsByEmailQuery
 >;
-export type AddPetitionAccessDialog_contactsByEmailLazyQueryHookResult =
-  ReturnType<typeof useAddPetitionAccessDialog_contactsByEmailLazyQuery>;
+export type AddPetitionAccessDialog_contactsByEmailLazyQueryHookResult = ReturnType<
+  typeof useAddPetitionAccessDialog_contactsByEmailLazyQuery
+>;
 export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
   mutation PetitionSettings_cancelPetitionSignatureRequest(
     $petitionSignatureRequestId: GID!
@@ -8637,8 +8542,9 @@ export function usePetitionSettings_cancelPetitionSignatureRequestMutation(
     PetitionSettings_cancelPetitionSignatureRequestMutationVariables
   >(PetitionSettings_cancelPetitionSignatureRequestDocument, options);
 }
-export type PetitionSettings_cancelPetitionSignatureRequestMutationHookResult =
-  ReturnType<typeof usePetitionSettings_cancelPetitionSignatureRequestMutation>;
+export type PetitionSettings_cancelPetitionSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSettings_cancelPetitionSignatureRequestMutation
+>;
 export const PetitionSettings_startPetitionSignatureRequestDocument = gql`
   mutation PetitionSettings_startPetitionSignatureRequest($petitionId: GID!) {
     startSignatureRequest(petitionId: $petitionId) {
@@ -8677,8 +8583,9 @@ export function usePetitionSettings_startPetitionSignatureRequestMutation(
     PetitionSettings_startPetitionSignatureRequestMutationVariables
   >(PetitionSettings_startPetitionSignatureRequestDocument, options);
 }
-export type PetitionSettings_startPetitionSignatureRequestMutationHookResult =
-  ReturnType<typeof usePetitionSettings_startPetitionSignatureRequestMutation>;
+export type PetitionSettings_startPetitionSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSettings_startPetitionSignatureRequestMutation
+>;
 export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionUserPermission(
     $petitionIds: [GID!]!
@@ -8733,8 +8640,9 @@ export function usePetitionSharingModal_addPetitionUserPermissionMutation(
     PetitionSharingModal_addPetitionUserPermissionMutationVariables
   >(PetitionSharingModal_addPetitionUserPermissionDocument, options);
 }
-export type PetitionSharingModal_addPetitionUserPermissionMutationHookResult =
-  ReturnType<typeof usePetitionSharingModal_addPetitionUserPermissionMutation>;
+export type PetitionSharingModal_addPetitionUserPermissionMutationHookResult = ReturnType<
+  typeof usePetitionSharingModal_addPetitionUserPermissionMutation
+>;
 export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_removePetitionUserPermission(
     $petitionId: GID!
@@ -8780,10 +8688,9 @@ export function usePetitionSharingModal_removePetitionUserPermissionMutation(
     PetitionSharingModal_removePetitionUserPermissionMutationVariables
   >(PetitionSharingModal_removePetitionUserPermissionDocument, options);
 }
-export type PetitionSharingModal_removePetitionUserPermissionMutationHookResult =
-  ReturnType<
-    typeof usePetitionSharingModal_removePetitionUserPermissionMutation
-  >;
+export type PetitionSharingModal_removePetitionUserPermissionMutationHookResult = ReturnType<
+  typeof usePetitionSharingModal_removePetitionUserPermissionMutation
+>;
 export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
   mutation PetitionSharingModal_transferPetitionOwnership(
     $petitionId: GID!
@@ -8826,8 +8733,9 @@ export function usePetitionSharingModal_transferPetitionOwnershipMutation(
     PetitionSharingModal_transferPetitionOwnershipMutationVariables
   >(PetitionSharingModal_transferPetitionOwnershipDocument, options);
 }
-export type PetitionSharingModal_transferPetitionOwnershipMutationHookResult =
-  ReturnType<typeof usePetitionSharingModal_transferPetitionOwnershipMutation>;
+export type PetitionSharingModal_transferPetitionOwnershipMutationHookResult = ReturnType<
+  typeof usePetitionSharingModal_transferPetitionOwnershipMutation
+>;
 export const PetitionSharingModal_PetitionsUserPermissionsDocument = gql`
   query PetitionSharingModal_PetitionsUserPermissions($petitionIds: [GID!]!) {
     petitionsById(ids: $petitionIds) {
@@ -8877,10 +8785,12 @@ export function usePetitionSharingModal_PetitionsUserPermissionsLazyQuery(
     PetitionSharingModal_PetitionsUserPermissionsQueryVariables
   >(PetitionSharingModal_PetitionsUserPermissionsDocument, options);
 }
-export type PetitionSharingModal_PetitionsUserPermissionsQueryHookResult =
-  ReturnType<typeof usePetitionSharingModal_PetitionsUserPermissionsQuery>;
-export type PetitionSharingModal_PetitionsUserPermissionsLazyQueryHookResult =
-  ReturnType<typeof usePetitionSharingModal_PetitionsUserPermissionsLazyQuery>;
+export type PetitionSharingModal_PetitionsUserPermissionsQueryHookResult = ReturnType<
+  typeof usePetitionSharingModal_PetitionsUserPermissionsQuery
+>;
+export type PetitionSharingModal_PetitionsUserPermissionsLazyQueryHookResult = ReturnType<
+  typeof usePetitionSharingModal_PetitionsUserPermissionsLazyQuery
+>;
 export const useTemplateDetailsDialogPetitionDocument = gql`
   query useTemplateDetailsDialogPetition($templateId: GID!) {
     petition(id: $templateId) {
@@ -8984,10 +8894,9 @@ export function useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation(
     DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables
   >(DynamicSelectSettings_uploadDynamicSelectFieldFileDocument, options);
 }
-export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationHookResult =
-  ReturnType<
-    typeof useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation
-  >;
+export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationHookResult = ReturnType<
+  typeof useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation
+>;
 export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = gql`
   mutation DynamicSelectSettings_dynamicSelectFieldFileDownloadLink(
     $petitionId: GID!
@@ -9033,10 +8942,9 @@ export function useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutat
     DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables
   >(DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument, options);
 }
-export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation
-  >;
+export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationHookResult = ReturnType<
+  typeof useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation
+>;
 export const ExportRepliesProgressDialog_PetitionRepliesDocument = gql`
   query ExportRepliesProgressDialog_PetitionReplies($petitionId: GID!) {
     petition(id: $petitionId) {
@@ -9086,10 +8994,12 @@ export function useExportRepliesProgressDialog_PetitionRepliesLazyQuery(
     ExportRepliesProgressDialog_PetitionRepliesQueryVariables
   >(ExportRepliesProgressDialog_PetitionRepliesDocument, options);
 }
-export type ExportRepliesProgressDialog_PetitionRepliesQueryHookResult =
-  ReturnType<typeof useExportRepliesProgressDialog_PetitionRepliesQuery>;
-export type ExportRepliesProgressDialog_PetitionRepliesLazyQueryHookResult =
-  ReturnType<typeof useExportRepliesProgressDialog_PetitionRepliesLazyQuery>;
+export type ExportRepliesProgressDialog_PetitionRepliesQueryHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_PetitionRepliesQuery
+>;
+export type ExportRepliesProgressDialog_PetitionRepliesLazyQueryHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_PetitionRepliesLazyQuery
+>;
 export const ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument = gql`
   mutation ExportRepliesProgressDialog_fileUploadReplyDownloadLink(
     $petitionId: GID!
@@ -9132,10 +9042,9 @@ export function useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutati
     ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVariables
   >(ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument, options);
 }
-export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation
-  >;
+export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation
+>;
 export const ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument = gql`
   mutation ExportRepliesProgressDialog_signedPetitionDownloadLink(
     $petitionSignatureRequestId: GID!
@@ -9182,10 +9091,9 @@ export function useExportRepliesProgressDialog_signedPetitionDownloadLinkMutatio
     ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables
   >(ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument, options);
 }
-export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation
-  >;
+export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation
+>;
 export const ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocument = gql`
   mutation ExportRepliesProgressDialog_updatePetitionFieldReplyMetadata(
     $petitionId: GID!
@@ -9237,10 +9145,9 @@ export function useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataM
     options
   );
 }
-export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationHookResult =
-  ReturnType<
-    typeof useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation
-  >;
+export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation
+>;
 export const ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument = gql`
   mutation ExportRepliesProgressDialog_updateSignatureRequestMetadata(
     $petitionSignatureRequestId: GID!
@@ -9289,10 +9196,9 @@ export function useExportRepliesProgressDialog_updateSignatureRequestMetadataMut
     options
   );
 }
-export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationHookResult =
-  ReturnType<
-    typeof useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation
-  >;
+export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationHookResult = ReturnType<
+  typeof useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation
+>;
 export const PetitionSignaturesCard_updatePetitionSignatureConfigDocument = gql`
   mutation PetitionSignaturesCard_updatePetitionSignatureConfig(
     $petitionId: GID!
@@ -9340,10 +9246,9 @@ export function usePetitionSignaturesCard_updatePetitionSignatureConfigMutation(
     PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables
   >(PetitionSignaturesCard_updatePetitionSignatureConfigDocument, options);
 }
-export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationHookResult =
-  ReturnType<
-    typeof usePetitionSignaturesCard_updatePetitionSignatureConfigMutation
-  >;
+export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_updatePetitionSignatureConfigMutation
+>;
 export const PetitionSignaturesCard_cancelSignatureRequestDocument = gql`
   mutation PetitionSignaturesCard_cancelSignatureRequest(
     $petitionSignatureRequestId: GID!
@@ -9386,8 +9291,9 @@ export function usePetitionSignaturesCard_cancelSignatureRequestMutation(
     PetitionSignaturesCard_cancelSignatureRequestMutationVariables
   >(PetitionSignaturesCard_cancelSignatureRequestDocument, options);
 }
-export type PetitionSignaturesCard_cancelSignatureRequestMutationHookResult =
-  ReturnType<typeof usePetitionSignaturesCard_cancelSignatureRequestMutation>;
+export type PetitionSignaturesCard_cancelSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_cancelSignatureRequestMutation
+>;
 export const PetitionSignaturesCard_startSignatureRequestDocument = gql`
   mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!) {
     startSignatureRequest(petitionId: $petitionId) {
@@ -9426,8 +9332,9 @@ export function usePetitionSignaturesCard_startSignatureRequestMutation(
     PetitionSignaturesCard_startSignatureRequestMutationVariables
   >(PetitionSignaturesCard_startSignatureRequestDocument, options);
 }
-export type PetitionSignaturesCard_startSignatureRequestMutationHookResult =
-  ReturnType<typeof usePetitionSignaturesCard_startSignatureRequestMutation>;
+export type PetitionSignaturesCard_startSignatureRequestMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_startSignatureRequestMutation
+>;
 export const PetitionSignaturesCard_signedPetitionDownloadLinkDocument = gql`
   mutation PetitionSignaturesCard_signedPetitionDownloadLink(
     $petitionSignatureRequestId: GID!
@@ -9473,10 +9380,9 @@ export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
     PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables
   >(PetitionSignaturesCard_signedPetitionDownloadLinkDocument, options);
 }
-export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
-  >;
+export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationHookResult = ReturnType<
+  typeof usePetitionSignaturesCard_signedPetitionDownloadLinkMutation
+>;
 export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
   mutation RecipientViewHeader_publicDelegateAccessToContact(
     $keycode: ID!
@@ -9537,10 +9443,9 @@ export function useRecipientViewHeader_publicDelegateAccessToContactMutation(
     RecipientViewHeader_publicDelegateAccessToContactMutationVariables
   >(RecipientViewHeader_publicDelegateAccessToContactDocument, options);
 }
-export type RecipientViewHeader_publicDelegateAccessToContactMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewHeader_publicDelegateAccessToContactMutation
-  >;
+export type RecipientViewHeader_publicDelegateAccessToContactMutationHookResult = ReturnType<
+  typeof useRecipientViewHeader_publicDelegateAccessToContactMutation
+>;
 export const RecipientViewPetitionFieldCommentsDocument = gql`
   query RecipientViewPetitionFieldComments(
     $keycode: ID!
@@ -9651,10 +9556,9 @@ export function useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCom
     options
   );
 }
-export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation
-  >;
+export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation
+>;
 export const RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentDocument = gql`
   mutation RecipientViewPetitionFieldCommentsDialog_createPetitionFieldComment(
     $keycode: ID!
@@ -9706,10 +9610,9 @@ export function useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldC
     options
   );
 }
-export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation
-  >;
+export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation
+>;
 export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentDocument = gql`
   mutation RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment(
     $keycode: ID!
@@ -9764,10 +9667,9 @@ export function useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldC
     options
   );
 }
-export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation
-  >;
+export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation
+>;
 export const RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentDocument = gql`
   mutation RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment(
     $keycode: ID!
@@ -9816,10 +9718,9 @@ export function useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldC
     options
   );
 }
-export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation
-  >;
+export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation
+>;
 export const RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkDocument = gql`
   mutation RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLink(
     $keycode: ID!
@@ -9871,10 +9772,9 @@ export function useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDow
     options
   );
 }
-export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation
-  >;
+export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation
+>;
 export const RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicDeletePetitionReply(
     $replyId: GID!
@@ -9917,10 +9817,9 @@ export function useRecipientViewPetitionFieldMutations_publicDeletePetitionReply
     options
   );
 }
-export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation
-  >;
+export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation
+>;
 export const RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicUpdateSimpleReply(
     $keycode: ID!
@@ -9974,10 +9873,9 @@ export function useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMu
     options
   );
 }
-export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation
-  >;
+export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation
+>;
 export const RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateSimpleReply(
     $keycode: ID!
@@ -10029,10 +9927,9 @@ export function useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMu
     options
   );
 }
-export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation
-  >;
+export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation
+>;
 export const RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(
     $keycode: ID!
@@ -10084,10 +9981,9 @@ export function useRecipientViewPetitionFieldMutations_publicCreateDynamicSelect
     options
   );
 }
-export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation
-  >;
+export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation
+>;
 export const RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReply(
     $keycode: ID!
@@ -10141,10 +10037,9 @@ export function useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelect
     options
   );
 }
-export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation
-  >;
+export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation
+>;
 export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateFileUploadReply(
     $keycode: ID!
@@ -10199,10 +10094,9 @@ export function useRecipientViewPetitionFieldMutations_publicCreateFileUploadRep
     options
   );
 }
-export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation
-  >;
+export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation
+>;
 export const RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicFileUploadReplyComplete(
     $keycode: ID!
@@ -10248,10 +10142,9 @@ export function useRecipientViewPetitionFieldMutations_publicFileUploadReplyComp
     options
   );
 }
-export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationHookResult =
-  ReturnType<
-    typeof useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation
-  >;
+export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationHookResult = ReturnType<
+  typeof useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation
+>;
 export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
   mutation GenerateNewTokenDialog_generateUserAuthToken($tokenName: String!) {
     generateUserAuthToken(tokenName: $tokenName) {
@@ -10295,8 +10188,9 @@ export function useGenerateNewTokenDialog_generateUserAuthTokenMutation(
     GenerateNewTokenDialog_generateUserAuthTokenMutationVariables
   >(GenerateNewTokenDialog_generateUserAuthTokenDocument, options);
 }
-export type GenerateNewTokenDialog_generateUserAuthTokenMutationHookResult =
-  ReturnType<typeof useGenerateNewTokenDialog_generateUserAuthTokenMutation>;
+export type GenerateNewTokenDialog_generateUserAuthTokenMutationHookResult = ReturnType<
+  typeof useGenerateNewTokenDialog_generateUserAuthTokenMutation
+>;
 export const AdminDocument = gql`
   query Admin {
     me {
@@ -11021,8 +10915,9 @@ export function useOrganizationUsers_createOrganizationUserMutation(
     OrganizationUsers_createOrganizationUserMutationVariables
   >(OrganizationUsers_createOrganizationUserDocument, options);
 }
-export type OrganizationUsers_createOrganizationUserMutationHookResult =
-  ReturnType<typeof useOrganizationUsers_createOrganizationUserMutation>;
+export type OrganizationUsers_createOrganizationUserMutationHookResult = ReturnType<
+  typeof useOrganizationUsers_createOrganizationUserMutation
+>;
 export const OrganizationUsers_updateUserStatusDocument = gql`
   mutation OrganizationUsers_updateUserStatus(
     $userIds: [GID!]!
@@ -11375,8 +11270,9 @@ export function usePetitionActivity_cancelScheduledMessageMutation(
     PetitionActivity_cancelScheduledMessageMutationVariables
   >(PetitionActivity_cancelScheduledMessageDocument, options);
 }
-export type PetitionActivity_cancelScheduledMessageMutationHookResult =
-  ReturnType<typeof usePetitionActivity_cancelScheduledMessageMutation>;
+export type PetitionActivity_cancelScheduledMessageMutationHookResult = ReturnType<
+  typeof usePetitionActivity_cancelScheduledMessageMutation
+>;
 export const PetitionsActivity_sendPetitionDocument = gql`
   mutation PetitionsActivity_sendPetition(
     $petitionId: GID!
@@ -11486,8 +11382,9 @@ export function usePetitionActivity_switchAutomaticRemindersMutation(
     PetitionActivity_switchAutomaticRemindersMutationVariables
   >(PetitionActivity_switchAutomaticRemindersDocument, options);
 }
-export type PetitionActivity_switchAutomaticRemindersMutationHookResult =
-  ReturnType<typeof usePetitionActivity_switchAutomaticRemindersMutation>;
+export type PetitionActivity_switchAutomaticRemindersMutationHookResult = ReturnType<
+  typeof usePetitionActivity_switchAutomaticRemindersMutation
+>;
 export const PetitionActivityDocument = gql`
   query PetitionActivity($id: GID!) {
     petition(id: $id) {
@@ -11992,8 +11889,9 @@ export function usePetitionCompose_changePetitionFieldTypeMutation(
     PetitionCompose_changePetitionFieldTypeMutationVariables
   >(PetitionCompose_changePetitionFieldTypeDocument, options);
 }
-export type PetitionCompose_changePetitionFieldTypeMutationHookResult =
-  ReturnType<typeof usePetitionCompose_changePetitionFieldTypeMutation>;
+export type PetitionCompose_changePetitionFieldTypeMutationHookResult = ReturnType<
+  typeof usePetitionCompose_changePetitionFieldTypeMutation
+>;
 export const PetitionCompose_batchSendPetitionDocument = gql`
   mutation PetitionCompose_batchSendPetition(
     $petitionId: GID!
@@ -12325,8 +12223,9 @@ export function usePetitionReplies_validatePetitionFieldsMutation(
     PetitionReplies_validatePetitionFieldsMutationVariables
   >(PetitionReplies_validatePetitionFieldsDocument, options);
 }
-export type PetitionReplies_validatePetitionFieldsMutationHookResult =
-  ReturnType<typeof usePetitionReplies_validatePetitionFieldsMutation>;
+export type PetitionReplies_validatePetitionFieldsMutationHookResult = ReturnType<
+  typeof usePetitionReplies_validatePetitionFieldsMutation
+>;
 export const PetitionReplies_fileUploadReplyDownloadLinkDocument = gql`
   mutation PetitionReplies_fileUploadReplyDownloadLink(
     $petitionId: GID!
@@ -12375,8 +12274,9 @@ export function usePetitionReplies_fileUploadReplyDownloadLinkMutation(
     PetitionReplies_fileUploadReplyDownloadLinkMutationVariables
   >(PetitionReplies_fileUploadReplyDownloadLinkDocument, options);
 }
-export type PetitionReplies_fileUploadReplyDownloadLinkMutationHookResult =
-  ReturnType<typeof usePetitionReplies_fileUploadReplyDownloadLinkMutation>;
+export type PetitionReplies_fileUploadReplyDownloadLinkMutationHookResult = ReturnType<
+  typeof usePetitionReplies_fileUploadReplyDownloadLinkMutation
+>;
 export const PetitionReplies_createPetitionFieldCommentDocument = gql`
   mutation PetitionReplies_createPetitionFieldComment(
     $petitionId: GID!
@@ -12433,8 +12333,9 @@ export function usePetitionReplies_createPetitionFieldCommentMutation(
     PetitionReplies_createPetitionFieldCommentMutationVariables
   >(PetitionReplies_createPetitionFieldCommentDocument, options);
 }
-export type PetitionReplies_createPetitionFieldCommentMutationHookResult =
-  ReturnType<typeof usePetitionReplies_createPetitionFieldCommentMutation>;
+export type PetitionReplies_createPetitionFieldCommentMutationHookResult = ReturnType<
+  typeof usePetitionReplies_createPetitionFieldCommentMutation
+>;
 export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
   mutation PetitionReplies_updatePetitionFieldComment(
     $petitionId: GID!
@@ -12488,8 +12389,9 @@ export function usePetitionReplies_updatePetitionFieldCommentMutation(
     PetitionReplies_updatePetitionFieldCommentMutationVariables
   >(PetitionReplies_updatePetitionFieldCommentDocument, options);
 }
-export type PetitionReplies_updatePetitionFieldCommentMutationHookResult =
-  ReturnType<typeof usePetitionReplies_updatePetitionFieldCommentMutation>;
+export type PetitionReplies_updatePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof usePetitionReplies_updatePetitionFieldCommentMutation
+>;
 export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
   mutation PetitionReplies_deletePetitionFieldComment(
     $petitionId: GID!
@@ -12535,8 +12437,9 @@ export function usePetitionReplies_deletePetitionFieldCommentMutation(
     PetitionReplies_deletePetitionFieldCommentMutationVariables
   >(PetitionReplies_deletePetitionFieldCommentDocument, options);
 }
-export type PetitionReplies_deletePetitionFieldCommentMutationHookResult =
-  ReturnType<typeof usePetitionReplies_deletePetitionFieldCommentMutation>;
+export type PetitionReplies_deletePetitionFieldCommentMutationHookResult = ReturnType<
+  typeof usePetitionReplies_deletePetitionFieldCommentMutation
+>;
 export const PetitionReplies_submitUnpublishedCommentsDocument = gql`
   mutation PetitionReplies_submitUnpublishedComments($petitionId: GID!) {
     submitUnpublishedComments(petitionId: $petitionId) {
@@ -12575,8 +12478,9 @@ export function usePetitionReplies_submitUnpublishedCommentsMutation(
     PetitionReplies_submitUnpublishedCommentsMutationVariables
   >(PetitionReplies_submitUnpublishedCommentsDocument, options);
 }
-export type PetitionReplies_submitUnpublishedCommentsMutationHookResult =
-  ReturnType<typeof usePetitionReplies_submitUnpublishedCommentsMutation>;
+export type PetitionReplies_submitUnpublishedCommentsMutationHookResult = ReturnType<
+  typeof usePetitionReplies_submitUnpublishedCommentsMutation
+>;
 export const PetitionReplies_markPetitionFieldCommentsAsReadDocument = gql`
   mutation PetitionReplies_markPetitionFieldCommentsAsRead(
     $petitionId: GID!
@@ -12622,8 +12526,9 @@ export function usePetitionReplies_markPetitionFieldCommentsAsReadMutation(
     PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
   >(PetitionReplies_markPetitionFieldCommentsAsReadDocument, options);
 }
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationHookResult =
-  ReturnType<typeof usePetitionReplies_markPetitionFieldCommentsAsReadMutation>;
+export type PetitionReplies_markPetitionFieldCommentsAsReadMutationHookResult = ReturnType<
+  typeof usePetitionReplies_markPetitionFieldCommentsAsReadMutation
+>;
 export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
   mutation PetitionReplies_updatePetitionFieldRepliesStatus(
     $petitionId: GID!
@@ -12685,10 +12590,9 @@ export function usePetitionReplies_updatePetitionFieldRepliesStatusMutation(
     PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables
   >(PetitionReplies_updatePetitionFieldRepliesStatusDocument, options);
 }
-export type PetitionReplies_updatePetitionFieldRepliesStatusMutationHookResult =
-  ReturnType<
-    typeof usePetitionReplies_updatePetitionFieldRepliesStatusMutation
-  >;
+export type PetitionReplies_updatePetitionFieldRepliesStatusMutationHookResult = ReturnType<
+  typeof usePetitionReplies_updatePetitionFieldRepliesStatusMutation
+>;
 export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
   mutation PetitionReplies_sendPetitionClosedNotification(
     $petitionId: GID!
@@ -12742,8 +12646,9 @@ export function usePetitionReplies_sendPetitionClosedNotificationMutation(
     PetitionReplies_sendPetitionClosedNotificationMutationVariables
   >(PetitionReplies_sendPetitionClosedNotificationDocument, options);
 }
-export type PetitionReplies_sendPetitionClosedNotificationMutationHookResult =
-  ReturnType<typeof usePetitionReplies_sendPetitionClosedNotificationMutation>;
+export type PetitionReplies_sendPetitionClosedNotificationMutationHookResult = ReturnType<
+  typeof usePetitionReplies_sendPetitionClosedNotificationMutation
+>;
 export const PetitionRepliesUserDocument = gql`
   query PetitionRepliesUser {
     me {
@@ -13652,8 +13557,9 @@ export function useRecipientView_submitUnpublishedCommentsMutation(
     RecipientView_submitUnpublishedCommentsMutationVariables
   >(RecipientView_submitUnpublishedCommentsDocument, options);
 }
-export type RecipientView_submitUnpublishedCommentsMutationHookResult =
-  ReturnType<typeof useRecipientView_submitUnpublishedCommentsMutation>;
+export type RecipientView_submitUnpublishedCommentsMutationHookResult = ReturnType<
+  typeof useRecipientView_submitUnpublishedCommentsMutation
+>;
 export const PublicPetitionDocument = gql`
   query PublicPetition($keycode: ID!) {
     access(keycode: $keycode) {
