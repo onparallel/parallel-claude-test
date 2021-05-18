@@ -60,8 +60,9 @@ export class UserGroupRepository extends BaseRepository {
         [...ids]
       );
       const byUserGroupId = groupBy(rows, (r) => r.user_group_id);
-      return ids.map((id) =>
-        byUserGroupId[id]?.map((r) => omit(r, ["user_group_id"]) ?? [])
+      return ids.map(
+        (id) =>
+          byUserGroupId[id]?.map((r) => omit(r, ["user_group_id"]) ?? []) ?? []
       );
     })
   );
