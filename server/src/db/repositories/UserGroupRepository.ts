@@ -84,13 +84,45 @@ export class UserGroupRepository extends BaseRepository {
       .returning("*");
   }
 
-  async createUserGroup(data: CreateUserGroup, createdBy: string) {
-    const [row] = await this.insert("user_group", {
-      ...data,
-      created_by: createdBy,
-      updated_by: createdBy,
-    });
+  async createUserGroup(
+    data: CreateUserGroup,
+    createdBy: string,
+    t?: Knex.Transaction
+  ) {
+    const [row] = await this.insert(
+      "user_group",
+      {
+        ...data,
+        created_by: createdBy,
+        updated_by: createdBy,
+      },
+      t
+    );
     return row;
+  }
+
+  async cloneUserGroup(userGroupId: number, name: string, user: User) {
+    return await this.withTransaction(async (t) => {
+      const newGroup = await this.createUserGroup(
+        {
+          name,
+          org_id: user.org_id,
+        },
+        `User:${user.id}`,
+        t
+      );
+
+      await t.raw(
+        /* sql */ `
+        with group_member as (select user_id from user_group_member where user_group_id = ? and deleted_at is null)
+        insert into user_group_member(user_group_id,user_id, createdBy)
+        select (?, group_member.user_id, ?) from group_member;
+      `,
+        [userGroupId, newGroup.id, `User:${user.id}`]
+      );
+
+      return newGroup;
+    });
   }
 
   async deleteUserGroup(userGroupId: number, deletedBy: string) {
@@ -108,8 +140,17 @@ export class UserGroupRepository extends BaseRepository {
           deleted_at: null,
         })
         .update({ deleted_at: this.now(), deleted_by: deletedBy });
+
+      /** remove all permissions for the deleted group */
+      await this.from("petition_user", t)
+        .whereNull("deleted_at")
+        .andWhere((q) =>
+          q
+            .where("user_group_id", userGroupId)
+            .orWhere("from_user_group_id", userGroupId)
+        )
+        .update({ deleted_at: this.now(), deleted_by: deletedBy });
     });
-    //TODO manage petition permissions
   }
 
   async removeUsersFromGroup(
@@ -117,14 +158,27 @@ export class UserGroupRepository extends BaseRepository {
     userIds: MaybeArray<number>,
     deletedBy: string
   ) {
-    await this.from("user_group_member")
-      .where({ user_group_id: userGroupId, deleted_at: null })
-      .whereIn("user_id", unMaybeArray(userIds))
-      .update({
-        deleted_by: deletedBy,
-        deleted_at: this.now(),
-      });
-    //TODO manage petition permissions
+    const ids = unMaybeArray(userIds);
+    await this.withTransaction(async (t) => {
+      await this.from("user_group_member", t)
+        .where({ user_group_id: userGroupId, deleted_at: null })
+        .whereIn("user_id", ids)
+        .update(
+          {
+            deleted_by: deletedBy,
+            deleted_at: this.now(),
+          },
+          "*"
+        );
+
+      /** remove group permissions on the deleted group members */
+      await this.removeUserGroupMemberPermissions(
+        userGroupId,
+        ids,
+        deletedBy,
+        t
+      );
+    });
   }
 
   async addUsersToGroup(
@@ -132,16 +186,59 @@ export class UserGroupRepository extends BaseRepository {
     userIds: MaybeArray<number>,
     createdBy: string
   ) {
-    await this.from("user_group_member")
-      .insert(
-        unMaybeArray(userIds).map((userId) => ({
-          user_group_id: userGroupId,
-          user_id: userId,
-          created_by: createdBy,
-        }))
-      )
-      .onConflict()
-      .ignore();
-    //TODO manage petition permissions
+    const ids = unMaybeArray(userIds);
+    await this.withTransaction(async (t) => {
+      await this.from("user_group_member", t)
+        .insert(
+          ids.map((userId) => ({
+            user_group_id: userGroupId,
+            user_id: userId,
+            created_by: createdBy,
+          }))
+        )
+        .onConflict()
+        .ignore();
+
+      /** add group permissions on the new group members */
+      await this.addUserGroupMemberPermissions(userGroupId, ids, createdBy, t);
+    });
+  }
+
+  private async addUserGroupMemberPermissions(
+    userGroupId: number,
+    memberIds: number[],
+    createdBy: string,
+    t?: Knex.Transaction
+  ) {
+    return await this.withTransaction(
+      (t) =>
+        t.raw(
+          /* sql */ `
+          with 
+            pu as (select * from petition_user where user_group_id = ? and deleted_at is null),
+            u as (select * from (values ${memberIds
+              .map(() => "(?)")
+              .join(", ")}) as t(user_id))
+          insert into petition_user(permission_type, user_id, petition_id, from_user_group_id, created_by)
+            select pu.permission_type, u.user_id, pu.petition_id, pu.user_group_id, ?
+            from pu cross join u
+          on conflict do nothing;
+        `,
+          [userGroupId, ...memberIds, createdBy]
+        ),
+      t
+    );
+  }
+
+  private async removeUserGroupMemberPermissions(
+    userGroupId: number,
+    memberIds: number[],
+    deletedBy: string,
+    t?: Knex.Transaction
+  ) {
+    await this.from("petition_user", t)
+      .where({ deleted_at: null, from_user_group_id: userGroupId })
+      .whereIn("user_id", memberIds)
+      .update({ deleted_at: this.now(), deleted_by: deletedBy });
   }
 }

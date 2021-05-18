@@ -717,7 +717,7 @@ export type CreatePetitionTag = PartialProps<
 export interface PetitionUser {
   id: number; // int4
   petition_id: number; // int4
-  user_id: number; // int4
+  user_id: Maybe<number>; // int4
   permission_type: PetitionUserPermissionType; // petition_user_permission_type
   is_subscribed: boolean; // bool
   created_at: Date; // timestamptz
@@ -726,10 +726,13 @@ export interface PetitionUser {
   updated_by: Maybe<string>; // varchar
   deleted_at: Maybe<Date>; // timestamptz
   deleted_by: Maybe<string>; // varchar
+  user_group_id: Maybe<number>; // int4
+  from_user_group_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionUser = PartialProps<
   Omit<PetitionUser, "id">,
+  | "user_id"
   | "permission_type"
   | "is_subscribed"
   | "created_at"
@@ -738,6 +741,8 @@ export type CreatePetitionUser = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+  | "user_group_id"
+  | "from_user_group_id"
 >;
 
 export interface PetitionUserNotification {

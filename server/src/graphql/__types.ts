@@ -603,6 +603,7 @@ export interface NexusGenFieldTypes {
     changePetitionFieldType: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
+    cloneUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createFileUploadReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -1392,6 +1393,7 @@ export interface NexusGenFieldTypeNames {
     changePetitionFieldType: "PetitionBaseAndField";
     clonePetitionField: "PetitionBaseAndField";
     clonePetitions: "PetitionBase";
+    cloneUserGroup: "UserGroup";
     createContact: "Contact";
     createFileUploadReply: "PetitionFieldReply";
     createOrganization: "SupportMethodResponse";
@@ -2142,6 +2144,11 @@ export interface NexusGenArgTypes {
     clonePetitions: {
       // args
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    cloneUserGroup: {
+      // args
+      name: string; // String!
+      userGroupId: NexusGenScalars["GID"]; // GID!
     };
     createContact: {
       // args

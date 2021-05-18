@@ -151,3 +151,24 @@ export const removeUsersFromGroup = mutationField("removeUsersFromGroup", {
     return (await ctx.userGroups.loadUserGroup(args.userGroupId))!;
   },
 });
+
+export const cloneUserGroup = mutationField("cloneUserGroup", {
+  description: "Clones the user group with all its members",
+  type: "UserGroup",
+  args: {
+    userGroupId: nonNull(globalIdArg("UserGroup")),
+    name: nonNull(stringArg()),
+  },
+  authorize: authenticateAnd(userHasAccessToUserGroup("userGroupId")),
+  validateArgs: validateAnd(
+    notEmptyString((args) => args.name, "name"),
+    maxLength((args) => args.name, "name", 100)
+  ),
+  resolve: async (_, args, ctx) => {
+    return await ctx.userGroups.cloneUserGroup(
+      args.userGroupId,
+      args.name,
+      ctx.user!
+    );
+  },
+});

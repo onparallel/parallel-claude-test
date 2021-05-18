@@ -2812,7 +2812,7 @@ export class PetitionRepository extends BaseRepository {
           data: {
             user_id: user.id,
             permission_type: p.permission_type,
-            permission_user_id: p.user_id,
+            permission_user_id: p.user_id!,
           },
         })),
         t
@@ -2860,7 +2860,7 @@ export class PetitionRepository extends BaseRepository {
           type: "USER_PERMISSION_REMOVED",
           data: {
             user_id: user.id,
-            permission_user_id: p.user_id,
+            permission_user_id: p.user_id!,
           },
         })),
         t
@@ -2895,7 +2895,7 @@ export class PetitionRepository extends BaseRepository {
           type: "USER_PERMISSION_REMOVED",
           data: {
             user_id: deletedBy.id,
-            permission_user_id: p.user_id,
+            permission_user_id: p.user_id!,
           },
         })),
         t
@@ -2971,7 +2971,7 @@ export class PetitionRepository extends BaseRepository {
           type: "OWNERSHIP_TRANSFERRED",
           data: {
             user_id: updatedBy.id,
-            previous_owner_id: p.user_id,
+            previous_owner_id: p.user_id!,
             owner_id: toUserId,
           },
         })),

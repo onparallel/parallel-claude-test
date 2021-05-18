@@ -306,6 +306,11 @@ type Mutation {
   clonePetitions(petitionIds: [GID!]!): [PetitionBase!]!
 
   """
+  Clones the user group with all its members
+  """
+  cloneUserGroup(name: String!, userGroupId: GID!): UserGroup!
+
+  """
   Create a contact.
   """
   createContact(data: CreateContactInput!): Contact!

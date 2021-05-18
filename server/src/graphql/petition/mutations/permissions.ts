@@ -101,7 +101,7 @@ export const addPetitionUserPermission = mutationField(
               data: {
                 user_id: ctx.user!.id,
                 permission_type: p.permission_type,
-                permission_user_id: p.user_id,
+                permission_user_id: p.user_id!,
               },
             })),
             t
