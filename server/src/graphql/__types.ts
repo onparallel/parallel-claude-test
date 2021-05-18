@@ -2223,6 +2223,7 @@ export interface NexusGenArgTypes {
     createUserGroup: {
       // args
       name: string; // String!
+      userIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     deactivateAccesses: {
       // args
@@ -2269,7 +2270,7 @@ export interface NexusGenArgTypes {
     };
     deleteUserGroup: {
       // args
-      id: NexusGenScalars["GID"]; // GID!
+      ids: NexusGenScalars["GID"][]; // [GID!]!
     };
     dynamicSelectFieldFileDownloadLink: {
       // args

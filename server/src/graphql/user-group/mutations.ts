@@ -27,16 +27,27 @@ export const createUserGroup = mutationField("createUserGroup", {
   ),
   args: {
     name: nonNull(stringArg()),
+    userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
   resolve: async (_, args, ctx) => {
     try {
-      return await ctx.userGroups.createUserGroup(
-        {
-          org_id: ctx.user!.org_id,
-          name: args.name.trim(),
-        },
-        `User:${ctx.user!.id}`
-      );
+      return await ctx.userGroups.withTransaction(async (t) => {
+        const group = await ctx.userGroups.createUserGroup(
+          {
+            org_id: ctx.user!.org_id,
+            name: args.name.trim(),
+          },
+          `User:${ctx.user!.id}`,
+          t
+        );
+        await ctx.userGroups.addUsersToGroup(
+          group.id,
+          args.userIds,
+          `User:${ctx.user!.id}`,
+          t
+        );
+        return group;
+      });
     } catch (error) {
       if (error.constraint === "user_group__org_id__name") {
         throw new WhitelistedError(
@@ -96,13 +107,13 @@ export const updateUserGroup = mutationField("updateUserGroup", {
 export const deleteUserGroup = mutationField("deleteUserGroup", {
   description: "Deletes a group",
   type: "Result",
-  authorize: authenticateAnd(userHasAccessToUserGroup("id")),
+  authorize: authenticateAnd(userHasAccessToUserGroup("ids")),
   args: {
-    id: nonNull(globalIdArg("UserGroup")),
+    ids: nonNull(list(nonNull(globalIdArg("UserGroup")))),
   },
-  resolve: async (_, { id }, ctx) => {
+  resolve: async (_, { ids }, ctx) => {
     try {
-      await ctx.userGroups.deleteUserGroup(id, `User:${ctx.user!.id}`);
+      await ctx.userGroups.deleteUserGroups(ids, `User:${ctx.user!.id}`);
       return RESULT.SUCCESS;
     } catch {
       return RESULT.FAILURE;

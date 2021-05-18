@@ -455,7 +455,7 @@ type Mutation {
   """
   Creates a group in the user's organization
   """
-  createUserGroup(name: String!): UserGroup!
+  createUserGroup(name: String!, userIds: [GID!]!): UserGroup!
 
   """
   Deactivates the specified active petition accesses.
@@ -514,7 +514,7 @@ type Mutation {
   """
   Deletes a group
   """
-  deleteUserGroup(id: GID!): Result!
+  deleteUserGroup(ids: [GID!]!): Result!
 
   """
   generates a signed download link for the xlsx file containing the listings of a dynamic select field

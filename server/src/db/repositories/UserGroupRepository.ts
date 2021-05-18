@@ -125,20 +125,20 @@ export class UserGroupRepository extends BaseRepository {
     });
   }
 
-  async deleteUserGroup(userGroupId: number, deletedBy: string) {
+  async deleteUserGroups(userGroupIds: number[], deletedBy: string) {
     await this.withTransaction(async (t) => {
       await this.from("user_group_member", t)
         .where({
-          user_group_id: userGroupId,
           deleted_at: null,
         })
+        .whereIn("user_group_id", userGroupIds)
         .update({ deleted_at: this.now(), deleted_by: deletedBy });
 
       await this.from("user_group", t)
         .where({
-          id: userGroupId,
           deleted_at: null,
         })
+        .whereIn("id", userGroupIds)
         .update({ deleted_at: this.now(), deleted_by: deletedBy });
 
       /** remove all permissions for the deleted group */
@@ -146,8 +146,8 @@ export class UserGroupRepository extends BaseRepository {
         .whereNull("deleted_at")
         .andWhere((q) =>
           q
-            .where("user_group_id", userGroupId)
-            .orWhere("from_user_group_id", userGroupId)
+            .whereIn("user_group_id", userGroupIds)
+            .orWhereIn("from_user_group_id", userGroupIds)
         )
         .update({ deleted_at: this.now(), deleted_by: deletedBy });
     });
@@ -184,24 +184,36 @@ export class UserGroupRepository extends BaseRepository {
   async addUsersToGroup(
     userGroupId: number,
     userIds: MaybeArray<number>,
-    createdBy: string
+    createdBy: string,
+    t?: Knex.Transaction
   ) {
     const ids = unMaybeArray(userIds);
-    await this.withTransaction(async (t) => {
-      await this.from("user_group_member", t)
-        .insert(
-          ids.map((userId) => ({
-            user_group_id: userGroupId,
-            user_id: userId,
-            created_by: createdBy,
-          }))
-        )
-        .onConflict()
-        .ignore();
+    if (ids.length > 0) {
+      await this.withTransaction(async (t) => {
+        await t.raw(
+          /* sql */ `
+        ? on conflict do nothing;
+        `,
+          [
+            this.from("user_group_member", t).insert(
+              ids.map((userId) => ({
+                user_group_id: userGroupId,
+                user_id: userId,
+                created_by: createdBy,
+              }))
+            ),
+          ]
+        );
 
-      /** add group permissions on the new group members */
-      await this.addUserGroupMemberPermissions(userGroupId, ids, createdBy, t);
-    });
+        /** add group permissions on the new group members */
+        await this.addUserGroupMemberPermissions(
+          userGroupId,
+          ids,
+          createdBy,
+          t
+        );
+      }, t);
+    }
   }
 
   private async addUserGroupMemberPermissions(
@@ -217,7 +229,7 @@ export class UserGroupRepository extends BaseRepository {
           with 
             pu as (select * from petition_user where user_group_id = ? and deleted_at is null),
             u as (select * from (values ${memberIds
-              .map(() => "(?)")
+              .map(() => "(?::int)")
               .join(", ")}) as t(user_id))
           insert into petition_user(permission_type, user_id, petition_id, from_user_group_id, created_by)
             select pu.permission_type, u.user_id, pu.petition_id, pu.user_group_id, ?
