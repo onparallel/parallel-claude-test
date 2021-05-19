@@ -5,7 +5,8 @@ import {
   nonNull,
   stringArg,
 } from "@nexus/schema";
-import { CreateUserGroup } from "../../db/__types";
+import pMap from "p-map";
+import { CreateUserGroup, UserGroup } from "../../db/__types";
 import { authenticateAnd } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -165,21 +166,23 @@ export const removeUsersFromGroup = mutationField("removeUsersFromGroup", {
 
 export const cloneUserGroup = mutationField("cloneUserGroup", {
   description: "Clones the user group with all its members",
-  type: "UserGroup",
+  type: list("UserGroup"),
   args: {
-    userGroupId: nonNull(globalIdArg("UserGroup")),
-    name: nonNull(stringArg()),
+    userGroupIds: nonNull(list(nonNull(globalIdArg("UserGroup")))),
+    locale: stringArg(),
   },
-  authorize: authenticateAnd(userHasAccessToUserGroup("userGroupId")),
-  validateArgs: validateAnd(
-    notEmptyString((args) => args.name, "name"),
-    maxLength((args) => args.name, "name", 100)
-  ),
+  authorize: authenticateAnd(userHasAccessToUserGroup("userGroupIds")),
   resolve: async (_, args, ctx) => {
-    return await ctx.userGroups.cloneUserGroup(
-      args.userGroupId,
-      args.name,
-      ctx.user!
+    const groups = (await ctx.userGroups.loadUserGroup(
+      args.userGroupIds
+    )) as UserGroup[];
+
+    return await pMap(groups, (group) =>
+      ctx.userGroups.cloneUserGroup(
+        group.id,
+        group.name.concat(args.locale === "es" ? " (copia)" : " (copy)"),
+        ctx.user!
+      )
     );
   },
 });

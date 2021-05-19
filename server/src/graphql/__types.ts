@@ -603,7 +603,7 @@ export interface NexusGenFieldTypes {
     changePetitionFieldType: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     clonePetitions: NexusGenRootTypes["PetitionBase"][]; // [PetitionBase!]!
-    cloneUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
+    cloneUserGroup: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     createContact: NexusGenRootTypes["Contact"]; // Contact!
     createFileUploadReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     createOrganization: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
@@ -2147,8 +2147,8 @@ export interface NexusGenArgTypes {
     };
     cloneUserGroup: {
       // args
-      name: string; // String!
-      userGroupId: NexusGenScalars["GID"]; // GID!
+      locale?: string | null; // String
+      userGroupIds: NexusGenScalars["GID"][]; // [GID!]!
     };
     createContact: {
       // args

@@ -115,8 +115,8 @@ export class UserGroupRepository extends BaseRepository {
       await t.raw(
         /* sql */ `
         with group_member as (select user_id from user_group_member where user_group_id = ? and deleted_at is null)
-        insert into user_group_member(user_group_id,user_id, createdBy)
-        select (?, group_member.user_id, ?) from group_member;
+        insert into user_group_member(user_group_id, user_id, created_by)
+        select ?::int, user_id, ? from group_member;
       `,
         [userGroupId, newGroup.id, `User:${user.id}`]
       );
