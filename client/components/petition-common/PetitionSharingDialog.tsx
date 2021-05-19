@@ -37,7 +37,6 @@ import {
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
-import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { usePreviousValue } from "beautiful-react-hooks";
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -50,6 +49,7 @@ import {
   UserSelect,
   UserSelectInstance,
   UserSelectSelection,
+  useSearchUsers,
 } from "../common/UserSelect";
 import { UserPermissionType } from "./UserPermissionType";
 
@@ -116,7 +116,7 @@ export function PetitionSharingDialog({
       )
     ) ?? [];
 
-  const usersRef = useRef<UserSelectInstance<true>>(null);
+  const usersRef = useRef<UserSelectInstance<true, true>>(null);
   const messageRef = useRef<HTMLInputElement>(null);
   const messageRegisterProps = useRegisterWithRef(
     messageRef,
@@ -243,8 +243,9 @@ export function PetitionSharingDialog({
                   rules={{ minLength: 1 }}
                   render={({ field: { onChange, onBlur, value } }) => (
                     <UserSelect
-                      ref={usersRef}
                       isMulti
+                      includeGroups
+                      ref={usersRef}
                       value={value}
                       onKeyDown={(e: KeyboardEvent) => {
                         if (

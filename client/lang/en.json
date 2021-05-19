@@ -1485,6 +1485,11 @@
     "context": "Language"
   },
   {
+    "term": "component.user-select.group-members",
+    "definition": "{count, plural, =1 {1 member} other {# members}}",
+    "context": "{count, plural, =1 {1 member} other {# members}}"
+  },
+  {
     "term": "component.user-select.no-options",
     "definition": "Can't find someone?",
     "context": "Can't find someone?"
@@ -1498,6 +1503,11 @@
     "term": "component.user-select.search-hint",
     "definition": "Search for existing users",
     "context": "Search for existing users"
+  },
+  {
+    "term": "component.user-select.user-group-icon-alt",
+    "definition": "User group",
+    "context": "User group"
   },
   {
     "term": "components.multiple-emails-pasted-dialog.header",

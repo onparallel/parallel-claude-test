@@ -1,15 +1,14 @@
+import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
+import { indexBy } from "remeda";
+import { unMaybeArray } from "../../util/arrays";
+import { fromDataLoader } from "../../util/fromDataLoader";
+import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
+import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import { CreateUser, User, UserGroup } from "../__types";
-import { fromDataLoader } from "../../util/fromDataLoader";
-import DataLoader from "dataloader";
-import { indexBy } from "remeda";
-import { MaybeArray } from "../../util/types";
-import { unMaybeArray } from "../../util/arrays";
-import { escapeLike } from "../helpers/utils";
-import { number } from "yargs";
 
 @injectable()
 export class UserRepository extends BaseRepository {

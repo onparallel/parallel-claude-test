@@ -1,9 +1,11 @@
-import { gql } from "@apollo/client";
+import { gql, useApolloClient } from "@apollo/client";
 import { Box, Image, Stack, Text } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
   UserSelect_UserFragment,
   UserSelect_UserGroupFragment,
+  useSearchUsers_searchUsersQuery,
+  useSearchUsers_searchUsersQueryVariables,
 } from "@parallel/graphql/__types";
 import {
   useReactSelectProps,
@@ -94,8 +96,12 @@ export const UserSelect = Object.assign(
         {...reactSelectProps}
       />
     );
-  }) as <IsMulti extends boolean = false>(
-    props: UserSelectProps<IsMulti> & RefAttributes<UserSelectInstance<IsMulti>>
+  }) as <
+    IsMulti extends boolean = false,
+    IncludeGroups extends boolean = false
+  >(
+    props: UserSelectProps<IsMulti, IncludeGroups> &
+      RefAttributes<UserSelectInstance<IsMulti, IncludeGroups>>
   ) => ReactElement | null,
   {
     fragments: {
@@ -306,5 +312,68 @@ function useUserSelectReactSelectProps<
       getOptionValue: (option) => option.id,
     }),
     [reactSelectProps]
+  );
+}
+
+export function useSearchUsers() {
+  const client = useApolloClient();
+  return useCallback(
+    async <IncludeGroups extends boolean = false>(
+      search: string,
+      options: {
+        excludeUsers?: string[];
+        excludeUserGroups?: string[];
+        includeGroups?: IncludeGroups;
+        includeInactive?: boolean;
+      } = {}
+    ): Promise<UserSelectSelection<IncludeGroups>[]> => {
+      const {
+        excludeUsers,
+        excludeUserGroups,
+        includeGroups,
+        includeInactive,
+      } = options;
+      const { data } = await client.query<
+        useSearchUsers_searchUsersQuery,
+        useSearchUsers_searchUsersQueryVariables
+      >({
+        query: gql`
+          query useSearchUsers_searchUsers(
+            $search: String!
+            $excludeUsers: [GID!]
+            $excludeUserGroups: [GID!]
+            $includeGroups: Boolean
+            $includeInactive: Boolean
+          ) {
+            searchUsers(
+              search: $search
+              excludeUsers: $excludeUsers
+              excludeUserGroups: $excludeUserGroups
+              includeGroups: $includeGroups
+              includeInactive: $includeInactive
+            ) {
+              ... on User {
+                ...UserSelect_User
+              }
+              ... on UserGroup {
+                ...UserSelect_UserGroup
+              }
+            }
+          }
+          ${UserSelect.fragments.User}
+          ${UserSelect.fragments.UserGroup}
+        `,
+        variables: {
+          search,
+          excludeUsers,
+          excludeUserGroups,
+          includeGroups,
+          includeInactive,
+        },
+        fetchPolicy: "no-cache",
+      });
+      return data!.searchUsers as UserSelectSelection<IncludeGroups>[];
+    },
+    []
   );
 }

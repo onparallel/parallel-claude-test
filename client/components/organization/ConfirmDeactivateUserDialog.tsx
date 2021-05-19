@@ -5,7 +5,6 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogProvider";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
-import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -13,6 +12,7 @@ import {
   UserSelect,
   UserSelectInstance,
   UserSelectSelection,
+  useSearchUsers,
 } from "../common/UserSelect";
 
 function ConfirmDeactivateUserDialog({

@@ -210,6 +210,8 @@ export type Mutation = {
   clonePetitionField: PetitionBaseAndField;
   /** Clone petition. */
   clonePetitions: Array<PetitionBase>;
+  /** Clones the user group with all its members */
+  cloneUserGroup: Array<UserGroup>;
   /** Create a contact. */
   createContact: Contact;
   /** Creates a reply to a file upload field. */
@@ -428,6 +430,11 @@ export type MutationclonePetitionsArgs = {
   petitionIds: Array<Scalars["GID"]>;
 };
 
+export type MutationcloneUserGroupArgs = {
+  locale?: Maybe<Scalars["String"]>;
+  userGroupIds: Array<Scalars["GID"]>;
+};
+
 export type MutationcreateContactArgs = {
   data: CreateContactInput;
 };
@@ -500,6 +507,7 @@ export type MutationcreateUserArgs = {
 
 export type MutationcreateUserGroupArgs = {
   name: Scalars["String"];
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationdeactivateAccessesArgs = {
@@ -546,7 +554,7 @@ export type MutationdeleteTagArgs = {
 };
 
 export type MutationdeleteUserGroupArgs = {
-  id: Scalars["GID"];
+  ids: Array<Scalars["GID"]>;
 };
 
 export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
@@ -2447,6 +2455,21 @@ export type UserSelect_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
   UserGroup,
   "id" | "name"
 > & { members: Array<{ __typename?: "User" } & UserSelect_UserFragment> };
+
+export type useSearchUsers_searchUsersQueryVariables = Exact<{
+  search: Scalars["String"];
+  excludeUsers?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  excludeUserGroups?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  includeGroups?: Maybe<Scalars["Boolean"]>;
+  includeInactive?: Maybe<Scalars["Boolean"]>;
+}>;
+
+export type useSearchUsers_searchUsersQuery = { __typename?: "Query" } & {
+  searchUsers: Array<
+    | ({ __typename?: "User" } & UserSelect_UserFragment)
+    | ({ __typename?: "UserGroup" } & UserSelect_UserGroupFragment)
+  >;
+};
 
 export type WithAdminOrganizationRoleQueryVariables = Exact<{
   [key: string]: never;
@@ -5757,25 +5780,6 @@ export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
   };
 };
 
-export type useSearchUsers_searchUsersQueryVariables = Exact<{
-  search: Scalars["String"];
-  excludeUsers?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  excludeUserGroups?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-  includeGroups?: Maybe<Scalars["Boolean"]>;
-  includeInactive?: Maybe<Scalars["Boolean"]>;
-}>;
-
-export type useSearchUsers_searchUsersQuery = { __typename?: "Query" } & {
-  searchUsers: Array<
-    | ({ __typename?: "User" } & Pick<User, "id" | "fullName" | "email">)
-    | ({ __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name"> & {
-          members: Array<
-            { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">
-          >;
-        })
-  >;
-};
-
 export type useSettingsSections_UserFragment = { __typename?: "User" } & {
   hasApiTokens: User["hasFeatureFlag"];
 };
@@ -8051,6 +8055,83 @@ export function useTagEditDialog_updateTagMutation(
 }
 export type TagEditDialog_updateTagMutationHookResult = ReturnType<
   typeof useTagEditDialog_updateTagMutation
+>;
+export const useSearchUsers_searchUsersDocument = gql`
+  query useSearchUsers_searchUsers(
+    $search: String!
+    $excludeUsers: [GID!]
+    $excludeUserGroups: [GID!]
+    $includeGroups: Boolean
+    $includeInactive: Boolean
+  ) {
+    searchUsers(
+      search: $search
+      excludeUsers: $excludeUsers
+      excludeUserGroups: $excludeUserGroups
+      includeGroups: $includeGroups
+      includeInactive: $includeInactive
+    ) {
+      ... on User {
+        ...UserSelect_User
+      }
+      ... on UserGroup {
+        ...UserSelect_UserGroup
+      }
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+  ${UserSelect_UserGroupFragmentDoc}
+`;
+
+/**
+ * __useuseSearchUsers_searchUsersQuery__
+ *
+ * To run a query within a React component, call `useuseSearchUsers_searchUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useuseSearchUsers_searchUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useuseSearchUsers_searchUsersQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *      excludeUsers: // value for 'excludeUsers'
+ *      excludeUserGroups: // value for 'excludeUserGroups'
+ *      includeGroups: // value for 'includeGroups'
+ *      includeInactive: // value for 'includeInactive'
+ *   },
+ * });
+ */
+export function useuseSearchUsers_searchUsersQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    useSearchUsers_searchUsersQuery,
+    useSearchUsers_searchUsersQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    useSearchUsers_searchUsersQuery,
+    useSearchUsers_searchUsersQueryVariables
+  >(useSearchUsers_searchUsersDocument, options);
+}
+export function useuseSearchUsers_searchUsersLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    useSearchUsers_searchUsersQuery,
+    useSearchUsers_searchUsersQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    useSearchUsers_searchUsersQuery,
+    useSearchUsers_searchUsersQueryVariables
+  >(useSearchUsers_searchUsersDocument, options);
+}
+export type useSearchUsers_searchUsersQueryHookResult = ReturnType<
+  typeof useuseSearchUsers_searchUsersQuery
+>;
+export type useSearchUsers_searchUsersLazyQueryHookResult = ReturnType<
+  typeof useuseSearchUsers_searchUsersLazyQuery
 >;
 export const WithAdminOrganizationRoleDocument = gql`
   query WithAdminOrganizationRole {
@@ -14101,87 +14182,4 @@ export type PetitionComposeSearchContactsQueryHookResult = ReturnType<
 >;
 export type PetitionComposeSearchContactsLazyQueryHookResult = ReturnType<
   typeof usePetitionComposeSearchContactsLazyQuery
->;
-export const useSearchUsers_searchUsersDocument = gql`
-  query useSearchUsers_searchUsers(
-    $search: String!
-    $excludeUsers: [GID!]
-    $excludeUserGroups: [GID!]
-    $includeGroups: Boolean
-    $includeInactive: Boolean
-  ) {
-    searchUsers(
-      search: $search
-      excludeUsers: $excludeUsers
-      excludeUserGroups: $excludeUserGroups
-      includeGroups: $includeGroups
-      includeInactive: $includeInactive
-    ) {
-      ... on User {
-        id
-        fullName
-        email
-      }
-      ... on UserGroup {
-        id
-        name
-        members {
-          id
-          fullName
-          email
-        }
-      }
-    }
-  }
-`;
-
-/**
- * __useuseSearchUsers_searchUsersQuery__
- *
- * To run a query within a React component, call `useuseSearchUsers_searchUsersQuery` and pass it any options that fit your needs.
- * When your component renders, `useuseSearchUsers_searchUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useuseSearchUsers_searchUsersQuery({
- *   variables: {
- *      search: // value for 'search'
- *      excludeUsers: // value for 'excludeUsers'
- *      excludeUserGroups: // value for 'excludeUserGroups'
- *      includeGroups: // value for 'includeGroups'
- *      includeInactive: // value for 'includeInactive'
- *   },
- * });
- */
-export function useuseSearchUsers_searchUsersQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    useSearchUsers_searchUsersQuery,
-    useSearchUsers_searchUsersQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    useSearchUsers_searchUsersQuery,
-    useSearchUsers_searchUsersQueryVariables
-  >(useSearchUsers_searchUsersDocument, options);
-}
-export function useuseSearchUsers_searchUsersLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    useSearchUsers_searchUsersQuery,
-    useSearchUsers_searchUsersQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    useSearchUsers_searchUsersQuery,
-    useSearchUsers_searchUsersQueryVariables
-  >(useSearchUsers_searchUsersDocument, options);
-}
-export type useSearchUsers_searchUsersQueryHookResult = ReturnType<
-  typeof useuseSearchUsers_searchUsersQuery
->;
-export type useSearchUsers_searchUsersLazyQueryHookResult = ReturnType<
-  typeof useuseSearchUsers_searchUsersLazyQuery
 >;
