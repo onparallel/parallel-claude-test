@@ -83,8 +83,6 @@ function OrganizationUsers() {
     })
   );
 
-  console.log(me);
-
   const hasSsoProvider = me.organization.hasSsoProvider;
   const userList = me.organization.users;
 

@@ -16,19 +16,19 @@ export type SettingsLayoutProps = {
   sections: { title: string; path: string }[];
   sectionsHeader: ReactNode;
   isBase?: boolean;
-  includesPath?: boolean;
+  showBackButton?: boolean;
   header?: ReactNode;
   children?: ReactNode;
 };
 
 export function SettingsLayout({
   basePath,
-  isBase,
-  includesPath,
   title,
   user,
   sections,
   sectionsHeader,
+  isBase,
+  showBackButton,
   header,
   children,
 }: SettingsLayoutProps) {
@@ -75,11 +75,7 @@ export function SettingsLayout({
             </Heading>
           </Flex>
           {sections.map((section, index) => (
-            <SettingsLayoutMenuItem
-              key={index}
-              path={section.path}
-              includesPath={includesPath ?? false}
-            >
+            <SettingsLayoutMenuItem key={index} path={section.path}>
               {section.title}
             </SettingsLayoutMenuItem>
           ))}
@@ -103,7 +99,9 @@ export function SettingsLayout({
                 borderBottom="1px solid"
                 borderBottomColor="gray.100"
               >
-                <NakedLink href={includesPath ? activeSection.path : basePath}>
+                <NakedLink
+                  href={showBackButton ? activeSection.path : basePath}
+                >
                   <IconButton
                     as="a"
                     icon={<ArrowBackIcon />}
@@ -115,7 +113,7 @@ export function SettingsLayout({
                     marginRight={2}
                     display={{
                       base: "flex",
-                      md: includesPath ? "flex" : "none",
+                      md: showBackButton ? "flex" : "none",
                     }}
                   />
                 </NakedLink>
@@ -144,19 +142,15 @@ SettingsLayout.fragments = {
 interface SettingsLayoutMenuItemProps {
   path: string;
   children: ReactNode;
-  includesPath: boolean;
 }
 
 function SettingsLayoutMenuItem({
   path,
   children,
-  includesPath,
 }: SettingsLayoutMenuItemProps) {
   const { pathname } = useRouter();
 
-  const active = includesPath
-    ? pathname.includes(`/[locale]${path}`)
-    : pathname === `/[locale]${path}`;
+  const active = pathname.includes(`/[locale]${path}`);
 
   return (
     <NakedLink href={path}>

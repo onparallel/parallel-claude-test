@@ -63,17 +63,6 @@ export const contactQueries = queryField((t) => {
     },
   });
 
-  t.nullable.field("contact", {
-    type: "Contact",
-    args: {
-      id: nonNull(globalIdArg()),
-    },
-    authorize: chain(authenticate(), userHasAccessToContacts("id")),
-    resolve: async (root, args, ctx) => {
-      return await ctx.contacts.loadContact(args.id);
-    },
-  });
-
   t.nullable.field("contactsByEmail", {
     description:
       "Matches the emails passed as argument with a Contact in the database. Returns a list of nullable Contacts",

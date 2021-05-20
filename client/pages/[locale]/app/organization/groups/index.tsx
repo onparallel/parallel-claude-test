@@ -1,12 +1,17 @@
-import { Flex, Heading, Text } from "@chakra-ui/layout";
+import { Flex, Heading } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import { FormattedMessage, useIntl } from "react-intl";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
-import { withDialogs } from "@parallel/components/common/DialogProvider";
+import {
+  DialogProps,
+  useDialog,
+  withDialogs,
+} from "@parallel/components/common/DialogProvider";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { compose } from "@parallel/utils/compose";
 import {
   integer,
+  parseQuery,
   sorting,
   string,
   useQueryState,
@@ -14,7 +19,7 @@ import {
 } from "@parallel/utils/queryState";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { FORMATS } from "@parallel/utils/dates";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
@@ -22,10 +27,34 @@ import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useCreateGroupDialog } from "@parallel/components/organization/CreateGroupDialog";
 import { TableColumn } from "@parallel/components/common/Table";
-import { withApolloData } from "@parallel/components/common/withApolloData";
+import {
+  withApolloData,
+  WithApolloDataContext,
+} from "@parallel/components/common/withApolloData";
 import { OverflownText } from "@parallel/components/common/OverflownText";
+import { useRouter } from "next/router";
+import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { Button } from "@chakra-ui/button";
+import gql from "graphql-tag";
+import {
+  assertQuery,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo/assertQuery";
+import { AppLayout } from "@parallel/components/layout/AppLayout";
+import {
+  OrganizationGroupsQuery,
+  OrganizationGroupsQueryVariables,
+  OrganizationGroupsUserQuery,
+  OrganizationGroups_UserGroupFragment,
+  QueryUserGroups_OrderBy,
+  useOrganizationGroupsQuery,
+  useOrganizationGroupsUserQuery,
+  useOrganizationGroups_cloneUserGroupMutation,
+  useOrganizationGroups_createUserGroupMutation,
+  useOrganizationGroups_deleteUserGroupMutation,
+} from "@parallel/graphql/__types";
 
-const SORTING = ["groupName", "members", "createdAt"] as const;
+const SORTING = ["name", "members", "createdAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -37,94 +66,42 @@ const QUERY_STATE = {
   }),
 };
 
-const loading = false;
-const refetch = () => {
-  console.log("Refetch function");
-};
-const me = {
-  fullName: "Konstantin Klykov",
-  id: "yQQfqcU7",
-  isSuperAdmin: true,
-  onboardingStatus: {
-    CONTACT_LIST: { SKIPPED: true },
-    PETITIONS_LIST: { SKIPPED: true },
-    PETITION_COMPOSE: { SKIPPED: true },
-    PETITION_REVIEW: { SKIPPED: true },
-  },
-  organization: {
-    hasSsoProvider: false,
-    id: "yw7RQt2cQ4XDHdrbtL3",
-    groups: {
-      totalCount: 3,
-      items: [
-        {
-          id: "1",
-          name: "Grupo HR",
-          users: [
-            { fullName: "fake 1 user", id: "1SgRex7YxU", __typename: "User" },
-            { fullName: "fake 2 user", id: "2SgRex7YxU", __typename: "User" },
-            { fullName: "fake 3 user", id: "3SgRex7YxU", __typename: "User" },
-          ],
-          createdAt: "2021-05-14T08:02:31.861Z",
-        },
-        {
-          id: "2",
-          name: "GROUP IT - Nombre de grupo largo",
-          users: [
-            { fullName: "fake 1 user", id: "1SgRex7YxU", __typename: "User" },
-            { fullName: "fake 2 user", id: "2SgRex7YxU", __typename: "User" },
-            { fullName: "fake 3 user", id: "3SgRex7YxU", __typename: "User" },
-            { fullName: "fake 4 user", id: "4SgRex7YxU", __typename: "User" },
-            { fullName: "fake 5 user", id: "5SgRex7YxU", __typename: "User" },
-            { fullName: "fake 6 user", id: "6SgRex7YxU", __typename: "User" },
-            { fullName: "fake 7 user", id: "7SgRex7YxU", __typename: "User" },
-          ],
-          createdAt: "2021-05-14T08:02:31.861Z",
-        },
-        {
-          id: "3",
-          name: "GROUP 02 - Nombre de grupo muy muy muy largo",
-          users: [
-            { fullName: "fake 1 user", id: "1SgRex7YxU", __typename: "User" },
-            { fullName: "fake 2 user", id: "2SgRex7YxU", __typename: "User" },
-            { fullName: "fake 3 user", id: "3SgRex7YxU", __typename: "User" },
-            { fullName: "fake 4 user", id: "4SgRex7YxU", __typename: "User" },
-            { fullName: "fake 5 user", id: "5SgRex7YxU", __typename: "User" },
-            { fullName: "fake 6 user", id: "6SgRex7YxU", __typename: "User" },
-            { fullName: "fake 7 user", id: "7SgRex7YxU", __typename: "User" },
-            { fullName: "fake 8 user", id: "8SgRex7YxU", __typename: "User" },
-            { fullName: "fake 9 user", id: "9SgRex7YxU", __typename: "User" },
-            { fullName: "fake 3 user", id: "3SgRex7YxU21", __typename: "User" },
-            { fullName: "fake 4 user", id: "4SgRex7YxU22", __typename: "User" },
-            { fullName: "fake 5 user", id: "5SgRex7YxU23", __typename: "User" },
-            { fullName: "fake 6 user", id: "6SgRex7YxU24", __typename: "User" },
-            { fullName: "fake 7 user", id: "7SgRex7YxU25", __typename: "User" },
-            { fullName: "fake 8 user", id: "8SgRex7YxU26", __typename: "User" },
-            { fullName: "fake 9 user", id: "9SgRex7YxU27", __typename: "User" },
-          ],
-          createdAt: "2021-05-14T08:02:31.861Z",
-        },
-      ],
-    },
-  },
-} as any;
-
 function OrganizationGroups() {
   const intl = useIntl();
   const toast = useToast();
+  const localeRef = useRef<string>(intl.locale);
+  const router = useRouter();
+
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [selected, setSelected] = useState<string[]>([]);
 
-  console.log("GROUPS RERENDER");
+  const {
+    data: { me },
+  } = assertQuery(useOrganizationGroupsUserQuery());
 
-  const groupList = me.organization.groups;
+  const {
+    data: { userGroups },
+    loading,
+    refetch,
+  } = useAssertQueryOrPreviousData(
+    useOrganizationGroupsQuery({
+      variables: {
+        offset: state.items * (state.page - 1),
+        limit: state.items,
+        search: state.search,
+        sortBy: [
+          `${state.sort.field}_${state.sort.direction}` as QueryUserGroups_OrderBy,
+        ],
+      },
+    })
+  );
 
   const selectedGroups = useMemo(
     () =>
       selected
-        .map((groupId) => groupList.items.find((g) => g.id === groupId)!)
+        .map((groupId) => userGroups.items.find((g) => g.id === groupId)!)
         .filter((u) => u !== undefined),
-    [selected.join(","), groupList.items]
+    [selected.join(","), userGroups.items]
   );
 
   const [search, setSearch] = useState(state.search);
@@ -132,6 +109,8 @@ function OrganizationGroups() {
   const sections = useOrganizationSections();
 
   const columns = useOrganizationGroupsTableColumns();
+
+  const confirmDelete = useConfirmDeleteGroupsDialog();
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (value) => {
@@ -152,16 +131,47 @@ function OrganizationGroups() {
     [debouncedOnSearchChange]
   );
 
+  const handleRowClick = useCallback(function (row: any) {
+    router.push(`/${localeRef.current}/app/organization/groups/${row.id}`);
+  }, []);
+
+  const [cloneUserGroup] = useOrganizationGroups_cloneUserGroupMutation();
+  const handleCloneClick = useCallback(
+    async function () {
+      await cloneUserGroup({
+        variables: {
+          ids: selected,
+          locale: intl.locale,
+        },
+      });
+      refetch();
+    },
+    [userGroups, selected]
+  );
+
+  const [deleteUserGroup] = useOrganizationGroups_deleteUserGroupMutation();
+  const handleDeleteClick = useCallback(async () => {
+    await confirmDelete({ name: selectedGroups[0].name, groupIds: selected });
+    await deleteUserGroup({
+      variables: {
+        ids: selected,
+      },
+    });
+    refetch();
+  }, [userGroups, selected]);
+
+  const [createUserGroup] = useOrganizationGroups_createUserGroupMutation();
   const showCreateGroupDialog = useCreateGroupDialog();
   const handleCreateGroup = async () => {
     try {
       const newGroup = await showCreateGroupDialog({});
-      //   await createOrganizationUser({
-      //     variables: newUser,
-      //     update: () => {
-      //       refetch();
-      //     },
-      //   });
+      await createUserGroup({
+        variables: {
+          name: newGroup.name,
+          userIds: newGroup.users.map((u) => u.id),
+        },
+      });
+      refetch();
       toast({
         title: intl.formatMessage({
           id: "organization.group-created-success.toast-title",
@@ -218,12 +228,13 @@ function OrganizationGroups() {
           isSelectable
           isHighlightable
           columns={columns}
-          rows={groupList.items}
+          rows={userGroups.items}
+          onRowClick={handleRowClick}
           rowKeyProp="id"
           loading={loading}
           page={state.page}
           pageSize={state.items}
-          totalCount={1}
+          totalCount={userGroups.totalCount}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
@@ -239,8 +250,8 @@ function OrganizationGroups() {
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
               onCreateGroup={handleCreateGroup}
-              onCloneGroup={() => {}}
-              onRemoveGroup={() => {}}
+              onCloneGroup={handleCloneClick}
+              onRemoveGroup={handleDeleteClick}
             />
           }
         />
@@ -249,7 +260,7 @@ function OrganizationGroups() {
   );
 }
 
-function useOrganizationGroupsTableColumns(): TableColumn<any>[] {
+function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_UserGroupFragment>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -257,7 +268,7 @@ function useOrganizationGroupsTableColumns(): TableColumn<any>[] {
         key: "name",
         isSortable: true,
         header: intl.formatMessage({
-          id: "organization-group.header.name",
+          id: "organization-groups.header.name",
           defaultMessage: "Name",
         }),
         headerProps: {
@@ -274,13 +285,13 @@ function useOrganizationGroupsTableColumns(): TableColumn<any>[] {
       {
         key: "members",
         header: intl.formatMessage({
-          id: "organization-group.header.members",
+          id: "organization-groups.header.members",
           defaultMessage: "Members",
         }),
         align: "left",
-        CellContent: ({ row: { users }, column }) => (
+        CellContent: ({ row: { members }, column }) => (
           <Flex justifyContent={column.align}>
-            <UserAvatarList users={users} max={10} />
+            <UserAvatarList users={members} max={10} />
           </Flex>
         ),
       },
@@ -308,12 +319,168 @@ function useOrganizationGroupsTableColumns(): TableColumn<any>[] {
   );
 }
 
-// OrganizationGroups.getInitialProps = async ({
-//   fetchQuery,
-//   ...context
-// }: WithApolloDataContext) => {
-//   const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
-// };
+export function useConfirmDeleteGroupsDialog() {
+  return useDialog(ConfirmDeleteGroupsDialog);
+}
+
+function ConfirmDeleteGroupsDialog({
+  groupIds,
+  name,
+  ...props
+}: DialogProps<{
+  name: string;
+  groupIds?: string[];
+}>) {
+  const count = groupIds?.length ?? 1;
+
+  return (
+    <ConfirmDialog
+      hasCloseButton
+      header={
+        <FormattedMessage
+          id="organization-groups.confirm-delete.header"
+          defaultMessage="Delete {count, plural, =1 {group} other {groups}}"
+          values={{ count }}
+        />
+      }
+      body={
+        <FormattedMessage
+          id="organization-groups.confirm-delete.body"
+          defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
+          values={{
+            count,
+            name,
+            b: (chunks: any[]) => <b>{chunks}</b>,
+          }}
+        />
+      }
+      confirm={
+        <Button colorScheme="red" onClick={() => props.onResolve()}>
+          <FormattedMessage
+            id="generic.confirm-delete-button"
+            defaultMessage="Yes, delete"
+          />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+OrganizationGroups.fragments = {
+  get UserGroupPagination() {
+    return gql`
+      fragment OrganizationGroups_UserGroupPagination on UserGroupPagination {
+        items {
+          ...OrganizationGroups_UserGroup
+        }
+        totalCount
+      }
+      ${this.UserGroup}
+    `;
+  },
+  get UserGroup() {
+    return gql`
+      fragment OrganizationGroups_UserGroup on UserGroup {
+        id
+        name
+        createdAt
+        members {
+          id
+          fullName
+          email
+        }
+      }
+    `;
+  },
+  get User() {
+    return gql`
+      fragment OrganizationGroups_User on User {
+        ...AppLayout_User
+      }
+      ${AppLayout.fragments.User}
+    `;
+  },
+};
+
+OrganizationGroups.mutations = [
+  gql`
+    mutation OrganizationGroups_createUserGroup(
+      $name: String!
+      $userIds: [GID!]!
+    ) {
+      createUserGroup(name: $name, userIds: $userIds) {
+        ...OrganizationGroups_UserGroup
+      }
+    }
+    ${OrganizationGroups.fragments.UserGroup}
+  `,
+  gql`
+    mutation OrganizationGroups_deleteUserGroup($ids: [GID!]!) {
+      deleteUserGroup(ids: $ids)
+    }
+  `,
+  gql`
+    mutation OrganizationGroups_cloneUserGroup(
+      $ids: [GID!]!
+      $locale: String!
+    ) {
+      cloneUserGroup(userGroupIds: $ids, locale: $locale) {
+        ...OrganizationGroups_UserGroup
+      }
+    }
+    ${OrganizationGroups.fragments.UserGroup}
+  `,
+];
+
+OrganizationGroups.getInitialProps = async ({
+  query,
+  fetchQuery,
+}: WithApolloDataContext) => {
+  const { page, items, search, sort } = parseQuery(query, QUERY_STATE);
+  await Promise.all([
+    fetchQuery<OrganizationGroupsQuery, OrganizationGroupsQueryVariables>(
+      gql`
+        query OrganizationGroups(
+          $offset: Int!
+          $limit: Int!
+          $search: String
+          $sortBy: [QueryUserGroups_OrderBy!]
+        ) {
+          userGroups(
+            offset: $offset
+            limit: $limit
+            search: $search
+            sortBy: $sortBy
+          ) {
+            ...OrganizationGroups_UserGroupPagination
+          }
+        }
+        ${OrganizationGroups.fragments.UserGroupPagination}
+      `,
+      {
+        variables: {
+          offset: items * (page - 1),
+          limit: items,
+          search,
+          sortBy: [
+            `${sort.field}_${sort.direction}` as QueryUserGroups_OrderBy,
+          ],
+        },
+      }
+    ),
+    fetchQuery<OrganizationGroupsUserQuery>(
+      gql`
+        query OrganizationGroupsUser {
+          me {
+            ...OrganizationGroups_User
+          }
+        }
+        ${OrganizationGroups.fragments.User}
+      `
+    ),
+  ]);
+};
 
 export default compose(
   withAdminOrganizationRole,

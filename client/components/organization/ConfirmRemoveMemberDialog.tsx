@@ -1,9 +1,11 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
+import { UserXIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
+import { OrganizationUsers_UserFragment } from "@parallel/graphql/__types";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { UserSelectSelection } from "../common/UserSelect";
@@ -11,7 +13,10 @@ import { UserSelectSelection } from "../common/UserSelect";
 function ConfirmRemoveMemberDialog({
   selected,
   ...props
-}: DialogProps<{ selected: string[] }, UserSelectSelection>) {
+}: DialogProps<
+  { selected: OrganizationUsers_UserFragment[] },
+  UserSelectSelection
+>) {
   const {
     handleSubmit,
     formState: { errors },
@@ -26,6 +31,7 @@ function ConfirmRemoveMemberDialog({
 
   return (
     <ConfirmDialog
+      hasCloseButton
       size="lg"
       content={{
         as: "form",
@@ -34,20 +40,26 @@ function ConfirmRemoveMemberDialog({
         }),
       }}
       header={
-        <FormattedMessage
-          id="organization-groups.remove"
-          defaultMessage="Remove from group"
-        />
+        <Stack direction={"row"} spacing={2} align="center">
+          <UserXIcon />
+          <Text>
+            <FormattedMessage
+              id="organization-groups.remove"
+              defaultMessage="Remove from group"
+            />
+          </Text>
+        </Stack>
       }
       body={
         <Stack spacing={4}>
           <Text>
             <FormattedMessage
               id="organization.confirm-remove-member.body"
-              defaultMessage="Are you sure you want to <b>remove from group</b> the selected {count, plural, =1{user} other {users}}? If continue they will lose access to the petitions shared with this group."
+              defaultMessage="Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
               values={{
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 count: selected.length,
+                fullName: selected[0].fullName,
               }}
             />
           </Text>

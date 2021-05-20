@@ -23,7 +23,7 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
-export type OrganizationGroupMembersListTableHeaderProps = {
+export type OrganizationGroupListTableHeaderProps = {
   me: AppLayout_UserFragment;
   search: string | null;
   selectedUsers: OrganizationUsers_UserFragment[];
@@ -33,7 +33,7 @@ export type OrganizationGroupMembersListTableHeaderProps = {
   onRemoveMember: (userIds: OrganizationUsers_UserFragment[]) => void;
 };
 
-export function OrganizationGroupMembersListTableHeader({
+export function OrganizationGroupListTableHeader({
   me,
   search,
   selectedUsers,
@@ -41,7 +41,7 @@ export function OrganizationGroupMembersListTableHeader({
   onReload,
   onAddMember,
   onRemoveMember,
-}: OrganizationGroupMembersListTableHeaderProps) {
+}: OrganizationGroupListTableHeaderProps) {
   const intl = useIntl();
   const showActions = selectedUsers.length > 0;
 

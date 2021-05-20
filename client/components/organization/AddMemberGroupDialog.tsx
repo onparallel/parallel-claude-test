@@ -1,22 +1,28 @@
-import { Button, FormControl, FormLabel, Stack } from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, Stack, Text } from "@chakra-ui/react";
+import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
-import { useSearchUsers } from "@parallel/utils/useSearchUsers";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { UserMultiSelect, UserSelectSelection } from "../common/UserSelect";
+import {
+  UserSelect,
+  UserSelectInstance,
+  UserSelectSelection,
+  useSearchUsers,
+} from "../common/UserSelect";
 
 interface AddMemberGroupDialogData {
-  users: string[];
+  users: UserSelectSelection[];
 }
 
 export function AddMemberGroupDialog({
+  exclude,
   ...props
-}: DialogProps<{}, AddMemberGroupDialogData>) {
+}: DialogProps<{ exclude: string[] }, AddMemberGroupDialogData>) {
   const { handleSubmit, control } = useForm<AddMemberGroupDialogData>({
     mode: "onChange",
     defaultValues: {
@@ -26,13 +32,15 @@ export function AddMemberGroupDialog({
 
   const intl = useIntl();
   const nameRef = useRef<HTMLInputElement>(null);
-
-  console.log("GROUPS DIALOG RERENDER");
+  const usersRef = useRef<UserSelectInstance<true>>(null);
 
   const _handleSearchUsers = useSearchUsers();
+
   const handleSearchUsers = useCallback(
-    async (search: string, exclude: string[]) => {
-      return await _handleSearchUsers(search, [...exclude]);
+    async (search: string, excludeUsers: string[]) => {
+      return await _handleSearchUsers(search, {
+        excludeUsers: [...excludeUsers, ...exclude],
+      });
     },
     [_handleSearchUsers]
   );
@@ -46,17 +54,22 @@ export function AddMemberGroupDialog({
       }}
       initialFocusRef={nameRef}
       header={
-        <FormattedMessage
-          id="organization-groups.add-member-title"
-          defaultMessage="Add new users to group "
-        />
+        <Stack direction={"row"} spacing={2} align="center">
+          <UserPlusIcon />
+          <Text>
+            <FormattedMessage
+              id="organization-groups.add-member-title"
+              defaultMessage="Add members to group "
+            />
+          </Text>
+        </Stack>
       }
       body={
         <Stack>
           <FormControl id="add-users">
             <FormLabel>
               <FormattedMessage
-                id="organization-groups.users"
+                id="organization.users.title"
                 defaultMessage="Users"
               />
             </FormLabel>
@@ -65,7 +78,9 @@ export function AddMemberGroupDialog({
               control={control}
               rules={{ minLength: 1 }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <UserMultiSelect
+                <UserSelect
+                  ref={usersRef}
+                  isMulti
                   value={value}
                   onKeyDown={(e: KeyboardEvent) => {
                     if (
@@ -75,11 +90,11 @@ export function AddMemberGroupDialog({
                       e.preventDefault();
                     }
                   }}
-                  onChange={(users: UserSelectSelection[]) => {
+                  onChange={(users) => {
                     onChange(users);
                   }}
                   onBlur={onBlur}
-                  onSearchUsers={handleSearchUsers}
+                  onSearch={handleSearchUsers}
                   placeholder={intl.formatMessage({
                     id: "petition-sharing.input-placeholder",
                     defaultMessage: "Add users from your organization",
@@ -92,7 +107,7 @@ export function AddMemberGroupDialog({
       }
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
-          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+          <FormattedMessage id="generic.done" defaultMessage="Done" />
         </Button>
       }
       {...props}

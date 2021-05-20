@@ -27,7 +27,6 @@ export const UserAvatarList = Object.assign(
     const excess =
       users.length > slice.length ? users.length - slice.length : null;
 
-    console.log(users);
     return (
       <Flex
         ref={ref}

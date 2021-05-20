@@ -2785,6 +2785,7 @@ type Query {
     """
     search: String
   ): TagPagination!
+  userGroup(id: GID!): UserGroup
 
   """
   Paginated list of user groups in the organization

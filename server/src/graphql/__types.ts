@@ -1117,6 +1117,7 @@ export interface NexusGenFieldTypes {
     publicTemplates: NexusGenRootTypes["PetitionTemplatePagination"]; // PetitionTemplatePagination!
     searchUsers: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
+    userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
   };
   ReminderSentEvent: {
@@ -1959,6 +1960,7 @@ export interface NexusGenFieldTypeNames {
     publicTemplates: "PetitionTemplatePagination";
     searchUsers: "UserOrUserGroup";
     tags: "TagPagination";
+    userGroup: "UserGroup";
     userGroups: "UserGroupPagination";
   };
   ReminderSentEvent: {
@@ -2833,6 +2835,10 @@ export interface NexusGenArgTypes {
       limit?: number | null; // Int
       offset?: number | null; // Int
       search?: string | null; // String
+    };
+    userGroup: {
+      // args
+      id: NexusGenScalars["GID"]; // GID!
     };
     userGroups: {
       // args

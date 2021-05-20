@@ -45,8 +45,6 @@ export function OrganizationGroupsListTableHeader({
 
   const showActions = selectedGroups.length > 0;
 
-  console.log("GROUPS TABLE HEADER RERENDER");
-
   return (
     <Stack direction="row" padding={2}>
       <Box flex="0 1 400px">
@@ -91,8 +89,8 @@ export function OrganizationGroupsListTableHeader({
               <MenuItem onClick={() => onRemoveGroup()} color="red.500">
                 <DeleteIcon marginRight={2} />
                 <FormattedMessage
-                  id="organization-groups.remove-group"
-                  defaultMessage="Remove {count, plural, =1{group} other {groups}}"
+                  id="organization-groups.delete-group"
+                  defaultMessage="Delete {count, plural, =1{group} other {groups}}"
                   values={{ count: selectedGroups.length }}
                 />
               </MenuItem>

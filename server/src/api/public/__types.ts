@@ -396,6 +396,11 @@ export type MutationaddUsersToUserGroupArgs = {
   userIds: Array<Scalars["GID"]>;
 };
 
+export type MutationaddUsersToUserGroupArgs = {
+  userGroupId: Scalars["GID"];
+  userIds: Array<Scalars["GID"]>;
+};
+
 export type MutationassignPetitionToUserArgs = {
   petitionId: Scalars["ID"];
   userId: Scalars["Int"];
@@ -1750,6 +1755,7 @@ export type Query = {
   searchUsers: Array<UserOrUserGroup>;
   /** Paginated list of tags in the organization */
   tags: TagPagination;
+  userGroup: Maybe<UserGroup>;
   /** Paginated list of user groups in the organization */
   userGroups: UserGroupPagination;
 };
@@ -1847,6 +1853,10 @@ export type QuerytagsArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
+};
+
+export type QueryuserGroupArgs = {
+  id: Scalars["GID"];
 };
 
 export type QueryuserGroupsArgs = {
@@ -2152,17 +2162,10 @@ export type UserGroup = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  members: Array<UserGroupMember>;
+  members: Array<User>;
   name: Scalars["String"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
-
-export type UserGroupMember = {
-  /** The time the user was added to the user group. */
-  addedAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  user: User;
 };
 
 export type UserGroupPagination = {

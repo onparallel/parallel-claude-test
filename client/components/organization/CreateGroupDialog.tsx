@@ -11,15 +11,20 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
-import { useSearchUsers } from "@parallel/utils/useSearchUsers";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
-import { UserMultiSelect, UserSelectSelection } from "../common/UserSelect";
+import {
+  UserSelect,
+  UserSelectInstance,
+  UserSelectSelection,
+  useSearchUsers,
+} from "../common/UserSelect";
 
 interface CreateGroupDialogData {
   name: string;
-  users: string[];
+  users: UserSelectSelection[];
 }
 
 export function CreateGroupDialog({
@@ -37,14 +42,19 @@ export function CreateGroupDialog({
   const { errors } = formState;
 
   const intl = useIntl();
-  const nameRef = useRef<HTMLInputElement>(null);
+  const usersRef = useRef<UserSelectInstance<true>>(null);
 
-  console.log("GROUPS DIALOG RERENDER");
+  const nameRef = useRef<HTMLInputElement>(null);
+  const nameRegisterProps = useRegisterWithRef(nameRef, register, "name", {
+    required: true,
+  });
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
-    async (search: string, exclude: string[]) => {
-      return await _handleSearchUsers(search, [...exclude]);
+    async (search: string, excludeUsers: string[]) => {
+      return await _handleSearchUsers(search, {
+        excludeUsers: [...excludeUsers],
+      });
     },
     [_handleSearchUsers]
   );
@@ -72,7 +82,7 @@ export function CreateGroupDialog({
                 defaultMessage="Group name"
               />
             </FormLabel>
-            <Input {...register("name", { required: true })} ref={nameRef} />
+            <Input {...nameRegisterProps} />
             <FormErrorMessage>
               <FormattedMessage
                 id="generic.forms.invalid-group-name-error"
@@ -92,7 +102,9 @@ export function CreateGroupDialog({
               control={control}
               rules={{ minLength: 1 }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <UserMultiSelect
+                <UserSelect
+                  ref={usersRef}
+                  isMulti
                   value={value}
                   onKeyDown={(e: KeyboardEvent) => {
                     if (
@@ -102,11 +114,11 @@ export function CreateGroupDialog({
                       e.preventDefault();
                     }
                   }}
-                  onChange={(users: UserSelectSelection[]) => {
+                  onChange={(users) => {
                     onChange(users);
                   }}
                   onBlur={onBlur}
-                  onSearchUsers={handleSearchUsers}
+                  onSearch={handleSearchUsers}
                   placeholder={intl.formatMessage({
                     id: "petition-sharing.input-placeholder",
                     defaultMessage: "Add users from your organization",

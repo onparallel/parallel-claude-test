@@ -490,6 +490,16 @@
     "context": "You already have a token with this name"
   },
   {
+    "term": "component.group-header.clone-label",
+    "definition": "",
+    "context": "Clone group"
+  },
+  {
+    "term": "component.group-header.delete-label",
+    "definition": "",
+    "context": "Delete group"
+  },
+  {
     "term": "component.header-name-editable.change-name",
     "definition": "Cambiar nombre",
     "context": "Change name"
@@ -1865,6 +1875,11 @@
     "context": "Add message"
   },
   {
+    "term": "generic.added-at",
+    "definition": "",
+    "context": "Added at"
+  },
+  {
     "term": "generic.all-languages",
     "definition": "Todos los idiomas",
     "context": "All languages"
@@ -2675,16 +2690,6 @@
     "context": "New petition"
   },
   {
-    "term": "organization-group.header.members",
-    "definition": "",
-    "context": "Members"
-  },
-  {
-    "term": "organization-group.header.name",
-    "definition": "",
-    "context": "Name"
-  },
-  {
     "term": "organization-groups.add-member",
     "definition": "",
     "context": "Add member"
@@ -2692,12 +2697,22 @@
   {
     "term": "organization-groups.add-member-title",
     "definition": "",
-    "context": "Add new users to group"
+    "context": "Add members to group"
   },
   {
     "term": "organization-groups.clone-group",
     "definition": "",
     "context": "Clone {count, plural, =1{group} other {groups}}"
+  },
+  {
+    "term": "organization-groups.confirm-delete.body",
+    "definition": "",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
+  },
+  {
+    "term": "organization-groups.confirm-delete.header",
+    "definition": "",
+    "context": "Delete {count, plural, =1 {group} other {groups}}"
   },
   {
     "term": "organization-groups.create-group",
@@ -2710,9 +2725,24 @@
     "context": "New working group"
   },
   {
+    "term": "organization-groups.delete-group",
+    "definition": "",
+    "context": "Delete {count, plural, =1{group} other {groups}}"
+  },
+  {
     "term": "organization-groups.group-name",
     "definition": "",
     "context": "Group name"
+  },
+  {
+    "term": "organization-groups.header.members",
+    "definition": "",
+    "context": "Members"
+  },
+  {
+    "term": "organization-groups.header.name",
+    "definition": "",
+    "context": "Name"
   },
   {
     "term": "organization-groups.members",
@@ -2728,11 +2758,6 @@
     "term": "organization-groups.remove-from-group",
     "definition": "",
     "context": "Remove from group"
-  },
-  {
-    "term": "organization-groups.remove-group",
-    "definition": "",
-    "context": "Remove {count, plural, =1{group} other {groups}}"
   },
   {
     "term": "organization-users.activate",
@@ -2847,7 +2872,7 @@
   {
     "term": "organization.confirm-remove-member.body",
     "definition": "",
-    "context": "Are you sure you want to <b>remove from group</b> the selected {count, plural, =1{user} other {users}}? If continue they will lose access to the petitions shared with this group."
+    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
   },
   {
     "term": "organization.confirm-remove-member.confirm",
@@ -2903,6 +2928,11 @@
     "term": "organization.user-updated-success.toast-title",
     "definition": "Usuario actualizado con éxito.",
     "context": "User updated successfully."
+  },
+  {
+    "term": "organization.users-added-success.toast-title",
+    "definition": "",
+    "context": "Users added successfully."
   },
   {
     "term": "organization.users.title",

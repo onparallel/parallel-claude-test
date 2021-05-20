@@ -1,5 +1,7 @@
-import { queryField } from "@nexus/schema";
-import { authenticate } from "../helpers/authorize";
+import { userHasAccessToUserGroup } from "./authorizers";
+import { nonNull, queryField } from "@nexus/schema";
+import { authenticate, chain } from "../helpers/authorize";
+import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 
 export const userGroupsQuery = queryField((t) => {
@@ -23,6 +25,17 @@ export const userGroupsQuery = queryField((t) => {
           return { column: columnMap[field], order };
         }),
       });
+    },
+  });
+
+  t.nullable.field("userGroup", {
+    type: "UserGroup",
+    args: {
+      id: nonNull(globalIdArg()),
+    },
+    authorize: chain(authenticate(), userHasAccessToUserGroup("id")),
+    resolve: async (root, args, ctx) => {
+      return await ctx.userGroups.loadUserGroup(args.id);
     },
   });
 });

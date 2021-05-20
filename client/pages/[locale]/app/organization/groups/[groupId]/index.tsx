@@ -33,19 +33,25 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/ConfirmRemoveMemberDialog";
-import { OrganizationGroupMembersListTableHeader } from "@parallel/components/organization/OrganizationGroupMembersListTableHeader";
 import {
-  OrganizationUsersQuery,
-  OrganizationUsers_OrderBy,
+  OrganizationGroupQuery,
+  OrganizationGroupQueryVariables,
+  OrganizationGroupUserQuery,
   OrganizationUsers_UserFragment,
-  useOrganizationUsersQuery,
+  useOrganizationGroupQuery,
+  useOrganizationGroupUserQuery,
+  useOrganizationGroup_addUsersToUserGroupMutation,
+  useOrganizationGroup_removeUsersFromGroupMutation,
+  useOrganizationGroup_deleteUserGroupMutation,
+  useOrganizationGroup_cloneUserGroupMutation,
+  useOrganizationGroup_updateUserGroupMutation,
+  OrganizationGroup_MemberFragment,
 } from "@parallel/graphql/__types";
-import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
+import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
   integer,
-  parseQuery,
   sorting,
   string,
   useQueryState,
@@ -53,60 +59,95 @@ import {
 } from "@parallel/utils/queryState";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/AddMemberGroupDialog";
+import { useConfirmDeleteGroupsDialog } from "..";
+import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
+import { UnwrapPromise } from "@parallel/utils/types";
+import { useRouter } from "next/router";
+import { sortBy } from "remeda";
 
-const SORTING = ["fullName", "email", "createdAt", "lastActiveAt"] as const;
+const SORTING = ["fullName", "email", "createdAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   search: string(),
   items: values([10, 25, 50]).orDefault(10),
   sort: sorting(SORTING).orDefault({
-    field: "createdAt",
+    field: "fullName",
     direction: "ASC",
   }),
 };
 
-function OrganizationGroupMembers() {
+type OrganizationGroupProps = UnwrapPromise<
+  ReturnType<typeof OrganizationGroup.getInitialProps>
+>;
+
+function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const intl = useIntl();
   const toast = useToast();
+  const router = useRouter();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
+
   const {
     data: { me },
+  } = assertQuery(useOrganizationGroupUserQuery());
+
+  const {
+    data: { userGroup },
     loading,
     refetch,
-  } = useAssertQueryOrPreviousData(
-    useOrganizationUsersQuery({
+  } = assertQuery(
+    useOrganizationGroupQuery({
       variables: {
-        offset: state.items * (state.page - 1),
-        limit: state.items,
-        search: state.search,
-        sortBy: [
-          `${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy,
-        ],
+        id: groupId,
       },
     })
   );
 
-  const userList = me.organization.users;
+  const userList = useMemo(() => {
+    console.log("Query State: ", state);
+    const {
+      items,
+      page,
+      search,
+      sort: { direction, field },
+    } = state;
+    let members = userGroup?.members ?? [];
+    if (search) {
+      members = members.filter((u) => {
+        return u.fullName?.includes(search) || u.email.includes(search);
+      });
+    }
+    members = sortBy(members, (u) => u[field]);
+    if (direction === "DESC") {
+      members = members.reverse();
+    }
+    return members.slice((page - 1) * items, page * items);
+  }, [userGroup, state]);
 
   const [selected, setSelected] = useState<string[]>([]);
 
   const selectedUsers = useMemo(
     () =>
       selected
-        .map((userId) => userList.items.find((u) => u.id === userId)!)
+        .map((userId) => userList.find((u) => u.id === userId)!)
         .filter((u) => u !== undefined),
-    [selected.join(","), userList.items]
+    [selected.join(","), userList]
   );
 
   const [search, setSearch] = useState(state.search);
+  const [name, setName] = useState(userGroup?.name ?? "");
+
+  useEffect(() => {
+    setName(userGroup?.name ?? "");
+  }, [userGroup]);
 
   const sections = useOrganizationSections();
 
-  const columns = useOrganizationUsersTableColumns();
+  const columns = useOrganizationGroupTableColumns();
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (value) => {
@@ -119,6 +160,7 @@ function OrganizationGroupMembers() {
     300,
     [setQueryState]
   );
+
   const handleSearchChange = useCallback(
     (value: string | null) => {
       setSearch(value);
@@ -127,27 +169,62 @@ function OrganizationGroupMembers() {
     [debouncedOnSearchChange]
   );
 
-  const handleChangeGroupName = () => {};
+  const [updateUserGroup] = useOrganizationGroup_updateUserGroupMutation();
+  const handleChangeGroupName = async (newName: string) => {
+    if (name.trim() !== newName.trim()) {
+      await updateUserGroup({
+        variables: {
+          id: groupId,
+          data: {
+            name: newName,
+          },
+        },
+      });
+    }
+  };
 
+  const [deleteUserGroup] = useOrganizationGroup_deleteUserGroupMutation();
+  const confirmDelete = useConfirmDeleteGroupsDialog();
+  const handleDeleteGroup = async () => {
+    await confirmDelete({ name });
+    await deleteUserGroup({ variables: { ids: [groupId] } });
+    router.push({
+      pathname: `/${router.query.locale}/app/organization/groups`,
+    });
+  };
+
+  const [_cloneUserGroup] = useOrganizationGroup_cloneUserGroupMutation();
+
+  const handleCloneGroup = async () => {
+    const { data } = await _cloneUserGroup({
+      variables: { ids: [groupId], locale: intl.locale },
+    });
+    const cloneUserGroupId = data?.cloneUserGroup[0].id || "";
+
+    router.push({
+      pathname: `/${router.query.locale}/app/organization/groups/${cloneUserGroupId}`,
+    });
+  };
+
+  const [addUsersToUserGroup] =
+    useOrganizationGroup_addUsersToUserGroupMutation();
   const showAddMemberDialog = useAddMemberGroupDialog();
   const handleAddMember = async () => {
     try {
-      const newMember = await showAddMemberDialog({});
-      //   await createOrganizationUser({
-      //     variables: newUser,
-      //     update: () => {
-      //       refetch();
-      //     },
-      //   });
+      const data = await showAddMemberDialog({
+        exclude: userGroup?.members.map((m) => m.id) ?? [],
+      });
+      const userIds = data.users.map((m) => m.id);
+      await addUsersToUserGroup({
+        variables: {
+          userGroupId: groupId,
+          userIds,
+        },
+      });
       toast({
         title: intl.formatMessage({
-          id: "organization.user-created-success.toast-title",
-          defaultMessage: "User created successfully.",
-        }),
-        description: intl.formatMessage({
-          id: "organization.user-created-success.toast-description",
-          defaultMessage:
-            "We have sent an email to with instructions to register in Parallel.",
+          id: "organization.users-added-success.toast-title",
+          defaultMessage: "Users added successfully.",
         }),
         status: "success",
         duration: 5000,
@@ -156,13 +233,21 @@ function OrganizationGroupMembers() {
     } catch {}
   };
 
+  const [removeUsersFromGroup] =
+    useOrganizationGroup_removeUsersFromGroupMutation();
   const showConfirmRemoveMemberDialog = useConfirmRemoveMemberDialog();
 
   const handleRemoveMember = async (
     members: OrganizationUsers_UserFragment[]
   ) => {
-    const selected = members.map((m) => m.fullName!) ?? [];
-    await showConfirmRemoveMemberDialog({ selected });
+    try {
+      await showConfirmRemoveMemberDialog({ selected: members });
+      const userIds = members.map((m) => m.id);
+      await removeUsersFromGroup({
+        variables: { userGroupId: groupId, userIds },
+      });
+      refetch();
+    } catch {}
   };
 
   return (
@@ -182,23 +267,10 @@ function OrganizationGroupMembers() {
       }
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
-          <Heading as="h3" size="md">
-            <Tooltip
-              label={intl.formatMessage({
-                id: "organization.groups.edit-name",
-                defaultMessage: "Edit name",
-              })}
-            >
-              <Editable
-                defaultValue="Some group name"
-                onSubmit={handleChangeGroupName}
-              >
-                <EditablePreview paddingY={1} paddingX={2} />
-                <EditableInput paddingY={1} paddingX={2} maxLength={255} />
-              </Editable>
-            </Tooltip>
-          </Heading>
-
+          <EditableHeading
+            value={name}
+            onSubmit={handleChangeGroupName}
+          ></EditableHeading>
           <Menu>
             <Tooltip
               placement="left"
@@ -221,7 +293,7 @@ function OrganizationGroupMembers() {
             </Tooltip>
             <Portal>
               <MenuList>
-                <MenuItem onClick={() => {}}>
+                <MenuItem onClick={handleCloneGroup}>
                   <CopyIcon marginRight={2} />
                   <FormattedMessage
                     id="component.group-header.clone-label"
@@ -229,7 +301,7 @@ function OrganizationGroupMembers() {
                   />
                 </MenuItem>
                 <MenuDivider />
-                <MenuItem color="red.500" onClick={() => {}}>
+                <MenuItem color="red.500" onClick={handleDeleteGroup}>
                   <DeleteIcon marginRight={2} />
                   <FormattedMessage
                     id="component.group-header.delete-label"
@@ -241,7 +313,7 @@ function OrganizationGroupMembers() {
           </Menu>
         </Flex>
       }
-      includesPath={true}
+      showBackButton={true}
     >
       <Flex
         flexDirection="column"
@@ -256,12 +328,12 @@ function OrganizationGroupMembers() {
           isSelectable
           isHighlightable
           columns={columns}
-          rows={userList.items}
+          rows={userList}
           rowKeyProp="id"
           loading={loading}
           page={state.page}
           pageSize={state.items}
-          totalCount={userList.totalCount}
+          totalCount={userGroup?.members.length ?? 0}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
@@ -270,7 +342,7 @@ function OrganizationGroupMembers() {
           }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
-            <OrganizationGroupMembersListTableHeader
+            <OrganizationGroupListTableHeader
               me={me}
               search={search}
               selectedUsers={selectedUsers}
@@ -286,7 +358,7 @@ function OrganizationGroupMembers() {
   );
 }
 
-function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserFragment>[] {
+function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_MemberFragment>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -298,40 +370,7 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
           defaultMessage: "Name",
         }),
         CellContent: ({ row }) => {
-          return (
-            <Text
-              as="span"
-              display="inline-flex"
-              whiteSpace="nowrap"
-              alignItems="center"
-            >
-              <Text
-                as="span"
-                textDecoration={
-                  row.status === "INACTIVE" ? "line-through" : "none"
-                }
-              >
-                {row.fullName}
-              </Text>
-              {row.status === "INACTIVE" ? (
-                <Tooltip
-                  label={intl.formatMessage({
-                    id: "organization-users.header.inactive-user",
-                    defaultMessage: "Inactive user",
-                  })}
-                >
-                  <ForbiddenIcon
-                    marginLeft={2}
-                    color="red.300"
-                    aria-label={intl.formatMessage({
-                      id: "organization-users.header.inactive-user",
-                      defaultMessage: "Inactive user",
-                    })}
-                  />
-                </Tooltip>
-              ) : null}
-            </Text>
-          );
+          return <Text as="span">{row.fullName}</Text>;
         },
       },
       {
@@ -347,8 +386,8 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
         key: "createdAt",
         isSortable: true,
         header: intl.formatMessage({
-          id: "generic.created-at",
-          defaultMessage: "Created at",
+          id: "generic.added-at",
+          defaultMessage: "Added at",
         }),
         cellProps: {
           width: "1px",
@@ -367,111 +406,192 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
   );
 }
 
-OrganizationGroupMembers.fragments = {
-  get User() {
+type EditableHeadingProps = {
+  value: string;
+  onChange?: (value: string) => void;
+  onSubmit?: (value: string) => void;
+};
+
+const EditableHeading = ({
+  value,
+  onChange = () => {},
+  onSubmit = () => {},
+}: EditableHeadingProps) => {
+  const intl = useIntl();
+  const [name, setName] = useState(value);
+  const [inputWidth, setInputWidth] = useState(0);
+  const previewRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setName(value);
+    setInputWidth(previewRef?.current?.offsetWidth ?? 0);
+  }, [value]);
+
+  return (
+    <Heading
+      as="h3"
+      size="md"
+      borderRadius="md"
+      borderWidth="2px"
+      borderColor="transparent"
+      transition="border 0.26s ease"
+      _hover={{
+        borderWidth: "2px",
+        borderColor: "gray.300",
+      }}
+    >
+      <Tooltip
+        label={intl.formatMessage({
+          id: "organization.groups.edit-name",
+          defaultMessage: "Edit name",
+        })}
+      >
+        <Editable
+          value={name}
+          onChange={(n) => {
+            setName(n);
+            onChange(n);
+          }}
+          onSubmit={onSubmit}
+        >
+          <EditablePreview
+            paddingY={1}
+            paddingX={2}
+            ref={previewRef}
+          ></EditablePreview>
+          <EditableInput
+            paddingY={1}
+            paddingX={2}
+            minWidth={255}
+            width={inputWidth}
+          />
+        </Editable>
+      </Tooltip>
+    </Heading>
+  );
+};
+
+OrganizationGroup.fragments = {
+  get UserGroup() {
     return gql`
-      fragment OrganizationUsers_User on User {
+      fragment OrganizationGroup_UserGroup on UserGroup {
+        id
+        name
+        createdAt
+        members {
+          ...OrganizationGroup_Member
+        }
+      }
+      ${this.Member}
+    `;
+  },
+  get Member() {
+    return gql`
+      fragment OrganizationGroup_Member on User {
         id
         fullName
         email
-        role
         createdAt
-        lastActiveAt
-        status
-        isSsoUser
       }
+    `;
+  },
+  get User() {
+    return gql`
+      fragment OrganizationGroup_User on User {
+        ...AppLayout_User
+      }
+      ${AppLayout.fragments.User}
     `;
   },
 };
 
-OrganizationGroupMembers.mutations = [
+OrganizationGroup.mutations = [
   gql`
-    mutation OrganizationUsers_createOrganizationUser(
-      $firstName: String!
-      $lastName: String!
-      $email: String!
-      $role: OrganizationRole!
+    mutation OrganizationGroup_updateUserGroup(
+      $id: GID!
+      $data: UpdateUserGroupInput!
     ) {
-      createOrganizationUser(
-        email: $email
-        firstName: $firstName
-        lastName: $lastName
-        role: $role
-      ) {
-        ...OrganizationUsers_User
+      updateUserGroup(id: $id, data: $data) {
+        ...OrganizationGroup_UserGroup
       }
     }
-    ${OrganizationGroupMembers.fragments.User}
+    ${OrganizationGroup.fragments.UserGroup}
   `,
   gql`
-    mutation OrganizationUsers_updateUserStatus(
+    mutation OrganizationGroup_addUsersToUserGroup(
+      $userGroupId: GID!
       $userIds: [GID!]!
-      $newStatus: UserStatus!
-      $transferToUserId: GID
     ) {
-      updateUserStatus(
-        userIds: $userIds
-        status: $newStatus
-        transferToUserId: $transferToUserId
-      ) {
-        id
-        status
+      addUsersToUserGroup(userGroupId: $userGroupId, userIds: $userIds) {
+        ...OrganizationGroup_UserGroup
       }
     }
+    ${OrganizationGroup.fragments.UserGroup}
+  `,
+  gql`
+    mutation OrganizationGroup_removeUsersFromGroup(
+      $userGroupId: GID!
+      $userIds: [GID!]!
+    ) {
+      removeUsersFromGroup(userGroupId: $userGroupId, userIds: $userIds) {
+        ...OrganizationGroup_UserGroup
+      }
+    }
+    ${OrganizationGroup.fragments.UserGroup}
+  `,
+  gql`
+    mutation OrganizationGroup_deleteUserGroup($ids: [GID!]!) {
+      deleteUserGroup(ids: $ids)
+    }
+  `,
+  gql`
+    mutation OrganizationGroup_cloneUserGroup($ids: [GID!]!, $locale: String!) {
+      cloneUserGroup(userGroupIds: $ids, locale: $locale) {
+        ...OrganizationGroup_UserGroup
+      }
+    }
+    ${OrganizationGroup.fragments.UserGroup}
   `,
 ];
 
-OrganizationGroupMembers.getInitialProps = async ({
+OrganizationGroup.getInitialProps = async ({
+  query,
   fetchQuery,
-  ...context
 }: WithApolloDataContext) => {
-  const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
-  await fetchQuery<OrganizationUsersQuery>(
-    gql`
-      query OrganizationUsers(
-        $offset: Int!
-        $limit: Int!
-        $search: String
-        $sortBy: [OrganizationUsers_OrderBy!]
-      ) {
-        me {
-          organization {
-            id
-            hasSsoProvider
-            users(
-              offset: $offset
-              limit: $limit
-              search: $search
-              sortBy: $sortBy
-              includeInactive: true
-            ) {
-              totalCount
-              items {
-                ...OrganizationUsers_User
-              }
-            }
+  await Promise.all([
+    fetchQuery<OrganizationGroupQuery, OrganizationGroupQueryVariables>(
+      gql`
+        query OrganizationGroup($id: GID!) {
+          userGroup(id: $id) {
+            ...OrganizationGroup_UserGroup
           }
-          ...SettingsLayout_User
         }
+        ${OrganizationGroup.fragments.UserGroup}
+      `,
+      {
+        variables: {
+          id: query.groupId as string,
+        },
       }
-      ${SettingsLayout.fragments.User}
-      ${OrganizationGroupMembers.fragments.User}
-    `,
-    {
-      variables: {
-        offset: items * (page - 1),
-        limit: items,
-        search,
-        sortBy: [
-          `${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy,
-        ],
-      },
-    }
-  );
+    ),
+    fetchQuery<OrganizationGroupUserQuery>(
+      gql`
+        query OrganizationGroupUser {
+          me {
+            ...OrganizationGroup_User
+          }
+        }
+        ${OrganizationGroup.fragments.User}
+      `
+    ),
+  ]);
+  return {
+    groupId: query.groupId as string,
+  };
 };
 
 export default compose(
   withAdminOrganizationRole,
   withDialogs,
   withApolloData
-)(OrganizationGroupMembers);
+)(OrganizationGroup);

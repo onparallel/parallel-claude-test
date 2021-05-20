@@ -490,6 +490,16 @@
     "context": "You already have a token with this name"
   },
   {
+    "term": "component.group-header.clone-label",
+    "definition": "Clone group",
+    "context": "Clone group"
+  },
+  {
+    "term": "component.group-header.delete-label",
+    "definition": "Delete group",
+    "context": "Delete group"
+  },
+  {
     "term": "component.header-name-editable.change-name",
     "definition": "Change name",
     "context": "Change name"
@@ -1865,6 +1875,11 @@
     "context": "Add message"
   },
   {
+    "term": "generic.added-at",
+    "definition": "Added at",
+    "context": "Added at"
+  },
+  {
     "term": "generic.all-languages",
     "definition": "All languages",
     "context": "All languages"
@@ -2675,29 +2690,29 @@
     "context": "New petition"
   },
   {
-    "term": "organization-group.header.members",
-    "definition": "Members",
-    "context": "Members"
-  },
-  {
-    "term": "organization-group.header.name",
-    "definition": "Name",
-    "context": "Name"
-  },
-  {
     "term": "organization-groups.add-member",
     "definition": "Add member",
     "context": "Add member"
   },
   {
     "term": "organization-groups.add-member-title",
-    "definition": "Add new users to group",
-    "context": "Add new users to group"
+    "definition": "Add members to group",
+    "context": "Add members to group"
   },
   {
     "term": "organization-groups.clone-group",
     "definition": "Clone {count, plural, =1{group} other {groups}}",
     "context": "Clone {count, plural, =1{group} other {groups}}"
+  },
+  {
+    "term": "organization-groups.confirm-delete.body",
+    "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}.",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
+  },
+  {
+    "term": "organization-groups.confirm-delete.header",
+    "definition": "Delete {count, plural, =1 {group} other {groups}}",
+    "context": "Delete {count, plural, =1 {group} other {groups}}"
   },
   {
     "term": "organization-groups.create-group",
@@ -2710,9 +2725,24 @@
     "context": "New working group"
   },
   {
+    "term": "organization-groups.delete-group",
+    "definition": "Delete {count, plural, =1{group} other {groups}}",
+    "context": "Delete {count, plural, =1{group} other {groups}}"
+  },
+  {
     "term": "organization-groups.group-name",
     "definition": "Group name",
     "context": "Group name"
+  },
+  {
+    "term": "organization-groups.header.members",
+    "definition": "Members",
+    "context": "Members"
+  },
+  {
+    "term": "organization-groups.header.name",
+    "definition": "Name",
+    "context": "Name"
   },
   {
     "term": "organization-groups.members",
@@ -2728,11 +2758,6 @@
     "term": "organization-groups.remove-from-group",
     "definition": "Remove from group",
     "context": "Remove from group"
-  },
-  {
-    "term": "organization-groups.remove-group",
-    "definition": "Remove {count, plural, =1{group} other {groups}}",
-    "context": "Remove {count, plural, =1{group} other {groups}}"
   },
   {
     "term": "organization-users.activate",
@@ -2846,8 +2871,8 @@
   },
   {
     "term": "organization.confirm-remove-member.body",
-    "definition": "Are you sure you want to <b>remove from group</b> the selected {count, plural, =1{user} other {users}}? If continue they will lose access to the petitions shared with this group.",
-    "context": "Are you sure you want to <b>remove from group</b> the selected {count, plural, =1{user} other {users}}? If continue they will lose access to the petitions shared with this group."
+    "definition": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group.",
+    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
   },
   {
     "term": "organization.confirm-remove-member.confirm",
@@ -2903,6 +2928,11 @@
     "term": "organization.user-updated-success.toast-title",
     "definition": "User updated successfully.",
     "context": "User updated successfully."
+  },
+  {
+    "term": "organization.users-added-success.toast-title",
+    "definition": "Users added successfully.",
+    "context": "Users added successfully."
   },
   {
     "term": "organization.users.title",
