@@ -3139,13 +3139,22 @@ type UserGroup implements Timestamps {
   """
   createdAt: DateTime!
   id: GID!
-  members: [User!]!
+  members: [UserGroupMember!]!
   name: String!
 
   """
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+type UserGroupMember {
+  """
+  The time the user was added to the user group.
+  """
+  addedAt: DateTime!
+  id: GID!
+  user: User!
 }
 
 type UserGroupPagination {

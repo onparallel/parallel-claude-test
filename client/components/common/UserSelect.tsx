@@ -120,7 +120,9 @@ export const UserSelect = Object.assign(
             id
             name
             members {
-              ...UserSelect_User
+              user {
+                ...UserSelect_User
+              }
             }
           }
           ${this.User}
@@ -234,7 +236,7 @@ function useUserSelectReactSelectProps<
                     : data.email}
                 </Text>
               ) : data.__typename === "UserGroup" ? (
-                <UserListPopover users={data.members}>
+                <UserListPopover users={data.members.map((m) => m.user)}>
                   <Box>
                     <UsersIcon
                       marginRight={1}

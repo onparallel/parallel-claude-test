@@ -46,25 +46,10 @@ export class UserGroupRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadMembersForUserGroup = fromDataLoader(
-    new DataLoader<number, User[]>(async (ids) => {
-      const rows = await this.raw<User & { user_group_id: number }>(
-        /* sql */ `
-        select u.*, ugm.user_group_id
-        from user_group_member ugm
-          join "user" u on u.id = ugm.user_id
-        where ugm.user_group_id in (${ids.map(() => "?").join(", ")})
-          and ugm.deleted_at is null
-        order by ugm.user_group_id asc, ugm.created_at asc
-      `,
-        [...ids]
-      );
-      const byUserGroupId = groupBy(rows, (r) => r.user_group_id);
-      return ids.map(
-        (id) =>
-          byUserGroupId[id]?.map((r) => omit(r, ["user_group_id"]) ?? []) ?? []
-      );
-    })
+  readonly loadUserGroupMembers = this.buildLoadMultipleBy(
+    "user_group_member",
+    "user_group_id",
+    (q) => q.whereNull("deleted_at").orderBy("created_at")
   );
 
   async updateUserGroupById(

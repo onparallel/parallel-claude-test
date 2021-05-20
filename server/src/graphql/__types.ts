@@ -435,6 +435,7 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   UserGroup: db.UserGroup;
+  UserGroupMember: db.UserGroupMember;
   UserGroupPagination: {
     // root type
     items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
@@ -1199,9 +1200,15 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    members: NexusGenRootTypes["User"][]; // [User!]!
+    members: NexusGenRootTypes["UserGroupMember"][]; // [UserGroupMember!]!
     name: string; // String!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  UserGroupMember: {
+    // field return type
+    addedAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    user: NexusGenRootTypes["User"]; // User!
   };
   UserGroupPagination: {
     // field return type
@@ -1987,9 +1994,15 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
-    members: "User";
+    members: "UserGroupMember";
     name: "String";
     updatedAt: "DateTime";
+  };
+  UserGroupMember: {
+    // field return type name
+    addedAt: "DateTime";
+    id: "GID";
+    user: "User";
   };
   UserGroupPagination: {
     // field return type name

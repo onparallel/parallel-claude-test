@@ -2157,10 +2157,18 @@ export type UserGroup = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  members: Array<User>;
+  members: Array<UserGroupMember>;
   name: Scalars["String"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+};
+
+export type UserGroupMember = {
+  __typename?: "UserGroupMember";
+  /** The time the user was added to the user group. */
+  addedAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  user: User;
 };
 
 export type UserGroupPagination = {
@@ -2454,7 +2462,13 @@ export type UserSelect_UserFragment = { __typename?: "User" } & Pick<
 export type UserSelect_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
   UserGroup,
   "id" | "name"
-> & { members: Array<{ __typename?: "User" } & UserSelect_UserFragment> };
+> & {
+    members: Array<
+      { __typename?: "UserGroupMember" } & {
+        user: { __typename?: "User" } & UserSelect_UserFragment;
+      }
+    >;
+  };
 
 export type useSearchUsers_searchUsersQueryVariables = Exact<{
   search: Scalars["String"];
@@ -5835,7 +5849,9 @@ export const UserSelect_UserGroupFragmentDoc = gql`
     id
     name
     members {
-      ...UserSelect_User
+      user {
+        ...UserSelect_User
+      }
     }
   }
   ${UserSelect_UserFragmentDoc}
