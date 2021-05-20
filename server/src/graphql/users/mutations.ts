@@ -201,7 +201,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     status: nonNull(arg({ type: "UserStatus" })),
     transferToUserId: globalIdArg("User"),
   },
-  resolve: async (_, { userIds, status, transferToUserId }, ctx, info) => {
+  resolve: async (_, { userIds, status, transferToUserId }, ctx) => {
     if (status === "ACTIVE") {
       return await ctx.users.updateUserById(
         userIds,
@@ -211,10 +211,16 @@ export const updateUserStatus = mutationField("updateUserStatus", {
     } else {
       const permissionsByUserId =
         await ctx.petitions.loadUserPermissionsByUserId(userIds);
-      return await pMap(
-        zip(userIds, permissionsByUserId),
-        async ([userId, userPermissions]) => {
-          return await ctx.petitions.withTransaction(async (t) => {
+
+      return await ctx.petitions.withTransaction(async (t) => {
+        await ctx.userGroups.removeUsersFromAllGroups(
+          userIds,
+          `User:${ctx.user!.id}`,
+          t
+        );
+        return await pMap(
+          zip(userIds, permissionsByUserId),
+          async ([userId, userPermissions]) => {
             const [ownedPermissions, notOwnedPermissions] = partition(
               userPermissions,
               (p) => p.permission_type === "OWNER"
@@ -247,10 +253,10 @@ export const updateUserStatus = mutationField("updateUserStatus", {
                 : undefined,
             ]);
             return user;
-          });
-        },
-        { concurrency: 1 }
-      );
+          },
+          { concurrency: 1 }
+        );
+      });
     }
   },
 });

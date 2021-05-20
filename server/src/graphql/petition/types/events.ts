@@ -68,6 +68,12 @@ export const PetitionEvent = interfaceType({
         return "UserPermissionRemovedEvent";
       case "USER_PERMISSION_EDITED":
         return "UserPermissionEditedEvent";
+      case "GROUP_PERMISSION_ADDED":
+        return "GroupPermissionAddedEvent";
+      case "GROUP_PERMISSION_EDITED":
+        return "GroupPermissionEditedEvent";
+      case "GROUP_PERMISSION_REMOVED":
+        return "GroupPermissionRemovedEvent";
       case "OWNERSHIP_TRANSFERRED":
         return "OwnershipTransferredEvent";
       case "PETITION_CLOSED":
@@ -411,6 +417,72 @@ export const UserPermissionEditedEvent = createPetitionEvent(
       type: "User",
       resolve: async (root, _, ctx) => {
         return await ctx.users.loadUser(root.data.permission_user_id);
+      },
+    });
+  }
+);
+
+export const GroupPermissionAddedEvent = createPetitionEvent(
+  "GroupPermissionAddedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+    t.field("permissionType", {
+      type: "PetitionUserPermissionType",
+      resolve: async (root, _, ctx) => {
+        return root.data.permission_type;
+      },
+    });
+    t.nullable.field("permissionGroup", {
+      type: "UserGroup",
+      resolve: async (root, _, ctx) => {
+        return await ctx.userGroups.loadUserGroup(root.data.user_group_id);
+      },
+    });
+  }
+);
+
+export const GroupPermissionRemovedEvent = createPetitionEvent(
+  "GroupPermissionRemovedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+    t.nullable.field("permissionGroup", {
+      type: "UserGroup",
+      resolve: async (root, _, ctx) => {
+        return await ctx.userGroups.loadUserGroup(root.data.user_group_id);
+      },
+    });
+  }
+);
+
+export const GroupPermissionEditedEvent = createPetitionEvent(
+  "GroupPermissionEditedEvent",
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async (root, _, ctx) => {
+        return await ctx.users.loadUser(root.data.user_id);
+      },
+    });
+    t.field("permissionType", {
+      type: "PetitionUserPermissionType",
+      resolve: async (root, _, ctx) => {
+        return root.data.permission_type;
+      },
+    });
+    t.nullable.field("permissionGroup", {
+      type: "UserGroup",
+      resolve: async (root, _, ctx) => {
+        return await ctx.userGroups.loadUserGroup(root.data.user_group_id);
       },
     });
   }

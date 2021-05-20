@@ -258,6 +258,26 @@ function mapEventPayload(event: PetitionEvent) {
         permissionUserId: toGlobalId("User", event.data.permission_user_id),
       };
     }
+    case "GROUP_PERMISSION_ADDED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        userGroupId: toGlobalId("UserGroup", event.data.user_group_id),
+        permissionType: event.data.permission_type,
+      };
+    }
+    case "GROUP_PERMISSION_EDITED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        userGroupId: toGlobalId("UserGroup", event.data.user_group_id),
+        permissionType: event.data.permission_type,
+      };
+    }
+    case "GROUP_PERMISSION_REMOVED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        userGroupId: toGlobalId("UserGroup", event.data.user_group_id),
+      };
+    }
     default:
       return {};
   }

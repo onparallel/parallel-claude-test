@@ -166,6 +166,24 @@ export class UserGroupRepository extends BaseRepository {
     });
   }
 
+  async removeUsersFromAllGroups(
+    userIds: MaybeArray<number>,
+    deletedBy: string,
+    t?: Knex.Transaction
+  ) {
+    const ids = unMaybeArray(userIds);
+    await this.from("user_group_member", t)
+      .where({ deleted_at: null })
+      .whereIn("user_id", ids)
+      .update(
+        {
+          deleted_by: deletedBy,
+          deleted_at: this.now(),
+        },
+        "*"
+      );
+  }
+
   async addUsersToGroup(
     userGroupId: number,
     userIds: MaybeArray<number>,

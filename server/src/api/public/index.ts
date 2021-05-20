@@ -804,8 +804,10 @@ api
         gql`
           query GetPermissions_Permissions($petitionId: GID!) {
             petition(id: $petitionId) {
-              userPermissions {
-                ...Permission
+              permissions {
+                ... on PetitionUserPermission {
+                  ...Permission
+                }
               }
             }
           }
@@ -845,8 +847,10 @@ api
               userIds: $userIds
               permissionType: WRITE
             ) {
-              userPermissions {
-                ...Permission
+              permissions {
+                ... on PetitionUserPermission {
+                  ...Permission
+                }
               }
             }
           }
@@ -971,8 +975,10 @@ api
               petitionIds: [$petitionId]
               userId: $userId
             ) {
-              userPermissions {
-                ...Permission
+              permissions {
+                ... on PetitionUserPermission {
+                  ...Permission
+                }
               }
             }
           }

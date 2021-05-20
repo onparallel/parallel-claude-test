@@ -1050,6 +1050,56 @@ export const PetitionEvent = schema({
         },
       },
     },
+    GROUP_PERMISSION_ADDED: {
+      description: "The user shared their petition with a user group",
+      properties: {
+        permissionType: {
+          description: "The type of permission for the group members",
+          type: "string",
+          enum: ["READ", "WRITE"],
+        },
+        userId: {
+          description: "The ID of the user that shared the petition",
+          type: "string",
+        },
+        userGroupId: {
+          description: "The ID of the group linked to the new permission",
+          type: "string",
+        },
+      },
+    },
+    GROUP_PERMISSION_EDITED: {
+      description:
+        "The user modified the type of permission on a shared petition",
+      properties: {
+        permissionType: {
+          description: "The new permission for the group",
+          type: "string",
+          enum: ["READ", "WRITE"],
+        },
+        userId: {
+          description: "The ID of the user that edited the permission",
+          type: "string",
+        },
+        userGroupId: {
+          description: "The ID of the group linked to the modified permission",
+          type: "string",
+        },
+      },
+    },
+    GROUP_PERMISSION_REMOVED: {
+      description: "The user removed a permission on their petition",
+      properties: {
+        userId: {
+          description: "The ID of the user that removed the permission",
+          type: "string",
+        },
+        userGroupId: {
+          description: "The ID of the group that lost its permission",
+          type: "string",
+        },
+      },
+    },
   } as Record<PetitionEventType, JsonSchema>).map(
     ([event, data]) =>
       ({

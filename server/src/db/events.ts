@@ -61,6 +61,20 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     permission_user_id: number;
     permission_type: PetitionUserPermissionType;
   };
+  GROUP_PERMISSION_ADDED: {
+    user_id: number;
+    user_group_id: number;
+    permission_type: PetitionUserPermissionType;
+  };
+  GROUP_PERMISSION_REMOVED: {
+    user_id: number;
+    user_group_id: number;
+  };
+  GROUP_PERMISSION_EDITED: {
+    user_id: number;
+    user_group_id: number;
+    permission_type: PetitionUserPermissionType;
+  };
   OWNERSHIP_TRANSFERRED: {
     user_id: number;
     owner_id: number;
@@ -122,6 +136,13 @@ export type UserPermissionRemovedEvent =
   GenericPetitionEvent<"USER_PERMISSION_REMOVED">;
 export type UserPermissionEditedEvent =
   GenericPetitionEvent<"USER_PERMISSION_EDITED">;
+export type GroupPermissionAddedEvent =
+  GenericPetitionEvent<"GROUP_PERMISSION_ADDED">;
+export type GroupPermissionEditedEvent =
+  GenericPetitionEvent<"GROUP_PERMISSION_EDITED">;
+export type GroupPermissionRemovedEvent =
+  GenericPetitionEvent<"GROUP_PERMISSION_REMOVED">;
+
 export type OwnershipTransferredEvent =
   GenericPetitionEvent<"OWNERSHIP_TRANSFERRED">;
 export type PetitionClosedEvent = GenericPetitionEvent<"PETITION_CLOSED">;
@@ -154,6 +175,9 @@ export type PetitionEvent =
   | UserPermissionAddedEvent
   | UserPermissionRemovedEvent
   | UserPermissionEditedEvent
+  | GroupPermissionAddedEvent
+  | GroupPermissionEditedEvent
+  | GroupPermissionRemovedEvent
   | OwnershipTransferredEvent
   | PetitionClosedEvent
   | PetitionClosedNotifiedEvent

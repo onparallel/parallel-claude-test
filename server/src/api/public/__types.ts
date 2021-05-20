@@ -126,6 +126,14 @@ export type CreatedAt = {
   createdAt: Scalars["DateTime"];
 };
 
+/** The effective permission for a petition and user */
+export type EffectivePetitionUserPermission = {
+  /** wether user is subscribed or not to emails and alerts of the petition */
+  isSubscribed: Scalars["Boolean"];
+  /** The type of the permission. */
+  permissionType: PetitionUserPermissionType;
+};
+
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
 export type FeatureFlag =
@@ -173,6 +181,8 @@ export type MessageSentEvent = PetitionEvent & {
 export type Mutation = {
   /** Adds permissions on given petitions and users */
   addPetitionUserPermission: Array<Petition>;
+  /** Add users to a user group */
+  addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
   assignPetitionToUser: SupportMethodResponse;
   /** Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages */
@@ -190,6 +200,8 @@ export type Mutation = {
   clonePetitionField: PetitionBaseAndField;
   /** Clone petition. */
   clonePetitions: Array<PetitionBase>;
+  /** Clones the user group with all its members */
+  cloneUserGroup: Array<UserGroup>;
   /** Create a contact. */
   createContact: Contact;
   /** Creates a reply to a file upload field. */
@@ -208,10 +220,12 @@ export type Mutation = {
   createPetitionSubscription: Subscription;
   /** Creates a reply to a text or select field. */
   createSimpleReply: PetitionFieldReply;
-  /** Creates a tag linked to the user's organization */
+  /** Creates a tag in the user's organization */
   createTag: Tag;
   /** Creates a new user in the specified organization. */
   createUser: SupportMethodResponse;
+  /** Creates a group in the user's organization */
+  createUserGroup: UserGroup;
   /** Deactivates the specified active petition accesses. */
   deactivateAccesses: Array<PetitionAccess>;
   /** Delete contacts. */
@@ -229,6 +243,8 @@ export type Mutation = {
   deletePetitions: Result;
   /** Removes the tag from every petition and soft-deletes it */
   deleteTag: Result;
+  /** Deletes a group */
+  deleteUserGroup: Result;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Edits permissions on given petitions and users */
@@ -278,6 +294,8 @@ export type Mutation = {
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes permissions on given petitions and users */
   removePetitionUserPermission: Array<Petition>;
+  /** Removes users from a user group */
+  removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
   reopenPetition: Petition;
   /** Removes the Signaturit Branding Ids of selected organization. */
@@ -330,6 +348,8 @@ export type Mutation = {
   updateTag: Tag;
   /** Updates the user with the provided data. */
   updateUser: User;
+  /** Updates the name of a given user group */
+  updateUserGroup: UserGroup;
   /** Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org. */
   updateUserStatus: Array<User>;
   /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
@@ -344,6 +364,12 @@ export type MutationaddPetitionUserPermissionArgs = {
   notify?: Maybe<Scalars["Boolean"]>;
   permissionType: PetitionUserPermissionTypeRW;
   petitionIds: Array<Scalars["GID"]>;
+  userGroupIds?: Maybe<Array<Scalars["GID"]>>;
+  userIds?: Maybe<Array<Scalars["GID"]>>;
+};
+
+export type MutationaddUsersToUserGroupArgs = {
+  userGroupId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
 };
 
@@ -393,6 +419,11 @@ export type MutationclonePetitionFieldArgs = {
 
 export type MutationclonePetitionsArgs = {
   petitionIds: Array<Scalars["GID"]>;
+};
+
+export type MutationcloneUserGroupArgs = {
+  locale?: Maybe<Scalars["String"]>;
+  userGroupIds: Array<Scalars["GID"]>;
 };
 
 export type MutationcreateContactArgs = {
@@ -465,6 +496,11 @@ export type MutationcreateUserArgs = {
   role: OrganizationRole;
 };
 
+export type MutationcreateUserGroupArgs = {
+  name: Scalars["String"];
+  userIds: Array<Scalars["GID"]>;
+};
+
 export type MutationdeactivateAccessesArgs = {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
@@ -508,6 +544,10 @@ export type MutationdeleteTagArgs = {
   id: Scalars["GID"];
 };
 
+export type MutationdeleteUserGroupArgs = {
+  ids: Array<Scalars["GID"]>;
+};
+
 export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
@@ -516,7 +556,8 @@ export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
 export type MutationeditPetitionUserPermissionArgs = {
   permissionType: PetitionUserPermissionType;
   petitionIds: Array<Scalars["GID"]>;
-  userIds: Array<Scalars["GID"]>;
+  userGroupIds?: Maybe<Array<Scalars["GID"]>>;
+  userIds?: Maybe<Array<Scalars["GID"]>>;
 };
 
 export type MutationfileUploadReplyDownloadLinkArgs = {
@@ -639,7 +680,13 @@ export type MutationreactivateAccessesArgs = {
 export type MutationremovePetitionUserPermissionArgs = {
   petitionIds: Array<Scalars["GID"]>;
   removeAll?: Maybe<Scalars["Boolean"]>;
+  userGroupIds?: Maybe<Array<Scalars["GID"]>>;
   userIds?: Maybe<Array<Scalars["GID"]>>;
+};
+
+export type MutationremoveUsersFromGroupArgs = {
+  userGroupId: Scalars["GID"];
+  userIds: Array<Scalars["GID"]>;
 };
 
 export type MutationreopenPetitionArgs = {
@@ -787,6 +834,11 @@ export type MutationupdateTagArgs = {
 
 export type MutationupdateUserArgs = {
   data: UpdateUserInput;
+  id: Scalars["GID"];
+};
+
+export type MutationupdateUserGroupArgs = {
+  data: UpdateUserGroupInput;
   id: Scalars["GID"];
 };
 
@@ -952,10 +1004,14 @@ export type Petition = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** The effective permission of the user */
+  myPermission: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  /** The permissions linked to the petition */
+  permissions: Array<PetitionPermission>;
   /** The progress of the petition. */
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
@@ -974,8 +1030,6 @@ export type Petition = PetitionBase & {
   tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-  /** The permissions linked to the petition */
-  userPermissions: Array<PetitionUserPermission>;
 };
 
 /** A petition */
@@ -1064,18 +1118,20 @@ export type PetitionBase = {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** The effective permission of the user */
+  myPermission: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  /** The permissions linked to the petition */
+  permissions: Array<PetitionPermission>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-  /** The permissions linked to the petition */
-  userPermissions: Array<PetitionUserPermission>;
 };
 
 export type PetitionBaseAndField = {
@@ -1271,6 +1327,23 @@ export type PetitionMessageStatus =
   /** The message has been scheduled to be sent at a specific time. */
   | "SCHEDULED";
 
+export type PetitionPermission =
+  | PetitionUserGroupPermission
+  | PetitionUserPermission;
+
+export type PetitionPermissionBase = {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  /** wether user is subscribed or not to emails and alerts of the petition */
+  isSubscribed: Scalars["Boolean"];
+  /** The type of the permission. */
+  permissionType: PetitionUserPermissionType;
+  /** The petition linked to the permission. */
+  petition: Petition;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+};
+
 /** The progress of a petition. */
 export type PetitionProgress = {
   /** Number of optional fields not replied or validated */
@@ -1376,18 +1449,20 @@ export type PetitionTemplate = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
+  /** The effective permission of the user */
+  myPermission: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
   owner: User;
+  /** The permissions linked to the petition */
+  permissions: Array<PetitionPermission>;
   /** Whether to skip the forward security check on the recipient view. */
   skipForwardSecurity: Scalars["Boolean"];
   /** The tags linked to the petition */
   tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-  /** The permissions linked to the petition */
-  userPermissions: Array<PetitionUserPermission>;
 };
 
 export type PetitionTemplateAndField = PetitionBaseAndField & {
@@ -1402,21 +1477,39 @@ export type PetitionTemplatePagination = {
   totalCount: Scalars["Int"];
 };
 
+/** The permission for a petition and user group */
+export type PetitionUserGroupPermission = PetitionPermissionBase &
+  Timestamps & {
+    /** Time when the resource was created. */
+    createdAt: Scalars["DateTime"];
+    /** The group linked to the permission */
+    group: UserGroup;
+    /** wether user is subscribed or not to emails and alerts of the petition */
+    isSubscribed: Scalars["Boolean"];
+    /** The type of the permission. */
+    permissionType: PetitionUserPermissionType;
+    /** The petition linked to the permission. */
+    petition: Petition;
+    /** Time when the resource was last updated. */
+    updatedAt: Scalars["DateTime"];
+  };
+
 /** The permission for a petition and user */
-export type PetitionUserPermission = Timestamps & {
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  /** wether user is subscribed or not to emails and alerts of the petition */
-  isSubscribed: Scalars["Boolean"];
-  /** The type of the permission. */
-  permissionType: PetitionUserPermissionType;
-  /** The petition linked to the permission. */
-  petition: Petition;
-  /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
-  /** The user linked to the permission */
-  user: User;
-};
+export type PetitionUserPermission = PetitionPermissionBase &
+  Timestamps & {
+    /** Time when the resource was created. */
+    createdAt: Scalars["DateTime"];
+    /** wether user is subscribed or not to emails and alerts of the petition */
+    isSubscribed: Scalars["Boolean"];
+    /** The type of the permission. */
+    permissionType: PetitionUserPermissionType;
+    /** The petition linked to the permission. */
+    petition: Petition;
+    /** Time when the resource was last updated. */
+    updatedAt: Scalars["DateTime"];
+    /** The user linked to the permission */
+    user: User;
+  };
 
 /** The type of permission for a petition user. */
 export type PetitionUserPermissionType = "OWNER" | "READ" | "WRITE";
@@ -1634,8 +1727,12 @@ export type Query = {
   publicOrgLogoUrl: Maybe<Scalars["String"]>;
   /** The publicly available templates */
   publicTemplates: PetitionTemplatePagination;
-  /** Tags of the user organization */
+  /** Search users and user groups */
+  searchUsers: Array<UserOrUserGroup>;
+  /** Paginated list of tags in the organization */
   tags: TagPagination;
+  /** Paginated list of user groups in the organization */
+  userGroups: UserGroupPagination;
 };
 
 export type QueryaccessArgs = {
@@ -1719,10 +1816,25 @@ export type QuerypublicTemplatesArgs = {
   search?: Maybe<Scalars["String"]>;
 };
 
+export type QuerysearchUsersArgs = {
+  excludeUserGroups?: Maybe<Array<Scalars["GID"]>>;
+  excludeUsers?: Maybe<Array<Scalars["GID"]>>;
+  includeGroups?: Maybe<Scalars["Boolean"]>;
+  includeInactive?: Maybe<Scalars["Boolean"]>;
+  search: Scalars["String"];
+};
+
 export type QuerytagsArgs = {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
+};
+
+export type QueryuserGroupsArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryUserGroups_OrderBy>>;
 };
 
 /** Order to use on Query.contacts */
@@ -1751,6 +1863,13 @@ export type QueryPetitions_OrderBy =
   | "createdAt_DESC"
   | "lastUsedAt_ASC"
   | "lastUsedAt_DESC"
+  | "name_ASC"
+  | "name_DESC";
+
+/** Order to use on Query.userGroups */
+export type QueryUserGroups_OrderBy =
+  | "createdAt_ASC"
+  | "createdAt_DESC"
   | "name_ASC"
   | "name_DESC";
 
@@ -1886,7 +2005,6 @@ export type Tag = {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   name: Scalars["String"];
-  organization_id: Scalars["GID"];
 };
 
 export type TagPagination = {
@@ -1933,6 +2051,10 @@ export type UpdatePetitionInput = {
 
 export type UpdateTagInput = {
   color?: Maybe<Scalars["String"]>;
+  name?: Maybe<Scalars["String"]>;
+};
+
+export type UpdateUserGroupInput = {
   name?: Maybe<Scalars["String"]>;
 };
 
@@ -2007,7 +2129,33 @@ export type UserAuthenticationTokens_OrderBy =
   | "tokenName_ASC"
   | "tokenName_DESC";
 
+export type UserGroup = Timestamps & {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  members: Array<UserGroupMember>;
+  name: Scalars["String"];
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+};
+
+export type UserGroupMember = {
+  /** The time the user was added to the user group. */
+  addedAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  user: User;
+};
+
+export type UserGroupPagination = {
+  /** The requested slice of items. */
+  items: Array<UserGroup>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
 export type UserOrPetitionAccess = PetitionAccess | User;
+
+export type UserOrUserGroup = User | UserGroup;
 
 export type UserPagination = {
   /** The requested slice of items. */
@@ -2221,10 +2369,11 @@ export type PetitionReplies_RepliesQuery = {
   >;
 };
 
-export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  replyId: Scalars["GID"];
-}>;
+export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"];
+    replyId: Scalars["GID"];
+  }>;
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: Pick<FileUploadReplyDownloadLinkResult, "url">;
@@ -2236,8 +2385,8 @@ export type GetPermissions_PermissionsQueryVariables = Exact<{
 
 export type GetPermissions_PermissionsQuery = {
   petition: Maybe<
-    | { userPermissions: Array<PermissionFragment> }
-    | { userPermissions: Array<PermissionFragment> }
+    | { permissions: Array<PermissionFragment> }
+    | { permissions: Array<PermissionFragment> }
   >;
 };
 
@@ -2247,9 +2396,7 @@ export type SharePetition_addPetitionUserPermissionMutationVariables = Exact<{
 }>;
 
 export type SharePetition_addPetitionUserPermissionMutation = {
-  addPetitionUserPermission: Array<{
-    userPermissions: Array<PermissionFragment>;
-  }>;
+  addPetitionUserPermission: Array<{ permissions: Array<PermissionFragment> }>;
 };
 
 export type StopSharing_removePetitionUserPermissionMutationVariables = Exact<{
@@ -2260,24 +2407,24 @@ export type StopSharing_removePetitionUserPermissionMutation = {
   removePetitionUserPermission: Array<Pick<Petition, "id">>;
 };
 
-export type RemoveUserPermission_removePetitionUserPermissionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  userId: Scalars["GID"];
-}>;
+export type RemoveUserPermission_removePetitionUserPermissionMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"];
+    userId: Scalars["GID"];
+  }>;
 
 export type RemoveUserPermission_removePetitionUserPermissionMutation = {
   removePetitionUserPermission: Array<Pick<Petition, "id">>;
 };
 
-export type TransferPetition_transferPetitionOwnershipMutationVariables = Exact<{
-  userId: Scalars["GID"];
-  petitionId: Scalars["GID"];
-}>;
+export type TransferPetition_transferPetitionOwnershipMutationVariables =
+  Exact<{
+    userId: Scalars["GID"];
+    petitionId: Scalars["GID"];
+  }>;
 
 export type TransferPetition_transferPetitionOwnershipMutation = {
-  transferPetitionOwnership: Array<{
-    userPermissions: Array<PermissionFragment>;
-  }>;
+  transferPetitionOwnership: Array<{ permissions: Array<PermissionFragment> }>;
 };
 
 export type GetSubscriptions_SubscriptionQueryVariables = Exact<{
@@ -2288,18 +2435,20 @@ export type GetSubscriptions_SubscriptionQuery = {
   petition: Maybe<{ subscriptions: Array<SubscriptionFragment> }>;
 };
 
-export type CreateSubscription_createPetitionSubscriptionMutationVariables = Exact<{
-  petitionId: Scalars["GID"];
-  endpoint: Scalars["String"];
-}>;
+export type CreateSubscription_createPetitionSubscriptionMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"];
+    endpoint: Scalars["String"];
+  }>;
 
 export type CreateSubscription_createPetitionSubscriptionMutation = {
   createPetitionSubscription: SubscriptionFragment;
 };
 
-export type DeleteSubscription_deletePetitionSubscriptionMutationVariables = Exact<{
-  subscriptionId: Scalars["GID"];
-}>;
+export type DeleteSubscription_deletePetitionSubscriptionMutationVariables =
+  Exact<{
+    subscriptionId: Scalars["GID"];
+  }>;
 
 export type DeleteSubscription_deletePetitionSubscriptionMutation = Pick<
   Mutation,

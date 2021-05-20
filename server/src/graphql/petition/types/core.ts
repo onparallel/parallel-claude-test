@@ -82,14 +82,21 @@ export const PetitionBase = interfaceType({
     t.field("owner", {
       type: "User",
       resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadPetitionOwners(root.id))!;
+        return (await ctx.petitions.loadPetitionOwner(root.id))!;
       },
     });
-    t.list.nonNull.field("userPermissions", {
-      type: "PetitionUserPermission",
+    t.list.nonNull.field("permissions", {
+      type: "PetitionPermission",
       description: "The permissions linked to the petition",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadUserPermissions(root.id);
+        return await ctx.petitions.loadUserAndUserGroupPermissions(root.id);
+      },
+    });
+    t.list.nonNull.field("effectivePermissions", {
+      type: "EffectivePetitionUserPermission",
+      description: "The effective permission of each user",
+      resolve: async (root, _, ctx) => {
+        return await ctx.petitions.loadEffectiveUserPermissions(root.id);
       },
     });
     t.list.nonNull.field("fields", {

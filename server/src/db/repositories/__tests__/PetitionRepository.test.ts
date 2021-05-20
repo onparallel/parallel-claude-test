@@ -573,6 +573,7 @@ describe("repositories/PetitionRepository", () => {
         const { newPermissions } = await petitions.addPetitionUserPermissions(
           [user0Petitions[0].id],
           [users[1].id],
+          [],
           "READ",
           users[0]
         );
@@ -599,18 +600,19 @@ describe("repositories/PetitionRepository", () => {
       });
 
       test("should not set new permission for user with access to the petitions", async () => {
-        const {
-          newPermissions: firstPermissions,
-        } = await petitions.addPetitionUserPermissions(
-          [user0Petitions[0].id],
-          [users[2].id],
-          "WRITE",
-          users[0]
-        );
+        const { newPermissions: firstPermissions } =
+          await petitions.addPetitionUserPermissions(
+            [user0Petitions[0].id],
+            [users[2].id],
+            [],
+            "WRITE",
+            users[0]
+          );
 
         const { newPermissions } = await petitions.addPetitionUserPermissions(
           [user0Petitions[0].id],
           [users[2].id],
+          [],
           "READ",
           users[0]
         );
@@ -623,6 +625,7 @@ describe("repositories/PetitionRepository", () => {
         const { newPermissions } = await petitions.addPetitionUserPermissions(
           petitionIds,
           [users[3].id],
+          [],
           "WRITE",
           users[0]
         );
@@ -655,6 +658,7 @@ describe("repositories/PetitionRepository", () => {
         const { newPermissions } = await petitions.addPetitionUserPermissions(
           [petitionId],
           userIds,
+          [],
           "READ",
           users[0]
         );
@@ -670,6 +674,7 @@ describe("repositories/PetitionRepository", () => {
         const { newPermissions } = await petitions.addPetitionUserPermissions(
           petitionIds,
           userIds,
+          [],
           "WRITE",
           users[0]
         );
@@ -688,6 +693,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.addPetitionUserPermissions(
           [petitionId],
           [userId],
+          [],
           "READ",
           users[0]
         );
@@ -698,6 +704,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.editPetitionUserPermissions(
           [petitionId],
           [userId],
+          [],
           "WRITE",
           users[0]
         );
@@ -725,6 +732,7 @@ describe("repositories/PetitionRepository", () => {
           await petitions.editPetitionUserPermissions(
             [petitionId],
             [userId],
+            [],
             "OWNER",
             users[0]
           );
@@ -738,6 +746,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.editPetitionUserPermissions(
           [petitionId],
           [users[3].id],
+          [],
           "READ",
           users[0]
         );
@@ -757,6 +766,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.addPetitionUserPermissions(
           [petitionId],
           [userId],
+          [],
           "READ",
           users[0]
         );
@@ -766,6 +776,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.removePetitionUserPermissions(
           [petitionId],
           [userId],
+          [],
           false,
           users[0]
         );
@@ -784,6 +795,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.addPetitionUserPermissions(
           [petitionId],
           [users[2].id, users[3].id],
+          [],
           "READ",
           users[0]
         );
@@ -791,6 +803,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.removePetitionUserPermissions(
           [petitionId],
           [users[1].id, users[2].id],
+          [],
           false,
           users[0]
         );
@@ -815,6 +828,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.addPetitionUserPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [users[1].id],
+          [],
           "WRITE",
           users[0]
         );
@@ -822,6 +836,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.removePetitionUserPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [users[1].id],
+          [],
           false,
           users[0]
         );
@@ -841,6 +856,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.addPetitionUserPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [users[1].id],
+          [],
           "WRITE",
           users[0]
         );
@@ -848,6 +864,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.removePetitionUserPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [100, 123, 234234234, 2],
+          [],
           true,
           users[0]
         );
@@ -866,6 +883,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.addPetitionUserPermissions(
           [user0Petitions[0].id, user0Petitions[1].id],
           [users[1].id, users[2].id, users[3].id],
+          [],
           "WRITE",
           users[0]
         );
@@ -873,6 +891,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.removePetitionUserPermissions(
           [user0Petitions[0].id, user0Petitions[1].id],
           [users[1].id, users[2].id, users[3].id],
+          [],
           false,
           users[0]
         );
@@ -943,6 +962,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.addPetitionUserPermissions(
           [petitionId],
           [userId],
+          [],
           "READ",
           users[0]
         );
@@ -969,6 +989,7 @@ describe("repositories/PetitionRepository", () => {
         await petitions.addPetitionUserPermissions(
           [petitionId],
           [userId],
+          [],
           "READ",
           users[0]
         );

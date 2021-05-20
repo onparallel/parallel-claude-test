@@ -66,7 +66,7 @@ describe("GraphQL/Users", () => {
   it("changes user name", async () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
-        mutation($userId: GID!, $firstName: String, $lastName: String) {
+        mutation ($userId: GID!, $firstName: String, $lastName: String) {
           updateUser(
             id: $userId
             data: { firstName: $firstName, lastName: $lastName }
@@ -137,7 +137,7 @@ describe("GraphQL/Users", () => {
     it("updates user status to inactive and transfers petition to session user", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $userIds: [GID!]!
             $status: UserStatus!
             $transferToUserId: GID
@@ -168,32 +168,32 @@ describe("GraphQL/Users", () => {
       ]);
 
       // query petition to make sure the permissions are correctly set
-      const {
-        errors: petitionErrors,
-        data: petitionData,
-      } = await testClient.query({
-        query: gql`
-          query petition($id: GID!) {
-            petition(id: $id) {
-              id
-              userPermissions {
-                permissionType
-                user {
-                  id
+      const { errors: petitionErrors, data: petitionData } =
+        await testClient.query({
+          query: gql`
+            query petition($id: GID!) {
+              petition(id: $id) {
+                id
+                permissions {
+                  ... on PetitionUserPermission {
+                    permissionType
+                    user {
+                      id
+                    }
+                  }
                 }
               }
             }
-          }
-        `,
-        variables: {
-          id: toGlobalId("Petition", user0Petition.id),
-        },
-      });
+          `,
+          variables: {
+            id: toGlobalId("Petition", user0Petition.id),
+          },
+        });
 
       expect(petitionErrors).toBeUndefined();
       expect(petitionData.petition).toEqual({
         id: toGlobalId("Petition", user0Petition.id),
-        userPermissions: [
+        permissions: [
           {
             permissionType: "OWNER",
             user: {
@@ -207,7 +207,7 @@ describe("GraphQL/Users", () => {
     it("updates user status to active without specifying transferToUserId argument", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($userIds: [GID!]!, $status: UserStatus!) {
+          mutation ($userIds: [GID!]!, $status: UserStatus!) {
             updateUserStatus(userIds: $userIds, status: $status) {
               id
               status
@@ -232,7 +232,7 @@ describe("GraphQL/Users", () => {
     it("updates multiple users to INACTIVE, and transfers all their petitions to another user in the org", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $userIds: [GID!]!
             $status: UserStatus!
             $transferToUserId: GID
@@ -310,7 +310,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to update status of a user in another organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($userIds: [GID!]!, $status: UserStatus!) {
+          mutation ($userIds: [GID!]!, $status: UserStatus!) {
             updateUserStatus(userIds: $userIds, status: $status) {
               id
               status
@@ -330,7 +330,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to transfer petitions to an inactive user", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $userIds: [GID!]!
             $status: UserStatus!
             $transferToUserId: GID
@@ -359,7 +359,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to transfer petitions to a user in another organization", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $userIds: [GID!]!
             $status: UserStatus!
             $transferToUserId: GID
@@ -388,7 +388,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to set status to inactive without specifying transferToUserId argument", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($userIds: [GID!]!, $status: UserStatus!) {
+          mutation ($userIds: [GID!]!, $status: UserStatus!) {
             updateUserStatus(userIds: $userIds, status: $status) {
               id
               status
@@ -408,7 +408,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to set own status", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($userIds: [GID!]!, $status: UserStatus!) {
+          mutation ($userIds: [GID!]!, $status: UserStatus!) {
             updateUserStatus(userIds: $userIds, status: $status) {
               id
             }
@@ -427,7 +427,7 @@ describe("GraphQL/Users", () => {
     it("sends error when trying to transfer petitions to the same user that will be set as inactive", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation(
+          mutation (
             $userIds: [GID!]!
             $status: UserStatus!
             $transferToUserId: GID

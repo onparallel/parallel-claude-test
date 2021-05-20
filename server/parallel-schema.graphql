@@ -147,6 +147,21 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTime
 
+"""
+The effective permission for a petition and user
+"""
+type EffectivePetitionUserPermission {
+  """
+  wether user is subscribed or not to emails and alerts of the petition
+  """
+  isSubscribed: Boolean!
+
+  """
+  The type of the permission.
+  """
+  permissionType: PetitionUserPermissionType!
+}
+
 enum EntityType {
   Contact
   Organization
@@ -175,6 +190,29 @@ scalar GID
 type GenerateUserAuthTokenResponse {
   apiKey: String!
   userAuthToken: UserAuthenticationToken!
+}
+
+type GroupPermissionAddedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  permissionGroup: UserGroup
+  permissionType: PetitionUserPermissionType!
+  user: User
+}
+
+type GroupPermissionEditedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  permissionGroup: UserGroup
+  permissionType: PetitionUserPermissionType!
+  user: User
+}
+
+type GroupPermissionRemovedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+  permissionGroup: UserGroup
+  user: User
 }
 
 """
@@ -232,7 +270,8 @@ type Mutation {
     notify: Boolean = false
     permissionType: PetitionUserPermissionTypeRW!
     petitionIds: [GID!]!
-    userIds: [GID!]!
+    userGroupIds: [GID!]
+    userIds: [GID!]
   ): [Petition!]!
 
   """
@@ -530,7 +569,8 @@ type Mutation {
   editPetitionUserPermission(
     permissionType: PetitionUserPermissionType!
     petitionIds: [GID!]!
-    userIds: [GID!]!
+    userGroupIds: [GID!]
+    userIds: [GID!]
   ): [Petition!]!
 
   """
@@ -712,6 +752,7 @@ type Mutation {
     Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds
     """
     removeAll: Boolean
+    userGroupIds: [GID!]
     userIds: [GID!]
   ): [Petition!]!
 
@@ -1158,6 +1199,11 @@ type Petition implements PetitionBase {
   deadline: DateTime
 
   """
+  The effective permission of each user
+  """
+  effectivePermissions: [EffectivePetitionUserPermission!]!
+
+  """
   The body of the petition.
   """
   emailBody: JSON
@@ -1220,6 +1266,11 @@ type Petition implements PetitionBase {
   owner: User!
 
   """
+  The permissions linked to the petition
+  """
+  permissions: [PetitionPermission!]!
+
+  """
   The progress of the petition.
   """
   progress: PetitionProgress!
@@ -1263,11 +1314,6 @@ type Petition implements PetitionBase {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
-
-  """
-  The permissions linked to the petition
-  """
-  userPermissions: [PetitionUserPermission!]!
 }
 
 """
@@ -1382,6 +1428,11 @@ interface PetitionBase {
   createdAt: DateTime!
 
   """
+  The effective permission of each user
+  """
+  effectivePermissions: [EffectivePetitionUserPermission!]!
+
+  """
   The body of the petition.
   """
   emailBody: JSON
@@ -1429,6 +1480,11 @@ interface PetitionBase {
   owner: User!
 
   """
+  The permissions linked to the petition
+  """
+  permissions: [PetitionPermission!]!
+
+  """
   Whether to skip the forward security check on the recipient view.
   """
   skipForwardSecurity: Boolean!
@@ -1442,11 +1498,6 @@ interface PetitionBase {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
-
-  """
-  The permissions linked to the petition
-  """
-  userPermissions: [PetitionUserPermission!]!
 }
 
 interface PetitionBaseAndField {
@@ -1829,6 +1880,35 @@ enum PetitionMessageStatus {
   SCHEDULED
 }
 
+union PetitionPermission = PetitionUserGroupPermission | PetitionUserPermission
+
+interface PetitionPermissionBase implements Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  wether user is subscribed or not to emails and alerts of the petition
+  """
+  isSubscribed: Boolean!
+
+  """
+  The type of the permission.
+  """
+  permissionType: PetitionUserPermissionType!
+
+  """
+  The petition linked to the permission.
+  """
+  petition: Petition!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
 """
 The progress of a petition.
 """
@@ -1988,6 +2068,11 @@ type PetitionTemplate implements PetitionBase {
   description: String
 
   """
+  The effective permission of each user
+  """
+  effectivePermissions: [EffectivePetitionUserPermission!]!
+
+  """
   The body of the petition.
   """
   emailBody: JSON
@@ -2040,6 +2125,11 @@ type PetitionTemplate implements PetitionBase {
   owner: User!
 
   """
+  The permissions linked to the petition
+  """
+  permissions: [PetitionPermission!]!
+
+  """
   Whether to skip the forward security check on the recipient view.
   """
   skipForwardSecurity: Boolean!
@@ -2053,11 +2143,6 @@ type PetitionTemplate implements PetitionBase {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
-
-  """
-  The permissions linked to the petition
-  """
-  userPermissions: [PetitionUserPermission!]!
 }
 
 type PetitionTemplateAndField implements PetitionBaseAndField {
@@ -2078,9 +2163,44 @@ type PetitionTemplatePagination {
 }
 
 """
+The permission for a petition and user group
+"""
+type PetitionUserGroupPermission implements PetitionPermissionBase & Timestamps {
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The group linked to the permission
+  """
+  group: UserGroup!
+
+  """
+  wether user is subscribed or not to emails and alerts of the petition
+  """
+  isSubscribed: Boolean!
+
+  """
+  The type of the permission.
+  """
+  permissionType: PetitionUserPermissionType!
+
+  """
+  The petition linked to the permission.
+  """
+  petition: Petition!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+"""
 The permission for a petition and user
 """
-type PetitionUserPermission implements Timestamps {
+type PetitionUserPermission implements PetitionPermissionBase & Timestamps {
   """
   Time when the resource was created.
   """

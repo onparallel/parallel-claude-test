@@ -1,4 +1,8 @@
 import { Knex } from "knex";
+import {
+  addPetitionEvent,
+  removePetitionEvent,
+} from "./helpers/petitionEvents";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.alterTable("petition_user", (t) => {
@@ -7,11 +11,20 @@ export async function up(knex: Knex): Promise<void> {
     t.integer("user_id").nullable().alter();
   });
 
+  await addPetitionEvent(knex, "GROUP_PERMISSION_ADDED");
+  await addPetitionEvent(knex, "GROUP_PERMISSION_EDITED");
+  await addPetitionEvent(knex, "GROUP_PERMISSION_REMOVED");
+
   await knex.raw(/* sql */ `
     drop index "petition_user__user_id__petition_id";
     drop index "user_group__org_id__name";
-    
+
+    -- useful for the "loadPetitionsForUser" query
+    create index "petition_user__user_id__petition_id"
+    on "petition_user" (user_id, petition_id) where deleted_at is null and user_group_id is null;
+
     -- unique directly assigned users per petition
+    -- useful to obtain the directly assigned users on a petition
     create unique index "petition_user__petition_id__user_id" 
     on "petition_user" (petition_id, user_id) where deleted_at is null and from_user_group_id is null and user_group_id is null;
     
@@ -49,6 +62,7 @@ export async function down(knex: Knex): Promise<void> {
     drop index "petition_user__petition_id__user_group_id";
     drop index "petition_user__petition_id__user_id__from_user_group_id";
     drop index "petition_user__petition_id__user_id";
+    drop index "petition_user__user_id__petition_id";
     
     create unique index "petition_user__user_id__petition_id" 
       on "petition_user" ("user_id", "petition_id") 
@@ -57,6 +71,10 @@ export async function down(knex: Knex): Promise<void> {
     create unique index "user_group__org_id__name" on "user_group" ("org_id", "name") where "deleted_at" is null;
 
   `);
+
+  await removePetitionEvent(knex, "GROUP_PERMISSION_ADDED");
+  await removePetitionEvent(knex, "GROUP_PERMISSION_EDITED");
+  await removePetitionEvent(knex, "GROUP_PERMISSION_REMOVED");
 
   await knex.schema.alterTable("petition_user", (t) => {
     t.dropColumn("user_group_id");

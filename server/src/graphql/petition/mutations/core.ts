@@ -259,7 +259,7 @@ export const deletePetitions = mutationField("deletePetitions", {
   },
   validateArgs: notEmptyArray((args) => args.ids, "ids"),
   resolve: async (_, args, ctx) => {
-    const petitionIsSharedByOwner = (p: PetitionUser[]) => {
+    function petitionIsSharedByOwner(p: PetitionUser[]) {
       return (
         p &&
         p.length > 1 && // the petition is being shared to another user
@@ -267,10 +267,27 @@ export const deletePetitions = mutationField("deletePetitions", {
           (u) => u.permission_type === "OWNER" && u.user_id === ctx.user!.id // logged user is the owner
         )
       );
-    };
+    }
+
+    function petitionIsSharedWithGroup(p: PetitionUser[]) {
+      return (
+        p &&
+        p.length > 1 &&
+        p.find(
+          (u) => u.user_id === ctx.user!.id && u.from_user_group_id !== null // user has access via group
+        )
+      );
+    }
 
     // user permissions grouped by permission_id
     const userPermissions = await ctx.petitions.loadUserPermissions(args.ids);
+
+    if (userPermissions.some(petitionIsSharedWithGroup)) {
+      throw new WhitelistedError(
+        "Can't delete a petition shared with a group",
+        "DELETE_GROUP_PETITION_ERROR"
+      );
+    }
 
     if (userPermissions.some(petitionIsSharedByOwner) && !args.force) {
       throw new WhitelistedError(

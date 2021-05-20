@@ -1,7 +1,6 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import { outdent } from "outdent";
 import {
   countBy,
   groupBy,
@@ -13,7 +12,7 @@ import {
   zip,
 } from "remeda";
 import { Aws, AWS_SERVICE } from "../../services/aws";
-import { unMaybeArray } from "../../util/arrays";
+import { partition, unMaybeArray } from "../../util/arrays";
 import {
   evaluateFieldVisibility,
   PetitionFieldVisibility,
@@ -128,12 +127,13 @@ export class PetitionRepository extends BaseRepository {
       .where({ user_id: userId })
       .whereIn("petition_id", petitionIds)
       .whereNull("deleted_at")
+      .whereNull("user_group_id")
       .mmodify((q) => {
         if (permissionTypes) {
           q.whereIn("permission_type", permissionTypes);
         }
       })
-      .select(this.count());
+      .select(this.knex.raw(`count(distinct(petition_id))::int as "count"`));
     return count === new Set(petitionIds).size;
   }
 
@@ -2676,33 +2676,84 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
+  readonly loadEffectiveUserPermissions = fromDataLoader(
+    new DataLoader<
+      number,
+      {
+        petition_id: number;
+        user_id: number;
+        permission_type: PetitionUserPermissionType;
+        is_subscribed: boolean;
+      }[]
+    >(async (petitionIds) => {
+      const rows = await this.raw<{
+        petition_id: number;
+        user_id: number;
+        permission_type: PetitionUserPermissionType;
+        is_subscribed: boolean;
+      }>(
+        /* sql */ `
+        select petition_id, user_id, min(permission_type) permission_type, bool_or(is_subscribed) is_subscribed 
+        from petition_user 
+          where deleted_at is null 
+          and user_group_id is null
+          and petition_id in (${petitionIds.map(() => "?")})
+          group by user_id, petition_id
+      `,
+        petitionIds
+      );
+
+      const byPetitionId = groupBy(rows, (r) => r.petition_id);
+      return petitionIds.map((id) => byPetitionId[id]);
+    })
+  );
+
   readonly loadUserPermissions = this.buildLoadMultipleBy(
     "petition_user",
     "petition_id",
     (q) =>
-      q.whereNull("deleted_at").orderByRaw(/* sql */ outdent`
-        case "permission_type" ${["OWNER", "WRITE", "READ"]
-          .map((v, i) => `when '${v}' then ${i}`)
-          .join(" ")} end, "created_at"`)
+      q
+        .whereNull("deleted_at")
+        .whereNull("user_group_id")
+        .orderByRaw("permission_type asc, created_at")
   );
 
   readonly loadUserPermissionsByUserId = this.buildLoadMultipleBy(
     "petition_user",
     "user_id",
     (q) =>
-      q.whereNull("deleted_at").orderByRaw(/* sql */ outdent`
-        case "permission_type" ${["OWNER", "WRITE", "READ"]
-          .map((v, i) => `when '${v}' then ${i}`)
-          .join(" ")} end, "created_at"`)
+      q.whereNull("deleted_at").orderByRaw("permission_type asc, created_at")
   );
 
-  readonly loadPetitionOwners = fromDataLoader(
+  readonly loadUserAndUserGroupPermissions = this.buildLoadMultipleBy(
+    "petition_user",
+    "petition_id",
+    (q) =>
+      q
+        .whereNull("deleted_at")
+        .whereNull("from_user_group_id")
+        .orderByRaw("permission_type asc, created_at")
+  );
+
+  readonly loadDirectlyAssignedUserPetitionPermissions =
+    this.buildLoadMultipleBy("petition_user", "user_id", (q) =>
+      q
+        .whereNull("deleted_at")
+        .whereNull("user_group_id")
+        .whereNull("from_user_group_id")
+        .orderByRaw("permission_type asc, created_at")
+    );
+
+  readonly loadPetitionOwner = fromDataLoader(
     new DataLoader<number, User | null>(async (ids) => {
       const rows = await this.from("petition_user")
         .leftJoin("user", "petition_user.user_id", "user.id")
         .whereIn("petition_id", ids)
         .where("permission_type", "OWNER")
         .whereNull("petition_user.deleted_at")
+        // required whereNull for using index on query
+        .whereNull("petition_user.from_user_group_id")
+        .whereNull("petition_user.user_group_id")
         .whereNull("user.deleted_at")
         .select("petition_user.petition_id", "user.*");
       const rowsByPetitionId = indexBy(rows, (r) => r.petition_id);
@@ -2726,12 +2777,12 @@ export class PetitionRepository extends BaseRepository {
     await this.raw(
       /* sql */ `
         with
-          u as (select user_id from petition_user where petition_id = ? and user_id != ? and deleted_at is null),
+          u as (select user_id, user_group_id, from_user_group_id from petition_user where petition_id = ? and user_id != ? and deleted_at is null),
           p as (select * from (values ${toPetitionIds
             .map(() => "(?::int)")
             .join(",")}) as t (petition_id))
-        insert into petition_user(petition_id, user_id, permission_type)
-        select p.petition_id, u.user_id, 'WRITE' from u cross join p
+        insert into petition_user(petition_id, user_id, user_group_id, from_user_group_id, permission_type)
+        select p.petition_id, u.user_id, u.user_group_id, u.from_user_group_id, 'WRITE' from u cross join p
         `,
       [fromPetitionId, user.id, ...toPetitionIds],
       t
@@ -2741,20 +2792,61 @@ export class PetitionRepository extends BaseRepository {
   async addPetitionUserPermissions(
     petitionIds: number[],
     userIds: number[],
+    userGroupIds: number[],
     permissionType: PetitionUserPermissionType,
     user: User,
     t?: Knex.Transaction
   ) {
-    const batch: CreatePetitionUser[] = petitionIds.flatMap((petitionId) =>
-      userIds.map((userId) => ({
-        petition_id: petitionId,
-        user_id: userId,
-        is_subscribed: true,
-        permission_type: permissionType,
-        created_by: `User:${user.id}`,
-        updated_by: `User:${user.id}`,
-      }))
+    const batch: CreatePetitionUser[] = [];
+    // directly assigned users
+    batch.push(
+      ...petitionIds.flatMap((petitionId) =>
+        userIds.map((userId) => ({
+          petition_id: petitionId,
+          user_id: userId,
+          is_subscribed: true,
+          permission_type: permissionType,
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+        }))
+      )
     );
+
+    // user groups
+    batch.push(
+      ...petitionIds.flatMap((petitionId) =>
+        userGroupIds.map((userGroupId) => ({
+          petition_id: petitionId,
+          user_group_id: userGroupId,
+          is_subscribed: true,
+          permission_type: permissionType,
+          created_by: `User:${user.id}`,
+          updated_by: `User:${user.id}`,
+        }))
+      )
+    );
+
+    // users assigned through groups
+    const allUsers = await this.from("user_group_member")
+      .whereIn("user_group_id", userGroupIds)
+      .whereNull("deleted_at")
+      .returning("*");
+    const groupedMembers = groupBy(allUsers, (u) => u.user_group_id);
+    Object.values(groupedMembers).forEach((groupMembers) => {
+      batch.push(
+        ...petitionIds.flatMap((petitionId) =>
+          groupMembers.map((member) => ({
+            petition_id: petitionId,
+            from_user_group_id: member.user_group_id,
+            user_id: member.user_id,
+            is_subscribed: true,
+            permission_type: permissionType,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`,
+          }))
+        )
+      );
+    });
 
     return this.withTransaction(async (t) => {
       /* 
@@ -2784,19 +2876,25 @@ export class PetitionRepository extends BaseRepository {
   async editPetitionUserPermissions(
     petitionIds: number[],
     userIds: number[],
-    newPermission: PetitionUserPermissionType,
+    userGroupIds: number[],
+    newPermissionType: PetitionUserPermissionType,
     user: User
   ) {
     return this.withTransaction(async (t) => {
       const updatedPermissions = await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
-        .whereIn("user_id", userIds)
+        .andWhere((q) =>
+          q
+            .orWhereIn("user_id", userIds)
+            .orWhereIn("user_group_id", userGroupIds)
+            .orWhereIn("from_user_group_id", userGroupIds)
+        )
         .whereNull("deleted_at")
         .update(
           {
             updated_at: this.now(),
             updated_by: `User:${user.id}`,
-            permission_type: newPermission,
+            permission_type: newPermissionType,
           },
           "*"
         );
@@ -2805,18 +2903,40 @@ export class PetitionRepository extends BaseRepository {
         this.loadUserPermissions.dataloader.clear(petitionId);
       }
 
-      await this.createEvent(
-        updatedPermissions.map((p) => ({
-          petitionId: p.petition_id,
-          type: "USER_PERMISSION_EDITED",
-          data: {
-            user_id: user.id,
-            permission_type: p.permission_type,
-            permission_user_id: p.user_id!,
-          },
-        })),
-        t
+      const [directlyAssigned, groupAssigned] = partition(
+        updatedPermissions,
+        (p) => p.from_user_group_id === null
       );
+
+      await Promise.all([
+        directlyAssigned.length > 0
+          ? this.createEvent(
+              directlyAssigned.map((p) => ({
+                petitionId: p.petition_id,
+                type: "USER_PERMISSION_EDITED",
+                data: {
+                  user_id: user.id,
+                  permission_type: p.permission_type,
+                  permission_user_id: p.user_id!,
+                },
+              })),
+              t
+            )
+          : undefined,
+        groupAssigned.length > 0
+          ? this.createEvent(
+              groupAssigned.map((p) => ({
+                petitionId: p.petition_id,
+                type: "GROUP_PERMISSION_EDITED",
+                data: {
+                  user_id: user.id,
+                  permission_type: p.permission_type,
+                  user_group_id: p.user_group_id!,
+                },
+              }))
+            )
+          : undefined,
+      ]);
 
       return await this.from("petition", t)
         .whereNull("deleted_at")
@@ -2828,6 +2948,7 @@ export class PetitionRepository extends BaseRepository {
   async removePetitionUserPermissions(
     petitionIds: number[],
     userIds: number[],
+    userGroupIds: number[],
     removeAll: boolean,
     user: User,
     t?: Knex.Transaction
@@ -2839,7 +2960,9 @@ export class PetitionRepository extends BaseRepository {
         .whereNot("user_id", user.id)
         .mmodify((q) => {
           if (!removeAll) {
-            q.whereIn("user_id", userIds);
+            q.whereIn("user_id", userIds)
+              .orWhereIn("from_user_group_id", userGroupIds)
+              .orWhereIn("user_group_id", userGroupIds);
           }
         })
         .update(
@@ -2854,17 +2977,38 @@ export class PetitionRepository extends BaseRepository {
         this.loadUserPermissions.dataloader.clear(petitionId);
       }
 
-      await this.createEvent(
-        removedPermissions.map((p) => ({
-          petitionId: p.petition_id,
-          type: "USER_PERMISSION_REMOVED",
-          data: {
-            user_id: user.id,
-            permission_user_id: p.user_id!,
-          },
-        })),
-        t
+      const [directlyAssigned, groupAssigned] = partition(
+        removedPermissions,
+        (p) => p.from_user_group_id === null
       );
+
+      await Promise.all([
+        directlyAssigned.length > 0
+          ? this.createEvent(
+              directlyAssigned.map((p) => ({
+                petitionId: p.petition_id,
+                type: "USER_PERMISSION_REMOVED",
+                data: {
+                  user_id: user.id,
+                  permission_user_id: p.user_id!,
+                },
+              })),
+              t
+            )
+          : undefined,
+        groupAssigned.length > 0
+          ? this.createEvent(
+              groupAssigned.map((p) => ({
+                petitionId: p.petition_id,
+                type: "GROUP_PERMISSION_REMOVED",
+                data: {
+                  user_id: user.id,
+                  user_group_id: p.user_group_id!,
+                },
+              }))
+            )
+          : undefined,
+      ]);
 
       return await this.from("petition", t)
         .whereNull("deleted_at")
@@ -2875,7 +3019,7 @@ export class PetitionRepository extends BaseRepository {
 
   async removePetitionUserPermissionsById(
     petitionUserPermissionIds: number[],
-    deletedBy: User,
+    user: User,
     t?: Knex.Transaction
   ) {
     return this.withTransaction(async (t) => {
@@ -2884,22 +3028,43 @@ export class PetitionRepository extends BaseRepository {
         .update(
           {
             deleted_at: this.now(),
-            deleted_by: `User:${deletedBy.id}`,
+            deleted_by: `User:${user.id}`,
           },
           "*"
         );
 
-      await this.createEvent(
-        removedPermissions.map((p) => ({
-          petitionId: p.petition_id,
-          type: "USER_PERMISSION_REMOVED",
-          data: {
-            user_id: deletedBy.id,
-            permission_user_id: p.user_id!,
-          },
-        })),
-        t
+      const [directlyAssigned, groupAssigned] = partition(
+        removedPermissions,
+        (p) => p.from_user_group_id === null
       );
+
+      await Promise.all([
+        directlyAssigned.length > 0
+          ? this.createEvent(
+              directlyAssigned.map((p) => ({
+                petitionId: p.petition_id,
+                type: "USER_PERMISSION_REMOVED",
+                data: {
+                  user_id: user.id,
+                  permission_user_id: p.user_id!,
+                },
+              })),
+              t
+            )
+          : undefined,
+        groupAssigned.length > 0
+          ? this.createEvent(
+              groupAssigned.map((p) => ({
+                petitionId: p.petition_id,
+                type: "GROUP_PERMISSION_REMOVED",
+                data: {
+                  user_id: user.id,
+                  user_group_id: p.user_group_id!,
+                },
+              }))
+            )
+          : undefined,
+      ]);
 
       return removedPermissions;
     }, t);
@@ -2940,14 +3105,15 @@ export class PetitionRepository extends BaseRepository {
       // so we have to update the conflicting row to have OWNER permission
       await t.raw<{ rows: PetitionUser[] }>(
         /* sql */ `
-        ? ON CONFLICT (user_id, petition_id) WHERE deleted_at IS NULL
-          DO UPDATE SET
+        ? on conflict (petition_id, user_id) 
+        where deleted_at is null and from_user_group_id is null and user_group_id is null
+          do update set
           permission_type = ?,
           updated_by = ?,
           updated_at = ?,
           deleted_by = null,
           deleted_at = null
-        RETURNING *;`,
+        returning *;`,
         [
           this.from("petition_user").insert(
             petitionIds.map((petitionId) => ({
@@ -3193,9 +3359,9 @@ export class PetitionRepository extends BaseRepository {
       .select<User[]>("user.*");
   }
 
-  async updatePetitionUser(
+  async updatePetitionUserSubscription(
     petitionId: number,
-    data: Partial<CreatePetitionUser>,
+    isSubscribed: boolean,
     user: User
   ) {
     const [row] = await this.from("petition_user")
@@ -3206,7 +3372,7 @@ export class PetitionRepository extends BaseRepository {
       })
       .update(
         {
-          ...data,
+          is_subscribed: isSubscribed,
           updated_at: this.now(),
           updated_by: `User:${user.id}`,
         },

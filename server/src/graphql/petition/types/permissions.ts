@@ -1,4 +1,5 @@
-import { enumType, objectType } from "@nexus/schema";
+import { enumType, interfaceType, objectType, unionType } from "@nexus/schema";
+import { isDefined } from "../../../util/remedaExtensions";
 
 export const PetitionUserPermissionTypeRW = enumType({
   name: "PetitionUserPermissionTypeRW",
@@ -12,19 +13,11 @@ export const PetitionUserPermissionType = enumType({
   members: ["OWNER", "READ", "WRITE"],
 });
 
-export const PetitionUserPermission = objectType({
-  name: "PetitionUserPermission",
-  rootTyping: "db.PetitionUser",
-  description: "The permission for a petition and user",
+export const PetitionPermissionBase = interfaceType({
+  name: "PetitionPermissionBase",
+  resolveType: (o) => null,
   definition(t) {
     t.implements("Timestamps");
-    t.field("user", {
-      type: "User",
-      description: "The user linked to the permission",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.users.loadUser(root.user_id))!;
-      },
-    });
     t.field("petition", {
       type: "Petition",
       description: "The petition linked to the permission.",
@@ -41,6 +34,74 @@ export const PetitionUserPermission = objectType({
       description:
         "wether user is subscribed or not to emails and alerts of the petition",
       resolve: (o) => o.is_subscribed,
+    });
+  },
+});
+
+export const PetitionPermission = unionType({
+  name: "PetitionPermission",
+  definition(t) {
+    t.members("PetitionUserPermission", "PetitionUserGroupPermission");
+  },
+  resolveType: (o) => {
+    if (isDefined(o.user_id)) {
+      return "PetitionUserPermission";
+    } else if (isDefined(o.user_group_id)) {
+      return "PetitionUserGroupPermission";
+    }
+    throw new Error(
+      `Either user_id or user_group_id must be defined on petition_user with id ${o.id}`
+    );
+  },
+  rootTyping: "db.PetitionUser",
+});
+
+export const EffectivePetitionUserPermission = objectType({
+  name: "EffectivePetitionUserPermission",
+  rootTyping: `Pick<db.PetitionUser, "petition_id" | "user_id" | "permission_type" | "is_subscribed">`,
+  description: "The effective permission for a petition and user",
+  definition(t) {
+    t.field("permissionType", {
+      type: "PetitionUserPermissionType",
+      description: "The type of the permission.",
+      resolve: (o) => o.permission_type,
+    });
+    t.boolean("isSubscribed", {
+      description:
+        "wether user is subscribed or not to emails and alerts of the petition",
+      resolve: (o) => o.is_subscribed,
+    });
+  },
+});
+
+export const PetitionUserGroupPermission = objectType({
+  name: "PetitionUserGroupPermission",
+  rootTyping: "db.PetitionUser",
+  description: "The permission for a petition and user group",
+  definition(t) {
+    t.implements("PetitionPermissionBase");
+    t.field("group", {
+      type: "UserGroup",
+      description: "The group linked to the permission",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.userGroups.loadUserGroup(root.user_group_id!))!;
+      },
+    });
+  },
+});
+
+export const PetitionUserPermission = objectType({
+  name: "PetitionUserPermission",
+  rootTyping: "db.PetitionUser",
+  description: "The permission for a petition and user",
+  definition(t) {
+    t.implements("PetitionPermissionBase");
+    t.field("user", {
+      type: "User",
+      description: "The user linked to the permission",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.users.loadUser(root.user_id!))!;
+      },
     });
   },
 });
