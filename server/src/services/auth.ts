@@ -137,7 +137,7 @@ export class Auth implements IAuth {
       const cognitoId = payload["cognito:username"] as string;
       const firstName = payload["given_name"] as string;
       const lastName = payload["family_name"] as string;
-      const email = payload["email"] as string;
+      const email = (payload["email"] as string).toLowerCase();
       const externalId = payload["identities"][0].userId as string;
       let user = await this.users.loadUserByEmail(email);
       const [, domain] = email.split("@");
