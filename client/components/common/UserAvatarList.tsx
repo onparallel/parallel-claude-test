@@ -95,7 +95,6 @@ export const UserAvatarList = Object.assign(
               sx={{
                 ":hover > *": {
                   transform: "translateY(-0.25rem)",
-                  borderColor: "purple.500",
                   zIndex: 1,
                 },
               }}
@@ -106,8 +105,15 @@ export const UserAvatarList = Object.assign(
                 borderRadius="full"
                 transition="transform 150ms ease"
                 position="relative"
+                boxSize={7}
+                overflow="hidden"
               >
-                <Avatar size="xs" name={fullName ?? undefined} />
+                <Avatar
+                  size="xs"
+                  name={fullName ?? undefined}
+                  boxSize="100%"
+                  borderRadius="none"
+                />
               </Box>
             </Box>
           </Tooltip>
