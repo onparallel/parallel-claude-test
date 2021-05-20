@@ -1,24 +1,29 @@
 import AWS from "aws-sdk";
-import { ContextDataType } from "aws-sdk/clients/cognitoidentityserviceprovider";
+import {
+  AuthenticationResultType,
+  ContextDataType,
+} from "aws-sdk/clients/cognitoidentityserviceprovider";
+import { parse as parseCookie } from "cookie";
 import { NextFunction, Request, RequestHandler, Response } from "express";
+import { IncomingMessage } from "http";
 import { inject, injectable } from "inversify";
 import { decode } from "jsonwebtoken";
 import fetch from "node-fetch";
-import { IncomingMessage } from "node:http";
 import { getClientIp } from "request-ip";
 import { Memoize } from "typescript-memoize";
 import { URL } from "url";
 import { CONFIG, Config } from "../config";
-import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
-import { UserRepository } from "../db/repositories/UserRepository";
-import { random } from "../util/token";
-import { REDIS, Redis } from "./redis";
-import { parse as parseCookie } from "cookie";
-import { User } from "../db/__types";
 import {
   IntegrationRepository,
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
+import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
+import { UserRepository } from "../db/repositories/UserRepository";
+import { User } from "../db/__types";
+import { toGlobalId } from "../util/globalId";
+import { random } from "../util/token";
+import { ANALYTICS, AnalyticsService } from "./analytics";
+import { REDIS, Redis } from "./redis";
 
 export interface IAuth {
   guessLogin: RequestHandler;
@@ -50,6 +55,7 @@ export class Auth implements IAuth {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(REDIS) private redis: Redis,
+    @inject(ANALYTICS) public readonly analytics: AnalyticsService,
     private orgs: OrganizationRepository,
     private integrations: IntegrationRepository,
     private users: UserRepository
@@ -133,10 +139,10 @@ export class Auth implements IAuth {
       const lastName = payload["family_name"] as string;
       const email = payload["email"] as string;
       const externalId = payload["identities"][0].userId as string;
-      const existing = await this.users.loadUserByEmail(email);
+      let user = await this.users.loadUserByEmail(email);
       const [, domain] = email.split("@");
-      const orgId = existing
-        ? existing.org_id
+      const orgId = user
+        ? user.org_id
         : (await this.integrations.loadSSOIntegrationByDomain(domain))?.org_id;
       if (!orgId) {
         throw new Error(`can't find SSO integration for domain ${domain}`);
@@ -147,8 +153,8 @@ export class Auth implements IAuth {
         throw new Error(`can't find organization with id ${orgId}`);
       }
 
-      if (!existing) {
-        await this.users.createUser(
+      if (!user) {
+        user = await this.users.createUser(
           {
             first_name: firstName,
             last_name: lastName,
@@ -162,13 +168,13 @@ export class Auth implements IAuth {
         );
       } else {
         if (
-          existing.first_name !== firstName ||
-          existing.last_name !== lastName ||
-          existing.cognito_id !== cognitoId ||
-          existing.external_id !== externalId
+          user.first_name !== firstName ||
+          user.last_name !== lastName ||
+          user.cognito_id !== cognitoId ||
+          user.external_id !== externalId
         ) {
           await this.users.updateUserById(
-            existing.id,
+            user.id,
             {
               first_name: firstName,
               last_name: lastName,
@@ -180,6 +186,7 @@ export class Auth implements IAuth {
           );
         }
       }
+      this.trackSessionLogin(user);
       const token = await this.storeSession({
         IdToken: tokens["id_token"],
         AccessToken: tokens["access_token"],
@@ -198,6 +205,10 @@ export class Auth implements IAuth {
       const auth = await this.initiateAuth(email, password, req);
       if (auth.AuthenticationResult) {
         const token = await this.storeSession(auth.AuthenticationResult as any);
+        const user = await this.getUserFromAuthenticationResult(
+          auth.AuthenticationResult
+        );
+        this.trackSessionLogin(user);
         this.setSession(res, token);
         res.status(201).send({});
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
@@ -233,6 +244,10 @@ export class Auth implements IAuth {
         req
       );
       if (challenge.AuthenticationResult) {
+        const user = await this.getUserFromAuthenticationResult(
+          challenge.AuthenticationResult
+        );
+        this.trackSessionLogin(user);
         const token = await this.storeSession(
           challenge.AuthenticationResult as any
         );
@@ -315,6 +330,27 @@ export class Auth implements IAuth {
     res.redirect(302, url.href);
   }
 
+  private async getUserFromAuthenticationResult(
+    result: AuthenticationResultType
+  ) {
+    const payload = decode(result.IdToken!) as any;
+    const cognitoId = payload["cognito:username"] as string;
+    return await this.users.loadUserByCognitoId(cognitoId);
+  }
+
+  private trackSessionLogin(user: User) {
+    this.analytics.identifyUser(user);
+    this.analytics.trackEvent(
+      "USER_LOGGED_IN",
+      {
+        email: user.email,
+        org_id: user.org_id,
+        user_id: user.id,
+      },
+      toGlobalId("User", user.id)
+    );
+  }
+
   private setSession(res: Response, token: string) {
     res.cookie("parallel_session", token, {
       sameSite: "lax",
@@ -336,30 +372,22 @@ export class Auth implements IAuth {
   /** Store session on Redis */
   private async storeSession(session: CognitoSession) {
     const token = random(48);
+    const { IdToken, AccessToken, RefreshToken } = session;
+    const prefix = `session:${token}`;
     await Promise.all([
-      this.redis.set(`session:${token}:idToken`, session.IdToken, this.EXPIRY),
-      this.redis.set(
-        `session:${token}:accessToken`,
-        session.AccessToken,
-        this.EXPIRY
-      ),
-      this.redis.set(
-        `session:${token}:refreshToken`,
-        session.RefreshToken,
-        this.EXPIRY
-      ),
+      this.redis.set(`${prefix}:idToken`, IdToken, this.EXPIRY),
+      this.redis.set(`${prefix}:accessToken`, AccessToken, this.EXPIRY),
+      this.redis.set(`${prefix}:refreshToken`, RefreshToken, this.EXPIRY),
     ]);
     return token;
   }
 
   private async updateSession(token: string, session: CognitoSession) {
+    const { IdToken, AccessToken } = session;
+    const prefix = `session:${token}`;
     await Promise.all([
-      this.redis.set(`session:${token}:idToken`, session.IdToken, this.EXPIRY),
-      this.redis.set(
-        `session:${token}:accessToken`,
-        session.AccessToken,
-        this.EXPIRY
-      ),
+      this.redis.set(`${prefix}:idToken`, IdToken, this.EXPIRY),
+      this.redis.set(`${prefix}:accessToken`, AccessToken, this.EXPIRY),
     ]);
   }
 
