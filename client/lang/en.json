@@ -140,6 +140,21 @@
     "context": "Ongoing eSignature"
   },
   {
+    "term": "component.confirm-remove-member-dialog.body",
+    "definition": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group.",
+    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
+  },
+  {
+    "term": "component.confirm-remove-member-dialog.confirm",
+    "definition": "Yes, remove from group",
+    "context": "Yes, remove from group"
+  },
+  {
+    "term": "component.confirm-remove-member-dialog.title",
+    "definition": "Remove from group",
+    "context": "Remove from group"
+  },
+  {
     "term": "component.confirm-resend-completed-notification.confirm-button",
     "definition": "Yes, resend the notification",
     "context": "Yes, resend the notification"
@@ -2095,6 +2110,11 @@
     "context": "Edited"
   },
   {
+    "term": "generic.email",
+    "definition": "Email",
+    "context": "Email"
+  },
+  {
     "term": "generic.empty-heading",
     "definition": "Untitled heading",
     "context": "Untitled heading"
@@ -2340,6 +2360,11 @@
     "context": "Load more"
   },
   {
+    "term": "generic.members",
+    "definition": "Members",
+    "context": "Members"
+  },
+  {
     "term": "generic.more-options",
     "definition": "More options...",
     "context": "More options..."
@@ -2348,6 +2373,11 @@
     "term": "generic.n-more",
     "definition": "{count} more",
     "context": "{count} more"
+  },
+  {
+    "term": "generic.name",
+    "definition": "Name",
+    "context": "Name"
   },
   {
     "term": "generic.never-active",
@@ -2740,16 +2770,6 @@
     "context": "Clone {count, plural, =1{group} other {groups}}"
   },
   {
-    "term": "organization-groups.confirm-delete.body",
-    "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}.",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
-  },
-  {
-    "term": "organization-groups.confirm-delete.header",
-    "definition": "Delete {count, plural, =1 {group} other {groups}}",
-    "context": "Delete {count, plural, =1 {group} other {groups}}"
-  },
-  {
     "term": "organization-groups.create-group",
     "definition": "Create group",
     "context": "Create group"
@@ -2758,21 +2778,6 @@
     "term": "organization-groups.delete-group",
     "definition": "Delete {count, plural, =1{group} other {groups}}",
     "context": "Delete {count, plural, =1{group} other {groups}}"
-  },
-  {
-    "term": "organization-groups.header.members",
-    "definition": "Members",
-    "context": "Members"
-  },
-  {
-    "term": "organization-groups.header.name",
-    "definition": "Name",
-    "context": "Name"
-  },
-  {
-    "term": "organization-groups.remove",
-    "definition": "Remove from group",
-    "context": "Remove from group"
   },
   {
     "term": "organization-groups.remove-from-group",
@@ -2890,51 +2895,6 @@
     "context": "Select a user from your organization"
   },
   {
-    "term": "organization.confirm-remove-member.body",
-    "definition": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group.",
-    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
-  },
-  {
-    "term": "organization.confirm-remove-member.confirm",
-    "definition": "Yes, remove from group",
-    "context": "Yes, remove from group"
-  },
-  {
-    "term": "organization.group-clone-success.toast-description",
-    "definition": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly cloned.",
-    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly cloned."
-  },
-  {
-    "term": "organization.group-clone-success.toast-title",
-    "definition": "{count, plural, =1{Group} other{Groups}} cloned successfully.",
-    "context": "{count, plural, =1{Group} other{Groups}} cloned successfully."
-  },
-  {
-    "term": "organization.group-created-success.toast-description",
-    "definition": "Group {name} succefuly created.",
-    "context": "Group {name} succefuly created."
-  },
-  {
-    "term": "organization.group-created-success.toast-title",
-    "definition": "Group created successfully.",
-    "context": "Group created successfully."
-  },
-  {
-    "term": "organization.group-delete-success.toast-description",
-    "definition": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly deleted.",
-    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly deleted."
-  },
-  {
-    "term": "organization.group-delete-success.toast-title",
-    "definition": "{count, plural, =1{Group} other{Groups}} deleted successfully.",
-    "context": "{count, plural, =1{Group} other{Groups}} deleted successfully."
-  },
-  {
-    "term": "organization.groups.edit-name",
-    "definition": "Edit name",
-    "context": "Edit name"
-  },
-  {
     "term": "organization.groups.title",
     "definition": "Groups",
     "context": "Groups"
@@ -2950,11 +2910,6 @@
     "context": "Normal"
   },
   {
-    "term": "organization.title",
-    "definition": "Organization",
-    "context": "Organization"
-  },
-  {
     "term": "organization.user-created-success.toast-description",
     "definition": "We have sent an email to {email} with instructions to register in Parallel.",
     "context": "We have sent an email to {email} with instructions to register in Parallel."
@@ -2968,11 +2923,6 @@
     "term": "organization.user-updated-success.toast-title",
     "definition": "User updated successfully.",
     "context": "User updated successfully."
-  },
-  {
-    "term": "organization.users-added-success.toast-title",
-    "definition": "Users added successfully.",
-    "context": "Users added successfully."
   },
   {
     "term": "organization.users.title",
@@ -5958,5 +5908,95 @@
     "term": "tour.petitions-list.welcome-title",
     "definition": "Welcome to Parallel!",
     "context": "Welcome to Parallel!"
+  },
+  {
+    "term": "view.group.edit-name",
+    "definition": "Edit name",
+    "context": "Edit name"
+  },
+  {
+    "term": "view.group.no-members",
+    "definition": "No members added to this group yet",
+    "context": "No members added to this group yet"
+  },
+  {
+    "term": "view.group.no-results",
+    "definition": "There's no members matching your search",
+    "context": "There's no members matching your search"
+  },
+  {
+    "term": "view.group.users-added-title",
+    "definition": "Users added successfully.",
+    "context": "Users added successfully."
+  },
+  {
+    "term": "view.groups.clone-success-description",
+    "definition": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully cloned.",
+    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully cloned."
+  },
+  {
+    "term": "view.groups.clone-success-title",
+    "definition": "{count, plural, =1{Group} other{Groups}} cloned successfully.",
+    "context": "{count, plural, =1{Group} other{Groups}} cloned successfully."
+  },
+  {
+    "term": "view.groups.confirm-delete-body",
+    "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}.",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
+  },
+  {
+    "term": "view.groups.confirm-delete-button",
+    "definition": "Yes, delete",
+    "context": "Yes, delete"
+  },
+  {
+    "term": "view.groups.confirm-delete-header",
+    "definition": "Delete {count, plural, =1 {group} other {groups}}",
+    "context": "Delete {count, plural, =1 {group} other {groups}}"
+  },
+  {
+    "term": "view.groups.create-success-description",
+    "definition": "Group {name} successfully created.",
+    "context": "Group {name} successfully created."
+  },
+  {
+    "term": "view.groups.create-success-title",
+    "definition": "Group created successfully.",
+    "context": "Group created successfully."
+  },
+  {
+    "term": "view.groups.delete-success-description",
+    "definition": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} successfully deleted.",
+    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} successfully deleted."
+  },
+  {
+    "term": "view.groups.delete-success-title",
+    "definition": "{count, plural, =1{Group} other{Groups}} deleted successfully.",
+    "context": "{count, plural, =1{Group} other{Groups}} deleted successfully."
+  },
+  {
+    "term": "view.groups.no-groups",
+    "definition": "You have no groups yet",
+    "context": "You have no groups yet"
+  },
+  {
+    "term": "view.groups.no-members-added",
+    "definition": "No members added",
+    "context": "No members added"
+  },
+  {
+    "term": "view.groups.no-results",
+    "definition": "There's no groups matching your search",
+    "context": "There's no groups matching your search"
+  },
+  {
+    "term": "view.groups.title",
+    "definition": "Groups",
+    "context": "Groups"
+  },
+  {
+    "term": "view.organization.title",
+    "definition": "Organization",
+    "context": "Organization"
   }
 ]

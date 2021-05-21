@@ -1,4 +1,5 @@
 import { Flex, Heading } from "@chakra-ui/layout";
+import { Text } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
 import { FormattedMessage, useIntl } from "react-intl";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
@@ -148,7 +149,7 @@ function OrganizationGroups() {
       toast({
         title: intl.formatMessage(
           {
-            id: "organization.group-clone-success.toast-title",
+            id: "view.groups.clone-success-title",
             defaultMessage:
               "{count, plural, =1{Group} other{Groups}} cloned successfully.",
           },
@@ -156,9 +157,9 @@ function OrganizationGroups() {
         ),
         description: intl.formatMessage(
           {
-            id: "organization.group-clone-success.toast-description",
+            id: "view.groups.clone-success-description",
             defaultMessage:
-              "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly cloned.",
+              "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully cloned.",
           },
           {
             count: selected.length,
@@ -186,7 +187,7 @@ function OrganizationGroups() {
     toast({
       title: intl.formatMessage(
         {
-          id: "organization.group-delete-success.toast-title",
+          id: "view.groups.delete-success-title",
           defaultMessage:
             "{count, plural, =1{Group} other{Groups}} deleted successfully.",
         },
@@ -194,9 +195,9 @@ function OrganizationGroups() {
       ),
       description: intl.formatMessage(
         {
-          id: "organization.group-delete-success.toast-description",
+          id: "view.groups.delete-success-description",
           defaultMessage:
-            "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly deleted.",
+            "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} successfully deleted.",
         },
         {
           count: selected.length,
@@ -224,13 +225,13 @@ function OrganizationGroups() {
       refetch();
       toast({
         title: intl.formatMessage({
-          id: "organization.group-created-success.toast-title",
+          id: "view.groups.create-success-title",
           defaultMessage: "Group created successfully.",
         }),
         description: intl.formatMessage(
           {
-            id: "organization.group-created-success.toast-description",
-            defaultMessage: "Group {name} succefuly created.",
+            id: "view.groups.create-success-description",
+            defaultMessage: "Group {name} successfully created.",
           },
           { name: newGroup.name }
         ),
@@ -244,7 +245,7 @@ function OrganizationGroups() {
   return (
     <SettingsLayout
       title={intl.formatMessage({
-        id: "organization.groups.title",
+        id: "view.groups.title",
         defaultMessage: "Groups",
       })}
       basePath="/app/organization"
@@ -252,16 +253,13 @@ function OrganizationGroups() {
       user={me}
       sectionsHeader={
         <FormattedMessage
-          id="organization.title"
+          id="view.organization.title"
           defaultMessage="Organization"
         />
       }
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage
-            id="organization.groups.title"
-            defaultMessage="Groups"
-          />
+          <FormattedMessage id="view.groups.title" defaultMessage="Groups" />
         </Heading>
       }
     >
@@ -304,6 +302,29 @@ function OrganizationGroups() {
               onRemoveGroup={handleDeleteClick}
             />
           }
+          body={
+            userGroups.totalCount === 0 && !loading ? (
+              state.search ? (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text color="gray.300" fontSize="lg">
+                    <FormattedMessage
+                      id="view.groups.no-results"
+                      defaultMessage="There's no groups matching your search"
+                    />
+                  </Text>
+                </Flex>
+              ) : (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text fontSize="lg">
+                    <FormattedMessage
+                      id="view.groups.no-groups"
+                      defaultMessage="You have no groups yet"
+                    />
+                  </Text>
+                </Flex>
+              )
+            ) : null
+          }
         />
       </Flex>
     </SettingsLayout>
@@ -318,7 +339,7 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
         key: "name",
         isSortable: true,
         header: intl.formatMessage({
-          id: "organization-groups.header.name",
+          id: "generic.name",
           defaultMessage: "Name",
         }),
         headerProps: {
@@ -335,7 +356,7 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
       {
         key: "members",
         header: intl.formatMessage({
-          id: "organization-groups.header.members",
+          id: "generic.members",
           defaultMessage: "Members",
         }),
         align: "left",
@@ -349,8 +370,8 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
           ) : (
             <OverflownText textStyle={"hint"}>
               {intl.formatMessage({
-                id: "organization-groups.empty-group",
-                defaultMessage: "Empty group",
+                id: "view.groups.no-members-added",
+                defaultMessage: "No members added",
               })}
             </OverflownText>
           );
@@ -399,14 +420,14 @@ function ConfirmDeleteGroupsDialog({
       hasCloseButton
       header={
         <FormattedMessage
-          id="organization-groups.confirm-delete.header"
+          id="view.groups.confirm-delete-header"
           defaultMessage="Delete {count, plural, =1 {group} other {groups}}"
           values={{ count }}
         />
       }
       body={
         <FormattedMessage
-          id="organization-groups.confirm-delete.body"
+          id="view.groups.confirm-delete-body"
           defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
           values={{
             count,
@@ -418,7 +439,7 @@ function ConfirmDeleteGroupsDialog({
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
           <FormattedMessage
-            id="generic.confirm-delete-button"
+            id="view.groups.confirm-delete-button"
             defaultMessage="Yes, delete"
           />
         </Button>

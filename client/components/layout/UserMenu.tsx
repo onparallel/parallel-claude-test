@@ -67,7 +67,7 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
               <MenuItem as="a">
                 <BusinessIcon marginRight={2} />
                 <FormattedMessage
-                  id="organization.title"
+                  id="view.organization.title"
                   defaultMessage="Organization"
                 />
               </MenuItem>

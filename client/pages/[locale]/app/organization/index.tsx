@@ -24,7 +24,7 @@ function OrganizationSettings() {
   return (
     <SettingsLayout
       title={intl.formatMessage({
-        id: "organization.title",
+        id: "view.organization.title",
         defaultMessage: "Organization",
       })}
       isBase
@@ -33,7 +33,7 @@ function OrganizationSettings() {
       user={me}
       sectionsHeader={
         <FormattedMessage
-          id="organization.title"
+          id="view.organization.title"
           defaultMessage="Organization"
         />
       }

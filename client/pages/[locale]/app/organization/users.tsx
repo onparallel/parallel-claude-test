@@ -204,7 +204,7 @@ function OrganizationUsers() {
       user={me}
       sectionsHeader={
         <FormattedMessage
-          id="organization.title"
+          id="view.organization.title"
           defaultMessage="Organization"
         />
       }

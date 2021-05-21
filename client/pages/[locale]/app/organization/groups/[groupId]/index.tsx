@@ -20,7 +20,7 @@ import {
 import {
   CopyIcon,
   DeleteIcon,
-  EditIcon,
+  EditSimpleIcon,
   MoreVerticalIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -229,7 +229,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       });
       toast({
         title: intl.formatMessage({
-          id: "organization.users-added-success.toast-title",
+          id: "view.group.users-added-title",
           defaultMessage: "Users added successfully.",
         }),
         status: "success",
@@ -260,16 +260,13 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
 
   return (
     <SettingsLayout
-      title={intl.formatMessage({
-        id: "organization.groups.title",
-        defaultMessage: "Groups",
-      })}
+      title={name}
       basePath="/app/organization"
       sections={sections}
       user={me}
       sectionsHeader={
         <FormattedMessage
-          id="organization.title"
+          id="view.organization.title"
           defaultMessage="Organization"
         />
       }
@@ -359,6 +356,29 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
               onRemoveMember={handleRemoveMember}
             />
           }
+          body={
+            userList.length === 0 && !loading ? (
+              state.search ? (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text color="gray.300" fontSize="lg">
+                    <FormattedMessage
+                      id="view.group.no-results"
+                      defaultMessage="There's no members matching your search"
+                    />
+                  </Text>
+                </Flex>
+              ) : (
+                <Flex flex="1" alignItems="center" justifyContent="center">
+                  <Text fontSize="lg">
+                    <FormattedMessage
+                      id="view.group.no-members"
+                      defaultMessage="No members added to this group yet"
+                    />
+                  </Text>
+                </Flex>
+              )
+            ) : null
+          }
         />
       </Flex>
     </SettingsLayout>
@@ -373,7 +393,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
         key: "fullName",
         isSortable: true,
         header: intl.formatMessage({
-          id: "organization-users.header.name",
+          id: "generic.name",
           defaultMessage: "Name",
         }),
         CellContent: ({ row }) => {
@@ -384,7 +404,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
         key: "email",
         isSortable: true,
         header: intl.formatMessage({
-          id: "organization-users.header.user-email",
+          id: "generic.email",
           defaultMessage: "Email",
         }),
         CellContent: ({ row }) => <>{row.user.email}</>,
@@ -421,7 +441,7 @@ const EditableControls = ({ ...props }) => {
       <IconButtonWithTooltip
         label={props.label}
         size="sm"
-        icon={<EditIcon />}
+        icon={<EditSimpleIcon />}
         {...getEditButtonProps()}
         {...props}
       />
@@ -461,31 +481,26 @@ const EditableHeading = ({
         onSubmit={onSubmit}
         display="flex"
         alignItems="center"
+        submitOnBlur
       >
-        <Tooltip
-          label={intl.formatMessage({
-            id: "organization.groups.edit-name",
-            defaultMessage: "Edit name",
-          })}
-        >
-          <EditablePreview
-            paddingY={1}
-            paddingX={2}
-            ref={previewRef}
-            borderRadius="md"
-            borderWidth="2px"
-            borderColor="transparent"
-            transition="border 0.26s ease"
-            _hover={{
-              borderWidth: "2px",
-              borderColor: "gray.300",
-            }}
-            whiteSpace="nowrap"
-            overflow="hidden"
-            maxWidth={655}
-            textOverflow="ellipsis"
-          ></EditablePreview>
-        </Tooltip>
+        <EditablePreview
+          paddingY={1}
+          paddingX={2}
+          ref={previewRef}
+          borderRadius="md"
+          borderWidth="2px"
+          borderColor="transparent"
+          transition="border 0.26s ease"
+          _hover={{
+            borderWidth: "2px",
+            borderColor: "gray.300",
+          }}
+          whiteSpace="nowrap"
+          overflow="hidden"
+          maxWidth={655}
+          textOverflow="ellipsis"
+        ></EditablePreview>
+
         <EditableInput
           paddingY={1}
           paddingX={2}
@@ -496,10 +511,10 @@ const EditableHeading = ({
           marginLeft={1}
           background={"white"}
           color={"gray.400"}
-          fontSize={20}
-          _hover={{ backgroundColor: "gray.100", color: "gray.600" }}
+          fontSize={18}
+          _hover={{ backgroundColor: "white", color: "gray.600" }}
           label={intl.formatMessage({
-            id: "organization.groups.edit-name",
+            id: "view.group.edit-name",
             defaultMessage: "Edit name",
           })}
         />

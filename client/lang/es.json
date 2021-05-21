@@ -16,17 +16,17 @@
   },
   {
     "term": "component.add-member-group-dialog.members-label",
-    "definition": "",
+    "definition": "Añadir al grupo",
     "context": "Add to group"
   },
   {
     "term": "component.add-member-group-dialog.members-placeholder",
-    "definition": "",
+    "definition": "Selecciona usuarios de su organización",
     "context": "Select users from your organization"
   },
   {
     "term": "component.add-member-group-dialog.title",
-    "definition": "",
+    "definition": "Agregar miembros al grupo",
     "context": "Add members to group"
   },
   {
@@ -138,6 +138,21 @@
     "term": "component.confirm-disable-ongoing-signature.header",
     "definition": "Firma digital pendiente",
     "context": "Ongoing eSignature"
+  },
+  {
+    "term": "component.confirm-remove-member-dialog.body",
+    "definition": "¿Estás seguro de querer <b>quitar del grupo</b> a {count, plural, =1{{fullName}} other {los miembros seleccionados}}? Si continúas, {count, plural, =1{perderá} other {perderán}} el acceso a las peticiones compartidas con el grupo",
+    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
+  },
+  {
+    "term": "component.confirm-remove-member-dialog.confirm",
+    "definition": "Si, quitar del grupo",
+    "context": "Yes, remove from group"
+  },
+  {
+    "term": "component.confirm-remove-member-dialog.title",
+    "definition": "Quitar del grupo",
+    "context": "Remove from group"
   },
   {
     "term": "component.confirm-resend-completed-notification.confirm-button",
@@ -271,27 +286,27 @@
   },
   {
     "term": "component.create-group-dialog.confirm-button",
-    "definition": "",
+    "definition": "Crea grupo",
     "context": "Create group"
   },
   {
     "term": "component.create-group-dialog.members-label",
-    "definition": "",
+    "definition": "Añadir al grupo",
     "context": "Add to group"
   },
   {
     "term": "component.create-group-dialog.members-placeholder",
-    "definition": "",
+    "definition": "Seleccionar usuarios de su organización",
     "context": "Select users from your organization"
   },
   {
     "term": "component.create-group-dialog.name-label",
-    "definition": "",
+    "definition": "Nombre del grupo",
     "context": "Group name"
   },
   {
     "term": "component.create-group-dialog.title",
-    "definition": "",
+    "definition": "Nuevo grupo de usuarios",
     "context": "New user group"
   },
   {
@@ -531,12 +546,12 @@
   },
   {
     "term": "component.group-header.clone-label",
-    "definition": "",
+    "definition": "Duplicar grupo",
     "context": "Clone group"
   },
   {
     "term": "component.group-header.delete-label",
-    "definition": "",
+    "definition": "Eliminar grupo",
     "context": "Delete group"
   },
   {
@@ -1916,7 +1931,7 @@
   },
   {
     "term": "generic.added-at",
-    "definition": "",
+    "definition": "Añadido el",
     "context": "Added at"
   },
   {
@@ -2095,6 +2110,11 @@
     "context": "Edited"
   },
   {
+    "term": "generic.email",
+    "definition": "Correo electrónico",
+    "context": "Email"
+  },
+  {
     "term": "generic.empty-heading",
     "definition": "Encabezado vacío",
     "context": "Untitled heading"
@@ -2191,7 +2211,7 @@
   },
   {
     "term": "generic.forms.invalid-group-name-error",
-    "definition": "",
+    "definition": "Por favor, introduzca el nombre del grupo",
     "context": "Please, enter the group name"
   },
   {
@@ -2340,6 +2360,11 @@
     "context": "Load more"
   },
   {
+    "term": "generic.members",
+    "definition": "Miembros",
+    "context": "Members"
+  },
+  {
     "term": "generic.more-options",
     "definition": "Más opciones...",
     "context": "More options..."
@@ -2348,6 +2373,11 @@
     "term": "generic.n-more",
     "definition": "{count} más",
     "context": "{count} more"
+  },
+  {
+    "term": "generic.name",
+    "definition": "Nombre",
+    "context": "Name"
   },
   {
     "term": "generic.never-active",
@@ -2731,52 +2761,27 @@
   },
   {
     "term": "organization-groups.add-member",
-    "definition": "",
+    "definition": "Añadir miembro",
     "context": "Add member"
   },
   {
     "term": "organization-groups.clone-group",
-    "definition": "",
+    "definition": "Duplicar {count, plural, =1{grupo} other {grupos}}",
     "context": "Clone {count, plural, =1{group} other {groups}}"
   },
   {
-    "term": "organization-groups.confirm-delete.body",
-    "definition": "",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
-  },
-  {
-    "term": "organization-groups.confirm-delete.header",
-    "definition": "",
-    "context": "Delete {count, plural, =1 {group} other {groups}}"
-  },
-  {
     "term": "organization-groups.create-group",
-    "definition": "",
+    "definition": "Crear un grupo",
     "context": "Create group"
   },
   {
     "term": "organization-groups.delete-group",
-    "definition": "",
+    "definition": "Eliminar {count, plural, =1{grupo} other {grupos}}",
     "context": "Delete {count, plural, =1{group} other {groups}}"
   },
   {
-    "term": "organization-groups.header.members",
-    "definition": "",
-    "context": "Members"
-  },
-  {
-    "term": "organization-groups.header.name",
-    "definition": "",
-    "context": "Name"
-  },
-  {
-    "term": "organization-groups.remove",
-    "definition": "",
-    "context": "Remove from group"
-  },
-  {
     "term": "organization-groups.remove-from-group",
-    "definition": "",
+    "definition": "Sacar del grupo",
     "context": "Remove from group"
   },
   {
@@ -2890,51 +2895,6 @@
     "context": "Select a user from your organization"
   },
   {
-    "term": "organization.confirm-remove-member.body",
-    "definition": "",
-    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
-  },
-  {
-    "term": "organization.confirm-remove-member.confirm",
-    "definition": "",
-    "context": "Yes, remove from group"
-  },
-  {
-    "term": "organization.group-clone-success.toast-description",
-    "definition": "",
-    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly cloned."
-  },
-  {
-    "term": "organization.group-clone-success.toast-title",
-    "definition": "",
-    "context": "{count, plural, =1{Group} other{Groups}} cloned successfully."
-  },
-  {
-    "term": "organization.group-created-success.toast-description",
-    "definition": "",
-    "context": "Group {name} succefuly created."
-  },
-  {
-    "term": "organization.group-created-success.toast-title",
-    "definition": "",
-    "context": "Group created successfully."
-  },
-  {
-    "term": "organization.group-delete-success.toast-description",
-    "definition": "",
-    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly deleted."
-  },
-  {
-    "term": "organization.group-delete-success.toast-title",
-    "definition": "",
-    "context": "{count, plural, =1{Group} other{Groups}} deleted successfully."
-  },
-  {
-    "term": "organization.groups.edit-name",
-    "definition": "",
-    "context": "Edit name"
-  },
-  {
     "term": "organization.groups.title",
     "definition": "Grupos",
     "context": "Groups"
@@ -2950,11 +2910,6 @@
     "context": "Normal"
   },
   {
-    "term": "organization.title",
-    "definition": "Organización",
-    "context": "Organization"
-  },
-  {
     "term": "organization.user-created-success.toast-description",
     "definition": "Hemos enviado un email a {email} con instrucciones para registrarse en Parallel.",
     "context": "We have sent an email to {email} with instructions to register in Parallel."
@@ -2968,11 +2923,6 @@
     "term": "organization.user-updated-success.toast-title",
     "definition": "Usuario actualizado con éxito.",
     "context": "User updated successfully."
-  },
-  {
-    "term": "organization.users-added-success.toast-title",
-    "definition": "",
-    "context": "Users added successfully."
   },
   {
     "term": "organization.users.title",
@@ -5958,5 +5908,95 @@
     "term": "tour.petitions-list.welcome-title",
     "definition": "¡Bienvenidos a Parallel!",
     "context": "Welcome to Parallel!"
+  },
+  {
+    "term": "view.group.edit-name",
+    "definition": "Editar nombre",
+    "context": "Edit name"
+  },
+  {
+    "term": "view.group.no-members",
+    "definition": "Aún no se agregaron miembros a este grupo",
+    "context": "No members added to this group yet"
+  },
+  {
+    "term": "view.group.no-results",
+    "definition": "No hay miembros que coincidan con su búsqueda",
+    "context": "There's no members matching your search"
+  },
+  {
+    "term": "view.group.users-added-title",
+    "definition": "Los usuarios se agregaron correctamente.",
+    "context": "Users added successfully."
+  },
+  {
+    "term": "view.groups.clone-success-description",
+    "definition": "{count, plural, =1 {Grupo <b>{name}</b> clonado} other{<b>#</b> grupos clonados}} con éxito.",
+    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> groups}} successfully cloned."
+  },
+  {
+    "term": "view.groups.clone-success-title",
+    "definition": "{count, plural, =1{Grupo clonado} other{Grupos clonados}} con éxito.",
+    "context": "{count, plural, =1{Group} other{Groups}} cloned successfully."
+  },
+  {
+    "term": "view.groups.confirm-delete-body",
+    "definition": "¿Estás seguro de querer eliminar {count, plural, =1 {<b>{name}</b>} other {los <b>#</b> grupos seleccionados}}? Si continúa, todos los miembros perderán el acceso a las solicitudes compartidas con {count, plural, =1 {el grupo} other {los grupos}}.",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
+  },
+  {
+    "term": "view.groups.confirm-delete-button",
+    "definition": "Si, eliminar",
+    "context": "Yes, delete"
+  },
+  {
+    "term": "view.groups.confirm-delete-header",
+    "definition": "Eliminar {count, plural, =1 {grupo} other {grupos}}",
+    "context": "Delete {count, plural, =1 {group} other {groups}}"
+  },
+  {
+    "term": "view.groups.create-success-description",
+    "definition": "El grupo {name} se creó correctamente.",
+    "context": "Group {name} successfully created."
+  },
+  {
+    "term": "view.groups.create-success-title",
+    "definition": "Grupo creado con éxito.",
+    "context": "Group created successfully."
+  },
+  {
+    "term": "view.groups.delete-success-description",
+    "definition": "{count, plural, =1 {Grupo <b>{name}</b> eliminado} other{<b>#</b> grupos eliminados}} correctamente.",
+    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} successfully deleted."
+  },
+  {
+    "term": "view.groups.delete-success-title",
+    "definition": "{count, plural, =1{Grupo eliminado} other{Grupos eliminados}} correctamente.",
+    "context": "{count, plural, =1{Group} other{Groups}} deleted successfully."
+  },
+  {
+    "term": "view.groups.no-groups",
+    "definition": "Aún no tienes grupos",
+    "context": "You have no groups yet"
+  },
+  {
+    "term": "view.groups.no-members-added",
+    "definition": "No hay miembros añadidos",
+    "context": "No members added"
+  },
+  {
+    "term": "view.groups.no-results",
+    "definition": "No hay grupos que coincidan con su búsqueda",
+    "context": "There's no groups matching your search"
+  },
+  {
+    "term": "view.groups.title",
+    "definition": "Grupos",
+    "context": "Groups"
+  },
+  {
+    "term": "view.organization.title",
+    "definition": "Organización",
+    "context": "Organization"
   }
 ]
