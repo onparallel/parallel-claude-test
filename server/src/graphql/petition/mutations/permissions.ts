@@ -113,15 +113,19 @@ export const addPetitionUserPermission = mutationField(
               t
             );
 
-          const [directlyAssigned, groupAssigned] = partition(
+          const [_directlyAssignedUsers, groupAssignedUsers] = partition(
             newPermissions,
             (p) => p.from_user_group_id === null
           );
 
+          const directlyAssignedUsers = _directlyAssignedUsers.filter(
+            (p) => !isDefined(p.user_group_id)
+          );
+
           await Promise.all([
-            directlyAssigned.length > 0
+            directlyAssignedUsers.length > 0
               ? ctx.petitions.createEvent(
-                  directlyAssigned.map((p) => ({
+                  directlyAssignedUsers.map((p) => ({
                     petitionId: p.petition_id,
                     type: "USER_PERMISSION_ADDED",
                     data: {
@@ -133,9 +137,9 @@ export const addPetitionUserPermission = mutationField(
                   t
                 )
               : undefined,
-            groupAssigned.length > 0
+            groupAssignedUsers.length > 0
               ? ctx.petitions.createEvent(
-                  groupAssigned.map((p) => ({
+                  groupAssignedUsers.map((p) => ({
                     petitionId: p.petition_id,
                     type: "GROUP_PERMISSION_ADDED",
                     data: {
@@ -156,6 +160,7 @@ export const addPetitionUserPermission = mutationField(
         /** we have to notify only those users who didn't have any permission before */
         const newUserPermissions = newPermissions.filter(
           (np) =>
+            !isDefined(np.user_group_id) &&
             !currentPermissions.some(
               (cp) =>
                 cp.petition_id === np.petition_id && cp.user_id === np.user_id

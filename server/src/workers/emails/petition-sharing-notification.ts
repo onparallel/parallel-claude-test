@@ -28,7 +28,7 @@ export async function petitionSharingNotification(
   }
   const [permissionUsers, petitions] = await Promise.all([
     context.users.loadUser(
-      uniq(permissions.filter(isDefined).map((p) => p.user_id))
+      uniq(permissions.filter(isDefined).map((p) => p.user_id!))
     ),
     context.petitions.loadPetition(
       uniq(permissions.filter(isDefined).map((p) => p.petition_id))
@@ -44,7 +44,7 @@ export async function petitionSharingNotification(
 
   for (const permission of permissions) {
     if (permission) {
-      const permissionUser = permissionUsersById[permission.user_id];
+      const permissionUser = permissionUsersById[permission.user_id!];
       const petition = petitionsById[permission.petition_id];
       const { html, text, subject, from } = await buildEmail(
         petition.is_template

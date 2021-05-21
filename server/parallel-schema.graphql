@@ -1880,9 +1880,7 @@ enum PetitionMessageStatus {
   SCHEDULED
 }
 
-union PetitionPermission = PetitionUserGroupPermission | PetitionUserPermission
-
-interface PetitionPermissionBase implements Timestamps {
+interface PetitionPermission implements Timestamps {
   """
   Time when the resource was created.
   """
@@ -2165,7 +2163,7 @@ type PetitionTemplatePagination {
 """
 The permission for a petition and user group
 """
-type PetitionUserGroupPermission implements PetitionPermissionBase & Timestamps {
+type PetitionUserGroupPermission implements PetitionPermission & Timestamps {
   """
   Time when the resource was created.
   """
@@ -2200,7 +2198,7 @@ type PetitionUserGroupPermission implements PetitionPermissionBase & Timestamps 
 """
 The permission for a petition and user
 """
-type PetitionUserPermission implements PetitionPermissionBase & Timestamps {
+type PetitionUserPermission implements PetitionPermission & Timestamps {
   """
   Time when the resource was created.
   """

@@ -8,7 +8,6 @@ import {
 import pMap from "p-map";
 import { CreateUserGroup, UserGroup } from "../../db/__types";
 import { authenticateAnd } from "../helpers/authorize";
-import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { RESULT } from "../helpers/result";
 import { validateAnd } from "../helpers/validateArgs";
@@ -31,34 +30,23 @@ export const createUserGroup = mutationField("createUserGroup", {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
   resolve: async (_, args, ctx) => {
-    try {
-      return await ctx.userGroups.withTransaction(async (t) => {
-        const group = await ctx.userGroups.createUserGroup(
-          {
-            org_id: ctx.user!.org_id,
-            name: args.name.trim(),
-          },
-          `User:${ctx.user!.id}`,
-          t
-        );
-        await ctx.userGroups.addUsersToGroup(
-          group.id,
-          args.userIds,
-          `User:${ctx.user!.id}`,
-          t
-        );
-        return group;
-      });
-    } catch (error) {
-      if (error.constraint === "user_group__org_id__name") {
-        throw new WhitelistedError(
-          "A group with the same name already exists",
-          "USER_GROUP_NAME_ALREADY_EXISTS"
-        );
-      } else {
-        throw error;
-      }
-    }
+    return await ctx.userGroups.withTransaction(async (t) => {
+      const group = await ctx.userGroups.createUserGroup(
+        {
+          org_id: ctx.user!.org_id,
+          name: args.name.trim(),
+        },
+        `User:${ctx.user!.id}`,
+        t
+      );
+      await ctx.userGroups.addUsersToGroup(
+        group.id,
+        args.userIds,
+        `User:${ctx.user!.id}`,
+        t
+      );
+      return group;
+    });
   },
 });
 
@@ -67,7 +55,8 @@ export const updateUserGroup = mutationField("updateUserGroup", {
   type: "UserGroup",
   authorize: authenticateAnd(userHasAccessToUserGroup("id")),
   validateArgs: validateAnd(
-    notEmptyString((args) => args.data.name, "data.name")
+    notEmptyString((args) => args.data.name, "data.name"),
+    maxLength((args) => args.data.name, "data.name", 100)
   ),
   args: {
     id: nonNull(globalIdArg("UserGroup")),
@@ -85,23 +74,13 @@ export const updateUserGroup = mutationField("updateUserGroup", {
     if (args.data.name?.trim()) {
       data.name = args.data.name.trim();
     }
-    try {
-      const [userGroup] = await ctx.userGroups.updateUserGroupById(
-        args.id,
-        data,
-        `User:${ctx.user!.id}`
-      );
-      return userGroup;
-    } catch (error) {
-      if (error.constraint === "user_group__org_id__name") {
-        throw new WhitelistedError(
-          "A group with the same name already exists",
-          "USER_GROUP_NAME_ALREADY_EXISTS"
-        );
-      } else {
-        throw error;
-      }
-    }
+
+    const [userGroup] = await ctx.userGroups.updateUserGroupById(
+      args.id,
+      data,
+      `User:${ctx.user!.id}`
+    );
+    return userGroup;
   },
 });
 

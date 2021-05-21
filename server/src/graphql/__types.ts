@@ -480,9 +480,7 @@ export interface NexusGenInterfaces {
     field: db.PetitionField;
   };
   PetitionEvent: events.PetitionEvent;
-  PetitionPermissionBase:
-    | NexusGenRootTypes["PetitionUserGroupPermission"]
-    | NexusGenRootTypes["PetitionUserPermission"];
+  PetitionPermission: db.PetitionUser;
   Timestamps: {
     created_at: Date;
     updated_at: Date;
@@ -490,7 +488,6 @@ export interface NexusGenInterfaces {
 }
 
 export interface NexusGenUnions {
-  PetitionPermission: db.PetitionUser;
   PublicUserOrContact:
     | ({ __type: "Contact" } & NexusGenRootTypes["Contact"])
     | ({ __type: "User" } & NexusGenRootTypes["User"]);
@@ -1339,7 +1336,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
   };
-  PetitionPermissionBase: {
+  PetitionPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     isSubscribed: boolean; // Boolean!
@@ -2181,7 +2178,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
   };
-  PetitionPermissionBase: {
+  PetitionPermission: {
     // field return type name
     createdAt: "DateTime";
     isSubscribed: "Boolean";
@@ -2861,7 +2858,6 @@ export interface NexusGenArgTypes {
 }
 
 export interface NexusGenAbstractTypeMembers {
-  PetitionPermission: "PetitionUserGroupPermission" | "PetitionUserPermission";
   PublicUserOrContact: "PublicContact" | "PublicUser";
   UserOrPetitionAccess: "PetitionAccess" | "User";
   UserOrUserGroup: "User" | "UserGroup";
@@ -2897,9 +2893,7 @@ export interface NexusGenAbstractTypeMembers {
     | "UserPermissionAddedEvent"
     | "UserPermissionEditedEvent"
     | "UserPermissionRemovedEvent";
-  PetitionPermissionBase:
-    | "PetitionUserGroupPermission"
-    | "PetitionUserPermission";
+  PetitionPermission: "PetitionUserGroupPermission" | "PetitionUserPermission";
   Timestamps:
     | "Contact"
     | "Organization"
@@ -2945,8 +2939,8 @@ export interface NexusGenTypeInterfaces {
   PetitionSignatureRequest: "Timestamps";
   PetitionTemplate: "PetitionBase";
   PetitionTemplateAndField: "PetitionBaseAndField";
-  PetitionUserGroupPermission: "PetitionPermissionBase" | "Timestamps";
-  PetitionUserPermission: "PetitionPermissionBase" | "Timestamps";
+  PetitionUserGroupPermission: "PetitionPermission" | "Timestamps";
+  PetitionUserPermission: "PetitionPermission" | "Timestamps";
   PublicPetition: "Timestamps";
   PublicPetitionFieldReply: "Timestamps";
   ReminderSentEvent: "PetitionEvent";
@@ -2963,7 +2957,7 @@ export interface NexusGenTypeInterfaces {
   UserPermissionAddedEvent: "PetitionEvent";
   UserPermissionEditedEvent: "PetitionEvent";
   UserPermissionRemovedEvent: "PetitionEvent";
-  PetitionPermissionBase: "Timestamps";
+  PetitionPermission: "Timestamps";
 }
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
@@ -2986,7 +2980,6 @@ export type NexusGenAbstractsUsingStrategyResolveType =
   | "PetitionBaseAndField"
   | "PetitionEvent"
   | "PetitionPermission"
-  | "PetitionPermissionBase"
   | "PublicUserOrContact"
   | "Timestamps"
   | "UserOrPetitionAccess"

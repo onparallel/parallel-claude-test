@@ -1,6 +1,12 @@
 import { initServer, TestClient } from "./server";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Contact, Organization, Petition, User } from "../../db/__types";
+import {
+  Contact,
+  Organization,
+  Petition,
+  PetitionUser,
+  User,
+} from "../../db/__types";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { toGlobalId } from "../../util/globalId";
 import gql from "graphql-tag";
@@ -202,6 +208,68 @@ describe("GraphQL/Users", () => {
           },
         ],
       });
+    });
+
+    it("removes user from all their groups and deletes all petition permissions", async () => {
+      // create a group, add user as member and share a petition with the group
+      const [group] = await mocks.createUserGroups(1, organization.id);
+      await mocks.insertUserGroupMembers(group.id, [activeUsers[0].id]);
+      await mocks.knex<PetitionUser>("petition_user").insert([
+        {
+          petition_id: user0Petition.id,
+          user_group_id: group.id,
+          permission_type: "WRITE",
+        },
+        {
+          petition_id: user0Petition.id,
+          user_id: activeUsers[0].id,
+          permission_type: "WRITE",
+          from_user_group_id: group.id,
+        },
+      ]);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $userIds: [GID!]!
+            $status: UserStatus!
+            $transferToUserId: GID
+          ) {
+            updateUserStatus(
+              userIds: $userIds
+              status: $status
+              transferToUserId: $transferToUserId
+            ) {
+              id
+              status
+            }
+          }
+        `,
+        variables: {
+          userIds: [toGlobalId("User", activeUsers[0].id)],
+          transferToUserId: toGlobalId("User", activeUsers[2].id),
+          status: "INACTIVE",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.updateUserStatus).toEqual([
+        {
+          id: toGlobalId("User", activeUsers[0].id),
+          status: "INACTIVE",
+        },
+      ]);
+
+      const permissions = await mocks.knex
+        .from<PetitionUser>("petition_user")
+        .whereNull("deleted_at")
+        .select("*");
+      const members = await mocks.knex
+        .from("user_group_member")
+        .where({ deleted_at: null, user_group_id: group.id });
+
+      expect(permissions.every((p) => p.user_id !== activeUsers[0].id));
+      expect(members).toHaveLength(0);
     });
 
     it("updates user status to active without specifying transferToUserId argument", async () => {

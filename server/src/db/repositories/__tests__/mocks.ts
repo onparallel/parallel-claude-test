@@ -1,41 +1,42 @@
 import faker from "faker";
 import { Knex } from "knex";
 import { range } from "remeda";
+import { hash, random } from "../../../util/token";
 import {
-  CreateOrganization,
-  CreatePetition,
-  CreatePetitionField,
-  CreateUser,
-  Organization,
-  Petition,
-  PetitionField,
-  PetitionFieldType,
-  User,
-  PetitionAccess,
-  CreatePetitionAccess,
   Contact,
   CreateContact,
-  PetitionUser,
-  PetitionFieldReply,
-  CreatePetitionFieldReply,
-  UserAuthenticationToken,
-  PetitionUserPermissionType,
-  PetitionEventSubscription,
   CreateFeatureFlag,
-  FileUpload,
   CreateFileUpload,
-  Tag,
+  CreateOrganization,
+  CreatePetition,
+  CreatePetitionAccess,
+  CreatePetitionField,
+  CreatePetitionFieldReply,
   CreateTag,
+  CreateUser,
+  CreateUserGroup,
+  FileUpload,
+  Organization,
+  Petition,
+  PetitionAccess,
+  PetitionEventSubscription,
+  PetitionField,
+  PetitionFieldReply,
+  PetitionFieldType,
+  PetitionUser,
+  PetitionUserPermissionType,
+  Tag,
+  User,
+  UserAuthenticationToken,
+  UserGroup,
+  UserGroupMember,
 } from "../../__types";
-import { hash, random } from "../../../util/token";
 
 export class Mocks {
   constructor(public knex: Knex) {}
 
   async loadUserPermissionsByPetitionId(id: number): Promise<PetitionUser[]> {
-    const {
-      rows: permissions,
-    } = await this.knex.raw(
+    const { rows: permissions } = await this.knex.raw(
       /* sql */ `SELECT * from petition_user where petition_id = ? and deleted_at is null`,
       [id]
     );
@@ -336,6 +337,31 @@ export class Mocks {
         }))
       )
       .returning("*");
+  }
+
+  async createUserGroups(
+    amount: number,
+    orgId: number,
+    builder?: (i: number) => Partial<UserGroup>
+  ) {
+    return await this.knex<UserGroup>("user_group").insert(
+      range(0, amount).map<CreateUserGroup>((index) => ({
+        name: faker.name.jobArea(),
+        org_id: orgId,
+        ...builder?.(index),
+      })),
+      "*"
+    );
+  }
+
+  async insertUserGroupMembers(userGroupId: number, userIds: number[]) {
+    return await this.knex<UserGroupMember>("user_group_member").insert(
+      userIds.map((userId) => ({
+        user_group_id: userGroupId,
+        user_id: userId,
+      })),
+      "*"
+    );
   }
 
   async clearSubscriptions() {

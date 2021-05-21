@@ -1,4 +1,4 @@
-import { enumType, interfaceType, objectType, unionType } from "@nexus/schema";
+import { enumType, interfaceType, objectType } from "@nexus/schema";
 import { isDefined } from "../../../util/remedaExtensions";
 
 export const PetitionUserPermissionTypeRW = enumType({
@@ -13,9 +13,19 @@ export const PetitionUserPermissionType = enumType({
   members: ["OWNER", "READ", "WRITE"],
 });
 
-export const PetitionPermissionBase = interfaceType({
-  name: "PetitionPermissionBase",
-  resolveType: (o) => null,
+export const PetitionPermission = interfaceType({
+  name: "PetitionPermission",
+  rootTyping: "db.PetitionUser",
+  resolveType: (o) => {
+    if (isDefined(o.user_id)) {
+      return "PetitionUserPermission";
+    } else if (isDefined(o.user_group_id)) {
+      return "PetitionUserGroupPermission";
+    }
+    throw new Error(
+      `Either user_id or user_group_id must be defined on petition_user with id ${o.id}`
+    );
+  },
   definition(t) {
     t.implements("Timestamps");
     t.field("petition", {
@@ -36,24 +46,6 @@ export const PetitionPermissionBase = interfaceType({
       resolve: (o) => o.is_subscribed,
     });
   },
-});
-
-export const PetitionPermission = unionType({
-  name: "PetitionPermission",
-  definition(t) {
-    t.members("PetitionUserPermission", "PetitionUserGroupPermission");
-  },
-  resolveType: (o) => {
-    if (isDefined(o.user_id)) {
-      return "PetitionUserPermission";
-    } else if (isDefined(o.user_group_id)) {
-      return "PetitionUserGroupPermission";
-    }
-    throw new Error(
-      `Either user_id or user_group_id must be defined on petition_user with id ${o.id}`
-    );
-  },
-  rootTyping: "db.PetitionUser",
 });
 
 export const EffectivePetitionUserPermission = objectType({
@@ -79,7 +71,7 @@ export const PetitionUserGroupPermission = objectType({
   rootTyping: "db.PetitionUser",
   description: "The permission for a petition and user group",
   definition(t) {
-    t.implements("PetitionPermissionBase");
+    t.implements("PetitionPermission");
     t.field("group", {
       type: "UserGroup",
       description: "The group linked to the permission",
@@ -95,7 +87,7 @@ export const PetitionUserPermission = objectType({
   rootTyping: "db.PetitionUser",
   description: "The permission for a petition and user",
   definition(t) {
-    t.implements("PetitionPermissionBase");
+    t.implements("PetitionPermission");
     t.field("user", {
       type: "User",
       description: "The user linked to the permission",

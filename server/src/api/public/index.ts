@@ -816,7 +816,7 @@ api
         params
       );
 
-      return Ok(result.petition!.userPermissions);
+      return Ok(result.petition!.permissions);
     }
   )
   .post(
@@ -862,7 +862,7 @@ api
         }
       );
 
-      return Ok(result.addPetitionUserPermission[0].userPermissions);
+      return Ok(result.addPetitionUserPermission[0].permissions);
     }
   )
   .delete(
@@ -990,7 +990,7 @@ api
         }
       );
 
-      return Ok(response.transferPetitionOwnership[0].userPermissions);
+      return Ok(response.transferPetitionOwnership[0].permissions);
     }
   );
 
