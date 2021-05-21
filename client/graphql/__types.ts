@@ -4525,13 +4525,18 @@ export type OrganizationBrandingQuery = { __typename?: "Query" } & {
 export type OrganizationGroup_UserGroupFragment = {
   __typename?: "UserGroup";
 } & Pick<UserGroup, "id" | "name" | "createdAt"> & {
-    members: Array<{ __typename?: "User" } & OrganizationGroup_MemberFragment>;
+    members: Array<
+      {
+        __typename?: "UserGroupMember";
+      } & OrganizationGroup_UserGroupMemberFragment
+    >;
   };
 
-export type OrganizationGroup_MemberFragment = { __typename?: "User" } & Pick<
-  User,
-  "id" | "fullName" | "email" | "createdAt"
->;
+export type OrganizationGroup_UserGroupMemberFragment = {
+  __typename?: "UserGroupMember";
+} & Pick<UserGroupMember, "id" | "addedAt"> & {
+    user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+  };
 
 export type OrganizationGroup_UserFragment = {
   __typename?: "User";
@@ -4627,7 +4632,9 @@ export type OrganizationGroups_UserGroupFragment = {
   __typename?: "UserGroup";
 } & Pick<UserGroup, "id" | "name" | "createdAt"> & {
     members: Array<
-      { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">
+      { __typename?: "UserGroupMember" } & {
+        user: { __typename?: "User" } & UserAvatarList_UserFragment;
+      }
     >;
   };
 
@@ -6443,12 +6450,15 @@ export const Contacts_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
 `;
-export const OrganizationGroup_MemberFragmentDoc = gql`
-  fragment OrganizationGroup_Member on User {
+export const OrganizationGroup_UserGroupMemberFragmentDoc = gql`
+  fragment OrganizationGroup_UserGroupMember on UserGroupMember {
     id
-    fullName
-    email
-    createdAt
+    addedAt
+    user {
+      id
+      fullName
+      email
+    }
   }
 `;
 export const OrganizationGroup_UserGroupFragmentDoc = gql`
@@ -6457,10 +6467,10 @@ export const OrganizationGroup_UserGroupFragmentDoc = gql`
     name
     createdAt
     members {
-      ...OrganizationGroup_Member
+      ...OrganizationGroup_UserGroupMember
     }
   }
-  ${OrganizationGroup_MemberFragmentDoc}
+  ${OrganizationGroup_UserGroupMemberFragmentDoc}
 `;
 export const OrganizationGroup_UserFragmentDoc = gql`
   fragment OrganizationGroup_User on User {
@@ -6474,11 +6484,12 @@ export const OrganizationGroups_UserGroupFragmentDoc = gql`
     name
     createdAt
     members {
-      id
-      fullName
-      email
+      user {
+        ...UserAvatarList_User
+      }
     }
   }
+  ${UserAvatarList_UserFragmentDoc}
 `;
 export const OrganizationGroups_UserGroupPaginationFragmentDoc = gql`
   fragment OrganizationGroups_UserGroupPagination on UserGroupPagination {

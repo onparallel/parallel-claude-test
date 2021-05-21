@@ -5,7 +5,7 @@ import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
-import { OrganizationUsers_UserFragment } from "@parallel/graphql/__types";
+import { OrganizationGroup_UserGroupMemberFragment } from "@parallel/graphql/__types";
 import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { UserSelectSelection } from "../common/UserSelect";
@@ -14,7 +14,7 @@ function ConfirmRemoveMemberDialog({
   selected,
   ...props
 }: DialogProps<
-  { selected: OrganizationUsers_UserFragment[] },
+  { selected: OrganizationGroup_UserGroupMemberFragment[] },
   UserSelectSelection
 >) {
   const {
@@ -59,7 +59,7 @@ function ConfirmRemoveMemberDialog({
               values={{
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 count: selected.length,
-                fullName: selected[0].fullName,
+                fullName: selected[0].user.fullName,
               }}
             />
           </Text>

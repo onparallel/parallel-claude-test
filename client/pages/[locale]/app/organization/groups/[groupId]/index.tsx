@@ -14,12 +14,13 @@ import {
   Portal,
   Text,
   Tooltip,
+  useEditableControls,
   useToast,
 } from "@chakra-ui/react";
 import {
   CopyIcon,
   DeleteIcon,
-  ForbiddenIcon,
+  EditIcon,
   MoreVerticalIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -37,7 +38,6 @@ import {
   OrganizationGroupQuery,
   OrganizationGroupQueryVariables,
   OrganizationGroupUserQuery,
-  OrganizationUsers_UserFragment,
   useOrganizationGroupQuery,
   useOrganizationGroupUserQuery,
   useOrganizationGroup_addUsersToUserGroupMutation,
@@ -45,7 +45,7 @@ import {
   useOrganizationGroup_deleteUserGroupMutation,
   useOrganizationGroup_cloneUserGroupMutation,
   useOrganizationGroup_updateUserGroupMutation,
-  OrganizationGroup_MemberFragment,
+  OrganizationGroup_UserGroupMemberFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
@@ -63,13 +63,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/AddMemberGroupDialog";
 import { useConfirmDeleteGroupsDialog } from "..";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useRouter } from "next/router";
 import { sortBy } from "remeda";
+import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { If } from "@parallel/utils/conditions";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 
-const SORTING = ["fullName", "email", "createdAt"] as const;
+const SORTING = ["fullName", "email", "addedAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -108,7 +110,6 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   );
 
   const userList = useMemo(() => {
-    console.log("Query State: ", state);
     const {
       items,
       page,
@@ -117,11 +118,16 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     } = state;
     let members = userGroup?.members ?? [];
     if (search) {
-      members = members.filter((u) => {
-        return u.fullName?.includes(search) || u.email.includes(search);
+      members = members.filter(({ user }) => {
+        return user.fullName?.includes(search) || user.email.includes(search);
       });
     }
-    members = sortBy(members, (u) => u[field]);
+
+    members =
+      field === "addedAt"
+        ? sortBy(members, (u) => u[field])
+        : sortBy(members, ({ user }) => user[field]);
+
     if (direction === "DESC") {
       members = members.reverse();
     }
@@ -130,10 +136,10 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
 
   const [selected, setSelected] = useState<string[]>([]);
 
-  const selectedUsers = useMemo(
+  const selectedMembers = useMemo(
     () =>
       selected
-        .map((userId) => userList.find((u) => u.id === userId)!)
+        .map((userId) => userList.find(({ user }) => user.id === userId)!)
         .filter((u) => u !== undefined),
     [selected.join(","), userList]
   );
@@ -171,7 +177,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
 
   const [updateUserGroup] = useOrganizationGroup_updateUserGroupMutation();
   const handleChangeGroupName = async (newName: string) => {
-    if (name.trim() !== newName.trim()) {
+    if (newName.trim() && name.trim() !== newName.trim()) {
       await updateUserGroup({
         variables: {
           id: groupId,
@@ -212,7 +218,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const handleAddMember = async () => {
     try {
       const data = await showAddMemberDialog({
-        exclude: userGroup?.members.map((m) => m.id) ?? [],
+        exclude: userGroup?.members.map((m) => m.user.id) ?? [],
       });
       const userIds = data.users.map((m) => m.id);
       await addUsersToUserGroup({
@@ -238,11 +244,13 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const showConfirmRemoveMemberDialog = useConfirmRemoveMemberDialog();
 
   const handleRemoveMember = async (
-    members: OrganizationUsers_UserFragment[]
+    members: OrganizationGroup_UserGroupMemberFragment[]
   ) => {
     try {
-      await showConfirmRemoveMemberDialog({ selected: members });
-      const userIds = members.map((m) => m.id);
+      await showConfirmRemoveMemberDialog({
+        selected: members,
+      });
+      const userIds = members.map(({ user }) => user.id);
       await removeUsersFromGroup({
         variables: { userGroupId: groupId, userIds },
       });
@@ -345,7 +353,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
             <OrganizationGroupListTableHeader
               me={me}
               search={search}
-              selectedUsers={selectedUsers}
+              selectedMembers={selectedMembers}
               onReload={() => refetch()}
               onSearchChange={handleSearchChange}
               onAddMember={handleAddMember}
@@ -358,7 +366,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   );
 }
 
-function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_MemberFragment>[] {
+function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserGroupMemberFragment>[] {
   const intl = useIntl();
   return useMemo(
     () => [
@@ -370,7 +378,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_Membe
           defaultMessage: "Name",
         }),
         CellContent: ({ row }) => {
-          return <Text as="span">{row.fullName}</Text>;
+          return <Text as="span">{row.user.fullName}</Text>;
         },
       },
       {
@@ -380,10 +388,10 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_Membe
           id: "organization-users.header.user-email",
           defaultMessage: "Email",
         }),
-        CellContent: ({ row }) => <>{row.email}</>,
+        CellContent: ({ row }) => <>{row.user.email}</>,
       },
       {
-        key: "createdAt",
+        key: "addedAt",
         isSortable: true,
         header: intl.formatMessage({
           id: "generic.added-at",
@@ -394,7 +402,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_Membe
         },
         CellContent: ({ row }) => (
           <DateTime
-            value={row.createdAt}
+            value={row.addedAt}
             format={FORMATS.LLL}
             useRelativeTime
             whiteSpace="nowrap"
@@ -405,6 +413,22 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_Membe
     [intl.locale]
   );
 }
+
+const EditableControls = ({ ...props }) => {
+  const { isEditing, getEditButtonProps } = useEditableControls();
+
+  return (
+    <If condition={!isEditing}>
+      <IconButtonWithTooltip
+        label={props.label}
+        size="sm"
+        icon={<EditIcon />}
+        {...getEditButtonProps()}
+        {...props}
+      />
+    </If>
+  );
+};
 
 type EditableHeadingProps = {
   value: string;
@@ -428,45 +452,59 @@ const EditableHeading = ({
   }, [value]);
 
   return (
-    <Heading
-      as="h3"
-      size="md"
-      borderRadius="md"
-      borderWidth="2px"
-      borderColor="transparent"
-      transition="border 0.26s ease"
-      _hover={{
-        borderWidth: "2px",
-        borderColor: "gray.300",
-      }}
-    >
-      <Tooltip
-        label={intl.formatMessage({
-          id: "organization.groups.edit-name",
-          defaultMessage: "Edit name",
-        })}
+    <Heading as="h3" size="md">
+      <Editable
+        value={name}
+        onChange={(n) => {
+          setName(n);
+          onChange(n);
+        }}
+        onSubmit={onSubmit}
+        display="flex"
+        alignItems="center"
       >
-        <Editable
-          value={name}
-          onChange={(n) => {
-            setName(n);
-            onChange(n);
-          }}
-          onSubmit={onSubmit}
+        <Tooltip
+          label={intl.formatMessage({
+            id: "organization.groups.edit-name",
+            defaultMessage: "Edit name",
+          })}
         >
           <EditablePreview
             paddingY={1}
             paddingX={2}
             ref={previewRef}
+            borderRadius="md"
+            borderWidth="2px"
+            borderColor="transparent"
+            transition="border 0.26s ease"
+            _hover={{
+              borderWidth: "2px",
+              borderColor: "gray.300",
+            }}
+            whiteSpace="nowrap"
+            overflow="hidden"
+            maxWidth={655}
+            textOverflow="ellipsis"
           ></EditablePreview>
-          <EditableInput
-            paddingY={1}
-            paddingX={2}
-            minWidth={255}
-            width={inputWidth}
-          />
-        </Editable>
-      </Tooltip>
+        </Tooltip>
+        <EditableInput
+          paddingY={1}
+          paddingX={2}
+          minWidth={255}
+          width={inputWidth}
+        />
+        <EditableControls
+          marginLeft={1}
+          background={"white"}
+          color={"gray.400"}
+          fontSize={20}
+          _hover={{ backgroundColor: "gray.100", color: "gray.600" }}
+          label={intl.formatMessage({
+            id: "organization.groups.edit-name",
+            defaultMessage: "Edit name",
+          })}
+        />
+      </Editable>
     </Heading>
   );
 };
@@ -479,19 +517,22 @@ OrganizationGroup.fragments = {
         name
         createdAt
         members {
-          ...OrganizationGroup_Member
+          ...OrganizationGroup_UserGroupMember
         }
       }
-      ${this.Member}
+      ${this.UserGroupMember}
     `;
   },
-  get Member() {
+  get UserGroupMember() {
     return gql`
-      fragment OrganizationGroup_Member on User {
+      fragment OrganizationGroup_UserGroupMember on UserGroupMember {
         id
-        fullName
-        email
-        createdAt
+        addedAt
+        user {
+          id
+          fullName
+          email
+        }
       }
     `;
   },

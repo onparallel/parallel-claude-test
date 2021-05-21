@@ -145,6 +145,31 @@ function OrganizationGroups() {
         },
       });
       refetch();
+      toast({
+        title: intl.formatMessage(
+          {
+            id: "organization.group-clone-success.toast-title",
+            defaultMessage:
+              "{count, plural, =1{Group} other{Groups}} cloned successfully.",
+          },
+          { count: selected.length }
+        ),
+        description: intl.formatMessage(
+          {
+            id: "organization.group-clone-success.toast-description",
+            defaultMessage:
+              "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly cloned.",
+          },
+          {
+            count: selected.length,
+            name: selectedGroups[0].name,
+            b: (chunks: any[]) => <b>{chunks}</b>,
+          }
+        ),
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
     },
     [userGroups, selected]
   );
@@ -158,6 +183,31 @@ function OrganizationGroups() {
       },
     });
     refetch();
+    toast({
+      title: intl.formatMessage(
+        {
+          id: "organization.group-delete-success.toast-title",
+          defaultMessage:
+            "{count, plural, =1{Group} other{Groups}} deleted successfully.",
+        },
+        { count: selected.length }
+      ),
+      description: intl.formatMessage(
+        {
+          id: "organization.group-delete-success.toast-description",
+          defaultMessage:
+            "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly deleted.",
+        },
+        {
+          count: selected.length,
+          name: selectedGroups[0].name,
+          b: (chunks: any[]) => <b>{chunks}</b>,
+        }
+      ),
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   }, [userGroups, selected]);
 
   const [createUserGroup] = useOrganizationGroups_createUserGroupMutation();
@@ -289,11 +339,14 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
           defaultMessage: "Members",
         }),
         align: "left",
-        CellContent: ({ row: { members }, column }) => (
-          <Flex justifyContent={column.align}>
-            <UserAvatarList users={members} max={10} />
-          </Flex>
-        ),
+        CellContent: ({ row: { members }, column }) => {
+          const users = members.map((m) => m.user);
+          return (
+            <Flex justifyContent={column.align}>
+              <UserAvatarList users={users} max={10} />
+            </Flex>
+          );
+        },
       },
       {
         key: "createdAt",
@@ -386,11 +439,12 @@ OrganizationGroups.fragments = {
         name
         createdAt
         members {
-          id
-          fullName
-          email
+          user {
+            ...UserAvatarList_User
+          }
         }
       }
+      ${UserAvatarList.fragments.User}
     `;
   },
   get User() {

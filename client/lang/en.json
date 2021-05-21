@@ -2880,6 +2880,16 @@
     "context": "Yes, remove from group"
   },
   {
+    "term": "organization.group-clone-success.toast-description",
+    "definition": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly cloned.",
+    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly cloned."
+  },
+  {
+    "term": "organization.group-clone-success.toast-title",
+    "definition": "{count, plural, =1{Group} other{Groups}} cloned successfully.",
+    "context": "{count, plural, =1{Group} other{Groups}} cloned successfully."
+  },
+  {
     "term": "organization.group-created-success.toast-description",
     "definition": "Group {name} succefuly created.",
     "context": "Group {name} succefuly created."
@@ -2888,6 +2898,16 @@
     "term": "organization.group-created-success.toast-title",
     "definition": "Group created successfully.",
     "context": "Group created successfully."
+  },
+  {
+    "term": "organization.group-delete-success.toast-description",
+    "definition": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly deleted.",
+    "context": "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} succefuly deleted."
+  },
+  {
+    "term": "organization.group-delete-success.toast-title",
+    "definition": "{count, plural, =1{Group} other{Groups}} deleted successfully.",
+    "context": "{count, plural, =1{Group} other{Groups}} deleted successfully."
   },
   {
     "term": "organization.groups.edit-name",

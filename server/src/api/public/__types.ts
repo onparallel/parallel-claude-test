@@ -2162,10 +2162,17 @@ export type UserGroup = Timestamps & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  members: Array<User>;
+  members: Array<UserGroupMember>;
   name: Scalars["String"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+};
+
+export type UserGroupMember = {
+  /** The time the user was added to the user group. */
+  addedAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  user: User;
 };
 
 export type UserGroupPagination = {

@@ -16,7 +16,7 @@ import {
 } from "@parallel/chakra/icons";
 import {
   AppLayout_UserFragment,
-  OrganizationUsers_UserFragment,
+  OrganizationGroup_UserGroupMemberFragment,
 } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -26,24 +26,26 @@ import { Spacer } from "../common/Spacer";
 export type OrganizationGroupListTableHeaderProps = {
   me: AppLayout_UserFragment;
   search: string | null;
-  selectedUsers: OrganizationUsers_UserFragment[];
+  selectedMembers: OrganizationGroup_UserGroupMemberFragment[];
   onSearchChange: (value: string | null) => void;
   onReload: () => void;
   onAddMember: () => void;
-  onRemoveMember: (userIds: OrganizationUsers_UserFragment[]) => void;
+  onRemoveMember: (
+    userIds: OrganizationGroup_UserGroupMemberFragment[]
+  ) => void;
 };
 
 export function OrganizationGroupListTableHeader({
   me,
   search,
-  selectedUsers,
+  selectedMembers,
   onSearchChange,
   onReload,
   onAddMember,
   onRemoveMember,
 }: OrganizationGroupListTableHeaderProps) {
   const intl = useIntl();
-  const showActions = selectedUsers.length > 0;
+  const showActions = selectedMembers.length > 0;
 
   return (
     <Stack direction="row" padding={2}>
@@ -79,14 +81,14 @@ export function OrganizationGroupListTableHeader({
           <Portal>
             <MenuList minWidth="160px">
               <MenuItem
-                onClick={() => onRemoveMember(selectedUsers)}
+                onClick={() => onRemoveMember(selectedMembers)}
                 color="red.500"
               >
                 <UserXIcon marginRight={2} />
                 <FormattedMessage
                   id="organization-groups.remove-from-group"
                   defaultMessage="Remove from group"
-                  values={{ count: selectedUsers.length }}
+                  values={{ count: selectedMembers.length }}
                 />
               </MenuItem>
             </MenuList>
