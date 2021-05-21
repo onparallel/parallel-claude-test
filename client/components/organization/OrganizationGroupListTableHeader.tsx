@@ -14,17 +14,13 @@ import {
   UserPlusIcon,
   UserXIcon,
 } from "@parallel/chakra/icons";
-import {
-  AppLayout_UserFragment,
-  OrganizationGroup_UserGroupMemberFragment,
-} from "@parallel/graphql/__types";
+import { OrganizationGroup_UserGroupMemberFragment } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
 export type OrganizationGroupListTableHeaderProps = {
-  me: AppLayout_UserFragment;
   search: string | null;
   selectedMembers: OrganizationGroup_UserGroupMemberFragment[];
   onSearchChange: (value: string | null) => void;
@@ -36,7 +32,6 @@ export type OrganizationGroupListTableHeaderProps = {
 };
 
 export function OrganizationGroupListTableHeader({
-  me,
   search,
   selectedMembers,
   onSearchChange,

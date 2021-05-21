@@ -341,10 +341,18 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
         align: "left",
         CellContent: ({ row: { members }, column }) => {
           const users = members.map((m) => m.user);
-          return (
+
+          return users.length ? (
             <Flex justifyContent={column.align}>
               <UserAvatarList users={users} max={10} />
             </Flex>
+          ) : (
+            <OverflownText textStyle={"hint"}>
+              {intl.formatMessage({
+                id: "organization-groups.empty-group",
+                defaultMessage: "Empty group",
+              })}
+            </OverflownText>
           );
         },
       },

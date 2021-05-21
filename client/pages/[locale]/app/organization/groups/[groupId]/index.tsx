@@ -139,7 +139,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const selectedMembers = useMemo(
     () =>
       selected
-        .map((userId) => userList.find(({ user }) => user.id === userId)!)
+        .map((memberId) => userList.find((m) => m.id === memberId)!)
         .filter((u) => u !== undefined),
     [selected.join(","), userList]
   );
@@ -351,7 +351,6 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <OrganizationGroupListTableHeader
-              me={me}
               search={search}
               selectedMembers={selectedMembers}
               onReload={() => refetch()}
