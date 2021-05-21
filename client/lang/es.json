@@ -15,6 +15,21 @@
     "context": "Admin panel"
   },
   {
+    "term": "component.add-member-group-dialog.members-label",
+    "definition": "",
+    "context": "Add to group"
+  },
+  {
+    "term": "component.add-member-group-dialog.members-placeholder",
+    "definition": "",
+    "context": "Select users from your organization"
+  },
+  {
+    "term": "component.add-member-group-dialog.title",
+    "definition": "",
+    "context": "Add members to group"
+  },
+  {
     "term": "component.add-petition-access-dialog.recipient-groups-description",
     "definition": "Cada grupo responderá peticiones diferentes.",
     "context": "Each group will reply to different petitions."
@@ -253,6 +268,31 @@
     "term": "component.copy-to-clipboard-button.copy-label",
     "definition": "Copiar al portapapeles",
     "context": "Copy to clipboard"
+  },
+  {
+    "term": "component.create-group-dialog.confirm-button",
+    "definition": "",
+    "context": "Create group"
+  },
+  {
+    "term": "component.create-group-dialog.members-label",
+    "definition": "",
+    "context": "Add to group"
+  },
+  {
+    "term": "component.create-group-dialog.members-placeholder",
+    "definition": "",
+    "context": "Select users from your organization"
+  },
+  {
+    "term": "component.create-group-dialog.name-label",
+    "definition": "",
+    "context": "Group name"
+  },
+  {
+    "term": "component.create-group-dialog.title",
+    "definition": "",
+    "context": "New user group"
   },
   {
     "term": "component.date-picker.next-month",
@@ -2695,11 +2735,6 @@
     "context": "Add member"
   },
   {
-    "term": "organization-groups.add-member-title",
-    "definition": "",
-    "context": "Add members to group"
-  },
-  {
     "term": "organization-groups.clone-group",
     "definition": "",
     "context": "Clone {count, plural, =1{group} other {groups}}"
@@ -2720,19 +2755,9 @@
     "context": "Create group"
   },
   {
-    "term": "organization-groups.create-group-title",
-    "definition": "",
-    "context": "New working group"
-  },
-  {
     "term": "organization-groups.delete-group",
     "definition": "",
     "context": "Delete {count, plural, =1{group} other {groups}}"
-  },
-  {
-    "term": "organization-groups.group-name",
-    "definition": "",
-    "context": "Group name"
   },
   {
     "term": "organization-groups.header.members",
@@ -2743,11 +2768,6 @@
     "term": "organization-groups.header.name",
     "definition": "",
     "context": "Name"
-  },
-  {
-    "term": "organization-groups.members",
-    "definition": "",
-    "context": "Members"
   },
   {
     "term": "organization-groups.remove",
@@ -3241,8 +3261,8 @@
   },
   {
     "term": "petition-sharing.input-placeholder",
-    "definition": "Añadir usuarios de tu organización",
-    "context": "Add users from your organization"
+    "definition": "Añade usuarios y equipos de tu organización",
+    "context": "Add users and groups from your organization"
   },
   {
     "term": "petition-sharing.input-placeholder-not-owner",

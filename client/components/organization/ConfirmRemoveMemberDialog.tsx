@@ -41,10 +41,10 @@ function ConfirmRemoveMemberDialog({
       }}
       header={
         <Stack direction={"row"} spacing={2} align="center">
-          <UserXIcon />
+          <UserXIcon role="presentation" />
           <Text>
             <FormattedMessage
-              id="organization-groups.remove"
+              id="component.confirm-remove-member-dialog.title"
               defaultMessage="Remove from group"
             />
           </Text>
@@ -54,7 +54,7 @@ function ConfirmRemoveMemberDialog({
         <Stack spacing={4}>
           <Text>
             <FormattedMessage
-              id="organization.confirm-remove-member.body"
+              id="component.confirm-remove-member-dialog.body"
               defaultMessage="Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
               values={{
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
@@ -72,7 +72,7 @@ function ConfirmRemoveMemberDialog({
           isDisabled={Boolean(errors.user)}
         >
           <FormattedMessage
-            id="organization.confirm-remove-member.confirm"
+            id="component.confirm-remove-member-dialog.confirm"
             defaultMessage="Yes, remove from group"
           />
         </Button>

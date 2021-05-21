@@ -15,6 +15,21 @@
     "context": "Admin panel"
   },
   {
+    "term": "component.add-member-group-dialog.members-label",
+    "definition": "Add to group",
+    "context": "Add to group"
+  },
+  {
+    "term": "component.add-member-group-dialog.members-placeholder",
+    "definition": "Select users from your organization",
+    "context": "Select users from your organization"
+  },
+  {
+    "term": "component.add-member-group-dialog.title",
+    "definition": "Add members to group",
+    "context": "Add members to group"
+  },
+  {
     "term": "component.add-petition-access-dialog.recipient-groups-description",
     "definition": "Each group will reply to different petitions.",
     "context": "Each group will reply to different petitions."
@@ -253,6 +268,31 @@
     "term": "component.copy-to-clipboard-button.copy-label",
     "definition": "Copy to clipboard",
     "context": "Copy to clipboard"
+  },
+  {
+    "term": "component.create-group-dialog.confirm-button",
+    "definition": "Create group",
+    "context": "Create group"
+  },
+  {
+    "term": "component.create-group-dialog.members-label",
+    "definition": "Add to group",
+    "context": "Add to group"
+  },
+  {
+    "term": "component.create-group-dialog.members-placeholder",
+    "definition": "Select users from your organization",
+    "context": "Select users from your organization"
+  },
+  {
+    "term": "component.create-group-dialog.name-label",
+    "definition": "Group name",
+    "context": "Group name"
+  },
+  {
+    "term": "component.create-group-dialog.title",
+    "definition": "New user group",
+    "context": "New user group"
   },
   {
     "term": "component.date-picker.next-month",
@@ -2695,11 +2735,6 @@
     "context": "Add member"
   },
   {
-    "term": "organization-groups.add-member-title",
-    "definition": "Add members to group",
-    "context": "Add members to group"
-  },
-  {
     "term": "organization-groups.clone-group",
     "definition": "Clone {count, plural, =1{group} other {groups}}",
     "context": "Clone {count, plural, =1{group} other {groups}}"
@@ -2720,19 +2755,9 @@
     "context": "Create group"
   },
   {
-    "term": "organization-groups.create-group-title",
-    "definition": "New working group",
-    "context": "New working group"
-  },
-  {
     "term": "organization-groups.delete-group",
     "definition": "Delete {count, plural, =1{group} other {groups}}",
     "context": "Delete {count, plural, =1{group} other {groups}}"
-  },
-  {
-    "term": "organization-groups.group-name",
-    "definition": "Group name",
-    "context": "Group name"
   },
   {
     "term": "organization-groups.header.members",
@@ -2743,11 +2768,6 @@
     "term": "organization-groups.header.name",
     "definition": "Name",
     "context": "Name"
-  },
-  {
-    "term": "organization-groups.members",
-    "definition": "Members",
-    "context": "Members"
   },
   {
     "term": "organization-groups.remove",
@@ -3241,8 +3261,8 @@
   },
   {
     "term": "petition-sharing.input-placeholder",
-    "definition": "Add users from your organization",
-    "context": "Add users from your organization"
+    "definition": "Add users and groups from your organization",
+    "context": "Add users and groups from your organization"
   },
   {
     "term": "petition-sharing.input-placeholder-not-owner",

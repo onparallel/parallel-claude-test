@@ -55,11 +55,11 @@ export function AddMemberGroupDialog({
       initialFocusRef={nameRef}
       header={
         <Stack direction={"row"} spacing={2} align="center">
-          <UserPlusIcon />
+          <UserPlusIcon role="presentation" />
           <Text>
             <FormattedMessage
-              id="organization-groups.add-member-title"
-              defaultMessage="Add members to group "
+              id="component.add-member-group-dialog.title"
+              defaultMessage="Add members to group"
             />
           </Text>
         </Stack>
@@ -69,8 +69,8 @@ export function AddMemberGroupDialog({
           <FormControl id="add-users">
             <FormLabel>
               <FormattedMessage
-                id="organization.users.title"
-                defaultMessage="Users"
+                id="component.add-member-group-dialog.members-label"
+                defaultMessage="Add to group"
               />
             </FormLabel>
             <Controller
@@ -96,8 +96,8 @@ export function AddMemberGroupDialog({
                   onBlur={onBlur}
                   onSearch={handleSearchUsers}
                   placeholder={intl.formatMessage({
-                    id: "petition-sharing.input-placeholder",
-                    defaultMessage: "Add users from your organization",
+                    id: "component.add-member-group-dialog.members-placeholder",
+                    defaultMessage: "Select users from your organization",
                   })}
                 />
               )}

@@ -69,8 +69,8 @@ export function CreateGroupDialog({
       initialFocusRef={nameRef}
       header={
         <FormattedMessage
-          id="organization-groups.create-group-title"
-          defaultMessage="New working group"
+          id="component.create-group-dialog.title"
+          defaultMessage="New user group"
         />
       }
       body={
@@ -78,7 +78,7 @@ export function CreateGroupDialog({
           <FormControl id="create-group-name" isInvalid={!!errors.name}>
             <FormLabel>
               <FormattedMessage
-                id="organization-groups.group-name"
+                id="component.create-group-dialog.name-label"
                 defaultMessage="Group name"
               />
             </FormLabel>
@@ -93,8 +93,8 @@ export function CreateGroupDialog({
           <FormControl id="create-group-members">
             <FormLabel>
               <FormattedMessage
-                id="organization-groups.members"
-                defaultMessage="Members"
+                id="component.create-group-dialog.members-label"
+                defaultMessage="Add to group"
               />
             </FormLabel>
             <Controller
@@ -120,8 +120,8 @@ export function CreateGroupDialog({
                   onBlur={onBlur}
                   onSearch={handleSearchUsers}
                   placeholder={intl.formatMessage({
-                    id: "petition-sharing.input-placeholder",
-                    defaultMessage: "Add users from your organization",
+                    id: "component.create-group-dialog.members-placeholder",
+                    defaultMessage: "Select users from your organization",
                   })}
                 />
               )}
@@ -131,7 +131,10 @@ export function CreateGroupDialog({
       }
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
-          <FormattedMessage id="generic.continue" defaultMessage="Continue" />
+          <FormattedMessage
+            id="component.create-group-dialog.confirm-button"
+            defaultMessage="Create group"
+          />
         </Button>
       }
       {...props}
