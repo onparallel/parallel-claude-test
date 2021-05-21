@@ -35,6 +35,8 @@ import { FormEvent, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 import { getClientIp } from "request-ip";
+import { UAParser } from "ua-parser-js";
+import compareVersions from "compare-versions";
 
 interface RecipientViewVerifyProps {
   email: string;
@@ -293,6 +295,14 @@ export async function getServerSideProps({
 }: GetServerSidePropsContext): Promise<
   GetServerSidePropsResult<RecipientViewVerifyProps>
 > {
+  if (isInsecureBrowser(req.headers["user-agent"])) {
+    return {
+      redirect: {
+        destination: `/${locale}/update-browser`,
+        permanent: false,
+      },
+    };
+  }
   const client = createApolloClient({}, { req });
   const { data } = await client.mutate<
     RecipientView_verifyPublicAccessMutation,
@@ -383,3 +393,24 @@ RecipientViewVerify.mutations = [
 ];
 
 export default withApolloData(RecipientViewVerify);
+
+function isInsecureBrowser(userAgent: string | undefined) {
+  if (userAgent === undefined) {
+    return false;
+  }
+  const ua = new UAParser(userAgent);
+  const browser = ua.getBrowser();
+  const insecure: Record<string, string> = {
+    IE: "999",
+    Edge: "89",
+    Safari: "13.3",
+  };
+  if (
+    browser.name &&
+    browser.name in insecure &&
+    browser.version &&
+    compareVersions(browser.version, insecure[browser.name]) < 0
+  ) {
+    return true;
+  }
+}

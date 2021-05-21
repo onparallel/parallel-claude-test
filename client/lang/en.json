@@ -6058,5 +6058,20 @@
     "term": "view.organization.title",
     "definition": "Organization",
     "context": "Organization"
+  },
+  {
+    "term": "view.update-browser.header",
+    "definition": "Unsupported browser",
+    "context": "Unsupported browser"
+  },
+  {
+    "term": "view.update-browser.text-1",
+    "definition": "You are using an old browser. We recommend updating your browser or download the latest version of one of the following:",
+    "context": "You are using an old browser. We recommend updating your browser or download the latest version of one of the following:"
+  },
+  {
+    "term": "view.update-browser.text-2",
+    "definition": "If the error persists please reach out to support so that we can help you.",
+    "context": "If the error persists please reach out to support so that we can help you."
   }
 ]

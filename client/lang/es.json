@@ -6058,5 +6058,20 @@
     "term": "view.organization.title",
     "definition": "Organización",
     "context": "Organization"
+  },
+  {
+    "term": "view.update-browser.header",
+    "definition": "Navegador no soportado",
+    "context": "Unsupported browser"
+  },
+  {
+    "term": "view.update-browser.text-1",
+    "definition": "Está utilizando un navegador antiguo. Le recomendamos actualizar su navegador o descargar la última versión de alguno de los siguientes:",
+    "context": "You are using an old browser. We recommend updating your browser or download the latest version of one of the following:"
+  },
+  {
+    "term": "view.update-browser.text-2",
+    "definition": "Si el error persiste contacta con soporte para que podamos ayudarte.",
+    "context": "If the error persists please reach out to support so that we can help you."
   }
 ]
