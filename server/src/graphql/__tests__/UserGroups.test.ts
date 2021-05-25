@@ -13,7 +13,6 @@ import {
 } from "../../db/__types";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
-import { orderBySort } from "order-by-sort";
 
 describe("GraphQL/UserGroups", () => {
   let mocks: Mocks;
@@ -135,16 +134,14 @@ describe("GraphQL/UserGroups", () => {
       `,
     });
 
-    const orderedUsers = orderBySort(userGroups, [
-      { field: "name", value: "asc" },
-    ]);
-
     expect(errors).toBeUndefined();
     expect(data!.userGroups).toEqual({
       totalCount: 3,
-      items: orderedUsers.map((ug) => ({
-        id: toGlobalId("UserGroup", ug.id),
-      })),
+      items: userGroups
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((ug) => ({
+          id: toGlobalId("UserGroup", ug.id),
+        })),
     });
   });
 
