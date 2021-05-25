@@ -79,7 +79,7 @@ export async function petitionCompleted(
   const emails: EmailLog[] = [];
   const subscribed = permissions.filter((p) => p && p.is_subscribed);
   for (const permission of subscribed) {
-    const user = await context.users.loadUser(permission.user_id);
+    const user = await context.users.loadUser(permission.user_id!);
     const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
       {

@@ -92,11 +92,13 @@ export const PetitionBase = interfaceType({
         return await ctx.petitions.loadUserAndUserGroupPermissions(root.id);
       },
     });
-    t.list.nonNull.field("effectivePermissions", {
+    t.nonNull.field("myEffectivePermissions", {
       type: "EffectivePetitionUserPermission",
-      description: "The effective permission of each user",
+      description: "The effective permission of the logged user",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadEffectiveUserPermissions(root.id);
+        const userPermissions =
+          await ctx.petitions.loadEffectiveUserPermissions(root.id);
+        return userPermissions.find((up) => up.user_id === ctx.user!.id)!;
       },
     });
     t.list.nonNull.field("fields", {
@@ -226,10 +228,10 @@ export const Petition = objectType({
       type: "PetitionEvent",
       description: "The events for the petition.",
       resolve: async (root, { offset, limit }, ctx) => {
-        return (await ctx.petitions.loadEventsForPetition(root.id, {
+        return await ctx.petitions.loadEventsForPetition(root.id, {
           offset,
           limit,
-        })) as any;
+        });
       },
     });
     t.list.field("subscriptions", {

@@ -14568,6 +14568,11 @@ optionator@^0.9.1:
   resolved "https://registry.yarnpkg.com/opts/-/opts-2.0.2.tgz#a17e189fbbfee171da559edd8a42423bc5993ce1"
   integrity sha512-k41FwbcLnlgnFh69f4qdUfvDQ+5vaSDnVPFI/y5XuhKRq97EnVVneO9F1ESVCdiVu4fCS2L8usX3mU331hB7pg==
 
+order-by-sort@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/order-by-sort/-/order-by-sort-0.2.2.tgz#066b5bc5f02c3a8bbca54724a36b4f4446079f8a"
+  integrity sha512-0RLAqK38owz5dmP2MUGB66bYAzmx8hYw4Hfwat58WVtiVeO5cYqCCUkjpWwdM7hVbzbTq7JTewj2s+3YA7T1FA==
+
 os-browserify@0.3.0, os-browserify@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/os-browserify/-/os-browserify-0.3.0.tgz#854373c7f5c2315914fc9bfc6bd8238fdda1ec27"

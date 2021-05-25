@@ -160,6 +160,7 @@
     "livereload": "^0.9.3",
     "localtunnel": "^2.0.1",
     "nodemon": "^2.0.7",
+    "order-by-sort": "^0.2.2",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.3.0",

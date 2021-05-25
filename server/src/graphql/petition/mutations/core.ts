@@ -261,20 +261,18 @@ export const deletePetitions = mutationField("deletePetitions", {
   resolve: async (_, args, ctx) => {
     function petitionIsSharedByOwner(p: PetitionUser[]) {
       return (
-        p &&
-        p.length > 1 && // the petition is being shared to another user
+        p?.length > 1 && // the petition is being shared to another user
         p.find(
           (u) => u.permission_type === "OWNER" && u.user_id === ctx.user!.id // logged user is the owner
         )
       );
     }
 
-    function petitionIsSharedWithGroup(p: PetitionUser[]) {
+    function userHasAccessViaGroup(p: PetitionUser[]) {
       return (
-        p &&
-        p.length > 1 &&
+        p?.length > 1 &&
         p.find(
-          (u) => u.user_id === ctx.user!.id && u.from_user_group_id !== null // user has access via group
+          (u) => u.user_id === ctx.user!.id && u.from_user_group_id !== null
         )
       );
     }
@@ -282,7 +280,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     // user permissions grouped by permission_id
     const userPermissions = await ctx.petitions.loadUserPermissions(args.ids);
 
-    if (userPermissions.some(petitionIsSharedWithGroup)) {
+    if (userPermissions.some(userHasAccessViaGroup)) {
       throw new WhitelistedError(
         "Can't delete a petition shared with a group",
         "DELETE_GROUP_PETITION_ERROR"
@@ -1111,7 +1109,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
 
     // copy the user permissions of the original petition to the cloned ones
     if (clonedPetitions.length > 0) {
-      await ctx.petitions.copyPetitionPermissions(
+      await ctx.petitions.clonePetitionPermissions(
         args.petitionId,
         clonedPetitions.map((p) => p.id),
         ctx.user!

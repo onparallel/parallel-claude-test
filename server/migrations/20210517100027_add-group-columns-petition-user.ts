@@ -29,12 +29,12 @@ export async function up(knex: Knex): Promise<void> {
     on "petition_user" (petition_id, user_id) where deleted_at is null and from_user_group_id is null and user_group_id is null;
     
     -- unique group assigned users per petition
-    create unique index "petition_user__petition_id__user_id__from_user_group_id" 
-    on "petition_user" (petition_id, user_id, from_user_group_id) where deleted_at is null and user_id is not null and from_user_group_id is not null;
+    create unique index "petition_user__from_user_group_id__petition_id__user_id" 
+    on "petition_user" (from_user_group_id, petition_id, user_id) where deleted_at is null and from_user_group_id is not null;
     
     -- unique groups per petition
-    create unique index "petition_user__petition_id__user_group_id" 
-    on "petition_user" (petition_id, user_group_id) where deleted_at is null and user_group_id is not null;
+    create unique index "petition_user__user_group_id__petition_id" 
+    on "petition_user" (user_group_id, petition_id) where deleted_at is null and user_group_id is not null;
 
     -- unique members per group
     create unique index "user_group_member__user_group_id__user_id" 
@@ -59,8 +59,8 @@ export async function down(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
     alter table "petition_user" drop constraint "petition_user__user_type_owner";
     drop index "user_group_member__user_group_id__user_id";
-    drop index "petition_user__petition_id__user_group_id";
-    drop index "petition_user__petition_id__user_id__from_user_group_id";
+    drop index "petition_user__user_group_id__petition_id";
+    drop index "petition_user__from_user_group_id__petition_id__user_id";
     drop index "petition_user__petition_id__user_id";
     drop index "petition_user__user_id__petition_id";
     

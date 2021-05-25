@@ -13,6 +13,7 @@ import {
 } from "../../db/__types";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { initServer, TestClient } from "./server";
+import { orderBySort } from "order-by-sort";
 
 describe("GraphQL/UserGroups", () => {
   let mocks: Mocks;
@@ -20,7 +21,7 @@ describe("GraphQL/UserGroups", () => {
   let organization: Organization;
   let sessionUser: User;
 
-  let members: User[];
+  let users: User[];
   let userGroups: UserGroup[];
   let petition: Petition;
   beforeAll(async () => {
@@ -57,10 +58,10 @@ describe("GraphQL/UserGroups", () => {
     await mocks.knex.from("user_group_member").delete();
     await mocks.knex.from("user_group").delete();
     userGroups = await mocks.createUserGroups(3, organization.id);
-    members = await mocks.createRandomUsers(organization.id, 4);
+    users = await mocks.createRandomUsers(organization.id, 4);
     await mocks.insertUserGroupMembers(
       userGroups[0].id,
-      members.slice(0, 3).map((user) => user.id)
+      users.slice(0, 3).map((user) => user.id)
     );
 
     await mocks.knex<PetitionUser>("petition_user").insert([
@@ -74,24 +75,15 @@ describe("GraphQL/UserGroups", () => {
         petition_id: petition.id,
         permission_type: "WRITE",
       },
-      {
-        from_user_group_id: userGroups[0].id,
-        petition_id: petition.id,
-        user_id: members[0].id,
-        permission_type: "WRITE",
-      },
-      {
-        from_user_group_id: userGroups[0].id,
-        petition_id: petition.id,
-        user_id: members[1].id,
-        permission_type: "WRITE",
-      },
-      {
-        from_user_group_id: userGroups[0].id,
-        petition_id: petition.id,
-        user_id: members[2].id,
-        permission_type: "WRITE",
-      },
+      ...users.slice(0, 3).map(
+        (user) =>
+          ({
+            from_user_group_id: userGroups[0].id,
+            petition_id: petition.id,
+            user_id: user.id,
+            permission_type: "WRITE",
+          } as PetitionUser)
+      ),
     ]);
   });
 
@@ -121,7 +113,7 @@ describe("GraphQL/UserGroups", () => {
         id: toGlobalId("UserGroup", ug.id),
         members:
           ug.id === userGroups[0].id
-            ? members.slice(0, 3).map((user) => ({
+            ? users.slice(0, 3).map((user) => ({
                 user: { id: toGlobalId("User", user.id) },
               }))
             : [],
@@ -143,14 +135,16 @@ describe("GraphQL/UserGroups", () => {
       `,
     });
 
+    const orderedUsers = orderBySort(userGroups, [
+      { field: "name", value: "asc" },
+    ]);
+
     expect(errors).toBeUndefined();
     expect(data!.userGroups).toEqual({
       totalCount: 3,
-      items: userGroups
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map((ug) => ({
-          id: toGlobalId("UserGroup", ug.id),
-        })),
+      items: orderedUsers.map((ug) => ({
+        id: toGlobalId("UserGroup", ug.id),
+      })),
     });
   });
 
@@ -240,14 +234,14 @@ describe("GraphQL/UserGroups", () => {
       `,
       variables: {
         name: "Marketing",
-        userIds: members.slice(0, 2).map((m) => toGlobalId("User", m.id)),
+        userIds: users.slice(0, 2).map((m) => toGlobalId("User", m.id)),
       },
     });
 
     expect(errors).toBeUndefined();
     expect(data!.createUserGroup).toEqual({
       name: "Marketing",
-      members: members
+      members: users
         .slice(0, 2)
         .map((m) => ({ user: { id: toGlobalId("User", m.id) } })),
     });
@@ -360,14 +354,14 @@ describe("GraphQL/UserGroups", () => {
       `,
       variables: {
         userGroupId: toGlobalId("UserGroup", userGroups[1].id),
-        userIds: [toGlobalId("User", members[0].id)],
+        userIds: [toGlobalId("User", users[0].id)],
       },
     });
     expect(errors).toBeUndefined();
     expect(data.addUsersToUserGroup).toEqual({
       id: toGlobalId("UserGroup", userGroups[1].id),
       name: userGroups[1].name,
-      members: [{ user: { id: toGlobalId("User", members[0].id) } }],
+      members: [{ user: { id: toGlobalId("User", users[0].id) } }],
     });
   });
 
@@ -391,14 +385,14 @@ describe("GraphQL/UserGroups", () => {
       `,
       variables: {
         userGroupId: toGlobalId("UserGroup", userGroups[0].id),
-        userIds: [toGlobalId("User", members[3].id)],
+        userIds: [toGlobalId("User", users[3].id)],
       },
     });
     expect(errors).toBeUndefined();
     expect(data.addUsersToUserGroup).toEqual({
       id: toGlobalId("UserGroup", userGroups[0].id),
       name: userGroups[0].name,
-      members: members.map((m) => ({
+      members: users.map((m) => ({
         user: { id: toGlobalId("User", m.id) },
       })),
     });
@@ -406,7 +400,7 @@ describe("GraphQL/UserGroups", () => {
     const newMemberPermissions = await mocks
       .knex<PetitionUser>("petition_user")
       .whereNull("deleted_at")
-      .where("user_id", members[3].id)
+      .where("user_id", users[3].id)
       .where("from_user_group_id", userGroups[0].id)
       .select("*");
 
@@ -434,8 +428,8 @@ describe("GraphQL/UserGroups", () => {
       variables: {
         userGroupId: toGlobalId("UserGroup", userGroups[0].id),
         userIds: [
-          toGlobalId("User", members[0].id),
-          toGlobalId("User", members[1].id),
+          toGlobalId("User", users[0].id),
+          toGlobalId("User", users[1].id),
         ],
       },
     });
@@ -443,7 +437,7 @@ describe("GraphQL/UserGroups", () => {
     expect(data.removeUsersFromGroup).toEqual({
       id: toGlobalId("UserGroup", userGroups[0].id),
       name: userGroups[0].name,
-      members: [{ user: { id: toGlobalId("User", members[2].id) } }],
+      members: [{ user: { id: toGlobalId("User", users[2].id) } }],
     });
   });
 
@@ -468,8 +462,8 @@ describe("GraphQL/UserGroups", () => {
       variables: {
         userGroupId: toGlobalId("UserGroup", userGroups[0].id),
         userIds: [
-          toGlobalId("User", members[0].id),
-          toGlobalId("User", members[1].id),
+          toGlobalId("User", users[0].id),
+          toGlobalId("User", users[1].id),
         ],
       },
     });
@@ -477,7 +471,7 @@ describe("GraphQL/UserGroups", () => {
     expect(data.removeUsersFromGroup).toEqual({
       id: toGlobalId("UserGroup", userGroups[0].id),
       name: userGroups[0].name,
-      members: [{ user: { id: toGlobalId("User", members[2].id) } }],
+      members: [{ user: { id: toGlobalId("User", users[2].id) } }],
     });
 
     const groupPermissions = await mocks
@@ -487,7 +481,7 @@ describe("GraphQL/UserGroups", () => {
       .select("*");
 
     expect(groupPermissions).toHaveLength(1);
-    expect(groupPermissions[0].user_id).toBe(members[2].id);
+    expect(groupPermissions[0].user_id).toBe(users[2].id);
   });
 
   it("clones a user group and all its members", async () => {
@@ -512,7 +506,7 @@ describe("GraphQL/UserGroups", () => {
     expect(data.cloneUserGroup).toEqual([
       {
         name: userGroups[0].name.concat(" (copy)"),
-        members: members
+        members: users
           .slice(0, 3)
           .map((user) => ({ user: { id: toGlobalId("User", user.id) } })),
       },

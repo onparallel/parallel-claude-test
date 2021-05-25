@@ -764,7 +764,6 @@ export interface NexusGenFieldTypes {
       | NexusGenRootTypes["PetitionSignatureRequest"]
       | null; // PetitionSignatureRequest
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
-    effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     events: NexusGenRootTypes["PetitionEventPagination"]; // PetitionEventPagination!
@@ -774,6 +773,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    myEffectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"]; // EffectivePetitionUserPermission!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
@@ -944,7 +944,6 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     description: string | null; // String
-    effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     fieldCount: number; // Int!
@@ -954,6 +953,7 @@ export interface NexusGenFieldTypes {
     isPublic: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    myEffectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"]; // EffectivePetitionUserPermission!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
@@ -1309,7 +1309,6 @@ export interface NexusGenFieldTypes {
   PetitionBase: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    effectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"][]; // [EffectivePetitionUserPermission!]!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     fieldCount: number; // Int!
@@ -1318,6 +1317,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    myEffectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"]; // EffectivePetitionUserPermission!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
@@ -1606,7 +1606,6 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     currentSignatureRequest: "PetitionSignatureRequest";
     deadline: "DateTime";
-    effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
     emailSubject: "String";
     events: "PetitionEventPagination";
@@ -1616,6 +1615,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
+    myEffectivePermissions: "EffectivePetitionUserPermission";
     name: "String";
     organization: "Organization";
     owner: "User";
@@ -1786,7 +1786,6 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     description: "String";
-    effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
     emailSubject: "String";
     fieldCount: "Int";
@@ -1796,6 +1795,7 @@ export interface NexusGenFieldTypeNames {
     isPublic: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
+    myEffectivePermissions: "EffectivePetitionUserPermission";
     name: "String";
     organization: "Organization";
     owner: "User";
@@ -2151,7 +2151,6 @@ export interface NexusGenFieldTypeNames {
   PetitionBase: {
     // field return type name
     createdAt: "DateTime";
-    effectivePermissions: "EffectivePetitionUserPermission";
     emailBody: "JSON";
     emailSubject: "String";
     fieldCount: "Int";
@@ -2160,6 +2159,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
+    myEffectivePermissions: "EffectivePetitionUserPermission";
     name: "String";
     organization: "Organization";
     owner: "User";

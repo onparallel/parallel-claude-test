@@ -1,0 +1,10 @@
+diff --git a/node_modules/order-by-sort/lib/index.d.ts b/node_modules/order-by-sort/lib/index.d.ts
+index 88a1037..66d29eb 100644
+--- a/node_modules/order-by-sort/lib/index.d.ts
++++ b/node_modules/order-by-sort/lib/index.d.ts
+@@ -14,4 +14,4 @@ export interface OrderByEntry {
+  * @param {OrderByEntry[]} orderArray Array of conditions how to sort eg. [{ field: 'author', value: 'asc_nulls_first' }]
+  * @returns
+  */
+-export declare function orderBySort(arr: OrderBySortItem[], orderArray: OrderByEntry[]): OrderBySortItem[];
++export declare function orderBySort<T>(arr: T[], orderArray: OrderByEntry[]): T[];

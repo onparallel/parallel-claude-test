@@ -1199,11 +1199,6 @@ type Petition implements PetitionBase {
   deadline: DateTime
 
   """
-  The effective permission of each user
-  """
-  effectivePermissions: [EffectivePetitionUserPermission!]!
-
-  """
   The body of the petition.
   """
   emailBody: JSON
@@ -1257,6 +1252,11 @@ type Petition implements PetitionBase {
   The locale of the petition.
   """
   locale: PetitionLocale!
+
+  """
+  The effective permission of the logged user
+  """
+  myEffectivePermissions: EffectivePetitionUserPermission!
 
   """
   The name of the petition.
@@ -1428,11 +1428,6 @@ interface PetitionBase {
   createdAt: DateTime!
 
   """
-  The effective permission of each user
-  """
-  effectivePermissions: [EffectivePetitionUserPermission!]!
-
-  """
   The body of the petition.
   """
   emailBody: JSON
@@ -1471,6 +1466,11 @@ interface PetitionBase {
   The locale of the petition.
   """
   locale: PetitionLocale!
+
+  """
+  The effective permission of the logged user
+  """
+  myEffectivePermissions: EffectivePetitionUserPermission!
 
   """
   The name of the petition.
@@ -2066,11 +2066,6 @@ type PetitionTemplate implements PetitionBase {
   description: String
 
   """
-  The effective permission of each user
-  """
-  effectivePermissions: [EffectivePetitionUserPermission!]!
-
-  """
   The body of the petition.
   """
   emailBody: JSON
@@ -2114,6 +2109,11 @@ type PetitionTemplate implements PetitionBase {
   The locale of the petition.
   """
   locale: PetitionLocale!
+
+  """
+  The effective permission of the logged user
+  """
+  myEffectivePermissions: EffectivePetitionUserPermission!
 
   """
   The name of the petition.
