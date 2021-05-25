@@ -280,22 +280,28 @@ export function PetitionHeader({
               </Tooltip>
               <Portal>
                 <MenuList width="min-content" minWidth="16rem">
-                  <MenuItem onClick={handlePetitionSharingClick}>
-                    <UserArrowIcon marginRight={2} />
+                  <MenuItem
+                    onClick={handlePetitionSharingClick}
+                    icon={<UserArrowIcon display="block" boxSize={4} />}
+                  >
                     <FormattedMessage
                       id="component.petition-header.share-label"
                       defaultMessage="Share petition"
                     />
                   </MenuItem>
-                  <MenuItem onClick={handleCloneClick}>
-                    <CopyIcon marginRight={2} />
+                  <MenuItem
+                    onClick={handleCloneClick}
+                    icon={<CopyIcon display="block" boxSize={4} />}
+                  >
                     <FormattedMessage
                       id="component.petition-header.clone-label"
                       defaultMessage="Clone petition"
                     />
                   </MenuItem>
-                  <MenuItem onClick={handleSaveAsTemplate}>
-                    <CopyIcon marginRight={2} />
+                  <MenuItem
+                    onClick={handleSaveAsTemplate}
+                    icon={<CopyIcon display="block" boxSize={4} />}
+                  >
                     <FormattedMessage
                       id="component.petition-header.save-as-template-button"
                       defaultMessage="Save as template"
@@ -304,16 +310,18 @@ export function PetitionHeader({
                   <MenuItem
                     onClick={handleReopenPetition}
                     hidden={petition.status !== "CLOSED"}
+                    icon={<EditIcon display="block" boxSize={4} />}
                   >
-                    <EditIcon marginRight={2} />
                     <FormattedMessage
                       id="component.petition-header.reopen-button"
                       defaultMessage="Reopen petition"
                     />
                   </MenuItem>
                   {user.hasPetitionPdfExport ? (
-                    <MenuItem onClick={handleExportPetitionPDF}>
-                      <DownloadIcon marginRight={2} />
+                    <MenuItem
+                      onClick={handleExportPetitionPDF}
+                      icon={<DownloadIcon display="block" boxSize={4} />}
+                    >
                       <FormattedMessage
                         id="component.petition-header.export-pdf"
                         defaultMessage="Export to PDF"
@@ -366,8 +374,11 @@ export function PetitionHeader({
                     </MenuItemOption>
                   </MenuOptionGroup>
                   <MenuDivider />
-                  <MenuItem color="red.500" onClick={handleDeleteClick}>
-                    <DeleteIcon marginRight={2} />
+                  <MenuItem
+                    color="red.500"
+                    onClick={handleDeleteClick}
+                    icon={<DeleteIcon display="block" boxSize={4} />}
+                  >
                     <FormattedMessage
                       id="component.petition-header.delete-label"
                       defaultMessage="Delete petition"

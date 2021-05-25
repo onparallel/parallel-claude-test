@@ -13,11 +13,11 @@ export function CheckboxMenuItemOption({
 }: CheckboxMenuItemOptionProps) {
   return (
     <MenuItemOption
-      icon={<></>}
-      iconSpacing={0}
       isChecked={value}
       type="checkbox"
       onClick={() => onChange(!value)}
+      icon={<></>}
+      iconSpacing={0}
     >
       <Flex alignItems="center">
         <Checkbox

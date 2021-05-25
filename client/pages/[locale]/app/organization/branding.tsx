@@ -98,7 +98,7 @@ function OrganizationBranding() {
         </Heading>
       }
     >
-      <Box padding={4} backgroundColor={"gray.50"} width="100%">
+      <Box padding={4}>
         <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
           <FormattedMessage
             id="organization.branding.logo-header"

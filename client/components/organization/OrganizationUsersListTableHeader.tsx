@@ -121,8 +121,8 @@ export function OrganizationUsersListTableHeader({
               <MenuItem
                 isDisabled={selectedUsers.every((u) => u.status === "ACTIVE")}
                 onClick={() => handleUpdateSelectedUsersStatus("ACTIVE")}
+                icon={<UserCheckIcon display="block" boxSize={4} />}
               >
-                <UserCheckIcon marginRight={2} />
                 <FormattedMessage
                   id="organization-users.activate"
                   defaultMessage="Activate {count, plural, =1{user} other {users}}"
@@ -132,8 +132,8 @@ export function OrganizationUsersListTableHeader({
               <MenuItem
                 isDisabled={selectedUsers.every((u) => u.status === "INACTIVE")}
                 onClick={() => handleUpdateSelectedUsersStatus("INACTIVE")}
+                icon={<UserXIcon display="block" boxSize={4} />}
               >
-                <UserXIcon marginRight={2} />
                 <FormattedMessage
                   id="organization-users.deactivate"
                   defaultMessage="Deactivate {count, plural, =1{user} other {users}}"

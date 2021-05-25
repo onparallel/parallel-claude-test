@@ -103,8 +103,8 @@ export function PetitionAccessesTable({
                         selected.some((a) => a.status === "INACTIVE")
                       }
                       onClick={handleSendReminders}
+                      icon={<BellIcon display="block" boxSize={4} />}
                     >
-                      <BellIcon marginRight={2} />
                       <FormattedMessage
                         id="petition-accesses.send-reminder"
                         defaultMessage="Send reminder"
@@ -116,8 +116,8 @@ export function PetitionAccessesTable({
                         selected.some((a) => a.status === "INACTIVE")
                       }
                       onClick={handleConfigureReminders}
+                      icon={<SettingsIcon display="block" boxSize={4} />}
                     >
-                      <SettingsIcon marginRight={2} />
                       <FormattedMessage
                         id="petition-accesses.reminder-settings"
                         defaultMessage="Reminder settings"

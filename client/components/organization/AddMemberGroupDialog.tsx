@@ -31,7 +31,6 @@ export function AddMemberGroupDialog({
   });
 
   const intl = useIntl();
-  const nameRef = useRef<HTMLInputElement>(null);
   const usersRef = useRef<UserSelectInstance<true>>(null);
 
   const _handleSearchUsers = useSearchUsers();
@@ -52,7 +51,7 @@ export function AddMemberGroupDialog({
         as: "form",
         onSubmit: handleSubmit((data) => props.onResolve(data)),
       }}
-      initialFocusRef={nameRef}
+      initialFocusRef={usersRef}
       header={
         <Stack direction={"row"} spacing={2} align="center">
           <UserPlusIcon role="presentation" />

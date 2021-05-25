@@ -114,8 +114,11 @@ export function PetitionListHeader({
           </MenuButton>
           <Portal>
             <MenuList minWidth="160px">
-              <MenuItem onClick={onShareClick} isDisabled={selectedCount === 0}>
-                <UserArrowIcon marginRight={2} />
+              <MenuItem
+                onClick={onShareClick}
+                isDisabled={selectedCount === 0}
+                icon={<UserArrowIcon display="block" boxSize={4} />}
+              >
                 {filter.type === "PETITION" ? (
                   <FormattedMessage
                     id="component.petition-list-header.share-petition-label"
@@ -130,8 +133,11 @@ export function PetitionListHeader({
                   />
                 )}
               </MenuItem>
-              <MenuItem onClick={onCloneClick} isDisabled={selectedCount === 0}>
-                <CopyIcon marginRight={2} />
+              <MenuItem
+                onClick={onCloneClick}
+                isDisabled={selectedCount === 0}
+                icon={<CopyIcon display="block" boxSize={4} />}
+              >
                 {filter.type === "PETITION" ? (
                   <FormattedMessage
                     id="component.petition-list-header.clone-petition-label"
@@ -150,8 +156,8 @@ export function PetitionListHeader({
                 <MenuItem
                   onClick={onCloneAsTemplateClick}
                   isDisabled={selectedCount !== 1}
+                  icon={<CopyIcon display="block" boxSize={4} />}
                 >
-                  <CopyIcon marginRight={2} />
                   <FormattedMessage
                     id="component.petition-list-header.save-as-template-label"
                     defaultMessage="Save as template"
@@ -161,8 +167,8 @@ export function PetitionListHeader({
                 <MenuItem
                   onClick={onUseTemplateClick}
                   isDisabled={selectedCount !== 1}
+                  icon={<PaperPlaneIcon display="block" boxSize={4} />}
                 >
-                  <PaperPlaneIcon marginRight={2} />
                   <FormattedMessage
                     id="component.petition-list-header.use-template-label"
                     defaultMessage="Use template"
@@ -174,8 +180,8 @@ export function PetitionListHeader({
                 color="red.500"
                 onClick={onDeleteClick}
                 isDisabled={selectedCount === 0}
+                icon={<DeleteIcon display="block" boxSize={4} />}
               >
-                <DeleteIcon marginRight={2} />
                 {filter.type === "PETITION" ? (
                   <FormattedMessage
                     id="component.petition-list-header.delete-petition-label"

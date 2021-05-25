@@ -181,16 +181,20 @@ export const AppLayoutNavbar = Object.assign(
                   })}
                 >
                   <NakedLink href="/app/petitions/new">
-                    <MenuItem as="a">
-                      <FileTextIcon marginRight={2} />
+                    <MenuItem
+                      as="a"
+                      icon={<FileTextIcon display="block" boxSize={4} />}
+                    >
                       <FormattedMessage
                         id="navbar.create-new-petition-from-template"
                         defaultMessage="Use a template"
                       />
                     </MenuItem>
                   </NakedLink>
-                  <MenuItem onClick={handleCreatePetition}>
-                    <FileNewIcon marginRight={2} />
+                  <MenuItem
+                    onClick={handleCreatePetition}
+                    icon={<FileNewIcon display="block" boxSize={4} />}
+                  >
                     <FormattedMessage
                       id="navbar.create-new-petition-blank"
                       defaultMessage="Blank petition"

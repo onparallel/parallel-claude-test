@@ -79,8 +79,10 @@ export function ContactListHeader({
             </MenuButton>
             <Portal>
               <MenuList minWidth="160px">
-                <MenuItem onClick={onDeleteClick}>
-                  <DeleteIcon marginRight={2} />
+                <MenuItem
+                  onClick={onDeleteClick}
+                  icon={<DeleteIcon display="block" boxSize={4} />}
+                >
                   <FormattedMessage
                     id="component.contact-list-header.delete-label"
                     defaultMessage="Delete selected"

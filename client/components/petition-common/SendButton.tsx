@@ -57,8 +57,10 @@ export const SendButton = chakraForwardRef<"div", SendButtonProps>(
           </Tooltip>
           <Portal>
             <MenuList minWidth={0}>
-              <MenuItem onClick={onScheduleClick as any}>
-                <TimeIcon marginRight={2} />
+              <MenuItem
+                onClick={onScheduleClick as any}
+                icon={<TimeIcon display="block" boxSize={4} />}
+              >
                 <FormattedMessage
                   id="component.send-button.schedule"
                   defaultMessage="Schedule send"

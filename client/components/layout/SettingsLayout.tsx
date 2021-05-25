@@ -47,11 +47,6 @@ export function SettingsLayout({
     )
   );
 
-  const activeSection =
-    sections.find((section) =>
-      router.pathname.includes(`/[locale]${section.path}`)
-    ) ?? sections[0];
-
   return (
     <AppLayout title={title} user={user}>
       <Flex flex="1" maxHeight="100vh">
@@ -99,9 +94,7 @@ export function SettingsLayout({
                 borderBottom="1px solid"
                 borderBottomColor="gray.100"
               >
-                <NakedLink
-                  href={showBackButton ? activeSection.path : basePath}
-                >
+                <NakedLink href={basePath}>
                   <IconButton
                     as="a"
                     icon={<ArrowBackIcon />}
@@ -119,7 +112,12 @@ export function SettingsLayout({
                 </NakedLink>
                 {header}
               </Flex>
-              <Flex flex="1" minHeight={0} overflow="auto">
+              <Flex
+                flex="1"
+                minHeight={0}
+                overflow="auto"
+                backgroundColor="gray.50"
+              >
                 {children}
               </Flex>
             </>
@@ -150,7 +148,7 @@ function SettingsLayoutMenuItem({
 }: SettingsLayoutMenuItemProps) {
   const { pathname } = useRouter();
 
-  const active = pathname.includes(`/[locale]${path}`);
+  const active = pathname.startsWith(`/[locale]${path}`);
 
   return (
     <NakedLink href={path}>

@@ -57,15 +57,16 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
       <Portal>
         <MenuList>
           <NakedLink href="/app/settings">
-            <MenuItem as="a">
-              <UserIcon marginRight={2} />
+            <MenuItem as="a" icon={<UserIcon display="block" boxSize={4} />}>
               <FormattedMessage id="settings.title" defaultMessage="Settings" />
             </MenuItem>
           </NakedLink>
           {user.role === "ADMIN" ? (
             <NakedLink href="/app/organization">
-              <MenuItem as="a">
-                <BusinessIcon marginRight={2} />
+              <MenuItem
+                as="a"
+                icon={<BusinessIcon display="block" boxSize={4} />}
+              >
                 <FormattedMessage
                   id="view.organization.title"
                   defaultMessage="Organization"
@@ -75,8 +76,7 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
           ) : null}
           {user.isSuperAdmin ? (
             <NakedLink href="/app/admin">
-              <MenuItem as="a">
-                <KeyIcon marginRight={2} />
+              <MenuItem as="a" icon={<KeyIcon display="block" boxSize={4} />}>
                 <FormattedMessage
                   id="admin.title"
                   defaultMessage="Admin panel"
@@ -100,8 +100,10 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
             ))}
           </MenuOptionGroup>
           <MenuDivider />
-          <MenuItem onClick={handleLogoutClick}>
-            <LogOutIcon marginRight={2} />
+          <MenuItem
+            onClick={handleLogoutClick}
+            icon={<LogOutIcon display="block" boxSize={4} />}
+          >
             <FormattedMessage
               id="component.user-menu.log-out"
               defaultMessage="Log out"

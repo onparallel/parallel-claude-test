@@ -359,8 +359,8 @@ export function PetitionSharingDialog({
                             onClick={() =>
                               handleTransferPetitionOwnership(petitionId, user)
                             }
+                            icon={<UserArrowIcon display="block" boxSize={4} />}
                           >
-                            <UserArrowIcon marginRight={2} />
                             <FormattedMessage
                               id="generic.transfer-ownership"
                               defaultMessage="Transfer ownership"
@@ -371,8 +371,8 @@ export function PetitionSharingDialog({
                             onClick={() =>
                               handleRemoveUserPermission(petitionId, user)
                             }
+                            icon={<DeleteIcon display="block" boxSize={4} />}
                           >
-                            <DeleteIcon marginRight={2} />
                             <FormattedMessage
                               id="generic.remove"
                               defaultMessage="Remove"

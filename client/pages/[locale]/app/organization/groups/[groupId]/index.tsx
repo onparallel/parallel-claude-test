@@ -261,7 +261,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   return (
     <SettingsLayout
       title={name}
-      basePath="/app/organization"
+      basePath="/app/organization/groups"
       sections={sections}
       user={me}
       sectionsHeader={
@@ -298,16 +298,21 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
             </Tooltip>
             <Portal>
               <MenuList>
-                <MenuItem onClick={handleCloneGroup}>
-                  <CopyIcon marginRight={2} />
+                <MenuItem
+                  onClick={handleCloneGroup}
+                  icon={<CopyIcon display="block" boxSize={4} />}
+                >
                   <FormattedMessage
                     id="component.group-header.clone-label"
                     defaultMessage="Clone group"
                   />
                 </MenuItem>
                 <MenuDivider />
-                <MenuItem color="red.500" onClick={handleDeleteGroup}>
-                  <DeleteIcon marginRight={2} />
+                <MenuItem
+                  color="red.500"
+                  onClick={handleDeleteGroup}
+                  icon={<DeleteIcon display="block" boxSize={4} />}
+                >
                   <FormattedMessage
                     id="component.group-header.delete-label"
                     defaultMessage="Delete group"
@@ -320,13 +325,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       }
       showBackButton={true}
     >
-      <Flex
-        flexDirection="column"
-        flex="1"
-        minHeight={0}
-        padding={4}
-        backgroundColor={"gray.50"}
-      >
+      <Flex flexDirection="column" flex="1" minHeight={0} padding={4}>
         <TablePage
           flex="0 1 auto"
           minHeight={0}

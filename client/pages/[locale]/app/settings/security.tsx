@@ -10,6 +10,7 @@ import {
   Stack,
   useToast,
 } from "@chakra-ui/react";
+import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import {
@@ -110,112 +111,125 @@ function Security() {
         </Heading>
       }
     >
-      <Stack padding={4} alignItems="stretch" flex="1" maxWidth="container.2xs">
-        <Heading as="h4" size="md" fontWeight="normal">
-          <FormattedMessage
-            id="settings.security.password-header"
-            defaultMessage="Change password"
-          />
-        </Heading>
-        {me.isSsoUser ? (
-          <Alert>
-            <AlertIcon />
+      <Card margin={4} height="fit-content">
+        <Stack
+          padding={4}
+          alignItems="stretch"
+          flex="1"
+          maxWidth="container.2xs"
+          spacing={4}
+        >
+          <Heading as="h4" size="md" fontWeight="normal">
             <FormattedMessage
-              id="settings.security.sso-user-explanation"
-              defaultMessage="SSO users are not able to change passwords"
-            />
-          </Alert>
-        ) : null}
-        <Stack as="form" onSubmit={handleSubmit(onChangePassword)}>
-          <FormControl
-            id="password"
-            isInvalid={!!errors.password}
-            isDisabled={me.isSsoUser}
-          >
-            <FormLabel>
-              <FormattedMessage
-                id="generic.forms.old-password-label"
-                defaultMessage="Old password"
-              />
-            </FormLabel>
-            <PasswordInput {...register("password", { required: true })} />
-            <FormErrorMessage>
-              {errors.password?.type === "required" ? (
-                <FormattedMessage
-                  id="generic.forms.required-old-password-error"
-                  defaultMessage="Old password is required"
-                />
-              ) : errors.password?.type === "validate" ? (
-                <FormattedMessage
-                  id="generic.forms.invalid-old-password-error"
-                  defaultMessage="Old password is incorrect"
-                />
-              ) : null}
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl
-            id="new-password"
-            isInvalid={!!errors.newPassword}
-            isDisabled={me.isSsoUser}
-          >
-            <FormLabel>
-              <FormattedMessage
-                id="generic.forms.new-password-label"
-                defaultMessage="New password"
-              />
-            </FormLabel>
-            <PasswordInput
-              {...register("newPassword", {
-                required: true,
-                validate: (value) => value.length >= 8,
-              })}
-            />
-            <FormErrorMessage>
-              {errors.newPassword?.type === "invalid" ? (
-                <FormattedMessage
-                  id="generic.forms.invalid-password-policy-error"
-                  defaultMessage="Please choose a stronger password"
-                />
-              ) : (
-                <FormattedMessage
-                  id="generic.forms.password-policy-error"
-                  defaultMessage="The password must have a least 8 characters"
-                />
-              )}
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl
-            id="new-password2"
-            isInvalid={!!errors.newPassword2}
-            isDisabled={me.isSsoUser}
-          >
-            <FormLabel>
-              <FormattedMessage
-                id="generic.forms.confirm-password-label"
-                defaultMessage="Confirm password"
-              />
-            </FormLabel>
-            <PasswordInput
-              {...register("newPassword2", {
-                required: true,
-                validate: (value) => value === getValues().newPassword,
-              })}
-            />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.passwords-must-match"
-                defaultMessage="Passwords must match"
-              />
-            </FormErrorMessage>
-          </FormControl>
-          <Button type="submit" colorScheme="purple" isDisabled={me.isSsoUser}>
-            <FormattedMessage
-              id="settings.account.change-password-button"
+              id="settings.security.password-header"
               defaultMessage="Change password"
             />
-          </Button>
+          </Heading>
+          {me.isSsoUser ? (
+            <Alert>
+              <AlertIcon />
+              <FormattedMessage
+                id="settings.security.sso-user-explanation"
+                defaultMessage="SSO users are not able to change passwords"
+              />
+            </Alert>
+          ) : null}
+          <Stack as="form" onSubmit={handleSubmit(onChangePassword)}>
+            <FormControl
+              id="password"
+              isInvalid={!!errors.password}
+              isDisabled={me.isSsoUser}
+            >
+              <FormLabel>
+                <FormattedMessage
+                  id="generic.forms.old-password-label"
+                  defaultMessage="Old password"
+                />
+              </FormLabel>
+              <PasswordInput {...register("password", { required: true })} />
+              <FormErrorMessage>
+                {errors.password?.type === "required" ? (
+                  <FormattedMessage
+                    id="generic.forms.required-old-password-error"
+                    defaultMessage="Old password is required"
+                  />
+                ) : errors.password?.type === "validate" ? (
+                  <FormattedMessage
+                    id="generic.forms.invalid-old-password-error"
+                    defaultMessage="Old password is incorrect"
+                  />
+                ) : null}
+              </FormErrorMessage>
+            </FormControl>
+            <FormControl
+              id="new-password"
+              isInvalid={!!errors.newPassword}
+              isDisabled={me.isSsoUser}
+            >
+              <FormLabel>
+                <FormattedMessage
+                  id="generic.forms.new-password-label"
+                  defaultMessage="New password"
+                />
+              </FormLabel>
+              <PasswordInput
+                {...register("newPassword", {
+                  required: true,
+                  validate: (value) => value.length >= 8,
+                })}
+              />
+              <FormErrorMessage>
+                {errors.newPassword?.type === "invalid" ? (
+                  <FormattedMessage
+                    id="generic.forms.invalid-password-policy-error"
+                    defaultMessage="Please choose a stronger password"
+                  />
+                ) : (
+                  <FormattedMessage
+                    id="generic.forms.password-policy-error"
+                    defaultMessage="The password must have a least 8 characters"
+                  />
+                )}
+              </FormErrorMessage>
+            </FormControl>
+            <FormControl
+              id="new-password2"
+              isInvalid={!!errors.newPassword2}
+              isDisabled={me.isSsoUser}
+              mb={2}
+            >
+              <FormLabel>
+                <FormattedMessage
+                  id="generic.forms.confirm-password-label"
+                  defaultMessage="Confirm password"
+                />
+              </FormLabel>
+              <PasswordInput
+                {...register("newPassword2", {
+                  required: true,
+                  validate: (value) => value === getValues().newPassword,
+                })}
+              />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms.passwords-must-match"
+                  defaultMessage="Passwords must match"
+                />
+              </FormErrorMessage>
+            </FormControl>
+            <Button
+              type="submit"
+              colorScheme="purple"
+              isDisabled={me.isSsoUser}
+            >
+              <FormattedMessage
+                id="settings.account.change-password-button"
+                defaultMessage="Change password"
+              />
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
+      </Card>
     </SettingsLayout>
   );
 }

@@ -207,8 +207,10 @@ export function TemplateDetailsDialog({
                 </Tooltip>
                 <Portal>
                   <MenuList minWidth={0}>
-                    <MenuItem onClick={() => props.onResolve("CLONE_TEMPLATE")}>
-                      <CopyIcon marginRight={2} />
+                    <MenuItem
+                      onClick={() => props.onResolve("CLONE_TEMPLATE")}
+                      icon={<CopyIcon display="block" boxSize={4} />}
+                    >
                       <FormattedMessage
                         id="template-details.clone-template"
                         defaultMessage="Clone template"
@@ -219,8 +221,8 @@ export function TemplateDetailsDialog({
                         justifyContent="left"
                         type="submit"
                         onClick={() => props.onResolve("EDIT_TEMPLATE")}
+                        icon={<EditIcon display="block" boxSize={4} />}
                       >
-                        <EditIcon marginRight={2} />
                         <FormattedMessage
                           id="template-details.edit-template"
                           defaultMessage="Edit template"

@@ -176,23 +176,30 @@ export function PetitionTemplateHeader({
           </Tooltip>
           <Portal>
             <MenuList>
-              <MenuItem onClick={handlePetitionSharingClick}>
-                <UserArrowIcon marginRight={2} />
+              <MenuItem
+                onClick={handlePetitionSharingClick}
+                icon={<UserArrowIcon display="block" boxSize={4} />}
+              >
                 <FormattedMessage
                   id="component.template-header.share-label"
                   defaultMessage="Share template"
                 />
               </MenuItem>
-              <MenuItem onClick={handleCloneClick}>
-                <CopyIcon marginRight={2} />
+              <MenuItem
+                onClick={handleCloneClick}
+                icon={<CopyIcon display="block" boxSize={4} />}
+              >
                 <FormattedMessage
                   id="component.template-header.clone-label"
                   defaultMessage="Clone template"
                 />
               </MenuItem>
               <MenuDivider />
-              <MenuItem color="red.500" onClick={handleDeleteClick}>
-                <DeleteIcon marginRight={2} />
+              <MenuItem
+                color="red.500"
+                onClick={handleDeleteClick}
+                icon={<DeleteIcon display="block" boxSize={4} />}
+              >
                 <FormattedMessage
                   id="component.petition-template.delete-label"
                   defaultMessage="Delete template"

@@ -10,6 +10,7 @@ import {
   Input,
   Stack,
 } from "@chakra-ui/react";
+import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import {
   withApolloData,
@@ -74,73 +75,85 @@ function Account() {
         </Heading>
       }
     >
-      <Stack padding={4} alignItems="stretch" flex="1" maxWidth="container.2xs">
-        <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
-          <FormattedMessage
-            id="settings.account.name-header"
-            defaultMessage="Name"
-          />
-        </Heading>
-        {me.isSsoUser ? (
-          <Alert>
-            <AlertIcon />
+      <Card margin={4} height="fit-content">
+        <Stack
+          padding={4}
+          alignItems="stretch"
+          flex="1"
+          maxWidth="container.2xs"
+        >
+          <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
             <FormattedMessage
-              id="settings.account.sso-user-explanation"
-              defaultMessage="SSO users are not able to change their name"
+              id="settings.account.name-header"
+              defaultMessage="Name"
             />
-          </Alert>
-        ) : null}
-        <Stack as="form" onSubmit={handleSubmit(onSaveName)}>
-          <FormControl
-            id="first-name"
-            isInvalid={!!errors.firstName}
-            isDisabled={me.isSsoUser}
-          >
-            <FormLabel>
+          </Heading>
+          {me.isSsoUser ? (
+            <Alert>
+              <AlertIcon />
               <FormattedMessage
-                id="generic.forms.first-name-label"
-                defaultMessage="First name"
+                id="settings.account.sso-user-explanation"
+                defaultMessage="SSO users are not able to change their name"
               />
-            </FormLabel>
-            <Input
-              {...register("firstName", { required: true, maxLength: 255 })}
-            />
-            <FormErrorMessage>
+            </Alert>
+          ) : null}
+          <Stack as="form" onSubmit={handleSubmit(onSaveName)}>
+            <FormControl
+              id="first-name"
+              isInvalid={!!errors.firstName}
+              isDisabled={me.isSsoUser}
+            >
+              <FormLabel>
+                <FormattedMessage
+                  id="generic.forms.first-name-label"
+                  defaultMessage="First name"
+                />
+              </FormLabel>
+              <Input
+                {...register("firstName", { required: true, maxLength: 255 })}
+              />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms.required-first-name-error"
+                  defaultMessage="First name is required"
+                />
+              </FormErrorMessage>
+            </FormControl>
+            <FormControl
+              id="last-name"
+              isInvalid={!!errors.lastName}
+              isDisabled={me.isSsoUser}
+              mb={2}
+            >
+              <FormLabel>
+                <FormattedMessage
+                  id="generic.forms.last-name-label"
+                  defaultMessage="Last name"
+                />
+              </FormLabel>
+              <Input
+                {...register("lastName", { required: true, maxLength: 255 })}
+              />
+              <FormErrorMessage>
+                <FormattedMessage
+                  id="generic.forms.required-last-name-error"
+                  defaultMessage="Last name is required"
+                />
+              </FormErrorMessage>
+            </FormControl>
+            <Button
+              type="submit"
+              colorScheme="purple"
+              isDisabled={me.isSsoUser}
+            >
               <FormattedMessage
-                id="generic.forms.required-first-name-error"
-                defaultMessage="First name is required"
+                id="settings.account.update-name-button"
+                defaultMessage="Save changes"
               />
-            </FormErrorMessage>
-          </FormControl>
-          <FormControl
-            id="last-name"
-            isInvalid={!!errors.lastName}
-            isDisabled={me.isSsoUser}
-          >
-            <FormLabel>
-              <FormattedMessage
-                id="generic.forms.last-name-label"
-                defaultMessage="Last name"
-              />
-            </FormLabel>
-            <Input
-              {...register("lastName", { required: true, maxLength: 255 })}
-            />
-            <FormErrorMessage>
-              <FormattedMessage
-                id="generic.forms.required-last-name-error"
-                defaultMessage="Last name is required"
-              />
-            </FormErrorMessage>
-          </FormControl>
-          <Button type="submit" colorScheme="purple" isDisabled={me.isSsoUser}>
-            <FormattedMessage
-              id="settings.account.update-name-button"
-              defaultMessage="Save changes"
-            />
-          </Button>
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
+      </Card>
     </SettingsLayout>
   );
 }

@@ -78,12 +78,11 @@ export function OrganizationGroupListTableHeader({
               <MenuItem
                 onClick={() => onRemoveMember(selectedMembers)}
                 color="red.500"
+                icon={<UserXIcon display="block" boxSize={4} />}
               >
-                <UserXIcon marginRight={2} />
                 <FormattedMessage
                   id="organization-groups.remove-from-group"
                   defaultMessage="Remove from group"
-                  values={{ count: selectedMembers.length }}
                 />
               </MenuItem>
             </MenuList>

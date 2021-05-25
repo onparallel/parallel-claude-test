@@ -78,16 +78,21 @@ export function OrganizationGroupsListTableHeader({
           </MenuButton>
           <Portal>
             <MenuList minWidth="160px">
-              <MenuItem onClick={() => onCloneGroup()}>
-                <CopyIcon marginRight={2} />
+              <MenuItem
+                onClick={() => onCloneGroup()}
+                icon={<CopyIcon display="block" boxSize={4} />}
+              >
                 <FormattedMessage
                   id="organization-groups.clone-group"
                   defaultMessage="Clone {count, plural, =1{group} other {groups}}"
                   values={{ count: selectedGroups.length }}
                 />
               </MenuItem>
-              <MenuItem onClick={() => onRemoveGroup()} color="red.500">
-                <DeleteIcon marginRight={2} />
+              <MenuItem
+                onClick={() => onRemoveGroup()}
+                color="red.500"
+                icon={<DeleteIcon display="block" boxSize={4} />}
+              >
                 <FormattedMessage
                   id="organization-groups.delete-group"
                   defaultMessage="Delete {count, plural, =1{group} other {groups}}"

@@ -6,7 +6,6 @@ import {
   useDialog,
 } from "@parallel/components/common/DialogProvider";
 import { OrganizationGroup_UserGroupMemberFragment } from "@parallel/graphql/__types";
-import { useForm } from "react-hook-form";
 import { FormattedMessage } from "react-intl";
 import { UserSelectSelection } from "../common/UserSelect";
 
@@ -17,27 +16,15 @@ function ConfirmRemoveMemberDialog({
   { selected: OrganizationGroup_UserGroupMemberFragment[] },
   UserSelectSelection
 >) {
-  const {
-    handleSubmit,
-    formState: { errors },
-  } = useForm<{
-    user: UserSelectSelection | null;
-  }>({
-    mode: "all",
-    defaultValues: {
-      user: null,
-    },
-  });
-
   return (
     <ConfirmDialog
       hasCloseButton
       size="lg"
       content={{
         as: "form",
-        onSubmit: handleSubmit(({ user }) => {
-          props.onResolve(user!);
-        }),
+        onSubmit: () => {
+          props.onResolve();
+        },
       }}
       header={
         <Stack direction={"row"} spacing={2} align="center">
@@ -66,11 +53,7 @@ function ConfirmRemoveMemberDialog({
         </Stack>
       }
       confirm={
-        <Button
-          type="submit"
-          colorScheme="red"
-          isDisabled={Boolean(errors.user)}
-        >
+        <Button type="submit" colorScheme="red">
           <FormattedMessage
             id="component.confirm-remove-member-dialog.confirm"
             defaultMessage="Yes, remove from group"
