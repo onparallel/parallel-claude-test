@@ -16,7 +16,6 @@ The client uses the following libraries:
 - `yarn start`: Serves the production build locally.
 - `yarn generate-graphql-types`: Generates the interfaces for all the queries, mutations and fragments used in the client (`graphql/__types.ts`).
 - `yarn extract-i18n-terms`: Extracts the translation terms into `lang/[locale].json`.
-- `yarn generate-i18n-files`: Generates the translations files for the app to consume.
 
 ## Server
 
@@ -38,6 +37,7 @@ The backend uses the following libraries:
 - `yarn seed`: Runs the seed file to populate a dev database.
 - `yarn generate-db-types`: Generates the TypeScript interfaces from the database schema (`src/db/__types.ts`).
 - `yarn test`: Creates a testing stack and runs the tests.
+- `yarn extract-i18n-terms`: Extracts the translation terms into `lang/[locale].json`.
 
 ### Testing
 
@@ -48,3 +48,24 @@ yarn test
 ```
 
 This command will create the testing stack using `docker-compose` (look inside `./test/setup.ts` and `./test/teardown.ts`).
+
+# Naming conventions
+
+## Repository methods
+
+Try to use the following convention for method names as much as possible
+
+_prefixEntity_\[By*Property*]
+
+where **_prefix_** is one of:
+
+- load: reads from the database and exposes a DataLoader
+- get: reads from the database
+- update: updates existing rows
+- create: creates new rows
+- delete: deletes or marks as delete
+- clone: clones existing rows
+
+**_Entity_** is the name of the main entity involved
+
+Optionally add **By*Property*** if you are accessing data by properties other than _id_
