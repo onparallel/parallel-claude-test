@@ -246,7 +246,7 @@ function OrganizationGroups() {
     <SettingsLayout
       title={intl.formatMessage({
         id: "view.groups.title",
-        defaultMessage: "Groups",
+        defaultMessage: "Work groups",
       })}
       basePath="/app/organization"
       sections={sections}
@@ -259,7 +259,10 @@ function OrganizationGroups() {
       }
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage id="view.groups.title" defaultMessage="Groups" />
+          <FormattedMessage
+            id="view.groups.title"
+            defaultMessage="Work groups"
+          />
         </Heading>
       }
     >

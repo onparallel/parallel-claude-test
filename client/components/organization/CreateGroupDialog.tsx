@@ -70,7 +70,7 @@ export function CreateGroupDialog({
       header={
         <FormattedMessage
           id="component.create-group-dialog.title"
-          defaultMessage="New user group"
+          defaultMessage="New work group"
         />
       }
       body={
@@ -94,7 +94,7 @@ export function CreateGroupDialog({
             <FormLabel>
               <FormattedMessage
                 id="component.create-group-dialog.members-label"
-                defaultMessage="Add to group"
+                defaultMessage="Members"
               />
             </FormLabel>
             <Controller

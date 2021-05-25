@@ -291,8 +291,8 @@
   },
   {
     "term": "component.create-group-dialog.members-label",
-    "definition": "Add to group",
-    "context": "Add to group"
+    "definition": "Members",
+    "context": "Members"
   },
   {
     "term": "component.create-group-dialog.members-placeholder",
@@ -306,8 +306,8 @@
   },
   {
     "term": "component.create-group-dialog.title",
-    "definition": "New user group",
-    "context": "New user group"
+    "definition": "New work group",
+    "context": "New work group"
   },
   {
     "term": "component.date-picker.next-month",
@@ -2893,11 +2893,6 @@
     "term": "organization.confirm-deactivate.user-select.input-placeholder",
     "definition": "Select a user from your organization",
     "context": "Select a user from your organization"
-  },
-  {
-    "term": "organization.groups.title",
-    "definition": "Groups",
-    "context": "Groups"
   },
   {
     "term": "organization.role.admin",
@@ -5991,8 +5986,8 @@
   },
   {
     "term": "view.groups.title",
-    "definition": "Groups",
-    "context": "Groups"
+    "definition": "Work groups",
+    "context": "Work groups"
   },
   {
     "term": "view.organization.title",

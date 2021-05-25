@@ -21,8 +21,8 @@ export function useOrganizationSections() {
       },
       {
         title: intl.formatMessage({
-          id: "organization.groups.title",
-          defaultMessage: "Groups",
+          id: "view.groups.title",
+          defaultMessage: "Work groups",
         }),
         path: "/app/organization/groups",
       },
