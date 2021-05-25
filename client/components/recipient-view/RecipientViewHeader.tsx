@@ -56,6 +56,7 @@ function Contact({
         color="purple.600"
         _hover={{ color: "purple.800" }}
         {...props}
+        tabIndex={0}
       >
         {`${contact.fullName || contact.email}`}
         {isFull && contact.fullName ? `<${contact.email}>` : null}
