@@ -805,9 +805,7 @@ api
           query GetPermissions_Permissions($petitionId: GID!) {
             petition(id: $petitionId) {
               permissions {
-                ... on PetitionUserPermission {
-                  ...Permission
-                }
+                ...Permission
               }
             }
           }

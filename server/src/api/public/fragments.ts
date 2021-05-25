@@ -30,6 +30,13 @@ export const UserFragment = gql`
   }
 `;
 
+export const UserGroupFragment = gql`
+  fragment UserGroup on UserGroup {
+    id
+    name
+  }
+`;
+
 export const ContactFragment = gql`
   fragment Contact on Contact {
     id
@@ -71,13 +78,22 @@ export const SubscriptionFragment = gql`
 `;
 
 export const PermissionFragment = gql`
-  fragment Permission on PetitionUserPermission {
-    user {
-      ...User
-    }
+  fragment Permission on PetitionPermission {
     permissionType
+    createdAt
+    ... on PetitionUserPermission {
+      user {
+        ...User
+      }
+    }
+    ... on PetitionUserGroupPermission {
+      group {
+        ...UserGroup
+      }
+    }
   }
   ${UserFragment}
+  ${UserGroupFragment}
 `;
 
 export const PetitionReplyFragment = gql`

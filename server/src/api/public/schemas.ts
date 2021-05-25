@@ -114,6 +114,27 @@ const _User = {
   },
 } as const;
 
+const _UserGroup = {
+  title: "UserGroup",
+  type: "object",
+  additionalProperties: false,
+  required: ["id", "name"],
+  properties: {
+    id: {
+      description: "The ID of the user group",
+      type: "string",
+    },
+    name: {
+      description: "The name of the user group",
+      type: "string",
+    },
+  },
+  example: {
+    id: toGlobalId("UserGroup", 42),
+    name: "Pearson Specter",
+  },
+} as const;
+
 const _Contact = {
   title: "Contact",
   type: "object",
@@ -322,28 +343,55 @@ const _Subscription = {
   },
 } as const;
 
+const _CommonPermission = {
+  permissionType: {
+    description: outdent`
+      The type of permission.  
+      \`OWNER\`: Full access to the petition. There can only be one owner per petition.  
+      \`READ\`: Read-only access. Users with READ permission can't modify the petition in any way.  
+      \`WRITE\`: Same level of access as the owner.   
+    `,
+    type: "string",
+    enum: ["OWNER", "READ", "WRITE"],
+    example: "OWNER",
+  },
+  createdAt: {
+    description: "Creation date of the permission",
+    type: "string",
+    format: "date-time",
+    example: new Date(2020, 2, 15).toISOString(),
+  },
+} as const;
+
 const _Permission = {
   title: "Permission",
   type: "object",
-  additionalProperties: false,
-  required: ["user", "permissionType"],
-  properties: {
-    user: {
-      ..._User,
-      description: "The user linked to this permission",
+  anyOf: [
+    {
+      type: "object",
+      required: ["permissionType", "user", "createdAt"],
+      additionalProperties: false,
+      properties: {
+        user: {
+          ..._User,
+          description: "The user linked to this permission",
+        },
+        ..._CommonPermission,
+      },
     },
-    permissionType: {
-      description: outdent`
-        The type of permission.  
-        \`OWNER\`: Full access to the petition. There can only be one owner per petition.  
-        \`READ\`: Read-only access. Users with READ permission can't modify the petition in any way.  
-        \`WRITE\`: Same level of access as the owner.   
-      `,
-      type: "string",
-      enum: ["OWNER", "READ", "WRITE"],
-      example: "OWNER",
+    {
+      type: "object",
+      required: ["permissionType", "group", "createdAt"],
+      additionalProperties: false,
+      properties: {
+        group: {
+          ..._UserGroup,
+          description: "The user group linked to this permission",
+        },
+        ..._CommonPermission,
+      },
     },
-  },
+  ],
 } as const;
 
 const _PetitionFieldReply = {

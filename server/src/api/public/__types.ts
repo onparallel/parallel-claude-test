@@ -156,6 +156,29 @@ export type GenerateUserAuthTokenResponse = {
   userAuthToken: UserAuthenticationToken;
 };
 
+export type GroupPermissionAddedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  permissionGroup: Maybe<UserGroup>;
+  permissionType: PetitionUserPermissionType;
+  user: Maybe<User>;
+};
+
+export type GroupPermissionEditedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  permissionGroup: Maybe<UserGroup>;
+  permissionType: PetitionUserPermissionType;
+  user: Maybe<User>;
+};
+
+export type GroupPermissionRemovedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  permissionGroup: Maybe<UserGroup>;
+  user: Maybe<User>;
+};
+
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE";
 
@@ -1004,8 +1027,8 @@ export type Petition = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the user */
-  myPermission: EffectivePetitionUserPermission;
+  /** The effective permission of the logged user */
+  myEffectivePermissions: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1118,8 +1141,8 @@ export type PetitionBase = {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the user */
-  myPermission: EffectivePetitionUserPermission;
+  /** The effective permission of the logged user */
+  myEffectivePermissions: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1327,11 +1350,7 @@ export type PetitionMessageStatus =
   /** The message has been scheduled to be sent at a specific time. */
   | "SCHEDULED";
 
-export type PetitionPermission =
-  | PetitionUserGroupPermission
-  | PetitionUserPermission;
-
-export type PetitionPermissionBase = {
+export type PetitionPermission = {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** wether user is subscribed or not to emails and alerts of the petition */
@@ -1449,8 +1468,8 @@ export type PetitionTemplate = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the user */
-  myPermission: EffectivePetitionUserPermission;
+  /** The effective permission of the logged user */
+  myEffectivePermissions: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1478,7 +1497,7 @@ export type PetitionTemplatePagination = {
 };
 
 /** The permission for a petition and user group */
-export type PetitionUserGroupPermission = PetitionPermissionBase &
+export type PetitionUserGroupPermission = PetitionPermission &
   Timestamps & {
     /** Time when the resource was created. */
     createdAt: Scalars["DateTime"];
@@ -1495,7 +1514,7 @@ export type PetitionUserGroupPermission = PetitionPermissionBase &
   };
 
 /** The permission for a petition and user */
-export type PetitionUserPermission = PetitionPermissionBase &
+export type PetitionUserPermission = PetitionPermission &
   Timestamps & {
     /** Time when the resource was created. */
     createdAt: Scalars["DateTime"];
@@ -2215,6 +2234,8 @@ export type UserFragment = Pick<
   "id" | "fullName" | "firstName" | "lastName"
 >;
 
+export type UserGroupFragment = Pick<UserGroup, "id" | "name">;
+
 export type ContactFragment = Pick<
   Contact,
   | "id"
@@ -2242,10 +2263,19 @@ export type SubscriptionFragment = Pick<
   "id" | "endpoint" | "createdAt"
 >;
 
-export type PermissionFragment = Pick<
+export type Permission_PetitionUserGroupPermission_Fragment = Pick<
+  PetitionUserGroupPermission,
+  "permissionType" | "createdAt"
+> & { group: UserGroupFragment };
+
+export type Permission_PetitionUserPermission_Fragment = Pick<
   PetitionUserPermission,
-  "permissionType"
+  "permissionType" | "createdAt"
 > & { user: UserFragment };
+
+export type PermissionFragment =
+  | Permission_PetitionUserGroupPermission_Fragment
+  | Permission_PetitionUserPermission_Fragment;
 
 export type PetitionFieldReplyFragment = Pick<
   PetitionFieldReply,
@@ -2385,8 +2415,18 @@ export type GetPermissions_PermissionsQueryVariables = Exact<{
 
 export type GetPermissions_PermissionsQuery = {
   petition: Maybe<
-    | { permissions: Array<PermissionFragment> }
-    | { permissions: Array<PermissionFragment> }
+    | {
+        permissions: Array<
+          | Permission_PetitionUserGroupPermission_Fragment
+          | Permission_PetitionUserPermission_Fragment
+        >;
+      }
+    | {
+        permissions: Array<
+          | Permission_PetitionUserGroupPermission_Fragment
+          | Permission_PetitionUserPermission_Fragment
+        >;
+      }
   >;
 };
 
@@ -2396,7 +2436,9 @@ export type SharePetition_addPetitionUserPermissionMutationVariables = Exact<{
 }>;
 
 export type SharePetition_addPetitionUserPermissionMutation = {
-  addPetitionUserPermission: Array<{ permissions: Array<PermissionFragment> }>;
+  addPetitionUserPermission: Array<{
+    permissions: Array<Permission_PetitionUserPermission_Fragment>;
+  }>;
 };
 
 export type StopSharing_removePetitionUserPermissionMutationVariables = Exact<{
@@ -2424,7 +2466,9 @@ export type TransferPetition_transferPetitionOwnershipMutationVariables =
   }>;
 
 export type TransferPetition_transferPetitionOwnershipMutation = {
-  transferPetitionOwnership: Array<{ permissions: Array<PermissionFragment> }>;
+  transferPetitionOwnership: Array<{
+    permissions: Array<Permission_PetitionUserPermission_Fragment>;
+  }>;
 };
 
 export type GetSubscriptions_SubscriptionQueryVariables = Exact<{
