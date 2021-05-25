@@ -2791,17 +2791,17 @@ export class PetitionRepository extends BaseRepository {
   ) {
     return this.withTransaction(async (t) => {
       const [
-        { rows: directlyAssignedNewUserPermissions },
-        { rows: userGroupNewPermissions },
-        { rows: groupAssignedNewUserPermissions },
+        directlyAssignedNewUserPermissions,
+        userGroupNewPermissions,
+        groupAssignedNewUserPermissions,
       ] = await Promise.all([
         userIds.length > 0
-          ? t.raw<{ rows: PetitionUser[] }>(
+          ? this.raw<PetitionUser>(
               /* sql */ `
-        ? ON CONFLICT DO NOTHING
-          RETURNING *;`,
+                ? on conflict do nothing returning *;
+              `,
               [
-                t.from("petition_user").insert(
+                this.from("petition_user").insert(
                   petitionIds.flatMap((petitionId) =>
                     userIds.map((userId) => ({
                       petition_id: petitionId,
@@ -2813,16 +2813,17 @@ export class PetitionRepository extends BaseRepository {
                     }))
                   )
                 ),
-              ]
+              ],
+              t
             )
-          : { rows: [] },
+          : [],
         userGroupIds.length > 0
-          ? t.raw<{ rows: PetitionUser[] }>(
+          ? this.raw<PetitionUser>(
               /* sql */ `
-        ? ON CONFLICT DO NOTHING
-          RETURNING *;`,
+                ? on conflict do nothing returning *;
+              `,
               [
-                t.from("petition_user").insert(
+                this.from("petition_user").insert(
                   petitionIds.flatMap((petitionId) =>
                     userGroupIds.map((userGroupId) => ({
                       petition_id: petitionId,
@@ -2834,34 +2835,36 @@ export class PetitionRepository extends BaseRepository {
                     }))
                   )
                 ),
-              ]
+              ],
+              t
             )
-          : { rows: [] },
+          : [],
         userGroupIds.length > 0
-          ? t.raw<{ rows: PetitionUser[] }>(
+          ? this.raw<PetitionUser>(
               /* sql */ `
-        with gm as (
-          select user_id, user_group_id
-          from user_group_member 
-          where deleted_at is null and user_group_id in (${userGroupIds
-            .map(() => `(?::int)`)
-            .join(", ")})),
-          p as (
-            select petition_id from (
-              values ${petitionIds.map(() => "(?::int)").join(", ")}
-            ) as t(petition_id))
-          insert into petition_user(petition_id, user_id, from_user_group_id, is_subscribed, permission_type, created_by)
-          select p.petition_id, gm.user_id, gm.user_group_id, true, ?, ? from gm cross join p
-          on conflict do nothing;
-        `,
+              with gm as (
+                select user_id, user_group_id
+                from user_group_member 
+                where deleted_at is null and user_group_id in (${userGroupIds
+                  .map(() => `(?::int)`)
+                  .join(", ")})),
+              p as (
+                select petition_id from (
+                  values ${petitionIds.map(() => "(?::int)").join(", ")}
+                ) as t(petition_id))
+              insert into petition_user(petition_id, user_id, from_user_group_id, is_subscribed, permission_type, created_by)
+              select p.petition_id, gm.user_id, gm.user_group_id, true, ?, ? from gm cross join p
+              on conflict do nothing;
+            `,
               [
                 ...userGroupIds,
                 ...petitionIds,
                 permissionType,
                 `User:${user.id}`,
-              ]
+              ],
+              t
             )
-          : { rows: [] },
+          : [],
       ]);
 
       for (const petitionId of petitionIds) {
