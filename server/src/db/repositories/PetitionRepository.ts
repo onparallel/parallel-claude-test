@@ -2795,46 +2795,51 @@ export class PetitionRepository extends BaseRepository {
         { rows: userGroupNewPermissions },
         { rows: groupAssignedNewUserPermissions },
       ] = await Promise.all([
-        t.raw<{ rows: PetitionUser[] }>(
-          /* sql */ `
+        userIds.length > 0
+          ? t.raw<{ rows: PetitionUser[] }>(
+              /* sql */ `
         ? ON CONFLICT DO NOTHING
           RETURNING *;`,
-          [
-            this.from("petition_user").insert(
-              petitionIds.flatMap((petitionId) =>
-                userIds.map((userId) => ({
-                  petition_id: petitionId,
-                  user_id: userId,
-                  is_subscribed: true,
-                  permission_type: permissionType,
-                  created_by: `User:${user.id}`,
-                  updated_by: `User:${user.id}`,
-                }))
-              )
-            ),
-          ]
-        ),
-        t.raw<{ rows: PetitionUser[] }>(
-          /* sql */ `
+              [
+                t.from("petition_user").insert(
+                  petitionIds.flatMap((petitionId) =>
+                    userIds.map((userId) => ({
+                      petition_id: petitionId,
+                      user_id: userId,
+                      is_subscribed: true,
+                      permission_type: permissionType,
+                      created_by: `User:${user.id}`,
+                      updated_by: `User:${user.id}`,
+                    }))
+                  )
+                ),
+              ]
+            )
+          : { rows: [] },
+        userGroupIds.length > 0
+          ? t.raw<{ rows: PetitionUser[] }>(
+              /* sql */ `
         ? ON CONFLICT DO NOTHING
           RETURNING *;`,
-          [
-            this.from("petition_user").insert(
-              petitionIds.flatMap((petitionId) =>
-                userGroupIds.map((userGroupId) => ({
-                  petition_id: petitionId,
-                  user_group_id: userGroupId,
-                  is_subscribed: true,
-                  permission_type: permissionType,
-                  created_by: `User:${user.id}`,
-                  updated_by: `User:${user.id}`,
-                }))
-              )
-            ),
-          ]
-        ),
-        t.raw<{ rows: PetitionUser[] }>(
-          /* sql */ `
+              [
+                t.from("petition_user").insert(
+                  petitionIds.flatMap((petitionId) =>
+                    userGroupIds.map((userGroupId) => ({
+                      petition_id: petitionId,
+                      user_group_id: userGroupId,
+                      is_subscribed: true,
+                      permission_type: permissionType,
+                      created_by: `User:${user.id}`,
+                      updated_by: `User:${user.id}`,
+                    }))
+                  )
+                ),
+              ]
+            )
+          : { rows: [] },
+        userGroupIds.length > 0
+          ? t.raw<{ rows: PetitionUser[] }>(
+              /* sql */ `
         with gm as (
           select user_id, user_group_id
           from user_group_member 
@@ -2849,8 +2854,14 @@ export class PetitionRepository extends BaseRepository {
           select p.petition_id, gm.user_id, gm.user_group_id, true, ?, ? from gm cross join p
           on conflict do nothing;
         `,
-          [...userGroupIds, ...petitionIds, permissionType, `User:${user.id}`]
-        ),
+              [
+                ...userGroupIds,
+                ...petitionIds,
+                permissionType,
+                `User:${user.id}`,
+              ]
+            )
+          : { rows: [] },
       ]);
 
       for (const petitionId of petitionIds) {
