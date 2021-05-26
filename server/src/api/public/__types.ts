@@ -2432,12 +2432,16 @@ export type GetPermissions_PermissionsQuery = {
 
 export type SharePetition_addPetitionUserPermissionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
-  userIds: Array<Scalars["GID"]> | Scalars["GID"];
+  userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
 export type SharePetition_addPetitionUserPermissionMutation = {
   addPetitionUserPermission: Array<{
-    permissions: Array<Permission_PetitionUserPermission_Fragment>;
+    permissions: Array<
+      | Permission_PetitionUserGroupPermission_Fragment
+      | Permission_PetitionUserPermission_Fragment
+    >;
   }>;
 };
 
@@ -2459,6 +2463,16 @@ export type RemoveUserPermission_removePetitionUserPermissionMutation = {
   removePetitionUserPermission: Array<Pick<Petition, "id">>;
 };
 
+export type RemoveUserGroupPermission_removePetitionUserPermissionMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"];
+    userGroupId: Scalars["GID"];
+  }>;
+
+export type RemoveUserGroupPermission_removePetitionUserPermissionMutation = {
+  removePetitionUserPermission: Array<Pick<Petition, "id">>;
+};
+
 export type TransferPetition_transferPetitionOwnershipMutationVariables =
   Exact<{
     userId: Scalars["GID"];
@@ -2467,7 +2481,10 @@ export type TransferPetition_transferPetitionOwnershipMutationVariables =
 
 export type TransferPetition_transferPetitionOwnershipMutation = {
   transferPetitionOwnership: Array<{
-    permissions: Array<Permission_PetitionUserPermission_Fragment>;
+    permissions: Array<
+      | Permission_PetitionUserGroupPermission_Fragment
+      | Permission_PetitionUserPermission_Fragment
+    >;
   }>;
 };
 

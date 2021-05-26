@@ -652,7 +652,7 @@ export const SharePetition = schema({
   title: "SharePetition",
   type: "object",
   additionalProperties: false,
-  required: ["userIds" /*, "permissionType"*/],
+  required: [],
   properties: {
     userIds: {
       description: "IDs of the users you want to share the petition with",
@@ -660,6 +660,14 @@ export const SharePetition = schema({
       items: {
         type: "string",
         example: toGlobalId("User", 42),
+      },
+    },
+    userGroupIds: {
+      description: "IDs of the user groups you want to share the petition with",
+      type: "array",
+      items: {
+        type: "string",
+        example: toGlobalId("UserGroup", 42),
       },
     },
     // permissionType: {

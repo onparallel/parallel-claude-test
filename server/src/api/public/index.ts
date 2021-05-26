@@ -105,6 +105,8 @@ import {
   PetitionFieldType,
   PetitionReplies_RepliesQuery,
   PetitionReplies_RepliesQueryVariables,
+  RemoveUserGroupPermission_removePetitionUserPermissionMutation,
+  RemoveUserGroupPermission_removePetitionUserPermissionMutationVariables,
   RemoveUserPermission_removePetitionUserPermissionMutation,
   RemoveUserPermission_removePetitionUserPermissionMutationVariables,
   SharePetition_addPetitionUserPermissionMutation,
@@ -822,7 +824,7 @@ api
       operationId: "SharePetition",
       summary: "Share the petition",
       description: outdent`
-        Share the specified petition with users from your organization, giving them \`WRITE\` permissions.
+        Share the specified petition with users and groups from your organization, giving them \`WRITE\` permissions.
       `,
       body: JsonBody(SharePetition),
       responses: {
@@ -838,17 +840,17 @@ api
         gql`
           mutation SharePetition_addPetitionUserPermission(
             $petitionId: GID!
-            $userIds: [GID!]!
+            $userIds: [GID!]
+            $userGroupIds: [GID!]
           ) {
             addPetitionUserPermission(
               petitionIds: [$petitionId]
               userIds: $userIds
+              userGroupIds: $userGroupIds
               permissionType: WRITE
             ) {
               permissions {
-                ... on PetitionUserPermission {
-                  ...Permission
-                }
+                ...Permission
               }
             }
           }
@@ -857,6 +859,7 @@ api
         {
           petitionId: params.petitionId,
           userIds: body.userIds,
+          userGroupIds: body.userGroupIds,
         }
       );
 
@@ -900,7 +903,7 @@ const userId = idParam({
 });
 
 api
-  .path("/petitions/:petitionId/permissions/:userId", {
+  .path("/petitions/:petitionId/permissions/user/:userId", {
     params: { petitionId, userId },
   })
   .delete(
@@ -934,6 +937,52 @@ api
         {
           petitionId: params.petitionId,
           userId: params.userId,
+        }
+      );
+      return NoContent();
+    }
+  );
+
+const userGroupId = idParam({
+  type: "UserGroup",
+  description: "The ID of the user group",
+});
+
+api
+  .path("/petitions/:petitionId/permissions/group/:userGroupId", {
+    params: { petitionId, userGroupId },
+  })
+  .delete(
+    {
+      operationId: "RemoveUserGroupPermission",
+      summary: "Delete a permission",
+      description: outdent`
+        Stop sharing the specified petition with the specified user group.
+      `,
+      tags: ["Petition Sharing"],
+      responses: { 204: SuccessResponse() },
+    },
+    async ({ client, params }) => {
+      await client.request<
+        RemoveUserGroupPermission_removePetitionUserPermissionMutation,
+        RemoveUserGroupPermission_removePetitionUserPermissionMutationVariables
+      >(
+        gql`
+          mutation RemoveUserGroupPermission_removePetitionUserPermission(
+            $petitionId: GID!
+            $userGroupId: GID!
+          ) {
+            removePetitionUserPermission(
+              petitionIds: [$petitionId]
+              userGroupIds: [$userGroupId]
+            ) {
+              id
+            }
+          }
+        `,
+        {
+          petitionId: params.petitionId,
+          userGroupId: params.userGroupId,
         }
       );
       return NoContent();
@@ -974,9 +1023,7 @@ api
               userId: $userId
             ) {
               permissions {
-                ... on PetitionUserPermission {
-                  ...Permission
-                }
+                ...Permission
               }
             }
           }
