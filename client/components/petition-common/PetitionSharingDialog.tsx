@@ -56,7 +56,7 @@ import {
 import { UserPermissionType } from "./UserPermissionType";
 
 type PetitionSharingDialogData = {
-  users: UserSelectSelection[];
+  selection: UserSelectSelection[];
   notify: boolean;
   message: string;
 };
@@ -107,7 +107,7 @@ export function PetitionSharingDialog({
     useForm<PetitionSharingDialogData>({
       mode: "onChange",
       defaultValues: {
-        users: [],
+        selection: [],
         notify: true,
         message: "",
       },
@@ -167,12 +167,20 @@ export function PetitionSharingDialog({
     usePetitionSharingModal_addPetitionUserPermissionMutation();
 
   const handleAddUserPermissions = handleSubmit(
-    async ({ users, notify, message }) => {
+    async ({ selection, notify, message }) => {
+      const users = selection
+        .filter((s) => s.__typename === "User")
+        .map((u) => u.id);
+      const groups = selection
+        .filter((s) => s.__typename === "UserGroup")
+        .map((g) => g.id);
+
       try {
         await addPetitionUserPermission({
           variables: {
             petitionIds: petitionsOwned.map((p) => p!.id),
-            userIds: users.map((u) => u.id),
+            userIds: users.length ? users : null,
+            userGroupIds: groups.length ? groups : null,
             permissionType: "WRITE",
             notify,
             message: message || null,
@@ -254,7 +262,7 @@ export function PetitionSharingDialog({
             <Stack direction="row">
               <Box flex="1">
                 <Controller
-                  name="users"
+                  name="selection"
                   control={control}
                   rules={{ minLength: 1 }}
                   render={({ field: { onChange, onBlur, value } }) => (
@@ -531,8 +539,8 @@ PetitionSharingDialog.mutations = [
   gql`
     mutation PetitionSharingModal_addPetitionUserPermission(
       $petitionIds: [GID!]!
-      $userIds: [GID!]!
-      $userGroupIds: [GID!]!
+      $userIds: [GID!]
+      $userGroupIds: [GID!]
       $permissionType: PetitionUserPermissionTypeRW!
       $notify: Boolean
       $message: String
@@ -553,13 +561,13 @@ PetitionSharingDialog.mutations = [
   gql`
     mutation PetitionSharingModal_removePetitionUserPermission(
       $petitionId: GID!
-      $userId: GID!
-      $userGroupId: GID!
+      $userIds: [GID!]
+      $userGroupIds: [GID!]
     ) {
       removePetitionUserPermission(
         petitionIds: [$petitionId]
-        userIds: [$userId]
-        userGroupIds: [$userGroupId]
+        userIds: $userIds
+        userGroupIds: $userGroupIds
       ) {
         ...PetitionSharingModal_Petition
       }
@@ -601,7 +609,7 @@ function useRemoveUserPermission() {
       try {
         await confirmRemoveUserPermission({ user });
         await removePetitionUserPermission({
-          variables: { petitionId, userId: user.id },
+          variables: { petitionId, userIds: [user.id] },
           refetchQueries: [getOperationName(PetitionActivityDocument)!],
         });
       } catch {}

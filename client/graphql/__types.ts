@@ -3536,8 +3536,8 @@ export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
 export type PetitionSharingModal_addPetitionUserPermissionMutationVariables =
   Exact<{
     petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
-    userIds: Array<Scalars["GID"]> | Scalars["GID"];
-    userGroupIds: Array<Scalars["GID"]> | Scalars["GID"];
+    userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+    userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
     permissionType: PetitionUserPermissionTypeRW;
     notify?: Maybe<Scalars["Boolean"]>;
     message?: Maybe<Scalars["String"]>;
@@ -3556,8 +3556,8 @@ export type PetitionSharingModal_addPetitionUserPermissionMutation = {
 export type PetitionSharingModal_removePetitionUserPermissionMutationVariables =
   Exact<{
     petitionId: Scalars["GID"];
-    userId: Scalars["GID"];
-    userGroupId: Scalars["GID"];
+    userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+    userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
   }>;
 
 export type PetitionSharingModal_removePetitionUserPermissionMutation = {
@@ -9135,8 +9135,8 @@ export type PetitionSettings_startPetitionSignatureRequestMutationHookResult =
 export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_addPetitionUserPermission(
     $petitionIds: [GID!]!
-    $userIds: [GID!]!
-    $userGroupIds: [GID!]!
+    $userIds: [GID!]
+    $userGroupIds: [GID!]
     $permissionType: PetitionUserPermissionTypeRW!
     $notify: Boolean
     $message: String
@@ -9194,13 +9194,13 @@ export type PetitionSharingModal_addPetitionUserPermissionMutationHookResult =
 export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
   mutation PetitionSharingModal_removePetitionUserPermission(
     $petitionId: GID!
-    $userId: GID!
-    $userGroupId: GID!
+    $userIds: [GID!]
+    $userGroupIds: [GID!]
   ) {
     removePetitionUserPermission(
       petitionIds: [$petitionId]
-      userIds: [$userId]
-      userGroupIds: [$userGroupId]
+      userIds: $userIds
+      userGroupIds: $userGroupIds
     ) {
       ...PetitionSharingModal_Petition
     }
@@ -9222,8 +9222,8 @@ export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
  * const [petitionSharingModalRemovePetitionUserPermissionMutation, { data, loading, error }] = usePetitionSharingModal_removePetitionUserPermissionMutation({
  *   variables: {
  *      petitionId: // value for 'petitionId'
- *      userId: // value for 'userId'
- *      userGroupId: // value for 'userGroupId'
+ *      userIds: // value for 'userIds'
+ *      userGroupIds: // value for 'userGroupIds'
  *   },
  * });
  */
