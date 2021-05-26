@@ -364,6 +364,29 @@ export class Mocks {
     );
   }
 
+  async sharePetitionWithGroups(petitionId: number, userGroupIds: number[]) {
+    await this.knex<PetitionUser>("petition_user").insert(
+      userGroupIds.map((groupId) => ({
+        petition_id: petitionId,
+        user_group_id: groupId,
+        permission_type: "WRITE",
+      }))
+    );
+
+    const members = await this.knex<UserGroupMember>("user_group_member")
+      .whereNull("deleted_at")
+      .whereIn("user_group_id", userGroupIds);
+
+    await this.knex<PetitionUser>("petition_user").insert(
+      members.map((m) => ({
+        petition_id: petitionId,
+        from_user_group_id: m.user_group_id,
+        user_id: m.user_id,
+        permission_type: "WRITE",
+      }))
+    );
+  }
+
   async clearSubscriptions() {
     await this.knex("petition_event_subscription").delete();
   }

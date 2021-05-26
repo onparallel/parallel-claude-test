@@ -2724,7 +2724,9 @@ export class PetitionRepository extends BaseRepository {
       q
         .whereNull("deleted_at")
         .whereNull("from_user_group_id")
-        .orderByRaw("permission_type asc, created_at")
+        .orderByRaw(
+          "permission_type asc, user_group_id nulls first, created_at"
+        )
   );
 
   readonly loadDirectlyAssignedUserPetitionPermissions =
@@ -2984,7 +2986,7 @@ export class PetitionRepository extends BaseRepository {
       const removedPermissions = await this.from("petition_user", t)
         .whereIn("petition_id", petitionIds)
         .whereNull("deleted_at")
-        .whereNot("user_id", user.id)
+        .where((q) => q.whereNot("user_id", user.id).orWhereNull("user_id"))
         .mmodify((q) => {
           if (!removeAll) {
             q.whereIn("user_id", userIds)

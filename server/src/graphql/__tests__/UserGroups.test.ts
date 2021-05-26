@@ -56,7 +56,9 @@ describe("GraphQL/UserGroups", () => {
     await mocks.knex.from("petition_user").delete();
     await mocks.knex.from("user_group_member").delete();
     await mocks.knex.from("user_group").delete();
-    userGroups = await mocks.createUserGroups(3, organization.id);
+    userGroups = await mocks.createUserGroups(3, organization.id, (i) => ({
+      name: i === 0 ? "First Group" : i === 1 ? "Second Group" : "Third Group",
+    }));
     users = await mocks.createRandomUsers(organization.id, 4);
     await mocks.insertUserGroupMembers(
       userGroups[0].id,
@@ -69,21 +71,9 @@ describe("GraphQL/UserGroups", () => {
         petition_id: petition.id,
         permission_type: "OWNER",
       },
-      {
-        user_group_id: userGroups[0].id,
-        petition_id: petition.id,
-        permission_type: "WRITE",
-      },
-      ...users.slice(0, 3).map(
-        (user) =>
-          ({
-            from_user_group_id: userGroups[0].id,
-            petition_id: petition.id,
-            user_id: user.id,
-            permission_type: "WRITE",
-          } as PetitionUser)
-      ),
     ]);
+
+    await mocks.sharePetitionWithGroups(petition.id, [userGroups[0].id]);
   });
 
   it("lists all available user groups in the org", async () => {
@@ -163,7 +153,7 @@ describe("GraphQL/UserGroups", () => {
         }
       `,
       variables: {
-        search: userGroups[1].name.substr(0, 5),
+        search: "Sec",
       },
     });
 

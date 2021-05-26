@@ -20,7 +20,7 @@ import {
 
 export function createTestContainer() {
   const container = createContainer();
-  container.rebind<IAuth>(AUTH).to(MockAuth);
+  container.rebind<IAuth>(AUTH).to(MockAuth).inSingletonScope();
   container.rebind<IRedis>(REDIS).to(MockRedis);
   container.rebind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService);
   container

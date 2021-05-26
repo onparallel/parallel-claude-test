@@ -271,8 +271,11 @@ export const deletePetitions = mutationField("deletePetitions", {
     function userHasAccessViaGroup(p: PetitionUser[]) {
       return (
         p?.length > 1 &&
+        !p.find(
+          (u) => u.user_id === ctx.user!.id && u.permission_type === "OWNER" // user is not the owner
+        ) &&
         p.find(
-          (u) => u.user_id === ctx.user!.id && u.from_user_group_id !== null
+          (u) => u.user_id === ctx.user!.id && u.from_user_group_id !== null // has access via group
         )
       );
     }

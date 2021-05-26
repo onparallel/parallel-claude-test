@@ -9,9 +9,12 @@ import {
   Organization,
   Petition,
   PetitionField,
+  PetitionUser,
   Tag,
   User,
+  UserGroup,
 } from "../../db/__types";
+import { AUTH, IAuth } from "../../services/auth";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
 import { initServer, TestClient } from "./server";
@@ -1282,6 +1285,91 @@ describe("GraphQL/Petitions", () => {
       });
       expect(errors).toContainGraphQLError("DELETE_SHARED_PETITION_ERROR");
       expect(data).toBeNull();
+    });
+  });
+
+  describe("deletePetitions shared with groups", () => {
+    let petition: Petition;
+    let users: User[];
+    let userGroup: UserGroup;
+
+    beforeAll(async () => {
+      [petition] = await mocks.createRandomPetitions(
+        sessionUser.org_id,
+        sessionUser.id,
+        1
+      );
+      users = await mocks.createRandomUsers(sessionUser.org_id, 2);
+      [userGroup] = await mocks.createUserGroups(1, sessionUser.org_id);
+      await mocks.insertUserGroupMembers(userGroup.id, [
+        sessionUser.id,
+        ...users.map((u) => u.id),
+      ]);
+      await mocks.sharePetitionWithGroups(petition.id, [userGroup.id]);
+      await mocks.knex<PetitionUser>("petition_user").insert({
+        user_id: users[1].id,
+        permission_type: "READ",
+        petition_id: petition.id,
+      });
+    });
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it("R/W user with group permissions should not be able to delete", async () => {
+      jest
+        .spyOn(testClient.container.get<IAuth>(AUTH), "validateSession")
+        .mockResolvedValueOnce(users[0]);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($ids: [GID!]!) {
+            deletePetitions(ids: $ids, force: true)
+          }
+        `,
+        variables: { ids: [toGlobalId("Petition", petition.id)] },
+      });
+
+      expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("R/W user with directly assigned and group permissions should not be able to delete", async () => {
+      jest
+        .spyOn(testClient.container.get<IAuth>(AUTH), "validateSession")
+        .mockResolvedValueOnce(users[1]);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($ids: [GID!]!) {
+            deletePetitions(ids: $ids, force: true)
+          }
+        `,
+        variables: { ids: [toGlobalId("Petition", petition.id)] },
+      });
+      expect(errors).toContainGraphQLError("DELETE_GROUP_PETITION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("petition owner with group access should be able to delete it", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($ids: [GID!]!) {
+            deletePetitions(ids: $ids, force: true)
+          }
+        `,
+        variables: { ids: [toGlobalId("Petition", petition.id)] },
+      });
+      expect(errors).toBeUndefined();
+      expect(data.deletePetitions).toBe("SUCCESS");
+
+      const petitionPermissions = await mocks.knex
+        .from("petition_user")
+        .where("petition_id", petition.id)
+        .whereNull("deleted_at")
+        .returning("*");
+
+      expect(petitionPermissions).toHaveLength(0);
     });
   });
 

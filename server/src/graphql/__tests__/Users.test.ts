@@ -214,19 +214,7 @@ describe("GraphQL/Users", () => {
       // create a group, add user as member and share a petition with the group
       const [group] = await mocks.createUserGroups(1, organization.id);
       await mocks.insertUserGroupMembers(group.id, [activeUsers[0].id]);
-      await mocks.knex<PetitionUser>("petition_user").insert([
-        {
-          petition_id: user0Petition.id,
-          user_group_id: group.id,
-          permission_type: "WRITE",
-        },
-        {
-          petition_id: user0Petition.id,
-          user_id: activeUsers[0].id,
-          permission_type: "WRITE",
-          from_user_group_id: group.id,
-        },
-      ]);
+      await mocks.sharePetitionWithGroups(user0Petition.id, [group.id]);
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
