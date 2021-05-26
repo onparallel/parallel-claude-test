@@ -7,7 +7,6 @@ export interface LogoProps extends BoxProps {
 export function Logo({ hideText, ...rest }: LogoProps) {
   return (
     <>
-      <VisuallyHidden>Parallel</VisuallyHidden>
       <Box
         as="svg"
         {...rest}
@@ -43,6 +42,7 @@ export function Logo({ hideText, ...rest }: LogoProps) {
           />
         </mask>
       </Box>
+      <VisuallyHidden>Parallel</VisuallyHidden>
     </>
   );
 }

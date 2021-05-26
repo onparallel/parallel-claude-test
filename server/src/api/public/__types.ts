@@ -396,11 +396,6 @@ export type MutationaddUsersToUserGroupArgs = {
   userIds: Array<Scalars["GID"]>;
 };
 
-export type MutationaddUsersToUserGroupArgs = {
-  userGroupId: Scalars["GID"];
-  userIds: Array<Scalars["GID"]>;
-};
-
 export type MutationassignPetitionToUserArgs = {
   petitionId: Scalars["ID"];
   userId: Scalars["Int"];

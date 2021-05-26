@@ -19,6 +19,9 @@ const result: PossibleTypesResultData = {
       "AccessOpenedEvent",
       "CommentDeletedEvent",
       "CommentPublishedEvent",
+      "GroupPermissionAddedEvent",
+      "GroupPermissionEditedEvent",
+      "GroupPermissionRemovedEvent",
       "MessageCancelledEvent",
       "MessageScheduledEvent",
       "MessageSentEvent",
@@ -39,6 +42,10 @@ const result: PossibleTypesResultData = {
       "UserPermissionEditedEvent",
       "UserPermissionRemovedEvent",
     ],
+    PetitionPermission: [
+      "PetitionUserGroupPermission",
+      "PetitionUserPermission",
+    ],
     PublicUserOrContact: ["PublicContact", "PublicUser"],
     Timestamps: [
       "Contact",
@@ -46,6 +53,7 @@ const result: PossibleTypesResultData = {
       "PetitionAccess",
       "PetitionFieldReply",
       "PetitionSignatureRequest",
+      "PetitionUserGroupPermission",
       "PetitionUserPermission",
       "PublicPetition",
       "PublicPetitionFieldReply",

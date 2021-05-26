@@ -33,6 +33,8 @@ import {
   ContactUserQuery,
   Contact_PetitionAccessFragment,
   Contact_UserFragment,
+  PetitionUserGroupPermission,
+  PetitionUserPermission,
   useContactQuery,
   useContactUserQuery,
   useContact_updateContactMutation,
@@ -245,6 +247,7 @@ type PetitionAccessSelection = Contact_PetitionAccessFragment;
 
 function useContactPetitionAccessesColumns() {
   const intl = useIntl();
+
   return useMemo(
     () =>
       [
@@ -305,13 +308,21 @@ function useContactPetitionAccessesColumns() {
           }),
           align: "center",
           cellProps: { width: "1%" },
-          CellContent: ({ row: { petition }, column }) => (
-            <Flex justifyContent={column.align}>
-              <UserAvatarList
-                users={petition!.userPermissions.map((p) => p.user)}
-              />
-            </Flex>
-          ),
+          CellContent: ({ row: { petition }, column }) => {
+            const userPermissions = petition!.permissions.filter(
+              (p) => p.__typename === "PetitionUserPermission"
+            ) as PetitionUserPermission[];
+
+            const groupPermissions = petition!.permissions.filter(
+              (p) => p.__typename === "PetitionUserGroupPermission"
+            ) as PetitionUserGroupPermission[];
+
+            return (
+              <Flex justifyContent={column.align}>
+                <UserAvatarList users={userPermissions.map((p) => p.user)} />
+              </Flex>
+            );
+          },
         },
         {
           key: "createdAt",
@@ -381,11 +392,19 @@ Contact.fragments = {
       id
       name
       createdAt
-      userPermissions {
+      permissions {
         permissionType
-        user {
-          id
-          ...UserAvatarList_User
+        ... on PetitionUserPermission {
+          user {
+            id
+            ...UserAvatarList_User
+          }
+        }
+        ... on PetitionUserGroupPermission {
+          group {
+            id
+            name
+          }
         }
       }
       ...PetitionStatusCellContent_Petition

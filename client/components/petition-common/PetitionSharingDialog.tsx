@@ -31,6 +31,8 @@ import {
 import {
   PetitionActivityDocument,
   PetitionSharingModal_UserFragment,
+  PetitionUserGroupPermission,
+  PetitionUserPermission,
   usePetitionSharingModal_addPetitionUserPermissionMutation,
   usePetitionSharingModal_PetitionsUserPermissionsQuery,
   usePetitionSharingModal_removePetitionUserPermissionMutation,
@@ -84,7 +86,15 @@ export function PetitionSharingDialog({
 
   const petitionId = petitionIds[0];
   const petitionsById = data?.petitionsById;
-  const userPermissions = petitionsById?.[0]?.userPermissions;
+
+  const userPermissions = petitionsById?.[0]?.permissions.filter(
+    (p) => p.__typename === "PetitionUserPermission"
+  ) as PetitionUserPermission[];
+
+  const groupPermissions = petitionsById?.[0]?.permissions.filter(
+    (p) => p.__typename === "PetitionUserGroupPermission"
+  ) as PetitionUserGroupPermission[];
+
   const prev = usePreviousValue(userPermissions);
 
   useEffect(() => {
@@ -105,14 +115,20 @@ export function PetitionSharingDialog({
 
   const petitionsOwned =
     petitionsById?.filter((petition) =>
-      petition?.userPermissions.some(
-        (up) => up.permissionType === "OWNER" && up.user.id === userId
+      petition?.permissions.some(
+        (up) =>
+          up.permissionType === "OWNER" &&
+          up.__typename === "PetitionUserPermission" &&
+          up.user.id === userId
       )
     ) ?? [];
   const petitionsRW =
     petitionsById?.filter((petition) =>
-      petition?.userPermissions.some(
-        (up) => up.permissionType !== "OWNER" && up.user.id === userId
+      petition?.permissions.some(
+        (up) =>
+          up.permissionType !== "OWNER" &&
+          up.__typename === "PetitionUserPermission" &&
+          up?.user.id === userId
       )
     ) ?? [];
 
@@ -150,6 +166,30 @@ export function PetitionSharingDialog({
   const [addPetitionUserPermission] =
     usePetitionSharingModal_addPetitionUserPermissionMutation();
 
+  const handleAddUserPermissions = handleSubmit(
+    async ({ users, notify, message }) => {
+      try {
+        await addPetitionUserPermission({
+          variables: {
+            petitionIds: petitionsOwned.map((p) => p!.id),
+            userIds: users.map((u) => u.id),
+            permissionType: "WRITE",
+            notify,
+            message: message || null,
+          },
+          refetchQueries: [getOperationName(PetitionActivityDocument)!],
+        });
+        toast({
+          title: getSuccesTitle(),
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        props.onResolve();
+      } catch {}
+    }
+  );
+
   const getSuccesTitle = () => {
     const template = intl.formatMessage(
       {
@@ -175,30 +215,6 @@ export function PetitionSharingDialog({
 
     return isTemplate ? template : petition;
   };
-
-  const handleAddUserPermissions = handleSubmit(
-    async ({ users, notify, message }) => {
-      try {
-        await addPetitionUserPermission({
-          variables: {
-            petitionIds: petitionsOwned.map((p) => p!.id),
-            userIds: users.map((u) => u.id),
-            permissionType: "WRITE",
-            notify,
-            message: message || null,
-          },
-          refetchQueries: [getOperationName(PetitionActivityDocument)!],
-        });
-        toast({
-          title: getSuccesTitle(),
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        props.onResolve();
-      } catch {}
-    }
-  );
 
   const notify = watch("notify");
   useEffect(() => {
@@ -480,11 +496,18 @@ PetitionSharingDialog.fragments = {
       fragment PetitionSharingModal_Petition on PetitionBase {
         id
         name
-        userPermissions {
+        permissions {
           permissionType
-          user {
-            id
-            ...PetitionSharingModal_User
+          ... on PetitionUserPermission {
+            user {
+              id
+              ...PetitionSharingModal_User
+            }
+          }
+          ... on PetitionUserGroupPermission {
+            group {
+              id
+            }
           }
         }
       }
@@ -509,6 +532,7 @@ PetitionSharingDialog.mutations = [
     mutation PetitionSharingModal_addPetitionUserPermission(
       $petitionIds: [GID!]!
       $userIds: [GID!]!
+      $userGroupIds: [GID!]!
       $permissionType: PetitionUserPermissionTypeRW!
       $notify: Boolean
       $message: String
@@ -516,6 +540,7 @@ PetitionSharingDialog.mutations = [
       addPetitionUserPermission(
         petitionIds: $petitionIds
         userIds: $userIds
+        userGroupIds: $userGroupIds
         permissionType: $permissionType
         notify: $notify
         message: $message
@@ -529,10 +554,12 @@ PetitionSharingDialog.mutations = [
     mutation PetitionSharingModal_removePetitionUserPermission(
       $petitionId: GID!
       $userId: GID!
+      $userGroupId: GID!
     ) {
       removePetitionUserPermission(
         petitionIds: [$petitionId]
         userIds: [$userId]
+        userGroupIds: [$userGroupId]
       ) {
         ...PetitionSharingModal_Petition
       }

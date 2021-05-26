@@ -103,9 +103,11 @@ export function PetitionHeader({
     } catch {}
   };
 
-  const isSubscribed =
-    petition.userPermissions.find((up) => up.user.id === user.id)
-      ?.isSubscribed ?? false;
+  // const isSubscribed =
+  //   petition.userPermissions.find((up) => up.user.id === user.id)
+  //     ?.isSubscribed ?? false;
+
+  const isSubscribed = petition.myEffectivePermissions.isSubscribed;
 
   const [updatePetitionUserSubscription] =
     usePetitionHeader_updatePetitionUserSubscriptionMutation();
@@ -469,11 +471,9 @@ PetitionHeader.fragments = {
       locale
       deadline
       status
-      userPermissions {
+
+      myEffectivePermissions {
         isSubscribed
-        user {
-          id
-        }
       }
       ...HeaderNameEditable_PetitionBase
     }
@@ -507,11 +507,8 @@ PetitionHeader.mutations = [
         isSubscribed: $isSubscribed
       ) {
         id
-        userPermissions {
+        myEffectivePermissions {
           isSubscribed
-          user {
-            id
-          }
         }
       }
     }

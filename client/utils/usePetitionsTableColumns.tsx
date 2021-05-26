@@ -12,6 +12,7 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   PetitionBaseType,
+  PetitionUserPermission,
   usePetitionsTableColumns_PetitionBaseFragment,
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
@@ -190,9 +191,13 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           }),
           align: "center",
           cellProps: { width: "1%" },
-          CellContent: ({ row: { userPermissions }, column }) => (
+          CellContent: ({ row: { permissions }, column }) => (
             <Flex justifyContent={column.align}>
-              <UserAvatarList users={userPermissions.map((p) => p.user)} />
+              <UserAvatarList
+                users={permissions
+                  .filter((p) => p.__typename === "PetitionUserPermission")
+                  .map((p) => p.user)}
+              />
             </Flex>
           ),
         },
@@ -244,11 +249,17 @@ usePetitionsTableColumns.fragments = {
       id
       name
       createdAt
-      userPermissions {
+      permissions {
         permissionType
-        user {
-          id
-          ...UserAvatarList_User
+        ... on PetitionUserPermission {
+          user {
+            ...UserAvatarList_User
+          }
+        }
+        ... on PetitionUserGroupPermission {
+          group {
+            id
+          }
         }
       }
       ...PetitionTagListCellContent_PetitionBase

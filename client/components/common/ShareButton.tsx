@@ -1,7 +1,11 @@
 import { gql } from "@apollo/client";
 import { Button, ButtonProps, Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
-import { ShareButton_PetitionBaseFragment } from "@parallel/graphql/__types";
+import {
+  PetitionUserGroupPermission,
+  PetitionUserPermission,
+  ShareButton_PetitionBaseFragment,
+} from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { SmallPopover } from "./SmallPopover";
 
@@ -13,17 +17,25 @@ export function ShareButton({
   petition: ShareButton_PetitionBaseFragment;
   userId: string;
 }) {
+  const userPermissions = petition!.permissions.filter(
+    (p) => p.__typename === "PetitionUserPermission"
+  ) as PetitionUserPermission[];
+
+  const groupPermissions = petition!.permissions.filter(
+    (p) => p.__typename === "PetitionUserGroupPermission"
+  ) as PetitionUserGroupPermission[];
+
   return (
     <SmallPopover
       content={
-        petition.userPermissions.length > 1 ? (
+        userPermissions.length > 1 ? (
           <Text>
             <FormattedMessage
               id="component.share-button.shared-with"
               defaultMessage="Shared with:"
             />{" "}
             <FormattedList
-              value={petition.userPermissions
+              value={userPermissions
                 .filter(({ user }) => user.id !== userId)
                 .map(({ user }) => user.fullName)}
             />
@@ -59,10 +71,19 @@ export function ShareButton({
 ShareButton.fragments = {
   PetitionBase: gql`
     fragment ShareButton_PetitionBase on PetitionBase {
-      userPermissions {
-        user {
-          id
-          fullName
+      permissions {
+        permissionType
+        ... on PetitionUserPermission {
+          user {
+            id
+            fullName
+          }
+        }
+        ... on PetitionUserGroupPermission {
+          group {
+            id
+            name
+          }
         }
       }
     }
