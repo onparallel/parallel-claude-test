@@ -410,6 +410,46 @@
     "context": "Open file in NetDocuments"
   },
   {
+    "term": "component.file-icon.audio-file",
+    "definition": "Archivo de audio",
+    "context": "Audio file"
+  },
+  {
+    "term": "component.file-icon.document-file",
+    "definition": "Documento de texto",
+    "context": "Document file"
+  },
+  {
+    "term": "component.file-icon.image-file",
+    "definition": "Archivo de imagen",
+    "context": "Image file"
+  },
+  {
+    "term": "component.file-icon.other-file",
+    "definition": "Archivo",
+    "context": "File"
+  },
+  {
+    "term": "component.file-icon.pdf-file",
+    "definition": "Archivo PDF",
+    "context": "PDF file"
+  },
+  {
+    "term": "component.file-icon.spreadsheet-file",
+    "definition": "Archivo de hoja de cálculo",
+    "context": "Spreadsheet file"
+  },
+  {
+    "term": "component.file-icon.video-file",
+    "definition": "Archivo de video",
+    "context": "Video file"
+  },
+  {
+    "term": "component.file-icon.zip-file",
+    "definition": "Archivo ZIP",
+    "context": "Zip file"
+  },
+  {
     "term": "component.generate-new-token-dialog.api-key-label",
     "definition": "Token API",
     "context": "API token"

@@ -16,10 +16,10 @@ import {
   CloseIcon,
   DeleteIcon,
   DownloadIcon,
-  HelpOutlineIcon,
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Dropzone } from "@parallel/components/common/Dropzone";
+import { FileIcon } from "@parallel/components/common/FileIcon";
 import { FileName } from "@parallel/components/common/FileName";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -196,9 +196,11 @@ export function RecipientViewPetitionFieldReplyFileUpload({
         fontWeight="bold"
         textTransform="uppercase"
       >
-        {reply.content.extension ?? (
-          <HelpOutlineIcon fontSize="18px" opacity={0.4} />
-        )}
+        <FileIcon
+          boxSize={5}
+          filename={reply.content!.filename}
+          contentType={reply.content!.contentType}
+        />
       </Center>
       <Box flex="1" overflow="hidden" paddingBottom="2px">
         <Flex minWidth={0} whiteSpace="nowrap" alignItems="baseline">
