@@ -1,11 +1,11 @@
 import gql from "graphql-tag";
 import { Knex } from "knex";
+import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import { Organization, Petition, User, UserGroup } from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/Petition Permissions", () => {
@@ -332,6 +332,63 @@ describe("GraphQL/Petition Permissions", () => {
   });
 
   describe("addPetitionUserPermission", () => {
+    it("creates an event when sharing petition with new group", async () => {
+      const [group] = await mocks.createUserGroups(1, organization.id);
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionIds: [GID!]!
+            $userGroupIds: [GID!]!
+            $type: PetitionUserPermissionTypeRW!
+          ) {
+            addPetitionUserPermission(
+              petitionIds: $petitionIds
+              userGroupIds: $userGroupIds
+              permissionType: $type
+              notify: false
+              message: "hello!"
+            ) {
+              id
+              events(limit: 1000, offset: 0) {
+                totalCount
+                items {
+                  __typename
+                  ... on GroupPermissionAddedEvent {
+                    permissionType
+                    permissionGroup {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userGroupIds: [toGlobalId("UserGroup", group.id)],
+          type: "READ",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.addPetitionUserPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                __typename: "GroupPermissionAddedEvent",
+                permissionType: "READ",
+                permissionGroup: { id: toGlobalId("UserGroup", group.id) },
+              },
+            ],
+          },
+        },
+      ]);
+    });
+
     it("adds new permissions on a given petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -880,6 +937,76 @@ describe("GraphQL/Petition Permissions", () => {
         },
       ]);
     });
+
+    it("creates user and group events when sharing petition", async () => {
+      const groups = await mocks.createUserGroups(2, organization.id);
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionIds: [GID!]!
+            $userGroupIds: [GID!]!
+            $userIds: [GID!]!
+            $type: PetitionUserPermissionTypeRW!
+          ) {
+            addPetitionUserPermission(
+              petitionIds: $petitionIds
+              userGroupIds: $userGroupIds
+              userIds: $userIds
+              permissionType: $type
+            ) {
+              id
+              events(limit: 1000, offset: 0) {
+                totalCount
+                items {
+                  __typename
+                  ... on GroupPermissionAddedEvent {
+                    permissionType
+                    permissionGroup {
+                      id
+                    }
+                  }
+                  ... on UserPermissionAddedEvent {
+                    permissionType
+                    permissionUser {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userGroupIds: [userGroup, ...groups].map((g) =>
+            toGlobalId("UserGroup", g.id)
+          ),
+          userIds: userGroupMembers.map((m) => toGlobalId("User", m.id)),
+          type: "READ",
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data.addPetitionUserPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          events: {
+            totalCount: 4,
+            items: [
+              ...userGroupMembers.map((u) => ({
+                __typename: "UserPermissionAddedEvent",
+                permissionType: "READ",
+                permissionUser: { id: toGlobalId("User", u.id) },
+              })),
+              ...groups.map((g) => ({
+                __typename: "GroupPermissionAddedEvent",
+                permissionType: "READ",
+                permissionGroup: { id: toGlobalId("UserGroup", g.id) },
+              })),
+            ],
+          },
+        },
+      ]);
+    });
   });
 
   describe("editPetitionUserPermission", () => {
@@ -951,6 +1078,60 @@ describe("GraphQL/Petition Permissions", () => {
               group: { id: toGlobalId("UserGroup", userGroup.id) },
             },
           ],
+        },
+      ]);
+    });
+
+    it("creates group event when editing petition permissions on a group", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionIds: [GID!]!
+            $userGroupIds: [GID!]!
+            $type: PetitionUserPermissionType!
+          ) {
+            editPetitionUserPermission(
+              petitionIds: $petitionIds
+              userGroupIds: $userGroupIds
+              permissionType: $type
+            ) {
+              id
+              events(limit: 1000, offset: 0) {
+                totalCount
+                items {
+                  __typename
+                  ... on GroupPermissionEditedEvent {
+                    permissionType
+                    permissionGroup {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userGroupIds: [toGlobalId("UserGroup", userGroup.id)],
+          type: "READ",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.editPetitionUserPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          events: {
+            totalCount: 1,
+            items: [
+              {
+                __typename: "GroupPermissionEditedEvent",
+                permissionType: "READ",
+                permissionGroup: { id: toGlobalId("UserGroup", userGroup.id) },
+              },
+            ],
+          },
         },
       ]);
     });
@@ -1392,6 +1573,67 @@ describe("GraphQL/Petition Permissions", () => {
               user: { id: toGlobalId("User", orgUsers[2].id) },
             },
           ],
+        },
+      ]);
+    });
+
+    it("creates events when removing permissions on multiple groups and users", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionIds: [GID!]!
+            $userIds: [GID!]!
+            $userGroupIds: [GID!]!
+          ) {
+            removePetitionUserPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              userGroupIds: $userGroupIds
+            ) {
+              id
+              events(limit: 1000, offset: 0) {
+                totalCount
+                items {
+                  __typename
+                  ... on UserPermissionRemovedEvent {
+                    permissionUser {
+                      id
+                    }
+                  }
+                  ... on GroupPermissionRemovedEvent {
+                    permissionGroup {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userIds: [toGlobalId("User", orgUsers[1].id)],
+          userGroupIds: [toGlobalId("UserGroup", userGroup.id)],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data!.removePetitionUserPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          events: {
+            totalCount: 2,
+            items: [
+              {
+                __typename: "UserPermissionRemovedEvent",
+                permissionUser: { id: toGlobalId("User", orgUsers[1].id) },
+              },
+              {
+                __typename: "GroupPermissionRemovedEvent",
+                permissionGroup: { id: toGlobalId("UserGroup", userGroup.id) },
+              },
+            ],
+          },
         },
       ]);
     });
