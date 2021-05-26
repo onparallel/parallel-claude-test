@@ -191,8 +191,6 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           align: "center",
           cellProps: { width: "1%" },
           CellContent: ({ row: { permissions }, column }) => {
-            console.log(permissions);
-
             const users = permissions.filter(
               (p) => p.__typename === "PetitionUserPermission"
             );

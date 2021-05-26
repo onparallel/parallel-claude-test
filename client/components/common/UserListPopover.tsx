@@ -56,21 +56,15 @@ export function UserListPopover({
                     ? u.name
                     : "";
 
-                const nameElement =
+                const avatar =
                   u.__typename === "User" ? (
-                    <Text flex="1" marginLeft={2} isTruncated>
-                      {name}
-                    </Text>
+                    <Avatar size="xs" name={name ?? undefined} />
                   ) : (
-                    <Stack
-                      direction={"row"}
-                      marginLeft={2}
-                      spacing={2}
-                      align="center"
-                    >
-                      <UsersIcon />
-                      <Text isTruncated>{name}</Text>
-                    </Stack>
+                    <Avatar
+                      size="xs"
+                      bg="gray.200"
+                      icon={<UsersIcon boxSize={3.5} />}
+                    />
                   );
 
                 return (
@@ -80,8 +74,10 @@ export function UserListPopover({
                     alignItems="center"
                     paddingX={4}
                   >
-                    <Avatar size="xs" name={name ?? undefined} />
-                    {nameElement}
+                    {avatar}
+                    <Text flex="1" marginLeft={2} isTruncated>
+                      {name}
+                    </Text>
                   </Flex>
                 );
               })}
