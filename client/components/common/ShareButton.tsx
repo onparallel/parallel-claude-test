@@ -25,6 +25,13 @@ export function ShareButton({
     (p) => p.__typename === "PetitionUserGroupPermission"
   ) as PetitionUserGroupPermission[];
 
+  const names = [
+    ...userPermissions
+      .filter(({ user }) => user.id !== userId)
+      .map(({ user }) => user.fullName),
+    ...groupPermissions.map(({ group }) => group.name),
+  ];
+
   return (
     <SmallPopover
       content={
@@ -34,11 +41,7 @@ export function ShareButton({
               id="component.share-button.shared-with"
               defaultMessage="Shared with:"
             />{" "}
-            <FormattedList
-              value={userPermissions
-                .filter(({ user }) => user.id !== userId)
-                .map(({ user }) => user.fullName)}
-            />
+            <FormattedList value={names} />
           </Text>
         ) : (
           <Text>

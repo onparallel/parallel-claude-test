@@ -17,23 +17,21 @@ import {
 import { UserListPopover } from "./UserListPopover";
 
 interface UserAvatarListProps {
-  users?: UserAvatarList_UserFragment[];
-  userGroups?: UserAvatarList_UserGroupFragment[];
+  users: UserAvatarList_UserFragment[] | UserAvatarList_UserGroupFragment[];
   size?: string;
   max?: number;
 }
 
 export const UserAvatarList = Object.assign(
   chakraForwardRef<"div", UserAvatarListProps>(function UserAvatarList(
-    { users = [], userGroups = [], size = "xs", max = 3 },
+    { users = [], size = "xs", max = 3 },
     ref
   ) {
-    const data = [...users, ...userGroups];
     const styles = useMultiStyleConfig("Avatar", { size });
-    const slice = data.length === max + 1 ? [...data] : data.slice(0, max);
+    const slice = users.length === max + 1 ? [...users] : users.slice(0, max);
     slice.reverse();
     const excess =
-      data.length > slice.length ? data.length - slice.length : null;
+      users.length > slice.length ? users.length - slice.length : null;
 
     return (
       <Flex
@@ -44,7 +42,7 @@ export const UserAvatarList = Object.assign(
         alignItems="center"
       >
         {excess && (
-          <UserListPopover users={users} userGroups={userGroups}>
+          <UserListPopover users={users}>
             <Flex
               alignItems="center"
               fontSize="2xs"

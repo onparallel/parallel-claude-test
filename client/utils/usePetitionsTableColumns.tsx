@@ -191,19 +191,12 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           align: "center",
           cellProps: { width: "1%" },
           CellContent: ({ row: { permissions }, column }) => {
-            const users = permissions.filter(
-              (p) => p.__typename === "PetitionUserPermission"
-            );
-
-            const groups = permissions.filter(
-              (p) => p.__typename === "PetitionUserGroupPermission"
-            );
-
             return (
               <Flex justifyContent={column.align}>
                 <UserAvatarList
-                  users={users.map((p) => p.user)}
-                  userGroups={groups.map((p) => p.group)}
+                  users={permissions.map((e) =>
+                    e.__typename === "PetitionUserPermission" ? e.user : e.group
+                  )}
                 />
               </Flex>
             );

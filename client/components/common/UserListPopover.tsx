@@ -21,17 +21,13 @@ import gql from "graphql-tag";
 import { ReactNode } from "react";
 
 export function UserListPopover({
-  users = [],
-  userGroups = [],
+  users,
   children,
 }: {
-  users?: UserListPopover_UserFragment[];
-  userGroups?: UserListPopover_UserGroupFragment[];
+  users: UserListPopover_UserFragment[] | UserListPopover_UserGroupFragment[];
   children: ReactNode;
 }) {
-  const data = [...users, ...userGroups];
-
-  if (data.length === 0) {
+  if (users.length === 0) {
     return <>{children}</>;
   }
 
@@ -48,7 +44,7 @@ export function UserListPopover({
             maxHeight="300px"
           >
             <Stack as={List}>
-              {data.map((u) => {
+              {users.map((u) => {
                 const name =
                   u.__typename === "User"
                     ? u.fullName

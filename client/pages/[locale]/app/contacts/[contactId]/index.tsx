@@ -309,19 +309,12 @@ function useContactPetitionAccessesColumns() {
           align: "center",
           cellProps: { width: "1%" },
           CellContent: ({ row: { petition }, column }) => {
-            const users = petition!.permissions.filter(
-              (p) => p.__typename === "PetitionUserPermission"
-            );
-
-            const groups = petition!.permissions.filter(
-              (p) => p.__typename === "PetitionUserGroupPermission"
-            );
-
             return (
               <Flex justifyContent={column.align}>
                 <UserAvatarList
-                  users={users.map((p) => p.user)}
-                  userGroups={groups.map((g) => g.group)}
+                  users={petition!.permissions.map((e) =>
+                    e.__typename === "PetitionUserPermission" ? e.user : e.group
+                  )}
                 />
               </Flex>
             );
