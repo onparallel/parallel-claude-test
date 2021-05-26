@@ -12,20 +12,29 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { UserListPopover_UserFragment } from "@parallel/graphql/__types";
+import { UsersIcon } from "@parallel/chakra/icons";
+import {
+  UserListPopover_UserFragment,
+  UserListPopover_UserGroupFragment,
+} from "@parallel/graphql/__types";
 import gql from "graphql-tag";
 import { ReactNode } from "react";
 
 export function UserListPopover({
-  users,
+  users = [],
+  userGroups = [],
   children,
 }: {
-  users: UserListPopover_UserFragment[];
+  users?: UserListPopover_UserFragment[];
+  userGroups?: UserListPopover_UserGroupFragment[];
   children: ReactNode;
 }) {
-  if (users.length === 0) {
+  const data = [...users, ...userGroups];
+
+  if (data.length === 0) {
     return <>{children}</>;
   }
+
   return (
     <Popover trigger="hover">
       <PopoverTrigger>{children}</PopoverTrigger>
@@ -39,19 +48,43 @@ export function UserListPopover({
             maxHeight="300px"
           >
             <Stack as={List}>
-              {users.map((user) => (
-                <Flex
-                  key={user.id}
-                  as={ListItem}
-                  alignItems="center"
-                  paddingX={4}
-                >
-                  <Avatar size="xs" name={user.fullName ?? undefined} />
-                  <Text flex="1" marginLeft={2} isTruncated>
-                    {user.fullName}
-                  </Text>
-                </Flex>
-              ))}
+              {data.map((u) => {
+                const name =
+                  u.__typename === "User"
+                    ? u.fullName
+                    : u.__typename === "UserGroup"
+                    ? u.name
+                    : "";
+
+                const nameElement =
+                  u.__typename === "User" ? (
+                    <Text flex="1" marginLeft={2} isTruncated>
+                      {name}
+                    </Text>
+                  ) : (
+                    <Stack
+                      direction={"row"}
+                      marginLeft={2}
+                      spacing={2}
+                      align="center"
+                    >
+                      <UsersIcon />
+                      <Text isTruncated>{name}</Text>
+                    </Stack>
+                  );
+
+                return (
+                  <Flex
+                    key={u.id}
+                    as={ListItem}
+                    alignItems="center"
+                    paddingX={4}
+                  >
+                    <Avatar size="xs" name={name ?? undefined} />
+                    {nameElement}
+                  </Flex>
+                );
+              })}
             </Stack>
           </PopoverBody>
         </PopoverContent>
@@ -61,10 +94,26 @@ export function UserListPopover({
 }
 
 UserListPopover.fragments = {
-  User: gql`
-    fragment UserListPopover_User on User {
-      id
-      fullName
-    }
-  `,
+  get User() {
+    return gql`
+      fragment UserListPopover_User on User {
+        id
+        fullName
+      }
+    `;
+  },
+  get UserGroup() {
+    return gql`
+      fragment UserListPopover_UserGroup on UserGroup {
+        id
+        name
+        members {
+          user {
+            ...UserListPopover_User
+          }
+        }
+      }
+      ${this.User}
+    `;
+  },
 };

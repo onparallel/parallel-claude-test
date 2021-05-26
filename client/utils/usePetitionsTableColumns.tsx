@@ -12,7 +12,6 @@ import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import {
   PetitionBaseType,
-  PetitionUserPermission,
   usePetitionsTableColumns_PetitionBaseFragment,
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
@@ -191,15 +190,26 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           }),
           align: "center",
           cellProps: { width: "1%" },
-          CellContent: ({ row: { permissions }, column }) => (
-            <Flex justifyContent={column.align}>
-              <UserAvatarList
-                users={permissions
-                  .filter((p) => p.__typename === "PetitionUserPermission")
-                  .map((p) => p.user)}
-              />
-            </Flex>
-          ),
+          CellContent: ({ row: { permissions }, column }) => {
+            console.log(permissions);
+
+            const users = permissions.filter(
+              (p) => p.__typename === "PetitionUserPermission"
+            );
+
+            const groups = permissions.filter(
+              (p) => p.__typename === "PetitionUserGroupPermission"
+            );
+
+            return (
+              <Flex justifyContent={column.align}>
+                <UserAvatarList
+                  users={users.map((p) => p.user)}
+                  userGroups={groups.map((p) => p.group)}
+                />
+              </Flex>
+            );
+          },
         },
         {
           key: "createdAt",
@@ -259,6 +269,12 @@ usePetitionsTableColumns.fragments = {
         ... on PetitionUserGroupPermission {
           group {
             id
+            name
+            members {
+              user {
+                fullName
+              }
+            }
           }
         }
       }

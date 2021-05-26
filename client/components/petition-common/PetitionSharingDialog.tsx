@@ -27,10 +27,12 @@ import {
   ChevronDownIcon,
   DeleteIcon,
   UserArrowIcon,
+  UsersIcon,
 } from "@parallel/chakra/icons";
 import {
   PetitionActivityDocument,
   PetitionSharingModal_UserFragment,
+  PetitionSharingModal_UserGroupFragment,
   PetitionUserGroupPermission,
   PetitionUserPermission,
   usePetitionSharingModal_addPetitionUserPermissionMutation,
@@ -39,6 +41,7 @@ import {
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
+import { Maybe } from "@parallel/utils/types";
 import { usePreviousValue } from "beautiful-react-hooks";
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -47,6 +50,7 @@ import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { PaddedCollapse } from "../common/PaddedCollapse";
+import { UserListPopover } from "../common/UserListPopover";
 import {
   UserSelect,
   UserSelectInstance,
@@ -393,7 +397,7 @@ export function PetitionSharingDialog({
                           <MenuItem
                             color="red.500"
                             onClick={() =>
-                              handleRemoveUserPermission(petitionId, user)
+                              handleRemoveUserPermission({ petitionId, user })
                             }
                             icon={<DeleteIcon display="block" boxSize={4} />}
                           >
@@ -408,6 +412,66 @@ export function PetitionSharingDialog({
                   )}
                 </Flex>
               ))}
+              {groupPermissions.map(({ group, permissionType }) => {
+                return (
+                  <Flex key={group.id} alignItems="center">
+                    <Avatar role="presentation" name={group.name!} size="sm" />
+                    <Box flex="1" minWidth={0} fontSize="sm" marginLeft={2}>
+                      <Stack direction={"row"} spacing={2} align="center">
+                        <UsersIcon />
+                        <Text isTruncated>{group.name} </Text>
+                      </Stack>
+                      <Flex
+                        role="group"
+                        flexDirection="row-reverse"
+                        justifyContent="flex-end"
+                        alignItems="center"
+                      >
+                        <UserListPopover
+                          users={group.members.map((m) => m.user)}
+                        >
+                          <Text color="gray.500" isTruncated>
+                            <FormattedMessage
+                              id="component.user-select.group-members"
+                              defaultMessage="{count, plural, =1 {1 member} other {# members}}"
+                              values={{ count: group.members.length }}
+                            />
+                          </Text>
+                        </UserListPopover>
+                      </Flex>
+                    </Box>
+                    <Menu placement="bottom-end">
+                      <MenuButton
+                        as={Button}
+                        variant="ghost"
+                        size="sm"
+                        rightIcon={<ChevronDownIcon />}
+                      >
+                        <UserPermissionType type="WRITE" />
+                      </MenuButton>
+                      <Portal>
+                        <MenuList minWidth={40}>
+                          <MenuItem
+                            color="red.500"
+                            onClick={() =>
+                              handleRemoveUserPermission({
+                                petitionId,
+                                userGroup: group,
+                              })
+                            }
+                            icon={<DeleteIcon display="block" boxSize={4} />}
+                          >
+                            <FormattedMessage
+                              id="generic.remove"
+                              defaultMessage="Remove"
+                            />
+                          </MenuItem>
+                        </MenuList>
+                      </Portal>
+                    </Menu>
+                  </Flex>
+                );
+              })}
             </Stack>
             <Stack
               display={
@@ -515,6 +579,12 @@ PetitionSharingDialog.fragments = {
           ... on PetitionUserGroupPermission {
             group {
               id
+              name
+              members {
+                user {
+                  ...PetitionSharingModal_User
+                }
+              }
             }
           }
         }
@@ -531,6 +601,20 @@ PetitionSharingDialog.fragments = {
         ...UserSelect_User
       }
       ${UserSelect.fragments.User}
+    `;
+  },
+  get UserGroup() {
+    return gql`
+      fragment PetitionSharingModal_UserGroup on UserGroup {
+        id
+        name
+        members {
+          user {
+            ...PetitionSharingModal_User
+          }
+        }
+      }
+      ${this.User}
     `;
   },
 };
@@ -598,6 +682,12 @@ PetitionSharingDialog.queries = [
   `,
 ];
 
+interface RemoveUserPermissionPorps {
+  petitionId: string;
+  user?: PetitionSharingModal_UserFragment;
+  userGroup?: PetitionSharingModal_UserGroupFragment;
+}
+
 function useRemoveUserPermission() {
   const confirmRemoveUserPermission = useDialog(
     ConfirmRemoveUserPermissionDialog
@@ -605,11 +695,15 @@ function useRemoveUserPermission() {
   const [removePetitionUserPermission] =
     usePetitionSharingModal_removePetitionUserPermissionMutation();
   return useCallback(
-    async (petitionId: string, user: PetitionSharingModal_UserFragment) => {
+    async ({ petitionId, user, userGroup }: RemoveUserPermissionPorps) => {
       try {
-        await confirmRemoveUserPermission({ user });
+        const prop = user ? "userIds" : "userGroupIds";
+        const name = user ? user.fullName : userGroup?.name;
+        const id = user ? user.id : userGroup?.id;
+
+        await confirmRemoveUserPermission({ name });
         await removePetitionUserPermission({
-          variables: { petitionId, userIds: [user.id] },
+          variables: { petitionId, [prop]: [id] },
           refetchQueries: [getOperationName(PetitionActivityDocument)!],
         });
       } catch {}
@@ -619,9 +713,11 @@ function useRemoveUserPermission() {
 }
 
 function ConfirmRemoveUserPermissionDialog({
-  user,
+  name = "",
   ...props
-}: DialogProps<{ user: PetitionSharingModal_UserFragment }>) {
+}: DialogProps<{
+  name?: Maybe<string>;
+}>) {
   return (
     <ConfirmDialog
       closeOnEsc={true}
@@ -637,7 +733,7 @@ function ConfirmRemoveUserPermissionDialog({
           id="petition-sharing.confirm-remove.message"
           defaultMessage="Are you sure you want to stop sharing this petition with {name}?"
           values={{
-            name: <Text as="strong">{user.fullName}</Text>,
+            name: <Text as="strong">{name}</Text>,
           }}
         />
       }

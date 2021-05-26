@@ -2543,10 +2543,30 @@ export type UserAvatarList_UserFragment = { __typename?: "User" } & Pick<
 > &
   UserListPopover_UserFragment;
 
+export type UserAvatarList_UserGroupFragment = {
+  __typename?: "UserGroup";
+} & Pick<UserGroup, "id" | "name"> & {
+    members: Array<
+      { __typename?: "UserGroupMember" } & {
+        user: { __typename?: "User" } & UserAvatarList_UserFragment;
+      }
+    >;
+  };
+
 export type UserListPopover_UserFragment = { __typename?: "User" } & Pick<
   User,
   "id" | "fullName"
 >;
+
+export type UserListPopover_UserGroupFragment = {
+  __typename?: "UserGroup";
+} & Pick<UserGroup, "id" | "name"> & {
+    members: Array<
+      { __typename?: "UserGroupMember" } & {
+        user: { __typename?: "User" } & UserListPopover_UserFragment;
+      }
+    >;
+  };
 
 export type UserSelect_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -3494,7 +3514,20 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
       | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
           PetitionUserGroupPermission,
           "permissionType"
-        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
+        > & {
+            group: { __typename?: "UserGroup" } & Pick<
+              UserGroup,
+              "id" | "name"
+            > & {
+                members: Array<
+                  { __typename?: "UserGroupMember" } & {
+                    user: {
+                      __typename?: "User";
+                    } & PetitionSharingModal_UserFragment;
+                  }
+                >;
+              };
+          })
       | ({ __typename?: "PetitionUserPermission" } & Pick<
           PetitionUserPermission,
           "permissionType"
@@ -3512,7 +3545,20 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
       | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
           PetitionUserGroupPermission,
           "permissionType"
-        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
+        > & {
+            group: { __typename?: "UserGroup" } & Pick<
+              UserGroup,
+              "id" | "name"
+            > & {
+                members: Array<
+                  { __typename?: "UserGroupMember" } & {
+                    user: {
+                      __typename?: "User";
+                    } & PetitionSharingModal_UserFragment;
+                  }
+                >;
+              };
+          })
       | ({ __typename?: "PetitionUserPermission" } & Pick<
           PetitionUserPermission,
           "permissionType"
@@ -3532,6 +3578,16 @@ export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
   "id" | "email" | "fullName"
 > &
   UserSelect_UserFragment;
+
+export type PetitionSharingModal_UserGroupFragment = {
+  __typename?: "UserGroup";
+} & Pick<UserGroup, "id" | "name"> & {
+    members: Array<
+      { __typename?: "UserGroupMember" } & {
+        user: { __typename?: "User" } & PetitionSharingModal_UserFragment;
+      }
+    >;
+  };
 
 export type PetitionSharingModal_addPetitionUserPermissionMutationVariables =
   Exact<{
@@ -6119,7 +6175,18 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
       | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
           PetitionUserGroupPermission,
           "permissionType"
-        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
+        > & {
+            group: { __typename?: "UserGroup" } & Pick<
+              UserGroup,
+              "id" | "name"
+            > & {
+                members: Array<
+                  { __typename?: "UserGroupMember" } & {
+                    user: { __typename?: "User" } & Pick<User, "fullName">;
+                  }
+                >;
+              };
+          })
       | ({ __typename?: "PetitionUserPermission" } & Pick<
           PetitionUserPermission,
           "permissionType"
@@ -6136,7 +6203,18 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
       | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
           PetitionUserGroupPermission,
           "permissionType"
-        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
+        > & {
+            group: { __typename?: "UserGroup" } & Pick<
+              UserGroup,
+              "id" | "name"
+            > & {
+                members: Array<
+                  { __typename?: "UserGroupMember" } & {
+                    user: { __typename?: "User" } & Pick<User, "fullName">;
+                  }
+                >;
+              };
+          })
       | ({ __typename?: "PetitionUserPermission" } & Pick<
           PetitionUserPermission,
           "permissionType"
@@ -6206,6 +6284,44 @@ export const TagEditDialog_TagFragmentDoc = gql`
   }
   ${Tag_TagFragmentDoc}
 `;
+export const UserListPopover_UserFragmentDoc = gql`
+  fragment UserListPopover_User on User {
+    id
+    fullName
+  }
+`;
+export const UserAvatarList_UserFragmentDoc = gql`
+  fragment UserAvatarList_User on User {
+    id
+    fullName
+    ...UserListPopover_User
+  }
+  ${UserListPopover_UserFragmentDoc}
+`;
+export const UserAvatarList_UserGroupFragmentDoc = gql`
+  fragment UserAvatarList_UserGroup on UserGroup {
+    id
+    name
+    members {
+      user {
+        ...UserAvatarList_User
+      }
+    }
+  }
+  ${UserAvatarList_UserFragmentDoc}
+`;
+export const UserListPopover_UserGroupFragmentDoc = gql`
+  fragment UserListPopover_UserGroup on UserGroup {
+    id
+    name
+    members {
+      user {
+        ...UserListPopover_User
+      }
+    }
+  }
+  ${UserListPopover_UserFragmentDoc}
+`;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
     id
@@ -6254,7 +6370,25 @@ export const PetitionSharingModal_PetitionFragmentDoc = gql`
       ... on PetitionUserGroupPermission {
         group {
           id
+          name
+          members {
+            user {
+              ...PetitionSharingModal_User
+            }
+          }
         }
+      }
+    }
+  }
+  ${PetitionSharingModal_UserFragmentDoc}
+`;
+export const PetitionSharingModal_UserGroupFragmentDoc = gql`
+  fragment PetitionSharingModal_UserGroup on UserGroup {
+    id
+    name
+    members {
+      user {
+        ...PetitionSharingModal_User
       }
     }
   }
@@ -6497,20 +6631,6 @@ export const Contact_Contact_ProfileFragmentDoc = gql`
     firstName
     lastName
   }
-`;
-export const UserListPopover_UserFragmentDoc = gql`
-  fragment UserListPopover_User on User {
-    id
-    fullName
-  }
-`;
-export const UserAvatarList_UserFragmentDoc = gql`
-  fragment UserAvatarList_User on User {
-    id
-    fullName
-    ...UserListPopover_User
-  }
-  ${UserListPopover_UserFragmentDoc}
 `;
 export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
   fragment PetitionStatusCellContent_Petition on Petition {
@@ -7765,6 +7885,12 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
       ... on PetitionUserGroupPermission {
         group {
           id
+          name
+          members {
+            user {
+              fullName
+            }
+          }
         }
       }
     }
