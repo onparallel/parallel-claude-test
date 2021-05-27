@@ -16,7 +16,6 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Portal,
   Spinner,
   Stack,
   Text,
@@ -82,8 +81,6 @@ export function PetitionSharingDialog({
   const intl = useIntl();
   const toast = useToast();
   const [hasUsers, setHasUsers] = useState(false);
-
-  const containerRef = useRef<HTMLInputElement>(null);
 
   const { data } = usePetitionSharingModal_PetitionsUserPermissionsQuery({
     variables: { petitionIds },
@@ -345,7 +342,6 @@ export function PetitionSharingDialog({
             <Stack
               display={hasUsers || petitionIds.length !== 1 ? "none" : "flex"}
               paddingTop={2}
-              ref={containerRef}
             >
               {userPermissions?.map(({ user, permissionType }) => (
                 <Flex key={user.id} alignItems="center">
@@ -389,33 +385,31 @@ export function PetitionSharingDialog({
                       >
                         <UserPermissionType type="WRITE" />
                       </MenuButton>
-                      <Portal containerRef={containerRef}>
-                        <MenuList minWidth={40}>
-                          <MenuItem
-                            onClick={() =>
-                              handleTransferPetitionOwnership(petitionId, user)
-                            }
-                            icon={<UserArrowIcon display="block" boxSize={4} />}
-                          >
-                            <FormattedMessage
-                              id="generic.transfer-ownership"
-                              defaultMessage="Transfer ownership"
-                            />
-                          </MenuItem>
-                          <MenuItem
-                            color="red.500"
-                            onClick={() =>
-                              handleRemoveUserPermission({ petitionId, user })
-                            }
-                            icon={<DeleteIcon display="block" boxSize={4} />}
-                          >
-                            <FormattedMessage
-                              id="generic.remove"
-                              defaultMessage="Remove"
-                            />
-                          </MenuItem>
-                        </MenuList>
-                      </Portal>
+                      <MenuList minWidth={40}>
+                        <MenuItem
+                          onClick={() =>
+                            handleTransferPetitionOwnership(petitionId, user)
+                          }
+                          icon={<UserArrowIcon display="block" boxSize={4} />}
+                        >
+                          <FormattedMessage
+                            id="generic.transfer-ownership"
+                            defaultMessage="Transfer ownership"
+                          />
+                        </MenuItem>
+                        <MenuItem
+                          color="red.500"
+                          onClick={() =>
+                            handleRemoveUserPermission({ petitionId, user })
+                          }
+                          icon={<DeleteIcon display="block" boxSize={4} />}
+                        >
+                          <FormattedMessage
+                            id="generic.remove"
+                            defaultMessage="Remove"
+                          />
+                        </MenuItem>
+                      </MenuList>
                     </Menu>
                   )}
                 </Flex>
@@ -469,25 +463,23 @@ export function PetitionSharingDialog({
                         >
                           <UserPermissionType type="WRITE" />
                         </MenuButton>
-                        <Portal containerRef={containerRef}>
-                          <MenuList minWidth={40}>
-                            <MenuItem
-                              color="red.500"
-                              onClick={() =>
-                                handleRemoveUserPermission({
-                                  petitionId,
-                                  userGroup: group,
-                                })
-                              }
-                              icon={<DeleteIcon display="block" boxSize={4} />}
-                            >
-                              <FormattedMessage
-                                id="generic.remove"
-                                defaultMessage="Remove"
-                              />
-                            </MenuItem>
-                          </MenuList>
-                        </Portal>
+                        <MenuList minWidth={40}>
+                          <MenuItem
+                            color="red.500"
+                            onClick={() =>
+                              handleRemoveUserPermission({
+                                petitionId,
+                                userGroup: group,
+                              })
+                            }
+                            icon={<DeleteIcon display="block" boxSize={4} />}
+                          >
+                            <FormattedMessage
+                              id="generic.remove"
+                              defaultMessage="Remove"
+                            />
+                          </MenuItem>
+                        </MenuList>
                       </Menu>
                     )}
                   </Flex>
