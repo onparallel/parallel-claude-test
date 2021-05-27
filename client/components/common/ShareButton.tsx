@@ -1,11 +1,7 @@
 import { gql } from "@apollo/client";
 import { Button, ButtonProps, Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
-import {
-  PetitionUserGroupPermission,
-  PetitionUserPermission,
-  ShareButton_PetitionBaseFragment,
-} from "@parallel/graphql/__types";
+import { ShareButton_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FormattedList, FormattedMessage } from "react-intl";
 import { SmallPopover } from "./SmallPopover";
 
@@ -17,25 +13,18 @@ export function ShareButton({
   petition: ShareButton_PetitionBaseFragment;
   userId: string;
 }) {
-  const userPermissions = petition!.permissions.filter(
-    (p) => p.__typename === "PetitionUserPermission"
-  ) as PetitionUserPermission[];
-
-  const groupPermissions = petition!.permissions.filter(
-    (p) => p.__typename === "PetitionUserGroupPermission"
-  ) as PetitionUserGroupPermission[];
-
-  const names = [
-    ...userPermissions
-      .filter(({ user }) => user.id !== userId)
-      .map(({ user }) => user.fullName),
-    ...groupPermissions.map(({ group }) => group.name),
-  ];
+  const names = petition!.permissions.map((p) =>
+    p.__typename === "PetitionUserPermission"
+      ? p.user.fullName
+      : p.__typename === "PetitionUserGroupPermission"
+      ? p.group.name
+      : (null as never)
+  );
 
   return (
     <SmallPopover
       content={
-        userPermissions.length > 1 ? (
+        petition!.permissions.length > 1 ? (
           <Text>
             <FormattedMessage
               id="component.share-button.shared-with"
