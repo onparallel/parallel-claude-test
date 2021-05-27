@@ -27,13 +27,13 @@ export const PublicPetitionAccess = objectType({
         return await ctx.contacts.loadContact(root.contact_id);
       },
     });
-    t.field("message", {
+    t.nullable.field("message", {
       type: "PublicPetitionMessage",
       resolve: async (root, _, ctx) => {
         const messages = await ctx.petitions.loadMessagesByPetitionAccessId(
           root.id
         );
-        return messages[0];
+        return messages?.[0] ?? null;
       },
     });
   },

@@ -1039,7 +1039,7 @@ export interface NexusGenFieldTypes {
     // field return type
     contact: NexusGenRootTypes["PublicContact"] | null; // PublicContact
     granter: NexusGenRootTypes["PublicUser"] | null; // PublicUser
-    message: NexusGenRootTypes["PublicPetitionMessage"]; // PublicPetitionMessage!
+    message: NexusGenRootTypes["PublicPetitionMessage"] | null; // PublicPetitionMessage
     petition: NexusGenRootTypes["PublicPetition"] | null; // PublicPetition
   };
   PublicPetitionField: {

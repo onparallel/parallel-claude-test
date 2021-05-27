@@ -63,7 +63,7 @@ interface RecipientViewHeaderProps extends CardProps {
   sender: RecipientViewHeader_PublicUserFragment;
   contact: RecipientViewHeader_PublicContactFragment;
   recipients: RecipientViewHeader_PublicContactFragment[];
-  message: RecipientView_PublicPetitionMessageFragment;
+  message: RecipientView_PublicPetitionMessageFragment | null | undefined;
   keycode: string;
   isClosed: boolean;
 }
@@ -198,16 +198,18 @@ export function RecipientViewHeader({
                     </Text>
                     <Contact contact={sender} />
                   </Box>
-                  <Box>
-                    <Text as="span" marginRight={2}>
-                      <FormattedMessage
-                        id="recipient-view.petition-subject"
-                        defaultMessage="Subject"
-                      />
-                      :
-                    </Text>
-                    {message.subject}
-                  </Box>
+                  {message ? (
+                    <Box>
+                      <Text as="span" marginRight={2}>
+                        <FormattedMessage
+                          id="recipient-view.petition-subject"
+                          defaultMessage="Subject"
+                        />
+                        :
+                      </Text>
+                      {message.subject}
+                    </Box>
+                  ) : null}
                 </Stack>
                 <Stack flex="2">
                   <Box flexWrap="wrap">

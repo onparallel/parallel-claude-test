@@ -80,8 +80,8 @@ function RecipientView({
   const granter = access!.granter!;
   const contact = access!.contact!;
   const signers = petition!.signature?.signers ?? [];
-  const recipients = petition!.recipients!;
-  const message = access!.message!;
+  const recipients = petition!.recipients;
+  const message = access!.message;
 
   const { fields, pages, visibility } = useGetPageFields(
     petition.fields,

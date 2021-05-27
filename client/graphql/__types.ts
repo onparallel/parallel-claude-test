@@ -1667,7 +1667,7 @@ export type PublicPetitionAccess = {
   __typename?: "PublicPetitionAccess";
   contact?: Maybe<PublicContact>;
   granter?: Maybe<PublicUser>;
-  message: PublicPetitionMessage;
+  message?: Maybe<PublicPetitionMessage>;
   petition?: Maybe<PublicPetition>;
 };
 
@@ -5856,9 +5856,11 @@ export type RecipientView_PublicPetitionAccessFragment = {
     } & RecipientViewHeader_PublicContactFragment &
       useCompleteSignerInfoDialog_PublicContactFragment
   >;
-  message: {
-    __typename?: "PublicPetitionMessage";
-  } & RecipientView_PublicPetitionMessageFragment;
+  message?: Maybe<
+    {
+      __typename?: "PublicPetitionMessage";
+    } & RecipientView_PublicPetitionMessageFragment
+  >;
 } & RecipientViewPetitionField_PublicPetitionAccessFragment;
 
 export type RecipientView_PublicPetitionMessageFragment = {
