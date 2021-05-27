@@ -4,29 +4,32 @@ import { PetitionActivityTimeline_PetitionEventFragment } from "@parallel/graphq
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { TimelineAccessActivatedEvent } from "./timeline/TimelineAccessActivatedEvent";
 import { TimelineAccessDeactivatedEvent } from "./timeline/TimelineAccessDeactivatedEvent";
+import { TimelineAccessDelegatedEvent } from "./timeline/TimelineAccessDelegatedEvent";
 import { TimelineAccessOpenedEvent } from "./timeline/TimelineAccessOpenedEvent";
 import { TimelineCommentDeletedEvent } from "./timeline/TimelineCommentDeletedEvent";
 import { TimelineCommentPublishedEvent } from "./timeline/TimelineCommentPublishedEvent";
+import { TimelineGroupPermissionAddedEvent } from "./timeline/TimelineGroupPermissionAddedEvent";
+import { TimelineGroupPermissionEditedEvent } from "./timeline/TimelineGroupPermissionEditedEvent";
+import { TimelineGroupPermissionRemovedEvent } from "./timeline/TimelineGroupPermissionRemovedEvent";
 import { TimelineMessageCancelledEvent } from "./timeline/TimelineMessageCancelledEvent";
 import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageScheduledEvent";
 import { TimelineMessageSentEvent } from "./timeline/TimelineMessageSentEvent";
 import { TimelineOwnershipTransferredEvent } from "./timeline/TimelineOwnershipTransferredEvent";
+import { TimelinePetitionClosedEvent } from "./timeline/TimelinePetitionClosedEvent";
+import { TimelinePetitionClosedNotifiedEvent } from "./timeline/TimelinePetitionClosedNotifiedEvent";
 import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
 import { TimelinePetitionCreatedEvent } from "./timeline/TimelinePetitionCreatedEvent";
-import { TimelinePetitionClosedEvent } from "./timeline/TimelinePetitionClosedEvent";
+import { TimelinePetitionReopenedEvent } from "./timeline/TimelinePetitionReopenedEvent";
 import { TimelineReminderSentEvent } from "./timeline/TimelineReminderSentEvent";
 import { TimelineReplyCreatedEvent } from "./timeline/TimelineReplyCreatedEvent";
-import { TimelineReplyUpdatedEvent } from "./timeline/TimelineReplyUpdatedEvent";
 import { TimelineReplyDeletedEvent } from "./timeline/TimelineReplyDeletedEvent";
+import { TimelineReplyUpdatedEvent } from "./timeline/TimelineReplyUpdatedEvent";
+import { TimelineSignatureCancelledEvent } from "./timeline/TimelineSignatureCancelledEvent";
+import { TimelineSignatureCompletedEvent } from "./timeline/TimelineSignatureCompletedEvent";
+import { TimelineSignatureStartedEvent } from "./timeline/TimelineSignatureStartedEvent";
 import { TimelineUserPermissionAddedEvent } from "./timeline/TimelineUserPermissionAddedEvent";
 import { TimelineUserPermissionEditedEvent } from "./timeline/TimelineUserPermissionEditedEvent";
 import { TimelineUserPermissionRemovedEvent } from "./timeline/TimelineUserPermissionRemovedEvent";
-import { TimelinePetitionClosedNotifiedEvent } from "./timeline/TimelinePetitionClosedNotifiedEvent";
-import { TimelinePetitionReopenedEvent } from "./timeline/TimelinePetitionReopenedEvent";
-import { TimelineSignatureStartedEvent } from "./timeline/TimelineSignatureStartedEvent";
-import { TimelineSignatureCompletedEvent } from "./timeline/TimelineSignatureCompletedEvent";
-import { TimelineSignatureCancelledEvent } from "./timeline/TimelineSignatureCancelledEvent";
-import { TimelineAccessDelegatedEvent } from "./timeline/TimelineAccessDelegatedEvent";
 
 export type PetitionActivityTimelineProps = {
   userId: string;
@@ -117,6 +120,21 @@ export function PetitionActivityTimeline({
               <TimelineSignatureCancelledEvent event={event} userId={userId} />
             ) : event.__typename === "AccessDelegatedEvent" ? (
               <TimelineAccessDelegatedEvent event={event} />
+            ) : event.__typename === "GroupPermissionAddedEvent" ? (
+              <TimelineGroupPermissionAddedEvent
+                event={event}
+                userId={userId}
+              />
+            ) : event.__typename === "GroupPermissionEditedEvent" ? (
+              <TimelineGroupPermissionEditedEvent
+                event={event}
+                userId={userId}
+              />
+            ) : event.__typename === "GroupPermissionRemovedEvent" ? (
+              <TimelineGroupPermissionRemovedEvent
+                event={event}
+                userId={userId}
+              />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -216,6 +234,15 @@ PetitionActivityTimeline.fragments = {
       ... on AccessDelegatedEvent {
         ...TimelineAccessDelegatedEvent_AccessDelegatedEvent
       }
+      ... on GroupPermissionAddedEvent {
+        ...TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent
+      }
+      ... on GroupPermissionEditedEvent {
+        ...TimelineGroupPermissionEditedEvent_GroupPermissionEditedEvent
+      }
+      ... on GroupPermissionRemovedEvent {
+        ...TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -242,5 +269,8 @@ PetitionActivityTimeline.fragments = {
     ${TimelineSignatureCompletedEvent.fragments.SignatureCompletedEvent}
     ${TimelineSignatureCancelledEvent.fragments.SignatureCancelledEvent}
     ${TimelineAccessDelegatedEvent.fragments.AccessDelegatedEvent}
+    ${TimelineGroupPermissionAddedEvent.fragments.GroupPermissionAddedEvent}
+    ${TimelineGroupPermissionEditedEvent.fragments.GroupPermissionEditedEvent}
+    ${TimelineGroupPermissionRemovedEvent.fragments.GroupPermissionRemovedEvent}
   `,
 };

@@ -5510,6 +5510,11 @@
     "context": "{contact} opened the petition {timeAgo}"
   },
   {
+    "term": "timeline.add-group-permission-description",
+    "definition": "{same, select, true {You} other {{user}}} shared this petition with {groupName} as {permissionType} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} shared this petition with {groupName} as {permissionType} {timeAgo}"
+  },
+  {
     "term": "timeline.add-user-permission-description",
     "definition": "{same, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}"
@@ -5528,6 +5533,11 @@
     "term": "timeline.comment-published-description",
     "definition": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}",
     "context": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+  },
+  {
+    "term": "timeline.edit-group-permission-description",
+    "definition": "{same, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.edit-user-permission-description",
@@ -5603,6 +5613,11 @@
     "term": "timeline.reminder-sent-description-manual",
     "definition": "{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
+  },
+  {
+    "term": "timeline.remove-group-permission-description",
+    "definition": "{same, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}"
   },
   {
     "term": "timeline.remove-user-permission-description",

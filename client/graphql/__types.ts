@@ -175,7 +175,7 @@ export type GroupPermissionAddedEvent = PetitionEvent & {
   __typename?: "GroupPermissionAddedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup?: Maybe<UserGroup>;
+  permissionGroup: UserGroup;
   permissionType: PetitionUserPermissionType;
   user?: Maybe<User>;
 };
@@ -184,7 +184,7 @@ export type GroupPermissionEditedEvent = PetitionEvent & {
   __typename?: "GroupPermissionEditedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup?: Maybe<UserGroup>;
+  permissionGroup: UserGroup;
   permissionType: PetitionUserPermissionType;
   user?: Maybe<User>;
 };
@@ -193,7 +193,7 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
   __typename?: "GroupPermissionRemovedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup?: Maybe<UserGroup>;
+  permissionGroup: UserGroup;
   user?: Maybe<User>;
 };
 
@@ -2935,19 +2935,22 @@ export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fra
   { __typename?: "GroupPermissionAddedEvent" } & Pick<
     GroupPermissionAddedEvent,
     "id"
-  >;
+  > &
+    TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment =
   { __typename?: "GroupPermissionEditedEvent" } & Pick<
     GroupPermissionEditedEvent,
     "id"
-  >;
+  > &
+    TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment =
   { __typename?: "GroupPermissionRemovedEvent" } & Pick<
     GroupPermissionRemovedEvent,
     "id"
-  >;
+  > &
+    TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment =
   { __typename?: "MessageCancelledEvent" } & Pick<MessageCancelledEvent, "id"> &
@@ -3191,6 +3194,33 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
         }
     >;
   };
+
+export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment =
+  { __typename?: "GroupPermissionAddedEvent" } & Pick<
+    GroupPermissionAddedEvent,
+    "permissionType" | "createdAt"
+  > & {
+      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+      permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+    };
+
+export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment =
+  { __typename?: "GroupPermissionEditedEvent" } & Pick<
+    GroupPermissionEditedEvent,
+    "permissionType" | "createdAt"
+  > & {
+      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+      permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+    };
+
+export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment =
+  { __typename?: "GroupPermissionRemovedEvent" } & Pick<
+    GroupPermissionRemovedEvent,
+    "createdAt"
+  > & {
+      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+      permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
+    };
 
 export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
   __typename?: "MessageCancelledEvent";
@@ -7250,6 +7280,44 @@ export const TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc = gql`
   }
   ${ContactLink_ContactFragmentDoc}
 `;
+export const TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc = gql`
+  fragment TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent on GroupPermissionAddedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionGroup {
+      name
+    }
+    permissionType
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
+export const TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmentDoc = gql`
+  fragment TimelineGroupPermissionEditedEvent_GroupPermissionEditedEvent on GroupPermissionEditedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionGroup {
+      name
+    }
+    permissionType
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
+export const TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragmentDoc = gql`
+  fragment TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEvent on GroupPermissionRemovedEvent {
+    user {
+      ...UserReference_User
+    }
+    permissionGroup {
+      name
+    }
+    createdAt
+  }
+  ${UserReference_UserFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -7331,6 +7399,15 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on AccessDelegatedEvent {
       ...TimelineAccessDelegatedEvent_AccessDelegatedEvent
     }
+    ... on GroupPermissionAddedEvent {
+      ...TimelineGroupPermissionAddedEvent_GroupPermissionAddedEvent
+    }
+    ... on GroupPermissionEditedEvent {
+      ...TimelineGroupPermissionEditedEvent_GroupPermissionEditedEvent
+    }
+    ... on GroupPermissionRemovedEvent {
+      ...TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -7357,6 +7434,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineSignatureCompletedEvent_SignatureCompletedEventFragmentDoc}
   ${TimelineSignatureCancelledEvent_SignatureCancelledEventFragmentDoc}
   ${TimelineAccessDelegatedEvent_AccessDelegatedEventFragmentDoc}
+  ${TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragmentDoc}
+  ${TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmentDoc}
+  ${TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {

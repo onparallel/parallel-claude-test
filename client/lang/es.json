@@ -5510,6 +5510,11 @@
     "context": "{contact} opened the petition {timeAgo}"
   },
   {
+    "term": "timeline.add-group-permission-description",
+    "definition": "{same, select, true {Compartiste} other {{user} compartió}} esta petición con {groupName} como {permissionType} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} shared this petition with {groupName} as {permissionType} {timeAgo}"
+  },
+  {
     "term": "timeline.add-user-permission-description",
     "definition": "{same, select, true {Compartiste} other {{user} compartió}} esta petición con {other} como {permissionType} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} shared this petition with {other} as {permissionType} {timeAgo}"
@@ -5528,6 +5533,11 @@
     "term": "timeline.comment-published-description",
     "definition": "{same, select, true {Comentaste} other {{author} comentó}} en el campo {field} {timeAgo}",
     "context": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+  },
+  {
+    "term": "timeline.edit-group-permission-description",
+    "definition": "{same, select, true {Actualizaste} other {{user} actualizó}} el permiso de {groupName} a {permissionType} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}"
   },
   {
     "term": "timeline.edit-user-permission-description",
@@ -5603,6 +5613,11 @@
     "term": "timeline.reminder-sent-description-manual",
     "definition": "{same, select, true {Enviaste} other {{user} envió}} un recordatorio manual a {contact} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
+  },
+  {
+    "term": "timeline.remove-group-permission-description",
+    "definition": "{same, select, true {Dejaste} other {{user} dejó}} de compartir esta petición con {groupName} {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} stopped sharing this petition with {groupName} {timeAgo}"
   },
   {
     "term": "timeline.remove-user-permission-description",

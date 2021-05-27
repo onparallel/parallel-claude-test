@@ -159,9 +159,9 @@ export type GenerateUserAuthTokenResponse = {
 export type GroupPermissionAddedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup: Maybe<UserGroup>;
+  permissionGroup: UserGroup;
   permissionType: PetitionUserPermissionType;
-  user: Maybe<User>;
+  user: User;
 };
 
 export type GroupPermissionEditedEvent = PetitionEvent & {

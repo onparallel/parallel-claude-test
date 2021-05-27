@@ -195,7 +195,7 @@ type GenerateUserAuthTokenResponse {
 type GroupPermissionAddedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
-  permissionGroup: UserGroup
+  permissionGroup: UserGroup!
   permissionType: PetitionUserPermissionType!
   user: User
 }
@@ -203,7 +203,7 @@ type GroupPermissionAddedEvent implements PetitionEvent {
 type GroupPermissionEditedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
-  permissionGroup: UserGroup
+  permissionGroup: UserGroup!
   permissionType: PetitionUserPermissionType!
   user: User
 }
@@ -211,7 +211,7 @@ type GroupPermissionEditedEvent implements PetitionEvent {
 type GroupPermissionRemovedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
-  permissionGroup: UserGroup
+  permissionGroup: UserGroup!
   user: User
 }
 

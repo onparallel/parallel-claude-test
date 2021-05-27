@@ -590,7 +590,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
+    permissionGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -598,7 +598,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
+    permissionGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     permissionType: NexusGenEnums["PetitionUserPermissionType"]; // PetitionUserPermissionType!
     user: NexusGenRootTypes["User"] | null; // User
   };
@@ -606,7 +606,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    permissionGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
+    permissionGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     user: NexusGenRootTypes["User"] | null; // User
   };
   MessageCancelledEvent: {
