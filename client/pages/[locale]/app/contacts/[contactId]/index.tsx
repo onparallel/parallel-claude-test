@@ -33,8 +33,6 @@ import {
   ContactUserQuery,
   Contact_PetitionAccessFragment,
   Contact_UserFragment,
-  PetitionUserGroupPermission,
-  PetitionUserPermission,
   useContactQuery,
   useContactUserQuery,
   useContact_updateContactMutation,

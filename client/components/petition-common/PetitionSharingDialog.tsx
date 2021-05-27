@@ -149,6 +149,11 @@ export function PetitionSharingDialog({
       ? userPermissions?.map((up) => up.user.id) ?? []
       : [userId];
 
+  const groupsToExlude =
+    petitionIds.length === 1
+      ? groupPermissions?.map((up) => up.group.id) ?? []
+      : [];
+
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
     async (
@@ -159,7 +164,7 @@ export function PetitionSharingDialog({
       return await _handleSearchUsers(search, {
         includeGroups: true,
         excludeUsers: [...excludeUsers, ...usersToExclude],
-        excludeUserGroups: excludeUserGroups,
+        excludeUserGroups: [...excludeUserGroups, ...groupsToExlude],
       });
     },
     [_handleSearchUsers, userPermissions]
@@ -440,35 +445,48 @@ export function PetitionSharingDialog({
                         </UserListPopover>
                       </Flex>
                     </Box>
-                    <Menu placement="bottom-end">
-                      <MenuButton
-                        as={Button}
-                        variant="ghost"
-                        size="sm"
-                        rightIcon={<ChevronDownIcon />}
+                    {!petitionsOwned.length ? (
+                      <Box
+                        paddingX={3}
+                        fontWeight="bold"
+                        fontStyle="italic"
+                        fontSize="sm"
+                        color="gray.500"
+                        cursor="default"
                       >
-                        <UserPermissionType type="WRITE" />
-                      </MenuButton>
-                      <Portal>
-                        <MenuList minWidth={40}>
-                          <MenuItem
-                            color="red.500"
-                            onClick={() =>
-                              handleRemoveUserPermission({
-                                petitionId,
-                                userGroup: group,
-                              })
-                            }
-                            icon={<DeleteIcon display="block" boxSize={4} />}
-                          >
-                            <FormattedMessage
-                              id="generic.remove"
-                              defaultMessage="Remove"
-                            />
-                          </MenuItem>
-                        </MenuList>
-                      </Portal>
-                    </Menu>
+                        <UserPermissionType type={permissionType} />
+                      </Box>
+                    ) : (
+                      <Menu placement="bottom-end">
+                        <MenuButton
+                          as={Button}
+                          variant="ghost"
+                          size="sm"
+                          rightIcon={<ChevronDownIcon />}
+                        >
+                          <UserPermissionType type="WRITE" />
+                        </MenuButton>
+                        <Portal>
+                          <MenuList minWidth={40}>
+                            <MenuItem
+                              color="red.500"
+                              onClick={() =>
+                                handleRemoveUserPermission({
+                                  petitionId,
+                                  userGroup: group,
+                                })
+                              }
+                              icon={<DeleteIcon display="block" boxSize={4} />}
+                            >
+                              <FormattedMessage
+                                id="generic.remove"
+                                defaultMessage="Remove"
+                              />
+                            </MenuItem>
+                          </MenuList>
+                        </Portal>
+                      </Menu>
+                    )}
                   </Flex>
                 );
               })}
