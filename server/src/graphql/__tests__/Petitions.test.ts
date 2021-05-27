@@ -633,19 +633,7 @@ describe("GraphQL/Petitions", () => {
             isFixed: true,
           },
           {
-            type: "TEXT",
-            isFixed: false,
-          },
-          {
             type: "SHORT_TEXT",
-            isFixed: false,
-          },
-          {
-            type: "FILE_UPLOAD",
-            isFixed: false,
-          },
-          {
-            type: "SELECT",
             isFixed: false,
           },
         ],
@@ -693,19 +681,7 @@ describe("GraphQL/Petitions", () => {
             isFixed: true,
           },
           {
-            type: "TEXT",
-            isFixed: false,
-          },
-          {
             type: "SHORT_TEXT",
-            isFixed: false,
-          },
-          {
-            type: "FILE_UPLOAD",
-            isFixed: false,
-          },
-          {
-            type: "SELECT",
             isFixed: false,
           },
         ],
