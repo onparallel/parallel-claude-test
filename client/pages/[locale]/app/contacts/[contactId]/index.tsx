@@ -308,17 +308,19 @@ function useContactPetitionAccessesColumns() {
           }),
           align: "center",
           cellProps: { width: "1%" },
-          CellContent: ({ row: { petition }, column }) => {
-            return (
-              <Flex justifyContent={column.align}>
-                <UserAvatarList
-                  users={petition!.permissions.map((e) =>
-                    e.__typename === "PetitionUserPermission" ? e.user : e.group
-                  )}
-                />
-              </Flex>
-            );
-          },
+          CellContent: ({ row: { petition }, column }) => (
+            <Flex justifyContent={column.align}>
+              <UserAvatarList
+                usersOrGroups={petition!.permissions.map((p) =>
+                  p.__typename === "PetitionUserPermission"
+                    ? p.user
+                    : p.__typename === "PetitionUserGroupPermission"
+                    ? p.group
+                    : (null as never)
+                )}
+              />
+            </Flex>
+          ),
         },
         {
           key: "createdAt",
@@ -392,23 +394,22 @@ Contact.fragments = {
         permissionType
         ... on PetitionUserPermission {
           user {
-            id
             ...UserAvatarList_User
           }
         }
         ... on PetitionUserGroupPermission {
           group {
-            id
-            name
+            ...UserAvatarList_UserGroup
           }
         }
       }
       ...PetitionStatusCellContent_Petition
       ...PetitionSignatureCellContent_Petition
     }
+    ${UserAvatarList.fragments.User}
+    ${UserAvatarList.fragments.UserGroup}
     ${PetitionStatusCellContent.fragments.Petition}
     ${PetitionSignatureCellContent.fragments.Petition}
-    ${UserAvatarList.fragments.User}
   `,
   User: gql`
     fragment Contact_User on User {

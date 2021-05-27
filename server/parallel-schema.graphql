@@ -1256,7 +1256,7 @@ type Petition implements PetitionBase {
   """
   The effective permission of the logged user
   """
-  myEffectivePermissions: EffectivePetitionUserPermission!
+  myEffectivePermission: EffectivePetitionUserPermission!
 
   """
   The name of the petition.
@@ -1470,7 +1470,7 @@ interface PetitionBase {
   """
   The effective permission of the logged user
   """
-  myEffectivePermissions: EffectivePetitionUserPermission!
+  myEffectivePermission: EffectivePetitionUserPermission!
 
   """
   The name of the petition.
@@ -2113,7 +2113,7 @@ type PetitionTemplate implements PetitionBase {
   """
   The effective permission of the logged user
   """
-  myEffectivePermissions: EffectivePetitionUserPermission!
+  myEffectivePermission: EffectivePetitionUserPermission!
 
   """
   The name of the petition.

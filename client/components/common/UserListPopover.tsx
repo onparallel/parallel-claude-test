@@ -21,13 +21,16 @@ import gql from "graphql-tag";
 import { ReactNode } from "react";
 
 export function UserListPopover({
-  users,
+  usersOrGroups,
   children,
 }: {
-  users: UserListPopover_UserFragment[] | UserListPopover_UserGroupFragment[];
+  usersOrGroups: (
+    | UserListPopover_UserFragment
+    | UserListPopover_UserGroupFragment
+  )[];
   children: ReactNode;
 }) {
-  if (users.length === 0) {
+  if (usersOrGroups.length === 0) {
     return <>{children}</>;
   }
 
@@ -44,39 +47,29 @@ export function UserListPopover({
             maxHeight="300px"
           >
             <Stack as={List}>
-              {users.map((u) => {
-                const name =
-                  u.__typename === "User"
-                    ? u.fullName
-                    : u.__typename === "UserGroup"
-                    ? u.name
-                    : "";
-
-                const avatar =
-                  u.__typename === "User" ? (
-                    <Avatar size="xs" name={name ?? undefined} />
-                  ) : (
-                    <Avatar
-                      size="xs"
-                      bg="gray.200"
-                      icon={<UsersIcon boxSize={3.5} />}
-                    />
-                  );
-
-                return (
-                  <Flex
-                    key={u.id}
-                    as={ListItem}
-                    alignItems="center"
-                    paddingX={4}
-                  >
-                    {avatar}
-                    <Text flex="1" marginLeft={2} isTruncated>
-                      {name}
-                    </Text>
-                  </Flex>
-                );
-              })}
+              {usersOrGroups.map((u) => (
+                <Flex key={u.id} as={ListItem} alignItems="center" paddingX={4}>
+                  {u.__typename === "User" ? (
+                    <>
+                      <Avatar size="xs" name={u.fullName ?? undefined} />
+                      <Text flex="1" marginLeft={2} isTruncated>
+                        {u.fullName}
+                      </Text>
+                    </>
+                  ) : u.__typename === "UserGroup" ? (
+                    <>
+                      <Avatar
+                        size="xs"
+                        backgroundColor="gray.200"
+                        icon={<UsersIcon boxSize={3.5} />}
+                      />
+                      <Text flex="1" marginLeft={2} isTruncated>
+                        {u.name}
+                      </Text>
+                    </>
+                  ) : null}
+                </Flex>
+              ))}
             </Stack>
           </PopoverBody>
         </PopoverContent>
@@ -99,13 +92,7 @@ UserListPopover.fragments = {
       fragment UserListPopover_UserGroup on UserGroup {
         id
         name
-        members {
-          user {
-            ...UserListPopover_User
-          }
-        }
       }
-      ${this.User}
     `;
   },
 };

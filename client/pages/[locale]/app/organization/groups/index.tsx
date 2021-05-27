@@ -246,7 +246,7 @@ function OrganizationGroups() {
     <SettingsLayout
       title={intl.formatMessage({
         id: "view.groups.title",
-        defaultMessage: "Work groups",
+        defaultMessage: "User groups",
       })}
       basePath="/app/organization"
       sections={sections}
@@ -261,7 +261,7 @@ function OrganizationGroups() {
         <Heading as="h3" size="md">
           <FormattedMessage
             id="view.groups.title"
-            defaultMessage="Work groups"
+            defaultMessage="User groups"
           />
         </Heading>
       }
@@ -362,7 +362,7 @@ function useOrganizationGroupsTableColumns(): TableColumn<OrganizationGroups_Use
 
           return users.length ? (
             <Flex justifyContent={column.align}>
-              <UserAvatarList users={users} max={10} />
+              <UserAvatarList usersOrGroups={users} max={10} />
             </Flex>
           ) : (
             <OverflownText textStyle={"hint"}>

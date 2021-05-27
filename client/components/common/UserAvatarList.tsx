@@ -17,21 +17,29 @@ import {
 import { UserListPopover } from "./UserListPopover";
 
 interface UserAvatarListProps {
-  users: UserAvatarList_UserFragment[] | UserAvatarList_UserGroupFragment[];
+  usersOrGroups: (
+    | UserAvatarList_UserFragment
+    | UserAvatarList_UserGroupFragment
+  )[];
   size?: string;
   max?: number;
 }
 
 export const UserAvatarList = Object.assign(
   chakraForwardRef<"div", UserAvatarListProps>(function UserAvatarList(
-    { users = [], size = "xs", max = 3 },
+    { usersOrGroups, size = "xs", max = 3 },
     ref
   ) {
     const styles = useMultiStyleConfig("Avatar", { size });
-    const slice = users.length === max + 1 ? [...users] : users.slice(0, max);
+    const slice =
+      usersOrGroups.length === max + 1
+        ? [...usersOrGroups]
+        : usersOrGroups.slice(0, max);
     slice.reverse();
     const excess =
-      users.length > slice.length ? users.length - slice.length : null;
+      usersOrGroups.length > slice.length
+        ? usersOrGroups.length - slice.length
+        : null;
 
     return (
       <Flex
@@ -42,7 +50,7 @@ export const UserAvatarList = Object.assign(
         alignItems="center"
       >
         {excess && (
-          <UserListPopover users={users}>
+          <UserListPopover usersOrGroups={usersOrGroups}>
             <Flex
               alignItems="center"
               fontSize="2xs"
@@ -55,7 +63,6 @@ export const UserAvatarList = Object.assign(
           </UserListPopover>
         )}
         {slice.map((u) => {
-          const id = u.id;
           const name =
             u.__typename === "User"
               ? u.fullName
@@ -63,18 +70,18 @@ export const UserAvatarList = Object.assign(
               ? u.name
               : "";
 
-          const nameElement =
+          const label =
             u.__typename === "User" ? (
-              name
+              u.fullName
             ) : (
-              <Stack direction={"row"} spacing={2} align="center">
+              <Stack direction="row" spacing={2} alignItems="center">
                 <UsersIcon />
                 <Text>{name}</Text>
               </Stack>
             );
 
           return (
-            <Tooltip key={id} label={nameElement!} isDisabled={!name}>
+            <Tooltip key={u.id} label={label} isDisabled={!name}>
               <Box
                 paddingY={1}
                 marginY={-1}
@@ -126,13 +133,7 @@ export const UserAvatarList = Object.assign(
           fragment UserAvatarList_UserGroup on UserGroup {
             id
             name
-            members {
-              user {
-                ...UserAvatarList_User
-              }
-            }
           }
-          ${this.User}
         `;
       },
     },

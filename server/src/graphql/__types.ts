@@ -773,7 +773,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    myEffectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"]; // EffectivePetitionUserPermission!
+    myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"]; // EffectivePetitionUserPermission!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
@@ -953,7 +953,7 @@ export interface NexusGenFieldTypes {
     isPublic: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    myEffectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"]; // EffectivePetitionUserPermission!
+    myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"]; // EffectivePetitionUserPermission!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
@@ -1318,7 +1318,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    myEffectivePermissions: NexusGenRootTypes["EffectivePetitionUserPermission"]; // EffectivePetitionUserPermission!
+    myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"]; // EffectivePetitionUserPermission!
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
@@ -1616,7 +1616,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
-    myEffectivePermissions: "EffectivePetitionUserPermission";
+    myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
     organization: "Organization";
     owner: "User";
@@ -1796,7 +1796,7 @@ export interface NexusGenFieldTypeNames {
     isPublic: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
-    myEffectivePermissions: "EffectivePetitionUserPermission";
+    myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
     organization: "Organization";
     owner: "User";
@@ -2161,7 +2161,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
-    myEffectivePermissions: "EffectivePetitionUserPermission";
+    myEffectivePermission: "EffectivePetitionUserPermission";
     name: "String";
     organization: "Organization";
     owner: "User";

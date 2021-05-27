@@ -22,7 +22,7 @@ export function useOrganizationSections() {
       {
         title: intl.formatMessage({
           id: "view.groups.title",
-          defaultMessage: "Work groups",
+          defaultMessage: "User groups",
         }),
         path: "/app/organization/groups",
       },

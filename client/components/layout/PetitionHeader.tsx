@@ -103,7 +103,7 @@ export function PetitionHeader({
     } catch {}
   };
 
-  const isSubscribed = petition.myEffectivePermissions.isSubscribed;
+  const isSubscribed = petition.myEffectivePermission.isSubscribed;
 
   const [updatePetitionUserSubscription] =
     usePetitionHeader_updatePetitionUserSubscriptionMutation();
@@ -468,7 +468,7 @@ PetitionHeader.fragments = {
       deadline
       status
 
-      myEffectivePermissions {
+      myEffectivePermission {
         isSubscribed
       }
       ...HeaderNameEditable_PetitionBase
@@ -503,7 +503,7 @@ PetitionHeader.mutations = [
         isSubscribed: $isSubscribed
       ) {
         id
-        myEffectivePermissions {
+        myEffectivePermission {
           isSubscribed
         }
       }

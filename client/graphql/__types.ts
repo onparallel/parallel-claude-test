@@ -1055,7 +1055,7 @@ export type Petition = PetitionBase & {
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user */
-  myEffectivePermissions: EffectivePetitionUserPermission;
+  myEffectivePermission: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1173,7 +1173,7 @@ export type PetitionBase = {
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user */
-  myEffectivePermissions: EffectivePetitionUserPermission;
+  myEffectivePermission: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1515,7 +1515,7 @@ export type PetitionTemplate = PetitionBase & {
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user */
-  myEffectivePermissions: EffectivePetitionUserPermission;
+  myEffectivePermission: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -2545,13 +2545,7 @@ export type UserAvatarList_UserFragment = { __typename?: "User" } & Pick<
 
 export type UserAvatarList_UserGroupFragment = {
   __typename?: "UserGroup";
-} & Pick<UserGroup, "id" | "name"> & {
-    members: Array<
-      { __typename?: "UserGroupMember" } & {
-        user: { __typename?: "User" } & UserAvatarList_UserFragment;
-      }
-    >;
-  };
+} & Pick<UserGroup, "id" | "name">;
 
 export type UserListPopover_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -2560,13 +2554,7 @@ export type UserListPopover_UserFragment = { __typename?: "User" } & Pick<
 
 export type UserListPopover_UserGroupFragment = {
   __typename?: "UserGroup";
-} & Pick<UserGroup, "id" | "name"> & {
-    members: Array<
-      { __typename?: "UserGroupMember" } & {
-        user: { __typename?: "User" } & UserListPopover_UserFragment;
-      }
-    >;
-  };
+} & Pick<UserGroup, "id" | "name">;
 
 export type UserSelect_UserFragment = { __typename?: "User" } & Pick<
   User,
@@ -2675,7 +2663,7 @@ export type HeaderNameEditable_PetitionBaseFragment =
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "locale" | "deadline" | "status"> & {
-    myEffectivePermissions: {
+    myEffectivePermission: {
       __typename?: "EffectivePetitionUserPermission";
     } & Pick<EffectivePetitionUserPermission, "isSubscribed">;
   } & HeaderNameEditable_PetitionBase_Petition_Fragment;
@@ -2711,7 +2699,7 @@ export type PetitionHeader_updatePetitionUserSubscriptionMutation = {
     Petition,
     "id"
   > & {
-      myEffectivePermissions: {
+      myEffectivePermission: {
         __typename?: "EffectivePetitionUserPermission";
       } & Pick<EffectivePetitionUserPermission, "isSubscribed">;
     };
@@ -3709,16 +3697,9 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
           "id" | "name"
         >;
       };
-    permissions: Array<
-      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-          PetitionUserGroupPermission,
-          "permissionType"
-        > & { group: { __typename?: "UserGroup" } & Pick<UserGroup, "id"> })
-      | ({ __typename?: "PetitionUserPermission" } & Pick<
-          PetitionUserPermission,
-          "permissionType"
-        > & { user: { __typename?: "User" } & Pick<User, "id"> })
-    >;
+    myEffectivePermission: {
+      __typename?: "EffectivePetitionUserPermission";
+    } & Pick<EffectivePetitionUserPermission, "permissionType">;
   };
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables =
@@ -4601,18 +4582,14 @@ export type Contact_PetitionFragment = { __typename?: "Petition" } & Pick<
           PetitionUserGroupPermission,
           "permissionType"
         > & {
-            group: { __typename?: "UserGroup" } & Pick<
-              UserGroup,
-              "id" | "name"
-            >;
+            group: {
+              __typename?: "UserGroup";
+            } & UserAvatarList_UserGroupFragment;
           })
       | ({ __typename?: "PetitionUserPermission" } & Pick<
           PetitionUserPermission,
           "permissionType"
-        > & {
-            user: { __typename?: "User" } & Pick<User, "id"> &
-              UserAvatarList_UserFragment;
-          })
+        > & { user: { __typename?: "User" } & UserAvatarList_UserFragment })
     >;
   } & PetitionStatusCellContent_PetitionFragment &
   PetitionSignatureCellContent_PetitionFragment;
@@ -6176,16 +6153,9 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
           PetitionUserGroupPermission,
           "permissionType"
         > & {
-            group: { __typename?: "UserGroup" } & Pick<
-              UserGroup,
-              "id" | "name"
-            > & {
-                members: Array<
-                  { __typename?: "UserGroupMember" } & {
-                    user: { __typename?: "User" } & Pick<User, "fullName">;
-                  }
-                >;
-              };
+            group: {
+              __typename?: "UserGroup";
+            } & UserAvatarList_UserGroupFragment;
           })
       | ({ __typename?: "PetitionUserPermission" } & Pick<
           PetitionUserPermission,
@@ -6204,16 +6174,9 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
           PetitionUserGroupPermission,
           "permissionType"
         > & {
-            group: { __typename?: "UserGroup" } & Pick<
-              UserGroup,
-              "id" | "name"
-            > & {
-                members: Array<
-                  { __typename?: "UserGroupMember" } & {
-                    user: { __typename?: "User" } & Pick<User, "fullName">;
-                  }
-                >;
-              };
+            group: {
+              __typename?: "UserGroup";
+            } & UserAvatarList_UserGroupFragment;
           })
       | ({ __typename?: "PetitionUserPermission" } & Pick<
           PetitionUserPermission,
@@ -6284,43 +6247,11 @@ export const TagEditDialog_TagFragmentDoc = gql`
   }
   ${Tag_TagFragmentDoc}
 `;
-export const UserListPopover_UserFragmentDoc = gql`
-  fragment UserListPopover_User on User {
-    id
-    fullName
-  }
-`;
-export const UserAvatarList_UserFragmentDoc = gql`
-  fragment UserAvatarList_User on User {
-    id
-    fullName
-    ...UserListPopover_User
-  }
-  ${UserListPopover_UserFragmentDoc}
-`;
-export const UserAvatarList_UserGroupFragmentDoc = gql`
-  fragment UserAvatarList_UserGroup on UserGroup {
-    id
-    name
-    members {
-      user {
-        ...UserAvatarList_User
-      }
-    }
-  }
-  ${UserAvatarList_UserFragmentDoc}
-`;
 export const UserListPopover_UserGroupFragmentDoc = gql`
   fragment UserListPopover_UserGroup on UserGroup {
     id
     name
-    members {
-      user {
-        ...UserListPopover_User
-      }
-    }
   }
-  ${UserListPopover_UserFragmentDoc}
 `;
 export const UserSelect_UserFragmentDoc = gql`
   fragment UserSelect_User on User {
@@ -6413,18 +6344,8 @@ export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
       }
       fullName
     }
-    permissions {
+    myEffectivePermission {
       permissionType
-      ... on PetitionUserPermission {
-        user {
-          id
-        }
-      }
-      ... on PetitionUserGroupPermission {
-        group {
-          id
-        }
-      }
     }
     updatedAt
   }
@@ -6632,6 +6553,26 @@ export const Contact_Contact_ProfileFragmentDoc = gql`
     lastName
   }
 `;
+export const UserListPopover_UserFragmentDoc = gql`
+  fragment UserListPopover_User on User {
+    id
+    fullName
+  }
+`;
+export const UserAvatarList_UserFragmentDoc = gql`
+  fragment UserAvatarList_User on User {
+    id
+    fullName
+    ...UserListPopover_User
+  }
+  ${UserListPopover_UserFragmentDoc}
+`;
+export const UserAvatarList_UserGroupFragmentDoc = gql`
+  fragment UserAvatarList_UserGroup on UserGroup {
+    id
+    name
+  }
+`;
 export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
   fragment PetitionStatusCellContent_Petition on Petition {
     status
@@ -6659,14 +6600,12 @@ export const Contact_PetitionFragmentDoc = gql`
       permissionType
       ... on PetitionUserPermission {
         user {
-          id
           ...UserAvatarList_User
         }
       }
       ... on PetitionUserGroupPermission {
         group {
-          id
-          name
+          ...UserAvatarList_UserGroup
         }
       }
     }
@@ -6674,6 +6613,7 @@ export const Contact_PetitionFragmentDoc = gql`
     ...PetitionSignatureCellContent_Petition
   }
   ${UserAvatarList_UserFragmentDoc}
+  ${UserAvatarList_UserGroupFragmentDoc}
   ${PetitionStatusCellContent_PetitionFragmentDoc}
   ${PetitionSignatureCellContent_PetitionFragmentDoc}
 `;
@@ -6811,7 +6751,7 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     locale
     deadline
     status
-    myEffectivePermissions {
+    myEffectivePermission {
       isSubscribed
     }
     ...HeaderNameEditable_PetitionBase
@@ -7884,13 +7824,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
       }
       ... on PetitionUserGroupPermission {
         group {
-          id
-          name
-          members {
-            user {
-              fullName
-            }
-          }
+          ...UserAvatarList_UserGroup
         }
       }
     }
@@ -7910,6 +7844,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
     }
   }
   ${UserAvatarList_UserFragmentDoc}
+  ${UserAvatarList_UserGroupFragmentDoc}
   ${PetitionTagListCellContent_PetitionBaseFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
   ${PetitionStatusCellContent_PetitionFragmentDoc}
@@ -9029,7 +8964,7 @@ export const PetitionHeader_updatePetitionUserSubscriptionDocument = gql`
       isSubscribed: $isSubscribed
     ) {
       id
-      myEffectivePermissions {
+      myEffectivePermission {
         isSubscribed
       }
     }

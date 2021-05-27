@@ -92,7 +92,7 @@ export const PetitionBase = interfaceType({
         return await ctx.petitions.loadUserAndUserGroupPermissions(root.id);
       },
     });
-    t.nonNull.field("myEffectivePermissions", {
+    t.nonNull.field("myEffectivePermission", {
       type: "EffectivePetitionUserPermission",
       description: "The effective permission of the logged user",
       resolve: async (root, _, ctx) => {

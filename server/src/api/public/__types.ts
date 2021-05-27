@@ -1028,7 +1028,7 @@ export type Petition = PetitionBase & {
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user */
-  myEffectivePermissions: EffectivePetitionUserPermission;
+  myEffectivePermission: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1142,7 +1142,7 @@ export type PetitionBase = {
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user */
-  myEffectivePermissions: EffectivePetitionUserPermission;
+  myEffectivePermission: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1469,7 +1469,7 @@ export type PetitionTemplate = PetitionBase & {
   /** The locale of the petition. */
   locale: PetitionLocale;
   /** The effective permission of the logged user */
-  myEffectivePermissions: EffectivePetitionUserPermission;
+  myEffectivePermission: EffectivePetitionUserPermission;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;

@@ -1570,6 +1570,11 @@
     "context": "Search for existing users"
   },
   {
+    "term": "component.user-select.search-hint-include-groups",
+    "definition": "Search for existing users and groups",
+    "context": "Search for existing users and groups"
+  },
+  {
     "term": "component.user-select.user-group-icon-alt",
     "definition": "User group",
     "context": "User group"
@@ -5986,8 +5991,8 @@
   },
   {
     "term": "view.groups.title",
-    "definition": "Work groups",
-    "context": "Work groups"
+    "definition": "User groups",
+    "context": "User groups"
   },
   {
     "term": "view.organization.title",

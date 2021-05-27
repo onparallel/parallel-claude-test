@@ -140,7 +140,12 @@ type AsyncUserSelectProps<
 function useUserSelectReactSelectProps<
   IsMulti extends boolean,
   IncludeGroups extends boolean
->(props: UseReactSelectProps): AsyncUserSelectProps<IsMulti, IncludeGroups> {
+>({
+  includeGroups,
+  ...props
+}: UseReactSelectProps & {
+  includeGroups?: IncludeGroups;
+}): AsyncUserSelectProps<IsMulti, IncludeGroups> {
   const reactSelectProps =
     useReactSelectProps<UserSelectSelection<IncludeGroups>, IsMulti>(props);
   return useMemo<AsyncUserSelectProps<IsMulti, IncludeGroups>>(
@@ -181,10 +186,17 @@ function useUserSelectReactSelectProps<
                 </>
               ) : (
                 <Text as="div" color="gray.400">
-                  <FormattedMessage
-                    id="component.user-select.search-hint"
-                    defaultMessage="Search for existing users"
-                  />
+                  {includeGroups ? (
+                    <FormattedMessage
+                      id="component.user-select.search-hint-include-groups"
+                      defaultMessage="Search for existing users and groups"
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="component.user-select.search-hint"
+                      defaultMessage="Search for existing users"
+                    />
+                  )}
                 </Text>
               )}
             </Stack>
@@ -236,7 +248,9 @@ function useUserSelectReactSelectProps<
                     : data.email}
                 </Text>
               ) : data.__typename === "UserGroup" ? (
-                <UserListPopover users={data.members.map((m) => m.user)}>
+                <UserListPopover
+                  usersOrGroups={data.members.map((m) => m.user)}
+                >
                   <Box>
                     <UsersIcon
                       marginRight={1}

@@ -190,17 +190,19 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           }),
           align: "center",
           cellProps: { width: "1%" },
-          CellContent: ({ row: { permissions }, column }) => {
-            return (
-              <Flex justifyContent={column.align}>
-                <UserAvatarList
-                  users={permissions.map((e) =>
-                    e.__typename === "PetitionUserPermission" ? e.user : e.group
-                  )}
-                />
-              </Flex>
-            );
-          },
+          CellContent: ({ row: { permissions }, column }) => (
+            <Flex justifyContent={column.align}>
+              <UserAvatarList
+                usersOrGroups={permissions.map((p) =>
+                  p.__typename === "PetitionUserPermission"
+                    ? p.user
+                    : p.__typename === "PetitionUserGroupPermission"
+                    ? p.group
+                    : (null as never)
+                )}
+              />
+            </Flex>
+          ),
         },
         {
           key: "createdAt",
@@ -259,13 +261,7 @@ usePetitionsTableColumns.fragments = {
         }
         ... on PetitionUserGroupPermission {
           group {
-            id
-            name
-            members {
-              user {
-                fullName
-              }
-            }
+            ...UserAvatarList_UserGroup
           }
         }
       }
@@ -285,6 +281,7 @@ usePetitionsTableColumns.fragments = {
       }
     }
     ${UserAvatarList.fragments.User}
+    ${UserAvatarList.fragments.UserGroup}
     ${PetitionTagListCellContent.fragments.PetitionBase}
     ${ContactLink.fragments.Contact}
     ${PetitionStatusCellContent.fragments.Petition}

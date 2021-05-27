@@ -122,7 +122,7 @@ describe("GraphQL/Petition Permissions", () => {
         query: gql`
           query ($petitionId: GID!) {
             petition(id: $petitionId) {
-              myEffectivePermissions {
+              myEffectivePermission {
                 permissionType
                 isSubscribed
               }
@@ -136,7 +136,7 @@ describe("GraphQL/Petition Permissions", () => {
 
       expect(errors).toBeUndefined();
       expect(data.petition).toEqual({
-        myEffectivePermissions: {
+        myEffectivePermission: {
           permissionType: "OWNER",
           isSubscribed: true,
         },

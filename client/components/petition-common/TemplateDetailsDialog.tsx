@@ -113,10 +113,8 @@ export function TemplateDetailsDialog({
   "CREATE_PETITION" | "CLONE_TEMPLATE" | "EDIT_TEMPLATE"
 >) {
   const intl = useIntl();
-  const canEdit = template.permissions.some(
-    (permission) =>
-      permission.user.id === userId &&
-      ["OWNER", "WRITE"].includes(permission.permissionType)
+  const canEdit = ["OWNER", "WRITE"].includes(
+    template.myEffectivePermission.permissionType
   );
 
   const indices = useFieldIndices(template.fields);
@@ -321,18 +319,8 @@ TemplateDetailsDialog.fragments = {
         }
         fullName
       }
-      permissions {
+      myEffectivePermission {
         permissionType
-        ... on PetitionUserPermission {
-          user {
-            id
-          }
-        }
-        ... on PetitionUserGroupPermission {
-          group {
-            id
-          }
-        }
       }
       updatedAt
     }

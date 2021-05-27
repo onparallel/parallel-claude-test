@@ -60,7 +60,7 @@ import {
 import { UserPermissionType } from "./UserPermissionType";
 
 type PetitionSharingDialogData = {
-  selection: UserSelectSelection[];
+  selection: UserSelectSelection<true>[];
   notify: boolean;
   message: string;
 };
@@ -428,7 +428,7 @@ export function PetitionSharingDialog({
                         alignItems="center"
                       >
                         <UserListPopover
-                          users={group.members.map((m) => m.user)}
+                          usersOrGroups={group.members.map((m) => m.user)}
                         >
                           <Text color="gray.500" isTruncated>
                             <FormattedMessage
