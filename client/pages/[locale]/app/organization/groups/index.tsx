@@ -54,6 +54,7 @@ import {
   useOrganizationGroups_createUserGroupMutation,
   useOrganizationGroups_deleteUserGroupMutation,
 } from "@parallel/graphql/__types";
+import { withError } from "@parallel/utils/promises/withError";
 
 const SORTING = ["name", "members", "createdAt"] as const;
 
@@ -177,38 +178,42 @@ function OrganizationGroups() {
 
   const [deleteUserGroup] = useOrganizationGroups_deleteUserGroupMutation();
   const handleDeleteClick = useCallback(async () => {
-    await confirmDelete({ name: selectedGroups[0].name, groupIds: selected });
-    await deleteUserGroup({
-      variables: {
-        ids: selected,
-      },
-    });
-    refetch();
-    toast({
-      title: intl.formatMessage(
-        {
-          id: "view.groups.delete-success-title",
-          defaultMessage:
-            "{count, plural, =1{Group} other{Groups}} deleted successfully.",
+    const [error] = await withError(
+      confirmDelete({ name: selectedGroups[0].name, groupIds: selected })
+    );
+    if (!error) {
+      await deleteUserGroup({
+        variables: {
+          ids: selected,
         },
-        { count: selected.length }
-      ),
-      description: intl.formatMessage(
-        {
-          id: "view.groups.delete-success-description",
-          defaultMessage:
-            "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} successfully deleted.",
-        },
-        {
-          count: selected.length,
-          name: selectedGroups[0].name,
-          b: (chunks: any[]) => <b>{chunks}</b>,
-        }
-      ),
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-    });
+      });
+      refetch();
+      toast({
+        title: intl.formatMessage(
+          {
+            id: "view.groups.delete-success-title",
+            defaultMessage:
+              "{count, plural, =1{Group} other{Groups}} deleted successfully.",
+          },
+          { count: selected.length }
+        ),
+        description: intl.formatMessage(
+          {
+            id: "view.groups.delete-success-description",
+            defaultMessage:
+              "{count, plural, =1 {Group <b>{name}</b>} other{<b>#</b> grups}} successfully deleted.",
+          },
+          {
+            count: selected.length,
+            name: selectedGroups[0].name,
+            b: (chunks: any[]) => <b>{chunks}</b>,
+          }
+        ),
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   }, [userGroups, selected]);
 
   const [createUserGroup] = useOrganizationGroups_createUserGroupMutation();

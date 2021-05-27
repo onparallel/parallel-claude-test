@@ -70,6 +70,7 @@ import { sort, sortBy } from "remeda";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { If } from "@parallel/utils/conditions";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { withError } from "@parallel/utils/promises/withError";
 
 const SORTING = ["fullName", "email", "addedAt"] as const;
 
@@ -196,11 +197,13 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const [deleteUserGroup] = useOrganizationGroup_deleteUserGroupMutation();
   const confirmDelete = useConfirmDeleteGroupsDialog();
   const handleDeleteGroup = async () => {
-    await confirmDelete({ name });
-    await deleteUserGroup({ variables: { ids: [groupId] } });
-    router.push({
-      pathname: `/${router.query.locale}/app/organization/groups`,
-    });
+    const [error] = await withError(confirmDelete({ name }));
+    if (!error) {
+      await deleteUserGroup({ variables: { ids: [groupId] } });
+      router.push({
+        pathname: `/${router.query.locale}/app/organization/groups`,
+      });
+    }
   };
 
   const [_cloneUserGroup] = useOrganizationGroup_cloneUserGroupMutation();
