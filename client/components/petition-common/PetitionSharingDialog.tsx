@@ -83,6 +83,8 @@ export function PetitionSharingDialog({
   const toast = useToast();
   const [hasUsers, setHasUsers] = useState(false);
 
+  const containerRef = useRef<HTMLInputElement>(null);
+
   const { data } = usePetitionSharingModal_PetitionsUserPermissionsQuery({
     variables: { petitionIds },
     fetchPolicy: "cache-and-network",
@@ -343,6 +345,7 @@ export function PetitionSharingDialog({
             <Stack
               display={hasUsers || petitionIds.length !== 1 ? "none" : "flex"}
               paddingTop={2}
+              ref={containerRef}
             >
               {userPermissions?.map(({ user, permissionType }) => (
                 <Flex key={user.id} alignItems="center">
@@ -386,7 +389,7 @@ export function PetitionSharingDialog({
                       >
                         <UserPermissionType type="WRITE" />
                       </MenuButton>
-                      <Portal>
+                      <Portal containerRef={containerRef}>
                         <MenuList minWidth={40}>
                           <MenuItem
                             onClick={() =>
@@ -466,7 +469,7 @@ export function PetitionSharingDialog({
                         >
                           <UserPermissionType type="WRITE" />
                         </MenuButton>
-                        <Portal>
+                        <Portal containerRef={containerRef}>
                           <MenuList minWidth={40}>
                             <MenuItem
                               color="red.500"
