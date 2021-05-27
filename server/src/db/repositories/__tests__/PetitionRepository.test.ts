@@ -575,6 +575,7 @@ describe("repositories/PetitionRepository", () => {
           [users[1].id],
           [],
           "READ",
+          true,
           users[0]
         );
 
@@ -606,6 +607,7 @@ describe("repositories/PetitionRepository", () => {
             [users[2].id],
             [],
             "WRITE",
+            true,
             users[0]
           );
 
@@ -614,6 +616,7 @@ describe("repositories/PetitionRepository", () => {
           [users[2].id],
           [],
           "READ",
+          true,
           users[0]
         );
         expect(firstPermissions).toHaveLength(1);
@@ -627,6 +630,7 @@ describe("repositories/PetitionRepository", () => {
           [users[3].id],
           [],
           "WRITE",
+          true,
           users[0]
         );
 
@@ -660,6 +664,7 @@ describe("repositories/PetitionRepository", () => {
           userIds,
           [],
           "READ",
+          true,
           users[0]
         );
 
@@ -676,6 +681,7 @@ describe("repositories/PetitionRepository", () => {
           userIds,
           [],
           "WRITE",
+          true,
           users[0]
         );
 
@@ -695,6 +701,7 @@ describe("repositories/PetitionRepository", () => {
           [userId],
           [],
           "READ",
+          true,
           users[0]
         );
       });
@@ -768,6 +775,7 @@ describe("repositories/PetitionRepository", () => {
           [userId],
           [],
           "READ",
+          true,
           users[0]
         );
       });
@@ -797,6 +805,7 @@ describe("repositories/PetitionRepository", () => {
           [users[2].id, users[3].id],
           [],
           "READ",
+          true,
           users[0]
         );
 
@@ -830,6 +839,7 @@ describe("repositories/PetitionRepository", () => {
           [users[1].id],
           [],
           "WRITE",
+          true,
           users[0]
         );
 
@@ -858,6 +868,7 @@ describe("repositories/PetitionRepository", () => {
           [users[1].id],
           [],
           "WRITE",
+          true,
           users[0]
         );
 
@@ -885,6 +896,7 @@ describe("repositories/PetitionRepository", () => {
           [users[1].id, users[2].id, users[3].id],
           [],
           "WRITE",
+          true,
           users[0]
         );
 
@@ -964,6 +976,7 @@ describe("repositories/PetitionRepository", () => {
           [userId],
           [],
           "READ",
+          true,
           users[0]
         );
 
@@ -991,6 +1004,7 @@ describe("repositories/PetitionRepository", () => {
           [userId],
           [],
           "READ",
+          true,
           users[0]
         );
 
