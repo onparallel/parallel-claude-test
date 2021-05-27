@@ -500,6 +500,7 @@ export class PetitionRepository extends BaseRepository {
       granter_id: granterId,
       contact_id: contactId,
       keycode: random(16),
+      reminders_left: 10,
       status: "ACTIVE",
       created_by: `Contact:${recipient.id}`,
       updated_by: `Contact:${recipient.id}`,
