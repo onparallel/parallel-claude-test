@@ -717,23 +717,17 @@ export class PetitionRepository extends BaseRepository {
         ),
         this.insert(
           "petition_field",
-          (
-            [
-              "HEADING",
-              "TEXT",
-              "SHORT_TEXT",
-              "FILE_UPLOAD",
-              "SELECT",
-            ] as PetitionFieldType[]
-          ).map((type, index) => ({
-            ...defaultFieldOptions(type),
-            petition_id: petition.id,
-            type,
-            is_fixed: type === "HEADING",
-            position: index,
-            created_by: `User:${user.id}`,
-            updated_by: `User:${user.id}`,
-          })),
+          (["HEADING", "SHORT_TEXT"] as PetitionFieldType[]).map(
+            (type, index) => ({
+              ...defaultFieldOptions(type),
+              petition_id: petition.id,
+              type,
+              is_fixed: type === "HEADING",
+              position: index,
+              created_by: `User:${user.id}`,
+              updated_by: `User:${user.id}`,
+            })
+          ),
           t
         ),
       ]);
