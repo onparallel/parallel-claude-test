@@ -13,11 +13,13 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
+import { getColor } from "@chakra-ui/theme-tools";
 import {
   ConditionIcon,
   CopyIcon,
   DeleteIcon,
   DragHandleIcon,
+  PaperclipIcon,
   SettingsIcon,
 } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -31,6 +33,7 @@ import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
+import useMergedRef from "@react-hook/merged-ref";
 import {
   memo,
   useCallback,
@@ -39,7 +42,9 @@ import {
   useState,
 } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
+import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
+import { omit } from "remeda";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
@@ -113,9 +118,27 @@ const _PetitionComposeField = chakraForwardRef<
         fields.findIndex((f) => f.id === field.id)
       )
       .filter((f) => !f.isReadOnly).length > 0;
+
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
+    onDrop: (files: File[]) => {
+      console.log(files);
+    },
+  });
+
+  const _rootProps = getRootProps();
+  const dropzoneRootProps = omit(_rootProps, [
+    "onBlur",
+    "onClick",
+    "onFocus",
+    "onKeyDown",
+    "ref",
+    "tabIndex",
+  ]);
+  const rootRef = useMergedRef(_rootProps.ref, elementRef);
+
   return (
     <Box
-      ref={elementRef}
+      ref={rootRef}
       borderY="1px solid"
       borderColor="gray.200"
       marginY="-1px"
@@ -126,8 +149,11 @@ const _PetitionComposeField = chakraForwardRef<
           generateCssStripe({ size: "1rem", color: "gray.50" })),
       }}
       onFocus={onFocus}
+      {...dropzoneRootProps}
       {...props}
     >
+      <input type="file" {...getInputProps()} />
+      {isDragActive ? <PetitionComposeFieldDragActiveIdicator /> : null}
       <Box
         ref={previewRef}
         display="flex"
@@ -234,6 +260,7 @@ const _PetitionComposeField = chakraForwardRef<
           onSettingsClick={onSettingsClick}
           onDeleteClick={onDeleteClick}
           onVisibilityClick={onFieldVisibilityClick}
+          onAttachmentClick={open}
           className="field-actions"
           position="absolute"
           bottom={0}
@@ -575,6 +602,7 @@ interface PetitionComposeFieldActionsProps
   > {
   canChangeVisibility: boolean;
   onVisibilityClick: () => void;
+  onAttachmentClick: () => void;
 }
 
 const _PetitionComposeFieldActions = chakraForwardRef<
@@ -585,6 +613,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
     field,
     canChangeVisibility,
     onVisibilityClick,
+    onAttachmentClick,
     onCloneField,
     onSettingsClick,
     onDeleteClick,
@@ -650,6 +679,18 @@ const _PetitionComposeFieldActions = chakraForwardRef<
           />
         </SmallPopover>
       )}
+      <IconButtonWithTooltip
+        icon={<PaperclipIcon />}
+        size="sm"
+        variant="ghost"
+        placement="bottom"
+        color="gray.600"
+        label={intl.formatMessage({
+          id: "component.petition-compose-field.add-attachment",
+          defaultMessage: "Add attachment",
+        })}
+        onClick={onAttachmentClick}
+      />
       <IconButtonWithTooltip
         icon={<CopyIcon />}
         size="sm"
@@ -740,6 +781,60 @@ interface DragItem {
   index: number;
   id: string;
   type: string;
+}
+
+function PetitionComposeFieldDragActiveIdicator() {
+  return (
+    <Center
+      position="absolute"
+      left={0}
+      top={0}
+      width="100%"
+      height="100%"
+      zIndex={1}
+      backgroundColor="whiteAlpha.700"
+    >
+      <Box
+        position="absolute"
+        left={0}
+        top={0}
+        width="100%"
+        height="100%"
+        opacity={0.2}
+        sx={{
+          backgroundImage: ((theme: any) => {
+            const c = getColor(theme, "gray.100");
+            return `linear-gradient(135deg, ${c} 25%, white 25%, white 50%, ${c} 50%, ${c} 75%, white 75%, white)`;
+          }) as any,
+          backgroundSize: `3rem 3rem`,
+          backgroundPosition: "top left",
+        }}
+      />
+      <Box
+        position="absolute"
+        left={2}
+        top={2}
+        right={2}
+        bottom={2}
+        border="2px dashed"
+        borderRadius="md"
+        borderColor="gray.300"
+      />
+      <Box
+        padding={2}
+        borderRadius="lg"
+        color="gray.500"
+        backgroundColor="white"
+        fontWeight="bold"
+        zIndex={1}
+      >
+        <FormattedMessage
+          id="component.petition-compose-field.drop-files-to-attach"
+          defaultMessage="Drop here your files to attach them to this field"
+        />
+      </Box>
+    </Center>
+  );
 }
 
 function useDragAndDrop(
