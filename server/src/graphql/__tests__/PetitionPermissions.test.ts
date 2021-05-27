@@ -3,9 +3,16 @@ import { Knex } from "knex";
 import { USER_COGNITO_ID } from "../../../test/mocks";
 import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { Organization, Petition, User, UserGroup } from "../../db/__types";
+import {
+  Organization,
+  Petition,
+  PetitionUser,
+  User,
+  UserGroup,
+} from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
+import { Maybe, MaybeArray } from "../../util/types";
 import { initServer, TestClient } from "./server";
 
 describe("GraphQL/Petition Permissions", () => {
@@ -687,6 +694,7 @@ describe("GraphQL/Petition Permissions", () => {
         testClient.container.get<IEmailsService>(EMAILS),
         "sendPetitionSharingNotificationEmail"
       );
+      const [newUser] = await mocks.createRandomUsers(organization.id, 1);
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -699,6 +707,7 @@ describe("GraphQL/Petition Permissions", () => {
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
+              notify: true
             ) {
               id
 
@@ -720,7 +729,10 @@ describe("GraphQL/Petition Permissions", () => {
         `,
         variables: {
           petitionIds: [toGlobalId("Petition", userPetition.id)],
-          userIds: [toGlobalId("User", userGroupMembers[0].id)],
+          userIds: [
+            toGlobalId("User", userGroupMembers[0].id),
+            toGlobalId("User", newUser.id),
+          ],
           type: "READ",
         },
       });
@@ -741,11 +753,78 @@ describe("GraphQL/Petition Permissions", () => {
               permissionType: "READ",
               user: { id: toGlobalId("User", userGroupMembers[0].id) },
             },
+            {
+              permissionType: "READ",
+              user: { id: toGlobalId("User", newUser.id) },
+            },
           ],
         },
       ]);
 
-      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenCalledTimes(0);
+      const [permission] = await mocks
+        .knex<PetitionUser>("petition_user")
+        .where({
+          petition_id: userPetition.id,
+          user_id: newUser.id,
+          deleted_at: null,
+          from_user_group_id: null,
+        });
+
+      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenLastCalledWith<
+        [number, MaybeArray<number>, Maybe<string>]
+      >(loggedUser.id, [permission.id], null);
+    });
+
+    it("notifies only once per user and petition", async () => {
+      const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
+        testClient.container.get<IEmailsService>(EMAILS),
+        "sendPetitionSharingNotificationEmail"
+      );
+
+      const [newUser] = await mocks.createRandomUsers(organization.id, 1);
+      const [newGroup] = await mocks.createUserGroups(1, organization.id);
+      await mocks.insertUserGroupMembers(newGroup.id, [newUser.id]);
+
+      const { errors } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionIds: [GID!]!
+            $userIds: [GID!]!
+            $userGroupIds: [GID!]!
+            $type: PetitionUserPermissionTypeRW!
+          ) {
+            addPetitionUserPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              userGroupIds: $userGroupIds
+              permissionType: $type
+              notify: true
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userIds: [toGlobalId("User", newUser.id)],
+          userGroupIds: [toGlobalId("UserGroup", newGroup.id)],
+          type: "READ",
+        },
+      });
+      expect(errors).toBeUndefined();
+
+      const [permission] = await mocks
+        .knex<PetitionUser>("petition_user")
+        .where({
+          petition_id: userPetition.id,
+          user_id: newUser.id,
+          deleted_at: null,
+          from_user_group_id: null,
+        });
+
+      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenLastCalledWith<
+        [number, MaybeArray<number>, Maybe<string>]
+      >(loggedUser.id, [permission.id], null);
     });
 
     it("shares a petition with a group", async () => {

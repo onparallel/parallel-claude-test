@@ -162,11 +162,13 @@ export const addPetitionUserPermission = mutationField(
                 cp.petition_id === np.petition_id && cp.user_id === np.user_id
             )
         );
-        ctx.emails.sendPetitionSharingNotificationEmail(
-          ctx.user!.id,
-          newUserPermissions.map((p) => p.id),
-          args.message ?? null
-        );
+        if (newUserPermissions.length > 0) {
+          ctx.emails.sendPetitionSharingNotificationEmail(
+            ctx.user!.id,
+            newUserPermissions.map((p) => p.id),
+            args.message ?? null
+          );
+        }
       }
       return petitions;
     },
