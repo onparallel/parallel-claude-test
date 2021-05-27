@@ -62,7 +62,6 @@ export const searchUsers = queryField("searchUsers", {
     { search, includeGroups, includeInactive, excludeUsers, excludeUserGroups },
     ctx
   ) => {
-    console.log(excludeUsers);
     return await ctx.users.searchUsers(ctx.user!.org_id, search, {
       includeGroups: includeGroups ?? false,
       includeInactive: includeInactive ?? false,
