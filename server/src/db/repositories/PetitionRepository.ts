@@ -2851,7 +2851,7 @@ export class PetitionRepository extends BaseRepository {
                 ) as t(petition_id))
               insert into petition_user(petition_id, user_id, from_user_group_id, is_subscribed, permission_type, created_by)
               select p.petition_id, gm.user_id, gm.user_group_id, true, ?, ? from gm cross join p
-              on conflict do nothing;
+              on conflict do nothing returning *;
             `,
               [
                 ...userGroupIds,
