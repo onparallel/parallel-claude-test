@@ -79,6 +79,10 @@ export const addPetitionUserPermission = mutationField(
         description: "Wether to notify the user via email or not.",
         default: false,
       }),
+      subscribe: booleanArg({
+        description: "Subscribe to notifications.",
+        default: true,
+      }),
       message: stringArg(),
     },
     validateArgs: validateAnd(
@@ -109,6 +113,7 @@ export const addPetitionUserPermission = mutationField(
               args.userIds ?? [],
               args.userGroupIds ?? [],
               args.permissionType,
+              args.subscribe ?? true,
               ctx.user!,
               t
             );

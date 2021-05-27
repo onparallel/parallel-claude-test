@@ -2783,6 +2783,7 @@ export class PetitionRepository extends BaseRepository {
     userIds: number[],
     userGroupIds: number[],
     permissionType: PetitionUserPermissionType,
+    subscribe: boolean,
     user: User,
     t?: Knex.Transaction
   ) {
@@ -2803,7 +2804,7 @@ export class PetitionRepository extends BaseRepository {
                     userIds.map((userId) => ({
                       petition_id: petitionId,
                       user_id: userId,
-                      is_subscribed: true,
+                      is_subscribed: subscribe,
                       permission_type: permissionType,
                       created_by: `User:${user.id}`,
                       updated_by: `User:${user.id}`,
@@ -2825,7 +2826,7 @@ export class PetitionRepository extends BaseRepository {
                     userGroupIds.map((userGroupId) => ({
                       petition_id: petitionId,
                       user_group_id: userGroupId,
-                      is_subscribed: true,
+                      is_subscribed: subscribe,
                       permission_type: permissionType,
                       created_by: `User:${user.id}`,
                       updated_by: `User:${user.id}`,

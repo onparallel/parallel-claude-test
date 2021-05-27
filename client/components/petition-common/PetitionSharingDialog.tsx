@@ -48,6 +48,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { GrowingTextarea } from "../common/GrowingTextarea";
+import { HelpPopover } from "../common/HelpPopover";
 import { PaddedCollapse } from "../common/PaddedCollapse";
 import { UserListPopover } from "../common/UserListPopover";
 import {
@@ -61,6 +62,7 @@ import { UserPermissionType } from "./UserPermissionType";
 type PetitionSharingDialogData = {
   selection: UserSelectSelection<true>[];
   notify: boolean;
+  subscribe: boolean;
   message: string;
 };
 
@@ -112,6 +114,7 @@ export function PetitionSharingDialog({
       defaultValues: {
         selection: [],
         notify: true,
+        subscribe: true,
         message: "",
       },
     });
@@ -175,7 +178,7 @@ export function PetitionSharingDialog({
     usePetitionSharingModal_addPetitionUserPermissionMutation();
 
   const handleAddUserPermissions = handleSubmit(
-    async ({ selection, notify, message }) => {
+    async ({ selection, notify, subscribe, message }) => {
       const users = selection
         .filter((s) => s.__typename === "User")
         .map((u) => u.id);
@@ -191,6 +194,7 @@ export function PetitionSharingDialog({
             userGroupIds: groups.length ? groups : null,
             permissionType: "WRITE",
             notify,
+            subscribe,
             message: message || null,
           },
           refetchQueries: [getOperationName(PetitionActivityDocument)!],
@@ -233,6 +237,7 @@ export function PetitionSharingDialog({
   };
 
   const notify = watch("notify");
+
   useEffect(() => {
     if (notify) {
       setTimeout(() => messageRef.current?.focus());
@@ -338,6 +343,22 @@ export function PetitionSharingDialog({
                   })}
                 />
               </PaddedCollapse>
+              <Checkbox
+                {...register("subscribe")}
+                colorScheme="purple"
+                defaultIsChecked
+              >
+                <FormattedMessage
+                  id="component.petition-sharing-dialog.subscribe"
+                  defaultMessage="Subscribe to notifications"
+                />
+                <HelpPopover marginLeft={2}>
+                  <FormattedMessage
+                    id="component.petition-sharing-dialog.subscribe-help"
+                    defaultMessage="Users will receive notifications about the activity of this request."
+                  />
+                </HelpPopover>
+              </Checkbox>
             </Stack>
             <Stack
               display={hasUsers || petitionIds.length !== 1 ? "none" : "flex"}
@@ -640,6 +661,7 @@ PetitionSharingDialog.mutations = [
       $userGroupIds: [GID!]
       $permissionType: PetitionUserPermissionTypeRW!
       $notify: Boolean
+      $subscribe: Boolean
       $message: String
     ) {
       addPetitionUserPermission(
@@ -648,6 +670,7 @@ PetitionSharingDialog.mutations = [
         userGroupIds: $userGroupIds
         permissionType: $permissionType
         notify: $notify
+        subscribe: $subscribe
         message: $message
       ) {
         ...PetitionSharingModal_Petition

@@ -270,6 +270,11 @@ type Mutation {
     notify: Boolean = false
     permissionType: PetitionUserPermissionTypeRW!
     petitionIds: [GID!]!
+
+    """
+    Subscribe to notifications.
+    """
+    subscribe: Boolean = true
     userGroupIds: [GID!]
     userIds: [GID!]
   ): [Petition!]!

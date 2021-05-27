@@ -1125,6 +1125,16 @@
     "context": "Language of the template"
   },
   {
+    "term": "component.petition-sharing-dialog.subscribe",
+    "definition": "Subscribe to notifications",
+    "context": "Subscribe to notifications"
+  },
+  {
+    "term": "component.petition-sharing-dialog.subscribe-help",
+    "definition": "Users will receive notifications about the activity of this request.",
+    "context": "Users will receive notifications about the activity of this request."
+  },
+  {
     "term": "component.petition-sigatures-card.awaiting",
     "definition": "Awaiting",
     "context": "Awaiting"

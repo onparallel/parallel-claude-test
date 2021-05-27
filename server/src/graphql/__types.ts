@@ -2210,6 +2210,7 @@ export interface NexusGenArgTypes {
       notify?: boolean | null; // Boolean
       permissionType: NexusGenEnums["PetitionUserPermissionTypeRW"]; // PetitionUserPermissionTypeRW!
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
+      subscribe: boolean | null; // Boolean
       userGroupIds?: NexusGenScalars["GID"][] | null; // [GID!]
       userIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };

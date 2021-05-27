@@ -387,6 +387,7 @@ export type MutationaddPetitionUserPermissionArgs = {
   notify?: Maybe<Scalars["Boolean"]>;
   permissionType: PetitionUserPermissionTypeRW;
   petitionIds: Array<Scalars["GID"]>;
+  subscribe?: Maybe<Scalars["Boolean"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
   userIds?: Maybe<Array<Scalars["GID"]>>;
 };

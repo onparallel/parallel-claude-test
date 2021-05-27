@@ -409,6 +409,7 @@ export type MutationaddPetitionUserPermissionArgs = {
   notify?: Maybe<Scalars["Boolean"]>;
   permissionType: PetitionUserPermissionTypeRW;
   petitionIds: Array<Scalars["GID"]>;
+  subscribe?: Maybe<Scalars["Boolean"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
   userIds?: Maybe<Array<Scalars["GID"]>>;
 };
@@ -3614,6 +3615,7 @@ export type PetitionSharingModal_addPetitionUserPermissionMutationVariables =
     userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
     permissionType: PetitionUserPermissionTypeRW;
     notify?: Maybe<Scalars["Boolean"]>;
+    subscribe?: Maybe<Scalars["Boolean"]>;
     message?: Maybe<Scalars["String"]>;
   }>;
 
@@ -9282,6 +9284,7 @@ export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
     $userGroupIds: [GID!]
     $permissionType: PetitionUserPermissionTypeRW!
     $notify: Boolean
+    $subscribe: Boolean
     $message: String
   ) {
     addPetitionUserPermission(
@@ -9290,6 +9293,7 @@ export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
       userGroupIds: $userGroupIds
       permissionType: $permissionType
       notify: $notify
+      subscribe: $subscribe
       message: $message
     ) {
       ...PetitionSharingModal_Petition
@@ -9316,6 +9320,7 @@ export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
  *      userGroupIds: // value for 'userGroupIds'
  *      permissionType: // value for 'permissionType'
  *      notify: // value for 'notify'
+ *      subscribe: // value for 'subscribe'
  *      message: // value for 'message'
  *   },
  * });
