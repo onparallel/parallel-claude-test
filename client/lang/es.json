@@ -306,8 +306,8 @@
   },
   {
     "term": "component.create-group-dialog.title",
-    "definition": "Nuevo grupo de trabajo",
-    "context": "New work group"
+    "definition": "Nuevo grupo de usuarios",
+    "context": "New user group"
   },
   {
     "term": "component.date-picker.next-month",
@@ -2786,7 +2786,7 @@
   },
   {
     "term": "organization-groups.remove-from-group",
-    "definition": "Sacar del grupo",
+    "definition": "Quitar del grupo",
     "context": "Remove from group"
   },
   {
@@ -3212,7 +3212,7 @@
   {
     "term": "petition-sharing.input-placeholder",
     "definition": "Añade usuarios y equipos de tu organización",
-    "context": "Add users and groups from your organization"
+    "context": "Add users and teams from your organization"
   },
   {
     "term": "petition-sharing.input-placeholder-not-owner",

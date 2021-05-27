@@ -66,7 +66,7 @@ import { useConfirmDeleteGroupsDialog } from "..";
 import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useRouter } from "next/router";
-import { sortBy } from "remeda";
+import { sort, sortBy } from "remeda";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { If } from "@parallel/utils/conditions";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -109,13 +109,14 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     })
   );
 
-  const userList = useMemo(() => {
+  const [userList, searchedList] = useMemo(() => {
     const {
       items,
       page,
       search,
       sort: { direction, field },
     } = state;
+
     let members = userGroup?.members ?? [];
     if (search) {
       members = members.filter(({ user }) => {
@@ -126,12 +127,15 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     members =
       field === "addedAt"
         ? sortBy(members, (u) => u[field])
-        : sortBy(members, ({ user }) => user[field]);
+        : sort(members, (a, b) =>
+            (a.user[field] ?? "").localeCompare(b.user[field] ?? "")
+          );
 
     if (direction === "DESC") {
       members = members.reverse();
     }
-    return members.slice((page - 1) * items, page * items);
+
+    return [members.slice((page - 1) * items, page * items), members];
   }, [userGroup, state]);
 
   const [selected, setSelected] = useState<string[]>([]);
@@ -337,7 +341,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           loading={loading}
           page={state.page}
           pageSize={state.items}
-          totalCount={userGroup?.members.length ?? 0}
+          totalCount={searchedList?.length ?? 0}
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}

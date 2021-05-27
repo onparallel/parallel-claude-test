@@ -70,7 +70,7 @@ export function CreateGroupDialog({
       header={
         <FormattedMessage
           id="component.create-group-dialog.title"
-          defaultMessage="New work group"
+          defaultMessage="New user group"
         />
       }
       body={

@@ -161,13 +161,13 @@ export type GroupPermissionAddedEvent = PetitionEvent & {
   id: Scalars["GID"];
   permissionGroup: UserGroup;
   permissionType: PetitionUserPermissionType;
-  user: User;
+  user: Maybe<User>;
 };
 
 export type GroupPermissionEditedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup: Maybe<UserGroup>;
+  permissionGroup: UserGroup;
   permissionType: PetitionUserPermissionType;
   user: Maybe<User>;
 };
@@ -175,7 +175,7 @@ export type GroupPermissionEditedEvent = PetitionEvent & {
 export type GroupPermissionRemovedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionGroup: Maybe<UserGroup>;
+  permissionGroup: UserGroup;
   user: Maybe<User>;
 };
 
@@ -1611,7 +1611,7 @@ export type PublicPetition = Timestamps & {
 export type PublicPetitionAccess = {
   contact: Maybe<PublicContact>;
   granter: Maybe<PublicUser>;
-  message: PublicPetitionMessage;
+  message: Maybe<PublicPetitionMessage>;
   petition: Maybe<PublicPetition>;
 };
 
