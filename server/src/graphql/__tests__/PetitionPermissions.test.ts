@@ -827,6 +827,43 @@ describe("GraphQL/Petition Permissions", () => {
       >(loggedUser.id, [permission.id], null);
     });
 
+    it("should not send notification to user with previous permissions", async () => {
+      const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
+        testClient.container.get<IEmailsService>(EMAILS),
+        "sendPetitionSharingNotificationEmail"
+      );
+      const [newGroup] = await mocks.createUserGroups(1, organization.id);
+      const [newUser] = await mocks.createRandomUsers(organization.id, 1);
+      await mocks.insertUserGroupMembers(newGroup.id, [newUser.id]);
+      await mocks.sharePetitionWithGroups(userPetition.id, [newGroup.id]);
+
+      const { errors } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionIds: [GID!]!
+            $userIds: [GID!]!
+            $type: PetitionUserPermissionTypeRW!
+          ) {
+            addPetitionUserPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+              permissionType: $type
+              notify: true
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userIds: [toGlobalId("User", newUser.id)],
+          type: "READ",
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(sendPetitionSharingNotificationEmailSpy).toHaveBeenCalledTimes(0);
+    });
+
     it("notifies group members when sharing a petition with a group", async () => {
       const sendPetitionSharingNotificationEmailSpy = jest.spyOn(
         testClient.container.get<IEmailsService>(EMAILS),
