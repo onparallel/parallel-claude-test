@@ -2,8 +2,10 @@ import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy } from "remeda";
+import { ANALYTICS, AnalyticsService } from "../../services/analytics";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
+import { toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
@@ -12,7 +14,10 @@ import { CreateUser, User, UserGroup } from "../__types";
 
 @injectable()
 export class UserRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex) {
+  constructor(
+    @inject(KNEX) knex: Knex,
+    @inject(ANALYTICS) private analytics: AnalyticsService
+  ) {
     super(knex);
   }
 
@@ -114,12 +119,21 @@ export class UserRepository extends BaseRepository {
   }
 
   async createUser(data: CreateUser, createdBy: string) {
-    const [row] = await this.insert("user", {
+    const [user] = await this.insert("user", {
       ...data,
       created_by: createdBy,
       updated_by: createdBy,
     });
-    return row;
+
+    this.analytics.trackEvent(
+      "USER_CREATED",
+      {
+        user_id: user.id,
+        org_id: user.org_id,
+      },
+      toGlobalId("User", user.id)
+    );
+    return user;
   }
 
   async searchUsers(

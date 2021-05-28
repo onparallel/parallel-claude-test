@@ -843,7 +843,8 @@ export class PetitionRepository extends BaseRepository {
         .update({
           deleted_at: this.now(),
           deleted_by: `User:${user.id}`,
-        });
+        })
+        .returning("*");
     }, t);
   }
 
@@ -1684,7 +1685,7 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  private async loadLastEventsByType(
+  async loadLastEventsByType(
     petitionId: number,
     eventTypes: MaybeArray<PetitionEventType>
   ): Promise<{ type: PetitionEventType; last_used_at: Date }[]> {

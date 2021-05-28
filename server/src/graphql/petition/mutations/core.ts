@@ -327,10 +327,21 @@ export const deletePetitions = mutationField("deletePetitions", {
         t
       );
       //finally, delete only petitions OWNED by me
-      await ctx.petitions.deletePetitionById(
+      const deletedPetitions = await ctx.petitions.deletePetitionById(
         ownerPermissions.map((p) => p.petition_id),
         ctx.user!,
         t
+      );
+
+      ctx.analytics.trackEvent(
+        "PETITION_DELETED",
+        deletedPetitions.map((petition) => ({
+          petition_id: petition.id,
+          org_id: ctx.user!.org_id,
+          user_id: ctx.user!.id,
+          status: petition.status!,
+        })),
+        toGlobalId("User", ctx.user!.id)
       );
     });
 

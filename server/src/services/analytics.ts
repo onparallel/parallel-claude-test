@@ -1,9 +1,11 @@
 import Analytics from "analytics-node";
 import { inject, injectable } from "inversify";
 import { Config, CONFIG } from "../config";
-import { User } from "../db/__types";
+import { PetitionStatus, User } from "../db/__types";
+import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
 import { titleize } from "../util/strings";
+import { MaybeArray } from "../util/types";
 
 type AnalyticsEventType =
   | "PETITION_CREATED"
@@ -12,9 +14,13 @@ type AnalyticsEventType =
   | "PETITION_SENT"
   | "PETITION_COMPLETED_BY_RECIPIENT"
   | "PETITION_COMPLETED"
+  | "PETITION_DELETED"
   | "USER_LOGGED_IN"
   | "REMINDER_EMAIL_SENT"
-  | "TEMPLATE_USED";
+  | "TEMPLATE_USED"
+  | "USER_CREATED"
+  | "ACCESS_OPENED"
+  | "ACCESS_OPENED_FIRST";
 
 type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
   /** User creates a petition/template from scratch */
@@ -31,6 +37,13 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
     from_petition_id: number;
     user_id: number;
     type: "PETITION" | "TEMPLATE";
+  };
+  /** User deletes a petition */
+  PETITION_DELETED: {
+    petition_id: number;
+    org_id: number;
+    user_id: number;
+    status: PetitionStatus;
   };
   /** User uses a template to create a petition */
   TEMPLATE_USED: {
@@ -67,6 +80,7 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
     org_id: number;
     access_id: number;
     requiresSignature: boolean;
+    same_domain: boolean;
   };
   /** User logs in */
   USER_LOGGED_IN: { user_id: number; email: string; org_id: number };
@@ -78,6 +92,27 @@ type AnalyticsEventProperties<EventType extends AnalyticsEventType> = {
     access_id: number;
     sent_count: number;
     type: "AUTOMATIC" | "MANUAL";
+  };
+  /** a user is created:
+   * - by support methods
+   * - by organization admin
+   * - by logging the first time with SSO
+   */
+  USER_CREATED: {
+    user_id: number;
+    org_id: number;
+  };
+  /** a petition has been opened by any recipient */
+  ACCESS_OPENED: {
+    contact_id: number;
+    petition_id: number;
+    org_id: number;
+  };
+  /** a petition has been opened the first time by any of the recipients */
+  ACCESS_OPENED_FIRST: {
+    contact_id: number;
+    petition_id: number;
+    org_id: number;
   };
 }[EventType];
 
@@ -118,13 +153,15 @@ export class AnalyticsService implements IAnalyticsService {
 
   trackEvent<EventType extends AnalyticsEventType>(
     eventName: EventType,
-    properties: AnalyticsEventProperties<EventType>,
+    properties: MaybeArray<AnalyticsEventProperties<EventType>>,
     userGID: string
   ) {
-    this.analytics?.track({
-      userId: userGID,
-      event: titleize(eventName),
-      properties,
+    unMaybeArray(properties).map((props) => {
+      this.analytics?.track({
+        userId: userGID,
+        event: titleize(eventName),
+        properties: props,
+      });
     });
   }
 }
