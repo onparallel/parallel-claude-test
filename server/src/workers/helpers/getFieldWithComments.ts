@@ -2,6 +2,7 @@ import pMap from "p-map";
 import { pick, sortBy } from "remeda";
 import { WorkerContext } from "../../context";
 import { PetitionField, PetitionFieldComment } from "../../db/__types";
+import { fullName } from "../../util/fullName";
 
 async function fetchCommentAuthor(
   c: PetitionFieldComment,
@@ -12,7 +13,10 @@ async function fetchCommentAuthor(
     if (!user) {
       throw new Error(`Can't find user with id ${c.user_id}`);
     }
-    return { id: `User:${user.id}`, name: user.first_name ?? user.email };
+    return {
+      id: `User:${user.id}`,
+      name: fullName(user.first_name, user.last_name) || user.email,
+    };
   } else if (c.petition_access_id) {
     const contact = await context.contacts.loadContactByAccessId(
       c.petition_access_id
@@ -24,7 +28,7 @@ async function fetchCommentAuthor(
     }
     return {
       id: `Contact:${contact.id}`,
-      name: contact.first_name ?? contact.email,
+      name: fullName(contact.first_name, contact.last_name) || contact.email,
     };
   } else {
     throw new Error(

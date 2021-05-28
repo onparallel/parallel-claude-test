@@ -1,5 +1,6 @@
-import { addSeconds } from "date-fns";
+import { differenceInMinutes } from "date-fns";
 import { groupBy, sortBy } from "remeda";
+import { Config } from "../config";
 import { WorkerContext } from "../context";
 import {
   PetitionContactNotification,
@@ -13,29 +14,32 @@ type PetitionNotification =
   | PetitionUserNotification
   | PetitionContactNotification;
 
-const WORKER_CONFIG = {
-  COMMENT_CREATED: {
-    SECONDS_BEFORE_NOTIFY: 60 * 15,
-  },
-};
-
-function shouldBeProcessed(notifications: PetitionNotification[]) {
+function shouldBeProcessed(
+  notifications: PetitionNotification[],
+  minutesBeforeNotify: number
+) {
   const lastNotification = sortBy(
     notifications,
     (n) => n.created_at
   ).reverse()[0];
 
   return (
-    addSeconds(
-      lastNotification.created_at,
-      WORKER_CONFIG.COMMENT_CREATED.SECONDS_BEFORE_NOTIFY
-    ).getTime() < Date.now()
+    differenceInMinutes(lastNotification.created_at, new Date()) >
+    minutesBeforeNotify
   );
 }
 
-function processCommentCreatedUserNotification(context: WorkerContext) {
+/**
+ * iterates over an array of unprocessed COMMENT_CREATED user notifications,
+ * sending an email to the user with the accumulated comments if the last notification
+ * was created more than `config.minutesBeforeNotify` minutes ago
+ */
+function processCommentCreatedUserNotification(
+  context: WorkerContext,
+  config: Config["cronWorkers"]["petition-notifications"]
+) {
   return async (notifications: PetitionUserNotification[]) => {
-    if (shouldBeProcessed(notifications)) {
+    if (shouldBeProcessed(notifications, config.minutesBeforeNotify)) {
       const petitionId = notifications[0].petition_id;
       const userId = notifications[0].user_id;
       const isSubscribed = await context.petitions.isUserSubscribedToPetition(
@@ -60,9 +64,17 @@ function processCommentCreatedUserNotification(context: WorkerContext) {
   };
 }
 
-function processCommentCreatedContactNotification(context: WorkerContext) {
+/**
+ * iterates over an array of unprocessed COMMENT_CREATED contact notifications,
+ * sending an email to the contact with the accumulated comments if the last notification
+ * was created more than `config.minutesBeforeNotify` minutes ago
+ */
+function processCommentCreatedContactNotification(
+  context: WorkerContext,
+  config: Config["cronWorkers"]["petition-notifications"]
+) {
   return async (notifications: PetitionContactNotification[]) => {
-    if (shouldBeProcessed(notifications)) {
+    if (shouldBeProcessed(notifications, config.minutesBeforeNotify)) {
       const petitionId = notifications[0].petition_id;
       const accessId = notifications[0].petition_access_id;
 
@@ -82,6 +94,9 @@ function processCommentCreatedContactNotification(context: WorkerContext) {
   };
 }
 
+/**
+ * groups the notifications array by recipientId and petitionId, and calls the callback function for each of this groups
+ */
 async function groupNotifications<T extends PetitionNotification>(
   notifications: T[],
   callback: (groupedItems: T[]) => MaybePromise<void>
@@ -102,14 +117,29 @@ async function groupNotifications<T extends PetitionNotification>(
   }
 }
 
-createCronWorker("petition-notifications", async (context) => {
+/*
+ * this worker reads from tables `petition_user_notification` and `petition_contact_notification`
+ * loads every unread and unprocessed entries and tries to process those.
+ * For now it only processes COMMENT_CREATED type notifications.
+ */
+createCronWorker("petition-notifications", async (context, config) => {
+  const [unprocessedUserNotifications, unprocessedContactNotifications] =
+    await Promise.all([
+      context.petitions.loadUnprocessedCommentCreatedUserNotifications(),
+      context.petitions.loadUnprocessedCommentCreatedContactNotifications(),
+    ]);
+
+  // group unprocessedUserNotifications by (user_id, petition_id)
+  // and call processCommentCreatedUserNotification with each of this subgroups
   await groupNotifications(
-    await context.petitions.loadUnprocessedCommentCreatedUserNotifications(),
-    processCommentCreatedUserNotification(context)
+    unprocessedUserNotifications,
+    processCommentCreatedUserNotification(context, config)
   );
 
+  // group unprocessedContactNotifications by (petition_access_id, petition_id)
+  // and call processCommentCreatedContactNotification with each of this subgroups
   await groupNotifications(
-    await context.petitions.loadUnprocessedCommentCreatedContactNotifications(),
-    processCommentCreatedContactNotification(context)
+    unprocessedContactNotifications,
+    processCommentCreatedContactNotification(context, config)
   );
 });

@@ -23,7 +23,7 @@
                 "content": "De dónde saco esto tio?\nNo lo encuentro por ningún lado",
                 "author": {
                   "id": "Access:1",
-                  "name": "Mariano"
+                  "name": "Mariano Rodriguez"
                 },
                 "createdAt": "2022-12-11T17:29:24.601Z"
               },
@@ -32,7 +32,7 @@
                 "content": "Ni caso, ya lo encontré 😅",
                 "author": {
                   "id": "Access:1",
-                  "name": "Mariano"
+                  "name": "Mariano Rodriguez"
                 },
                 "createdAt": "2022-12-11T17:31:24.601Z"
               }
@@ -48,7 +48,7 @@
                 "content": "Ya sale en el borrador",
                 "author": {
                   "id": "User:2",
-                  "name": "Derek"
+                  "name": "Derek Lou"
                 },
                 "createdAt": "2022-12-11T17:40:24.601Z"
               },
@@ -57,7 +57,7 @@
                 "content": "Cualquier cosa me avisas",
                 "author": {
                   "id": "User:2",
-                  "name": "Derek"
+                  "name": "Derek Lou"
                 },
                 "createdAt": "2022-12-11T17:40:30.601Z"
               },
@@ -66,7 +66,7 @@
                 "content": "Ostia que chulo este sistema de comentarios 😎",
                 "author": {
                   "id": "User:3",
-                  "name": "Angela"
+                  "name": "Angela Velasco"
                 },
                 "createdAt": "2022-12-11T17:45:30.601Z"
               },
@@ -75,7 +75,7 @@
                 "content": "Ok!",
                 "author": {
                   "id": "Access:1",
-                  "name": "Mariano"
+                  "name": "Mariano Rodriguez"
                 },
                 "createdAt": "2022-12-11T17:51:30.601Z"
               },
@@ -84,7 +84,7 @@
                 "content": "Ya está todo",
                 "author": {
                   "id": "Access:1",
-                  "name": "Mariano"
+                  "name": "Mariano Rodriguez"
                 },
                 "createdAt": "2022-12-11T17:52:30.601Z"
               }

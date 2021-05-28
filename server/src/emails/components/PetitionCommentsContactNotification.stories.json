@@ -22,7 +22,7 @@
                 "content": "De dónde saco esto tio?\n No lo encuentro por ningun lado",
                 "author": {
                   "id": "Access:1",
-                  "name": "Mariano"
+                  "name": "Mariano Rodriguez"
                 },
                 "createdAt": "2022-12-11T17:29:24.601Z"
               },
@@ -31,7 +31,7 @@
                 "content": "Ni caso, ya lo encontré",
                 "author": {
                   "id": "Access:1",
-                  "name": "Mariano"
+                  "name": "Mariano Rodriguez"
                 },
                 "createdAt": "2022-12-11T17:30:24.601Z"
               }
@@ -47,7 +47,7 @@
                 "content": "Ya sale en el borrador",
                 "author": {
                   "id": "User:1",
-                  "name": "Derek"
+                  "name": "Derek Lou"
                 },
                 "createdAt": "2022-12-11T17:41:24.601Z"
               }

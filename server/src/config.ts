@@ -72,6 +72,10 @@ export function buildConfig() {
       }),
       "petition-notifications": Object.freeze({
         rule: process.env.WORKERS_PETITION_NOTIFICATIONS_RULE!,
+        minutesBeforeNotify: parseInt(
+          process.env.WORKERS_PETITION_NOTIFICATIONS_MINUTES_BEFORE_NOTIFY!,
+          10
+        ),
       }),
       reporting: Object.freeze({
         rule: process.env.WORKERS_REPORTING_RULE!,

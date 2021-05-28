@@ -88,7 +88,7 @@ export function PetitionFieldAndComments({
                         <MjmlText fontSize="12px" padding="0">
                           <b>{author.name}</b>{" "}
                           <span style={{ color: "#555555" }}>
-                            {intl.formatDate(new Date(createdAt), FORMATS.HHMM)}
+                            {intl.formatDate(new Date(createdAt), FORMATS.HHmm)}
                           </span>
                         </MjmlText>
                       )}

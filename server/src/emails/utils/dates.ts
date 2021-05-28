@@ -41,7 +41,7 @@ export const FORMATS = {
   /**
    * E.g. 14:16
    */
-  HHMM: {
+  HHmm: {
     hour: "numeric",
     minute: "numeric",
     hour12: false,
