@@ -264,7 +264,7 @@ export function PetitionSharingDialog({
           <Text as="div" flex="1">
             <FormattedMessage
               id="petition-sharing.header"
-              defaultMessage="Share with people"
+              defaultMessage="Share with people and groups"
             />
           </Text>
         </Stack>
