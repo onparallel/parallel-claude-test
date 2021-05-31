@@ -13,12 +13,14 @@ import {
   AlertCircleIcon,
   EyeOffIcon,
   SignatureIcon,
+  TimeIcon,
 } from "@parallel/chakra/icons";
 import {
   PetitionContents_PetitionFieldFragment,
   PetitionSignatureRequestStatus,
 } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
+import { If } from "@parallel/utils/conditions";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import {
   filterPetitionFields,
@@ -133,19 +135,29 @@ function SignatureStatusInfo({
         </Text>
         <Tooltip label={labels[status]}>
           <Flex alignItems="center">
-            <Box
-              hidden={status !== "START"}
-              width="4px"
-              height="4px"
-              borderColor="purple.500"
-              borderWidth="4px"
-              borderRadius="100%"
-              marginRight={2}
-            ></Box>
+            <If condition={status === "START"}>
+              <Box
+                width="4px"
+                height="4px"
+                borderColor="purple.500"
+                borderWidth="4px"
+                borderRadius="100%"
+                marginRight={2}
+              />
+            </If>
             <SignatureIcon
               color={status === "COMPLETED" ? "gray.700" : "gray.400"}
             />
-            {status === "CANCELLED" ? (
+            {status === "PROCESSING" ? (
+              <TimeIcon
+                color="yellow.600"
+                fontSize="13px"
+                position="relative"
+                bottom={2}
+                right={2}
+                marginRight={-2}
+              />
+            ) : status === "CANCELLED" ? (
               <AlertCircleIcon
                 color="red.500"
                 fontSize="14px"

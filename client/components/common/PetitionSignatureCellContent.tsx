@@ -1,44 +1,62 @@
 import { gql } from "@apollo/client";
-import { Box, Tooltip } from "@chakra-ui/react";
-import { AlertCircleIcon, SignatureIcon } from "@parallel/chakra/icons";
+import { Box, Flex, Tooltip } from "@chakra-ui/react";
+import {
+  AlertCircleIcon,
+  SignatureIcon,
+  TimeIcon,
+} from "@parallel/chakra/icons";
 import {
   PetitionSignatureCellContent_PetitionFragment,
   PetitionSignatureCellContent_UserFragment,
-  PetitionSignatureRequestStatus,
 } from "@parallel/graphql/__types";
+import { If } from "@parallel/utils/conditions";
+import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 
-export function PetitionSignatureCellContent({
-  petition: { currentSignatureRequest },
-  user: { hasPetitionSignature },
-}: {
+interface PetitionSignatureCellContentProps {
   petition: PetitionSignatureCellContent_PetitionFragment;
   user: PetitionSignatureCellContent_UserFragment;
-}) {
-  const colors: Record<PetitionSignatureRequestStatus, string> = {
-    ENQUEUED: "gray.300",
-    PROCESSING: "gray.300",
-    CANCELLED: "gray.300",
-    COMPLETED: "gray.700",
-  };
+}
+export function PetitionSignatureCellContent({
+  petition,
+  user,
+}: PetitionSignatureCellContentProps) {
   const labels = usePetitionSignatureStatusLabels();
-  return hasPetitionSignature && currentSignatureRequest ? (
-    <Tooltip label={labels[currentSignatureRequest.status]}>
-      <Box position="relative">
+  const status = usePetitionCurrentSignatureStatus(petition);
+  return user.hasPetitionSignature && status ? (
+    <Tooltip label={labels[status]}>
+      <Flex alignItems="center">
+        <If condition={status === "START"}>
+          <Box
+            width="4px"
+            height="4px"
+            borderColor="purple.500"
+            borderWidth="4px"
+            borderRadius="100%"
+            marginRight="2px"
+          />
+        </If>
         <SignatureIcon
-          color={colors[currentSignatureRequest.status]}
-          fontSize="18px"
+          color={status === "COMPLETED" ? "gray.700" : "gray.400"}
         />
-        {currentSignatureRequest.status === "CANCELLED" ? (
+        {status === "PROCESSING" ? (
+          <TimeIcon
+            color="yellow.600"
+            fontSize="13px"
+            position="relative"
+            top={-2}
+            right={2}
+          />
+        ) : status === "CANCELLED" ? (
           <AlertCircleIcon
             color="red.500"
             fontSize="14px"
-            position="absolute"
-            top={0}
-            right="-6px"
+            position="relative"
+            top={-2}
+            right={2}
           />
         ) : null}
-      </Box>
+      </Flex>
     </Tooltip>
   ) : null;
 }
@@ -46,10 +64,10 @@ export function PetitionSignatureCellContent({
 PetitionSignatureCellContent.fragments = {
   Petition: gql`
     fragment PetitionSignatureCellContent_Petition on Petition {
-      currentSignatureRequest @include(if: $hasPetitionSignature) {
-        status
-      }
+      ...usePetitionCurrentSignatureStatus_Petition
+        @include(if: $hasPetitionSignature)
     }
+    ${usePetitionCurrentSignatureStatus.fragments.Petition}
   `,
   User: gql`
     fragment PetitionSignatureCellContent_User on User {

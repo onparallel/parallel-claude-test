@@ -91,6 +91,7 @@ import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
+import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -499,16 +500,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const [filter, setFilter] =
     useState<PetitionFieldFilter>(defaultFieldsFilter);
 
-  const petitionSignatureStatus =
-    petition.signatureConfig?.review &&
-    petition.status === "COMPLETED" &&
-    (!petition.currentSignatureRequest ||
-      !["ENQUEUED", "PROCESSING"].includes(
-        petition.currentSignatureRequest.status
-      ))
-      ? "START"
-      : petition.currentSignatureRequest?.status ??
-        (petition.signatureConfig ? "PROCESSING" : null);
+  const petitionSignatureStatus = usePetitionCurrentSignatureStatus(petition);
 
   return (
     <PetitionLayout
@@ -731,11 +723,14 @@ PetitionReplies.fragments = {
           status
         }
         ...PetitionSignaturesCard_Petition @include(if: $hasPetitionSignature)
+        ...usePetitionCurrentSignatureStatus_Petition
+          @include(if: $hasPetitionSignature)
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
       ${ShareButton.fragments.PetitionBase}
       ${PetitionSignaturesCard.fragments.Petition}
+      ${usePetitionCurrentSignatureStatus.fragments.Petition}
     `;
   },
   get PetitionField() {

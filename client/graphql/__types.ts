@@ -2343,14 +2343,7 @@ export type PetitionFieldSelect_PetitionFieldFragment = {
 
 export type PetitionSignatureCellContent_PetitionFragment = {
   __typename?: "Petition";
-} & {
-  currentSignatureRequest?: Maybe<
-    { __typename?: "PetitionSignatureRequest" } & Pick<
-      PetitionSignatureRequest,
-      "status"
-    >
-  >;
-};
+} & usePetitionCurrentSignatureStatus_PetitionFragment;
 
 export type PetitionSignatureCellContent_UserFragment = {
   __typename?: "User";
@@ -5389,7 +5382,8 @@ export type PetitionReplies_PetitionFragment = {
     >;
   } & PetitionLayout_PetitionBase_Petition_Fragment &
   ShareButton_PetitionBase_Petition_Fragment &
-  PetitionSignaturesCard_PetitionFragment;
+  PetitionSignaturesCard_PetitionFragment &
+  usePetitionCurrentSignatureStatus_PetitionFragment;
 
 export type PetitionReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
@@ -6172,6 +6166,20 @@ export type useFilenamePlaceholdersRename_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
 } & Pick<PetitionFieldReply, "content">;
 
+export type usePetitionCurrentSignatureStatus_PetitionFragment = {
+  __typename?: "Petition";
+} & Pick<Petition, "status"> & {
+    currentSignatureRequest?: Maybe<
+      { __typename?: "PetitionSignatureRequest" } & Pick<
+        PetitionSignatureRequest,
+        "status"
+      >
+    >;
+    signatureConfig?: Maybe<
+      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
+    >;
+  };
+
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "name" | "createdAt"> & {
@@ -6618,12 +6626,23 @@ export const PetitionStatusCellContent_PetitionFragmentDoc = gql`
     }
   }
 `;
-export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
-  fragment PetitionSignatureCellContent_Petition on Petition {
-    currentSignatureRequest @include(if: $hasPetitionSignature) {
+export const usePetitionCurrentSignatureStatus_PetitionFragmentDoc = gql`
+  fragment usePetitionCurrentSignatureStatus_Petition on Petition {
+    status
+    currentSignatureRequest {
       status
     }
+    signatureConfig {
+      review
+    }
   }
+`;
+export const PetitionSignatureCellContent_PetitionFragmentDoc = gql`
+  fragment PetitionSignatureCellContent_Petition on Petition {
+    ...usePetitionCurrentSignatureStatus_Petition
+      @include(if: $hasPetitionSignature)
+  }
+  ${usePetitionCurrentSignatureStatus_PetitionFragmentDoc}
 `;
 export const Contact_PetitionFragmentDoc = gql`
   fragment Contact_Petition on Petition {
@@ -7822,11 +7841,14 @@ export const PetitionReplies_PetitionFragmentDoc = gql`
       status
     }
     ...PetitionSignaturesCard_Petition @include(if: $hasPetitionSignature)
+    ...usePetitionCurrentSignatureStatus_Petition
+      @include(if: $hasPetitionSignature)
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionReplies_PetitionFieldFragmentDoc}
   ${ShareButton_PetitionBaseFragmentDoc}
   ${PetitionSignaturesCard_PetitionFragmentDoc}
+  ${usePetitionCurrentSignatureStatus_PetitionFragmentDoc}
 `;
 export const PetitionRepliesFieldComments_UserFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_User on User {
