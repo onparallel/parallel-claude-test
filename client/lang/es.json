@@ -335,6 +335,21 @@
     "context": "Revoke access {count, plural, =1 {token} other {tokens}}"
   },
   {
+    "term": "component.delete-petitions.error-header",
+    "definition": "Error al eliminar",
+    "context": "Delete failed"
+  },
+  {
+    "term": "component.delete-petitions.group-error",
+    "definition": "",
+    "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with a group you belong to."
+  },
+  {
+    "term": "component.delete-petitions.shared-delete-error",
+    "definition": "",
+    "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
+  },
+  {
     "term": "component.download-dialog.placeholder-field-number",
     "definition": "Número del campo",
     "context": "Field number"
@@ -3713,11 +3728,6 @@
     "term": "petition.set-deadline",
     "definition": "Establecer vencimiento",
     "context": "Set deadline"
-  },
-  {
-    "term": "petition.shared-delete-error",
-    "definition": "{count, plural, =1 {La petición} other {Al menos una de las peticiones}} que estás intentando eliminar {count, plural, =1 {está siendo compartida} other {están siendo compartidas}}. Por favor, transfiere la propiedad o elimina el acceso compartido primero.",
-    "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
   },
   {
     "term": "petition.signature-successful.subtitle",

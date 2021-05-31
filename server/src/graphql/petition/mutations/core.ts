@@ -284,16 +284,28 @@ export const deletePetitions = mutationField("deletePetitions", {
     const userPermissions = await ctx.petitions.loadUserPermissions(args.ids);
 
     if (userPermissions.some(userHasAccessViaGroup)) {
-      throw new WhitelistedError(
-        "Can't delete a petition shared with a group",
-        "DELETE_GROUP_PETITION_ERROR"
-      );
+      if (userPermissions.some(userHasAccessViaGroup)) {
+        throw new WhitelistedError(
+          "Can't delete a petition shared with a group",
+          "DELETE_GROUP_PETITION_ERROR",
+          {
+            petitionIds: zip(args.ids, userPermissions)
+              .filter(([, permissions]) => userHasAccessViaGroup(permissions))
+              .map(([id]) => toGlobalId("Petition", id)),
+          }
+        );
+      }
     }
 
     if (userPermissions.some(petitionIsSharedByOwner) && !args.force) {
       throw new WhitelistedError(
         "Petition to delete is shared to another user",
-        "DELETE_SHARED_PETITION_ERROR"
+        "DELETE_SHARED_PETITION_ERROR",
+        {
+          petitionIds: zip(args.ids, userPermissions)
+            .filter(([, permissions]) => petitionIsSharedByOwner(permissions))
+            .map(([id]) => toGlobalId("Petition", id)),
+        }
       );
     }
 

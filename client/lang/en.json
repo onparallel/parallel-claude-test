@@ -335,6 +335,21 @@
     "context": "Revoke access {count, plural, =1 {token} other {tokens}}"
   },
   {
+    "term": "component.delete-petitions.error-header",
+    "definition": "Delete failed",
+    "context": "Delete failed"
+  },
+  {
+    "term": "component.delete-petitions.group-error",
+    "definition": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with a group you belong to.",
+    "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with a group you belong to."
+  },
+  {
+    "term": "component.delete-petitions.shared-delete-error",
+    "definition": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first.",
+    "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
+  },
+  {
     "term": "component.download-dialog.placeholder-field-number",
     "definition": "Field number",
     "context": "Field number"
@@ -3713,11 +3728,6 @@
     "term": "petition.set-deadline",
     "definition": "Set deadline",
     "context": "Set deadline"
-  },
-  {
-    "term": "petition.shared-delete-error",
-    "definition": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first.",
-    "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
   },
   {
     "term": "petition.signature-successful.subtitle",

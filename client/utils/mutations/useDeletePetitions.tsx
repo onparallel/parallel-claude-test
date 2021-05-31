@@ -1,5 +1,6 @@
 import { gql, useApolloClient, useMutation } from "@apollo/client";
-import { Button } from "@chakra-ui/react";
+import { Button, Stack, Text } from "@chakra-ui/react";
+import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -37,6 +38,19 @@ export function useDeletePetitions() {
   );
 
   const { cache } = useApolloClient();
+
+  const errorHeader = (
+    <Stack direction="row" spacing={2} align="center">
+      <AlertCircleIcon role="presentation" />
+      <Text>
+        <FormattedMessage
+          id="component.delete-petitions.error-header"
+          defaultMessage="Delete failed"
+        />
+      </Text>
+    </Stack>
+  );
+
   return useCallback(
     async (petitionIds: string[]) => {
       try {
@@ -62,16 +76,33 @@ export function useDeletePetitions() {
           variables: { ids: petitionIds! },
         });
       } catch (error) {
+        console.log(error?.graphQLErrors?.[0]?.extensions);
         if (
           error?.graphQLErrors?.[0]?.extensions.code ===
           "DELETE_SHARED_PETITION_ERROR"
         ) {
           await showErrorDialog({
+            header: errorHeader,
             message: intl.formatMessage(
               {
-                id: "petition.shared-delete-error",
+                id: "component.delete-petitions.shared-delete-error",
                 defaultMessage:
                   "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first.",
+              },
+              { count: petitionIds.length }
+            ),
+          });
+        } else if (
+          error?.graphQLErrors?.[0]?.extensions.code ===
+          "DELETE_GROUP_PETITION_ERROR"
+        ) {
+          await showErrorDialog({
+            header: errorHeader,
+            message: intl.formatMessage(
+              {
+                id: "component.delete-petitions.group-error",
+                defaultMessage:
+                  "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with a group you belong to.",
               },
               { count: petitionIds.length }
             ),

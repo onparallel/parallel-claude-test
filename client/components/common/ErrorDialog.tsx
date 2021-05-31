@@ -1,4 +1,5 @@
-import { Button } from "@chakra-ui/react";
+import { Button, Stack, Text } from "@chakra-ui/react";
+import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
@@ -25,10 +26,15 @@ export function ErrorDialog({
       closeOnOverlayClick={true}
       header={
         header ?? (
-          <FormattedMessage
-            id="component.error-dialog.header"
-            defaultMessage="Error"
-          />
+          <Stack direction="row" spacing={2} align="center">
+            <AlertCircleIcon role="presentation" />
+            <Text>
+              <FormattedMessage
+                id="component.error-dialog.header"
+                defaultMessage="Error"
+              />
+            </Text>
+          </Stack>
         )
       }
       body={message}
