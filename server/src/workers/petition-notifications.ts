@@ -1,5 +1,5 @@
 import { differenceInMinutes } from "date-fns";
-import { groupBy, sortBy } from "remeda";
+import { groupBy, maxBy } from "remeda";
 import { Config } from "../config";
 import { WorkerContext } from "../context";
 import {
@@ -12,10 +12,7 @@ function shouldBeProcessed(
   notifications: (PetitionUserNotification | PetitionContactNotification)[],
   minutesBeforeNotify: number
 ) {
-  const lastNotification = sortBy(
-    notifications,
-    (n) => n.created_at
-  ).reverse()[0];
+  const lastNotification = maxBy(notifications, (n) => n.created_at.getTime())!;
 
   return (
     differenceInMinutes(lastNotification.created_at, new Date()) >
@@ -98,19 +95,23 @@ createCronWorker("petition-notifications", async (context, config) => {
       context.petitions.loadUnprocessedCommentCreatedContactNotifications(),
     ]);
 
-  const groupedUserNotifications = groupBy(
-    unprocessedUserNotifications,
-    (n) => `${n.petition_id},${n.user_id}`
-  );
-  for (const group of Object.values(groupedUserNotifications)) {
-    await processCommentCreatedUserNotification(group, context, config);
+  if (unprocessedUserNotifications.length > 0) {
+    const groupedUserNotifications = groupBy(
+      unprocessedUserNotifications,
+      (n) => `${n.petition_id},${n.user_id}`
+    );
+    for (const group of Object.values(groupedUserNotifications)) {
+      await processCommentCreatedUserNotification(group, context, config);
+    }
   }
 
-  const groupedContactNotifications = groupBy(
-    unprocessedContactNotifications,
-    (n) => `${n.petition_id},${n.petition_access_id}`
-  );
-  for (const group of Object.values(groupedContactNotifications)) {
-    await processCommentCreatedContactNotification(group, context, config);
+  if (unprocessedContactNotifications.length > 0) {
+    const groupedContactNotifications = groupBy(
+      unprocessedContactNotifications,
+      (n) => `${n.petition_id},${n.petition_access_id}`
+    );
+    for (const group of Object.values(groupedContactNotifications)) {
+      await processCommentCreatedContactNotification(group, context, config);
+    }
   }
 });
