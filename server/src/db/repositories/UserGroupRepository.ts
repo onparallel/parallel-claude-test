@@ -124,7 +124,7 @@ export class UserGroupRepository extends BaseRepository {
         .update({ deleted_at: this.now(), deleted_by: deletedBy });
 
       /** remove all permissions for the deleted group */
-      await this.from("petition_user", t)
+      await this.from("petition_permission", t)
         .whereNull("deleted_at")
         .andWhere((q) =>
           q
@@ -227,13 +227,13 @@ export class UserGroupRepository extends BaseRepository {
         t.raw(
           /* sql */ `
           with 
-            pu as (select * from petition_user where user_group_id = ? and deleted_at is null),
+            pp as (select * from petition_permission where user_group_id = ? and deleted_at is null),
             u as (select * from (values ${memberIds
               .map(() => "(?::int)")
               .join(", ")}) as t(user_id))
-          insert into petition_user(permission_type, user_id, petition_id, from_user_group_id, created_by)
-            select pu.permission_type, u.user_id, pu.petition_id, pu.user_group_id, ?
-            from pu cross join u
+          insert into petition_permission(type, user_id, petition_id, from_user_group_id, created_by)
+            select pp.type, u.user_id, pp.petition_id, pp.user_group_id, ?
+            from pp cross join u
           on conflict do nothing;
         `,
           [userGroupId, ...memberIds, createdBy]
@@ -248,7 +248,7 @@ export class UserGroupRepository extends BaseRepository {
     deletedBy: string,
     t?: Knex.Transaction
   ) {
-    await this.from("petition_user", t)
+    await this.from("petition_permission", t)
       .where({ deleted_at: null, from_user_group_id: userGroupId })
       .whereIn("user_id", memberIds)
       .update({ deleted_at: this.now(), deleted_by: deletedBy });

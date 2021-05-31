@@ -540,21 +540,20 @@ describe("repositories/PetitionRepository", () => {
     describe("loadUserPermissions", () => {
       test("should load current user permissions", async () => {
         expect(
-          await petitions.loadUserPermissions(user0Petitions[0].id)
+          await petitions.loadUserPermissionsByPetitionId(user0Petitions[0].id)
         ).toMatchObject([
           {
             petition_id: user0Petitions[0].id,
             user_id: users[0].id,
-            permission_type: "OWNER",
+            type: "OWNER",
           },
         ]);
       });
 
       test("loading for multiple petitions should return permissions grouped by petition_id", async () => {
         const petitionIds = user0Petitions.map((p) => p.id);
-        const groupedPermissions = await petitions.loadUserPermissions(
-          petitionIds
-        );
+        const groupedPermissions =
+          await petitions.loadUserPermissionsByPetitionId(petitionIds);
         expect(groupedPermissions).toHaveLength(3);
         for (let i = 0; i < 3; i++) {
           expect(
@@ -564,13 +563,13 @@ describe("repositories/PetitionRepository", () => {
       });
     });
 
-    describe("addPetitionUserPermissions", () => {
+    describe("addPetitionPermissions", () => {
       beforeEach(async () => {
         await mocks.clearSharedPetitions();
       });
 
       test("should insert new permission for user without access to the petitions", async () => {
-        const { newPermissions } = await petitions.addPetitionUserPermissions(
+        const { newPermissions } = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
           [users[1].id],
           [],
@@ -579,7 +578,7 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        const permissions = await petitions.loadUserPermissions(
+        const permissions = await petitions.loadUserPermissionsByPetitionId(
           user0Petitions[0].id
         );
         permissions.sort((a, b) => a.id - b.id);
@@ -590,19 +589,19 @@ describe("repositories/PetitionRepository", () => {
           {
             petition_id: user0Petitions[0].id,
             user_id: users[0].id,
-            permission_type: "OWNER",
+            type: "OWNER",
           },
           {
             petition_id: user0Petitions[0].id,
             user_id: users[1].id,
-            permission_type: "READ",
+            type: "READ",
           },
         ]);
       });
 
       test("should not set new permission for user with access to the petitions", async () => {
         const { newPermissions: firstPermissions } =
-          await petitions.addPetitionUserPermissions(
+          await petitions.addPetitionPermissions(
             [user0Petitions[0].id],
             [users[2].id],
             [],
@@ -611,7 +610,7 @@ describe("repositories/PetitionRepository", () => {
             users[0]
           );
 
-        const { newPermissions } = await petitions.addPetitionUserPermissions(
+        const { newPermissions } = await petitions.addPetitionPermissions(
           [user0Petitions[0].id],
           [users[2].id],
           [],
@@ -625,7 +624,7 @@ describe("repositories/PetitionRepository", () => {
 
       test("should share multiple petitions with a single user", async () => {
         const petitionIds = user0Petitions.map((u) => u.id);
-        const { newPermissions } = await petitions.addPetitionUserPermissions(
+        const { newPermissions } = await petitions.addPetitionPermissions(
           petitionIds,
           [users[3].id],
           [],
@@ -635,9 +634,8 @@ describe("repositories/PetitionRepository", () => {
         );
 
         expect(newPermissions).toHaveLength(3);
-        let groupedPermissions = await petitions.loadUserPermissions(
-          petitionIds
-        );
+        let groupedPermissions =
+          await petitions.loadUserPermissionsByPetitionId(petitionIds);
 
         expect(groupedPermissions).toHaveLength(3);
         for (let i = 0; i < 3; i++) {
@@ -645,11 +643,11 @@ describe("repositories/PetitionRepository", () => {
           groupedPermissions[i].sort((a, b) => a.id - b.id);
           expect(groupedPermissions[i]).toMatchObject([
             {
-              permission_type: "OWNER",
+              type: "OWNER",
               user_id: users[0].id,
             },
             {
-              permission_type: "WRITE",
+              type: "WRITE",
               user_id: users[3].id,
             },
           ]);
@@ -659,7 +657,7 @@ describe("repositories/PetitionRepository", () => {
       test("should share a single petition with multiple users", async () => {
         const userIds = users.slice(1).map((u) => u.id);
         const petitionId = user0Petitions[1].id;
-        const { newPermissions } = await petitions.addPetitionUserPermissions(
+        const { newPermissions } = await petitions.addPetitionPermissions(
           [petitionId],
           userIds,
           [],
@@ -669,14 +667,16 @@ describe("repositories/PetitionRepository", () => {
         );
 
         expect(newPermissions).toHaveLength(userIds.length);
-        const permissions = await petitions.loadUserPermissions(petitionId);
+        const permissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(permissions).toHaveLength(userIds.length + 1);
       });
 
       test("should share multiple petitions with multiple users", async () => {
         const userIds = users.slice(1).map((u) => u.id);
         const petitionIds = user0Petitions.map((p) => p.id);
-        const { newPermissions } = await petitions.addPetitionUserPermissions(
+        const { newPermissions } = await petitions.addPetitionPermissions(
           petitionIds,
           userIds,
           [],
@@ -690,13 +690,13 @@ describe("repositories/PetitionRepository", () => {
       });
     });
 
-    describe("editPetitionUserPermissions", () => {
+    describe("editPetitionPermissions", () => {
       let petitionId: number, userId: number;
       beforeEach(async () => {
         await mocks.clearSharedPetitions();
         petitionId = user0Petitions[0].id;
         userId = users[1].id;
-        await petitions.addPetitionUserPermissions(
+        await petitions.addPetitionPermissions(
           [petitionId],
           [userId],
           [],
@@ -707,25 +707,29 @@ describe("repositories/PetitionRepository", () => {
       });
 
       test("should update permissions for users with shared petitions", async () => {
-        const permissions = await petitions.loadUserPermissions(petitionId);
-        await petitions.editPetitionUserPermissions(
+        const permissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
+        await petitions.editPetitionPermissions(
           [petitionId],
           [userId],
           [],
           "WRITE",
           users[0]
         );
-        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(permissions.length).toEqual(newPermissions.length);
         permissions.sort((a, b) => a.id - b.id);
         expect(newPermissions).toMatchObject([
           {
-            permission_type: "OWNER",
+            type: "OWNER",
             user_id: users[0].id,
             petition_id: petitionId,
           },
           {
-            permission_type: "WRITE",
+            type: "WRITE",
             user_id: userId,
             petition_id: petitionId,
           },
@@ -736,7 +740,7 @@ describe("repositories/PetitionRepository", () => {
         // this test should assert 1 time on the catch block
         expect.assertions(1);
         try {
-          await petitions.editPetitionUserPermissions(
+          await petitions.editPetitionPermissions(
             [petitionId],
             [userId],
             [],
@@ -744,33 +748,38 @@ describe("repositories/PetitionRepository", () => {
             users[0]
           );
         } catch (e) {
-          expect(e.constraint).toBe("petition_user__owner");
+          expect(e.constraint).toBe("petition_permission__owner");
         }
       });
 
       test("should not edit for user without permissions", async () => {
-        const permissions = await petitions.loadUserPermissions(petitionId);
-        await petitions.editPetitionUserPermissions(
+        const permissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
+        await petitions.editPetitionPermissions(
           [petitionId],
           [users[3].id],
           [],
           "READ",
           users[0]
         );
-        const newPermissions = await petitions.loadUserPermissions(petitionId, {
-          cache: false,
-        });
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId,
+          {
+            cache: false,
+          }
+        );
         expect(permissions).toMatchObject(newPermissions);
       });
     });
 
-    describe("removePetitionUserPermissions", () => {
+    describe("removePetitionPermissions", () => {
       let petitionId: number, userId: number;
       beforeEach(async () => {
         await mocks.clearSharedPetitions();
         petitionId = user0Petitions[0].id;
         userId = users[1].id;
-        await petitions.addPetitionUserPermissions(
+        await petitions.addPetitionPermissions(
           [petitionId],
           [userId],
           [],
@@ -781,18 +790,20 @@ describe("repositories/PetitionRepository", () => {
       });
 
       test("should remove access to a single petition for a single user", async () => {
-        await petitions.removePetitionUserPermissions(
+        await petitions.removePetitionPermissions(
           [petitionId],
           [userId],
           [],
           false,
           users[0]
         );
-        const permissions = await petitions.loadUserPermissions(petitionId);
+        const permissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(permissions).toHaveLength(1);
         expect(permissions).toMatchObject([
           {
-            permission_type: "OWNER",
+            type: "OWNER",
             user_id: users[0].id,
             petition_id: petitionId,
           },
@@ -800,7 +811,7 @@ describe("repositories/PetitionRepository", () => {
       });
 
       test("should remove access to a single petition for multiple users", async () => {
-        await petitions.addPetitionUserPermissions(
+        await petitions.addPetitionPermissions(
           [petitionId],
           [users[2].id, users[3].id],
           [],
@@ -809,32 +820,34 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        await petitions.removePetitionUserPermissions(
+        await petitions.removePetitionPermissions(
           [petitionId],
           [users[1].id, users[2].id],
           [],
           false,
           users[0]
         );
-        const permissions = await petitions.loadUserPermissions(petitionId);
+        const permissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(permissions).toHaveLength(2);
         permissions.sort((a, b) => a.id - b.id);
         expect(permissions).toMatchObject([
           {
             petition_id: petitionId,
             user_id: users[0].id,
-            permission_type: "OWNER",
+            type: "OWNER",
           },
           {
             petition_id: petitionId,
             user_id: users[3].id,
-            permission_type: "READ",
+            type: "READ",
           },
         ]);
       });
 
       test("should remove access to multiple petitions for a single user", async () => {
-        await petitions.addPetitionUserPermissions(
+        await petitions.addPetitionPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [users[1].id],
           [],
@@ -843,7 +856,7 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        await petitions.removePetitionUserPermissions(
+        await petitions.removePetitionPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [users[1].id],
           [],
@@ -851,19 +864,21 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        const permissions = await petitions.loadUserPermissions(petitionId);
+        const permissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(permissions).toHaveLength(1);
         expect(permissions).toMatchObject([
           {
             petition_id: petitionId,
             user_id: users[0].id,
-            permission_type: "OWNER",
+            type: "OWNER",
           },
         ]);
       });
 
       test("ignores the userIds array when passing removeAll = true arg", async () => {
-        await petitions.addPetitionUserPermissions(
+        await petitions.addPetitionPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [users[1].id],
           [],
@@ -872,7 +887,7 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        await petitions.removePetitionUserPermissions(
+        await petitions.removePetitionPermissions(
           [user0Petitions[0].id, user0Petitions[1].id, user0Petitions[2].id],
           [100, 123, 234234234, 2],
           [],
@@ -880,18 +895,20 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        const permissions = await petitions.loadUserPermissions(petitionId);
+        const permissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(permissions).toMatchObject([
           {
             petition_id: petitionId,
             user_id: users[0].id,
-            permission_type: "OWNER",
+            type: "OWNER",
           },
         ]);
       });
 
       test("should remove access to multiple petitions for multiple user", async () => {
-        await petitions.addPetitionUserPermissions(
+        await petitions.addPetitionPermissions(
           [user0Petitions[0].id, user0Petitions[1].id],
           [users[1].id, users[2].id, users[3].id],
           [],
@@ -900,7 +917,7 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        await petitions.removePetitionUserPermissions(
+        await petitions.removePetitionPermissions(
           [user0Petitions[0].id, user0Petitions[1].id],
           [users[1].id, users[2].id, users[3].id],
           [],
@@ -909,7 +926,7 @@ describe("repositories/PetitionRepository", () => {
         );
 
         const permissions = (
-          await petitions.loadUserPermissions([
+          await petitions.loadUserPermissionsByPetitionId([
             user0Petitions[0].id,
             user0Petitions[1].id,
           ])
@@ -933,16 +950,18 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(newPermissions).toMatchObject([
           {
             petition_id: petitionId,
-            permission_type: "OWNER",
+            type: "OWNER",
             user_id: users[2].id,
           },
           {
             petition_id: petitionId,
-            permission_type: "WRITE",
+            type: "WRITE",
             user_id: users[0].id,
           },
         ]);
@@ -958,11 +977,13 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(newPermissions).toMatchObject([
           {
             petition_id: petitionId,
-            permission_type: "OWNER",
+            type: "OWNER",
             user_id: users[2].id,
           },
         ]);
@@ -971,7 +992,7 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user with READ or WRITE access", async () => {
         const petitionId = user0Petitions[2].id;
         const userId = users[2].id;
-        await petitions.addPetitionUserPermissions(
+        await petitions.addPetitionPermissions(
           [petitionId],
           [userId],
           [],
@@ -981,16 +1002,18 @@ describe("repositories/PetitionRepository", () => {
         );
 
         await petitions.transferOwnership([petitionId], userId, true, users[0]);
-        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(newPermissions).toMatchObject([
           {
             petition_id: petitionId,
-            permission_type: "OWNER",
+            type: "OWNER",
             user_id: userId,
           },
           {
             petition_id: petitionId,
-            permission_type: "WRITE",
+            type: "WRITE",
             user_id: users[0].id,
           },
         ]);
@@ -999,7 +1022,7 @@ describe("repositories/PetitionRepository", () => {
       it("should transfer ownership to a user with READ or WRITE access and remove original permissions", async () => {
         const petitionId = user0Petitions[2].id;
         const userId = users[2].id;
-        await petitions.addPetitionUserPermissions(
+        await petitions.addPetitionPermissions(
           [petitionId],
           [userId],
           [],
@@ -1015,11 +1038,13 @@ describe("repositories/PetitionRepository", () => {
           users[0]
         );
 
-        const newPermissions = await petitions.loadUserPermissions(petitionId);
+        const newPermissions = await petitions.loadUserPermissionsByPetitionId(
+          petitionId
+        );
         expect(newPermissions).toMatchObject([
           {
             petition_id: petitionId,
-            permission_type: "OWNER",
+            type: "OWNER",
             user_id: userId,
           },
         ]);

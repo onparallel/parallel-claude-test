@@ -4,7 +4,7 @@ import {
   Contact,
   Organization,
   Petition,
-  PetitionUser,
+  PetitionPermission,
   User,
 } from "../../db/__types";
 import { USER_COGNITO_ID } from "../../../test/mocks";
@@ -249,7 +249,7 @@ describe("GraphQL/Users", () => {
       ]);
 
       const permissions = await mocks.knex
-        .from<PetitionUser>("petition_user")
+        .from<PetitionPermission>("petition_permission")
         .whereNull("deleted_at")
         .select("*");
       const members = await mocks.knex
@@ -329,8 +329,8 @@ describe("GraphQL/Users", () => {
       // as petitions are private for each user, here we have to obtain the info directly from the database
       const { rows: petitionUserPermissions } = await mocks.knex.raw(
         /* sql */ `
-        select petition_id, permission_type, user_id, updated_by 
-        from petition_user 
+        select petition_id, type, user_id, updated_by 
+        from petition_permission 
         where petition_id in (?,?,?,?) and deleted_at is null`,
         [user0Petition.id, ...user1Petitions.map((p) => p.id)]
       );
@@ -338,25 +338,25 @@ describe("GraphQL/Users", () => {
       expect(petitionUserPermissions).toEqual([
         {
           petition_id: user0Petition.id,
-          permission_type: "OWNER",
+          type: "OWNER",
           user_id: activeUsers[2].id,
           updated_by: `User:${sessionUser.id}`,
         },
         {
           petition_id: user1Petitions[0].id,
-          permission_type: "OWNER",
+          type: "OWNER",
           user_id: activeUsers[2].id,
           updated_by: `User:${sessionUser.id}`,
         },
         {
           petition_id: user1Petitions[1].id,
-          permission_type: "OWNER",
+          type: "OWNER",
           user_id: activeUsers[2].id,
           updated_by: `User:${sessionUser.id}`,
         },
         {
           petition_id: user1Petitions[2].id,
-          permission_type: "OWNER",
+          type: "OWNER",
           user_id: activeUsers[2].id,
           updated_by: `User:${sessionUser.id}`,
         },

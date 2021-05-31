@@ -144,7 +144,7 @@ export interface EffectivePetitionUserPermission {
   /** wether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
 }
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
@@ -176,7 +176,7 @@ export interface GroupPermissionAddedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionGroup: UserGroup;
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   user?: Maybe<User>;
 }
 
@@ -185,7 +185,7 @@ export interface GroupPermissionEditedEvent extends PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionGroup: UserGroup;
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   user?: Maybe<User>;
 }
 
@@ -225,7 +225,7 @@ export interface MessageSentEvent extends PetitionEvent {
 export interface Mutation {
   __typename?: "Mutation";
   /** Adds permissions on given petitions and users */
-  addPetitionUserPermission: Array<Petition>;
+  addPetitionPermission: Array<Petition>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
@@ -293,7 +293,7 @@ export interface Mutation {
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Edits permissions on given petitions and users */
-  editPetitionUserPermission: Array<Petition>;
+  editPetitionPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Generates a new API token for the context user */
@@ -338,7 +338,7 @@ export interface Mutation {
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes permissions on given petitions and users */
-  removePetitionUserPermission: Array<Petition>;
+  removePetitionPermission: Array<Petition>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
@@ -384,8 +384,8 @@ export interface Mutation {
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
   /** Updates the metada of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
-  /** Updates the subscription flag on a PetitionUser */
-  updatePetitionUserSubscription: Petition;
+  /** Updates the subscription flag on a PetitionPermission */
+  updatePetitionPermissionSubscription: Petition;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
@@ -404,10 +404,10 @@ export interface Mutation {
   verifyPublicAccess: PublicAccessVerification;
 }
 
-export interface MutationaddPetitionUserPermissionArgs {
+export interface MutationaddPetitionPermissionArgs {
   message?: Maybe<Scalars["String"]>;
   notify?: Maybe<Scalars["Boolean"]>;
-  permissionType: PetitionUserPermissionTypeRW;
+  permissionType: PetitionPermissionTypeRW;
   petitionIds: Array<Scalars["GID"]>;
   subscribe?: Maybe<Scalars["Boolean"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
@@ -599,8 +599,8 @@ export interface MutationdynamicSelectFieldFileDownloadLinkArgs {
   petitionId: Scalars["GID"];
 }
 
-export interface MutationeditPetitionUserPermissionArgs {
-  permissionType: PetitionUserPermissionType;
+export interface MutationeditPetitionPermissionArgs {
+  permissionType: PetitionPermissionType;
   petitionIds: Array<Scalars["GID"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
   userIds?: Maybe<Array<Scalars["GID"]>>;
@@ -723,7 +723,7 @@ export interface MutationreactivateAccessesArgs {
   petitionId: Scalars["GID"];
 }
 
-export interface MutationremovePetitionUserPermissionArgs {
+export interface MutationremovePetitionPermissionArgs {
   petitionIds: Array<Scalars["GID"]>;
   removeAll?: Maybe<Scalars["Boolean"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
@@ -857,7 +857,7 @@ export interface MutationupdatePetitionFieldReplyMetadataArgs {
   replyId: Scalars["GID"];
 }
 
-export interface MutationupdatePetitionUserSubscriptionArgs {
+export interface MutationupdatePetitionPermissionSubscriptionArgs {
   isSubscribed: Scalars["Boolean"];
   petitionId: Scalars["GID"];
 }
@@ -1398,12 +1398,18 @@ export interface PetitionPermission {
   /** wether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   /** The petition linked to the permission. */
   petition: Petition;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 }
+
+/** The type of permission for a petition user. */
+export type PetitionPermissionType = "OWNER" | "READ" | "WRITE";
+
+/** The READ and WRITE permissions for a petition user. */
+export type PetitionPermissionTypeRW = "READ" | "WRITE";
 
 /** The progress of a petition. */
 export interface PetitionProgress {
@@ -1557,7 +1563,7 @@ export interface PetitionUserGroupPermission
   /** wether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   /** The petition linked to the permission. */
   petition: Petition;
   /** Time when the resource was last updated. */
@@ -1572,7 +1578,7 @@ export interface PetitionUserPermission extends PetitionPermission, Timestamps {
   /** wether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   /** The petition linked to the permission. */
   petition: Petition;
   /** Time when the resource was last updated. */
@@ -1580,12 +1586,6 @@ export interface PetitionUserPermission extends PetitionPermission, Timestamps {
   /** The user linked to the permission */
   user: User;
 }
-
-/** The type of permission for a petition user. */
-export type PetitionUserPermissionType = "OWNER" | "READ" | "WRITE";
-
-/** The READ and WRITE permissions for a petition user. */
-export type PetitionUserPermissionTypeRW = "READ" | "WRITE";
 
 export interface PetitionWithFieldAndReplies {
   __typename?: "PetitionWithFieldAndReplies";
@@ -1652,7 +1652,7 @@ export interface PublicPetition extends Timestamps {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The recipitions of the petition */
+  /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */
   signature?: Maybe<PublicSignatureConfig>;
@@ -2277,7 +2277,7 @@ export interface UserPermissionAddedEvent extends PetitionEvent {
   __typename?: "UserPermissionAddedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
 }
@@ -2286,7 +2286,7 @@ export interface UserPermissionEditedEvent extends PetitionEvent {
   __typename?: "UserPermissionEditedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
 }
@@ -2491,12 +2491,12 @@ export type ShareButton_PetitionBase_Petition_Fragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         group: { __typename?: "UserGroup"; id: string; name: string };
       }
     | {
         __typename?: "PetitionUserPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
       }
   >;
@@ -2507,12 +2507,12 @@ export type ShareButton_PetitionBase_PetitionTemplate_Fragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         group: { __typename?: "UserGroup"; id: string; name: string };
       }
     | {
         __typename?: "PetitionUserPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
       }
   >;
@@ -2710,14 +2710,14 @@ export type PetitionHeader_reopenPetitionMutation = {
   };
 };
 
-export type PetitionHeader_updatePetitionUserSubscriptionMutationVariables =
+export type PetitionHeader_updatePetitionPermissionSubscriptionMutationVariables =
   Exact<{
     petitionId: Scalars["GID"];
     isSubscribed: Scalars["Boolean"];
   }>;
 
-export type PetitionHeader_updatePetitionUserSubscriptionMutation = {
-  updatePetitionUserSubscription: {
+export type PetitionHeader_updatePetitionPermissionSubscriptionMutation = {
+  updatePetitionPermissionSubscription: {
     __typename?: "Petition";
     id: string;
     myEffectivePermission?: Maybe<{
@@ -3256,7 +3256,7 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
 export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment =
   {
     __typename?: "GroupPermissionAddedEvent";
-    permissionType: PetitionUserPermissionType;
+    permissionType: PetitionPermissionType;
     createdAt: string;
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
     permissionGroup: { __typename?: "UserGroup"; name: string };
@@ -3265,7 +3265,7 @@ export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment 
 export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment =
   {
     __typename?: "GroupPermissionEditedEvent";
-    permissionType: PetitionUserPermissionType;
+    permissionType: PetitionPermissionType;
     createdAt: string;
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
     permissionGroup: { __typename?: "UserGroup"; name: string };
@@ -3467,7 +3467,7 @@ export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
 export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment =
   {
     __typename?: "UserPermissionAddedEvent";
-    permissionType: PetitionUserPermissionType;
+    permissionType: PetitionPermissionType;
     createdAt: string;
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
     permissionUser?: Maybe<
@@ -3478,7 +3478,7 @@ export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment =
 export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment =
   {
     __typename?: "UserPermissionEditedEvent";
-    permissionType: PetitionUserPermissionType;
+    permissionType: PetitionPermissionType;
     createdAt: string;
     user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
     permissionUser?: Maybe<
@@ -3582,7 +3582,7 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         group: {
           __typename?: "UserGroup";
           id: string;
@@ -3595,7 +3595,7 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
       }
     | {
         __typename?: "PetitionUserPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         user: {
           __typename?: "User";
           id: string;
@@ -3611,7 +3611,7 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         group: {
           __typename?: "UserGroup";
           id: string;
@@ -3624,7 +3624,7 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
       }
     | {
         __typename?: "PetitionUserPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         user: {
           __typename?: "User";
           id: string;
@@ -3654,34 +3654,34 @@ export type PetitionSharingModal_UserGroupFragment = {
   }>;
 };
 
-export type PetitionSharingModal_addPetitionUserPermissionMutationVariables =
+export type PetitionSharingModal_addPetitionPermissionMutationVariables =
   Exact<{
     petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
     userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
     userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
-    permissionType: PetitionUserPermissionTypeRW;
+    permissionType: PetitionPermissionTypeRW;
     notify?: Maybe<Scalars["Boolean"]>;
     subscribe?: Maybe<Scalars["Boolean"]>;
     message?: Maybe<Scalars["String"]>;
   }>;
 
-export type PetitionSharingModal_addPetitionUserPermissionMutation = {
-  addPetitionUserPermission: Array<
+export type PetitionSharingModal_addPetitionPermissionMutation = {
+  addPetitionPermission: Array<
     {
       __typename?: "Petition";
     } & PetitionSharingModal_Petition_Petition_Fragment
   >;
 };
 
-export type PetitionSharingModal_removePetitionUserPermissionMutationVariables =
+export type PetitionSharingModal_removePetitionPermissionMutationVariables =
   Exact<{
     petitionId: Scalars["GID"];
     userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
     userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
   }>;
 
-export type PetitionSharingModal_removePetitionUserPermissionMutation = {
-  removePetitionUserPermission: Array<
+export type PetitionSharingModal_removePetitionPermissionMutation = {
+  removePetitionPermission: Array<
     {
       __typename?: "Petition";
     } & PetitionSharingModal_Petition_Petition_Fragment
@@ -3775,7 +3775,7 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
   };
   myEffectivePermission?: Maybe<{
     __typename?: "EffectivePetitionUserPermission";
-    permissionType: PetitionUserPermissionType;
+    permissionType: PetitionPermissionType;
   }>;
 };
 
@@ -4670,12 +4670,12 @@ export type Contact_PetitionFragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         group: { __typename?: "UserGroup" } & UserAvatarList_UserGroupFragment;
       }
     | {
         __typename?: "PetitionUserPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         user: { __typename?: "User" } & UserAvatarList_UserFragment;
       }
   >;
@@ -6211,12 +6211,12 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         group: { __typename?: "UserGroup" } & UserAvatarList_UserGroupFragment;
       }
     | {
         __typename?: "PetitionUserPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         user: { __typename?: "User" } & UserAvatarList_UserFragment;
       }
   >;
@@ -6233,12 +6233,12 @@ export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         group: { __typename?: "UserGroup" } & UserAvatarList_UserGroupFragment;
       }
     | {
         __typename?: "PetitionUserPermission";
-        permissionType: PetitionUserPermissionType;
+        permissionType: PetitionPermissionType;
         user: { __typename?: "User" } & UserAvatarList_UserFragment;
       }
   >;
@@ -8832,12 +8832,12 @@ export function usePetitionHeader_reopenPetitionMutation(
 export type PetitionHeader_reopenPetitionMutationHookResult = ReturnType<
   typeof usePetitionHeader_reopenPetitionMutation
 >;
-export const PetitionHeader_updatePetitionUserSubscriptionDocument = gql`
-  mutation PetitionHeader_updatePetitionUserSubscription(
+export const PetitionHeader_updatePetitionPermissionSubscriptionDocument = gql`
+  mutation PetitionHeader_updatePetitionPermissionSubscription(
     $petitionId: GID!
     $isSubscribed: Boolean!
   ) {
-    updatePetitionUserSubscription(
+    updatePetitionPermissionSubscription(
       petitionId: $petitionId
       isSubscribed: $isSubscribed
     ) {
@@ -8848,20 +8848,22 @@ export const PetitionHeader_updatePetitionUserSubscriptionDocument = gql`
     }
   }
 `;
-export function usePetitionHeader_updatePetitionUserSubscriptionMutation(
+export function usePetitionHeader_updatePetitionPermissionSubscriptionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    PetitionHeader_updatePetitionUserSubscriptionMutation,
-    PetitionHeader_updatePetitionUserSubscriptionMutationVariables
+    PetitionHeader_updatePetitionPermissionSubscriptionMutation,
+    PetitionHeader_updatePetitionPermissionSubscriptionMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    PetitionHeader_updatePetitionUserSubscriptionMutation,
-    PetitionHeader_updatePetitionUserSubscriptionMutationVariables
-  >(PetitionHeader_updatePetitionUserSubscriptionDocument, options);
+    PetitionHeader_updatePetitionPermissionSubscriptionMutation,
+    PetitionHeader_updatePetitionPermissionSubscriptionMutationVariables
+  >(PetitionHeader_updatePetitionPermissionSubscriptionDocument, options);
 }
-export type PetitionHeader_updatePetitionUserSubscriptionMutationHookResult =
-  ReturnType<typeof usePetitionHeader_updatePetitionUserSubscriptionMutation>;
+export type PetitionHeader_updatePetitionPermissionSubscriptionMutationHookResult =
+  ReturnType<
+    typeof usePetitionHeader_updatePetitionPermissionSubscriptionMutation
+  >;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {
     emailIsAvailable(email: $email)
@@ -8982,17 +8984,17 @@ export function usePetitionSettings_startPetitionSignatureRequestMutation(
 }
 export type PetitionSettings_startPetitionSignatureRequestMutationHookResult =
   ReturnType<typeof usePetitionSettings_startPetitionSignatureRequestMutation>;
-export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
-  mutation PetitionSharingModal_addPetitionUserPermission(
+export const PetitionSharingModal_addPetitionPermissionDocument = gql`
+  mutation PetitionSharingModal_addPetitionPermission(
     $petitionIds: [GID!]!
     $userIds: [GID!]
     $userGroupIds: [GID!]
-    $permissionType: PetitionUserPermissionTypeRW!
+    $permissionType: PetitionPermissionTypeRW!
     $notify: Boolean
     $subscribe: Boolean
     $message: String
   ) {
-    addPetitionUserPermission(
+    addPetitionPermission(
       petitionIds: $petitionIds
       userIds: $userIds
       userGroupIds: $userGroupIds
@@ -9006,27 +9008,27 @@ export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-export function usePetitionSharingModal_addPetitionUserPermissionMutation(
+export function usePetitionSharingModal_addPetitionPermissionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    PetitionSharingModal_addPetitionUserPermissionMutation,
-    PetitionSharingModal_addPetitionUserPermissionMutationVariables
+    PetitionSharingModal_addPetitionPermissionMutation,
+    PetitionSharingModal_addPetitionPermissionMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    PetitionSharingModal_addPetitionUserPermissionMutation,
-    PetitionSharingModal_addPetitionUserPermissionMutationVariables
-  >(PetitionSharingModal_addPetitionUserPermissionDocument, options);
+    PetitionSharingModal_addPetitionPermissionMutation,
+    PetitionSharingModal_addPetitionPermissionMutationVariables
+  >(PetitionSharingModal_addPetitionPermissionDocument, options);
 }
-export type PetitionSharingModal_addPetitionUserPermissionMutationHookResult =
-  ReturnType<typeof usePetitionSharingModal_addPetitionUserPermissionMutation>;
-export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
-  mutation PetitionSharingModal_removePetitionUserPermission(
+export type PetitionSharingModal_addPetitionPermissionMutationHookResult =
+  ReturnType<typeof usePetitionSharingModal_addPetitionPermissionMutation>;
+export const PetitionSharingModal_removePetitionPermissionDocument = gql`
+  mutation PetitionSharingModal_removePetitionPermission(
     $petitionId: GID!
     $userIds: [GID!]
     $userGroupIds: [GID!]
   ) {
-    removePetitionUserPermission(
+    removePetitionPermission(
       petitionIds: [$petitionId]
       userIds: $userIds
       userGroupIds: $userGroupIds
@@ -9036,22 +9038,20 @@ export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-export function usePetitionSharingModal_removePetitionUserPermissionMutation(
+export function usePetitionSharingModal_removePetitionPermissionMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    PetitionSharingModal_removePetitionUserPermissionMutation,
-    PetitionSharingModal_removePetitionUserPermissionMutationVariables
+    PetitionSharingModal_removePetitionPermissionMutation,
+    PetitionSharingModal_removePetitionPermissionMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    PetitionSharingModal_removePetitionUserPermissionMutation,
-    PetitionSharingModal_removePetitionUserPermissionMutationVariables
-  >(PetitionSharingModal_removePetitionUserPermissionDocument, options);
+    PetitionSharingModal_removePetitionPermissionMutation,
+    PetitionSharingModal_removePetitionPermissionMutationVariables
+  >(PetitionSharingModal_removePetitionPermissionDocument, options);
 }
-export type PetitionSharingModal_removePetitionUserPermissionMutationHookResult =
-  ReturnType<
-    typeof usePetitionSharingModal_removePetitionUserPermissionMutation
-  >;
+export type PetitionSharingModal_removePetitionPermissionMutationHookResult =
+  ReturnType<typeof usePetitionSharingModal_removePetitionPermissionMutation>;
 export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
   mutation PetitionSharingModal_transferPetitionOwnership(
     $petitionId: GID!

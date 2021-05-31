@@ -105,14 +105,14 @@ import {
   PetitionFieldType,
   PetitionReplies_RepliesQuery,
   PetitionReplies_RepliesQueryVariables,
-  RemoveUserGroupPermission_removePetitionUserPermissionMutation,
-  RemoveUserGroupPermission_removePetitionUserPermissionMutationVariables,
-  RemoveUserPermission_removePetitionUserPermissionMutation,
-  RemoveUserPermission_removePetitionUserPermissionMutationVariables,
-  SharePetition_addPetitionUserPermissionMutation,
-  SharePetition_addPetitionUserPermissionMutationVariables,
-  StopSharing_removePetitionUserPermissionMutation,
-  StopSharing_removePetitionUserPermissionMutationVariables,
+  RemoveUserGroupPermission_removePetitionPermissionMutation,
+  RemoveUserGroupPermission_removePetitionPermissionMutationVariables,
+  RemoveUserPermission_removePetitionPermissionMutation,
+  RemoveUserPermission_removePetitionPermissionMutationVariables,
+  SharePetition_addPetitionPermissionMutation,
+  SharePetition_addPetitionPermissionMutationVariables,
+  StopSharing_removePetitionPermissionMutation,
+  StopSharing_removePetitionPermissionMutationVariables,
   TransferPetition_transferPetitionOwnershipMutation,
   TransferPetition_transferPetitionOwnershipMutationVariables,
   UpdatePetition_PetitionMutation,
@@ -834,16 +834,16 @@ api
     },
     async ({ client, params, body }) => {
       const result = await client.request<
-        SharePetition_addPetitionUserPermissionMutation,
-        SharePetition_addPetitionUserPermissionMutationVariables
+        SharePetition_addPetitionPermissionMutation,
+        SharePetition_addPetitionPermissionMutationVariables
       >(
         gql`
-          mutation SharePetition_addPetitionUserPermission(
+          mutation SharePetition_addPetitionPermission(
             $petitionId: GID!
             $userIds: [GID!]
             $userGroupIds: [GID!]
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: [$petitionId]
               userIds: $userIds
               userGroupIds: $userGroupIds
@@ -863,7 +863,7 @@ api
         }
       );
 
-      return Ok(result.addPetitionUserPermission[0].permissions);
+      return Ok(result.addPetitionPermission[0].permissions);
     }
   )
   .delete(
@@ -878,12 +878,12 @@ api
     },
     async ({ client, params }) => {
       await client.request<
-        StopSharing_removePetitionUserPermissionMutation,
-        StopSharing_removePetitionUserPermissionMutationVariables
+        StopSharing_removePetitionPermissionMutation,
+        StopSharing_removePetitionPermissionMutationVariables
       >(
         gql`
-          mutation StopSharing_removePetitionUserPermission($petitionId: GID!) {
-            removePetitionUserPermission(
+          mutation StopSharing_removePetitionPermission($petitionId: GID!) {
+            removePetitionPermission(
               petitionIds: [$petitionId]
               removeAll: true
             ) {
@@ -918,15 +918,15 @@ api
     },
     async ({ client, params }) => {
       await client.request<
-        RemoveUserPermission_removePetitionUserPermissionMutation,
-        RemoveUserPermission_removePetitionUserPermissionMutationVariables
+        RemoveUserPermission_removePetitionPermissionMutation,
+        RemoveUserPermission_removePetitionPermissionMutationVariables
       >(
         gql`
-          mutation RemoveUserPermission_removePetitionUserPermission(
+          mutation RemoveUserPermission_removePetitionPermission(
             $petitionId: GID!
             $userId: GID!
           ) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: [$petitionId]
               userIds: [$userId]
             ) {
@@ -964,15 +964,15 @@ api
     },
     async ({ client, params }) => {
       await client.request<
-        RemoveUserGroupPermission_removePetitionUserPermissionMutation,
-        RemoveUserGroupPermission_removePetitionUserPermissionMutationVariables
+        RemoveUserGroupPermission_removePetitionPermissionMutation,
+        RemoveUserGroupPermission_removePetitionPermissionMutationVariables
       >(
         gql`
-          mutation RemoveUserGroupPermission_removePetitionUserPermission(
+          mutation RemoveUserGroupPermission_removePetitionPermission(
             $petitionId: GID!
             $userGroupId: GID!
           ) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: [$petitionId]
               userGroupIds: [$userGroupId]
             ) {

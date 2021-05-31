@@ -1,10 +1,6 @@
-import { PetitionUserPermissionType } from "@parallel/graphql/__types";
+import { PetitionPermissionType } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-export function UserPermissionType({
-  type,
-}: {
-  type: PetitionUserPermissionType;
-}) {
+export function UserPermissionType({ type }: { type: PetitionPermissionType }) {
   switch (type) {
     case "OWNER":
       return (

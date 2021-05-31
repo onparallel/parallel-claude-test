@@ -33,7 +33,7 @@ export interface IEmailsService {
   ): Promise<void>;
   sendPetitionSharingNotificationEmail(
     userId: number,
-    petitionUserIds: MaybeArray<number>,
+    petitionPermissionIds: MaybeArray<number>,
     message: Maybe<string>
   ): Promise<void>;
   sendPetitionClosedEmail(
@@ -170,13 +170,13 @@ export class EmailsService implements IEmailsService {
 
   async sendPetitionSharingNotificationEmail(
     userId: number,
-    petitionUserIds: MaybeArray<number>,
+    petitionPermissionIds: MaybeArray<number>,
     message: Maybe<string>
   ) {
     return await this.enqueueEmail("petition-sharing-notification", {
-      id: this.buildQueueId("PetitionAccess", petitionUserIds),
+      id: this.buildQueueId("PetitionAccess", petitionPermissionIds),
       user_id: userId,
-      petition_user_ids: unMaybeArray(petitionUserIds),
+      petition_permission_ids: unMaybeArray(petitionPermissionIds),
       message,
     });
   }

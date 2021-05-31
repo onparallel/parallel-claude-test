@@ -7,7 +7,7 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
   Petition,
-  PetitionUser,
+  PetitionPermission,
   User,
   UserGroup,
 } from "../../db/__types";
@@ -53,7 +53,7 @@ describe("GraphQL/UserGroups", () => {
   });
 
   beforeEach(async () => {
-    await mocks.knex.from("petition_user").delete();
+    await mocks.knex.from("petition_permission").delete();
     await mocks.knex.from("user_group_member").delete();
     await mocks.knex.from("user_group").delete();
     userGroups = await mocks.createUserGroups(3, organization.id, (i) => ({
@@ -65,11 +65,11 @@ describe("GraphQL/UserGroups", () => {
       users.slice(0, 3).map((user) => user.id)
     );
 
-    await mocks.knex<PetitionUser>("petition_user").insert([
+    await mocks.knex<PetitionPermission>("petition_permission").insert([
       {
         user_id: sessionUser.id,
         petition_id: petition.id,
-        permission_type: "OWNER",
+        type: "OWNER",
       },
     ]);
 
@@ -310,7 +310,7 @@ describe("GraphQL/UserGroups", () => {
     expect(data.deleteUserGroup).toEqual("SUCCESS");
 
     const groupPermissions = await mocks
-      .knex<PetitionUser>("petition_user")
+      .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_by")
       .andWhere((q) =>
         q
@@ -385,7 +385,7 @@ describe("GraphQL/UserGroups", () => {
     });
 
     const newMemberPermissions = await mocks
-      .knex<PetitionUser>("petition_user")
+      .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_at")
       .where("user_id", users[3].id)
       .where("from_user_group_id", userGroups[0].id)
@@ -462,7 +462,7 @@ describe("GraphQL/UserGroups", () => {
     });
 
     const groupPermissions = await mocks
-      .knex<PetitionUser>("petition_user")
+      .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_at")
       .where("from_user_group_id", userGroups[0].id)
       .select("*");
@@ -516,7 +516,7 @@ describe("GraphQL/UserGroups", () => {
     expect(errors).toBeUndefined();
     const newGroupId = fromGlobalId(data.cloneUserGroup[0].id, "UserGroup").id;
     const newGroupPermissions = await mocks
-      .knex<PetitionUser>("petition_user")
+      .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_at")
       .andWhere((q) =>
         q

@@ -1,6 +1,6 @@
 import { Arg } from "../helpers/authorize";
 import { unMaybeArray } from "../../util/arrays";
-import { FeatureFlagName, PetitionUserPermissionType } from "../../db/__types";
+import { FeatureFlagName, PetitionPermissionType } from "../../db/__types";
 import { MaybeArray } from "../../util/types";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { countBy } from "remeda";
@@ -11,7 +11,7 @@ export function userHasAccessToPetitions<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(
   argName: TArg,
-  permissionTypes?: PetitionUserPermissionType[]
+  permissionTypes?: PetitionPermissionType[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
@@ -35,7 +35,7 @@ export function userHasAccessToSignatureRequest<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(
   argName: TArg,
-  permissionTypes?: PetitionUserPermissionType[]
+  permissionTypes?: PetitionPermissionType[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {

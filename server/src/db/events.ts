@@ -1,7 +1,7 @@
 import {
   PetitionEventType,
   PetitionSignatureCancelReason,
-  PetitionUserPermissionType,
+  PetitionPermissionType,
   PetitionEvent as DbPetitionEvent,
 } from "./__types";
 
@@ -50,7 +50,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   USER_PERMISSION_ADDED: {
     user_id: number;
     permission_user_id: number;
-    permission_type: PetitionUserPermissionType;
+    permission_type: PetitionPermissionType;
   };
   USER_PERMISSION_REMOVED: {
     user_id: number;
@@ -59,12 +59,12 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   USER_PERMISSION_EDITED: {
     user_id: number;
     permission_user_id: number;
-    permission_type: PetitionUserPermissionType;
+    permission_type: PetitionPermissionType;
   };
   GROUP_PERMISSION_ADDED: {
     user_id: number;
     user_group_id: number;
-    permission_type: PetitionUserPermissionType;
+    permission_type: PetitionPermissionType;
   };
   GROUP_PERMISSION_REMOVED: {
     user_id: number;
@@ -73,7 +73,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   GROUP_PERMISSION_EDITED: {
     user_id: number;
     user_group_id: number;
-    permission_type: PetitionUserPermissionType;
+    permission_type: PetitionPermissionType;
   };
   OWNERSHIP_TRANSFERRED: {
     user_id: number;

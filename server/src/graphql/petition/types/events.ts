@@ -366,7 +366,7 @@ export const UserPermissionAddedEvent = createPetitionEvent(
       },
     });
     t.field("permissionType", {
-      type: "PetitionUserPermissionType",
+      type: "PetitionPermissionType",
       resolve: (root) => root.data.permission_type,
     });
     t.nullable.field("permissionUser", {
@@ -406,7 +406,7 @@ export const UserPermissionEditedEvent = createPetitionEvent(
       },
     });
     t.field("permissionType", {
-      type: "PetitionUserPermissionType",
+      type: "PetitionPermissionType",
       resolve: (root) => root.data.permission_type,
     });
     t.nullable.field("permissionUser", {
@@ -428,7 +428,7 @@ export const GroupPermissionAddedEvent = createPetitionEvent(
       },
     });
     t.field("permissionType", {
-      type: "PetitionUserPermissionType",
+      type: "PetitionPermissionType",
       resolve: (root) => root.data.permission_type,
     });
     t.field("permissionGroup", {
@@ -468,7 +468,7 @@ export const GroupPermissionEditedEvent = createPetitionEvent(
       },
     });
     t.field("permissionType", {
-      type: "PetitionUserPermissionType",
+      type: "PetitionPermissionType",
       resolve: (root) => root.data.permission_type,
     });
     t.field("permissionGroup", {

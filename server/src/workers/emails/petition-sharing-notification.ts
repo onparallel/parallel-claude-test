@@ -14,14 +14,14 @@ import { getLayoutProps } from "../helpers/getLayoutProps";
 export async function petitionSharingNotification(
   payload: {
     user_id: number;
-    petition_user_ids: number[];
+    petition_permission_ids: number[];
     message: Maybe<string>;
   },
   context: WorkerContext
 ) {
   const [user, permissions] = await Promise.all([
     context.users.loadUser(payload.user_id),
-    context.petitions.loadPetitionUser(payload.petition_user_ids),
+    context.petitions.loadPetitionPermission(payload.petition_permission_ids),
   ]);
   if (!user) {
     throw new Error(`User not found for user_id ${payload.user_id}`);
@@ -67,7 +67,7 @@ export async function petitionSharingNotification(
         subject,
         text,
         html,
-        created_from: `PetitionUser:${permission.id}`,
+        created_from: `PetitionPermission:${permission.id}`,
       });
       emails.push(email);
     }

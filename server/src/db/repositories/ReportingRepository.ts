@@ -67,11 +67,11 @@ export class ReportingRepository extends BaseRepository {
                   "petition_id",
                   this.knex.raw("min(created_at) as sent_at")
                 ),
-              this.from("petition_user")
+              this.from("petition_permission")
                 .whereIn("petition_id", batch)
                 .where({
                   deleted_at: null,
-                  permission_type: "OWNER",
+                  type: "OWNER",
                 })
                 .select("user_id as owner_id", "petition_id"),
             ]);

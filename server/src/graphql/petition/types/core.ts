@@ -89,7 +89,9 @@ export const PetitionBase = interfaceType({
       type: "PetitionPermission",
       description: "The permissions linked to the petition",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadUserAndUserGroupPermissions(root.id);
+        return await ctx.petitions.loadUserAndUserGroupPermissionsByPetitionId(
+          root.id
+        );
       },
     });
     t.nullable.field("myEffectivePermission", {

@@ -199,11 +199,11 @@ export class ContactRepository extends BaseRepository {
   ) {
     return await this.loadPageAndCount(
       this.knex<PetitionAccess>("petition_access as pa")
-        .join("petition_user as pu", "pu.petition_id", "pa.petition_id")
+        .join("petition_permission as pp", "pp.petition_id", "pa.petition_id")
         .join("petition as p", "p.id", "pa.petition_id")
         .where("pa.contact_id", contactId)
-        .where("pu.user_id", userId)
-        .whereNull("pu.deleted_at")
+        .where("pp.user_id", userId)
+        .whereNull("pp.deleted_at")
         .whereNull("p.deleted_at")
         .orderBy("pa.created_at", "desc")
         .select<any, PetitionAccess[]>("pa.*"),

@@ -159,7 +159,7 @@ type EffectivePetitionUserPermission {
   """
   The type of the permission.
   """
-  permissionType: PetitionUserPermissionType!
+  permissionType: PetitionPermissionType!
 }
 
 enum EntityType {
@@ -196,7 +196,7 @@ type GroupPermissionAddedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   permissionGroup: UserGroup!
-  permissionType: PetitionUserPermissionType!
+  permissionType: PetitionPermissionType!
   user: User
 }
 
@@ -204,7 +204,7 @@ type GroupPermissionEditedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   permissionGroup: UserGroup!
-  permissionType: PetitionUserPermissionType!
+  permissionType: PetitionPermissionType!
   user: User
 }
 
@@ -261,14 +261,14 @@ type Mutation {
   """
   Adds permissions on given petitions and users
   """
-  addPetitionUserPermission(
+  addPetitionPermission(
     message: String
 
     """
     Wether to notify the user via email or not.
     """
     notify: Boolean = false
-    permissionType: PetitionUserPermissionTypeRW!
+    permissionType: PetitionPermissionTypeRW!
     petitionIds: [GID!]!
 
     """
@@ -571,8 +571,8 @@ type Mutation {
   """
   Edits permissions on given petitions and users
   """
-  editPetitionUserPermission(
-    permissionType: PetitionUserPermissionType!
+  editPetitionPermission(
+    permissionType: PetitionPermissionType!
     petitionIds: [GID!]!
     userGroupIds: [GID!]
     userIds: [GID!]
@@ -750,7 +750,7 @@ type Mutation {
   """
   Removes permissions on given petitions and users
   """
-  removePetitionUserPermission(
+  removePetitionPermission(
     petitionIds: [GID!]!
 
     """
@@ -920,9 +920,9 @@ type Mutation {
   ): PetitionFieldReply!
 
   """
-  Updates the subscription flag on a PetitionUser
+  Updates the subscription flag on a PetitionPermission
   """
-  updatePetitionUserSubscription(
+  updatePetitionPermissionSubscription(
     isSubscribed: Boolean!
     petitionId: GID!
   ): Petition!
@@ -1899,7 +1899,7 @@ interface PetitionPermission implements Timestamps {
   """
   The type of the permission.
   """
-  permissionType: PetitionUserPermissionType!
+  permissionType: PetitionPermissionType!
 
   """
   The petition linked to the permission.
@@ -1910,6 +1910,23 @@ interface PetitionPermission implements Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+"""
+The type of permission for a petition user.
+"""
+enum PetitionPermissionType {
+  OWNER
+  READ
+  WRITE
+}
+
+"""
+The READ and WRITE permissions for a petition user.
+"""
+enum PetitionPermissionTypeRW {
+  READ
+  WRITE
 }
 
 """
@@ -2187,7 +2204,7 @@ type PetitionUserGroupPermission implements PetitionPermission & Timestamps {
   """
   The type of the permission.
   """
-  permissionType: PetitionUserPermissionType!
+  permissionType: PetitionPermissionType!
 
   """
   The petition linked to the permission.
@@ -2217,7 +2234,7 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
   """
   The type of the permission.
   """
-  permissionType: PetitionUserPermissionType!
+  permissionType: PetitionPermissionType!
 
   """
   The petition linked to the permission.
@@ -2233,23 +2250,6 @@ type PetitionUserPermission implements PetitionPermission & Timestamps {
   The user linked to the permission
   """
   user: User!
-}
-
-"""
-The type of permission for a petition user.
-"""
-enum PetitionUserPermissionType {
-  OWNER
-  READ
-  WRITE
-}
-
-"""
-The READ and WRITE permissions for a petition user.
-"""
-enum PetitionUserPermissionTypeRW {
-  READ
-  WRITE
 }
 
 type PetitionWithFieldAndReplies {
@@ -2362,7 +2362,7 @@ type PublicPetition implements Timestamps {
   locale: PetitionLocale!
 
   """
-  The recipitions of the petition
+  The recipients of the petition
   """
   recipients: [PublicContact!]!
 
@@ -3312,7 +3312,7 @@ type UserPagination {
 type UserPermissionAddedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
-  permissionType: PetitionUserPermissionType!
+  permissionType: PetitionPermissionType!
   permissionUser: User
   user: User
 }
@@ -3320,7 +3320,7 @@ type UserPermissionAddedEvent implements PetitionEvent {
 type UserPermissionEditedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
-  permissionType: PetitionUserPermissionType!
+  permissionType: PetitionPermissionType!
   permissionUser: User
   user: User
 }

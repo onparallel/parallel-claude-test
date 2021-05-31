@@ -34,9 +34,9 @@ import {
   PetitionSharingModal_UserGroupFragment,
   PetitionUserGroupPermission,
   PetitionUserPermission,
-  usePetitionSharingModal_addPetitionUserPermissionMutation,
+  usePetitionSharingModal_addPetitionPermissionMutation,
   usePetitionSharingModal_PetitionsUserPermissionsQuery,
-  usePetitionSharingModal_removePetitionUserPermissionMutation,
+  usePetitionSharingModal_removePetitionPermissionMutation,
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -174,8 +174,8 @@ export function PetitionSharingDialog({
   const handleRemoveUserPermission = useRemoveUserPermission();
   const handleTransferPetitionOwnership = useTransferPetitionOwnership();
 
-  const [addPetitionUserPermission] =
-    usePetitionSharingModal_addPetitionUserPermissionMutation();
+  const [addPetitionPermission] =
+    usePetitionSharingModal_addPetitionPermissionMutation();
 
   const handleAddUserPermissions = handleSubmit(
     async ({ selection, notify, subscribe, message }) => {
@@ -187,7 +187,7 @@ export function PetitionSharingDialog({
         .map((g) => g.id);
 
       try {
-        await addPetitionUserPermission({
+        await addPetitionPermission({
           variables: {
             petitionIds: petitionsOwned.map((p) => p!.id),
             userIds: users.length ? users : null,
@@ -655,16 +655,16 @@ PetitionSharingDialog.fragments = {
 
 PetitionSharingDialog.mutations = [
   gql`
-    mutation PetitionSharingModal_addPetitionUserPermission(
+    mutation PetitionSharingModal_addPetitionPermission(
       $petitionIds: [GID!]!
       $userIds: [GID!]
       $userGroupIds: [GID!]
-      $permissionType: PetitionUserPermissionTypeRW!
+      $permissionType: PetitionPermissionTypeRW!
       $notify: Boolean
       $subscribe: Boolean
       $message: String
     ) {
-      addPetitionUserPermission(
+      addPetitionPermission(
         petitionIds: $petitionIds
         userIds: $userIds
         userGroupIds: $userGroupIds
@@ -679,12 +679,12 @@ PetitionSharingDialog.mutations = [
     ${PetitionSharingDialog.fragments.Petition}
   `,
   gql`
-    mutation PetitionSharingModal_removePetitionUserPermission(
+    mutation PetitionSharingModal_removePetitionPermission(
       $petitionId: GID!
       $userIds: [GID!]
       $userGroupIds: [GID!]
     ) {
-      removePetitionUserPermission(
+      removePetitionPermission(
         petitionIds: [$petitionId]
         userIds: $userIds
         userGroupIds: $userGroupIds
@@ -728,8 +728,8 @@ function useRemoveUserPermission() {
   const confirmRemoveUserPermission = useDialog(
     ConfirmRemoveUserPermissionDialog
   );
-  const [removePetitionUserPermission] =
-    usePetitionSharingModal_removePetitionUserPermissionMutation();
+  const [removePetitionPermission] =
+    usePetitionSharingModal_removePetitionPermissionMutation();
   return useCallback(
     async ({ petitionId, user, userGroup }: RemoveUserPermissionPorps) => {
       try {
@@ -738,13 +738,13 @@ function useRemoveUserPermission() {
         const id = user ? user.id : userGroup?.id;
 
         await confirmRemoveUserPermission({ name });
-        await removePetitionUserPermission({
+        await removePetitionPermission({
           variables: { petitionId, [prop]: [id] },
           refetchQueries: [getOperationName(PetitionActivityDocument)!],
         });
       } catch {}
     },
-    [confirmRemoveUserPermission, removePetitionUserPermission]
+    [confirmRemoveUserPermission, removePetitionPermission]
   );
 }
 

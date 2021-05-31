@@ -9,7 +9,7 @@ import {
   Organization,
   Petition,
   PetitionField,
-  PetitionUser,
+  PetitionPermission,
   Tag,
   User,
   UserGroup,
@@ -1211,7 +1211,7 @@ describe("GraphQL/Petitions", () => {
       expect(userPermissions).toEqual([
         {
           ...userPermissions[0],
-          permission_type: "OWNER",
+          type: "OWNER",
           user_id: sameOrgUser.id,
         },
       ]);
@@ -1282,9 +1282,9 @@ describe("GraphQL/Petitions", () => {
         ...users.map((u) => u.id),
       ]);
       await mocks.sharePetitionWithGroups(petition.id, [userGroup.id]);
-      await mocks.knex<PetitionUser>("petition_user").insert({
+      await mocks.knex<PetitionPermission>("petition_permission").insert({
         user_id: users[1].id,
-        permission_type: "READ",
+        type: "READ",
         petition_id: petition.id,
       });
     });
@@ -1340,7 +1340,7 @@ describe("GraphQL/Petitions", () => {
       expect(data.deletePetitions).toBe("SUCCESS");
 
       const petitionPermissions = await mocks.knex
-        .from("petition_user")
+        .from("petition_permission")
         .where("petition_id", petition.id)
         .whereNull("deleted_at")
         .returning("*");

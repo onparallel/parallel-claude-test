@@ -23,8 +23,8 @@ import {
   PetitionField,
   PetitionFieldReply,
   PetitionFieldType,
-  PetitionUser,
-  PetitionUserPermissionType,
+  PetitionPermission,
+  PetitionPermissionType,
   Tag,
   User,
   UserAuthenticationToken,
@@ -35,9 +35,11 @@ import {
 export class Mocks {
   constructor(public knex: Knex) {}
 
-  async loadUserPermissionsByPetitionId(id: number): Promise<PetitionUser[]> {
+  async loadUserPermissionsByPetitionId(
+    id: number
+  ): Promise<PetitionPermission[]> {
     const { rows: permissions } = await this.knex.raw(
-      /* sql */ `SELECT * from petition_user where petition_id = ? and deleted_at is null`,
+      /* sql */ `SELECT * from petition_permission where petition_id = ? and deleted_at is null`,
       [id]
     );
 
@@ -142,7 +144,7 @@ export class Mocks {
       )
       .returning("*");
 
-    await this.knex<PetitionUser>("petition_user").insert(
+    await this.knex<PetitionPermission>("petition_permission").insert(
       petitions.map(({ id }) => ({
         created_by: `User:${ownerId}`,
         petition_id: id,
@@ -284,22 +286,22 @@ export class Mocks {
   async sharePetitions(
     petitionIds: number[],
     toUserId: number,
-    permissionType: PetitionUserPermissionType
+    permissionType: PetitionPermissionType
   ) {
-    return await this.knex<PetitionUser>("petition_user")
+    return await this.knex<PetitionPermission>("petition_permission")
       .insert(
         petitionIds.map((petitionId) => ({
           petition_id: petitionId,
           user_id: toUserId,
-          permission_type: permissionType,
+          type: permissionType,
         }))
       )
       .returning("*");
   }
 
   async clearSharedPetitions() {
-    return await this.knex<PetitionUser>("petition_user")
-      .whereNot("permission_type", "OWNER")
+    return await this.knex<PetitionPermission>("petition_permission")
+      .whereNot("type", "OWNER")
       .delete();
   }
 
@@ -365,11 +367,11 @@ export class Mocks {
   }
 
   async sharePetitionWithGroups(petitionId: number, userGroupIds: number[]) {
-    await this.knex<PetitionUser>("petition_user").insert(
+    await this.knex<PetitionPermission>("petition_permission").insert(
       userGroupIds.map((groupId) => ({
         petition_id: petitionId,
         user_group_id: groupId,
-        permission_type: "WRITE",
+        type: "WRITE",
       }))
     );
 
@@ -377,12 +379,12 @@ export class Mocks {
       .whereNull("deleted_at")
       .whereIn("user_group_id", userGroupIds);
 
-    await this.knex<PetitionUser>("petition_user").insert(
+    await this.knex<PetitionPermission>("petition_permission").insert(
       members.map((m) => ({
         petition_id: petitionId,
         from_user_group_id: m.user_group_id,
         user_id: m.user_id,
-        permission_type: "WRITE",
+        type: "WRITE",
       }))
     );
   }

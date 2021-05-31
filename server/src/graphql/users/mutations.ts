@@ -210,7 +210,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
       );
     } else {
       const permissionsByUserId =
-        await ctx.petitions.loadUserPermissionsByUserId(userIds);
+        await ctx.petitions.loadPetitionPermissionsByUserId(userIds);
 
       return await ctx.petitions.withTransaction(async (t) => {
         await ctx.userGroups.removeUsersFromAllGroups(
@@ -223,7 +223,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
           async ([userId, userPermissions]) => {
             const [ownedPermissions, notOwnedPermissions] = partition(
               userPermissions,
-              (p) => p.permission_type === "OWNER"
+              (p) => p.type === "OWNER"
             );
             const [[user]] = await Promise.all([
               ctx.users.updateUserById(

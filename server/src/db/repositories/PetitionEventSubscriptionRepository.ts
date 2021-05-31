@@ -21,12 +21,12 @@ export class PetitionEventSubscriptionRepository extends BaseRepository {
     const [{ count }] = await this.raw(
       /* sql */ `
       select count(*)::int as count from petition_event_subscription pes
-      left join petition_user pu on pes.petition_id = pu.petition_id
+      left join petition_permission pp on pes.petition_id = pp.petition_id
       where 
-        pu.permission_type = 'OWNER'
-        and pu.user_id = ?
+        pp.type = 'OWNER'
+        and pp.user_id = ?
         and pes.id in (${subscriptionIds.map(() => "?").join(",")})
-        and pu.deleted_at is null
+        and pp.deleted_at is null
         and pes.deleted_at is null
     `,
       [userId, ...subscriptionIds]

@@ -6,7 +6,7 @@ import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Organization,
   Petition,
-  PetitionUser,
+  PetitionPermission,
   User,
   UserGroup,
 } from "../../db/__types";
@@ -338,7 +338,7 @@ describe("GraphQL/Petition Permissions", () => {
     });
   });
 
-  describe("addPetitionUserPermission", () => {
+  describe("addPetitionPermission", () => {
     it("creates an event when sharing petition with new group", async () => {
       const [group] = await mocks.createUserGroups(1, organization.id);
       const { errors, data } = await testClient.mutate({
@@ -346,9 +346,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userGroupIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -379,7 +379,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.addPetitionUserPermission).toEqual([
+      expect(data.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           events: {
@@ -402,9 +402,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -437,7 +437,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.addPetitionUserPermission).toEqual([
+      expect(data!.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -469,9 +469,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -511,9 +511,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -547,9 +547,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -584,9 +584,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -621,9 +621,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -658,9 +658,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -701,9 +701,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -737,7 +737,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionUserPermission).toEqual([
+      expect(data.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -762,7 +762,7 @@ describe("GraphQL/Petition Permissions", () => {
       ]);
 
       const [permission] = await mocks
-        .knex<PetitionUser>("petition_user")
+        .knex<PetitionPermission>("petition_permission")
         .where({
           petition_id: userPetition.id,
           user_id: newUser.id,
@@ -791,9 +791,9 @@ describe("GraphQL/Petition Permissions", () => {
             $petitionIds: [GID!]!
             $userIds: [GID!]!
             $userGroupIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               userGroupIds: $userGroupIds
@@ -814,7 +814,7 @@ describe("GraphQL/Petition Permissions", () => {
       expect(errors).toBeUndefined();
 
       const [permission] = await mocks
-        .knex<PetitionUser>("petition_user")
+        .knex<PetitionPermission>("petition_permission")
         .where({
           petition_id: userPetition.id,
           user_id: newUser.id,
@@ -842,9 +842,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -879,9 +879,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userGroupIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -900,7 +900,7 @@ describe("GraphQL/Petition Permissions", () => {
       expect(errors).toBeUndefined();
 
       const [permission] = await mocks
-        .knex<PetitionUser>("petition_user")
+        .knex<PetitionPermission>("petition_permission")
         .where({
           petition_id: userPetition.id,
           user_id: newUser.id,
@@ -922,9 +922,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userGroupIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -953,7 +953,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionUserPermission).toEqual([
+      expect(data.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -981,9 +981,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userGroupIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -1014,7 +1014,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionUserPermission).toEqual([
+      expect(data.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1043,9 +1043,9 @@ describe("GraphQL/Petition Permissions", () => {
             $petitionIds: [GID!]!
             $userGroupIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               userIds: $userIds
@@ -1078,7 +1078,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionUserPermission).toEqual([
+      expect(data.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1111,9 +1111,9 @@ describe("GraphQL/Petition Permissions", () => {
             $petitionIds: [GID!]!
             $userGroupIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionTypeRW!
+            $type: PetitionPermissionTypeRW!
           ) {
-            addPetitionUserPermission(
+            addPetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               userIds: $userIds
@@ -1151,7 +1151,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionUserPermission).toEqual([
+      expect(data.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           events: {
@@ -1174,7 +1174,7 @@ describe("GraphQL/Petition Permissions", () => {
     });
   });
 
-  describe("editPetitionUserPermission", () => {
+  describe("editPetitionPermission", () => {
     beforeEach(async () => {
       await mocks.sharePetitions([userPetition.id], orgUsers[1].id, "WRITE");
       await mocks.sharePetitions([userPetition.id], orgUsers[2].id, "WRITE");
@@ -1190,9 +1190,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userGroupIds: [GID!]!
-            $type: PetitionUserPermissionType!
+            $type: PetitionPermissionType!
           ) {
-            editPetitionUserPermission(
+            editPetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -1222,7 +1222,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.editPetitionUserPermission).toEqual([
+      expect(data!.editPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1253,9 +1253,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userGroupIds: [GID!]!
-            $type: PetitionUserPermissionType!
+            $type: PetitionPermissionType!
           ) {
-            editPetitionUserPermission(
+            editPetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               permissionType: $type
@@ -1284,7 +1284,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.editPetitionUserPermission).toEqual([
+      expect(data!.editPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           events: {
@@ -1308,9 +1308,9 @@ describe("GraphQL/Petition Permissions", () => {
             $petitionIds: [GID!]!
             $userGroupIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionType!
+            $type: PetitionPermissionType!
           ) {
-            editPetitionUserPermission(
+            editPetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
               userIds: $userIds
@@ -1342,7 +1342,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.editPetitionUserPermission).toEqual([
+      expect(data!.editPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1373,9 +1373,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionType!
+            $type: PetitionPermissionType!
           ) {
-            editPetitionUserPermission(
+            editPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -1409,7 +1409,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.editPetitionUserPermission).toEqual([
+      expect(data!.editPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1440,9 +1440,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionType!
+            $type: PetitionPermissionType!
           ) {
-            editPetitionUserPermission(
+            editPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -1480,9 +1480,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionType!
+            $type: PetitionPermissionType!
           ) {
-            editPetitionUserPermission(
+            editPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -1517,9 +1517,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionType!
+            $type: PetitionPermissionType!
           ) {
-            editPetitionUserPermission(
+            editPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -1554,9 +1554,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionType!
+            $type: PetitionPermissionType!
           ) {
-            editPetitionUserPermission(
+            editPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -1591,9 +1591,9 @@ describe("GraphQL/Petition Permissions", () => {
           mutation (
             $petitionIds: [GID!]!
             $userIds: [GID!]!
-            $type: PetitionUserPermissionType!
+            $type: PetitionPermissionType!
           ) {
-            editPetitionUserPermission(
+            editPetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               permissionType: $type
@@ -1623,7 +1623,7 @@ describe("GraphQL/Petition Permissions", () => {
     });
   });
 
-  describe("removePetitionUserPermission", () => {
+  describe("removePetitionPermission", () => {
     beforeEach(async () => {
       await mocks.sharePetitions([userPetition.id], orgUsers[1].id, "READ");
       await mocks.sharePetitions([userPetition.id], orgUsers[2].id, "READ");
@@ -1637,7 +1637,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
             ) {
@@ -1665,7 +1665,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.removePetitionUserPermission).toEqual([
+      expect(data!.removePetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1694,7 +1694,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userIds: [GID!]!
             $userGroupIds: [GID!]!
           ) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               userGroupIds: $userGroupIds
@@ -1724,7 +1724,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.removePetitionUserPermission).toEqual([
+      expect(data!.removePetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1749,7 +1749,7 @@ describe("GraphQL/Petition Permissions", () => {
             $userIds: [GID!]!
             $userGroupIds: [GID!]!
           ) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
               userGroupIds: $userGroupIds
@@ -1782,7 +1782,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.removePetitionUserPermission).toEqual([
+      expect(data!.removePetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           events: {
@@ -1806,7 +1806,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: $petitionIds
               removeAll: true
             ) {
@@ -1834,7 +1834,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data!.removePetitionUserPermission).toEqual([
+      expect(data!.removePetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1851,7 +1851,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!) {
-            removePetitionUserPermission(petitionIds: $petitionIds) {
+            removePetitionPermission(petitionIds: $petitionIds) {
               id
             }
           }
@@ -1869,7 +1869,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
             ) {
@@ -1891,7 +1891,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
             ) {
@@ -1913,7 +1913,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
             ) {
@@ -1940,7 +1940,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: $petitionIds
               userIds: $userIds
             ) {
@@ -1967,7 +1967,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.removePetitionUserPermission).toEqual([
+      expect(data.removePetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1993,7 +1993,7 @@ describe("GraphQL/Petition Permissions", () => {
 
       //also make sure that the group-assigned permission for user userGroupMembers[0] is still there
       const memberPermissions = await mocks.knex
-        .from("petition_user")
+        .from("petition_permission")
         .where({
           petition_id: userPetition.id,
           deleted_at: null,
@@ -2014,7 +2014,7 @@ describe("GraphQL/Petition Permissions", () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
           mutation ($petitionIds: [GID!]!, $userGroupIds: [GID!]!) {
-            removePetitionUserPermission(
+            removePetitionPermission(
               petitionIds: $petitionIds
               userGroupIds: $userGroupIds
             ) {
@@ -2041,7 +2041,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.removePetitionUserPermission).toEqual([
+      expect(data.removePetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [

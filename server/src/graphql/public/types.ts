@@ -86,7 +86,7 @@ export const PublicPetition = objectType({
     });
     t.list.field("recipients", {
       type: "PublicContact",
-      description: "The recipitions of the petition",
+      description: "The recipients of the petition",
       resolve: async (root, _, ctx) => {
         const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
         const contactIds = accesses

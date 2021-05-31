@@ -71,6 +71,8 @@ export type PetitionMessageStatus =
   | "PROCESSING"
   | "SCHEDULED";
 
+export type PetitionPermissionType = "OWNER" | "READ" | "WRITE";
+
 export type PetitionReminderStatus = "ERROR" | "PROCESSED" | "PROCESSING";
 
 export type PetitionReminderType = "AUTOMATIC" | "MANUAL";
@@ -89,8 +91,6 @@ export type PetitionSignatureStatus =
 export type PetitionStatus = "CLOSED" | "COMPLETED" | "DRAFT" | "PENDING";
 
 export type PetitionUserNotificationType = "COMMENT_CREATED";
-
-export type PetitionUserPermissionType = "OWNER" | "READ" | "WRITE";
 
 export type UserOrganizationRole = "ADMIN" | "NORMAL";
 
@@ -117,10 +117,10 @@ export interface TableTypes {
   petition_field_comment: PetitionFieldComment;
   petition_field_reply: PetitionFieldReply;
   petition_message: PetitionMessage;
+  petition_permission: PetitionPermission;
   petition_reminder: PetitionReminder;
   petition_signature_request: PetitionSignatureRequest;
   petition_tag: PetitionTag;
-  petition_user: PetitionUser;
   petition_user_notification: PetitionUserNotification;
   public_file_upload: PublicFileUpload;
   tag: Tag;
@@ -152,10 +152,10 @@ export interface TableCreateTypes {
   petition_field_comment: CreatePetitionFieldComment;
   petition_field_reply: CreatePetitionFieldReply;
   petition_message: CreatePetitionMessage;
+  petition_permission: CreatePetitionPermission;
   petition_reminder: CreatePetitionReminder;
   petition_signature_request: CreatePetitionSignatureRequest;
   petition_tag: CreatePetitionTag;
-  petition_user: CreatePetitionUser;
   petition_user_notification: CreatePetitionUserNotification;
   public_file_upload: CreatePublicFileUpload;
   tag: CreateTag;
@@ -187,10 +187,10 @@ export interface TablePrimaryKeys {
   petition_field_comment: "id";
   petition_field_reply: "id";
   petition_message: "id";
+  petition_permission: "id";
   petition_reminder: "id";
   petition_signature_request: "id";
   petition_tag: "id";
-  petition_user: "id";
   petition_user_notification: "id";
   public_file_upload: "id";
   tag: "id";
@@ -655,6 +655,37 @@ export type CreatePetitionMessage = PartialProps<
   | "created_by"
 >;
 
+export interface PetitionPermission {
+  id: number; // int4
+  petition_id: number; // int4
+  user_id: Maybe<number>; // int4
+  type: PetitionPermissionType; // petition_permission_type
+  is_subscribed: boolean; // bool
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  updated_at: Date; // timestamptz
+  updated_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+  user_group_id: Maybe<number>; // int4
+  from_user_group_id: Maybe<number>; // int4
+}
+
+export type CreatePetitionPermission = PartialProps<
+  Omit<PetitionPermission, "id">,
+  | "user_id"
+  | "type"
+  | "is_subscribed"
+  | "created_at"
+  | "created_by"
+  | "updated_at"
+  | "updated_by"
+  | "deleted_at"
+  | "deleted_by"
+  | "user_group_id"
+  | "from_user_group_id"
+>;
+
 export interface PetitionReminder {
   id: number; // int4
   email_log_id: Maybe<number>; // int4
@@ -715,37 +746,6 @@ export interface PetitionTag {
 export type CreatePetitionTag = PartialProps<
   Omit<PetitionTag, "id">,
   "created_at" | "created_by"
->;
-
-export interface PetitionUser {
-  id: number; // int4
-  petition_id: number; // int4
-  user_id: Maybe<number>; // int4
-  permission_type: PetitionUserPermissionType; // petition_user_permission_type
-  is_subscribed: boolean; // bool
-  created_at: Date; // timestamptz
-  created_by: Maybe<string>; // varchar
-  updated_at: Date; // timestamptz
-  updated_by: Maybe<string>; // varchar
-  deleted_at: Maybe<Date>; // timestamptz
-  deleted_by: Maybe<string>; // varchar
-  user_group_id: Maybe<number>; // int4
-  from_user_group_id: Maybe<number>; // int4
-}
-
-export type CreatePetitionUser = PartialProps<
-  Omit<PetitionUser, "id">,
-  | "user_id"
-  | "permission_type"
-  | "is_subscribed"
-  | "created_at"
-  | "created_by"
-  | "updated_at"
-  | "updated_by"
-  | "deleted_at"
-  | "deleted_by"
-  | "user_group_id"
-  | "from_user_group_id"
 >;
 
 export interface PetitionUserNotification {

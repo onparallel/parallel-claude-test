@@ -131,7 +131,7 @@ export type EffectivePetitionUserPermission = {
   /** wether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
 };
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
@@ -160,7 +160,7 @@ export type GroupPermissionAddedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionGroup: UserGroup;
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   user: Maybe<User>;
 };
 
@@ -168,7 +168,7 @@ export type GroupPermissionEditedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionGroup: UserGroup;
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   user: Maybe<User>;
 };
 
@@ -203,7 +203,7 @@ export type MessageSentEvent = PetitionEvent & {
 
 export type Mutation = {
   /** Adds permissions on given petitions and users */
-  addPetitionUserPermission: Array<Petition>;
+  addPetitionPermission: Array<Petition>;
   /** Add users to a user group */
   addUsersToUserGroup: UserGroup;
   /** Clones the petition and assigns the given user as owner and creator. */
@@ -271,7 +271,7 @@ export type Mutation = {
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
   dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Edits permissions on given petitions and users */
-  editPetitionUserPermission: Array<Petition>;
+  editPetitionPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
   fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
   /** Generates a new API token for the context user */
@@ -316,7 +316,7 @@ export type Mutation = {
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
   /** Removes permissions on given petitions and users */
-  removePetitionUserPermission: Array<Petition>;
+  removePetitionPermission: Array<Petition>;
   /** Removes users from a user group */
   removeUsersFromGroup: UserGroup;
   /** Reopens the petition */
@@ -362,7 +362,7 @@ export type Mutation = {
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
   /** Updates the metada of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
-  /** Updates the subscription flag on a PetitionUser */
+  /** Updates the subscription flag on a PetitionPermission */
   updatePetitionUserSubscription: Petition;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
@@ -382,10 +382,10 @@ export type Mutation = {
   verifyPublicAccess: PublicAccessVerification;
 };
 
-export type MutationaddPetitionUserPermissionArgs = {
+export type MutationaddPetitionPermissionArgs = {
   message?: Maybe<Scalars["String"]>;
   notify?: Maybe<Scalars["Boolean"]>;
-  permissionType: PetitionUserPermissionTypeRW;
+  permissionType: PetitionPermissionTypeRW;
   petitionIds: Array<Scalars["GID"]>;
   subscribe?: Maybe<Scalars["Boolean"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
@@ -577,8 +577,8 @@ export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
   petitionId: Scalars["GID"];
 };
 
-export type MutationeditPetitionUserPermissionArgs = {
-  permissionType: PetitionUserPermissionType;
+export type MutationeditPetitionPermissionArgs = {
+  permissionType: PetitionPermissionType;
   petitionIds: Array<Scalars["GID"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
   userIds?: Maybe<Array<Scalars["GID"]>>;
@@ -701,7 +701,7 @@ export type MutationreactivateAccessesArgs = {
   petitionId: Scalars["GID"];
 };
 
-export type MutationremovePetitionUserPermissionArgs = {
+export type MutationremovePetitionPermissionArgs = {
   petitionIds: Array<Scalars["GID"]>;
   removeAll?: Maybe<Scalars["Boolean"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
@@ -1357,12 +1357,18 @@ export type PetitionPermission = {
   /** wether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   /** The petition linked to the permission. */
   petition: Petition;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
+
+/** The type of permission for a petition user. */
+export type PetitionPermissionType = "OWNER" | "READ" | "WRITE";
+
+/** The READ and WRITE permissions for a petition user. */
+export type PetitionPermissionTypeRW = "READ" | "WRITE";
 
 /** The progress of a petition. */
 export type PetitionProgress = {
@@ -1507,7 +1513,7 @@ export type PetitionUserGroupPermission = PetitionPermission &
     /** wether user is subscribed or not to emails and alerts of the petition */
     isSubscribed: Scalars["Boolean"];
     /** The type of the permission. */
-    permissionType: PetitionUserPermissionType;
+    permissionType: PetitionPermissionType;
     /** The petition linked to the permission. */
     petition: Petition;
     /** Time when the resource was last updated. */
@@ -1522,7 +1528,7 @@ export type PetitionUserPermission = PetitionPermission &
     /** wether user is subscribed or not to emails and alerts of the petition */
     isSubscribed: Scalars["Boolean"];
     /** The type of the permission. */
-    permissionType: PetitionUserPermissionType;
+    permissionType: PetitionPermissionType;
     /** The petition linked to the permission. */
     petition: Petition;
     /** Time when the resource was last updated. */
@@ -1530,12 +1536,6 @@ export type PetitionUserPermission = PetitionPermission &
     /** The user linked to the permission */
     user: User;
   };
-
-/** The type of permission for a petition user. */
-export type PetitionUserPermissionType = "OWNER" | "READ" | "WRITE";
-
-/** The READ and WRITE permissions for a petition user. */
-export type PetitionUserPermissionTypeRW = "READ" | "WRITE";
 
 export type PetitionWithFieldAndReplies = {
   field: PetitionField;
@@ -2192,7 +2192,7 @@ export type UserPagination = {
 export type UserPermissionAddedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
   user: Maybe<User>;
 };
@@ -2200,7 +2200,7 @@ export type UserPermissionAddedEvent = PetitionEvent & {
 export type UserPermissionEditedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  permissionType: PetitionUserPermissionType;
+  permissionType: PetitionPermissionType;
   permissionUser: Maybe<User>;
   user: Maybe<User>;
 };
@@ -2436,14 +2436,14 @@ export type GetPermissions_PermissionsQuery = {
   >;
 };
 
-export type SharePetition_addPetitionUserPermissionMutationVariables = Exact<{
+export type SharePetition_addPetitionPermissionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
   userIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
-export type SharePetition_addPetitionUserPermissionMutation = {
-  addPetitionUserPermission: Array<{
+export type SharePetition_addPetitionPermissionMutation = {
+  addPetitionPermission: Array<{
     permissions: Array<
       | Permission_PetitionUserGroupPermission_Fragment
       | Permission_PetitionUserPermission_Fragment
@@ -2451,32 +2451,32 @@ export type SharePetition_addPetitionUserPermissionMutation = {
   }>;
 };
 
-export type StopSharing_removePetitionUserPermissionMutationVariables = Exact<{
+export type StopSharing_removePetitionPermissionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
-export type StopSharing_removePetitionUserPermissionMutation = {
-  removePetitionUserPermission: Array<Pick<Petition, "id">>;
+export type StopSharing_removePetitionPermissionMutation = {
+  removePetitionPermission: Array<Pick<Petition, "id">>;
 };
 
-export type RemoveUserPermission_removePetitionUserPermissionMutationVariables =
+export type RemoveUserPermission_removePetitionPermissionMutationVariables =
   Exact<{
     petitionId: Scalars["GID"];
     userId: Scalars["GID"];
   }>;
 
-export type RemoveUserPermission_removePetitionUserPermissionMutation = {
-  removePetitionUserPermission: Array<Pick<Petition, "id">>;
+export type RemoveUserPermission_removePetitionPermissionMutation = {
+  removePetitionPermission: Array<Pick<Petition, "id">>;
 };
 
-export type RemoveUserGroupPermission_removePetitionUserPermissionMutationVariables =
+export type RemoveUserGroupPermission_removePetitionPermissionMutationVariables =
   Exact<{
     petitionId: Scalars["GID"];
     userGroupId: Scalars["GID"];
   }>;
 
-export type RemoveUserGroupPermission_removePetitionUserPermissionMutation = {
-  removePetitionUserPermission: Array<Pick<Petition, "id">>;
+export type RemoveUserGroupPermission_removePetitionPermissionMutation = {
+  removePetitionPermission: Array<Pick<Petition, "id">>;
 };
 
 export type TransferPetition_transferPetitionOwnershipMutationVariables =

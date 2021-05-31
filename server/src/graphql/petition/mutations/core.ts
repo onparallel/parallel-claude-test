@@ -19,7 +19,7 @@ import {
   CreatePetition,
   CreatePetitionField,
   Petition,
-  PetitionUser,
+  PetitionPermission,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
 import {
@@ -259,20 +259,20 @@ export const deletePetitions = mutationField("deletePetitions", {
   },
   validateArgs: notEmptyArray((args) => args.ids, "ids"),
   resolve: async (_, args, ctx) => {
-    function petitionIsSharedByOwner(p: PetitionUser[]) {
+    function petitionIsSharedByOwner(p: PetitionPermission[]) {
       return (
         p?.length > 1 && // the petition is being shared to another user
         p.find(
-          (u) => u.permission_type === "OWNER" && u.user_id === ctx.user!.id // logged user is the owner
+          (u) => u.type === "OWNER" && u.user_id === ctx.user!.id // logged user is the owner
         )
       );
     }
 
-    function userHasAccessViaGroup(p: PetitionUser[]) {
+    function userHasAccessViaGroup(p: PetitionPermission[]) {
       return (
         p?.length > 1 &&
         !p.find(
-          (u) => u.user_id === ctx.user!.id && u.permission_type === "OWNER" // user is not the owner
+          (u) => u.user_id === ctx.user!.id && u.type === "OWNER" // user is not the owner
         ) &&
         p.find(
           (u) => u.user_id === ctx.user!.id && u.from_user_group_id !== null // has access via group
@@ -281,7 +281,9 @@ export const deletePetitions = mutationField("deletePetitions", {
     }
 
     // user permissions grouped by permission_id
-    const userPermissions = await ctx.petitions.loadUserPermissions(args.ids);
+    const userPermissions = await ctx.petitions.loadUserPermissionsByPetitionId(
+      args.ids
+    );
 
     if (userPermissions.some(userHasAccessViaGroup)) {
       throw new WhitelistedError(
@@ -317,7 +319,7 @@ export const deletePetitions = mutationField("deletePetitions", {
       );
 
       const ownerPermissions = deletedPermissions.filter(
-        (p) => p.permission_type === "OWNER"
+        (p) => p.type === "OWNER"
       );
 
       // make sure to also remove every remaining permission on deleted owned petitions

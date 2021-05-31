@@ -34,7 +34,7 @@ import {
   PetitionHeader_UserFragment,
   UpdatePetitionInput,
   usePetitionHeader_reopenPetitionMutation,
-  usePetitionHeader_updatePetitionUserSubscriptionMutation,
+  usePetitionHeader_updatePetitionPermissionSubscriptionMutation,
 } from "@parallel/graphql/__types";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
@@ -105,10 +105,10 @@ export function PetitionHeader({
 
   const isSubscribed = petition.myEffectivePermission?.isSubscribed ?? false;
 
-  const [updatePetitionUserSubscription] =
-    usePetitionHeader_updatePetitionUserSubscriptionMutation();
+  const [updatePetitionPermissionSubscription] =
+    usePetitionHeader_updatePetitionPermissionSubscriptionMutation();
   const handleUpdateUserPermission = async function (isSubscribed: boolean) {
-    await updatePetitionUserSubscription({
+    await updatePetitionPermissionSubscription({
       variables: {
         petitionId: petition.id,
         isSubscribed,
@@ -494,11 +494,11 @@ PetitionHeader.mutations = [
     }
   `,
   gql`
-    mutation PetitionHeader_updatePetitionUserSubscription(
+    mutation PetitionHeader_updatePetitionPermissionSubscription(
       $petitionId: GID!
       $isSubscribed: Boolean!
     ) {
-      updatePetitionUserSubscription(
+      updatePetitionPermissionSubscription(
         petitionId: $petitionId
         isSubscribed: $isSubscribed
       ) {
