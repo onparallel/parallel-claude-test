@@ -6,16 +6,10 @@ import {
   PetitionContactNotification,
   PetitionUserNotification,
 } from "../db/__types";
-import { isDefined } from "../util/remedaExtensions";
-import { MaybePromise } from "../util/types";
 import { createCronWorker } from "./helpers/createCronWorker";
 
-type PetitionNotification =
-  | PetitionUserNotification
-  | PetitionContactNotification;
-
 function shouldBeProcessed(
-  notifications: PetitionNotification[],
+  notifications: (PetitionUserNotification | PetitionContactNotification)[],
   minutesBeforeNotify: number
 ) {
   const lastNotification = sortBy(
@@ -34,34 +28,33 @@ function shouldBeProcessed(
  * sending an email to the user with the accumulated comments if the last notification
  * was created more than `config.minutesBeforeNotify` minutes ago
  */
-function processCommentCreatedUserNotification(
+async function processCommentCreatedUserNotification(
+  notifications: PetitionUserNotification[],
   context: WorkerContext,
   config: Config["cronWorkers"]["petition-notifications"]
 ) {
-  return async (notifications: PetitionUserNotification[]) => {
-    if (shouldBeProcessed(notifications, config.minutesBeforeNotify)) {
-      const petitionId = notifications[0].petition_id;
-      const userId = notifications[0].user_id;
-      const isSubscribed = await context.petitions.isUserSubscribedToPetition(
+  if (shouldBeProcessed(notifications, config.minutesBeforeNotify)) {
+    const petitionId = notifications[0].petition_id;
+    const userId = notifications[0].user_id;
+    const isSubscribed = await context.petitions.isUserSubscribedToPetition(
+      userId,
+      petitionId
+    );
+    if (isSubscribed) {
+      await context.emails.sendPetitionCommentsUserNotificationEmail(
+        petitionId,
         userId,
-        petitionId
-      );
-      if (isSubscribed) {
-        await context.emails.sendPetitionCommentsUserNotificationEmail(
-          petitionId,
-          userId,
-          notifications.map((n) => n.data.petition_field_comment_id)
-        );
-      }
-
-      await context.petitions.updatePetitionUserNotifications(
-        notifications.map((n) => n.id),
-        {
-          processed_at: new Date(),
-        }
+        notifications.map((n) => n.data.petition_field_comment_id)
       );
     }
-  };
+
+    await context.petitions.updatePetitionUserNotifications(
+      notifications.map((n) => n.id),
+      {
+        processed_at: new Date(),
+      }
+    );
+  }
 }
 
 /**
@@ -69,51 +62,27 @@ function processCommentCreatedUserNotification(
  * sending an email to the contact with the accumulated comments if the last notification
  * was created more than `config.minutesBeforeNotify` minutes ago
  */
-function processCommentCreatedContactNotification(
+async function processCommentCreatedContactNotification(
+  notifications: PetitionContactNotification[],
   context: WorkerContext,
   config: Config["cronWorkers"]["petition-notifications"]
 ) {
-  return async (notifications: PetitionContactNotification[]) => {
-    if (shouldBeProcessed(notifications, config.minutesBeforeNotify)) {
-      const petitionId = notifications[0].petition_id;
-      const accessId = notifications[0].petition_access_id;
+  if (shouldBeProcessed(notifications, config.minutesBeforeNotify)) {
+    const petitionId = notifications[0].petition_id;
+    const accessId = notifications[0].petition_access_id;
 
-      await context.emails.sendPetitionCommentsContactNotificationEmail(
-        petitionId,
-        accessId,
-        notifications.map((n) => n.data.petition_field_comment_id)
-      );
-
-      await context.petitions.updatePetitionContactNotifications(
-        notifications.map((n) => n.id),
-        {
-          processed_at: new Date(),
-        }
-      );
-    }
-  };
-}
-
-/**
- * groups the notifications array by recipientId and petitionId, and calls the callback function for each of this groups
- */
-async function groupNotifications<T extends PetitionNotification>(
-  notifications: T[],
-  callback: (groupedItems: T[]) => MaybePromise<void>
-) {
-  const byRecipientId = groupBy(notifications, (n) =>
-    isDefined((n as any).user_id)
-      ? (n as any).user_id
-      : (n as any).petition_access_id
-  );
-  for (const notificationsByRecipientId of Object.values(byRecipientId)) {
-    const byPetitionId = groupBy(
-      notificationsByRecipientId,
-      (n) => n.petition_id
+    await context.emails.sendPetitionCommentsContactNotificationEmail(
+      petitionId,
+      accessId,
+      notifications.map((n) => n.data.petition_field_comment_id)
     );
-    for (const notificationsByPetitionId of Object.values(byPetitionId)) {
-      await callback(notificationsByPetitionId);
-    }
+
+    await context.petitions.updatePetitionContactNotifications(
+      notifications.map((n) => n.id),
+      {
+        processed_at: new Date(),
+      }
+    );
   }
 }
 
@@ -129,17 +98,19 @@ createCronWorker("petition-notifications", async (context, config) => {
       context.petitions.loadUnprocessedCommentCreatedContactNotifications(),
     ]);
 
-  // group unprocessedUserNotifications by (user_id, petition_id)
-  // and call processCommentCreatedUserNotification with each of this subgroups
-  await groupNotifications(
+  const groupedUserNotifications = groupBy(
     unprocessedUserNotifications,
-    processCommentCreatedUserNotification(context, config)
+    (n) => `${n.petition_id},${n.user_id}`
   );
+  for (const group of Object.values(groupedUserNotifications)) {
+    await processCommentCreatedUserNotification(group, context, config);
+  }
 
-  // group unprocessedContactNotifications by (petition_access_id, petition_id)
-  // and call processCommentCreatedContactNotification with each of this subgroups
-  await groupNotifications(
+  const groupedContactNotifications = groupBy(
     unprocessedContactNotifications,
-    processCommentCreatedContactNotification(context, config)
+    (n) => `${n.petition_id},${n.petition_access_id}`
   );
+  for (const group of Object.values(groupedContactNotifications)) {
+    await processCommentCreatedContactNotification(group, context, config);
+  }
 });
