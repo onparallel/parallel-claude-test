@@ -1055,8 +1055,8 @@ export type Petition = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the logged user */
-  myEffectivePermission: EffectivePetitionUserPermission;
+  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
+  myEffectivePermission?: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1173,8 +1173,8 @@ export type PetitionBase = {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the logged user */
-  myEffectivePermission: EffectivePetitionUserPermission;
+  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
+  myEffectivePermission?: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1515,8 +1515,8 @@ export type PetitionTemplate = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the logged user */
-  myEffectivePermission: EffectivePetitionUserPermission;
+  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
+  myEffectivePermission?: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name?: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -2657,9 +2657,12 @@ export type HeaderNameEditable_PetitionBaseFragment =
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
 } & Pick<Petition, "id" | "locale" | "deadline" | "status"> & {
-    myEffectivePermission: {
-      __typename?: "EffectivePetitionUserPermission";
-    } & Pick<EffectivePetitionUserPermission, "isSubscribed">;
+    myEffectivePermission?: Maybe<
+      { __typename?: "EffectivePetitionUserPermission" } & Pick<
+        EffectivePetitionUserPermission,
+        "isSubscribed"
+      >
+    >;
   } & HeaderNameEditable_PetitionBase_Petition_Fragment;
 
 export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
@@ -2693,9 +2696,12 @@ export type PetitionHeader_updatePetitionUserSubscriptionMutation = {
     Petition,
     "id"
   > & {
-      myEffectivePermission: {
-        __typename?: "EffectivePetitionUserPermission";
-      } & Pick<EffectivePetitionUserPermission, "isSubscribed">;
+      myEffectivePermission?: Maybe<
+        { __typename?: "EffectivePetitionUserPermission" } & Pick<
+          EffectivePetitionUserPermission,
+          "isSubscribed"
+        >
+      >;
     };
 };
 
@@ -3722,9 +3728,12 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
           "id" | "name"
         >;
       };
-    myEffectivePermission: {
-      __typename?: "EffectivePetitionUserPermission";
-    } & Pick<EffectivePetitionUserPermission, "permissionType">;
+    myEffectivePermission?: Maybe<
+      { __typename?: "EffectivePetitionUserPermission" } & Pick<
+        EffectivePetitionUserPermission,
+        "permissionType"
+      >
+    >;
   };
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables =

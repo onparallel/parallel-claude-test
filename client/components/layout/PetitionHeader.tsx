@@ -103,7 +103,7 @@ export function PetitionHeader({
     } catch {}
   };
 
-  const isSubscribed = petition.myEffectivePermission.isSubscribed;
+  const isSubscribed = petition.myEffectivePermission?.isSubscribed ?? false;
 
   const [updatePetitionUserSubscription] =
     usePetitionHeader_updatePetitionUserSubscriptionMutation();

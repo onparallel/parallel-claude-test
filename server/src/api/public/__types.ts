@@ -1028,8 +1028,8 @@ export type Petition = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the logged user */
-  myEffectivePermission: EffectivePetitionUserPermission;
+  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
+  myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1142,8 +1142,8 @@ export type PetitionBase = {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the logged user */
-  myEffectivePermission: EffectivePetitionUserPermission;
+  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
+  myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
@@ -1469,8 +1469,8 @@ export type PetitionTemplate = PetitionBase & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The effective permission of the logged user */
-  myEffectivePermission: EffectivePetitionUserPermission;
+  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
+  myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
   /** The name of the petition. */
   name: Maybe<Scalars["String"]>;
   organization: Organization;
