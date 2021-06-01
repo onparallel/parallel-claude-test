@@ -1,7 +1,9 @@
 import { gql } from "@apollo/client";
 import {
   Box,
+  Button,
   Center,
+  Flex,
   FormControl,
   FormLabel,
   IconButton,
@@ -49,6 +51,7 @@ import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
+import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
 import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 import {
   SelectTypeFieldOptions,
@@ -64,6 +67,8 @@ export interface PetitionComposeFieldProps {
   showError: boolean;
   onMove: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
+  onAddAttachment: (files: File[]) => void;
+  onRemoveAttachment: (attachmentId: number) => void;
   onCloneField: () => void;
   onSettingsClick: () => void;
   onFieldVisibilityClick: () => void;
@@ -240,7 +245,7 @@ const _PetitionComposeField = chakraForwardRef<
         <PetitionComposeFieldInner
           ref={ref}
           flex="1"
-          paddingLeft={2}
+          paddingLeft={4}
           paddingTop={2}
           paddingBottom={10}
           paddingRight={4}
@@ -278,6 +283,7 @@ type PetitionComposeFieldInnerProps = Pick<
   | "fields"
   | "showError"
   | "onFieldEdit"
+  | "onRemoveAttachment"
   | "onFocusNextField"
   | "onFocusPrevField"
   | "onAddField"
@@ -383,7 +389,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             width="100%"
             maxLength={500}
             border="none"
-            paddingX={2}
+            padding={0}
             height={6}
             _placeholder={
               showError && !title ? { color: "red.500" } : undefined
@@ -473,8 +479,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         maxLength={4000}
         border="none"
         height="20px"
-        paddingX={2}
-        paddingY={0}
+        padding={0}
         minHeight={0}
         rows={1}
         _focus={{
@@ -515,6 +520,30 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           }
         }}
       />
+      <Flex margin={-1} marginTop={0}>
+        <PetitionComposeFieldAttachment
+          attachment={{
+            filename: "Example_003.doc",
+            contentType: "application/vnd.ms-word",
+            size: 1024 * 100,
+            isCompleted: true,
+          }}
+          onDownload={() => console.log("donwload")}
+          onRemove={() => console.log("remove")}
+          margin={1}
+        />
+        <PetitionComposeFieldAttachment
+          attachment={{
+            filename: "Example_003.doc",
+            contentType: "application/vnd.ms-word",
+            size: 1024 * 100,
+            isCompleted: false,
+          }}
+          onDownload={() => console.log("donwload")}
+          onRemove={() => console.log("remove")}
+          margin={1}
+        />
+      </Flex>
       {field.type === "SELECT" ? (
         <Box marginTop={1}>
           <SelectTypeFieldOptions
