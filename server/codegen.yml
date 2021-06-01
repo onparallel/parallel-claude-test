@@ -8,8 +8,9 @@ generates:
       - typescript
       - typescript-operations
     config:
+      strictScalars: true
       skipTypename: true
-      avoidOptionals: 
+      avoidOptionals:
         field: true
         inputValue: false
         object: false
@@ -19,7 +20,9 @@ generates:
       enumsAsTypes: true
       scalars:
         DateTime: string
+        JSON: any
         JSONObject: "{ [key: string]: any }"
+        Upload: any
         GID: string
 hooks:
   afterAllFileWrite:

@@ -10,7 +10,7 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> &
   { [SubKey in K]: Maybe<T[SubKey]> };
 const defaultOptions = {};
 /** All built-in and custom scalars, mapped to their actual values */
-export type Scalars = {
+export interface Scalars {
   ID: string;
   String: string;
   Boolean: boolean;
@@ -24,63 +24,63 @@ export type Scalars = {
   /** The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSONObject: { [key: string]: any };
   /** The `Upload` scalar type represents a file upload. */
-  Upload: any;
-};
+  Upload: File;
+}
 
-export type AccessActivatedEvent = PetitionEvent & {
+export interface AccessActivatedEvent extends PetitionEvent {
   __typename?: "AccessActivatedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user?: Maybe<User>;
-};
+}
 
-export type AccessDeactivatedEvent = PetitionEvent & {
+export interface AccessDeactivatedEvent extends PetitionEvent {
   __typename?: "AccessDeactivatedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user?: Maybe<User>;
-};
+}
 
-export type AccessDelegatedEvent = PetitionEvent & {
+export interface AccessDelegatedEvent extends PetitionEvent {
   __typename?: "AccessDelegatedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   newAccess: PetitionAccess;
   originalAccess: PetitionAccess;
-};
+}
 
-export type AccessOpenedEvent = PetitionEvent & {
+export interface AccessOpenedEvent extends PetitionEvent {
   __typename?: "AccessOpenedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-};
+}
 
 export type ChangePasswordResult =
   | "INCORRECT_PASSWORD"
   | "INVALID_NEW_PASSWORD"
   | "SUCCESS";
 
-export type CommentDeletedEvent = PetitionEvent & {
+export interface CommentDeletedEvent extends PetitionEvent {
   __typename?: "CommentDeletedEvent";
   createdAt: Scalars["DateTime"];
   deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
-};
+}
 
-export type CommentPublishedEvent = PetitionEvent & {
+export interface CommentPublishedEvent extends PetitionEvent {
   __typename?: "CommentPublishedEvent";
   comment?: Maybe<PetitionFieldComment>;
   createdAt: Scalars["DateTime"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
-};
+}
 
 /** A contact in the system. */
-export type Contact = Timestamps & {
+export interface Contact extends Timestamps {
   __typename?: "Contact";
   /** The petition accesses for this contact */
   accesses: PetitionAccessPagination;
@@ -98,54 +98,54 @@ export type Contact = Timestamps & {
   lastName?: Maybe<Scalars["String"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
 /** A contact in the system. */
-export type ContactaccessesArgs = {
+export interface ContactaccessesArgs {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
-};
+}
 
-export type ContactPagination = {
+export interface ContactPagination {
   __typename?: "ContactPagination";
   /** The requested slice of items. */
   items: Array<Contact>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
-export type CreateContactInput = {
+export interface CreateContactInput {
   email: Scalars["String"];
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
-};
+}
 
-export type CreateFileUploadReply = {
+export interface CreateFileUploadReply {
   __typename?: "CreateFileUploadReply";
   /** Endpoint where to upload the file. */
   endpoint: Scalars["String"];
   reply: PublicPetitionFieldReply;
-};
+}
 
-export type CreateFileUploadReplyInput = {
+export interface CreateFileUploadReplyInput {
   contentType: Scalars["String"];
   filename: Scalars["String"];
   size: Scalars["Int"];
-};
+}
 
-export type CreatedAt = {
+export interface CreatedAt {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
-};
+}
 
 /** The effective permission for a petition and user */
-export type EffectivePetitionUserPermission = {
+export interface EffectivePetitionUserPermission {
   __typename?: "EffectivePetitionUserPermission";
   /** wether user is subscribed or not to emails and alerts of the petition */
   isSubscribed: Scalars["Boolean"];
   /** The type of the permission. */
   permissionType: PetitionUserPermissionType;
-};
+}
 
 export type EntityType = "Contact" | "Organization" | "Petition" | "User";
 
@@ -158,71 +158,71 @@ export type FeatureFlag =
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
-export type FileUploadReplyDownloadLinkResult = {
+export interface FileUploadReplyDownloadLinkResult {
   __typename?: "FileUploadReplyDownloadLinkResult";
   filename?: Maybe<Scalars["String"]>;
   result: Result;
   url?: Maybe<Scalars["String"]>;
-};
+}
 
-export type GenerateUserAuthTokenResponse = {
+export interface GenerateUserAuthTokenResponse {
   __typename?: "GenerateUserAuthTokenResponse";
   apiKey: Scalars["String"];
   userAuthToken: UserAuthenticationToken;
-};
+}
 
-export type GroupPermissionAddedEvent = PetitionEvent & {
+export interface GroupPermissionAddedEvent extends PetitionEvent {
   __typename?: "GroupPermissionAddedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionGroup: UserGroup;
   permissionType: PetitionUserPermissionType;
   user?: Maybe<User>;
-};
+}
 
-export type GroupPermissionEditedEvent = PetitionEvent & {
+export interface GroupPermissionEditedEvent extends PetitionEvent {
   __typename?: "GroupPermissionEditedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionGroup: UserGroup;
   permissionType: PetitionUserPermissionType;
   user?: Maybe<User>;
-};
+}
 
-export type GroupPermissionRemovedEvent = PetitionEvent & {
+export interface GroupPermissionRemovedEvent extends PetitionEvent {
   __typename?: "GroupPermissionRemovedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionGroup: UserGroup;
   user?: Maybe<User>;
-};
+}
 
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE";
 
-export type MessageCancelledEvent = PetitionEvent & {
+export interface MessageCancelledEvent extends PetitionEvent {
   __typename?: "MessageCancelledEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
   user?: Maybe<User>;
-};
+}
 
-export type MessageScheduledEvent = PetitionEvent & {
+export interface MessageScheduledEvent extends PetitionEvent {
   __typename?: "MessageScheduledEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
-};
+}
 
-export type MessageSentEvent = PetitionEvent & {
+export interface MessageSentEvent extends PetitionEvent {
   __typename?: "MessageSentEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   message: PetitionMessage;
-};
+}
 
-export type Mutation = {
+export interface Mutation {
   __typename?: "Mutation";
   /** Adds permissions on given petitions and users */
   addPetitionUserPermission: Array<Petition>;
@@ -402,9 +402,9 @@ export type Mutation = {
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
   verifyPublicAccess: PublicAccessVerification;
-};
+}
 
-export type MutationaddPetitionUserPermissionArgs = {
+export interface MutationaddPetitionUserPermissionArgs {
   message?: Maybe<Scalars["String"]>;
   notify?: Maybe<Scalars["Boolean"]>;
   permissionType: PetitionUserPermissionTypeRW;
@@ -412,507 +412,507 @@ export type MutationaddPetitionUserPermissionArgs = {
   subscribe?: Maybe<Scalars["Boolean"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
   userIds?: Maybe<Array<Scalars["GID"]>>;
-};
+}
 
-export type MutationaddUsersToUserGroupArgs = {
+export interface MutationaddUsersToUserGroupArgs {
   userGroupId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationassignPetitionToUserArgs = {
+export interface MutationassignPetitionToUserArgs {
   petitionId: Scalars["ID"];
   userId: Scalars["Int"];
-};
+}
 
-export type MutationbatchSendPetitionArgs = {
+export interface MutationbatchSendPetitionArgs {
   body: Scalars["JSON"];
   contactIdGroups: Array<Array<Scalars["GID"]>>;
   petitionId: Scalars["GID"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
   subject: Scalars["String"];
-};
+}
 
-export type MutationbulkCreateContactsArgs = {
+export interface MutationbulkCreateContactsArgs {
   file: Scalars["Upload"];
-};
+}
 
-export type MutationcancelScheduledMessageArgs = {
+export interface MutationcancelScheduledMessageArgs {
   messageId: Scalars["GID"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationcancelSignatureRequestArgs = {
+export interface MutationcancelSignatureRequestArgs {
   petitionSignatureRequestId: Scalars["GID"];
-};
+}
 
-export type MutationchangePasswordArgs = {
+export interface MutationchangePasswordArgs {
   newPassword: Scalars["String"];
   password: Scalars["String"];
-};
+}
 
-export type MutationchangePetitionFieldTypeArgs = {
+export interface MutationchangePetitionFieldTypeArgs {
   fieldId: Scalars["GID"];
   force?: Maybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
   type: PetitionFieldType;
-};
+}
 
-export type MutationclonePetitionFieldArgs = {
+export interface MutationclonePetitionFieldArgs {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationclonePetitionsArgs = {
+export interface MutationclonePetitionsArgs {
   petitionIds: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationcloneUserGroupArgs = {
+export interface MutationcloneUserGroupArgs {
   locale?: Maybe<Scalars["String"]>;
   userGroupIds: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationcreateContactArgs = {
+export interface MutationcreateContactArgs {
   data: CreateContactInput;
-};
+}
 
-export type MutationcreateFileUploadReplyArgs = {
+export interface MutationcreateFileUploadReplyArgs {
   fieldId: Scalars["GID"];
   file: Scalars["Upload"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationcreateOrganizationArgs = {
+export interface MutationcreateOrganizationArgs {
   identifier: Scalars["String"];
   name: Scalars["String"];
   status: OrganizationStatus;
-};
+}
 
-export type MutationcreateOrganizationUserArgs = {
+export interface MutationcreateOrganizationUserArgs {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   role: OrganizationRole;
-};
+}
 
-export type MutationcreatePetitionArgs = {
+export interface MutationcreatePetitionArgs {
   eventsUrl?: Maybe<Scalars["String"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
   petitionId?: Maybe<Scalars["GID"]>;
   type?: Maybe<PetitionBaseType>;
-};
+}
 
-export type MutationcreatePetitionFieldArgs = {
+export interface MutationcreatePetitionFieldArgs {
   petitionId: Scalars["GID"];
   position?: Maybe<Scalars["Int"]>;
   type: PetitionFieldType;
-};
+}
 
-export type MutationcreatePetitionFieldCommentArgs = {
+export interface MutationcreatePetitionFieldCommentArgs {
   content: Scalars["String"];
   isInternal?: Maybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
   petitionFieldReplyId?: Maybe<Scalars["GID"]>;
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationcreatePetitionSubscriptionArgs = {
+export interface MutationcreatePetitionSubscriptionArgs {
   endpoint: Scalars["String"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationcreateSimpleReplyArgs = {
+export interface MutationcreateSimpleReplyArgs {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
   reply: Scalars["String"];
-};
+}
 
-export type MutationcreateTagArgs = {
+export interface MutationcreateTagArgs {
   color: Scalars["String"];
   name: Scalars["String"];
-};
+}
 
-export type MutationcreateUserArgs = {
+export interface MutationcreateUserArgs {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   organizationId: Scalars["Int"];
   password: Scalars["String"];
   role: OrganizationRole;
-};
+}
 
-export type MutationcreateUserGroupArgs = {
+export interface MutationcreateUserGroupArgs {
   name: Scalars["String"];
   userIds: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationdeactivateAccessesArgs = {
+export interface MutationdeactivateAccessesArgs {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationdeleteContactsArgs = {
+export interface MutationdeleteContactsArgs {
   ids: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationdeletePetitionArgs = {
+export interface MutationdeletePetitionArgs {
   petitionId: Scalars["ID"];
-};
+}
 
-export type MutationdeletePetitionFieldArgs = {
+export interface MutationdeletePetitionFieldArgs {
   fieldId: Scalars["GID"];
   force?: Maybe<Scalars["Boolean"]>;
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationdeletePetitionFieldCommentArgs = {
+export interface MutationdeletePetitionFieldCommentArgs {
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationdeletePetitionReplyArgs = {
+export interface MutationdeletePetitionReplyArgs {
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
-};
+}
 
-export type MutationdeletePetitionSubscriptionArgs = {
+export interface MutationdeletePetitionSubscriptionArgs {
   subscriptionId: Scalars["GID"];
-};
+}
 
-export type MutationdeletePetitionsArgs = {
+export interface MutationdeletePetitionsArgs {
   force?: Maybe<Scalars["Boolean"]>;
   ids: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationdeleteTagArgs = {
+export interface MutationdeleteTagArgs {
   id: Scalars["GID"];
-};
+}
 
-export type MutationdeleteUserGroupArgs = {
+export interface MutationdeleteUserGroupArgs {
   ids: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationdynamicSelectFieldFileDownloadLinkArgs = {
+export interface MutationdynamicSelectFieldFileDownloadLinkArgs {
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationeditPetitionUserPermissionArgs = {
+export interface MutationeditPetitionUserPermissionArgs {
   permissionType: PetitionUserPermissionType;
   petitionIds: Array<Scalars["GID"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
   userIds?: Maybe<Array<Scalars["GID"]>>;
-};
+}
 
-export type MutationfileUploadReplyDownloadLinkArgs = {
+export interface MutationfileUploadReplyDownloadLinkArgs {
   petitionId: Scalars["GID"];
   preview?: Maybe<Scalars["Boolean"]>;
   replyId: Scalars["GID"];
-};
+}
 
-export type MutationgenerateUserAuthTokenArgs = {
+export interface MutationgenerateUserAuthTokenArgs {
   tokenName: Scalars["String"];
-};
+}
 
-export type MutationmarkPetitionFieldCommentsAsReadArgs = {
+export interface MutationmarkPetitionFieldCommentsAsReadArgs {
   petitionFieldCommentIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationpublicCheckVerificationCodeArgs = {
+export interface MutationpublicCheckVerificationCodeArgs {
   code: Scalars["String"];
   keycode: Scalars["ID"];
   token: Scalars["ID"];
-};
+}
 
-export type MutationpublicCompletePetitionArgs = {
+export interface MutationpublicCompletePetitionArgs {
   keycode: Scalars["ID"];
   signer?: Maybe<PublicPetitionSignerData>;
-};
+}
 
-export type MutationpublicCreateDynamicSelectReplyArgs = {
+export interface MutationpublicCreateDynamicSelectReplyArgs {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   value: Array<Array<Maybe<Scalars["String"]>>>;
-};
+}
 
-export type MutationpublicCreateFileUploadReplyArgs = {
+export interface MutationpublicCreateFileUploadReplyArgs {
   data: CreateFileUploadReplyInput;
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
-};
+}
 
-export type MutationpublicCreatePetitionFieldCommentArgs = {
+export interface MutationpublicCreatePetitionFieldCommentArgs {
   content: Scalars["String"];
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
-};
+}
 
-export type MutationpublicCreateSimpleReplyArgs = {
+export interface MutationpublicCreateSimpleReplyArgs {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   value: Scalars["String"];
-};
+}
 
-export type MutationpublicDelegateAccessToContactArgs = {
+export interface MutationpublicDelegateAccessToContactArgs {
   email: Scalars["String"];
   firstName: Scalars["String"];
   keycode: Scalars["ID"];
   lastName: Scalars["String"];
   messageBody: Scalars["JSON"];
-};
+}
 
-export type MutationpublicDeletePetitionFieldCommentArgs = {
+export interface MutationpublicDeletePetitionFieldCommentArgs {
   keycode: Scalars["ID"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
-};
+}
 
-export type MutationpublicDeletePetitionReplyArgs = {
+export interface MutationpublicDeletePetitionReplyArgs {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
-};
+}
 
-export type MutationpublicFileUploadReplyCompleteArgs = {
+export interface MutationpublicFileUploadReplyCompleteArgs {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
-};
+}
 
-export type MutationpublicFileUploadReplyDownloadLinkArgs = {
+export interface MutationpublicFileUploadReplyDownloadLinkArgs {
   keycode: Scalars["ID"];
   preview?: Maybe<Scalars["Boolean"]>;
   replyId: Scalars["GID"];
-};
+}
 
-export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
+export interface MutationpublicMarkPetitionFieldCommentsAsReadArgs {
   keycode: Scalars["ID"];
   petitionFieldCommentIds: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationpublicSendVerificationCodeArgs = {
+export interface MutationpublicSendVerificationCodeArgs {
   keycode: Scalars["ID"];
-};
+}
 
-export type MutationpublicSubmitUnpublishedCommentsArgs = {
+export interface MutationpublicSubmitUnpublishedCommentsArgs {
   keycode: Scalars["ID"];
-};
+}
 
-export type MutationpublicUpdateDynamicSelectReplyArgs = {
+export interface MutationpublicUpdateDynamicSelectReplyArgs {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
   value: Array<Array<Maybe<Scalars["String"]>>>;
-};
+}
 
-export type MutationpublicUpdatePetitionFieldCommentArgs = {
+export interface MutationpublicUpdatePetitionFieldCommentArgs {
   content: Scalars["String"];
   keycode: Scalars["ID"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
-};
+}
 
-export type MutationpublicUpdateSimpleReplyArgs = {
+export interface MutationpublicUpdateSimpleReplyArgs {
   keycode: Scalars["ID"];
   replyId: Scalars["GID"];
   value: Scalars["String"];
-};
+}
 
-export type MutationreactivateAccessesArgs = {
+export interface MutationreactivateAccessesArgs {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationremovePetitionUserPermissionArgs = {
+export interface MutationremovePetitionUserPermissionArgs {
   petitionIds: Array<Scalars["GID"]>;
   removeAll?: Maybe<Scalars["Boolean"]>;
   userGroupIds?: Maybe<Array<Scalars["GID"]>>;
   userIds?: Maybe<Array<Scalars["GID"]>>;
-};
+}
 
-export type MutationremoveUsersFromGroupArgs = {
+export interface MutationremoveUsersFromGroupArgs {
   userGroupId: Scalars["GID"];
   userIds: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationreopenPetitionArgs = {
+export interface MutationreopenPetitionArgs {
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationresetSignaturitOrganizationBrandingArgs = {
+export interface MutationresetSignaturitOrganizationBrandingArgs {
   orgId: Scalars["Int"];
-};
+}
 
-export type MutationrevokeUserAuthTokenArgs = {
+export interface MutationrevokeUserAuthTokenArgs {
   authTokenIds: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationsendPetitionArgs = {
+export interface MutationsendPetitionArgs {
   body: Scalars["JSON"];
   contactIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
   subject: Scalars["String"];
-};
+}
 
-export type MutationsendPetitionClosedNotificationArgs = {
+export interface MutationsendPetitionClosedNotificationArgs {
   attachPdfExport: Scalars["Boolean"];
   emailBody: Scalars["JSON"];
   force?: Maybe<Scalars["Boolean"]>;
   pdfExportTitle?: Maybe<Scalars["String"]>;
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationsendRemindersArgs = {
+export interface MutationsendRemindersArgs {
   accessIds: Array<Scalars["GID"]>;
   body?: Maybe<Scalars["JSON"]>;
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationsignedPetitionDownloadLinkArgs = {
+export interface MutationsignedPetitionDownloadLinkArgs {
   downloadAuditTrail?: Maybe<Scalars["Boolean"]>;
   petitionSignatureRequestId: Scalars["GID"];
   preview?: Maybe<Scalars["Boolean"]>;
-};
+}
 
-export type MutationstartSignatureRequestArgs = {
+export interface MutationstartSignatureRequestArgs {
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationsubmitUnpublishedCommentsArgs = {
+export interface MutationsubmitUnpublishedCommentsArgs {
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationswitchAutomaticRemindersArgs = {
+export interface MutationswitchAutomaticRemindersArgs {
   accessIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   start: Scalars["Boolean"];
-};
+}
 
-export type MutationtagPetitionArgs = {
+export interface MutationtagPetitionArgs {
   petitionId: Scalars["GID"];
   tagId: Scalars["GID"];
-};
+}
 
-export type MutationtransferPetitionOwnershipArgs = {
+export interface MutationtransferPetitionOwnershipArgs {
   petitionIds: Array<Scalars["GID"]>;
   userId: Scalars["GID"];
-};
+}
 
-export type MutationuntagPetitionArgs = {
+export interface MutationuntagPetitionArgs {
   petitionId: Scalars["GID"];
   tagId: Scalars["GID"];
-};
+}
 
-export type MutationupdateContactArgs = {
+export interface MutationupdateContactArgs {
   data: UpdateContactInput;
   id: Scalars["GID"];
-};
+}
 
-export type MutationupdateFieldPositionsArgs = {
+export interface MutationupdateFieldPositionsArgs {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationupdateOnboardingStatusArgs = {
+export interface MutationupdateOnboardingStatusArgs {
   key: OnboardingKey;
   status: OnboardingStatus;
-};
+}
 
-export type MutationupdateOrganizationLogoArgs = {
+export interface MutationupdateOrganizationLogoArgs {
   file: Scalars["Upload"];
   orgId: Scalars["GID"];
-};
+}
 
-export type MutationupdatePetitionArgs = {
+export interface MutationupdatePetitionArgs {
   data: UpdatePetitionInput;
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationupdatePetitionFieldArgs = {
+export interface MutationupdatePetitionFieldArgs {
   data: UpdatePetitionFieldInput;
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationupdatePetitionFieldCommentArgs = {
+export interface MutationupdatePetitionFieldCommentArgs {
   content: Scalars["String"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationupdatePetitionFieldRepliesStatusArgs = {
+export interface MutationupdatePetitionFieldRepliesStatusArgs {
   petitionFieldId: Scalars["GID"];
   petitionFieldReplyIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   status: PetitionFieldReplyStatus;
-};
+}
 
-export type MutationupdatePetitionFieldReplyMetadataArgs = {
+export interface MutationupdatePetitionFieldReplyMetadataArgs {
   metadata: Scalars["JSONObject"];
   petitionId: Scalars["GID"];
   replyId: Scalars["GID"];
-};
+}
 
-export type MutationupdatePetitionUserSubscriptionArgs = {
+export interface MutationupdatePetitionUserSubscriptionArgs {
   isSubscribed: Scalars["Boolean"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationupdateSignatureRequestMetadataArgs = {
+export interface MutationupdateSignatureRequestMetadataArgs {
   metadata: Scalars["JSONObject"];
   petitionSignatureRequestId: Scalars["GID"];
-};
+}
 
-export type MutationupdateSimpleReplyArgs = {
+export interface MutationupdateSimpleReplyArgs {
   petitionId: Scalars["GID"];
   reply: Scalars["String"];
   replyId: Scalars["GID"];
-};
+}
 
-export type MutationupdateTagArgs = {
+export interface MutationupdateTagArgs {
   data: UpdateTagInput;
   id: Scalars["GID"];
-};
+}
 
-export type MutationupdateUserArgs = {
+export interface MutationupdateUserArgs {
   data: UpdateUserInput;
   id: Scalars["GID"];
-};
+}
 
-export type MutationupdateUserGroupArgs = {
+export interface MutationupdateUserGroupArgs {
   data: UpdateUserGroupInput;
   id: Scalars["GID"];
-};
+}
 
-export type MutationupdateUserStatusArgs = {
+export interface MutationupdateUserStatusArgs {
   status: UserStatus;
   transferToUserId?: Maybe<Scalars["GID"]>;
   userIds: Array<Scalars["GID"]>;
-};
+}
 
-export type MutationuploadDynamicSelectFieldFileArgs = {
+export interface MutationuploadDynamicSelectFieldFileArgs {
   fieldId: Scalars["GID"];
   file: Scalars["Upload"];
   petitionId: Scalars["GID"];
-};
+}
 
-export type MutationvalidatePetitionFieldsArgs = {
+export interface MutationvalidatePetitionFieldsArgs {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
   validateRepliesWith?: Maybe<PetitionFieldReplyStatus>;
   value: Scalars["Boolean"];
-};
+}
 
-export type MutationverifyPublicAccessArgs = {
+export interface MutationverifyPublicAccessArgs {
   ip?: Maybe<Scalars["String"]>;
   keycode: Scalars["ID"];
   token: Scalars["ID"];
   userAgent?: Maybe<Scalars["String"]>;
-};
+}
 
 export type OnboardingKey =
   | "CONTACT_DETAILS"
@@ -924,7 +924,7 @@ export type OnboardingKey =
 
 export type OnboardingStatus = "FINISHED" | "SKIPPED";
 
-export type OrgIntegration = {
+export interface OrgIntegration {
   __typename?: "OrgIntegration";
   /** The name of the integration. */
   name: Scalars["String"];
@@ -932,10 +932,10 @@ export type OrgIntegration = {
   provider: Scalars["String"];
   /** The type of the integration. */
   type: IntegrationType;
-};
+}
 
 /** An organization in the system. */
-export type Organization = Timestamps & {
+export interface Organization extends Timestamps {
   __typename?: "Organization";
   /** @deprecated Temporal solution for support methods, don't use */
   _id: Scalars["Int"];
@@ -960,30 +960,30 @@ export type Organization = Timestamps & {
   userCount: Scalars["Int"];
   /** The users in the organization. */
   users: UserPagination;
-};
+}
 
 /** An organization in the system. */
-export type OrganizationintegrationsArgs = {
+export interface OrganizationintegrationsArgs {
   type?: Maybe<IntegrationType>;
-};
+}
 
 /** An organization in the system. */
-export type OrganizationusersArgs = {
+export interface OrganizationusersArgs {
   exclude?: Maybe<Array<Scalars["GID"]>>;
   includeInactive?: Maybe<Scalars["Boolean"]>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<OrganizationUsers_OrderBy>>;
-};
+}
 
-export type OrganizationPagination = {
+export interface OrganizationPagination {
   __typename?: "OrganizationPagination";
   /** The requested slice of items. */
   items: Array<Organization>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
 /** The roles of a user within an organization. */
 export type OrganizationRole = "ADMIN" | "NORMAL";
@@ -1014,17 +1014,17 @@ export type OrganizationUsers_OrderBy =
   | "lastName_ASC"
   | "lastName_DESC";
 
-export type OwnershipTransferredEvent = PetitionEvent & {
+export interface OwnershipTransferredEvent extends PetitionEvent {
   __typename?: "OwnershipTransferredEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   owner?: Maybe<User>;
   previousOwner?: Maybe<User>;
   user?: Maybe<User>;
-};
+}
 
 /** A petition */
-export type Petition = PetitionBase & {
+export interface Petition extends PetitionBase {
   __typename?: "Petition";
   /** The accesses for this petition */
   accesses: Array<PetitionAccess>;
@@ -1081,21 +1081,21 @@ export type Petition = PetitionBase & {
   tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
 /** A petition */
-export type PetitioncurrentSignatureRequestArgs = {
+export interface PetitioncurrentSignatureRequestArgs {
   token?: Maybe<Scalars["String"]>;
-};
+}
 
 /** A petition */
-export type PetitioneventsArgs = {
+export interface PetitioneventsArgs {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
-};
+}
 
 /** A petition access */
-export type PetitionAccess = Timestamps & {
+export interface PetitionAccess extends Timestamps {
   __typename?: "PetitionAccess";
   /** The contact of this access. */
   contact?: Maybe<Contact>;
@@ -1121,15 +1121,15 @@ export type PetitionAccess = Timestamps & {
   status: PetitionAccessStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
-export type PetitionAccessPagination = {
+export interface PetitionAccessPagination {
   __typename?: "PetitionAccessPagination";
   /** The requested slice of items. */
   items: Array<PetitionAccess>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
 /** The status of a petition access. */
 export type PetitionAccessStatus =
@@ -1138,20 +1138,20 @@ export type PetitionAccessStatus =
   /** The petition is not accessible by the contact. */
   | "INACTIVE";
 
-export type PetitionAndField = PetitionBaseAndField & {
+export interface PetitionAndField extends PetitionBaseAndField {
   __typename?: "PetitionAndField";
   field: PetitionField;
   petition: Petition;
-};
+}
 
 /** The petition and a subset of some of its fields. */
-export type PetitionAndPartialFields = {
+export interface PetitionAndPartialFields {
   __typename?: "PetitionAndPartialFields";
   fields: Array<PetitionField>;
   petition: Petition;
-};
+}
 
-export type PetitionBase = {
+export interface PetitionBase {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The body of the petition. */
@@ -1187,67 +1187,67 @@ export type PetitionBase = {
   tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
-export type PetitionBaseAndField = {
+export interface PetitionBaseAndField {
   field: PetitionField;
   petition: PetitionBase;
-};
+}
 
-export type PetitionBasePagination = {
+export interface PetitionBasePagination {
   __typename?: "PetitionBasePagination";
   /** The requested slice of items. */
   items: Array<PetitionBase>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
 export type PetitionBaseType = "PETITION" | "TEMPLATE";
 
-export type PetitionClosedEvent = PetitionEvent & {
+export interface PetitionClosedEvent extends PetitionEvent {
   __typename?: "PetitionClosedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user?: Maybe<User>;
-};
+}
 
-export type PetitionClosedNotifiedEvent = PetitionEvent & {
+export interface PetitionClosedNotifiedEvent extends PetitionEvent {
   __typename?: "PetitionClosedNotifiedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user?: Maybe<User>;
-};
+}
 
-export type PetitionCompletedEvent = PetitionEvent & {
+export interface PetitionCompletedEvent extends PetitionEvent {
   __typename?: "PetitionCompletedEvent";
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-};
+}
 
-export type PetitionCreatedEvent = PetitionEvent & {
+export interface PetitionCreatedEvent extends PetitionEvent {
   __typename?: "PetitionCreatedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user?: Maybe<User>;
-};
+}
 
-export type PetitionEvent = {
+export interface PetitionEvent {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-};
+}
 
-export type PetitionEventPagination = {
+export interface PetitionEventPagination {
   __typename?: "PetitionEventPagination";
   /** The requested slice of items. */
   items: Array<PetitionEvent>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
 /** A field within a petition. */
-export type PetitionField = {
+export interface PetitionField {
   __typename?: "PetitionField";
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
@@ -1276,10 +1276,10 @@ export type PetitionField = {
   validated: Scalars["Boolean"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility?: Maybe<Scalars["JSONObject"]>;
-};
+}
 
 /** A comment on a petition field */
-export type PetitionFieldComment = {
+export interface PetitionFieldComment {
   __typename?: "PetitionFieldComment";
   /** The author of the comment. */
   author?: Maybe<UserOrPetitionAccess>;
@@ -1297,10 +1297,10 @@ export type PetitionFieldComment = {
   publishedAt?: Maybe<Scalars["DateTime"]>;
   /** The reply the comment is refering to. */
   reply?: Maybe<PetitionFieldReply>;
-};
+}
 
 /** A reply to a petition field */
-export type PetitionFieldReply = Timestamps & {
+export interface PetitionFieldReply extends Timestamps {
   __typename?: "PetitionFieldReply";
   /** The content of the reply. */
   content: Scalars["JSONObject"];
@@ -1316,7 +1316,7 @@ export type PetitionFieldReply = Timestamps & {
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
 /** The status of a petition. */
 export type PetitionFieldReplyStatus =
@@ -1342,18 +1342,18 @@ export type PetitionFieldType =
   /** A text field. */
   | "TEXT";
 
-export type PetitionFilter = {
+export interface PetitionFilter {
   locale?: Maybe<PetitionLocale>;
   status?: Maybe<PetitionStatus>;
   tagIds?: Maybe<Array<Scalars["ID"]>>;
   type?: Maybe<PetitionBaseType>;
-};
+}
 
 /** The locale used for rendering the petition to the contact. */
 export type PetitionLocale = "en" | "es";
 
 /** A petition message */
-export type PetitionMessage = CreatedAt & {
+export interface PetitionMessage extends CreatedAt {
   __typename?: "PetitionMessage";
   /** The access of this petition message. */
   access: PetitionAccess;
@@ -1379,7 +1379,7 @@ export type PetitionMessage = CreatedAt & {
   sentAt?: Maybe<Scalars["DateTime"]>;
   /** The status of the petition message */
   status: PetitionMessageStatus;
-};
+}
 
 /** The status of a petition message. */
 export type PetitionMessageStatus =
@@ -1392,7 +1392,7 @@ export type PetitionMessageStatus =
   /** The message has been scheduled to be sent at a specific time. */
   | "SCHEDULED";
 
-export type PetitionPermission = {
+export interface PetitionPermission {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** wether user is subscribed or not to emails and alerts of the petition */
@@ -1403,10 +1403,10 @@ export type PetitionPermission = {
   petition: Petition;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
 /** The progress of a petition. */
-export type PetitionProgress = {
+export interface PetitionProgress {
   __typename?: "PetitionProgress";
   /** Number of optional fields not replied or validated */
   optional: Scalars["Int"];
@@ -1416,9 +1416,9 @@ export type PetitionProgress = {
   total: Scalars["Int"];
   /** Number of fields validated */
   validated: Scalars["Int"];
-};
+}
 
-export type PetitionReminder = CreatedAt & {
+export interface PetitionReminder extends CreatedAt {
   __typename?: "PetitionReminder";
   /** The access of this petition message. */
   access: PetitionAccess;
@@ -1431,7 +1431,7 @@ export type PetitionReminder = CreatedAt & {
   sender?: Maybe<User>;
   /** The type of the reminder. */
   type: PetitionReminderType;
-};
+}
 
 /** The type of a petition reminder. */
 export type PetitionReminderType =
@@ -1440,19 +1440,19 @@ export type PetitionReminderType =
   /** The reminder has been sent manually by a user. */
   | "MANUAL";
 
-export type PetitionReopenedEvent = PetitionEvent & {
+export interface PetitionReopenedEvent extends PetitionEvent {
   __typename?: "PetitionReopenedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user?: Maybe<User>;
-};
+}
 
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
   | "REQUEST_ERROR";
 
-export type PetitionSignatureRequest = Timestamps & {
+export interface PetitionSignatureRequest extends Timestamps {
   __typename?: "PetitionSignatureRequest";
   auditTrailFilename?: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
@@ -1468,7 +1468,7 @@ export type PetitionSignatureRequest = Timestamps & {
   status: PetitionSignatureRequestStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
 export type PetitionSignatureRequestStatus =
   | "CANCELLED"
@@ -1488,7 +1488,7 @@ export type PetitionStatus =
   | "PENDING";
 
 /** A petition template */
-export type PetitionTemplate = PetitionBase & {
+export interface PetitionTemplate extends PetitionBase {
   __typename?: "PetitionTemplate";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -1529,57 +1529,57 @@ export type PetitionTemplate = PetitionBase & {
   tags: Array<Tag>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
-export type PetitionTemplateAndField = PetitionBaseAndField & {
+export interface PetitionTemplateAndField extends PetitionBaseAndField {
   __typename?: "PetitionTemplateAndField";
   field: PetitionField;
   petition: PetitionTemplate;
-};
+}
 
-export type PetitionTemplatePagination = {
+export interface PetitionTemplatePagination {
   __typename?: "PetitionTemplatePagination";
   /** The requested slice of items. */
   items: Array<PetitionTemplate>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
 /** The permission for a petition and user group */
-export type PetitionUserGroupPermission = PetitionPermission &
-  Timestamps & {
-    __typename?: "PetitionUserGroupPermission";
-    /** Time when the resource was created. */
-    createdAt: Scalars["DateTime"];
-    /** The group linked to the permission */
-    group: UserGroup;
-    /** wether user is subscribed or not to emails and alerts of the petition */
-    isSubscribed: Scalars["Boolean"];
-    /** The type of the permission. */
-    permissionType: PetitionUserPermissionType;
-    /** The petition linked to the permission. */
-    petition: Petition;
-    /** Time when the resource was last updated. */
-    updatedAt: Scalars["DateTime"];
-  };
+export interface PetitionUserGroupPermission
+  extends PetitionPermission,
+    Timestamps {
+  __typename?: "PetitionUserGroupPermission";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  /** The group linked to the permission */
+  group: UserGroup;
+  /** wether user is subscribed or not to emails and alerts of the petition */
+  isSubscribed: Scalars["Boolean"];
+  /** The type of the permission. */
+  permissionType: PetitionUserPermissionType;
+  /** The petition linked to the permission. */
+  petition: Petition;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+}
 
 /** The permission for a petition and user */
-export type PetitionUserPermission = PetitionPermission &
-  Timestamps & {
-    __typename?: "PetitionUserPermission";
-    /** Time when the resource was created. */
-    createdAt: Scalars["DateTime"];
-    /** wether user is subscribed or not to emails and alerts of the petition */
-    isSubscribed: Scalars["Boolean"];
-    /** The type of the permission. */
-    permissionType: PetitionUserPermissionType;
-    /** The petition linked to the permission. */
-    petition: Petition;
-    /** Time when the resource was last updated. */
-    updatedAt: Scalars["DateTime"];
-    /** The user linked to the permission */
-    user: User;
-  };
+export interface PetitionUserPermission extends PetitionPermission, Timestamps {
+  __typename?: "PetitionUserPermission";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  /** wether user is subscribed or not to emails and alerts of the petition */
+  isSubscribed: Scalars["Boolean"];
+  /** The type of the permission. */
+  permissionType: PetitionUserPermissionType;
+  /** The petition linked to the permission. */
+  petition: Petition;
+  /** Time when the resource was last updated. */
+  updatedAt: Scalars["DateTime"];
+  /** The user linked to the permission */
+  user: User;
+}
 
 /** The type of permission for a petition user. */
 export type PetitionUserPermissionType = "OWNER" | "READ" | "WRITE";
@@ -1587,14 +1587,14 @@ export type PetitionUserPermissionType = "OWNER" | "READ" | "WRITE";
 /** The READ and WRITE permissions for a petition user. */
 export type PetitionUserPermissionTypeRW = "READ" | "WRITE";
 
-export type PetitionWithFieldAndReplies = {
+export interface PetitionWithFieldAndReplies {
   __typename?: "PetitionWithFieldAndReplies";
   field: PetitionField;
   petition: Petition;
   replies: Array<PetitionFieldReply>;
-};
+}
 
-export type PublicAccessVerification = {
+export interface PublicAccessVerification {
   __typename?: "PublicAccessVerification";
   cookieName?: Maybe<Scalars["String"]>;
   cookieValue?: Maybe<Scalars["String"]>;
@@ -1602,10 +1602,10 @@ export type PublicAccessVerification = {
   isAllowed: Scalars["Boolean"];
   orgLogoUrl?: Maybe<Scalars["String"]>;
   orgName?: Maybe<Scalars["String"]>;
-};
+}
 
 /** A public view of a contact */
-export type PublicContact = {
+export interface PublicContact {
   __typename?: "PublicContact";
   /** The email of the user. */
   email: Scalars["String"];
@@ -1617,10 +1617,10 @@ export type PublicContact = {
   id: Scalars["GID"];
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
-};
+}
 
 /** A public view of an organization */
-export type PublicOrganization = {
+export interface PublicOrganization {
   __typename?: "PublicOrganization";
   /** The ID of the organization. */
   id: Scalars["GID"];
@@ -1630,10 +1630,10 @@ export type PublicOrganization = {
   logoUrl?: Maybe<Scalars["String"]>;
   /** The name of the organization. */
   name: Scalars["String"];
-};
+}
 
 /** A public view of the petition */
-export type PublicPetition = Timestamps & {
+export interface PublicPetition extends Timestamps {
   __typename?: "PublicPetition";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -1661,19 +1661,19 @@ export type PublicPetition = Timestamps & {
   status: PetitionStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
 /** A public view of a petition access */
-export type PublicPetitionAccess = {
+export interface PublicPetitionAccess {
   __typename?: "PublicPetitionAccess";
   contact?: Maybe<PublicContact>;
   granter?: Maybe<PublicUser>;
   message?: Maybe<PublicPetitionMessage>;
   petition?: Maybe<PublicPetition>;
-};
+}
 
 /** A field within a petition. */
-export type PublicPetitionField = {
+export interface PublicPetitionField {
   __typename?: "PublicPetitionField";
   commentCount: Scalars["Int"];
   /** The comments for this field. */
@@ -1702,10 +1702,10 @@ export type PublicPetitionField = {
   validated: Scalars["Boolean"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility?: Maybe<Scalars["JSONObject"]>;
-};
+}
 
 /** A comment on a petition field */
-export type PublicPetitionFieldComment = {
+export interface PublicPetitionFieldComment {
   __typename?: "PublicPetitionFieldComment";
   /** The author of the comment. */
   author?: Maybe<PublicUserOrContact>;
@@ -1719,10 +1719,10 @@ export type PublicPetitionFieldComment = {
   publishedAt?: Maybe<Scalars["DateTime"]>;
   /** The reply the comment is refering to. */
   reply?: Maybe<PublicPetitionFieldReply>;
-};
+}
 
 /** A reply to a petition field */
-export type PublicPetitionFieldReply = Timestamps & {
+export interface PublicPetitionFieldReply extends Timestamps {
   __typename?: "PublicPetitionFieldReply";
   /** The public content of the reply */
   content: Scalars["JSONObject"];
@@ -1734,37 +1734,37 @@ export type PublicPetitionFieldReply = Timestamps & {
   status: PetitionFieldReplyStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
 /** A public message in a petition */
-export type PublicPetitionMessage = {
+export interface PublicPetitionMessage {
   __typename?: "PublicPetitionMessage";
   /** The ID of the message. */
   id: Scalars["GID"];
   /** Subject of a email. */
   subject?: Maybe<Scalars["String"]>;
-};
+}
 
-export type PublicPetitionSignerData = {
+export interface PublicPetitionSignerData {
   email: Scalars["String"];
   firstName: Scalars["String"];
   lastName: Scalars["String"];
   message?: Maybe<Scalars["String"]>;
-};
+}
 
 /** The public signature settings of a petition */
-export type PublicSignatureConfig = {
+export interface PublicSignatureConfig {
   __typename?: "PublicSignatureConfig";
   /** If true, lets the user review the replies before starting the signature process */
   review: Scalars["Boolean"];
   /** The contacts that need to sign the generated document. */
   signers: Array<Maybe<PublicContact>>;
-};
+}
 
 export type PublicSignatureStatus = "COMPLETED" | "STARTED";
 
 /** A public view of a user */
-export type PublicUser = {
+export interface PublicUser {
   __typename?: "PublicUser";
   /** The email of the user. */
   email: Scalars["String"];
@@ -1778,11 +1778,11 @@ export type PublicUser = {
   lastName?: Maybe<Scalars["String"]>;
   /** The organization of the user. */
   organization: PublicOrganization;
-};
+}
 
 export type PublicUserOrContact = PublicContact | PublicUser;
 
-export type Query = {
+export interface Query {
   __typename?: "Query";
   access?: Maybe<PublicPetitionAccess>;
   contact?: Maybe<Contact>;
@@ -1817,113 +1817,113 @@ export type Query = {
   userGroup?: Maybe<UserGroup>;
   /** Paginated list of user groups in the organization */
   userGroups: UserGroupPagination;
-};
+}
 
-export type QueryaccessArgs = {
+export interface QueryaccessArgs {
   keycode: Scalars["ID"];
-};
+}
 
-export type QuerycontactArgs = {
+export interface QuerycontactArgs {
   id: Scalars["GID"];
-};
+}
 
-export type QuerycontactsArgs = {
+export interface QuerycontactsArgs {
   exclude?: Maybe<Array<Scalars["GID"]>>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryContacts_OrderBy>>;
-};
+}
 
-export type QuerycontactsByEmailArgs = {
+export interface QuerycontactsByEmailArgs {
   emails: Array<Scalars["String"]>;
-};
+}
 
-export type QueryemailIsAvailableArgs = {
+export interface QueryemailIsAvailableArgs {
   email: Scalars["String"];
-};
+}
 
-export type QueryglobalIdDecodeArgs = {
+export interface QueryglobalIdDecodeArgs {
   id: Scalars["ID"];
-};
+}
 
-export type QueryglobalIdEncodeArgs = {
+export interface QueryglobalIdEncodeArgs {
   id: Scalars["Int"];
   type: EntityType;
-};
+}
 
-export type QueryorganizationArgs = {
+export interface QueryorganizationArgs {
   id: Scalars["GID"];
-};
+}
 
-export type QueryorganizationsArgs = {
+export interface QueryorganizationsArgs {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryOrganizations_OrderBy>>;
   status?: Maybe<OrganizationStatus>;
-};
+}
 
-export type QuerypetitionArgs = {
+export interface QuerypetitionArgs {
   id: Scalars["GID"];
-};
+}
 
-export type QuerypetitionAuthTokenArgs = {
+export interface QuerypetitionAuthTokenArgs {
   token: Scalars["String"];
-};
+}
 
-export type QuerypetitionFieldCommentsArgs = {
+export interface QuerypetitionFieldCommentsArgs {
   keycode: Scalars["ID"];
   petitionFieldId: Scalars["GID"];
-};
+}
 
-export type QuerypetitionsArgs = {
+export interface QuerypetitionsArgs {
   filters?: Maybe<PetitionFilter>;
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy>>;
-};
+}
 
-export type QuerypetitionsByIdArgs = {
+export interface QuerypetitionsByIdArgs {
   ids: Array<Scalars["GID"]>;
-};
+}
 
-export type QuerypublicOrgLogoUrlArgs = {
+export interface QuerypublicOrgLogoUrlArgs {
   id: Scalars["GID"];
-};
+}
 
-export type QuerypublicTemplatesArgs = {
+export interface QuerypublicTemplatesArgs {
   limit?: Maybe<Scalars["Int"]>;
   locale?: Maybe<PetitionLocale>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
-};
+}
 
-export type QuerysearchUsersArgs = {
+export interface QuerysearchUsersArgs {
   excludeUserGroups?: Maybe<Array<Scalars["GID"]>>;
   excludeUsers?: Maybe<Array<Scalars["GID"]>>;
   includeGroups?: Maybe<Scalars["Boolean"]>;
   includeInactive?: Maybe<Scalars["Boolean"]>;
   search: Scalars["String"];
-};
+}
 
-export type QuerytagsArgs = {
+export interface QuerytagsArgs {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
-};
+}
 
-export type QueryuserGroupArgs = {
+export interface QueryuserGroupArgs {
   id: Scalars["GID"];
-};
+}
 
-export type QueryuserGroupsArgs = {
+export interface QueryuserGroupsArgs {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<QueryUserGroups_OrderBy>>;
-};
+}
 
 /** Order to use on Query.contacts */
 export type QueryContacts_OrderBy =
@@ -1961,15 +1961,15 @@ export type QueryUserGroups_OrderBy =
   | "name_ASC"
   | "name_DESC";
 
-export type ReminderSentEvent = PetitionEvent & {
+export interface ReminderSentEvent extends PetitionEvent {
   __typename?: "ReminderSentEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   reminder: PetitionReminder;
-};
+}
 
 /** The reminder settings of a petition */
-export type RemindersConfig = {
+export interface RemindersConfig {
   __typename?: "RemindersConfig";
   /** The amount of days between reminders. */
   offset: Scalars["Int"];
@@ -1979,10 +1979,10 @@ export type RemindersConfig = {
   timezone: Scalars["String"];
   /** Whether to send reminders only from monday to friday. */
   weekdaysOnly: Scalars["Boolean"];
-};
+}
 
 /** The reminders settings for the petition */
-export type RemindersConfigInput = {
+export interface RemindersConfigInput {
   /** The amount of days between reminders. */
   offset: Scalars["Int"];
   /** The time at which the reminder should be sent. */
@@ -1991,45 +1991,45 @@ export type RemindersConfigInput = {
   timezone: Scalars["String"];
   /** Whether to send reminders only from monday to friday. */
   weekdaysOnly: Scalars["Boolean"];
-};
+}
 
-export type ReplyCreatedEvent = PetitionEvent & {
+export interface ReplyCreatedEvent extends PetitionEvent {
   __typename?: "ReplyCreatedEvent";
   createdAt: Scalars["DateTime"];
   createdBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply?: Maybe<PetitionFieldReply>;
-};
+}
 
-export type ReplyDeletedEvent = PetitionEvent & {
+export interface ReplyDeletedEvent extends PetitionEvent {
   __typename?: "ReplyDeletedEvent";
   createdAt: Scalars["DateTime"];
   deletedBy?: Maybe<UserOrPetitionAccess>;
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
-};
+}
 
-export type ReplyUpdatedEvent = PetitionEvent & {
+export interface ReplyUpdatedEvent extends PetitionEvent {
   __typename?: "ReplyUpdatedEvent";
   createdAt: Scalars["DateTime"];
   field?: Maybe<PetitionField>;
   id: Scalars["GID"];
   reply?: Maybe<PetitionFieldReply>;
   updatedBy?: Maybe<UserOrPetitionAccess>;
-};
+}
 
 /** Represents the result of an operation. */
 export type Result = "FAILURE" | "SUCCESS";
 
-export type SendPetitionResult = {
+export interface SendPetitionResult {
   __typename?: "SendPetitionResult";
   accesses?: Maybe<Array<PetitionAccess>>;
   petition?: Maybe<Petition>;
   result: Result;
-};
+}
 
-export type SignatureCancelledEvent = PetitionEvent & {
+export interface SignatureCancelledEvent extends PetitionEvent {
   __typename?: "SignatureCancelledEvent";
   cancelType: PetitionSignatureCancelReason;
   cancellerReason?: Maybe<Scalars["String"]>;
@@ -2037,16 +2037,16 @@ export type SignatureCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user?: Maybe<User>;
-};
+}
 
-export type SignatureCompletedEvent = PetitionEvent & {
+export interface SignatureCompletedEvent extends PetitionEvent {
   __typename?: "SignatureCompletedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-};
+}
 
 /** The signature settings of a petition */
-export type SignatureConfig = {
+export interface SignatureConfig {
   __typename?: "SignatureConfig";
   /** The contacts that need to sign the generated document. */
   contacts: Array<Maybe<Contact>>;
@@ -2058,10 +2058,10 @@ export type SignatureConfig = {
   timezone: Scalars["String"];
   /** Title of the signature document */
   title: Scalars["String"];
-};
+}
 
 /** The signature settings for the petition */
-export type SignatureConfigInput = {
+export interface SignatureConfigInput {
   /** The contacts that need to sign the generated document. */
   contactIds: Array<Scalars["ID"]>;
   /** The selected provider for the signature. */
@@ -2072,15 +2072,15 @@ export type SignatureConfigInput = {
   timezone: Scalars["String"];
   /** The title of the signing document */
   title: Scalars["String"];
-};
+}
 
-export type SignatureStartedEvent = PetitionEvent & {
+export interface SignatureStartedEvent extends PetitionEvent {
   __typename?: "SignatureStartedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-};
+}
 
-export type Subscription = Timestamps & {
+export interface Subscription extends Timestamps {
   __typename?: "Subscription";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -2089,16 +2089,16 @@ export type Subscription = Timestamps & {
   petition: Petition;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
 /** Return type for all support methods */
-export type SupportMethodResponse = {
+export interface SupportMethodResponse {
   __typename?: "SupportMethodResponse";
   message?: Maybe<Scalars["String"]>;
   result: Result;
-};
+}
 
-export type Tag = {
+export interface Tag {
   __typename?: "Tag";
   /** The color of the tag in hex format (example: #FFFFFF) */
   color: Scalars["String"];
@@ -2106,38 +2106,38 @@ export type Tag = {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   name: Scalars["String"];
-};
+}
 
-export type TagPagination = {
+export interface TagPagination {
   __typename?: "TagPagination";
   /** The requested slice of items. */
   items: Array<Tag>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
-export type Timestamps = {
+export interface Timestamps {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
-export type UpdateContactInput = {
+export interface UpdateContactInput {
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
-};
+}
 
-export type UpdatePetitionFieldInput = {
+export interface UpdatePetitionFieldInput {
   description?: Maybe<Scalars["String"]>;
   multiple?: Maybe<Scalars["Boolean"]>;
   optional?: Maybe<Scalars["Boolean"]>;
   options?: Maybe<Scalars["JSONObject"]>;
   title?: Maybe<Scalars["String"]>;
   visibility?: Maybe<Scalars["JSONObject"]>;
-};
+}
 
-export type UpdatePetitionInput = {
+export interface UpdatePetitionInput {
   deadline?: Maybe<Scalars["DateTime"]>;
   description?: Maybe<Scalars["String"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
@@ -2149,24 +2149,24 @@ export type UpdatePetitionInput = {
   remindersConfig?: Maybe<RemindersConfigInput>;
   signatureConfig?: Maybe<SignatureConfigInput>;
   skipForwardSecurity?: Maybe<Scalars["Boolean"]>;
-};
+}
 
-export type UpdateTagInput = {
+export interface UpdateTagInput {
   color?: Maybe<Scalars["String"]>;
   name?: Maybe<Scalars["String"]>;
-};
+}
 
-export type UpdateUserGroupInput = {
+export interface UpdateUserGroupInput {
   name?: Maybe<Scalars["String"]>;
-};
+}
 
-export type UpdateUserInput = {
+export interface UpdateUserInput {
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
-};
+}
 
 /** A user in the system. */
-export type User = Timestamps & {
+export interface User extends Timestamps {
   __typename?: "User";
   /** Lists every auth token of the user */
   authenticationTokens: UserAuthenticationTokenPagination;
@@ -2193,37 +2193,37 @@ export type User = Timestamps & {
   status: UserStatus;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
 /** A user in the system. */
-export type UserauthenticationTokensArgs = {
+export interface UserauthenticationTokensArgs {
   limit?: Maybe<Scalars["Int"]>;
   offset?: Maybe<Scalars["Int"]>;
   search?: Maybe<Scalars["String"]>;
   sortBy?: Maybe<Array<UserAuthenticationTokens_OrderBy>>;
-};
+}
 
 /** A user in the system. */
-export type UserhasFeatureFlagArgs = {
+export interface UserhasFeatureFlagArgs {
   featureFlag: FeatureFlag;
-};
+}
 
-export type UserAuthenticationToken = CreatedAt & {
+export interface UserAuthenticationToken extends CreatedAt {
   __typename?: "UserAuthenticationToken";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   lastUsedAt?: Maybe<Scalars["DateTime"]>;
   tokenName: Scalars["String"];
-};
+}
 
-export type UserAuthenticationTokenPagination = {
+export interface UserAuthenticationTokenPagination {
   __typename?: "UserAuthenticationTokenPagination";
   /** The requested slice of items. */
   items: Array<UserAuthenticationToken>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
 /** Order to use on User.authenticationTokens */
 export type UserAuthenticationTokens_OrderBy =
@@ -2234,7 +2234,7 @@ export type UserAuthenticationTokens_OrderBy =
   | "tokenName_ASC"
   | "tokenName_DESC";
 
-export type UserGroup = Timestamps & {
+export interface UserGroup extends Timestamps {
   __typename?: "UserGroup";
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
@@ -2243,103 +2243,117 @@ export type UserGroup = Timestamps & {
   name: Scalars["String"];
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
-};
+}
 
-export type UserGroupMember = {
+export interface UserGroupMember {
   __typename?: "UserGroupMember";
   /** The time the user was added to the user group. */
   addedAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user: User;
-};
+}
 
-export type UserGroupPagination = {
+export interface UserGroupPagination {
   __typename?: "UserGroupPagination";
   /** The requested slice of items. */
   items: Array<UserGroup>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
 export type UserOrPetitionAccess = PetitionAccess | User;
 
 export type UserOrUserGroup = User | UserGroup;
 
-export type UserPagination = {
+export interface UserPagination {
   __typename?: "UserPagination";
   /** The requested slice of items. */
   items: Array<User>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
-};
+}
 
-export type UserPermissionAddedEvent = PetitionEvent & {
+export interface UserPermissionAddedEvent extends PetitionEvent {
   __typename?: "UserPermissionAddedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionType: PetitionUserPermissionType;
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
-};
+}
 
-export type UserPermissionEditedEvent = PetitionEvent & {
+export interface UserPermissionEditedEvent extends PetitionEvent {
   __typename?: "UserPermissionEditedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionType: PetitionUserPermissionType;
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
-};
+}
 
-export type UserPermissionRemovedEvent = PetitionEvent & {
+export interface UserPermissionRemovedEvent extends PetitionEvent {
   __typename?: "UserPermissionRemovedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   permissionUser?: Maybe<User>;
   user?: Maybe<User>;
-};
+}
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
 
-export type VerificationCodeCheck = {
+export interface VerificationCodeCheck {
   __typename?: "VerificationCodeCheck";
   remainingAttempts?: Maybe<Scalars["Int"]>;
   result: Result;
-};
+}
 
-export type VerificationCodeRequest = {
+export interface VerificationCodeRequest {
   __typename?: "VerificationCodeRequest";
   expiresAt: Scalars["DateTime"];
   remainingAttempts: Scalars["Int"];
   token: Scalars["ID"];
-};
+}
 
-export type ContactLink_ContactFragment = { __typename?: "Contact" } & Pick<
-  Contact,
-  "id" | "fullName" | "email"
->;
+export type ContactLink_ContactFragment = {
+  __typename?: "Contact";
+  id: string;
+  fullName?: Maybe<string>;
+  email: string;
+};
 
 export type ContactListPopover_ContactFragment = {
   __typename?: "Contact";
-} & Pick<Contact, "id" | "email" | "fullName">;
+  id: string;
+  email: string;
+  fullName?: Maybe<string>;
+};
 
 export type ContactListPopover_PublicContactFragment = {
   __typename?: "PublicContact";
-} & Pick<PublicContact, "id" | "email" | "fullName">;
+  id: string;
+  email: string;
+  fullName?: Maybe<string>;
+};
 
-export type ContactSelect_ContactFragment = { __typename?: "Contact" } & Pick<
-  Contact,
-  "id" | "fullName" | "email"
->;
+export type ContactSelect_ContactFragment = {
+  __typename?: "Contact";
+  id: string;
+  fullName?: Maybe<string>;
+  email: string;
+};
 
-export type OnboardingTour_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "onboardingStatus"
->;
+export type OnboardingTour_UserFragment = {
+  __typename?: "User";
+  onboardingStatus: { [key: string]: any };
+};
 
 export type PetitionFieldSelect_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "title" | "options">;
+  id: string;
+  type: PetitionFieldType;
+  title?: Maybe<string>;
+  options: { [key: string]: any };
+};
 
 export type PetitionSignatureCellContent_PetitionFragment = {
   __typename?: "Petition";
@@ -2347,29 +2361,33 @@ export type PetitionSignatureCellContent_PetitionFragment = {
 
 export type PetitionSignatureCellContent_UserFragment = {
   __typename?: "User";
-} & { hasPetitionSignature: User["hasFeatureFlag"] };
+  hasPetitionSignature: boolean;
+};
 
 export type PetitionStatusCellContent_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status"> & {
-    progress: { __typename?: "PetitionProgress" } & Pick<
-      PetitionProgress,
-      "validated" | "replied" | "optional" | "total"
-    >;
+  status: PetitionStatus;
+  progress: {
+    __typename?: "PetitionProgress";
+    validated: number;
+    replied: number;
+    optional: number;
+    total: number;
   };
+};
 
-export type PetitionTagFilter_TagFragment = { __typename?: "Tag" } & Pick<
-  Tag,
-  "id"
-> &
-  Tag_TagFragment;
+export type PetitionTagFilter_TagFragment = {
+  __typename?: "Tag";
+  id: string;
+} & Tag_TagFragment;
 
 export type PetitionTagFilter_tagsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
 }>;
 
-export type PetitionTagFilter_tagsQuery = { __typename?: "Query" } & {
-  tags: { __typename?: "TagPagination" } & {
+export type PetitionTagFilter_tagsQuery = {
+  tags: {
+    __typename?: "TagPagination";
     items: Array<
       { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
     >;
@@ -2378,23 +2396,23 @@ export type PetitionTagFilter_tagsQuery = { __typename?: "Query" } & {
 
 export type PetitionTagListCellContent_TagFragment = {
   __typename?: "Tag";
-} & Pick<Tag, "id"> &
-  Tag_TagFragment;
+  id: string;
+} & Tag_TagFragment;
 
 export type PetitionTagListCellContent_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id"> & {
+  id: string;
+  tags: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
+};
+
+export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment =
+  {
+    __typename?: "PetitionTemplate";
+    id: string;
     tags: Array<
       { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
     >;
   };
-
-export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment =
-  { __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
-      tags: Array<
-        { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-      >;
-    };
 
 export type PetitionTagListCellContent_PetitionBaseFragment =
   | PetitionTagListCellContent_PetitionBase_Petition_Fragment
@@ -2404,8 +2422,9 @@ export type PetitionTagListCellContent_tagsQueryVariables = Exact<{
   search?: Maybe<Scalars["String"]>;
 }>;
 
-export type PetitionTagListCellContent_tagsQuery = { __typename?: "Query" } & {
-  tags: { __typename?: "TagPagination" } & {
+export type PetitionTagListCellContent_tagsQuery = {
+  tags: {
+    __typename?: "TagPagination";
     items: Array<
       { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
     >;
@@ -2418,19 +2437,21 @@ export type PetitionTagListCellContent_tagPetitionMutationVariables = Exact<{
 }>;
 
 export type PetitionTagListCellContent_tagPetitionMutation = {
-  __typename?: "Mutation";
-} & {
   tagPetition:
-    | ({ __typename?: "Petition" } & Pick<Petition, "id"> & {
-          tags: Array<
-            { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-          >;
-        })
-    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
-          tags: Array<
-            { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-          >;
-        });
+    | {
+        __typename?: "Petition";
+        id: string;
+        tags: Array<
+          { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+        >;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        tags: Array<
+          { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+        >;
+      };
 };
 
 export type PetitionTagListCellContent_untagPetitionMutationVariables = Exact<{
@@ -2439,19 +2460,21 @@ export type PetitionTagListCellContent_untagPetitionMutationVariables = Exact<{
 }>;
 
 export type PetitionTagListCellContent_untagPetitionMutation = {
-  __typename?: "Mutation";
-} & {
   untagPetition:
-    | ({ __typename?: "Petition" } & Pick<Petition, "id"> & {
-          tags: Array<
-            { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-          >;
-        })
-    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
-          tags: Array<
-            { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-          >;
-        });
+    | {
+        __typename?: "Petition";
+        id: string;
+        tags: Array<
+          { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+        >;
+      }
+    | {
+        __typename?: "PetitionTemplate";
+        id: string;
+        tags: Array<
+          { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+        >;
+      };
 };
 
 export type PetitionTagListCellContent_createTagMutationVariables = Exact<{
@@ -2460,42 +2483,38 @@ export type PetitionTagListCellContent_createTagMutationVariables = Exact<{
 }>;
 
 export type PetitionTagListCellContent_createTagMutation = {
-  __typename?: "Mutation";
-} & {
   createTag: { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment;
 };
 
 export type ShareButton_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & {
   permissions: Array<
-    | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-        PetitionUserGroupPermission,
-        "permissionType"
-      > & {
-          group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name">;
-        })
-    | ({ __typename?: "PetitionUserPermission" } & Pick<
-        PetitionUserPermission,
-        "permissionType"
-      > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName"> })
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        permissionType: PetitionUserPermissionType;
+        group: { __typename?: "UserGroup"; id: string; name: string };
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        permissionType: PetitionUserPermissionType;
+        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+      }
   >;
 };
 
 export type ShareButton_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & {
   permissions: Array<
-    | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-        PetitionUserGroupPermission,
-        "permissionType"
-      > & {
-          group: { __typename?: "UserGroup" } & Pick<UserGroup, "id" | "name">;
-        })
-    | ({ __typename?: "PetitionUserPermission" } & Pick<
-        PetitionUserPermission,
-        "permissionType"
-      > & { user: { __typename?: "User" } & Pick<User, "id" | "fullName"> })
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        permissionType: PetitionUserPermissionType;
+        group: { __typename?: "UserGroup"; id: string; name: string };
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        permissionType: PetitionUserPermissionType;
+        user: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+      }
   >;
 };
 
@@ -2503,21 +2522,23 @@ export type ShareButton_PetitionBaseFragment =
   | ShareButton_PetitionBase_Petition_Fragment
   | ShareButton_PetitionBase_PetitionTemplate_Fragment;
 
-export type Tag_TagFragment = { __typename?: "Tag" } & Pick<
-  Tag,
-  "name" | "color"
->;
+export type Tag_TagFragment = {
+  __typename?: "Tag";
+  name: string;
+  color: string;
+};
 
-export type TagEditDialog_TagFragment = { __typename?: "Tag" } & Pick<
-  Tag,
-  "id" | "createdAt"
-> &
-  Tag_TagFragment;
+export type TagEditDialog_TagFragment = {
+  __typename?: "Tag";
+  id: string;
+  createdAt: string;
+} & Tag_TagFragment;
 
 export type TagEditDialog_tagsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type TagEditDialog_tagsQuery = { __typename?: "Query" } & {
-  tags: { __typename?: "TagPagination" } & {
+export type TagEditDialog_tagsQuery = {
+  tags: {
+    __typename?: "TagPagination";
     items: Array<{ __typename?: "Tag" } & TagEditDialog_TagFragment>;
   };
 };
@@ -2527,44 +2548,50 @@ export type TagEditDialog_updateTagMutationVariables = Exact<{
   data: UpdateTagInput;
 }>;
 
-export type TagEditDialog_updateTagMutation = { __typename?: "Mutation" } & {
+export type TagEditDialog_updateTagMutation = {
   updateTag: { __typename?: "Tag" } & TagEditDialog_TagFragment;
 };
 
-export type UserAvatarList_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "id" | "fullName"
-> &
-  UserListPopover_UserFragment;
+export type UserAvatarList_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: Maybe<string>;
+} & UserListPopover_UserFragment;
 
 export type UserAvatarList_UserGroupFragment = {
   __typename?: "UserGroup";
-} & Pick<UserGroup, "id" | "name">;
+  id: string;
+  name: string;
+};
 
-export type UserListPopover_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "id" | "fullName"
->;
+export type UserListPopover_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: Maybe<string>;
+};
 
 export type UserListPopover_UserGroupFragment = {
   __typename?: "UserGroup";
-} & Pick<UserGroup, "id" | "name">;
+  id: string;
+  name: string;
+};
 
-export type UserSelect_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "id" | "fullName" | "email"
->;
+export type UserSelect_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: Maybe<string>;
+  email: string;
+};
 
-export type UserSelect_UserGroupFragment = { __typename?: "UserGroup" } & Pick<
-  UserGroup,
-  "id" | "name"
-> & {
-    members: Array<
-      { __typename?: "UserGroupMember" } & {
-        user: { __typename?: "User" } & UserSelect_UserFragment;
-      }
-    >;
-  };
+export type UserSelect_UserGroupFragment = {
+  __typename?: "UserGroup";
+  id: string;
+  name: string;
+  members: Array<{
+    __typename?: "UserGroupMember";
+    user: { __typename?: "User" } & UserSelect_UserFragment;
+  }>;
+};
 
 export type useSearchUsers_searchUsersQueryVariables = Exact<{
   search: Scalars["String"];
@@ -2574,7 +2601,7 @@ export type useSearchUsers_searchUsersQueryVariables = Exact<{
   includeInactive?: Maybe<Scalars["Boolean"]>;
 }>;
 
-export type useSearchUsers_searchUsersQuery = { __typename?: "Query" } & {
+export type useSearchUsers_searchUsersQuery = {
   searchUsers: Array<
     | ({ __typename?: "User" } & UserSelect_UserFragment)
     | ({ __typename?: "UserGroup" } & UserSelect_UserGroupFragment)
@@ -2585,26 +2612,24 @@ export type WithAdminOrganizationRoleQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type WithAdminOrganizationRoleQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "role">;
+export type WithAdminOrganizationRoleQuery = {
+  me: { __typename?: "User"; role: OrganizationRole };
 };
 
 export type HasFeatureFlagQueryVariables = Exact<{
   featureFlag: FeatureFlag;
 }>;
 
-export type HasFeatureFlagQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> & {
-      hasFeatureFlag: User["hasFeatureFlag"];
-    };
+export type HasFeatureFlagQuery = {
+  me: { __typename?: "User"; id: string; hasFeatureFlag: boolean };
 };
 
 export type WithSuperAdminAccessQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type WithSuperAdminAccessQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "isSuperAdmin">;
+export type WithSuperAdminAccessQuery = {
+  me: { __typename?: "User"; isSuperAdmin: boolean };
 };
 
 export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
@@ -2612,16 +2637,13 @@ export type ImportContactsDialog_bulkCreateContactsMutationVariables = Exact<{
 }>;
 
 export type ImportContactsDialog_bulkCreateContactsMutation = {
-  __typename?: "Mutation";
-} & {
-  bulkCreateContacts: Array<{ __typename?: "Contact" } & Pick<Contact, "id">>;
+  bulkCreateContacts: Array<{ __typename?: "Contact"; id: string }>;
 };
 
-export type AppLayout_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "id"
-> &
-  AppLayoutNavbar_UserFragment &
+export type AppLayout_UserFragment = {
+  __typename?: "User";
+  id: string;
+} & AppLayoutNavbar_UserFragment &
   OnboardingTour_UserFragment;
 
 export type AppLayout_updateOnboardingStatusMutationVariables = Exact<{
@@ -2630,12 +2652,11 @@ export type AppLayout_updateOnboardingStatusMutationVariables = Exact<{
 }>;
 
 export type AppLayout_updateOnboardingStatusMutation = {
-  __typename?: "Mutation";
-} & {
-  updateOnboardingStatus: { __typename?: "User" } & Pick<
-    User,
-    "id" | "onboardingStatus"
-  >;
+  updateOnboardingStatus: {
+    __typename?: "User";
+    id: string;
+    onboardingStatus: { [key: string]: any };
+  };
 };
 
 export type AppLayoutNavbar_UserFragment = {
@@ -2644,11 +2665,15 @@ export type AppLayoutNavbar_UserFragment = {
 
 export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "name" | "updatedAt">;
+  name?: Maybe<string>;
+  updatedAt: string;
+};
 
 export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "name" | "updatedAt">;
+  name?: Maybe<string>;
+  updatedAt: string;
+};
 
 export type HeaderNameEditable_PetitionBaseFragment =
   | HeaderNameEditable_PetitionBase_Petition_Fragment
@@ -2656,31 +2681,33 @@ export type HeaderNameEditable_PetitionBaseFragment =
 
 export type PetitionHeader_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "locale" | "deadline" | "status"> & {
-    myEffectivePermission?: Maybe<
-      { __typename?: "EffectivePetitionUserPermission" } & Pick<
-        EffectivePetitionUserPermission,
-        "isSubscribed"
-      >
-    >;
-  } & HeaderNameEditable_PetitionBase_Petition_Fragment;
+  id: string;
+  locale: PetitionLocale;
+  deadline?: Maybe<string>;
+  status: PetitionStatus;
+  myEffectivePermission?: Maybe<{
+    __typename?: "EffectivePetitionUserPermission";
+    isSubscribed: boolean;
+  }>;
+} & HeaderNameEditable_PetitionBase_Petition_Fragment;
 
-export type PetitionHeader_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "id"
-> & { hasPetitionPdfExport: User["hasFeatureFlag"] };
+export type PetitionHeader_UserFragment = {
+  __typename?: "User";
+  id: string;
+  hasPetitionPdfExport: boolean;
+};
 
 export type PetitionHeader_reopenPetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
 export type PetitionHeader_reopenPetitionMutation = {
-  __typename?: "Mutation";
-} & {
-  reopenPetition: { __typename?: "Petition" } & Pick<
-    Petition,
-    "id" | "status" | "updatedAt"
-  >;
+  reopenPetition: {
+    __typename?: "Petition";
+    id: string;
+    status: PetitionStatus;
+    updatedAt: string;
+  };
 };
 
 export type PetitionHeader_updatePetitionUserSubscriptionMutationVariables =
@@ -2690,30 +2717,27 @@ export type PetitionHeader_updatePetitionUserSubscriptionMutationVariables =
   }>;
 
 export type PetitionHeader_updatePetitionUserSubscriptionMutation = {
-  __typename?: "Mutation";
-} & {
-  updatePetitionUserSubscription: { __typename?: "Petition" } & Pick<
-    Petition,
-    "id"
-  > & {
-      myEffectivePermission?: Maybe<
-        { __typename?: "EffectivePetitionUserPermission" } & Pick<
-          EffectivePetitionUserPermission,
-          "isSubscribed"
-        >
-      >;
-    };
+  updatePetitionUserSubscription: {
+    __typename?: "Petition";
+    id: string;
+    myEffectivePermission?: Maybe<{
+      __typename?: "EffectivePetitionUserPermission";
+      isSubscribed: boolean;
+    }>;
+  };
 };
 
 export type PetitionLayout_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "name"> &
-  PetitionHeader_PetitionFragment;
+  id: string;
+  name?: Maybe<string>;
+} & PetitionHeader_PetitionFragment;
 
 export type PetitionLayout_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "name"> &
-  PetitionTemplateHeader_PetitionTemplateFragment;
+  id: string;
+  name?: Maybe<string>;
+} & PetitionTemplateHeader_PetitionTemplateFragment;
 
 export type PetitionLayout_PetitionBaseFragment =
   | PetitionLayout_PetitionBase_Petition_Fragment
@@ -2726,48 +2750,52 @@ export type PetitionLayout_UserFragment = {
 
 export type PetitionTemplateHeader_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "locale"> &
-  HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
+  id: string;
+  locale: PetitionLocale;
+} & HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionTemplateHeader_UserFragment = {
   __typename?: "User";
-} & Pick<User, "id">;
+  id: string;
+};
 
 export type SettingsLayout_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
 
-export type UserMenu_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "fullName" | "isSuperAdmin" | "role"
->;
+export type UserMenu_UserFragment = {
+  __typename?: "User";
+  fullName?: Maybe<string>;
+  isSuperAdmin: boolean;
+  role: OrganizationRole;
+};
 
 export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
   email: Scalars["String"];
 }>;
 
 export type CreateUserDialog_emailIsAvailableQuery = {
-  __typename?: "Query";
-} & Pick<Query, "emailIsAvailable">;
+  emailIsAvailable: boolean;
+};
 
 export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "emailSubject" | "emailBody"> & {
-    remindersConfig?: Maybe<
-      { __typename?: "RemindersConfig" } & Pick<
-        RemindersConfig,
-        "offset" | "time" | "timezone" | "weekdaysOnly"
-      >
-    >;
-  };
+  emailSubject?: Maybe<string>;
+  emailBody?: Maybe<any>;
+  remindersConfig?: Maybe<{
+    __typename?: "RemindersConfig";
+    offset: number;
+    time: string;
+    timezone: string;
+    weekdaysOnly: boolean;
+  }>;
+};
 
 export type AddPetitionAccessDialog_contactsByEmailQueryVariables = Exact<{
   emails: Array<Scalars["String"]> | Scalars["String"];
 }>;
 
 export type AddPetitionAccessDialog_contactsByEmailQuery = {
-  __typename?: "Query";
-} & {
   contactsByEmail: Array<
     Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
   >;
@@ -2775,46 +2803,50 @@ export type AddPetitionAccessDialog_contactsByEmailQuery = {
 
 export type MessageEventsIndicator_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
-} & Pick<PetitionMessage, "bouncedAt" | "deliveredAt" | "openedAt">;
+  bouncedAt?: Maybe<string>;
+  deliveredAt?: Maybe<string>;
+  openedAt?: Maybe<string>;
+};
 
 export type PetitionAccessTable_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status"> & {
-    accesses: Array<
-      {
-        __typename?: "PetitionAccess";
-      } & PetitionAccessTable_PetitionAccessFragment
-    >;
-  };
+  status: PetitionStatus;
+  accesses: Array<
+    {
+      __typename?: "PetitionAccess";
+    } & PetitionAccessTable_PetitionAccessFragment
+  >;
+};
 
 export type PetitionAccessTable_PetitionAccessRemindersConfigFragment = {
   __typename?: "RemindersConfig";
-} & Pick<RemindersConfig, "offset" | "time" | "timezone" | "weekdaysOnly">;
+  offset: number;
+  time: string;
+  timezone: string;
+  weekdaysOnly: boolean;
+};
 
 export type PetitionAccessTable_PetitionAccessFragment = {
   __typename?: "PetitionAccess";
-} & Pick<
-  PetitionAccess,
-  | "id"
-  | "status"
-  | "nextReminderAt"
-  | "remindersLeft"
-  | "reminderCount"
-  | "remindersActive"
-  | "createdAt"
-> & {
-    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    remindersConfig?: Maybe<
-      {
-        __typename?: "RemindersConfig";
-      } & PetitionAccessTable_PetitionAccessRemindersConfigFragment
-    >;
-  };
+  id: string;
+  status: PetitionAccessStatus;
+  nextReminderAt?: Maybe<string>;
+  remindersLeft: number;
+  reminderCount: number;
+  remindersActive: boolean;
+  createdAt: string;
+  contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  remindersConfig?: Maybe<
+    {
+      __typename?: "RemindersConfig";
+    } & PetitionAccessTable_PetitionAccessRemindersConfigFragment
+  >;
+};
 
 export type PetitionActivityTimeline_PetitionFragment = {
   __typename?: "Petition";
-} & {
-  events: { __typename?: "PetitionEventPagination" } & {
+  events: {
+    __typename?: "PetitionEventPagination";
     items: Array<
       | ({
           __typename?: "AccessActivatedEvent";
@@ -2905,157 +2937,172 @@ export type PetitionActivityTimeline_PetitionFragment = {
 };
 
 export type PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment =
-  { __typename?: "AccessActivatedEvent" } & Pick<AccessActivatedEvent, "id"> &
-    TimelineAccessActivatedEvent_AccessActivatedEventFragment;
+  {
+    __typename?: "AccessActivatedEvent";
+    id: string;
+  } & TimelineAccessActivatedEvent_AccessActivatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_AccessDeactivatedEvent_Fragment =
-  { __typename?: "AccessDeactivatedEvent" } & Pick<
-    AccessDeactivatedEvent,
-    "id"
-  > &
-    TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
+  {
+    __typename?: "AccessDeactivatedEvent";
+    id: string;
+  } & TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_AccessDelegatedEvent_Fragment =
-  { __typename?: "AccessDelegatedEvent" } & Pick<AccessDelegatedEvent, "id"> &
-    TimelineAccessDelegatedEvent_AccessDelegatedEventFragment;
+  {
+    __typename?: "AccessDelegatedEvent";
+    id: string;
+  } & TimelineAccessDelegatedEvent_AccessDelegatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment =
-  { __typename?: "AccessOpenedEvent" } & Pick<AccessOpenedEvent, "id"> &
-    TimelineAccessOpenedEvent_AccessOpenedEventFragment;
+  {
+    __typename?: "AccessOpenedEvent";
+    id: string;
+  } & TimelineAccessOpenedEvent_AccessOpenedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment =
-  { __typename?: "CommentDeletedEvent" } & Pick<CommentDeletedEvent, "id"> &
-    TimelineCommentDeletedEvent_CommentDeletedEventFragment;
+  {
+    __typename?: "CommentDeletedEvent";
+    id: string;
+  } & TimelineCommentDeletedEvent_CommentDeletedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment =
-  { __typename?: "CommentPublishedEvent" } & Pick<CommentPublishedEvent, "id"> &
-    TimelineCommentPublishedEvent_CommentPublishedEventFragment;
+  {
+    __typename?: "CommentPublishedEvent";
+    id: string;
+  } & TimelineCommentPublishedEvent_CommentPublishedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment =
-  { __typename?: "GroupPermissionAddedEvent" } & Pick<
-    GroupPermissionAddedEvent,
-    "id"
-  > &
-    TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment;
+  {
+    __typename?: "GroupPermissionAddedEvent";
+    id: string;
+  } & TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment =
-  { __typename?: "GroupPermissionEditedEvent" } & Pick<
-    GroupPermissionEditedEvent,
-    "id"
-  > &
-    TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment;
+  {
+    __typename?: "GroupPermissionEditedEvent";
+    id: string;
+  } & TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment =
-  { __typename?: "GroupPermissionRemovedEvent" } & Pick<
-    GroupPermissionRemovedEvent,
-    "id"
-  > &
-    TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment;
+  {
+    __typename?: "GroupPermissionRemovedEvent";
+    id: string;
+  } & TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageCancelledEvent_Fragment =
-  { __typename?: "MessageCancelledEvent" } & Pick<MessageCancelledEvent, "id"> &
-    TimelineMessageCancelledEvent_MessageCancelledEventFragment;
+  {
+    __typename?: "MessageCancelledEvent";
+    id: string;
+  } & TimelineMessageCancelledEvent_MessageCancelledEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageScheduledEvent_Fragment =
-  { __typename?: "MessageScheduledEvent" } & Pick<
-    MessageScheduledEvent,
-    "id"
-  > & {
-      message: { __typename?: "PetitionMessage" } & Pick<PetitionMessage, "id">;
-    } & TimelineMessageScheduledEvent_MessageScheduledEventFragment;
+  {
+    __typename?: "MessageScheduledEvent";
+    id: string;
+    message: { __typename?: "PetitionMessage"; id: string };
+  } & TimelineMessageScheduledEvent_MessageScheduledEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_MessageSentEvent_Fragment = {
   __typename?: "MessageSentEvent";
-} & Pick<MessageSentEvent, "id"> &
-  TimelineMessageSentEvent_MessageSentEventFragment;
+  id: string;
+} & TimelineMessageSentEvent_MessageSentEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_OwnershipTransferredEvent_Fragment =
-  { __typename?: "OwnershipTransferredEvent" } & Pick<
-    OwnershipTransferredEvent,
-    "id"
-  > &
-    TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
+  {
+    __typename?: "OwnershipTransferredEvent";
+    id: string;
+  } & TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClosedEvent_Fragment =
-  { __typename?: "PetitionClosedEvent" } & Pick<PetitionClosedEvent, "id"> &
-    TimelinePetitionClosedEvent_PetitionClosedEventFragment;
+  {
+    __typename?: "PetitionClosedEvent";
+    id: string;
+  } & TimelinePetitionClosedEvent_PetitionClosedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionClosedNotifiedEvent_Fragment =
-  { __typename?: "PetitionClosedNotifiedEvent" } & Pick<
-    PetitionClosedNotifiedEvent,
-    "id"
-  > &
-    TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
+  {
+    __typename?: "PetitionClosedNotifiedEvent";
+    id: string;
+  } & TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCompletedEvent_Fragment =
-  { __typename?: "PetitionCompletedEvent" } & Pick<
-    PetitionCompletedEvent,
-    "id"
-  > &
-    TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
+  {
+    __typename?: "PetitionCompletedEvent";
+    id: string;
+  } & TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionCreatedEvent_Fragment =
-  { __typename?: "PetitionCreatedEvent" } & Pick<PetitionCreatedEvent, "id"> &
-    TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
+  {
+    __typename?: "PetitionCreatedEvent";
+    id: string;
+  } & TimelinePetitionCreatedEvent_PetitionCreatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment =
-  { __typename?: "PetitionReopenedEvent" } & Pick<PetitionReopenedEvent, "id"> &
-    TimelinePetitionReopenedEvent_PetitionReopenedEventFragment;
+  {
+    __typename?: "PetitionReopenedEvent";
+    id: string;
+  } & TimelinePetitionReopenedEvent_PetitionReopenedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment =
-  { __typename?: "ReminderSentEvent" } & Pick<ReminderSentEvent, "id"> &
-    TimelineReminderSentEvent_ReminderSentEventFragment;
+  {
+    __typename?: "ReminderSentEvent";
+    id: string;
+  } & TimelineReminderSentEvent_ReminderSentEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment =
-  { __typename?: "ReplyCreatedEvent" } & Pick<ReplyCreatedEvent, "id"> &
-    TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
+  {
+    __typename?: "ReplyCreatedEvent";
+    id: string;
+  } & TimelineReplyCreatedEvent_ReplyCreatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment =
-  { __typename?: "ReplyDeletedEvent" } & Pick<ReplyDeletedEvent, "id"> &
-    TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
+  {
+    __typename?: "ReplyDeletedEvent";
+    id: string;
+  } & TimelineReplyDeletedEvent_ReplyDeletedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment =
-  { __typename?: "ReplyUpdatedEvent" } & Pick<ReplyUpdatedEvent, "id"> &
-    TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
+  {
+    __typename?: "ReplyUpdatedEvent";
+    id: string;
+  } & TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCancelledEvent_Fragment =
-  { __typename?: "SignatureCancelledEvent" } & Pick<
-    SignatureCancelledEvent,
-    "id"
-  > &
-    TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
+  {
+    __typename?: "SignatureCancelledEvent";
+    id: string;
+  } & TimelineSignatureCancelledEvent_SignatureCancelledEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureCompletedEvent_Fragment =
-  { __typename?: "SignatureCompletedEvent" } & Pick<
-    SignatureCompletedEvent,
-    "id"
-  > &
-    TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
+  {
+    __typename?: "SignatureCompletedEvent";
+    id: string;
+  } & TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_SignatureStartedEvent_Fragment =
-  { __typename?: "SignatureStartedEvent" } & Pick<SignatureStartedEvent, "id"> &
-    TimelineSignatureStartedEvent_SignatureStartedEventFragment;
+  {
+    __typename?: "SignatureStartedEvent";
+    id: string;
+  } & TimelineSignatureStartedEvent_SignatureStartedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionAddedEvent_Fragment =
-  { __typename?: "UserPermissionAddedEvent" } & Pick<
-    UserPermissionAddedEvent,
-    "id"
-  > &
-    TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment;
+  {
+    __typename?: "UserPermissionAddedEvent";
+    id: string;
+  } & TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionEditedEvent_Fragment =
-  { __typename?: "UserPermissionEditedEvent" } & Pick<
-    UserPermissionEditedEvent,
-    "id"
-  > &
-    TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment;
+  {
+    __typename?: "UserPermissionEditedEvent";
+    id: string;
+  } & TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_UserPermissionRemovedEvent_Fragment =
-  { __typename?: "UserPermissionRemovedEvent" } & Pick<
-    UserPermissionRemovedEvent,
-    "id"
-  > &
-    TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
+  {
+    __typename?: "UserPermissionRemovedEvent";
+    id: string;
+  } & TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessActivatedEvent_Fragment
@@ -3089,409 +3136,414 @@ export type PetitionActivityTimeline_PetitionEventFragment =
 
 export type PetitionFieldReference_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "title">;
+  title?: Maybe<string>;
+};
 
 export type SentPetitionMessageDialog_PetitionMessageFragment = {
   __typename?: "PetitionMessage";
-} & Pick<
-  PetitionMessage,
-  "emailBody" | "emailSubject" | "sentAt" | "scheduledAt"
-> & {
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+  emailBody?: Maybe<string>;
+  emailSubject?: Maybe<any>;
+  sentAt?: Maybe<string>;
+  scheduledAt?: Maybe<string>;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
+};
 
 export type SentReminderMessageDialog_PetitionReminderFragment = {
   __typename?: "PetitionReminder";
-} & Pick<PetitionReminder, "createdAt" | "emailBody"> & {
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+  createdAt: string;
+  emailBody?: Maybe<string>;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
+};
 
-export type UserReference_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "id" | "fullName" | "status"
->;
+export type UserReference_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: Maybe<string>;
+  status: UserStatus;
+};
 
 export type TimelineAccessActivatedEvent_AccessActivatedEventFragment = {
   __typename?: "AccessActivatedEvent";
-} & Pick<AccessActivatedEvent, "createdAt"> & {
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
+};
 
 export type TimelineAccessDeactivatedEvent_AccessDeactivatedEventFragment = {
   __typename?: "AccessDeactivatedEvent";
-} & Pick<AccessDeactivatedEvent, "createdAt"> & {
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
+};
 
 export type TimelineAccessDelegatedEvent_AccessDelegatedEventFragment = {
   __typename?: "AccessDelegatedEvent";
-} & Pick<AccessDelegatedEvent, "createdAt"> & {
-    originalAccess: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
-    newAccess: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+  createdAt: string;
+  originalAccess: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
+  newAccess: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  };
+};
 
 export type TimelineAccessOpenedEvent_AccessOpenedEventFragment = {
   __typename?: "AccessOpenedEvent";
-} & Pick<AccessOpenedEvent, "createdAt"> & {
-    access: { __typename?: "PetitionAccess" } & {
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
+  createdAt: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   };
+};
 
 export type TimelineCommentDeletedEvent_CommentDeletedEventFragment = {
   __typename?: "CommentDeletedEvent";
-} & Pick<CommentDeletedEvent, "createdAt"> & {
-    field?: Maybe<
-      {
-        __typename?: "PetitionField";
-      } & PetitionFieldReference_PetitionFieldFragment
-    >;
-    deletedBy?: Maybe<
-      | ({ __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        })
-      | ({ __typename?: "User" } & UserReference_UserFragment)
-    >;
-  };
-
-export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
-  __typename?: "CommentPublishedEvent";
-} & Pick<CommentPublishedEvent, "createdAt"> & {
-    field?: Maybe<
-      {
-        __typename?: "PetitionField";
-      } & PetitionFieldReference_PetitionFieldFragment
-    >;
-    comment?: Maybe<
-      { __typename?: "PetitionFieldComment" } & Pick<
-        PetitionFieldComment,
-        "isEdited" | "content"
-      > & {
-          author?: Maybe<
-            | ({ __typename?: "PetitionAccess" } & {
-                contact?: Maybe<
-                  { __typename?: "Contact" } & ContactLink_ContactFragment
-                >;
-              })
-            | ({ __typename?: "User" } & UserReference_UserFragment)
-          >;
-        }
-    >;
-  };
-
-export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment =
-  { __typename?: "GroupPermissionAddedEvent" } & Pick<
-    GroupPermissionAddedEvent,
-    "permissionType" | "createdAt"
-  > & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
-    };
-
-export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment =
-  { __typename?: "GroupPermissionEditedEvent" } & Pick<
-    GroupPermissionEditedEvent,
-    "permissionType" | "createdAt"
-  > & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
-    };
-
-export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment =
-  { __typename?: "GroupPermissionRemovedEvent" } & Pick<
-    GroupPermissionRemovedEvent,
-    "createdAt"
-  > & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      permissionGroup: { __typename?: "UserGroup" } & Pick<UserGroup, "name">;
-    };
-
-export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
-  __typename?: "MessageCancelledEvent";
-} & Pick<MessageCancelledEvent, "createdAt"> & {
-    message: { __typename?: "PetitionMessage" } & Pick<
-      PetitionMessage,
-      "status" | "scheduledAt" | "emailSubject"
-    > & {
-        access: { __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        };
-      };
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-  };
-
-export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
-  __typename?: "MessageScheduledEvent";
-} & Pick<MessageScheduledEvent, "createdAt"> & {
-    message: { __typename?: "PetitionMessage" } & Pick<
-      PetitionMessage,
-      "status" | "scheduledAt" | "emailSubject"
-    > & {
-        sender: { __typename?: "User" } & UserReference_UserFragment;
-        access: { __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        };
-      } & SentPetitionMessageDialog_PetitionMessageFragment;
-  };
-
-export type TimelineMessageSentEvent_MessageSentEventFragment = {
-  __typename?: "MessageSentEvent";
-} & Pick<MessageSentEvent, "createdAt"> & {
-    message: { __typename?: "PetitionMessage" } & Pick<
-      PetitionMessage,
-      "emailSubject" | "scheduledAt"
-    > & {
-        sender: { __typename?: "User" } & UserReference_UserFragment;
-        access: { __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        };
-      } & MessageEventsIndicator_PetitionMessageFragment &
-      SentPetitionMessageDialog_PetitionMessageFragment;
-  };
-
-export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment =
-  { __typename?: "OwnershipTransferredEvent" } & Pick<
-    OwnershipTransferredEvent,
-    "createdAt"
-  > & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      previousOwner?: Maybe<
-        { __typename?: "User" } & UserReference_UserFragment
-      >;
-    };
-
-export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
-  __typename?: "PetitionClosedEvent";
-} & Pick<PetitionClosedEvent, "createdAt"> & {
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-  };
-
-export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment =
-  { __typename?: "PetitionClosedNotifiedEvent" } & Pick<
-    PetitionClosedNotifiedEvent,
-    "createdAt"
-  > & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      access: { __typename?: "PetitionAccess" } & {
+  createdAt: string;
+  field?: Maybe<
+    {
+      __typename?: "PetitionField";
+    } & PetitionFieldReference_PetitionFieldFragment
+  >;
+  deletedBy?: Maybe<
+    | {
+        __typename?: "PetitionAccess";
         contact?: Maybe<
           { __typename?: "Contact" } & ContactLink_ContactFragment
         >;
-      };
-    };
+      }
+    | ({ __typename?: "User" } & UserReference_UserFragment)
+  >;
+};
 
-export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
-  __typename?: "PetitionCompletedEvent";
-} & Pick<PetitionCompletedEvent, "createdAt"> & {
-    access: { __typename?: "PetitionAccess" } & {
+export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
+  __typename?: "CommentPublishedEvent";
+  createdAt: string;
+  field?: Maybe<
+    {
+      __typename?: "PetitionField";
+    } & PetitionFieldReference_PetitionFieldFragment
+  >;
+  comment?: Maybe<{
+    __typename?: "PetitionFieldComment";
+    isEdited: boolean;
+    content: string;
+    author?: Maybe<
+      | {
+          __typename?: "PetitionAccess";
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
+        }
+      | ({ __typename?: "User" } & UserReference_UserFragment)
+    >;
+  }>;
+};
+
+export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment =
+  {
+    __typename?: "GroupPermissionAddedEvent";
+    permissionType: PetitionUserPermissionType;
+    createdAt: string;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionGroup: { __typename?: "UserGroup"; name: string };
+  };
+
+export type TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragment =
+  {
+    __typename?: "GroupPermissionEditedEvent";
+    permissionType: PetitionUserPermissionType;
+    createdAt: string;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionGroup: { __typename?: "UserGroup"; name: string };
+  };
+
+export type TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragment =
+  {
+    __typename?: "GroupPermissionRemovedEvent";
+    createdAt: string;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionGroup: { __typename?: "UserGroup"; name: string };
+  };
+
+export type TimelineMessageCancelledEvent_MessageCancelledEventFragment = {
+  __typename?: "MessageCancelledEvent";
+  createdAt: string;
+  message: {
+    __typename?: "PetitionMessage";
+    status: PetitionMessageStatus;
+    scheduledAt?: Maybe<string>;
+    emailSubject?: Maybe<any>;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  };
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+};
+
+export type TimelineMessageScheduledEvent_MessageScheduledEventFragment = {
+  __typename?: "MessageScheduledEvent";
+  createdAt: string;
+  message: {
+    __typename?: "PetitionMessage";
+    status: PetitionMessageStatus;
+    scheduledAt?: Maybe<string>;
+    emailSubject?: Maybe<any>;
+    sender: { __typename?: "User" } & UserReference_UserFragment;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  } & SentPetitionMessageDialog_PetitionMessageFragment;
+};
+
+export type TimelineMessageSentEvent_MessageSentEventFragment = {
+  __typename?: "MessageSentEvent";
+  createdAt: string;
+  message: {
+    __typename?: "PetitionMessage";
+    emailSubject?: Maybe<any>;
+    scheduledAt?: Maybe<string>;
+    sender: { __typename?: "User" } & UserReference_UserFragment;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  } & MessageEventsIndicator_PetitionMessageFragment &
+    SentPetitionMessageDialog_PetitionMessageFragment;
+};
+
+export type TimelineOwnershipTransferredEvent_OwnershipTransferredEventFragment =
+  {
+    __typename?: "OwnershipTransferredEvent";
+    createdAt: string;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    owner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    previousOwner?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  };
+
+export type TimelinePetitionClosedEvent_PetitionClosedEventFragment = {
+  __typename?: "PetitionClosedEvent";
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+};
+
+export type TimelinePetitionClosedNotifiedEvent_PetitionClosedNotifiedEventFragment =
+  {
+    __typename?: "PetitionClosedNotifiedEvent";
+    createdAt: string;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    access: {
+      __typename?: "PetitionAccess";
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
   };
 
+export type TimelinePetitionCompletedEvent_PetitionCompletedEventFragment = {
+  __typename?: "PetitionCompletedEvent";
+  createdAt: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  };
+};
+
 export type TimelinePetitionCreatedEvent_PetitionCreatedEventFragment = {
   __typename?: "PetitionCreatedEvent";
-} & Pick<PetitionCreatedEvent, "createdAt"> & {
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-  };
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+};
 
 export type TimelinePetitionReopenedEvent_PetitionReopenedEventFragment = {
   __typename?: "PetitionReopenedEvent";
-} & Pick<PetitionReopenedEvent, "createdAt"> & {
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-  };
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+};
 
 export type TimelineReminderSentEvent_ReminderSentEventFragment = {
   __typename?: "ReminderSentEvent";
-} & Pick<ReminderSentEvent, "createdAt"> & {
-    reminder: { __typename?: "PetitionReminder" } & Pick<
-      PetitionReminder,
-      "type"
-    > & {
-        sender?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-        access: { __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        };
-      } & SentReminderMessageDialog_PetitionReminderFragment;
-  };
+  createdAt: string;
+  reminder: {
+    __typename?: "PetitionReminder";
+    type: PetitionReminderType;
+    sender?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  } & SentReminderMessageDialog_PetitionReminderFragment;
+};
 
 export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
   __typename?: "ReplyCreatedEvent";
-} & Pick<ReplyCreatedEvent, "createdAt"> & {
-    field?: Maybe<
-      {
-        __typename?: "PetitionField";
-      } & PetitionFieldReference_PetitionFieldFragment
-    >;
-    createdBy?: Maybe<
-      | ({ __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        })
-      | ({ __typename?: "User" } & UserReference_UserFragment)
-    >;
-  };
+  createdAt: string;
+  field?: Maybe<
+    {
+      __typename?: "PetitionField";
+    } & PetitionFieldReference_PetitionFieldFragment
+  >;
+  createdBy?: Maybe<
+    | {
+        __typename?: "PetitionAccess";
+        contact?: Maybe<
+          { __typename?: "Contact" } & ContactLink_ContactFragment
+        >;
+      }
+    | ({ __typename?: "User" } & UserReference_UserFragment)
+  >;
+};
 
 export type TimelineReplyDeletedEvent_ReplyDeletedEventFragment = {
   __typename?: "ReplyDeletedEvent";
-} & Pick<ReplyDeletedEvent, "createdAt"> & {
-    field?: Maybe<
-      {
-        __typename?: "PetitionField";
-      } & PetitionFieldReference_PetitionFieldFragment
-    >;
-    deletedBy?: Maybe<
-      | ({ __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        })
-      | ({ __typename?: "User" } & UserReference_UserFragment)
-    >;
-  };
+  createdAt: string;
+  field?: Maybe<
+    {
+      __typename?: "PetitionField";
+    } & PetitionFieldReference_PetitionFieldFragment
+  >;
+  deletedBy?: Maybe<
+    | {
+        __typename?: "PetitionAccess";
+        contact?: Maybe<
+          { __typename?: "Contact" } & ContactLink_ContactFragment
+        >;
+      }
+    | ({ __typename?: "User" } & UserReference_UserFragment)
+  >;
+};
 
 export type TimelineReplyUpdatedEvent_ReplyUpdatedEventFragment = {
   __typename?: "ReplyUpdatedEvent";
-} & Pick<ReplyUpdatedEvent, "createdAt"> & {
-    field?: Maybe<
-      {
-        __typename?: "PetitionField";
-      } & PetitionFieldReference_PetitionFieldFragment
-    >;
-    updatedBy?: Maybe<
-      | ({ __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        })
-      | ({ __typename?: "User" } & UserReference_UserFragment)
-    >;
-  };
+  createdAt: string;
+  field?: Maybe<
+    {
+      __typename?: "PetitionField";
+    } & PetitionFieldReference_PetitionFieldFragment
+  >;
+  updatedBy?: Maybe<
+    | {
+        __typename?: "PetitionAccess";
+        contact?: Maybe<
+          { __typename?: "Contact" } & ContactLink_ContactFragment
+        >;
+      }
+    | ({ __typename?: "User" } & UserReference_UserFragment)
+  >;
+};
 
 export type TimelineSignatureCancelledEvent_SignatureCancelledEventFragment = {
   __typename?: "SignatureCancelledEvent";
-} & Pick<
-  SignatureCancelledEvent,
-  "cancelType" | "cancellerReason" | "createdAt"
-> & {
-    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-  };
+  cancelType: PetitionSignatureCancelReason;
+  cancellerReason?: Maybe<string>;
+  createdAt: string;
+  user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+  contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+};
 
 export type TimelineSignatureCompletedEvent_SignatureCompletedEventFragment = {
   __typename?: "SignatureCompletedEvent";
-} & Pick<SignatureCompletedEvent, "createdAt">;
+  createdAt: string;
+};
 
 export type TimelineSignatureStartedEvent_SignatureStartedEventFragment = {
   __typename?: "SignatureStartedEvent";
-} & Pick<SignatureStartedEvent, "createdAt">;
+  createdAt: string;
+};
 
 export type TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment =
-  { __typename?: "UserPermissionAddedEvent" } & Pick<
-    UserPermissionAddedEvent,
-    "permissionType" | "createdAt"
-  > & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      permissionUser?: Maybe<
-        { __typename?: "User" } & UserReference_UserFragment
-      >;
-    };
+  {
+    __typename?: "UserPermissionAddedEvent";
+    permissionType: PetitionUserPermissionType;
+    createdAt: string;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionUser?: Maybe<
+      { __typename?: "User" } & UserReference_UserFragment
+    >;
+  };
 
 export type TimelineUserPermissionEditedEvent_UserPermissionEditedEventFragment =
-  { __typename?: "UserPermissionEditedEvent" } & Pick<
-    UserPermissionEditedEvent,
-    "permissionType" | "createdAt"
-  > & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      permissionUser?: Maybe<
-        { __typename?: "User" } & UserReference_UserFragment
-      >;
-    };
+  {
+    __typename?: "UserPermissionEditedEvent";
+    permissionType: PetitionUserPermissionType;
+    createdAt: string;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionUser?: Maybe<
+      { __typename?: "User" } & UserReference_UserFragment
+    >;
+  };
 
 export type TimelineUserPermissionRemovedEvent_UserPermissionRemovedEventFragment =
-  { __typename?: "UserPermissionRemovedEvent" } & Pick<
-    UserPermissionRemovedEvent,
-    "createdAt"
-  > & {
-      user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
-      permissionUser?: Maybe<
-        { __typename?: "User" } & UserReference_UserFragment
-      >;
-    };
+  {
+    __typename?: "UserPermissionRemovedEvent";
+    createdAt: string;
+    user?: Maybe<{ __typename?: "User" } & UserReference_UserFragment>;
+    permissionUser?: Maybe<
+      { __typename?: "User" } & UserReference_UserFragment
+    >;
+  };
 
 export type PetitionContents_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "title" | "type" | "options"> &
-  filterPetitionFields_PetitionFieldFragment;
+  id: string;
+  title?: Maybe<string>;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+} & filterPetitionFields_PetitionFieldFragment;
 
-export type PetitionSettings_UserFragment = { __typename?: "User" } & {
-  hasPetitionSignature: User["hasFeatureFlag"];
-  hasSkipForwardSecurity: User["hasFeatureFlag"];
-  hasHideRecipientViewContents: User["hasFeatureFlag"];
-} & {
-  organization: { __typename?: "Organization" } & Pick<Organization, "id"> & {
-      signatureIntegrations: Array<
-        {
-          __typename?: "OrgIntegration";
-        } & SignatureConfigDialog_OrgIntegrationFragment
-      >;
-    };
+export type PetitionSettings_UserFragment = {
+  __typename?: "User";
+  hasPetitionSignature: boolean;
+  hasSkipForwardSecurity: boolean;
+  hasHideRecipientViewContents: boolean;
+  organization: {
+    __typename?: "Organization";
+    id: string;
+    signatureIntegrations: Array<
+      {
+        __typename?: "OrgIntegration";
+      } & SignatureConfigDialog_OrgIntegrationFragment
+    >;
+  };
 };
 
 export type PetitionSettings_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<
-  Petition,
-  | "status"
-  | "deadline"
-  | "id"
-  | "locale"
-  | "hasCommentsEnabled"
-  | "skipForwardSecurity"
-  | "isRecipientViewContentsHidden"
-> & {
-    currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<
-        PetitionSignatureRequest,
-        "id" | "status"
-      >
-    >;
-  } & SignatureConfigDialog_PetitionFragment;
+  status: PetitionStatus;
+  deadline?: Maybe<string>;
+  id: string;
+  locale: PetitionLocale;
+  hasCommentsEnabled: boolean;
+  skipForwardSecurity: boolean;
+  isRecipientViewContentsHidden: boolean;
+  currentSignatureRequest?: Maybe<{
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  }>;
+} & SignatureConfigDialog_PetitionFragment;
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<
-  PetitionTemplate,
-  | "id"
-  | "locale"
-  | "hasCommentsEnabled"
-  | "skipForwardSecurity"
-  | "isRecipientViewContentsHidden"
->;
+  id: string;
+  locale: PetitionLocale;
+  hasCommentsEnabled: boolean;
+  skipForwardSecurity: boolean;
+  isRecipientViewContentsHidden: boolean;
+};
 
 export type PetitionSettings_PetitionBaseFragment =
   | PetitionSettings_PetitionBase_Petition_Fragment
@@ -3503,12 +3555,11 @@ export type PetitionSettings_cancelPetitionSignatureRequestMutationVariables =
   }>;
 
 export type PetitionSettings_cancelPetitionSignatureRequestMutation = {
-  __typename?: "Mutation";
-} & {
-  cancelSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
-    PetitionSignatureRequest,
-    "id" | "status"
-  >;
+  cancelSignatureRequest: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  };
 };
 
 export type PetitionSettings_startPetitionSignatureRequestMutationVariables =
@@ -3517,95 +3568,91 @@ export type PetitionSettings_startPetitionSignatureRequestMutationVariables =
   }>;
 
 export type PetitionSettings_startPetitionSignatureRequestMutation = {
-  __typename?: "Mutation";
-} & {
-  startSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
-    PetitionSignatureRequest,
-    "id" | "status"
-  >;
+  startSignatureRequest: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  };
 };
 
 export type PetitionSharingModal_Petition_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "name"> & {
-    permissions: Array<
-      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-          PetitionUserGroupPermission,
-          "permissionType"
-        > & {
-            group: { __typename?: "UserGroup" } & Pick<
-              UserGroup,
-              "id" | "name"
-            > & {
-                members: Array<
-                  { __typename?: "UserGroupMember" } & {
-                    user: {
-                      __typename?: "User";
-                    } & PetitionSharingModal_UserFragment;
-                  }
-                >;
-              };
-          })
-      | ({ __typename?: "PetitionUserPermission" } & Pick<
-          PetitionUserPermission,
-          "permissionType"
-        > & {
-            user: { __typename?: "User" } & Pick<User, "id"> &
-              PetitionSharingModal_UserFragment;
-          })
-    >;
-  };
+  id: string;
+  name?: Maybe<string>;
+  permissions: Array<
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        permissionType: PetitionUserPermissionType;
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          members: Array<{
+            __typename?: "UserGroupMember";
+            user: { __typename?: "User" } & PetitionSharingModal_UserFragment;
+          }>;
+        };
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        permissionType: PetitionUserPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+        } & PetitionSharingModal_UserFragment;
+      }
+  >;
+};
 
 export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "name"> & {
-    permissions: Array<
-      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-          PetitionUserGroupPermission,
-          "permissionType"
-        > & {
-            group: { __typename?: "UserGroup" } & Pick<
-              UserGroup,
-              "id" | "name"
-            > & {
-                members: Array<
-                  { __typename?: "UserGroupMember" } & {
-                    user: {
-                      __typename?: "User";
-                    } & PetitionSharingModal_UserFragment;
-                  }
-                >;
-              };
-          })
-      | ({ __typename?: "PetitionUserPermission" } & Pick<
-          PetitionUserPermission,
-          "permissionType"
-        > & {
-            user: { __typename?: "User" } & Pick<User, "id"> &
-              PetitionSharingModal_UserFragment;
-          })
-    >;
-  };
+  id: string;
+  name?: Maybe<string>;
+  permissions: Array<
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        permissionType: PetitionUserPermissionType;
+        group: {
+          __typename?: "UserGroup";
+          id: string;
+          name: string;
+          members: Array<{
+            __typename?: "UserGroupMember";
+            user: { __typename?: "User" } & PetitionSharingModal_UserFragment;
+          }>;
+        };
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        permissionType: PetitionUserPermissionType;
+        user: {
+          __typename?: "User";
+          id: string;
+        } & PetitionSharingModal_UserFragment;
+      }
+  >;
+};
 
 export type PetitionSharingModal_PetitionFragment =
   | PetitionSharingModal_Petition_Petition_Fragment
   | PetitionSharingModal_Petition_PetitionTemplate_Fragment;
 
-export type PetitionSharingModal_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "id" | "email" | "fullName"
-> &
-  UserSelect_UserFragment;
+export type PetitionSharingModal_UserFragment = {
+  __typename?: "User";
+  id: string;
+  email: string;
+  fullName?: Maybe<string>;
+} & UserSelect_UserFragment;
 
 export type PetitionSharingModal_UserGroupFragment = {
   __typename?: "UserGroup";
-} & Pick<UserGroup, "id" | "name"> & {
-    members: Array<
-      { __typename?: "UserGroupMember" } & {
-        user: { __typename?: "User" } & PetitionSharingModal_UserFragment;
-      }
-    >;
-  };
+  id: string;
+  name: string;
+  members: Array<{
+    __typename?: "UserGroupMember";
+    user: { __typename?: "User" } & PetitionSharingModal_UserFragment;
+  }>;
+};
 
 export type PetitionSharingModal_addPetitionUserPermissionMutationVariables =
   Exact<{
@@ -3619,8 +3666,6 @@ export type PetitionSharingModal_addPetitionUserPermissionMutationVariables =
   }>;
 
 export type PetitionSharingModal_addPetitionUserPermissionMutation = {
-  __typename?: "Mutation";
-} & {
   addPetitionUserPermission: Array<
     {
       __typename?: "Petition";
@@ -3636,8 +3681,6 @@ export type PetitionSharingModal_removePetitionUserPermissionMutationVariables =
   }>;
 
 export type PetitionSharingModal_removePetitionUserPermissionMutation = {
-  __typename?: "Mutation";
-} & {
   removePetitionUserPermission: Array<
     {
       __typename?: "Petition";
@@ -3652,8 +3695,6 @@ export type PetitionSharingModal_transferPetitionOwnershipMutationVariables =
   }>;
 
 export type PetitionSharingModal_transferPetitionOwnershipMutation = {
-  __typename?: "Mutation";
-} & {
   transferPetitionOwnership: Array<
     {
       __typename?: "Petition";
@@ -3667,8 +3708,6 @@ export type PetitionSharingModal_PetitionsUserPermissionsQueryVariables =
   }>;
 
 export type PetitionSharingModal_PetitionsUserPermissionsQuery = {
-  __typename?: "Query";
-} & {
   petitionsById: Array<
     Maybe<
       | ({
@@ -3683,28 +3722,30 @@ export type PetitionSharingModal_PetitionsUserPermissionsQuery = {
 
 export type SignatureConfigDialog_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "name" | "status"> & {
-    signatureConfig?: Maybe<
-      { __typename?: "SignatureConfig" } & Pick<
-        SignatureConfig,
-        "provider" | "title" | "review"
-      > & {
-          contacts: Array<
-            Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
-          >;
-        }
+  name?: Maybe<string>;
+  status: PetitionStatus;
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    provider: string;
+    title: string;
+    review: boolean;
+    contacts: Array<
+      Maybe<{ __typename?: "Contact" } & ContactSelect_ContactFragment>
     >;
-  };
+  }>;
+};
 
 export type SignatureConfigDialog_OrgIntegrationFragment = {
   __typename?: "OrgIntegration";
-} & { label: OrgIntegration["name"]; value: OrgIntegration["provider"] };
+  label: string;
+  value: string;
+};
 
 export type useTemplateDetailsDialogPetitionQueryVariables = Exact<{
   templateId: Scalars["GID"];
 }>;
 
-export type useTemplateDetailsDialogPetitionQuery = { __typename?: "Query" } & {
+export type useTemplateDetailsDialogPetitionQuery = {
   petition?: Maybe<
     | { __typename?: "Petition" }
     | ({
@@ -3715,26 +3756,28 @@ export type useTemplateDetailsDialogPetitionQuery = { __typename?: "Query" } & {
 
 export type TemplateDetailsDialog_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "description" | "name" | "updatedAt"> & {
-    fields: Array<
-      { __typename?: "PetitionField" } & Pick<
-        PetitionField,
-        "id" | "title" | "type" | "options"
-      >
-    >;
-    owner: { __typename?: "User" } & Pick<User, "id" | "fullName"> & {
-        organization: { __typename?: "Organization" } & Pick<
-          Organization,
-          "id" | "name"
-        >;
-      };
-    myEffectivePermission?: Maybe<
-      { __typename?: "EffectivePetitionUserPermission" } & Pick<
-        EffectivePetitionUserPermission,
-        "permissionType"
-      >
-    >;
+  id: string;
+  description?: Maybe<string>;
+  name?: Maybe<string>;
+  updatedAt: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    title?: Maybe<string>;
+    type: PetitionFieldType;
+    options: { [key: string]: any };
+  }>;
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: Maybe<string>;
+    organization: { __typename?: "Organization"; id: string; name: string };
   };
+  myEffectivePermission?: Maybe<{
+    __typename?: "EffectivePetitionUserPermission";
+    permissionType: PetitionUserPermissionType;
+  }>;
+};
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables =
   Exact<{
@@ -3744,12 +3787,11 @@ export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables 
   }>;
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutation = {
-  __typename?: "Mutation";
-} & {
-  uploadDynamicSelectFieldFile: { __typename?: "PetitionField" } & Pick<
-    PetitionField,
-    "id" | "options"
-  >;
+  uploadDynamicSelectFieldFile: {
+    __typename?: "PetitionField";
+    id: string;
+    options: { [key: string]: any };
+  };
 };
 
 export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVariables =
@@ -3759,119 +3801,129 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVari
   }>;
 
 export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
-  __typename?: "Mutation";
-} & {
   dynamicSelectFieldFileDownloadLink: {
     __typename?: "FileUploadReplyDownloadLinkResult";
-  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+    result: Result;
+    url?: Maybe<string>;
+  };
 };
 
 export type PetitionComposeField_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<
-  PetitionField,
-  | "id"
-  | "type"
-  | "title"
-  | "description"
-  | "optional"
-  | "multiple"
-  | "isFixed"
-  | "isReadOnly"
-  | "visibility"
-> &
-  SelectTypeFieldOptions_PetitionFieldFragment &
+  id: string;
+  type: PetitionFieldType;
+  title?: Maybe<string>;
+  description?: Maybe<string>;
+  optional: boolean;
+  multiple: boolean;
+  isFixed: boolean;
+  isReadOnly: boolean;
+  visibility?: Maybe<{ [key: string]: any }>;
+} & SelectTypeFieldOptions_PetitionFieldFragment &
   PetitionFieldVisibilityEditor_PetitionFieldFragment;
 
 export type PetitionComposeFieldList_PetitionFragment = {
   __typename?: "Petition";
-} & {
   fields: Array<
-    { __typename?: "PetitionField" } & Pick<PetitionField, "isFixed"> &
-      PetitionComposeField_PetitionFieldFragment &
+    {
+      __typename?: "PetitionField";
+      isFixed: boolean;
+    } & PetitionComposeField_PetitionFieldFragment &
       ReferencedFieldDialogDialog_PetitionFieldFragment
   >;
 };
 
 export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<
-  PetitionField,
-  | "id"
-  | "type"
-  | "optional"
-  | "multiple"
-  | "options"
-  | "isReadOnly"
-  | "isFixed"
-  | "position"
-  | "visibility"
->;
+  id: string;
+  type: PetitionFieldType;
+  optional: boolean;
+  multiple: boolean;
+  options: { [key: string]: any };
+  isReadOnly: boolean;
+  isFixed: boolean;
+  position: number;
+  visibility?: Maybe<{ [key: string]: any }>;
+};
 
 export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "multiple" | "options" | "isReadOnly"> &
-  PetitionFieldSelect_PetitionFieldFragment;
+  id: string;
+  type: PetitionFieldType;
+  multiple: boolean;
+  options: { [key: string]: any };
+  isReadOnly: boolean;
+} & PetitionFieldSelect_PetitionFieldFragment;
 
 export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "emailSubject" | "emailBody" | "description">;
+  id: string;
+  emailSubject?: Maybe<string>;
+  emailBody?: Maybe<any>;
+  description?: Maybe<string>;
+};
 
 export type ReferencedFieldDialogDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "title" | "type">;
+  id: string;
+  title?: Maybe<string>;
+  type: PetitionFieldType;
+};
 
 export type SelectTypeFieldOptions_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "options">;
+  id: string;
+  options: { [key: string]: any };
+};
 
-export type ExportRepliesDialog_UserFragment = { __typename?: "User" } & {
-  hasExportCuatrecasas: User["hasFeatureFlag"];
+export type ExportRepliesDialog_UserFragment = {
+  __typename?: "User";
+  hasExportCuatrecasas: boolean;
 };
 
 export type ExportRepliesDialog_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type"> & {
-    replies: Array<
-      {
-        __typename?: "PetitionFieldReply";
-      } & useFilenamePlaceholdersRename_PetitionFieldReplyFragment
-    >;
-  } & useFilenamePlaceholdersRename_PetitionFieldFragment;
+  id: string;
+  type: PetitionFieldType;
+  replies: Array<
+    {
+      __typename?: "PetitionFieldReply";
+    } & useFilenamePlaceholdersRename_PetitionFieldReplyFragment
+  >;
+} & useFilenamePlaceholdersRename_PetitionFieldFragment;
 
 export type ExportRepliesProgressDialog_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id"> & {
-    fields: Array<
-      { __typename?: "PetitionField" } & Pick<PetitionField, "id" | "type"> & {
-          replies: Array<
-            { __typename?: "PetitionFieldReply" } & Pick<
-              PetitionFieldReply,
-              "id" | "metadata"
-            > &
-              useFilenamePlaceholdersRename_PetitionFieldReplyFragment
-          >;
-        } & useFilenamePlaceholdersRename_PetitionFieldFragment
-    >;
-    currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<
-        PetitionSignatureRequest,
-        | "id"
-        | "status"
-        | "signedDocumentFilename"
-        | "auditTrailFilename"
-        | "metadata"
-      >
-    >;
-  };
+  id: string;
+  fields: Array<
+    {
+      __typename?: "PetitionField";
+      id: string;
+      type: PetitionFieldType;
+      replies: Array<
+        {
+          __typename?: "PetitionFieldReply";
+          id: string;
+          metadata: { [key: string]: any };
+        } & useFilenamePlaceholdersRename_PetitionFieldReplyFragment
+      >;
+    } & useFilenamePlaceholdersRename_PetitionFieldFragment
+  >;
+  currentSignatureRequest?: Maybe<{
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+    signedDocumentFilename?: Maybe<string>;
+    auditTrailFilename?: Maybe<string>;
+    metadata: { [key: string]: any };
+  }>;
+};
 
 export type ExportRepliesProgressDialog_PetitionRepliesQueryVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
 export type ExportRepliesProgressDialog_PetitionRepliesQuery = {
-  __typename?: "Query";
-} & {
   petition?: Maybe<
     | ({
         __typename?: "Petition";
@@ -3887,11 +3939,11 @@ export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVaria
   }>;
 
 export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
-  __typename?: "Mutation";
-} & {
   fileUploadReplyDownloadLink: {
     __typename?: "FileUploadReplyDownloadLinkResult";
-  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+    result: Result;
+    url?: Maybe<string>;
+  };
 };
 
 export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariables =
@@ -3901,11 +3953,12 @@ export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariab
   }>;
 
 export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
-  __typename?: "Mutation";
-} & {
   signedPetitionDownloadLink: {
     __typename?: "FileUploadReplyDownloadLinkResult";
-  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "filename" | "url">;
+    result: Result;
+    filename?: Maybe<string>;
+    url?: Maybe<string>;
+  };
 };
 
 export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutationVariables =
@@ -3916,10 +3969,12 @@ export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation
   }>;
 
 export type ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation =
-  { __typename?: "Mutation" } & {
+  {
     updatePetitionFieldReplyMetadata: {
       __typename?: "PetitionFieldReply";
-    } & Pick<PetitionFieldReply, "id" | "metadata">;
+      id: string;
+      metadata: { [key: string]: any };
+    };
   };
 
 export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVariables =
@@ -3929,91 +3984,100 @@ export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationVa
   }>;
 
 export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation =
-  { __typename?: "Mutation" } & {
+  {
     updateSignatureRequestMetadata: {
       __typename?: "PetitionSignatureRequest";
-    } & Pick<PetitionSignatureRequest, "id" | "metadata">;
+      id: string;
+      metadata: { [key: string]: any };
+    };
   };
 
 export type PetitionRepliesField_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<
-  PetitionField,
-  "id" | "type" | "title" | "description" | "validated"
-> & {
-    replies: Array<
-      {
-        __typename?: "PetitionFieldReply";
-      } & PetitionRepliesField_PetitionFieldReplyFragment
-    >;
-    comments: Array<
-      { __typename?: "PetitionFieldComment" } & Pick<
-        PetitionFieldComment,
-        "id" | "isUnread" | "publishedAt"
-      >
-    >;
-  };
+  id: string;
+  type: PetitionFieldType;
+  title?: Maybe<string>;
+  description?: Maybe<string>;
+  validated: boolean;
+  replies: Array<
+    {
+      __typename?: "PetitionFieldReply";
+    } & PetitionRepliesField_PetitionFieldReplyFragment
+  >;
+  comments: Array<{
+    __typename?: "PetitionFieldComment";
+    id: string;
+    isUnread: boolean;
+    publishedAt?: Maybe<string>;
+  }>;
+};
 
 export type PetitionRepliesField_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-} & Pick<PetitionFieldReply, "id"> &
-  PetitionRepliesFieldReply_PetitionFieldReplyFragment;
+  id: string;
+} & PetitionRepliesFieldReply_PetitionFieldReplyFragment;
 
 export type PetitionRepliesFieldComments_UserFragment = {
   __typename?: "User";
-} & Pick<User, "id"> & { hasInternalComments: User["hasFeatureFlag"] };
+  id: string;
+  hasInternalComments: boolean;
+};
 
 export type PetitionRepliesFieldComments_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "title" | "type"> & {
-    comments: Array<
-      {
-        __typename?: "PetitionFieldComment";
-      } & PetitionRepliesFieldComments_PetitionFieldCommentFragment
-    >;
-    replies: Array<
-      {
-        __typename?: "PetitionFieldReply";
-      } & PetitionRepliesFieldComments_PetitionFieldReplyFragment
-    >;
-  };
+  title?: Maybe<string>;
+  type: PetitionFieldType;
+  comments: Array<
+    {
+      __typename?: "PetitionFieldComment";
+    } & PetitionRepliesFieldComments_PetitionFieldCommentFragment
+  >;
+  replies: Array<
+    {
+      __typename?: "PetitionFieldReply";
+    } & PetitionRepliesFieldComments_PetitionFieldReplyFragment
+  >;
+};
 
 export type PetitionRepliesFieldComments_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-} & Pick<PetitionFieldReply, "id" | "content">;
+  id: string;
+  content: { [key: string]: any };
+};
 
 export type PetitionRepliesFieldComments_PetitionFieldCommentFragment = {
   __typename?: "PetitionFieldComment";
-} & MakeOptional<
-  Pick<
-    PetitionFieldComment,
-    "id" | "content" | "publishedAt" | "isUnread" | "isEdited" | "isInternal"
-  >,
-  "isInternal"
-> & {
-    author?: Maybe<
-      | ({ __typename?: "PetitionAccess" } & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        })
-      | ({ __typename?: "User" } & UserReference_UserFragment)
-    >;
-  };
+  id: string;
+  content: string;
+  publishedAt?: Maybe<string>;
+  isUnread: boolean;
+  isEdited: boolean;
+  isInternal?: Maybe<boolean>;
+  author?: Maybe<
+    | {
+        __typename?: "PetitionAccess";
+        contact?: Maybe<
+          { __typename?: "Contact" } & ContactLink_ContactFragment
+        >;
+      }
+    | ({ __typename?: "User" } & UserReference_UserFragment)
+  >;
+};
 
 export type PetitionRepliesFieldReply_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-} & Pick<
-  PetitionFieldReply,
-  "id" | "content" | "status" | "createdAt" | "metadata"
-> & {
-    field?: Maybe<
-      { __typename?: "PetitionField" } & Pick<PetitionField, "type">
-    >;
-  };
+  id: string;
+  content: { [key: string]: any };
+  status: PetitionFieldReplyStatus;
+  createdAt: string;
+  metadata: { [key: string]: any };
+  field?: Maybe<{ __typename?: "PetitionField"; type: PetitionFieldType }>;
+};
 
-export type PetitionSignaturesCard_UserFragment = { __typename?: "User" } & {
-  organization: { __typename?: "Organization" } & {
+export type PetitionSignaturesCard_UserFragment = {
+  __typename?: "User";
+  organization: {
+    __typename?: "Organization";
     signatureIntegrations: Array<
       {
         __typename?: "OrgIntegration";
@@ -4024,32 +4088,35 @@ export type PetitionSignaturesCard_UserFragment = { __typename?: "User" } & {
 
 export type PetitionSignaturesCard_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "status"> & {
-    signatureConfig?: Maybe<
-      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "timezone"> & {
-          contacts: Array<
-            Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
-          >;
-        }
+  id: string;
+  status: PetitionStatus;
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    timezone: string;
+    contacts: Array<
+      Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
     >;
-    signatureRequests?: Maybe<
-      Array<
-        {
-          __typename?: "PetitionSignatureRequest";
-        } & PetitionSignaturesCard_PetitionSignatureRequestFragment
-      >
-    >;
-  } & SignatureConfigDialog_PetitionFragment;
+  }>;
+  signatureRequests?: Maybe<
+    Array<
+      {
+        __typename?: "PetitionSignatureRequest";
+      } & PetitionSignaturesCard_PetitionSignatureRequestFragment
+    >
+  >;
+} & SignatureConfigDialog_PetitionFragment;
 
 export type PetitionSignaturesCard_PetitionSignatureRequestFragment = {
   __typename?: "PetitionSignatureRequest";
-} & Pick<PetitionSignatureRequest, "id" | "status"> & {
-    signatureConfig: { __typename?: "SignatureConfig" } & {
-      contacts: Array<
-        Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
-      >;
-    };
+  id: string;
+  status: PetitionSignatureRequestStatus;
+  signatureConfig: {
+    __typename?: "SignatureConfig";
+    contacts: Array<
+      Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>
+    >;
   };
+};
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariables =
   Exact<{
@@ -4058,8 +4125,6 @@ export type PetitionSignaturesCard_updatePetitionSignatureConfigMutationVariable
   }>;
 
 export type PetitionSignaturesCard_updatePetitionSignatureConfigMutation = {
-  __typename?: "Mutation";
-} & {
   updatePetition:
     | ({ __typename?: "Petition" } & PetitionSignaturesCard_PetitionFragment)
     | { __typename?: "PetitionTemplate" };
@@ -4071,12 +4136,11 @@ export type PetitionSignaturesCard_cancelSignatureRequestMutationVariables =
   }>;
 
 export type PetitionSignaturesCard_cancelSignatureRequestMutation = {
-  __typename?: "Mutation";
-} & {
-  cancelSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
-    PetitionSignatureRequest,
-    "id" | "status"
-  >;
+  cancelSignatureRequest: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  };
 };
 
 export type PetitionSignaturesCard_startSignatureRequestMutationVariables =
@@ -4085,12 +4149,11 @@ export type PetitionSignaturesCard_startSignatureRequestMutationVariables =
   }>;
 
 export type PetitionSignaturesCard_startSignatureRequestMutation = {
-  __typename?: "Mutation";
-} & {
-  startSignatureRequest: { __typename?: "PetitionSignatureRequest" } & Pick<
-    PetitionSignatureRequest,
-    "id" | "status"
-  >;
+  startSignatureRequest: {
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  };
 };
 
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables =
@@ -4100,65 +4163,70 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables =
   }>;
 
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
-  __typename?: "Mutation";
-} & {
   signedPetitionDownloadLink: {
     __typename?: "FileUploadReplyDownloadLinkResult";
-  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+    result: Result;
+    url?: Maybe<string>;
+  };
 };
 
 export type useCompleteSignerInfoDialog_PublicContactFragment = {
   __typename?: "PublicContact";
-} & Pick<PublicContact, "firstName" | "lastName" | "email">;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
+  email: string;
+};
 
 export type RecipientViewContentsCard_PublicUserFragment = {
   __typename?: "PublicUser";
-} & Pick<PublicUser, "firstName">;
+  firstName?: Maybe<string>;
+};
 
 export type RecipientViewContentsCard_PublicPetitionFragment = {
   __typename?: "PublicPetition";
-} & Pick<PublicPetition, "status"> & {
-    fields: Array<
-      {
-        __typename?: "PublicPetitionField";
-      } & RecipientViewContentsCard_PublicPetitionFieldFragment
-    >;
-  };
+  status: PetitionStatus;
+  fields: Array<
+    {
+      __typename?: "PublicPetitionField";
+    } & RecipientViewContentsCard_PublicPetitionFieldFragment
+  >;
+};
 
 export type RecipientViewContentsCard_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-} & Pick<
-  PublicPetitionField,
-  | "id"
-  | "type"
-  | "title"
-  | "options"
-  | "optional"
-  | "isReadOnly"
-  | "commentCount"
-  | "unpublishedCommentCount"
-  | "unreadCommentCount"
-> & {
-    replies: Array<
-      { __typename?: "PublicPetitionFieldReply" } & Pick<
-        PublicPetitionFieldReply,
-        "id"
-      >
-    >;
-  } & useFieldVisibility_PublicPetitionFieldFragment;
+  id: string;
+  type: PetitionFieldType;
+  title?: Maybe<string>;
+  options: { [key: string]: any };
+  optional: boolean;
+  isReadOnly: boolean;
+  commentCount: number;
+  unpublishedCommentCount: number;
+  unreadCommentCount: number;
+  replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+} & useFieldVisibility_PublicPetitionFieldFragment;
 
 export type RecipientViewHeader_PublicContactFragment = {
   __typename?: "PublicContact";
-} & Pick<PublicContact, "id" | "fullName" | "firstName" | "email">;
+  id: string;
+  fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  email: string;
+};
 
 export type RecipientViewHeader_PublicUserFragment = {
   __typename?: "PublicUser";
-} & Pick<PublicUser, "id" | "firstName" | "fullName" | "email"> & {
-    organization: { __typename?: "PublicOrganization" } & Pick<
-      PublicOrganization,
-      "name" | "identifier" | "logoUrl"
-    >;
+  id: string;
+  firstName?: Maybe<string>;
+  fullName?: Maybe<string>;
+  email: string;
+  organization: {
+    __typename?: "PublicOrganization";
+    name: string;
+    identifier: string;
+    logoUrl?: Maybe<string>;
   };
+};
 
 export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables =
   Exact<{
@@ -4170,48 +4238,40 @@ export type RecipientViewHeader_publicDelegateAccessToContactMutationVariables =
   }>;
 
 export type RecipientViewHeader_publicDelegateAccessToContactMutation = {
-  __typename?: "Mutation";
-} & {
-  publicDelegateAccessToContact: { __typename?: "PublicPetitionAccess" } & {
-    petition?: Maybe<
-      { __typename?: "PublicPetition" } & Pick<PublicPetition, "id"> & {
-          recipients: Array<
-            { __typename?: "PublicContact" } & Pick<
-              PublicContact,
-              "id" | "fullName" | "email"
-            >
-          >;
-        }
-    >;
+  publicDelegateAccessToContact: {
+    __typename?: "PublicPetitionAccess";
+    petition?: Maybe<{
+      __typename?: "PublicPetition";
+      id: string;
+      recipients: Array<{
+        __typename?: "PublicContact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    }>;
   };
 };
 
 export type RecipientViewProgressFooter_PublicPetitionFragment = {
   __typename?: "PublicPetition";
-} & Pick<PublicPetition, "status"> & {
-    fields: Array<
-      {
-        __typename?: "PublicPetitionField";
-      } & RecipientViewProgressFooter_PublicPetitionFieldFragment
-    >;
-    signature?: Maybe<
-      { __typename?: "PublicSignatureConfig" } & Pick<
-        PublicSignatureConfig,
-        "review"
-      >
-    >;
-  };
+  status: PetitionStatus;
+  fields: Array<
+    {
+      __typename?: "PublicPetitionField";
+    } & RecipientViewProgressFooter_PublicPetitionFieldFragment
+  >;
+  signature?: Maybe<{ __typename?: "PublicSignatureConfig"; review: boolean }>;
+};
 
 export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-} & Pick<PublicPetitionField, "id" | "type" | "optional" | "isReadOnly"> & {
-    replies: Array<
-      { __typename?: "PublicPetitionFieldReply" } & Pick<
-        PublicPetitionFieldReply,
-        "id"
-      >
-    >;
-  } & useFieldVisibility_PublicPetitionFieldFragment;
+  id: string;
+  type: PetitionFieldType;
+  optional: boolean;
+  isReadOnly: boolean;
+  replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
+} & useFieldVisibility_PublicPetitionFieldFragment;
 
 export type RecipientViewPetitionField_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
@@ -4227,63 +4287,55 @@ export type RecipientViewPetitionFieldCard_PublicPetitionAccessFragment = {
 
 export type RecipientViewPetitionFieldCard_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-} & Pick<
-  PublicPetitionField,
-  | "id"
-  | "type"
-  | "title"
-  | "description"
-  | "options"
-  | "optional"
-  | "multiple"
-  | "validated"
-  | "commentCount"
-  | "unpublishedCommentCount"
-  | "unreadCommentCount"
-> & {
-    replies: Array<
-      {
-        __typename?: "PublicPetitionFieldReply";
-      } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment
-    >;
-  } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment;
+  id: string;
+  type: PetitionFieldType;
+  title?: Maybe<string>;
+  description?: Maybe<string>;
+  options: { [key: string]: any };
+  optional: boolean;
+  multiple: boolean;
+  validated: boolean;
+  commentCount: number;
+  unpublishedCommentCount: number;
+  unreadCommentCount: number;
+  replies: Array<
+    {
+      __typename?: "PublicPetitionFieldReply";
+    } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment
+  >;
+} & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment;
 
 export type RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment = {
   __typename?: "PublicPetitionFieldReply";
-} & Pick<
-  PublicPetitionFieldReply,
-  "id" | "status" | "content" | "createdAt" | "updatedAt"
->;
+  id: string;
+  status: PetitionFieldReplyStatus;
+  content: { [key: string]: any };
+  createdAt: string;
+  updatedAt: string;
+};
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionAccessFragment =
-  { __typename?: "PublicPetitionAccess" } & {
-    granter?: Maybe<
-      { __typename?: "PublicUser" } & Pick<PublicUser, "fullName">
-    >;
-    contact?: Maybe<
-      { __typename?: "PublicContact" } & Pick<PublicContact, "id">
-    >;
+  {
+    __typename?: "PublicPetitionAccess";
+    granter?: Maybe<{ __typename?: "PublicUser"; fullName?: Maybe<string> }>;
+    contact?: Maybe<{ __typename?: "PublicContact"; id: string }>;
   };
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldFragment =
-  { __typename?: "PublicPetitionField" } & Pick<
-    PublicPetitionField,
-    "id" | "title"
-  >;
+  { __typename?: "PublicPetitionField"; id: string; title?: Maybe<string> };
 
 export type RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment =
-  { __typename?: "PublicPetitionFieldComment" } & Pick<
-    PublicPetitionFieldComment,
-    "id" | "content" | "publishedAt" | "isUnread"
-  > & {
-      author?: Maybe<
-        | ({ __typename?: "PublicContact" } & Pick<
-            PublicContact,
-            "id" | "fullName"
-          >)
-        | ({ __typename?: "PublicUser" } & Pick<PublicUser, "id" | "fullName">)
-      >;
-    };
+  {
+    __typename?: "PublicPetitionFieldComment";
+    id: string;
+    content: string;
+    publishedAt?: Maybe<string>;
+    isUnread: boolean;
+    author?: Maybe<
+      | { __typename?: "PublicContact"; id: string; fullName?: Maybe<string> }
+      | { __typename?: "PublicUser"; id: string; fullName?: Maybe<string> }
+    >;
+  };
 
 export type RecipientViewPetitionFieldCommentsQueryVariables = Exact<{
   keycode: Scalars["ID"];
@@ -4291,8 +4343,6 @@ export type RecipientViewPetitionFieldCommentsQueryVariables = Exact<{
 }>;
 
 export type RecipientViewPetitionFieldCommentsQuery = {
-  __typename?: "Query";
-} & {
   petitionFieldComments: Array<
     {
       __typename?: "PublicPetitionFieldComment";
@@ -4307,13 +4357,12 @@ export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAs
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation =
-  { __typename?: "Mutation" } & {
-    publicMarkPetitionFieldCommentsAsRead: Array<
-      { __typename?: "PublicPetitionFieldComment" } & Pick<
-        PublicPetitionFieldComment,
-        "id" | "isUnread"
-      >
-    >;
+  {
+    publicMarkPetitionFieldCommentsAsRead: Array<{
+      __typename?: "PublicPetitionFieldComment";
+      id: string;
+      isUnread: boolean;
+    }>;
   };
 
 export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables =
@@ -4324,7 +4373,7 @@ export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentM
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation =
-  { __typename?: "Mutation" } & {
+  {
     publicCreatePetitionFieldComment: {
       __typename?: "PublicPetitionFieldComment";
     } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
@@ -4339,7 +4388,7 @@ export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentM
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation =
-  { __typename?: "Mutation" } & {
+  {
     publicUpdatePetitionFieldComment: {
       __typename?: "PublicPetitionFieldComment";
     } & RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment;
@@ -4353,16 +4402,15 @@ export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentM
   }>;
 
 export type RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation =
-  { __typename?: "Mutation" } & Pick<
-    Mutation,
-    "publicDeletePetitionFieldComment"
-  >;
+  { publicDeletePetitionFieldComment: Result };
 
 export type RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentCountsFragment =
-  { __typename?: "PublicPetitionField" } & Pick<
-    PublicPetitionField,
-    "commentCount" | "unpublishedCommentCount" | "unreadCommentCount"
-  >;
+  {
+    __typename?: "PublicPetitionField";
+    commentCount: number;
+    unpublishedCommentCount: number;
+    unreadCommentCount: number;
+  };
 
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutationVariables =
   Exact<{
@@ -4372,10 +4420,12 @@ export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLi
   }>;
 
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation =
-  { __typename?: "Mutation" } & {
+  {
     publicFileUploadReplyDownloadLink: {
       __typename?: "FileUploadReplyDownloadLinkResult";
-    } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+      result: Result;
+      url?: Maybe<string>;
+    };
   };
 
 export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutationVariables =
@@ -4385,7 +4435,7 @@ export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutatio
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation =
-  { __typename?: "Mutation" } & Pick<Mutation, "publicDeletePetitionReply">;
+  { publicDeletePetitionReply: Result };
 
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationVariables =
   Exact<{
@@ -4395,11 +4445,14 @@ export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutationV
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation =
-  { __typename?: "Mutation" } & {
-    publicUpdateSimpleReply: { __typename?: "PublicPetitionFieldReply" } & Pick<
-      PublicPetitionFieldReply,
-      "id" | "content" | "status" | "updatedAt"
-    >;
+  {
+    publicUpdateSimpleReply: {
+      __typename?: "PublicPetitionFieldReply";
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      updatedAt: string;
+    };
   };
 
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationVariables =
@@ -4410,7 +4463,7 @@ export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationV
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation =
-  { __typename?: "Mutation" } & {
+  {
     publicCreateSimpleReply: {
       __typename?: "PublicPetitionFieldReply";
     } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
@@ -4427,7 +4480,7 @@ export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMu
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation =
-  { __typename?: "Mutation" } & {
+  {
     publicCreateDynamicSelectReply: {
       __typename?: "PublicPetitionFieldReply";
     } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
@@ -4444,13 +4497,14 @@ export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMu
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation =
-  { __typename?: "Mutation" } & {
+  {
     publicUpdateDynamicSelectReply: {
       __typename?: "PublicPetitionFieldReply";
-    } & Pick<
-      PublicPetitionFieldReply,
-      "id" | "content" | "status" | "updatedAt"
-    >;
+      id: string;
+      content: { [key: string]: any };
+      status: PetitionFieldReplyStatus;
+      updatedAt: string;
+    };
   };
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutationVariables =
@@ -4461,14 +4515,14 @@ export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutat
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation =
-  { __typename?: "Mutation" } & {
+  {
     publicCreateFileUploadReply: {
       __typename?: "CreateFileUploadReply";
-    } & Pick<CreateFileUploadReply, "endpoint"> & {
-        reply: {
-          __typename?: "PublicPetitionFieldReply";
-        } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
-      };
+      endpoint: string;
+      reply: {
+        __typename?: "PublicPetitionFieldReply";
+      } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+    };
   };
 
 export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutationVariables =
@@ -4478,30 +4532,25 @@ export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMut
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation =
-  { __typename?: "Mutation" } & {
+  {
     publicFileUploadReplyComplete: {
       __typename?: "PublicPetitionFieldReply";
-    } & Pick<PublicPetitionFieldReply, "id" | "content">;
+      id: string;
+      content: { [key: string]: any };
+    };
   };
 
 export type RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment =
-  { __typename?: "PublicPetitionField" } & {
-    replies: Array<
-      { __typename?: "PublicPetitionFieldReply" } & Pick<
-        PublicPetitionFieldReply,
-        "id"
-      >
-    >;
+  {
+    __typename?: "PublicPetitionField";
+    replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
   };
 
 export type RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment =
-  { __typename?: "PublicPetitionFieldReply" } & Pick<
-    PublicPetitionFieldReply,
-    "content"
-  >;
+  { __typename?: "PublicPetitionFieldReply"; content: { [key: string]: any } };
 
 export type RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment =
-  { __typename?: "PublicPetition" } & Pick<PublicPetition, "status">;
+  { __typename?: "PublicPetition"; status: PetitionStatus };
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables =
   Exact<{
@@ -4509,16 +4558,17 @@ export type GenerateNewTokenDialog_generateUserAuthTokenMutationVariables =
   }>;
 
 export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
-  __typename?: "Mutation";
-} & {
   generateUserAuthToken: {
     __typename?: "GenerateUserAuthTokenResponse";
-  } & Pick<GenerateUserAuthTokenResponse, "apiKey"> & {
-      userAuthToken: { __typename?: "UserAuthenticationToken" } & Pick<
-        UserAuthenticationToken,
-        "id" | "tokenName" | "createdAt" | "lastUsedAt"
-      >;
+    apiKey: string;
+    userAuthToken: {
+      __typename?: "UserAuthenticationToken";
+      id: string;
+      tokenName: string;
+      createdAt: string;
+      lastUsedAt?: Maybe<string>;
     };
+  };
 };
 
 export type Admin_UserFragment = {
@@ -4527,16 +4577,20 @@ export type Admin_UserFragment = {
 
 export type AdminQueryVariables = Exact<{ [key: string]: never }>;
 
-export type AdminQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> & Admin_UserFragment;
+export type AdminQuery = {
+  me: { __typename?: "User"; id: string } & Admin_UserFragment;
 };
 
 export type AdminOrganizations_OrganizationFragment = {
   __typename?: "Organization";
-} & Pick<
-  Organization,
-  "id" | "_id" | "name" | "identifier" | "status" | "userCount" | "createdAt"
->;
+  id: string;
+  _id: number;
+  name: string;
+  identifier: string;
+  status: OrganizationStatus;
+  userCount: number;
+  createdAt: string;
+};
 
 export type AdminOrganizations_UserFragment = {
   __typename?: "User";
@@ -4552,24 +4606,21 @@ export type AdminOrganizationsQueryVariables = Exact<{
   status?: Maybe<OrganizationStatus>;
 }>;
 
-export type AdminOrganizationsQuery = { __typename?: "Query" } & {
-  organizations: { __typename?: "OrganizationPagination" } & Pick<
-    OrganizationPagination,
-    "totalCount"
-  > & {
-      items: Array<
-        {
-          __typename?: "Organization";
-        } & AdminOrganizations_OrganizationFragment
-      >;
-    };
+export type AdminOrganizationsQuery = {
+  organizations: {
+    __typename?: "OrganizationPagination";
+    totalCount: number;
+    items: Array<
+      { __typename?: "Organization" } & AdminOrganizations_OrganizationFragment
+    >;
+  };
 };
 
 export type AdminOrganizationsUserQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type AdminOrganizationsUserQuery = { __typename?: "Query" } & {
+export type AdminOrganizationsUserQuery = {
   me: { __typename?: "User" } & AdminOrganizations_UserFragment;
 };
 
@@ -4581,51 +4632,54 @@ export type AdminSupportMethodsUserQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type AdminSupportMethodsUserQuery = { __typename?: "Query" } & {
+export type AdminSupportMethodsUserQuery = {
   me: { __typename?: "User" } & AdminSupportMethods_UserFragment;
 };
 
-export type Contact_ContactFragment = { __typename?: "Contact" } & Pick<
-  Contact,
-  "id"
-> & {
-    accesses: { __typename?: "PetitionAccessPagination" } & {
-      items: Array<
-        { __typename?: "PetitionAccess" } & Contact_PetitionAccessFragment
-      >;
-    };
-  } & Contact_Contact_ProfileFragment;
+export type Contact_ContactFragment = {
+  __typename?: "Contact";
+  id: string;
+  accesses: {
+    __typename?: "PetitionAccessPagination";
+    items: Array<
+      { __typename?: "PetitionAccess" } & Contact_PetitionAccessFragment
+    >;
+  };
+} & Contact_Contact_ProfileFragment;
 
-export type Contact_Contact_ProfileFragment = { __typename?: "Contact" } & Pick<
-  Contact,
-  "id" | "email" | "fullName" | "firstName" | "lastName"
->;
+export type Contact_Contact_ProfileFragment = {
+  __typename?: "Contact";
+  id: string;
+  email: string;
+  fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
+};
 
 export type Contact_PetitionAccessFragment = {
   __typename?: "PetitionAccess";
-} & Pick<PetitionAccess, "id"> & {
-    petition?: Maybe<{ __typename?: "Petition" } & Contact_PetitionFragment>;
-  };
+  id: string;
+  petition?: Maybe<{ __typename?: "Petition" } & Contact_PetitionFragment>;
+};
 
-export type Contact_PetitionFragment = { __typename?: "Petition" } & Pick<
-  Petition,
-  "id" | "name" | "createdAt"
-> & {
-    permissions: Array<
-      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-          PetitionUserGroupPermission,
-          "permissionType"
-        > & {
-            group: {
-              __typename?: "UserGroup";
-            } & UserAvatarList_UserGroupFragment;
-          })
-      | ({ __typename?: "PetitionUserPermission" } & Pick<
-          PetitionUserPermission,
-          "permissionType"
-        > & { user: { __typename?: "User" } & UserAvatarList_UserFragment })
-    >;
-  } & PetitionStatusCellContent_PetitionFragment &
+export type Contact_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: Maybe<string>;
+  createdAt: string;
+  permissions: Array<
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        permissionType: PetitionUserPermissionType;
+        group: { __typename?: "UserGroup" } & UserAvatarList_UserGroupFragment;
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        permissionType: PetitionUserPermissionType;
+        user: { __typename?: "User" } & UserAvatarList_UserFragment;
+      }
+  >;
+} & PetitionStatusCellContent_PetitionFragment &
   PetitionSignatureCellContent_PetitionFragment;
 
 export type Contact_UserFragment = {
@@ -4638,13 +4692,13 @@ export type Contact_updateContactMutationVariables = Exact<{
   data: UpdateContactInput;
 }>;
 
-export type Contact_updateContactMutation = { __typename?: "Mutation" } & {
+export type Contact_updateContactMutation = {
   updateContact: { __typename?: "Contact" } & Contact_Contact_ProfileFragment;
 };
 
 export type ContactUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ContactUserQuery = { __typename?: "Query" } & {
+export type ContactUserQuery = {
   me: { __typename?: "User" } & Contact_UserFragment;
 };
 
@@ -4653,20 +4707,23 @@ export type ContactQueryVariables = Exact<{
   hasPetitionSignature: Scalars["Boolean"];
 }>;
 
-export type ContactQuery = { __typename?: "Query" } & {
+export type ContactQuery = {
   contact?: Maybe<{ __typename?: "Contact" } & Contact_ContactFragment>;
 };
 
 export type Contacts_ContactsListFragment = {
   __typename?: "ContactPagination";
-} & Pick<ContactPagination, "totalCount"> & {
-    items: Array<
-      { __typename?: "Contact" } & Pick<
-        Contact,
-        "id" | "fullName" | "firstName" | "lastName" | "email" | "createdAt"
-      >
-    >;
-  };
+  totalCount: number;
+  items: Array<{
+    __typename?: "Contact";
+    id: string;
+    fullName?: Maybe<string>;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+    email: string;
+    createdAt: string;
+  }>;
+};
 
 export type Contacts_UserFragment = {
   __typename?: "User";
@@ -4676,9 +4733,7 @@ export type Contacts_deleteContactsMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type Contacts_deleteContactsMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "deleteContacts">;
+export type Contacts_deleteContactsMutation = { deleteContacts: Result };
 
 export type ContactsQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -4687,7 +4742,7 @@ export type ContactsQueryVariables = Exact<{
   sortBy?: Maybe<Array<QueryContacts_OrderBy> | QueryContacts_OrderBy>;
 }>;
 
-export type ContactsQuery = { __typename?: "Query" } & {
+export type ContactsQuery = {
   contacts: {
     __typename?: "ContactPagination";
   } & Contacts_ContactsListFragment;
@@ -4695,7 +4750,7 @@ export type ContactsQuery = { __typename?: "Query" } & {
 
 export type ContactsUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type ContactsUserQuery = { __typename?: "Query" } & {
+export type ContactsUserQuery = {
   me: { __typename?: "User" } & Contacts_UserFragment;
 };
 
@@ -4705,42 +4760,52 @@ export type OrganizationBranding_updateOrgLogoMutationVariables = Exact<{
 }>;
 
 export type OrganizationBranding_updateOrgLogoMutation = {
-  __typename?: "Mutation";
-} & {
-  updateOrganizationLogo: { __typename?: "Organization" } & Pick<
-    Organization,
-    "id" | "logoUrl"
-  >;
+  updateOrganizationLogo: {
+    __typename?: "Organization";
+    id: string;
+    logoUrl?: Maybe<string>;
+  };
 };
 
 export type OrganizationBrandingQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type OrganizationBrandingQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & {
-    organization: { __typename?: "Organization" } & Pick<
-      Organization,
-      "id" | "logoUrl" | "name"
-    >;
+export type OrganizationBrandingQuery = {
+  me: {
+    __typename?: "User";
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      logoUrl?: Maybe<string>;
+      name: string;
+    };
   } & SettingsLayout_UserFragment;
 };
 
 export type OrganizationGroup_UserGroupFragment = {
   __typename?: "UserGroup";
-} & Pick<UserGroup, "id" | "name" | "createdAt"> & {
-    members: Array<
-      {
-        __typename?: "UserGroupMember";
-      } & OrganizationGroup_UserGroupMemberFragment
-    >;
-  };
+  id: string;
+  name: string;
+  createdAt: string;
+  members: Array<
+    {
+      __typename?: "UserGroupMember";
+    } & OrganizationGroup_UserGroupMemberFragment
+  >;
+};
 
 export type OrganizationGroup_UserGroupMemberFragment = {
   __typename?: "UserGroupMember";
-} & Pick<UserGroupMember, "id" | "addedAt"> & {
-    user: { __typename?: "User" } & Pick<User, "id" | "fullName" | "email">;
+  id: string;
+  addedAt: string;
+  user: {
+    __typename?: "User";
+    id: string;
+    fullName?: Maybe<string>;
+    email: string;
   };
+};
 
 export type OrganizationGroup_UserFragment = {
   __typename?: "User";
@@ -4752,8 +4817,6 @@ export type OrganizationGroup_updateUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_updateUserGroupMutation = {
-  __typename?: "Mutation";
-} & {
   updateUserGroup: {
     __typename?: "UserGroup";
   } & OrganizationGroup_UserGroupFragment;
@@ -4765,8 +4828,6 @@ export type OrganizationGroup_addUsersToUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_addUsersToUserGroupMutation = {
-  __typename?: "Mutation";
-} & {
   addUsersToUserGroup: {
     __typename?: "UserGroup";
   } & OrganizationGroup_UserGroupFragment;
@@ -4778,8 +4839,6 @@ export type OrganizationGroup_removeUsersFromGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_removeUsersFromGroupMutation = {
-  __typename?: "Mutation";
-} & {
   removeUsersFromGroup: {
     __typename?: "UserGroup";
   } & OrganizationGroup_UserGroupFragment;
@@ -4790,8 +4849,8 @@ export type OrganizationGroup_deleteUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_deleteUserGroupMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "deleteUserGroup">;
+  deleteUserGroup: Result;
+};
 
 export type OrganizationGroup_cloneUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
@@ -4799,8 +4858,6 @@ export type OrganizationGroup_cloneUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroup_cloneUserGroupMutation = {
-  __typename?: "Mutation";
-} & {
   cloneUserGroup: Array<
     { __typename?: "UserGroup" } & OrganizationGroup_UserGroupFragment
   >;
@@ -4810,7 +4867,7 @@ export type OrganizationGroupQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type OrganizationGroupQuery = { __typename?: "Query" } & {
+export type OrganizationGroupQuery = {
   userGroup?: Maybe<
     { __typename?: "UserGroup" } & OrganizationGroup_UserGroupFragment
   >;
@@ -4820,27 +4877,28 @@ export type OrganizationGroupUserQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type OrganizationGroupUserQuery = { __typename?: "Query" } & {
+export type OrganizationGroupUserQuery = {
   me: { __typename?: "User" } & OrganizationGroup_UserFragment;
 };
 
 export type OrganizationGroups_UserGroupPaginationFragment = {
   __typename?: "UserGroupPagination";
-} & Pick<UserGroupPagination, "totalCount"> & {
-    items: Array<
-      { __typename?: "UserGroup" } & OrganizationGroups_UserGroupFragment
-    >;
-  };
+  totalCount: number;
+  items: Array<
+    { __typename?: "UserGroup" } & OrganizationGroups_UserGroupFragment
+  >;
+};
 
 export type OrganizationGroups_UserGroupFragment = {
   __typename?: "UserGroup";
-} & Pick<UserGroup, "id" | "name" | "createdAt"> & {
-    members: Array<
-      { __typename?: "UserGroupMember" } & {
-        user: { __typename?: "User" } & UserAvatarList_UserFragment;
-      }
-    >;
-  };
+  id: string;
+  name: string;
+  createdAt: string;
+  members: Array<{
+    __typename?: "UserGroupMember";
+    user: { __typename?: "User" } & UserAvatarList_UserFragment;
+  }>;
+};
 
 export type OrganizationGroups_UserFragment = {
   __typename?: "User";
@@ -4852,8 +4910,6 @@ export type OrganizationGroups_createUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroups_createUserGroupMutation = {
-  __typename?: "Mutation";
-} & {
   createUserGroup: {
     __typename?: "UserGroup";
   } & OrganizationGroups_UserGroupFragment;
@@ -4864,8 +4920,8 @@ export type OrganizationGroups_deleteUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroups_deleteUserGroupMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "deleteUserGroup">;
+  deleteUserGroup: Result;
+};
 
 export type OrganizationGroups_cloneUserGroupMutationVariables = Exact<{
   ids: Array<Scalars["GID"]> | Scalars["GID"];
@@ -4873,8 +4929,6 @@ export type OrganizationGroups_cloneUserGroupMutationVariables = Exact<{
 }>;
 
 export type OrganizationGroups_cloneUserGroupMutation = {
-  __typename?: "Mutation";
-} & {
   cloneUserGroup: Array<
     { __typename?: "UserGroup" } & OrganizationGroups_UserGroupFragment
   >;
@@ -4887,7 +4941,7 @@ export type OrganizationGroupsQueryVariables = Exact<{
   sortBy?: Maybe<Array<QueryUserGroups_OrderBy> | QueryUserGroups_OrderBy>;
 }>;
 
-export type OrganizationGroupsQuery = { __typename?: "Query" } & {
+export type OrganizationGroupsQuery = {
   userGroups: {
     __typename?: "UserGroupPagination";
   } & OrganizationGroups_UserGroupPaginationFragment;
@@ -4897,7 +4951,7 @@ export type OrganizationGroupsUserQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type OrganizationGroupsUserQuery = { __typename?: "Query" } & {
+export type OrganizationGroupsUserQuery = {
   me: { __typename?: "User" } & OrganizationGroups_UserFragment;
 };
 
@@ -4905,21 +4959,21 @@ export type OrganizationSettingsQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type OrganizationSettingsQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> & SettingsLayout_UserFragment;
+export type OrganizationSettingsQuery = {
+  me: { __typename?: "User"; id: string } & SettingsLayout_UserFragment;
 };
 
-export type OrganizationUsers_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  | "id"
-  | "fullName"
-  | "email"
-  | "role"
-  | "createdAt"
-  | "lastActiveAt"
-  | "status"
-  | "isSsoUser"
->;
+export type OrganizationUsers_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: Maybe<string>;
+  email: string;
+  role: OrganizationRole;
+  createdAt: string;
+  lastActiveAt?: Maybe<string>;
+  status: UserStatus;
+  isSsoUser: boolean;
+};
 
 export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
   firstName: Scalars["String"];
@@ -4929,8 +4983,6 @@ export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
 }>;
 
 export type OrganizationUsers_createOrganizationUserMutation = {
-  __typename?: "Mutation";
-} & {
   createOrganizationUser: {
     __typename?: "User";
   } & OrganizationUsers_UserFragment;
@@ -4943,11 +4995,11 @@ export type OrganizationUsers_updateUserStatusMutationVariables = Exact<{
 }>;
 
 export type OrganizationUsers_updateUserStatusMutation = {
-  __typename?: "Mutation";
-} & {
-  updateUserStatus: Array<
-    { __typename?: "User" } & Pick<User, "id" | "status">
-  >;
+  updateUserStatus: Array<{
+    __typename?: "User";
+    id: string;
+    status: UserStatus;
+  }>;
 };
 
 export type OrganizationUsersQueryVariables = Exact<{
@@ -4957,28 +5009,26 @@ export type OrganizationUsersQueryVariables = Exact<{
   sortBy?: Maybe<Array<OrganizationUsers_OrderBy> | OrganizationUsers_OrderBy>;
 }>;
 
-export type OrganizationUsersQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & {
-    organization: { __typename?: "Organization" } & Pick<
-      Organization,
-      "id" | "hasSsoProvider"
-    > & {
-        users: { __typename?: "UserPagination" } & Pick<
-          UserPagination,
-          "totalCount"
-        > & {
-            items: Array<
-              { __typename?: "User" } & OrganizationUsers_UserFragment
-            >;
-          };
+export type OrganizationUsersQuery = {
+  me: {
+    __typename?: "User";
+    organization: {
+      __typename?: "Organization";
+      id: string;
+      hasSsoProvider: boolean;
+      users: {
+        __typename?: "UserPagination";
+        totalCount: number;
+        items: Array<{ __typename?: "User" } & OrganizationUsers_UserFragment>;
       };
+    };
   } & SettingsLayout_UserFragment;
 };
 
 export type PetitionActivity_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id"> &
-  PetitionLayout_PetitionBase_Petition_Fragment &
+  id: string;
+} & PetitionLayout_PetitionBase_Petition_Fragment &
   PetitionAccessTable_PetitionFragment &
   PetitionActivityTimeline_PetitionFragment &
   ShareButton_PetitionBase_Petition_Fragment;
@@ -4993,8 +5043,6 @@ export type PetitionActivity_updatePetitionMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_updatePetitionMutation = {
-  __typename?: "Mutation";
-} & {
   updatePetition:
     | ({ __typename?: "Petition" } & PetitionActivity_PetitionFragment)
     | { __typename?: "PetitionTemplate" };
@@ -5006,9 +5054,7 @@ export type PetitionActivity_sendRemindersMutationVariables = Exact<{
   body?: Maybe<Scalars["JSON"]>;
 }>;
 
-export type PetitionActivity_sendRemindersMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "sendReminders">;
+export type PetitionActivity_sendRemindersMutation = { sendReminders: Result };
 
 export type PetitionActivity_deactivateAccessesMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -5016,11 +5062,11 @@ export type PetitionActivity_deactivateAccessesMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_deactivateAccessesMutation = {
-  __typename?: "Mutation";
-} & {
-  deactivateAccesses: Array<
-    { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "id" | "status">
-  >;
+  deactivateAccesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+  }>;
 };
 
 export type PetitionActivity_reactivateAccessesMutationVariables = Exact<{
@@ -5029,11 +5075,11 @@ export type PetitionActivity_reactivateAccessesMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_reactivateAccessesMutation = {
-  __typename?: "Mutation";
-} & {
-  reactivateAccesses: Array<
-    { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "id" | "status">
-  >;
+  reactivateAccesses: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+    status: PetitionAccessStatus;
+  }>;
 };
 
 export type PetitionActivity_cancelScheduledMessageMutationVariables = Exact<{
@@ -5042,11 +5088,11 @@ export type PetitionActivity_cancelScheduledMessageMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_cancelScheduledMessageMutation = {
-  __typename?: "Mutation";
-} & {
-  cancelScheduledMessage?: Maybe<
-    { __typename?: "PetitionMessage" } & Pick<PetitionMessage, "id" | "status">
-  >;
+  cancelScheduledMessage?: Maybe<{
+    __typename?: "PetitionMessage";
+    id: string;
+    status: PetitionMessageStatus;
+  }>;
 };
 
 export type PetitionsActivity_sendPetitionMutationVariables = Exact<{
@@ -5059,12 +5105,7 @@ export type PetitionsActivity_sendPetitionMutationVariables = Exact<{
 }>;
 
 export type PetitionsActivity_sendPetitionMutation = {
-  __typename?: "Mutation";
-} & {
-  sendPetition: { __typename?: "SendPetitionResult" } & Pick<
-    SendPetitionResult,
-    "result"
-  >;
+  sendPetition: { __typename?: "SendPetitionResult"; result: Result };
 };
 
 export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
@@ -5075,18 +5116,17 @@ export type PetitionActivity_switchAutomaticRemindersMutationVariables = Exact<{
 }>;
 
 export type PetitionActivity_switchAutomaticRemindersMutation = {
-  __typename?: "Mutation";
-} & {
-  switchAutomaticReminders: Array<
-    { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "id">
-  >;
+  switchAutomaticReminders: Array<{
+    __typename?: "PetitionAccess";
+    id: string;
+  }>;
 };
 
 export type PetitionActivityQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type PetitionActivityQuery = { __typename?: "Query" } & {
+export type PetitionActivityQuery = {
   petition?: Maybe<
     | ({ __typename?: "Petition" } & PetitionActivity_PetitionFragment)
     | { __typename?: "PetitionTemplate" }
@@ -5097,27 +5137,28 @@ export type PetitionActivityUserQueryVariables = Exact<{
   [key: string]: never;
 }>;
 
-export type PetitionActivityUserQuery = { __typename?: "Query" } & {
+export type PetitionActivityUserQuery = {
   me: { __typename?: "User" } & PetitionActivity_UserFragment;
 };
 
 export type PetitionCompose_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status" | "id"> & {
-    fields: Array<
-      { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
-    >;
-  } & PetitionLayout_PetitionBase_Petition_Fragment &
+  status: PetitionStatus;
+  id: string;
+  fields: Array<
+    { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
+  >;
+} & PetitionLayout_PetitionBase_Petition_Fragment &
   AddPetitionAccessDialog_PetitionFragment &
   PetitionSettings_PetitionBase_Petition_Fragment;
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id"> & {
-    fields: Array<
-      { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
-    >;
-  } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment &
+  id: string;
+  fields: Array<
+    { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
+  >;
+} & PetitionLayout_PetitionBase_PetitionTemplate_Fragment &
   PetitionTemplateComposeMessageEditor_PetitionFragment &
   PetitionSettings_PetitionBase_PetitionTemplate_Fragment;
 
@@ -5143,8 +5184,6 @@ export type PetitionCompose_updatePetitionMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_updatePetitionMutation = {
-  __typename?: "Mutation";
-} & {
   updatePetition:
     | ({
         __typename?: "Petition";
@@ -5164,19 +5203,17 @@ export type PetitionCompose_updateFieldPositionsMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_updateFieldPositionsMutation = {
-  __typename?: "Mutation";
-} & {
   updateFieldPositions:
-    | ({ __typename?: "Petition" } & Pick<Petition, "id"> & {
-          fields: Array<
-            { __typename?: "PetitionField" } & Pick<PetitionField, "id">
-          >;
-        } & PetitionLayout_PetitionBase_Petition_Fragment)
-    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
-          fields: Array<
-            { __typename?: "PetitionField" } & Pick<PetitionField, "id">
-          >;
-        } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment);
+    | ({
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{ __typename?: "PetitionField"; id: string }>;
+      } & PetitionLayout_PetitionBase_Petition_Fragment)
+    | ({
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{ __typename?: "PetitionField"; id: string }>;
+      } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment);
 };
 
 export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
@@ -5186,27 +5223,29 @@ export type PetitionCompose_createPetitionFieldMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_createPetitionFieldMutation = {
-  __typename?: "Mutation";
-} & {
   createPetitionField:
-    | ({ __typename?: "PetitionAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionCompose_PetitionFieldFragment;
-        petition: { __typename?: "Petition" } & {
-          fields: Array<
-            { __typename?: "PetitionField" } & Pick<PetitionField, "id">
-          >;
+    | {
+        __typename?: "PetitionAndField";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+        } & PetitionCompose_PetitionFieldFragment;
+        petition: {
+          __typename?: "Petition";
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
         } & PetitionLayout_PetitionBase_Petition_Fragment;
-      })
-    | ({ __typename?: "PetitionTemplateAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionCompose_PetitionFieldFragment;
-        petition: { __typename?: "PetitionTemplate" } & {
-          fields: Array<
-            { __typename?: "PetitionField" } & Pick<PetitionField, "id">
-          >;
+      }
+    | {
+        __typename?: "PetitionTemplateAndField";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+        } & PetitionCompose_PetitionFieldFragment;
+        petition: {
+          __typename?: "PetitionTemplate";
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
         } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment;
-      });
+      };
 };
 
 export type PetitionCompose_clonePetitionFieldMutationVariables = Exact<{
@@ -5215,27 +5254,29 @@ export type PetitionCompose_clonePetitionFieldMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_clonePetitionFieldMutation = {
-  __typename?: "Mutation";
-} & {
   clonePetitionField:
-    | ({ __typename?: "PetitionAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionCompose_PetitionFieldFragment;
-        petition: { __typename?: "Petition" } & {
-          fields: Array<
-            { __typename?: "PetitionField" } & Pick<PetitionField, "id">
-          >;
+    | {
+        __typename?: "PetitionAndField";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+        } & PetitionCompose_PetitionFieldFragment;
+        petition: {
+          __typename?: "Petition";
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
         } & PetitionLayout_PetitionBase_Petition_Fragment;
-      })
-    | ({ __typename?: "PetitionTemplateAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionCompose_PetitionFieldFragment;
-        petition: { __typename?: "PetitionTemplate" } & {
-          fields: Array<
-            { __typename?: "PetitionField" } & Pick<PetitionField, "id">
-          >;
+      }
+    | {
+        __typename?: "PetitionTemplateAndField";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+        } & PetitionCompose_PetitionFieldFragment;
+        petition: {
+          __typename?: "PetitionTemplate";
+          fields: Array<{ __typename?: "PetitionField"; id: string }>;
         } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment;
-      });
+      };
 };
 
 export type PetitionCompose_deletePetitionFieldMutationVariables = Exact<{
@@ -5245,19 +5286,17 @@ export type PetitionCompose_deletePetitionFieldMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_deletePetitionFieldMutation = {
-  __typename?: "Mutation";
-} & {
   deletePetitionField:
-    | ({ __typename?: "Petition" } & Pick<Petition, "id"> & {
-          fields: Array<
-            { __typename?: "PetitionField" } & Pick<PetitionField, "id">
-          >;
-        } & PetitionLayout_PetitionBase_Petition_Fragment)
-    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id"> & {
-          fields: Array<
-            { __typename?: "PetitionField" } & Pick<PetitionField, "id">
-          >;
-        } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment);
+    | ({
+        __typename?: "Petition";
+        id: string;
+        fields: Array<{ __typename?: "PetitionField"; id: string }>;
+      } & PetitionLayout_PetitionBase_Petition_Fragment)
+    | ({
+        __typename?: "PetitionTemplate";
+        id: string;
+        fields: Array<{ __typename?: "PetitionField"; id: string }>;
+      } & PetitionLayout_PetitionBase_PetitionTemplate_Fragment);
 };
 
 export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
@@ -5267,25 +5306,32 @@ export type PetitionCompose_updatePetitionFieldMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_updatePetitionFieldMutation = {
-  __typename?: "Mutation";
-} & {
   updatePetitionField:
-    | ({ __typename?: "PetitionAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionCompose_PetitionFieldFragment;
-        petition: { __typename?: "Petition" } & Pick<
-          Petition,
-          "status" | "id" | "updatedAt"
-        >;
-      })
-    | ({ __typename?: "PetitionTemplateAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionCompose_PetitionFieldFragment;
-        petition: { __typename?: "PetitionTemplate" } & Pick<
-          PetitionTemplate,
-          "id" | "updatedAt"
-        >;
-      });
+    | {
+        __typename?: "PetitionAndField";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+        } & PetitionCompose_PetitionFieldFragment;
+        petition: {
+          __typename?: "Petition";
+          status: PetitionStatus;
+          id: string;
+          updatedAt: string;
+        };
+      }
+    | {
+        __typename?: "PetitionTemplateAndField";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+        } & PetitionCompose_PetitionFieldFragment;
+        petition: {
+          __typename?: "PetitionTemplate";
+          id: string;
+          updatedAt: string;
+        };
+      };
 };
 
 export type PetitionCompose_changePetitionFieldTypeMutationVariables = Exact<{
@@ -5296,25 +5342,32 @@ export type PetitionCompose_changePetitionFieldTypeMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_changePetitionFieldTypeMutation = {
-  __typename?: "Mutation";
-} & {
   changePetitionFieldType:
-    | ({ __typename?: "PetitionAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionCompose_PetitionFieldFragment;
-        petition: { __typename?: "Petition" } & Pick<
-          Petition,
-          "status" | "id" | "updatedAt"
-        >;
-      })
-    | ({ __typename?: "PetitionTemplateAndField" } & {
-        field: { __typename?: "PetitionField" } & Pick<PetitionField, "id"> &
-          PetitionCompose_PetitionFieldFragment;
-        petition: { __typename?: "PetitionTemplate" } & Pick<
-          PetitionTemplate,
-          "id" | "updatedAt"
-        >;
-      });
+    | {
+        __typename?: "PetitionAndField";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+        } & PetitionCompose_PetitionFieldFragment;
+        petition: {
+          __typename?: "Petition";
+          status: PetitionStatus;
+          id: string;
+          updatedAt: string;
+        };
+      }
+    | {
+        __typename?: "PetitionTemplateAndField";
+        field: {
+          __typename?: "PetitionField";
+          id: string;
+        } & PetitionCompose_PetitionFieldFragment;
+        petition: {
+          __typename?: "PetitionTemplate";
+          id: string;
+          updatedAt: string;
+        };
+      };
 };
 
 export type PetitionCompose_batchSendPetitionMutationVariables = Exact<{
@@ -5330,23 +5383,20 @@ export type PetitionCompose_batchSendPetitionMutationVariables = Exact<{
 }>;
 
 export type PetitionCompose_batchSendPetitionMutation = {
-  __typename?: "Mutation";
-} & {
-  batchSendPetition: Array<
-    { __typename?: "SendPetitionResult" } & Pick<
-      SendPetitionResult,
-      "result"
-    > & {
-        petition?: Maybe<
-          { __typename?: "Petition" } & Pick<Petition, "id" | "status">
-        >;
-      }
-  >;
+  batchSendPetition: Array<{
+    __typename?: "SendPetitionResult";
+    result: Result;
+    petition?: Maybe<{
+      __typename?: "Petition";
+      id: string;
+      status: PetitionStatus;
+    }>;
+  }>;
 };
 
 export type PetitionComposeUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type PetitionComposeUserQuery = { __typename?: "Query" } & {
+export type PetitionComposeUserQuery = {
   me: { __typename?: "User" } & PetitionCompose_UserFragment;
 };
 
@@ -5355,7 +5405,7 @@ export type PetitionComposeQueryVariables = Exact<{
   hasPetitionSignature: Scalars["Boolean"];
 }>;
 
-export type PetitionComposeQuery = { __typename?: "Query" } & {
+export type PetitionComposeQuery = {
   petition?: Maybe<
     | ({
         __typename?: "Petition";
@@ -5370,42 +5420,43 @@ export type PetitionQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type PetitionQuery = { __typename?: "Query" } & {
+export type PetitionQuery = {
   petition?: Maybe<
-    | ({ __typename?: "Petition" } & Pick<Petition, "status" | "id">)
-    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">)
+    | { __typename?: "Petition"; status: PetitionStatus; id: string }
+    | { __typename?: "PetitionTemplate"; id: string }
   >;
 };
 
 export type PetitionReplies_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "hasCommentsEnabled"> & {
-    fields: Array<
-      { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
-    >;
-    currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<
-        PetitionSignatureRequest,
-        "id" | "status"
-      >
-    >;
-  } & PetitionLayout_PetitionBase_Petition_Fragment &
+  id: string;
+  hasCommentsEnabled: boolean;
+  fields: Array<
+    { __typename?: "PetitionField" } & PetitionReplies_PetitionFieldFragment
+  >;
+  currentSignatureRequest?: Maybe<{
+    __typename?: "PetitionSignatureRequest";
+    id: string;
+    status: PetitionSignatureRequestStatus;
+  }>;
+} & PetitionLayout_PetitionBase_Petition_Fragment &
   ShareButton_PetitionBase_Petition_Fragment &
   PetitionSignaturesCard_PetitionFragment &
   usePetitionCurrentSignatureStatus_PetitionFragment;
 
 export type PetitionReplies_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "isReadOnly"> &
-  PetitionRepliesField_PetitionFieldFragment &
+  isReadOnly: boolean;
+} & PetitionRepliesField_PetitionFieldFragment &
   PetitionContents_PetitionFieldFragment &
   PetitionRepliesFieldComments_PetitionFieldFragment &
   ExportRepliesDialog_PetitionFieldFragment &
   useFieldVisibility_PetitionFieldFragment;
 
-export type PetitionReplies_UserFragment = { __typename?: "User" } & {
-  hasPetitionSignature: User["hasFeatureFlag"];
-  hasPetitionPdfExport: User["hasFeatureFlag"];
+export type PetitionReplies_UserFragment = {
+  __typename?: "User";
+  hasPetitionSignature: boolean;
+  hasPetitionPdfExport: boolean;
 } & PetitionLayout_UserFragment &
   PetitionRepliesFieldComments_UserFragment &
   ExportRepliesDialog_UserFragment &
@@ -5417,8 +5468,6 @@ export type PetitionReplies_updatePetitionMutationVariables = Exact<{
 }>;
 
 export type PetitionReplies_updatePetitionMutation = {
-  __typename?: "Mutation";
-} & {
   updatePetition:
     | ({
         __typename?: "Petition";
@@ -5436,23 +5485,19 @@ export type PetitionReplies_validatePetitionFieldsMutationVariables = Exact<{
 }>;
 
 export type PetitionReplies_validatePetitionFieldsMutation = {
-  __typename?: "Mutation";
-} & {
-  validatePetitionFields: { __typename?: "PetitionAndPartialFields" } & {
-    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "status">;
-    fields: Array<
-      { __typename?: "PetitionField" } & Pick<
-        PetitionField,
-        "id" | "validated"
-      > & {
-          replies: Array<
-            { __typename?: "PetitionFieldReply" } & Pick<
-              PetitionFieldReply,
-              "id" | "status"
-            >
-          >;
-        }
-    >;
+  validatePetitionFields: {
+    __typename?: "PetitionAndPartialFields";
+    petition: { __typename?: "Petition"; id: string; status: PetitionStatus };
+    fields: Array<{
+      __typename?: "PetitionField";
+      id: string;
+      validated: boolean;
+      replies: Array<{
+        __typename?: "PetitionFieldReply";
+        id: string;
+        status: PetitionFieldReplyStatus;
+      }>;
+    }>;
   };
 };
 
@@ -5464,11 +5509,11 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables =
   }>;
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
-  __typename?: "Mutation";
-} & {
   fileUploadReplyDownloadLink: {
     __typename?: "FileUploadReplyDownloadLinkResult";
-  } & Pick<FileUploadReplyDownloadLinkResult, "result" | "url">;
+    result: Result;
+    url?: Maybe<string>;
+  };
 };
 
 export type PetitionReplies_createPetitionFieldCommentMutationVariables =
@@ -5482,8 +5527,6 @@ export type PetitionReplies_createPetitionFieldCommentMutationVariables =
   }>;
 
 export type PetitionReplies_createPetitionFieldCommentMutation = {
-  __typename?: "Mutation";
-} & {
   createPetitionFieldComment: {
     __typename?: "PetitionFieldComment";
   } & PetitionRepliesFieldComments_PetitionFieldCommentFragment;
@@ -5499,8 +5542,6 @@ export type PetitionReplies_updatePetitionFieldCommentMutationVariables =
   }>;
 
 export type PetitionReplies_updatePetitionFieldCommentMutation = {
-  __typename?: "Mutation";
-} & {
   updatePetitionFieldComment: {
     __typename?: "PetitionFieldComment";
   } & PetitionRepliesFieldComments_PetitionFieldCommentFragment;
@@ -5514,22 +5555,19 @@ export type PetitionReplies_deletePetitionFieldCommentMutationVariables =
   }>;
 
 export type PetitionReplies_deletePetitionFieldCommentMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "deletePetitionFieldComment">;
+  deletePetitionFieldComment: Result;
+};
 
 export type PetitionReplies_submitUnpublishedCommentsMutationVariables = Exact<{
   petitionId: Scalars["GID"];
 }>;
 
 export type PetitionReplies_submitUnpublishedCommentsMutation = {
-  __typename?: "Mutation";
-} & {
-  submitUnpublishedComments: Array<
-    { __typename?: "PetitionFieldComment" } & Pick<
-      PetitionFieldComment,
-      "id" | "publishedAt"
-    >
-  >;
+  submitUnpublishedComments: Array<{
+    __typename?: "PetitionFieldComment";
+    id: string;
+    publishedAt?: Maybe<string>;
+  }>;
 };
 
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables =
@@ -5539,14 +5577,11 @@ export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables =
   }>;
 
 export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
-  __typename?: "Mutation";
-} & {
-  markPetitionFieldCommentsAsRead: Array<
-    { __typename?: "PetitionFieldComment" } & Pick<
-      PetitionFieldComment,
-      "id" | "isUnread"
-    >
-  >;
+  markPetitionFieldCommentsAsRead: Array<{
+    __typename?: "PetitionFieldComment";
+    id: string;
+    isUnread: boolean;
+  }>;
 };
 
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables =
@@ -5558,22 +5593,15 @@ export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables =
   }>;
 
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutation = {
-  __typename?: "Mutation";
-} & {
   updatePetitionFieldRepliesStatus: {
     __typename?: "PetitionWithFieldAndReplies";
-  } & {
-    petition: { __typename?: "Petition" } & Pick<Petition, "id" | "status">;
-    field: { __typename?: "PetitionField" } & Pick<
-      PetitionField,
-      "id" | "validated"
-    >;
-    replies: Array<
-      { __typename?: "PetitionFieldReply" } & Pick<
-        PetitionFieldReply,
-        "id" | "status"
-      >
-    >;
+    petition: { __typename?: "Petition"; id: string; status: PetitionStatus };
+    field: { __typename?: "PetitionField"; id: string; validated: boolean };
+    replies: Array<{
+      __typename?: "PetitionFieldReply";
+      id: string;
+      status: PetitionFieldReplyStatus;
+    }>;
   };
 };
 
@@ -5587,17 +5615,11 @@ export type PetitionReplies_sendPetitionClosedNotificationMutationVariables =
   }>;
 
 export type PetitionReplies_sendPetitionClosedNotificationMutation = {
-  __typename?: "Mutation";
-} & {
-  sendPetitionClosedNotification: { __typename?: "Petition" } & Pick<
-    Petition,
-    "id"
-  >;
+  sendPetitionClosedNotification: { __typename?: "Petition"; id: string };
 };
 
 export type PetitionReplies_createPetitionFieldComment_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & {
   comments: Array<
     {
       __typename?: "PetitionFieldComment";
@@ -5607,15 +5629,12 @@ export type PetitionReplies_createPetitionFieldComment_PetitionFieldFragment = {
 
 export type PetitionReplies_deletePetitionFieldComment_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & {
-  comments: Array<
-    { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
-  >;
+  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
 };
 
 export type PetitionRepliesUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type PetitionRepliesUserQuery = { __typename?: "Query" } & {
+export type PetitionRepliesUserQuery = {
   me: { __typename?: "User" } & PetitionReplies_UserFragment;
 };
 
@@ -5625,7 +5644,7 @@ export type PetitionRepliesQueryVariables = Exact<{
   hasInternalComments: Scalars["Boolean"];
 }>;
 
-export type PetitionRepliesQuery = { __typename?: "Query" } & {
+export type PetitionRepliesQuery = {
   petition?: Maybe<
     | ({ __typename?: "Petition" } & PetitionReplies_PetitionFragment)
     | { __typename?: "PetitionTemplate" }
@@ -5634,14 +5653,14 @@ export type PetitionRepliesQuery = { __typename?: "Query" } & {
 
 export type Petitions_PetitionBasePaginationFragment = {
   __typename?: "PetitionBasePagination";
-} & Pick<PetitionBasePagination, "totalCount"> & {
-    items: Array<
-      | ({ __typename?: "Petition" } & Petitions_PetitionBase_Petition_Fragment)
-      | ({
-          __typename?: "PetitionTemplate";
-        } & Petitions_PetitionBase_PetitionTemplate_Fragment)
-    >;
-  };
+  totalCount: number;
+  items: Array<
+    | ({ __typename?: "Petition" } & Petitions_PetitionBase_Petition_Fragment)
+    | ({
+        __typename?: "PetitionTemplate";
+      } & Petitions_PetitionBase_PetitionTemplate_Fragment)
+  >;
+};
 
 export type Petitions_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
@@ -5662,7 +5681,7 @@ export type Petitions_UserFragment = {
 
 export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type PetitionsUserQuery = { __typename?: "Query" } & {
+export type PetitionsUserQuery = {
   me: { __typename?: "User" } & Petitions_UserFragment;
 };
 
@@ -5675,7 +5694,7 @@ export type PetitionsQueryVariables = Exact<{
   filters?: Maybe<PetitionFilter>;
 }>;
 
-export type PetitionsQuery = { __typename?: "Query" } & {
+export type PetitionsQuery = {
   petitions: {
     __typename?: "PetitionBasePagination";
   } & Petitions_PetitionBasePaginationFragment;
@@ -5683,9 +5702,12 @@ export type PetitionsQuery = { __typename?: "Query" } & {
 
 export type NewPetition_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "id" | "name" | "description" | "locale"> & {
-    owner: { __typename?: "User" } & Pick<User, "id" | "fullName">;
-  };
+  id: string;
+  name?: Maybe<string>;
+  description?: Maybe<string>;
+  locale: PetitionLocale;
+  owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+};
 
 export type NewPetition_UserFragment = {
   __typename?: "User";
@@ -5698,17 +5720,14 @@ export type NewPetitionPublicTemplatesQueryVariables = Exact<{
   locale?: Maybe<PetitionLocale>;
 }>;
 
-export type NewPetitionPublicTemplatesQuery = { __typename?: "Query" } & {
-  publicTemplates: { __typename?: "PetitionTemplatePagination" } & Pick<
-    PetitionTemplatePagination,
-    "totalCount"
-  > & {
-      items: Array<
-        {
-          __typename?: "PetitionTemplate";
-        } & NewPetition_PetitionTemplateFragment
-      >;
-    };
+export type NewPetitionPublicTemplatesQuery = {
+  publicTemplates: {
+    __typename?: "PetitionTemplatePagination";
+    totalCount: number;
+    items: Array<
+      { __typename?: "PetitionTemplate" } & NewPetition_PetitionTemplateFragment
+    >;
+  };
 };
 
 export type NewPetitionTemplatesQueryVariables = Exact<{
@@ -5718,35 +5737,32 @@ export type NewPetitionTemplatesQueryVariables = Exact<{
   filters?: Maybe<PetitionFilter>;
 }>;
 
-export type NewPetitionTemplatesQuery = { __typename?: "Query" } & {
-  templates: { __typename?: "PetitionBasePagination" } & Pick<
-    PetitionBasePagination,
-    "totalCount"
-  > & {
-      items: Array<
-        | { __typename?: "Petition" }
-        | ({
-            __typename?: "PetitionTemplate";
-          } & NewPetition_PetitionTemplateFragment)
-      >;
-    };
-  hasTemplates: { __typename?: "PetitionBasePagination" } & Pick<
-    PetitionBasePagination,
-    "totalCount"
-  >;
+export type NewPetitionTemplatesQuery = {
+  templates: {
+    __typename?: "PetitionBasePagination";
+    totalCount: number;
+    items: Array<
+      | { __typename?: "Petition" }
+      | ({
+          __typename?: "PetitionTemplate";
+        } & NewPetition_PetitionTemplateFragment)
+    >;
+  };
+  hasTemplates: { __typename?: "PetitionBasePagination"; totalCount: number };
 };
 
 export type NewPetitionUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type NewPetitionUserQuery = { __typename?: "Query" } & {
+export type NewPetitionUserQuery = {
   me: { __typename?: "User" } & NewPetition_UserFragment;
 };
 
-export type Account_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "firstName" | "lastName" | "isSsoUser"
-> &
-  SettingsLayout_UserFragment &
+export type Account_UserFragment = {
+  __typename?: "User";
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
+  isSsoUser: boolean;
+} & SettingsLayout_UserFragment &
   useSettingsSections_UserFragment;
 
 export type Account_updateAccountMutationVariables = Exact<{
@@ -5754,17 +5770,20 @@ export type Account_updateAccountMutationVariables = Exact<{
   data: UpdateUserInput;
 }>;
 
-export type Account_updateAccountMutation = { __typename?: "Mutation" } & {
-  updateUser: { __typename?: "User" } & Pick<
-    User,
-    "id" | "firstName" | "lastName" | "fullName"
-  >;
+export type Account_updateAccountMutation = {
+  updateUser: {
+    __typename?: "User";
+    id: string;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+    fullName?: Maybe<string>;
+  };
 };
 
 export type AccountQueryVariables = Exact<{ [key: string]: never }>;
 
-export type AccountQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> & Account_UserFragment;
+export type AccountQuery = {
+  me: { __typename?: "User"; id: string } & Account_UserFragment;
 };
 
 export type Settings_UserFragment = {
@@ -5774,8 +5793,8 @@ export type Settings_UserFragment = {
 
 export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type SettingsQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> & Settings_UserFragment;
+export type SettingsQuery = {
+  me: { __typename?: "User"; id: string } & Settings_UserFragment;
 };
 
 export type Security_updatePasswordMutationVariables = Exact<{
@@ -5784,32 +5803,32 @@ export type Security_updatePasswordMutationVariables = Exact<{
 }>;
 
 export type Security_updatePasswordMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "changePassword">;
+  changePassword: ChangePasswordResult;
+};
 
 export type SecurityQueryVariables = Exact<{ [key: string]: never }>;
 
-export type SecurityQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "isSsoUser"> &
-    SettingsLayout_UserFragment &
+export type SecurityQuery = {
+  me: {
+    __typename?: "User";
+    isSsoUser: boolean;
+  } & SettingsLayout_UserFragment &
     useSettingsSections_UserFragment;
 };
 
 export type Tokens_UserAuthenticationTokenFragment = {
   __typename?: "UserAuthenticationToken";
-} & Pick<
-  UserAuthenticationToken,
-  "id" | "tokenName" | "createdAt" | "lastUsedAt"
->;
+  id: string;
+  tokenName: string;
+  createdAt: string;
+  lastUsedAt?: Maybe<string>;
+};
 
 export type RevokeUserAuthTokenMutationVariables = Exact<{
   authTokenIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
-export type RevokeUserAuthTokenMutation = { __typename?: "Mutation" } & Pick<
-  Mutation,
-  "revokeUserAuthToken"
->;
+export type RevokeUserAuthTokenMutation = { revokeUserAuthToken: Result };
 
 export type TokensQueryVariables = Exact<{
   offset: Scalars["Int"];
@@ -5820,35 +5839,38 @@ export type TokensQueryVariables = Exact<{
   >;
 }>;
 
-export type TokensQuery = { __typename?: "Query" } & {
-  me: { __typename?: "User" } & Pick<User, "id"> & {
-      authenticationTokens: {
-        __typename?: "UserAuthenticationTokenPagination";
-      } & Pick<UserAuthenticationTokenPagination, "totalCount"> & {
-          items: Array<
-            {
-              __typename?: "UserAuthenticationToken";
-            } & Tokens_UserAuthenticationTokenFragment
-          >;
-        };
-    } & SettingsLayout_UserFragment &
+export type TokensQuery = {
+  me: {
+    __typename?: "User";
+    id: string;
+    authenticationTokens: {
+      __typename?: "UserAuthenticationTokenPagination";
+      totalCount: number;
+      items: Array<
+        {
+          __typename?: "UserAuthenticationToken";
+        } & Tokens_UserAuthenticationTokenFragment
+      >;
+    };
+  } & SettingsLayout_UserFragment &
     useSettingsSections_UserFragment;
 };
 
 export type CurrentUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type CurrentUserQuery = { __typename?: "Query" } & {
+export type CurrentUserQuery = {
   me: { __typename?: "User" } & Login_UserFragment;
 };
 
-export type Login_UserFragment = { __typename?: "User" } & Pick<
-  User,
-  "id" | "fullName" | "email"
->;
+export type Login_UserFragment = {
+  __typename?: "User";
+  id: string;
+  fullName?: Maybe<string>;
+  email: string;
+};
 
 export type RecipientView_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-} & {
   petition?: Maybe<
     { __typename?: "PublicPetition" } & RecipientView_PublicPetitionFragment
   >;
@@ -5870,51 +5892,48 @@ export type RecipientView_PublicPetitionAccessFragment = {
 
 export type RecipientView_PublicPetitionMessageFragment = {
   __typename?: "PublicPetitionMessage";
-} & Pick<PublicPetitionMessage, "id" | "subject">;
+  id: string;
+  subject?: Maybe<string>;
+};
 
 export type RecipientView_PublicPetitionFragment = {
   __typename?: "PublicPetition";
-} & Pick<
-  PublicPetition,
-  | "id"
-  | "status"
-  | "deadline"
-  | "hasCommentsEnabled"
-  | "isRecipientViewContentsHidden"
-  | "signatureStatus"
-> & {
-    fields: Array<
-      {
-        __typename?: "PublicPetitionField";
-      } & RecipientView_PublicPetitionFieldFragment
+  id: string;
+  status: PetitionStatus;
+  deadline?: Maybe<string>;
+  hasCommentsEnabled: boolean;
+  isRecipientViewContentsHidden: boolean;
+  signatureStatus?: Maybe<PublicSignatureStatus>;
+  fields: Array<
+    {
+      __typename?: "PublicPetitionField";
+    } & RecipientView_PublicPetitionFieldFragment
+  >;
+  signature?: Maybe<{
+    __typename?: "PublicSignatureConfig";
+    signers: Array<
+      Maybe<
+        { __typename?: "PublicContact" } & RecipientView_PublicContactFragment
+      >
     >;
-    signature?: Maybe<
-      { __typename?: "PublicSignatureConfig" } & {
-        signers: Array<
-          Maybe<
-            {
-              __typename?: "PublicContact";
-            } & RecipientView_PublicContactFragment
-          >
-        >;
-      }
-    >;
-    recipients: Array<
-      {
-        __typename?: "PublicContact";
-      } & RecipientViewHeader_PublicContactFragment
-    >;
-  } & RecipientViewContentsCard_PublicPetitionFragment &
+  }>;
+  recipients: Array<
+    { __typename?: "PublicContact" } & RecipientViewHeader_PublicContactFragment
+  >;
+} & RecipientViewContentsCard_PublicPetitionFragment &
   RecipientViewProgressFooter_PublicPetitionFragment;
 
 export type RecipientView_PublicContactFragment = {
   __typename?: "PublicContact";
-} & Pick<PublicContact, "id" | "fullName" | "email">;
+  id: string;
+  fullName?: Maybe<string>;
+  email: string;
+};
 
 export type RecipientView_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-} & Pick<PublicPetitionField, "id"> &
-  RecipientViewPetitionField_PublicPetitionFieldFragment &
+  id: string;
+} & RecipientViewPetitionField_PublicPetitionFieldFragment &
   RecipientViewContentsCard_PublicPetitionFieldFragment &
   RecipientViewProgressFooter_PublicPetitionFieldFragment;
 
@@ -5929,12 +5948,11 @@ export type RecipientView_publicCompletePetitionMutationVariables = Exact<{
 }>;
 
 export type RecipientView_publicCompletePetitionMutation = {
-  __typename?: "Mutation";
-} & {
-  publicCompletePetition: { __typename?: "PublicPetition" } & Pick<
-    PublicPetition,
-    "id" | "status"
-  >;
+  publicCompletePetition: {
+    __typename?: "PublicPetition";
+    id: string;
+    status: PetitionStatus;
+  };
 };
 
 export type RecipientView_submitUnpublishedCommentsMutationVariables = Exact<{
@@ -5942,21 +5960,18 @@ export type RecipientView_submitUnpublishedCommentsMutationVariables = Exact<{
 }>;
 
 export type RecipientView_submitUnpublishedCommentsMutation = {
-  __typename?: "Mutation";
-} & {
-  publicSubmitUnpublishedComments: Array<
-    { __typename?: "PublicPetitionFieldComment" } & Pick<
-      PublicPetitionFieldComment,
-      "id" | "publishedAt"
-    >
-  >;
+  publicSubmitUnpublishedComments: Array<{
+    __typename?: "PublicPetitionFieldComment";
+    id: string;
+    publishedAt?: Maybe<string>;
+  }>;
 };
 
 export type PublicPetitionQueryVariables = Exact<{
   keycode: Scalars["ID"];
 }>;
 
-export type PublicPetitionQuery = { __typename?: "Query" } & {
+export type PublicPetitionQuery = {
   access?: Maybe<
     {
       __typename?: "PublicPetitionAccess";
@@ -5972,28 +5987,28 @@ export type RecipientView_verifyPublicAccessMutationVariables = Exact<{
 }>;
 
 export type RecipientView_verifyPublicAccessMutation = {
-  __typename?: "Mutation";
-} & {
-  verifyPublicAccess: { __typename?: "PublicAccessVerification" } & Pick<
-    PublicAccessVerification,
-    | "isAllowed"
-    | "cookieName"
-    | "cookieValue"
-    | "email"
-    | "orgName"
-    | "orgLogoUrl"
-  >;
+  verifyPublicAccess: {
+    __typename?: "PublicAccessVerification";
+    isAllowed: boolean;
+    cookieName?: Maybe<string>;
+    cookieValue?: Maybe<string>;
+    email?: Maybe<string>;
+    orgName?: Maybe<string>;
+    orgLogoUrl?: Maybe<string>;
+  };
 };
 
 export type publicSendVerificationCodeMutationVariables = Exact<{
   keycode: Scalars["ID"];
 }>;
 
-export type publicSendVerificationCodeMutation = { __typename?: "Mutation" } & {
-  publicSendVerificationCode: { __typename?: "VerificationCodeRequest" } & Pick<
-    VerificationCodeRequest,
-    "token" | "remainingAttempts" | "expiresAt"
-  >;
+export type publicSendVerificationCodeMutation = {
+  publicSendVerificationCode: {
+    __typename?: "VerificationCodeRequest";
+    token: string;
+    remainingAttempts: number;
+    expiresAt: string;
+  };
 };
 
 export type publicCheckVerificationCodeMutationVariables = Exact<{
@@ -6003,63 +6018,62 @@ export type publicCheckVerificationCodeMutationVariables = Exact<{
 }>;
 
 export type publicCheckVerificationCodeMutation = {
-  __typename?: "Mutation";
-} & {
-  publicCheckVerificationCode: { __typename?: "VerificationCodeCheck" } & Pick<
-    VerificationCodeCheck,
-    "result" | "remainingAttempts"
-  >;
+  publicCheckVerificationCode: {
+    __typename?: "VerificationCodeCheck";
+    result: Result;
+    remainingAttempts?: Maybe<number>;
+  };
 };
 
-export type PetitionPdf_PetitionFragment = { __typename?: "Petition" } & Pick<
-  Petition,
-  "id" | "name"
-> & {
-    fields: Array<
-      { __typename?: "PetitionField" } & PetitionPdf_PetitionFieldFragment
-    >;
-    organization: { __typename?: "Organization" } & Pick<
-      Organization,
-      "name" | "logoUrl"
-    >;
-    currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & {
-        signatureConfig: { __typename?: "SignatureConfig" } & Pick<
-          SignatureConfig,
-          "timezone"
-        > & {
-            contacts: Array<
-              Maybe<
-                { __typename?: "Contact" } & Pick<
-                  Contact,
-                  "id" | "fullName" | "email"
-                >
-              >
-            >;
-          };
-      }
-    >;
+export type PetitionPdf_PetitionFragment = {
+  __typename?: "Petition";
+  id: string;
+  name?: Maybe<string>;
+  fields: Array<
+    { __typename?: "PetitionField" } & PetitionPdf_PetitionFieldFragment
+  >;
+  organization: {
+    __typename?: "Organization";
+    name: string;
+    logoUrl?: Maybe<string>;
   };
+  currentSignatureRequest?: Maybe<{
+    __typename?: "PetitionSignatureRequest";
+    signatureConfig: {
+      __typename?: "SignatureConfig";
+      timezone: string;
+      contacts: Array<
+        Maybe<{
+          __typename?: "Contact";
+          id: string;
+          fullName?: Maybe<string>;
+          email: string;
+        }>
+      >;
+    };
+  }>;
+};
 
 export type PetitionPdf_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<
-  PetitionField,
-  "id" | "type" | "title" | "options" | "description" | "validated"
-> & {
-    replies: Array<
-      { __typename?: "PetitionFieldReply" } & Pick<
-        PetitionFieldReply,
-        "id" | "content"
-      >
-    >;
-  } & useFieldVisibility_PetitionFieldFragment;
+  id: string;
+  type: PetitionFieldType;
+  title?: Maybe<string>;
+  options: { [key: string]: any };
+  description?: Maybe<string>;
+  validated: boolean;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+  }>;
+} & useFieldVisibility_PetitionFieldFragment;
 
 export type PdfViewPetitionQueryVariables = Exact<{
   token: Scalars["String"];
 }>;
 
-export type PdfViewPetitionQuery = { __typename?: "Query" } & {
+export type PdfViewPetitionQuery = {
   petitionAuthToken?: Maybe<
     { __typename?: "Petition" } & PetitionPdf_PetitionFragment
   >;
@@ -6069,54 +6083,47 @@ export type Thanks_PetitionLogoQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
 
-export type Thanks_PetitionLogoQuery = { __typename?: "Query" } & Pick<
-  Query,
-  "publicOrgLogoUrl"
->;
+export type Thanks_PetitionLogoQuery = { publicOrgLogoUrl?: Maybe<string> };
 
 export type useFieldVisibility_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
-} & Pick<PublicPetitionField, "id" | "visibility"> & {
-    replies: Array<
-      { __typename?: "PublicPetitionFieldReply" } & Pick<
-        PublicPetitionFieldReply,
-        "id" | "content"
-      >
-    >;
-  };
+  id: string;
+  visibility?: Maybe<{ [key: string]: any }>;
+  replies: Array<{
+    __typename?: "PublicPetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+  }>;
+};
 
 export type useFieldVisibility_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "visibility"> & {
-    replies: Array<
-      { __typename?: "PetitionFieldReply" } & Pick<
-        PetitionFieldReply,
-        "id" | "content"
-      >
-    >;
-  };
+  id: string;
+  visibility?: Maybe<{ [key: string]: any }>;
+  replies: Array<{
+    __typename?: "PetitionFieldReply";
+    id: string;
+    content: { [key: string]: any };
+  }>;
+};
 
 export type filterPetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "isReadOnly" | "validated"> & {
-    comments: Array<
-      { __typename?: "PetitionFieldComment" } & Pick<PetitionFieldComment, "id">
-    >;
-    replies: Array<
-      { __typename?: "PetitionFieldReply" } & Pick<PetitionFieldReply, "id">
-    >;
-  };
+  id: string;
+  isReadOnly: boolean;
+  validated: boolean;
+  comments: Array<{ __typename?: "PetitionFieldComment"; id: string }>;
+  replies: Array<{ __typename?: "PetitionFieldReply"; id: string }>;
+};
 
 export type useClonePetitions_clonePetitionsMutationVariables = Exact<{
   petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
 }>;
 
 export type useClonePetitions_clonePetitionsMutation = {
-  __typename?: "Mutation";
-} & {
   clonePetitions: Array<
-    | ({ __typename?: "Petition" } & Pick<Petition, "id">)
-    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">)
+    | { __typename?: "Petition"; id: string }
+    | { __typename?: "PetitionTemplate"; id: string }
   >;
 };
 
@@ -6125,12 +6132,14 @@ export type useCreateContact_createContactMutationVariables = Exact<{
 }>;
 
 export type useCreateContact_createContactMutation = {
-  __typename?: "Mutation";
-} & {
-  createContact: { __typename?: "Contact" } & Pick<
-    Contact,
-    "id" | "email" | "firstName" | "lastName" | "fullName"
-  >;
+  createContact: {
+    __typename?: "Contact";
+    id: string;
+    email: string;
+    firstName?: Maybe<string>;
+    lastName?: Maybe<string>;
+    fullName?: Maybe<string>;
+  };
 };
 
 export type useCreatePetition_createPetitionMutationVariables = Exact<{
@@ -6141,11 +6150,9 @@ export type useCreatePetition_createPetitionMutationVariables = Exact<{
 }>;
 
 export type useCreatePetition_createPetitionMutation = {
-  __typename?: "Mutation";
-} & {
   createPetition:
-    | ({ __typename?: "Petition" } & Pick<Petition, "id">)
-    | ({ __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id">);
+    | { __typename?: "Petition"; id: string }
+    | { __typename?: "PetitionTemplate"; id: string };
 };
 
 export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
@@ -6153,15 +6160,17 @@ export type useDeletePetitions_deletePetitionsMutationVariables = Exact<{
 }>;
 
 export type useDeletePetitions_deletePetitionsMutation = {
-  __typename?: "Mutation";
-} & Pick<Mutation, "deletePetitions">;
+  deletePetitions: Result;
+};
 
 export type ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "name">;
+  id: string;
+  name?: Maybe<string>;
+};
 
 export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment =
-  { __typename?: "PetitionTemplate" } & Pick<PetitionTemplate, "id" | "name">;
+  { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
 
 export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
   | ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment
@@ -6169,72 +6178,71 @@ export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
 
 export type useFilenamePlaceholdersRename_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "type" | "title">;
+  id: string;
+  type: PetitionFieldType;
+  title?: Maybe<string>;
+};
 
 export type useFilenamePlaceholdersRename_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
-} & Pick<PetitionFieldReply, "content">;
+  content: { [key: string]: any };
+};
 
 export type usePetitionCurrentSignatureStatus_PetitionFragment = {
   __typename?: "Petition";
-} & Pick<Petition, "status"> & {
-    currentSignatureRequest?: Maybe<
-      { __typename?: "PetitionSignatureRequest" } & Pick<
-        PetitionSignatureRequest,
-        "status"
-      >
-    >;
-    signatureConfig?: Maybe<
-      { __typename?: "SignatureConfig" } & Pick<SignatureConfig, "review">
-    >;
-  };
+  status: PetitionStatus;
+  currentSignatureRequest?: Maybe<{
+    __typename?: "PetitionSignatureRequest";
+    status: PetitionSignatureRequestStatus;
+  }>;
+  signatureConfig?: Maybe<{ __typename?: "SignatureConfig"; review: boolean }>;
+};
 
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
-} & Pick<Petition, "id" | "name" | "createdAt"> & {
-    accesses: Array<
-      { __typename?: "PetitionAccess" } & Pick<PetitionAccess, "status"> & {
-          contact?: Maybe<
-            { __typename?: "Contact" } & ContactLink_ContactFragment
-          >;
-        }
-    >;
-    permissions: Array<
-      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-          PetitionUserGroupPermission,
-          "permissionType"
-        > & {
-            group: {
-              __typename?: "UserGroup";
-            } & UserAvatarList_UserGroupFragment;
-          })
-      | ({ __typename?: "PetitionUserPermission" } & Pick<
-          PetitionUserPermission,
-          "permissionType"
-        > & { user: { __typename?: "User" } & UserAvatarList_UserFragment })
-    >;
-  } & PetitionStatusCellContent_PetitionFragment &
+  id: string;
+  name?: Maybe<string>;
+  createdAt: string;
+  accesses: Array<{
+    __typename?: "PetitionAccess";
+    status: PetitionAccessStatus;
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  }>;
+  permissions: Array<
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        permissionType: PetitionUserPermissionType;
+        group: { __typename?: "UserGroup" } & UserAvatarList_UserGroupFragment;
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        permissionType: PetitionUserPermissionType;
+        user: { __typename?: "User" } & UserAvatarList_UserFragment;
+      }
+  >;
+} & PetitionStatusCellContent_PetitionFragment &
   PetitionSignatureCellContent_PetitionFragment &
   PetitionTagListCellContent_PetitionBase_Petition_Fragment;
 
 export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-} & Pick<PetitionTemplate, "description" | "id" | "name" | "createdAt"> & {
-    permissions: Array<
-      | ({ __typename?: "PetitionUserGroupPermission" } & Pick<
-          PetitionUserGroupPermission,
-          "permissionType"
-        > & {
-            group: {
-              __typename?: "UserGroup";
-            } & UserAvatarList_UserGroupFragment;
-          })
-      | ({ __typename?: "PetitionUserPermission" } & Pick<
-          PetitionUserPermission,
-          "permissionType"
-        > & { user: { __typename?: "User" } & UserAvatarList_UserFragment })
-    >;
-  } & PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment;
+  description?: Maybe<string>;
+  id: string;
+  name?: Maybe<string>;
+  createdAt: string;
+  permissions: Array<
+    | {
+        __typename?: "PetitionUserGroupPermission";
+        permissionType: PetitionUserPermissionType;
+        group: { __typename?: "UserGroup" } & UserAvatarList_UserGroupFragment;
+      }
+    | {
+        __typename?: "PetitionUserPermission";
+        permissionType: PetitionUserPermissionType;
+        user: { __typename?: "User" } & UserAvatarList_UserFragment;
+      }
+  >;
+} & PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment;
 
 export type usePetitionsTableColumns_PetitionBaseFragment =
   | usePetitionsTableColumns_PetitionBase_Petition_Fragment
@@ -6249,19 +6257,25 @@ export type PetitionComposeSearchContactsQueryVariables = Exact<{
   exclude?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
 }>;
 
-export type PetitionComposeSearchContactsQuery = { __typename?: "Query" } & {
-  contacts: { __typename?: "ContactPagination" } & {
+export type PetitionComposeSearchContactsQuery = {
+  contacts: {
+    __typename?: "ContactPagination";
     items: Array<{ __typename?: "Contact" } & ContactSelect_ContactFragment>;
   };
 };
 
-export type useSettingsSections_UserFragment = { __typename?: "User" } & {
-  hasApiTokens: User["hasFeatureFlag"];
+export type useSettingsSections_UserFragment = {
+  __typename?: "User";
+  hasApiTokens: boolean;
 };
 
 export type validatePetitionFields_PetitionFieldFragment = {
   __typename?: "PetitionField";
-} & Pick<PetitionField, "id" | "title" | "type" | "options">;
+  id: string;
+  title?: Maybe<string>;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+};
 
 export const ContactListPopover_ContactFragmentDoc = gql`
   fragment ContactListPopover_Contact on Contact {
@@ -8364,23 +8378,6 @@ export const PetitionTagFilter_tagsDocument = gql`
   }
   ${PetitionTagListCellContent_TagFragmentDoc}
 `;
-
-/**
- * __usePetitionTagFilter_tagsQuery__
- *
- * To run a query within a React component, call `usePetitionTagFilter_tagsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionTagFilter_tagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionTagFilter_tagsQuery({
- *   variables: {
- *      search: // value for 'search'
- *   },
- * });
- */
 export function usePetitionTagFilter_tagsQuery(
   baseOptions?: Apollo.QueryHookOptions<
     PetitionTagFilter_tagsQuery,
@@ -8421,23 +8418,6 @@ export const PetitionTagListCellContent_tagsDocument = gql`
   }
   ${PetitionTagListCellContent_TagFragmentDoc}
 `;
-
-/**
- * __usePetitionTagListCellContent_tagsQuery__
- *
- * To run a query within a React component, call `usePetitionTagListCellContent_tagsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionTagListCellContent_tagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionTagListCellContent_tagsQuery({
- *   variables: {
- *      search: // value for 'search'
- *   },
- * });
- */
 export function usePetitionTagListCellContent_tagsQuery(
   baseOptions?: Apollo.QueryHookOptions<
     PetitionTagListCellContent_tagsQuery,
@@ -8482,25 +8462,6 @@ export const PetitionTagListCellContent_tagPetitionDocument = gql`
   }
   ${PetitionTagListCellContent_TagFragmentDoc}
 `;
-
-/**
- * __usePetitionTagListCellContent_tagPetitionMutation__
- *
- * To run a mutation, you first call `usePetitionTagListCellContent_tagPetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionTagListCellContent_tagPetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionTagListCellContentTagPetitionMutation, { data, loading, error }] = usePetitionTagListCellContent_tagPetitionMutation({
- *   variables: {
- *      tagId: // value for 'tagId'
- *      petitionId: // value for 'petitionId'
- *   },
- * });
- */
 export function usePetitionTagListCellContent_tagPetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionTagListCellContent_tagPetitionMutation,
@@ -8529,25 +8490,6 @@ export const PetitionTagListCellContent_untagPetitionDocument = gql`
   }
   ${PetitionTagListCellContent_TagFragmentDoc}
 `;
-
-/**
- * __usePetitionTagListCellContent_untagPetitionMutation__
- *
- * To run a mutation, you first call `usePetitionTagListCellContent_untagPetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionTagListCellContent_untagPetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionTagListCellContentUntagPetitionMutation, { data, loading, error }] = usePetitionTagListCellContent_untagPetitionMutation({
- *   variables: {
- *      tagId: // value for 'tagId'
- *      petitionId: // value for 'petitionId'
- *   },
- * });
- */
 export function usePetitionTagListCellContent_untagPetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionTagListCellContent_untagPetitionMutation,
@@ -8573,25 +8515,6 @@ export const PetitionTagListCellContent_createTagDocument = gql`
   }
   ${PetitionTagListCellContent_TagFragmentDoc}
 `;
-
-/**
- * __usePetitionTagListCellContent_createTagMutation__
- *
- * To run a mutation, you first call `usePetitionTagListCellContent_createTagMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionTagListCellContent_createTagMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionTagListCellContentCreateTagMutation, { data, loading, error }] = usePetitionTagListCellContent_createTagMutation({
- *   variables: {
- *      name: // value for 'name'
- *      color: // value for 'color'
- *   },
- * });
- */
 export function usePetitionTagListCellContent_createTagMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionTagListCellContent_createTagMutation,
@@ -8617,22 +8540,6 @@ export const TagEditDialog_tagsDocument = gql`
   }
   ${TagEditDialog_TagFragmentDoc}
 `;
-
-/**
- * __useTagEditDialog_tagsQuery__
- *
- * To run a query within a React component, call `useTagEditDialog_tagsQuery` and pass it any options that fit your needs.
- * When your component renders, `useTagEditDialog_tagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useTagEditDialog_tagsQuery({
- *   variables: {
- *   },
- * });
- */
 export function useTagEditDialog_tagsQuery(
   baseOptions?: Apollo.QueryHookOptions<
     TagEditDialog_tagsQuery,
@@ -8671,25 +8578,6 @@ export const TagEditDialog_updateTagDocument = gql`
   }
   ${TagEditDialog_TagFragmentDoc}
 `;
-
-/**
- * __useTagEditDialog_updateTagMutation__
- *
- * To run a mutation, you first call `useTagEditDialog_updateTagMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useTagEditDialog_updateTagMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [tagEditDialogUpdateTagMutation, { data, loading, error }] = useTagEditDialog_updateTagMutation({
- *   variables: {
- *      id: // value for 'id'
- *      data: // value for 'data'
- *   },
- * });
- */
 export function useTagEditDialog_updateTagMutation(
   baseOptions?: Apollo.MutationHookOptions<
     TagEditDialog_updateTagMutation,
@@ -8731,27 +8619,6 @@ export const useSearchUsers_searchUsersDocument = gql`
   ${UserSelect_UserFragmentDoc}
   ${UserSelect_UserGroupFragmentDoc}
 `;
-
-/**
- * __useuseSearchUsers_searchUsersQuery__
- *
- * To run a query within a React component, call `useuseSearchUsers_searchUsersQuery` and pass it any options that fit your needs.
- * When your component renders, `useuseSearchUsers_searchUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useuseSearchUsers_searchUsersQuery({
- *   variables: {
- *      search: // value for 'search'
- *      excludeUsers: // value for 'excludeUsers'
- *      excludeUserGroups: // value for 'excludeUserGroups'
- *      includeGroups: // value for 'includeGroups'
- *      includeInactive: // value for 'includeInactive'
- *   },
- * });
- */
 export function useuseSearchUsers_searchUsersQuery(
   baseOptions: Apollo.QueryHookOptions<
     useSearchUsers_searchUsersQuery,
@@ -8789,22 +8656,6 @@ export const WithAdminOrganizationRoleDocument = gql`
     }
   }
 `;
-
-/**
- * __useWithAdminOrganizationRoleQuery__
- *
- * To run a query within a React component, call `useWithAdminOrganizationRoleQuery` and pass it any options that fit your needs.
- * When your component renders, `useWithAdminOrganizationRoleQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useWithAdminOrganizationRoleQuery({
- *   variables: {
- *   },
- * });
- */
 export function useWithAdminOrganizationRoleQuery(
   baseOptions?: Apollo.QueryHookOptions<
     WithAdminOrganizationRoleQuery,
@@ -8843,23 +8694,6 @@ export const HasFeatureFlagDocument = gql`
     }
   }
 `;
-
-/**
- * __useHasFeatureFlagQuery__
- *
- * To run a query within a React component, call `useHasFeatureFlagQuery` and pass it any options that fit your needs.
- * When your component renders, `useHasFeatureFlagQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useHasFeatureFlagQuery({
- *   variables: {
- *      featureFlag: // value for 'featureFlag'
- *   },
- * });
- */
 export function useHasFeatureFlagQuery(
   baseOptions: Apollo.QueryHookOptions<
     HasFeatureFlagQuery,
@@ -8897,22 +8731,6 @@ export const WithSuperAdminAccessDocument = gql`
     }
   }
 `;
-
-/**
- * __useWithSuperAdminAccessQuery__
- *
- * To run a query within a React component, call `useWithSuperAdminAccessQuery` and pass it any options that fit your needs.
- * When your component renders, `useWithSuperAdminAccessQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useWithSuperAdminAccessQuery({
- *   variables: {
- *   },
- * });
- */
 export function useWithSuperAdminAccessQuery(
   baseOptions?: Apollo.QueryHookOptions<
     WithSuperAdminAccessQuery,
@@ -8950,24 +8768,6 @@ export const ImportContactsDialog_bulkCreateContactsDocument = gql`
     }
   }
 `;
-
-/**
- * __useImportContactsDialog_bulkCreateContactsMutation__
- *
- * To run a mutation, you first call `useImportContactsDialog_bulkCreateContactsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useImportContactsDialog_bulkCreateContactsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [importContactsDialogBulkCreateContactsMutation, { data, loading, error }] = useImportContactsDialog_bulkCreateContactsMutation({
- *   variables: {
- *      file: // value for 'file'
- *   },
- * });
- */
 export function useImportContactsDialog_bulkCreateContactsMutation(
   baseOptions?: Apollo.MutationHookOptions<
     ImportContactsDialog_bulkCreateContactsMutation,
@@ -8993,25 +8793,6 @@ export const AppLayout_updateOnboardingStatusDocument = gql`
     }
   }
 `;
-
-/**
- * __useAppLayout_updateOnboardingStatusMutation__
- *
- * To run a mutation, you first call `useAppLayout_updateOnboardingStatusMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAppLayout_updateOnboardingStatusMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [appLayoutUpdateOnboardingStatusMutation, { data, loading, error }] = useAppLayout_updateOnboardingStatusMutation({
- *   variables: {
- *      key: // value for 'key'
- *      status: // value for 'status'
- *   },
- * });
- */
 export function useAppLayout_updateOnboardingStatusMutation(
   baseOptions?: Apollo.MutationHookOptions<
     AppLayout_updateOnboardingStatusMutation,
@@ -9036,24 +8817,6 @@ export const PetitionHeader_reopenPetitionDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionHeader_reopenPetitionMutation__
- *
- * To run a mutation, you first call `usePetitionHeader_reopenPetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionHeader_reopenPetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionHeaderReopenPetitionMutation, { data, loading, error }] = usePetitionHeader_reopenPetitionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *   },
- * });
- */
 export function usePetitionHeader_reopenPetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionHeader_reopenPetitionMutation,
@@ -9085,25 +8848,6 @@ export const PetitionHeader_updatePetitionUserSubscriptionDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionHeader_updatePetitionUserSubscriptionMutation__
- *
- * To run a mutation, you first call `usePetitionHeader_updatePetitionUserSubscriptionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionHeader_updatePetitionUserSubscriptionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionHeaderUpdatePetitionUserSubscriptionMutation, { data, loading, error }] = usePetitionHeader_updatePetitionUserSubscriptionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      isSubscribed: // value for 'isSubscribed'
- *   },
- * });
- */
 export function usePetitionHeader_updatePetitionUserSubscriptionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionHeader_updatePetitionUserSubscriptionMutation,
@@ -9123,23 +8867,6 @@ export const CreateUserDialog_emailIsAvailableDocument = gql`
     emailIsAvailable(email: $email)
   }
 `;
-
-/**
- * __useCreateUserDialog_emailIsAvailableQuery__
- *
- * To run a query within a React component, call `useCreateUserDialog_emailIsAvailableQuery` and pass it any options that fit your needs.
- * When your component renders, `useCreateUserDialog_emailIsAvailableQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useCreateUserDialog_emailIsAvailableQuery({
- *   variables: {
- *      email: // value for 'email'
- *   },
- * });
- */
 export function useCreateUserDialog_emailIsAvailableQuery(
   baseOptions: Apollo.QueryHookOptions<
     CreateUserDialog_emailIsAvailableQuery,
@@ -9178,23 +8905,6 @@ export const AddPetitionAccessDialog_contactsByEmailDocument = gql`
   }
   ${ContactSelect_ContactFragmentDoc}
 `;
-
-/**
- * __useAddPetitionAccessDialog_contactsByEmailQuery__
- *
- * To run a query within a React component, call `useAddPetitionAccessDialog_contactsByEmailQuery` and pass it any options that fit your needs.
- * When your component renders, `useAddPetitionAccessDialog_contactsByEmailQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAddPetitionAccessDialog_contactsByEmailQuery({
- *   variables: {
- *      emails: // value for 'emails'
- *   },
- * });
- */
 export function useAddPetitionAccessDialog_contactsByEmailQuery(
   baseOptions: Apollo.QueryHookOptions<
     AddPetitionAccessDialog_contactsByEmailQuery,
@@ -9236,24 +8946,6 @@ export const PetitionSettings_cancelPetitionSignatureRequestDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionSettings_cancelPetitionSignatureRequestMutation__
- *
- * To run a mutation, you first call `usePetitionSettings_cancelPetitionSignatureRequestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSettings_cancelPetitionSignatureRequestMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSettingsCancelPetitionSignatureRequestMutation, { data, loading, error }] = usePetitionSettings_cancelPetitionSignatureRequestMutation({
- *   variables: {
- *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
- *   },
- * });
- */
 export function usePetitionSettings_cancelPetitionSignatureRequestMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionSettings_cancelPetitionSignatureRequestMutation,
@@ -9276,24 +8968,6 @@ export const PetitionSettings_startPetitionSignatureRequestDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionSettings_startPetitionSignatureRequestMutation__
- *
- * To run a mutation, you first call `usePetitionSettings_startPetitionSignatureRequestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSettings_startPetitionSignatureRequestMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSettingsStartPetitionSignatureRequestMutation, { data, loading, error }] = usePetitionSettings_startPetitionSignatureRequestMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *   },
- * });
- */
 export function usePetitionSettings_startPetitionSignatureRequestMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionSettings_startPetitionSignatureRequestMutation,
@@ -9332,30 +9006,6 @@ export const PetitionSharingModal_addPetitionUserPermissionDocument = gql`
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-
-/**
- * __usePetitionSharingModal_addPetitionUserPermissionMutation__
- *
- * To run a mutation, you first call `usePetitionSharingModal_addPetitionUserPermissionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSharingModal_addPetitionUserPermissionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSharingModalAddPetitionUserPermissionMutation, { data, loading, error }] = usePetitionSharingModal_addPetitionUserPermissionMutation({
- *   variables: {
- *      petitionIds: // value for 'petitionIds'
- *      userIds: // value for 'userIds'
- *      userGroupIds: // value for 'userGroupIds'
- *      permissionType: // value for 'permissionType'
- *      notify: // value for 'notify'
- *      subscribe: // value for 'subscribe'
- *      message: // value for 'message'
- *   },
- * });
- */
 export function usePetitionSharingModal_addPetitionUserPermissionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionSharingModal_addPetitionUserPermissionMutation,
@@ -9386,26 +9036,6 @@ export const PetitionSharingModal_removePetitionUserPermissionDocument = gql`
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-
-/**
- * __usePetitionSharingModal_removePetitionUserPermissionMutation__
- *
- * To run a mutation, you first call `usePetitionSharingModal_removePetitionUserPermissionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSharingModal_removePetitionUserPermissionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSharingModalRemovePetitionUserPermissionMutation, { data, loading, error }] = usePetitionSharingModal_removePetitionUserPermissionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      userIds: // value for 'userIds'
- *      userGroupIds: // value for 'userGroupIds'
- *   },
- * });
- */
 export function usePetitionSharingModal_removePetitionUserPermissionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionSharingModal_removePetitionUserPermissionMutation,
@@ -9433,25 +9063,6 @@ export const PetitionSharingModal_transferPetitionOwnershipDocument = gql`
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-
-/**
- * __usePetitionSharingModal_transferPetitionOwnershipMutation__
- *
- * To run a mutation, you first call `usePetitionSharingModal_transferPetitionOwnershipMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSharingModal_transferPetitionOwnershipMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSharingModalTransferPetitionOwnershipMutation, { data, loading, error }] = usePetitionSharingModal_transferPetitionOwnershipMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      userId: // value for 'userId'
- *   },
- * });
- */
 export function usePetitionSharingModal_transferPetitionOwnershipMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionSharingModal_transferPetitionOwnershipMutation,
@@ -9474,23 +9085,6 @@ export const PetitionSharingModal_PetitionsUserPermissionsDocument = gql`
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-
-/**
- * __usePetitionSharingModal_PetitionsUserPermissionsQuery__
- *
- * To run a query within a React component, call `usePetitionSharingModal_PetitionsUserPermissionsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionSharingModal_PetitionsUserPermissionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionSharingModal_PetitionsUserPermissionsQuery({
- *   variables: {
- *      petitionIds: // value for 'petitionIds'
- *   },
- * });
- */
 export function usePetitionSharingModal_PetitionsUserPermissionsQuery(
   baseOptions: Apollo.QueryHookOptions<
     PetitionSharingModal_PetitionsUserPermissionsQuery,
@@ -9527,23 +9121,6 @@ export const useTemplateDetailsDialogPetitionDocument = gql`
   }
   ${TemplateDetailsDialog_PetitionTemplateFragmentDoc}
 `;
-
-/**
- * __useuseTemplateDetailsDialogPetitionQuery__
- *
- * To run a query within a React component, call `useuseTemplateDetailsDialogPetitionQuery` and pass it any options that fit your needs.
- * When your component renders, `useuseTemplateDetailsDialogPetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useuseTemplateDetailsDialogPetitionQuery({
- *   variables: {
- *      templateId: // value for 'templateId'
- *   },
- * });
- */
 export function useuseTemplateDetailsDialogPetitionQuery(
   baseOptions: Apollo.QueryHookOptions<
     useTemplateDetailsDialogPetitionQuery,
@@ -9590,26 +9167,6 @@ export const DynamicSelectSettings_uploadDynamicSelectFieldFileDocument = gql`
     }
   }
 `;
-
-/**
- * __useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation__
- *
- * To run a mutation, you first call `useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [dynamicSelectSettingsUploadDynamicSelectFieldFileMutation, { data, loading, error }] = useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      fieldId: // value for 'fieldId'
- *      file: // value for 'file'
- *   },
- * });
- */
 export function useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation(
   baseOptions?: Apollo.MutationHookOptions<
     DynamicSelectSettings_uploadDynamicSelectFieldFileMutation,
@@ -9640,25 +9197,6 @@ export const DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkDocument = 
     }
   }
 `;
-
-/**
- * __useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation__
- *
- * To run a mutation, you first call `useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [dynamicSelectSettingsDynamicSelectFieldFileDownloadLinkMutation, { data, loading, error }] = useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      fieldId: // value for 'fieldId'
- *   },
- * });
- */
 export function useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation(
   baseOptions?: Apollo.MutationHookOptions<
     DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
@@ -9683,23 +9221,6 @@ export const ExportRepliesProgressDialog_PetitionRepliesDocument = gql`
   }
   ${ExportRepliesProgressDialog_PetitionFragmentDoc}
 `;
-
-/**
- * __useExportRepliesProgressDialog_PetitionRepliesQuery__
- *
- * To run a query within a React component, call `useExportRepliesProgressDialog_PetitionRepliesQuery` and pass it any options that fit your needs.
- * When your component renders, `useExportRepliesProgressDialog_PetitionRepliesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useExportRepliesProgressDialog_PetitionRepliesQuery({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *   },
- * });
- */
 export function useExportRepliesProgressDialog_PetitionRepliesQuery(
   baseOptions: Apollo.QueryHookOptions<
     ExportRepliesProgressDialog_PetitionRepliesQuery,
@@ -9739,25 +9260,6 @@ export const ExportRepliesProgressDialog_fileUploadReplyDownloadLinkDocument = g
     }
   }
 `;
-
-/**
- * __useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation__
- *
- * To run a mutation, you first call `useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [exportRepliesProgressDialogFileUploadReplyDownloadLinkMutation, { data, loading, error }] = useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      replyId: // value for 'replyId'
- *   },
- * });
- */
 export function useExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation(
   baseOptions?: Apollo.MutationHookOptions<
     ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation,
@@ -9789,25 +9291,6 @@ export const ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument = gq
     }
   }
 `;
-
-/**
- * __useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation__
- *
- * To run a mutation, you first call `useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [exportRepliesProgressDialogSignedPetitionDownloadLinkMutation, { data, loading, error }] = useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation({
- *   variables: {
- *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
- *      downloadAuditTrail: // value for 'downloadAuditTrail'
- *   },
- * });
- */
 export function useExportRepliesProgressDialog_signedPetitionDownloadLinkMutation(
   baseOptions?: Apollo.MutationHookOptions<
     ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation,
@@ -9840,26 +9323,6 @@ export const ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataDocumen
     }
   }
 `;
-
-/**
- * __useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation__
- *
- * To run a mutation, you first call `useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [exportRepliesProgressDialogUpdatePetitionFieldReplyMetadataMutation, { data, loading, error }] = useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      replyId: // value for 'replyId'
- *      metadata: // value for 'metadata'
- *   },
- * });
- */
 export function useExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation(
   baseOptions?: Apollo.MutationHookOptions<
     ExportRepliesProgressDialog_updatePetitionFieldReplyMetadataMutation,
@@ -9893,25 +9356,6 @@ export const ExportRepliesProgressDialog_updateSignatureRequestMetadataDocument 
     }
   }
 `;
-
-/**
- * __useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation__
- *
- * To run a mutation, you first call `useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [exportRepliesProgressDialogUpdateSignatureRequestMetadataMutation, { data, loading, error }] = useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation({
- *   variables: {
- *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
- *      metadata: // value for 'metadata'
- *   },
- * });
- */
 export function useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation(
   baseOptions?: Apollo.MutationHookOptions<
     ExportRepliesProgressDialog_updateSignatureRequestMetadataMutation,
@@ -9947,25 +9391,6 @@ export const PetitionSignaturesCard_updatePetitionSignatureConfigDocument = gql`
   }
   ${PetitionSignaturesCard_PetitionFragmentDoc}
 `;
-
-/**
- * __usePetitionSignaturesCard_updatePetitionSignatureConfigMutation__
- *
- * To run a mutation, you first call `usePetitionSignaturesCard_updatePetitionSignatureConfigMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSignaturesCard_updatePetitionSignatureConfigMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSignaturesCardUpdatePetitionSignatureConfigMutation, { data, loading, error }] = usePetitionSignaturesCard_updatePetitionSignatureConfigMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      signatureConfig: // value for 'signatureConfig'
- *   },
- * });
- */
 export function usePetitionSignaturesCard_updatePetitionSignatureConfigMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionSignaturesCard_updatePetitionSignatureConfigMutation,
@@ -9994,24 +9419,6 @@ export const PetitionSignaturesCard_cancelSignatureRequestDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionSignaturesCard_cancelSignatureRequestMutation__
- *
- * To run a mutation, you first call `usePetitionSignaturesCard_cancelSignatureRequestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSignaturesCard_cancelSignatureRequestMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSignaturesCardCancelSignatureRequestMutation, { data, loading, error }] = usePetitionSignaturesCard_cancelSignatureRequestMutation({
- *   variables: {
- *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
- *   },
- * });
- */
 export function usePetitionSignaturesCard_cancelSignatureRequestMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionSignaturesCard_cancelSignatureRequestMutation,
@@ -10034,24 +9441,6 @@ export const PetitionSignaturesCard_startSignatureRequestDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionSignaturesCard_startSignatureRequestMutation__
- *
- * To run a mutation, you first call `usePetitionSignaturesCard_startSignatureRequestMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSignaturesCard_startSignatureRequestMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSignaturesCardStartSignatureRequestMutation, { data, loading, error }] = usePetitionSignaturesCard_startSignatureRequestMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *   },
- * });
- */
 export function usePetitionSignaturesCard_startSignatureRequestMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionSignaturesCard_startSignatureRequestMutation,
@@ -10080,25 +9469,6 @@ export const PetitionSignaturesCard_signedPetitionDownloadLinkDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionSignaturesCard_signedPetitionDownloadLinkMutation__
- *
- * To run a mutation, you first call `usePetitionSignaturesCard_signedPetitionDownloadLinkMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionSignaturesCard_signedPetitionDownloadLinkMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionSignaturesCardSignedPetitionDownloadLinkMutation, { data, loading, error }] = usePetitionSignaturesCard_signedPetitionDownloadLinkMutation({
- *   variables: {
- *      petitionSignatureRequestId: // value for 'petitionSignatureRequestId'
- *      preview: // value for 'preview'
- *   },
- * });
- */
 export function usePetitionSignaturesCard_signedPetitionDownloadLinkMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionSignaturesCard_signedPetitionDownloadLinkMutation,
@@ -10141,28 +9511,6 @@ export const RecipientViewHeader_publicDelegateAccessToContactDocument = gql`
     }
   }
 `;
-
-/**
- * __useRecipientViewHeader_publicDelegateAccessToContactMutation__
- *
- * To run a mutation, you first call `useRecipientViewHeader_publicDelegateAccessToContactMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewHeader_publicDelegateAccessToContactMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewHeaderPublicDelegateAccessToContactMutation, { data, loading, error }] = useRecipientViewHeader_publicDelegateAccessToContactMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      email: // value for 'email'
- *      firstName: // value for 'firstName'
- *      lastName: // value for 'lastName'
- *      messageBody: // value for 'messageBody'
- *   },
- * });
- */
 export function useRecipientViewHeader_publicDelegateAccessToContactMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewHeader_publicDelegateAccessToContactMutation,
@@ -10193,24 +9541,6 @@ export const RecipientViewPetitionFieldCommentsDocument = gql`
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
 `;
-
-/**
- * __useRecipientViewPetitionFieldCommentsQuery__
- *
- * To run a query within a React component, call `useRecipientViewPetitionFieldCommentsQuery` and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldCommentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useRecipientViewPetitionFieldCommentsQuery({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      petitionFieldId: // value for 'petitionFieldId'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldCommentsQuery(
   baseOptions: Apollo.QueryHookOptions<
     RecipientViewPetitionFieldCommentsQuery,
@@ -10255,25 +9585,6 @@ export const RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsA
     }
   }
 `;
-
-/**
- * __useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldCommentsDialogMarkPetitionFieldCommentsAsReadMutation, { data, loading, error }] = useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      petitionFieldCommentIds: // value for 'petitionFieldCommentIds'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldCommentsDialog_markPetitionFieldCommentsAsReadMutation,
@@ -10309,26 +9620,6 @@ export const RecipientViewPetitionFieldCommentsDialog_createPetitionFieldComment
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
 `;
-
-/**
- * __useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldCommentsDialogCreatePetitionFieldCommentMutation, { data, loading, error }] = useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      petitionFieldId: // value for 'petitionFieldId'
- *      content: // value for 'content'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutation,
@@ -10366,27 +9657,6 @@ export const RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldComment
   }
   ${RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc}
 `;
-
-/**
- * __useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldCommentsDialogUpdatePetitionFieldCommentMutation, { data, loading, error }] = useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      petitionFieldId: // value for 'petitionFieldId'
- *      petitionFieldCommentId: // value for 'petitionFieldCommentId'
- *      content: // value for 'content'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldCommentsDialog_updatePetitionFieldCommentMutation,
@@ -10419,26 +9689,6 @@ export const RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldComment
     )
   }
 `;
-
-/**
- * __useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldCommentsDialogDeletePetitionFieldCommentMutation, { data, loading, error }] = useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      petitionFieldId: // value for 'petitionFieldId'
- *      petitionFieldCommentId: // value for 'petitionFieldCommentId'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldCommentsDialog_deletePetitionFieldCommentMutation,
@@ -10474,26 +9724,6 @@ export const RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadL
     }
   }
 `;
-
-/**
- * __useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldFileUploadPublicFileUploadReplyDownloadLinkMutation, { data, loading, error }] = useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      replyId: // value for 'replyId'
- *      preview: // value for 'preview'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation,
@@ -10521,25 +9751,6 @@ export const RecipientViewPetitionFieldMutations_publicDeletePetitionReplyDocume
     publicDeletePetitionReply(replyId: $replyId, keycode: $keycode)
   }
 `;
-
-/**
- * __useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldMutationsPublicDeletePetitionReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation({
- *   variables: {
- *      replyId: // value for 'replyId'
- *      keycode: // value for 'keycode'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation,
@@ -10577,26 +9788,6 @@ export const RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyDocument
     }
   }
 `;
-
-/**
- * __useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldMutationsPublicUpdateSimpleReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      replyId: // value for 'replyId'
- *      value: // value for 'value'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
@@ -10632,26 +9823,6 @@ export const RecipientViewPetitionFieldMutations_publicCreateSimpleReplyDocument
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
 `;
-
-/**
- * __useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldMutationsPublicCreateSimpleReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      fieldId: // value for 'fieldId'
- *      value: // value for 'value'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation,
@@ -10687,26 +9858,6 @@ export const RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyD
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
 `;
-
-/**
- * __useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldMutationsPublicCreateDynamicSelectReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      fieldId: // value for 'fieldId'
- *      value: // value for 'value'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation,
@@ -10744,26 +9895,6 @@ export const RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyD
     }
   }
 `;
-
-/**
- * __useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldMutationsPublicUpdateDynamicSelectReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      replyId: // value for 'replyId'
- *      value: // value for 'value'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation,
@@ -10802,26 +9933,6 @@ export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocu
   }
   ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
 `;
-
-/**
- * __useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldMutationsPublicCreateFileUploadReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      fieldId: // value for 'fieldId'
- *      data: // value for 'data'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation,
@@ -10852,25 +9963,6 @@ export const RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteDo
     }
   }
 `;
-
-/**
- * __useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation__
- *
- * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPetitionFieldMutationsPublicFileUploadReplyCompleteMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      replyId: // value for 'replyId'
- *   },
- * });
- */
 export function useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
@@ -10903,24 +9995,6 @@ export const GenerateNewTokenDialog_generateUserAuthTokenDocument = gql`
     }
   }
 `;
-
-/**
- * __useGenerateNewTokenDialog_generateUserAuthTokenMutation__
- *
- * To run a mutation, you first call `useGenerateNewTokenDialog_generateUserAuthTokenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useGenerateNewTokenDialog_generateUserAuthTokenMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [generateNewTokenDialogGenerateUserAuthTokenMutation, { data, loading, error }] = useGenerateNewTokenDialog_generateUserAuthTokenMutation({
- *   variables: {
- *      tokenName: // value for 'tokenName'
- *   },
- * });
- */
 export function useGenerateNewTokenDialog_generateUserAuthTokenMutation(
   baseOptions?: Apollo.MutationHookOptions<
     GenerateNewTokenDialog_generateUserAuthTokenMutation,
@@ -10944,22 +10018,6 @@ export const AdminDocument = gql`
   }
   ${Admin_UserFragmentDoc}
 `;
-
-/**
- * __useAdminQuery__
- *
- * To run a query within a React component, call `useAdminQuery` and pass it any options that fit your needs.
- * When your component renders, `useAdminQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAdminQuery({
- *   variables: {
- *   },
- * });
- */
 export function useAdminQuery(
   baseOptions?: Apollo.QueryHookOptions<AdminQuery, AdminQueryVariables>
 ) {
@@ -11003,27 +10061,6 @@ export const AdminOrganizationsDocument = gql`
   }
   ${AdminOrganizations_OrganizationFragmentDoc}
 `;
-
-/**
- * __useAdminOrganizationsQuery__
- *
- * To run a query within a React component, call `useAdminOrganizationsQuery` and pass it any options that fit your needs.
- * When your component renders, `useAdminOrganizationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAdminOrganizationsQuery({
- *   variables: {
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      search: // value for 'search'
- *      sortBy: // value for 'sortBy'
- *      status: // value for 'status'
- *   },
- * });
- */
 export function useAdminOrganizationsQuery(
   baseOptions: Apollo.QueryHookOptions<
     AdminOrganizationsQuery,
@@ -11062,22 +10099,6 @@ export const AdminOrganizationsUserDocument = gql`
   }
   ${AdminOrganizations_UserFragmentDoc}
 `;
-
-/**
- * __useAdminOrganizationsUserQuery__
- *
- * To run a query within a React component, call `useAdminOrganizationsUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useAdminOrganizationsUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAdminOrganizationsUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function useAdminOrganizationsUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     AdminOrganizationsUserQuery,
@@ -11116,22 +10137,6 @@ export const AdminSupportMethodsUserDocument = gql`
   }
   ${AdminSupportMethods_UserFragmentDoc}
 `;
-
-/**
- * __useAdminSupportMethodsUserQuery__
- *
- * To run a query within a React component, call `useAdminSupportMethodsUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useAdminSupportMethodsUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAdminSupportMethodsUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function useAdminSupportMethodsUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     AdminSupportMethodsUserQuery,
@@ -11170,25 +10175,6 @@ export const Contact_updateContactDocument = gql`
   }
   ${Contact_Contact_ProfileFragmentDoc}
 `;
-
-/**
- * __useContact_updateContactMutation__
- *
- * To run a mutation, you first call `useContact_updateContactMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useContact_updateContactMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [contactUpdateContactMutation, { data, loading, error }] = useContact_updateContactMutation({
- *   variables: {
- *      id: // value for 'id'
- *      data: // value for 'data'
- *   },
- * });
- */
 export function useContact_updateContactMutation(
   baseOptions?: Apollo.MutationHookOptions<
     Contact_updateContactMutation,
@@ -11212,22 +10198,6 @@ export const ContactUserDocument = gql`
   }
   ${Contact_UserFragmentDoc}
 `;
-
-/**
- * __useContactUserQuery__
- *
- * To run a query within a React component, call `useContactUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useContactUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useContactUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function useContactUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     ContactUserQuery,
@@ -11264,24 +10234,6 @@ export const ContactDocument = gql`
   }
   ${Contact_ContactFragmentDoc}
 `;
-
-/**
- * __useContactQuery__
- *
- * To run a query within a React component, call `useContactQuery` and pass it any options that fit your needs.
- * When your component renders, `useContactQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useContactQuery({
- *   variables: {
- *      id: // value for 'id'
- *      hasPetitionSignature: // value for 'hasPetitionSignature'
- *   },
- * });
- */
 export function useContactQuery(
   baseOptions: Apollo.QueryHookOptions<ContactQuery, ContactQueryVariables>
 ) {
@@ -11307,24 +10259,6 @@ export const Contacts_deleteContactsDocument = gql`
     deleteContacts(ids: $ids)
   }
 `;
-
-/**
- * __useContacts_deleteContactsMutation__
- *
- * To run a mutation, you first call `useContacts_deleteContactsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useContacts_deleteContactsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [contactsDeleteContactsMutation, { data, loading, error }] = useContacts_deleteContactsMutation({
- *   variables: {
- *      ids: // value for 'ids'
- *   },
- * });
- */
 export function useContacts_deleteContactsMutation(
   baseOptions?: Apollo.MutationHookOptions<
     Contacts_deleteContactsMutation,
@@ -11353,26 +10287,6 @@ export const ContactsDocument = gql`
   }
   ${Contacts_ContactsListFragmentDoc}
 `;
-
-/**
- * __useContactsQuery__
- *
- * To run a query within a React component, call `useContactsQuery` and pass it any options that fit your needs.
- * When your component renders, `useContactsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useContactsQuery({
- *   variables: {
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      search: // value for 'search'
- *      sortBy: // value for 'sortBy'
- *   },
- * });
- */
 export function useContactsQuery(
   baseOptions: Apollo.QueryHookOptions<ContactsQuery, ContactsQueryVariables>
 ) {
@@ -11406,22 +10320,6 @@ export const ContactsUserDocument = gql`
   }
   ${Contacts_UserFragmentDoc}
 `;
-
-/**
- * __useContactsUserQuery__
- *
- * To run a query within a React component, call `useContactsUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useContactsUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useContactsUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function useContactsUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     ContactsUserQuery,
@@ -11460,25 +10358,6 @@ export const OrganizationBranding_updateOrgLogoDocument = gql`
     }
   }
 `;
-
-/**
- * __useOrganizationBranding_updateOrgLogoMutation__
- *
- * To run a mutation, you first call `useOrganizationBranding_updateOrgLogoMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationBranding_updateOrgLogoMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationBrandingUpdateOrgLogoMutation, { data, loading, error }] = useOrganizationBranding_updateOrgLogoMutation({
- *   variables: {
- *      orgId: // value for 'orgId'
- *      file: // value for 'file'
- *   },
- * });
- */
 export function useOrganizationBranding_updateOrgLogoMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationBranding_updateOrgLogoMutation,
@@ -11507,22 +10386,6 @@ export const OrganizationBrandingDocument = gql`
   }
   ${SettingsLayout_UserFragmentDoc}
 `;
-
-/**
- * __useOrganizationBrandingQuery__
- *
- * To run a query within a React component, call `useOrganizationBrandingQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrganizationBrandingQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrganizationBrandingQuery({
- *   variables: {
- *   },
- * });
- */
 export function useOrganizationBrandingQuery(
   baseOptions?: Apollo.QueryHookOptions<
     OrganizationBrandingQuery,
@@ -11564,25 +10427,6 @@ export const OrganizationGroup_updateUserGroupDocument = gql`
   }
   ${OrganizationGroup_UserGroupFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroup_updateUserGroupMutation__
- *
- * To run a mutation, you first call `useOrganizationGroup_updateUserGroupMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroup_updateUserGroupMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationGroupUpdateUserGroupMutation, { data, loading, error }] = useOrganizationGroup_updateUserGroupMutation({
- *   variables: {
- *      id: // value for 'id'
- *      data: // value for 'data'
- *   },
- * });
- */
 export function useOrganizationGroup_updateUserGroupMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationGroup_updateUserGroupMutation,
@@ -11609,25 +10453,6 @@ export const OrganizationGroup_addUsersToUserGroupDocument = gql`
   }
   ${OrganizationGroup_UserGroupFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroup_addUsersToUserGroupMutation__
- *
- * To run a mutation, you first call `useOrganizationGroup_addUsersToUserGroupMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroup_addUsersToUserGroupMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationGroupAddUsersToUserGroupMutation, { data, loading, error }] = useOrganizationGroup_addUsersToUserGroupMutation({
- *   variables: {
- *      userGroupId: // value for 'userGroupId'
- *      userIds: // value for 'userIds'
- *   },
- * });
- */
 export function useOrganizationGroup_addUsersToUserGroupMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationGroup_addUsersToUserGroupMutation,
@@ -11653,25 +10478,6 @@ export const OrganizationGroup_removeUsersFromGroupDocument = gql`
   }
   ${OrganizationGroup_UserGroupFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroup_removeUsersFromGroupMutation__
- *
- * To run a mutation, you first call `useOrganizationGroup_removeUsersFromGroupMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroup_removeUsersFromGroupMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationGroupRemoveUsersFromGroupMutation, { data, loading, error }] = useOrganizationGroup_removeUsersFromGroupMutation({
- *   variables: {
- *      userGroupId: // value for 'userGroupId'
- *      userIds: // value for 'userIds'
- *   },
- * });
- */
 export function useOrganizationGroup_removeUsersFromGroupMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationGroup_removeUsersFromGroupMutation,
@@ -11691,24 +10497,6 @@ export const OrganizationGroup_deleteUserGroupDocument = gql`
     deleteUserGroup(ids: $ids)
   }
 `;
-
-/**
- * __useOrganizationGroup_deleteUserGroupMutation__
- *
- * To run a mutation, you first call `useOrganizationGroup_deleteUserGroupMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroup_deleteUserGroupMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationGroupDeleteUserGroupMutation, { data, loading, error }] = useOrganizationGroup_deleteUserGroupMutation({
- *   variables: {
- *      ids: // value for 'ids'
- *   },
- * });
- */
 export function useOrganizationGroup_deleteUserGroupMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationGroup_deleteUserGroupMutation,
@@ -11732,25 +10520,6 @@ export const OrganizationGroup_cloneUserGroupDocument = gql`
   }
   ${OrganizationGroup_UserGroupFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroup_cloneUserGroupMutation__
- *
- * To run a mutation, you first call `useOrganizationGroup_cloneUserGroupMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroup_cloneUserGroupMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationGroupCloneUserGroupMutation, { data, loading, error }] = useOrganizationGroup_cloneUserGroupMutation({
- *   variables: {
- *      ids: // value for 'ids'
- *      locale: // value for 'locale'
- *   },
- * });
- */
 export function useOrganizationGroup_cloneUserGroupMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationGroup_cloneUserGroupMutation,
@@ -11774,23 +10543,6 @@ export const OrganizationGroupDocument = gql`
   }
   ${OrganizationGroup_UserGroupFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroupQuery__
- *
- * To run a query within a React component, call `useOrganizationGroupQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroupQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrganizationGroupQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
 export function useOrganizationGroupQuery(
   baseOptions: Apollo.QueryHookOptions<
     OrganizationGroupQuery,
@@ -11829,22 +10581,6 @@ export const OrganizationGroupUserDocument = gql`
   }
   ${OrganizationGroup_UserFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroupUserQuery__
- *
- * To run a query within a React component, call `useOrganizationGroupUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroupUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrganizationGroupUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function useOrganizationGroupUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     OrganizationGroupUserQuery,
@@ -11886,25 +10622,6 @@ export const OrganizationGroups_createUserGroupDocument = gql`
   }
   ${OrganizationGroups_UserGroupFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroups_createUserGroupMutation__
- *
- * To run a mutation, you first call `useOrganizationGroups_createUserGroupMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroups_createUserGroupMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationGroupsCreateUserGroupMutation, { data, loading, error }] = useOrganizationGroups_createUserGroupMutation({
- *   variables: {
- *      name: // value for 'name'
- *      userIds: // value for 'userIds'
- *   },
- * });
- */
 export function useOrganizationGroups_createUserGroupMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationGroups_createUserGroupMutation,
@@ -11925,24 +10642,6 @@ export const OrganizationGroups_deleteUserGroupDocument = gql`
     deleteUserGroup(ids: $ids)
   }
 `;
-
-/**
- * __useOrganizationGroups_deleteUserGroupMutation__
- *
- * To run a mutation, you first call `useOrganizationGroups_deleteUserGroupMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroups_deleteUserGroupMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationGroupsDeleteUserGroupMutation, { data, loading, error }] = useOrganizationGroups_deleteUserGroupMutation({
- *   variables: {
- *      ids: // value for 'ids'
- *   },
- * });
- */
 export function useOrganizationGroups_deleteUserGroupMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationGroups_deleteUserGroupMutation,
@@ -11966,25 +10665,6 @@ export const OrganizationGroups_cloneUserGroupDocument = gql`
   }
   ${OrganizationGroups_UserGroupFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroups_cloneUserGroupMutation__
- *
- * To run a mutation, you first call `useOrganizationGroups_cloneUserGroupMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroups_cloneUserGroupMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationGroupsCloneUserGroupMutation, { data, loading, error }] = useOrganizationGroups_cloneUserGroupMutation({
- *   variables: {
- *      ids: // value for 'ids'
- *      locale: // value for 'locale'
- *   },
- * });
- */
 export function useOrganizationGroups_cloneUserGroupMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationGroups_cloneUserGroupMutation,
@@ -12018,26 +10698,6 @@ export const OrganizationGroupsDocument = gql`
   }
   ${OrganizationGroups_UserGroupPaginationFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroupsQuery__
- *
- * To run a query within a React component, call `useOrganizationGroupsQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroupsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrganizationGroupsQuery({
- *   variables: {
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      search: // value for 'search'
- *      sortBy: // value for 'sortBy'
- *   },
- * });
- */
 export function useOrganizationGroupsQuery(
   baseOptions: Apollo.QueryHookOptions<
     OrganizationGroupsQuery,
@@ -12076,22 +10736,6 @@ export const OrganizationGroupsUserDocument = gql`
   }
   ${OrganizationGroups_UserFragmentDoc}
 `;
-
-/**
- * __useOrganizationGroupsUserQuery__
- *
- * To run a query within a React component, call `useOrganizationGroupsUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrganizationGroupsUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrganizationGroupsUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function useOrganizationGroupsUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     OrganizationGroupsUserQuery,
@@ -12131,22 +10775,6 @@ export const OrganizationSettingsDocument = gql`
   }
   ${SettingsLayout_UserFragmentDoc}
 `;
-
-/**
- * __useOrganizationSettingsQuery__
- *
- * To run a query within a React component, call `useOrganizationSettingsQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrganizationSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrganizationSettingsQuery({
- *   variables: {
- *   },
- * });
- */
 export function useOrganizationSettingsQuery(
   baseOptions?: Apollo.QueryHookOptions<
     OrganizationSettingsQuery,
@@ -12195,27 +10823,6 @@ export const OrganizationUsers_createOrganizationUserDocument = gql`
   }
   ${OrganizationUsers_UserFragmentDoc}
 `;
-
-/**
- * __useOrganizationUsers_createOrganizationUserMutation__
- *
- * To run a mutation, you first call `useOrganizationUsers_createOrganizationUserMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationUsers_createOrganizationUserMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationUsersCreateOrganizationUserMutation, { data, loading, error }] = useOrganizationUsers_createOrganizationUserMutation({
- *   variables: {
- *      firstName: // value for 'firstName'
- *      lastName: // value for 'lastName'
- *      email: // value for 'email'
- *      role: // value for 'role'
- *   },
- * });
- */
 export function useOrganizationUsers_createOrganizationUserMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationUsers_createOrganizationUserMutation,
@@ -12246,26 +10853,6 @@ export const OrganizationUsers_updateUserStatusDocument = gql`
     }
   }
 `;
-
-/**
- * __useOrganizationUsers_updateUserStatusMutation__
- *
- * To run a mutation, you first call `useOrganizationUsers_updateUserStatusMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useOrganizationUsers_updateUserStatusMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [organizationUsersUpdateUserStatusMutation, { data, loading, error }] = useOrganizationUsers_updateUserStatusMutation({
- *   variables: {
- *      userIds: // value for 'userIds'
- *      newStatus: // value for 'newStatus'
- *      transferToUserId: // value for 'transferToUserId'
- *   },
- * });
- */
 export function useOrganizationUsers_updateUserStatusMutation(
   baseOptions?: Apollo.MutationHookOptions<
     OrganizationUsers_updateUserStatusMutation,
@@ -12311,26 +10898,6 @@ export const OrganizationUsersDocument = gql`
   ${OrganizationUsers_UserFragmentDoc}
   ${SettingsLayout_UserFragmentDoc}
 `;
-
-/**
- * __useOrganizationUsersQuery__
- *
- * To run a query within a React component, call `useOrganizationUsersQuery` and pass it any options that fit your needs.
- * When your component renders, `useOrganizationUsersQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useOrganizationUsersQuery({
- *   variables: {
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      search: // value for 'search'
- *      sortBy: // value for 'sortBy'
- *   },
- * });
- */
 export function useOrganizationUsersQuery(
   baseOptions: Apollo.QueryHookOptions<
     OrganizationUsersQuery,
@@ -12372,25 +10939,6 @@ export const PetitionActivity_updatePetitionDocument = gql`
   }
   ${PetitionActivity_PetitionFragmentDoc}
 `;
-
-/**
- * __usePetitionActivity_updatePetitionMutation__
- *
- * To run a mutation, you first call `usePetitionActivity_updatePetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionActivity_updatePetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionActivityUpdatePetitionMutation, { data, loading, error }] = usePetitionActivity_updatePetitionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      data: // value for 'data'
- *   },
- * });
- */
 export function usePetitionActivity_updatePetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_updatePetitionMutation,
@@ -12415,26 +10963,6 @@ export const PetitionActivity_sendRemindersDocument = gql`
     sendReminders(petitionId: $petitionId, accessIds: $accessIds, body: $body)
   }
 `;
-
-/**
- * __usePetitionActivity_sendRemindersMutation__
- *
- * To run a mutation, you first call `usePetitionActivity_sendRemindersMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionActivity_sendRemindersMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionActivitySendRemindersMutation, { data, loading, error }] = usePetitionActivity_sendRemindersMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      accessIds: // value for 'accessIds'
- *      body: // value for 'body'
- *   },
- * });
- */
 export function usePetitionActivity_sendRemindersMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_sendRemindersMutation,
@@ -12461,25 +10989,6 @@ export const PetitionActivity_deactivateAccessesDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionActivity_deactivateAccessesMutation__
- *
- * To run a mutation, you first call `usePetitionActivity_deactivateAccessesMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionActivity_deactivateAccessesMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionActivityDeactivateAccessesMutation, { data, loading, error }] = usePetitionActivity_deactivateAccessesMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      accessIds: // value for 'accessIds'
- *   },
- * });
- */
 export function usePetitionActivity_deactivateAccessesMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_deactivateAccessesMutation,
@@ -12506,25 +11015,6 @@ export const PetitionActivity_reactivateAccessesDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionActivity_reactivateAccessesMutation__
- *
- * To run a mutation, you first call `usePetitionActivity_reactivateAccessesMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionActivity_reactivateAccessesMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionActivityReactivateAccessesMutation, { data, loading, error }] = usePetitionActivity_reactivateAccessesMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      accessIds: // value for 'accessIds'
- *   },
- * });
- */
 export function usePetitionActivity_reactivateAccessesMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_reactivateAccessesMutation,
@@ -12551,25 +11041,6 @@ export const PetitionActivity_cancelScheduledMessageDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionActivity_cancelScheduledMessageMutation__
- *
- * To run a mutation, you first call `usePetitionActivity_cancelScheduledMessageMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionActivity_cancelScheduledMessageMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionActivityCancelScheduledMessageMutation, { data, loading, error }] = usePetitionActivity_cancelScheduledMessageMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      messageId: // value for 'messageId'
- *   },
- * });
- */
 export function usePetitionActivity_cancelScheduledMessageMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_cancelScheduledMessageMutation,
@@ -12605,29 +11076,6 @@ export const PetitionsActivity_sendPetitionDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionsActivity_sendPetitionMutation__
- *
- * To run a mutation, you first call `usePetitionsActivity_sendPetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionsActivity_sendPetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionsActivitySendPetitionMutation, { data, loading, error }] = usePetitionsActivity_sendPetitionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      contactIds: // value for 'contactIds'
- *      subject: // value for 'subject'
- *      body: // value for 'body'
- *      remindersConfig: // value for 'remindersConfig'
- *      scheduledAt: // value for 'scheduledAt'
- *   },
- * });
- */
 export function usePetitionsActivity_sendPetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionsActivity_sendPetitionMutation,
@@ -12660,27 +11108,6 @@ export const PetitionActivity_switchAutomaticRemindersDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionActivity_switchAutomaticRemindersMutation__
- *
- * To run a mutation, you first call `usePetitionActivity_switchAutomaticRemindersMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionActivity_switchAutomaticRemindersMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionActivitySwitchAutomaticRemindersMutation, { data, loading, error }] = usePetitionActivity_switchAutomaticRemindersMutation({
- *   variables: {
- *      start: // value for 'start'
- *      petitionId: // value for 'petitionId'
- *      accessIds: // value for 'accessIds'
- *      remindersConfig: // value for 'remindersConfig'
- *   },
- * });
- */
 export function usePetitionActivity_switchAutomaticRemindersMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionActivity_switchAutomaticRemindersMutation,
@@ -12703,23 +11130,6 @@ export const PetitionActivityDocument = gql`
   }
   ${PetitionActivity_PetitionFragmentDoc}
 `;
-
-/**
- * __usePetitionActivityQuery__
- *
- * To run a query within a React component, call `usePetitionActivityQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionActivityQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionActivityQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
 export function usePetitionActivityQuery(
   baseOptions: Apollo.QueryHookOptions<
     PetitionActivityQuery,
@@ -12758,22 +11168,6 @@ export const PetitionActivityUserDocument = gql`
   }
   ${PetitionActivity_UserFragmentDoc}
 `;
-
-/**
- * __usePetitionActivityUserQuery__
- *
- * To run a query within a React component, call `usePetitionActivityUserQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionActivityUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionActivityUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function usePetitionActivityUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     PetitionActivityUserQuery,
@@ -12822,26 +11216,6 @@ export const PetitionCompose_updatePetitionDocument = gql`
   ${AddPetitionAccessDialog_PetitionFragmentDoc}
   ${PetitionTemplateComposeMessageEditor_PetitionFragmentDoc}
 `;
-
-/**
- * __usePetitionCompose_updatePetitionMutation__
- *
- * To run a mutation, you first call `usePetitionCompose_updatePetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionCompose_updatePetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionComposeUpdatePetitionMutation, { data, loading, error }] = usePetitionCompose_updatePetitionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      data: // value for 'data'
- *      hasPetitionSignature: // value for 'hasPetitionSignature'
- *   },
- * });
- */
 export function usePetitionCompose_updatePetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_updatePetitionMutation,
@@ -12872,25 +11246,6 @@ export const PetitionCompose_updateFieldPositionsDocument = gql`
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
-
-/**
- * __usePetitionCompose_updateFieldPositionsMutation__
- *
- * To run a mutation, you first call `usePetitionCompose_updateFieldPositionsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionCompose_updateFieldPositionsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionComposeUpdateFieldPositionsMutation, { data, loading, error }] = usePetitionCompose_updateFieldPositionsMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      fieldIds: // value for 'fieldIds'
- *   },
- * });
- */
 export function usePetitionCompose_updateFieldPositionsMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_updateFieldPositionsMutation,
@@ -12932,26 +11287,6 @@ export const PetitionCompose_createPetitionFieldDocument = gql`
   ${PetitionCompose_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
-
-/**
- * __usePetitionCompose_createPetitionFieldMutation__
- *
- * To run a mutation, you first call `usePetitionCompose_createPetitionFieldMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionCompose_createPetitionFieldMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionComposeCreatePetitionFieldMutation, { data, loading, error }] = usePetitionCompose_createPetitionFieldMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      type: // value for 'type'
- *      position: // value for 'position'
- *   },
- * });
- */
 export function usePetitionCompose_createPetitionFieldMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_createPetitionFieldMutation,
@@ -12988,25 +11323,6 @@ export const PetitionCompose_clonePetitionFieldDocument = gql`
   ${PetitionCompose_PetitionFieldFragmentDoc}
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
-
-/**
- * __usePetitionCompose_clonePetitionFieldMutation__
- *
- * To run a mutation, you first call `usePetitionCompose_clonePetitionFieldMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionCompose_clonePetitionFieldMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionComposeClonePetitionFieldMutation, { data, loading, error }] = usePetitionCompose_clonePetitionFieldMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      fieldId: // value for 'fieldId'
- *   },
- * });
- */
 export function usePetitionCompose_clonePetitionFieldMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_clonePetitionFieldMutation,
@@ -13042,26 +11358,6 @@ export const PetitionCompose_deletePetitionFieldDocument = gql`
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
-
-/**
- * __usePetitionCompose_deletePetitionFieldMutation__
- *
- * To run a mutation, you first call `usePetitionCompose_deletePetitionFieldMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionCompose_deletePetitionFieldMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionComposeDeletePetitionFieldMutation, { data, loading, error }] = usePetitionCompose_deletePetitionFieldMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      fieldId: // value for 'fieldId'
- *      force: // value for 'force'
- *   },
- * });
- */
 export function usePetitionCompose_deletePetitionFieldMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_deletePetitionFieldMutation,
@@ -13103,26 +11399,6 @@ export const PetitionCompose_updatePetitionFieldDocument = gql`
   }
   ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
-
-/**
- * __usePetitionCompose_updatePetitionFieldMutation__
- *
- * To run a mutation, you first call `usePetitionCompose_updatePetitionFieldMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionCompose_updatePetitionFieldMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionComposeUpdatePetitionFieldMutation, { data, loading, error }] = usePetitionCompose_updatePetitionFieldMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      fieldId: // value for 'fieldId'
- *      data: // value for 'data'
- *   },
- * });
- */
 export function usePetitionCompose_updatePetitionFieldMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_updatePetitionFieldMutation,
@@ -13166,27 +11442,6 @@ export const PetitionCompose_changePetitionFieldTypeDocument = gql`
   }
   ${PetitionCompose_PetitionFieldFragmentDoc}
 `;
-
-/**
- * __usePetitionCompose_changePetitionFieldTypeMutation__
- *
- * To run a mutation, you first call `usePetitionCompose_changePetitionFieldTypeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionCompose_changePetitionFieldTypeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionComposeChangePetitionFieldTypeMutation, { data, loading, error }] = usePetitionCompose_changePetitionFieldTypeMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      fieldId: // value for 'fieldId'
- *      type: // value for 'type'
- *      force: // value for 'force'
- *   },
- * });
- */
 export function usePetitionCompose_changePetitionFieldTypeMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_changePetitionFieldTypeMutation,
@@ -13226,29 +11481,6 @@ export const PetitionCompose_batchSendPetitionDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionCompose_batchSendPetitionMutation__
- *
- * To run a mutation, you first call `usePetitionCompose_batchSendPetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionCompose_batchSendPetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionComposeBatchSendPetitionMutation, { data, loading, error }] = usePetitionCompose_batchSendPetitionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      contactIdGroups: // value for 'contactIdGroups'
- *      subject: // value for 'subject'
- *      body: // value for 'body'
- *      remindersConfig: // value for 'remindersConfig'
- *      scheduledAt: // value for 'scheduledAt'
- *   },
- * });
- */
 export function usePetitionCompose_batchSendPetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionCompose_batchSendPetitionMutation,
@@ -13272,22 +11504,6 @@ export const PetitionComposeUserDocument = gql`
   }
   ${PetitionCompose_UserFragmentDoc}
 `;
-
-/**
- * __usePetitionComposeUserQuery__
- *
- * To run a query within a React component, call `usePetitionComposeUserQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionComposeUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionComposeUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function usePetitionComposeUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     PetitionComposeUserQuery,
@@ -13326,24 +11542,6 @@ export const PetitionComposeDocument = gql`
   }
   ${PetitionCompose_PetitionBaseFragmentDoc}
 `;
-
-/**
- * __usePetitionComposeQuery__
- *
- * To run a query within a React component, call `usePetitionComposeQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionComposeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionComposeQuery({
- *   variables: {
- *      id: // value for 'id'
- *      hasPetitionSignature: // value for 'hasPetitionSignature'
- *   },
- * });
- */
 export function usePetitionComposeQuery(
   baseOptions: Apollo.QueryHookOptions<
     PetitionComposeQuery,
@@ -13384,23 +11582,6 @@ export const PetitionDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionQuery__
- *
- * To run a query within a React component, call `usePetitionQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
 export function usePetitionQuery(
   baseOptions: Apollo.QueryHookOptions<PetitionQuery, PetitionQueryVariables>
 ) {
@@ -13437,25 +11618,6 @@ export const PetitionReplies_updatePetitionDocument = gql`
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
 `;
-
-/**
- * __usePetitionReplies_updatePetitionMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_updatePetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_updatePetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesUpdatePetitionMutation, { data, loading, error }] = usePetitionReplies_updatePetitionMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      data: // value for 'data'
- *   },
- * });
- */
 export function usePetitionReplies_updatePetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_updatePetitionMutation,
@@ -13499,27 +11661,6 @@ export const PetitionReplies_validatePetitionFieldsDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionReplies_validatePetitionFieldsMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_validatePetitionFieldsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_validatePetitionFieldsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesValidatePetitionFieldsMutation, { data, loading, error }] = usePetitionReplies_validatePetitionFieldsMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      fieldIds: // value for 'fieldIds'
- *      value: // value for 'value'
- *      validateRepliesWith: // value for 'validateRepliesWith'
- *   },
- * });
- */
 export function usePetitionReplies_validatePetitionFieldsMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_validatePetitionFieldsMutation,
@@ -13550,26 +11691,6 @@ export const PetitionReplies_fileUploadReplyDownloadLinkDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionReplies_fileUploadReplyDownloadLinkMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_fileUploadReplyDownloadLinkMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_fileUploadReplyDownloadLinkMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesFileUploadReplyDownloadLinkMutation, { data, loading, error }] = usePetitionReplies_fileUploadReplyDownloadLinkMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      replyId: // value for 'replyId'
- *      preview: // value for 'preview'
- *   },
- * });
- */
 export function usePetitionReplies_fileUploadReplyDownloadLinkMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_fileUploadReplyDownloadLinkMutation,
@@ -13605,29 +11726,6 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
   }
   ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
 `;
-
-/**
- * __usePetitionReplies_createPetitionFieldCommentMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_createPetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_createPetitionFieldCommentMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesCreatePetitionFieldCommentMutation, { data, loading, error }] = usePetitionReplies_createPetitionFieldCommentMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      petitionFieldId: // value for 'petitionFieldId'
- *      petitionFieldReplyId: // value for 'petitionFieldReplyId'
- *      content: // value for 'content'
- *      isInternal: // value for 'isInternal'
- *      hasInternalComments: // value for 'hasInternalComments'
- *   },
- * });
- */
 export function usePetitionReplies_createPetitionFieldCommentMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_createPetitionFieldCommentMutation,
@@ -13661,28 +11759,6 @@ export const PetitionReplies_updatePetitionFieldCommentDocument = gql`
   }
   ${PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc}
 `;
-
-/**
- * __usePetitionReplies_updatePetitionFieldCommentMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_updatePetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_updatePetitionFieldCommentMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesUpdatePetitionFieldCommentMutation, { data, loading, error }] = usePetitionReplies_updatePetitionFieldCommentMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      petitionFieldId: // value for 'petitionFieldId'
- *      petitionFieldCommentId: // value for 'petitionFieldCommentId'
- *      content: // value for 'content'
- *      hasInternalComments: // value for 'hasInternalComments'
- *   },
- * });
- */
 export function usePetitionReplies_updatePetitionFieldCommentMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_updatePetitionFieldCommentMutation,
@@ -13710,26 +11786,6 @@ export const PetitionReplies_deletePetitionFieldCommentDocument = gql`
     )
   }
 `;
-
-/**
- * __usePetitionReplies_deletePetitionFieldCommentMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_deletePetitionFieldCommentMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_deletePetitionFieldCommentMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesDeletePetitionFieldCommentMutation, { data, loading, error }] = usePetitionReplies_deletePetitionFieldCommentMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      petitionFieldId: // value for 'petitionFieldId'
- *      petitionFieldCommentId: // value for 'petitionFieldCommentId'
- *   },
- * });
- */
 export function usePetitionReplies_deletePetitionFieldCommentMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_deletePetitionFieldCommentMutation,
@@ -13752,24 +11808,6 @@ export const PetitionReplies_submitUnpublishedCommentsDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionReplies_submitUnpublishedCommentsMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_submitUnpublishedCommentsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_submitUnpublishedCommentsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesSubmitUnpublishedCommentsMutation, { data, loading, error }] = usePetitionReplies_submitUnpublishedCommentsMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *   },
- * });
- */
 export function usePetitionReplies_submitUnpublishedCommentsMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_submitUnpublishedCommentsMutation,
@@ -13798,25 +11836,6 @@ export const PetitionReplies_markPetitionFieldCommentsAsReadDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionReplies_markPetitionFieldCommentsAsReadMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_markPetitionFieldCommentsAsReadMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_markPetitionFieldCommentsAsReadMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesMarkPetitionFieldCommentsAsReadMutation, { data, loading, error }] = usePetitionReplies_markPetitionFieldCommentsAsReadMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      petitionFieldCommentIds: // value for 'petitionFieldCommentIds'
- *   },
- * });
- */
 export function usePetitionReplies_markPetitionFieldCommentsAsReadMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_markPetitionFieldCommentsAsReadMutation,
@@ -13859,27 +11878,6 @@ export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionReplies_updatePetitionFieldRepliesStatusMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_updatePetitionFieldRepliesStatusMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_updatePetitionFieldRepliesStatusMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesUpdatePetitionFieldRepliesStatusMutation, { data, loading, error }] = usePetitionReplies_updatePetitionFieldRepliesStatusMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      petitionFieldId: // value for 'petitionFieldId'
- *      petitionFieldReplyIds: // value for 'petitionFieldReplyIds'
- *      status: // value for 'status'
- *   },
- * });
- */
 export function usePetitionReplies_updatePetitionFieldRepliesStatusMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_updatePetitionFieldRepliesStatusMutation,
@@ -13915,28 +11913,6 @@ export const PetitionReplies_sendPetitionClosedNotificationDocument = gql`
     }
   }
 `;
-
-/**
- * __usePetitionReplies_sendPetitionClosedNotificationMutation__
- *
- * To run a mutation, you first call `usePetitionReplies_sendPetitionClosedNotificationMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usePetitionReplies_sendPetitionClosedNotificationMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [petitionRepliesSendPetitionClosedNotificationMutation, { data, loading, error }] = usePetitionReplies_sendPetitionClosedNotificationMutation({
- *   variables: {
- *      petitionId: // value for 'petitionId'
- *      emailBody: // value for 'emailBody'
- *      attachPdfExport: // value for 'attachPdfExport'
- *      pdfExportTitle: // value for 'pdfExportTitle'
- *      force: // value for 'force'
- *   },
- * });
- */
 export function usePetitionReplies_sendPetitionClosedNotificationMutation(
   baseOptions?: Apollo.MutationHookOptions<
     PetitionReplies_sendPetitionClosedNotificationMutation,
@@ -13959,22 +11935,6 @@ export const PetitionRepliesUserDocument = gql`
   }
   ${PetitionReplies_UserFragmentDoc}
 `;
-
-/**
- * __usePetitionRepliesUserQuery__
- *
- * To run a query within a React component, call `usePetitionRepliesUserQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionRepliesUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionRepliesUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function usePetitionRepliesUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     PetitionRepliesUserQuery,
@@ -14017,25 +11977,6 @@ export const PetitionRepliesDocument = gql`
   }
   ${PetitionReplies_PetitionFragmentDoc}
 `;
-
-/**
- * __usePetitionRepliesQuery__
- *
- * To run a query within a React component, call `usePetitionRepliesQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionRepliesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionRepliesQuery({
- *   variables: {
- *      id: // value for 'id'
- *      hasPetitionSignature: // value for 'hasPetitionSignature'
- *      hasInternalComments: // value for 'hasInternalComments'
- *   },
- * });
- */
 export function usePetitionRepliesQuery(
   baseOptions: Apollo.QueryHookOptions<
     PetitionRepliesQuery,
@@ -14074,22 +12015,6 @@ export const PetitionsUserDocument = gql`
   }
   ${Petitions_UserFragmentDoc}
 `;
-
-/**
- * __usePetitionsUserQuery__
- *
- * To run a query within a React component, call `usePetitionsUserQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionsUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionsUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function usePetitionsUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     PetitionsUserQuery,
@@ -14141,28 +12066,6 @@ export const PetitionsDocument = gql`
   }
   ${Petitions_PetitionBasePaginationFragmentDoc}
 `;
-
-/**
- * __usePetitionsQuery__
- *
- * To run a query within a React component, call `usePetitionsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionsQuery({
- *   variables: {
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      search: // value for 'search'
- *      sortBy: // value for 'sortBy'
- *      hasPetitionSignature: // value for 'hasPetitionSignature'
- *      filters: // value for 'filters'
- *   },
- * });
- */
 export function usePetitionsQuery(
   baseOptions: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
 ) {
@@ -14209,26 +12112,6 @@ export const NewPetitionPublicTemplatesDocument = gql`
   }
   ${NewPetition_PetitionTemplateFragmentDoc}
 `;
-
-/**
- * __useNewPetitionPublicTemplatesQuery__
- *
- * To run a query within a React component, call `useNewPetitionPublicTemplatesQuery` and pass it any options that fit your needs.
- * When your component renders, `useNewPetitionPublicTemplatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useNewPetitionPublicTemplatesQuery({
- *   variables: {
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      search: // value for 'search'
- *      locale: // value for 'locale'
- *   },
- * });
- */
 export function useNewPetitionPublicTemplatesQuery(
   baseOptions: Apollo.QueryHookOptions<
     NewPetitionPublicTemplatesQuery,
@@ -14284,26 +12167,6 @@ export const NewPetitionTemplatesDocument = gql`
   }
   ${NewPetition_PetitionTemplateFragmentDoc}
 `;
-
-/**
- * __useNewPetitionTemplatesQuery__
- *
- * To run a query within a React component, call `useNewPetitionTemplatesQuery` and pass it any options that fit your needs.
- * When your component renders, `useNewPetitionTemplatesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useNewPetitionTemplatesQuery({
- *   variables: {
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      search: // value for 'search'
- *      filters: // value for 'filters'
- *   },
- * });
- */
 export function useNewPetitionTemplatesQuery(
   baseOptions: Apollo.QueryHookOptions<
     NewPetitionTemplatesQuery,
@@ -14342,22 +12205,6 @@ export const NewPetitionUserDocument = gql`
   }
   ${NewPetition_UserFragmentDoc}
 `;
-
-/**
- * __useNewPetitionUserQuery__
- *
- * To run a query within a React component, call `useNewPetitionUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useNewPetitionUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useNewPetitionUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function useNewPetitionUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     NewPetitionUserQuery,
@@ -14398,25 +12245,6 @@ export const Account_updateAccountDocument = gql`
     }
   }
 `;
-
-/**
- * __useAccount_updateAccountMutation__
- *
- * To run a mutation, you first call `useAccount_updateAccountMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAccount_updateAccountMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [accountUpdateAccountMutation, { data, loading, error }] = useAccount_updateAccountMutation({
- *   variables: {
- *      id: // value for 'id'
- *      data: // value for 'data'
- *   },
- * });
- */
 export function useAccount_updateAccountMutation(
   baseOptions?: Apollo.MutationHookOptions<
     Account_updateAccountMutation,
@@ -14441,22 +12269,6 @@ export const AccountDocument = gql`
   }
   ${Account_UserFragmentDoc}
 `;
-
-/**
- * __useAccountQuery__
- *
- * To run a query within a React component, call `useAccountQuery` and pass it any options that fit your needs.
- * When your component renders, `useAccountQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useAccountQuery({
- *   variables: {
- *   },
- * });
- */
 export function useAccountQuery(
   baseOptions?: Apollo.QueryHookOptions<AccountQuery, AccountQueryVariables>
 ) {
@@ -14486,22 +12298,6 @@ export const SettingsDocument = gql`
   }
   ${Settings_UserFragmentDoc}
 `;
-
-/**
- * __useSettingsQuery__
- *
- * To run a query within a React component, call `useSettingsQuery` and pass it any options that fit your needs.
- * When your component renders, `useSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSettingsQuery({
- *   variables: {
- *   },
- * });
- */
 export function useSettingsQuery(
   baseOptions?: Apollo.QueryHookOptions<SettingsQuery, SettingsQueryVariables>
 ) {
@@ -14532,25 +12328,6 @@ export const Security_updatePasswordDocument = gql`
     changePassword(password: $password, newPassword: $newPassword)
   }
 `;
-
-/**
- * __useSecurity_updatePasswordMutation__
- *
- * To run a mutation, you first call `useSecurity_updatePasswordMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSecurity_updatePasswordMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [securityUpdatePasswordMutation, { data, loading, error }] = useSecurity_updatePasswordMutation({
- *   variables: {
- *      password: // value for 'password'
- *      newPassword: // value for 'newPassword'
- *   },
- * });
- */
 export function useSecurity_updatePasswordMutation(
   baseOptions?: Apollo.MutationHookOptions<
     Security_updatePasswordMutation,
@@ -14577,22 +12354,6 @@ export const SecurityDocument = gql`
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
 `;
-
-/**
- * __useSecurityQuery__
- *
- * To run a query within a React component, call `useSecurityQuery` and pass it any options that fit your needs.
- * When your component renders, `useSecurityQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSecurityQuery({
- *   variables: {
- *   },
- * });
- */
 export function useSecurityQuery(
   baseOptions?: Apollo.QueryHookOptions<SecurityQuery, SecurityQueryVariables>
 ) {
@@ -14623,24 +12384,6 @@ export const RevokeUserAuthTokenDocument = gql`
     revokeUserAuthToken(authTokenIds: $authTokenIds)
   }
 `;
-
-/**
- * __useRevokeUserAuthTokenMutation__
- *
- * To run a mutation, you first call `useRevokeUserAuthTokenMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRevokeUserAuthTokenMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [revokeUserAuthTokenMutation, { data, loading, error }] = useRevokeUserAuthTokenMutation({
- *   variables: {
- *      authTokenIds: // value for 'authTokenIds'
- *   },
- * });
- */
 export function useRevokeUserAuthTokenMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RevokeUserAuthTokenMutation,
@@ -14684,26 +12427,6 @@ export const TokensDocument = gql`
   ${SettingsLayout_UserFragmentDoc}
   ${useSettingsSections_UserFragmentDoc}
 `;
-
-/**
- * __useTokensQuery__
- *
- * To run a query within a React component, call `useTokensQuery` and pass it any options that fit your needs.
- * When your component renders, `useTokensQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useTokensQuery({
- *   variables: {
- *      offset: // value for 'offset'
- *      limit: // value for 'limit'
- *      search: // value for 'search'
- *      sortBy: // value for 'sortBy'
- *   },
- * });
- */
 export function useTokensQuery(
   baseOptions: Apollo.QueryHookOptions<TokensQuery, TokensQueryVariables>
 ) {
@@ -14732,22 +12455,6 @@ export const CurrentUserDocument = gql`
   }
   ${Login_UserFragmentDoc}
 `;
-
-/**
- * __useCurrentUserQuery__
- *
- * To run a query within a React component, call `useCurrentUserQuery` and pass it any options that fit your needs.
- * When your component renders, `useCurrentUserQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useCurrentUserQuery({
- *   variables: {
- *   },
- * });
- */
 export function useCurrentUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
     CurrentUserQuery,
@@ -14787,25 +12494,6 @@ export const RecipientView_publicCompletePetitionDocument = gql`
     }
   }
 `;
-
-/**
- * __useRecipientView_publicCompletePetitionMutation__
- *
- * To run a mutation, you first call `useRecipientView_publicCompletePetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientView_publicCompletePetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewPublicCompletePetitionMutation, { data, loading, error }] = useRecipientView_publicCompletePetitionMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      signer: // value for 'signer'
- *   },
- * });
- */
 export function useRecipientView_publicCompletePetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientView_publicCompletePetitionMutation,
@@ -14829,24 +12517,6 @@ export const RecipientView_submitUnpublishedCommentsDocument = gql`
     }
   }
 `;
-
-/**
- * __useRecipientView_submitUnpublishedCommentsMutation__
- *
- * To run a mutation, you first call `useRecipientView_submitUnpublishedCommentsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientView_submitUnpublishedCommentsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewSubmitUnpublishedCommentsMutation, { data, loading, error }] = useRecipientView_submitUnpublishedCommentsMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *   },
- * });
- */
 export function useRecipientView_submitUnpublishedCommentsMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientView_submitUnpublishedCommentsMutation,
@@ -14869,23 +12539,6 @@ export const PublicPetitionDocument = gql`
   }
   ${RecipientView_PublicPetitionAccessFragmentDoc}
 `;
-
-/**
- * __usePublicPetitionQuery__
- *
- * To run a query within a React component, call `usePublicPetitionQuery` and pass it any options that fit your needs.
- * When your component renders, `usePublicPetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePublicPetitionQuery({
- *   variables: {
- *      keycode: // value for 'keycode'
- *   },
- * });
- */
 export function usePublicPetitionQuery(
   baseOptions: Apollo.QueryHookOptions<
     PublicPetitionQuery,
@@ -14938,27 +12591,6 @@ export const RecipientView_verifyPublicAccessDocument = gql`
     }
   }
 `;
-
-/**
- * __useRecipientView_verifyPublicAccessMutation__
- *
- * To run a mutation, you first call `useRecipientView_verifyPublicAccessMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useRecipientView_verifyPublicAccessMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [recipientViewVerifyPublicAccessMutation, { data, loading, error }] = useRecipientView_verifyPublicAccessMutation({
- *   variables: {
- *      token: // value for 'token'
- *      keycode: // value for 'keycode'
- *      ip: // value for 'ip'
- *      userAgent: // value for 'userAgent'
- *   },
- * });
- */
 export function useRecipientView_verifyPublicAccessMutation(
   baseOptions?: Apollo.MutationHookOptions<
     RecipientView_verifyPublicAccessMutation,
@@ -14983,24 +12615,6 @@ export const publicSendVerificationCodeDocument = gql`
     }
   }
 `;
-
-/**
- * __usepublicSendVerificationCodeMutation__
- *
- * To run a mutation, you first call `usepublicSendVerificationCodeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usepublicSendVerificationCodeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [publicSendVerificationCodeMutation, { data, loading, error }] = usepublicSendVerificationCodeMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *   },
- * });
- */
 export function usepublicSendVerificationCodeMutation(
   baseOptions?: Apollo.MutationHookOptions<
     publicSendVerificationCodeMutation,
@@ -15028,26 +12642,6 @@ export const publicCheckVerificationCodeDocument = gql`
     }
   }
 `;
-
-/**
- * __usepublicCheckVerificationCodeMutation__
- *
- * To run a mutation, you first call `usepublicCheckVerificationCodeMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `usepublicCheckVerificationCodeMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [publicCheckVerificationCodeMutation, { data, loading, error }] = usepublicCheckVerificationCodeMutation({
- *   variables: {
- *      keycode: // value for 'keycode'
- *      token: // value for 'token'
- *      code: // value for 'code'
- *   },
- * });
- */
 export function usepublicCheckVerificationCodeMutation(
   baseOptions?: Apollo.MutationHookOptions<
     publicCheckVerificationCodeMutation,
@@ -15071,23 +12665,6 @@ export const PdfViewPetitionDocument = gql`
   }
   ${PetitionPdf_PetitionFragmentDoc}
 `;
-
-/**
- * __usePdfViewPetitionQuery__
- *
- * To run a query within a React component, call `usePdfViewPetitionQuery` and pass it any options that fit your needs.
- * When your component renders, `usePdfViewPetitionQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePdfViewPetitionQuery({
- *   variables: {
- *      token: // value for 'token'
- *   },
- * });
- */
 export function usePdfViewPetitionQuery(
   baseOptions: Apollo.QueryHookOptions<
     PdfViewPetitionQuery,
@@ -15123,23 +12700,6 @@ export const Thanks_PetitionLogoDocument = gql`
     publicOrgLogoUrl(id: $id)
   }
 `;
-
-/**
- * __useThanks_PetitionLogoQuery__
- *
- * To run a query within a React component, call `useThanks_PetitionLogoQuery` and pass it any options that fit your needs.
- * When your component renders, `useThanks_PetitionLogoQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useThanks_PetitionLogoQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
 export function useThanks_PetitionLogoQuery(
   baseOptions: Apollo.QueryHookOptions<
     Thanks_PetitionLogoQuery,
@@ -15177,24 +12737,6 @@ export const useClonePetitions_clonePetitionsDocument = gql`
     }
   }
 `;
-
-/**
- * __useuseClonePetitions_clonePetitionsMutation__
- *
- * To run a mutation, you first call `useuseClonePetitions_clonePetitionsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useuseClonePetitions_clonePetitionsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [useClonePetitionsClonePetitionsMutation, { data, loading, error }] = useuseClonePetitions_clonePetitionsMutation({
- *   variables: {
- *      petitionIds: // value for 'petitionIds'
- *   },
- * });
- */
 export function useuseClonePetitions_clonePetitionsMutation(
   baseOptions?: Apollo.MutationHookOptions<
     useClonePetitions_clonePetitionsMutation,
@@ -15221,24 +12763,6 @@ export const useCreateContact_createContactDocument = gql`
     }
   }
 `;
-
-/**
- * __useuseCreateContact_createContactMutation__
- *
- * To run a mutation, you first call `useuseCreateContact_createContactMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useuseCreateContact_createContactMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [useCreateContactCreateContactMutation, { data, loading, error }] = useuseCreateContact_createContactMutation({
- *   variables: {
- *      data: // value for 'data'
- *   },
- * });
- */
 export function useuseCreateContact_createContactMutation(
   baseOptions?: Apollo.MutationHookOptions<
     useCreateContact_createContactMutation,
@@ -15271,27 +12795,6 @@ export const useCreatePetition_createPetitionDocument = gql`
     }
   }
 `;
-
-/**
- * __useuseCreatePetition_createPetitionMutation__
- *
- * To run a mutation, you first call `useuseCreatePetition_createPetitionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useuseCreatePetition_createPetitionMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [useCreatePetitionCreatePetitionMutation, { data, loading, error }] = useuseCreatePetition_createPetitionMutation({
- *   variables: {
- *      name: // value for 'name'
- *      locale: // value for 'locale'
- *      petitionId: // value for 'petitionId'
- *      type: // value for 'type'
- *   },
- * });
- */
 export function useuseCreatePetition_createPetitionMutation(
   baseOptions?: Apollo.MutationHookOptions<
     useCreatePetition_createPetitionMutation,
@@ -15312,24 +12815,6 @@ export const useDeletePetitions_deletePetitionsDocument = gql`
     deletePetitions(ids: $ids)
   }
 `;
-
-/**
- * __useuseDeletePetitions_deletePetitionsMutation__
- *
- * To run a mutation, you first call `useuseDeletePetitions_deletePetitionsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useuseDeletePetitions_deletePetitionsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [useDeletePetitionsDeletePetitionsMutation, { data, loading, error }] = useuseDeletePetitions_deletePetitionsMutation({
- *   variables: {
- *      ids: // value for 'ids'
- *   },
- * });
- */
 export function useuseDeletePetitions_deletePetitionsMutation(
   baseOptions?: Apollo.MutationHookOptions<
     useDeletePetitions_deletePetitionsMutation,
@@ -15355,24 +12840,6 @@ export const PetitionComposeSearchContactsDocument = gql`
   }
   ${ContactSelect_ContactFragmentDoc}
 `;
-
-/**
- * __usePetitionComposeSearchContactsQuery__
- *
- * To run a query within a React component, call `usePetitionComposeSearchContactsQuery` and pass it any options that fit your needs.
- * When your component renders, `usePetitionComposeSearchContactsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePetitionComposeSearchContactsQuery({
- *   variables: {
- *      search: // value for 'search'
- *      exclude: // value for 'exclude'
- *   },
- * });
- */
 export function usePetitionComposeSearchContactsQuery(
   baseOptions?: Apollo.QueryHookOptions<
     PetitionComposeSearchContactsQuery,

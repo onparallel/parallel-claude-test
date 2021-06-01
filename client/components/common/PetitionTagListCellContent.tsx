@@ -94,7 +94,6 @@ export function PetitionTagListCellContent({
     await tagPetition({
       variables: { tagId: tag.id, petitionId: petition.id },
       optimisticResponse: {
-        __typename: "Mutation",
         tagPetition: {
           ...pick(petition, ["__typename", "id"]),
           tags: [...petition.tags, tag],
@@ -111,7 +110,6 @@ export function PetitionTagListCellContent({
     await untagPetition({
       variables: { tagId: tag.id, petitionId: petition.id },
       optimisticResponse: {
-        __typename: "Mutation",
         untagPetition: {
           ...pick(petition, ["__typename", "id"]),
           tags: petition.tags.filter((t) => t.id !== tag.id),

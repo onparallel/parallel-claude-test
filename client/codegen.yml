@@ -15,16 +15,23 @@ generates:
       - typescript-operations
       - typescript-react-apollo
     config:
-      namingConvention: keep
-      exportFragmentSpreadSubTypes: true
-      enumsAsTypes: true
+      strictScalars: true
       scalars:
         DateTime: string
+        JSON: any
         JSONObject: "{ [key: string]: any }"
+        Upload: File
         GID: string
+      namingConvention: keep
+      preResolveTypes: true
+      declarationKind: "interface"
+      skipTypeNameForRoot: true
+      exportFragmentSpreadSubTypes: true
+      enumsAsTypes: true
       withMutationFn: false
       withResultType: false
       withMutationOptionsType: false
+      addDocBlocks: false
 
 hooks:
   afterAllFileWrite:
