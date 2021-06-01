@@ -335,19 +335,54 @@
     "context": "Revoke access {count, plural, =1 {token} other {tokens}}"
   },
   {
+    "term": "component.delete-petitions-.shared-error-singular",
+    "definition": "La {type, select, PETITION {petición} other{plantilla}} {name} no se ha podido eliminar porque está siendo compartida. Por favor, transfiere la propiedad o elimina el acceso compartido primero.",
+    "context": "The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
+  },
+  {
+    "term": "component.delete-petitions.confirm-delete-petition.body",
+    "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?"
+  },
+  {
+    "term": "component.delete-petitions.confirm-delete-petition.header",
+    "definition": "Eliminar {count, plural, =1 {petición} other {peticiónes}}",
+    "context": "Delete {count, plural, =1 {petition} other {petitions}}"
+  },
+  {
+    "term": "component.delete-petitions.confirm-delete-template.body",
+    "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> plantillas seleccionadas}}?",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected templates}}?"
+  },
+  {
+    "term": "component.delete-petitions.confirm-delete-template.header",
+    "definition": "Eliminar {count, plural, =1 {plantilla} other {plantillas}}",
+    "context": "Delete {count, plural, =1 {template} other {templates}}"
+  },
+  {
     "term": "component.delete-petitions.error-header",
     "definition": "Error al eliminar",
     "context": "Delete failed"
   },
   {
-    "term": "component.delete-petitions.group-error",
-    "definition": "",
-    "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with a group you belong to."
+    "term": "component.delete-petitions.group-error-plural",
+    "definition": "Las siguientes {type, select, PETITION {peticiónes} other{plantillas}} no se pueden eliminar porque se han compartido contigo a través de un grupo:",
+    "context": "The following {type, select, PETITION {petitions} other{templates}} cannot be deleted because they have been shared with you through a group:"
   },
   {
-    "term": "component.delete-petitions.shared-delete-error",
-    "definition": "",
-    "context": "{count, plural, =1 {The petition} other {At least one of the petitions}} you want to delete {count, plural, =1 {is} other {are}} shared with other users. Please transfer the ownership or remove the shared access first."
+    "term": "component.delete-petitions.group-error-singular",
+    "definition": "La {type, select, PETITION {petición} other{plantilla}} {name} no se puede eliminar porque se ha compartido contigo a través de un grupo.",
+    "context": "The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a group."
+  },
+  {
+    "term": "component.delete-petitions.shared-error-plural-1",
+    "definition": "Las siguientes {type, select, PETITION {peticiones} other{plantillas}} no se han podido eliminar porque están siendo compartidas:",
+    "context": "The following {type, select, PETITION {petitions} other{templates}} could not be removed because they are being shared:"
+  },
+  {
+    "term": "component.delete-petitions.shared-error-plural-2",
+    "definition": "Por favor, transfiere la propiedad o elimina el acceso compartido primero.",
+    "context": "Please transfer ownership or remove shared access first."
   },
   {
     "term": "component.download-dialog.placeholder-field-number",
@@ -3748,16 +3783,6 @@
     "term": "petition.template-name-label",
     "definition": "Nombre de la plantilla",
     "context": "Template name"
-  },
-  {
-    "term": "petitions.confirm-delete.body",
-    "definition": "¿Está seguro de que quiere eliminar {count, plural, =1 {<b>{name}</b>} other {las <b>#</b> peticiones seleccionadas}}?",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?"
-  },
-  {
-    "term": "petitions.confirm-delete.header",
-    "definition": "Eliminar peticiones",
-    "context": "Delete petitions"
   },
   {
     "term": "petitions.header.description",
