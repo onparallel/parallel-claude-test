@@ -77,35 +77,35 @@ export function useDeletePetitions() {
           variables: { ids: petitionIds! },
         });
       } catch (error) {
-        const petitionIds =
+        const conflictingPetitionIds: string[] =
           error?.graphQLErrors?.[0]?.extensions?.petitionIds ?? [];
 
-        const ERROR = error?.graphQLErrors?.[0]?.extensions.code ?? "";
+        const errorCode: string | undefined =
+          error?.graphQLErrors?.[0]?.extensions?.code;
 
-        const cachedPetitions = [
-          ...petitionIds.map((id: string) =>
+        const cachedPetitions = conflictingPetitionIds.map(
+          (id) =>
             cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>(
               {
                 fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
                 id: id,
               }
-            )
-          ),
-        ];
+            )!
+        );
 
         const petitionName =
-          cachedPetitions[0]!.name ||
+          cachedPetitions[0].name ||
           intl.formatMessage({
             id: "generic.untitled-petition",
             defaultMessage: "Untitled petition",
           });
 
         const type =
-          cachedPetitions[0]!.__typename === "PetitionTemplate"
+          cachedPetitions[0].__typename === "PetitionTemplate"
             ? "TEMPLATE"
             : "PETITION";
 
-        if (ERROR === "DELETE_SHARED_PETITION_ERROR") {
+        if (errorCode === "DELETE_SHARED_PETITION_ERROR") {
           const singlePetitionMessage = (
             <FormattedMessage
               id="component.delete-petitions.shared-error-singular"
@@ -123,7 +123,7 @@ export function useDeletePetitions() {
               />
               <UnorderedList paddingLeft={2} py={2}>
                 {cachedPetitions.map((petition) => (
-                  <ListItem key={petition!.id}>{petition!.name}</ListItem>
+                  <ListItem key={petition.id}>{petition.name}</ListItem>
                 ))}
               </UnorderedList>
               <FormattedMessage
@@ -134,7 +134,7 @@ export function useDeletePetitions() {
           );
 
           const errorMessage =
-            petitionIds.length === 1
+            conflictingPetitionIds.length === 1
               ? singlePetitionMessage
               : multiplePetitionMessage;
 
@@ -142,7 +142,7 @@ export function useDeletePetitions() {
             header: errorHeader,
             message: errorMessage,
           });
-        } else if (ERROR === "DELETE_GROUP_PETITION_ERROR") {
+        } else if (errorCode === "DELETE_GROUP_PETITION_ERROR") {
           const singlePetitionMessage = (
             <FormattedMessage
               id="component.delete-petitions.group-error-singular"
@@ -167,7 +167,7 @@ export function useDeletePetitions() {
           );
 
           const errorMessage =
-            petitionIds.length === 1
+            conflictingPetitionIds.length === 1
               ? singlePetitionMessage
               : multiplePetitionMessage;
 
