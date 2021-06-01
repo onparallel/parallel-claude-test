@@ -335,7 +335,7 @@
     "context": "Revoke access {count, plural, =1 {token} other {tokens}}"
   },
   {
-    "term": "component.delete-petitions-.shared-error-singular",
+    "term": "component.delete-petitions.shared-error-singular",
     "definition": "La {type, select, PETITION {petición} other{plantilla}} {name} no se ha podido eliminar porque está siendo compartida. Por favor, transfiere la propiedad o elimina el acceso compartido primero.",
     "context": "The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
   },

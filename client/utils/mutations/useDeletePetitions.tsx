@@ -108,7 +108,7 @@ export function useDeletePetitions() {
         if (ERROR === "DELETE_SHARED_PETITION_ERROR") {
           const singlePetitionMessage = (
             <FormattedMessage
-              id="component.delete-petitions-.shared-error-singular"
+              id="component.delete-petitions.shared-error-singular"
               defaultMessage="The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
               values={{ name: <b>{petitionName}</b>, type }}
             />
