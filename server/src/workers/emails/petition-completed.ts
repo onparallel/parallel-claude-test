@@ -45,7 +45,7 @@ export async function petitionCompleted(
   const petitionId = payload.petition_id;
   const [petition, permissions, fields] = await Promise.all([
     context.petitions.loadPetition(petitionId),
-    context.petitions.loadEffectiveUserPermissions(petitionId),
+    context.petitions.loadEffectivePermissions(petitionId),
     context.petitions.loadFieldsForPetition(petitionId),
   ]);
 

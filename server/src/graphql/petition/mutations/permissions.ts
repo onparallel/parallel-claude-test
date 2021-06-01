@@ -103,7 +103,7 @@ export const addPetitionUserPermission = mutationField(
     ),
     resolve: async (_, args, ctx) => {
       const currentPermissions = (
-        await ctx.petitions.loadEffectiveUserPermissions(args.petitionIds)
+        await ctx.petitions.loadEffectivePermissions(args.petitionIds)
       ).flat();
       const { petitions, newPermissions } = await ctx.petitions.withTransaction(
         async (t) => {

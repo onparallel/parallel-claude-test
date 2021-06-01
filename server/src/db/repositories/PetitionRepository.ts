@@ -2674,7 +2674,7 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadEffectiveUserPermissions = fromDataLoader(
+  readonly loadEffectivePermissions = fromDataLoader(
     new DataLoader<number, EffectivePetitionPermission[]>(
       async (petitionIds) => {
         const rows = await this.raw<EffectivePetitionPermission>(

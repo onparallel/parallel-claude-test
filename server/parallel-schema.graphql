@@ -1259,9 +1259,9 @@ type Petition implements PetitionBase {
   locale: PetitionLocale!
 
   """
-  The effective permission of the logged user
+  The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates).
   """
-  myEffectivePermission: EffectivePetitionUserPermission!
+  myEffectivePermission: EffectivePetitionUserPermission
 
   """
   The name of the petition.
@@ -1473,9 +1473,9 @@ interface PetitionBase {
   locale: PetitionLocale!
 
   """
-  The effective permission of the logged user
+  The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates).
   """
-  myEffectivePermission: EffectivePetitionUserPermission!
+  myEffectivePermission: EffectivePetitionUserPermission
 
   """
   The name of the petition.
@@ -2116,9 +2116,9 @@ type PetitionTemplate implements PetitionBase {
   locale: PetitionLocale!
 
   """
-  The effective permission of the logged user
+  The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates).
   """
-  myEffectivePermission: EffectivePetitionUserPermission!
+  myEffectivePermission: EffectivePetitionUserPermission
 
   """
   The name of the petition.
