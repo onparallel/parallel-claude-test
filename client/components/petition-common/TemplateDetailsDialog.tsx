@@ -113,8 +113,9 @@ export function TemplateDetailsDialog({
   "CREATE_PETITION" | "CLONE_TEMPLATE" | "EDIT_TEMPLATE"
 >) {
   const intl = useIntl();
-  const canEdit = ["OWNER", "WRITE"].includes(
-    template.myEffectivePermission.permissionType
+  const canEdit = Boolean(
+    template.myEffectivePermission &&
+      ["OWNER", "WRITE"].includes(template.myEffectivePermission.permissionType)
   );
 
   const indices = useFieldIndices(template.fields);
