@@ -335,11 +335,6 @@
     "context": "Revoke access {count, plural, =1 {token} other {tokens}}"
   },
   {
-    "term": "component.delete-petitions.shared-error-singular",
-    "definition": "The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first.",
-    "context": "The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
-  },
-  {
     "term": "component.delete-petitions.confirm-delete-petition.body",
     "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?",
     "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected petitions}}?"
@@ -383,6 +378,11 @@
     "term": "component.delete-petitions.shared-error-plural-2",
     "definition": "Please transfer ownership or remove shared access first.",
     "context": "Please transfer ownership or remove shared access first."
+  },
+  {
+    "term": "component.delete-petitions.shared-error-singular",
+    "definition": "The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first.",
+    "context": "The {name} {type, select, PETITION {petition} other{template}} could not be removed because it is being shared. Please transfer ownership or remove shared access first."
   },
   {
     "term": "component.download-dialog.placeholder-field-number",
@@ -1013,6 +1013,21 @@
     "term": "component.petition-list-header.use-template-label",
     "definition": "Use template",
     "context": "Use template"
+  },
+  {
+    "term": "component.petition-permission-type.owner",
+    "definition": "Owner",
+    "context": "Owner"
+  },
+  {
+    "term": "component.petition-permission-type.read",
+    "definition": "Reader",
+    "context": "Reader"
+  },
+  {
+    "term": "component.petition-permission-type.write",
+    "definition": "Editor",
+    "context": "Editor"
   },
   {
     "term": "component.petition-progress-bar.all-pending",
@@ -3300,24 +3315,9 @@
     "context": "Notify users"
   },
   {
-    "term": "petition-sharing.owner",
-    "definition": "Owner",
-    "context": "Owner"
-  },
-  {
-    "term": "petition-sharing.read",
-    "definition": "Reader",
-    "context": "Reader"
-  },
-  {
     "term": "petition-sharing.success-title",
     "definition": "{count, plural, =1 {Petition} other {Petitions}} shared",
     "context": "{count, plural, =1 {Petition} other {Petitions}} shared"
-  },
-  {
-    "term": "petition-sharing.write",
-    "definition": "Editor",
-    "context": "Editor"
   },
   {
     "term": "petition-signature-status-label.e-signature-cancelled",

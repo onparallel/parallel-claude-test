@@ -120,8 +120,45 @@ export function createApolloClient(
         },
         Petition: {
           fields: {
-            userPermissions: {
-              merge: mergeArraysBy(["user", "id"]),
+            permissions: {
+              merge: function merge(
+                existing,
+                incoming,
+                { readField, mergeObjects }
+              ) {
+                const getKey = (value: any) => {
+                  const user = readField("user", value);
+                  const group = readField("group", value);
+                  if (user) {
+                    const id = readField("id", user as any);
+                    if (!id) {
+                      throw new Error(
+                        `Please include "user.id" when fetching permissions`
+                      );
+                    }
+                    return id as string;
+                  } else if (group) {
+                    const id = readField("id", group as any);
+                    if (!id) {
+                      throw new Error(
+                        `Please include "group.id" when fetching permissions`
+                      );
+                    }
+                    return id as string;
+                  } else {
+                    throw new Error(
+                      `Please include either "user.id" or "group.id" when fetching permissions`
+                    );
+                  }
+                };
+                const existingByKey = indexBy(existing || [], getKey);
+                return incoming.map((value: any) => {
+                  const key = getKey(value);
+                  return existingByKey[key]
+                    ? mergeObjects(existingByKey[key], value)
+                    : value;
+                });
+              },
             },
             emailBody: {
               merge: false,

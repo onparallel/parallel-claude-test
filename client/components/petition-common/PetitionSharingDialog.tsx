@@ -30,18 +30,17 @@ import {
 } from "@parallel/chakra/icons";
 import {
   PetitionActivityDocument,
+  PetitionSharingModal_PetitionUserGroupPermissionFragment,
+  PetitionSharingModal_PetitionUserPermissionFragment,
   PetitionSharingModal_UserFragment,
   PetitionSharingModal_UserGroupFragment,
-  PetitionUserGroupPermission,
-  PetitionUserPermission,
   usePetitionSharingModal_addPetitionPermissionMutation,
-  usePetitionSharingModal_PetitionsUserPermissionsQuery,
+  usePetitionSharingModal_PetitionsQuery,
   usePetitionSharingModal_removePetitionPermissionMutation,
   usePetitionSharingModal_transferPetitionOwnershipMutation,
 } from "@parallel/graphql/__types";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { Maybe } from "@parallel/utils/types";
-import { usePreviousValue } from "beautiful-react-hooks";
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -57,7 +56,7 @@ import {
   UserSelectSelection,
   useSearchUsers,
 } from "../common/UserSelect";
-import { UserPermissionType } from "./UserPermissionType";
+import { PetitionPermissionTypeText } from "./PetitionPermissionType";
 
 type PetitionSharingDialogData = {
   selection: UserSelectSelection<true>[];
@@ -84,29 +83,27 @@ export function PetitionSharingDialog({
   const toast = useToast();
   const [hasUsers, setHasUsers] = useState(false);
 
-  const { data } = usePetitionSharingModal_PetitionsUserPermissionsQuery({
+  const { data, loading } = usePetitionSharingModal_PetitionsQuery({
     variables: { petitionIds },
     fetchPolicy: "cache-and-network",
   });
 
+  useEffect(() => {
+    if (!loading) {
+      setTimeout(() => usersRef.current?.focus());
+    }
+  }, [loading]);
+
   const petitionId = petitionIds[0];
   const petitionsById = data?.petitionsById;
 
-  const userPermissions = petitionsById?.[0]?.permissions.filter(
+  const userPermissions = (petitionsById?.[0]?.permissions.filter(
     (p) => p.__typename === "PetitionUserPermission"
-  ) as PetitionUserPermission[];
+  ) ?? []) as PetitionSharingModal_PetitionUserPermissionFragment[];
 
-  const groupPermissions = petitionsById?.[0]?.permissions.filter(
+  const groupPermissions = (petitionsById?.[0]?.permissions.filter(
     (p) => p.__typename === "PetitionUserGroupPermission"
-  ) as PetitionUserGroupPermission[];
-
-  const prev = usePreviousValue(userPermissions);
-
-  useEffect(() => {
-    if (userPermissions && !prev) {
-      setTimeout(() => usersRef.current?.focus());
-    }
-  }, [userPermissions, prev]);
+  ) ?? []) as PetitionSharingModal_PetitionUserGroupPermissionFragment[];
 
   const { handleSubmit, register, control, watch } =
     useForm<PetitionSharingDialogData>({
@@ -148,12 +145,12 @@ export function PetitionSharingDialog({
 
   const usersToExclude =
     petitionIds.length === 1
-      ? userPermissions?.map((up) => up.user.id) ?? []
+      ? userPermissions?.map((p) => p.user.id) ?? []
       : [userId];
 
   const groupsToExlude =
     petitionIds.length === 1
-      ? groupPermissions?.map((up) => up.group.id) ?? []
+      ? groupPermissions?.map((p) => p.group.id) ?? []
       : [];
 
   const _handleSearchUsers = useSearchUsers();
@@ -169,15 +166,15 @@ export function PetitionSharingDialog({
         excludeUserGroups: [...excludeUserGroups, ...groupsToExlude],
       });
     },
-    [_handleSearchUsers, userPermissions]
+    [_handleSearchUsers, usersToExclude.join(","), groupsToExlude.join(",")]
   );
-  const handleRemoveUserPermission = useRemoveUserPermission();
+  const handleRemovePetitionPermission = useRemovePetitionPermission();
   const handleTransferPetitionOwnership = useTransferPetitionOwnership();
 
   const [addPetitionPermission] =
     usePetitionSharingModal_addPetitionPermissionMutation();
 
-  const handleAddUserPermissions = handleSubmit(
+  const handleAddPetitionPermissions = handleSubmit(
     async ({ selection, notify, subscribe, message }) => {
       const users = selection
         .filter((s) => s.__typename === "User")
@@ -250,7 +247,7 @@ export function PetitionSharingDialog({
       initialFocusRef={usersRef}
       hasCloseButton
       {...props}
-      content={{ as: "form", onSubmit: handleAddUserPermissions }}
+      content={{ as: "form", onSubmit: handleAddPetitionPermissions }}
       header={
         <Stack direction="row">
           <Circle
@@ -394,7 +391,7 @@ export function PetitionSharingDialog({
                       color="gray.500"
                       cursor="default"
                     >
-                      <UserPermissionType type={permissionType} />
+                      <PetitionPermissionTypeText type={permissionType} />
                     </Box>
                   ) : (
                     <Menu placement="bottom-end">
@@ -404,7 +401,7 @@ export function PetitionSharingDialog({
                         size="sm"
                         rightIcon={<ChevronDownIcon />}
                       >
-                        <UserPermissionType type="WRITE" />
+                        <PetitionPermissionTypeText type="WRITE" />
                       </MenuButton>
                       <MenuList minWidth={40}>
                         <MenuItem
@@ -421,7 +418,7 @@ export function PetitionSharingDialog({
                         <MenuItem
                           color="red.500"
                           onClick={() =>
-                            handleRemoveUserPermission({ petitionId, user })
+                            handleRemovePetitionPermission({ petitionId, user })
                           }
                           icon={<DeleteIcon display="block" boxSize={4} />}
                         >
@@ -472,7 +469,7 @@ export function PetitionSharingDialog({
                         color="gray.500"
                         cursor="default"
                       >
-                        <UserPermissionType type={permissionType} />
+                        <PetitionPermissionTypeText type={permissionType} />
                       </Box>
                     ) : (
                       <Menu placement="bottom-end">
@@ -482,13 +479,13 @@ export function PetitionSharingDialog({
                           size="sm"
                           rightIcon={<ChevronDownIcon />}
                         >
-                          <UserPermissionType type="WRITE" />
+                          <PetitionPermissionTypeText type="WRITE" />
                         </MenuButton>
                         <MenuList minWidth={40}>
                           <MenuItem
                             color="red.500"
                             onClick={() =>
-                              handleRemoveUserPermission({
+                              handleRemovePetitionPermission({
                                 petitionId,
                                 userGroup: group,
                               })
@@ -539,8 +536,18 @@ export function PetitionSharingDialog({
                         </Text>
                         <UnorderedList paddingLeft={2}>
                           {petitionsRW.map((petition) => (
-                            <ListItem key={petition!.id}>
-                              {petition!.name}
+                            <ListItem key={petition!.id} s>
+                              <Text
+                                as="span"
+                                textStyle={petition!.name ? undefined : "hint"}
+                              >
+                                {petition?.name
+                                  ? petition.name
+                                  : intl.formatMessage({
+                                      id: "generic.untitled-petition",
+                                      defaultMessage: "Untitled petition",
+                                    })}
+                              </Text>
                             </ListItem>
                           ))}
                         </UnorderedList>
@@ -603,22 +610,39 @@ PetitionSharingDialog.fragments = {
         id
         name
         permissions {
-          permissionType
           ... on PetitionUserPermission {
-            user {
-              id
-              ...PetitionSharingModal_User
-            }
+            ...PetitionSharingModal_PetitionUserPermission
           }
           ... on PetitionUserGroupPermission {
-            group {
-              id
-              name
-              members {
-                user {
-                  ...PetitionSharingModal_User
-                }
-              }
+            ...PetitionSharingModal_PetitionUserGroupPermission
+          }
+        }
+      }
+      ${this.PetitionUserPermission}
+      ${this.PetitionUserGroupPermission}
+    `;
+  },
+  get PetitionUserPermission() {
+    return gql`
+      fragment PetitionSharingModal_PetitionUserPermission on PetitionUserPermission {
+        permissionType
+        user {
+          ...PetitionSharingModal_User
+        }
+      }
+      ${this.User}
+    `;
+  },
+  get PetitionUserGroupPermission() {
+    return gql`
+      fragment PetitionSharingModal_PetitionUserGroupPermission on PetitionUserGroupPermission {
+        permissionType
+        group {
+          id
+          name
+          members {
+            user {
+              ...PetitionSharingModal_User
             }
           }
         }
@@ -709,7 +733,7 @@ PetitionSharingDialog.mutations = [
 
 PetitionSharingDialog.queries = [
   gql`
-    query PetitionSharingModal_PetitionsUserPermissions($petitionIds: [GID!]!) {
+    query PetitionSharingModal_Petitions($petitionIds: [GID!]!) {
       petitionsById(ids: $petitionIds) {
         ...PetitionSharingModal_Petition
       }
@@ -718,37 +742,37 @@ PetitionSharingDialog.queries = [
   `,
 ];
 
-interface RemoveUserPermissionPorps {
+interface RemovePetitionPermissionProps {
   petitionId: string;
   user?: PetitionSharingModal_UserFragment;
   userGroup?: PetitionSharingModal_UserGroupFragment;
 }
 
-function useRemoveUserPermission() {
-  const confirmRemoveUserPermission = useDialog(
-    ConfirmRemoveUserPermissionDialog
+function useRemovePetitionPermission() {
+  const confirmRemovePetitionPermission = useDialog(
+    ConfirmRemovePetitionPermissionDialog
   );
   const [removePetitionPermission] =
     usePetitionSharingModal_removePetitionPermissionMutation();
   return useCallback(
-    async ({ petitionId, user, userGroup }: RemoveUserPermissionPorps) => {
+    async ({ petitionId, user, userGroup }: RemovePetitionPermissionProps) => {
       try {
         const prop = user ? "userIds" : "userGroupIds";
         const name = user ? user.fullName : userGroup?.name;
         const id = user ? user.id : userGroup?.id;
 
-        await confirmRemoveUserPermission({ name });
+        await confirmRemovePetitionPermission({ name });
         await removePetitionPermission({
           variables: { petitionId, [prop]: [id] },
           refetchQueries: [getOperationName(PetitionActivityDocument)!],
         });
       } catch {}
     },
-    [confirmRemoveUserPermission, removePetitionPermission]
+    [confirmRemovePetitionPermission, removePetitionPermission]
   );
 }
 
-function ConfirmRemoveUserPermissionDialog({
+function ConfirmRemovePetitionPermissionDialog({
   name = "",
   ...props
 }: DialogProps<{

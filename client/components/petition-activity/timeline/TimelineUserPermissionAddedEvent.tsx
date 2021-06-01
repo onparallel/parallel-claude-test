@@ -3,7 +3,7 @@ import { Text } from "@chakra-ui/react";
 import { UserArrowIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
-import { UserPermissionType } from "@parallel/components/petition-common/UserPermissionType";
+import { PetitionPermissionTypeText } from "@parallel/components/petition-common/PetitionPermissionType";
 import { TimelineUserPermissionAddedEvent_UserPermissionAddedEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { FormattedMessage } from "react-intl";
@@ -38,9 +38,11 @@ export function TimelineUserPermissionAddedEvent({
           user: <UserReference user={event.user} />,
           other: <UserReference user={event.permissionUser} />,
           permissionType: (
-            <Text as="em" textTransform="lowercase">
-              {<UserPermissionType type={event.permissionType} />}
-            </Text>
+            <PetitionPermissionTypeText
+              as="em"
+              type={event.permissionType}
+              textTransform="lowercase"
+            />
           ),
           timeAgo: (
             <DateTime

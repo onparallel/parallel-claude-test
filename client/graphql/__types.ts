@@ -3580,27 +3580,12 @@ export type PetitionSharingModal_Petition_Petition_Fragment = {
   id: string;
   name?: Maybe<string>;
   permissions: Array<
-    | {
+    | ({
         __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: {
-          __typename?: "UserGroup";
-          id: string;
-          name: string;
-          members: Array<{
-            __typename?: "UserGroupMember";
-            user: { __typename?: "User" } & PetitionSharingModal_UserFragment;
-          }>;
-        };
-      }
-    | {
+      } & PetitionSharingModal_PetitionUserGroupPermissionFragment)
+    | ({
         __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-        } & PetitionSharingModal_UserFragment;
-      }
+      } & PetitionSharingModal_PetitionUserPermissionFragment)
   >;
 };
 
@@ -3609,33 +3594,38 @@ export type PetitionSharingModal_Petition_PetitionTemplate_Fragment = {
   id: string;
   name?: Maybe<string>;
   permissions: Array<
-    | {
+    | ({
         __typename?: "PetitionUserGroupPermission";
-        permissionType: PetitionPermissionType;
-        group: {
-          __typename?: "UserGroup";
-          id: string;
-          name: string;
-          members: Array<{
-            __typename?: "UserGroupMember";
-            user: { __typename?: "User" } & PetitionSharingModal_UserFragment;
-          }>;
-        };
-      }
-    | {
+      } & PetitionSharingModal_PetitionUserGroupPermissionFragment)
+    | ({
         __typename?: "PetitionUserPermission";
-        permissionType: PetitionPermissionType;
-        user: {
-          __typename?: "User";
-          id: string;
-        } & PetitionSharingModal_UserFragment;
-      }
+      } & PetitionSharingModal_PetitionUserPermissionFragment)
   >;
 };
 
 export type PetitionSharingModal_PetitionFragment =
   | PetitionSharingModal_Petition_Petition_Fragment
   | PetitionSharingModal_Petition_PetitionTemplate_Fragment;
+
+export type PetitionSharingModal_PetitionUserPermissionFragment = {
+  __typename?: "PetitionUserPermission";
+  permissionType: PetitionPermissionType;
+  user: { __typename?: "User" } & PetitionSharingModal_UserFragment;
+};
+
+export type PetitionSharingModal_PetitionUserGroupPermissionFragment = {
+  __typename?: "PetitionUserGroupPermission";
+  permissionType: PetitionPermissionType;
+  group: {
+    __typename?: "UserGroup";
+    id: string;
+    name: string;
+    members: Array<{
+      __typename?: "UserGroupMember";
+      user: { __typename?: "User" } & PetitionSharingModal_UserFragment;
+    }>;
+  };
+};
 
 export type PetitionSharingModal_UserFragment = {
   __typename?: "User";
@@ -3702,12 +3692,11 @@ export type PetitionSharingModal_transferPetitionOwnershipMutation = {
   >;
 };
 
-export type PetitionSharingModal_PetitionsUserPermissionsQueryVariables =
-  Exact<{
-    petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
-  }>;
+export type PetitionSharingModal_PetitionsQueryVariables = Exact<{
+  petitionIds: Array<Scalars["GID"]> | Scalars["GID"];
+}>;
 
-export type PetitionSharingModal_PetitionsUserPermissionsQuery = {
+export type PetitionSharingModal_PetitionsQuery = {
   petitionsById: Array<
     Maybe<
       | ({
@@ -6351,32 +6340,45 @@ export const PetitionSharingModal_UserFragmentDoc = gql`
   }
   ${UserSelect_UserFragmentDoc}
 `;
-export const PetitionSharingModal_PetitionFragmentDoc = gql`
-  fragment PetitionSharingModal_Petition on PetitionBase {
-    id
-    name
-    permissions {
-      permissionType
-      ... on PetitionUserPermission {
+export const PetitionSharingModal_PetitionUserPermissionFragmentDoc = gql`
+  fragment PetitionSharingModal_PetitionUserPermission on PetitionUserPermission {
+    permissionType
+    user {
+      ...PetitionSharingModal_User
+    }
+  }
+  ${PetitionSharingModal_UserFragmentDoc}
+`;
+export const PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc = gql`
+  fragment PetitionSharingModal_PetitionUserGroupPermission on PetitionUserGroupPermission {
+    permissionType
+    group {
+      id
+      name
+      members {
         user {
-          id
           ...PetitionSharingModal_User
-        }
-      }
-      ... on PetitionUserGroupPermission {
-        group {
-          id
-          name
-          members {
-            user {
-              ...PetitionSharingModal_User
-            }
-          }
         }
       }
     }
   }
   ${PetitionSharingModal_UserFragmentDoc}
+`;
+export const PetitionSharingModal_PetitionFragmentDoc = gql`
+  fragment PetitionSharingModal_Petition on PetitionBase {
+    id
+    name
+    permissions {
+      ... on PetitionUserPermission {
+        ...PetitionSharingModal_PetitionUserPermission
+      }
+      ... on PetitionUserGroupPermission {
+        ...PetitionSharingModal_PetitionUserGroupPermission
+      }
+    }
+  }
+  ${PetitionSharingModal_PetitionUserPermissionFragmentDoc}
+  ${PetitionSharingModal_PetitionUserGroupPermissionFragmentDoc}
 `;
 export const PetitionSharingModal_UserGroupFragmentDoc = gql`
   fragment PetitionSharingModal_UserGroup on UserGroup {
@@ -9077,42 +9079,44 @@ export function usePetitionSharingModal_transferPetitionOwnershipMutation(
 }
 export type PetitionSharingModal_transferPetitionOwnershipMutationHookResult =
   ReturnType<typeof usePetitionSharingModal_transferPetitionOwnershipMutation>;
-export const PetitionSharingModal_PetitionsUserPermissionsDocument = gql`
-  query PetitionSharingModal_PetitionsUserPermissions($petitionIds: [GID!]!) {
+export const PetitionSharingModal_PetitionsDocument = gql`
+  query PetitionSharingModal_Petitions($petitionIds: [GID!]!) {
     petitionsById(ids: $petitionIds) {
       ...PetitionSharingModal_Petition
     }
   }
   ${PetitionSharingModal_PetitionFragmentDoc}
 `;
-export function usePetitionSharingModal_PetitionsUserPermissionsQuery(
+export function usePetitionSharingModal_PetitionsQuery(
   baseOptions: Apollo.QueryHookOptions<
-    PetitionSharingModal_PetitionsUserPermissionsQuery,
-    PetitionSharingModal_PetitionsUserPermissionsQueryVariables
+    PetitionSharingModal_PetitionsQuery,
+    PetitionSharingModal_PetitionsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    PetitionSharingModal_PetitionsUserPermissionsQuery,
-    PetitionSharingModal_PetitionsUserPermissionsQueryVariables
-  >(PetitionSharingModal_PetitionsUserPermissionsDocument, options);
+    PetitionSharingModal_PetitionsQuery,
+    PetitionSharingModal_PetitionsQueryVariables
+  >(PetitionSharingModal_PetitionsDocument, options);
 }
-export function usePetitionSharingModal_PetitionsUserPermissionsLazyQuery(
+export function usePetitionSharingModal_PetitionsLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionSharingModal_PetitionsUserPermissionsQuery,
-    PetitionSharingModal_PetitionsUserPermissionsQueryVariables
+    PetitionSharingModal_PetitionsQuery,
+    PetitionSharingModal_PetitionsQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    PetitionSharingModal_PetitionsUserPermissionsQuery,
-    PetitionSharingModal_PetitionsUserPermissionsQueryVariables
-  >(PetitionSharingModal_PetitionsUserPermissionsDocument, options);
+    PetitionSharingModal_PetitionsQuery,
+    PetitionSharingModal_PetitionsQueryVariables
+  >(PetitionSharingModal_PetitionsDocument, options);
 }
-export type PetitionSharingModal_PetitionsUserPermissionsQueryHookResult =
-  ReturnType<typeof usePetitionSharingModal_PetitionsUserPermissionsQuery>;
-export type PetitionSharingModal_PetitionsUserPermissionsLazyQueryHookResult =
-  ReturnType<typeof usePetitionSharingModal_PetitionsUserPermissionsLazyQuery>;
+export type PetitionSharingModal_PetitionsQueryHookResult = ReturnType<
+  typeof usePetitionSharingModal_PetitionsQuery
+>;
+export type PetitionSharingModal_PetitionsLazyQueryHookResult = ReturnType<
+  typeof usePetitionSharingModal_PetitionsLazyQuery
+>;
 export const useTemplateDetailsDialogPetitionDocument = gql`
   query useTemplateDetailsDialogPetition($templateId: GID!) {
     petition(id: $templateId) {

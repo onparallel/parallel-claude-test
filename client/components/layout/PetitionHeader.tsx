@@ -103,11 +103,13 @@ export function PetitionHeader({
     } catch {}
   };
 
-  const isSubscribed = petition.myEffectivePermission?.isSubscribed ?? false;
+  const isSubscribed = petition.myEffectivePermission!.isSubscribed;
 
   const [updatePetitionPermissionSubscription] =
     usePetitionHeader_updatePetitionPermissionSubscriptionMutation();
-  const handleUpdateUserPermission = async function (isSubscribed: boolean) {
+  const handleUpdatePetitionPermissionSubscription = async function (
+    isSubscribed: boolean
+  ) {
     await updatePetitionPermissionSubscription({
       variables: {
         petitionId: petition.id,
@@ -334,7 +336,9 @@ export function PetitionHeader({
                       defaultMessage: "Notifications",
                     })}
                     onChange={(value) => {
-                      handleUpdateUserPermission(value === "FOLLOW");
+                      handleUpdatePetitionPermissionSubscription(
+                        value === "FOLLOW"
+                      );
                     }}
                     value={isSubscribed ? "FOLLOW" : "IGNORE"}
                   >
