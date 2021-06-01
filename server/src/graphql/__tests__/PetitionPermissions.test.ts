@@ -1642,7 +1642,6 @@ describe("GraphQL/Petition Permissions", () => {
               userIds: $userIds
             ) {
               id
-
               permissions {
                 permissionType
                 ... on PetitionUserPermission {
@@ -1875,15 +1874,6 @@ describe("GraphQL/Petition Permissions", () => {
               userIds: $userIds
             ) {
               id
-
-              permissions {
-                ... on PetitionUserPermission {
-                  permissionType
-                  user {
-                    id
-                  }
-                }
-              }
             }
           }
         `,
@@ -1906,15 +1896,6 @@ describe("GraphQL/Petition Permissions", () => {
               userIds: $userIds
             ) {
               id
-
-              permissions {
-                ... on PetitionUserPermission {
-                  permissionType
-                  user {
-                    id
-                  }
-                }
-              }
             }
           }
         `,
@@ -1937,15 +1918,6 @@ describe("GraphQL/Petition Permissions", () => {
               userIds: $userIds
             ) {
               id
-
-              permissions {
-                ... on PetitionUserPermission {
-                  permissionType
-                  user {
-                    id
-                  }
-                }
-              }
             }
           }
         `,
@@ -1957,6 +1929,141 @@ describe("GraphQL/Petition Permissions", () => {
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
+    });
+
+    it("should not remove group permissions on the users when passing only userIds argument", async () => {
+      await mocks.sharePetitions(
+        [userPetition.id],
+        userGroupMembers[0].id,
+        "READ"
+      );
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]!) {
+            removePetitionUserPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+            ) {
+              id
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PetitionUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userIds: [toGlobalId("User", userGroupMembers[0].id)],
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data.removePetitionUserPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          permissions: [
+            {
+              permissionType: "OWNER",
+              user: { id: toGlobalId("User", loggedUser.id) },
+            },
+            {
+              permissionType: "WRITE",
+              group: { id: toGlobalId("UserGroup", userGroup.id) },
+            },
+            {
+              permissionType: "READ",
+              user: { id: toGlobalId("User", orgUsers[1].id) },
+            },
+            {
+              permissionType: "READ",
+              user: { id: toGlobalId("User", orgUsers[2].id) },
+            },
+          ],
+        },
+      ]);
+
+      //also make sure that the group-assigned permission for user userGroupMembers[0] is still there
+      const memberPermissions = await mocks.knex
+        .from("petition_user")
+        .where({
+          petition_id: userPetition.id,
+          deleted_at: null,
+          user_id: userGroupMembers[0].id,
+          from_user_group_id: userGroup.id,
+        })
+        .select("*");
+
+      expect(memberPermissions).toHaveLength(1);
+    });
+
+    it("should not remove directly-assigned user permissions when passing only groupIds argument", async () => {
+      await mocks.sharePetitions(
+        [userPetition.id],
+        userGroupMembers[0].id,
+        "READ"
+      );
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!, $userGroupIds: [GID!]!) {
+            removePetitionUserPermission(
+              petitionIds: $petitionIds
+              userGroupIds: $userGroupIds
+            ) {
+              id
+              permissions {
+                permissionType
+                ... on PetitionUserPermission {
+                  user {
+                    id
+                  }
+                }
+                ... on PetitionUserGroupPermission {
+                  group {
+                    id
+                  }
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", userPetition.id)],
+          userGroupIds: [toGlobalId("UserGroup", userGroup.id)],
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data.removePetitionUserPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          permissions: [
+            {
+              permissionType: "OWNER",
+              user: { id: toGlobalId("User", loggedUser.id) },
+            },
+            {
+              permissionType: "READ",
+              user: { id: toGlobalId("User", orgUsers[1].id) },
+            },
+            {
+              permissionType: "READ",
+              user: { id: toGlobalId("User", orgUsers[2].id) },
+            },
+            {
+              permissionType: "READ",
+              user: { id: toGlobalId("User", userGroupMembers[0].id) },
+            },
+          ],
+        },
+      ]);
     });
   });
 });

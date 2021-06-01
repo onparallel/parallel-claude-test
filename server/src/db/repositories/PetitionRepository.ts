@@ -2986,9 +2986,25 @@ export class PetitionRepository extends BaseRepository {
         .where((q) => q.whereNot("user_id", user.id).orWhereNull("user_id"))
         .mmodify((q) => {
           if (!removeAll) {
-            q.whereIn("user_id", userIds)
-              .orWhereIn("from_user_group_id", userGroupIds)
-              .orWhereIn("user_group_id", userGroupIds);
+            q.andWhere((q) =>
+              q
+                .orWhere((q) =>
+                  q
+                    .whereIn("user_id", userIds)
+                    .whereNull("from_user_group_id")
+                    .whereNull("user_group_id")
+                )
+                .orWhere((q) =>
+                  q
+                    .whereIn("user_group_id", userGroupIds)
+                    .whereNotNull("user_group_id")
+                )
+                .orWhere((q) =>
+                  q
+                    .whereIn("from_user_group_id", userGroupIds)
+                    .whereNotNull("from_user_group_id")
+                )
+            );
           }
         })
         .update(
