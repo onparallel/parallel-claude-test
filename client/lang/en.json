@@ -6071,7 +6071,7 @@
   },
   {
     "term": "view.update-browser.text-2",
-    "definition": "If the error persists please reach out to support so that we can help you.",
-    "context": "If the error persists please reach out to support so that we can help you."
+    "definition": "If the error persists, please contact the person who sent you this link.",
+    "context": "If the error persists, please contact the person who sent you this link."
   }
 ]

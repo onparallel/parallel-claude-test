@@ -74,7 +74,7 @@ export default function UpdateBrowser() {
         <Text>
           <FormattedMessage
             id="view.update-browser.text-2"
-            defaultMessage="If the error persists please reach out to support so that we can help you."
+            defaultMessage="If the error persists, please contact the person who sent you this link."
           />
         </Text>
       </Stack>
