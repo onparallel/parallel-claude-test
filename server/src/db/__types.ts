@@ -114,6 +114,7 @@ export interface TableTypes {
   petition_event: PetitionEvent;
   petition_event_subscription: PetitionEventSubscription;
   petition_field: PetitionField;
+  petition_field_attachment: PetitionFieldAttachment;
   petition_field_comment: PetitionFieldComment;
   petition_field_reply: PetitionFieldReply;
   petition_message: PetitionMessage;
@@ -149,6 +150,7 @@ export interface TableCreateTypes {
   petition_event: CreatePetitionEvent;
   petition_event_subscription: CreatePetitionEventSubscription;
   petition_field: CreatePetitionField;
+  petition_field_attachment: CreatePetitionFieldAttachment;
   petition_field_comment: CreatePetitionFieldComment;
   petition_field_reply: CreatePetitionFieldReply;
   petition_message: CreatePetitionMessage;
@@ -184,6 +186,7 @@ export interface TablePrimaryKeys {
   petition_event: "id";
   petition_event_subscription: "id";
   petition_field: "id";
+  petition_field_attachment: "id";
   petition_field_comment: "id";
   petition_field_reply: "id";
   petition_message: "id";
@@ -566,6 +569,21 @@ export type CreatePetitionField = PartialProps<
   | "deleted_by"
   | "is_fixed"
   | "visibility"
+>;
+
+export interface PetitionFieldAttachment {
+  id: number; // int4
+  petition_field_id: number; // int4
+  file_upload_id: number; // int4
+  created_at: Date; // timestamptz
+  created_by: Maybe<string>; // varchar
+  deleted_at: Maybe<Date>; // timestamptz
+  deleted_by: Maybe<string>; // varchar
+}
+
+export type CreatePetitionFieldAttachment = PartialProps<
+  Omit<PetitionFieldAttachment, "id">,
+  "created_at" | "created_by" | "deleted_at" | "deleted_by"
 >;
 
 export interface PetitionFieldComment {

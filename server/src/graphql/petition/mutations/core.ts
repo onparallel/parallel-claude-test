@@ -807,7 +807,7 @@ export const dynamicSelectFieldFileDownloadLink = mutationField(
   {
     description:
       "generates a signed download link for the xlsx file containing the listings of a dynamic select field",
-    type: "FileUploadReplyDownloadLinkResult",
+    type: "FileUploadDownloadLinkResult",
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
@@ -826,6 +826,7 @@ export const dynamicSelectFieldFileDownloadLink = mutationField(
         const file = await ctx.files.loadFileUpload(fileId as any);
         return {
           result: RESULT.SUCCESS,
+          file,
           url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
@@ -981,7 +982,7 @@ export const fileUploadReplyDownloadLink = mutationField(
   "fileUploadReplyDownloadLink",
   {
     description: "Generates a download link for a file reply.",
-    type: "FileUploadReplyDownloadLinkResult",
+    type: "FileUploadDownloadLinkResult",
     authorize: chain(
       authenticate(),
       and(
@@ -1015,6 +1016,7 @@ export const fileUploadReplyDownloadLink = mutationField(
         }
         return {
           result: RESULT.SUCCESS,
+          file,
           url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,

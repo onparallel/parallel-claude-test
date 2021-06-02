@@ -167,7 +167,7 @@ export const signedPetitionDownloadLink = mutationField(
   "signedPetitionDownloadLink",
   {
     description: "Generates a download link for the signed PDF petition.",
-    type: "FileUploadReplyDownloadLinkResult",
+    type: "FileUploadDownloadLinkResult",
     authorize: authenticateAnd(
       userHasFeatureFlag("PETITION_SIGNATURE"),
       userHasAccessToSignatureRequest("petitionSignatureRequestId", [
@@ -219,7 +219,7 @@ export const signedPetitionDownloadLink = mutationField(
         }
         return {
           result: RESULT.SUCCESS,
-          filename: file.filename,
+          file,
           url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file.path,
             file.filename,

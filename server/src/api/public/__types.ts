@@ -24,6 +24,12 @@ export type Scalars = {
   Upload: any;
 };
 
+/** JSON with AWS S3 url and required form data to make a POST request */
+export type AWSPresignedPostData = {
+  fields: Scalars["JSONObject"];
+  url: Scalars["String"];
+};
+
 export type AccessActivatedEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
@@ -109,16 +115,14 @@ export type CreateContactInput = {
   lastName?: Maybe<Scalars["String"]>;
 };
 
-export type CreateFileUploadReply = {
-  /** Endpoint where to upload the file. */
-  endpoint: Scalars["String"];
-  reply: PublicPetitionFieldReply;
+export type CreateFileUploadFieldAttachment = {
+  attachment: PetitionFieldAttachment;
+  presignedPostData: AWSPresignedPostData;
 };
 
-export type CreateFileUploadReplyInput = {
-  contentType: Scalars["String"];
-  filename: Scalars["String"];
-  size: Scalars["Int"];
+export type CreateFileUploadReply = {
+  presignedPostData: AWSPresignedPostData;
+  reply: PublicPetitionFieldReply;
 };
 
 export type CreatedAt = {
@@ -145,10 +149,22 @@ export type FeatureFlag =
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
-export type FileUploadReplyDownloadLinkResult = {
-  filename: Maybe<Scalars["String"]>;
+export type FileUpload = {
+  contentType: Scalars["String"];
+  filename: Scalars["String"];
+  size: Scalars["Int"];
+};
+
+export type FileUploadDownloadLinkResult = {
+  file: Maybe<FileUpload>;
   result: Result;
   url: Maybe<Scalars["String"]>;
+};
+
+export type FileUploadInput = {
+  contentType: Scalars["String"];
+  filename: Scalars["String"];
+  size: Scalars["Int"];
 };
 
 export type GenerateUserAuthTokenResponse = {
@@ -237,6 +253,8 @@ export type Mutation = {
   createPetition: PetitionBase;
   /** Creates a petition field */
   createPetitionField: PetitionBaseAndField;
+  /** Generates and returns a signed url to upload a field attachment to AWS S3 */
+  createPetitionFieldAttachmentUploadLink: CreateFileUploadFieldAttachment;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionFieldComment;
   /** Creates a new subscription on a petition */
@@ -269,15 +287,17 @@ export type Mutation = {
   /** Deletes a group */
   deleteUserGroup: Result;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
-  dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
+  dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   /** Edits permissions on given petitions and users */
   editPetitionPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
-  fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
+  fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Marks the specified comments as read. */
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
+  /** Generates a download link for a field attachment */
+  petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -301,9 +321,11 @@ export type Mutation = {
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Generates a download link for a file reply on a public context. */
-  publicFileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
+  publicFileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
+  /** Generates a download link for a field attachment on a public context. */
+  publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendVerificationCode: VerificationCodeRequest;
   /** Updates a reply for a dynamic select field. */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
@@ -330,7 +352,7 @@ export type Mutation = {
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
   /** Generates a download link for the signed PDF petition. */
-  signedPetitionDownloadLink: FileUploadReplyDownloadLinkResult;
+  signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
@@ -359,7 +381,7 @@ export type Mutation = {
   /** Updates the metada of the specified petition field reply */
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
-  updatePetitionUserSubscription: Petition;
+  updatePetitionPermissionSubscription: Petition;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
@@ -483,6 +505,12 @@ export type MutationcreatePetitionFieldArgs = {
   type: PetitionFieldType;
 };
 
+export type MutationcreatePetitionFieldAttachmentUploadLinkArgs = {
+  data: FileUploadInput;
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+};
+
 export type MutationcreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   isInternal?: Maybe<Scalars["Boolean"]>;
@@ -595,6 +623,12 @@ export type MutationmarkPetitionFieldCommentsAsReadArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
+  fieldAttachmentId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+};
+
 export type MutationpublicCheckVerificationCodeArgs = {
   code: Scalars["String"];
   keycode: Scalars["ID"];
@@ -613,7 +647,7 @@ export type MutationpublicCreateDynamicSelectReplyArgs = {
 };
 
 export type MutationpublicCreateFileUploadReplyArgs = {
-  data: CreateFileUploadReplyInput;
+  data: FileUploadInput;
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
 };
@@ -663,6 +697,12 @@ export type MutationpublicFileUploadReplyDownloadLinkArgs = {
 export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
   keycode: Scalars["ID"];
   petitionFieldCommentIds: Array<Scalars["GID"]>;
+};
+
+export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
+  fieldAttachmentId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  preview?: Maybe<Scalars["Boolean"]>;
 };
 
 export type MutationpublicSendVerificationCodeArgs = {
@@ -823,7 +863,7 @@ export type MutationupdatePetitionFieldReplyMetadataArgs = {
   replyId: Scalars["GID"];
 };
 
-export type MutationupdatePetitionUserSubscriptionArgs = {
+export type MutationupdatePetitionPermissionSubscriptionArgs = {
   isSubscribed: Scalars["Boolean"];
   petitionId: Scalars["GID"];
 };
@@ -1199,6 +1239,8 @@ export type PetitionEventPagination = {
 
 /** A field within a petition. */
 export type PetitionField = {
+  /** A list of files attached to this field. */
+  attachments: Array<PetitionFieldAttachment>;
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
@@ -1226,6 +1268,14 @@ export type PetitionField = {
   validated: Scalars["Boolean"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility: Maybe<Scalars["JSONObject"]>;
+};
+
+/** An attachment on a petition field */
+export type PetitionFieldAttachment = CreatedAt & {
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  file: FileUpload;
+  id: Scalars["GID"];
 };
 
 /** A comment on a petition field */
@@ -1585,7 +1635,7 @@ export type PublicPetition = Timestamps & {
   isRecipientViewContentsHidden: Scalars["Boolean"];
   /** The locale of the petition. */
   locale: PetitionLocale;
-  /** The recipitions of the petition */
+  /** The recipients of the petition */
   recipients: Array<PublicContact>;
   /** The signature config of the petition */
   signature: Maybe<PublicSignatureConfig>;
@@ -2399,7 +2449,7 @@ export type DownloadFileReply_fileUploadReplyDownloadLinkMutationVariables =
   }>;
 
 export type DownloadFileReply_fileUploadReplyDownloadLinkMutation = {
-  fileUploadReplyDownloadLink: Pick<FileUploadReplyDownloadLinkResult, "url">;
+  fileUploadReplyDownloadLink: Pick<FileUploadDownloadLinkResult, "url">;
 };
 
 export type GetPermissions_PermissionsQueryVariables = Exact<{

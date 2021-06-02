@@ -335,8 +335,8 @@ export const publicCreateFileUploadReply = mutationField(
     type: objectType({
       name: "CreateFileUploadReply",
       definition(t) {
-        t.string("endpoint", {
-          description: "Endpoint where to upload the file.",
+        t.field("presignedPostData", {
+          type: "AWSPresignedPostData",
         });
         t.field("reply", { type: "PublicPetitionFieldReply" });
       },
@@ -344,16 +344,7 @@ export const publicCreateFileUploadReply = mutationField(
     args: {
       keycode: nonNull(idArg()),
       fieldId: nonNull(globalIdArg("PetitionField")),
-      data: nonNull(
-        inputObjectType({
-          name: "CreateFileUploadReplyInput",
-          definition(t) {
-            t.nonNull.string("filename");
-            t.nonNull.int("size");
-            t.nonNull.string("contentType");
-          },
-        }).asArg()
-      ),
+      data: nonNull("FileUploadInput"),
     },
     authorize: chain(
       authenticatePublicAccess("keycode"),
@@ -372,8 +363,8 @@ export const publicCreateFileUploadReply = mutationField(
         },
         `Contact:${ctx.contact!.id}`
       );
-      const [endpoint, reply] = await Promise.all([
-        ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType),
+      const [presignedPostData, reply] = await Promise.all([
+        ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
         ctx.petitions.createPetitionFieldReply(
           {
             petition_field_id: args.fieldId,
@@ -384,7 +375,7 @@ export const publicCreateFileUploadReply = mutationField(
           ctx.contact!
         ),
       ]);
-      return { endpoint, reply };
+      return { presignedPostData, reply };
     },
   }
 );
@@ -773,7 +764,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
   {
     description:
       "Generates a download link for a file reply on a public context.",
-    type: "FileUploadReplyDownloadLinkResult",
+    type: "FileUploadDownloadLinkResult",
     authorize: chain(
       authenticatePublicAccess("keycode"),
       replyBelongsToAccess("replyId")
@@ -801,6 +792,7 @@ export const publicFileUploadReplyDownloadLink = mutationField(
         }
         return {
           result: RESULT.SUCCESS,
+          file,
           url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
@@ -955,3 +947,53 @@ async function startSignatureRequest(
     },
   });
 }
+
+export const publicPetitionFieldAttachmentDownloadLink = mutationField(
+  "publicPetitionFieldAttachmentDownloadLink",
+  {
+    description:
+      "Generates a download link for a field attachment on a public context.",
+    type: "FileUploadDownloadLinkResult",
+    authorize: authenticatePublicAccess("keycode"),
+    args: {
+      keycode: nonNull(idArg()),
+      fieldAttachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
+      preview: booleanArg({
+        description:
+          "If true will use content-disposition inline instead of attachment",
+      }),
+    },
+    resolve: async (_, args, ctx) => {
+      try {
+        const attachment = await ctx.petitions.loadFieldAttachment(
+          args.fieldAttachmentId
+        );
+
+        if (!attachment) {
+          throw new Error(
+            `Can't load PetitionFieldAttachment with id ${args.fieldAttachmentId}`
+          );
+        }
+
+        const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
+        if (file && !file.upload_complete) {
+          await ctx.aws.fileUploads.getFileMetadata(file!.path);
+          await ctx.files.markFileUploadComplete(file.id);
+        }
+        return {
+          result: RESULT.SUCCESS,
+          file,
+          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+            file!.path,
+            file!.filename,
+            args.preview ? "inline" : "attachment"
+          ),
+        };
+      } catch {
+        return {
+          result: RESULT.FAILURE,
+        };
+      }
+    },
+  }
+);

@@ -41,6 +41,7 @@ import {
   CreatePetitionAccess,
   CreatePetitionContactNotification,
   CreatePetitionField,
+  CreatePetitionFieldAttachment,
   CreatePetitionFieldReply,
   CreatePetitionMessage,
   CreatePetitionReminder,
@@ -149,6 +150,20 @@ export class PetitionRepository extends BaseRepository {
       .whereIn("id", fieldIds)
       .select(this.count());
     return count === new Set(fieldIds).size;
+  }
+
+  async fieldAttachmentBelongsToField(
+    fieldId: number,
+    attachmentIds: number[]
+  ) {
+    const [{ count }] = await this.from("petition_field_attachment")
+      .where({
+        petition_field_id: fieldId,
+        deleted_at: null,
+      })
+      .whereIn("id", attachmentIds)
+      .select(this.count());
+    return count === new Set(attachmentIds).size;
   }
 
   async accessesBelongToPetition(petitionId: number, accessIds: number[]) {
@@ -3259,6 +3274,29 @@ export class PetitionRepository extends BaseRepository {
         "*"
       );
 
+    return row;
+  }
+
+  readonly loadFieldAttachment = this.buildLoadById(
+    "petition_field_attachment",
+    "id",
+    (q) => q.whereNull("deleted_at")
+  );
+
+  readonly loadFieldAttachmentsByFieldId = this.buildLoadMultipleBy(
+    "petition_field_attachment",
+    "petition_field_id",
+    (q) => q.whereNull("deleted_at")
+  );
+
+  async createFileUploadAttachment(
+    data: CreatePetitionFieldAttachment,
+    user: User
+  ) {
+    const [row] = await this.insert("petition_field_attachment", {
+      ...data,
+      created_by: `User:${user.id}`,
+    });
     return row;
   }
 }

@@ -270,14 +270,17 @@ const _publicCreateFileUploadReply = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateFileUploadReply(
     $keycode: ID!
     $fieldId: GID!
-    $data: CreateFileUploadReplyInput!
+    $data: FileUploadInput!
   ) {
     publicCreateFileUploadReply(
       keycode: $keycode
       fieldId: $fieldId
       data: $data
     ) {
-      endpoint
+      presignedPostData {
+        url
+        fields
+      }
       reply {
         ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
       }
@@ -344,11 +347,19 @@ export function useCreateFileUploadReply(
             }
           },
         });
-        const { reply, endpoint } = data!.publicCreateFileUploadReply;
+        const { reply, presignedPostData } = data!.publicCreateFileUploadReply;
+
+        const formData = new FormData();
+        Object.keys(presignedPostData.fields).forEach((key) => {
+          formData.append(key, presignedPostData.fields[key]);
+        });
+
+        formData.append("Content-Type", file.type);
+        formData.append("file", file);
 
         const request = new XMLHttpRequest();
-        request.open("PUT", endpoint);
-        request.setRequestHeader("Content-Type", file.type);
+        request.open("POST", presignedPostData.url);
+
         uploads.current[reply.id] = request;
 
         request.upload.addEventListener("progress", (e) =>
@@ -363,7 +374,7 @@ export function useCreateFileUploadReply(
             variables: { keycode, replyId: reply.id },
           });
         });
-        request.send(file);
+        request.send(formData);
       }
     },
     [uploads, createFileUploadReply, fileUploadReplyComplete]

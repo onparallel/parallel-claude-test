@@ -1,5 +1,6 @@
 import {
   enumType,
+  inputObjectType,
   interfaceType,
   nullable,
   objectType,
@@ -386,6 +387,13 @@ export const PetitionField = objectType({
           })),
         },
     });
+    t.nonNull.list.nonNull.field("attachments", {
+      type: "PetitionFieldAttachment",
+      description: "A list of files attached to this field.",
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadFieldAttachmentsByFieldId(o.id);
+      },
+    });
   },
   rootTyping: "db.PetitionField",
 });
@@ -606,11 +614,11 @@ export const PetitionFieldReply = objectType({
   },
 });
 
-export const FileUploadReplyDownloadLinkResult = objectType({
-  name: "FileUploadReplyDownloadLinkResult",
+export const FileUploadDownloadLinkResult = objectType({
+  name: "FileUploadDownloadLinkResult",
   definition(t) {
     t.field("result", { type: "Result" });
-    t.nullable.string("filename");
+    t.nullable.field("file", { type: "FileUpload" });
     t.nullable.string("url");
   },
 });
@@ -621,5 +629,37 @@ export const SendPetitionResult = objectType({
     t.field("result", { type: "Result" });
     t.nullable.field("petition", { type: "Petition" });
     t.nullable.list.nonNull.field("accesses", { type: "PetitionAccess" });
+  },
+});
+
+export const FileUpload = objectType({
+  name: "FileUpload",
+  definition(t) {
+    t.string("filename");
+    t.string("contentType", {
+      resolve: (o) => o.content_type,
+    });
+    t.int("size", {
+      resolve: (o) => parseInt(o.size, 10),
+    });
+  },
+});
+
+export const FileUploadInput = inputObjectType({
+  name: "FileUploadInput",
+  definition(t) {
+    t.nonNull.string("filename");
+    t.nonNull.int("size");
+    t.nonNull.string("contentType");
+  },
+});
+
+export const AWSPresignedPostData = objectType({
+  name: "AWSPresignedPostData",
+  description:
+    "JSON with AWS S3 url and required form data to make a POST request",
+  definition(t) {
+    t.string("url");
+    t.jsonObject("fields");
   },
 });

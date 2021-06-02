@@ -27,6 +27,13 @@ export interface Scalars {
   Upload: File;
 }
 
+/** JSON with AWS S3 url and required form data to make a POST request */
+export interface AWSPresignedPostData {
+  __typename?: "AWSPresignedPostData";
+  fields: Scalars["JSONObject"];
+  url: Scalars["String"];
+}
+
 export interface AccessActivatedEvent extends PetitionEvent {
   __typename?: "AccessActivatedEvent";
   access: PetitionAccess;
@@ -120,17 +127,16 @@ export interface CreateContactInput {
   lastName?: Maybe<Scalars["String"]>;
 }
 
-export interface CreateFileUploadReply {
-  __typename?: "CreateFileUploadReply";
-  /** Endpoint where to upload the file. */
-  endpoint: Scalars["String"];
-  reply: PublicPetitionFieldReply;
+export interface CreateFileUploadFieldAttachment {
+  __typename?: "CreateFileUploadFieldAttachment";
+  attachment: PetitionFieldAttachment;
+  presignedPostData: AWSPresignedPostData;
 }
 
-export interface CreateFileUploadReplyInput {
-  contentType: Scalars["String"];
-  filename: Scalars["String"];
-  size: Scalars["Int"];
+export interface CreateFileUploadReply {
+  __typename?: "CreateFileUploadReply";
+  presignedPostData: AWSPresignedPostData;
+  reply: PublicPetitionFieldReply;
 }
 
 export interface CreatedAt {
@@ -158,11 +164,24 @@ export type FeatureFlag =
   | "PETITION_SIGNATURE"
   | "SKIP_FORWARD_SECURITY";
 
-export interface FileUploadReplyDownloadLinkResult {
-  __typename?: "FileUploadReplyDownloadLinkResult";
-  filename?: Maybe<Scalars["String"]>;
+export interface FileUpload {
+  __typename?: "FileUpload";
+  contentType: Scalars["String"];
+  filename: Scalars["String"];
+  size: Scalars["Int"];
+}
+
+export interface FileUploadDownloadLinkResult {
+  __typename?: "FileUploadDownloadLinkResult";
+  file?: Maybe<FileUpload>;
   result: Result;
   url?: Maybe<Scalars["String"]>;
+}
+
+export interface FileUploadInput {
+  contentType: Scalars["String"];
+  filename: Scalars["String"];
+  size: Scalars["Int"];
 }
 
 export interface GenerateUserAuthTokenResponse {
@@ -259,6 +278,8 @@ export interface Mutation {
   createPetition: PetitionBase;
   /** Creates a petition field */
   createPetitionField: PetitionBaseAndField;
+  /** Generates and returns a signed url to upload a field attachment to AWS S3 */
+  createPetitionFieldAttachmentUploadLink: CreateFileUploadFieldAttachment;
   /** Create a petition field comment. */
   createPetitionFieldComment: PetitionField;
   /** Creates a new subscription on a petition */
@@ -291,15 +312,17 @@ export interface Mutation {
   /** Deletes a group */
   deleteUserGroup: Result;
   /** generates a signed download link for the xlsx file containing the listings of a dynamic select field */
-  dynamicSelectFieldFileDownloadLink: FileUploadReplyDownloadLinkResult;
+  dynamicSelectFieldFileDownloadLink: FileUploadDownloadLinkResult;
   /** Edits permissions on given petitions and users */
   editPetitionPermission: Array<Petition>;
   /** Generates a download link for a file reply. */
-  fileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
+  fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
   /** Marks the specified comments as read. */
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
+  /** Generates a download link for a field attachment */
+  petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -323,9 +346,11 @@ export interface Mutation {
   /** Notifies the backend that the upload is complete. */
   publicFileUploadReplyComplete: PublicPetitionFieldReply;
   /** Generates a download link for a file reply on a public context. */
-  publicFileUploadReplyDownloadLink: FileUploadReplyDownloadLinkResult;
+  publicFileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
+  /** Generates a download link for a field attachment on a public context. */
+  publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendVerificationCode: VerificationCodeRequest;
   /** Updates a reply for a dynamic select field. */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
@@ -352,7 +377,7 @@ export interface Mutation {
   /** Sends a reminder for the specified petition accesses. */
   sendReminders: Result;
   /** Generates a download link for the signed PDF petition. */
-  signedPetitionDownloadLink: FileUploadReplyDownloadLinkResult;
+  signedPetitionDownloadLink: FileUploadDownloadLinkResult;
   startSignatureRequest: PetitionSignatureRequest;
   /** Switches automatic reminders for the specified petition accesses. */
   switchAutomaticReminders: Array<PetitionAccess>;
@@ -505,6 +530,12 @@ export interface MutationcreatePetitionFieldArgs {
   type: PetitionFieldType;
 }
 
+export interface MutationcreatePetitionFieldAttachmentUploadLinkArgs {
+  data: FileUploadInput;
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}
+
 export interface MutationcreatePetitionFieldCommentArgs {
   content: Scalars["String"];
   isInternal?: Maybe<Scalars["Boolean"]>;
@@ -617,6 +648,12 @@ export interface MutationmarkPetitionFieldCommentsAsReadArgs {
   petitionId: Scalars["GID"];
 }
 
+export interface MutationpetitionFieldAttachmentDownloadLinkArgs {
+  fieldAttachmentId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}
+
 export interface MutationpublicCheckVerificationCodeArgs {
   code: Scalars["String"];
   keycode: Scalars["ID"];
@@ -635,7 +672,7 @@ export interface MutationpublicCreateDynamicSelectReplyArgs {
 }
 
 export interface MutationpublicCreateFileUploadReplyArgs {
-  data: CreateFileUploadReplyInput;
+  data: FileUploadInput;
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
 }
@@ -685,6 +722,12 @@ export interface MutationpublicFileUploadReplyDownloadLinkArgs {
 export interface MutationpublicMarkPetitionFieldCommentsAsReadArgs {
   keycode: Scalars["ID"];
   petitionFieldCommentIds: Array<Scalars["GID"]>;
+}
+
+export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
+  fieldAttachmentId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  preview?: Maybe<Scalars["Boolean"]>;
 }
 
 export interface MutationpublicSendVerificationCodeArgs {
@@ -1237,6 +1280,8 @@ export interface PetitionEventPagination {
 /** A field within a petition. */
 export interface PetitionField {
   __typename?: "PetitionField";
+  /** A list of files attached to this field. */
+  attachments: Array<PetitionFieldAttachment>;
   /** The comments for this field. */
   comments: Array<PetitionFieldComment>;
   /** The description of the petition field. */
@@ -1264,6 +1309,15 @@ export interface PetitionField {
   validated: Scalars["Boolean"];
   /** A JSON object representing the conditions for the field to be visible */
   visibility?: Maybe<Scalars["JSONObject"]>;
+}
+
+/** An attachment on a petition field */
+export interface PetitionFieldAttachment extends CreatedAt {
+  __typename?: "PetitionFieldAttachment";
+  /** Time when the resource was created. */
+  createdAt: Scalars["DateTime"];
+  file: FileUpload;
+  id: Scalars["GID"];
 }
 
 /** A comment on a petition field */
@@ -3778,7 +3832,7 @@ export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutationVari
 
 export type DynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation = {
   dynamicSelectFieldFileDownloadLink: {
-    __typename?: "FileUploadReplyDownloadLinkResult";
+    __typename?: "FileUploadDownloadLinkResult";
     result: Result;
     url?: Maybe<string>;
   };
@@ -3916,7 +3970,7 @@ export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutationVaria
 
 export type ExportRepliesProgressDialog_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: {
-    __typename?: "FileUploadReplyDownloadLinkResult";
+    __typename?: "FileUploadDownloadLinkResult";
     result: Result;
     url?: Maybe<string>;
   };
@@ -3930,9 +3984,8 @@ export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutationVariab
 
 export type ExportRepliesProgressDialog_signedPetitionDownloadLinkMutation = {
   signedPetitionDownloadLink: {
-    __typename?: "FileUploadReplyDownloadLinkResult";
+    __typename?: "FileUploadDownloadLinkResult";
     result: Result;
-    filename?: Maybe<string>;
     url?: Maybe<string>;
   };
 };
@@ -4141,7 +4194,7 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutationVariables =
 
 export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   signedPetitionDownloadLink: {
-    __typename?: "FileUploadReplyDownloadLinkResult";
+    __typename?: "FileUploadDownloadLinkResult";
     result: Result;
     url?: Maybe<string>;
   };
@@ -4396,7 +4449,7 @@ export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLi
 export type RecipientViewPetitionFieldFileUpload_publicFileUploadReplyDownloadLinkMutation =
   {
     publicFileUploadReplyDownloadLink: {
-      __typename?: "FileUploadReplyDownloadLinkResult";
+      __typename?: "FileUploadDownloadLinkResult";
       result: Result;
       url?: Maybe<string>;
     };
@@ -4485,14 +4538,18 @@ export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutat
   Exact<{
     keycode: Scalars["ID"];
     fieldId: Scalars["GID"];
-    data: CreateFileUploadReplyInput;
+    data: FileUploadInput;
   }>;
 
 export type RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation =
   {
     publicCreateFileUploadReply: {
       __typename?: "CreateFileUploadReply";
-      endpoint: string;
+      presignedPostData: {
+        __typename?: "AWSPresignedPostData";
+        url: string;
+        fields: { [key: string]: any };
+      };
       reply: {
         __typename?: "PublicPetitionFieldReply";
       } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
@@ -5484,7 +5541,7 @@ export type PetitionReplies_fileUploadReplyDownloadLinkMutationVariables =
 
 export type PetitionReplies_fileUploadReplyDownloadLinkMutation = {
   fileUploadReplyDownloadLink: {
-    __typename?: "FileUploadReplyDownloadLinkResult";
+    __typename?: "FileUploadDownloadLinkResult";
     result: Result;
     url?: Maybe<string>;
   };
@@ -9223,7 +9280,6 @@ export const ExportRepliesProgressDialog_signedPetitionDownloadLinkDocument = gq
       downloadAuditTrail: $downloadAuditTrail
     ) {
       result
-      filename
       url
     }
   }
@@ -9855,14 +9911,17 @@ export const RecipientViewPetitionFieldMutations_publicCreateFileUploadReplyDocu
   mutation RecipientViewPetitionFieldMutations_publicCreateFileUploadReply(
     $keycode: ID!
     $fieldId: GID!
-    $data: CreateFileUploadReplyInput!
+    $data: FileUploadInput!
   ) {
     publicCreateFileUploadReply(
       keycode: $keycode
       fieldId: $fieldId
       data: $data
     ) {
-      endpoint
+      presignedPostData {
+        url
+        fields
+      }
       reply {
         ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
       }

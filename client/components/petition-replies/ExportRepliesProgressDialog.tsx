@@ -452,7 +452,6 @@ ExportRepliesProgressDialog.mutations = [
         downloadAuditTrail: $downloadAuditTrail
       ) {
         result
-        filename
         url
       }
     }

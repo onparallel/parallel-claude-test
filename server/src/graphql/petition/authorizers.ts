@@ -126,6 +126,26 @@ export function fieldsBelongsToPetition<
   };
 }
 
+export function fieldAttachmentBelongsToField<
+  TypeName extends string,
+  FieldName extends string,
+  TArg1 extends Arg<TypeName, FieldName, number>,
+  TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(
+  argNameFieldId: TArg1,
+  argNameAttachmentId: TArg2
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      return await ctx.petitions.fieldAttachmentBelongsToField(
+        args[argNameFieldId] as unknown as number,
+        unMaybeArray(args[argNameAttachmentId] as MaybeArray<number>)
+      );
+    } catch {}
+    return false;
+  };
+}
+
 export function repliesBelongsToPetition<
   TypeName extends string,
   FieldName extends string,

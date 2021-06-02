@@ -1,5 +1,5 @@
 import AWS from "aws-sdk";
-import { HeadObjectOutput } from "aws-sdk/clients/s3";
+import { HeadObjectOutput, PresignedPost } from "aws-sdk/clients/s3";
 import contentDisposition from "content-disposition";
 import { injectable } from "inversify";
 import { Readable } from "stream";
@@ -11,7 +11,11 @@ export type StorageFactory = (
 ) => IStorage;
 
 export interface IStorage {
-  getSignedUploadEndpoint(key: string, contentType: string): Promise<string>;
+  getSignedUploadEndpoint(
+    key: string,
+    contentType: string,
+    maxAllowedSize?: number
+  ): Promise<PresignedPost>;
   getSignedDownloadEndpoint(
     key: string,
     filename: string,
@@ -26,17 +30,35 @@ export interface IStorage {
     body: Buffer | Readable
   ): Promise<HeadObjectOutput>;
 }
-
+const _4GB = 1024 * 1024 * 1024 * 4;
 @injectable()
 export class Storage implements IStorage {
   constructor(private s3: AWS.S3, private bucketName: string) {}
 
-  async getSignedUploadEndpoint(key: string, contentType: string) {
-    return await this.s3.getSignedUrlPromise("putObject", {
-      Bucket: this.bucketName,
-      Key: key,
-      ContentType: contentType,
-      Expires: 60 * 30,
+  async getSignedUploadEndpoint(
+    key: string,
+    contentType: string,
+    maxAllowedSize?: number
+  ) {
+    return await new Promise<PresignedPost>((resolve, reject) => {
+      this.s3.createPresignedPost(
+        {
+          Bucket: this.bucketName,
+          Fields: { key },
+          Expires: 60 * 30,
+          Conditions: [
+            ["eq", "$Content-Type", contentType],
+            ["content-length-range", 0, Math.min(maxAllowedSize ?? _4GB, _4GB)],
+          ],
+        },
+        (error, data) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(data);
+          }
+        }
+      );
     });
   }
 
