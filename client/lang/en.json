@@ -1906,8 +1906,8 @@
   },
   {
     "term": "error.unknown-error.text",
-    "definition": "Please try again later and if the error persists reach out to support for help.",
-    "context": "Please try again later and if the error persists reach out to support for help."
+    "definition": "Please try again later and if the error persists <a>reach out to support</a> for help.",
+    "context": "Please try again later and if the error persists <a>reach out to support</a> for help."
   },
   {
     "term": "field-settings.dynamic-select.import-from-excel.attach-xlsx",

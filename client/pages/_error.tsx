@@ -4,6 +4,7 @@ import { NextPageContext } from "next";
 import { FormattedMessage } from "react-intl";
 import * as Sentry from "@sentry/node";
 import { UnwrapPromise } from "@parallel/utils/types";
+import { NormalLink } from "@parallel/components/common/Link";
 
 const SENTRY_WHITELISTED_ERRORS = [
   "PUBLIC_PETITION_NOT_AVAILABLE",
@@ -70,7 +71,14 @@ export default function CustomError({
       <Text>
         <FormattedMessage
           id="error.unknown-error.text"
-          defaultMessage="Please try again later and if the error persists reach out to support for help."
+          defaultMessage="Please try again later and if the error persists <a>reach out to support</a> for help."
+          values={{
+            a: (chunks: any[]) => (
+              <NormalLink href={`mailto:support@onparallel.com`}>
+                {chunks}
+              </NormalLink>
+            ),
+          }}
         />
       </Text>
     </ErrorPage>
