@@ -164,12 +164,11 @@ export function useDeletePetitions() {
                     key={petition!.id}
                     textStyle={petition!.name ? undefined : "hint"}
                   >
-                    {petition?.name
-                      ? petition.name
-                      : intl.formatMessage({
-                          id: "generic.untitled-petition",
-                          defaultMessage: "Untitled petition",
-                        })}
+                    {petition?.name ??
+                      intl.formatMessage({
+                        id: "generic.untitled-petition",
+                        defaultMessage: "Untitled petition",
+                      })}
                   </ListItem>
                 ))}
               </UnorderedList>

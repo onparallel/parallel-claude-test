@@ -148,7 +148,7 @@ export function PetitionSharingDialog({
       ? userPermissions?.map((p) => p.user.id) ?? []
       : [userId];
 
-  const groupsToExlude =
+  const groupsToExclude =
     petitionIds.length === 1
       ? groupPermissions?.map((p) => p.group.id) ?? []
       : [];
@@ -163,10 +163,10 @@ export function PetitionSharingDialog({
       return await _handleSearchUsers(search, {
         includeGroups: true,
         excludeUsers: [...excludeUsers, ...usersToExclude],
-        excludeUserGroups: [...excludeUserGroups, ...groupsToExlude],
+        excludeUserGroups: [...excludeUserGroups, ...groupsToExclude],
       });
     },
-    [_handleSearchUsers, usersToExclude.join(","), groupsToExlude.join(",")]
+    [_handleSearchUsers, usersToExclude.join(","), groupsToExclude.join(",")]
   );
   const handleRemovePetitionPermission = useRemovePetitionPermission();
   const handleTransferPetitionOwnership = useTransferPetitionOwnership();
@@ -197,7 +197,7 @@ export function PetitionSharingDialog({
           refetchQueries: [getOperationName(PetitionActivityDocument)!],
         });
         toast({
-          title: getSuccesTitle(),
+          title: getSuccessTitle(),
           status: "success",
           duration: 3000,
           isClosable: true,
@@ -207,7 +207,7 @@ export function PetitionSharingDialog({
     }
   );
 
-  const getSuccesTitle = () => {
+  const getSuccessTitle = () => {
     const template = intl.formatMessage(
       {
         id: "template-sharing.success-title",
@@ -541,12 +541,11 @@ export function PetitionSharingDialog({
                                 as="span"
                                 textStyle={petition!.name ? undefined : "hint"}
                               >
-                                {petition?.name
-                                  ? petition.name
-                                  : intl.formatMessage({
-                                      id: "generic.untitled-petition",
-                                      defaultMessage: "Untitled petition",
-                                    })}
+                                {petition?.name ??
+                                  intl.formatMessage({
+                                    id: "generic.untitled-petition",
+                                    defaultMessage: "Untitled petition",
+                                  })}
                               </Text>
                             </ListItem>
                           ))}
