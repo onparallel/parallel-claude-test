@@ -92,10 +92,9 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
       ))!;
       const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
 
-      await Promise.all([
-        ctx.aws.fileUploads.getFileMetadata(file!.path),
-        ctx.files.markFileUploadComplete(file!.id),
-      ]);
+      await ctx.aws.fileUploads.getFileMetadata(file!.path);
+      await ctx.files.markFileUploadComplete(file!.id);
+
       return attachment;
     },
   }
