@@ -15,7 +15,7 @@ function shouldBeProcessed(
   const lastNotification = maxBy(notifications, (n) => n.created_at.getTime())!;
 
   return (
-    differenceInMinutes(lastNotification.created_at, new Date()) >
+    differenceInMinutes(new Date(), lastNotification.created_at) >
     minutesBeforeNotify
   );
 }
