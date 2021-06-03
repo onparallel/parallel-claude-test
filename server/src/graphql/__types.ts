@@ -2582,6 +2582,7 @@ export interface NexusGenArgTypes {
     publicPetitionFieldAttachmentDownloadLink: {
       // args
       fieldAttachmentId: NexusGenScalars["GID"]; // GID!
+      fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
       preview?: boolean | null; // Boolean
     };

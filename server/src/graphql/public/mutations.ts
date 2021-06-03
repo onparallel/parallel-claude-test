@@ -24,6 +24,7 @@ import { jsonArg } from "../helpers/json";
 import { RESULT } from "../helpers/result";
 import { notEmptyArray } from "../helpers/validators/notEmptyArray";
 import { validRichTextContent } from "../helpers/validators/validRichTextContent";
+import { fieldAttachmentBelongsToField } from "../petition/authorizers";
 import {
   authenticatePublicAccess,
   commentsBelongsToAccess,
@@ -954,9 +955,16 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
     description:
       "Generates a download link for a field attachment on a public context.",
     type: "FileUploadDownloadLinkResult",
-    authorize: authenticatePublicAccess("keycode"),
+    authorize: chain(
+      authenticatePublicAccess("keycode"),
+      and(
+        fieldBelongsToAccess("fieldId"),
+        fieldAttachmentBelongsToField("fieldId", "fieldAttachmentId")
+      )
+    ),
     args: {
       keycode: nonNull(idArg()),
+      fieldId: nonNull(globalIdArg("PetitionField")),
       fieldAttachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
       preview: booleanArg({
         description:

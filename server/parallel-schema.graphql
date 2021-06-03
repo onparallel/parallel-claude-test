@@ -757,6 +757,7 @@ type Mutation {
   """
   publicPetitionFieldAttachmentDownloadLink(
     fieldAttachmentId: GID!
+    fieldId: GID!
     keycode: ID!
 
     """
