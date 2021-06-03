@@ -670,9 +670,24 @@
     "context": "Show"
   },
   {
+    "term": "component.petition-compose-field-attachment.label",
+    "definition": "Archivo adjunto: {filename}. Para ver el archivo, pulsa la tecla Intro. Para eliminarlo, pulsa Suprimir.",
+    "context": "Attached file: {filename}. To see the file, press Enter. To remove it, press Delete."
+  },
+  {
+    "term": "component.petition-compose-field-attachment.remove-attachment",
+    "definition": "Quitar adjunto",
+    "context": "Remove attachment"
+  },
+  {
     "term": "component.petition-compose-field-list.move-referenced-field-error",
     "definition": "Solo se pueden mover campos de manera que las condiciones de visibilidad hagan referencia únicamente a campos anteriores.",
     "context": "You can only move fields so that visibility conditions refer only to previous fields."
+  },
+  {
+    "term": "component.petition-compose-field.add-attachment",
+    "definition": "Añadir adjunto",
+    "context": "Add attachment"
   },
   {
     "term": "component.petition-compose-field.add-condition",
@@ -688,6 +703,11 @@
     "term": "component.petition-compose-field.drag-to-sort-label",
     "definition": "Arrastrar para ordenar los campos de la petición",
     "context": "Drag to sort this petition fields"
+  },
+  {
+    "term": "component.petition-compose-field.drop-files-to-attach",
+    "definition": "Arrastra aquí tus archivos para añadirlos a este campo",
+    "context": "Drop here your files to attach them to this field"
   },
   {
     "term": "component.petition-compose-field.dynamic-select-labels-header",
@@ -743,6 +763,21 @@
     "term": "component.petition-compose-field.heading-title-placeholder",
     "definition": "Escribe un título introductorio para esta sección...",
     "context": "Enter an introductory title for this section..."
+  },
+  {
+    "term": "component.petition-compose-field.invalid-attachment-header",
+    "definition": "Adjunto inválido",
+    "context": "Invalid attachment"
+  },
+  {
+    "term": "component.petition-compose-field.invalid-attachment-message",
+    "definition": "Solo están permitidos archivos de hasta {size}.",
+    "context": "Only attachments of up to {size} are allowed."
+  },
+  {
+    "term": "component.petition-compose-field.over-max-attachments",
+    "definition": "Se pueden añadir a un campo hasta un máximo de {count, plural, =1 {un adjunto} other {# adjuntos}}.",
+    "context": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
   },
   {
     "term": "component.petition-compose-field.remove-condition",
@@ -1343,6 +1378,11 @@
     "term": "component.recipient-select-groups.unknown-recipients",
     "definition": "No hemos encontrado {count, plural, =1 {a {email}} other {algunos emails}} en tu lista de contactos.",
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
+  },
+  {
+    "term": "component.recipient-view-field-attachment.label",
+    "definition": "Archivo adjunto: {filename}",
+    "context": "Attached file: {filename}"
   },
   {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
