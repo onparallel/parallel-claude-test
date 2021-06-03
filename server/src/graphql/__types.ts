@@ -698,7 +698,6 @@ export interface NexusGenFieldTypes {
     editPetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     fileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
-    markPetitionFieldCommentsAsRead: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
@@ -741,6 +740,7 @@ export interface NexusGenFieldTypes {
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    updatePetitionFieldCommentsReadStatus: NexusGenRootTypes["PetitionFieldComment"][]; // [PetitionFieldComment!]!
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
@@ -1576,7 +1576,6 @@ export interface NexusGenFieldTypeNames {
     editPetitionPermission: "Petition";
     fileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
-    markPetitionFieldCommentsAsRead: "PetitionFieldComment";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
     publicCheckVerificationCode: "VerificationCodeCheck";
@@ -1619,6 +1618,7 @@ export interface NexusGenFieldTypeNames {
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionBaseAndField";
     updatePetitionFieldComment: "PetitionField";
+    updatePetitionFieldCommentsReadStatus: "PetitionFieldComment";
     updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionPermissionSubscription: "Petition";
@@ -2494,11 +2494,6 @@ export interface NexusGenArgTypes {
       // args
       tokenName: string; // String!
     };
-    markPetitionFieldCommentsAsRead: {
-      // args
-      petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
-      petitionId: NexusGenScalars["GID"]; // GID!
-    };
     petitionFieldAttachmentDownloadLink: {
       // args
       attachmentId: NexusGenScalars["GID"]; // GID!
@@ -2737,6 +2732,12 @@ export interface NexusGenArgTypes {
       content: string; // String!
       petitionFieldCommentId: NexusGenScalars["GID"]; // GID!
       petitionFieldId: NexusGenScalars["GID"]; // GID!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    updatePetitionFieldCommentsReadStatus: {
+      // args
+      isRead: boolean; // Boolean!
+      petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     updatePetitionFieldRepliesStatus: {

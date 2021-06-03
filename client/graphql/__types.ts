@@ -320,8 +320,6 @@ export interface Mutation {
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
-  /** Marks the specified comments as read. */
-  markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -406,6 +404,8 @@ export interface Mutation {
   updatePetitionField: PetitionBaseAndField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionField;
+  /** Marks the specified comments as read or unread. */
+  updatePetitionFieldCommentsReadStatus: Array<PetitionFieldComment>;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
   /** Updates the metada of the specified petition field reply */
@@ -648,11 +648,6 @@ export interface MutationgenerateUserAuthTokenArgs {
   tokenName: Scalars["String"];
 }
 
-export interface MutationmarkPetitionFieldCommentsAsReadArgs {
-  petitionFieldCommentIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
-}
-
 export interface MutationpetitionFieldAttachmentDownloadLinkArgs {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -890,6 +885,12 @@ export interface MutationupdatePetitionFieldCommentArgs {
   content: Scalars["String"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+}
+
+export interface MutationupdatePetitionFieldCommentsReadStatusArgs {
+  isRead: Scalars["Boolean"];
+  petitionFieldCommentIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
 }
 
@@ -5764,14 +5765,15 @@ export type PetitionReplies_deletePetitionFieldCommentMutation = {
   } & PetitionRepliesFieldComments_PetitionFieldFragment;
 };
 
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables =
+export type PetitionReplies_updatePetitionFieldCommentsReadStatusMutationVariables =
   Exact<{
     petitionId: Scalars["GID"];
     petitionFieldCommentIds: Array<Scalars["GID"]> | Scalars["GID"];
+    isRead: Scalars["Boolean"];
   }>;
 
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutation = {
-  markPetitionFieldCommentsAsRead: Array<{
+export type PetitionReplies_updatePetitionFieldCommentsReadStatusMutation = {
+  updatePetitionFieldCommentsReadStatus: Array<{
     __typename?: "PetitionFieldComment";
     id: string;
     isUnread: boolean;
@@ -12245,34 +12247,38 @@ export function usePetitionReplies_deletePetitionFieldCommentMutation(
 }
 export type PetitionReplies_deletePetitionFieldCommentMutationHookResult =
   ReturnType<typeof usePetitionReplies_deletePetitionFieldCommentMutation>;
-export const PetitionReplies_markPetitionFieldCommentsAsReadDocument = gql`
-  mutation PetitionReplies_markPetitionFieldCommentsAsRead(
+export const PetitionReplies_updatePetitionFieldCommentsReadStatusDocument = gql`
+  mutation PetitionReplies_updatePetitionFieldCommentsReadStatus(
     $petitionId: GID!
     $petitionFieldCommentIds: [GID!]!
+    $isRead: Boolean!
   ) {
-    markPetitionFieldCommentsAsRead(
+    updatePetitionFieldCommentsReadStatus(
       petitionId: $petitionId
       petitionFieldCommentIds: $petitionFieldCommentIds
+      isRead: $isRead
     ) {
       id
       isUnread
     }
   }
 `;
-export function usePetitionReplies_markPetitionFieldCommentsAsReadMutation(
+export function usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    PetitionReplies_markPetitionFieldCommentsAsReadMutation,
-    PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
+    PetitionReplies_updatePetitionFieldCommentsReadStatusMutation,
+    PetitionReplies_updatePetitionFieldCommentsReadStatusMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    PetitionReplies_markPetitionFieldCommentsAsReadMutation,
-    PetitionReplies_markPetitionFieldCommentsAsReadMutationVariables
-  >(PetitionReplies_markPetitionFieldCommentsAsReadDocument, options);
+    PetitionReplies_updatePetitionFieldCommentsReadStatusMutation,
+    PetitionReplies_updatePetitionFieldCommentsReadStatusMutationVariables
+  >(PetitionReplies_updatePetitionFieldCommentsReadStatusDocument, options);
 }
-export type PetitionReplies_markPetitionFieldCommentsAsReadMutationHookResult =
-  ReturnType<typeof usePetitionReplies_markPetitionFieldCommentsAsReadMutation>;
+export type PetitionReplies_updatePetitionFieldCommentsReadStatusMutationHookResult =
+  ReturnType<
+    typeof usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation
+  >;
 export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
   mutation PetitionReplies_updatePetitionFieldRepliesStatus(
     $petitionId: GID!

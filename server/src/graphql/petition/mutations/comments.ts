@@ -8,6 +8,7 @@ import {
 import {
   and,
   authenticate,
+  authenticateAnd,
   chain,
   ifArgDefined,
   ifArgEquals,
@@ -133,20 +134,18 @@ export const updatePetitionFieldComment = mutationField(
   }
 );
 
-export const markPetitionFieldCommentsAsRead = mutationField(
-  "markPetitionFieldCommentsAsRead",
+export const updatePetitionFieldCommentsReadStatus = mutationField(
+  "updatePetitionFieldCommentsReadStatus",
   {
-    description: "Marks the specified comments as read.",
+    description: "Marks the specified comments as read or unread.",
     type: list(nonNull("PetitionFieldComment")),
-    authorize: chain(
-      authenticate(),
-      and(
-        userHasAccessToPetitions("petitionId"),
-        commentsBelongsToPetition("petitionId", "petitionFieldCommentIds")
-      )
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId"),
+      commentsBelongsToPetition("petitionId", "petitionFieldCommentIds")
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
+      isRead: nonNull(booleanArg()),
       petitionFieldCommentIds: nonNull(
         list(nonNull(globalIdArg("PetitionFieldComment")))
       ),
@@ -156,8 +155,9 @@ export const markPetitionFieldCommentsAsRead = mutationField(
       "petitionFieldCommentIds"
     ),
     resolve: async (_, args, ctx) => {
-      return await ctx.petitions.markPetitionFieldCommentsAsReadForUser(
+      return await ctx.petitions.updatePetitionFieldCommentsReadStatusForUser(
         args.petitionFieldCommentIds,
+        args.isRead,
         ctx.user!
       );
     },

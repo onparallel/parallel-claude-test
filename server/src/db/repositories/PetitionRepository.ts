@@ -2407,8 +2407,9 @@ export class PetitionRepository extends BaseRepository {
     return comment;
   }
 
-  async markPetitionFieldCommentsAsReadForUser(
+  async updatePetitionFieldCommentsReadStatusForUser(
     petitionFieldCommentIds: number[],
+    isRead: boolean,
     user: User
   ) {
     const comments = (await this.loadPetitionFieldComment(
@@ -2431,7 +2432,8 @@ export class PetitionRepository extends BaseRepository {
           });
         }
       })
-      .update({ is_read: true });
+      .update({ is_read: isRead });
+
     return comments;
   }
 

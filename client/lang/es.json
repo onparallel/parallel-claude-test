@@ -1495,6 +1495,11 @@
     "context": "This field is being referenced"
   },
   {
+    "term": "component.replies-field-comment.mark-as-unread",
+    "definition": "Marcar como no leído",
+    "context": "Mark as unread"
+  },
+  {
     "term": "component.search-input.placeholder",
     "definition": "Buscar...",
     "context": "Search..."

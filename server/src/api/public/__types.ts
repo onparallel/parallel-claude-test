@@ -295,8 +295,6 @@ export type Mutation = {
   fileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Generates a new API token for the context user */
   generateUserAuthToken: GenerateUserAuthTokenResponse;
-  /** Marks the specified comments as read. */
-  markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
@@ -381,6 +379,8 @@ export type Mutation = {
   updatePetitionField: PetitionBaseAndField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionField;
+  /** Marks the specified comments as read or unread. */
+  updatePetitionFieldCommentsReadStatus: Array<PetitionFieldComment>;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
   /** Updates the metada of the specified petition field reply */
@@ -623,11 +623,6 @@ export type MutationgenerateUserAuthTokenArgs = {
   tokenName: Scalars["String"];
 };
 
-export type MutationmarkPetitionFieldCommentsAsReadArgs = {
-  petitionFieldCommentIds: Array<Scalars["GID"]>;
-  petitionId: Scalars["GID"];
-};
-
 export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
@@ -865,6 +860,12 @@ export type MutationupdatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   petitionFieldCommentId: Scalars["GID"];
   petitionFieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+};
+
+export type MutationupdatePetitionFieldCommentsReadStatusArgs = {
+  isRead: Scalars["Boolean"];
+  petitionFieldCommentIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
 };
 

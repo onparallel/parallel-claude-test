@@ -62,7 +62,7 @@ import {
   usePetitionReplies_createPetitionFieldCommentMutation,
   usePetitionReplies_deletePetitionFieldCommentMutation,
   usePetitionReplies_fileUploadReplyDownloadLinkMutation,
-  usePetitionReplies_markPetitionFieldCommentsAsReadMutation,
+  usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation,
   usePetitionReplies_sendPetitionClosedNotificationMutation,
   usePetitionReplies_updatePetitionFieldCommentMutation,
   usePetitionReplies_updatePetitionFieldRepliesStatusMutation,
@@ -132,8 +132,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     return () => document.body.classList.remove("hide-hubspot");
   }, [Boolean(activeFieldId)]);
 
-  const [markPetitionFieldCommentsAsRead] =
-    usePetitionReplies_markPetitionFieldCommentsAsReadMutation();
+  const [updatePetitionFieldCommentsReadStatus] =
+    usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation();
   useEffect(() => {
     if (activeFieldId) {
       const timeout = setTimeout(async () => {
@@ -141,8 +141,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           .filter((c) => c.isUnread)
           .map((c) => c.id);
         if (petitionFieldCommentIds.length > 0) {
-          await markPetitionFieldCommentsAsRead({
-            variables: { petitionId, petitionFieldCommentIds },
+          await updatePetitionFieldCommentsReadStatus({
+            variables: { petitionId, petitionFieldCommentIds, isRead: true },
           });
         }
       }, 1000);
@@ -334,6 +334,16 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         petitionFieldId: activeFieldId!,
         petitionFieldCommentId,
         hasInternalComments: me.hasInternalComments,
+      },
+    });
+  }
+
+  async function handleMarkAsUnread(petitionFieldCommentId: string) {
+    await updatePetitionFieldCommentsReadStatus({
+      variables: {
+        petitionId,
+        petitionFieldCommentIds: [petitionFieldCommentId],
+        isRead: false,
       },
     });
   }
@@ -582,6 +592,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   onAddComment={handleAddComment}
                   onUpdateComment={handleUpdateComment}
                   onDeleteComment={handleDeleteComment}
+                  onMarkAsUnread={handleMarkAsUnread}
                 />
               ) : (
                 <Card
@@ -851,13 +862,15 @@ PetitionReplies.mutations = [
     ${PetitionRepliesFieldComments.fragments.PetitionField}
   `,
   gql`
-    mutation PetitionReplies_markPetitionFieldCommentsAsRead(
+    mutation PetitionReplies_updatePetitionFieldCommentsReadStatus(
       $petitionId: GID!
       $petitionFieldCommentIds: [GID!]!
+      $isRead: Boolean!
     ) {
-      markPetitionFieldCommentsAsRead(
+      updatePetitionFieldCommentsReadStatus(
         petitionId: $petitionId
         petitionFieldCommentIds: $petitionFieldCommentIds
+        isRead: $isRead
       ) {
         id
         isUnread

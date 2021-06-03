@@ -60,6 +60,7 @@ export type PetitionRepliesFieldCommentsProps = {
   onAddComment: (value: string, internal?: boolean) => void;
   onDeleteComment: (petitionFieldCommentId: string) => void;
   onUpdateComment: (petitionFieldCommentId: string, content: string) => void;
+  onMarkAsUnread: (petitionFieldCommentId: string) => void;
   onClose: () => void;
 };
 
@@ -71,6 +72,7 @@ export function PetitionRepliesFieldComments({
   onAddComment,
   onDeleteComment,
   onUpdateComment,
+  onMarkAsUnread,
   onClose,
 }: PetitionRepliesFieldCommentsProps) {
   const intl = useIntl();
@@ -147,6 +149,7 @@ export function PetitionRepliesFieldComments({
               userId={user.id}
               onEdit={(content) => onUpdateComment(comment.id, content)}
               onDelete={() => onDeleteComment(comment.id)}
+              onMarkAsUnread={() => onMarkAsUnread(comment.id)}
             />
             {index === field.comments.length - 1 ? null : <Divider />}
           </Fragment>
@@ -273,11 +276,13 @@ function FieldComment({
   userId,
   onDelete,
   onEdit,
+  onMarkAsUnread,
 }: {
   comment: PetitionRepliesFieldComments_PetitionFieldCommentFragment;
   userId: string;
   onDelete: () => void;
   onEdit: (content: string) => void;
+  onMarkAsUnread: () => void;
 }) {
   const intl = useIntl();
   const [isEditing, setIsEditing] = useState(false);
@@ -396,6 +401,16 @@ function FieldComment({
               {author?.__typename === "User" && author?.id === userId ? (
                 <MenuItem onClick={handleEditClick}>
                   <FormattedMessage id="generic.edit" defaultMessage="Edit" />
+                </MenuItem>
+              ) : null}
+              {!isUnread &&
+              ((author?.__typename === "User" && author.id !== userId) ||
+                author?.__typename === "PetitionAccess") ? (
+                <MenuItem onClick={onMarkAsUnread}>
+                  <FormattedMessage
+                    id="component.replies-field-comment.mark-as-unread"
+                    defaultMessage="Mark as unread"
+                  />
                 </MenuItem>
               ) : null}
               <MenuItem onClick={onDelete}>

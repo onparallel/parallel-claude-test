@@ -623,14 +623,6 @@ type Mutation {
   generateUserAuthToken(tokenName: String!): GenerateUserAuthTokenResponse!
 
   """
-  Marks the specified comments as read.
-  """
-  markPetitionFieldCommentsAsRead(
-    petitionFieldCommentIds: [GID!]!
-    petitionId: GID!
-  ): [PetitionFieldComment!]!
-
-  """
   Generates a download link for a field attachment
   """
   petitionFieldAttachmentDownloadLink(
@@ -956,6 +948,15 @@ type Mutation {
     petitionFieldId: GID!
     petitionId: GID!
   ): PetitionField!
+
+  """
+  Marks the specified comments as read or unread.
+  """
+  updatePetitionFieldCommentsReadStatus(
+    isRead: Boolean!
+    petitionFieldCommentIds: [GID!]!
+    petitionId: GID!
+  ): [PetitionFieldComment!]!
 
   """
   Updates the status of a petition field reply and sets the petition as closed if all fields are validated.
