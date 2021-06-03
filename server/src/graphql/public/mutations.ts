@@ -774,7 +774,10 @@ export const publicFileUploadReplyDownloadLink = mutationField(
     description:
       "Generates a download link for a file reply on a public context.",
     type: "FileUploadReplyDownloadLinkResult",
-    authorize: authenticatePublicAccess("keycode"),
+    authorize: chain(
+      authenticatePublicAccess("keycode"),
+      replyBelongsToAccess("replyId")
+    ),
     args: {
       keycode: nonNull(idArg()),
       replyId: nonNull(globalIdArg("PetitionFieldReply")),
