@@ -130,7 +130,10 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
         }
         return {
           result: RESULT.SUCCESS,
-          file,
+          file: {
+            ...file!,
+            upload_complete: true,
+          },
           url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,

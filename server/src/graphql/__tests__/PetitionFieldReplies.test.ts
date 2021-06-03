@@ -74,7 +74,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("creates a simple reply as an User", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
             createSimpleReply(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -127,7 +127,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("creates REPLY_CREATED event with user_id on payload", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
             createSimpleReply(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -171,7 +171,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("sends error when creating a reply on a FILE_UPLOAD field", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
             createSimpleReply(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -200,7 +200,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("sends error when creating a reply from a SELECT field with unknown option", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $fieldId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $reply: String!) {
             createSimpleReply(
               petitionId: $petitionId
               fieldId: $fieldId
@@ -278,7 +278,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("updates a simple reply as an User, previously created by a Contact", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $replyId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
             updateSimpleReply(
               petitionId: $petitionId
               replyId: $replyId
@@ -333,7 +333,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("updates a simple reply as an User, previously created by an User", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $replyId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
             updateSimpleReply(
               petitionId: $petitionId
               replyId: $replyId
@@ -384,7 +384,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("creates REPLY_UPDATED event with user_id on payload", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $replyId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
             updateSimpleReply(
               petitionId: $petitionId
               replyId: $replyId
@@ -438,7 +438,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $replyId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
             updateSimpleReply(
               petitionId: $petitionId
               replyId: $replyId
@@ -494,7 +494,7 @@ describe("GraphQL/Petition Field Replies", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $replyId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
             updateSimpleReply(
               petitionId: $petitionId
               replyId: $replyId
@@ -546,7 +546,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("sends error when updating a reply on a FILE_UPLOAD field", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $replyId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
             updateSimpleReply(
               petitionId: $petitionId
               replyId: $replyId
@@ -570,7 +570,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("sends error when updating a reply from a SELECT field with unknown option", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $replyId: GID!, $reply: String!) {
+          mutation ($petitionId: GID!, $replyId: GID!, $reply: String!) {
             updateSimpleReply(
               petitionId: $petitionId
               replyId: $replyId
@@ -590,14 +590,6 @@ describe("GraphQL/Petition Field Replies", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
-  });
-
-  describe("createFileUploadReply", () => {
-    it.todo("creates a file reply as an User");
-    it.todo(
-      "sends error when trying to create a file reply from a simple field"
-    );
-    it.todo("sends error when trying to send a file with unsupported type");
   });
 
   describe("deletePetitionReply", () => {
@@ -628,7 +620,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("deletes a simple reply as an User", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $replyId: GID!) {
+          mutation ($petitionId: GID!, $replyId: GID!) {
             deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
           }
         `,
@@ -645,7 +637,7 @@ describe("GraphQL/Petition Field Replies", () => {
     it("deletes a file reply and its entry on file_upload table", async () => {
       const { errors } = await testClient.mutate({
         mutation: gql`
-          mutation($petitionId: GID!, $replyId: GID!) {
+          mutation ($petitionId: GID!, $replyId: GID!) {
             deletePetitionReply(petitionId: $petitionId, replyId: $replyId)
           }
         `,

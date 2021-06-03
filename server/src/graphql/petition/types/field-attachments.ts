@@ -9,7 +9,9 @@ export const PetitionFieldAttachment = objectType({
     t.field("file", {
       type: "FileUpload",
       resolve: async (o, _, ctx) => {
-        return (await ctx.files.loadFileUpload(o.file_upload_id))!;
+        return (await ctx.files.loadFileUpload(o.file_upload_id, {
+          refresh: true, // necessary to always have the latest value of 'upload_completed' field
+        }))!;
       },
     });
   },

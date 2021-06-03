@@ -4,6 +4,7 @@ import { range } from "remeda";
 import { hash, random } from "../../../util/token";
 import {
   Contact,
+  ContactAuthentication,
   CreateContact,
   CreateFeatureFlag,
   CreateFileUpload,
@@ -11,6 +12,7 @@ import {
   CreatePetition,
   CreatePetitionAccess,
   CreatePetitionField,
+  CreatePetitionFieldAttachment,
   CreatePetitionFieldReply,
   CreateTag,
   CreateUser,
@@ -21,6 +23,7 @@ import {
   PetitionAccess,
   PetitionEventSubscription,
   PetitionField,
+  PetitionFieldAttachment,
   PetitionFieldReply,
   PetitionFieldType,
   PetitionPermission,
@@ -217,6 +220,22 @@ export class Mocks {
       .returning("*");
   }
 
+  async createPetitionFieldAttachment(
+    fieldId: number,
+    amount?: number,
+    builder?: (index: number) => Partial<FileUpload>
+  ) {
+    const files = await this.createRandomFileUpload(amount, builder);
+    return await this.knex<PetitionFieldAttachment>("petition_field_attachment")
+      .insert(
+        files.map<CreatePetitionFieldAttachment>((file) => ({
+          file_upload_id: file.id,
+          petition_field_id: fieldId,
+        }))
+      )
+      .returning("*");
+  }
+
   async createRandomFileReply(
     fieldId: number,
     amount?: number,
@@ -391,6 +410,17 @@ export class Mocks {
 
   async clearSubscriptions() {
     await this.knex("petition_event_subscription").delete();
+  }
+
+  async createContactAuthentication(contactId: number) {
+    const cookieValue = random(48);
+    await this.knex<ContactAuthentication>("contact_authentication")
+      .insert({
+        contact_id: contactId,
+        cookie_value_hash: await hash(cookieValue, contactId.toString()),
+      })
+      .returning("*");
+    return cookieValue;
   }
 }
 

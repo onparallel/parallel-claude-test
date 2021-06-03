@@ -7,6 +7,7 @@ import { KNEX } from "../../db/knex";
 import { ContactRepository } from "../../db/repositories/ContactRepository";
 import { serialize as serializeCookie } from "cookie";
 import { EMAILS, IEmailsService } from "../../services/emails";
+import { toGlobalId } from "../../util/globalId";
 
 describe("GraphQL/Public", () => {
   let testClient: TestClient;
@@ -19,9 +20,8 @@ describe("GraphQL/Public", () => {
   beforeAll(async () => {
     testClient = await initServer();
     knex = testClient.container.get<Knex>(KNEX);
-    contactRepository = testClient.container.get<ContactRepository>(
-      ContactRepository
-    );
+    contactRepository =
+      testClient.container.get<ContactRepository>(ContactRepository);
     mocks = new Mocks(knex);
     const [org] = await mocks.createRandomOrganizations(1, () => ({
       identifier: "parallel",
@@ -58,7 +58,7 @@ describe("GraphQL/Public", () => {
       await contactRepository.hasContactAuthentication(access.contact_id)
     ).toBe(false);
     const mutation = gql`
-      mutation($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
+      mutation ($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
         verifyPublicAccess(
           token: $token
           keycode: $keycode
@@ -136,7 +136,7 @@ describe("GraphQL/Public", () => {
 
     const res1 = await testClient.mutate({
       mutation: gql`
-        mutation($keycode: ID!) {
+        mutation ($keycode: ID!) {
           publicSendVerificationCode(keycode: $keycode) {
             token
             remainingAttempts
@@ -167,7 +167,7 @@ describe("GraphQL/Public", () => {
 
     const res2 = await testClient.mutate({
       mutation: gql`
-        mutation($keycode: ID!, $token: ID!, $code: String!) {
+        mutation ($keycode: ID!, $token: ID!, $code: String!) {
           publicCheckVerificationCode(
             keycode: $keycode
             token: $token
@@ -202,7 +202,7 @@ describe("GraphQL/Public", () => {
 
     const res3 = await testClient.mutate({
       mutation: gql`
-        mutation($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
+        mutation ($token: ID!, $keycode: ID!, $ip: String, $userAgent: String) {
           verifyPublicAccess(
             token: $token
             keycode: $keycode
@@ -223,5 +223,150 @@ describe("GraphQL/Public", () => {
 
     expect(res3.errors).toBeUndefined();
     expect(res3.data!.verifyPublicAccess.isAllowed).toBe(true);
+  });
+
+  describe("publicPetitionFieldAttachmentDownloadLink", () => {
+    let cookieValue: string;
+    beforeAll(async () => {
+      cookieValue = await mocks.createContactAuthentication(access.contact_id);
+    });
+
+    beforeEach(() => {
+      testClient.setNextReq({
+        headers: {
+          cookie: serializeCookie(
+            `parallel_contact_auth_${toGlobalId("Contact", access.contact_id)}`,
+            cookieValue
+          ),
+        },
+      });
+    });
+
+    it("generates a download link for a petition field attachment", async () => {
+      const [attachment] = await mocks.createPetitionFieldAttachment(
+        fields[1].id,
+        1,
+        () => ({
+          content_type: "image/png",
+          filename: "parallel.png",
+          size: "150",
+          upload_complete: true,
+        })
+      );
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($keycode: ID!, $fieldId: GID!, $fieldAttachmentId: GID!) {
+            publicPetitionFieldAttachmentDownloadLink(
+              keycode: $keycode
+              fieldId: $fieldId
+              fieldAttachmentId: $fieldAttachmentId
+            ) {
+              result
+              file {
+                contentType
+                filename
+                isComplete
+                size
+              }
+              url
+            }
+          }
+        `,
+        variables: {
+          keycode: access.keycode,
+          fieldId: toGlobalId("PetitionField", fields[1].id),
+          fieldAttachmentId: toGlobalId(
+            "PetitionFieldAttachment",
+            attachment.id
+          ),
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data.publicPetitionFieldAttachmentDownloadLink).toEqual({
+        result: "SUCCESS",
+        file: {
+          contentType: "image/png",
+          filename: "parallel.png",
+          size: 150,
+          isComplete: true,
+        },
+        url: "", // mocked to avoid calling AWS
+      });
+    });
+
+    it("marks file attachment upload as completed if it was correctly uploaded to s3 but unmarked", async () => {
+      const [attachment] = await mocks.createPetitionFieldAttachment(
+        fields[1].id,
+        1,
+        () => ({
+          content_type: "image/png",
+          filename: "parallel.png",
+          size: "150",
+          upload_complete: false,
+        })
+      );
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($keycode: ID!, $fieldId: GID!, $fieldAttachmentId: GID!) {
+            publicPetitionFieldAttachmentDownloadLink(
+              keycode: $keycode
+              fieldId: $fieldId
+              fieldAttachmentId: $fieldAttachmentId
+            ) {
+              result
+              file {
+                contentType
+                filename
+                isComplete
+                size
+              }
+              url
+            }
+          }
+        `,
+        variables: {
+          keycode: access.keycode,
+          fieldId: toGlobalId("PetitionField", fields[1].id),
+          fieldAttachmentId: toGlobalId(
+            "PetitionFieldAttachment",
+            attachment.id
+          ),
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data.publicPetitionFieldAttachmentDownloadLink).toEqual({
+        result: "SUCCESS",
+        file: {
+          contentType: "image/png",
+          filename: "parallel.png",
+          size: 150,
+          isComplete: true,
+        },
+        url: "", // mocked to avoid calling AWS
+      });
+    });
+
+    it("sends error if the fieldAttachmentId is not related with the provided keycode", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($keycode: ID!, $fieldId: GID!, $fieldAttachmentId: GID!) {
+            publicPetitionFieldAttachmentDownloadLink(
+              keycode: $keycode
+              fieldId: $fieldId
+              fieldAttachmentId: $fieldAttachmentId
+            ) {
+              result
+            }
+          }
+        `,
+        variables: {
+          keycode: access.keycode,
+          fieldId: toGlobalId("PetitionField", fields[1].id),
+          fieldAttachmentId: toGlobalId("PetitionFieldAttachment", 1234),
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
   });
 });
