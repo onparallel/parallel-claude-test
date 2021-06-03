@@ -290,15 +290,11 @@ describe("GraphQL/PetitionFieldAttachments", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $fieldAttachmentId: GID!
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $attachmentId: GID!) {
             petitionFieldAttachmentDownloadLink(
               petitionId: $petitionId
               fieldId: $fieldId
-              fieldAttachmentId: $fieldAttachmentId
+              attachmentId: $attachmentId
             ) {
               result
               url
@@ -314,10 +310,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
           fieldId: toGlobalId("PetitionField", field.id),
-          fieldAttachmentId: toGlobalId(
-            "PetitionFieldAttachment",
-            attachment.id
-          ),
+          attachmentId: toGlobalId("PetitionFieldAttachment", attachment.id),
         },
       });
 
@@ -348,15 +341,11 @@ describe("GraphQL/PetitionFieldAttachments", () => {
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $fieldAttachmentId: GID!
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $attachmentId: GID!) {
             petitionFieldAttachmentDownloadLink(
               petitionId: $petitionId
               fieldId: $fieldId
-              fieldAttachmentId: $fieldAttachmentId
+              attachmentId: $attachmentId
             ) {
               result
               file {
@@ -368,10 +357,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
           fieldId: toGlobalId("PetitionField", field.id),
-          fieldAttachmentId: toGlobalId(
-            "PetitionFieldAttachment",
-            attachment.id
-          ),
+          attachmentId: toGlobalId("PetitionFieldAttachment", attachment.id),
         },
       });
 
@@ -387,15 +373,11 @@ describe("GraphQL/PetitionFieldAttachments", () => {
     it("sends error if trying to generate a download link for a private attachment", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $fieldId: GID!
-            $fieldAttachmentId: GID!
-          ) {
+          mutation ($petitionId: GID!, $fieldId: GID!, $attachmentId: GID!) {
             petitionFieldAttachmentDownloadLink(
               petitionId: $petitionId
               fieldId: $fieldId
-              fieldAttachmentId: $fieldAttachmentId
+              attachmentId: $attachmentId
             ) {
               result
               url
@@ -411,7 +393,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
         variables: {
           petitionId: toGlobalId("Petition", petition.id),
           fieldId: toGlobalId("PetitionField", field.id),
-          fieldAttachmentId: toGlobalId("PetitionFieldAttachment", 1234),
+          attachmentId: toGlobalId("PetitionFieldAttachment", 1234),
         },
       });
 

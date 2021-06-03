@@ -255,11 +255,11 @@ describe("GraphQL/Public", () => {
       );
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($keycode: ID!, $fieldId: GID!, $fieldAttachmentId: GID!) {
+          mutation ($keycode: ID!, $fieldId: GID!, $attachmentId: GID!) {
             publicPetitionFieldAttachmentDownloadLink(
               keycode: $keycode
               fieldId: $fieldId
-              fieldAttachmentId: $fieldAttachmentId
+              attachmentId: $attachmentId
             ) {
               result
               file {
@@ -275,10 +275,7 @@ describe("GraphQL/Public", () => {
         variables: {
           keycode: access.keycode,
           fieldId: toGlobalId("PetitionField", fields[1].id),
-          fieldAttachmentId: toGlobalId(
-            "PetitionFieldAttachment",
-            attachment.id
-          ),
+          attachmentId: toGlobalId("PetitionFieldAttachment", attachment.id),
         },
       });
       expect(errors).toBeUndefined();
@@ -307,11 +304,11 @@ describe("GraphQL/Public", () => {
       );
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($keycode: ID!, $fieldId: GID!, $fieldAttachmentId: GID!) {
+          mutation ($keycode: ID!, $fieldId: GID!, $attachmentId: GID!) {
             publicPetitionFieldAttachmentDownloadLink(
               keycode: $keycode
               fieldId: $fieldId
-              fieldAttachmentId: $fieldAttachmentId
+              attachmentId: $attachmentId
             ) {
               result
               file {
@@ -327,10 +324,7 @@ describe("GraphQL/Public", () => {
         variables: {
           keycode: access.keycode,
           fieldId: toGlobalId("PetitionField", fields[1].id),
-          fieldAttachmentId: toGlobalId(
-            "PetitionFieldAttachment",
-            attachment.id
-          ),
+          attachmentId: toGlobalId("PetitionFieldAttachment", attachment.id),
         },
       });
       expect(errors).toBeUndefined();
@@ -346,14 +340,14 @@ describe("GraphQL/Public", () => {
       });
     });
 
-    it("sends error if the fieldAttachmentId is not related with the provided keycode", async () => {
+    it("sends error if the attachmentId is not related with the provided keycode", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($keycode: ID!, $fieldId: GID!, $fieldAttachmentId: GID!) {
+          mutation ($keycode: ID!, $fieldId: GID!, $attachmentId: GID!) {
             publicPetitionFieldAttachmentDownloadLink(
               keycode: $keycode
               fieldId: $fieldId
-              fieldAttachmentId: $fieldAttachmentId
+              attachmentId: $attachmentId
             ) {
               result
             }
@@ -362,7 +356,7 @@ describe("GraphQL/Public", () => {
         variables: {
           keycode: access.keycode,
           fieldId: toGlobalId("PetitionField", fields[1].id),
-          fieldAttachmentId: toGlobalId("PetitionFieldAttachment", 1234),
+          attachmentId: toGlobalId("PetitionFieldAttachment", 1234),
         },
       });
       expect(errors).toContainGraphQLError("FORBIDDEN");

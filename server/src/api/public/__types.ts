@@ -152,6 +152,7 @@ export type FeatureFlag =
 export type FileUpload = {
   contentType: Scalars["String"];
   filename: Scalars["String"];
+  isComplete: Scalars["Boolean"];
   size: Scalars["Int"];
 };
 
@@ -256,7 +257,7 @@ export type Mutation = {
   /** Generates and returns a signed url to upload a field attachment to AWS S3 */
   createPetitionFieldAttachmentUploadLink: CreateFileUploadFieldAttachment;
   /** Create a petition field comment. */
-  createPetitionFieldComment: PetitionFieldComment;
+  createPetitionFieldComment: PetitionField;
   /** Creates a new subscription on a petition */
   createPetitionSubscription: Subscription;
   /** Creates a reply to a text or select field. */
@@ -276,7 +277,7 @@ export type Mutation = {
   /** Deletes a petition field. */
   deletePetitionField: PetitionBase;
   /** Delete a petition field comment. */
-  deletePetitionFieldComment: Result;
+  deletePetitionFieldComment: PetitionField;
   /** Deletes a reply to a petition field. */
   deletePetitionReply: Result;
   deletePetitionSubscription: Result;
@@ -298,6 +299,8 @@ export type Mutation = {
   markPetitionFieldCommentsAsRead: Array<PetitionFieldComment>;
   /** Generates a download link for a field attachment */
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
+  /** Tells the backend that the field attachment was correctly uploaded to S3 */
+  petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -335,6 +338,8 @@ export type Mutation = {
   publicUpdateSimpleReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
+  /** Remove a petition field attachemnt */
+  removePetitionFieldAttachment: Result;
   /** Removes permissions on given petitions and users */
   removePetitionPermission: Array<Petition>;
   /** Removes users from a user group */
@@ -375,7 +380,7 @@ export type Mutation = {
   /** Updates a petition field. */
   updatePetitionField: PetitionBaseAndField;
   /** Update a petition field comment. */
-  updatePetitionFieldComment: PetitionFieldComment;
+  updatePetitionFieldComment: PetitionField;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
   /** Updates the metada of the specified petition field reply */
@@ -624,7 +629,13 @@ export type MutationmarkPetitionFieldCommentsAsReadArgs = {
 };
 
 export type MutationpetitionFieldAttachmentDownloadLinkArgs = {
-  fieldAttachmentId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+  fieldId: Scalars["GID"];
+  petitionId: Scalars["GID"];
+};
+
+export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
+  attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 };
@@ -700,7 +711,8 @@ export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
 };
 
 export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
-  fieldAttachmentId: Scalars["GID"];
+  attachmentId: Scalars["GID"];
+  fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
   preview?: Maybe<Scalars["Boolean"]>;
 };
@@ -730,6 +742,12 @@ export type MutationpublicUpdateSimpleReplyArgs = {
 
 export type MutationreactivateAccessesArgs = {
   accessIds: Array<Scalars["GID"]>;
+  petitionId: Scalars["GID"];
+};
+
+export type MutationremovePetitionFieldAttachmentArgs = {
+  attachmentId: Scalars["GID"];
+  fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
 };
 
@@ -1656,6 +1674,8 @@ export type PublicPetitionAccess = {
 
 /** A field within a petition. */
 export type PublicPetitionField = {
+  /** A list of files attached to this field. */
+  attachments: Array<PetitionFieldAttachment>;
   commentCount: Scalars["Int"];
   /** The comments for this field. */
   comments: Array<PublicPetitionFieldComment>;
