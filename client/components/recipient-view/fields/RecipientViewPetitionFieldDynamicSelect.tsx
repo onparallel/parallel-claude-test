@@ -64,6 +64,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
+  onDownloadAttachment,
 }: RecipientViewPetitionFieldDynamicSelectProps) {
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
   const [isDeletingReply, setIsDeletingReply] = useState<
@@ -137,6 +138,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
       hasCommentsEnabled={hasCommentsEnabled}
       showAddNewReply={showAddNewReply}
       onAddNewReply={handleAddNewReply}
+      onDownloadAttachment={onDownloadAttachment}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={1} spacing={8}>

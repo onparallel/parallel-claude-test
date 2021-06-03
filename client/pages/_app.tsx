@@ -1,3 +1,6 @@
+import { createElement, useEffect } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import {
@@ -6,9 +9,6 @@ import {
 } from "@parallel/components/common/I18nProvider";
 import PlausibleProvider from "next-plausible";
 import { AppProps } from "next/app";
-import { createElement, useEffect } from "react";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import { init as initSentry } from "../utils/sentry";
 
 type MyAppProps = AppProps & I18nProps;

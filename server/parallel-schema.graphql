@@ -634,7 +634,7 @@ type Mutation {
   Generates a download link for a field attachment
   """
   petitionFieldAttachmentDownloadLink(
-    fieldAttachmentId: GID!
+    attachmentId: GID!
     fieldId: GID!
     petitionId: GID!
   ): FileUploadDownloadLinkResult!
@@ -756,7 +756,7 @@ type Mutation {
   Generates a download link for a field attachment on a public context.
   """
   publicPetitionFieldAttachmentDownloadLink(
-    fieldAttachmentId: GID!
+    attachmentId: GID!
     fieldId: GID!
     keycode: ID!
 
@@ -799,6 +799,15 @@ type Mutation {
   Reactivates the specified inactive petition accesses.
   """
   reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
+
+  """
+  Remove a petition field attachemnt
+  """
+  removePetitionFieldAttachment(
+    attachmentId: GID!
+    fieldId: GID!
+    petitionId: GID!
+  ): Result!
 
   """
   Removes permissions on given petitions and users

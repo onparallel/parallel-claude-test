@@ -176,6 +176,9 @@ export function createApolloClient(
             replies: {
               merge: false,
             },
+            attachments: {
+              merge: mergeArraysBy(["id"]),
+            },
           },
         },
         PublicPetitionField: {

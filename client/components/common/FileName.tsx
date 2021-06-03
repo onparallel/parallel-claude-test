@@ -30,6 +30,7 @@ export const FileName = chakraForwardRef<"span", FileNameProps>(
           ref={mergedRef as any}
           as="span"
           minWidth={0}
+          title={isTruncated ? value : undefined}
           {...props}
         >
           <chakra.span isTruncated>{value.slice(0, -10)}</chakra.span>

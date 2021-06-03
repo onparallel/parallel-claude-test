@@ -3289,7 +3289,7 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at")
   );
 
-  async createFileUploadAttachment(
+  async createPetitionFieldAttachment(
     data: CreatePetitionFieldAttachment,
     user: User
   ) {
@@ -3298,5 +3298,23 @@ export class PetitionRepository extends BaseRepository {
       created_by: `User:${user.id}`,
     });
     return row;
+  }
+
+  async removePetitionFieldAttachment(attachmentId: number, user: User) {
+    this.withTransaction(async (t) => {
+      const [row] = await this.from("petition_field_attachment", t)
+        .where("id", attachmentId)
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        })
+        .returning("*");
+      await this.from("file_upload", t)
+        .where("id", row.file_upload_id)
+        .update({
+          deleted_at: this.now(),
+          deleted_by: `User:${user.id}`,
+        });
+    });
   }
 }

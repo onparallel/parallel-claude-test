@@ -1,4 +1,6 @@
 import { gql } from "@apollo/client";
+import { useRecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation } from "@parallel/graphql/__types";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -12,7 +14,7 @@ import { RecipientViewPetitionFieldText } from "./RecipientViewPetitionFieldText
 export interface RecipientViewPetitionFieldProps
   extends Omit<
     RecipientViewPetitionFieldCardProps,
-    "children" | "showAddNewReply" | "onAddNewReply"
+    "children" | "showAddNewReply" | "onAddNewReply" | "onDownloadAttachment"
   > {
   petitionId: string;
   isDisabled: boolean;
@@ -21,16 +23,46 @@ export interface RecipientViewPetitionFieldProps
 export function RecipientViewPetitionField(
   props: RecipientViewPetitionFieldProps
 ) {
+  const [publicPetitionFieldAttachmentDownloadLink] =
+    useRecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation();
+  const handleDownloadAttachment = function (attachmentId: string) {
+    openNewWindow(async () => {
+      const { data } = await publicPetitionFieldAttachmentDownloadLink({
+        variables: {
+          keycode: props.keycode,
+          fieldId: props.field.id,
+          attachmentId,
+        },
+      });
+      const { url } = data!.publicPetitionFieldAttachmentDownloadLink;
+      return url!;
+    });
+  };
   return props.field.type === "HEADING" ? (
-    <RecipientViewPetitionFieldHeading field={props.field} />
+    <RecipientViewPetitionFieldHeading
+      field={props.field}
+      onDownloadAttachment={handleDownloadAttachment}
+    />
   ) : props.field.type === "TEXT" || props.field.type === "SHORT_TEXT" ? (
-    <RecipientViewPetitionFieldText {...props} />
+    <RecipientViewPetitionFieldText
+      {...props}
+      onDownloadAttachment={handleDownloadAttachment}
+    />
   ) : props.field.type === "SELECT" ? (
-    <RecipientViewPetitionFieldSelect {...props} />
+    <RecipientViewPetitionFieldSelect
+      {...props}
+      onDownloadAttachment={handleDownloadAttachment}
+    />
   ) : props.field.type === "FILE_UPLOAD" ? (
-    <RecipientViewPetitionFieldFileUpload {...props} />
+    <RecipientViewPetitionFieldFileUpload
+      {...props}
+      onDownloadAttachment={handleDownloadAttachment}
+    />
   ) : props.field.type === "DYNAMIC_SELECT" ? (
-    <RecipientViewPetitionFieldDynamicSelect {...props} />
+    <RecipientViewPetitionFieldDynamicSelect
+      {...props}
+      onDownloadAttachment={handleDownloadAttachment}
+    />
   ) : null;
 }
 
@@ -48,3 +80,21 @@ RecipientViewPetitionField.fragments = {
     ${RecipientViewPetitionFieldCard.fragments.PublicPetitionField}
   `,
 };
+
+RecipientViewPetitionField.mutations = [
+  gql`
+    mutation RecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLink(
+      $keycode: ID!
+      $fieldId: GID!
+      $attachmentId: GID!
+    ) {
+      publicPetitionFieldAttachmentDownloadLink(
+        keycode: $keycode
+        fieldId: $fieldId
+        attachmentId: $attachmentId
+      ) {
+        url
+      }
+    }
+  `,
+];

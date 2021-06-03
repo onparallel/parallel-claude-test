@@ -23,6 +23,7 @@ import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../../common/BreakLines";
 import { RecipientViewCommentsBadge } from "../RecipientViewCommentsBadge";
+import { RecipientViewFieldAttachment } from "./RecipientViewFieldAttachment";
 import {
   RecipientViewPetitionFieldCommentsDialog,
   usePetitionFieldCommentsDialog,
@@ -37,6 +38,7 @@ export interface RecipientViewPetitionFieldCardProps {
   showAddNewReply?: boolean;
   children: ReactNode;
   onAddNewReply?: () => void;
+  onDownloadAttachment: (attachmentId: string) => void;
 }
 
 export function RecipientViewPetitionFieldCard({
@@ -47,6 +49,7 @@ export function RecipientViewPetitionFieldCard({
   hasCommentsEnabled,
   showAddNewReply,
   onAddNewReply,
+  onDownloadAttachment,
   children,
 }: RecipientViewPetitionFieldCardProps) {
   const intl = useIntl();
@@ -128,20 +131,30 @@ export function RecipientViewPetitionFieldCard({
           />
         ) : null}
       </Flex>
-      <Box>
-        {field.description ? (
-          <Text
-            fontSize="sm"
-            color="gray.600"
-            overflowWrap="anywhere"
-            marginBottom={2}
-          >
-            <Linkify>
-              <BreakLines>{field.description}</BreakLines>
-            </Linkify>
-          </Text>
-        ) : null}
-      </Box>
+      {field.description ? (
+        <Text
+          fontSize="sm"
+          color="gray.600"
+          overflowWrap="anywhere"
+          marginBottom={2}
+        >
+          <Linkify>
+            <BreakLines>{field.description}</BreakLines>
+          </Linkify>
+        </Text>
+      ) : null}
+      {field.attachments.length ? (
+        <Flex flexWrap="wrap" margin={-1} marginBottom={1}>
+          {field.attachments.map((attachment) => (
+            <RecipientViewFieldAttachment
+              key={attachment.id}
+              attachment={attachment}
+              margin={1}
+              onClick={() => onDownloadAttachment(attachment.id)}
+            />
+          ))}
+        </Flex>
+      ) : null}
       <Text fontSize="sm" color="gray.500">
         {field.type === "FILE_UPLOAD" ? (
           <FormattedMessage
@@ -199,11 +212,15 @@ RecipientViewPetitionFieldCard.fragments = {
         replies {
           ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
         }
+        attachments {
+          ...RecipientViewFieldAttachment_PetitionFieldAttachment
+        }
         commentCount
         unreadCommentCount
         ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionField
       }
       ${this.PublicPetitionFieldReply}
+      ${RecipientViewFieldAttachment.fragments.PetitionFieldAttachment}
       ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionField}
     `;
   },

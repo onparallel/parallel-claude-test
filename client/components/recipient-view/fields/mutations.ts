@@ -3,15 +3,16 @@ import {
   RecipientViewPetitionFieldMutations_updateFieldReplies_PublicPetitionFieldFragment,
   RecipientViewPetitionFieldMutations_updatePetitionStatus_PublicPetitionFragment,
   RecipientViewPetitionFieldMutations_updateReplyContent_PublicPetitionFieldReplyFragment,
+  useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation,
   useRecipientViewPetitionFieldMutations_publicCreateFileUploadReplyMutation,
   useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation,
   useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation,
   useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
-  useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
-  useRecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutation,
   useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation,
+  useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
+import { uploadFile } from "@parallel/utils/uploadFile";
 import { MutableRefObject, useCallback } from "react";
 import { pick } from "remeda";
 import { RecipientViewPetitionFieldCard } from "./RecipientViewPetitionFieldCard";
@@ -278,14 +279,14 @@ const _publicCreateFileUploadReply = gql`
       data: $data
     ) {
       presignedPostData {
-        url
-        fields
+        ...uploadFile_AWSPresignedPostData
       }
       reply {
         ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
       }
     }
   }
+  ${uploadFile.fragments.AWSPresignedPostData}
   ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
 `;
 const _publicFileUploadReplyComplete = gql`
@@ -349,32 +350,20 @@ export function useCreateFileUploadReply(
         });
         const { reply, presignedPostData } = data!.publicCreateFileUploadReply;
 
-        const formData = new FormData();
-        Object.keys(presignedPostData.fields).forEach((key) => {
-          formData.append(key, presignedPostData.fields[key]);
+        uploads.current[reply.id] = uploadFile(file, presignedPostData, {
+          onProgress(progress) {
+            updateReplyContent(apollo, reply.id, (content) => ({
+              ...content,
+              progress,
+            }));
+          },
+          async onComplete() {
+            delete uploads.current[reply.id];
+            await fileUploadReplyComplete({
+              variables: { keycode, replyId: reply.id },
+            });
+          },
         });
-
-        formData.append("Content-Type", file.type);
-        formData.append("file", file);
-
-        const request = new XMLHttpRequest();
-        request.open("POST", presignedPostData.url);
-
-        uploads.current[reply.id] = request;
-
-        request.upload.addEventListener("progress", (e) =>
-          updateReplyContent(apollo, reply.id, (content) => ({
-            ...content,
-            progress: e.loaded / e.total,
-          }))
-        );
-        request.addEventListener("load", async () => {
-          delete uploads.current[reply.id];
-          await fileUploadReplyComplete({
-            variables: { keycode, replyId: reply.id },
-          });
-        });
-        request.send(formData);
       }
     },
     [uploads, createFileUploadReply, fileUploadReplyComplete]

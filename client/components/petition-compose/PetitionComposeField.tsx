@@ -1,7 +1,6 @@
-import { gql } from "@apollo/client";
+import { DataProxy, gql } from "@apollo/client";
 import {
   Box,
-  Button,
   Center,
   Flex,
   FormControl,
@@ -27,14 +26,23 @@ import {
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionComposeField_PetitionFieldFragment,
+  PetitionComposeField_updateFieldAttachments_PetitionFieldFragment,
   PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
+  usePetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation,
+  usePetitionComposeField_petitionFieldAttachmentUploadCompleteMutation,
+  usePetitionComposeField_removePetitionFieldAttachmentMutation,
+  usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation,
 } from "@parallel/graphql/__types";
+import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
+import { withError } from "@parallel/utils/promises/withError";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
+import { uploadFile } from "@parallel/utils/uploadFile";
 import useMergedRef from "@react-hook/merged-ref";
 import {
   memo,
@@ -47,6 +55,8 @@ import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
+import { useErrorDialog } from "../common/ErrorDialog";
+import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
@@ -59,6 +69,7 @@ import {
 } from "./SelectTypeFieldOptions";
 
 export interface PetitionComposeFieldProps {
+  petitionId: string;
   field: PetitionComposeField_PetitionFieldFragment;
   fields: PetitionFieldVisibilityEditor_PetitionFieldFragment[];
   fieldIndex: PetitionFieldIndex;
@@ -67,8 +78,6 @@ export interface PetitionComposeFieldProps {
   showError: boolean;
   onMove: (dragIndex: number, hoverIndex: number, dropped?: boolean) => void;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
-  onAddAttachment: (files: File[]) => void;
-  onRemoveAttachment: (attachmentId: number) => void;
   onCloneField: () => void;
   onSettingsClick: () => void;
   onFieldVisibilityClick: () => void;
@@ -89,6 +98,7 @@ const _PetitionComposeField = chakraForwardRef<
   PetitionComposeFieldRef
 >(function PetitionComposeField(
   {
+    petitionId,
     field,
     fields,
     fieldIndex,
@@ -124,11 +134,122 @@ const _PetitionComposeField = chakraForwardRef<
       )
       .filter((f) => !f.isReadOnly).length > 0;
 
-  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
-    onDrop: (files: File[]) => {
-      console.log(files);
-    },
-  });
+  const uploads = useRef<Record<string, XMLHttpRequest>>({});
+  const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<
+    Record<string, number>
+  >({});
+  const [createPetitionFieldAttachmentUploadLink] =
+    usePetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation();
+  const [petitionFieldAttachmentUploadComplete] =
+    usePetitionComposeField_petitionFieldAttachmentUploadCompleteMutation();
+  const [removePetitionFieldAttachment] =
+    usePetitionComposeField_removePetitionFieldAttachmentMutation();
+  const [petitionFieldAttachmentDownloadLink] =
+    usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation();
+
+  const handleRemoveAttachment = async function (attachmentId: string) {
+    uploads.current[attachmentId]?.abort();
+    delete uploads.current[attachmentId];
+    await removePetitionFieldAttachment({
+      variables: { petitionId, fieldId: field.id, attachmentId },
+      optimisticResponse: {
+        removePetitionFieldAttachment: "SUCCESS",
+      },
+      update(cache, { data }) {
+        updateFieldAttachments(cache, field.id, (attachments) =>
+          attachments.filter((a) => a.id !== attachmentId)
+        );
+      },
+    });
+  };
+
+  const handleDownloadAttachment = function (attachmentId: string) {
+    openNewWindow(async () => {
+      const { data } = await petitionFieldAttachmentDownloadLink({
+        variables: { petitionId, fieldId: field.id, attachmentId },
+      });
+      const { url } = data!.petitionFieldAttachmentDownloadLink;
+      return url!;
+    });
+  };
+
+  const showErrorDialog = useErrorDialog();
+  const maxAttachmentSize = 100 * 1024 * 1024;
+  const { getRootProps, getInputProps, isDragActive, open, draggedFiles } =
+    useDropzone({
+      maxSize: maxAttachmentSize,
+      onDropRejected: async () => {
+        await withError(
+          showErrorDialog({
+            header: (
+              <FormattedMessage
+                id="component.petition-compose-field.invalid-attachment-header"
+                defaultMessage="Invalid attachment"
+              />
+            ),
+            message: (
+              <FormattedMessage
+                id="component.petition-compose-field.invalid-attachment-message"
+                defaultMessage="Only attachments of up to {size} are allowed."
+                values={{ size: <FileSize value={maxAttachmentSize} /> }}
+              />
+            ),
+          })
+        );
+      },
+      onDrop: async (files: File[]) => {
+        if (field.attachments.length + files.length > 10) {
+          return;
+        }
+        await Promise.all(
+          files.map(async (file) => {
+            const { data } = await createPetitionFieldAttachmentUploadLink({
+              variables: {
+                petitionId: petitionId,
+                fieldId: field.id,
+                data: {
+                  filename: file.name,
+                  size: file.size,
+                  contentType: file.type,
+                },
+              },
+              update(cache, { data }) {
+                const { attachment } =
+                  data!.createPetitionFieldAttachmentUploadLink;
+                updateFieldAttachments(cache, field.id, (attachments) => [
+                  ...attachments,
+                  attachment,
+                ]);
+              },
+            });
+            const { attachment, presignedPostData } =
+              data!.createPetitionFieldAttachmentUploadLink;
+            uploads.current[attachment.id] = uploadFile(
+              file,
+              presignedPostData,
+              {
+                onProgress(progress) {
+                  setAttachmentUploadProgress((progresses) => ({
+                    ...progresses,
+                    [attachment.id]: progress,
+                  }));
+                },
+                async onComplete() {
+                  delete uploads.current[field.id];
+                  await petitionFieldAttachmentUploadComplete({
+                    variables: {
+                      petitionId: petitionId,
+                      fieldId: field.id,
+                      attachmentId: attachment.id,
+                    },
+                  });
+                },
+              }
+            );
+          })
+        );
+      },
+    });
 
   const _rootProps = getRootProps();
   const dropzoneRootProps = omit(_rootProps, [
@@ -158,7 +279,12 @@ const _PetitionComposeField = chakraForwardRef<
       {...props}
     >
       <input type="file" {...getInputProps()} />
-      {isDragActive ? <PetitionComposeFieldDragActiveIdicator /> : null}
+      {isDragActive ? (
+        <PetitionComposeFieldDragActiveIndicator
+          field={field}
+          draggedFiles={draggedFiles}
+        />
+      ) : null}
       <Box
         ref={previewRef}
         display="flex"
@@ -253,10 +379,13 @@ const _PetitionComposeField = chakraForwardRef<
           fieldIndex={fieldIndex}
           fields={fields}
           showError={showError}
+          attachmentUploadProgress={attachmentUploadProgress}
           onFieldEdit={onFieldEdit}
           onFocusNextField={onFocusNextField}
           onFocusPrevField={onFocusPrevField}
           onAddField={onAddField}
+          onRemoveAttachment={handleRemoveAttachment}
+          onDownloadAttachment={handleDownloadAttachment}
         />
         <PetitionComposeFieldActions
           field={field}
@@ -276,18 +405,22 @@ const _PetitionComposeField = chakraForwardRef<
   );
 });
 
-type PetitionComposeFieldInnerProps = Pick<
-  PetitionComposeFieldProps,
-  | "field"
-  | "fieldIndex"
-  | "fields"
-  | "showError"
-  | "onFieldEdit"
-  | "onRemoveAttachment"
-  | "onFocusNextField"
-  | "onFocusPrevField"
-  | "onAddField"
->;
+interface PetitionComposeFieldInnerProps
+  extends Pick<
+    PetitionComposeFieldProps,
+    | "field"
+    | "fieldIndex"
+    | "fields"
+    | "showError"
+    | "onFieldEdit"
+    | "onFocusNextField"
+    | "onFocusPrevField"
+    | "onAddField"
+  > {
+  attachmentUploadProgress: Record<string, number>;
+  onRemoveAttachment: (attachmentId: string) => void;
+  onDownloadAttachment: (attachmentId: string) => void;
+}
 
 // This component was extracted so the whole PetitionComposeField doesn't rerender
 // when the fieldIndex changes
@@ -301,10 +434,13 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     fieldIndex,
     fields,
     showError,
+    attachmentUploadProgress,
     onFieldEdit,
     onFocusNextField,
     onFocusPrevField,
     onAddField,
+    onDownloadAttachment,
+    onRemoveAttachment,
     ...props
   },
   ref
@@ -520,29 +656,17 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           }
         }}
       />
-      <Flex margin={-1} marginTop={0}>
-        <PetitionComposeFieldAttachment
-          attachment={{
-            filename: "Example_003.doc",
-            contentType: "application/vnd.ms-word",
-            size: 1024 * 100,
-            isCompleted: true,
-          }}
-          onDownload={() => console.log("donwload")}
-          onRemove={() => console.log("remove")}
-          margin={1}
-        />
-        <PetitionComposeFieldAttachment
-          attachment={{
-            filename: "Example_003.doc",
-            contentType: "application/vnd.ms-word",
-            size: 1024 * 100,
-            isCompleted: false,
-          }}
-          onDownload={() => console.log("donwload")}
-          onRemove={() => console.log("remove")}
-          margin={1}
-        />
+      <Flex flexWrap="wrap" margin={-1} marginTop={0}>
+        {field.attachments.map((attachment) => (
+          <PetitionComposeFieldAttachment
+            key={attachment.id}
+            attachment={attachment}
+            progress={attachmentUploadProgress[attachment.id]}
+            onDownload={() => onDownloadAttachment(attachment.id)}
+            onRemove={() => onRemoveAttachment(attachment.id)}
+            margin={1}
+          />
+        ))}
       </Flex>
       {field.type === "SELECT" ? (
         <Box marginTop={1}>
@@ -764,24 +888,107 @@ const _PetitionComposeFieldActions = chakraForwardRef<
 });
 
 const fragments = {
-  PetitionField: gql`
-    fragment PetitionComposeField_PetitionField on PetitionField {
-      id
-      type
-      title
-      description
-      optional
-      multiple
-      isFixed
-      isReadOnly
-      visibility
-      ...SelectTypeFieldOptions_PetitionField
-      ...PetitionFieldVisibilityEditor_PetitionField
-    }
-    ${SelectTypeFieldOptions.fragments.PetitionField}
-    ${PetitionFieldVisibilityEditor.fragments.PetitionField}
-  `,
+  get PetitionField() {
+    return gql`
+      fragment PetitionComposeField_PetitionField on PetitionField {
+        id
+        type
+        title
+        description
+        optional
+        multiple
+        isFixed
+        isReadOnly
+        visibility
+        attachments {
+          ...PetitionComposeField_PetitionFieldAttachment
+        }
+        ...SelectTypeFieldOptions_PetitionField
+        ...PetitionFieldVisibilityEditor_PetitionField
+      }
+      ${this.PetitionFieldAttachment}
+      ${SelectTypeFieldOptions.fragments.PetitionField}
+      ${PetitionFieldVisibilityEditor.fragments.PetitionField}
+    `;
+  },
+  get PetitionFieldAttachment() {
+    return gql`
+      fragment PetitionComposeField_PetitionFieldAttachment on PetitionFieldAttachment {
+        ...PetitionComposeFieldAttachment_PetitionFieldAttachment
+      }
+      ${PetitionComposeFieldAttachment.fragments.PetitionFieldAttachment}
+    `;
+  },
 };
+
+const _mutations = [
+  gql`
+    mutation PetitionComposeField_createPetitionFieldAttachmentUploadLink(
+      $petitionId: GID!
+      $fieldId: GID!
+      $data: FileUploadInput!
+    ) {
+      createPetitionFieldAttachmentUploadLink(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        data: $data
+      ) {
+        presignedPostData {
+          ...uploadFile_AWSPresignedPostData
+        }
+        attachment {
+          ...PetitionComposeField_PetitionFieldAttachment
+        }
+      }
+    }
+    ${uploadFile.fragments.AWSPresignedPostData}
+    ${fragments.PetitionFieldAttachment}
+  `,
+  gql`
+    mutation PetitionComposeField_petitionFieldAttachmentUploadComplete(
+      $petitionId: GID!
+      $fieldId: GID!
+      $attachmentId: GID!
+    ) {
+      petitionFieldAttachmentUploadComplete(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        attachmentId: $attachmentId
+      ) {
+        ...PetitionComposeField_PetitionFieldAttachment
+      }
+    }
+    ${fragments.PetitionFieldAttachment}
+  `,
+  gql`
+    mutation PetitionComposeField_removePetitionFieldAttachment(
+      $petitionId: GID!
+      $fieldId: GID!
+      $attachmentId: GID!
+    ) {
+      removePetitionFieldAttachment(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        attachmentId: $attachmentId
+      )
+    }
+  `,
+  gql`
+    mutation PetitionComposeField_petitionFieldAttachmentDownloadLink(
+      $petitionId: GID!
+      $fieldId: GID!
+      $attachmentId: GID!
+    ) {
+      petitionFieldAttachmentDownloadLink(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        attachmentId: $attachmentId
+      ) {
+        url
+      }
+    }
+  `,
+];
 
 const comparePetitionComposeFieldProps = compareWithFragments<any>({
   field: fragments.PetitionField,
@@ -806,13 +1013,17 @@ export const PetitionComposeField = Object.assign(
   { fragments }
 );
 
-interface DragItem {
-  index: number;
-  id: string;
-  type: string;
+interface PetitionComposeFieldDragActiveIndicatorProps {
+  field: PetitionComposeField_PetitionFieldFragment;
+  draggedFiles: File[];
 }
 
-function PetitionComposeFieldDragActiveIdicator() {
+function PetitionComposeFieldDragActiveIndicator({
+  field,
+  draggedFiles,
+}: PetitionComposeFieldDragActiveIndicatorProps) {
+  const isOverMaxAttachments =
+    field.attachments.length + draggedFiles.length > 10;
   return (
     <Center
       position="absolute"
@@ -832,7 +1043,9 @@ function PetitionComposeFieldDragActiveIdicator() {
         opacity={0.2}
         sx={{
           backgroundImage: ((theme: any) => {
-            const c = getColor(theme, "gray.100");
+            const c = isOverMaxAttachments
+              ? getColor(theme, "red.100")
+              : getColor(theme, "gray.100");
             return `linear-gradient(135deg, ${c} 25%, white 25%, white 50%, ${c} 50%, ${c} 75%, white 75%, white)`;
           }) as any,
           backgroundSize: `3rem 3rem`,
@@ -847,23 +1060,37 @@ function PetitionComposeFieldDragActiveIdicator() {
         bottom={2}
         border="2px dashed"
         borderRadius="md"
-        borderColor="gray.300"
+        borderColor={isOverMaxAttachments ? "red.300" : "gray.300"}
       />
       <Box
         padding={2}
         borderRadius="lg"
-        color="gray.500"
+        color={isOverMaxAttachments ? "red.500" : "gray.500"}
         backgroundColor="white"
         fontWeight="bold"
         zIndex={1}
       >
-        <FormattedMessage
-          id="component.petition-compose-field.drop-files-to-attach"
-          defaultMessage="Drop here your files to attach them to this field"
-        />
+        {isOverMaxAttachments ? (
+          <FormattedMessage
+            id="component.petition-compose-field.over-max-attachments"
+            defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+            values={{ count: 10 }}
+          />
+        ) : (
+          <FormattedMessage
+            id="component.petition-compose-field.drop-files-to-attach"
+            defaultMessage="Drop here your files to attach them to this field"
+          />
+        )}
       </Box>
     </Center>
   );
+}
+
+interface DragItem {
+  index: number;
+  id: string;
+  type: string;
 }
 
 function useDragAndDrop(
@@ -945,4 +1172,32 @@ function useDragAndDrop(
 
   drop(elementRef);
   return { elementRef, dragRef, previewRef, isDragging };
+}
+
+function updateFieldAttachments(
+  proxy: DataProxy,
+  fieldId: string,
+  updateFn: (
+    cached: PetitionComposeField_updateFieldAttachments_PetitionFieldFragment["attachments"]
+  ) => PetitionComposeField_updateFieldAttachments_PetitionFieldFragment["attachments"]
+) {
+  updateFragment<PetitionComposeField_updateFieldAttachments_PetitionFieldFragment>(
+    proxy,
+    {
+      id: fieldId,
+      fragmentName: "PetitionComposeField_updateFieldAttachments_PetitionField",
+      fragment: gql`
+        fragment PetitionComposeField_updateFieldAttachments_PetitionField on PetitionField {
+          attachments {
+            ...PetitionComposeField_PetitionFieldAttachment
+          }
+        }
+        ${fragments.PetitionFieldAttachment}
+      `,
+      data: (cached) => ({
+        ...cached,
+        attachments: updateFn(cached!.attachments),
+      }),
+    }
+  );
 }

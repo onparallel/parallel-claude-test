@@ -604,6 +604,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       >
         <Box padding={4}>
           <PetitionComposeFieldList
+            petitionId={petition!.id}
             showErrors={showErrors}
             fields={petition!.fields}
             active={activeFieldId}

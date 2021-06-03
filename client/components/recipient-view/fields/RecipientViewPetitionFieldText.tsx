@@ -49,6 +49,7 @@ export function RecipientViewPetitionFieldText({
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
+  onDownloadAttachment,
 }: RecipientViewPetitionFieldTextProps) {
   const intl = useIntl();
 
@@ -197,6 +198,7 @@ export function RecipientViewPetitionFieldText({
       hasCommentsEnabled={hasCommentsEnabled}
       showAddNewReply={!isDisabled && !showNewReply && field.multiple}
       onAddNewReply={handleAddNewReply}
+      onDownloadAttachment={onDownloadAttachment}
     >
       <If condition={field.replies.length}>
         <List as={Stack} marginTop={2}>

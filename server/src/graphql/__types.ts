@@ -719,6 +719,7 @@ export interface NexusGenFieldTypes {
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     reactivateAccesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
+    removePetitionFieldAttachment: NexusGenEnums["Result"]; // Result!
     removePetitionPermission: NexusGenRootTypes["Petition"][]; // [Petition!]!
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
@@ -1596,6 +1597,7 @@ export interface NexusGenFieldTypeNames {
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdateSimpleReply: "PublicPetitionFieldReply";
     reactivateAccesses: "PetitionAccess";
+    removePetitionFieldAttachment: "Result";
     removePetitionPermission: "Petition";
     removeUsersFromGroup: "UserGroup";
     reopenPetition: "Petition";
@@ -2499,7 +2501,7 @@ export interface NexusGenArgTypes {
     };
     petitionFieldAttachmentDownloadLink: {
       // args
-      fieldAttachmentId: NexusGenScalars["GID"]; // GID!
+      attachmentId: NexusGenScalars["GID"]; // GID!
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
@@ -2581,7 +2583,7 @@ export interface NexusGenArgTypes {
     };
     publicPetitionFieldAttachmentDownloadLink: {
       // args
-      fieldAttachmentId: NexusGenScalars["GID"]; // GID!
+      attachmentId: NexusGenScalars["GID"]; // GID!
       fieldId: NexusGenScalars["GID"]; // GID!
       keycode: string; // ID!
       preview?: boolean | null; // Boolean
@@ -2612,6 +2614,12 @@ export interface NexusGenArgTypes {
     reactivateAccesses: {
       // args
       accessIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    removePetitionFieldAttachment: {
+      // args
+      attachmentId: NexusGenScalars["GID"]; // GID!
+      fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     removePetitionPermission: {

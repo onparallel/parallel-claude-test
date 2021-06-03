@@ -324,6 +324,7 @@ export const publicFileUploadReplyComplete = mutationField(
       // Try to get metadata
       await ctx.aws.fileUploads.getFileMetadata(file!.path);
       await ctx.files.markFileUploadComplete(file!.id);
+      ctx.files.loadFileUpload.dataloader.clear(file!.id);
       return reply;
     },
   }
@@ -787,13 +788,18 @@ export const publicFileUploadReplyDownloadLink = mutationField(
         const file = await ctx.files.loadFileUpload(
           reply!.content["file_upload_id"]
         );
-        if (file && !file.upload_complete) {
+        if (!file) {
+          throw new Error();
+        }
+        if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);
           await ctx.files.markFileUploadComplete(file.id);
         }
         return {
           result: RESULT.SUCCESS,
-          file,
+          file: file.upload_complete
+            ? file
+            : await ctx.files.loadFileUpload(file.id, { refresh: true }),
           url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,
@@ -959,13 +965,13 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
       authenticatePublicAccess("keycode"),
       and(
         fieldBelongsToAccess("fieldId"),
-        fieldAttachmentBelongsToField("fieldId", "fieldAttachmentId")
+        fieldAttachmentBelongsToField("fieldId", "attachmentId")
       )
     ),
     args: {
       keycode: nonNull(idArg()),
       fieldId: nonNull(globalIdArg("PetitionField")),
-      fieldAttachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
+      attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
       preview: booleanArg({
         description:
           "If true will use content-disposition inline instead of attachment",
@@ -974,26 +980,28 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
     resolve: async (_, args, ctx) => {
       try {
         const attachment = await ctx.petitions.loadFieldAttachment(
-          args.fieldAttachmentId
+          args.attachmentId
         );
 
         if (!attachment) {
           throw new Error(
-            `Can't load PetitionFieldAttachment with id ${args.fieldAttachmentId}`
+            `Can't load PetitionFieldAttachment with id ${args.attachmentId}`
           );
         }
 
         const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
-        if (file && !file.upload_complete) {
+        if (!file) {
+          throw new Error();
+        }
+        if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);
           await ctx.files.markFileUploadComplete(file.id);
         }
         return {
           result: RESULT.SUCCESS,
-          file: {
-            ...file!,
-            upload_complete: true,
-          },
+          file: file.upload_complete
+            ? file
+            : await ctx.files.loadFileUpload(file.id, { refresh: true }),
           url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,

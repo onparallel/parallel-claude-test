@@ -41,6 +41,7 @@ export function RecipientViewPetitionFieldSelect({
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
+  onDownloadAttachment,
 }: RecipientViewPetitionFieldSelectProps) {
   const intl = useIntl();
 
@@ -130,6 +131,7 @@ export function RecipientViewPetitionFieldSelect({
       hasCommentsEnabled={hasCommentsEnabled}
       showAddNewReply={!isDisabled && !showNewReply && field.multiple}
       onAddNewReply={handleAddNewReply}
+      onDownloadAttachment={onDownloadAttachment}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>

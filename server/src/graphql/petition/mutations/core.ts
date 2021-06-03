@@ -1010,13 +1010,18 @@ export const fileUploadReplyDownloadLink = mutationField(
         const file = await ctx.files.loadFileUpload(
           reply!.content["file_upload_id"]
         );
-        if (file && !file.upload_complete) {
+        if (!file) {
+          throw new Error();
+        }
+        if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);
           await ctx.files.markFileUploadComplete(file.id);
         }
         return {
           result: RESULT.SUCCESS,
-          file,
+          file: file.upload_complete
+            ? file
+            : await ctx.files.loadFileUpload(file.id, { refresh: true }),
           url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
             file!.path,
             file!.filename,

@@ -59,6 +59,7 @@ export function RecipientViewPetitionFieldFileUpload({
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
+  onDownloadAttachment,
 }: RecipientViewPetitionFieldFileUploadProps) {
   const uploads = useRef<Record<string, XMLHttpRequest>>({});
 
@@ -77,10 +78,8 @@ export function RecipientViewPetitionFieldFileUpload({
       fieldId: string;
       replyId: string;
     }) {
-      if (uploads.current[replyId]) {
-        uploads.current[replyId].abort();
-        delete uploads.current[replyId];
-      }
+      uploads.current[replyId]?.abort();
+      delete uploads.current[replyId];
       setIsDeletingReply((curr) => ({ ...curr, [replyId]: true }));
       await deletePetitionReply({ petitionId, fieldId, replyId, keycode });
       setIsDeletingReply(({ [replyId]: _, ...curr }) => curr);
@@ -107,6 +106,7 @@ export function RecipientViewPetitionFieldFileUpload({
       field={field}
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
+      onDownloadAttachment={onDownloadAttachment}
     >
       {field.replies.length ? (
         <List as={Stack} marginTop={1}>

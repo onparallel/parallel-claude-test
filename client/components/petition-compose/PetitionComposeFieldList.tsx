@@ -59,6 +59,7 @@ function reset(fields: FieldSelection[]): () => FieldsState {
 }
 
 export interface PetitionComposeFieldListProps extends BoxProps {
+  petitionId: string;
   active: Maybe<string>;
   fields: FieldSelection[];
   showErrors: boolean;
@@ -75,6 +76,7 @@ export interface PetitionComposeFieldListProps extends BoxProps {
 
 export const PetitionComposeFieldList = Object.assign(
   memo(function PetitionComposeFieldList({
+    petitionId,
     active,
     fields,
     showErrors,
@@ -146,6 +148,7 @@ export const PetitionComposeFieldList = Object.assign(
     const fieldRefs = useMultipleRefs<PetitionComposeFieldRef>();
 
     const showReferencedFieldDialog = useReferencedFieldDialog();
+
     // Memoize field callbacks
     const fieldsDataRef = useUpdatingRef({ fields, indices, active });
     const fieldProps = useMemoFactory(
@@ -153,6 +156,7 @@ export const PetitionComposeFieldList = Object.assign(
         fieldId: string
       ): Pick<
         PetitionComposeFieldProps & BoxProps,
+        | "petitionId"
         | "onCloneField"
         | "onSettingsClick"
         | "onDeleteClick"
@@ -162,6 +166,7 @@ export const PetitionComposeFieldList = Object.assign(
         | "onFocusNextField"
         | "onAddField"
       > => ({
+        petitionId,
         onCloneField: () => onCloneField(fieldId),
         onSettingsClick: () => onFieldSettingsClick(fieldId),
         onDeleteClick: async () => {
