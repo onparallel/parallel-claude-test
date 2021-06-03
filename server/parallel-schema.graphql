@@ -638,6 +638,15 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): FileUploadDownloadLinkResult!
+
+  """
+  Tells the backend that the field attachment was correctly uploaded to S3
+  """
+  petitionFieldAttachmentUploadComplete(
+    attachmentId: GID!
+    fieldId: GID!
+    petitionId: GID!
+  ): PetitionFieldAttachment!
   publicCheckVerificationCode(
     code: String!
     keycode: ID!

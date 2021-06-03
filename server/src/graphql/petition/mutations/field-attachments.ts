@@ -70,6 +70,37 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
   }
 );
 
+export const petitionFieldAttachmentUploadComplete = mutationField(
+  "petitionFieldAttachmentUploadComplete",
+  {
+    description:
+      "Tells the backend that the field attachment was correctly uploaded to S3",
+    type: "PetitionFieldAttachment",
+    args: {
+      petitionId: nonNull(globalIdArg("Petition")),
+      fieldId: nonNull(globalIdArg("PetitionField")),
+      attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
+    },
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId"),
+      fieldsBelongsToPetition("petitionId", "fieldId"),
+      fieldAttachmentBelongsToField("fieldId", "attachmentId")
+    ),
+    resolve: async (_, args, ctx) => {
+      const attachment = (await ctx.petitions.loadFieldAttachment(
+        args.attachmentId
+      ))!;
+      const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
+
+      await Promise.all([
+        ctx.aws.fileUploads.getFileMetadata(file!.path),
+        ctx.files.markFileUploadComplete(file!.id),
+      ]);
+      return attachment;
+    },
+  }
+);
+
 export const petitionFieldAttachmentDownloadLink = mutationField(
   "petitionFieldAttachmentDownloadLink",
   {
