@@ -601,6 +601,7 @@ export interface NexusGenFieldTypes {
     // field return type
     contentType: string; // String!
     filename: string; // String!
+    isComplete: boolean; // Boolean!
     size: number; // Int!
   };
   FileUploadDownloadLinkResult: {
@@ -1476,6 +1477,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     contentType: "String";
     filename: "String";
+    isComplete: "Boolean";
     size: "Int";
   };
   FileUploadDownloadLinkResult: {

@@ -186,6 +186,7 @@ enum FeatureFlag {
 type FileUpload {
   contentType: String!
   filename: String!
+  isComplete: Boolean!
   size: Int!
 }
 

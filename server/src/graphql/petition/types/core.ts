@@ -642,6 +642,9 @@ export const FileUpload = objectType({
     t.int("size", {
       resolve: (o) => parseInt(o.size, 10),
     });
+    t.boolean("isComplete", {
+      resolve: (o) => o.upload_complete,
+    });
   },
 });
 
