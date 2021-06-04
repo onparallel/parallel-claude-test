@@ -4,7 +4,7 @@ import pMap from "p-map";
 import { chunk, indexBy, omit } from "remeda";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import { PetitionAccess, PetitionField } from "../__types";
+import { PetitionAccess, PetitionField, PetitionFieldType } from "../__types";
 
 @injectable()
 export class ReportingRepository extends BaseRepository {
@@ -53,11 +53,20 @@ export class ReportingRepository extends BaseRepository {
                 .groupBy("petition_id")
                 .select(
                   "petition_id",
-                  ...["TEXT", "SHORT_TEXT", "FILE_UPLOAD", "HEADING"].map(
-                    (type) =>
-                      this.knex.raw(
-                        `sum((type = '${type}')::int)::int as ${type.toLowerCase()}_fields`
-                      )
+                  ...(
+                    [
+                      "TEXT",
+                      "SHORT_TEXT",
+                      "FILE_UPLOAD",
+                      "SELECT",
+                      "DYNAMIC_SELECT",
+                      "HEADING",
+                    ] as PetitionFieldType[]
+                  ).map((type) =>
+                    this.knex.raw(
+                      `(count(*) filter (where type = ?))::int as ??`,
+                      [type, `${type.toLowerCase()}_fields`]
+                    )
                   )
                 ),
               this.from("petition_access")

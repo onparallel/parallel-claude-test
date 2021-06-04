@@ -37,7 +37,7 @@ export class BaseRepository {
   }
 
   protected count(as?: string) {
-    return this.knex.raw(`count(*)::int as "${as ?? "count"}"`) as any;
+    return this.knex.raw(`count(*)::int as ??`, [as ?? "count"]);
   }
 
   protected from<TName extends TableNames>(
@@ -145,7 +145,10 @@ export class BaseRepository {
           .whereIn(column as any, values as TableKey<TName>[])
           .modify((q) => builder?.(q))
           .groupBy(column)
-          .select(this.knex.raw(`"${column}" as aggr`), this.count())) as {
+          .select(
+            this.knex.raw(`?? as aggr`, [column as string]),
+            this.count()
+          )) as {
           aggr: any;
           count: number;
         }[];
