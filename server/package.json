@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
     "debug": "cross-env NODE_ENV=development ts-node-dev --inspect --ignore-watch graphql/__types.ts --no-notify --transpile-only --respawn ./src",
-    "nodemon": "cross-env NODE_ENV=development nodemon --watch 'src/' --ignore 'src/graphql/__types.ts' -e 'ts tsx json' --exec 'node -r ts-node/register/transpile-only' --inspect src/index.ts",
     "build": "tsc --project tsconfig.prod.json",
     "prebuild": "yarn generate-i18n-files",
     "migrate": "knex migrate:latest",
@@ -160,7 +159,6 @@
     "jest": "^26.6.3",
     "livereload": "^0.9.3",
     "localtunnel": "^2.0.1",
-    "nodemon": "^2.0.7",
     "patch-package": "^6.4.7",
     "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.3.0",
