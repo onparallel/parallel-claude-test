@@ -1,8 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlText, MjmlWrapper } from "mjml-react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { BreakLines } from "./BreakLines";
+import { FormattedMessage } from "react-intl";
 import { Maybe } from "../../util/types";
-import { FORMATS } from "../utils/dates";
+import { BreakLines } from "./BreakLines";
 
 type FieldComment = {
   id: number;
@@ -11,7 +10,6 @@ type FieldComment = {
     id: string;
     name: string;
   };
-  createdAt: string;
 };
 
 export type PetitionFieldAndComments = {
@@ -28,8 +26,6 @@ export type PetitionFieldAndCommentsProps = {
 export function PetitionFieldAndComments({
   fields,
 }: PetitionFieldAndCommentsProps) {
-  const intl = useIntl();
-
   /** group together consecutive comments of the same author */
   function groupCommentsByAuthor(comments: FieldComment[]) {
     const groups: FieldComment[][] = [];
@@ -76,29 +72,24 @@ export function PetitionFieldAndComments({
           </MjmlSection>
           {groupCommentsByAuthor(comments).map((commentGroup, i) => (
             <MjmlSection key={i} padding="8px 50px">
-              {commentGroup.map(
-                ({ id, content, author, createdAt }, commentNumber) => (
-                  <MjmlSection key={id} padding="2px 0">
-                    <MjmlColumn
-                      backgroundColor="#f6f6f6"
-                      borderRadius="4px"
-                      padding="8px 16px"
-                    >
-                      {commentNumber === 0 && (
-                        <MjmlText fontSize="12px" padding="0">
-                          <b>{author.name}</b>{" "}
-                          <span style={{ color: "#555555" }}>
-                            {intl.formatDate(new Date(createdAt), FORMATS.HHmm)}
-                          </span>
-                        </MjmlText>
-                      )}
-                      <MjmlText padding="0" lineHeight="24px">
-                        <BreakLines>{content}</BreakLines>
+              {commentGroup.map(({ id, content, author }, commentNumber) => (
+                <MjmlSection key={id} padding="2px 0">
+                  <MjmlColumn
+                    backgroundColor="#f6f6f6"
+                    borderRadius="4px"
+                    padding="8px 16px"
+                  >
+                    {commentNumber === 0 && (
+                      <MjmlText fontSize="12px" padding="0">
+                        <b>{author.name}</b>
                       </MjmlText>
-                    </MjmlColumn>
-                  </MjmlSection>
-                )
-              )}
+                    )}
+                    <MjmlText padding="0" lineHeight="24px">
+                      <BreakLines>{content}</BreakLines>
+                    </MjmlText>
+                  </MjmlColumn>
+                </MjmlSection>
+              ))}
             </MjmlSection>
           ))}
         </MjmlWrapper>

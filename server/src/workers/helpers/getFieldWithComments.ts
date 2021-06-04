@@ -48,7 +48,6 @@ export async function buildFieldWithComments(
       async (c) => ({
         id: c.id,
         content: c.content,
-        createdAt: c.created_at.toISOString(),
         author: await fetchCommentAuthor(c, context),
       })
     ),

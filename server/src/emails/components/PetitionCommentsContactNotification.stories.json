@@ -23,8 +23,7 @@
                 "author": {
                   "id": "Access:1",
                   "name": "Mariano Rodriguez"
-                },
-                "createdAt": "2022-12-11T17:29:24.601Z"
+                }
               },
               {
                 "id": 2,
@@ -32,8 +31,7 @@
                 "author": {
                   "id": "Access:1",
                   "name": "Mariano Rodriguez"
-                },
-                "createdAt": "2022-12-11T17:30:24.601Z"
+                }
               }
             ]
           },
@@ -48,8 +46,7 @@
                 "author": {
                   "id": "User:1",
                   "name": "Derek Lou"
-                },
-                "createdAt": "2022-12-11T17:41:24.601Z"
+                }
               }
             ]
           }

@@ -38,12 +38,4 @@ export const FORMATS = {
     second: "numeric",
     hour12: false,
   } as DateTimeFormatOptions,
-  /**
-   * E.g. 14:16
-   */
-  HHmm: {
-    hour: "numeric",
-    minute: "numeric",
-    hour12: false,
-  } as DateTimeFormatOptions,
 };
