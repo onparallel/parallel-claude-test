@@ -3301,7 +3301,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async removePetitionFieldAttachment(attachmentId: number, user: User) {
-    this.withTransaction(async (t) => {
+    await this.withTransaction(async (t) => {
       const [row] = await this.from("petition_field_attachment", t)
         .where("id", attachmentId)
         .update({

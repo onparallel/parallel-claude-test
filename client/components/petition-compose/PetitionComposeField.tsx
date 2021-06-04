@@ -834,6 +834,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
       )}
       <IconButtonWithTooltip
         icon={<PaperclipIcon />}
+        isDisabled={field.attachments.length >= 10}
         size="sm"
         variant="ghost"
         placement="bottom"

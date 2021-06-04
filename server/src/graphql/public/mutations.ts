@@ -789,7 +789,9 @@ export const publicFileUploadReplyDownloadLink = mutationField(
           reply!.content["file_upload_id"]
         );
         if (!file) {
-          throw new Error();
+          throw new Error(
+            `FileUpload not found with id ${reply!.content["file_upload_id"]}`
+          );
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);
@@ -991,7 +993,9 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
 
         const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
         if (!file) {
-          throw new Error();
+          throw new Error(
+            `FileUpload not found with id ${attachment.file_upload_id}`
+          );
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);

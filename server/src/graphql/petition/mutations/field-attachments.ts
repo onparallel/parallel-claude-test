@@ -113,7 +113,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
 export const removePetitionFieldAttachment = mutationField(
   "removePetitionFieldAttachment",
   {
-    description: "Remove a petition field attachemnt",
+    description: "Remove a petition field attachment",
     type: "Result",
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
@@ -160,7 +160,9 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
           fieldAttachment.file_upload_id
         );
         if (!file) {
-          throw new Error();
+          throw new Error(
+            `FileUpload not found with id ${fieldAttachment.file_upload_id}`
+          );
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);

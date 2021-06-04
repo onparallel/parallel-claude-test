@@ -233,6 +233,40 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
       expect(data).toBeNull();
     });
+
+    it("sends error when trying to attach more than 10 files", async () => {
+      await mocks.createPetitionFieldAttachment(field.id, 10);
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: FileUploadInput!
+          ) {
+            createPetitionFieldAttachmentUploadLink(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              attachment {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          data: {
+            contentType: "application/pdf",
+            filename: "nomina.pdf",
+            size: 100,
+          },
+        },
+      });
+      expect(errors).toContainGraphQLError("MAX_ATTACHMENTS");
+      expect(data).toBeNull();
+    });
   });
 
   describe("petitionFieldAttachmentUploadComplete", () => {
@@ -399,6 +433,54 @@ describe("GraphQL/PetitionFieldAttachments", () => {
 
       expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
+    });
+  });
+
+  describe("removePetitionFieldAttachment", () => {
+    it("removes the field attachment and its corresponding file", async () => {
+      const [attachment] = await mocks.createPetitionFieldAttachment(
+        field.id,
+        1,
+        () => ({
+          filename: "image.png",
+          content_type: "image/png",
+          size: "2048",
+          upload_complete: false,
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!, $attachmentId: GID!) {
+            removePetitionFieldAttachment(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              attachmentId: $attachmentId
+            )
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          fieldId: toGlobalId("PetitionField", field.id),
+          attachmentId: toGlobalId("PetitionFieldAttachment", attachment.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.removePetitionFieldAttachment).toEqual("SUCCESS");
+
+      const attachments = await mocks.knex
+        .from("petition_field_attachment")
+        .where({ deleted_at: null, id: attachment.id })
+        .select("*");
+
+      const fileUploads = await mocks.knex
+        .from("file_upload")
+        .where({ deleted_at: null, id: attachment.file_upload_id })
+        .select("*");
+
+      expect(attachments).toHaveLength(0);
+      expect(fileUploads).toHaveLength(0);
     });
   });
 });

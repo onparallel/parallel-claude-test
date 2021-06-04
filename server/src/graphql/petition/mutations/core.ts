@@ -1011,7 +1011,9 @@ export const fileUploadReplyDownloadLink = mutationField(
           reply!.content["file_upload_id"]
         );
         if (!file) {
-          throw new Error();
+          throw new Error(
+            `FileUpload not found with id ${reply!.content["file_upload_id"]}`
+          );
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);

@@ -801,7 +801,7 @@ type Mutation {
   reactivateAccesses(accessIds: [GID!]!, petitionId: GID!): [PetitionAccess!]!
 
   """
-  Remove a petition field attachemnt
+  Remove a petition field attachment
   """
   removePetitionFieldAttachment(
     attachmentId: GID!
