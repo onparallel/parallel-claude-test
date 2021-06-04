@@ -114,6 +114,31 @@ const SCHEMAS = {
     },
     $ref: "#/definitions/root",
   },
+  CHECKBOX: {
+    type: "object",
+    required: ["values"],
+    additionalProperties: false,
+    properties: {
+      values: {
+        type: ["array", "null"],
+        items: {
+          type: "string",
+        },
+      },
+      limit: {
+        type: "object",
+        required: ["min", "max", "type"],
+        properties: {
+          type: {
+            type: "string",
+            enum: ["RADIO", "UNLIMITED", "EXACT", "RANGE"],
+          },
+          min: { type: "number" },
+          max: { type: "number" },
+        },
+      },
+    },
+  },
 };
 
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
@@ -189,6 +214,20 @@ export function defaultFieldOptions(
           file: null,
           values: [],
           labels: [],
+        },
+      };
+    }
+    case "CHECKBOX": {
+      return {
+        optional: optional ?? false,
+        multiple: false,
+        options: {
+          values: [],
+          limit: {
+            type: "UNLIMITED",
+            min: 1,
+            max: 1,
+          },
         },
       };
     }

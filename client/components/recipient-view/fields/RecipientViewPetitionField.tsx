@@ -5,6 +5,7 @@ import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
 } from "./RecipientViewPetitionFieldCard";
+import { RecipientViewPetitionFieldCheckbox } from "./RecipientViewPetitionFieldCheckbox";
 import { RecipientViewPetitionFieldDynamicSelect } from "./RecipientViewPetitionFieldDynamicSelect";
 import { RecipientViewPetitionFieldFileUpload } from "./RecipientViewPetitionFieldFileUpload";
 import { RecipientViewPetitionFieldHeading } from "./RecipientViewPetitionFieldHeading";
@@ -63,6 +64,8 @@ export function RecipientViewPetitionField(
       {...props}
       onDownloadAttachment={handleDownloadAttachment}
     />
+  ) : props.field.type === "CHECKBOX" ? (
+    <RecipientViewPetitionFieldCheckbox {...props} />
   ) : null;
 }
 

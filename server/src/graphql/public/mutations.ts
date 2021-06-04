@@ -35,7 +35,10 @@ import {
   replyBelongsToAccess,
   replyIsForFieldOfType,
 } from "./authorizers";
-import { validateDynamicSelectReplyValues } from "./utils";
+import {
+  validateCheckboxReplyValues,
+  validateDynamicSelectReplyValues,
+} from "./utils";
 
 function anonymizePart(part: string) {
   return part.length > 2
@@ -448,6 +451,102 @@ export const publicUpdateSimpleReply = mutationField(
         await ctx.petitions.createEvent({
           type: "REPLY_UPDATED",
           petition_id: petitionId,
+          data: {
+            petition_access_id: reply.petition_access_id!,
+            petition_field_id: reply.petition_field_id,
+            petition_field_reply_id: reply.id,
+          },
+        });
+      }
+      return reply;
+    },
+  }
+);
+
+export const publicCreateCheckboxReply = mutationField(
+  "publicCreateCheckboxReply",
+  {
+    description: "Creates a reply to a checkbox field.",
+    type: "PublicPetitionFieldReply",
+    args: {
+      keycode: nonNull(idArg()),
+      fieldId: nonNull(globalIdArg("PetitionField")),
+      values: nonNull(list(nonNull(stringArg()))),
+    },
+    authorize: chain(
+      authenticatePublicAccess("keycode"),
+      fieldBelongsToAccess("fieldId"),
+      fieldHasType("fieldId", ["CHECKBOX"])
+    ),
+    validateArgs: async (_, args, ctx, info) => {
+      try {
+        const field = (await ctx.petitions.loadField(args.fieldId))!;
+        validateCheckboxReplyValues(field, args.values);
+      } catch (error) {
+        throw new ArgValidationError(info, "value", error.message);
+      }
+    },
+    resolve: async (_, args, ctx) => {
+      const field = (await ctx.petitions.loadField(args.fieldId))!;
+      return await ctx.petitions.createPetitionFieldReply(
+        {
+          petition_field_id: args.fieldId,
+          petition_access_id: ctx.access!.id,
+          type: field.type,
+          content: { options: args.values },
+        },
+        ctx.contact!
+      );
+    },
+  }
+);
+
+export const publicUpdateCheckboxReply = mutationField(
+  "publicUpdateCheckboxReply",
+  {
+    description: "Updates a reply of checkbox field.",
+    type: "PublicPetitionFieldReply",
+    args: {
+      keycode: nonNull(idArg()),
+      replyId: nonNull(globalIdArg("PetitionFieldReply")),
+      values: nonNull(list(nonNull(stringArg()))),
+    },
+    authorize: chain(
+      authenticatePublicAccess("keycode"),
+      and(
+        replyBelongsToAccess("replyId"),
+        replyIsForFieldOfType("replyId", ["CHECKBOX"])
+      )
+    ),
+    validateArgs: async (_, args, ctx, info) => {
+      try {
+        const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+        validateCheckboxReplyValues(field, args.values);
+      } catch (error) {
+        throw new ArgValidationError(info, "value", error.message);
+      }
+    },
+    resolve: async (_, args, ctx) => {
+      const petitionId = ctx.access!.petition_id;
+      const [reply, event] = await Promise.all([
+        ctx.petitions.updatePetitionFieldReply(
+          args.replyId,
+          { content: { options: args.values }, status: "PENDING" },
+          `Contact:${ctx.contact!.id}`
+        ),
+        ctx.petitions.getLastEventForPetitionId(petitionId),
+      ]);
+      if (
+        event &&
+        (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
+        event.data.petition_field_reply_id === args.replyId &&
+        differenceInSeconds(new Date(), event.created_at) < 60
+      ) {
+        await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
+      } else {
+        await ctx.petitions.createEvent({
+          type: "REPLY_UPDATED",
+          petitionId,
           data: {
             petition_access_id: reply.petition_access_id!,
             petition_field_id: reply.petition_field_id,

@@ -160,7 +160,23 @@ export const SelectTypeFieldOptions = Object.assign(
           .map((n) => (n.children as any)[0].text.trim())
           .filter((option) => option !== "");
         if (!shallowEqualArrays(field.options.values, values)) {
-          onFieldEdit({ options: { values } });
+          if (field.type === "CHECKBOX") {
+            let max = field.options.limit.max;
+            if (max > values.length) max = values.length;
+
+            onFieldEdit({
+              options: {
+                ...field.options,
+                limit: {
+                  ...field.options.limit,
+                  max,
+                },
+                values,
+              },
+            });
+          } else {
+            onFieldEdit({ options: { ...field.options, values } });
+          }
         }
       }, [field.options.values, value, onFieldEdit, onChange]);
       return (
@@ -183,6 +199,7 @@ export const SelectTypeFieldOptions = Object.assign(
       PetitionField: gql`
         fragment SelectTypeFieldOptions_PetitionField on PetitionField {
           id
+          type
           options
         }
       `,

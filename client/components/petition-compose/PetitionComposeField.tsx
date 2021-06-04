@@ -62,6 +62,7 @@ import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
+import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 import {
   SelectTypeFieldOptions,
@@ -689,8 +690,9 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           />
         ))}
       </Flex>
-      {field.type === "SELECT" ? (
+      {field.type === "SELECT" || field.type === "CHECKBOX" ? (
         <Box marginTop={1}>
+          <CheckboxTypeLabel fontSize="xs" pb={2} pl={2} field={field} />
           <SelectTypeFieldOptions
             ref={selectFieldOptionsRef}
             field={field}

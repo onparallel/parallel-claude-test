@@ -655,6 +655,15 @@ type Mutation {
   ): PublicPetition!
 
   """
+  Creates a reply to a checkbox field.
+  """
+  publicCreateCheckboxReply(
+    fieldId: GID!
+    keycode: ID!
+    values: [String!]!
+  ): PublicPetitionFieldReply!
+
+  """
   Creates a reply for a dynamic select field.
   """
   publicCreateDynamicSelectReply(
@@ -758,6 +767,15 @@ type Mutation {
     preview: Boolean
   ): FileUploadDownloadLinkResult!
   publicSendVerificationCode(keycode: ID!): VerificationCodeRequest!
+
+  """
+  Updates a reply of checkbox field.
+  """
+  publicUpdateCheckboxReply(
+    keycode: ID!
+    replyId: GID!
+    values: [String!]!
+  ): PublicPetitionFieldReply!
 
   """
   Updates a reply for a dynamic select field.
@@ -1840,6 +1858,11 @@ enum PetitionFieldReplyStatus {
 Type of a petition field
 """
 enum PetitionFieldType {
+  """
+  A options list.
+  """
+  CHECKBOX
+
   """
   A dynamic select field.
   """

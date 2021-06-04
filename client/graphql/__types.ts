@@ -330,6 +330,8 @@ export interface Mutation {
    * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
+  /** Creates a reply to a checkbox field. */
+  publicCreateCheckboxReply: PublicPetitionFieldReply;
   /** Creates a reply for a dynamic select field. */
   publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
@@ -1409,6 +1411,8 @@ export type PetitionFieldReplyStatus =
 
 /** Type of a petition field */
 export type PetitionFieldType =
+  /** A options list. */
+  | "CHECKBOX"
   /** A dynamic select field. */
   | "DYNAMIC_SELECT"
   /** A file upload field. */
@@ -4726,6 +4730,37 @@ export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation 
     } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
   };
 
+export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationVariables =
+  Exact<{
+    keycode: Scalars["ID"];
+    fieldId: Scalars["GID"];
+    values: Array<Scalars["String"]> | Scalars["String"];
+  }>;
+
+export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation =
+  { __typename?: "Mutation" } & {
+    publicCreateCheckboxReply: {
+      __typename?: "PublicPetitionFieldReply";
+    } & RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
+  };
+
+export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationVariables =
+  Exact<{
+    keycode: Scalars["ID"];
+    replyId: Scalars["GID"];
+    values: Array<Scalars["String"]> | Scalars["String"];
+  }>;
+
+export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation =
+  { __typename?: "Mutation" } & {
+    publicUpdateCheckboxReply: {
+      __typename?: "PublicPetitionFieldReply";
+    } & Pick<
+      PublicPetitionFieldReply,
+      "id" | "content" | "status" | "updatedAt"
+    >;
+  };
+
 export type RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyMutationVariables =
   Exact<{
     keycode: Scalars["ID"];
@@ -6687,6 +6722,7 @@ export const PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDo
 export const SelectTypeFieldOptions_PetitionFieldFragmentDoc = gql`
   fragment SelectTypeFieldOptions_PetitionField on PetitionField {
     id
+    type
     options
   }
 `;
@@ -10349,6 +10385,118 @@ export function useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMu
 export type RecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutationHookResult =
   ReturnType<
     typeof useRecipientViewPetitionFieldMutations_publicCreateSimpleReplyMutation
+  >;
+export const RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyDocument = gql`
+  mutation RecipientViewPetitionFieldMutations_publicCreateCheckboxReply(
+    $keycode: ID!
+    $fieldId: GID!
+    $values: [String!]!
+  ) {
+    publicCreateCheckboxReply(
+      keycode: $keycode
+      fieldId: $fieldId
+      values: $values
+    ) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragmentDoc}
+`;
+
+/**
+ * __useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation__
+ *
+ * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewPetitionFieldMutationsPublicCreateCheckboxReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      fieldId: // value for 'fieldId'
+ *      values: // value for 'values'
+ *   },
+ * });
+ */
+export function useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation,
+    RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation,
+    RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationVariables
+  >(
+    RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyDocument,
+    options
+  );
+}
+export type RecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutationHookResult =
+  ReturnType<
+    typeof useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation
+  >;
+export const RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyDocument = gql`
+  mutation RecipientViewPetitionFieldMutations_publicUpdateCheckboxReply(
+    $keycode: ID!
+    $replyId: GID!
+    $values: [String!]!
+  ) {
+    publicUpdateCheckboxReply(
+      keycode: $keycode
+      replyId: $replyId
+      values: $values
+    ) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+`;
+
+/**
+ * __useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation__
+ *
+ * To run a mutation, you first call `useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [recipientViewPetitionFieldMutationsPublicUpdateCheckboxReplyMutation, { data, loading, error }] = useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation({
+ *   variables: {
+ *      keycode: // value for 'keycode'
+ *      replyId: // value for 'replyId'
+ *      values: // value for 'values'
+ *   },
+ * });
+ */
+export function useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation,
+    RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation,
+    RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationVariables
+  >(
+    RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyDocument,
+    options
+  );
+}
+export type RecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutationHookResult =
+  ReturnType<
+    typeof useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation
   >;
 export const RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReplyDocument = gql`
   mutation RecipientViewPetitionFieldMutations_publicCreateDynamicSelectReply(

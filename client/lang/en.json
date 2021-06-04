@@ -60,6 +60,26 @@
     "context": "Open menu"
   },
   {
+    "term": "component.checkbox-type-label.exact",
+    "definition": "Choose {X} {X, plural, =1{option} other{options}}",
+    "context": "Choose {X} {X, plural, =1{option} other{options}}"
+  },
+  {
+    "term": "component.checkbox-type-label.range",
+    "definition": "Choose between {Y} and {X} options",
+    "context": "Choose between {Y} and {X} options"
+  },
+  {
+    "term": "component.checkbox-type-label.unlimited",
+    "definition": "Choose as many options as you want",
+    "context": "Choose as many options as you want"
+  },
+  {
+    "term": "component.checkbox-type-label.up-to",
+    "definition": "Choose up to {X} options",
+    "context": "Choose up to {X} options"
+  },
+  {
     "term": "component.close-petition-dialog.attach-pdf-export.checkbox",
     "definition": "Attach a PDF export with the submitted replies",
     "context": "Attach a PDF export with the submitted replies"
@@ -800,9 +820,29 @@
     "context": "Petition eSignature"
   },
   {
+    "term": "component.petition-field-checkbox-settings.exact-number",
+    "definition": "Exact number",
+    "context": "Exact number"
+  },
+  {
+    "term": "component.petition-field-checkbox-settings.range",
+    "definition": "Range",
+    "context": "Range"
+  },
+  {
+    "term": "component.petition-field-checkbox-settings.unlimited",
+    "definition": "Unlimited",
+    "context": "Unlimited"
+  },
+  {
     "term": "component.petition-field-select.placeholder",
     "definition": "Select a field",
     "context": "Select a field"
+  },
+  {
+    "term": "component.petition-field-type-select-dropdown.checkbox",
+    "definition": "Allow the recipient to select one or more options from a short list of possible answers.",
+    "context": "Allow the recipient to select one or more options from a short list of possible answers."
   },
   {
     "term": "component.petition-field-type-select-dropdown.dynamic-select-description",
@@ -2018,6 +2058,11 @@
     "term": "field-settings.dynamic-select.loaded-options.example",
     "definition": "For example:",
     "context": "For example:"
+  },
+  {
+    "term": "field-settings.file-checbox-description",
+    "definition": "This option allows you to limit the number of options that the recipient can choose.",
+    "context": "This option allows you to limit the number of options that the recipient can choose."
   },
   {
     "term": "field-settings.file-multiple-description",
@@ -3543,6 +3588,11 @@
     "term": "petition.field-settings",
     "definition": "Field settings",
     "context": "Field settings"
+  },
+  {
+    "term": "petition.field-type.checkbox",
+    "definition": "Multiple choice",
+    "context": "Multiple choice"
   },
   {
     "term": "petition.field-type.conditional-select",

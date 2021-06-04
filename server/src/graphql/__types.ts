@@ -705,6 +705,7 @@ export interface NexusGenFieldTypes {
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
+    publicCreateCheckboxReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicCreateFileUploadReply: NexusGenRootTypes["CreateFileUploadReply"]; // CreateFileUploadReply!
     publicCreatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
@@ -717,6 +718,11 @@ export interface NexusGenFieldTypes {
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
+<<<<<<< master
+=======
+    publicSubmitUnpublishedComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
+    publicUpdateCheckboxReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
+>>>>>>> WIP Add checkbox to compose and recipient view
     publicUpdateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -1600,6 +1606,7 @@ export interface NexusGenFieldTypeNames {
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
     publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
+    publicCreateCheckboxReply: "PublicPetitionFieldReply";
     publicCreateDynamicSelectReply: "PublicPetitionFieldReply";
     publicCreateFileUploadReply: "CreateFileUploadReply";
     publicCreatePetitionFieldComment: "PublicPetitionFieldComment";
@@ -1612,6 +1619,11 @@ export interface NexusGenFieldTypeNames {
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     publicSendVerificationCode: "VerificationCodeRequest";
+<<<<<<< master
+=======
+    publicSubmitUnpublishedComments: "PublicPetitionFieldComment";
+    publicUpdateCheckboxReply: "PublicPetitionFieldReply";
+>>>>>>> WIP Add checkbox to compose and recipient view
     publicUpdateDynamicSelectReply: "PublicPetitionFieldReply";
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdateSimpleReply: "PublicPetitionFieldReply";
@@ -2554,6 +2566,12 @@ export interface NexusGenArgTypes {
       keycode: string; // ID!
       signer?: NexusGenInputs["PublicPetitionSignerData"] | null; // PublicPetitionSignerData
     };
+    publicCreateCheckboxReply: {
+      // args
+      fieldId: NexusGenScalars["GID"]; // GID!
+      keycode: string; // ID!
+      values: string[]; // [String!]!
+    };
     publicCreateDynamicSelectReply: {
       // args
       fieldId: NexusGenScalars["GID"]; // GID!
@@ -2623,6 +2641,12 @@ export interface NexusGenArgTypes {
     publicSendVerificationCode: {
       // args
       keycode: string; // ID!
+    };
+    publicUpdateCheckboxReply: {
+      // args
+      keycode: string; // ID!
+      replyId: NexusGenScalars["GID"]; // GID!
+      values: string[]; // [String!]!
     };
     publicUpdateDynamicSelectReply: {
       // args

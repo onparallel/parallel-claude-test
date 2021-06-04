@@ -61,6 +61,7 @@ export type PetitionEventType =
 export type PetitionFieldReplyStatus = "APPROVED" | "PENDING" | "REJECTED";
 
 export type PetitionFieldType =
+  | "CHECKBOX"
   | "DYNAMIC_SELECT"
   | "FILE_UPLOAD"
   | "HEADING"

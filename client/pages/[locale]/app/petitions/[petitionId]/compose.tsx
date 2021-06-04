@@ -514,6 +514,26 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     minHeight: 0,
   } as const;
 
+  // TODO: Remove before push
+  // const memoSettings = useMemo(() => {
+  //   return activeField ? (
+  //     <PetitionComposeFieldSettings
+  //       petitionId={petition!.id}
+  //       key={activeField.id}
+  //       field={activeField}
+  //       onFieldEdit={handleFieldEdit}
+  //       onFieldTypeChange={handleFieldTypeChange}
+  //       onClose={handleSettingsClose}
+  //     />
+  //   ) : null;
+  // }, [
+  //   petition,
+  //   activeField,
+  //   handleFieldEdit,
+  //   handleFieldTypeChange,
+  //   handleSettingsClose,
+  // ]);
+
   return (
     <PetitionLayout
       key={petition!.id}

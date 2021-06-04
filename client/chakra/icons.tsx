@@ -1248,6 +1248,23 @@ export const FieldHeadingIcon = createIcon({
   ),
 });
 
+export const FieldCheckboxIcon = createIcon({
+  displayName: "FieldCheckboxIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <g
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="2" y="2" width="12" height="12" rx="1.42077" />
+      <path d="M5 8L7 10L11 6" />
+    </g>
+  ),
+});
+
 export const CloudUploadIcon = createIcon({
   displayName: "CloudUploadIcon",
   viewBox: "0 0 24 24",

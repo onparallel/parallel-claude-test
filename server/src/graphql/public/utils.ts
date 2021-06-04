@@ -35,3 +35,16 @@ export function validateDynamicSelectReplyValues(
     }
   }
 }
+
+export function validateCheckboxReplyValues(
+  field: PetitionField,
+  values: string[]
+) {
+  const length = field.options.values.length;
+
+  const mixedSet = new Set([...values, ...field.options.values]);
+
+  if (mixedSet.size != length) {
+    throw new Error(`Invalid values`);
+  }
+}

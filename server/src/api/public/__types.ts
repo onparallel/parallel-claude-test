@@ -305,6 +305,8 @@ export type Mutation = {
    * If the petition does not require a review, starts the signing process. Otherwise sends email to user.
    */
   publicCompletePetition: PublicPetition;
+  /** Creates a reply to a checkbox field. */
+  publicCreateCheckboxReply: PublicPetitionFieldReply;
   /** Creates a reply for a dynamic select field. */
   publicCreateDynamicSelectReply: PublicPetitionFieldReply;
   /** Creates a reply to a file upload field. */
@@ -328,6 +330,13 @@ export type Mutation = {
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendVerificationCode: VerificationCodeRequest;
+<<<<<<< master
+=======
+  /** Submits all unpublished comments. */
+  publicSubmitUnpublishedComments: Array<PublicPetitionFieldComment>;
+  /** Updates a reply of checkbox field. */
+  publicUpdateCheckboxReply: PublicPetitionFieldReply;
+>>>>>>> WIP Add checkbox to compose and recipient view
   /** Updates a reply for a dynamic select field. */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
@@ -648,6 +657,12 @@ export type MutationpublicCompletePetitionArgs = {
   signer?: Maybe<PublicPetitionSignerData>;
 };
 
+export type MutationpublicCreateCheckboxReplyArgs = {
+  fieldId: Scalars["GID"];
+  keycode: Scalars["ID"];
+  values: Array<Scalars["String"]>;
+};
+
 export type MutationpublicCreateDynamicSelectReplyArgs = {
   fieldId: Scalars["GID"];
   keycode: Scalars["ID"];
@@ -716,6 +731,12 @@ export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
 
 export type MutationpublicSendVerificationCodeArgs = {
   keycode: Scalars["ID"];
+};
+
+export type MutationpublicUpdateCheckboxReplyArgs = {
+  keycode: Scalars["ID"];
+  replyId: Scalars["GID"];
+  values: Array<Scalars["String"]>;
 };
 
 export type MutationpublicUpdateDynamicSelectReplyArgs = {
@@ -1352,6 +1373,8 @@ export type PetitionFieldReplyStatus =
 
 /** Type of a petition field */
 export type PetitionFieldType =
+  /** A options list. */
+  | "CHECKBOX"
   /** A dynamic select field. */
   | "DYNAMIC_SELECT"
   /** A file upload field. */

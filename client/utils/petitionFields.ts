@@ -35,6 +35,14 @@ export type FieldOptions = {
       updatedAt: Date;
     };
   };
+  CHECKBOX: {
+    values: string[];
+    limit: {
+      type: string;
+      min: number;
+      max: number;
+    };
+  };
 };
 
 export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
@@ -71,6 +79,11 @@ export function usePetitionFieldTypeLabel(type: PetitionFieldType) {
           id: "petition.field-type.conditional-select",
           defaultMessage: "Conditional select",
         });
+      case "CHECKBOX":
+        return intl.formatMessage({
+          id: "petition.field-type.checkbox",
+          defaultMessage: "Multiple choice",
+        });
       default:
         throw new Error(`Missing PetitionFieldType "${type}"`);
     }
@@ -87,6 +100,7 @@ export function usePetitionFieldTypeColor(type: PetitionFieldType) {
       HEADING: theme.colors.blue[400],
       SELECT: theme.colors.pink[400],
       DYNAMIC_SELECT: theme.colors.pink[600],
+      CHECKBOX: theme.colors.purple[500],
     } as Record<PetitionFieldType, string>
   )[type];
 }

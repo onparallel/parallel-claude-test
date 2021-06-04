@@ -9,6 +9,8 @@ import {
   useRecipientViewPetitionFieldMutations_publicDeletePetitionReplyMutation,
   useRecipientViewPetitionFieldMutations_publicFileUploadReplyCompleteMutation,
   useRecipientViewPetitionFieldMutations_publicUpdateDynamicSelectReplyMutation,
+  useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation,
+  useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation,
   useRecipientViewPetitionFieldMutations_publicUpdateSimpleReplyMutation,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
@@ -159,6 +161,111 @@ export function useCreateSimpleReply() {
       return data?.publicCreateSimpleReply;
     },
     [createSimpleReply]
+  );
+}
+
+const _publicCreateCheckboxReply = gql`
+  mutation RecipientViewPetitionFieldMutations_publicCreateCheckboxReply(
+    $keycode: ID!
+    $fieldId: GID!
+    $values: [String!]!
+  ) {
+    publicCreateCheckboxReply(
+      keycode: $keycode
+      fieldId: $fieldId
+      values: $values
+    ) {
+      ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
+    }
+  }
+  ${RecipientViewPetitionFieldCard.fragments.PublicPetitionFieldReply}
+`;
+
+export function useCreateCheckboxReply() {
+  const [createCheckboxReply] =
+    useRecipientViewPetitionFieldMutations_publicCreateCheckboxReplyMutation();
+  return useCallback(
+    async function _createCheckboxReply({
+      petitionId,
+      keycode,
+      fieldId,
+      values,
+    }: {
+      petitionId: string;
+      keycode: string;
+      fieldId: string;
+      values: string[];
+    }) {
+      const { data } = await createCheckboxReply({
+        variables: {
+          keycode,
+          fieldId,
+          values,
+        },
+        update(cache, { data }) {
+          updateFieldReplies(cache, fieldId, (replies) => [
+            ...replies,
+            pick(data!.publicCreateCheckboxReply, ["id", "__typename"]),
+          ]);
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+      return data?.publicCreateCheckboxReply;
+    },
+    [createCheckboxReply]
+  );
+}
+
+const _publicUpdateCheckboxReply = gql`
+  mutation RecipientViewPetitionFieldMutations_publicUpdateCheckboxReply(
+    $keycode: ID!
+    $replyId: GID!
+    $values: [String!]!
+  ) {
+    publicUpdateCheckboxReply(
+      keycode: $keycode
+      replyId: $replyId
+      values: $values
+    ) {
+      id
+      content
+      status
+      updatedAt
+    }
+  }
+`;
+
+export function useUpdateCheckboxReply() {
+  const [updateCheckboxReply] =
+    useRecipientViewPetitionFieldMutations_publicUpdateCheckboxReplyMutation();
+  return useCallback(
+    async function _updateCheckboxReply({
+      petitionId,
+      keycode,
+      replyId,
+      values,
+    }: {
+      petitionId: string;
+      keycode: string;
+      replyId: string;
+      values: string[];
+    }) {
+      await updateCheckboxReply({
+        variables: {
+          keycode,
+          replyId,
+          values,
+        },
+        update(cache, { data }) {
+          if (data) {
+            updatePetitionStatus(cache, petitionId);
+          }
+        },
+      });
+    },
+    [updateCheckboxReply]
   );
 }
 
