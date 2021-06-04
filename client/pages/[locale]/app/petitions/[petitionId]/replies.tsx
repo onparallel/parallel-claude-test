@@ -636,6 +636,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   <PetitionRepliesField
                     id={`field-${x.field.id}`}
                     key={x.field.id}
+                    petitionId={petition.id}
                     field={x.field}
                     isVisible={true}
                     fieldIndex={x.fieldIndex}

@@ -363,7 +363,7 @@ export interface Mutation {
   publicUpdateSimpleReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
-  /** Remove a petition field attachemnt */
+  /** Remove a petition field attachment */
   removePetitionFieldAttachment: Result;
   /** Removes permissions on given petitions and users */
   removePetitionPermission: Array<Petition>;
@@ -4149,12 +4149,43 @@ export type PetitionRepliesField_PetitionFieldFragment = {
     isUnread: boolean;
     createdAt: string;
   }>;
+  attachments: Array<
+    {
+      __typename?: "PetitionFieldAttachment";
+    } & PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment
+  >;
 };
 
 export type PetitionRepliesField_PetitionFieldReplyFragment = {
   __typename?: "PetitionFieldReply";
   id: string;
 } & PetitionRepliesFieldReply_PetitionFieldReplyFragment;
+
+export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVariables =
+  Exact<{
+    petitionId: Scalars["GID"];
+    fieldId: Scalars["GID"];
+    attachmentId: Scalars["GID"];
+  }>;
+
+export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation = {
+  petitionFieldAttachmentDownloadLink: {
+    __typename?: "FileUploadDownloadLinkResult";
+    url?: Maybe<string>;
+  };
+};
+
+export type PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment = {
+  __typename?: "PetitionFieldAttachment";
+  id: string;
+  file: {
+    __typename?: "FileUpload";
+    filename: string;
+    contentType: string;
+    size: number;
+    isComplete: boolean;
+  };
+};
 
 export type PetitionRepliesFieldComments_UserFragment = {
   __typename?: "User";
@@ -7905,6 +7936,17 @@ export const PetitionRepliesField_PetitionFieldReplyFragmentDoc = gql`
   }
   ${PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc}
 `;
+export const PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragmentDoc = gql`
+  fragment PetitionRepliesFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
+    id
+    file {
+      filename
+      contentType
+      size
+      isComplete
+    }
+  }
+`;
 export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
   fragment PetitionRepliesField_PetitionField on PetitionField {
     id
@@ -7920,8 +7962,12 @@ export const PetitionRepliesField_PetitionFieldFragmentDoc = gql`
       isUnread
       createdAt
     }
+    attachments {
+      ...PetitionRepliesFieldAttachment_PetitionFieldAttachment
+    }
   }
   ${PetitionRepliesField_PetitionFieldReplyFragmentDoc}
+  ${PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragmentDoc}
 `;
 export const PetitionRepliesFieldComments_PetitionFieldCommentFragmentDoc = gql`
   fragment PetitionRepliesFieldComments_PetitionFieldComment on PetitionFieldComment {
@@ -9699,6 +9745,37 @@ export function useExportRepliesProgressDialog_updateSignatureRequestMetadataMut
 export type ExportRepliesProgressDialog_updateSignatureRequestMetadataMutationHookResult =
   ReturnType<
     typeof useExportRepliesProgressDialog_updateSignatureRequestMetadataMutation
+  >;
+export const PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument = gql`
+  mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(
+    $petitionId: GID!
+    $fieldId: GID!
+    $attachmentId: GID!
+  ) {
+    petitionFieldAttachmentDownloadLink(
+      petitionId: $petitionId
+      fieldId: $fieldId
+      attachmentId: $attachmentId
+    ) {
+      url
+    }
+  }
+`;
+export function usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation,
+    PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation,
+    PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationVariables
+  >(PetitionRepliesField_petitionFieldAttachmentDownloadLinkDocument, options);
+}
+export type PetitionRepliesField_petitionFieldAttachmentDownloadLinkMutationHookResult =
+  ReturnType<
+    typeof usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation
   >;
 export const PetitionSignaturesCard_updatePetitionSignatureConfigDocument = gql`
   mutation PetitionSignaturesCard_updatePetitionSignatureConfig(

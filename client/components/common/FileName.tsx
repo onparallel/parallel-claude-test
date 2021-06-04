@@ -20,7 +20,7 @@ export const FileName = chakraForwardRef<"span", FileNameProps>(
     if (!isTruncated) {
       return (
         <Text ref={mergedRef as any} isTruncated as="span" {...props}>
-          {value}
+          <Text as="span">{value}</Text>
         </Text>
       );
     } else {
@@ -34,7 +34,9 @@ export const FileName = chakraForwardRef<"span", FileNameProps>(
           {...props}
         >
           <chakra.span isTruncated>{value.slice(0, -10)}</chakra.span>
-          <chakra.span flexShrink={0}>{value.slice(-10)}</chakra.span>
+          <chakra.span flexShrink={0} position="relative" left="-0.2rem">
+            {value.slice(-10)}
+          </chakra.span>
         </Flex>
       );
     }

@@ -1120,6 +1120,36 @@
     "context": "Send reminders every <days-input></days-input> days at <time-input></time-input>"
   },
   {
+    "term": "component.petition-replies-field.attachments",
+    "definition": "{count, plural, =1 {1 file attached} other {# files attached}}",
+    "context": "{count, plural, =1 {1 file attached} other {# files attached}}"
+  },
+  {
+    "term": "component.petition-replies-field.conditions-not-met",
+    "definition": "Visibility conditions for this field are not met",
+    "context": "Visibility conditions for this field are not met"
+  },
+  {
+    "term": "component.petition-replies-field.no-replies",
+    "definition": "There are no replies to this field yet",
+    "context": "There are no replies to this field yet"
+  },
+  {
+    "term": "component.petition-replies-field.review-button",
+    "definition": "Reviewed",
+    "context": "Reviewed"
+  },
+  {
+    "term": "component.petition-replies-field.review-button-not-validated-label",
+    "definition": "Not reviewed",
+    "context": "Not reviewed"
+  },
+  {
+    "term": "component.petition-replies-field.review-button-validated-label",
+    "definition": "Reviewed",
+    "context": "Reviewed"
+  },
+  {
     "term": "component.petition-replies-filter-button.show-not-reviewed",
     "definition": "Not reviewed",
     "context": "Not reviewed"
@@ -1378,11 +1408,6 @@
     "term": "component.recipient-select-groups.unknown-recipients",
     "definition": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list.",
     "context": "We couldn't find {count, plural, =1 {{email}} other {some of the emails}} in your contacts list."
-  },
-  {
-    "term": "component.recipient-view-field-attachment.label",
-    "definition": "Attached file: {filename}",
-    "context": "Attached file: {filename}"
   },
   {
     "term": "component.recipient-view-petition-field-card.add-another-reply",
@@ -2058,6 +2083,11 @@
     "term": "generic.all-languages",
     "definition": "All languages",
     "context": "All languages"
+  },
+  {
+    "term": "generic.attached-file",
+    "definition": "Attached file: {filename}",
+    "context": "Attached file: {filename}"
   },
   {
     "term": "generic.by",
@@ -3248,31 +3278,6 @@
     "term": "petition-replies.petition-field-reply.reject",
     "definition": "Reject",
     "context": "Reject"
-  },
-  {
-    "term": "petition-replies.petition-field.conditions-not-met",
-    "definition": "Visibility conditions for this field are not met",
-    "context": "Visibility conditions for this field are not met"
-  },
-  {
-    "term": "petition-replies.petition-field.no-replies",
-    "definition": "There are no replies to this field yet",
-    "context": "There are no replies to this field yet"
-  },
-  {
-    "term": "petition-replies.validate-field-button",
-    "definition": "Reviewed",
-    "context": "Reviewed"
-  },
-  {
-    "term": "petition-replies.validate-field-button.not-validated",
-    "definition": "Not reviewed",
-    "context": "Not reviewed"
-  },
-  {
-    "term": "petition-replies.validate-field-button.validated",
-    "definition": "Reviewed",
-    "context": "Reviewed"
   },
   {
     "term": "petition-sharing.confirm-remove.confirm-button",

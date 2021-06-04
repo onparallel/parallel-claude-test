@@ -1,5 +1,10 @@
 import { gql } from "@apollo/client";
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Box,
   BoxProps,
   Button,
@@ -11,27 +16,36 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { ArrowForwardIcon, CommentIcon } from "@parallel/chakra/icons";
+import {
+  ArrowForwardIcon,
+  CommentIcon,
+  PaperclipIcon,
+} from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import {
   PetitionFieldReplyStatus,
+  PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment,
   PetitionRepliesField_PetitionFieldFragment,
   PetitionRepliesField_PetitionFieldReplyFragment,
+  usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation,
 } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
+import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { FormattedMessage, useIntl } from "react-intl";
 import { noop } from "remeda";
 import { BreakLines } from "../common/BreakLines";
 import { Spacer } from "../common/Spacer";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
+import { PetitionRepliesFieldAttachment } from "./PetitionRepliesFieldAttachment";
 import {
   PetitionRepliesFieldAction,
   PetitionRepliesFieldReply,
 } from "./PetitionRepliesFieldReply";
 
 export interface PetitionRepliesFieldProps extends BoxProps {
+  petitionId: string;
   field: PetitionRepliesField_PetitionFieldFragment;
   fieldIndex: PetitionFieldIndex;
   isVisible: boolean;
@@ -49,6 +63,7 @@ export interface PetitionRepliesFieldProps extends BoxProps {
 }
 
 export function PetitionRepliesField({
+  petitionId,
   field,
   fieldIndex,
   isVisible,
@@ -60,6 +75,17 @@ export function PetitionRepliesField({
   ...props
 }: PetitionRepliesFieldProps) {
   const intl = useIntl();
+  const [petitionFieldAttachmentDownloadLink] =
+    usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation();
+  const handleAttachmentClick = function (attachmentId: string) {
+    openNewWindow(async () => {
+      const { data } = await petitionFieldAttachmentDownloadLink({
+        variables: { petitionId, fieldId: field.id, attachmentId },
+      });
+      const { url } = data!.petitionFieldAttachmentDownloadLink;
+      return url!;
+    });
+  };
 
   return field.type === "HEADING" ? (
     <Stack
@@ -101,6 +127,14 @@ export function PetitionRepliesField({
         <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
           <BreakLines>{field.description}</BreakLines>
         </Text>
+      ) : null}
+      {field.attachments.length ? (
+        <Box paddingY={1}>
+          <PetitionRepliesFieldAttachments
+            attachments={field.attachments}
+            onAttachmentClick={handleAttachmentClick}
+          />
+        </Box>
       ) : null}
     </Stack>
   ) : (
@@ -146,11 +180,11 @@ export function PetitionRepliesField({
             aria-label={
               field.validated
                 ? intl.formatMessage({
-                    id: "petition-replies.validate-field-button.validated",
+                    id: "component.petition-replies-field.review-button-validated-label",
                     defaultMessage: "Reviewed",
                   })
                 : intl.formatMessage({
-                    id: "petition-replies.validate-field-button.not-validated",
+                    id: "component.petition-replies-field.review-button-not-validated-label",
                     defaultMessage: "Not reviewed",
                   })
             }
@@ -168,7 +202,7 @@ export function PetitionRepliesField({
               aria-hidden={field.validated}
             />
             <FormattedMessage
-              id="petition-replies.validate-field-button"
+              id="component.petition-replies-field.review-button"
               defaultMessage="Reviewed"
             />
           </Button>
@@ -198,6 +232,14 @@ export function PetitionRepliesField({
           </Text>
         )}
       </Box>
+      {field.attachments.length ? (
+        <Box marginBottom={2} paddingY={1}>
+          <PetitionRepliesFieldAttachments
+            attachments={field.attachments}
+            onAttachmentClick={handleAttachmentClick}
+          />
+        </Box>
+      ) : null}
       {field.replies.length ? (
         <>
           {field.type === "DYNAMIC_SELECT" ? (
@@ -236,7 +278,7 @@ export function PetitionRepliesField({
         <Box paddingY={4}>
           <Text textStyle="hint" textAlign="center">
             <FormattedMessage
-              id="petition-replies.petition-field.no-replies"
+              id="component.petition-replies-field.no-replies"
               defaultMessage="There are no replies to this field yet"
             />
           </Text>
@@ -245,13 +287,64 @@ export function PetitionRepliesField({
         <Box paddingY={4}>
           <Text textStyle="hint" textAlign="center">
             <FormattedMessage
-              id="petition-replies.petition-field.conditions-not-met"
+              id="component.petition-replies-field.conditions-not-met"
               defaultMessage="Visibility conditions for this field are not met"
             />
           </Text>
         </Box>
       )}
     </Card>
+  );
+}
+
+function PetitionRepliesFieldAttachments({
+  attachments,
+  onAttachmentClick,
+}: {
+  attachments: PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment[];
+  onAttachmentClick: (attachmentId: string) => void;
+}) {
+  return (
+    <Accordion allowToggle margin={-1}>
+      <AccordionItem border="none">
+        <AccordionButton
+          width="auto"
+          color="gray.700"
+          _hover={{ background: "transparent" }}
+          padding="0"
+          marginLeft={1}
+        >
+          <Stack direction="row" alignItems="center">
+            <PaperclipIcon boxSize="14px" />
+            <Box fontSize="sm">
+              <FormattedMessage
+                id="component.petition-replies-field.attachments"
+                defaultMessage="{count, plural, =1 {1 file attached} other {# files attached}}"
+                values={{ count: attachments.length }}
+              />
+            </Box>
+            <AccordionIcon />
+          </Stack>
+        </AccordionButton>
+        <AccordionPanel
+          paddingTop={2}
+          paddingX={1}
+          paddingBottom={1}
+          display="flex"
+          flexWrap="wrap"
+          margin={-1}
+        >
+          {attachments.map((attachment) => (
+            <PetitionRepliesFieldAttachment
+              key={attachment.id}
+              attachment={attachment}
+              onClick={() => onAttachmentClick(attachment.id)}
+              margin={1}
+            />
+          ))}
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
   );
 }
 
@@ -345,11 +438,33 @@ PetitionRepliesField.fragments = {
         isUnread
         createdAt
       }
+      attachments {
+        ...PetitionRepliesFieldAttachment_PetitionFieldAttachment
+      }
     }
     fragment PetitionRepliesField_PetitionFieldReply on PetitionFieldReply {
       id
       ...PetitionRepliesFieldReply_PetitionFieldReply
     }
+    ${PetitionRepliesFieldAttachment.fragments.PetitionFieldAttachment}
     ${PetitionRepliesFieldReply.fragments.PetitionFieldReply}
   `,
 };
+
+PetitionRepliesField.mutations = [
+  gql`
+    mutation PetitionRepliesField_petitionFieldAttachmentDownloadLink(
+      $petitionId: GID!
+      $fieldId: GID!
+      $attachmentId: GID!
+    ) {
+      petitionFieldAttachmentDownloadLink(
+        petitionId: $petitionId
+        fieldId: $fieldId
+        attachmentId: $attachmentId
+      ) {
+        url
+      }
+    }
+  `,
+];

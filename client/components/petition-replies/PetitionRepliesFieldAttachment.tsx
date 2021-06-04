@@ -1,25 +1,25 @@
 import { Button, Flex, Text } from "@chakra-ui/react";
-import { DownloadIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
-import { RecipientViewFieldAttachment_PetitionFieldAttachmentFragment } from "@parallel/graphql/__types";
+import { PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment } from "@parallel/graphql/__types";
 import gql from "graphql-tag";
 import { useIntl } from "react-intl";
-import { FileIcon } from "../../common/FileIcon";
-import { FileName } from "../../common/FileName";
-import { FileSize } from "../../common/FileSize";
+import { FileIcon } from "../common/FileIcon";
+import { FileName } from "../common/FileName";
+import { FileSize } from "../common/FileSize";
 
-interface RecipientViewFieldAttachmentProps {
-  attachment: RecipientViewFieldAttachment_PetitionFieldAttachmentFragment;
+interface PetitionRepliesFieldAttachmentProps {
+  attachment: PetitionRepliesFieldAttachment_PetitionFieldAttachmentFragment;
 }
 
-export const RecipientViewFieldAttachment = Object.assign(
-  chakraForwardRef<"button", RecipientViewFieldAttachmentProps>(
-    function RecipientViewFieldAttachment({ attachment, ...props }, ref) {
+export const PetitionRepliesFieldAttachment = Object.assign(
+  chakraForwardRef<"button", PetitionRepliesFieldAttachmentProps>(
+    function PetitionRepliesFieldAttachment({ attachment, ...props }, ref) {
       const intl = useIntl();
       return (
         <Button
           ref={ref as any}
           variant="outline"
+          backgroundColor="white"
           paddingX={2}
           height={8}
           alignItems="center"
@@ -39,6 +39,7 @@ export const RecipientViewFieldAttachment = Object.assign(
           />
           <Flex marginX={2}>
             <FileName
+              as="div"
               value={attachment.file.filename}
               fontSize="sm"
               fontWeight="500"
@@ -54,7 +55,6 @@ export const RecipientViewFieldAttachment = Object.assign(
               (<FileSize value={attachment.file.size} />)
             </Text>
           </Flex>
-          <DownloadIcon />
         </Button>
       );
     }
@@ -62,7 +62,7 @@ export const RecipientViewFieldAttachment = Object.assign(
   {
     fragments: {
       PetitionFieldAttachment: gql`
-        fragment RecipientViewFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
+        fragment PetitionRepliesFieldAttachment_PetitionFieldAttachment on PetitionFieldAttachment {
           id
           file {
             filename
