@@ -775,14 +775,19 @@
     "context": "Only attachments of up to {size} are allowed."
   },
   {
-    "term": "component.petition-compose-field.over-max-attachments",
+    "term": "component.petition-compose-field.remove-condition",
+    "definition": "Borrar condición",
+    "context": "Remove condition"
+  },
+  {
+    "term": "component.petition-compose-field.too-many-attachments",
     "definition": "Se pueden añadir a un campo hasta un máximo de {count, plural, =1 {un adjunto} other {# adjuntos}}.",
     "context": "A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
   },
   {
-    "term": "component.petition-compose-field.remove-condition",
-    "definition": "Borrar condición",
-    "context": "Remove condition"
+    "term": "component.petition-compose-field.too-many-attachments-header",
+    "definition": "Demasiados archivos adjuntos",
+    "context": "Too many attachments"
   },
   {
     "term": "component.petition-contents.hidden-fields-divider",

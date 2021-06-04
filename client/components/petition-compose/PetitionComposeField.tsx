@@ -197,8 +197,29 @@ const _PetitionComposeField = chakraForwardRef<
           })
         );
       },
-      onDrop: async (files: File[]) => {
+      onDrop: async (files: File[], _, event) => {
         if (field.attachments.length + files.length > 10) {
+          // on drop event already shows a message on the dropzone, type="change" means the
+          // file is coming from the "Add attachment" button which doesn't provide any feedback
+          if (event.type === "change") {
+            await withError(
+              showErrorDialog({
+                header: (
+                  <FormattedMessage
+                    id="component.petition-compose-field.too-many-attachments-header"
+                    defaultMessage="Too many attachments"
+                  />
+                ),
+                message: (
+                  <FormattedMessage
+                    id="component.petition-compose-field.too-many-attachments"
+                    defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+                    values={{ count: 10 }}
+                  />
+                ),
+              })
+            );
+          }
           return;
         }
         await Promise.all(
@@ -834,7 +855,6 @@ const _PetitionComposeFieldActions = chakraForwardRef<
       )}
       <IconButtonWithTooltip
         icon={<PaperclipIcon />}
-        isDisabled={field.attachments.length >= 10}
         size="sm"
         variant="ghost"
         placement="bottom"
@@ -1073,7 +1093,7 @@ function PetitionComposeFieldDragActiveIndicator({
       >
         {isOverMaxAttachments ? (
           <FormattedMessage
-            id="component.petition-compose-field.over-max-attachments"
+            id="component.petition-compose-field.too-many-attachments"
             defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
             values={{ count: 10 }}
           />
