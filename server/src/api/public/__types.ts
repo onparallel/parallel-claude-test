@@ -338,7 +338,7 @@ export type Mutation = {
   publicUpdateSimpleReply: PublicPetitionFieldReply;
   /** Reactivates the specified inactive petition accesses. */
   reactivateAccesses: Array<PetitionAccess>;
-  /** Remove a petition field attachemnt */
+  /** Remove a petition field attachment */
   removePetitionFieldAttachment: Result;
   /** Removes permissions on given petitions and users */
   removePetitionPermission: Array<Petition>;
