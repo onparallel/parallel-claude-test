@@ -5,8 +5,10 @@ export async function up(knex: Knex): Promise<void> {
   await knex
     .from("petition_field_comment")
     .where({ published_at: null, deleted_at: null })
-    .whereRaw("created_at < now() - interval '7 days'")
-    .update({ deleted_at: knex.raw("CURRENT_TIMESTAMP") });
+    .update({
+      deleted_at: knex.raw("CURRENT_TIMESTAMP"),
+      deleted_by: "Migration:20210511084653",
+    });
 
   await knex.schema
     .alterTable("petition_user_notification", (t) => {
