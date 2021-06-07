@@ -9,7 +9,7 @@ AWS.config.credentials = new AWS.SharedIniFileCredentials({
 AWS.config.region = "eu-central-1";
 
 async function main() {
-  const { commit: _commit, env } = yargs
+  const { commit: _commit, env } = await yargs
     .usage("Usage: $0 --commit [commit] --env [env]")
     .option("commit", {
       required: true,

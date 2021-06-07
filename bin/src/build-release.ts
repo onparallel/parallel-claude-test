@@ -15,7 +15,7 @@ AWS.config.region = "eu-central-1";
 const WORK_DIR = "/home/ec2-user";
 
 async function main() {
-  const { commit: _commit, env } = yargs
+  const { commit: _commit, env } = await yargs
     .usage("Usage: $0 --commit [commit] --env [env]")
     .option("commit", {
       required: true,

@@ -15,7 +15,7 @@ const elbv2 = new AWS.ELBv2();
 const cloudfront = new AWS.CloudFront();
 
 async function main() {
-  const { commit: _commit, env } = yargs
+  const { commit: _commit, env } = await yargs
     .usage("Usage: $0 --commit [commit] --env [env]")
     .option("commit", {
       required: true,

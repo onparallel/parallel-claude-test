@@ -92,7 +92,7 @@ function getValues(elements) {
     }));
 }
 async function main() {
-    const { locales, input, outputRaw, outputCompiled } = yargs_1.default
+    const { locales, input, outputRaw, outputCompiled } = await yargs_1.default
         .option("locales", {
         required: true,
         array: true,

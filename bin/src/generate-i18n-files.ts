@@ -107,7 +107,7 @@ function getValues(elements: MessageFormatElement[]): string[] {
 }
 
 async function main() {
-  const { locales, input, outputRaw, outputCompiled } = yargs
+  const { locales, input, outputRaw, outputCompiled } = await yargs
     .option("locales", {
       required: true,
       array: true,

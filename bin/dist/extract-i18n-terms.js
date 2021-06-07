@@ -93,7 +93,7 @@ function logStats(terms, data) {
     }
 }
 async function main() {
-    const { locales, input, output } = yargs_1.default
+    const { locales, input, output } = await yargs_1.default
         .option("locales", {
         required: true,
         array: true,

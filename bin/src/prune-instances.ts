@@ -12,7 +12,7 @@ const ec2 = new AWS.EC2();
 const elbv2 = new AWS.ELBv2();
 
 async function main() {
-  const { env, "dry-run": dryRun } = yargs
+  const { env, "dry-run": dryRun } = await yargs
     .usage("Usage: $0 --env [env]")
     .option("dry-run", {
       type: "boolean",

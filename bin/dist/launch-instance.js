@@ -30,7 +30,7 @@ const OPS_DIR = "/home/ec2-user/parallel/ops/prod";
 const ec2 = new aws_sdk_1.default.EC2();
 const elbv2 = new aws_sdk_1.default.ELBv2();
 async function main() {
-    const { commit: _commit, env } = yargs_1.default
+    const { commit: _commit, env } = await yargs_1.default
         .usage("Usage: $0 --commit [commit] --env [env]")
         .option("commit", {
         required: true,
