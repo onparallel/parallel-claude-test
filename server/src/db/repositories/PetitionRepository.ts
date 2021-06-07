@@ -91,12 +91,6 @@ export class PetitionRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  readonly loadFieldWithNullVisibility = this.buildLoadById(
-    "petition_field",
-    "id",
-    (q) => q.where({ deleted_at: null, visibility: null })
-  );
-
   readonly loadFieldReply = this.buildLoadById(
     "petition_field_reply",
     "id",
