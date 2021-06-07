@@ -71,8 +71,7 @@ export function TablePage<T, TContext = unknown>({
         {loading ? (
           <Flex
             position="absolute"
-            width="100%"
-            height="100%"
+            inset={0}
             justifyContent="center"
             alignItems="center"
             backgroundColor="whiteAlpha.800"

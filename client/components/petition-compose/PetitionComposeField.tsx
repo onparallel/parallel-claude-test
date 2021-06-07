@@ -1048,19 +1048,13 @@ function PetitionComposeFieldDragActiveIndicator({
   return (
     <Center
       position="absolute"
-      left={0}
-      top={0}
-      width="100%"
-      height="100%"
+      inset={0}
       zIndex={1}
       backgroundColor="whiteAlpha.700"
     >
       <Box
         position="absolute"
-        left={0}
-        top={0}
-        width="100%"
-        height="100%"
+        inset={0}
         opacity={0.2}
         sx={{
           backgroundImage: ((theme: any) => {
@@ -1075,10 +1069,7 @@ function PetitionComposeFieldDragActiveIndicator({
       />
       <Box
         position="absolute"
-        left={2}
-        top={2}
-        right={2}
-        bottom={2}
+        inset={2}
         border="2px dashed"
         borderRadius="md"
         borderColor={isOverMaxAttachments ? "red.300" : "gray.300"}
