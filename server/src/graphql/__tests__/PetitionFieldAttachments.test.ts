@@ -271,10 +271,13 @@ describe("GraphQL/PetitionFieldAttachments", () => {
 
   describe("petitionFieldAttachmentUploadComplete", () => {
     it("marks file attachment upload as completed", async () => {
+      const [file] = await mocks.createRandomFileUpload(1, () => ({
+        upload_complete: false,
+      }));
       const [attachment] = await mocks.createPetitionFieldAttachment(
         field.id,
         1,
-        () => ({ upload_complete: false })
+        [file]
       );
 
       const { errors, data } = await testClient.mutate({
@@ -311,15 +314,16 @@ describe("GraphQL/PetitionFieldAttachments", () => {
 
   describe("petitionFieldAttachmentDownloadLink", () => {
     it("generates a download link for a petition field attachment", async () => {
+      const [file] = await mocks.createRandomFileUpload(1, () => ({
+        filename: "image.png",
+        content_type: "image/png",
+        size: "2048",
+        upload_complete: true,
+      }));
       const [attachment] = await mocks.createPetitionFieldAttachment(
         field.id,
         1,
-        () => ({
-          filename: "image.png",
-          content_type: "image/png",
-          size: "2048",
-          upload_complete: true,
-        })
+        [file]
       );
 
       const { errors, data } = await testClient.mutate({
@@ -362,15 +366,17 @@ describe("GraphQL/PetitionFieldAttachments", () => {
     });
 
     it("marks file attachment upload as completed if it was correctly uploaded to s3 but unmarked", async () => {
+      const [file] = await mocks.createRandomFileUpload(1, () => ({
+        filename: "image.png",
+        content_type: "image/png",
+        size: "2048",
+        upload_complete: false,
+      }));
+
       const [attachment] = await mocks.createPetitionFieldAttachment(
         field.id,
         1,
-        () => ({
-          filename: "image.png",
-          content_type: "image/png",
-          size: "2048",
-          upload_complete: false,
-        })
+        [file]
       );
 
       const { errors, data } = await testClient.mutate({
@@ -438,15 +444,17 @@ describe("GraphQL/PetitionFieldAttachments", () => {
 
   describe("removePetitionFieldAttachment", () => {
     it("removes the field attachment and its corresponding file", async () => {
+      const [file] = await mocks.createRandomFileUpload(1, () => ({
+        filename: "image.png",
+        content_type: "image/png",
+        size: "2048",
+        upload_complete: false,
+      }));
+
       const [attachment] = await mocks.createPetitionFieldAttachment(
         field.id,
         1,
-        () => ({
-          filename: "image.png",
-          content_type: "image/png",
-          size: "2048",
-          upload_complete: false,
-        })
+        [file]
       );
 
       const { errors, data } = await testClient.mutate({

@@ -1126,6 +1126,9 @@ export class PetitionRepository extends BaseRepository {
           })
           .where("position", ">", field.position),
       ]);
+
+      await this.removePetitionFieldAttachmentByFieldId(fieldId, user);
+
       return petition;
     });
   }
@@ -1598,6 +1601,28 @@ export class PetitionRepository extends BaseRepository {
         [cloned.id, petitionId],
         t
       );
+
+      // copy field attachments to new fields, using the original file_upload_id
+      // TODO maybe this can be done in just one query
+      const attachments = await this.from("petition_field_attachment", t)
+        .whereNull("deleted_at")
+        .whereIn(
+          "petition_field_id",
+          fields.map((f) => f.id)
+        )
+        .select("*");
+
+      if (attachments.length > 0) {
+        await this.insert(
+          "petition_field_attachment",
+          attachments.map((a) => ({
+            file_upload_id: a.file_upload_id,
+            petition_field_id: newIds[a.petition_field_id],
+            created_by: `User:${user.id}`,
+          })),
+          t
+        );
+      }
 
       return cloned;
     });
@@ -3303,12 +3328,54 @@ export class PetitionRepository extends BaseRepository {
           deleted_by: `User:${user.id}`,
         })
         .returning("*");
-      await this.from("file_upload", t)
-        .where("id", row.file_upload_id)
-        .update({
-          deleted_at: this.now(),
-          deleted_by: `User:${user.id}`,
-        });
+
+      await this.safeDeleteFileUploadAttachments([row.file_upload_id], user, t);
     });
+  }
+
+  /** delete attached files only if they are not referenced in any other field attachment */
+  private async safeDeleteFileUploadAttachments(
+    fileUploadIds: number[],
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    if (fileUploadIds.length > 0) {
+      await this.raw(
+        /* sql */ `
+        update file_upload set deleted_at = ?, deleted_by = ?
+        where id in (${fileUploadIds.map(() => "?").join(", ")})
+        and deleted_at is null
+        and not exists (
+          select id from petition_field_attachment 
+          where deleted_at is null 
+          and file_upload_id in (${fileUploadIds.map(() => "?").join(", ")})
+          )`,
+        [this.now(), `User:${user.id}`, ...fileUploadIds, ...fileUploadIds],
+        t
+      );
+    }
+  }
+
+  private async removePetitionFieldAttachmentByFieldId(
+    petitionFieldId: number,
+    user: User,
+    t?: Knex.Transaction
+  ) {
+    const deletedAttachments = await this.from("petition_field_attachment", t)
+      .where({
+        deleted_at: null,
+        petition_field_id: petitionFieldId,
+      })
+      .update({
+        deleted_at: this.now(),
+        deleted_by: `User:${user.id}`,
+      })
+      .returning("*");
+
+    await this.safeDeleteFileUploadAttachments(
+      deletedAttachments.map((a) => a.file_upload_id),
+      user,
+      t
+    );
   }
 }

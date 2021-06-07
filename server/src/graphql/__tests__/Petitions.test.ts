@@ -1101,6 +1101,30 @@ describe("GraphQL/Petitions", () => {
         ],
       });
     });
+
+    it("copies field attachments when cloning the petition", async () => {
+      await mocks.createPetitionFieldAttachment(fields[0].id, 1);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              fields {
+                id
+                attachments {
+                  id
+                }
+              }
+            }
+          }
+        `,
+        variables: { petitionIds: [toGlobalId("Petition", petitions[0].id)] },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.clonePetitions[0].fields[0].attachments).toHaveLength(1);
+      expect(data.clonePetitions[0].fields[1].attachments).toHaveLength(0);
+    });
   });
 
   describe("deletePetitions", () => {

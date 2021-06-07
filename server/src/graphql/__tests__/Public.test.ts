@@ -243,15 +243,17 @@ describe("GraphQL/Public", () => {
     });
 
     it("generates a download link for a petition field attachment", async () => {
+      const [file] = await mocks.createRandomFileUpload(1, () => ({
+        content_type: "image/png",
+        filename: "parallel.png",
+        size: "150",
+        upload_complete: true,
+      }));
+
       const [attachment] = await mocks.createPetitionFieldAttachment(
         fields[1].id,
         1,
-        () => ({
-          content_type: "image/png",
-          filename: "parallel.png",
-          size: "150",
-          upload_complete: true,
-        })
+        [file]
       );
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -292,15 +294,16 @@ describe("GraphQL/Public", () => {
     });
 
     it("marks file attachment upload as completed if it was correctly uploaded to s3 but unmarked", async () => {
+      const [file] = await mocks.createRandomFileUpload(1, () => ({
+        content_type: "image/png",
+        filename: "parallel.png",
+        size: "150",
+        upload_complete: false,
+      }));
       const [attachment] = await mocks.createPetitionFieldAttachment(
         fields[1].id,
         1,
-        () => ({
-          content_type: "image/png",
-          filename: "parallel.png",
-          size: "150",
-          upload_complete: false,
-        })
+        [file]
       );
       const { errors, data } = await testClient.mutate({
         mutation: gql`

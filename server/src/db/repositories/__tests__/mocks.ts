@@ -223,12 +223,12 @@ export class Mocks {
   async createPetitionFieldAttachment(
     fieldId: number,
     amount?: number,
-    builder?: (index: number) => Partial<FileUpload>
+    files?: FileUpload[]
   ) {
-    const files = await this.createRandomFileUpload(amount, builder);
+    const fileUploads = files ?? (await this.createRandomFileUpload(amount));
     return await this.knex<PetitionFieldAttachment>("petition_field_attachment")
       .insert(
-        files.map<CreatePetitionFieldAttachment>((file) => ({
+        fileUploads.map((file) => ({
           file_upload_id: file.id,
           petition_field_id: fieldId,
         }))
