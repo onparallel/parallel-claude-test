@@ -200,8 +200,9 @@ export type Theme = typeof theme;
 
 Tooltip.defaultProps = {
   hasArrow: true,
-  openDelay: 250,
-  closeDelay: 150,
+  // https://github.com/chakra-ui/chakra-ui/issues/3659
+  // openDelay: 250,
+  // closeDelay: 150,
   arrowSize: 8,
 } as any;
 

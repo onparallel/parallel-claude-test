@@ -23,13 +23,7 @@ import {
   withSingleLine,
 } from "@parallel/utils/slate/withSingleLine";
 import { EditablePlugins } from "@udecode/slate-plugins";
-import {
-  MouseEvent,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-} from "react";
+import { MouseEvent, useCallback, useImperativeHandle, useMemo } from "react";
 import { useIntl } from "react-intl";
 import { pipe } from "remeda";
 import { createEditor, Editor, Transforms } from "slate";
@@ -126,22 +120,33 @@ export const PlaceholderInput = chakraForwardRef<
     ReactEditor.focus(editor);
   }
 
-  const { getPopperProps, getReferenceProps, forceUpdate, state } = usePopper({
+  const { referenceRef, popperRef } = usePopper({
     placement: "bottom",
     gutter: 2,
+    modifiers: [
+      // https://github.com/popperjs/popper-core/issues/794#issuecomment-824220211
+      {
+        name: "sameWidth",
+        enabled: true,
+        phase: "beforeWrite",
+        requires: ["computeStyles"],
+        fn({ state }) {
+          state.styles.popper.minWidth = `${state.rects.reference.width}px`;
+        },
+        effect({ state }) {
+          return () => {
+            const reference = state.elements.reference as HTMLElement;
+            state.elements.popper.style.minWidth = `${reference.offsetWidth}px`;
+          };
+        },
+      },
+    ],
   });
-
-  useEffect(() => {
-    if (isOpen) {
-      const { popper, reference } = state!.elements;
-      popper.style.width = `${(reference as HTMLDivElement).offsetWidth}px`;
-    }
-    forceUpdate?.();
-  }, [isOpen, forceUpdate]);
 
   return (
     <>
       <Box
+        ref={referenceRef}
         role="combobox"
         aria-owns={placeholderMenuId}
         aria-haspopup="listbox"
@@ -149,7 +154,8 @@ export const PlaceholderInput = chakraForwardRef<
         aria-disabled={isDisabled}
         display="flex"
         alignItems="center"
-        {...getReferenceProps({ ...props, ...inputStyles })}
+        {...inputStyles}
+        {...props}
       >
         <Slate
           editor={editor}
@@ -212,6 +218,7 @@ export const PlaceholderInput = chakraForwardRef<
       </Box>
       <Portal>
         <PlaceholderMenu
+          ref={popperRef}
           menuId={placeholderMenuId}
           itemIdPrefix={itemIdPrefix}
           search={search}
@@ -222,7 +229,6 @@ export const PlaceholderInput = chakraForwardRef<
             onAddPlaceholder(editor, placeholder)
           }
           onHighlightOption={onHighlightOption}
-          {...(getPopperProps() as any)}
         />
       </Portal>
     </>
