@@ -25,7 +25,7 @@ function Collaborate() {
     >
       <PublicContainer
         textAlign="center"
-        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
+        paddingY={16}
       >
         <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
@@ -40,7 +40,7 @@ function Collaborate() {
           />
         </Text>
       </PublicContainer>
-      <PublicContainer paddingY={8} maxWidth="container.lg">
+      <PublicContainer paddingY={8} maxWidth="container.lg" marginBottom={16}>
         <PublicVideoShowcase
           videoSources={[
             {
@@ -48,9 +48,9 @@ function Collaborate() {
               src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/videos/team-collaboration-${query.locale}.mp4`,
             },
           ]}
-          videoSize="350px"
+          videoSize="300px"
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.team-collaboration.share"
               defaultMessage="Share templates to standardize workflows"
@@ -71,16 +71,16 @@ function Collaborate() {
         </PublicVideoShowcase>
       </PublicContainer>
       <PublicContainer
-        paddingY={8}
+        paddingY={16}
         maxWidth="container.lg"
-        wrapper={{ paddingY: 16, backgroundColor: "purple.50" }}
+        wrapper={{ background:"purple.50" }}
       >
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-share-${query.locale}.png`}
           imageSize="350px"
           isReversed
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.team-collaboration.team"
               defaultMessage="Include your team to the ongoing processes"
@@ -103,7 +103,7 @@ function Collaborate() {
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-internal-comments-${query.locale}.svg`}
           imageSize="350px"
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.team-collaboration.centralize"
               defaultMessage="Centralize the revision and internal communication"

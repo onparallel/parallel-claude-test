@@ -27,6 +27,7 @@ export const PublicShowcase = chakraForwardRef<"div", PublicShowcaseProps>(
             loading="lazy"
             height={imageSize}
             role="presentation"
+            objectFit="contain"
           />
         </Flex>
         <Box flex="1" justifyContent="center">

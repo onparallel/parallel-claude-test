@@ -4701,18 +4701,23 @@
   },
   {
     "term": "public.product.request-information.create",
-    "definition": "Desde cero, o a partir de una plantilla para estandarizar tus procesos, podrás preparar el listado de información para tus clientes o terceros.",
-    "context": "From scratch or a template, you can prepare a list of information for your clients or third parties."
+    "definition": "Es muy sencillo, utiliza diferentes tipos de campos para preparar el listado de información que necesitas.",
+    "context": "It’s very simple, you can use different types of fields to prepare the list of information that you need."
   },
   {
     "term": "public.product.request-information.create-templates",
-    "definition": "Crea plantillas para tus procesos habituales y úsalas tantas veces como necesites.",
-    "context": "Create templates for your daily processes and use them as many times as you need."
+    "definition": "Puedes crear tus propias plantillas con tus procesos habituales y usarlas tantas veces como necesites o utilizar alguna de nuestras plantillas organizadas por sector.",
+    "context": "You can create your own templates with your daily processes and use them as many times as you need or use one of our templates organized by sector."
   },
   {
     "term": "public.product.request-information.customize",
-    "definition": "Personaliza con tu marca",
-    "context": "Customize with your branding"
+    "definition": "Un portal con tu marca",
+    "context": "A portal with your branding"
+  },
+  {
+    "term": "public.product.request-information.decisions-processes",
+    "definition": "Mediante condiciones, podrás configurar fácilmente decisiones en tus procesos para asegurarte de que tu destinatario responde solo lo necesario",
+    "context": "Through conditions, you can easily set up decisions in your processes to ensure that your recipient responds only to what is needed."
   },
   {
     "term": "public.product.request-information.hero-title",
@@ -4721,8 +4726,13 @@
   },
   {
     "term": "public.product.request-information.include-branding",
-    "definition": "Incluye en tus comunicaciones y formularios tu imagen corporativa y transmite profesionalidad a tus clientes.",
-    "context": "Include in your communications and forms your corporate branding and show your clients your professionalism."
+    "definition": "Creamos un portal seguro con tu imagen corporativa donde tus clientes podrán ir subiendo toda la información",
+    "context": "We create a secure portal with your corporate branding where your clients will be able to upload the information."
+  },
+  {
+    "term": "public.product.request-information.include-branding2",
+    "definition": "Además, podrás incluir tu marca en tus comunicaciones y formularios para transmitir profesionalidad.",
+    "context": "In addition, you can include your brand in your communications and forms and show your clients your professionalism."
   },
   {
     "term": "public.product.request-information.list",
@@ -4733,6 +4743,11 @@
     "term": "public.product.request-information.meta-description",
     "definition": "Pide documentos e información de forma profesional y eficiente.",
     "context": "Request professionally and efficiently documents and information."
+  },
+  {
+    "term": "public.product.request-information.smart-forms",
+    "definition": "Crea formularios inteligentes",
+    "context": "Create smart forms"
   },
   {
     "term": "public.product.request-information.templates",

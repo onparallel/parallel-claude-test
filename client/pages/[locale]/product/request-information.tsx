@@ -25,7 +25,7 @@ function Request() {
     >
       <PublicContainer
         textAlign="center"
-        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
+        wrapper={{ paddingY: 16 }}
       >
         <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
@@ -48,9 +48,9 @@ function Request() {
               src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/videos/request-information-${query.locale}.mp4`,
             },
           ]}
-          videoSize="350px"
+          videoSize="300px"
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.request-information.list"
               defaultMessage="List the information quickly"
@@ -59,7 +59,7 @@ function Request() {
           <Text marginBottom={2}>
             <FormattedMessage
               id="public.product.request-information.create"
-              defaultMessage="From scratch or a template, you can prepare a list of information for your clients or third parties."
+              defaultMessage="It’s very simple, you can use different types of fields to prepare the list of information that you need."
             />
           </Text>
         </PublicVideoShowcase>
@@ -67,14 +67,14 @@ function Request() {
       <PublicContainer
         paddingY={8}
         maxWidth="container.lg"
-        wrapper={{ paddingY: 16, backgroundColor: "purple.50" }}
+        wrapper={{ paddingY: 16 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-template-${query.locale}.svg`}
-          imageSize="350px"
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel_template_${query.locale}.png`}
+          imageSize="300px"
           isReversed
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.request-information.templates"
               defaultMessage="Use templates to save time"
@@ -83,7 +83,30 @@ function Request() {
           <Text marginBottom={2}>
             <FormattedMessage
               id="public.product.request-information.create-templates"
-              defaultMessage="Create templates for your daily processes and use them as many times as you need."
+              defaultMessage="You can create your own templates with your daily processes and use them as many times as you need or use one of our templates organized by sector."
+              />
+          </Text>
+        </PublicShowcase>
+      </PublicContainer>
+      <PublicContainer
+        paddingY={8}
+        maxWidth="container.lg"
+        wrapper={{ paddingY: 16 }}
+      >
+        <PublicShowcase
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel_conditions_${query.locale}.png`}
+          imageSize="300px"
+        >
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
+            <FormattedMessage
+              id="public.product.request-information.smart-forms"
+              defaultMessage="Create smart forms"
+            />
+          </Heading>
+          <Text marginBottom={2}>
+            <FormattedMessage
+              id="public.product.request-information.decisions-processes"
+              defaultMessage="Through conditions, you can easily set up decisions in your processes to ensure that your recipient responds only to what is needed."
             />
           </Text>
         </PublicShowcase>
@@ -94,21 +117,26 @@ function Request() {
         wrapper={{ paddingY: 16 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-branding.svg`}
-          imageSize="350px"
+          isReversed
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-branding.png`}
+          imageSize="300px"
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.request-information.customize"
-              defaultMessage="Customize with your branding"
+              defaultMessage="A portal with your branding"
             />
           </Heading>
           <Text marginBottom={2}>
             <FormattedMessage
               id="public.product.request-information.include-branding"
-              defaultMessage="Include in your communications and forms your corporate branding and show your clients your professionalism."
-            />
-          </Text>
+              defaultMessage="We create a secure portal with your corporate branding where your clients will be able to upload the information."
+            /> <br /> </Text>
+           <Text marginBottom={2}>
+            <FormattedMessage
+              id="public.product.request-information.include-branding2"
+              defaultMessage="In addition, you can include your brand in your communications and forms and show your clients your professionalism."
+            /> </Text> 
         </PublicShowcase>
       </PublicContainer>
       <PublicDemoCta>

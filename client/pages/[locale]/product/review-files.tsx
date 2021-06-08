@@ -25,7 +25,7 @@ function Review() {
     >
       <PublicContainer
         textAlign="center"
-        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
+        wrapper={{ paddingY: 16 }}
       >
         <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
@@ -40,7 +40,7 @@ function Review() {
           />
         </Text>
       </PublicContainer>
-      <PublicContainer paddingY={8} maxWidth="container.lg">
+      <PublicContainer paddingY={8} maxWidth="container.lg" marginBottom={16} >
         <PublicVideoShowcase
           videoSources={[
             {
@@ -48,9 +48,9 @@ function Review() {
               src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/videos/review-files-${query.locale}.mp4`,
             },
           ]}
-          videoSize="350px"
+          videoSize="300px"
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.review-files.approve"
               defaultMessage="Approve or reject the documents or the answers"
@@ -74,7 +74,7 @@ function Review() {
           imageSize="350px"
           isReversed
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.review-files.rename"
               defaultMessage="Forget about renaming files one by one manually"
@@ -97,7 +97,7 @@ function Review() {
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-activity-${query.locale}.svg`}
           imageSize="350px"
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.review-files.activity-log"
               defaultMessage="Control better the timings with an activity log"

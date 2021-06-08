@@ -25,7 +25,7 @@ function Follow() {
     >
       <PublicContainer
         textAlign="center"
-        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
+        wrapper={{ paddingY: 16 }}
       >
         <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
@@ -40,7 +40,7 @@ function Follow() {
           />
         </Text>
       </PublicContainer>
-      <PublicContainer paddingY={8} maxWidth="container.lg">
+      <PublicContainer paddingY={8} maxWidth="container.lg" marginBottom={16}>
         <PublicVideoShowcase
           videoSources={[
             {
@@ -48,9 +48,9 @@ function Follow() {
               src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/videos/monitor-progress-${query.locale}.mp4`,
             },
           ]}
-          videoSize="350px"
+          videoSize="300px"
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.monitor-progress.control"
               defaultMessage="Control and follow your petitions in a simple and visual way"
@@ -74,7 +74,7 @@ function Follow() {
           imageSize="350px"
           isReversed
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.monitor-progress.reminders"
               defaultMessage="Set up intelligent reminders"
@@ -97,7 +97,7 @@ function Follow() {
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-conversation-${query.locale}.svg`}
           imageSize="350px"
         >
-          <Heading as="h3" size="lg" color="purple.500" marginBottom={4}>
+          <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage
               id="public.product.monitor-progress.stress"
               defaultMessage="Reduce the stress of the emails and simplify the conversation"
