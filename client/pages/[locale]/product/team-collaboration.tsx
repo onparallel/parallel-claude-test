@@ -23,10 +23,7 @@ function Collaborate() {
           "Parallel fosters and makes collaboration possible around document workflows and processes.",
       })}
     >
-      <PublicContainer
-        textAlign="center"
-        paddingY={16}
-      >
+      <PublicContainer textAlign="center" paddingY={16}>
         <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
             id="public.product.team-collaboration.hero-title"
@@ -73,7 +70,7 @@ function Collaborate() {
       <PublicContainer
         paddingY={16}
         maxWidth="container.lg"
-        wrapper={{ background:"purple.50" }}
+        wrapper={{ background: "purple.50" }}
       >
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-share-${query.locale}.png`}

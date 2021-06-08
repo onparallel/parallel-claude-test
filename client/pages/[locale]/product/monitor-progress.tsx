@@ -23,10 +23,7 @@ function Follow() {
           "Parallel gives you a simple way to follow-up with your information requests so that you can focus on important tasks.",
       })}
     >
-      <PublicContainer
-        textAlign="center"
-        wrapper={{ paddingY: 16 }}
-      >
+      <PublicContainer textAlign="center" wrapper={{ paddingY: 16 }}>
         <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
             id="public.product.monitor-progress.hero-title"

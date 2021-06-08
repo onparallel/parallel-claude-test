@@ -23,10 +23,7 @@ function Review() {
           "Parallel simplifies the information review process while giving you control and order over your document workflows.",
       })}
     >
-      <PublicContainer
-        textAlign="center"
-        wrapper={{ paddingY: 16 }}
-      >
+      <PublicContainer textAlign="center" wrapper={{ paddingY: 16 }}>
         <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
             id="public.product.review-files.hero-title"
@@ -40,7 +37,7 @@ function Review() {
           />
         </Text>
       </PublicContainer>
-      <PublicContainer paddingY={8} maxWidth="container.lg" marginBottom={16} >
+      <PublicContainer paddingY={8} maxWidth="container.lg" marginBottom={16}>
         <PublicVideoShowcase
           videoSources={[
             {

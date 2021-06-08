@@ -23,10 +23,7 @@ function Request() {
           "Request professionally and efficiently documents and information.",
       })}
     >
-      <PublicContainer
-        textAlign="center"
-        wrapper={{ paddingY: 16 }}
-      >
+      <PublicContainer textAlign="center" wrapper={{ paddingY: 16 }}>
         <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
             id="public.product.request-information.hero-title"
@@ -84,7 +81,7 @@ function Request() {
             <FormattedMessage
               id="public.product.request-information.create-templates"
               defaultMessage="You can create your own templates with your daily processes and use them as many times as you need or use one of our templates organized by sector."
-              />
+            />
           </Text>
         </PublicShowcase>
       </PublicContainer>
@@ -131,12 +128,15 @@ function Request() {
             <FormattedMessage
               id="public.product.request-information.include-branding"
               defaultMessage="We create a secure portal with your corporate branding where your clients will be able to upload the information."
-            /> <br /> </Text>
-           <Text marginBottom={2}>
+            />{" "}
+            <br />{" "}
+          </Text>
+          <Text marginBottom={2}>
             <FormattedMessage
               id="public.product.request-information.include-branding2"
               defaultMessage="In addition, you can include your brand in your communications and forms and show your clients your professionalism."
-            /> </Text> 
+            />{" "}
+          </Text>
         </PublicShowcase>
       </PublicContainer>
       <PublicDemoCta>
