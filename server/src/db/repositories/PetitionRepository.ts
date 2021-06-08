@@ -1606,10 +1606,7 @@ export class PetitionRepository extends BaseRepository {
       // TODO maybe this can be done in just one query
       const attachments = await this.from("petition_field_attachment", t)
         .whereNull("deleted_at")
-        .whereIn(
-          "petition_field_id",
-          fields.map((f) => f.id)
-        )
+        .whereIn("petition_field_id", uniq(fields.map((f) => f.id)))
         .select("*");
 
       if (attachments.length > 0) {
