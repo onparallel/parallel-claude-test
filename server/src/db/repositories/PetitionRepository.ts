@@ -1495,10 +1495,9 @@ export class PetitionRepository extends BaseRepository {
 
     return await this.withTransaction(async (t) => {
       const fromTemplateId =
-        isDefined(data?.is_template) &&
-        data?.is_template === false &&
-        petition?.is_template
-          ? petitionId
+        !data?.is_template &&
+        (petition?.is_template || petition?.from_template_id)
+          ? petition.from_template_id ?? petitionId
           : null;
 
       const [cloned] = await this.insert(
