@@ -39,8 +39,9 @@ export function PetitionFieldSelect<
   ...props
 }: PetitionFieldSelectProps<T, ExpandFields>) {
   const intl = useIntl();
-  const rsProps =
-    useReactSelectProps<PetitionFieldSelectOption<T>, any, never>(props);
+  const rsProps = useReactSelectProps<PetitionFieldSelectOption<T>, any, never>(
+    props
+  );
   const fieldSelectProps = useMemo<
     SelectProps<PetitionFieldSelectOption<T>, any, never>
   >(

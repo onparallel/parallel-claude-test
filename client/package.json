@@ -15,7 +15,6 @@
   "dependencies": {
     "@apollo/client": "^3.3.19",
     "@apollo/react-common": "^3.1.4",
-    "@apollo/react-ssr": "^4.0.0",
     "@chakra-ui/react": "^1.6.3",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11.3.0",
@@ -32,16 +31,13 @@
     "@zeit/next-source-maps": "^0.0.4-canary.1",
     "apollo-upload-client": "^15.0.0",
     "autosize": "^5.0.0",
-    "axios": "^0.21.1",
     "beautiful-react-hooks": "^0.35.0",
     "clipboard-copy": "^4.0.1",
     "compare-versions": "^3.6.0",
     "cookie": "^0.4.1",
     "core-js": "^3.14.0",
     "date-fns": "^2.22.1",
-    "dnd-core": "^14.0.0",
-    "emotion-theming": "^11.0.0",
-    "escape-string-regexp": "^5.0.0",
+    "escape-string-regexp": "^4.0.0",
     "framer-motion": "^4.1.17",
     "graphql": "^15.5.0",
     "js-cookie": "^2.2.1",
@@ -77,8 +73,7 @@
     "slate-react": "^0.65.0",
     "smooth-scroll-into-view-if-needed": "^1.1.32",
     "styled-components": "^5.3.0",
-    "ua-parser-js": "^0.7.28",
-    "vanilla-text-mask": "^5.1.1"
+    "ua-parser-js": "^0.7.28"
   },
   "devDependencies": {
     "@emotion/babel-plugin": "^11.3.0",

@@ -213,9 +213,9 @@ const _PathResolver: any = (function () {
             context.params = await pProps(
               this.pathOptions?.params ?? ({} as RestParameters<any>),
               async (param, name) => {
-                const value = req.params[name as string];
+                const value = req.params[name as keyof typeof req.params];
                 try {
-                  return await param.parse(req.params[name as string]);
+                  return await param.parse(value);
                 } catch (e) {
                   if (e instanceof ParseError) {
                     throw new InvalidParameterError(

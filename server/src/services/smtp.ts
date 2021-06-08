@@ -1,10 +1,9 @@
 import { inject, injectable } from "inversify";
+import { createTransport, SentMessageInfo, Transporter } from "nodemailer";
 import { Config, CONFIG } from "../config";
-import { createTransport } from "nodemailer";
 
-type Mail = ReturnType<typeof createTransport>;
 type MailOptions = Pick<
-  Parameters<Mail["sendMail"]>[0],
+  Parameters<Transporter<SentMessageInfo>["sendMail"]>[0],
   | "from"
   | "to"
   | "subject"
@@ -17,7 +16,7 @@ type MailOptions = Pick<
 
 @injectable()
 export class Smtp {
-  private readonly transport: Mail;
+  private readonly transport: Transporter<SentMessageInfo>;
 
   constructor(@inject(CONFIG) config: Config) {
     const { host, port, user, password } = config.smtp;

@@ -83,8 +83,10 @@ export const UserSelect = Object.assign(
       [onSearch, value]
     );
 
-    const reactSelectProps =
-      useUserSelectReactSelectProps<IsMulti, IncludeGroups>(props);
+    const reactSelectProps = useUserSelectReactSelectProps<
+      IsMulti,
+      IncludeGroups
+    >(props);
 
     return (
       <AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>
@@ -146,8 +148,10 @@ function useUserSelectReactSelectProps<
 }: UseReactSelectProps & {
   includeGroups?: IncludeGroups;
 }): AsyncUserSelectProps<IsMulti, IncludeGroups> {
-  const reactSelectProps =
-    useReactSelectProps<UserSelectSelection<IncludeGroups>, IsMulti>(props);
+  const reactSelectProps = useReactSelectProps<
+    UserSelectSelection<IncludeGroups>,
+    IsMulti
+  >(props);
   return useMemo<AsyncUserSelectProps<IsMulti, IncludeGroups>>(
     () => ({
       ...reactSelectProps,

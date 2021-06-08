@@ -92,8 +92,9 @@ export function ExportRepliesProgressDialog({
 }: DialogProps<ExportRepliesProgressDialogProps>) {
   const intl = useIntl();
   const [progress, setProgress] = useState(0);
-  const [state, setState] =
-    useState<"LOADING" | "UPLOADING" | "FINISHED">("LOADING");
+  const [state, setState] = useState<"LOADING" | "UPLOADING" | "FINISHED">(
+    "LOADING"
+  );
   const { data } = useExportRepliesProgressDialog_PetitionRepliesQuery({
     variables: { petitionId },
   });
