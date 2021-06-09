@@ -142,16 +142,36 @@ export function RecipientViewPetitionFieldCheckbox({
       onAddNewReply={() => {}}
     >
       <Stack>
-        <Stack direction="row">
-          <CheckboxTypeLabel fontSize="sm" field={field} />
+        <Flex flexWrap="wrap">
+          <CheckboxTypeLabel fontSize="sm" field={field} mr={2} />
           {!isSaving ? (
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color={isInvalid ? "red.600" : "gray.500"}>
               {showRadio ? null : "("}
-              <FormattedMessage
-                id="component.recipient-view-petition-field-card.replies-submitted-unique"
-                defaultMessage="{count, plural, =0 {No replies have been submitted yet} other {Reply submitted}}"
-                values={{ count: field.replies.length }}
-              />
+              {type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox"
+                  defaultMessage="{count, plural, =0 {No replies have been submitted yet} other {Reply submitted}}"
+                  values={{ count: checkedItems.length }}
+                />
+              ) : type === "UNLIMITED" ? (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
+                  defaultMessage="{count, plural, =0 {No replies have been submitted yet} other {{count} submitted}}"
+                  values={{ count: checkedItems.length }}
+                />
+              ) : type === "EXACT" ? (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox-exact"
+                  defaultMessage="{count, plural, =0 {No replies have been submitted yet} other {{count}/{total} submitted}}"
+                  values={{ count: checkedItems.length, total: max }}
+                />
+              ) : (
+                <FormattedMessage
+                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
+                  defaultMessage="{count, plural, =0 {No replies have been submitted yet} other {{count} submitted}}"
+                  values={{ count: checkedItems.length }}
+                />
+              )}
               {showRadio ? null : ")"}
             </Text>
           ) : null}
@@ -162,7 +182,7 @@ export function RecipientViewPetitionFieldCheckbox({
               showSavedIcon={false}
             />
           </Flex>
-        </Stack>
+        </Flex>
 
         {showRadio
           ? values.map((option, index) => (

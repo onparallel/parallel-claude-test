@@ -2,6 +2,7 @@ import { PetitionFieldType } from "@parallel/graphql/__types";
 
 type PartialField = {
   type: PetitionFieldType;
+  options: any;
   replies: { content: any }[];
 };
 
@@ -14,6 +15,14 @@ export function completedFieldReplies<T extends PartialField>(field: T) {
           ([, value]: [string, string | null]) => !!value
         )
       );
+    case "CHECKBOX":
+      return field.replies.filter((reply) => {
+        if (field.options.limit.type === "EXACT") {
+          return reply.content.choices.length == field.options.limit.max;
+        } else {
+          return reply.content.choices.length >= field.options.limit.min;
+        }
+      });
 
     default:
       return field.replies;
