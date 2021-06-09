@@ -19,13 +19,13 @@ import {
 } from "@parallel/graphql/__types";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { ChangeEvent, ReactNode, useEffect, useState } from "react";
+import { ChangeEvent, ReactNode, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { HelpPopover } from "../common/HelpPopover";
 import { SmallPopover } from "../common/SmallPopover";
 import { DynamicSelectSettings } from "./PetitionComposeDynamicSelectFieldSettings";
 import { PetitionFieldTypeSelect } from "./PetitionFieldTypeSelectDropdown";
-import { CheckboxSettings } from "./fields/ChecboxSettings";
+import { CheckboxSettings } from "./fields/CheckboxSettings";
 
 export type PetitionComposeFieldSettingsProps = {
   petitionId: string;
@@ -42,9 +42,6 @@ export function PetitionComposeFieldSettings({
   onFieldTypeChange,
   onClose,
 }: PetitionComposeFieldSettingsProps) {
-  useEffect(() => {
-    console.log("PetitionComposeFieldSettings rerender");
-  });
   return (
     <Card>
       <CardHeader isCloseable onClose={onClose}>

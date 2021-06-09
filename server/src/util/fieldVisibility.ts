@@ -28,7 +28,8 @@ export interface PetitionFieldVisibilityCondition {
     | "LESS_THAN"
     | "LESS_THAN_OR_EQUAL"
     | "GREATER_THAN"
-    | "GREATER_THAN_OR_EQUAL";
+    | "GREATER_THAN_OR_EQUAL"
+    | "NUMBER_OF_CHOICES";
   value: string | number | null;
 }
 
@@ -39,12 +40,19 @@ type VisibilityField = {
 };
 
 function evaluatePredicate<T extends string | number>(
-  reply: T,
+  reply: T | string[],
   operator: PetitionFieldVisibilityCondition["operator"],
   value: T | null
 ) {
+  if (reply === undefined || value === undefined) return false;
+
   const a = typeof reply === "string" ? reply.toLowerCase() : reply;
-  const b = typeof value === "string" ? value.toLowerCase() : value;
+  const b = Array.isArray(reply)
+    ? value
+    : typeof value === "string"
+    ? value.toLowerCase()
+    : value;
+
   if (a === null || b === null) return false;
   switch (operator) {
     case "LESS_THAN":
@@ -67,6 +75,8 @@ function evaluatePredicate<T extends string | number>(
       return a.toString().includes(b.toString());
     case "NOT_CONTAIN":
       return !a.toString().includes(b.toString());
+    case "NUMBER_OF_CHOICES":
+      return (a as string[]).length == b;
     default:
       return false;
   }

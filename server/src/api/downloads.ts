@@ -171,7 +171,9 @@ async function* getPetitionFiles(
         }
       }
     } else if (
-      ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT"].includes(field.type)
+      ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(
+        field.type
+      )
     ) {
       excelWorkbook.addPetitionFieldReply(field, replies);
     }

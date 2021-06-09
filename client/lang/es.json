@@ -905,6 +905,11 @@
     "context": "any"
   },
   {
+    "term": "component.petition-field-visibility-editor.contain-choice",
+    "definition": "está seleccionado",
+    "context": "is selected"
+  },
+  {
     "term": "component.petition-field-visibility-editor.contain-default",
     "definition": "{modifier, select, ALL {contienen} other {contiene}}",
     "context": "{modifier, select, ALL {contain} other {contains}}"
@@ -940,6 +945,11 @@
     "context": "none"
   },
   {
+    "term": "component.petition-field-visibility-editor.not-contain-choice",
+    "definition": "no está seleccionado",
+    "context": "is not selected"
+  },
+  {
     "term": "component.petition-field-visibility-editor.not-contain-default",
     "definition": "no {modifier, select, ALL {contienen} other {contiene}}",
     "context": "{modifier, select, ALL {do not contain} other {does not contain}}"
@@ -958,6 +968,11 @@
     "term": "component.petition-field-visibility-editor.not-have-reply",
     "definition": "no tiene respuestas",
     "context": "does not have replies"
+  },
+  {
+    "term": "component.petition-field-visibility-editor.number-of-choices",
+    "definition": "nº de seleccionados",
+    "context": "no. of selected"
   },
   {
     "term": "component.petition-field-visibility-editor.number-of-files",
@@ -1468,6 +1483,11 @@
     "term": "component.recipient-view-petition-field-card.replies-submitted",
     "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviada} other {# respuestas enviadas}}",
     "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
+  },
+  {
+    "term": "component.recipient-view-petition-field-card.replies-submitted-unique",
+    "definition": "{count, plural, =0 {No se han enviado respuestas todavía} other {Respuesta enviada}}",
+    "context": "{count, plural, =0 {No replies have been submitted yet} other {Reply submitted}}"
   },
   {
     "term": "component.recipient-view-petition-field-reply.approved-file",

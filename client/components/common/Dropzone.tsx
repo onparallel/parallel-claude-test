@@ -28,6 +28,7 @@ export const Dropzone = chakraForwardRef<"div", DropzoneProps, DropzoneRef>(
       minSize,
       maxSize,
       maxFiles,
+      multiple = false,
       preventDropOnDocument,
       noClick,
       noKeyboard,
@@ -69,6 +70,7 @@ export const Dropzone = chakraForwardRef<"div", DropzoneProps, DropzoneRef>(
       getFilesFromEvent,
       onFileDialogCancel,
       validator,
+      multiple,
     };
     // delete undefined props to avoid overriding react-dropzone defaults
     for (const [key, value] of Object.entries(dropZoneOptions)) {

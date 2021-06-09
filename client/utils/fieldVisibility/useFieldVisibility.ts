@@ -21,7 +21,7 @@ type VisibilityField =
   | useFieldVisibility_PetitionFieldFragment;
 
 function evaluatePredicate<T extends string | number>(
-  reply: T,
+  reply: T | string[],
   operator: PetitionFieldVisibilityConditionOperator,
   value: T | null
 ) {
@@ -29,7 +29,12 @@ function evaluatePredicate<T extends string | number>(
     return false;
   }
   const a = typeof reply === "string" ? reply.toLowerCase() : reply;
-  const b = typeof value === "string" ? value.toLowerCase() : value;
+  const b = Array.isArray(reply)
+    ? value
+    : typeof value === "string"
+    ? value.toLowerCase()
+    : value;
+
   switch (operator) {
     case "LESS_THAN":
       return a < b;
@@ -51,6 +56,8 @@ function evaluatePredicate<T extends string | number>(
       return a.toString().includes(b.toString());
     case "NOT_CONTAIN":
       return !a.toString().includes(b.toString());
+    case "NUMBER_OF_CHOICES":
+      return (a as string[]).length == b;
   }
 }
 
@@ -65,7 +72,10 @@ function conditionIsMet(
     const _value =
       condition.column !== undefined
         ? reply.content.columns?.[condition.column]?.[1] ?? null
-        : reply.content.text;
+        : reply.content.text
+        ? reply.content.text
+        : reply.content.choices;
+
     return evaluatePredicate(_value, operator, value);
   }
   switch (modifier) {

@@ -35,6 +35,8 @@ function defaultConditionFieldValue<
     return 0;
   } else if (field.type === "SELECT") {
     return (field.options as FieldOptions["SELECT"]).values[0] ?? null;
+  } else if (field.type === "CHECKBOX") {
+    return (field.options as FieldOptions["CHECKBOX"]).values[0] ?? null;
   } else if (field.type === "DYNAMIC_SELECT" && column !== undefined) {
     return (
       getFirstDynamicSelectValue(
@@ -68,6 +70,13 @@ export function updateConditionOperator<
       operator: "EQUAL",
       value: 0,
     };
+  } else if (operator === "NUMBER_OF_CHOICES") {
+    return {
+      ...condition,
+      modifier: "ANY",
+      operator: "NUMBER_OF_CHOICES",
+      value: 0,
+    };
   } else if (field.multiple && condition.modifier === "NUMBER_OF_REPLIES") {
     return { ...condition, operator };
   } else {
@@ -76,9 +85,13 @@ export function updateConditionOperator<
       operator,
       // override existing "has replies/does not have replies"
       modifier:
-        condition.modifier === "NUMBER_OF_REPLIES" ? "ANY" : condition.modifier,
+        condition.modifier === "NUMBER_OF_REPLIES" ||
+        condition.operator === "NUMBER_OF_CHOICES"
+          ? "ANY"
+          : condition.modifier,
       value:
-        condition.modifier === "NUMBER_OF_REPLIES"
+        condition.modifier === "NUMBER_OF_REPLIES" ||
+        condition.operator === "NUMBER_OF_CHOICES"
           ? defaultConditionFieldValue(field, condition.column)
           : condition.value,
     };

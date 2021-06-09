@@ -493,7 +493,7 @@ export const publicCreateCheckboxReply = mutationField(
           petition_field_id: args.fieldId,
           petition_access_id: ctx.access!.id,
           type: field.type,
-          content: { options: args.values },
+          content: { choices: args.values },
         },
         ctx.contact!
       );
@@ -531,7 +531,7 @@ export const publicUpdateCheckboxReply = mutationField(
       const [reply, event] = await Promise.all([
         ctx.petitions.updatePetitionFieldReply(
           args.replyId,
-          { content: { options: args.values }, status: "PENDING" },
+          { content: { choices: args.values }, status: "PENDING" },
           `Contact:${ctx.contact!.id}`
         ),
         ctx.petitions.getLastEventForPetitionId(petitionId),

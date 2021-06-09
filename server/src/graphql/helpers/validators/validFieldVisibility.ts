@@ -27,7 +27,9 @@ const schema = {
         required: ["fieldId", "modifier", "operator", "value"],
         properties: {
           fieldId: { type: "string" },
-          modifier: { enum: ["ANY", "ALL", "NONE", "NUMBER_OF_REPLIES"] },
+          modifier: {
+            enum: ["ANY", "ALL", "NONE", "NUMBER_OF_REPLIES"],
+          },
           operator: {
             enum: [
               "EQUAL",
@@ -40,6 +42,7 @@ const schema = {
               "LESS_THAN_OR_EQUAL",
               "GREATER_THAN",
               "GREATER_THAN_OR_EQUAL",
+              "NUMBER_OF_CHOICES",
             ],
           },
           value: { type: ["string", "integer", "null"] },

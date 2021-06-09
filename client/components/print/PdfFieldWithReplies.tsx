@@ -68,6 +68,12 @@ export function PdfFieldWithReplies({
                   )
                 )}
               </Stack>
+            ) : field.type === "CHECKBOX" ? (
+              <Stack spacing={0}>
+                {(reply.content.choices as [string]).map((value, i) => (
+                  <Text key={i}>{value}</Text>
+                ))}
+              </Stack>
             ) : (
               <Text key={reply.id}>
                 <BreakLines>{reply.content.text}</BreakLines>

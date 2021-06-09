@@ -97,6 +97,12 @@ export function PetitionRepliesFieldReply({
                 ) : null
             )}
           </Stack>
+        ) : reply.field!.type === "CHECKBOX" ? (
+          <Stack spacing={1}>
+            {(reply.content.choices as string[]).map((value, index) => (
+              <CopyToClipboardButton key={index} size="xs" text={value} />
+            ))}
+          </Stack>
         ) : null}
       </Box>
       <Flex
@@ -138,6 +144,12 @@ export function PetitionRepliesFieldReply({
                 <ListItem key={index}>{value}</ListItem>
               )
             )}
+          </List>
+        ) : reply.field!.type === "CHECKBOX" ? (
+          <List spacing={1}>
+            {(reply.content.choices as string[]).map((value, index) => (
+              <ListItem key={index}>{value}</ListItem>
+            ))}
           </List>
         ) : null}
         <Box fontSize="sm">

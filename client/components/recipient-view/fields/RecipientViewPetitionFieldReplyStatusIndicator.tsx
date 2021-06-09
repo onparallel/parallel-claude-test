@@ -7,9 +7,11 @@ import { useIntl } from "react-intl";
 export function RecipientViewPetitionFieldReplyStatusIndicator({
   reply,
   isSaving,
+  showSavedIcon = true,
 }: {
   reply?: RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment;
   isSaving: boolean;
+  showSavedIcon?: boolean;
 }) {
   const intl = useIntl();
   return isSaving ? (
@@ -39,7 +41,7 @@ export function RecipientViewPetitionFieldReplyStatusIndicator({
     >
       <CloseIcon fontSize="14px" color="red.500" />
     </Tooltip>
-  ) : reply ? (
+  ) : reply && showSavedIcon ? (
     <Tooltip
       label={intl.formatMessage(
         {

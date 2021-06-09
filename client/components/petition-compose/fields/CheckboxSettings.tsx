@@ -27,15 +27,17 @@ export function CheckboxSettings({
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 100, [field.id]);
 
-  const [selected, setSelected] = useState({});
+  const [selected, setSelected] = useState({
+    label: intl.formatMessage({
+      id: "component.petition-field-checkbox-settings.unlimited",
+      defaultMessage: "Unlimited",
+    }),
+    value: "UNLIMITED",
+  });
 
   const type = field?.options?.limit?.type ?? "UNLIMITED";
   const [min, setMin] = useState(field.options?.limit?.min ?? 1);
   const [max, setMax] = useState(field.options?.limit?.max ?? 1);
-
-  useEffect(() => {
-    console.log("CheckboxSettings rerender");
-  });
 
   useEffect(() => {
     setMin(field.options?.limit?.min ?? 1);
@@ -69,7 +71,7 @@ export function CheckboxSettings({
   }, [intl.locale]);
 
   useEffect(() => {
-    let _selected = {};
+    let _selected = null;
     switch (type) {
       case "UNLIMITED":
         _selected = {

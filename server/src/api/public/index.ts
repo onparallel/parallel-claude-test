@@ -702,6 +702,8 @@ api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
                 })
               : field.type === "DYNAMIC_SELECT"
               ? (reply.content.columns as [string, string][])
+              : field.type === "CHECKBOX"
+              ? (reply.content.choices as string[])
               : (reply.content.text as string),
           fieldId: field.id,
           updatedAt: reply.updatedAt,

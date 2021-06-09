@@ -1,10 +1,10 @@
-import { Text } from "@chakra-ui/react";
+import { Text, TextProps } from "@chakra-ui/react";
 import { PetitionComposeField_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
-export type CheckboxTypeLabelProps = {
+export interface CheckboxTypeLabelProps extends TextProps {
   field: PetitionComposeField_PetitionFieldFragment;
-};
+}
 
 export function CheckboxTypeLabel({ field, ...props }: CheckboxTypeLabelProps) {
   const { type = "UNLIMITED", min = 1, max = 1 } = field.options.limit ?? {};
@@ -65,5 +65,5 @@ export function CheckboxTypeLabel({ field, ...props }: CheckboxTypeLabelProps) {
     }
   };
 
-  return <>{show ? <Text {...props}>{getText()}</Text> : null}</>;
+  return show ? <Text {...props}>{getText()}</Text> : null;
 }

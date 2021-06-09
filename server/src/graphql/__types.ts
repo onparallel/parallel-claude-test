@@ -718,11 +718,7 @@ export interface NexusGenFieldTypes {
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
-<<<<<<< master
-=======
-    publicSubmitUnpublishedComments: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
     publicUpdateCheckboxReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
->>>>>>> WIP Add checkbox to compose and recipient view
     publicUpdateDynamicSelectReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicUpdatePetitionFieldComment: NexusGenRootTypes["PublicPetitionFieldComment"]; // PublicPetitionFieldComment!
     publicUpdateSimpleReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -1619,11 +1615,7 @@ export interface NexusGenFieldTypeNames {
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     publicSendVerificationCode: "VerificationCodeRequest";
-<<<<<<< master
-=======
-    publicSubmitUnpublishedComments: "PublicPetitionFieldComment";
     publicUpdateCheckboxReply: "PublicPetitionFieldReply";
->>>>>>> WIP Add checkbox to compose and recipient view
     publicUpdateDynamicSelectReply: "PublicPetitionFieldReply";
     publicUpdatePetitionFieldComment: "PublicPetitionFieldComment";
     publicUpdateSimpleReply: "PublicPetitionFieldReply";

@@ -207,8 +207,12 @@ export const PetitionComposeFieldList = Object.assign(
         onFieldEdit: async (data) => {
           const { fields } = fieldsDataRef.current!;
           const field = fields.find((f) => f.id === fieldId)!;
+
           await onFieldEdit(fieldId, data);
-          if (field.type === "SELECT" && data.options) {
+          if (
+            (field.type === "CHECKBOX" || field.type === "SELECT") &&
+            data.options
+          ) {
             // ensure no field has a condition on a missing value
             const values = field.options.values as any[];
             const newValues = data.options.values as any[];

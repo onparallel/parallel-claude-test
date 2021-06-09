@@ -31,6 +31,8 @@ export class PetitionExcelExport {
       this.textRepliesTab.addDynamicSelectReply(field, replies);
     } else if (["TEXT", "SHORT_TEXT", "SELECT"].includes(field.type)) {
       this.textRepliesTab.addSimpleReply(field, replies);
+    } else if (field.type === "CHECKBOX") {
+      this.textRepliesTab.addCheckboxReply(field, replies);
     }
   }
 

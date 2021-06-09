@@ -49,6 +49,7 @@ import {
   Fragment,
   SetStateAction,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -146,13 +147,14 @@ export function PetitionFieldVisibilityEditor({
     setConditions((conditions) => {
       const last = conditions[conditions.length - 1];
       const field = fields.find((f) => f.id === last.fieldId)!;
-      if (field.type === "SELECT") {
-        // if the previous condition is of type SELECT try to get the next value
+      if (field.type === "SELECT" || field.type === "CHECKBOX") {
+        // if the previous condition is of type SELECT or CHECKBOX try to get the next value
         const values = field.options.values as string[];
         const index = Math.min(
           values.indexOf(last.value as string) + 1,
           values.length - 1
         );
+
         return [
           ...conditions,
           {
@@ -165,6 +167,7 @@ export function PetitionFieldVisibilityEditor({
       }
     });
   };
+
   return (
     <Stack spacing={1}>
       <Grid
@@ -261,9 +264,9 @@ export function PetitionFieldVisibilityEditor({
                       showError={showError}
                       field={conditionField}
                       value={condition}
-                      onChange={(condition) =>
-                        updateCondition(index, condition)
-                      }
+                      onChange={(condition) => {
+                        updateCondition(index, condition);
+                      }}
                     />
                   </Stack>
                 </>
@@ -408,6 +411,7 @@ interface ConditionPredicateProps
   extends ValueProps<PetitionFieldVisibilityCondition, false> {
   field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
   showError: boolean;
+  max?: number;
 }
 
 function ConditionPredicate({
@@ -429,6 +433,30 @@ function ConditionPredicate({
         { label: ">", value: "GREATER_THAN" },
         { label: "≤", value: "LESS_THAN_OR_EQUAL" },
         { label: "≥", value: "GREATER_THAN_OR_EQUAL" }
+      );
+    } else if (field.type === "CHECKBOX") {
+      options.push(
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-visibility-editor.contain-choice",
+            defaultMessage: "is selected",
+          }),
+          value: "CONTAIN",
+        },
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-visibility-editor.not-contain-choice",
+            defaultMessage: "is not selected",
+          }),
+          value: "NOT_CONTAIN",
+        },
+        {
+          label: intl.formatMessage({
+            id: "component.petition-field-visibility-editor.number-of-choices",
+            defaultMessage: "no. of selected",
+          }),
+          value: "NUMBER_OF_CHOICES",
+        }
       );
     } else if (
       field.type === "SELECT" ||
@@ -557,7 +585,7 @@ function ConditionPredicate({
           ? "HAVE_REPLY"
           : "NOT_HAVE_REPLY"
         : condition.operator;
-    return options.find((o) => o.value === operator);
+    return options.find((o) => o.value === operator) ?? options[0];
   }, [options, condition.operator, condition.modifier, field.multiple]);
   const iprops = useInlineReactSelectProps<
     OptionType<PseudoPetitionFieldVisibilityConditionOperator>,
@@ -577,6 +605,7 @@ function ConditionPredicate({
     },
     [onChange, condition, field]
   );
+
   return !field.multiple && condition.modifier === "NUMBER_OF_REPLIES" ? (
     <Box flex="1">
       <Select
@@ -595,14 +624,19 @@ function ConditionPredicate({
         {...iprops}
       />
       <Box flex="1" minWidth={20}>
-        {condition.modifier === "NUMBER_OF_REPLIES" ? (
+        {condition.modifier === "NUMBER_OF_REPLIES" ||
+        condition.operator === "NUMBER_OF_CHOICES" ? (
           <ConditionPredicateValueNumber
             field={field}
             showError={showError}
             value={condition}
             onChange={onChange}
+            max={
+              field.type === "CHECKBOX" ? field.options.values.length : Infinity
+            }
           />
-        ) : field.type === "SELECT" ||
+        ) : field.type === "CHECKBOX" ||
+          field.type === "SELECT" ||
           (field.type === "DYNAMIC_SELECT" &&
             condition.column !== undefined) ? (
           <ConditionPredicateValueSelect
@@ -626,14 +660,22 @@ function ConditionPredicate({
 
 function ConditionPredicateValueNumber({
   value: condition,
+  max = Infinity,
   onChange,
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const [value, setValue] = useState((condition.value as number) ?? 0);
+  useEffect(() => {
+    if (max < value) {
+      setValue(max);
+      onChange({ ...condition, value: max });
+    }
+  }, [max]);
   return (
     <NumberInput
       size="sm"
       min={0}
+      max={max}
       value={value}
       onChange={(_, value) => setValue(value)}
       onBlur={() => onChange({ ...condition, value })}
@@ -681,6 +723,8 @@ function ConditionPredicateValueSelect({
     const values =
       field.type === "SELECT"
         ? (field.options as FieldOptions["SELECT"]).values
+        : field.type === "CHECKBOX"
+        ? (field.options as FieldOptions["CHECKBOX"]).values
         : getDynamicSelectValues(
             (field.options as FieldOptions["DYNAMIC_SELECT"]).values,
             condition.column!

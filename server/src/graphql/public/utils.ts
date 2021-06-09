@@ -40,11 +40,11 @@ export function validateCheckboxReplyValues(
   field: PetitionField,
   values: string[]
 ) {
-  const length = field.options.values.length;
+  const valuesSet = new Set(field.options.values);
 
   const mixedSet = new Set([...values, ...field.options.values]);
 
-  if (mixedSet.size != length) {
+  if (mixedSet.size != valuesSet.size) {
     throw new Error(`Invalid values`);
   }
 }

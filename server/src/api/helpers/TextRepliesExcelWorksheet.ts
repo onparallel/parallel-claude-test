@@ -61,6 +61,20 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     }
   }
 
+  public addCheckboxReply(field: PetitionField, replies: PetitionFieldReply[]) {
+    if (replies.length > 0) {
+      this.addRows(
+        replies.flatMap((r, i) =>
+          (r.content.choices as [string]).map((value) => ({
+            title: field.title || "",
+            description: field.description?.slice(0, 200) || "",
+            answer: value,
+          }))
+        )
+      );
+    }
+  }
+
   private addEmptyReply(data: Omit<TextReplyRow, "answer">) {
     this.addRows(
       [

@@ -330,7 +330,8 @@ export const PublicPetitionFieldReply = objectType({
           case "TEXT":
           case "SHORT_TEXT":
           case "SELECT":
-          case "DYNAMIC_SELECT": {
+          case "DYNAMIC_SELECT":
+          case "CHECKBOX": {
             return root.content;
           }
           case "FILE_UPLOAD": {
