@@ -330,13 +330,8 @@ export type Mutation = {
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendVerificationCode: VerificationCodeRequest;
-<<<<<<< master
-=======
-  /** Submits all unpublished comments. */
-  publicSubmitUnpublishedComments: Array<PublicPetitionFieldComment>;
   /** Updates a reply of checkbox field. */
   publicUpdateCheckboxReply: PublicPetitionFieldReply;
->>>>>>> WIP Add checkbox to compose and recipient view
   /** Updates a reply for a dynamic select field. */
   publicUpdateDynamicSelectReply: PublicPetitionFieldReply;
   /** Update a petition field comment. */
