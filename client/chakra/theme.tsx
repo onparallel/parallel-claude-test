@@ -146,6 +146,11 @@ export const theme = extendTheme({
           icon: { fontSize: "0.75rem" },
         },
       },
+      variants: {
+        radio: {
+          control: { borderRadius: "50%" },
+        },
+      },
     },
     Heading: {
       sizes: {

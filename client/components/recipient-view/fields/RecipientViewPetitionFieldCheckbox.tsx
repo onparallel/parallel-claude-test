@@ -5,7 +5,10 @@ import {
   Stack,
   Text,
   Flex,
+  CheckboxGroup,
+  Icon,
 } from "@chakra-ui/react";
+import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
@@ -42,6 +45,11 @@ const haveChanges = ({
     ? checked[0] != choices[0]
     : checked.length != choices.length;
 };
+
+function CustomIcon(props) {
+  const { isIndeterminate, ...rest } = props;
+  return <RadioButtonSelected />;
+}
 
 export function RecipientViewPetitionFieldCheckbox({
   petitionId,
@@ -99,16 +107,17 @@ export function RecipientViewPetitionFieldCheckbox({
       (c: string) => values?.some((v: string) => v === c) ?? true
     );
     if (field.replies.length) {
-      if (
-        filteredChecked.length &&
-        haveChanges({
-          checked: filteredChecked,
-          choices: field.replies[0].content.choices,
-          max: type == "UNLIMITED" ? values.length : max,
-        })
-      ) {
-        const update = handleUpdate(field.replies[0].id);
-        update(filteredChecked);
+      if (filteredChecked.length) {
+        if (
+          haveChanges({
+            checked: filteredChecked,
+            choices: field.replies[0].content.choices,
+            max: type == "UNLIMITED" ? values.length : max,
+          })
+        ) {
+          const update = handleUpdate(field.replies[0].id);
+          update(filteredChecked);
+        }
       } else {
         handleDelete(field.replies[0].id);
       }
@@ -119,13 +128,6 @@ export function RecipientViewPetitionFieldCheckbox({
       }
     }
   }, [checkedItems]);
-
-  const handleRadioClick = (element) => {
-    if (element.checked) {
-      element.checked = false;
-      delete element.nextSibling.dataset.checked;
-    }
-  };
 
   const showRadio = max === 1 && type !== "UNLIMITED";
 
@@ -153,7 +155,7 @@ export function RecipientViewPetitionFieldCheckbox({
               {showRadio ? null : ")"}
             </Text>
           ) : null}
-          <Flex alignItems="center">
+          <Flex alignItems="center" boxSize={6}>
             <RecipientViewPetitionFieldReplyStatusIndicator
               isSaving={isSaving}
               reply={field.replies[0]}
@@ -162,64 +164,47 @@ export function RecipientViewPetitionFieldCheckbox({
           </Flex>
         </Stack>
 
-        {showRadio ? (
-          <RadioGroup
-            onClick={(e) => {
-              if (e.target.className.includes("chakra-radio__label")) {
-                handleRadioClick(e.target.previousSibling.previousSibling);
-              }
-              if (e.target.className.includes("chakra-radio__control")) {
-                handleRadioClick(e.target.previousSibling);
-              }
-            }}
-            onKeyPress={(e) => {
-              if (e.code === "Space") {
-                handleRadioClick(e.target);
-              }
-            }}
-          >
-            <Stack>
-              {values.map((option, index) => {
-                const id = `${option}-${index}`;
-                return (
-                  <Radio
-                    key={index}
-                    value={id}
-                    isDisabled={isDisabled}
-                    isInvalid={isRejected}
-                  >
-                    {option}
-                  </Radio>
-                );
-              })}
-            </Stack>
-          </RadioGroup>
-        ) : (
-          values.map((option, index) => (
-            <Checkbox
-              key={index}
-              isInvalid={isRejected}
-              isDisabled={isDisabled}
-              isChecked={checkedItems.includes(option)}
-              onChange={(e) => {
-                e.preventDefault();
-                if (
-                  e.target.checked &&
-                  (type === "RANGE" || type === "EXACT")
-                ) {
-                  if (checkedItems.length === max) return;
-                }
-                setCheckedItems((checked) =>
-                  e.target.checked
-                    ? [...checked, option]
-                    : checked.filter((o) => o !== option)
-                );
-              }}
-            >
-              {option}
-            </Checkbox>
-          ))
-        )}
+        {showRadio
+          ? values.map((option, index) => (
+              <Checkbox
+                key={index}
+                icon={<CustomIcon />}
+                isInvalid={isRejected}
+                isDisabled={isDisabled}
+                isChecked={checkedItems.includes(option)}
+                onChange={(e) => {
+                  e.preventDefault();
+                  setCheckedItems(() => (e.target.checked ? [option] : []));
+                }}
+                variant="radio"
+              >
+                {option}
+              </Checkbox>
+            ))
+          : values.map((option, index) => (
+              <Checkbox
+                key={index}
+                isInvalid={isRejected}
+                isDisabled={isDisabled}
+                isChecked={checkedItems.includes(option)}
+                onChange={(e) => {
+                  e.preventDefault();
+                  if (
+                    e.target.checked &&
+                    (type === "RANGE" || type === "EXACT")
+                  ) {
+                    if (checkedItems.length === max) return;
+                  }
+                  setCheckedItems((checked) =>
+                    e.target.checked
+                      ? [...checked, option]
+                      : checked.filter((o) => o !== option)
+                  );
+                }}
+              >
+                {option}
+              </Checkbox>
+            ))}
       </Stack>
     </RecipientViewPetitionFieldCard>
   );

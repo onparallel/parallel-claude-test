@@ -1470,3 +1470,19 @@ export const UserGroupXIcon = createIcon({
     </g>
   ),
 });
+
+export const RadioButtonSelected = createIcon({
+  displayName: "RadioButtonSelected",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle xmlns="http://www.w3.org/2000/svg" cx="12" cy="12" r="4" />
+    </g>
+  ),
+});
