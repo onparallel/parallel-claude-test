@@ -100,7 +100,7 @@ const SCHEMAS = {
             },
           },
           file: {
-            type: "object",
+            type: ["object", "null"],
             required: ["id", "name", "size", "updatedAt"],
             properties: {
               id: { type: "string" },
@@ -186,6 +186,7 @@ export function defaultFieldOptions(
         optional: optional ?? false,
         multiple: multiple ?? false,
         options: {
+          file: null,
           values: [],
           labels: [],
         },

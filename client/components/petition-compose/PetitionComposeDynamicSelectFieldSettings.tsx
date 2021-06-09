@@ -44,7 +44,7 @@ export function DynamicSelectSettings({
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
 
   function handleRemoveOptions() {
-    onFieldEdit(field.id, { options: { labels: [], values: [] } });
+    onFieldEdit(field.id, { options: { labels: [], values: [], file: null } });
   }
 
   const [downloadLink] =
