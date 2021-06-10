@@ -1,175 +1,147 @@
-import { json, NextFunction, Request, Response, Router } from "express";
+import { json, Router } from "express";
 import { CreateUser, User } from "../db/__types";
 import { isDefined } from "../util/remedaExtensions";
 
-function getExternalId(filter: any) {
-  if (!filter) return;
-  const match = filter.match(/externalId eq "([^"]*)"/);
-  if (!match) return;
-  return match[1];
-}
-
-function toScimUser(user: User) {
-  return {
-    schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
-    id: user.external_id,
-    externalId: user.external_id,
-    active: user.status === "ACTIVE",
-    name: {
-      givenName: user.first_name,
-      familyName: user.last_name,
-    },
-    emails: [
-      {
-        type: "work",
-        value: user.email,
-      },
-    ],
-  };
-}
-
-async function authenticateOrganization(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const match = req.headers.authorization?.match(/^Bearer (.*)$/);
-    if (!match) {
-      return res.status(401).end();
-    }
-    const integration =
-      await req.context.integrations.loadProvisioningIntegrationByAuthKey(
-        match[1]
-      );
-    if (!integration) {
-      return res.status(401).end();
-    }
-    req.context.organization = await req.context.organizations.loadOrg(
-      integration.org_id
-    );
-    next();
-  } catch (error) {
-    next(error);
-  }
-}
-
-/**
- *  make sure the organization triggering an action has access to the user
- */
-async function validateExternalId(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  const externalId = req.params?.externalId ?? req.body?.externalId;
-  if (!externalId) {
-    next();
-    return;
-  }
-
-  const user = await req.context.users.loadUserByExternalId({
-    externalId,
-    orgId: req.context.organization!.id,
-  });
-  if (!user) {
-    return res
-      .status(404)
-      .json({
-        schemas: ["urn:ietf:params:scim:api:messages:2.0:Error"],
-        detail: `Resource ${externalId} not found`,
-        status: "404",
-      })
-      .end();
-  } else {
-    next();
-  }
-}
-
-async function logRequest(req: Request, _: Response, next: NextFunction) {
-  try {
-    console.log({
-      url: req.url,
-      method: req.method,
-      body: JSON.stringify(req.body),
-      authorization: req.header("authorization"),
-    });
-  } catch {}
-  next();
-}
-
 export const scim = Router().use(
   json({ type: "application/scim+json" }),
-  logRequest,
-  authenticateOrganization,
-  validateExternalId
+  (req, res, next) => {
+    try {
+      console.log({
+        url: req.url,
+        method: req.method,
+        body: JSON.stringify(req.body),
+        authorization: req.header("authorization"),
+      });
+    } catch {}
+    next();
+  },
+  async function authenticate(req, res, next) {
+    try {
+      const match = req.headers.authorization?.match(/^Bearer (.*)$/);
+      if (!match) {
+        throw new Error("Missing authentication");
+      }
+      const integration =
+        await req.context.integrations.loadProvisioningIntegrationByAuthKey(
+          match[1]
+        );
+      if (!integration) {
+        throw new Error("Invalid authentication");
+      }
+      req.context.organization = await req.context.organizations.loadOrg(
+        integration.org_id
+      );
+      next();
+    } catch (error) {
+      return res.sendStatus(401);
+    }
+  }
 );
 
 scim
   .route("/Users")
   .get(async (req, res) => {
     const externalId: string = getExternalId(req.query.filter);
-    let totalResults = 0;
-    const users: User[] = [];
-    if (externalId) {
-      const user = await req.context.users.loadUserByExternalId({
-        externalId,
-        orgId: req.context.organization!.id,
+    const user = await req.context.users.loadUserByExternalId({
+      externalId,
+      orgId: req.context.organization!.id,
+    });
+    if (!user) {
+      res.json({
+        totalResults: 0,
+        Resources: [],
       });
-      if (user) {
-        totalResults = 1;
-        users.push(user!);
-      }
+    } else {
+      res.json({
+        totalResults: 1,
+        Resources: [toScimUser(user)],
+      });
     }
-    res
-      .json({
-        totalResults,
-        Resources: users.map(toScimUser),
-      })
-      .end();
   })
-  /**
-   * Use the CREATE endpoint just for reactivating disabled users
-   */
   .post(async (req, res) => {
     const {
       externalId,
       active,
       name: { familyName, givenName },
+      emails,
     }: {
       externalId: string;
       active: boolean;
       name: { givenName: string; familyName: string };
+      emails: { type: string; value: string }[];
     } = req.body;
     let user = await req.context.users.loadUserByExternalId({
       externalId,
       orgId: req.context.organization!.id,
     });
-    if (user && user.status === "INACTIVE" && user.is_sso_user) {
-      [user] = await req.context.users.updateUserById(
-        user.id,
-        {
-          status: active ? "ACTIVE" : "INACTIVE",
-          first_name: givenName,
-          last_name: familyName,
-        },
-        `Provisioning:${req.context.organization!.id}`
-      );
-      res.json(toScimUser(user)).end();
+    if (user) {
+      if (
+        user.first_name !== givenName ||
+        user.last_name !== familyName ||
+        (user.status === "ACTIVE") !== active
+      ) {
+        [user] = await req.context.users.updateUserById(
+          user.id,
+          {
+            status: active ? "ACTIVE" : "INACTIVE",
+            first_name: givenName,
+            last_name: familyName,
+          },
+          `Provisioning:${req.context.organization!.id}`
+        );
+      }
+      res.json(toScimUser(user));
     } else {
-      // fake an "OK" response to provider
-      res.json({ ...req.body, id: externalId }).end();
+      const orgId = req.context.organization!.id;
+      const integrations =
+        await req.context.integrations.loadEnabledIntegrationsForOrgId(orgId);
+      const email = emails.find((e) => e.type === "work")?.value;
+      if (integrations.some((i) => i.type === "SSO") && email) {
+        const user = await req.context.users.createUser(
+          {
+            // fake unique cognitoId, should update when user logs in
+            cognito_id: `${req.context.organization!.identifier}_${externalId}`,
+            org_id: orgId,
+            email: email.toLowerCase(),
+            first_name: givenName,
+            last_name: familyName,
+            status: active ? "ACTIVE" : "INACTIVE",
+            external_id: externalId,
+          },
+          `Provisioning:${req.context.organization!.id}`
+        );
+        res.json(toScimUser(user));
+      } else {
+        // fake an "OK" response to provider
+        res.json({ ...req.body, id: externalId });
+      }
     }
   });
 
 scim
   .route("/Users/:externalId")
+  .all(async (req, res, next) => {
+    const externalId = req.params?.externalId;
+    const user = await req.context.users.loadUserByExternalId({
+      externalId,
+      orgId: req.context.organization!.id,
+    });
+    if (!user) {
+      return res.status(404).json({
+        schemas: ["urn:ietf:params:scim:api:messages:2.0:Error"],
+        detail: `Resource ${externalId} not found`,
+        status: "404",
+      });
+    } else {
+      next();
+    }
+  })
   .get(async (req, res) => {
     const user = await req.context.users.loadUserByExternalId({
       externalId: req.params.externalId,
       orgId: req.context.organization!.id,
     });
-    res.json(toScimUser(user!)).end();
+    res.json(toScimUser(user!));
   })
   .patch(async (req, res) => {
     const data: Partial<CreateUser> = {};
@@ -196,7 +168,7 @@ scim
       data,
       `Provisioning:${req.context.organization!.id}`
     );
-    res.json(toScimUser(user)).end();
+    res.json(toScimUser(user));
   })
   .put(async (req, res) => {
     const data: Partial<CreateUser> = {};
@@ -216,7 +188,7 @@ scim
       data,
       `Provisioning:${req.context.organization!.id}`
     );
-    res.json(toScimUser(user)).end();
+    res.json(toScimUser(user));
   })
   .delete(async (req, res) => {
     await req.context.users.updateUserByExternalId(
@@ -225,5 +197,31 @@ scim
       { status: "INACTIVE" },
       `Provisioning:${req.context.organization!.id}`
     );
-    res.sendStatus(204).end();
+    res.sendStatus(204);
   });
+
+function getExternalId(filter: any) {
+  if (!filter) return;
+  const match = filter.match(/externalId eq "([^"]*)"/);
+  if (!match) return;
+  return match[1];
+}
+
+function toScimUser(user: User) {
+  return {
+    schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
+    id: user.external_id,
+    externalId: user.external_id,
+    active: user.status === "ACTIVE",
+    name: {
+      givenName: user.first_name,
+      familyName: user.last_name,
+    },
+    emails: [
+      {
+        type: "work",
+        value: user.email,
+      },
+    ],
+  };
+}
