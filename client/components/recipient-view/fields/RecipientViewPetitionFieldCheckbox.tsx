@@ -180,7 +180,7 @@ export function RecipientViewPetitionFieldCheckbox({
         </Flex>
 
         {showRadio
-          ? values.map((option, index) => (
+          ? values.map((option: string, index: number) => (
               <Checkbox
                 key={index}
                 icon={<CustomIcon />}
@@ -196,7 +196,7 @@ export function RecipientViewPetitionFieldCheckbox({
                 {option}
               </Checkbox>
             ))
-          : values.map((option, index) => (
+          : values.map((option: string, index: number) => (
               <Checkbox
                 key={index}
                 isInvalid={isRejected}
@@ -210,10 +210,10 @@ export function RecipientViewPetitionFieldCheckbox({
                   ) {
                     if (checkedItems.length === max) return;
                   }
-                  setCheckedItems((checked) =>
+                  setCheckedItems((checked: string[]) =>
                     e.target.checked
                       ? [...checked, option]
-                      : checked.filter((o) => o !== option)
+                      : checked.filter((o: string) => o !== option)
                   );
                 }}
               >

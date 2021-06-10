@@ -136,6 +136,8 @@ useFieldVisibility.fragments = {
   PublicPetitionField: gql`
     fragment useFieldVisibility_PublicPetitionField on PublicPetitionField {
       id
+      type
+      options
       visibility
       replies {
         id
@@ -146,6 +148,8 @@ useFieldVisibility.fragments = {
   PetitionField: gql`
     fragment useFieldVisibility_PetitionField on PetitionField {
       id
+      type
+      options
       visibility
       replies {
         id

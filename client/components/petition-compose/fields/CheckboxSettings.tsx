@@ -10,6 +10,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { OptionType } from "@parallel/utils/react-select/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -160,8 +161,8 @@ export function CheckboxSettings({
     }
   };
 
-  const handleChangeSelect = (_selected) => {
-    if (_selected.value != selected?.value) {
+  const handleChangeSelect = (_selected: OptionType | null) => {
+    if (_selected && _selected.value != selected?.value) {
       setType(_selected.value);
       debouncedOnUpdate(field.id, {
         options: {

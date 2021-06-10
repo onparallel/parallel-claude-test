@@ -25,7 +25,7 @@ import { HelpPopover } from "../common/HelpPopover";
 import { SmallPopover } from "../common/SmallPopover";
 import { DynamicSelectSettings } from "./PetitionComposeDynamicSelectFieldSettings";
 import { PetitionFieldTypeSelect } from "./PetitionFieldTypeSelectDropdown";
-import { CheckboxSettings } from "./fields/CheckboxSettings";
+import { CheckboxSettings } from "@parallel/components/petition-compose/fields/CheckboxSettings";
 
 export type PetitionComposeFieldSettingsProps = {
   petitionId: string;

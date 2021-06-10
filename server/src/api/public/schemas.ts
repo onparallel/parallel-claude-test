@@ -407,7 +407,14 @@ const _PetitionFieldReply = {
     },
     type: {
       type: "string",
-      enum: ["TEXT", "SHORT_TEXT", "FILE_UPLOAD", "SELECT", "DYNAMIC_SELECT"],
+      enum: [
+        "TEXT",
+        "SHORT_TEXT",
+        "FILE_UPLOAD",
+        "SELECT",
+        "DYNAMIC_SELECT",
+        "CHECKBOX",
+      ],
       description: "The type of the field this reply originated from",
       example: "TEXT",
     },
@@ -451,6 +458,20 @@ const _PetitionFieldReply = {
           items: {
             type: "array",
             items: [{ type: "string" }, { type: "string" }],
+          },
+        },
+        {
+          title: "Checkbox reply",
+          type: "object",
+          required: ["choices"],
+          additionalProperties: false,
+          properties: {
+            choices: {
+              type: "array",
+              items: {
+                type: "string",
+              },
+            },
           },
         },
       ],

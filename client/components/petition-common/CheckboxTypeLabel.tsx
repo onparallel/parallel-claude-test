@@ -1,9 +1,14 @@
 import { Text, TextProps } from "@chakra-ui/react";
-import { PetitionComposeField_PetitionFieldFragment } from "@parallel/graphql/__types";
+import {
+  PetitionComposeField_PetitionFieldFragment,
+  RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
+} from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
 export interface CheckboxTypeLabelProps extends TextProps {
-  field: PetitionComposeField_PetitionFieldFragment;
+  field:
+    | PetitionComposeField_PetitionFieldFragment
+    | RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
 }
 
 export function CheckboxTypeLabel({ field, ...props }: CheckboxTypeLabelProps) {

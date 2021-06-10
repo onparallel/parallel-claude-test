@@ -268,9 +268,9 @@ export function PetitionFieldVisibilityEditor({
                       showError={showError}
                       field={conditionField}
                       value={condition}
-                      onChange={(condition) => {
-                        updateCondition(index, condition);
-                      }}
+                      onChange={(condition) =>
+                        updateCondition(index, condition)
+                      }
                     />
                   </Stack>
                 </>

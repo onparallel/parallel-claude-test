@@ -385,7 +385,13 @@ export class PetitionRepository extends BaseRepository {
     >(async (ids) => {
       const fields: (Pick<
         PetitionField,
-        "id" | "petition_id" | "validated" | "optional" | "visibility"
+        | "id"
+        | "petition_id"
+        | "validated"
+        | "optional"
+        | "visibility"
+        | "type"
+        | "options"
       > & { content: string })[] = await this.knex<PetitionField>(
         "petition_field as pf"
       )
@@ -414,6 +420,8 @@ export class PetitionRepository extends BaseRepository {
           "pf.validated",
           "pf.optional",
           "pf.visibility",
+          "pf.type",
+          "pf.options",
           this.knex.raw(`"pfr"."content"::text as "content"`) as any
         );
 

@@ -6364,6 +6364,8 @@ export type Thanks_PetitionLogoQuery = { publicOrgLogoUrl?: Maybe<string> };
 export type useFieldVisibility_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
   visibility?: Maybe<{ [key: string]: any }>;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
@@ -6375,6 +6377,8 @@ export type useFieldVisibility_PublicPetitionFieldFragment = {
 export type useFieldVisibility_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
   visibility?: Maybe<{ [key: string]: any }>;
   replies: Array<{
     __typename?: "PetitionFieldReply";
@@ -8150,6 +8154,8 @@ export const ExportRepliesDialog_PetitionFieldFragmentDoc = gql`
 export const useFieldVisibility_PetitionFieldFragmentDoc = gql`
   fragment useFieldVisibility_PetitionField on PetitionField {
     id
+    type
+    options
     visibility
     replies {
       id
@@ -8468,6 +8474,8 @@ export const RecipientViewPetitionField_PublicPetitionFieldFragmentDoc = gql`
 export const useFieldVisibility_PublicPetitionFieldFragmentDoc = gql`
   fragment useFieldVisibility_PublicPetitionField on PublicPetitionField {
     id
+    type
+    options
     visibility
     replies {
       id

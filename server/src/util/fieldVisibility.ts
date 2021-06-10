@@ -4,6 +4,7 @@
  */
 
 import { indexBy } from "remeda";
+import { PetitionFieldType } from "../api/public/__types";
 
 export interface PetitionFieldVisibility {
   type: "SHOW" | "HIDE";
@@ -35,8 +36,10 @@ export interface PetitionFieldVisibilityCondition {
 
 type VisibilityField = {
   id: number;
+  type: PetitionFieldType;
+  options: any;
   visibility: PetitionFieldVisibility | null;
-  replies: { content: { text: string } }[];
+  replies: { content: any }[];
 };
 
 function evaluatePredicate<T extends string | number>(
@@ -104,7 +107,8 @@ function conditionIsMet(
     case "NONE":
       return !replies.some(evaluator);
     case "NUMBER_OF_REPLIES":
-      return evaluatePredicate(replies.length, operator, value);
+      const completed = completedFieldReplies(field);
+      return evaluatePredicate(completed.length, operator, value);
     default:
       return false;
   }
@@ -140,4 +144,33 @@ export function evaluateFieldVisibility<T extends VisibilityField>(
     }
   }
   return fields.map((f) => visibilitiesById[f.id]);
+}
+
+type PartialField = {
+  type: PetitionFieldType;
+  options: any;
+  replies: { content: any }[];
+};
+
+/** returns the field replies that are fully completed */
+export function completedFieldReplies<T extends PartialField>(field: T) {
+  switch (field.type) {
+    case "DYNAMIC_SELECT":
+      return field.replies.filter((reply) =>
+        reply.content.columns.every(
+          ([, value]: [string, string | null]) => !!value
+        )
+      );
+    case "CHECKBOX":
+      return field.replies.filter((reply) => {
+        if (field.options.limit.type === "EXACT") {
+          return reply.content.choices.length == field.options.limit.max;
+        } else {
+          return reply.content.choices.length >= field.options.limit.min;
+        }
+      });
+
+    default:
+      return field.replies;
+  }
 }
