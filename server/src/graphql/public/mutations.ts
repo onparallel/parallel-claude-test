@@ -52,44 +52,6 @@ function anonymizeEmail(email: string) {
   return anonymizePart(local) + "@" + _domain;
 }
 
-/*
- * this is a temporal solution and will be gone after the refactor on 'event-processor' worker
- */
-async function trackAccessOpenedEvent(ctx: ApiContext, petition: Petition) {
-  const accessOpenedEvents = await ctx.petitions.loadLastEventsByType(
-    petition.id,
-    "ACCESS_OPENED"
-  );
-
-  if (accessOpenedEvents.length === 0) {
-    ctx.analytics.trackEvent(
-      "ACCESS_OPENED_FIRST",
-      {
-        contact_id: ctx.access!.contact_id,
-        org_id: petition.org_id,
-        petition_id: ctx.access!.petition_id,
-      },
-      toGlobalId("User", ctx.access!.granter_id)
-    );
-  }
-
-  await ctx.petitions.createEvent({
-    petitionId: ctx.access!.petition_id,
-    type: "ACCESS_OPENED",
-    data: { petition_access_id: ctx.access!.id },
-  });
-
-  ctx.analytics.trackEvent(
-    "ACCESS_OPENED",
-    {
-      contact_id: ctx.access!.contact_id,
-      org_id: petition.org_id,
-      petition_id: ctx.access!.petition_id,
-    },
-    toGlobalId("User", ctx.access!.granter_id)
-  );
-}
-
 export const verifyPublicAccess = mutationField("verifyPublicAccess", {
   type: objectType({
     name: "PublicAccessVerification",
@@ -117,7 +79,13 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       ctx.access!.petition_id
     ))!;
     if (petition.skip_forward_security) {
-      await trackAccessOpenedEvent(ctx, petition);
+      await ctx.petitions.createEvent({
+        type: "ACCESS_OPENED",
+        petition_id: ctx.access!.petition_id,
+        data: {
+          petition_access_id: ctx.access!.id,
+        },
+      });
       return { isAllowed: true };
     }
     const logEntry = {
@@ -131,7 +99,13 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         ? await ctx.contacts.verifyContact(contactId, cookieValue)
         : null;
       if (authenticationId) {
-        await trackAccessOpenedEvent(ctx, petition);
+        await ctx.petitions.createEvent({
+          type: "ACCESS_OPENED",
+          petition_id: ctx.access!.petition_id,
+          data: {
+            petition_access_id: ctx.access!.id,
+          },
+        });
         await ctx.contacts.addContactAuthenticationLogAccessEntry(
           authenticationId,
           logEntry
@@ -150,7 +124,13 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
         };
       }
     } else {
-      await trackAccessOpenedEvent(ctx, petition);
+      await ctx.petitions.createEvent({
+        type: "ACCESS_OPENED",
+        petition_id: ctx.access!.petition_id,
+        data: {
+          petition_access_id: ctx.access!.id,
+        },
+      });
       const { cookieValue, contactAuthentication } =
         await ctx.contacts.createContactAuthentication(contactId);
       await ctx.contacts.addContactAuthenticationLogAccessEntry(
@@ -467,7 +447,7 @@ export const publicUpdateSimpleReply = mutationField(
       } else {
         await ctx.petitions.createEvent({
           type: "REPLY_UPDATED",
-          petitionId,
+          petition_id: petitionId,
           data: {
             petition_access_id: reply.petition_access_id!,
             petition_field_id: reply.petition_field_id,
@@ -568,7 +548,7 @@ export const publicUpdateDynamicSelectReply = mutationField(
       } else {
         await ctx.petitions.createEvent({
           type: "REPLY_UPDATED",
-          petitionId,
+          petition_id: petitionId,
           data: {
             petition_access_id: reply.petition_access_id!,
             petition_field_id: reply.petition_field_id,
@@ -620,22 +600,6 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
         accessIds: ctx.access!.id,
       });
     }
-    const [user, recipient] = await Promise.all([
-      ctx.users.loadUser(ctx.access!.granter_id),
-      ctx.contacts.loadContactByAccessId(ctx.access!.id),
-    ]);
-    ctx.analytics.trackEvent(
-      "PETITION_COMPLETED",
-      {
-        access_id: ctx.access!.id,
-        org_id: petition.org_id,
-        petition_id: petition.id,
-        requiresSignature: !!signatureConfig,
-        same_domain:
-          user!.email.split("@")[1] === recipient!.email.split("@")[1],
-      },
-      toGlobalId("User", ctx.access!.granter_id)
-    );
     return petition;
   },
 });
@@ -873,7 +837,7 @@ export const publicDelegateAccessToContact = mutationField(
           ),
           ctx.petitions.createEvent({
             type: "ACCESS_DELEGATED",
-            petitionId,
+            petition_id: petitionId,
             data: {
               petition_access_id: access.id,
               new_petition_access_id: newAccess.id,

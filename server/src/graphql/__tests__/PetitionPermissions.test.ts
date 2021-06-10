@@ -12,6 +12,7 @@ import {
 } from "../../db/__types";
 import { EMAILS, IEmailsService } from "../../services/emails";
 import { toGlobalId } from "../../util/globalId";
+import { deleteAllData } from "../../util/knexUtils";
 import { Maybe, MaybeArray } from "../../util/types";
 import { initServer, TestClient } from "./server";
 
@@ -32,6 +33,8 @@ describe("GraphQL/Petition Permissions", () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
+
+    await deleteAllData(knex);
 
     [organization] = await mocks.createRandomOrganizations(1, () => ({
       identifier: "parallel",

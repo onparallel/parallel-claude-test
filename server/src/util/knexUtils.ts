@@ -10,7 +10,7 @@ export async function deleteAllData(knex: Knex) {
       select 'truncate ' || string_agg(format('%I.%I', schemaname, tablename), ',')
         into l_stmt
       from pg_tables
-      where schemaname in ('public') and tablename not in ('migrations', 'migrations_lock', 'feature_flag');
+      where schemaname in ('public') and tablename not in ('migrations', 'migrations_lock');
     
       execute l_stmt;
     end;

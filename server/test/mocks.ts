@@ -60,6 +60,7 @@ export class MockEmailsService implements IEmailsService {
 @injectable()
 export class MockAwsService implements IAws {
   async enqueueMessages() {}
+  async enqueueEvents() {}
   async createCognitoUser() {
     return "";
   }

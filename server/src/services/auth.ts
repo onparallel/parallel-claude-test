@@ -20,9 +20,8 @@ import {
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
-import { toGlobalId } from "../util/globalId";
 import { random } from "../util/token";
-import { ANALYTICS, AnalyticsService } from "./analytics";
+import { Aws, AWS_SERVICE } from "./aws";
 import { REDIS, Redis } from "./redis";
 
 export interface IAuth {
@@ -55,7 +54,7 @@ export class Auth implements IAuth {
   constructor(
     @inject(CONFIG) private config: Config,
     @inject(REDIS) private redis: Redis,
-    @inject(ANALYTICS) public readonly analytics: AnalyticsService,
+    @inject(AWS_SERVICE) public readonly aws: Aws,
     private orgs: OrganizationRepository,
     private integrations: IntegrationRepository,
     private users: UserRepository
@@ -339,16 +338,12 @@ export class Auth implements IAuth {
   }
 
   private trackSessionLogin(user: User) {
-    this.analytics.identifyUser(user);
-    this.analytics.trackEvent(
-      "USER_LOGGED_IN",
-      {
-        email: user.email,
-        org_id: user.org_id,
+    this.aws.enqueueEvents({
+      type: "USER_LOGGED_IN",
+      data: {
         user_id: user.id,
       },
-      toGlobalId("User", user.id)
-    );
+    });
   }
 
   private setSession(res: Response, token: string) {

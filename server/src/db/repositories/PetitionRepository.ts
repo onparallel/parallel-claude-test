@@ -27,7 +27,16 @@ import {
 } from "../../util/reminderUtils";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
-import { PetitionEvent, PetitionEventPayload } from "../events";
+import {
+  AccessDeactivatedEvent,
+  CreatePetitionEvent,
+  GroupPermissionEditedEvent,
+  GroupPermissionRemovedEvent,
+  MessageCancelledEvent,
+  PetitionEvent,
+  UserPermissionEditedEvent,
+  UserPermissionRemovedEvent,
+} from "../events";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import {
   defaultFieldOptions,
@@ -82,6 +91,8 @@ export class PetitionRepository extends BaseRepository {
   constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: Aws) {
     super(knex);
   }
+
+  readonly load = this.buildLoadById("petition", "id");
 
   readonly loadPetition = this.buildLoadById("petition", "id", (q) =>
     q.whereNull("deleted_at")
@@ -487,18 +498,18 @@ export class PetitionRepository extends BaseRepository {
               updated_by: `User:${user.id}`,
             }))
           );
-    if (rows.length > 0) {
-      await this.createEvent(
-        rows.map((access) => ({
-          type: "ACCESS_ACTIVATED",
-          petitionId,
-          data: {
-            petition_access_id: access.id,
-            user_id: user.id,
-          },
-        }))
-      );
-    }
+
+    await this.createEvent(
+      rows.map((access) => ({
+        type: "ACCESS_ACTIVATED",
+        petition_id: petitionId,
+        data: {
+          petition_access_id: access.id,
+          user_id: user.id,
+        },
+      }))
+    );
+
     return rows;
   }
 
@@ -556,17 +567,16 @@ export class PetitionRepository extends BaseRepository {
               created_by: `User:${user.id}`,
             }))
           );
-    if (rows.length > 0) {
-      await this.createEvent(
-        rows.map((message) => ({
-          type: scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
-          petitionId,
-          data: {
-            petition_message_id: message.id,
-          },
-        }))
-      );
-    }
+
+    await this.createEvent(
+      rows.map((message) => ({
+        type: scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
+        petition_id: petitionId,
+        data: {
+          petition_message_id: message.id,
+        },
+      }))
+    );
 
     return rows;
   }
@@ -576,22 +586,24 @@ export class PetitionRepository extends BaseRepository {
     messageId: number,
     user: User
   ) {
-    const [row] = await this.from("petition_message")
-      .where({ id: messageId, status: "SCHEDULED" })
-      .update(
-        {
-          status: "CANCELLED",
+    const [[row]] = await Promise.all([
+      this.from("petition_message")
+        .where({ id: messageId, status: "SCHEDULED" })
+        .update(
+          {
+            status: "CANCELLED",
+          },
+          "*"
+        ),
+      this.createEvent({
+        type: "MESSAGE_CANCELLED",
+        petition_id: petitionId,
+        data: {
+          petition_message_id: messageId,
+          user_id: user.id,
         },
-        "*"
-      );
-    await this.createEvent({
-      type: "MESSAGE_CANCELLED",
-      petitionId,
-      data: {
-        petition_message_id: messageId,
-        user_id: user.id,
-      },
-    });
+      }),
+    ]);
     return row ?? null;
   }
 
@@ -624,28 +636,26 @@ export class PetitionRepository extends BaseRepository {
           "*"
         ),
     ]);
-    await this.createEvent(
-      accesses.map((access) => ({
+
+    await this.createEvent([
+      ...accesses.map<AccessDeactivatedEvent<true>>((access) => ({
         type: "ACCESS_DEACTIVATED",
-        petitionId,
+        petition_id: petitionId,
         data: {
           petition_access_id: access.id,
           user_id: user.id,
         },
-      }))
-    );
-    if (messages.length > 0) {
-      await this.createEvent(
-        messages.map((message) => ({
-          type: "MESSAGE_CANCELLED",
-          petitionId,
-          data: {
-            petition_message_id: message.id,
-            user_id: user.id,
-          },
-        }))
-      );
-    }
+      })),
+      ...messages.map<MessageCancelledEvent<true>>((message) => ({
+        type: "MESSAGE_CANCELLED",
+        petition_id: petitionId,
+        data: {
+          petition_message_id: message.id,
+          user_id: user.id,
+        },
+      })),
+    ]);
+
     return accesses;
   }
 
@@ -668,7 +678,7 @@ export class PetitionRepository extends BaseRepository {
     await this.createEvent(
       accesses.map((access) => ({
         type: "ACCESS_ACTIVATED",
-        petitionId,
+        petition_id: petitionId,
         data: {
           petition_access_id: access.id,
           user_id: user.id,
@@ -826,7 +836,7 @@ export class PetitionRepository extends BaseRepository {
         await this.createEvent(
           _accesses.map((access) => ({
             type: "ACCESS_DEACTIVATED",
-            petitionId: _accesses[0].petition_id,
+            petition_id: _accesses[0].petition_id,
             data: {
               petition_access_id: access.id,
               user_id: user.id,
@@ -841,7 +851,7 @@ export class PetitionRepository extends BaseRepository {
         await this.createEvent(
           _messages.map((message) => ({
             type: "MESSAGE_CANCELLED",
-            petitionId: _messages[0].petition_id,
+            petition_id: _messages[0].petition_id,
             data: {
               petition_message_id: message.id,
               user_id: user.id,
@@ -1313,7 +1323,7 @@ export class PetitionRepository extends BaseRepository {
     ]);
     await this.createEvent({
       type: "REPLY_CREATED",
-      petitionId: field.petition_id,
+      petition_id: field.petition_id,
       data: {
         ...(createdBy === "User"
           ? { user_id: reply.user_id! }
@@ -1391,7 +1401,7 @@ export class PetitionRepository extends BaseRepository {
         .where({ id: field.petition_id, status: "COMPLETED" }),
       this.createEvent({
         type: "REPLY_DELETED",
-        petitionId: field!.petition_id,
+        petition_id: field!.petition_id,
         data: {
           petition_access_id: reply.petition_access_id!,
           petition_field_id: reply.petition_field_id,
@@ -1460,8 +1470,8 @@ export class PetitionRepository extends BaseRepository {
         return updated;
       });
       await this.createEvent({
-        petitionId,
         type: "PETITION_COMPLETED",
+        petition_id: petitionId,
         data: { petition_access_id: accessId },
       });
       return petition;
@@ -1657,16 +1667,6 @@ export class PetitionRepository extends BaseRepository {
         data,
         t
       ).returning("*");
-      await this.createEvent(
-        reminders.map((reminder) => ({
-          type: "REMINDER_SENT",
-          petitionId,
-          data: {
-            petition_reminder_id: reminder.id,
-          },
-        })),
-        t
-      );
       return reminders;
     });
   }
@@ -1746,37 +1746,19 @@ export class PetitionRepository extends BaseRepository {
     return true;
   }
 
-  async createEvent<TType extends PetitionEventType>(
-    events: MaybeArray<{
-      petitionId: number;
-      type: TType;
-      data: PetitionEventPayload<TType>;
-    }>,
-    t?: Knex.Transaction<any, any>
-  ): Promise<PetitionEvent[]> {
-    if (Array.isArray(events) && events.length === 0) {
+  async createEvent(
+    events: MaybeArray<CreatePetitionEvent>,
+    t?: Knex.Transaction
+  ) {
+    const eventsArray = unMaybeArray(events);
+    if (eventsArray.length === 0) {
       return [];
     }
 
-    const petitionEvents = await this.insert(
-      "petition_event",
-      unMaybeArray(events).map(({ petitionId, type, data }) => ({
-        petition_id: petitionId,
-        type,
-        data,
-      })),
-      t
-    );
+    const petitionEvents = await this.insert("petition_event", eventsArray, t);
 
     // dont await this. we may be inside a transaction
-    this.aws.enqueueMessages(
-      "event-processor",
-      petitionEvents.map((event) => ({
-        id: `event-processor-${event.id}`,
-        groupId: `event-processor-${event.id}`,
-        body: { event },
-      }))
-    );
+    this.aws.enqueueEvents(petitionEvents);
 
     return petitionEvents;
   }
@@ -2186,19 +2168,18 @@ export class PetitionRepository extends BaseRepository {
         userNotifications.length > 0
           ? this.insert("petition_user_notification", userNotifications, t)
           : [],
-      ]);
-
-      await this.createEvent(
-        {
-          type: "COMMENT_PUBLISHED",
-          petitionId: data.petitionId,
-          data: {
-            petition_field_id: comment.petition_field_id,
-            petition_field_comment_id: comment.id,
+        this.createEvent(
+          {
+            type: "COMMENT_PUBLISHED",
+            petition_id: data.petitionId,
+            data: {
+              petition_field_id: comment.petition_field_id,
+              petition_field_comment_id: comment.id,
+            },
           },
-        },
-        t
-      );
+          t
+        ),
+      ]);
 
       return comment;
     });
@@ -2277,19 +2258,18 @@ export class PetitionRepository extends BaseRepository {
               t
             )
           : [],
-      ]);
-
-      await this.createEvent(
-        {
-          type: "COMMENT_PUBLISHED",
-          petitionId: data.petitionId,
-          data: {
-            petition_field_id: comment.petition_field_id,
-            petition_field_comment_id: comment.id,
+        this.createEvent(
+          {
+            type: "COMMENT_PUBLISHED",
+            petition_id: data.petitionId,
+            data: {
+              petition_field_id: comment.petition_field_id,
+              petition_field_comment_id: comment.id,
+            },
           },
-        },
-        t
-      );
+          t
+        ),
+      ]);
 
       return comment;
     });
@@ -2308,7 +2288,7 @@ export class PetitionRepository extends BaseRepository {
       ),
       this.createEvent({
         type: "COMMENT_DELETED",
-        petitionId,
+        petition_id: petitionId,
         data: {
           petition_field_id: petitionFieldId,
           petition_field_comment_id: petitionFieldCommentId,
@@ -2331,7 +2311,7 @@ export class PetitionRepository extends BaseRepository {
       ),
       this.createEvent({
         type: "COMMENT_DELETED",
-        petitionId,
+        petition_id: petitionId,
         data: {
           petition_field_id: petitionFieldId,
           petition_field_comment_id: petitionFieldCommentId,
@@ -2792,35 +2772,29 @@ export class PetitionRepository extends BaseRepository {
         (p) => p.user_group_id === null
       );
 
-      await Promise.all([
-        directlyAssigned.length > 0
-          ? this.createEvent(
-              directlyAssigned.map((p) => ({
-                petitionId: p.petition_id,
-                type: "USER_PERMISSION_EDITED",
-                data: {
-                  user_id: user.id,
-                  permission_type: p.type,
-                  permission_user_id: p.user_id!,
-                },
-              })),
-              t
-            )
-          : undefined,
-        groupAssigned.length > 0
-          ? this.createEvent(
-              groupAssigned.map((p) => ({
-                petitionId: p.petition_id,
-                type: "GROUP_PERMISSION_EDITED",
-                data: {
-                  user_id: user.id,
-                  permission_type: p.type,
-                  user_group_id: p.user_group_id!,
-                },
-              }))
-            )
-          : undefined,
-      ]);
+      await this.createEvent(
+        [
+          ...directlyAssigned.map<UserPermissionEditedEvent<true>>((p) => ({
+            petition_id: p.petition_id,
+            type: "USER_PERMISSION_EDITED",
+            data: {
+              user_id: user.id,
+              permission_type: p.type,
+              permission_user_id: p.user_id!,
+            },
+          })),
+          ...groupAssigned.map<GroupPermissionEditedEvent<true>>((p) => ({
+            petition_id: p.petition_id,
+            type: "GROUP_PERMISSION_EDITED",
+            data: {
+              user_id: user.id,
+              permission_type: p.type,
+              user_group_id: p.user_group_id!,
+            },
+          })),
+        ],
+        t
+      );
 
       return await this.from("petition", t)
         .whereNull("deleted_at")
@@ -2882,38 +2856,34 @@ export class PetitionRepository extends BaseRepository {
         (p) => p.user_group_id === null
       );
 
-      await Promise.all([
-        directlyAssigned.length > 0
-          ? this.createEvent(
-              directlyAssigned.map((p) => ({
-                petitionId: p.petition_id,
-                type: "USER_PERMISSION_REMOVED",
-                data: {
-                  user_id: user.id,
-                  permission_user_id: p.user_id!,
-                },
-              })),
-              t
-            )
-          : undefined,
-        groupAssigned.length > 0
-          ? this.createEvent(
-              groupAssigned.map((p) => ({
-                petitionId: p.petition_id,
-                type: "GROUP_PERMISSION_REMOVED",
-                data: {
-                  user_id: user.id,
-                  user_group_id: p.user_group_id!,
-                },
-              }))
-            )
-          : undefined,
+      const [petitions] = await Promise.all([
+        this.from("petition", t)
+          .whereNull("deleted_at")
+          .whereIn("id", petitionIds)
+          .returning("*"),
+        this.createEvent(
+          [
+            ...directlyAssigned.map<UserPermissionRemovedEvent<true>>((p) => ({
+              petition_id: p.petition_id,
+              type: "USER_PERMISSION_REMOVED",
+              data: {
+                user_id: user.id,
+                permission_user_id: p.user_id!,
+              },
+            })),
+            ...groupAssigned.map<GroupPermissionRemovedEvent<true>>((p) => ({
+              petition_id: p.petition_id,
+              type: "GROUP_PERMISSION_REMOVED",
+              data: {
+                user_id: user.id,
+                user_group_id: p.user_group_id!,
+              },
+            })),
+          ],
+          t
+        ),
       ]);
-
-      return await this.from("petition", t)
-        .whereNull("deleted_at")
-        .whereIn("id", petitionIds)
-        .returning("*");
+      return petitions;
     }, t);
   }
 
@@ -2938,33 +2908,27 @@ export class PetitionRepository extends BaseRepository {
         (p) => p.user_group_id === null
       );
 
-      await Promise.all([
-        directlyAssigned.length > 0
-          ? this.createEvent(
-              directlyAssigned.map((p) => ({
-                petitionId: p.petition_id,
-                type: "USER_PERMISSION_REMOVED",
-                data: {
-                  user_id: user.id,
-                  permission_user_id: p.user_id!,
-                },
-              })),
-              t
-            )
-          : undefined,
-        groupAssigned.length > 0
-          ? this.createEvent(
-              groupAssigned.map((p) => ({
-                petitionId: p.petition_id,
-                type: "GROUP_PERMISSION_REMOVED",
-                data: {
-                  user_id: user.id,
-                  user_group_id: p.user_group_id!,
-                },
-              }))
-            )
-          : undefined,
-      ]);
+      await this.createEvent(
+        [
+          ...directlyAssigned.map<UserPermissionRemovedEvent<true>>((p) => ({
+            petition_id: p.petition_id,
+            type: "USER_PERMISSION_REMOVED",
+            data: {
+              user_id: user.id,
+              permission_user_id: p.user_id!,
+            },
+          })),
+          ...groupAssigned.map<GroupPermissionRemovedEvent<true>>((p) => ({
+            petition_id: p.petition_id,
+            type: "GROUP_PERMISSION_REMOVED",
+            data: {
+              user_id: user.id,
+              user_group_id: p.user_group_id!,
+            },
+          })),
+        ],
+        t
+      );
 
       return removedPermissions;
     }, t);
@@ -3033,7 +2997,7 @@ export class PetitionRepository extends BaseRepository {
 
       await this.createEvent(
         previousOwnerPermissions.map((p) => ({
-          petitionId: p.petition_id,
+          petition_id: p.petition_id,
           type: "OWNERSHIP_TRANSFERRED",
           data: {
             user_id: updatedBy.id,

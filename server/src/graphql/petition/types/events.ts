@@ -88,6 +88,14 @@ export const PetitionEvent = interfaceType({
         return "SignatureCompletedEvent";
       case "SIGNATURE_CANCELLED":
         return "SignatureCancelledEvent";
+      case "PETITION_CLONED":
+        return "PetitionClonedEvent";
+      case "PETITION_DELETED":
+        return "PetitionDeletedEvent";
+      case "PETITION_SENT":
+        return "PetitionSentEvent";
+      case "TEMPLATE_USED":
+        return "TemplateUsedEvent";
     }
   },
   rootTyping: "events.PetitionEvent",
@@ -612,4 +620,25 @@ export const SignatureCancelledEvent = createPetitionEvent(
       },
     });
   }
+);
+
+/**
+ * the following events must be defined in GraphQL
+ * but are not exposed to the client, so they have an empty definition
+ */
+export const PetitionClonedEvent = createPetitionEvent(
+  "PetitionClonedEvent",
+  (t) => {}
+);
+export const PetitionDeletedEvent = createPetitionEvent(
+  "PetitionDeletedEvent",
+  (t) => {}
+);
+export const PetitionSentEvent = createPetitionEvent(
+  "PetitionSentEvent",
+  (t) => {}
+);
+export const TemplateUsedEvent = createPetitionEvent(
+  "TemplateUsedEvent",
+  (t) => {}
 );

@@ -1,4 +1,7 @@
 import gql from "graphql-tag";
+import { Knex } from "knex";
+import { USER_COGNITO_ID } from "../../../test/mocks";
+import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   FeatureFlagOverride,
@@ -6,11 +9,9 @@ import {
   User,
   UserAuthenticationToken,
 } from "../../db/__types";
-import { USER_COGNITO_ID } from "../../../test/mocks";
-import { initServer, TestClient } from "./server";
 import { toGlobalId } from "../../util/globalId";
-import { Knex } from "knex";
-import { KNEX } from "../../db/knex";
+import { deleteAllData } from "../../util/knexUtils";
+import { initServer, TestClient } from "./server";
 
 describe("GraphQL/UserAuthenticationToken", () => {
   let testClient: TestClient;
@@ -22,8 +23,12 @@ describe("GraphQL/UserAuthenticationToken", () => {
     testClient = await initServer();
     const knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
+    await deleteAllData(knex);
 
     [organization] = await mocks.createRandomOrganizations(1);
+    await mocks.createFeatureFlags([
+      { name: "API_TOKENS", default_value: false },
+    ]);
     await knex.from<FeatureFlagOverride>("feature_flag_override").insert({
       org_id: organization.id,
       feature_flag_name: "API_TOKENS",

@@ -124,7 +124,7 @@ async function startSignatureProcess(
 
       ctx.petitions.createEvent({
         type: "SIGNATURE_STARTED",
-        petitionId: signature.petition_id,
+        petition_id: signature.petition_id,
         data: {
           petition_signature_request_id: signature.id,
         },

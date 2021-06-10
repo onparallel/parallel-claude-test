@@ -130,27 +130,27 @@ export const createPetition = mutationField("createPetition", {
       });
 
       if (original.is_template && !isTemplate) {
-        ctx.analytics.trackEvent(
-          "TEMPLATE_USED",
-          {
+        await ctx.petitions.createEvent({
+          type: "TEMPLATE_USED",
+          petition_id: petitionId,
+          data: {
             template_id: petitionId,
             org_id: ctx.user!.org_id,
             user_id: ctx.user!.id,
           },
-          toGlobalId("User", ctx.user!.id)
-        );
+        });
       } else if (!original.is_template) {
-        ctx.analytics.trackEvent(
-          "PETITION_CLONED",
-          {
+        await ctx.petitions.createEvent({
+          type: "PETITION_CLONED",
+          petition_id: petition.id,
+          data: {
             from_petition_id: petitionId,
             org_id: petition.org_id,
             petition_id: petition.id,
             user_id: ctx.user!.id,
             type: petition.is_template ? "TEMPLATE" : "PETITION",
           },
-          toGlobalId("User", ctx.user!.id)
-        );
+        });
       }
     } else {
       petition = await ctx.petitions.createPetition(
@@ -162,17 +162,6 @@ export const createPetition = mutationField("createPetition", {
         },
         ctx.user!
       );
-
-      ctx.analytics.trackEvent(
-        "PETITION_CREATED",
-        {
-          petition_id: petition.id,
-          org_id: petition.org_id,
-          user_id: ctx.user!.id,
-          type: isTemplate ? "TEMPLATE" : "PETITION",
-        },
-        toGlobalId("User", ctx.user!.id)
-      );
     }
 
     if (eventsUrl) {
@@ -183,8 +172,8 @@ export const createPetition = mutationField("createPetition", {
       );
     }
     await ctx.petitions.createEvent({
-      petitionId: petition.id,
       type: "PETITION_CREATED",
+      petition_id: petition.id,
       data: {
         user_id: ctx.user!.id,
       },
@@ -224,23 +213,24 @@ export const clonePetitions = mutationField("clonePetitions", {
           }
         );
 
-        await ctx.petitions.createEvent({
-          petitionId: cloned.id,
-          type: "PETITION_CREATED",
-          data: { user_id: ctx.user!.id },
-        });
-
-        ctx.analytics.trackEvent(
-          "PETITION_CLONED",
+        await ctx.petitions.createEvent([
           {
-            from_petition_id: petitionId,
-            org_id: cloned.org_id,
+            type: "PETITION_CREATED",
             petition_id: cloned.id,
-            user_id: ctx.user!.id,
-            type: cloned.is_template ? "TEMPLATE" : "PETITION",
+            data: { user_id: ctx.user!.id },
           },
-          toGlobalId("User", ctx.user!.id)
-        );
+          {
+            type: "PETITION_CLONED",
+            petition_id: cloned.id,
+            data: {
+              from_petition_id: petitionId,
+              org_id: cloned.org_id,
+              petition_id: cloned.id,
+              user_id: ctx.user!.id,
+              type: cloned.is_template ? "TEMPLATE" : "PETITION",
+            },
+          },
+        ]);
 
         return cloned;
       },
@@ -335,15 +325,15 @@ export const deletePetitions = mutationField("deletePetitions", {
         t
       );
 
-      ctx.analytics.trackEvent(
-        "PETITION_DELETED",
+      await ctx.petitions.createEvent(
         deletedPetitions.map((petition) => ({
+          type: "PETITION_DELETED",
           petition_id: petition.id,
-          org_id: ctx.user!.org_id,
-          user_id: ctx.user!.id,
-          status: petition.status!,
-        })),
-        toGlobalId("User", ctx.user!.id)
+          data: {
+            user_id: ctx.user!.id,
+            status: petition.status!,
+          },
+        }))
       );
     });
 
@@ -888,20 +878,11 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
     ) {
       await ctx.petitions.createEvent({
         type: "PETITION_CLOSED",
-        petitionId: petition.id,
+        petition_id: petition.id,
         data: {
           user_id: ctx.user!.id,
         },
       });
-      ctx.analytics.trackEvent(
-        "PETITION_CLOSED",
-        {
-          petition_id: petition.id,
-          org_id: petition.org_id,
-          user_id: ctx.user!.id,
-        },
-        toGlobalId("User", ctx.user!.id)
-      );
     }
     return { petition, fields };
   },
@@ -1165,17 +1146,15 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       await ctx.emails.sendPetitionMessageEmail(messages.map((m) => m.id));
     }
 
-    successfulSends.map((s) =>
-      ctx.analytics.trackEvent(
-        "PETITION_SENT",
-        {
-          petition_id: s.petition!.id,
-          org_id: s.petition!.org_id,
+    await ctx.petitions.createEvent(
+      successfulSends.map((s) => ({
+        type: "PETITION_SENT",
+        petition_id: s.petition!.id,
+        data: {
           user_id: ctx.user!.id,
-          access_ids: s.accesses!.map((a) => a.id),
+          petition_access_ids: s.accesses!.map((a) => a.id),
         },
-        toGlobalId("User", ctx.user!.id)
-      )
+      }))
     );
 
     return results.map((r) => omit(r, ["messages"]));
@@ -1234,16 +1213,14 @@ export const sendPetition = mutationField("sendPetition", {
         await ctx.emails.sendPetitionMessageEmail(messages!.map((s) => s.id));
       }
 
-      ctx.analytics.trackEvent(
-        "PETITION_SENT",
-        {
-          petition_id: args.petitionId,
-          org_id: ctx.user!.org_id,
+      await ctx.petitions.createEvent({
+        type: "PETITION_SENT",
+        petition_id: args.petitionId,
+        data: {
           user_id: ctx.user!.id,
-          access_ids: accesses!.map((a) => a.id),
+          petition_access_ids: accesses!.map((a) => a.id),
         },
-        toGlobalId("User", ctx.user!.id)
-      );
+      });
     }
 
     return {
@@ -1292,24 +1269,19 @@ export const sendReminders = mutationField("sendReminders", {
           created_by: `User:${ctx.user!.id}`,
         }))
       );
+
+      await ctx.petitions.createEvent(
+        reminders.filter(isDefined).map((reminder) => ({
+          type: "REMINDER_SENT",
+          petition_id: args.petitionId,
+          data: {
+            petition_reminder_id: reminder.id,
+          },
+        }))
+      );
+
       await ctx.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
 
-      accesses.forEach((access) => {
-        if (access) {
-          ctx.analytics.trackEvent(
-            "REMINDER_EMAIL_SENT",
-            {
-              petition_id: args.petitionId,
-              user_id: ctx.user!.id,
-              org_id: ctx.user!.org_id,
-              access_id: access.id,
-              sent_count: 10 - access.reminders_left + 1,
-              type: "MANUAL",
-            },
-            toGlobalId("User", ctx.user!.id)
-          );
-        }
-      });
       return RESULT.SUCCESS;
     } catch (error) {
       return RESULT.FAILURE;
@@ -1527,27 +1499,27 @@ export const sendPetitionClosedNotification = mutationField(
 
       const activeAccesses = accesses.filter((a) => a.status === "ACTIVE");
 
-      await ctx.emails.sendPetitionClosedEmail(
-        args.petitionId,
-        ctx.user!.id,
-        activeAccesses.map((a) => a.id),
-        args.emailBody,
-        args.attachPdfExport,
-        args.pdfExportTitle ?? null
-      );
-
-      await Promise.all(
-        activeAccesses.map((access) =>
-          ctx.petitions.createEvent({
+      await Promise.all([
+        ctx.emails.sendPetitionClosedEmail(
+          args.petitionId,
+          ctx.user!.id,
+          activeAccesses.map((a) => a.id),
+          args.emailBody,
+          args.attachPdfExport,
+          args.pdfExportTitle ?? null
+        ),
+        ctx.petitions.createEvent(
+          activeAccesses.map((access) => ({
             type: "PETITION_CLOSED_NOTIFIED",
-            petitionId: args.petitionId,
+            petition_id: args.petitionId,
             data: {
               user_id: ctx.user!.id,
               petition_access_id: access.id,
             },
-          })
-        )
-      );
+          }))
+        ),
+      ]);
+
       return (await ctx.petitions.loadPetition(args.petitionId))!;
     },
   }
@@ -1562,20 +1534,24 @@ export const reopenPetition = mutationField("reopenPetition", {
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
-      await ctx.petitions.createEvent(
-        {
-          type: "PETITION_REOPENED",
-          data: { user_id: ctx.user!.id },
-          petitionId: args.petitionId,
-        },
-        t
-      );
-      return await ctx.petitions.updatePetition(
-        args.petitionId,
-        { status: "PENDING" },
-        `User:${ctx.user!.id}`,
-        t
-      );
+      const [petition] = await Promise.all([
+        ctx.petitions.updatePetition(
+          args.petitionId,
+          { status: "PENDING" },
+          `User:${ctx.user!.id}`,
+          t
+        ),
+        ctx.petitions.createEvent(
+          {
+            type: "PETITION_REOPENED",
+            petition_id: args.petitionId,
+            data: { user_id: ctx.user!.id },
+          },
+          t
+        ),
+      ]);
+
+      return petition;
     });
   },
 });

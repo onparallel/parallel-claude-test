@@ -1,8 +1,7 @@
-import { createCronWorker } from "./helpers/createCronWorker";
+import pMap from "p-map";
 import { groupBy } from "remeda";
 import { calculateNextReminder } from "../util/reminderUtils";
-import { toGlobalId } from "../util/globalId";
-import pMap from "p-map";
+import { createCronWorker } from "./helpers/createCronWorker";
 
 createCronWorker("reminder-trigger", async (context) => {
   const accesses = await context.petitions.getRemindableAccesses();
@@ -30,25 +29,14 @@ createCronWorker("reminder-trigger", async (context) => {
       }))
     );
     await context.emails.sendPetitionReminderEmail(reminders.map((r) => r.id));
-
-    await pMap(
-      batch,
-      async (access) => {
-        const granter = await context.users.loadUser(access.granter_id);
-        context.analytics.trackEvent(
-          "REMINDER_EMAIL_SENT",
-          {
-            petition_id: access.petition_id,
-            org_id: granter!.org_id,
-            user_id: access.granter_id,
-            access_id: access.id,
-            sent_count: 10 - access.reminders_left + 1,
-            type: "AUTOMATIC",
-          },
-          toGlobalId("User", access.granter_id)
-        );
-      },
-      { concurrency: 5 }
+    await context.petitions.createEvent(
+      reminders.map((reminder) => ({
+        type: "REMINDER_SENT",
+        petition_id: batch[0].petition_id,
+        data: {
+          petition_reminder_id: reminder.id,
+        },
+      }))
     );
   }
 });

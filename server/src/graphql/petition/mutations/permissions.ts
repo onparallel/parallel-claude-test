@@ -25,6 +25,10 @@ import { isDefined } from "../../../util/remedaExtensions";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { userHasAccessToUserGroups } from "../../user-group/authorizers";
 import { partition } from "../../../util/arrays";
+import {
+  GroupPermissionAddedEvent,
+  UserPermissionAddedEvent,
+} from "../../../db/events";
 
 export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
@@ -121,35 +125,29 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
           (p) => p.user_group_id === null
         );
 
-        await Promise.all([
-          directlyAssigned.length > 0
-            ? ctx.petitions.createEvent(
-                directlyAssigned.map((p) => ({
-                  petitionId: p.petition_id,
-                  type: "USER_PERMISSION_ADDED",
-                  data: {
-                    user_id: ctx.user!.id,
-                    permission_type: p.type,
-                    permission_user_id: p.user_id!,
-                  },
-                })),
-                t
-              )
-            : undefined,
-          groupAssigned.length > 0
-            ? ctx.petitions.createEvent(
-                groupAssigned.map((p) => ({
-                  petitionId: p.petition_id,
-                  type: "GROUP_PERMISSION_ADDED",
-                  data: {
-                    user_id: ctx.user!.id,
-                    permission_type: p.type,
-                    user_group_id: p.user_group_id!,
-                  },
-                }))
-              )
-            : undefined,
-        ]);
+        await ctx.petitions.createEvent(
+          [
+            ...directlyAssigned.map<UserPermissionAddedEvent<true>>((p) => ({
+              petition_id: p.petition_id,
+              type: "USER_PERMISSION_ADDED",
+              data: {
+                user_id: ctx.user!.id,
+                permission_type: p.type,
+                permission_user_id: p.user_id!,
+              },
+            })),
+            ...groupAssigned.map<GroupPermissionAddedEvent<true>>((p) => ({
+              petition_id: p.petition_id,
+              type: "GROUP_PERMISSION_ADDED",
+              data: {
+                user_id: ctx.user!.id,
+                permission_type: p.type,
+                user_group_id: p.user_group_id!,
+              },
+            })),
+          ],
+          t
+        );
 
         return { petitions, newPermissions };
       }

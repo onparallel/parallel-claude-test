@@ -1590,6 +1590,11 @@ enum PetitionBaseType {
   TEMPLATE
 }
 
+type PetitionClonedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
+}
+
 type PetitionClosedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
@@ -1613,6 +1618,11 @@ type PetitionCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   user: User
+}
+
+type PetitionDeletedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
 }
 
 interface PetitionEvent {
@@ -2081,6 +2091,11 @@ type PetitionReopenedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
   user: User
+}
+
+type PetitionSentEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
 }
 
 enum PetitionSignatureCancelReason {
@@ -3168,6 +3183,11 @@ type TagPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type TemplateUsedEvent implements PetitionEvent {
+  createdAt: DateTime!
+  id: GID!
 }
 
 interface Timestamps {

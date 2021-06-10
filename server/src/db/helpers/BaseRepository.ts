@@ -4,9 +4,9 @@ import { Knex } from "knex";
 import { groupBy, indexBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { MaybeArray, UnwrapPromise } from "../../util/types";
-import { PetitionEvent } from "../events";
+import { CreatePetitionEvent, PetitionEvent } from "../events";
 import {
-  TableCreateTypes,
+  TableCreateTypes as _TableCreateTypes,
   TablePrimaryKeys,
   TableTypes as _TableTypes,
 } from "../__types";
@@ -15,6 +15,10 @@ interface TableTypes extends Omit<_TableTypes, "PetitionEvent"> {
   petition_event: PetitionEvent;
 }
 
+interface TableCreateTypes
+  extends Omit<_TableCreateTypes, "CreatePetitionEvent"> {
+  petition_event: CreatePetitionEvent;
+}
 export interface PageOpts {
   offset?: number | null;
   limit?: number | null;

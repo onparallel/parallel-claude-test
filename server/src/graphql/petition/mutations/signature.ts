@@ -122,7 +122,7 @@ export const cancelSignatureRequest = mutationField("cancelSignatureRequest", {
         : Promise.resolve(),
       ctx.petitions.createEvent({
         type: "SIGNATURE_CANCELLED",
-        petitionId: petition.id,
+        petition_id: petition.id,
         data: {
           petition_signature_request_id: signature.id,
           cancel_reason: "CANCELLED_BY_USER",

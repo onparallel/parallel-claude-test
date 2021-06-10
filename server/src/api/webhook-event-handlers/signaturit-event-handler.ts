@@ -73,8 +73,8 @@ async function documentDeclined(
     email: data.document.email,
   });
 
-  const signatureRequest =
-    await ctx.petitions.updatePetitionSignatureByExternalId(
+  const [signatureRequest] = await Promise.all([
+    ctx.petitions.updatePetitionSignatureByExternalId(
       `SIGNATURIT/${data.document.signature.id}`,
       {
         status: "CANCELLED",
@@ -84,13 +84,13 @@ async function documentDeclined(
           decline_reason: data.document.decline_reason,
         },
       }
-    );
-
-  await appendEventLogs(petitionId, data, ctx);
+    ),
+    appendEventLogs(petitionId, data, ctx),
+  ]);
 
   await ctx.petitions.createEvent({
     type: "SIGNATURE_CANCELLED",
-    petitionId,
+    petition_id: petitionId,
     data: {
       petition_signature_request_id: signatureRequest.id,
       cancel_reason: "DECLINED_BY_SIGNER",
@@ -178,7 +178,7 @@ async function documentCompleted(
     appendEventLogs(petitionId, data, ctx),
     ctx.petitions.createEvent({
       type: "SIGNATURE_COMPLETED",
-      petitionId,
+      petition_id: petitionId,
       data: {
         petition_signature_request_id: signatureRequest.id,
         file_upload_id: signedDoc.id,

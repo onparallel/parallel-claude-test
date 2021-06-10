@@ -4,6 +4,10 @@ import { inject, injectable, interfaces } from "inversify";
 import { chunk } from "remeda";
 import { Memoize } from "typescript-memoize";
 import { Config, CONFIG } from "../config";
+import { PetitionEvent, SystemEvent } from "../db/events";
+import { unMaybeArray } from "../util/arrays";
+import { isDefined } from "../util/remedaExtensions";
+import { MaybeArray } from "../util/types";
 import { LOGGER, Logger } from "./logger";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
 
@@ -16,6 +20,7 @@ export interface IAws {
       | { id: string; body: any; groupId: string }[]
       | { body: any; groupId: string }
   ): Promise<void>;
+  enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>): void;
   createCognitoUser(
     email: string,
     password?: string,
@@ -116,6 +121,20 @@ export class Aws implements IAws {
           MessageGroupId: messages.groupId,
         })
         .promise();
+    }
+  }
+
+  enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>) {
+    const _events = unMaybeArray(events).filter(isDefined);
+    if (_events.length > 0) {
+      this.enqueueMessages(
+        "event-processor",
+        _events.map((event) => ({
+          id: "event-processor-queue",
+          groupId: "event-processor-queue",
+          body: event,
+        }))
+      );
     }
   }
 

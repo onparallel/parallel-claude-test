@@ -97,7 +97,7 @@ export const updateSimpleReply = mutationField("updateSimpleReply", {
     } else {
       await ctx.petitions.createEvent({
         type: "REPLY_UPDATED",
-        petitionId: args.petitionId,
+        petition_id: args.petitionId,
         data: {
           user_id: reply.user_id!,
           petition_field_id: reply.petition_field_id,
