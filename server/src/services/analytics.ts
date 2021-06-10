@@ -95,7 +95,6 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   };
   /** a petition has been opened by any recipient */
   ACCESS_OPENED: {
-    petition_access_id: number;
     contact_id: number;
     petition_id: number;
     org_id: number;

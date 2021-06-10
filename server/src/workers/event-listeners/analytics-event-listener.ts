@@ -256,7 +256,6 @@ async function trackAccessOpenedEvent(
     type: "ACCESS_OPENED",
     user_id: access.granter_id,
     data: {
-      petition_access_id: event.data.petition_access_id,
       contact_id: access.contact_id,
       org_id: petition.org_id,
       petition_id: event.petition_id,
