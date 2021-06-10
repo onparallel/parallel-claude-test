@@ -37,8 +37,7 @@ const haveChanges = ({
     : checked.length != choices.length;
 };
 
-function CustomIcon(props) {
-  const { isIndeterminate, ...rest } = props;
+function CustomIcon() {
   return <RadioButtonSelected />;
 }
 
@@ -50,6 +49,7 @@ export function RecipientViewPetitionFieldCheckbox({
   isDisabled,
   isInvalid,
   hasCommentsEnabled,
+  onDownloadAttachment,
 }: RecipientViewPetitionFieldCheckboxProps) {
   const { values, limit } = field.options;
 
@@ -130,7 +130,7 @@ export function RecipientViewPetitionFieldCheckbox({
       isInvalid={isInvalid}
       hasCommentsEnabled={hasCommentsEnabled}
       showAddNewReply={false}
-      onAddNewReply={() => {}}
+      onDownloadAttachment={onDownloadAttachment}
     >
       <Stack>
         <Flex flexWrap="wrap" alignItems="center">

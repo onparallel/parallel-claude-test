@@ -65,7 +65,10 @@ export function RecipientViewPetitionField(
       onDownloadAttachment={handleDownloadAttachment}
     />
   ) : props.field.type === "CHECKBOX" ? (
-    <RecipientViewPetitionFieldCheckbox {...props} />
+    <RecipientViewPetitionFieldCheckbox
+      {...props}
+      onDownloadAttachment={handleDownloadAttachment}
+    />
   ) : null;
 }
 
