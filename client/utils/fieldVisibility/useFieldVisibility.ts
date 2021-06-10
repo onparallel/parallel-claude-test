@@ -10,6 +10,7 @@ import {
 } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { indexBy } from "remeda";
+import { completedFieldReplies } from "../completedFieldReplies";
 import {
   PetitionFieldVisibility,
   PetitionFieldVisibilityCondition,
@@ -86,7 +87,8 @@ function conditionIsMet(
     case "NONE":
       return !replies.some(evaluator);
     case "NUMBER_OF_REPLIES":
-      return evaluatePredicate(replies.length, operator, value);
+      const completed = completedFieldReplies(field);
+      return evaluatePredicate(completed.length, operator, value);
     default:
       return false;
   }

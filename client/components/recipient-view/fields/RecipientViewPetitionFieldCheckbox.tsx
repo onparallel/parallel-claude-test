@@ -1,13 +1,4 @@
-import {
-  Checkbox,
-  RadioGroup,
-  Radio,
-  Stack,
-  Text,
-  Flex,
-  CheckboxGroup,
-  Icon,
-} from "@chakra-ui/react";
+import { Checkbox, Stack, Text, Flex } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { useEffect, useState } from "react";
@@ -142,10 +133,14 @@ export function RecipientViewPetitionFieldCheckbox({
       onAddNewReply={() => {}}
     >
       <Stack>
-        <Flex flexWrap="wrap">
-          <CheckboxTypeLabel fontSize="sm" field={field} mr={2} />
+        <Flex flexWrap="wrap" alignItems="center">
+          <CheckboxTypeLabel fontSize="sm" mr={2} field={field} />
           {!isSaving ? (
-            <Text fontSize="sm" color={isInvalid ? "red.600" : "gray.500"}>
+            <Text
+              fontSize="sm"
+              mr={2}
+              color={isInvalid ? "red.600" : "gray.500"}
+            >
               {showRadio ? null : "("}
               {type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
                 <FormattedMessage

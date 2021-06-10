@@ -35,7 +35,7 @@ export function PdfFieldWithReplies({
           ) : null}
           {field.replies.map((reply) =>
             field.type === "FILE_UPLOAD" ? (
-              <Text>
+              <Text key={reply.id}>
                 <FormattedMessage
                   key={reply.id}
                   id="petition-signature.file-submitted.pending-review"
@@ -51,7 +51,7 @@ export function PdfFieldWithReplies({
                 />
               </Text>
             ) : field.type === "DYNAMIC_SELECT" ? (
-              <Stack spacing={0}>
+              <Stack spacing={0} key={reply.id}>
                 {(reply.content.columns as [string, string | null][]).map(
                   ([label, value], i) => (
                     <Text key={i}>
@@ -69,7 +69,7 @@ export function PdfFieldWithReplies({
                 )}
               </Stack>
             ) : field.type === "CHECKBOX" ? (
-              <Stack spacing={0}>
+              <Stack spacing={0} key={reply.id}>
                 {(reply.content.choices as [string]).map((value, i) => (
                   <Text key={i}>{value}</Text>
                 ))}

@@ -161,14 +161,19 @@ export const SelectTypeFieldOptions = Object.assign(
           .filter((option) => option !== "");
         if (!shallowEqualArrays(field.options.values, values)) {
           if (field.type === "CHECKBOX") {
+            let min = field.options.limit.min;
             let max = field.options.limit.max;
-            if (max > values.length) max = values.length;
+            if (max > values.length) {
+              max = values.length;
+              min = min >= max ? max - 1 || 1 : min;
+            }
 
             onFieldEdit({
               options: {
                 ...field.options,
                 limit: {
                   ...field.options.limit,
+                  min,
                   max,
                 },
                 values,

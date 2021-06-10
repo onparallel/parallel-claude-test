@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 import {
@@ -25,7 +25,8 @@ export function CheckboxSettings({
 }: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
   const intl = useIntl();
 
-  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 100, [field.id]);
+  const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 180, [field.id]);
+  const reactSelectProps = useFieldSelectReactSelectProps({});
 
   const [selected, setSelected] = useState({
     label: intl.formatMessage({
@@ -34,14 +35,21 @@ export function CheckboxSettings({
     }),
     value: "UNLIMITED",
   });
+  const [type, setType] = useState(field.options?.limit?.type ?? "UNLIMITED");
+  const [min, setMin] = useState(1);
+  const [max, setMax] = useState(1);
 
-  const type = field?.options?.limit?.type ?? "UNLIMITED";
-  const [min, setMin] = useState(field.options?.limit?.min ?? 1);
-  const [max, setMax] = useState(field.options?.limit?.max ?? 1);
+  const refMin = useRef<HTMLInputElement>(null);
+  const refMax = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setMin(field.options?.limit?.min ?? 1);
-    setMax(field.options?.limit?.max ?? 1);
+    if (
+      document.activeElement !== refMin?.current &&
+      document.activeElement !== refMax?.current
+    ) {
+      setMin(field.options?.limit?.min ?? 1);
+      setMax(field.options?.limit?.max ?? 1);
+    }
   }, [field.options.limit]);
 
   const options = useMemo(() => {
@@ -117,8 +125,6 @@ export function CheckboxSettings({
     setSelected(_selected);
   }, [intl.locale, type]);
 
-  const reactSelectProps = useFieldSelectReactSelectProps({});
-
   const handleMinOnChange = (value: string) => {
     if (Number(value) != Number(min)) {
       setMin(Number(value));
@@ -156,6 +162,7 @@ export function CheckboxSettings({
 
   const handleChangeSelect = (_selected) => {
     if (_selected.value != selected?.value) {
+      setType(_selected.value);
       debouncedOnUpdate(field.id, {
         options: {
           ...field.options,
@@ -196,6 +203,7 @@ export function CheckboxSettings({
           color="green"
           isChecked={type !== "RADIO"}
           onChange={(event) => {
+            setType(event.target.checked ? "UNLIMITED" : "RADIO");
             debouncedOnUpdate(field.id, {
               options: {
                 ...field.options,
@@ -228,7 +236,7 @@ export function CheckboxSettings({
               w={"64px"}
               onChange={handleMinOnChange}
             >
-              <NumberInputField />
+              <NumberInputField ref={refMin} />
               <NumberInputStepper>
                 <NumberIncrementStepper />
                 <NumberDecrementStepper />
@@ -243,7 +251,7 @@ export function CheckboxSettings({
               w={"64px"}
               onChange={handleMaxOnChange}
             >
-              <NumberInputField />
+              <NumberInputField ref={refMax} />
               <NumberInputStepper>
                 <NumberIncrementStepper />
                 <NumberDecrementStepper />
