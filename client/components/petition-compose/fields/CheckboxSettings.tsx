@@ -37,8 +37,8 @@ export function CheckboxSettings({
     value: "UNLIMITED",
   });
   const [type, setType] = useState(field.options?.limit?.type ?? "UNLIMITED");
-  const [min, setMin] = useState(1);
-  const [max, setMax] = useState(1);
+  const [min, setMin] = useState<number | "">(1);
+  const [max, setMax] = useState<number | "">(1);
 
   const refMin = useRef<HTMLInputElement>(null);
   const refMax = useRef<HTMLInputElement>(null);
@@ -127,14 +127,26 @@ export function CheckboxSettings({
   }, [intl.locale, type]);
 
   const handleMinOnChange = (value: string) => {
-    if (Number(value) != Number(min)) {
-      setMin(Number(value));
+    if (value === "") {
+      setMin("");
+      return;
+    }
+
+    const _max = max ? max : field.options.values.length;
+
+    let _min = Number(value);
+    _min = _min >= _max ? (_max >= 2 ? _max - 1 : 1) : _min;
+    _min = _min > 0 ? _min : 1;
+
+    if (_min != min) {
+      setMin(_min);
       debouncedOnUpdate(field.id, {
         options: {
           ...field.options,
           limit: {
             ...field.options.limit,
-            min: Number(value),
+            min: _min,
+            max: _max,
           },
         },
       });
@@ -142,12 +154,24 @@ export function CheckboxSettings({
   };
 
   const handleMaxOnChange = (value: string) => {
-    if (Number(value) != Number(max)) {
-      const _max = Number(value);
-      const _min = min === _max ? min - 1 || 1 : min;
+    if (value === "") {
+      setMax("");
+      return;
+    }
+    const length = field.options.values.length || 1;
 
-      setMin(Number(_min));
-      setMax(Number(_max));
+    let _max = Number(value);
+
+    _max = _max > length ? length : _max;
+
+    _max = _max > 0 ? _max : 1;
+
+    if (_max != max) {
+      let _min = min >= _max ? (_max >= 2 ? _max - 1 : 1) : min;
+      _min = _min > 0 ? _min : 1;
+
+      setMin(_min);
+      setMax(_max);
       debouncedOnUpdate(field.id, {
         options: {
           ...field.options,
@@ -233,9 +257,10 @@ export function CheckboxSettings({
             <NumberInput
               value={min}
               min={1}
-              max={max - 1 || 1}
-              w={"64px"}
+              max={Number(max) > 1 ? Number(max) - 1 : 1}
+              w={"72px"}
               onChange={handleMinOnChange}
+              allowMouseWheel={true}
             >
               <NumberInputField ref={refMin} />
               <NumberInputStepper>
@@ -247,10 +272,11 @@ export function CheckboxSettings({
           {(type === "EXACT" || type === "RANGE") && (
             <NumberInput
               value={max}
-              min={type === "EXACT" ? 1 : min}
+              min={type === "EXACT" ? 1 : Number(min)}
               max={field.options.values.length ?? 1}
-              w={"64px"}
+              w={"72px"}
               onChange={handleMaxOnChange}
+              allowMouseWheel={true}
             >
               <NumberInputField ref={refMax} />
               <NumberInputStepper>
