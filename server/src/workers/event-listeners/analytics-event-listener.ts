@@ -199,7 +199,7 @@ async function trackReminderSentEvent(
       user_id: access.granter_id,
       petition_access_id: access.id,
       sent_count: 10 - access.reminders_left + 1,
-      type: "AUTOMATIC",
+      type: reminder.type,
     },
   });
 }

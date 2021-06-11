@@ -20,7 +20,6 @@ createCronWorker("reminder-trigger", async (context) => {
       { concurrency: 5 }
     );
     const reminders = await context.petitions.createReminders(
-      batch[0].petition_id,
       batch.map((access) => ({
         petition_access_id: access.id,
         status: "PROCESSING",

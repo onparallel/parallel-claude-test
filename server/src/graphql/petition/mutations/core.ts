@@ -132,7 +132,7 @@ export const createPetition = mutationField("createPetition", {
       if (original.is_template && !isTemplate) {
         await ctx.petitions.createEvent({
           type: "TEMPLATE_USED",
-          petition_id: petitionId,
+          petition_id: original.id,
           data: {
             template_id: petitionId,
             org_id: ctx.user!.org_id,
@@ -142,9 +142,9 @@ export const createPetition = mutationField("createPetition", {
       } else if (!original.is_template) {
         await ctx.petitions.createEvent({
           type: "PETITION_CLONED",
-          petition_id: petition.id,
+          petition_id: original.id,
           data: {
-            from_petition_id: petitionId,
+            from_petition_id: original.id,
             org_id: petition.org_id,
             petition_id: petition.id,
             user_id: ctx.user!.id,
@@ -221,7 +221,7 @@ export const clonePetitions = mutationField("clonePetitions", {
           },
           {
             type: "PETITION_CLONED",
-            petition_id: cloned.id,
+            petition_id: petitionId,
             data: {
               from_petition_id: petitionId,
               org_id: cloned.org_id,
@@ -1259,7 +1259,6 @@ export const sendReminders = mutationField("sendReminders", {
 
     try {
       const reminders = await ctx.petitions.createReminders(
-        args.petitionId,
         args.accessIds.map((accessId) => ({
           type: "MANUAL",
           status: "PROCESSING",

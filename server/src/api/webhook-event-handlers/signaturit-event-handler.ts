@@ -59,9 +59,9 @@ export function signaturItEventHandler(type: SignatureEvents) {
 
 /** signer declined the document. Whole signature process will be cancelled */
 async function documentDeclined(
-  petitionId: number,
+  ctx: ApiContext,
   data: SignaturItEventBody,
-  ctx: ApiContext
+  petitionId: number
 ) {
   const petition = await ctx.petitions.loadPetition(petitionId);
   if (!petition) {
@@ -85,7 +85,7 @@ async function documentDeclined(
         },
       }
     ),
-    appendEventLogs(petitionId, data, ctx),
+    appendEventLogs(ctx, data),
   ]);
 
   await ctx.petitions.createEvent({
@@ -103,9 +103,9 @@ async function documentDeclined(
 }
 /** signed document has been completed and is ready to be downloaded */
 async function documentCompleted(
-  petitionId: number,
+  ctx: ApiContext,
   data: SignaturItEventBody,
-  ctx: ApiContext
+  petitionId: number
 ) {
   const petition = await ctx.petitions.loadPetition(petitionId);
 
@@ -175,7 +175,7 @@ async function documentCompleted(
     ctx.emails.sendPetitionCompletedEmail(petition.id, {
       contactId: contact.id,
     }),
-    appendEventLogs(petitionId, data, ctx),
+    appendEventLogs(ctx, data),
     ctx.petitions.createEvent({
       type: "SIGNATURE_COMPLETED",
       petition_id: petitionId,
@@ -194,9 +194,9 @@ async function documentCompleted(
 
 /** audit trail has been completed and is ready to be downloaded */
 async function auditTrailCompleted(
-  petitionId: number,
+  ctx: ApiContext,
   data: SignaturItEventBody,
-  ctx: ApiContext
+  petitionId: number
 ) {
   const petition = await ctx.petitions.loadPetition(petitionId);
 
@@ -245,7 +245,7 @@ async function auditTrailCompleted(
     { file_upload_audit_trail_id: auditTrail.id }
   );
 
-  await appendEventLogs(petitionId, data, ctx);
+  await appendEventLogs(ctx, data);
 }
 
 async function fetchPetitionSignature(
@@ -266,9 +266,8 @@ async function fetchPetitionSignature(
 }
 
 async function appendEventLogs(
-  petitionId: number,
-  data: SignaturItEventBody,
-  ctx: ApiContext
+  ctx: ApiContext,
+  data: SignaturItEventBody
 ): Promise<void> {
   await ctx.petitions.appendPetitionSignatureEventLogs(
     `SIGNATURIT/${data.document.signature.id}`,

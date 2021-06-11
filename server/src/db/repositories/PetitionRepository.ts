@@ -27,16 +27,7 @@ import {
 } from "../../util/reminderUtils";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
-import {
-  AccessDeactivatedEvent,
-  CreatePetitionEvent,
-  GroupPermissionEditedEvent,
-  GroupPermissionRemovedEvent,
-  MessageCancelledEvent,
-  PetitionEvent,
-  UserPermissionEditedEvent,
-  UserPermissionRemovedEvent,
-} from "../events";
+import { CreatePetitionEvent, PetitionEvent } from "../events";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import {
   defaultFieldOptions,
@@ -638,22 +629,28 @@ export class PetitionRepository extends BaseRepository {
     ]);
 
     await this.createEvent([
-      ...accesses.map<AccessDeactivatedEvent<true>>((access) => ({
-        type: "ACCESS_DEACTIVATED",
-        petition_id: petitionId,
-        data: {
-          petition_access_id: access.id,
-          user_id: user.id,
-        },
-      })),
-      ...messages.map<MessageCancelledEvent<true>>((message) => ({
-        type: "MESSAGE_CANCELLED",
-        petition_id: petitionId,
-        data: {
-          petition_message_id: message.id,
-          user_id: user.id,
-        },
-      })),
+      ...accesses.map(
+        (access) =>
+          ({
+            type: "ACCESS_DEACTIVATED",
+            petition_id: petitionId,
+            data: {
+              petition_access_id: access.id,
+              user_id: user.id,
+            },
+          } as const)
+      ),
+      ...messages.map(
+        (message) =>
+          ({
+            type: "MESSAGE_CANCELLED",
+            petition_id: petitionId,
+            data: {
+              petition_message_id: message.id,
+              user_id: user.id,
+            },
+          } as const)
+      ),
     ]);
 
     return accesses;
@@ -1642,7 +1639,7 @@ export class PetitionRepository extends BaseRepository {
     "petition_access_id"
   );
 
-  async createReminders(petitionId: number, data: CreatePetitionReminder[]) {
+  async createReminders(data: CreatePetitionReminder[]) {
     if (data.length === 0) {
       return [];
     }
@@ -2774,24 +2771,30 @@ export class PetitionRepository extends BaseRepository {
 
       await this.createEvent(
         [
-          ...directlyAssigned.map<UserPermissionEditedEvent<true>>((p) => ({
-            petition_id: p.petition_id,
-            type: "USER_PERMISSION_EDITED",
-            data: {
-              user_id: user.id,
-              permission_type: p.type,
-              permission_user_id: p.user_id!,
-            },
-          })),
-          ...groupAssigned.map<GroupPermissionEditedEvent<true>>((p) => ({
-            petition_id: p.petition_id,
-            type: "GROUP_PERMISSION_EDITED",
-            data: {
-              user_id: user.id,
-              permission_type: p.type,
-              user_group_id: p.user_group_id!,
-            },
-          })),
+          ...directlyAssigned.map(
+            (p) =>
+              ({
+                petition_id: p.petition_id,
+                type: "USER_PERMISSION_EDITED",
+                data: {
+                  user_id: user.id,
+                  permission_type: p.type,
+                  permission_user_id: p.user_id!,
+                },
+              } as const)
+          ),
+          ...groupAssigned.map(
+            (p) =>
+              ({
+                petition_id: p.petition_id,
+                type: "GROUP_PERMISSION_EDITED",
+                data: {
+                  user_id: user.id,
+                  permission_type: p.type,
+                  user_group_id: p.user_group_id!,
+                },
+              } as const)
+          ),
         ],
         t
       );
@@ -2863,22 +2866,28 @@ export class PetitionRepository extends BaseRepository {
           .returning("*"),
         this.createEvent(
           [
-            ...directlyAssigned.map<UserPermissionRemovedEvent<true>>((p) => ({
-              petition_id: p.petition_id,
-              type: "USER_PERMISSION_REMOVED",
-              data: {
-                user_id: user.id,
-                permission_user_id: p.user_id!,
-              },
-            })),
-            ...groupAssigned.map<GroupPermissionRemovedEvent<true>>((p) => ({
-              petition_id: p.petition_id,
-              type: "GROUP_PERMISSION_REMOVED",
-              data: {
-                user_id: user.id,
-                user_group_id: p.user_group_id!,
-              },
-            })),
+            ...directlyAssigned.map(
+              (p) =>
+                ({
+                  petition_id: p.petition_id,
+                  type: "USER_PERMISSION_REMOVED",
+                  data: {
+                    user_id: user.id,
+                    permission_user_id: p.user_id!,
+                  },
+                } as const)
+            ),
+            ...groupAssigned.map(
+              (p) =>
+                ({
+                  petition_id: p.petition_id,
+                  type: "GROUP_PERMISSION_REMOVED",
+                  data: {
+                    user_id: user.id,
+                    user_group_id: p.user_group_id!,
+                  },
+                } as const)
+            ),
           ],
           t
         ),
@@ -2910,22 +2919,28 @@ export class PetitionRepository extends BaseRepository {
 
       await this.createEvent(
         [
-          ...directlyAssigned.map<UserPermissionRemovedEvent<true>>((p) => ({
-            petition_id: p.petition_id,
-            type: "USER_PERMISSION_REMOVED",
-            data: {
-              user_id: user.id,
-              permission_user_id: p.user_id!,
-            },
-          })),
-          ...groupAssigned.map<GroupPermissionRemovedEvent<true>>((p) => ({
-            petition_id: p.petition_id,
-            type: "GROUP_PERMISSION_REMOVED",
-            data: {
-              user_id: user.id,
-              user_group_id: p.user_group_id!,
-            },
-          })),
+          ...directlyAssigned.map(
+            (p) =>
+              ({
+                petition_id: p.petition_id,
+                type: "USER_PERMISSION_REMOVED",
+                data: {
+                  user_id: user.id,
+                  permission_user_id: p.user_id!,
+                },
+              } as const)
+          ),
+          ...groupAssigned.map(
+            (p) =>
+              ({
+                petition_id: p.petition_id,
+                type: "GROUP_PERMISSION_REMOVED",
+                data: {
+                  user_id: user.id,
+                  user_group_id: p.user_group_id!,
+                },
+              } as const)
+          ),
         ],
         t
       );

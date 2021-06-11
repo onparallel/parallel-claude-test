@@ -1,34 +1,30 @@
 import {
-  mutationField,
   arg,
   booleanArg,
-  stringArg,
-  nonNull,
   list,
+  mutationField,
+  nonNull,
+  stringArg,
 } from "@nexus/schema";
+import { partition } from "../../../util/arrays";
+import { isDefined } from "../../../util/remedaExtensions";
 import {
-  chain,
   and,
   authenticate,
-  ifArgDefined,
   authenticateAnd,
+  chain,
+  ifArgDefined,
 } from "../../helpers/authorize";
-import { userHasAccessToPetitions } from "../authorizers";
-import { userHasAccessToUsers } from "./authorizers";
-import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
-import { validateAnd, validateIf } from "../../helpers/validateArgs";
-import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
-import { maxLength } from "../../helpers/validators/maxLength";
-import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { ArgValidationError, WhitelistedError } from "../../helpers/errors";
-import { isDefined } from "../../../util/remedaExtensions";
+import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { validateAnd, validateIf } from "../../helpers/validateArgs";
+import { maxLength } from "../../helpers/validators/maxLength";
+import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
+import { userIdNotIncludedInArray } from "../../helpers/validators/notIncludedInArray";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
 import { userHasAccessToUserGroups } from "../../user-group/authorizers";
-import { partition } from "../../../util/arrays";
-import {
-  GroupPermissionAddedEvent,
-  UserPermissionAddedEvent,
-} from "../../../db/events";
+import { userHasAccessToPetitions } from "../authorizers";
+import { userHasAccessToUsers } from "./authorizers";
 
 export const transferPetitionOwnership = mutationField(
   "transferPetitionOwnership",
@@ -127,24 +123,30 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
 
         await ctx.petitions.createEvent(
           [
-            ...directlyAssigned.map<UserPermissionAddedEvent<true>>((p) => ({
-              petition_id: p.petition_id,
-              type: "USER_PERMISSION_ADDED",
-              data: {
-                user_id: ctx.user!.id,
-                permission_type: p.type,
-                permission_user_id: p.user_id!,
-              },
-            })),
-            ...groupAssigned.map<GroupPermissionAddedEvent<true>>((p) => ({
-              petition_id: p.petition_id,
-              type: "GROUP_PERMISSION_ADDED",
-              data: {
-                user_id: ctx.user!.id,
-                permission_type: p.type,
-                user_group_id: p.user_group_id!,
-              },
-            })),
+            ...directlyAssigned.map(
+              (p) =>
+                ({
+                  petition_id: p.petition_id,
+                  type: "USER_PERMISSION_ADDED",
+                  data: {
+                    user_id: ctx.user!.id,
+                    permission_type: p.type,
+                    permission_user_id: p.user_id!,
+                  },
+                } as const)
+            ),
+            ...groupAssigned.map(
+              (p) =>
+                ({
+                  petition_id: p.petition_id,
+                  type: "GROUP_PERMISSION_ADDED",
+                  data: {
+                    user_id: ctx.user!.id,
+                    permission_type: p.type,
+                    user_group_id: p.user_group_id!,
+                  },
+                } as const)
+            ),
           ],
           t
         );
