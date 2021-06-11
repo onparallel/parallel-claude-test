@@ -38,7 +38,7 @@ export function UserListPopover({
     <Popover trigger="hover">
       <PopoverTrigger>{children}</PopoverTrigger>
       <Portal>
-        <PopoverContent>
+        <PopoverContent width="fit-content">
           <PopoverArrow />
           <PopoverBody
             paddingX={0}

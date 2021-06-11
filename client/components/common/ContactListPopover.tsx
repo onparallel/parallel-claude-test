@@ -35,7 +35,7 @@ export function ContactListPopover<T extends ContactSelection>({
     <Popover trigger="hover">
       <PopoverTrigger>{children}</PopoverTrigger>
       <Portal>
-        <PopoverContent>
+        <PopoverContent width="fit-content">
           <PopoverArrow />
           <PopoverBody
             paddingX={0}
