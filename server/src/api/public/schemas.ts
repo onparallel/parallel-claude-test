@@ -462,16 +462,10 @@ const _PetitionFieldReply = {
         },
         {
           title: "Checkbox reply",
-          type: "object",
-          required: ["choices"],
-          additionalProperties: false,
-          properties: {
-            choices: {
-              type: "array",
-              items: {
-                type: "string",
-              },
-            },
+          description: "An array with the selected choices.",
+          type: "array",
+          items: {
+            type: "string",
           },
         },
       ],

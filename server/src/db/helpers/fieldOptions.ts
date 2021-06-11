@@ -136,6 +136,7 @@ const SCHEMAS = {
           min: { type: "number" },
           max: { type: "number" },
         },
+        validateMinMax: true,
       },
     },
   },
@@ -144,6 +145,14 @@ const SCHEMAS = {
 export function validateFieldOptions(type: PetitionFieldType, options: any) {
   const ajv = new Ajv();
   addFormats(ajv, ["date-time"]);
+
+  ajv.addKeyword({
+    keyword: "validateMinMax",
+    validate(runValidation: boolean, dataPath: { min: number; max: number }) {
+      return runValidation ? dataPath.min <= dataPath.max : true;
+    },
+  });
+
   const valid = ajv.validate(SCHEMAS[type], options);
   if (!valid) {
     throw new Error(ajv.errorsText());
