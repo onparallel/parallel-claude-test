@@ -65,9 +65,9 @@ import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment
 import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 import {
-  SelectTypeFieldOptions,
-  SelectTypeFieldOptionsRef,
-} from "./SelectTypeFieldOptions";
+  PetitionFieldOptionsEditor,
+  PetitionFieldOptionsEditorRef,
+} from "./PetitionFieldOptionsEditor";
 
 export interface PetitionComposeFieldProps {
   petitionId: string;
@@ -489,9 +489,9 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     }
   }, []);
 
-  const selectFieldOptionsRef = useRef<SelectTypeFieldOptionsRef>(null);
-  const focusSelectOptions = useCallback((atStart?: boolean) => {
-    selectFieldOptionsRef.current?.focus(atStart ? "START" : undefined);
+  const fieldOptionsRef = useRef<PetitionFieldOptionsEditorRef>(null);
+  const focusFieldOptions = useCallback((atStart?: boolean) => {
+    fieldOptionsRef.current?.focus(atStart ? "START" : undefined);
   }, []);
 
   useImperativeHandle(
@@ -500,8 +500,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       ({
         focusFromPrevious: () => focusTitle(true),
         focusFromNext: () => {
-          if (field.type === "SELECT") {
-            focusSelectOptions(true);
+          if (field.type === "SELECT" || field.type === "CHECKBOX") {
+            focusFieldOptions(true);
           } else if (field.description) {
             focusDescription(true);
           } else {
@@ -569,8 +569,11 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                   event.preventDefault();
                   if (field.description) {
                     focusDescription(true);
-                  } else if (field.type === "SELECT") {
-                    focusSelectOptions(true);
+                  } else if (
+                    field.type === "SELECT" ||
+                    field.type === "CHECKBOX"
+                  ) {
+                    focusFieldOptions(true);
                   } else {
                     onFocusNextField();
                   }
@@ -664,7 +667,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               if (currentLine === totalLines - 1) {
                 if (field.type === "SELECT") {
                   event.preventDefault();
-                  focusSelectOptions(true);
+                  focusFieldOptions(true);
                 } else {
                   onFocusNextField();
                 }
@@ -693,8 +696,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       {field.type === "SELECT" || field.type === "CHECKBOX" ? (
         <Box marginTop={1}>
           <CheckboxTypeLabel fontSize="xs" pb={2} pl={2} field={field} />
-          <SelectTypeFieldOptions
-            ref={selectFieldOptionsRef}
+          <PetitionFieldOptionsEditor
+            ref={fieldOptionsRef}
             field={field}
             onFieldEdit={onFieldEdit}
             showError={showError}
@@ -926,11 +929,11 @@ const fragments = {
         attachments {
           ...PetitionComposeField_PetitionFieldAttachment
         }
-        ...SelectTypeFieldOptions_PetitionField
+        ...PetitionFieldOptionsEditor_PetitionField
         ...PetitionFieldVisibilityEditor_PetitionField
       }
       ${this.PetitionFieldAttachment}
-      ${SelectTypeFieldOptions.fragments.PetitionField}
+      ${PetitionFieldOptionsEditor.fragments.PetitionField}
       ${PetitionFieldVisibilityEditor.fragments.PetitionField}
     `;
   },

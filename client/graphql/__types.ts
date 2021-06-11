@@ -3948,7 +3948,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
       __typename?: "PetitionFieldAttachment";
     } & PetitionComposeField_PetitionFieldAttachmentFragment
   >;
-} & SelectTypeFieldOptions_PetitionFieldFragment &
+} & PetitionFieldOptionsEditor_PetitionFieldFragment &
   PetitionFieldVisibilityEditor_PetitionFieldFragment;
 
 export type PetitionComposeField_PetitionFieldAttachmentFragment = {
@@ -4060,6 +4060,13 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   visibility?: Maybe<{ [key: string]: any }>;
 };
 
+export type PetitionFieldOptionsEditor_PetitionFieldFragment = {
+  __typename?: "PetitionField";
+  id: string;
+  type: PetitionFieldType;
+  options: { [key: string]: any };
+};
+
 export type PetitionFieldVisibilityEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
@@ -4082,13 +4089,6 @@ export type ReferencedFieldDialogDialog_PetitionFieldFragment = {
   id: string;
   title?: Maybe<string>;
   type: PetitionFieldType;
-};
-
-export type SelectTypeFieldOptions_PetitionFieldFragment = {
-  __typename?: "PetitionField";
-  id: string;
-  type: PetitionFieldType;
-  options: { [key: string]: any };
 };
 
 export type ExportRepliesDialog_UserFragment = {
@@ -6739,8 +6739,8 @@ export const PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDo
   }
   ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
 `;
-export const SelectTypeFieldOptions_PetitionFieldFragmentDoc = gql`
-  fragment SelectTypeFieldOptions_PetitionField on PetitionField {
+export const PetitionFieldOptionsEditor_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldOptionsEditor_PetitionField on PetitionField {
     id
     type
     options
@@ -6779,11 +6779,11 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     attachments {
       ...PetitionComposeField_PetitionFieldAttachment
     }
-    ...SelectTypeFieldOptions_PetitionField
+    ...PetitionFieldOptionsEditor_PetitionField
     ...PetitionFieldVisibilityEditor_PetitionField
   }
   ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
-  ${SelectTypeFieldOptions_PetitionFieldFragmentDoc}
+  ${PetitionFieldOptionsEditor_PetitionFieldFragmentDoc}
   ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
 `;
 export const ReferencedFieldDialogDialog_PetitionFieldFragmentDoc = gql`

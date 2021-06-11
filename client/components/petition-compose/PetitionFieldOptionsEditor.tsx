@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
 import {
-  SelectTypeFieldOptions_PetitionFieldFragment,
+  PetitionFieldOptionsEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
@@ -29,8 +29,8 @@ import {
 } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 
-export interface SelectTypeFieldOptionsProps extends EditableProps {
-  field: SelectTypeFieldOptions_PetitionFieldFragment;
+export interface PetitionFieldOptionsEditorProps extends EditableProps {
+  field: PetitionFieldOptionsEditor_PetitionFieldFragment;
   showError: boolean;
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onFocusNextField: () => void;
@@ -73,7 +73,7 @@ function renderLeaf({ attributes, children, leaf }: RenderLeafProps) {
   );
 }
 
-export type SelectTypeFieldOptionsRef = {
+export type PetitionFieldOptionsEditorRef = {
   focus: (position?: "START" | "END") => void;
   editor: Editor;
 };
@@ -85,9 +85,9 @@ function valuesToSlateNodes(values: string[]): ParagraphElement[] {
   }));
 }
 
-export const SelectTypeFieldOptions = Object.assign(
-  forwardRef<SelectTypeFieldOptionsRef, SelectTypeFieldOptionsProps>(
-    function SelectTypeFieldOptions(
+export const PetitionFieldOptionsEditor = Object.assign(
+  forwardRef<PetitionFieldOptionsEditorRef, PetitionFieldOptionsEditorProps>(
+    function PetitionFieldOptionsEditor(
       {
         field,
         showError,
@@ -122,7 +122,7 @@ export const SelectTypeFieldOptions = Object.assign(
                 }
               },
               editor,
-            } as SelectTypeFieldOptionsRef),
+            } as PetitionFieldOptionsEditorRef),
           [editor]
         )
       );
@@ -203,7 +203,7 @@ export const SelectTypeFieldOptions = Object.assign(
   {
     fragments: {
       PetitionField: gql`
-        fragment SelectTypeFieldOptions_PetitionField on PetitionField {
+        fragment PetitionFieldOptionsEditor_PetitionField on PetitionField {
           id
           type
           options
