@@ -12,7 +12,7 @@ import {
   UserCreatedEvent,
   UserLoggedInEvent,
 } from "../../db/events";
-import { EventType, ServerEvent } from "../event-processor";
+import { EventListener } from "../event-processor";
 
 async function loadPetition(petitionId: number, ctx: WorkerContext) {
   const petition = await ctx.petitions.load(petitionId);
@@ -263,53 +263,47 @@ async function trackAccessOpenedEvent(
   });
 }
 
-export async function analyticsEventListener(
-  event: ServerEvent,
-  acceptedEvents: EventType[],
-  ctx: WorkerContext
-) {
-  if (acceptedEvents.includes(event.type)) {
-    switch (event.type) {
-      case "PETITION_CREATED":
-        await trackPetitionCreatedEvent(event, ctx);
-        break;
-      case "PETITION_CLONED":
-        await trackPetitionClonedEvent(event, ctx);
-        break;
-      case "PETITION_CLOSED":
-        await trackPetitionClosedEvent(event, ctx);
-        break;
-      case "PETITION_SENT":
-        await trackPetitionSentEvent(event, ctx);
-        break;
-      case "PETITION_COMPLETED":
-        await trackPetitionCompletedEvent(event, ctx);
-        break;
-      case "PETITION_DELETED":
-        await trackPetitionDeletedEvent(event, ctx);
-        break;
-      case "USER_LOGGED_IN":
-        await trackUserLoggedInEvent(event, ctx);
-        break;
-      case "REMINDER_SENT":
-        await trackReminderSentEvent(event, ctx);
-        break;
-      case "TEMPLATE_USED":
-        await trackTemplateUsedEvent(event, ctx);
-        break;
-      case "USER_CREATED":
-        await trackUserCreatedEvent(event, ctx);
-        break;
-      case "ACCESS_OPENED":
-        await trackAccessOpenedEvent(event, ctx);
-        break;
-      default:
-        throw new Error(
-          `Tracking to analytics not implemented for event ${JSON.stringify(
-            event
-          )}`
-        );
-        break;
-    }
+export const analyticsEventListener: EventListener = async (event, ctx) => {
+  switch (event.type) {
+    case "PETITION_CREATED":
+      await trackPetitionCreatedEvent(event, ctx);
+      break;
+    case "PETITION_CLONED":
+      await trackPetitionClonedEvent(event, ctx);
+      break;
+    case "PETITION_CLOSED":
+      await trackPetitionClosedEvent(event, ctx);
+      break;
+    case "PETITION_SENT":
+      await trackPetitionSentEvent(event, ctx);
+      break;
+    case "PETITION_COMPLETED":
+      await trackPetitionCompletedEvent(event, ctx);
+      break;
+    case "PETITION_DELETED":
+      await trackPetitionDeletedEvent(event, ctx);
+      break;
+    case "USER_LOGGED_IN":
+      await trackUserLoggedInEvent(event, ctx);
+      break;
+    case "REMINDER_SENT":
+      await trackReminderSentEvent(event, ctx);
+      break;
+    case "TEMPLATE_USED":
+      await trackTemplateUsedEvent(event, ctx);
+      break;
+    case "USER_CREATED":
+      await trackUserCreatedEvent(event, ctx);
+      break;
+    case "ACCESS_OPENED":
+      await trackAccessOpenedEvent(event, ctx);
+      break;
+    default:
+      throw new Error(
+        `Tracking to analytics not implemented for event ${JSON.stringify(
+          event
+        )}`
+      );
+      break;
   }
-}
+};
