@@ -4,11 +4,9 @@ import {
   Menu,
   Popover,
   Select,
-  theme as base,
   Tooltip,
 } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
-import deepmerge from "deepmerge";
 import { ChevronDownIcon } from "./icons";
 import { styles } from "./styles";
 
