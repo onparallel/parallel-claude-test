@@ -1,6 +1,7 @@
 import { json, Router } from "express";
 import { CreateUser, User } from "../db/__types";
 import { isDefined } from "../util/remedaExtensions";
+import { Maybe } from "../util/types";
 
 export const scim = Router().use(
   json({ type: "application/scim+json" }),
@@ -41,11 +42,14 @@ export const scim = Router().use(
 scim
   .route("/Users")
   .get(async (req, res) => {
-    const externalId: string = getExternalId(req.query.filter);
-    const user = await req.context.users.loadUserByExternalId({
-      externalId,
-      orgId: req.context.organization!.id,
-    });
+    const externalId = getExternalId(req.query.filter);
+    let user: User | undefined;
+    if (externalId) {
+      user = await req.context.users.loadUserByExternalId({
+        externalId,
+        orgId: req.context.organization!.id,
+      });
+    }
     if (!user) {
       res.json({
         totalResults: 0,
@@ -112,8 +116,7 @@ scim
         );
         res.json(toScimUser(user));
       } else {
-        // fake an "OK" response to provider
-        res.json({ ...req.body, id: externalId });
+        res.sendStatus(401);
       }
     }
   });
@@ -121,7 +124,7 @@ scim
 scim
   .route("/Users/:externalId")
   .all(async (req, res, next) => {
-    const externalId = req.params?.externalId;
+    const externalId = req.params.externalId;
     const user = await req.context.users.loadUserByExternalId({
       externalId,
       orgId: req.context.organization!.id,
@@ -200,11 +203,10 @@ scim
     res.sendStatus(204);
   });
 
-function getExternalId(filter: any) {
-  if (!filter) return;
+function getExternalId(filter: any): Maybe<string> {
+  if (!filter) return null;
   const match = filter.match(/externalId eq "([^"]*)"/);
-  if (!match) return;
-  return match[1];
+  return match?.[1] ?? null;
 }
 
 function toScimUser(user: User) {
