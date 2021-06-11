@@ -373,5 +373,426 @@ describe("fieldVisibility", () => {
 
       expect(fields).toMatchObject([true, true, true]);
     });
+
+    it("SHOW ONE TEXT AND HIDE OTHER WHEN CHECKBOX CONTAIN CHOICE 1", () => {
+      const fields = evaluateFieldVisibility([
+        {
+          id: 1,
+          type: "CHECKBOX",
+          options: {
+            values: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+            limit: {
+              type: "UNLIMITED",
+              min: 1,
+              max: 1,
+            },
+          },
+          visibility: null,
+          replies: [{ content: { choices: ["Choice 1", "Choice 2"] } }],
+        },
+        {
+          id: 2,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "ANY",
+                operator: "CONTAIN",
+                value: "Choice 1",
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+        {
+          id: 3,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "HIDE",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "ANY",
+                operator: "CONTAIN",
+                value: "Choice 1",
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+      ]);
+
+      expect(fields).toMatchObject([true, true, false]);
+    });
+
+    it("SHOW ONE TEXT AND HIDE OTHER WHEN CHECKBOX NOT CONTAIN CHOICE 1", () => {
+      const fields = evaluateFieldVisibility([
+        {
+          id: 1,
+          type: "CHECKBOX",
+          options: {
+            values: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+            limit: {
+              type: "UNLIMITED",
+              min: 1,
+              max: 1,
+            },
+          },
+          visibility: null,
+          replies: [{ content: { choices: ["Choice 1", "Choice 2"] } }],
+        },
+        {
+          id: 2,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "ANY",
+                operator: "NOT_CONTAIN",
+                value: "Choice 1",
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+        {
+          id: 3,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "HIDE",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "ANY",
+                operator: "NOT_CONTAIN",
+                value: "Choice 1",
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+      ]);
+
+      expect(fields).toMatchObject([true, false, true]);
+    });
+
+    it("SHOW WHEN NUMBER_OF_CHOICES CHECKBOX", () => {
+      const fields = evaluateFieldVisibility([
+        {
+          id: 1,
+          type: "CHECKBOX",
+          options: {
+            values: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+            limit: {
+              type: "UNLIMITED",
+              min: 1,
+              max: 1,
+            },
+          },
+          visibility: null,
+          replies: [{ content: { choices: ["Choice 1", "Choice 2"] } }],
+        },
+        {
+          id: 2,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "ANY",
+                operator: "NUMBER_OF_CHOICES",
+                value: 2,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+        {
+          id: 3,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "HIDE",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "ANY",
+                operator: "NUMBER_OF_CHOICES",
+                value: 2,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+        {
+          id: 4,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "ANY",
+                operator: "NUMBER_OF_CHOICES",
+                value: 5,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+      ]);
+
+      expect(fields).toMatchObject([true, true, false, false]);
+    });
+
+    it("SHOW WHEN HAS REPLIES AND DOES NOT HAVE REPLIES CHECKBOX INCOMPLETED REPLY", () => {
+      const fields = evaluateFieldVisibility([
+        {
+          id: 1,
+          type: "CHECKBOX",
+          options: {
+            values: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+            limit: {
+              type: "EXACT",
+              min: 1,
+              max: 3,
+            },
+          },
+          visibility: null,
+          replies: [{ content: { choices: ["Choice 1", "Choice 2"] } }],
+        },
+        {
+          id: 2,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "GREATER_THAN",
+                value: 0,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+        {
+          id: 3,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "EQUAL",
+                value: 0,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+      ]);
+
+      expect(fields).toMatchObject([true, false, true]);
+    });
+
+    it("SHOW WHEN HAS REPLIES AND DOES NOT HAVE REPLIES CHECKBOX COMPLETED REPLY", () => {
+      const fields = evaluateFieldVisibility([
+        {
+          id: 1,
+          type: "CHECKBOX",
+          options: {
+            values: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+            limit: {
+              type: "EXACT",
+              min: 1,
+              max: 3,
+            },
+          },
+          visibility: null,
+          replies: [
+            { content: { choices: ["Choice 1", "Choice 2", "Choice 3"] } },
+          ],
+        },
+        {
+          id: 2,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "GREATER_THAN",
+                value: 0,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+        {
+          id: 3,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "EQUAL",
+                value: 0,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+      ]);
+
+      expect(fields).toMatchObject([true, true, false]);
+    });
+
+    it("SHOW WHEN HAS REPLIES AND DOES NOT HAVE REPLIES CHECKBOX INCOMPLETED REPLY RANGE", () => {
+      const fields = evaluateFieldVisibility([
+        {
+          id: 1,
+          type: "CHECKBOX",
+          options: {
+            values: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+            limit: {
+              type: "RANGE",
+              min: 3,
+              max: 4,
+            },
+          },
+          visibility: null,
+          replies: [{ content: { choices: ["Choice 1", "Choice 2"] } }],
+        },
+        {
+          id: 2,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "GREATER_THAN",
+                value: 0,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+        {
+          id: 3,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "EQUAL",
+                value: 0,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+      ]);
+
+      expect(fields).toMatchObject([true, false, true]);
+    });
+
+    it("SHOW WHEN HAS REPLIES AND DOES NOT HAVE REPLIES CHECKBOX COMPLETED REPLY RANGE", () => {
+      const fields = evaluateFieldVisibility([
+        {
+          id: 1,
+          type: "CHECKBOX",
+          options: {
+            values: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"],
+            limit: {
+              type: "RANGE",
+              min: 3,
+              max: 4,
+            },
+          },
+          visibility: null,
+          replies: [
+            { content: { choices: ["Choice 1", "Choice 2", "Choice 3"] } },
+          ],
+        },
+        {
+          id: 2,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "GREATER_THAN",
+                value: 0,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+        {
+          id: 3,
+          type: "TEXT",
+          options: {},
+          visibility: {
+            type: "SHOW",
+            operator: "AND",
+            conditions: [
+              {
+                fieldId: 1,
+                modifier: "NUMBER_OF_REPLIES",
+                operator: "EQUAL",
+                value: 0,
+              },
+            ],
+          },
+          replies: [{ content: { text: "." } }],
+        },
+      ]);
+
+      expect(fields).toMatchObject([true, true, false]);
+    });
   });
 });

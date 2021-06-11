@@ -97,7 +97,9 @@ function conditionIsMet(
     const _value =
       condition.column !== undefined
         ? reply.content.columns?.[condition.column]?.[1] ?? null
-        : reply.content.text;
+        : reply.content.text
+        ? reply.content.text
+        : reply.content.choices;
     return evaluatePredicate(_value, operator, value);
   }
   switch (modifier) {

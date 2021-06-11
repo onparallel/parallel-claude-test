@@ -19,7 +19,11 @@ export function defaultCondition<
   return {
     fieldId: field.id,
     modifier: isOnlyHasReplies ? "NUMBER_OF_REPLIES" : "ANY",
-    operator: isOnlyHasReplies ? "GREATER_THAN" : "EQUAL",
+    operator: isOnlyHasReplies
+      ? "GREATER_THAN"
+      : field.type === "CHECKBOX"
+      ? "CONTAIN"
+      : "EQUAL",
     value: defaultConditionFieldValue(field, column),
     column,
   };
