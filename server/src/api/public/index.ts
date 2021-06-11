@@ -676,6 +676,7 @@ api.path("/petitions/:petitionId/replies", { params: { petitionId } }).get(
             fields {
               id
               type
+              options
               replies {
                 ...PetitionFieldReply
               }

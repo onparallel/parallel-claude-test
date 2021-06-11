@@ -2472,14 +2472,14 @@ export type PetitionReplies_RepliesQuery = {
   petition: Maybe<
     | {
         fields: Array<
-          Pick<PetitionField, "id" | "type"> & {
+          Pick<PetitionField, "id" | "type" | "options"> & {
             replies: Array<PetitionFieldReplyFragment>;
           }
         >;
       }
     | {
         fields: Array<
-          Pick<PetitionField, "id" | "type"> & {
+          Pick<PetitionField, "id" | "type" | "options"> & {
             replies: Array<PetitionFieldReplyFragment>;
           }
         >;

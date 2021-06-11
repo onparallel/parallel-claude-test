@@ -5,11 +5,15 @@ describe("fieldVisibility", () => {
     const fields = evaluateFieldVisibility([
       {
         id: 1,
+        type: "TEXT",
+        options: {},
         visibility: null,
         replies: [{ content: { text: "Yes" } }],
       },
       {
         id: 2,
+        type: "TEXT",
+        options: {},
         visibility: null,
         replies: [{ content: { text: "No" } }],
       },
@@ -22,11 +26,15 @@ describe("fieldVisibility", () => {
     const fields = evaluateFieldVisibility([
       {
         id: 1,
+        type: "TEXT",
+        options: {},
         visibility: null,
         replies: [{ content: { text: "Jon Snow" } }],
       },
       {
         id: 2,
+        type: "TEXT",
+        options: {},
         visibility: {
           type: "SHOW",
           operator: "OR",
@@ -51,11 +59,15 @@ describe("fieldVisibility", () => {
       const fields = evaluateFieldVisibility([
         {
           id: 1,
+          type: "TEXT",
+          options: {},
           visibility: null,
           replies: [{ content: { text: "Jon Snow" } }],
         },
         {
           id: 2,
+          type: "TEXT",
+          options: {},
           visibility: {
             type: "SHOW",
             operator: "OR",
@@ -79,6 +91,8 @@ describe("fieldVisibility", () => {
       const fields = evaluateFieldVisibility([
         {
           id: 1,
+          type: "TEXT",
+          options: {},
           visibility: null,
           replies: [
             { content: { text: "Jon Snow" } },
@@ -87,6 +101,8 @@ describe("fieldVisibility", () => {
         },
         {
           id: 2,
+          type: "TEXT",
+          options: {},
           visibility: {
             type: "SHOW",
             operator: "OR",
@@ -110,6 +126,8 @@ describe("fieldVisibility", () => {
       const fields = evaluateFieldVisibility([
         {
           id: 1,
+          type: "TEXT",
+          options: {},
           visibility: null,
           replies: [
             { content: { text: "Robb Stark" } },
@@ -119,6 +137,8 @@ describe("fieldVisibility", () => {
         },
         {
           id: 2,
+          type: "TEXT",
+          options: {},
           visibility: {
             type: "SHOW",
             operator: "OR",
@@ -141,6 +161,8 @@ describe("fieldVisibility", () => {
       const fields = evaluateFieldVisibility([
         {
           id: 1,
+          type: "TEXT",
+          options: {},
           visibility: null,
           replies: [
             { content: { text: "Robert Baratheon, king of Westeros" } },
@@ -149,6 +171,8 @@ describe("fieldVisibility", () => {
         },
         {
           id: 2,
+          type: "TEXT",
+          options: {},
           visibility: {
             type: "SHOW",
             operator: "OR",
@@ -172,6 +196,8 @@ describe("fieldVisibility", () => {
       const fields = evaluateFieldVisibility([
         {
           id: 1,
+          type: "TEXT",
+          options: {},
           visibility: null,
           replies: [
             { content: { text: "Robb" } },
@@ -183,6 +209,8 @@ describe("fieldVisibility", () => {
         },
         {
           id: 2,
+          type: "TEXT",
+          options: {},
           visibility: {
             type: "SHOW",
             operator: "OR",
@@ -208,11 +236,15 @@ describe("fieldVisibility", () => {
       const fields = evaluateFieldVisibility([
         {
           id: 1,
+          type: "TEXT",
+          options: {},
           visibility: null,
           replies: [{ content: { text: "Jon Snow" } }],
         },
         {
           id: 2,
+          type: "TEXT",
+          options: {},
           visibility: {
             type: "SHOW",
             operator: "AND",
@@ -242,6 +274,8 @@ describe("fieldVisibility", () => {
       const fields = evaluateFieldVisibility([
         {
           id: 1,
+          type: "TEXT",
+          options: {},
           visibility: null,
           replies: [
             { content: { text: "King in the North" } },
@@ -252,6 +286,8 @@ describe("fieldVisibility", () => {
         },
         {
           id: 2,
+          type: "TEXT",
+          options: {},
           visibility: {
             type: "SHOW",
             operator: "AND",
@@ -281,6 +317,8 @@ describe("fieldVisibility", () => {
       const fields = evaluateFieldVisibility([
         {
           id: 1,
+          type: "TEXT",
+          options: {},
           visibility: null,
           replies: [
             { content: { text: "Jon Snow" } },
@@ -291,6 +329,8 @@ describe("fieldVisibility", () => {
         },
         {
           id: 2,
+          type: "TEXT",
+          options: {},
           visibility: null,
           replies: [
             { content: { text: "King in the North" } },
@@ -301,6 +341,8 @@ describe("fieldVisibility", () => {
         },
         {
           id: 3,
+          type: "TEXT",
+          options: {},
           visibility: {
             type: "SHOW",
             operator: "OR",

@@ -1,4 +1,4 @@
-import { PetitionFieldType } from "@parallel/graphql/__types";
+import { PetitionFieldType } from "../api/public/__types";
 
 type PartialField = {
   type: PetitionFieldType;
