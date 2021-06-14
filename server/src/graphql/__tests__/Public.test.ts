@@ -1,6 +1,10 @@
 import gql from "graphql-tag";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
-import { PetitionAccess, PetitionField } from "../../db/__types";
+import {
+  PetitionAccess,
+  PetitionField,
+  PetitionFieldReply,
+} from "../../db/__types";
 import { initServer, TestClient } from "./server";
 import { Knex } from "knex";
 import { KNEX } from "../../db/knex";
@@ -369,6 +373,8 @@ describe("GraphQL/Public", () => {
 
   describe("publicCreateCheckboxReply", () => {
     let cookieValue: string;
+    let checkboxField: PetitionField;
+    let checkboxReply: PetitionFieldReply;
     beforeAll(async () => {
       cookieValue = await mocks.createContactAuthentication(access.contact_id);
     });
@@ -417,15 +423,13 @@ describe("GraphQL/Public", () => {
     });
 
     it("creates a checkbox reply", async () => {
-      const [checkboxField] = await mocks.createRandomPetitionFields(
-        access.petition_id,
-        1,
-        () => ({
+      checkboxField = (
+        await mocks.createRandomPetitionFields(access.petition_id, 1, () => ({
           type: "CHECKBOX",
           position: 6,
           options: { values: ["Option 1", "Option 2"] },
-        })
-      );
+        }))
+      )[0];
 
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -435,6 +439,7 @@ describe("GraphQL/Public", () => {
               fieldId: $fieldId
               values: $values
             ) {
+              id
               content
             }
           }
@@ -445,9 +450,61 @@ describe("GraphQL/Public", () => {
           values: ["Option 1"],
         },
       });
+
+      checkboxReply = data.publicCreateCheckboxReply;
+
       expect(errors).toBeUndefined();
       expect(data.publicCreateCheckboxReply).toEqual({
+        id: data.publicCreateCheckboxReply.id,
         content: { choices: ["Option 1"] },
+      });
+    });
+
+    it("sends error if trying to update worng option on reply", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($keycode: ID!, $replyId: GID!, $values: [String!]!) {
+            publicUpdateCheckboxReply(
+              keycode: $keycode
+              replyId: $replyId
+              values: $values
+            ) {
+              content
+            }
+          }
+        `,
+        variables: {
+          keycode: access.keycode,
+          replyId: checkboxReply.id,
+          values: ["Option 3"],
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("updates a checkbox reply", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($keycode: ID!, $replyId: GID!, $values: [String!]!) {
+            publicUpdateCheckboxReply(
+              keycode: $keycode
+              replyId: $replyId
+              values: $values
+            ) {
+              content
+            }
+          }
+        `,
+        variables: {
+          keycode: access.keycode,
+          replyId: checkboxReply.id,
+          values: ["Option 1", "Option 2"],
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data.publicUpdateCheckboxReply).toEqual({
+        content: { choices: ["Option 1", "Option 2"] },
       });
     });
   });
