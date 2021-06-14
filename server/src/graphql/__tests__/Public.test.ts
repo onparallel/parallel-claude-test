@@ -366,4 +366,89 @@ describe("GraphQL/Public", () => {
       expect(data).toBeNull();
     });
   });
+
+  describe("publicCreateCheckboxReply", () => {
+    let cookieValue: string;
+    beforeAll(async () => {
+      cookieValue = await mocks.createContactAuthentication(access.contact_id);
+    });
+
+    beforeEach(() => {
+      testClient.setNextReq({
+        headers: {
+          cookie: serializeCookie(
+            `parallel_contact_auth_${toGlobalId("Contact", access.contact_id)}`,
+            cookieValue
+          ),
+        },
+      });
+    });
+
+    it("sends error if trying to submit wrong option", async () => {
+      const [checkboxField] = await mocks.createRandomPetitionFields(
+        access.petition_id,
+        1,
+        () => ({
+          type: "CHECKBOX",
+          position: 5,
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($keycode: ID!, $fieldId: GID!, $values: [String!]!) {
+            publicCreateCheckboxReply(
+              keycode: $keycode
+              fieldId: $fieldId
+              values: $values
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          keycode: access.keycode,
+          fieldId: toGlobalId("PetitionField", checkboxField.id),
+          values: ["Option 1"],
+        },
+      });
+      expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+
+    it("creates a checkbox reply", async () => {
+      const [checkboxField] = await mocks.createRandomPetitionFields(
+        access.petition_id,
+        1,
+        () => ({
+          type: "CHECKBOX",
+          position: 6,
+          options: { values: ["Option 1", "Option 2"] },
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($keycode: ID!, $fieldId: GID!, $values: [String!]!) {
+            publicCreateCheckboxReply(
+              keycode: $keycode
+              fieldId: $fieldId
+              values: $values
+            ) {
+              content
+            }
+          }
+        `,
+        variables: {
+          keycode: access.keycode,
+          fieldId: toGlobalId("PetitionField", checkboxField.id),
+          values: ["Option 1"],
+        },
+      });
+      expect(errors).toBeUndefined();
+      expect(data.publicCreateCheckboxReply).toEqual({
+        content: { choices: ["Option 1"] },
+      });
+    });
+  });
 });
