@@ -210,7 +210,7 @@ export function defaultFieldOptions(
         optional: optional ?? false,
         multiple: multiple ?? false,
         options: {
-          values: [],
+          values: options?.values ?? [],
           placeholder: options?.placeholder ?? null,
         },
       };
@@ -231,7 +231,7 @@ export function defaultFieldOptions(
         optional: optional ?? false,
         multiple: false,
         options: {
-          values: [],
+          values: options?.values ?? [],
           limit: {
             type: "UNLIMITED",
             min: 1,
