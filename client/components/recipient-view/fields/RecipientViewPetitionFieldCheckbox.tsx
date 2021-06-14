@@ -57,6 +57,8 @@ export function RecipientViewPetitionFieldCheckbox({
 
   const isRejected = field.replies[0]?.status === "REJECTED" ?? false;
 
+  const showRadio = max === 1 && type !== "UNLIMITED";
+
   const [checkedItems, setCheckedItems] = useState(
     field.replies[0]?.content?.choices ?? ([] as string[])
   );
@@ -97,30 +99,25 @@ export function RecipientViewPetitionFieldCheckbox({
     const filteredChecked = checkedItems.filter(
       (c: string) => values?.some((v: string) => v === c) ?? true
     );
-    if (field.replies.length) {
-      if (filteredChecked.length) {
-        if (
-          haveChanges({
-            checked: filteredChecked,
-            choices: field.replies[0].content.choices,
-            max: type == "UNLIMITED" ? values.length : max,
-          })
-        ) {
-          const update = handleUpdate(field.replies[0].id);
-          update(filteredChecked);
-        }
-      } else {
-        handleDelete(field.replies[0].id);
+
+    if (!filteredChecked.length && field.replies.length) {
+      handleDelete(field.replies[0].id);
+    } else if (field.replies.length) {
+      if (
+        haveChanges({
+          checked: filteredChecked,
+          choices: field.replies[0].content.choices,
+          max: type == "UNLIMITED" ? values.length : max,
+        })
+      ) {
+        const update = handleUpdate(field.replies[0].id);
+        update(filteredChecked);
       }
     } else {
-      if (filteredChecked.length) {
-        const create = handleCreate(field.id);
-        create(filteredChecked);
-      }
+      const create = handleCreate(field.id);
+      create(filteredChecked);
     }
   }, [checkedItems]);
-
-  const showRadio = max === 1 && type !== "UNLIMITED";
 
   return (
     <RecipientViewPetitionFieldCard
@@ -206,9 +203,10 @@ export function RecipientViewPetitionFieldCheckbox({
                   e.preventDefault();
                   if (
                     e.target.checked &&
+                    checkedItems.length >= max &&
                     (type === "RANGE" || type === "EXACT")
                   ) {
-                    if (checkedItems.length === max) return;
+                    return;
                   }
                   setCheckedItems((checked: string[]) =>
                     e.target.checked

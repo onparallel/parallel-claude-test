@@ -72,6 +72,8 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
           }))
         )
       );
+    } else {
+      this.addEmptyReply(field);
     }
   }
 
