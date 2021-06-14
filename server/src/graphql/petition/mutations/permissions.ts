@@ -123,30 +123,24 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
 
         await ctx.petitions.createEvent(
           [
-            ...directlyAssigned.map(
-              (p) =>
-                ({
-                  petition_id: p.petition_id,
-                  type: "USER_PERMISSION_ADDED",
-                  data: {
-                    user_id: ctx.user!.id,
-                    permission_type: p.type,
-                    permission_user_id: p.user_id!,
-                  },
-                } as const)
-            ),
-            ...groupAssigned.map(
-              (p) =>
-                ({
-                  petition_id: p.petition_id,
-                  type: "GROUP_PERMISSION_ADDED",
-                  data: {
-                    user_id: ctx.user!.id,
-                    permission_type: p.type,
-                    user_group_id: p.user_group_id!,
-                  },
-                } as const)
-            ),
+            ...directlyAssigned.map((p) => ({
+              petition_id: p.petition_id,
+              type: "USER_PERMISSION_ADDED" as const,
+              data: {
+                user_id: ctx.user!.id,
+                permission_type: p.type,
+                permission_user_id: p.user_id!,
+              },
+            })),
+            ...groupAssigned.map((p) => ({
+              petition_id: p.petition_id,
+              type: "GROUP_PERMISSION_ADDED" as const,
+              data: {
+                user_id: ctx.user!.id,
+                permission_type: p.type,
+                user_group_id: p.user_group_id!,
+              },
+            })),
           ],
           t
         );

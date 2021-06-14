@@ -134,7 +134,7 @@ export const createPetition = mutationField("createPetition", {
           type: "TEMPLATE_USED",
           petition_id: original.id,
           data: {
-            template_id: petitionId,
+            new_petition_id: petition.id,
             org_id: ctx.user!.org_id,
             user_id: ctx.user!.id,
           },
@@ -144,9 +144,8 @@ export const createPetition = mutationField("createPetition", {
           type: "PETITION_CLONED",
           petition_id: original.id,
           data: {
-            from_petition_id: original.id,
+            new_petition_id: petition.id,
             org_id: petition.org_id,
-            petition_id: petition.id,
             user_id: ctx.user!.id,
             type: petition.is_template ? "TEMPLATE" : "PETITION",
           },
@@ -223,9 +222,8 @@ export const clonePetitions = mutationField("clonePetitions", {
             type: "PETITION_CLONED",
             petition_id: petitionId,
             data: {
-              from_petition_id: petitionId,
+              new_petition_id: cloned.id,
               org_id: cloned.org_id,
-              petition_id: cloned.id,
               user_id: ctx.user!.id,
               type: cloned.is_template ? "TEMPLATE" : "PETITION",
             },

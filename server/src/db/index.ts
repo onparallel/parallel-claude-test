@@ -10,6 +10,7 @@ import { OrganizationRepository } from "./repositories/OrganizationRepository";
 import { PetitionEventSubscriptionRepository } from "./repositories/PetitionEventSubscriptionRepository";
 import { PetitionRepository } from "./repositories/PetitionRepository";
 import { ReportingRepository } from "./repositories/ReportingRepository";
+import { SystemRepository } from "./repositories/SystemRepository";
 import { TagRepository } from "./repositories/TagRepository";
 import { UserAuthenticationRepository } from "./repositories/UserAuthenticationRepository";
 import { UserGroupRepository } from "./repositories/UserGroupRepository";
@@ -34,4 +35,5 @@ export const dbModule = new ContainerModule((bind) => {
     PetitionEventSubscriptionRepository
   ).toSelf();
   bind<TagRepository>(TagRepository).toSelf();
+  bind<SystemRepository>(SystemRepository).toSelf();
 });

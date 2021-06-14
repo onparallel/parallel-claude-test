@@ -7,7 +7,6 @@ import { Config, CONFIG } from "../config";
 import { PetitionEvent, SystemEvent } from "../db/events";
 import { unMaybeArray } from "../util/arrays";
 import { isDefined } from "../util/remedaExtensions";
-import { random } from "../util/token";
 import { MaybeArray } from "../util/types";
 import { LOGGER, Logger } from "./logger";
 import { IStorage, Storage, STORAGE_FACTORY } from "./storage";
@@ -130,14 +129,11 @@ export class Aws implements IAws {
     if (_events.length > 0) {
       this.enqueueMessages(
         "event-processor",
-        _events.map((event) => {
-          const id = random(5);
-          return {
-            id: `event-processor-${id}`,
-            groupId: `event-processor-${id}`,
-            body: event,
-          };
-        })
+        _events.map((event) => ({
+          id: `event-processor-${event.id}`,
+          groupId: `event-processor-${event.id}`,
+          body: event,
+        }))
       );
     }
   }

@@ -10,10 +10,15 @@ import { BaseRepository } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
 import { CreateUser, User, UserGroup } from "../__types";
+import { SystemRepository } from "./SystemRepository";
 
 @injectable()
 export class UserRepository extends BaseRepository {
-  constructor(@inject(KNEX) knex: Knex, @inject(AWS_SERVICE) private aws: Aws) {
+  constructor(
+    @inject(KNEX) knex: Knex,
+    @inject(AWS_SERVICE) private aws: Aws,
+    private system: SystemRepository
+  ) {
     super(knex);
   }
 
@@ -121,7 +126,7 @@ export class UserRepository extends BaseRepository {
       updated_by: createdBy,
     });
 
-    this.aws.enqueueEvents({
+    this.system.createEvent({
       type: "USER_CREATED",
       data: {
         user_id: user.id,

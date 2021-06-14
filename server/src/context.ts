@@ -24,6 +24,7 @@ import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticati
 import { PetitionEventSubscriptionRepository } from "./db/repositories/PetitionEventSubscriptionRepository";
 import { TagRepository } from "./db/repositories/TagRepository";
 import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
+import { SystemRepository } from "./db/repositories/SystemRepository";
 
 @injectable()
 export class ApiContext {
@@ -80,6 +81,7 @@ export class WorkerContext {
     public readonly organizations: OrganizationRepository,
     public readonly petitions: PetitionRepository,
     public readonly reporting: ReportingRepository,
-    public readonly subscriptions: PetitionEventSubscriptionRepository
+    public readonly subscriptions: PetitionEventSubscriptionRepository,
+    public readonly system: SystemRepository
   ) {}
 }

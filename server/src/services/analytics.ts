@@ -4,6 +4,7 @@ import { Config, CONFIG } from "../config";
 import { PetitionStatus, User } from "../db/__types";
 import { unMaybeArray } from "../util/arrays";
 import { toGlobalId } from "../util/globalId";
+import { isDefined } from "../util/remedaExtensions";
 import { titleize } from "../util/strings";
 import { MaybeArray } from "../util/types";
 
@@ -32,8 +33,8 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   /** User clones a petition/template */
   PETITION_CLONED: {
     petition_id: number;
+    new_petition_id: number;
     org_id: number;
-    from_petition_id: number;
     user_id: number;
     type: "PETITION" | "TEMPLATE";
   };
@@ -49,6 +50,7 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     user_id: number;
     org_id: number;
     template_id: number;
+    new_petition_id: number;
   };
   /** User sends petition to accesses */
   PETITION_SENT: {
@@ -135,11 +137,7 @@ export interface IAnalyticsService {
     user: Pick<User, "id" | "email" | "created_at" | "last_active_at">
   ): void;
 
-  trackEvent<EventType extends AnalyticsEventType>(event: {
-    type: EventType;
-    data: AnalyticsEventPayload<EventType>;
-    user_id: number;
-  }): void;
+  trackEvent(events: MaybeArray<AnalyticsEvent>): void;
 }
 
 @injectable()
@@ -167,17 +165,15 @@ export class AnalyticsService implements IAnalyticsService {
     });
   }
 
-  trackEvent<EventType extends AnalyticsEventType>(event: {
-    type: EventType;
-    data: MaybeArray<AnalyticsEventPayload<EventType>>;
-    user_id: number;
-  }) {
-    unMaybeArray(event.data).map((properties) => {
-      this.analytics?.track({
-        userId: toGlobalId("User", event.user_id),
-        event: titleize(event.type),
-        properties,
+  trackEvent(events: MaybeArray<AnalyticsEvent | null>) {
+    unMaybeArray(events)
+      .filter(isDefined)
+      .map((event) => {
+        this.analytics?.track({
+          userId: toGlobalId("User", event.user_id),
+          event: titleize(event.type),
+          properties: event.data,
+        });
       });
-    });
   }
 }

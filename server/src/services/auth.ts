@@ -18,6 +18,7 @@ import {
   IntegrationSettings,
 } from "../db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "../db/repositories/OrganizationRepository";
+import { SystemRepository } from "../db/repositories/SystemRepository";
 import { UserRepository } from "../db/repositories/UserRepository";
 import { User } from "../db/__types";
 import { random } from "../util/token";
@@ -57,7 +58,8 @@ export class Auth implements IAuth {
     @inject(AWS_SERVICE) public readonly aws: Aws,
     private orgs: OrganizationRepository,
     private integrations: IntegrationRepository,
-    private users: UserRepository
+    private users: UserRepository,
+    private system: SystemRepository
   ) {}
 
   async guessLogin(req: Request, res: Response, next: NextFunction) {
@@ -338,11 +340,9 @@ export class Auth implements IAuth {
   }
 
   private trackSessionLogin(user: User) {
-    this.aws.enqueueEvents({
+    this.system.createEvent({
       type: "USER_LOGGED_IN",
-      data: {
-        user_id: user.id,
-      },
+      data: { user_id: user.id },
     });
   }
 

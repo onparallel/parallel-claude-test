@@ -96,6 +96,11 @@ export type PetitionStatus = "CLOSED" | "COMPLETED" | "DRAFT" | "PENDING";
 
 export type PetitionUserNotificationType = "COMMENT_CREATED";
 
+export type SystemEventType =
+  | "EMAIL_BOUNCED"
+  | "USER_CREATED"
+  | "USER_LOGGED_IN";
+
 export type UserOrganizationRole = "ADMIN" | "NORMAL";
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
@@ -128,6 +133,7 @@ export interface TableTypes {
   petition_tag: PetitionTag;
   petition_user_notification: PetitionUserNotification;
   public_file_upload: PublicFileUpload;
+  system_event: SystemEvent;
   tag: Tag;
   temporary_file: TemporaryFile;
   user: User;
@@ -164,6 +170,7 @@ export interface TableCreateTypes {
   petition_tag: CreatePetitionTag;
   petition_user_notification: CreatePetitionUserNotification;
   public_file_upload: CreatePublicFileUpload;
+  system_event: CreateSystemEvent;
   tag: CreateTag;
   temporary_file: CreateTemporaryFile;
   user: CreateUser;
@@ -200,6 +207,7 @@ export interface TablePrimaryKeys {
   petition_tag: "id";
   petition_user_notification: "id";
   public_file_upload: "id";
+  system_event: "id";
   tag: "id";
   temporary_file: "id";
   user: "id";
@@ -807,6 +815,18 @@ export type CreatePublicFileUpload = PartialProps<
   | "updated_by"
   | "deleted_at"
   | "deleted_by"
+>;
+
+export interface SystemEvent {
+  id: number; // int4
+  type: SystemEventType; // system_event_type
+  data: Maybe<any>; // jsonb
+  created_at: Date; // timestamptz
+}
+
+export type CreateSystemEvent = PartialProps<
+  Omit<SystemEvent, "id">,
+  "data" | "created_at"
 >;
 
 export interface Tag {

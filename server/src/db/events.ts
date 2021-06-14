@@ -4,6 +4,8 @@ import {
   PetitionPermissionType,
   PetitionSignatureCancelReason,
   PetitionStatus,
+  SystemEvent as DbSystemEvent,
+  SystemEventType,
 } from "./__types";
 
 export type PetitionEventPayload<TType extends PetitionEventType> = {
@@ -107,14 +109,13 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     file_upload_id: number;
   };
   TEMPLATE_USED: {
-    template_id: number;
+    new_petition_id: number;
     org_id: number;
     user_id: number;
   };
   PETITION_CLONED: {
-    from_petition_id: number;
+    new_petition_id: number;
     org_id: number;
-    petition_id: number;
     user_id: number;
     type: "PETITION" | "TEMPLATE";
   };
@@ -242,9 +243,6 @@ export type PetitionEvent<IsCreate extends boolean = false> =
 
 export type CreatePetitionEvent = PetitionEvent<true>;
 
-/** SYSTEM EVENTS */
-export type SystemEventType = "USER_LOGGED_IN" | "USER_CREATED";
-
 export type SystemEventPayload<TType extends SystemEventType> = {
   USER_LOGGED_IN: {
     user_id: number;
@@ -252,14 +250,32 @@ export type SystemEventPayload<TType extends SystemEventType> = {
   USER_CREATED: {
     user_id: number;
   };
+  EMAIL_BOUNCED: {
+    email_log_id: number;
+  };
 }[TType];
 
-type GenericSystemEvent<TType extends SystemEventType> = {
+type GenericSystemEvent<
+  TType extends SystemEventType,
+  IsCreate extends boolean = false
+> = Omit<
+  DbSystemEvent,
+  "type" | "data" | (IsCreate extends true ? "id" | "created_at" : never)
+> & {
   type: TType;
   data: SystemEventPayload<TType>;
 };
 
-export type UserCreatedEvent = GenericSystemEvent<"USER_CREATED">;
-export type UserLoggedInEvent = GenericSystemEvent<"USER_LOGGED_IN">;
+export type UserCreatedEvent<IsCreate extends boolean = false> =
+  GenericSystemEvent<"USER_CREATED", IsCreate>;
+export type UserLoggedInEvent<IsCreate extends boolean = false> =
+  GenericSystemEvent<"USER_LOGGED_IN", IsCreate>;
+export type EmailBouncedEvent<IsCreate extends boolean = false> =
+  GenericSystemEvent<"EMAIL_BOUNCED", IsCreate>;
 
-export type SystemEvent = UserLoggedInEvent | UserCreatedEvent;
+export type SystemEvent<IsCreate extends boolean = false> =
+  | UserLoggedInEvent<IsCreate>
+  | UserCreatedEvent<IsCreate>
+  | EmailBouncedEvent<IsCreate>;
+
+export type CreateSystemEvent = SystemEvent<true>;

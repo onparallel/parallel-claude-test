@@ -1,6 +1,6 @@
 import { WorkerContext } from "../context";
-import { PetitionEvent, SystemEvent, SystemEventType } from "../db/events";
-import { PetitionEventType } from "../db/__types";
+import { PetitionEvent, SystemEvent } from "../db/events";
+import { PetitionEventType, SystemEventType } from "../db/__types";
 import { analyticsEventListener } from "./event-listeners/analytics-event-listener";
 import { eventSubscriptionsListener } from "./event-listeners/event-subscriptions-listener";
 import { createQueueWorker } from "./helpers/createQueueWorker";

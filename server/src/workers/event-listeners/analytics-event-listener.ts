@@ -15,7 +15,11 @@ import {
 import { EventListener } from "../event-processor";
 
 async function loadPetition(petitionId: number, ctx: WorkerContext) {
-  const petition = await ctx.petitions.load(petitionId);
+  // when receiving different events, the petition could be already deleted in the database
+  // example: creating and immediately after deleting a petition.
+  // the PETITION_CREATED event will reference to a deleted petition.
+  // because of this, we need to also search for deleted petitions.
+  const petition = await ctx.petitions.loadAnyPetitionById(petitionId);
   if (!petition) {
     throw new Error(`Petition not found with id ${petitionId}`);
   }
@@ -78,7 +82,10 @@ async function trackPetitionClonedEvent(
   await ctx.analytics.trackEvent({
     type: "PETITION_CLONED",
     user_id: event.data.user_id,
-    data: event.data,
+    data: {
+      petition_id: event.petition_id,
+      ...event.data,
+    },
   });
 }
 
@@ -211,7 +218,10 @@ async function trackTemplateUsedEvent(
   await ctx.analytics.trackEvent({
     type: "TEMPLATE_USED",
     user_id: event.data.user_id,
-    data: event.data,
+    data: {
+      template_id: event.petition_id,
+      ...event.data,
+    },
   });
 }
 
@@ -241,26 +251,29 @@ async function trackAccessOpenedEvent(
   ]);
 
   if (accessOpenedEvents.length === 0) {
-    await ctx.analytics.trackEvent({
-      type: "ACCESS_OPENED_FIRST",
-      user_id: access.granter_id,
-      data: {
-        contact_id: access.contact_id,
-        org_id: petition.org_id,
-        petition_id: event.petition_id,
+    await ctx.analytics.trackEvent([
+      accessOpenedEvents.length === 0
+        ? {
+            type: "ACCESS_OPENED_FIRST",
+            user_id: access.granter_id,
+            data: {
+              contact_id: access.contact_id,
+              org_id: petition.org_id,
+              petition_id: event.petition_id,
+            },
+          }
+        : null,
+      {
+        type: "ACCESS_OPENED",
+        user_id: access.granter_id,
+        data: {
+          contact_id: access.contact_id,
+          org_id: petition.org_id,
+          petition_id: event.petition_id,
+        },
       },
-    });
+    ]);
   }
-
-  await ctx.analytics.trackEvent({
-    type: "ACCESS_OPENED",
-    user_id: access.granter_id,
-    data: {
-      contact_id: access.contact_id,
-      org_id: petition.org_id,
-      petition_id: event.petition_id,
-    },
-  });
 }
 
 export const analyticsEventListener: EventListener = async (event, ctx) => {
