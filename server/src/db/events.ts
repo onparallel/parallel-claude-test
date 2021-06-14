@@ -123,10 +123,6 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     user_id: number;
     status: PetitionStatus;
   };
-  PETITION_SENT: {
-    user_id: number;
-    petition_access_ids: number[];
-  };
 }[TType];
 
 type GenericPetitionEvent<
@@ -204,8 +200,6 @@ export type PetitionClonedEvent<IsCreate extends boolean = false> =
   GenericPetitionEvent<"PETITION_CLONED", IsCreate>;
 export type PetitionDeletedEvent<IsCreate extends boolean = false> =
   GenericPetitionEvent<"PETITION_DELETED", IsCreate>;
-export type PetitionSentEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"PETITION_SENT", IsCreate>;
 
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
@@ -238,8 +232,7 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | SignatureCancelledEvent<IsCreate>
   | TemplateUsedEvent<IsCreate>
   | PetitionClonedEvent<IsCreate>
-  | PetitionDeletedEvent<IsCreate>
-  | PetitionSentEvent<IsCreate>;
+  | PetitionDeletedEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;
 

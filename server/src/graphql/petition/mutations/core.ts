@@ -1144,17 +1144,6 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       await ctx.emails.sendPetitionMessageEmail(messages.map((m) => m.id));
     }
 
-    await ctx.petitions.createEvent(
-      successfulSends.map((s) => ({
-        type: "PETITION_SENT",
-        petition_id: s.petition!.id,
-        data: {
-          user_id: ctx.user!.id,
-          petition_access_ids: s.accesses!.map((a) => a.id),
-        },
-      }))
-    );
-
     return results.map((r) => omit(r, ["messages"]));
   },
 });
@@ -1210,15 +1199,6 @@ export const sendPetition = mutationField("sendPetition", {
       if (!args.scheduledAt) {
         await ctx.emails.sendPetitionMessageEmail(messages!.map((s) => s.id));
       }
-
-      await ctx.petitions.createEvent({
-        type: "PETITION_SENT",
-        petition_id: args.petitionId,
-        data: {
-          user_id: ctx.user!.id,
-          petition_access_ids: accesses!.map((a) => a.id),
-        },
-      });
     }
 
     return {

@@ -51,7 +51,6 @@ createQueueWorker(
         "PETITION_CREATED",
         "PETITION_CLONED",
         "PETITION_CLOSED",
-        "PETITION_SENT",
         "PETITION_COMPLETED",
         "PETITION_DELETED",
         "REMINDER_SENT",
@@ -59,6 +58,7 @@ createQueueWorker(
         "ACCESS_OPENED",
         "USER_LOGGED_IN",
         "USER_CREATED",
+        "ACCESS_ACTIVATED",
       ],
       analyticsEventListener
     )

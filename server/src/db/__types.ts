@@ -46,7 +46,6 @@ export type PetitionEventType =
   | "PETITION_CREATED"
   | "PETITION_DELETED"
   | "PETITION_REOPENED"
-  | "PETITION_SENT"
   | "REMINDER_SENT"
   | "REPLY_CREATED"
   | "REPLY_DELETED"

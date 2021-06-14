@@ -57,7 +57,6 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     petition_id: number;
     org_id: number;
     user_id: number;
-    petition_access_ids: number[];
   };
   /** User closes the petition */
   PETITION_CLOSED: {

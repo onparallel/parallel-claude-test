@@ -2093,11 +2093,6 @@ type PetitionReopenedEvent implements PetitionEvent {
   user: User
 }
 
-type PetitionSentEvent implements PetitionEvent {
-  createdAt: DateTime!
-  id: GID!
-}
-
 enum PetitionSignatureCancelReason {
   CANCELLED_BY_USER
   DECLINED_BY_SIGNER

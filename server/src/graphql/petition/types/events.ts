@@ -92,8 +92,6 @@ export const PetitionEvent = interfaceType({
         return "PetitionClonedEvent";
       case "PETITION_DELETED":
         return "PetitionDeletedEvent";
-      case "PETITION_SENT":
-        return "PetitionSentEvent";
       case "TEMPLATE_USED":
         return "TemplateUsedEvent";
     }
@@ -632,10 +630,6 @@ export const PetitionClonedEvent = createPetitionEvent(
 );
 export const PetitionDeletedEvent = createPetitionEvent(
   "PetitionDeletedEvent",
-  (t) => {}
-);
-export const PetitionSentEvent = createPetitionEvent(
-  "PetitionSentEvent",
   (t) => {}
 );
 export const TemplateUsedEvent = createPetitionEvent(

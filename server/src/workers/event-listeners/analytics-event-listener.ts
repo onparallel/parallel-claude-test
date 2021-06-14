@@ -1,12 +1,12 @@
 import { WorkerContext } from "../../context";
 import {
+  AccessActivatedEvent,
   AccessOpenedEvent,
   PetitionClonedEvent,
   PetitionClosedEvent,
   PetitionCompletedEvent,
   PetitionCreatedEvent,
   PetitionDeletedEvent,
-  PetitionSentEvent,
   ReminderSentEvent,
   TemplateUsedEvent,
   UserCreatedEvent,
@@ -105,21 +105,28 @@ async function trackPetitionClosedEvent(
   });
 }
 
-async function trackPetitionSentEvent(
-  event: PetitionSentEvent,
+async function trackAccessActivatedEvent(
+  event: AccessActivatedEvent,
   ctx: WorkerContext
 ) {
   const petition = await loadPetition(event.petition_id, ctx);
-  await ctx.analytics.trackEvent({
-    type: "PETITION_SENT",
-    user_id: event.data.user_id,
-    data: {
-      petition_access_ids: event.data.petition_access_ids,
+  const accessActivatedEvent = await ctx.petitions.loadLastEventsByType(
+    event.petition_id,
+    "ACCESS_ACTIVATED"
+  );
+
+  // send a PETITION_SENT event only on the first ACCESS_ACTIVATED event of each petition
+  if (accessActivatedEvent.length === 0) {
+    await ctx.analytics.trackEvent({
+      type: "PETITION_SENT",
       user_id: event.data.user_id,
-      org_id: petition.org_id,
-      petition_id: event.petition_id,
-    },
-  });
+      data: {
+        user_id: event.data.user_id,
+        org_id: petition.org_id,
+        petition_id: event.petition_id,
+      },
+    });
+  }
 }
 
 async function trackPetitionCompletedEvent(
@@ -287,9 +294,6 @@ export const analyticsEventListener: EventListener = async (event, ctx) => {
     case "PETITION_CLOSED":
       await trackPetitionClosedEvent(event, ctx);
       break;
-    case "PETITION_SENT":
-      await trackPetitionSentEvent(event, ctx);
-      break;
     case "PETITION_COMPLETED":
       await trackPetitionCompletedEvent(event, ctx);
       break;
@@ -310,6 +314,9 @@ export const analyticsEventListener: EventListener = async (event, ctx) => {
       break;
     case "ACCESS_OPENED":
       await trackAccessOpenedEvent(event, ctx);
+      break;
+    case "ACCESS_ACTIVATED":
+      await trackAccessActivatedEvent(event, ctx);
       break;
     default:
       throw new Error(
