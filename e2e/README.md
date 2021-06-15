@@ -1,16 +1,28 @@
-# Parallel
+# e2e testing
 
-## Run
+Run tests with the following command
 
-In order to run the tests, first make sure that:
+```
+ENV=xxx BROWSER=xxx yarn test
+```
 
-- you have installed all required dependencies.
-- you have the client and server running on an accessible URL.
+`ENV` can be one of the following:
 
-Then just run `yarn test:e2e`.
+- `local`: The app must be running locally on your machine.
+- `staging`
 
-## Environment variables
+`BROWSER` is a comma separated list of browser names to run the tests on
 
-`PLAYWRIGHT_HEADLESS=true` will run tests on browsers with headless mode. Defaults to false.
-`PARALLEL_CLIENT_HOST=<HOST>` URL for the Parallel client. Defaults to localhost.  
-`PARALLEL_CLIENT_PORT=<PORT>` PORT of the Parallel client. Defaults to 80
+- `chrome`
+- `firefox`
+- `webkit`
+
+Examples:
+
+```
+# Run tests locally using chrome
+ENV=local BROWSER=chrome yarn test
+
+# Run tests on staging on all browsers
+ENV=staging BROWSER=chrome,firefox,webkit yarn test
+```

@@ -60,6 +60,7 @@ export function CookieConsent({}: CookieConsentProps) {
         />
       </Text>
       <Button
+        id="cookie-content-accept"
         marginX={4}
         marginY={2}
         borderColor="white"

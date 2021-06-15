@@ -502,7 +502,7 @@ export const PetitionComposeFieldList = Object.assign(
         </Card>
         <Flex marginTop={4} justifyContent="center">
           <BigAddFieldButton
-            className="big-add-field-button"
+            id="big-add-field-button"
             onSelectFieldType={onAddField}
           />
         </Flex>

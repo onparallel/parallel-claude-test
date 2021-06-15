@@ -10,11 +10,11 @@ export interface AddFieldPopoverProps
 
 export const AddFieldPopover = chakraForwardRef<"button", AddFieldPopoverProps>(
   function AddFieldPopover(
-    { onSelectFieldType, onOpen, onClose, ...props },
+    { id, onSelectFieldType, onOpen, onClose, ...props },
     ref
   ) {
     return (
-      <Menu placement="bottom" onOpen={onOpen} onClose={onClose}>
+      <Menu id={id} placement="bottom" onOpen={onOpen} onClose={onClose}>
         <MenuButton ref={ref} {...props} />
         <Portal>
           <PetitionFieldTypeSelectDropdown

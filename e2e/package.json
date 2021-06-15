@@ -3,11 +3,7 @@
   "name": "@parallel/e2e",
   "private": true,
   "scripts": {
-    "test:e2e": "jest",
-    "test:e2e:headless": "env PLAYWRIGHT_HEADLESS=true jest",
-    "test:e2e:chrome": "env PLAYWRIGHT_BROWSERS=chrome jest",
-    "test:e2e:firefox": "env PLAYWRIGHT_BROWSERS=firefox jest",
-    "test:e2e:webkit": "env PLAYWRIGHT_BROWSERS=webkit jest"
+    "test": "jest"
   },
   "devDependencies": {
     "@babel/core": "^7.14.6",
@@ -17,6 +13,7 @@
   },
   "dependencies": {
     "babel-jest": "^27.0.5",
+    "dotenv": "^10.0.0",
     "faker": "^5.5.3",
     "jest": "^27.0.5",
     "playwright": "^1.12.2",

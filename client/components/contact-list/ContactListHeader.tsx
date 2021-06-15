@@ -55,9 +55,14 @@ export function ContactListHeader({
   return (
     <Stack direction="row" padding={2}>
       <Box flex="0 1 400px">
-        <SearchInput value={search ?? ""} onChange={handleSearchChange} />
+        <SearchInput
+          id="contacts-search"
+          value={search ?? ""}
+          onChange={handleSearchChange}
+        />
       </Box>
       <IconButtonWithTooltip
+        id="contacts-reload"
         onClick={() => onReload()}
         icon={<RepeatIcon />}
         placement="bottom"

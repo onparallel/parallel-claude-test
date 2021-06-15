@@ -30,9 +30,9 @@ import {
   PetitionFieldVisibilityEditor_PetitionFieldFragment,
   UpdatePetitionFieldInput,
   usePetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation,
+  usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation,
   usePetitionComposeField_petitionFieldAttachmentUploadCompleteMutation,
   usePetitionComposeField_removePetitionFieldAttachmentMutation,
-  usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation,
 } from "@parallel/graphql/__types";
 import { updateFragment } from "@parallel/utils/apollo/updateFragment";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
@@ -63,14 +63,14 @@ import { FileSize } from "../common/FileSize";
 import { GrowingTextarea } from "../common/GrowingTextarea";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SmallPopover } from "../common/SmallPopover";
+import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldTypeIndicator } from "../petition-common/PetitionFieldTypeIndicator";
 import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment";
-import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
-import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 import {
   PetitionFieldOptionsListEditor,
   PetitionFieldOptionsListEditorRef,
 } from "./PetitionFieldOptionsListEditor";
+import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 
 export interface PetitionComposeFieldProps {
   petitionId: string;
@@ -731,6 +731,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       {field.type === "SELECT" || field.type === "CHECKBOX" ? (
         <PetitionFieldOptionsListEditor
           ref={fieldOptionsRef}
+          id={`field-options-list-${field.id}`}
           field={field}
           onFieldEdit={onFieldEdit}
           showError={showError}

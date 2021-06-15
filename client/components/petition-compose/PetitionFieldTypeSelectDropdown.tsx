@@ -204,6 +204,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
                 aria-describedby={
                   activeType === type ? `field-description-${type}` : undefined
                 }
+                data-field-type={type}
                 onClick={() => onSelectFieldType(type)}
                 onFocus={() => setActiveType(type)}
               >
