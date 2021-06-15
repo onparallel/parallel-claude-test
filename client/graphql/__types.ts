@@ -4439,6 +4439,7 @@ export type RecipientViewProgressFooter_PublicPetitionFieldFragment = {
   id: string;
   type: PetitionFieldType;
   optional: boolean;
+  validated: boolean;
   isReadOnly: boolean;
   replies: Array<{ __typename?: "PublicPetitionFieldReply"; id: string }>;
 } & useFieldVisibility_PublicPetitionFieldFragment;
@@ -6256,7 +6257,6 @@ export type useFieldVisibility_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   visibility?: Maybe<{ [key: string]: any }>;
-  validated: boolean;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
@@ -8347,7 +8347,6 @@ export const useFieldVisibility_PublicPetitionFieldFragmentDoc = gql`
   fragment useFieldVisibility_PublicPetitionField on PublicPetitionField {
     id
     visibility
-    validated
     replies {
       id
       content
@@ -8376,6 +8375,7 @@ export const RecipientViewProgressFooter_PublicPetitionFieldFragmentDoc = gql`
     id
     type
     optional
+    validated
     isReadOnly
     replies {
       id

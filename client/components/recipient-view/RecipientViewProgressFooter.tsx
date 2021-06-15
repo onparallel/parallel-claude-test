@@ -146,6 +146,7 @@ RecipientViewProgressFooter.fragments = {
         id
         type
         optional
+        validated
         isReadOnly
         replies {
           id
