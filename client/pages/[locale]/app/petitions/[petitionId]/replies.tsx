@@ -291,7 +291,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }, [petitionId, petition.fields]);
 
   const showDownloadAll = petition.fields.some(
-    (f) => !f.isReadOnly && f.replies.length > 0
+    (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0
   );
 
   const [createPetitionFieldComment] =
