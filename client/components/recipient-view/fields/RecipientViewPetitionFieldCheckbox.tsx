@@ -96,6 +96,8 @@ export function RecipientViewPetitionFieldCheckbox({
   };
 
   useEffect(() => {
+    if (isDisabled) return;
+
     const filteredChecked = checkedItems.filter(
       (c: string) => values?.some((v: string) => v === c) ?? true
     );
