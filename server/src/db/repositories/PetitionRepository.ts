@@ -1711,7 +1711,7 @@ export class PetitionRepository extends BaseRepository {
       this.from("petition_event")
         .where("petition_id", petitionId)
         .orderBy([
-          { column: "created_at", order: "asc" },
+          { column: "created_at", order: "desc" },
           { column: "id", order: "asc" },
         ])
         .select("*"),
