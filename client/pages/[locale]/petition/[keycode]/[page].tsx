@@ -100,6 +100,7 @@ function RecipientView({
         const canFinalize = petition.fields.every(
           (f, index) =>
             !visibility[index] ||
+            f.validated ||
             f.optional ||
             completedFieldReplies(f).length > 0 ||
             f.isReadOnly
@@ -150,6 +151,7 @@ function RecipientView({
               visibility[index] &&
               !completedFieldReplies(field).length &&
               !field.optional &&
+              !field.validated &&
               !field.isReadOnly
             );
           })!;
@@ -397,6 +399,7 @@ function RecipientView({
                       }
                       isInvalid={
                         finalized &&
+                        !field.validated &&
                         completedFieldReplies(field).length === 0 &&
                         !field.optional
                       }

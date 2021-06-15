@@ -125,6 +125,7 @@ useFieldVisibility.fragments = {
     fragment useFieldVisibility_PublicPetitionField on PublicPetitionField {
       id
       visibility
+      validated
       replies {
         id
         content

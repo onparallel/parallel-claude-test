@@ -6256,6 +6256,7 @@ export type useFieldVisibility_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
   visibility?: Maybe<{ [key: string]: any }>;
+  validated: boolean;
   replies: Array<{
     __typename?: "PublicPetitionFieldReply";
     id: string;
@@ -8346,6 +8347,7 @@ export const useFieldVisibility_PublicPetitionFieldFragmentDoc = gql`
   fragment useFieldVisibility_PublicPetitionField on PublicPetitionField {
     id
     visibility
+    validated
     replies {
       id
       content

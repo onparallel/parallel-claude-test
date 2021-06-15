@@ -29,8 +29,9 @@ export function RecipientViewProgressFooter({
     for (const [field, isVisible] of zip(petition.fields, fieldVisibility)) {
       const fieldReplies = completedFieldReplies(field);
       if (isVisible && !field.isReadOnly) {
-        replied += fieldReplies.length ? 1 : 0;
-        optional += field.optional && !fieldReplies.length ? 1 : 0;
+        replied += fieldReplies.length || field.validated ? 1 : 0;
+        optional +=
+          field.optional && !fieldReplies.length && !field.validated ? 1 : 0;
         total += 1;
       }
     }

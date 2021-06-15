@@ -1438,6 +1438,7 @@ export class PetitionRepository extends BaseRepository {
       ([field, isVisible]) =>
         field.type === "HEADING" ||
         field.optional ||
+        field.validated ||
         field.replies.length > 0 ||
         !isVisible
     );
