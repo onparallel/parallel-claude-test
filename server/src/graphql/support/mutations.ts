@@ -191,3 +191,35 @@ export const resetSignaturitOrganizationBranding = mutationField(
     },
   }
 );
+
+export const resetUserPassword = mutationField("resetUserPassword", {
+  description:
+    "Resets the given user password on AWS Cognito and sends an email with new temporary.",
+  type: "SupportMethodResponse",
+  args: {
+    email: nonNull(stringArg()),
+  },
+  authorize: supportMethodAccess(),
+  validateArgs: validEmail((args) => args.email, "email"),
+  resolve: async (_, { email }, ctx) => {
+    try {
+      const response = await ctx.aws.resetUserPassword(email);
+      if (!response.error) {
+        return {
+          result: RESULT.SUCCESS,
+          message: "User will receive an email with new temporary password.",
+        };
+      } else {
+        return {
+          result: RESULT.FAILURE,
+          message: response.error.message,
+        };
+      }
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error.message,
+      };
+    }
+  },
+});

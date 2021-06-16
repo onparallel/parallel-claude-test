@@ -346,6 +346,8 @@ export type Mutation = {
   reopenPetition: Petition;
   /** Removes the Signaturit Branding Ids of selected organization. */
   resetSignaturitOrganizationBranding: SupportMethodResponse;
+  /** Resets the given user password on AWS Cognito and sends an email with new temporary. */
+  resetUserPassword: SupportMethodResponse;
   /** Soft-deletes a given auth token, making it permanently unusable. */
   revokeUserAuthToken: Result;
   /** Sends the petition and creates the corresponding accesses and messages. */
@@ -764,6 +766,10 @@ export type MutationreopenPetitionArgs = {
 
 export type MutationresetSignaturitOrganizationBrandingArgs = {
   orgId: Scalars["Int"];
+};
+
+export type MutationresetUserPasswordArgs = {
+  email: Scalars["String"];
 };
 
 export type MutationrevokeUserAuthTokenArgs = {

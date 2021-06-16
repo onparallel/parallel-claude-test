@@ -831,6 +831,11 @@ type Mutation {
   resetSignaturitOrganizationBranding(orgId: Int!): SupportMethodResponse!
 
   """
+  Resets the given user password on AWS Cognito and sends an email with new temporary.
+  """
+  resetUserPassword(email: String!): SupportMethodResponse!
+
+  """
   Soft-deletes a given auth token, making it permanently unusable.
   """
   revokeUserAuthToken(authTokenIds: [GID!]!): Result!

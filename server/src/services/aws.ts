@@ -147,4 +147,14 @@ export class Aws implements IAws {
       .promise();
     return res.User!.Username;
   }
+
+  async resetUserPassword(email: string) {
+    const res = await this.cognitoIdP
+      .adminResetUserPassword({
+        UserPoolId: this.config.cognito.defaultPoolId,
+        Username: email,
+      })
+      .promise();
+    return res.$response;
+  }
 }

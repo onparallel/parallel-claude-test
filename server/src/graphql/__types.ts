@@ -723,6 +723,7 @@ export interface NexusGenFieldTypes {
     removeUsersFromGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     reopenPetition: NexusGenRootTypes["Petition"]; // Petition!
     resetSignaturitOrganizationBranding: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    resetUserPassword: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     revokeUserAuthToken: NexusGenEnums["Result"]; // Result!
     sendPetition: NexusGenRootTypes["SendPetitionResult"]; // SendPetitionResult!
     sendPetitionClosedNotification: NexusGenRootTypes["Petition"]; // Petition!
@@ -1601,6 +1602,7 @@ export interface NexusGenFieldTypeNames {
     removeUsersFromGroup: "UserGroup";
     reopenPetition: "Petition";
     resetSignaturitOrganizationBranding: "SupportMethodResponse";
+    resetUserPassword: "SupportMethodResponse";
     revokeUserAuthToken: "Result";
     sendPetition: "SendPetitionResult";
     sendPetitionClosedNotification: "Petition";
@@ -2636,6 +2638,10 @@ export interface NexusGenArgTypes {
     resetSignaturitOrganizationBranding: {
       // args
       orgId: number; // Int!
+    };
+    resetUserPassword: {
+      // args
+      email: string; // String!
     };
     revokeUserAuthToken: {
       // args
