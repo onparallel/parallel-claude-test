@@ -22,6 +22,7 @@ createQueueWorker(
         Delivery: "delivery",
         Bounce: "bounce",
         Open: "open",
+        Complaint: "complaint",
       } as any
     )[payload.eventType];
     await context.emailLogs.createEmailEvent({
