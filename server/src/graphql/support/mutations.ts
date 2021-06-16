@@ -203,18 +203,11 @@ export const resetUserPassword = mutationField("resetUserPassword", {
   validateArgs: validEmail((args) => args.email, "email"),
   resolve: async (_, { email }, ctx) => {
     try {
-      const response = await ctx.aws.resetUserPassword(email);
-      if (!response.error) {
-        return {
-          result: RESULT.SUCCESS,
-          message: "User will receive an email with new temporary password.",
-        };
-      } else {
-        return {
-          result: RESULT.FAILURE,
-          message: response.error.message,
-        };
-      }
+      await ctx.aws.resetUserPassword(email);
+      return {
+        result: RESULT.SUCCESS,
+        message: "User will receive an email with new temporary password.",
+      };
     } catch (error) {
       return {
         result: RESULT.FAILURE,

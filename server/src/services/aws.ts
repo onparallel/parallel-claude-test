@@ -148,13 +148,14 @@ export class Aws implements IAws {
     return res.User!.Username;
   }
 
+  /** resends the email with temporary email to an already existing user */
   async resetUserPassword(email: string) {
-    const res = await this.cognitoIdP
-      .adminResetUserPassword({
+    await this.cognitoIdP
+      .adminCreateUser({
         UserPoolId: this.config.cognito.defaultPoolId,
         Username: email,
+        MessageAction: "RESEND",
       })
       .promise();
-    return res.$response;
   }
 }
