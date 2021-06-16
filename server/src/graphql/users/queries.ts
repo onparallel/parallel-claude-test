@@ -13,7 +13,7 @@ import {
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validEmail } from "../helpers/validators/validEmail";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
-import { userHasAccessToUserGroup } from "../user-group/authorizers";
+import { userHasAccessToUserGroups } from "../user-group/authorizers";
 import { contextUserIsAdmin } from "./authorizers";
 
 export const userQueries = queryField((t) => {
@@ -47,7 +47,7 @@ export const searchUsers = queryField("searchUsers", {
     ifArgDefined("excludeUsers", userHasAccessToUsers("excludeUsers" as never)),
     ifArgDefined(
       "excludeUserGroups",
-      userHasAccessToUserGroup("excludeUserGroups" as never)
+      userHasAccessToUserGroups("excludeUserGroups" as never)
     )
   ),
   args: {

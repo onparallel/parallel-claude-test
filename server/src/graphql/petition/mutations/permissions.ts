@@ -23,7 +23,7 @@ import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { ArgValidationError, WhitelistedError } from "../../helpers/errors";
 import { isDefined } from "../../../util/remedaExtensions";
 import { validBooleanValue } from "../../helpers/validators/validBooleanValue";
-import { userHasAccessToUserGroup } from "../../user-group/authorizers";
+import { userHasAccessToUserGroups } from "../../user-group/authorizers";
 import { partition } from "../../../util/arrays";
 
 export const transferPetitionOwnership = mutationField(
@@ -65,7 +65,7 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
     ifArgDefined(
       "userGroupIds",
-      userHasAccessToUserGroup("userGroupIds" as never)
+      userHasAccessToUserGroups("userGroupIds" as never)
     )
   ),
   args: {
@@ -195,7 +195,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
     ifArgDefined(
       "userGroupIds",
-      userHasAccessToUserGroup("userGroupIds" as never)
+      userHasAccessToUserGroups("userGroupIds" as never)
     )
   ),
   args: {
@@ -251,7 +251,7 @@ export const removePetitionPermission = mutationField(
       ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
       ifArgDefined(
         "userGroupIds",
-        userHasAccessToUsers("userGroupIds" as never)
+        userHasAccessToUserGroups("userGroupIds" as never)
       )
     ),
     args: {

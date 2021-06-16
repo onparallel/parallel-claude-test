@@ -15,7 +15,7 @@ import { maxLength } from "../helpers/validators/maxLength";
 import { notEmptyString } from "../helpers/validators/notEmptyString";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
 import { contextUserIsAdmin } from "../users/authorizers";
-import { userHasAccessToUserGroup } from "./authorizers";
+import { userHasAccessToUserGroups } from "./authorizers";
 
 export const createUserGroup = mutationField("createUserGroup", {
   description: "Creates a group in the user's organization",
@@ -53,7 +53,7 @@ export const createUserGroup = mutationField("createUserGroup", {
 export const updateUserGroup = mutationField("updateUserGroup", {
   description: "Updates the name of a given user group",
   type: "UserGroup",
-  authorize: authenticateAnd(userHasAccessToUserGroup("id")),
+  authorize: authenticateAnd(userHasAccessToUserGroups("id")),
   validateArgs: validateAnd(
     notEmptyString((args) => args.data.name, "data.name"),
     maxLength((args) => args.data.name, "data.name", 100)
@@ -87,7 +87,7 @@ export const updateUserGroup = mutationField("updateUserGroup", {
 export const deleteUserGroup = mutationField("deleteUserGroup", {
   description: "Deletes a group",
   type: "Result",
-  authorize: authenticateAnd(userHasAccessToUserGroup("ids")),
+  authorize: authenticateAnd(userHasAccessToUserGroups("ids")),
   args: {
     ids: nonNull(list(nonNull(globalIdArg("UserGroup")))),
   },
@@ -109,7 +109,7 @@ export const addUsersToUserGroup = mutationField("addUsersToUserGroup", {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
   authorize: authenticateAnd(
-    userHasAccessToUserGroup("userGroupId"),
+    userHasAccessToUserGroups("userGroupId"),
     userHasAccessToUsers("userIds")
   ),
   resolve: async (_, args, ctx) => {
@@ -130,7 +130,7 @@ export const removeUsersFromGroup = mutationField("removeUsersFromGroup", {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
   authorize: authenticateAnd(
-    userHasAccessToUserGroup("userGroupId"),
+    userHasAccessToUserGroups("userGroupId"),
     userHasAccessToUsers("userIds")
   ),
   resolve: async (_, args, ctx) => {
@@ -150,7 +150,7 @@ export const cloneUserGroup = mutationField("cloneUserGroup", {
     userGroupIds: nonNull(list(nonNull(globalIdArg("UserGroup")))),
     locale: stringArg(),
   },
-  authorize: authenticateAnd(userHasAccessToUserGroup("userGroupIds")),
+  authorize: authenticateAnd(userHasAccessToUserGroups("userGroupIds")),
   resolve: async (_, args, ctx) => {
     const groups = (await ctx.userGroups.loadUserGroup(
       args.userGroupIds

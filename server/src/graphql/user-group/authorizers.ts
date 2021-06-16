@@ -3,7 +3,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { Arg } from "../helpers/authorize";
 
-export function userHasAccessToUserGroup<
+export function userHasAccessToUserGroups<
   TypeName extends string,
   FieldName extends string,
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>

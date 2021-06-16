@@ -1,4 +1,4 @@
-import { userHasAccessToUserGroup } from "./authorizers";
+import { userHasAccessToUserGroups } from "./authorizers";
 import { nonNull, queryField } from "@nexus/schema";
 import { authenticate, chain } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -33,7 +33,7 @@ export const userGroupsQuery = queryField((t) => {
     args: {
       id: nonNull(globalIdArg()),
     },
-    authorize: chain(authenticate(), userHasAccessToUserGroup("id")),
+    authorize: chain(authenticate(), userHasAccessToUserGroups("id")),
     resolve: async (root, args, ctx) => {
       return await ctx.userGroups.loadUserGroup(args.id);
     },
