@@ -1,4 +1,5 @@
 import Excel from "exceljs";
+import { PetitionField, PetitionFieldReply } from "../../db/__types";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
@@ -21,7 +22,46 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     ];
   }
 
-  public addEmptyReply(data: Omit<TextReplyRow, "answer">) {
+  public addSimpleReply(field: PetitionField, replies: PetitionFieldReply[]) {
+    if (replies.length > 0) {
+      this.addRows(
+        replies.map((r, i) => ({
+          title: field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
+          description: field.description?.slice(0, 200) || "",
+          answer: r.content.text,
+        }))
+      );
+    } else {
+      this.addEmptyReply(field);
+    }
+  }
+
+  public addDynamicSelectReply(
+    field: PetitionField,
+    replies: PetitionFieldReply[]
+  ) {
+    if (replies.length > 0) {
+      this.addRows(
+        replies.flatMap((r, i) =>
+          (r.content.columns as [string, string | null][]).map(
+            ([label, value]) => ({
+              title:
+                field.title?.concat(
+                  ` (${label})`,
+                  field.multiple ? ` [${i + 1}]` : ""
+                ) || "",
+              description: field.description?.slice(0, 200) || "",
+              answer: value ?? this.noAnswerLabel,
+            })
+          )
+        )
+      );
+    } else {
+      this.addEmptyReply(field);
+    }
+  }
+
+  private addEmptyReply(data: Omit<TextReplyRow, "answer">) {
     this.addRows(
       [
         {
@@ -36,7 +76,7 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     );
   }
 
-  public get noAnswerLabel() {
+  private get noAnswerLabel() {
     return this.locale === "en" ? "[Not replied]" : "[No cumplimentado]";
   }
 }

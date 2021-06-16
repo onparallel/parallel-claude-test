@@ -1,4 +1,12 @@
 import Excel from "exceljs";
+import { ApiContext } from "../../context";
+import {
+  Contact,
+  PetitionField,
+  PetitionFieldComment,
+  User,
+} from "../../db/__types";
+import { fullName } from "../../util/fullName";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
 
@@ -13,7 +21,7 @@ export type FieldCommentRow = {
 };
 
 export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow> {
-  constructor(locale: string, wb: Excel.Workbook) {
+  constructor(locale: string, wb: Excel.Workbook, private context: ApiContext) {
     super(locale === "en" ? "Comments" : "Comentarios", locale, wb);
     this.page.columns = [
       {
@@ -40,5 +48,84 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
           this.locale === "en" ? "Internal comment?" : "¿Comentario interno?",
       },
     ];
+  }
+
+  public async addFieldComments(field: PetitionField) {
+    const fieldComments =
+      await this.context.petitions.loadPetitionFieldCommentsForField({
+        petitionFieldId: field.id,
+        petitionId: field.petition_id,
+        loadInternalComments: true,
+      });
+
+    for (const comment of fieldComments) {
+      await this.addCommentRow(comment, field.title);
+    }
+  }
+
+  private async addCommentRow(
+    comment: PetitionFieldComment,
+    fieldTitle: Maybe<string>
+  ) {
+    const { author, isUnread } = await this.loadCommentData(comment);
+    this.addRows({
+      authorEmail: author.email,
+      authorFullName: fullName(author.first_name, author.last_name),
+      content: comment.content,
+      createdAt: comment.created_at.toISOString(),
+      fieldName: fieldTitle,
+      isInternal: this.boolToLocaleString(comment.is_internal, this.locale),
+
+      isRead: this.boolToLocaleString(!isUnread, this.locale),
+    });
+  }
+
+  private async loadCommentData(
+    comment: PetitionFieldComment
+  ): Promise<{ author: User | Contact; isUnread: boolean }> {
+    if (comment.user_id) {
+      const [author, isUnread] = await Promise.all([
+        this.context.users.loadUser(comment.user_id),
+        this.context.petitions.getPetitionFieldCommentIsUnreadForUser({
+          userId: comment.user_id,
+          petitionFieldCommentId: comment.id,
+          petitionFieldId: comment.petition_field_id,
+          petitionId: comment.petition_id,
+        }),
+      ]);
+      if (!author) {
+        throw new Error(`User with id ${comment.user_id} not found`);
+      }
+      return { author, isUnread };
+    }
+
+    if (comment.petition_access_id) {
+      const [author, isUnread] = await Promise.all([
+        this.context.contacts.loadContactByAccessId(comment.petition_access_id),
+        this.context.petitions.getPetitionFieldCommentIsUnreadForContact({
+          petitionAccessId: comment.petition_access_id,
+          petitionFieldCommentId: comment.id,
+          petitionFieldId: comment.petition_field_id,
+          petitionId: comment.petition_id,
+        }),
+      ]);
+      if (!author) {
+        throw new Error(
+          `Contact not found for PetitionAccess with id ${comment.petition_access_id}`
+        );
+      }
+      return { author, isUnread };
+    }
+
+    throw new Error(
+      `expected user_id or petition_access_id to be defined in PetitionFieldComment with id ${comment.id}`
+    );
+  }
+
+  private boolToLocaleString(value: boolean, locale: string) {
+    if (value) {
+      return locale === "en" ? "Yes" : "Si";
+    }
+    return locale === "en" ? "No" : "No";
   }
 }

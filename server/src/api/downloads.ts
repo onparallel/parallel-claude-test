@@ -5,13 +5,11 @@ import { indexBy, zip } from "remeda";
 import sanitize from "sanitize-filename";
 import { URLSearchParams } from "url";
 import { ApiContext } from "../context";
-import { Contact, PetitionFieldComment, User } from "../db/__types";
 import { createZipFile, ZipFileInput } from "../util/createZipFile";
-import { fullName } from "../util/fullName";
 import { fromGlobalId } from "../util/globalId";
 import { isDefined } from "../util/remedaExtensions";
 import { authenticate } from "./helpers/authenticate";
-import { ExcelWorkbookExport } from "./helpers/ExcelWorkbookExport";
+import { PetitionExcelExport } from "./helpers/PetitionExcelExport";
 
 /**
  * This code is a bit messy. It needs some cleanup and tests
@@ -135,7 +133,7 @@ async function* getPetitionFiles(
     files.filter((f) => f !== null),
     (f) => f!.id
   );
-  const excelWorkbook = new ExcelWorkbookExport(locale);
+  const excelWorkbook = new PetitionExcelExport(locale, ctx);
   const seen = new Set<string>();
   let headingCount = 0;
 
@@ -170,62 +168,13 @@ async function* getPetitionFiles(
           } as ZipFileInput;
         }
       }
-    } else if (["TEXT", "SHORT_TEXT", "SELECT"].includes(field.type)) {
-      if (replies.length > 0) {
-        excelWorkbook.textRepliesTab.addRows(
-          replies.map((r, i) => ({
-            title:
-              field.title?.concat(field.multiple ? ` [${i + 1}]` : "") || "",
-            description: field.description?.slice(0, 200) || "",
-            answer: r.content.text,
-          }))
-        );
-      } else {
-        excelWorkbook.textRepliesTab.addEmptyReply(field);
-      }
-    } else if (field.type === "DYNAMIC_SELECT") {
-      if (replies.length > 0) {
-        excelWorkbook.textRepliesTab.addRows(
-          replies.flatMap((r, i) =>
-            (r.content.columns as [string, string | null][]).map(
-              ([label, value]) => ({
-                title:
-                  field.title?.concat(
-                    ` (${label})`,
-                    field.multiple ? ` [${i + 1}]` : ""
-                  ) || "",
-                description: field.description?.slice(0, 200) || "",
-                answer: value ?? excelWorkbook.textRepliesTab.noAnswerLabel,
-              })
-            )
-          )
-        );
-      } else {
-        excelWorkbook.textRepliesTab.addEmptyReply(field);
-      }
+    } else if (
+      ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT"].includes(field.type)
+    ) {
+      excelWorkbook.addPetitionFieldReply(field, replies);
     }
 
-    const fieldComments = await ctx.petitions.loadPetitionFieldCommentsForField(
-      {
-        petitionFieldId: field.id,
-        petitionId: field.petition_id,
-        loadInternalComments: true,
-      }
-    );
-
-    for (const comment of fieldComments) {
-      const { author, isUnread } = await loadCommentData(comment, ctx);
-      excelWorkbook.fieldCommentsTab.addRows({
-        authorEmail: author.email,
-        authorFullName: fullName(author.first_name, author.last_name),
-        content: comment.content,
-        createdAt: comment.created_at.toISOString(),
-        fieldName: field.title,
-        isInternal: boolToLocaleString(comment.is_internal, locale),
-
-        isRead: boolToLocaleString(!isUnread, locale),
-      });
-    }
+    await excelWorkbook.addPetitionFieldComments(field);
   }
 
   if (excelWorkbook.hasRows()) {
@@ -283,54 +232,4 @@ function rename<T extends string>(
       return part;
     })
     .join("");
-}
-
-async function loadCommentData(
-  comment: PetitionFieldComment,
-  ctx: ApiContext
-): Promise<{ author: User | Contact; isUnread: boolean }> {
-  if (comment.user_id) {
-    const [author, isUnread] = await Promise.all([
-      ctx.users.loadUser(comment.user_id),
-      ctx.petitions.getPetitionFieldCommentIsUnreadForUser({
-        userId: comment.user_id,
-        petitionFieldCommentId: comment.id,
-        petitionFieldId: comment.petition_field_id,
-        petitionId: comment.petition_id,
-      }),
-    ]);
-    if (!author) {
-      throw new Error(`User with id ${comment.user_id} not found`);
-    }
-    return { author, isUnread };
-  }
-
-  if (comment.petition_access_id) {
-    const [author, isUnread] = await Promise.all([
-      ctx.contacts.loadContactByAccessId(comment.petition_access_id),
-      ctx.petitions.getPetitionFieldCommentIsUnreadForContact({
-        petitionAccessId: comment.petition_access_id,
-        petitionFieldCommentId: comment.id,
-        petitionFieldId: comment.petition_field_id,
-        petitionId: comment.petition_id,
-      }),
-    ]);
-    if (!author) {
-      throw new Error(
-        `Contact not found for PetitionAccess with id ${comment.petition_access_id}`
-      );
-    }
-    return { author, isUnread };
-  }
-
-  throw new Error(
-    `expected user_id or petition_access_id to be defined in PetitionFieldComment with id ${comment.id}`
-  );
-}
-
-function boolToLocaleString(value: boolean, locale: string) {
-  if (value) {
-    return locale === "en" ? "Yes" : "Si";
-  }
-  return locale === "en" ? "No" : "No";
 }
