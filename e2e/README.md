@@ -26,3 +26,13 @@ ENV=local BROWSER=chrome yarn test
 # Run tests on staging on all browsers
 ENV=staging BROWSER=chrome,firefox,webkit yarn test
 ```
+
+By default, the tests on `local` will open your browser and show every action performed. The tests on `staging` will run on headless mode, this means it will run entirely on a terminal without opening any browser.
+
+If you want to change this behavior, pass `HEADLESS_BROWSER` to the test command.
+Example:
+
+```
+# Run tests locally on all browsers on headless mode
+ENV=local BROWSER=chrome,firefox,webkit HEADLESS_BROWSER=true yarn test
+```

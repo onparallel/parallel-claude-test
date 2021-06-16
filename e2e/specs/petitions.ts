@@ -46,6 +46,5 @@ createTestSession("petitions", (context) => {
       title: "A photo of you",
       description: "Your face must be perfectly visible.",
     });
-    await page.waitForSelector("xxx");
   });
 });

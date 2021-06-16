@@ -2,9 +2,9 @@ import { Browser, chromium, firefox, LaunchOptions, webkit } from "playwright";
 
 export const getBrowser = (() => {
   const cache: Record<string, Browser> = {};
-  return async function getBrowser(browserName: string) {
+  return async function getBrowser(browserName: string, headless = false) {
     const options: LaunchOptions = {
-      headless: false,
+      headless,
       timeout: 60 * 1000,
       slowMo: 0,
     };

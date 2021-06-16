@@ -14,9 +14,11 @@ function buildCreateTestSession(func: jest.Describe) {
       `${name} - %s`,
       (browserName) => {
         const context = {} as Partial<TestSessionContext>;
-
         beforeAll(async () => {
-          context.browser = await getBrowser(browserName);
+          context.browser = await getBrowser(
+            browserName,
+            process.env.HEADLESS_BROWSER === "true"
+          );
         });
 
         beforeEach(async () => {
