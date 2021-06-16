@@ -17,7 +17,6 @@ export type FieldCommentRow = {
   authorEmail: string;
   createdAt: string;
   isInternal: string;
-  isRead: string;
 };
 
 export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow> {
@@ -41,7 +40,6 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
             ? "Message sent at"
             : "Hora de envío del mensaje",
       },
-      { key: "isRead", header: this.locale === "en" ? "Is read?" : "¿Leído?" },
       {
         key: "isInternal",
         header:
@@ -67,7 +65,7 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     comment: PetitionFieldComment,
     fieldTitle: Maybe<string>
   ) {
-    const { author, isUnread } = await this.loadCommentData(comment);
+    const author = await this.loadCommentAuthor(comment);
     this.addRows({
       authorEmail: author.email,
       authorFullName: fullName(author.first_name, author.last_name),
@@ -75,46 +73,31 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
       createdAt: comment.created_at.toISOString(),
       fieldName: fieldTitle,
       isInternal: this.boolToLocaleString(comment.is_internal, this.locale),
-
-      isRead: this.boolToLocaleString(!isUnread, this.locale),
     });
   }
 
-  private async loadCommentData(
+  private async loadCommentAuthor(
     comment: PetitionFieldComment
-  ): Promise<{ author: User | Contact; isUnread: boolean }> {
+  ): Promise<Contact | User> {
     if (comment.user_id) {
-      const [author, isUnread] = await Promise.all([
-        this.context.users.loadUser(comment.user_id),
-        this.context.petitions.getPetitionFieldCommentIsUnreadForUser({
-          userId: comment.user_id,
-          petitionFieldCommentId: comment.id,
-          petitionFieldId: comment.petition_field_id,
-          petitionId: comment.petition_id,
-        }),
-      ]);
+      const author = await this.context.users.loadUser(comment.user_id);
       if (!author) {
         throw new Error(`User with id ${comment.user_id} not found`);
       }
-      return { author, isUnread };
+      return author;
     }
 
     if (comment.petition_access_id) {
-      const [author, isUnread] = await Promise.all([
-        this.context.contacts.loadContactByAccessId(comment.petition_access_id),
-        this.context.petitions.getPetitionFieldCommentIsUnreadForContact({
-          petitionAccessId: comment.petition_access_id,
-          petitionFieldCommentId: comment.id,
-          petitionFieldId: comment.petition_field_id,
-          petitionId: comment.petition_id,
-        }),
-      ]);
+      const author = await this.context.contacts.loadContactByAccessId(
+        comment.petition_access_id
+      );
+
       if (!author) {
         throw new Error(
           `Contact not found for PetitionAccess with id ${comment.petition_access_id}`
         );
       }
-      return { author, isUnread };
+      return author;
     }
 
     throw new Error(
