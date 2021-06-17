@@ -144,7 +144,7 @@ async function* getPetitionFiles(
       for (const reply of replies) {
         const file = filesById[reply.content["file_upload_id"]];
         if (file) {
-          const extension = file.filename.match(/\.[a-z0-9]+$/)?.[0] ?? "";
+          const extension = file.filename.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
           const name = rename(pattern, placeholders, (placeholder) => {
             switch (placeholder) {
               case "field-number":
@@ -156,10 +156,12 @@ async function* getPetitionFiles(
                 return file.filename.replace(/\.[a-z0-9]+$/, "");
             }
           });
-          let filename = sanitize(`${name}${extension}`);
+          let filename = sanitize(`${name}${extension.toLowerCase()}`);
           let counter = 1;
           while (seen.has(filename)) {
-            filename = sanitize(`${name} ${++counter}${extension}`);
+            filename = sanitize(
+              `${name} ${++counter}${extension.toLowerCase()}`
+            );
           }
           seen.add(filename);
           yield {
