@@ -1,22 +1,17 @@
 import { Text, TextProps } from "@chakra-ui/react";
-import {
-  PetitionComposeField_PetitionFieldFragment,
-  RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
-} from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 
 export interface CheckboxTypeLabelProps extends TextProps {
-  field:
-    | PetitionComposeField_PetitionFieldFragment
-    | RecipientViewPetitionFieldCard_PublicPetitionFieldFragment;
+  options: any;
 }
 
-export function CheckboxTypeLabel({ field, ...props }: CheckboxTypeLabelProps) {
-  const { type = "UNLIMITED", min = 1, max = 1 } = field.options.limit ?? {};
+export function CheckboxTypeLabel({
+  options,
+  ...props
+}: CheckboxTypeLabelProps) {
+  const { type = "UNLIMITED", min = 1, max = 1 } = options.limit ?? {};
 
-  const show =
-    field.type == "CHECKBOX" &&
-    ((type != "RADIO" && max > 1) || type == "UNLIMITED");
+  const show = (type != "RADIO" && max > 1) || type == "UNLIMITED";
 
   const getText = () => {
     switch (type) {
@@ -42,7 +37,7 @@ export function CheckboxTypeLabel({ field, ...props }: CheckboxTypeLabelProps) {
           max === 1 ? (
             <FormattedMessage
               id="component.checkbox-type-label.exact"
-              defaultMessage="Choose {X} {X, plural, =1{option} other{options}}"
+              defaultMessage="Choose {X, plural, =1{# option} other{# options}}"
               values={{ X: max }}
             />
           ) : (

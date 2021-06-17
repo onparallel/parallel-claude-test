@@ -61,8 +61,8 @@
   },
   {
     "term": "component.checkbox-type-label.exact",
-    "definition": "Escoja {X} {X, plural, =1{opción} other{opciones}}",
-    "context": "Choose {X} {X, plural, =1{option} other{options}}"
+    "definition": "Escoja {X, plural, =1{# opción} other{# opciones}}",
+    "context": "Choose {X, plural, =1{# option} other{# options}}"
   },
   {
     "term": "component.checkbox-type-label.range",

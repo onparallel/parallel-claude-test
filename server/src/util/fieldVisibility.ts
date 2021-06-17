@@ -31,7 +31,7 @@ export interface PetitionFieldVisibilityCondition {
     | "LESS_THAN_OR_EQUAL"
     | "GREATER_THAN"
     | "GREATER_THAN_OR_EQUAL"
-    | "NUMBER_OF_CHOICES";
+    | "NUMBER_OF_SUBREPLIES";
   value: string | number | null;
 }
 
@@ -79,7 +79,7 @@ function evaluatePredicate<T extends string | number>(
       return a.toString().includes(b.toString());
     case "NOT_CONTAIN":
       return !a.toString().includes(b.toString());
-    case "NUMBER_OF_CHOICES":
+    case "NUMBER_OF_SUBREPLIES":
       return (a as string[]).length == b;
     default:
       return false;

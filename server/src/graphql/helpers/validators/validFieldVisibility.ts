@@ -42,7 +42,7 @@ const schema = {
               "LESS_THAN_OR_EQUAL",
               "GREATER_THAN",
               "GREATER_THAN_OR_EQUAL",
-              "NUMBER_OF_CHOICES",
+              "NUMBER_OF_SUBREPLIES",
             ],
           },
           value: { type: ["string", "integer", "null"] },

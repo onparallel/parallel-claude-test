@@ -5,6 +5,7 @@ import {
   UpdatePetitionFieldInput,
 } from "@parallel/graphql/__types";
 import { assignRef } from "@parallel/utils/assignRef";
+import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { isEmptyParagraph } from "@parallel/utils/slate/isEmptyRTEValue";
 import { ParagraphElement } from "@parallel/utils/slate/types";
 import { isSelectionExpanded, pipe } from "@udecode/slate-plugins";
@@ -161,14 +162,11 @@ export const PetitionFieldOptionsEditor = Object.assign(
           .filter((option) => option !== "");
         if (!shallowEqualArrays(field.options.values, values)) {
           if (field.type === "CHECKBOX") {
-            let min = field.options.limit.min || 1;
-            let max = field.options.limit.max || 1;
-
-            if (max > values.length) {
-              max = values.length || 1;
-              min = min >= max ? (max >= 2 ? max - 1 : 1) : min;
-            }
-
+            const [min, max] = getMinMaxCheckboxLimit({
+              min: field.options.limit.min || 1,
+              max: field.options.limit.max || 1,
+              valuesLength: values.length || 1,
+            });
             onFieldEdit({
               options: {
                 ...field.options,

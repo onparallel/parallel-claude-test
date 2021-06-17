@@ -61,8 +61,8 @@
   },
   {
     "term": "component.checkbox-type-label.exact",
-    "definition": "Choose {X} {X, plural, =1{option} other{options}}",
-    "context": "Choose {X} {X, plural, =1{option} other{options}}"
+    "definition": "Choose {X, plural, =1{# option} other{# options}}",
+    "context": "Choose {X, plural, =1{# option} other{# options}}"
   },
   {
     "term": "component.checkbox-type-label.range",

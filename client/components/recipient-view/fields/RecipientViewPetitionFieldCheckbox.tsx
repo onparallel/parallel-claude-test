@@ -133,7 +133,9 @@ export function RecipientViewPetitionFieldCheckbox({
     >
       <Stack>
         <Flex flexWrap="wrap" alignItems="center">
-          <CheckboxTypeLabel fontSize="sm" mr={2} field={field} />
+          {field.type === "CHECKBOX" ? (
+            <CheckboxTypeLabel fontSize="sm" mr={2} options={field.options} />
+          ) : null}
           {!isSaving ? (
             <Text
               fontSize="sm"

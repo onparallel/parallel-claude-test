@@ -488,7 +488,7 @@ describe("fieldVisibility", () => {
       expect(fields).toMatchObject([true, false, true]);
     });
 
-    it("SHOW WHEN NUMBER_OF_CHOICES CHECKBOX", () => {
+    it("SHOW WHEN NUMBER_OF_SUBREPLIES CHECKBOX", () => {
       const fields = evaluateFieldVisibility([
         {
           id: 1,
@@ -515,7 +515,7 @@ describe("fieldVisibility", () => {
               {
                 fieldId: 1,
                 modifier: "ANY",
-                operator: "NUMBER_OF_CHOICES",
+                operator: "NUMBER_OF_SUBREPLIES",
                 value: 2,
               },
             ],
@@ -533,7 +533,7 @@ describe("fieldVisibility", () => {
               {
                 fieldId: 1,
                 modifier: "ANY",
-                operator: "NUMBER_OF_CHOICES",
+                operator: "NUMBER_OF_SUBREPLIES",
                 value: 2,
               },
             ],
@@ -551,7 +551,7 @@ describe("fieldVisibility", () => {
               {
                 fieldId: 1,
                 modifier: "ANY",
-                operator: "NUMBER_OF_CHOICES",
+                operator: "NUMBER_OF_SUBREPLIES",
                 value: 5,
               },
             ],

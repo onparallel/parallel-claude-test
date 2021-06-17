@@ -147,7 +147,7 @@ export function PetitionFieldVisibilityEditor({
     setConditions((conditions) => {
       const last = conditions[conditions.length - 1];
 
-      if (last.operator === "NUMBER_OF_CHOICES")
+      if (last.operator === "NUMBER_OF_SUBREPLIES")
         return [...conditions, { ...last, value: 0 }];
 
       const field = fields.find((f) => f.id === last.fieldId)!;
@@ -459,7 +459,7 @@ function ConditionPredicate({
             id: "component.petition-field-visibility-editor.number-of-choices",
             defaultMessage: "no. of selected",
           }),
-          value: "NUMBER_OF_CHOICES",
+          value: "NUMBER_OF_SUBREPLIES",
         }
       );
     } else if (
@@ -629,7 +629,7 @@ function ConditionPredicate({
       />
       <Box flex="1" minWidth={20}>
         {condition.modifier === "NUMBER_OF_REPLIES" ||
-        condition.operator === "NUMBER_OF_CHOICES" ? (
+        condition.operator === "NUMBER_OF_SUBREPLIES" ? (
           <ConditionPredicateValueNumber
             field={field}
             showError={showError}

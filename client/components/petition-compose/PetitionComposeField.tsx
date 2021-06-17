@@ -695,7 +695,14 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       </Flex>
       {field.type === "SELECT" || field.type === "CHECKBOX" ? (
         <Box marginTop={1}>
-          <CheckboxTypeLabel fontSize="xs" pb={2} pl={2} field={field} />
+          {field.type === "CHECKBOX" ? (
+            <CheckboxTypeLabel
+              fontSize="xs"
+              pb={2}
+              pl={2}
+              options={field.options}
+            />
+          ) : null}
           <PetitionFieldOptionsEditor
             ref={fieldOptionsRef}
             field={field}

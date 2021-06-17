@@ -74,11 +74,11 @@ export function updateConditionOperator<
       operator: "EQUAL",
       value: 0,
     };
-  } else if (operator === "NUMBER_OF_CHOICES") {
+  } else if (operator === "NUMBER_OF_SUBREPLIES") {
     return {
       ...condition,
       modifier: "ANY",
-      operator: "NUMBER_OF_CHOICES",
+      operator: "NUMBER_OF_SUBREPLIES",
       value: 0,
     };
   } else if (field.multiple && condition.modifier === "NUMBER_OF_REPLIES") {
@@ -90,12 +90,12 @@ export function updateConditionOperator<
       // override existing "has replies/does not have replies"
       modifier:
         condition.modifier === "NUMBER_OF_REPLIES" ||
-        condition.operator === "NUMBER_OF_CHOICES"
+        condition.operator === "NUMBER_OF_SUBREPLIES"
           ? "ANY"
           : condition.modifier,
       value:
         condition.modifier === "NUMBER_OF_REPLIES" ||
-        condition.operator === "NUMBER_OF_CHOICES"
+        condition.operator === "NUMBER_OF_SUBREPLIES"
           ? defaultConditionFieldValue(field, condition.column)
           : condition.value,
     };
