@@ -812,6 +812,42 @@ export const EmailSentIcon = createIcon({
   ),
 });
 
+export const EmailXIcon = createIcon({
+  displayName: "EmailXIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14.6668 7.66699V4.00033C14.6668 3.26699 14.0668 2.66699 13.3335 2.66699H2.66683C1.9335 2.66699 1.3335 3.26699 1.3335 4.00033V12.0003C1.3335 12.7337 1.9335 13.3337 2.66683 13.3337H8.66683" />
+      <path d="M14 3.33301L8 7.66634L2 3.33301" />
+      <path d="M11.3335 10L14.6668 13.3333" />
+      <path d="M14.6668 10L11.3335 13.3333" />
+    </g>
+  ),
+});
+
+export const EmailOpenedIcon = createIcon({
+  displayName: "EmailOpenedIcon",
+  viewBox: "0 0 17 16",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3.16667 5.33301L8.5 8.66634L13.8333 5.33301L15.1667 6.41634V12.9163C15.1667 13.5122 14.5667 13.9997 13.8333 13.9997H3.16667C2.43334 13.9997 1.83334 13.5122 1.83334 12.9163V6.41634C1.83334 6.33301 3.16667 5.33301 3.16667 5.33301Z" />
+      <path d="M15.1667 6.33301L8.5 1.33301L1.83334 6.33301" />
+    </g>
+  ),
+});
+
 export const ShinyIcon = createIcon({
   displayName: "ShinyIcon",
   viewBox: "0 0 24 24",
@@ -1470,6 +1506,120 @@ export const UserGroupXIcon = createIcon({
     </g>
   ),
 });
+
+export const MapIcon = createIcon({
+  displayName: "MapIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M0.666504 4.00016V14.6668L5.33317 12.0002L10.6665 14.6668L15.3332 12.0002V1.3335L10.6665 4.00016L5.33317 1.3335L0.666504 4.00016Z" />
+      <path d="M5.3335 1.3335V12.0002" />
+      <path d="M10.6665 4V14.6667" />
+    </g>
+  ),
+});
+
+export const icons = [
+  TwitterIcon,
+  LinkedInIcon,
+  LinkedInSimpleIcon,
+  NetDocumentsIcon,
+  BusinessIcon,
+  LockIcon,
+  GlobeIcon,
+  ConditionIcon,
+  PaperclipIcon,
+  KeyIcon,
+  QuoteIcon,
+  LogOutIcon,
+  AlertCircleIcon,
+  PaperPlaneIcon,
+  PaperPlanesIcon,
+  UsersIcon,
+  BellIcon,
+  BellSettingsIcon,
+  MoreVerticalIcon,
+  MoreIcon,
+  PlusCircleIcon,
+  XCircleIcon,
+  UserIcon,
+  UserXIcon,
+  UserPlusIcon,
+  UserArrowIcon,
+  UserCheckIcon,
+  FileTextIcon,
+  FileNewIcon,
+  FileShineIcon,
+  ClipboardIcon,
+  CommentIcon,
+  DeleteIcon,
+  SettingsIcon,
+  CommentXIcon,
+  FilterIcon,
+  PencilIcon,
+  ForbiddenIcon,
+  ChevronDownBigIcon,
+  ChevronUpBigIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ArrowUpDownIcon,
+  CheckShortIcon,
+  EmailIcon,
+  EmailSentIcon,
+  EmailXIcon,
+  EmailOpenedIcon,
+  ShinyIcon,
+  SaveIcon,
+  ArrowForwardIcon,
+  ArrowBackIcon,
+  BoldIcon,
+  ItalicIcon,
+  UnderlineIcon,
+  ListIcon,
+  EyeIcon,
+  EyeOffIcon,
+  QuestionIcon,
+  CheckIcon,
+  DoubleCheckIcon,
+  TimeIcon,
+  EditIcon,
+  EditSimpleIcon,
+  SearchIcon,
+  RepeatIcon,
+  AddIcon,
+  InfoOutlineIcon,
+  HelpOutlineIcon,
+  DragHandleIcon,
+  CopyIcon,
+  DownloadIcon,
+  CloseIcon,
+  SmallCloseIcon,
+  FieldFileUploadIcon,
+  FieldTextIcon,
+  FieldShortTextIcon,
+  FieldHeadingIcon,
+  CloudUploadIcon,
+  CloudOkIcon,
+  CloudErrorIcon,
+  ThumbUpIcon,
+  SignatureIcon,
+  SignaturePlusIcon,
+  FieldDynamicSelectIcon,
+  FieldSelectIcon,
+  DownForwardArrowIcon,
+  SharpIcon,
+  UserGroupArrowIcon,
+  UserGroupXIcon,
+  MapIcon,
+];
 
 export const RadioButtonSelected = createIcon({
   displayName: "RadioButtonSelected",

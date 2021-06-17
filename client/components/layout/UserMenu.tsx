@@ -14,8 +14,10 @@ import {
 } from "@chakra-ui/react";
 import {
   BusinessIcon,
+  HelpOutlineIcon,
   KeyIcon,
   LogOutIcon,
+  MapIcon,
   UserIcon,
 } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
@@ -28,9 +30,17 @@ export interface UserMenuProps {
   placement?: UsePopperProps["placement"];
   user: UserMenu_UserFragment;
   onLocaleChange?: (locale: string) => void;
+  onOnboardingClick: () => void;
 }
 
-export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
+declare const zE: any;
+
+export function UserMenu({
+  placement,
+  user,
+  onLocaleChange,
+  onOnboardingClick,
+}: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
 
@@ -38,6 +48,15 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
     window.location.href = `/api/auth/logout`;
   }
   const locales = useSupportedLocales();
+
+  const { query } = router;
+
+  function handleHelpCenterClick() {
+    (window as any).zE?.(function () {
+      zE("webWidget", "setLocale", query.locale);
+      zE.activate({ hideOnClose: true });
+    });
+  }
 
   return (
     <Menu placement={placement}>
@@ -100,6 +119,27 @@ export function UserMenu({ placement, user, onLocaleChange }: UserMenuProps) {
             ))}
           </MenuOptionGroup>
           <MenuDivider />
+
+          <MenuItem
+            icon={<HelpOutlineIcon display="block" boxSize={4} />}
+            onClick={handleHelpCenterClick}
+          >
+            <FormattedMessage
+              id="navbar.help-center"
+              defaultMessage="Help center"
+            />
+          </MenuItem>
+          <MenuItem
+            icon={<MapIcon display="block" boxSize={4} />}
+            onClick={onOnboardingClick}
+          >
+            <FormattedMessage
+              id="navbar.start-tour"
+              defaultMessage="Guide me around"
+            />
+          </MenuItem>
+          <MenuDivider />
+
           <MenuItem
             onClick={handleLogoutClick}
             icon={<LogOutIcon display="block" boxSize={4} />}

@@ -50,6 +50,11 @@
     "context": "Recipients"
   },
   {
+    "term": "component.app-layout-navbar.notifications",
+    "definition": "Notifications",
+    "context": "Notifications"
+  },
+  {
     "term": "component.burger-button.label-close",
     "definition": "Close menu",
     "context": "Close menu"
@@ -678,6 +683,41 @@
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "The email was opened on {date}",
     "context": "The email was opened on {date}"
+  },
+  {
+    "term": "component.notifications-drawer.header",
+    "definition": "Notifications",
+    "context": "Notifications"
+  },
+  {
+    "term": "component.notifications-select.all-notifications",
+    "definition": "All notifications",
+    "context": "All notifications"
+  },
+  {
+    "term": "component.notifications-select.comments",
+    "definition": "Comments",
+    "context": "Comments"
+  },
+  {
+    "term": "component.notifications-select.completed",
+    "definition": "Completed",
+    "context": "Completed"
+  },
+  {
+    "term": "component.notifications-select.others",
+    "definition": "Others",
+    "context": "Others"
+  },
+  {
+    "term": "component.notifications-select.SHARED",
+    "definition": "Shared",
+    "context": "Shared"
+  },
+  {
+    "term": "component.notifications-select.unread",
+    "definition": "Unread",
+    "context": "Unread"
   },
   {
     "term": "component.password-input.hide",
@@ -2903,11 +2943,6 @@
     "term": "navbar.help-center",
     "definition": "Help center",
     "context": "Help center"
-  },
-  {
-    "term": "navbar.help-menu",
-    "definition": "Help menu",
-    "context": "Help menu"
   },
   {
     "term": "navbar.petitions-link",

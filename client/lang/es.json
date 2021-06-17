@@ -50,6 +50,11 @@
     "context": "Recipients"
   },
   {
+    "term": "component.app-layout-navbar.notifications",
+    "definition": "Notificaciones",
+    "context": "Notifications"
+  },
+  {
     "term": "component.burger-button.label-close",
     "definition": "Cerrar menú",
     "context": "Close menu"
@@ -678,6 +683,41 @@
     "term": "component.message-events-indicator.opened-explanation",
     "definition": "El correo electrónico fue abierto el {date}",
     "context": "The email was opened on {date}"
+  },
+  {
+    "term": "component.notifications-drawer.header",
+    "definition": "Notificaciones",
+    "context": "Notifications"
+  },
+  {
+    "term": "component.notifications-select.all-notifications",
+    "definition": "Todas las notificaciones",
+    "context": "All notifications"
+  },
+  {
+    "term": "component.notifications-select.comments",
+    "definition": "Comentarios",
+    "context": "Comments"
+  },
+  {
+    "term": "component.notifications-select.completed",
+    "definition": "Completadas",
+    "context": "Completed"
+  },
+  {
+    "term": "component.notifications-select.others",
+    "definition": "Otros",
+    "context": "Others"
+  },
+  {
+    "term": "component.notifications-select.SHARED",
+    "definition": "Compartidos",
+    "context": "Shared"
+  },
+  {
+    "term": "component.notifications-select.unread",
+    "definition": "No leídos",
+    "context": "Unread"
   },
   {
     "term": "component.password-input.hide",
@@ -2903,11 +2943,6 @@
     "term": "navbar.help-center",
     "definition": "Centro de ayuda",
     "context": "Help center"
-  },
-  {
-    "term": "navbar.help-menu",
-    "definition": "Menú de ayuda",
-    "context": "Help menu"
   },
   {
     "term": "navbar.petitions-link",

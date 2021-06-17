@@ -20,7 +20,6 @@ import {
   AddIcon,
   FileNewIcon,
   FileTextIcon,
-  HelpOutlineIcon,
   PaperPlaneIcon,
   PaperPlanesIcon,
   UsersIcon,
@@ -36,14 +35,13 @@ import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
 import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
+import { Notifications } from "../notifications/Notifications";
 import { UserMenu } from "./UserMenu";
 
 export interface AppLayoutNavbarProps extends BoxProps {
   user: AppLayoutNavbar_UserFragment;
   onOnboardingClick: () => void;
 }
-
-declare const zE: any;
 
 export const AppLayoutNavbar = Object.assign(
   memo(function AppLayoutNavbar({
@@ -105,13 +103,6 @@ export const AppLayoutNavbar = Object.assign(
           locale,
         })
       );
-    }
-
-    function handleHelpCenterClick() {
-      (window as any).zE?.(function () {
-        zE("webWidget", "setLocale", query.locale);
-        zE.activate({ hideOnClose: true });
-      });
     }
 
     const isMobile = useBreakpointValue({ base: true, sm: false });
@@ -228,50 +219,14 @@ export const AppLayoutNavbar = Object.assign(
           ))}
         </Flex>
         <Spacer display={{ base: "none", sm: "block" }} />
-        <Center display={{ base: "none", sm: "flex" }} marginBottom={2}>
-          <Menu id="help-menu" placement={isMobile ? "top-start" : "right"}>
-            <Tooltip
-              label={intl.formatMessage({
-                id: "navbar.help-menu",
-                defaultMessage: "Help menu",
-              })}
-              placement={isMobile ? "top" : "right"}
-            >
-              <MenuButton
-                as={IconButton}
-                icon={<HelpOutlineIcon fontSize="20px" />}
-                isRound
-                variant="ghost"
-                aria-label={intl.formatMessage({
-                  id: "navbar.help-menu",
-                  defaultMessage: "Help menu",
-                })}
-              />
-            </Tooltip>
-            <Portal>
-              <MenuList>
-                <MenuGroup>
-                  <MenuItem onClick={handleHelpCenterClick}>
-                    <FormattedMessage
-                      id="navbar.help-center"
-                      defaultMessage="Help center"
-                    />
-                  </MenuItem>
-                  <MenuItem onClick={onOnboardingClick}>
-                    <FormattedMessage
-                      id="navbar.start-tour"
-                      defaultMessage="Guide me around"
-                    />
-                  </MenuItem>
-                </MenuGroup>
-              </MenuList>
-            </Portal>
-          </Menu>
+        <Center display={{ base: "none", sm: "flex" }} marginBottom={6}>
+          <Notifications />
         </Center>
         <Center>
           <UserMenu
             placement={isMobile ? "top-end" : "right-end"}
             user={user}
+            onOnboardingClick={onOnboardingClick}
             onLocaleChange={handleLocaleChange}
           />
         </Center>
