@@ -1593,6 +1593,7 @@ enum PetitionBaseType {
 type PetitionClonedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+  user: User
 }
 
 type PetitionClosedEvent implements PetitionEvent {

@@ -19,8 +19,7 @@ export type AnalyticsEventType =
   | "REMINDER_EMAIL_SENT"
   | "TEMPLATE_USED"
   | "USER_CREATED"
-  | "ACCESS_OPENED"
-  | "ACCESS_OPENED_FIRST";
+  | "ACCESS_OPENED";
 
 export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   /** User creates a petition/template from scratch */
@@ -55,6 +54,7 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
   /** User sends petition to accesses */
   PETITION_SENT: {
     petition_id: number;
+    petition_access_id: number;
     org_id: number;
     user_id: number;
   };
@@ -100,12 +100,6 @@ export type AnalyticsEventPayload<TType extends AnalyticsEventType> = {
     petition_id: number;
     org_id: number;
   };
-  /** a petition has been opened the first time by any of the recipients */
-  ACCESS_OPENED_FIRST: {
-    contact_id: number;
-    petition_id: number;
-    org_id: number;
-  };
 }[TType];
 
 export type GenericAnalyticsEvent<TType extends AnalyticsEventType> = {
@@ -126,8 +120,7 @@ export type AnalyticsEvent =
   | GenericAnalyticsEvent<"REMINDER_EMAIL_SENT">
   | GenericAnalyticsEvent<"TEMPLATE_USED">
   | GenericAnalyticsEvent<"USER_CREATED">
-  | GenericAnalyticsEvent<"ACCESS_OPENED">
-  | GenericAnalyticsEvent<"ACCESS_OPENED_FIRST">;
+  | GenericAnalyticsEvent<"ACCESS_OPENED">;
 
 export const ANALYTICS = Symbol.for("ANALYTICS");
 

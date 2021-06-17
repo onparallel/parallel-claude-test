@@ -5660,6 +5660,11 @@
     "context": "{same, select, true {You} other {{user}}} transferred the ownership of this petition {previousOwner, select, null {} other {from {previousOwner} }}to {owner} {timeAgo}"
   },
   {
+    "term": "timeline.petition-cloned-description",
+    "definition": "{same, select, true {You} other {{user}}} cloned this petition {timeAgo}",
+    "context": "{same, select, true {You} other {{user}}} cloned this petition {timeAgo}"
+  },
+  {
     "term": "timeline.petition-closed-description",
     "definition": "{same, select, true {You} other {{user}}} closed the petition {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} closed the petition {timeAgo}"

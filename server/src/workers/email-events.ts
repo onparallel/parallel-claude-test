@@ -33,7 +33,7 @@ createQueueWorker(
 
     if (event === "bounce") {
       await context.emails.sendPetitionMessageBouncedEmail(emailLogId);
-      context.system.createEvent({
+      await context.system.createEvent({
         type: "EMAIL_BOUNCED",
         data: { email_log_id: emailLogId },
       });

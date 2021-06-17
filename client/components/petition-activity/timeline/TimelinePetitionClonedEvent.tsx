@@ -1,0 +1,58 @@
+import { gql } from "@apollo/client";
+import { PlusCircleIcon } from "@parallel/chakra/icons";
+import { DateTime } from "@parallel/components/common/DateTime";
+import { TimelinePetitionClonedEvent_PetitionClonedEventFragment } from "@parallel/graphql/__types";
+import { FORMATS } from "@parallel/utils/dates";
+import { FormattedMessage } from "react-intl";
+import { UserReference } from "../UserReference";
+import { TimelineIcon, TimelineItem } from "./helpers";
+
+export type TimelinePetitionClonedEventProps = {
+  userId: string;
+  event: TimelinePetitionClonedEvent_PetitionClonedEventFragment;
+};
+
+export function TimelinePetitionClonedEvent({
+  event,
+  userId,
+}: TimelinePetitionClonedEventProps) {
+  return (
+    <TimelineItem
+      icon={
+        <TimelineIcon
+          icon={<PlusCircleIcon />}
+          color="white"
+          backgroundColor="purple.500"
+        />
+      }
+    >
+      <FormattedMessage
+        id="timeline.petition-cloned-description"
+        defaultMessage="{same, select, true {You} other {{user}}} cloned this petition {timeAgo}"
+        values={{
+          same: userId === event.user?.id,
+          user: <UserReference user={event.user} />,
+          timeAgo: (
+            <DateTime
+              value={event.createdAt}
+              format={FORMATS.LLL}
+              useRelativeTime="always"
+            />
+          ),
+        }}
+      />
+    </TimelineItem>
+  );
+}
+
+TimelinePetitionClonedEvent.fragments = {
+  PetitionClonedEvent: gql`
+    fragment TimelinePetitionClonedEvent_PetitionClonedEvent on PetitionClonedEvent {
+      user {
+        ...UserReference_User
+      }
+      createdAt
+    }
+    ${UserReference.fragments.User}
+  `,
+};

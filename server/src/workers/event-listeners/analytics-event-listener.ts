@@ -110,23 +110,16 @@ async function trackAccessActivatedEvent(
   ctx: WorkerContext
 ) {
   const petition = await loadPetition(event.petition_id, ctx);
-  const accessActivatedEvent = await ctx.petitions.loadLastEventsByType(
-    event.petition_id,
-    "ACCESS_ACTIVATED"
-  );
-
-  // send a PETITION_SENT event only on the first ACCESS_ACTIVATED event of each petition
-  if (accessActivatedEvent.length === 0) {
-    await ctx.analytics.trackEvent({
-      type: "PETITION_SENT",
+  await ctx.analytics.trackEvent({
+    type: "PETITION_SENT",
+    user_id: event.data.user_id,
+    data: {
+      petition_access_id: event.data.petition_access_id,
       user_id: event.data.user_id,
-      data: {
-        user_id: event.data.user_id,
-        org_id: petition.org_id,
-        petition_id: event.petition_id,
-      },
-    });
-  }
+      org_id: petition.org_id,
+      petition_id: event.petition_id,
+    },
+  });
 }
 
 async function trackPetitionCompletedEvent(
@@ -251,36 +244,20 @@ async function trackAccessOpenedEvent(
   event: AccessOpenedEvent,
   ctx: WorkerContext
 ) {
-  const [accessOpenedEvents, access, petition] = await Promise.all([
-    ctx.petitions.loadLastEventsByType(event.petition_id, "ACCESS_OPENED"),
+  const [access, petition] = await Promise.all([
     loadPetitionAccess(event.data.petition_access_id, ctx),
     loadPetition(event.petition_id, ctx),
   ]);
 
-  if (accessOpenedEvents.length === 0) {
-    await ctx.analytics.trackEvent([
-      accessOpenedEvents.length === 0
-        ? {
-            type: "ACCESS_OPENED_FIRST",
-            user_id: access.granter_id,
-            data: {
-              contact_id: access.contact_id,
-              org_id: petition.org_id,
-              petition_id: event.petition_id,
-            },
-          }
-        : null,
-      {
-        type: "ACCESS_OPENED",
-        user_id: access.granter_id,
-        data: {
-          contact_id: access.contact_id,
-          org_id: petition.org_id,
-          petition_id: event.petition_id,
-        },
-      },
-    ]);
-  }
+  await ctx.analytics.trackEvent({
+    type: "ACCESS_OPENED",
+    user_id: access.granter_id,
+    data: {
+      contact_id: access.contact_id,
+      org_id: petition.org_id,
+      petition_id: event.petition_id,
+    },
+  });
 }
 
 export const analyticsEventListener: EventListener = async (event, ctx) => {

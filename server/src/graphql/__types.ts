@@ -865,6 +865,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    user: NexusGenRootTypes["User"] | null; // User
   };
   PetitionClosedEvent: {
     // field return type
@@ -1755,6 +1756,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    user: "User";
   };
   PetitionClosedEvent: {
     // field return type name

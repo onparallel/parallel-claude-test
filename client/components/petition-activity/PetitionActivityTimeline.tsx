@@ -15,6 +15,7 @@ import { TimelineMessageCancelledEvent } from "./timeline/TimelineMessageCancell
 import { TimelineMessageScheduledEvent } from "./timeline/TimelineMessageScheduledEvent";
 import { TimelineMessageSentEvent } from "./timeline/TimelineMessageSentEvent";
 import { TimelineOwnershipTransferredEvent } from "./timeline/TimelineOwnershipTransferredEvent";
+import { TimelinePetitionClonedEvent } from "./timeline/TimelinePetitionClonedEvent";
 import { TimelinePetitionClosedEvent } from "./timeline/TimelinePetitionClosedEvent";
 import { TimelinePetitionClosedNotifiedEvent } from "./timeline/TimelinePetitionClosedNotifiedEvent";
 import { TimelinePetitionCompletedEvent } from "./timeline/TimelinePetitionCompletedEvent";
@@ -135,6 +136,8 @@ export function PetitionActivityTimeline({
                 event={event}
                 userId={userId}
               />
+            ) : event.__typename === "PetitionClonedEvent" ? (
+              <TimelinePetitionClonedEvent event={event} userId={userId} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -243,6 +246,9 @@ PetitionActivityTimeline.fragments = {
       ... on GroupPermissionRemovedEvent {
         ...TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEvent
       }
+      ... on PetitionClonedEvent {
+        ...TimelinePetitionClonedEvent_PetitionClonedEvent
+      }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
     ${TimelinePetitionCompletedEvent.fragments.PetitionCompletedEvent}
@@ -272,5 +278,6 @@ PetitionActivityTimeline.fragments = {
     ${TimelineGroupPermissionAddedEvent.fragments.GroupPermissionAddedEvent}
     ${TimelineGroupPermissionEditedEvent.fragments.GroupPermissionEditedEvent}
     ${TimelineGroupPermissionRemovedEvent.fragments.GroupPermissionRemovedEvent}
+    ${TimelinePetitionClonedEvent.fragments.PetitionClonedEvent}
   `,
 };

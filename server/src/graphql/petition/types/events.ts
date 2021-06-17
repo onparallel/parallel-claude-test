@@ -620,13 +620,16 @@ export const SignatureCancelledEvent = createPetitionEvent(
   }
 );
 
-/**
- * the following events must be defined in GraphQL
- * but are not exposed to the client, so they have an empty definition
- */
 export const PetitionClonedEvent = createPetitionEvent(
   "PetitionClonedEvent",
-  (t) => {}
+  (t) => {
+    t.nullable.field("user", {
+      type: "User",
+      resolve: async ({ data }, _, ctx) => {
+        return await ctx.users.loadUser(data.user_id);
+      },
+    });
+  }
 );
 export const PetitionDeletedEvent = createPetitionEvent(
   "PetitionDeletedEvent",

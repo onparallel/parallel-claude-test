@@ -187,7 +187,7 @@ export class Auth implements IAuth {
           );
         }
       }
-      this.trackSessionLogin(user);
+      await this.trackSessionLogin(user);
       const token = await this.storeSession({
         IdToken: tokens["id_token"],
         AccessToken: tokens["access_token"],
@@ -209,7 +209,7 @@ export class Auth implements IAuth {
         const user = await this.getUserFromAuthenticationResult(
           auth.AuthenticationResult
         );
-        this.trackSessionLogin(user);
+        await this.trackSessionLogin(user);
         this.setSession(res, token);
         res.status(201).send({});
       } else if (auth.ChallengeName === "NEW_PASSWORD_REQUIRED") {
@@ -248,7 +248,7 @@ export class Auth implements IAuth {
         const user = await this.getUserFromAuthenticationResult(
           challenge.AuthenticationResult
         );
-        this.trackSessionLogin(user);
+        await this.trackSessionLogin(user);
         const token = await this.storeSession(
           challenge.AuthenticationResult as any
         );
@@ -339,8 +339,8 @@ export class Auth implements IAuth {
     return await this.users.loadUserByCognitoId(cognitoId);
   }
 
-  private trackSessionLogin(user: User) {
-    this.system.createEvent({
+  private async trackSessionLogin(user: User) {
+    await this.system.createEvent({
       type: "USER_LOGGED_IN",
       data: { user_id: user.id },
     });

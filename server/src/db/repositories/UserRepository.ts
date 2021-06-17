@@ -126,7 +126,7 @@ export class UserRepository extends BaseRepository {
       updated_by: createdBy,
     });
 
-    this.system.createEvent({
+    await this.system.createEvent({
       type: "USER_CREATED",
       data: {
         user_id: user.id,
