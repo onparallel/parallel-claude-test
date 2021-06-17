@@ -278,6 +278,22 @@ function mapEventPayload(event: PetitionEvent) {
         userGroupId: toGlobalId("UserGroup", event.data.user_group_id),
       };
     }
+    case "PETITION_CLONED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+        newPetitionId: toGlobalId("Petition", event.data.new_petition_id),
+      };
+    }
+    case "PETITION_DELETED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
+    case "TEMPLATE_USED": {
+      return {
+        userId: toGlobalId("User", event.data.user_id),
+      };
+    }
     default:
       return {};
   }

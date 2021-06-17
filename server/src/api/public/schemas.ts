@@ -1156,6 +1156,33 @@ export const PetitionEvent = schema({
         },
       },
     },
+    PETITION_CLONED: {
+      description: "The user cloned a petition",
+      properties: {
+        userId: {
+          description: "The ID of the user that cloned the petition",
+          type: "string",
+        },
+      },
+    },
+    PETITION_DELETED: {
+      description: "The user deleted a petition",
+      properties: {
+        userId: {
+          description: "The ID of the user that deleted the petition",
+          type: "string",
+        },
+      },
+    },
+    TEMPLATE_USED: {
+      description: "A template has been used to create a petition",
+      properties: {
+        userId: {
+          description: "The ID of the user that used the template",
+          type: "string",
+        },
+      },
+    },
   } as Record<PetitionEventType, JsonSchema>).map(
     ([event, data]) =>
       ({
