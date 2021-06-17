@@ -37,6 +37,7 @@ export function MessageEmailEditor({
           />
         </FormLabel>
         <Input
+          id="input-message-email-editor-subject"
           type="text"
           ref={subjectRef}
           value={subject}
@@ -58,6 +59,7 @@ export function MessageEmailEditor({
       <FormControl
         isInvalid={showErrors && isEmptyRTEValue(body)}
         marginTop={4}
+        id="rich-text-editor-textarea"
       >
         <RichTextEditor
           value={body}

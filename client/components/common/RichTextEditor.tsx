@@ -159,6 +159,7 @@ export const RichTextEditor = forwardRef<
   RichTextEditorProps
 >(function RichTextEditor(
   {
+    id,
     value,
     onChange,
     isDisabled,
@@ -182,6 +183,7 @@ export const RichTextEditor = forwardRef<
     [placeholderOptions]
   );
   const formControl = useFormControl({
+    id,
     isDisabled,
     isInvalid,
     isRequired,
@@ -353,6 +355,7 @@ export const RichTextEditor = forwardRef<
           }}
         >
           <EditablePlugins
+            id={formControl.id}
             readOnly={formControl.disabled || formControl.readOnly}
             onKeyDown={[onKeyDownPlaceholder]}
             onKeyDownDeps={[selectedIndex, search, target]}

@@ -30,6 +30,7 @@ export const SendButton = chakraForwardRef<"div", SendButtonProps>(
     return (
       <ButtonGroup ref={ref} isAttached {...props}>
         <Button
+          id="send-button"
           colorScheme="purple"
           leftIcon={<PaperPlaneIcon fontSize="18px" />}
           onClick={onSendClick}

@@ -12,10 +12,10 @@ export async function fillPetitionField(
   data: PetitionFieldData
 ) {
   const title = await element.$(`[id^="field-title-"]`);
-  await title!.fill(data.title);
+  await title!.type(data.title);
   if (data.description) {
     const description = await element.$(`[id^="field-description-"]`);
-    await description!.fill(data.description);
+    await description!.type(data.description);
   }
   if (data.values) {
     const values = await element.$(`[id^="field-select-values-"]`);

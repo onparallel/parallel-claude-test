@@ -19,15 +19,8 @@ function buildCreateTestSession(func: jest.Describe) {
             browserName,
             process.env.HEADLESS_BROWSER === "true"
           );
-        });
-
-        beforeEach(async () => {
           context.browserContext = await startContext(context.browser!);
           context.page = await context.browserContext!.newPage();
-        });
-
-        afterEach(async () => {
-          await context.browserContext!.close();
         });
 
         afterAll(async () => {
