@@ -32,7 +32,7 @@ export function CheckboxTypeLabel({ field, ...props }: CheckboxTypeLabelProps) {
         return (
           <FormattedMessage
             id="component.checkbox-type-label.exact"
-            defaultMessage="Choose {X} {X, plural, =1{option} other{options}}"
+            defaultMessage="Choose {X, plural, =1{# option} other{# options}}"
             values={{ X: max }}
           />
         );
