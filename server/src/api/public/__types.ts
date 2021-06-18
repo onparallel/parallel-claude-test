@@ -1241,6 +1241,12 @@ export type PetitionBasePagination = {
 
 export type PetitionBaseType = "PETITION" | "TEMPLATE";
 
+export type PetitionClonedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  user: Maybe<User>;
+};
+
 export type PetitionClosedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -1264,6 +1270,11 @@ export type PetitionCreatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   user: Maybe<User>;
+};
+
+export type PetitionDeletedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
 };
 
 export type PetitionEvent = {
@@ -2119,6 +2130,11 @@ export type TagPagination = {
   items: Array<Tag>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
+};
+
+export type TemplateUsedEvent = PetitionEvent & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
 };
 
 export type Timestamps = {
