@@ -112,7 +112,7 @@ export function RecipientViewPetitionFieldCheckbox({
     }
     setCheckedItems(newCheckedItems);
     // make sure we only submit existing options
-    const filteredChecked = checkedItems.filter((c) => values.includes(c));
+    const filteredChecked = newCheckedItems.filter((c) => values.includes(c));
 
     if (!filteredChecked.length && field.replies.length) {
       handleDelete();
