@@ -768,6 +768,53 @@ describe("GraphQL/Petitions", () => {
       });
     });
 
+    it("doesn't copy tags when creating a petition from a public template", async () => {
+      const [tag] = await mocks.createRandomTags(otherOrg.id);
+      const [publicTemplateWithTags] = await mocks.createRandomPetitions(
+        otherOrg.id,
+        otherUser.id,
+        1,
+        () => ({
+          template_public: true,
+          is_template: true,
+          status: null,
+          name: "KYC",
+        })
+      );
+      await mocks.tagPetitions([publicTemplateWithTags.id], tag.id);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $name: String
+            $locale: PetitionLocale!
+            $petitionId: GID
+            $type: PetitionBaseType
+          ) {
+            createPetition(
+              name: $name
+              locale: $locale
+              petitionId: $petitionId
+              type: $type
+            ) {
+              tags {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          name: "Test tags",
+          locale: "es",
+          type: "PETITION",
+          petitionId: toGlobalId("Petition", publicTemplateWithTags.id),
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.createPetition).toEqual({ tags: [] });
+    });
+
     it("creates a petition based on a public template", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
@@ -1124,6 +1171,40 @@ describe("GraphQL/Petitions", () => {
       expect(errors).toBeUndefined();
       expect(data.clonePetitions[0].fields[0].attachments).toHaveLength(1);
       expect(data.clonePetitions[0].fields[1].attachments).toHaveLength(0);
+    });
+
+    it("copies tags when cloning the petition", async () => {
+      const [tag] = await mocks.createRandomTags(organization.id);
+      const [petitionWithTags] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          template_public: false,
+          is_template: false,
+          status: "DRAFT",
+          name: "KYC",
+        })
+      );
+      await mocks.tagPetitions([petitionWithTags.id], tag.id);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              tags {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", petitionWithTags.id)],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.clonePetitions[0].tags).toHaveLength(1);
     });
   });
 

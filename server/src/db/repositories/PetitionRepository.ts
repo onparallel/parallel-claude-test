@@ -1594,14 +1594,16 @@ export class PetitionRepository extends BaseRepository {
       }
 
       // copy original tag ids to cloned petition
-      await this.raw(
-        /* sql */ `
+      if (!petition!.is_template) {
+        await this.raw(
+          /* sql */ `
         insert into petition_tag (petition_id, tag_id)
         select ?, tag_id from petition_tag where petition_id = ?
       `,
-        [cloned.id, petitionId],
-        t
-      );
+          [cloned.id, petitionId],
+          t
+        );
+      }
 
       // copy field attachments to new fields, using the original file_upload_id
       // TODO maybe this can be done in just one query
