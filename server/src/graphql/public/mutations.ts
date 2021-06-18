@@ -545,7 +545,7 @@ export const publicUpdateCheckboxReply = mutationField(
       } else {
         await ctx.petitions.createEvent({
           type: "REPLY_UPDATED",
-          petitionId,
+          petition_id: petitionId,
           data: {
             petition_access_id: reply.petition_access_id!,
             petition_field_id: reply.petition_field_id,
