@@ -237,7 +237,7 @@ export function defaultFieldOptions(
           values: options?.values ?? [],
           limit: {
             type: "UNLIMITED",
-            min: 1,
+            min: optional ?? false ? 0 : 1,
             max: 1,
           },
         },

@@ -143,18 +143,28 @@ export function getFirstDynamicSelectValue(
 }
 
 export function getMinMaxCheckboxLimit({
-  min = 1,
-  max = 1,
-  valuesLength = 1,
+  min,
+  max,
+  valuesLength,
+  optional = false,
 }: {
   min: number;
   max: number;
   valuesLength: number;
+  optional?: boolean;
 }) {
+  min = !optional && min === 0 ? 1 : min;
+
   if (max > valuesLength) {
     max = valuesLength;
-    min = min >= max ? (max >= 2 ? max - 1 : 1) : min;
   }
+
+  min =
+    min >= max
+      ? max >= 2 - Number(optional)
+        ? max - 1
+        : Number(!optional)
+      : min;
 
   return [min, max];
 }

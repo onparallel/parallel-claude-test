@@ -39,7 +39,10 @@ import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
-import { usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
+import {
+  getMinMaxCheckboxLimit,
+  usePetitionFieldTypeColor,
+} from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { uploadFile } from "@parallel/utils/uploadFile";
@@ -617,16 +620,21 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               isChecked={!field.optional}
               onChange={(event) => {
                 if (field.type === "CHECKBOX") {
+                  const [min, max] = getMinMaxCheckboxLimit({
+                    min: field.options.limit.min || 0,
+                    max: field.options.limit.max || 1,
+                    valuesLength: field.options.values.length || 1,
+                    optional: !event.target.checked,
+                  });
+
                   onFieldEdit({
                     optional: !event.target.checked,
                     options: {
                       ...field.options,
                       limit: {
                         ...field.options.limit,
-                        min:
-                          field.options.limit.min == 0 && !event.target.checked
-                            ? 1
-                            : field.options.limit.min,
+                        min,
+                        max,
                       },
                     },
                   });

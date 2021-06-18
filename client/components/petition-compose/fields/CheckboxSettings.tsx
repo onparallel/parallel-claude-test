@@ -9,6 +9,7 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
+import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -36,6 +37,8 @@ export function CheckboxSettings({
     }),
     value: "UNLIMITED",
   });
+
+  const values = field.options?.values ?? [];
   const [type, setType] = useState(field.options?.limit?.type ?? "UNLIMITED");
   const [min, setMin] = useState<number | "">(1);
   const [max, setMax] = useState<number | "">(1);
@@ -48,8 +51,8 @@ export function CheckboxSettings({
       document.activeElement !== refMin?.current &&
       document.activeElement !== refMax?.current
     ) {
-      setMin(field.options?.limit?.min ?? 1);
-      setMax(field.options?.limit?.max ?? 1);
+      setMin(field.options?.limit?.min);
+      setMax(field.options?.limit?.max);
     }
   }, [field.options.limit]);
 
@@ -132,11 +135,12 @@ export function CheckboxSettings({
       return;
     }
 
-    const _max = max ? max : field.options.values.length;
-
-    let _min = Number(value);
-    _min = _min >= _max ? (_max >= 2 ? _max - 1 : 1) : _min;
-    _min = _min > 0 ? _min : 1;
+    const [_min, _max] = getMinMaxCheckboxLimit({
+      min: Number(value) || 0,
+      max: max || 1,
+      valuesLength: values.length || 1,
+      optional: field.optional,
+    });
 
     if (_min != min) {
       setMin(_min);
@@ -158,31 +162,26 @@ export function CheckboxSettings({
       setMax("");
       return;
     }
-    const length = field.options.values.length || 1;
 
-    let _max = Number(value);
+    const [_min, _max] = getMinMaxCheckboxLimit({
+      min: min || 0,
+      max: Number(value) || 1,
+      valuesLength: values.length || 1,
+      optional: field.optional,
+    });
 
-    _max = _max > length ? length : _max;
-
-    _max = _max > 0 ? _max : 1;
-
-    if (_max != max) {
-      let _min = min >= _max ? (_max >= 2 ? _max - 1 : 1) : min;
-      _min = _min > 0 ? _min : 1;
-
-      setMin(_min);
-      setMax(_max);
-      debouncedOnUpdate(field.id, {
-        options: {
-          ...field.options,
-          limit: {
-            ...field.options.limit,
-            min: _min,
-            max: _max,
-          },
+    setMin(_min);
+    setMax(_max);
+    debouncedOnUpdate(field.id, {
+      options: {
+        ...field.options,
+        limit: {
+          ...field.options.limit,
+          min: _min,
+          max: _max,
         },
-      });
-    }
+      },
+    });
   };
 
   const handleChangeSelect = (_selected: OptionType | null) => {
@@ -234,7 +233,7 @@ export function CheckboxSettings({
                 ...field.options,
                 limit: {
                   type: event.target.checked ? "UNLIMITED" : "RADIO",
-                  min: 1,
+                  min: field.optional ? 0 : 1,
                   max: 1,
                 },
               },
@@ -256,8 +255,8 @@ export function CheckboxSettings({
           {type === "RANGE" && (
             <NumberInput
               value={min}
-              min={1}
-              max={Number(max) > 1 ? Number(max) - 1 : 1}
+              min={field.optional ? 0 : 1}
+              max={Number(max) > 1 ? Number(max) - 1 : field.optional ? 0 : 1}
               w={"72px"}
               onChange={handleMinOnChange}
               allowMouseWheel={true}

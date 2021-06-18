@@ -33,20 +33,12 @@ export function CheckboxTypeLabel({
         );
 
       case "RANGE":
-        return min === 1 ? (
-          max === 1 ? (
-            <FormattedMessage
-              id="component.checkbox-type-label.exact"
-              defaultMessage="Choose {X, plural, =1{# option} other{# options}}"
-              values={{ X: max }}
-            />
-          ) : (
-            <FormattedMessage
-              id="component.checkbox-type-label.up-to"
-              defaultMessage="Choose up to {X, plural, =1{# option} other{# options}}"
-              values={{ X: max }}
-            />
-          )
+        return min === 1 || min === 0 ? (
+          <FormattedMessage
+            id="component.checkbox-type-label.up-to"
+            defaultMessage="Choose up to {X, plural, =1{# option} other{# options}}"
+            values={{ X: max }}
+          />
         ) : (
           <FormattedMessage
             id="component.checkbox-type-label.range"

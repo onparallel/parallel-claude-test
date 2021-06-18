@@ -4064,6 +4064,7 @@ export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
+  optional: boolean;
   options: { [key: string]: any };
 };
 
@@ -6743,6 +6744,7 @@ export const PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc = gql`
   fragment PetitionFieldOptionsListEditor_PetitionField on PetitionField {
     id
     type
+    optional
     options
   }
 `;

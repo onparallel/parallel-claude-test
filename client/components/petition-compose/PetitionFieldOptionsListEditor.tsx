@@ -165,9 +165,10 @@ export const PetitionFieldOptionsListEditor = Object.assign(
       if (!shallowEqualArrays(field.options.values, values)) {
         if (field.type === "CHECKBOX") {
           const [min, max] = getMinMaxCheckboxLimit({
-            min: field.options.limit.min || 1,
+            min: field.options.limit.min || 0,
             max: field.options.limit.max || 1,
             valuesLength: values.length || 1,
+            optional: field.optional,
           });
           onFieldEdit({
             options: {
@@ -205,6 +206,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
         fragment PetitionFieldOptionsListEditor_PetitionField on PetitionField {
           id
           type
+          optional
           options
         }
       `,
