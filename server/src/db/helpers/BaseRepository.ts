@@ -11,21 +11,35 @@ import {
   CreateSystemEvent,
 } from "../events";
 import {
+  CreatePetitionUserNotification,
+  PetitionUserNotification,
+} from "../notifications";
+import {
   TableCreateTypes as _TableCreateTypes,
   TablePrimaryKeys,
   TableTypes as _TableTypes,
 } from "../__types";
 
 interface TableTypes
-  extends Omit<_TableTypes, "PetitionEvent" | "SystemEvent"> {
+  extends Omit<
+    _TableTypes,
+    "PetitionEvent" | "SystemEvent" | "PetitionUserNotification"
+  > {
   petition_event: PetitionEvent;
+  petition_user_notification: PetitionUserNotification;
   system_event: SystemEvent;
 }
 
 interface TableCreateTypes
-  extends Omit<_TableCreateTypes, "CreatePetitionEvent" | "CreateSystemEvent"> {
+  extends Omit<
+    _TableCreateTypes,
+    | "CreatePetitionEvent"
+    | "CreateSystemEvent"
+    | "CreatePetitionUserNotification"
+  > {
   petition_event: CreatePetitionEvent;
   system_event: CreateSystemEvent;
+  petition_user_notification: CreatePetitionUserNotification;
 }
 export interface PageOpts {
   offset?: number | null;

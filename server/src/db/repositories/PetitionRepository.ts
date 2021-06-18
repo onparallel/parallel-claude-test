@@ -36,6 +36,11 @@ import {
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
+  CommentCreatedNotification,
+  CreatePetitionUserNotification,
+  PetitionUserNotification,
+} from "../notifications";
+import {
   Contact,
   CreatePetition,
   CreatePetitionAccess,
@@ -45,7 +50,6 @@ import {
   CreatePetitionFieldReply,
   CreatePetitionMessage,
   CreatePetitionReminder,
-  CreatePetitionUserNotification,
   Petition,
   PetitionAccess,
   PetitionContactNotification,
@@ -59,7 +63,6 @@ import {
   PetitionPermissionType,
   PetitionSignatureRequest,
   PetitionStatus,
-  PetitionUserNotification,
   User,
 } from "../__types";
 
@@ -1937,6 +1940,11 @@ export class PetitionRepository extends BaseRepository {
     `);
   }
 
+  readonly loadUnreadPetitionUserNotificationsByUserId =
+    this.buildLoadMultipleBy("petition_user_notification", "user_id", (q) =>
+      q.where({ is_read: false })
+    );
+
   async updatePetitionUserNotifications(
     petitionUserNotificationIds: number[],
     data: Partial<CreatePetitionUserNotification>
@@ -1981,6 +1989,7 @@ export class PetitionRepository extends BaseRepository {
                     .where({
                       user_id: userId,
                       petition_id: petitionId,
+                      type: "COMMENT_CREATED",
                     })
                     .whereRaw(
                       "data ->> 'petition_field_id' = ?",
@@ -1998,12 +2007,12 @@ export class PetitionRepository extends BaseRepository {
           .select("*");
 
         const byId = indexBy(
-          rows,
+          rows as CommentCreatedNotification[],
           keyBuilder([
             "user_id",
             "petition_id",
-            (r) => r.data.petition_field_id,
-            (r) => r.data.petition_field_comment_id,
+            (r) => r.data.petition_field_id.toString(),
+            (r) => r.data.petition_field_comment_id.toString(),
           ])
         );
         return ids

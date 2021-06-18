@@ -42,6 +42,14 @@ enum ChangePasswordResult {
   SUCCESS
 }
 
+type CommentCreatedNotification implements PetitionUserNotification {
+  author: UserOrPetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+  isInternal: Boolean!
+  petition: Petition!
+}
+
 type CommentDeletedEvent implements PetitionEvent {
   createdAt: DateTime!
   deletedBy: UserOrPetitionAccess
@@ -260,6 +268,13 @@ type MessageCancelledEvent implements PetitionEvent {
   id: GID!
   message: PetitionMessage!
   user: User
+}
+
+type MessageEmailBouncedNotification implements PetitionUserNotification {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+  petition: Petition!
 }
 
 type MessageScheduledEvent implements PetitionEvent {
@@ -1632,6 +1647,13 @@ type PetitionCompletedEvent implements PetitionEvent {
   id: GID!
 }
 
+type PetitionCompletedNotification implements PetitionUserNotification {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+  petition: Petition!
+}
+
 type PetitionCreatedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
@@ -2111,6 +2133,15 @@ type PetitionReopenedEvent implements PetitionEvent {
   user: User
 }
 
+type PetitionSharedNotification implements PetitionUserNotification {
+  createdAt: DateTime!
+  id: GID!
+  owner: User!
+  permissionType: PetitionPermissionTypeRW!
+  petition: Petition!
+  sharedWith: [UserOrUserGroup!]!
+}
+
 enum PetitionSignatureCancelReason {
   CANCELLED_BY_USER
   DECLINED_BY_SIGNER
@@ -2323,6 +2354,12 @@ type PetitionUserGroupPermission implements PetitionPermission & Timestamps {
   Time when the resource was last updated.
   """
   updatedAt: DateTime!
+}
+
+interface PetitionUserNotification {
+  createdAt: DateTime!
+  id: GID!
+  petition: Petition!
 }
 
 """
@@ -3074,9 +3111,23 @@ type SignatureCancelledEvent implements PetitionEvent {
   user: User
 }
 
+type SignatureCancelledNotification implements PetitionUserNotification {
+  author: UserOrContact!
+  createdAt: DateTime!
+  id: GID!
+  petition: Petition!
+}
+
 type SignatureCompletedEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
+}
+
+type SignatureCompletedNotification implements PetitionUserNotification {
+  contact: Contact!
+  createdAt: DateTime!
+  id: GID!
+  petition: Petition!
 }
 
 """
@@ -3327,6 +3378,7 @@ type User implements Timestamps {
   organization: Organization!
   role: OrganizationRole!
   status: UserStatus!
+  unreadNotificationIds: [String!]!
 
   """
   Time when the resource was last updated.
@@ -3403,6 +3455,8 @@ type UserGroupPagination {
   """
   totalCount: Int!
 }
+
+union UserOrContact = Contact | User
 
 union UserOrPetitionAccess = PetitionAccess | User
 

@@ -37,6 +37,7 @@ export const schema = makeSchema({
     sources: [
       { source: resolve("./db/__types.ts"), alias: "db" },
       { source: resolve("./db/events.ts"), alias: "events" },
+      { source: resolve("./db/notifications.ts"), alias: "notifications" },
       { source: resolve("./context.ts"), alias: "ctx" },
     ],
     contextType: "ctx.ApiContext",

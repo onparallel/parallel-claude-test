@@ -1,7 +1,15 @@
-import { arg, enumType, nonNull, objectType, unionType } from "@nexus/schema";
-import { rootIsContextUser } from "./authorizers";
+import {
+  arg,
+  enumType,
+  list,
+  nonNull,
+  objectType,
+  unionType,
+} from "@nexus/schema";
 import { fullName } from "../../util/fullName";
+import { toGlobalId } from "../../util/globalId";
 import { parseSortBy } from "../helpers/paginationPlugin";
+import { rootIsContextUser } from "./authorizers";
 
 export const OrganizationRole = enumType({
   name: "OrganizationRole",
@@ -120,6 +128,17 @@ export const User = objectType({
               return { column: columnMap[field], order };
             }),
           }
+        );
+      },
+    });
+    t.field("unreadNotificationIds", {
+      authorize: rootIsContextUser(),
+      type: nonNull(list(nonNull("String"))),
+      resolve: async ({ id }, _, ctx) => {
+        const notifications =
+          await ctx.petitions.loadUnreadPetitionUserNotificationsByUserId(id);
+        return notifications.map((n) =>
+          toGlobalId("PetitionUserNotification", n.id)
         );
       },
     });

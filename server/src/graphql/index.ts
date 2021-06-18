@@ -38,3 +38,5 @@ export * from "./user-group/queries";
 export * from "./tag/queries";
 export * from "./tag/mutations";
 export * from "./tag/types";
+
+export * from "./notifications/types";

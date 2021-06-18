@@ -94,7 +94,13 @@ export type PetitionSignatureStatus =
 
 export type PetitionStatus = "CLOSED" | "COMPLETED" | "DRAFT" | "PENDING";
 
-export type PetitionUserNotificationType = "COMMENT_CREATED";
+export type PetitionUserNotificationType =
+  | "COMMENT_CREATED"
+  | "MESSAGE_EMAIL_BOUNCED"
+  | "PETITION_COMPLETED"
+  | "PETITION_SHARED"
+  | "SIGNATURE_CANCELLED"
+  | "SIGNATURE_COMPLETED";
 
 export type SystemEventType =
   | "EMAIL_BOUNCED"
