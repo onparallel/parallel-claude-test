@@ -1,4 +1,4 @@
-import { Checkbox, Stack, Text, Flex } from "@chakra-ui/react";
+import { Checkbox, Flex, Stack, Text } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
 import { useState } from "react";
@@ -60,8 +60,8 @@ export function RecipientViewPetitionFieldCheckbox({
   const fieldId = field.id;
   const replyId = field.replies[0]?.id;
 
-  const [checkedItems, setCheckedItems] = useState(
-    field.replies[0]?.content?.choices ?? ([] as string[])
+  const [checkedItems, setCheckedItems] = useState<string[]>(
+    field.replies[0]?.content?.choices ?? []
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -96,10 +96,23 @@ export function RecipientViewPetitionFieldCheckbox({
     setIsSaving(false);
   };
 
-  const handleApiChanges = (checkedItems: string[]) => {
-    const filteredChecked = checkedItems.filter(
-      (c: string) => values?.some((v: string) => v === c) ?? true
-    );
+  const handleChange = (option: string) => {
+    const isSelected = checkedItems.includes(option);
+    let newCheckedItems: string[];
+    if (showRadio) {
+      newCheckedItems = isSelected ? [] : [option];
+    } else {
+      // skip if maximum allowed options are selected
+      if (type !== "UNLIMITED" && !isSelected && checkedItems.length >= max) {
+        return;
+      }
+      newCheckedItems = isSelected
+        ? checkedItems.filter((o) => o !== option)
+        : [...checkedItems, option];
+    }
+    setCheckedItems(newCheckedItems);
+    // make sure we only submit existing options
+    const filteredChecked = checkedItems.filter((c) => values.includes(c));
 
     if (!filteredChecked.length && field.replies.length) {
       handleDelete();
@@ -181,54 +194,21 @@ export function RecipientViewPetitionFieldCheckbox({
           </Flex>
         </Flex>
 
-        {showRadio
-          ? values.map((option: string, index: number) => (
-              <Checkbox
-                key={index}
-                icon={<CustomIcon />}
-                isInvalid={isRejected}
-                isDisabled={isDisabled}
-                isChecked={checkedItems.includes(option)}
-                onChange={(e) => {
-                  e.preventDefault();
-                  setCheckedItems(() => {
-                    const newChecked = e.target.checked ? [option] : [];
-                    handleApiChanges(newChecked);
-                    return newChecked;
-                  });
-                }}
-                variant="radio"
-              >
-                {option}
-              </Checkbox>
-            ))
-          : values.map((option: string, index: number) => (
-              <Checkbox
-                key={index}
-                isInvalid={isRejected}
-                isDisabled={isDisabled}
-                isChecked={checkedItems.includes(option)}
-                onChange={(e) => {
-                  e.preventDefault();
-                  if (
-                    e.target.checked &&
-                    checkedItems.length >= max &&
-                    (type === "RANGE" || type === "EXACT")
-                  ) {
-                    return;
-                  }
-                  setCheckedItems((checked: string[]) => {
-                    const newChecked = e.target.checked
-                      ? [...checked, option]
-                      : checked.filter((o: string) => o !== option);
-                    handleApiChanges(newChecked);
-                    return newChecked;
-                  });
-                }}
-              >
-                {option}
-              </Checkbox>
-            ))}
+        {values.map((option: string, index: number) => (
+          <Checkbox
+            key={index}
+            isInvalid={isRejected}
+            isDisabled={isDisabled}
+            isChecked={checkedItems.includes(option)}
+            onChange={(e) => {
+              e.preventDefault();
+              handleChange(option);
+            }}
+            {...(showRadio ? { icon: <CustomIcon />, variant: "radio" } : {})}
+          >
+            {option}
+          </Checkbox>
+        ))}
       </Stack>
     </RecipientViewPetitionFieldCard>
   );
