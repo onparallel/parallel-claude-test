@@ -11,7 +11,7 @@ export function CheckboxTypeLabel({
 }: CheckboxTypeLabelProps) {
   const { type = "UNLIMITED", min = 1, max = 1 } = options.limit ?? {};
 
-  const show = (type != "RADIO" && max > 1) || type == "UNLIMITED";
+  const show = (type != "RADIO" && max > 1) || type === "UNLIMITED";
 
   const getText = () => {
     switch (type) {
@@ -43,7 +43,7 @@ export function CheckboxTypeLabel({
           ) : (
             <FormattedMessage
               id="component.checkbox-type-label.up-to"
-              defaultMessage="Choose up to {X} options"
+              defaultMessage="Choose up to {X, plural, =1{# option} other{# options}}"
               values={{ X: max }}
             />
           )

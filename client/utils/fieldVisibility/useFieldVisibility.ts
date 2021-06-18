@@ -21,7 +21,7 @@ type VisibilityField =
   | useFieldVisibility_PublicPetitionFieldFragment
   | useFieldVisibility_PetitionFieldFragment;
 
-function evaluatePredicate<T extends string | number>(
+function evaluatePredicate<T extends string | number | string[]>(
   reply: T | string[],
   operator: PetitionFieldVisibilityConditionOperator,
   value: T | null
@@ -58,7 +58,7 @@ function evaluatePredicate<T extends string | number>(
     case "NOT_CONTAIN":
       return !a.toString().includes(b.toString());
     case "NUMBER_OF_SUBREPLIES":
-      return (a as string[]).length == b;
+      return (a as string[]).length === b;
   }
 }
 

@@ -11,6 +11,7 @@ type ValidationResult<T extends PartialField> = {
     | "NO_REPLIABLE_FIELDS"
     | "FIELD_WITHOUT_TITLE"
     | "SELECT_WITHOUT_OPTIONS"
+    | "CHECKBOX_WITHOUT_OPTIONS"
     | null;
   field?: T;
   errorMessage?: ReactNode;
@@ -62,6 +63,26 @@ export function validatePetitionFields<T extends PartialField>(
         <FormattedMessage
           id="petition.no-select-fields-without-options-error"
           defaultMessage="Please add two or more options to all Dropdown fields."
+        />
+      ),
+    };
+  }
+
+  const checkboxFieldWithoutOptions = fields.find(
+    (f) =>
+      f.type === "CHECKBOX" &&
+      (!f.options.values ||
+        !Array.isArray(f.options.values) ||
+        f.options.values.length < 1)
+  );
+  if (checkboxFieldWithoutOptions) {
+    return {
+      error: "CHECKBOX_WITHOUT_OPTIONS",
+      field: checkboxFieldWithoutOptions,
+      errorMessage: (
+        <FormattedMessage
+          id="petition.no-checkbox-fields-without-options-error"
+          defaultMessage="Please add one or more options to all Multiple options fields."
         />
       ),
     };

@@ -18,7 +18,6 @@ import {
   RecipientViewPetitionFieldCard_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
 } from "@parallel/graphql/__types";
-import { If } from "@parallel/utils/conditions";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -156,7 +155,8 @@ export function RecipientViewPetitionFieldCard({
           ))}
         </Flex>
       ) : null}
-      <If condition={field.type !== "CHECKBOX"}>
+
+      {field.type !== "CHECKBOX" ? (
         <Text fontSize="sm" color="gray.500">
           {field.type === "FILE_UPLOAD" ? (
             <FormattedMessage
@@ -172,7 +172,7 @@ export function RecipientViewPetitionFieldCard({
             />
           )}
         </Text>
-      </If>
+      ) : null}
 
       {children}
       {showAddNewReply ? (

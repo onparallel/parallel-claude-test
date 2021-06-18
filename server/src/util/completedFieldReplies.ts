@@ -19,7 +19,7 @@ export function completedFieldReplies<T extends PartialField>(field: T) {
     case "CHECKBOX":
       return field.replies.filter((reply) => {
         if (field.options.limit.type === "EXACT") {
-          return reply.content.choices.length == field.options.limit.max;
+          return reply.content.choices.length === field.options.limit.max;
         } else {
           return reply.content.choices.length >= field.options.limit.min;
         }

@@ -483,16 +483,15 @@ export const publicCreateCheckboxReply = mutationField(
         const field = (await ctx.petitions.loadField(args.fieldId))!;
         validateCheckboxReplyValues(field, args.values);
       } catch (error) {
-        throw new ArgValidationError(info, "value", error.message);
+        throw new ArgValidationError(info, "values", error.message);
       }
     },
     resolve: async (_, args, ctx) => {
-      const field = (await ctx.petitions.loadField(args.fieldId))!;
       return await ctx.petitions.createPetitionFieldReply(
         {
           petition_field_id: args.fieldId,
           petition_access_id: ctx.access!.id,
-          type: field.type,
+          type: "CHECKBOX",
           content: { choices: args.values },
         },
         ctx.contact!
@@ -523,7 +522,7 @@ export const publicUpdateCheckboxReply = mutationField(
         const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
         validateCheckboxReplyValues(field, args.values);
       } catch (error) {
-        throw new ArgValidationError(info, "value", error.message);
+        throw new ArgValidationError(info, "values", error.message);
       }
     },
     resolve: async (_, args, ctx) => {
@@ -585,12 +584,11 @@ export const publicCreateDynamicSelectReply = mutationField(
       }
     },
     resolve: async (_, args, ctx) => {
-      const field = (await ctx.petitions.loadField(args.fieldId))!;
       return await ctx.petitions.createPetitionFieldReply(
         {
           petition_field_id: args.fieldId,
           petition_access_id: ctx.access!.id,
-          type: field.type,
+          type: "DYNAMIC_SELECT",
           content: { columns: args.value },
         },
         ctx.contact!

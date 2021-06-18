@@ -76,8 +76,8 @@
   },
   {
     "term": "component.checkbox-type-label.up-to",
-    "definition": "Escoja hasta {X} opciones",
-    "context": "Choose up to {X} options"
+    "definition": "Escoja hasta {X, plural, =1{# opción} other{# opciones}}",
+    "context": "Choose up to {X, plural, =1{# option} other{# options}}"
   },
   {
     "term": "component.close-petition-dialog.attach-pdf-export.checkbox",
@@ -3713,6 +3713,11 @@
     "term": "petition.name-label",
     "definition": "Nombre de la petición",
     "context": "Petition name"
+  },
+  {
+    "term": "petition.no-checkbox-fields-without-options-error",
+    "definition": "Agregue una o más opciones a todos los campos de opciones múltiples.",
+    "context": "Please add one or more options to all Multiple options fields."
   },
   {
     "term": "petition.no-fields-error",

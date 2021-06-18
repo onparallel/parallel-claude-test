@@ -1,3 +1,4 @@
+import { difference } from "remeda";
 import { PetitionField } from "../../db/__types";
 import { DynamicSelectOption } from "../helpers/parseDynamicSelectValues";
 
@@ -40,11 +41,7 @@ export function validateCheckboxReplyValues(
   field: PetitionField,
   values: string[]
 ) {
-  const valuesSet = new Set(field.options.values);
-
-  const mixedSet = new Set([...values, ...field.options.values]);
-
-  if (mixedSet.size != valuesSet.size) {
+  if (difference(values, field.options.values).length !== 0) {
     throw new Error(`Invalid values`);
   }
 }

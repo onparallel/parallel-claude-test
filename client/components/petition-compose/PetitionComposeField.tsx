@@ -65,9 +65,9 @@ import { PetitionComposeFieldAttachment } from "./PetitionComposeFieldAttachment
 import { CheckboxTypeLabel } from "../petition-common/CheckboxTypeLabel";
 import { PetitionFieldVisibilityEditor } from "./PetitionFieldVisibilityEditor";
 import {
-  PetitionFieldOptionsEditor,
-  PetitionFieldOptionsEditorRef,
-} from "./PetitionFieldOptionsEditor";
+  PetitionFieldOptionsListEditor,
+  PetitionFieldOptionsListEditorRef,
+} from "./PetitionFieldOptionsListEditor";
 
 export interface PetitionComposeFieldProps {
   petitionId: string;
@@ -489,7 +489,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     }
   }, []);
 
-  const fieldOptionsRef = useRef<PetitionFieldOptionsEditorRef>(null);
+  const fieldOptionsRef = useRef<PetitionFieldOptionsListEditorRef>(null);
   const focusFieldOptions = useCallback((atStart?: boolean) => {
     fieldOptionsRef.current?.focus(atStart ? "START" : undefined);
   }, []);
@@ -615,9 +615,25 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               id={`field-required-${field.id}`}
               height="20px"
               isChecked={!field.optional}
-              onChange={(event) =>
-                onFieldEdit({ optional: !event.target.checked })
-              }
+              onChange={(event) => {
+                if (field.type === "CHECKBOX") {
+                  onFieldEdit({
+                    optional: !event.target.checked,
+                    options: {
+                      ...field.options,
+                      limit: {
+                        ...field.options.limit,
+                        min:
+                          field.options.limit.min == 0 && !event.target.checked
+                            ? 1
+                            : field.options.limit.min,
+                      },
+                    },
+                  });
+                } else {
+                  onFieldEdit({ optional: !event.target.checked });
+                }
+              }}
             />
           </FormControl>
         )}
@@ -698,12 +714,12 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           {field.type === "CHECKBOX" ? (
             <CheckboxTypeLabel
               fontSize="xs"
-              pb={2}
-              pl={2}
+              paddingBottom={2}
+              paddingLeft={2}
               options={field.options}
             />
           ) : null}
-          <PetitionFieldOptionsEditor
+          <PetitionFieldOptionsListEditor
             ref={fieldOptionsRef}
             field={field}
             onFieldEdit={onFieldEdit}
@@ -936,11 +952,11 @@ const fragments = {
         attachments {
           ...PetitionComposeField_PetitionFieldAttachment
         }
-        ...PetitionFieldOptionsEditor_PetitionField
+        ...PetitionFieldOptionsListEditor_PetitionField
         ...PetitionFieldVisibilityEditor_PetitionField
       }
       ${this.PetitionFieldAttachment}
-      ${PetitionFieldOptionsEditor.fragments.PetitionField}
+      ${PetitionFieldOptionsListEditor.fragments.PetitionField}
       ${PetitionFieldVisibilityEditor.fragments.PetitionField}
     `;
   },

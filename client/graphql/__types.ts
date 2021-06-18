@@ -3948,7 +3948,7 @@ export type PetitionComposeField_PetitionFieldFragment = {
       __typename?: "PetitionFieldAttachment";
     } & PetitionComposeField_PetitionFieldAttachmentFragment
   >;
-} & PetitionFieldOptionsEditor_PetitionFieldFragment &
+} & PetitionFieldOptionsListEditor_PetitionFieldFragment &
   PetitionFieldVisibilityEditor_PetitionFieldFragment;
 
 export type PetitionComposeField_PetitionFieldAttachmentFragment = {
@@ -4060,7 +4060,7 @@ export type PetitionComposeFieldSettings_PetitionFieldFragment = {
   visibility?: Maybe<{ [key: string]: any }>;
 };
 
-export type PetitionFieldOptionsEditor_PetitionFieldFragment = {
+export type PetitionFieldOptionsListEditor_PetitionFieldFragment = {
   __typename?: "PetitionField";
   id: string;
   type: PetitionFieldType;
@@ -6739,8 +6739,8 @@ export const PetitionComposeField_updateFieldAttachments_PetitionFieldFragmentDo
   }
   ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
 `;
-export const PetitionFieldOptionsEditor_PetitionFieldFragmentDoc = gql`
-  fragment PetitionFieldOptionsEditor_PetitionField on PetitionField {
+export const PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc = gql`
+  fragment PetitionFieldOptionsListEditor_PetitionField on PetitionField {
     id
     type
     options
@@ -6779,11 +6779,11 @@ export const PetitionComposeField_PetitionFieldFragmentDoc = gql`
     attachments {
       ...PetitionComposeField_PetitionFieldAttachment
     }
-    ...PetitionFieldOptionsEditor_PetitionField
+    ...PetitionFieldOptionsListEditor_PetitionField
     ...PetitionFieldVisibilityEditor_PetitionField
   }
   ${PetitionComposeField_PetitionFieldAttachmentFragmentDoc}
-  ${PetitionFieldOptionsEditor_PetitionFieldFragmentDoc}
+  ${PetitionFieldOptionsListEditor_PetitionFieldFragmentDoc}
   ${PetitionFieldVisibilityEditor_PetitionFieldFragmentDoc}
 `;
 export const ReferencedFieldDialogDialog_PetitionFieldFragmentDoc = gql`

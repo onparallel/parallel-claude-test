@@ -43,7 +43,7 @@ type VisibilityField = {
   replies: { content: any }[];
 };
 
-function evaluatePredicate<T extends string | number>(
+function evaluatePredicate<T extends string | number | string[]>(
   reply: T | string[],
   operator: PetitionFieldVisibilityCondition["operator"],
   value: T | null
@@ -80,7 +80,7 @@ function evaluatePredicate<T extends string | number>(
     case "NOT_CONTAIN":
       return !a.toString().includes(b.toString());
     case "NUMBER_OF_SUBREPLIES":
-      return (a as string[]).length == b;
+      return (a as string[]).length === b;
     default:
       return false;
   }

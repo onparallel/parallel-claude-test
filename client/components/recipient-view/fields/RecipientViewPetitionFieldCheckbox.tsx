@@ -1,7 +1,7 @@
 import { Checkbox, Stack, Text, Flex } from "@chakra-ui/react";
 import { RadioButtonSelected } from "@parallel/chakra/icons";
 import { CheckboxTypeLabel } from "@parallel/components/petition-common/CheckboxTypeLabel";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import {
   useCreateCheckboxReply,
@@ -56,8 +56,9 @@ export function RecipientViewPetitionFieldCheckbox({
   const { type = "UNLIMITED", max = 1 } = limit ?? {};
 
   const isRejected = field.replies[0]?.status === "REJECTED" ?? false;
-
   const showRadio = max === 1 && type !== "UNLIMITED";
+  const fieldId = field.id;
+  const replyId = field.replies[0]?.id;
 
   const [checkedItems, setCheckedItems] = useState(
     field.replies[0]?.content?.choices ?? ([] as string[])
@@ -65,7 +66,7 @@ export function RecipientViewPetitionFieldCheckbox({
   const [isSaving, setIsSaving] = useState(false);
 
   const updateCheckboxReply = useUpdateCheckboxReply();
-  const handleUpdate = (replyId: string) => async (values: string[]) => {
+  const handleUpdate = async (values: string[]) => {
     setIsSaving(true);
     await updateCheckboxReply({
       petitionId,
@@ -77,7 +78,7 @@ export function RecipientViewPetitionFieldCheckbox({
   };
 
   const createChekcboxReply = useCreateCheckboxReply();
-  const handleCreate = (fieldId: string) => async (values: string[]) => {
+  const handleCreate = async (values: string[]) => {
     setIsSaving(true);
     await createChekcboxReply({
       petitionId,
@@ -89,21 +90,19 @@ export function RecipientViewPetitionFieldCheckbox({
   };
 
   const deleteReply = useDeletePetitionReply();
-  const handleDelete = async (replyId: string) => {
+  const handleDelete = async () => {
     setIsSaving(true);
-    await deleteReply({ petitionId, fieldId: field.id, replyId, keycode });
+    await deleteReply({ petitionId, fieldId, replyId, keycode });
     setIsSaving(false);
   };
 
-  useEffect(() => {
-    if (isDisabled) return;
-
+  const handleApiChanges = (checkedItems: string[]) => {
     const filteredChecked = checkedItems.filter(
       (c: string) => values?.some((v: string) => v === c) ?? true
     );
 
     if (!filteredChecked.length && field.replies.length) {
-      handleDelete(field.replies[0].id);
+      handleDelete();
     } else if (field.replies.length) {
       if (
         haveChanges({
@@ -112,14 +111,12 @@ export function RecipientViewPetitionFieldCheckbox({
           max: type == "UNLIMITED" ? values.length : max,
         })
       ) {
-        const update = handleUpdate(field.replies[0].id);
-        update(filteredChecked);
+        handleUpdate(filteredChecked);
       }
     } else {
-      const create = handleCreate(field.id);
-      create(filteredChecked);
+      handleCreate(filteredChecked);
     }
-  }, [checkedItems]);
+  };
 
   return (
     <RecipientViewPetitionFieldCard
@@ -134,7 +131,11 @@ export function RecipientViewPetitionFieldCheckbox({
       <Stack>
         <Flex flexWrap="wrap" alignItems="center">
           {field.type === "CHECKBOX" ? (
-            <CheckboxTypeLabel fontSize="sm" mr={2} options={field.options} />
+            <CheckboxTypeLabel
+              fontSize="sm"
+              marginRight={2}
+              options={field.options}
+            />
           ) : null}
           {!isSaving ? (
             <Text
@@ -190,7 +191,11 @@ export function RecipientViewPetitionFieldCheckbox({
                 isChecked={checkedItems.includes(option)}
                 onChange={(e) => {
                   e.preventDefault();
-                  setCheckedItems(() => (e.target.checked ? [option] : []));
+                  setCheckedItems(() => {
+                    const newChecked = e.target.checked ? [option] : [];
+                    handleApiChanges(newChecked);
+                    return newChecked;
+                  });
                 }}
                 variant="radio"
               >
@@ -212,11 +217,13 @@ export function RecipientViewPetitionFieldCheckbox({
                   ) {
                     return;
                   }
-                  setCheckedItems((checked: string[]) =>
-                    e.target.checked
+                  setCheckedItems((checked: string[]) => {
+                    const newChecked = e.target.checked
                       ? [...checked, option]
-                      : checked.filter((o: string) => o !== option)
-                  );
+                      : checked.filter((o: string) => o !== option);
+                    handleApiChanges(newChecked);
+                    return newChecked;
+                  });
                 }}
               >
                 {option}

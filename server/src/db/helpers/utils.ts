@@ -24,6 +24,16 @@ export const isOptionsCompatible = (
   newType: PetitionFieldType
 ) => {
   return (
+    ["TEXT", "SHORT_TEXT", "SELECT", "CHECKBOX"].includes(oldType) &&
+    ["TEXT", "SHORT_TEXT", "SELECT", "CHECKBOX"].includes(newType)
+  );
+};
+
+export const isSettingsCompatible = (
+  oldType: PetitionFieldType,
+  newType: PetitionFieldType
+) => {
+  return (
     ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(
       oldType
     ) &&

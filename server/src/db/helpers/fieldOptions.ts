@@ -5,7 +5,7 @@ import {
 } from "../__types";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
-import { isOptionsCompatible } from "./utils";
+import { isOptionsCompatible, isSettingsCompatible } from "./utils";
 
 const SCHEMAS = {
   TEXT: {
@@ -167,6 +167,9 @@ export function defaultFieldOptions(
 
   if (!field || !isOptionsCompatible(field.type, type)) {
     options = {};
+  }
+
+  if (!field || !isSettingsCompatible(field.type, type)) {
     optional = false;
     multiple = false;
   }
