@@ -205,11 +205,11 @@ export const AppLayoutNavbar = Object.assign(
             </Portal>
           </Menu>
         </Flex>
-        <List
-          as={Flex}
+        <Flex
+          as={List}
           alignSelf="stretch"
           flexDirection={{ base: "row", sm: "column" }}
-          flex={{ base: 1, sm: 0 }}
+          flex={{ base: 1, sm: "none" }}
           justifyContent="center"
           marginX={{ base: 2, sm: 0 }}
           marginY={{ base: 0, sm: 2 }}
@@ -226,7 +226,7 @@ export const AppLayoutNavbar = Object.assign(
               </AppLayoutNavbarLink>
             </ListItem>
           ))}
-        </List>
+        </Flex>
         <Spacer display={{ base: "none", sm: "block" }} />
         <Center display={{ base: "none", sm: "flex" }} marginBottom={2}>
           <Menu id="help-menu" placement={isMobile ? "top-start" : "right"}>
