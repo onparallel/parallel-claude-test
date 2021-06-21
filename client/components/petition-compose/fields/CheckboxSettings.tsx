@@ -142,7 +142,7 @@ export function CheckboxSettings({
       optional: field.optional,
     });
 
-    if (_min != min) {
+    if (_min !== min) {
       setMin(_min);
       debouncedOnUpdate(field.id, {
         options: {
@@ -185,7 +185,7 @@ export function CheckboxSettings({
   };
 
   const handleChangeSelect = (_selected: OptionType | null) => {
-    if (_selected && _selected.value != selected?.value) {
+    if (_selected && _selected.value !== selected?.value) {
       setType(_selected.value);
       debouncedOnUpdate(field.id, {
         options: {

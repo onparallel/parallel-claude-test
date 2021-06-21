@@ -33,8 +33,8 @@ const haveChanges = ({
   max: number;
 }) => {
   return max === 1
-    ? checked[0] != choices[0]
-    : checked.length != choices.length;
+    ? checked[0] !== choices[0]
+    : checked.length !== choices.length;
 };
 
 function CustomIcon() {
@@ -121,7 +121,7 @@ export function RecipientViewPetitionFieldCheckbox({
         haveChanges({
           checked: filteredChecked,
           choices: field.replies[0].content.choices,
-          max: type == "UNLIMITED" ? values.length : max,
+          max: type === "UNLIMITED" ? values.length : max,
         })
       ) {
         handleUpdate(filteredChecked);
