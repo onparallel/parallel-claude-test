@@ -29,7 +29,7 @@ export function TimelineReplyCreatedEvent({
         id="timeline.reply-created-description"
         defaultMessage="{same, select, true {You} other {{createdBy}}} replied to the field {field} {timeAgo}"
         values={{
-          same: createdBy?.__typename == "User" && createdBy.id === userId,
+          same: createdBy?.__typename === "User" && createdBy.id === userId,
           createdBy:
             createdBy?.__typename === "PetitionAccess" ? (
               <ContactLink contact={createdBy.contact} />

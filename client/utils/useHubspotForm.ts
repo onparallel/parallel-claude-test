@@ -29,7 +29,7 @@ export function useHubspotForm(data: HubspotFormProps | null) {
     }
     // Hubspot expects jQuery when using onFormSubmit so we fake it out here
     (window as any).jQuery = function (nodeOrSelector: string | Element) {
-      if (typeof nodeOrSelector == "string") {
+      if (typeof nodeOrSelector === "string") {
         return document.querySelector(nodeOrSelector);
       }
       return nodeOrSelector;

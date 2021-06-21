@@ -70,6 +70,7 @@ export function values<T>(values: T[]): QueryItem<T | null>;
 export function values<T extends string>(values: T[]): QueryItem<T | null>;
 export function values(values: any[]): QueryItem<any> {
   return new QueryItem<any>((value) => {
+    // eslint-disable-next-line eqeqeq
     return values.find((v) => v == value) ?? null;
   });
 }
