@@ -1501,31 +1501,36 @@ export class PetitionRepository extends BaseRepository {
     user: User,
     data?: Partial<CreatePetition>
   ) {
-    const petition = await this.loadPetition(petitionId);
+    const sourcePetition = await this.loadPetition(petitionId);
 
     return await this.withTransaction(async (t) => {
       const fromTemplateId =
         !data?.is_template &&
-        (petition?.is_template || petition?.from_template_id)
-          ? petition.from_template_id ?? petitionId
+        (sourcePetition?.is_template || sourcePetition?.from_template_id)
+          ? sourcePetition.from_template_id ?? petitionId
           : null;
 
       const [cloned] = await this.insert(
         "petition",
         {
-          ...omit(petition!, [
+          ...omit(sourcePetition!, [
             "id",
             "created_at",
             "updated_at",
             "template_public",
             "from_template_id",
             "signature_config",
+            // avoid copying reminders and deadline data if creating a template or cloning from a template
+            ...(data?.is_template || sourcePetition?.is_template
+              ? (["reminders_active", "reminders_config", "deadline"] as const)
+              : ([] as const)),
+            // avoid copying template_description if creating a petition
             ...(data?.is_template
-              ? (["reminders_active", "reminders_config"] as const)
+              ? ([] as const)
               : (["template_description"] as const)),
           ]),
           org_id: user.org_id,
-          status: petition?.is_template ? null : "DRAFT",
+          status: sourcePetition?.is_template ? null : "DRAFT",
           created_by: `User:${user.id}`,
           updated_by: `User:${user.id}`,
           from_template_id: fromTemplateId,
@@ -1602,7 +1607,7 @@ export class PetitionRepository extends BaseRepository {
       }
 
       // copy original tag ids to cloned petition
-      if (!petition!.is_template) {
+      if (!sourcePetition!.is_template) {
         await this.raw(
           /* sql */ `
         insert into petition_tag (petition_id, tag_id)

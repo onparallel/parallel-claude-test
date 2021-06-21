@@ -768,7 +768,7 @@ describe("GraphQL/Petitions", () => {
       });
     });
 
-    it("doesn't copy tags when creating a petition from a public template", async () => {
+    it("don't copy tags when creating a petition from a public template", async () => {
       const [tag] = await mocks.createRandomTags(otherOrg.id);
       const [publicTemplateWithTags] = await mocks.createRandomPetitions(
         otherOrg.id,
@@ -813,6 +813,141 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeUndefined();
       expect(data.createPetition).toEqual({ tags: [] });
+    });
+
+    it("don't copy reminders configuration when creating a petition from a template", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          template_public: false,
+          is_template: true,
+          status: null,
+          name: "KYC",
+          reminders_active: true,
+          reminders_config: {
+            time: "12:00",
+            offset: 1,
+            timezone: "Europe/Madrid",
+            weekdaysOnly: true,
+          },
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID, $locale: PetitionLocale!) {
+            createPetition(petitionId: $petitionId, locale: $locale) {
+              ... on Petition {
+                remindersConfig {
+                  offset
+                  time
+                  timezone
+                  weekdaysOnly
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", template.id),
+          locale: "es",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.createPetition).toEqual({ remindersConfig: null });
+    });
+
+    it("don't copy deadline configuration when creating a petition from a template", async () => {
+      const [template] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          template_public: false,
+          is_template: true,
+          status: null,
+          name: "KYC",
+          deadline: new Date(),
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID, $locale: PetitionLocale!) {
+            createPetition(petitionId: $petitionId, locale: $locale) {
+              ... on Petition {
+                deadline
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", template.id),
+          locale: "es",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.createPetition).toEqual({ deadline: null });
+    });
+
+    it("copy reminders and deadline config when cloning a petition", async () => {
+      const deadline = new Date();
+      const [petition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({
+          template_public: false,
+          is_template: false,
+          status: "DRAFT",
+          name: "KYC",
+          deadline,
+          reminders_active: true,
+          reminders_config: {
+            time: "12:00",
+            offset: 1,
+            timezone: "Europe/Madrid",
+            weekdaysOnly: true,
+          },
+        })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID, $locale: PetitionLocale!) {
+            createPetition(petitionId: $petitionId, locale: $locale) {
+              ... on Petition {
+                deadline
+                remindersConfig {
+                  offset
+                  time
+                  timezone
+                  weekdaysOnly
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", petition.id),
+          locale: "es",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.createPetition).toEqual({
+        remindersConfig: {
+          time: "12:00",
+          offset: 1,
+          timezone: "Europe/Madrid",
+          weekdaysOnly: true,
+        },
+        deadline: deadline.toISOString(),
+      });
     });
 
     it("creates a petition based on a public template", async () => {
