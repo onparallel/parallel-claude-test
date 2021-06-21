@@ -11,8 +11,6 @@ export function CheckboxTypeLabel({
 }: CheckboxTypeLabelProps) {
   const { type = "UNLIMITED", min = 1, max = 1 } = options.limit ?? {};
 
-  const show = (type != "RADIO" && max > 1) || type === "UNLIMITED";
-
   const getText = () => {
     switch (type) {
       case "UNLIMITED":
@@ -57,5 +55,5 @@ export function CheckboxTypeLabel({
     }
   };
 
-  return show ? <Text {...props}>{getText()}</Text> : null;
+  return <Text {...props}>{getText()}</Text>;
 }

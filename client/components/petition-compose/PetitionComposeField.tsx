@@ -518,8 +518,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
   const letter = letters();
 
   return (
-    <Box {...props}>
-      <Stack direction="row" marginBottom={1}>
+    <Stack spacing={1} {...props}>
+      <Stack direction="row">
         <Box flex={1}>
           <Input
             id={`field-title-${field.id}`}
@@ -705,39 +705,40 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           }
         }}
       />
-      <Flex flexWrap="wrap" margin={-1} marginTop={0}>
-        {field.attachments.map((attachment) => (
-          <PetitionComposeFieldAttachment
-            key={attachment.id}
-            attachment={attachment}
-            progress={attachmentUploadProgress[attachment.id]}
-            onDownload={() => onDownloadAttachment(attachment.id)}
-            onRemove={() => onRemoveAttachment(attachment.id)}
-            margin={1}
-          />
-        ))}
-      </Flex>
-      {field.type === "SELECT" || field.type === "CHECKBOX" ? (
-        <Box marginTop={1}>
-          {field.type === "CHECKBOX" ? (
-            <CheckboxTypeLabel
-              fontSize="xs"
-              paddingBottom={2}
-              paddingLeft={2}
-              options={field.options}
-            />
-          ) : null}
-          <PetitionFieldOptionsListEditor
-            ref={fieldOptionsRef}
-            field={field}
-            onFieldEdit={onFieldEdit}
-            showError={showError}
-            onFocusNextField={onFocusNextField}
-            onFocusDescription={focusDescription}
-          />
+      {field.attachments.length ? (
+        <Box>
+          <Flex flexWrap="wrap" margin={-1}>
+            {field.attachments.map((attachment) => (
+              <PetitionComposeFieldAttachment
+                key={attachment.id}
+                attachment={attachment}
+                progress={attachmentUploadProgress[attachment.id]}
+                onDownload={() => onDownloadAttachment(attachment.id)}
+                onRemove={() => onRemoveAttachment(attachment.id)}
+                margin={1}
+              />
+            ))}
+          </Flex>
         </Box>
+      ) : null}
+      {field.type === "CHECKBOX" ? (
+        <CheckboxTypeLabel
+          options={field.options}
+          fontSize="xs"
+          color="gray.600"
+        />
+      ) : null}
+      {field.type === "SELECT" || field.type === "CHECKBOX" ? (
+        <PetitionFieldOptionsListEditor
+          ref={fieldOptionsRef}
+          field={field}
+          onFieldEdit={onFieldEdit}
+          showError={showError}
+          onFocusNextField={onFocusNextField}
+          onFocusDescription={focusDescription}
+        />
       ) : field.type === "DYNAMIC_SELECT" ? (
-        <Box marginTop={1} paddingLeft={2}>
+        <Box>
           {field.options.labels?.length ? (
             <>
               <Text as="h6" fontSize="sm">
@@ -787,7 +788,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       ) : null}
       {field.visibility ? (
         <Box
-          marginTop={2}
+          paddingTop={1}
           marginBottom={
             field.visibility && field.visibility.conditions.length < 5 ? -5 : 0
           }
@@ -801,7 +802,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           />
         </Box>
       ) : null}
-    </Box>
+    </Stack>
   );
 });
 

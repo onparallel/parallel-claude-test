@@ -247,6 +247,7 @@ export function CheckboxSettings({
             <Select
               options={options}
               value={selected}
+              isSearchable={false}
               onChange={handleChangeSelect}
               {...reactSelectProps}
             />

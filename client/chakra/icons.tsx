@@ -1218,7 +1218,7 @@ export const FieldShortTextIcon = createIcon({
     <g
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.2"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -1236,7 +1236,7 @@ export const FieldHeadingIcon = createIcon({
     <g
       fill="none"
       stroke="currentColor"
-      strokeWidth="2.6"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -1255,7 +1255,7 @@ export const FieldCheckboxIcon = createIcon({
     <g
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.33"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
