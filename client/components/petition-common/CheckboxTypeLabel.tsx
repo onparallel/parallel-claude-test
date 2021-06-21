@@ -21,6 +21,7 @@ export function CheckboxTypeLabel({
           />
         );
 
+      case "RADIO":
       case "EXACT":
         return (
           <FormattedMessage
