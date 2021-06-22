@@ -135,12 +135,26 @@ export const User = objectType({
     });
     t.field("unreadNotificationIds", {
       authorize: rootIsContextUser(),
-      type: nonNull(list(nonNull("String"))),
+      type: nonNull(list(nonNull("GID"))),
       resolve: async ({ id }, _, ctx) => {
         const notifications =
           await ctx.petitions.loadUnreadPetitionUserNotificationsByUserId(id);
-        return notifications.map((n) =>
-          toGlobalId("PetitionUserNotification", n.id)
+        return notifications.map((n) => n.id);
+      },
+    });
+    t.paginationField("notifications", {
+      authorize: rootIsContextUser(),
+      description:
+        "Read and unread user notifications about events on their petitions",
+      type: "PetitionUserNotification",
+      additionalArgs: {
+        filter: arg({ type: "PetitionUserNotificationFilter" }),
+      },
+      resolve: async (_, { limit, offset, filter }, ctx) => {
+        return await ctx.petitions.loadPetitionUserNotificationsByUserId(
+          ctx.user!.id,
+          { limit, offset },
+          filter
         );
       },
     });

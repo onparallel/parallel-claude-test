@@ -393,6 +393,11 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   PetitionUserGroupPermission: db.PetitionPermission;
+  PetitionUserNotificationPagination: {
+    // root type
+    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
+    totalCount: number; // Int!
+  };
   PetitionUserPermission: db.PetitionPermission;
   PetitionWithFieldAndReplies: {
     // root type
@@ -1094,6 +1099,11 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
+  PetitionUserNotificationPagination: {
+    // field return type
+    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
+    totalCount: number; // Int!
+  };
   PetitionUserPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1363,7 +1373,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
-    unreadNotificationIds: string[]; // [String!]!
+    unreadNotificationIds: NexusGenScalars["GID"][]; // [GID!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   UserAuthenticationToken: {
@@ -2042,6 +2052,11 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     updatedAt: "DateTime";
   };
+  PetitionUserNotificationPagination: {
+    // field return type name
+    items: "PetitionUserNotification";
+    totalCount: "Int";
+  };
   PetitionUserPermission: {
     // field return type name
     createdAt: "DateTime";
@@ -2311,7 +2326,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     role: "OrganizationRole";
     status: "UserStatus";
-    unreadNotificationIds: "String";
+    unreadNotificationIds: "GID";
     updatedAt: "DateTime";
   };
   UserAuthenticationToken: {
