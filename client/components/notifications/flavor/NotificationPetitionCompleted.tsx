@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import { Notification, NotificationBody } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
+import { FormattedMessage } from "react-intl";
 
 function NotificationAvatar() {
   return (
@@ -14,19 +15,30 @@ function NotificationAvatar() {
   );
 }
 
-function Body() {
-  return <NotificationBody body={"NotificationPetitionCompleted"} />;
-}
-
 export function NotificationPetitionCompleted({ notification }) {
-  const { id, timestamp, isRead } = notification;
+  const { id, timestamp, isRead, title } = notification;
+
+  const body = (
+    <FormattedMessage
+      id="ccomponent.notification-petition-completed.body"
+      defaultMessage="<b>{name}</b> completed the petition."
+      values={{
+        name: "Fullname destinatario",
+        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+      }}
+    />
+  );
+
+  const createdAt = timestamp;
+  const petition = { name: title };
+
   return (
     <Notification
       id={id}
       icon={<NotificationAvatar />}
-      body={<Body />}
-      title={"NotificationPetitionCompleted"}
-      timestamp={timestamp}
+      body={<NotificationBody body={body} />}
+      title={petition.name}
+      timestamp={createdAt}
       isRead={isRead}
     />
   );
@@ -36,7 +48,8 @@ NotificationPetitionCompleted.fragments = {
   PetitionCompletedNotification: gql`
     fragment NotificationEmailBounced_PetitionCompletedNotification on PetitionCompletedNotification {
       id
-      petitionId
+      petition
+      access
       createdAt
     }
   `,

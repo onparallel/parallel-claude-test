@@ -12,7 +12,7 @@ export const notificationsMock = [
     id: "1",
     type: "COMMENT_CREATED",
     title: "KYC_Cuatrecasas_2345",
-    body: "Lucas Ramírez ha escrito un comentario en el campo “Adjunta la fotocopia de tu DNI/NIE.”",
+    body: "Lucas Ramírez ha escrito un comentario en el campo “Adjunta la fotocopia de tu DNI/NIE texto más largo”",
     timestamp: new Date().getTime(),
     isRead: true,
     meta: {},

@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { Notification, NotificationBody } from "./Notification";
-import { Avatar } from "@chakra-ui/react";
+import { Avatar, Text } from "@chakra-ui/react";
+import { FormattedMessage } from "react-intl";
 
 function NotificationAvatar() {
   return (
@@ -14,19 +15,43 @@ function NotificationAvatar() {
   );
 }
 
-function Body() {
-  return <NotificationBody body={"NotificationComment"} />;
-}
-
 export function NotificationComment({ notification }) {
-  const { id, timestamp, isRead } = notification;
+  const { id, timestamp, isRead, title } = notification;
+
+  const isInternal = false;
+
+  const body = isInternal ? (
+    <FormattedMessage
+      id="ccomponent.notification-internal-comment.body"
+      defaultMessage='<b>{name}</b> has written an internal comment in the field "{field}".'
+      values={{
+        name: "Destinatario",
+        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+        field: "Campo",
+      }}
+    />
+  ) : (
+    <FormattedMessage
+      id="component.notification-comment.body"
+      defaultMessage='<b>{name}</b> has written a comment in the field "{field}".'
+      values={{
+        name: "Destinatario",
+        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+        field: "Campo",
+      }}
+    />
+  );
+
+  const createdAt = timestamp;
+  const petition = { name: title };
+
   return (
     <Notification
       id={id}
       icon={<NotificationAvatar />}
-      body={<Body />}
-      title={"NotificationComment"}
-      timestamp={timestamp}
+      body={<NotificationBody body={body} />}
+      title={petition.name}
+      timestamp={createdAt}
       isRead={isRead}
     />
   );
@@ -36,7 +61,9 @@ NotificationComment.fragments = {
   CommentCreatedNotification: gql`
     fragment NotificationComment_CommentCreatedNotification on CommentCreatedNotification {
       id
-      petitionId
+      petition
+      author
+      isInternal
       createdAt
     }
   `,

@@ -1,5 +1,5 @@
 import { Box, Center, Stack, Text } from "@chakra-ui/layout";
-import { IconButton, Tooltip } from "@chakra-ui/react";
+import { Circle } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
@@ -32,30 +32,30 @@ export function Notification({
         defaultMessage: "Mark as read",
       });
 
-  const handleMarkAsRead = () => {};
+  const handleMarkAsReadUnread = () => {
+    console.log(`mark as ${isRead ? "unread" : "read"}`, id);
+  };
 
   return (
     <Stack
-      position="relative"
       direction="row"
       background={isRead ? "white" : "purple.50"}
       spacing={0}
       paddingY={2}
       paddingX={4}
       _hover={{ background: "gray.75", ".mark-as": { display: "flex" } }}
+      _focus={{ background: "gray.75", ".mark-as": { display: "flex" } }}
       borderBottom="1px solid"
       borderColor="gray.200"
     >
       <Center width={"68px"}>
         {isRead ? null : (
-          <Box
-            position="absolute"
-            width="8px"
-            height="8px"
-            background="purple.400"
-            borderRadius="50%"
+          <Circle
+            boxSize={2}
+            backgroundColor="purple.400"
             left="14px"
-          ></Box>
+            position="absolute"
+          />
         )}
         {icon}
       </Center>
@@ -75,12 +75,13 @@ export function Notification({
           <IconButtonWithTooltip
             icon={isRead ? <EmailIcon /> : <EmailOpenedIcon />}
             fontSize="16px"
-            onClick={handleMarkAsRead}
+            onClick={handleMarkAsReadUnread}
             height="24px"
             minWidth="24px"
             borderRadius="5px"
             background="white"
             _hover={{ background: "gray.100" }}
+            _focus={{ background: "gray.100" }}
             aria-label={markAsReadText}
             label={markAsReadText}
           />
@@ -111,8 +112,12 @@ export function NotificationTitle({ title, ...props }: { title: string }) {
   );
 }
 
-export function NotificationBody({ body }: { body: string }) {
-  return <Text>{body}</Text>;
+export function NotificationBody({ body }: { body: any }) {
+  return (
+    <Text color="black" noOfLines={2}>
+      {body}
+    </Text>
+  );
 }
 
 function NotificationTimestamp({ time }: { time: string }) {
