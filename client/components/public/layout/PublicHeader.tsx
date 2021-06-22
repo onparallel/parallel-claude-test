@@ -164,6 +164,30 @@ function PublicHeaderMenu(props: StackProps) {
           </MenuList>
         </Portal>
       </Menu>
+      <Menu placement="bottom">
+        <MenuButton as={Button} variant="ghost" rightIcon={<ChevronDownIcon />}>
+          <FormattedMessage
+            id="public.solutions-link"
+            defaultMessage="Solutions"
+          />
+        </MenuButton>
+        <Portal>
+          <MenuList>
+            <MenuItemLink href="/solutions/law-firms">
+              <FormattedMessage
+                id="public.solutions.law-firms-link"
+                defaultMessage="Law firms"
+              />
+            </MenuItemLink>
+            <MenuItemLink href="/solutions/accountants">
+              <FormattedMessage
+                id="public.solutions.accountants-link"
+                defaultMessage="Accountants"
+              />
+            </MenuItemLink>
+          </MenuList>
+        </Portal>
+      </Menu>
       <NakedLink href="/about">
         <Button as="a" variant="ghost">
           <FormattedMessage id="public.about-link" defaultMessage="About" />
