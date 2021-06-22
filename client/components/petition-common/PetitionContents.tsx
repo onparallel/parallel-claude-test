@@ -213,7 +213,7 @@ function _PetitionContentsItem<
           />
         </PetitionContentsDivider>
       ) : null}
-      <Box as="li" listStyleType="none" display="flex">
+      <Box as="li" listStyleType="none" display="flex" flex="none">
         <Stack
           as={Button}
           direction="row"

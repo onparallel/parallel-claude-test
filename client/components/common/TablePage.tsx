@@ -59,7 +59,7 @@ export function TablePage<T, TContext = unknown>({
   const pagination = usePagination({ current: page, pageSize, totalCount });
   return (
     <Card display="flex" flexDirection="column" {...props}>
-      {header ? header : null}
+      {header ? <Box flex="none">{header}</Box> : null}
       <Flex
         flexDirection="column"
         flex="0 1 auto"
