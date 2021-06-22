@@ -25,6 +25,7 @@ import {
 } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
+import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
@@ -32,24 +33,28 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
+import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { useAddMemberGroupDialog } from "@parallel/components/organization/AddMemberGroupDialog";
 import { useConfirmRemoveMemberDialog } from "@parallel/components/organization/ConfirmRemoveMemberDialog";
+import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
 import {
   OrganizationGroupQuery,
   OrganizationGroupQueryVariables,
   OrganizationGroupUserQuery,
+  OrganizationGroup_UserGroupMemberFragment,
   useOrganizationGroupQuery,
   useOrganizationGroupUserQuery,
   useOrganizationGroup_addUsersToUserGroupMutation,
-  useOrganizationGroup_removeUsersFromGroupMutation,
-  useOrganizationGroup_deleteUserGroupMutation,
   useOrganizationGroup_cloneUserGroupMutation,
+  useOrganizationGroup_deleteUserGroupMutation,
+  useOrganizationGroup_removeUsersFromGroupMutation,
   useOrganizationGroup_updateUserGroupMutation,
-  OrganizationGroup_UserGroupMemberFragment,
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { withError } from "@parallel/utils/promises/withError";
 import {
   integer,
   sorting,
@@ -57,20 +62,14 @@ import {
   useQueryState,
   values,
 } from "@parallel/utils/queryState";
+import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useAddMemberGroupDialog } from "@parallel/components/organization/AddMemberGroupDialog";
-import { useConfirmDeleteGroupsDialog } from "..";
-import { OrganizationGroupListTableHeader } from "@parallel/components/organization/OrganizationGroupListTableHeader";
-import { UnwrapPromise } from "@parallel/utils/types";
-import { useRouter } from "next/router";
 import { sort, sortBy } from "remeda";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
-import { If } from "@parallel/utils/conditions";
-import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { withError } from "@parallel/utils/promises/withError";
+import { useConfirmDeleteGroupsDialog } from "..";
 
 const SORTING = ["fullName", "email", "addedAt"] as const;
 
@@ -442,16 +441,14 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
 const EditableControls = ({ ...props }) => {
   const { isEditing, getEditButtonProps } = useEditableControls();
 
-  return (
-    <If condition={!isEditing}>
-      <IconButtonWithTooltip
-        label={props.label}
-        size="sm"
-        icon={<EditSimpleIcon />}
-        {...getEditButtonProps()}
-        {...props}
-      />
-    </If>
+  return isEditing ? null : (
+    <IconButtonWithTooltip
+      label={props.label}
+      size="sm"
+      icon={<EditSimpleIcon />}
+      {...getEditButtonProps()}
+      {...props}
+    />
   );
 };
 

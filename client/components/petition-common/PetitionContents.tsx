@@ -4,6 +4,7 @@ import {
   BoxProps,
   Button,
   Center,
+  Circle,
   Flex,
   Stack,
   Text,
@@ -20,7 +21,6 @@ import {
   PetitionSignatureRequestStatus,
 } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
-import { If } from "@parallel/utils/conditions";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import {
   filterPetitionFields,
@@ -135,16 +135,13 @@ function SignatureStatusInfo({
         </Text>
         <Tooltip label={labels[status]}>
           <Flex alignItems="center">
-            <If condition={status === "START"}>
-              <Box
-                width="4px"
-                height="4px"
-                borderColor="purple.500"
-                borderWidth="4px"
-                borderRadius="100%"
-                marginRight={2}
+            {status === "START" ? (
+              <Circle
+                boxSize={2}
+                backgroundColor="purple.500"
+                marginRight="2px"
               />
-            </If>
+            ) : null}
             <SignatureIcon
               color={status === "COMPLETED" ? "gray.700" : "gray.400"}
             />

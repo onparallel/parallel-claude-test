@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Box, Flex, Tooltip } from "@chakra-ui/react";
+import { Circle, Flex, Tooltip } from "@chakra-ui/react";
 import {
   AlertCircleIcon,
   SignatureIcon,
@@ -9,7 +9,6 @@ import {
   PetitionSignatureCellContent_PetitionFragment,
   PetitionSignatureCellContent_UserFragment,
 } from "@parallel/graphql/__types";
-import { If } from "@parallel/utils/conditions";
 import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 
@@ -26,16 +25,9 @@ export function PetitionSignatureCellContent({
   return user.hasPetitionSignature && status ? (
     <Tooltip label={labels[status]}>
       <Flex alignItems="center">
-        <If condition={status === "START"}>
-          <Box
-            width="4px"
-            height="4px"
-            borderColor="purple.500"
-            borderWidth="4px"
-            borderRadius="100%"
-            marginRight="2px"
-          />
-        </If>
+        {status === "START" ? (
+          <Circle boxSize={2} backgroundColor="purple.500" marginRight="2px" />
+        ) : null}
         <SignatureIcon
           color={status === "COMPLETED" ? "gray.700" : "gray.400"}
         />

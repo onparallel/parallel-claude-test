@@ -1,5 +1,4 @@
-import { Box, BoxProps, Tooltip } from "@chakra-ui/react";
-import { If } from "@parallel/utils/conditions";
+import { Box, BoxProps, Circle, Tooltip } from "@chakra-ui/react";
 import { useIntl } from "react-intl";
 
 export interface RecipientViewCommentsBadgeProps extends BoxProps {
@@ -17,20 +16,15 @@ export function RecipientViewCommentsBadge({
     id: "recipient-view.unread-comments",
     defaultMessage: "There's unread comments",
   });
-  return (
-    <If condition={hasUnreadComments}>
-      <Box display="inline-block" aria-label={label} role="img" {...props}>
-        <Tooltip label={label}>
-          <Box
-            width="4px"
-            height="4px"
-            borderColor={isReversedPurple ? "white" : "purple.500"}
-            borderWidth="4px"
-            transform="rotate(-45deg)"
-            borderRadius="9999px"
-          />
-        </Tooltip>
-      </Box>
-    </If>
-  );
+  return hasUnreadComments ? (
+    <Box display="inline-block" aria-label={label} role="img" {...props}>
+      <Tooltip label={label}>
+        <Circle
+          boxSize={2}
+          backgroundColor={isReversedPurple ? "white" : "purple.500"}
+          marginRight="2px"
+        />
+      </Tooltip>
+    </Box>
+  ) : null;
 }

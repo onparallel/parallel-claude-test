@@ -3,7 +3,6 @@ import { DeleteIcon } from "@parallel/chakra/icons";
 import { GrowingTextarea } from "@parallel/components/common/GrowingTextarea";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment } from "@parallel/graphql/__types";
-import { If } from "@parallel/utils/conditions";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { FieldOptions } from "@parallel/utils/petitionFields";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
@@ -200,7 +199,7 @@ export function RecipientViewPetitionFieldText({
       onAddNewReply={handleAddNewReply}
       onDownloadAttachment={onDownloadAttachment}
     >
-      <If condition={field.replies.length}>
+      {field.replies.length ? (
         <List as={Stack} marginTop={2}>
           <AnimatePresence initial={false}>
             {field.replies.map((reply) => (
@@ -222,12 +221,8 @@ export function RecipientViewPetitionFieldText({
             ))}
           </AnimatePresence>
         </List>
-      </If>
-      <If
-        condition={
-          (field.multiple && showNewReply) || field.replies.length === 0
-        }
-      >
+      ) : null}
+      {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
           {field.type === "TEXT" ? (
             <GrowingTextarea {...inputProps} />
@@ -240,7 +235,7 @@ export function RecipientViewPetitionFieldText({
             />
           </Center>
         </Flex>
-      </If>
+      ) : null}
     </RecipientViewPetitionFieldCard>
   );
 }
