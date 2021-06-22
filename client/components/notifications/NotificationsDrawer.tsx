@@ -8,7 +8,11 @@ import {
   DrawerHeader,
   DrawerOverlay,
 } from "@chakra-ui/modal";
+import { BoxProps, Button } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect } from "react";
+import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { NotificationsList } from "./NotificationsList";
 import { NotificationsSelect } from "./NotificationsSelect";
@@ -16,107 +20,42 @@ import { NotificationsSelect } from "./NotificationsSelect";
 export interface NotificationsDrawerProps {
   onClose: () => void;
   isOpen: boolean;
+  notifications: any[];
+  fetchData: () => void;
+  onChangeFilterBy: (arg0: string) => void;
+  selectedFilter: string;
+  hasMore: boolean;
+  onMarkAllAsRead: () => void;
 }
 
 export function NotificationsDrawer({
   onClose,
   isOpen,
+  notifications,
+  fetchData,
+  onChangeFilterBy,
+  selectedFilter,
+  hasMore,
+  onMarkAllAsRead,
 }: NotificationsDrawerProps) {
-  const notifications = [
-    {
-      id: "1",
-      type: "COMMENT",
-      title: "Notification 1",
-      body: "Body notification",
-      timestamp: new Date().getTime(),
-      isUnread: true,
-      meta: {},
-    },
-    {
-      id: "2",
-      type: "PETITION-COMPLETED",
-      title: "Notification 2",
-      body: "Body notification",
-      timestamp: new Date().getTime(),
-      isUnread: false,
-      meta: {},
-    },
-    {
-      id: "3",
-      type: "SIGNATURE-COMPLETED",
-      title: "Notification 3",
-      body: "Body notification",
-      timestamp: new Date().getTime(),
-      isUnread: false,
-      meta: {},
-    },
-    {
-      id: "4",
-      type: "SIGNATURE-CANCELED",
-      title: "Notification 4",
-      body: "Body notification",
-      timestamp: new Date().getTime(),
-      isUnread: true,
-      meta: {},
-    },
-    {
-      id: "5",
-      type: "PETITION-SHARED",
-      title: "Notification 5",
-      body: "Body notification",
-      timestamp: new Date().getTime(),
-      isUnread: true,
-      meta: {},
-    },
-    {
-      id: "6",
-      type: "PETITION-GROUP-SHARED",
-      title: "Notification 6",
-      body: "Body notification",
-      timestamp: new Date().getTime(),
-      isUnread: true,
-      meta: {},
-    },
-    {
-      id: "7",
-      type: "BOUNCE-EMAIL",
-      title: "Notification 7",
-      body: "Body notification",
-      timestamp: new Date().getTime(),
-      isUnread: false,
-      meta: {},
-    },
-    // {
-    //   id: "8",
-    //   type: "OTHER",
-    //   title: "Notification 8",
-    //   body: "Body notification",
-    //   timestamp: new Date().getTime(),
-    //   isUnread: true,
-    //   meta: {},
-    // },
-    // {
-    //   id: "9",
-    //   type: "PETITION-COMPLETED",
-    //   title: "Notification 9",
-    //   body: "Body notification",
-    //   timestamp: new Date().getTime(),
-    //   isUnread: false,
-    //   meta: {},
-    // },
-    // {
-    //   id: "10",
-    //   type: "PETITION-COMPLETED",
-    //   title: "Notification 10",
-    //   body: "Body notification",
-    //   timestamp: new Date().getTime(),
-    //   isUnread: true,
-    //   meta: {},
-    // },
-  ] as any[];
+  const MotionFooter = motion<BoxProps>(DrawerFooter);
+  const scrollRef = useRef(null);
+
+  const hasUnreaded = notifications.filter((n) => !n.isRead).length > 0;
+  const showFooter = useRef(hasUnreaded);
+
+  useEffect(() => {
+    showFooter.current = hasUnreaded;
+  }, [notifications]);
 
   return (
-    <Drawer placement={"right"} onClose={onClose} isOpen={isOpen} size={"sm"}>
+    <Drawer
+      placement={"right"}
+      onClose={onClose}
+      isOpen={isOpen}
+      size={"sm"}
+      isFullHeight
+    >
       <DrawerOverlay />
       <DrawerContent>
         <DrawerCloseButton top={4} />
@@ -134,39 +73,71 @@ export function NotificationsDrawer({
               />
             </Text>
           </Stack>
-          <NotificationsSelect />
+          <NotificationsSelect
+            selectedOption={selectedFilter}
+            onChange={onChangeFilterBy}
+          />
         </DrawerHeader>
         <DrawerBody
           paddingInlineStart={0}
           paddingInlineEnd={0}
           paddingY={0}
+          paddingBottom={hasUnreaded ? "48px" : "0px"}
           display="flex"
           flexDirection="column"
+          ref={scrollRef}
         >
-          <NotificationsList notifications={notifications} />
+          <NotificationsList
+            hasMore={hasMore}
+            fetchData={fetchData}
+            scrollRef={scrollRef}
+            notifications={notifications}
+          />
         </DrawerBody>
-        <DrawerFooter
-          h="48px"
-          justifyContent="center"
-          alignItems="center"
-          boxShadow="0px -2px 10px 0px #1A202C1A"
-          zIndex="1"
-        >
-          <Stack
-            direction={"row"}
-            spacing={2}
-            align="center"
-            color="purple.500"
-          >
-            <EmailOpenedIcon fontSize="20px" role="presentation" />
-            <Text fontSize="16px" fontWeight="600">
-              <FormattedMessage
-                id="component.notifications-drawer.mark-all-as-read"
-                defaultMessage="Mark all as read"
-              />
-            </Text>
-          </Stack>
-        </DrawerFooter>
+
+        <AnimatePresence>
+          {hasUnreaded && (
+            <MotionFooter
+              initial={
+                showFooter.current
+                  ? { transform: "translateY(0px)" }
+                  : { transform: "translateY(48px)" }
+              }
+              animate={{ transform: "translateY(0px)" }}
+              exit={{ transform: "translateY(48px)" }}
+              position="absolute"
+              bottom="0px"
+              width="100%"
+              height="48px"
+              justifyContent="center"
+              alignItems="center"
+              boxShadow="0px -2px 10px 0px #1A202C1A"
+              zIndex="1"
+              padding="0"
+            >
+              <Button
+                width="100%"
+                height="48px"
+                borderRadius="2px"
+                background="white"
+                color="purple.600"
+                _hover={{ background: "purple.50" }}
+                _active={{ background: "purple.50" }}
+                leftIcon={
+                  <EmailOpenedIcon fontSize="16px" role="presentation" />
+                }
+                onClick={onMarkAllAsRead}
+              >
+                <Text fontSize="16px" fontWeight="600">
+                  <FormattedMessage
+                    id="component.notifications-drawer.mark-all-as-read"
+                    defaultMessage="Mark all as read"
+                  />
+                </Text>
+              </Button>
+            </MotionFooter>
+          )}
+        </AnimatePresence>
       </DrawerContent>
     </Drawer>
   );

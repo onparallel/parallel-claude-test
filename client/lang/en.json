@@ -15,6 +15,31 @@
     "context": "Admin panel"
   },
   {
+    "term": "ccomponent.notification-email-bounced.body",
+    "definition": "Error sending request to recipient <b>{name}</b> ({email}).",
+    "context": "Error sending request to recipient <b>{name}</b> ({email})."
+  },
+  {
+    "term": "ccomponent.notification-internal-comment.body",
+    "definition": "<b>{name}</b> has written an internal comment in the field \"{field}\".",
+    "context": "<b>{name}</b> has written an internal comment in the field \"{field}\"."
+  },
+  {
+    "term": "ccomponent.notification-petition-completed.body",
+    "definition": "<b>{name}</b> completed the petition.",
+    "context": "<b>{name}</b> completed the petition."
+  },
+  {
+    "term": "ccomponent.notification-petition-shared-group.body",
+    "definition": "<b>{name}</b> has shared the request with the group \"{group}\" to which you belong.",
+    "context": "<b>{name}</b> has shared the request with the group \"{group}\" to which you belong."
+  },
+  {
+    "term": "ccomponent.notification-petition-shared.body",
+    "definition": "<b>{name}</b> has shared the request with you as {permissionType}.",
+    "context": "<b>{name}</b> has shared the request with you as {permissionType}."
+  },
+  {
     "term": "component.add-member-group-dialog.members-label",
     "definition": "Add to group",
     "context": "Add to group"
@@ -685,9 +710,44 @@
     "context": "The email was opened on {date}"
   },
   {
+    "term": "component.notification-comment.body",
+    "definition": "<b>{name}</b> has written a comment in the field \"{field}\".",
+    "context": "<b>{name}</b> has written a comment in the field \"{field}\"."
+  },
+  {
+    "term": "component.notification-signature-canceled.body",
+    "definition": "The digital signature has been canceled.",
+    "context": "The digital signature has been canceled."
+  },
+  {
+    "term": "component.notification-signature-completed.body",
+    "definition": "The digital signature has been completed.",
+    "context": "The digital signature has been completed."
+  },
+  {
+    "term": "component.notification.mark-as-read",
+    "definition": "Mark as read",
+    "context": "Mark as read"
+  },
+  {
+    "term": "component.notification.mark-as-unread",
+    "definition": "Mark as unread",
+    "context": "Mark as unread"
+  },
+  {
     "term": "component.notifications-drawer.header",
     "definition": "Notifications",
     "context": "Notifications"
+  },
+  {
+    "term": "component.notifications-drawer.mark-all-as-read",
+    "definition": "Mark all as read",
+    "context": "Mark all as read"
+  },
+  {
+    "term": "component.notifications-list.empty-notifications",
+    "definition": "There's no notifications yet",
+    "context": "There's no notifications yet"
   },
   {
     "term": "component.notifications-select.all-notifications",

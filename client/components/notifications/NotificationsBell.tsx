@@ -2,32 +2,40 @@ import { IconButton, IconButtonProps } from "@chakra-ui/button";
 import { Box, BoxProps } from "@chakra-ui/layout";
 import { BellIcon } from "@parallel/chakra/icons";
 import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 import { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 
-export interface BellProps extends Omit<IconButtonProps, "aria-label"> {
-  badgeColor?: string;
-  backgroundColor?: string;
-  hoverBackgroundColor?: string;
-  activeBackgroundColor?: string;
+export interface NotificationsBellProps
+  extends Omit<IconButtonProps, "aria-label"> {
   onClick: () => void;
   isOpen: boolean;
   hasNotifications: boolean;
 }
 
-export function Bell({
-  badgeColor = "purple.500",
-  backgroundColor = "white",
-  hoverBackgroundColor = "gray.75",
-  activeBackgroundColor = "gray.100",
+export function NotificationsBell({
   onClick,
   isOpen,
   hasNotifications,
   ...props
-}: BellProps) {
+}: NotificationsBellProps) {
   const intl = useIntl();
 
+  const badgeColor = "purple.500";
+  const backgroundColor = "white";
+  const hoverBackgroundColor = "gray.75";
+  const activeBackgroundColor = "gray.100";
+  const closed = { color: "gray.800", backgroundColor: "white" };
+  const opened = { color: "purple.500", backgroundColor: "gray.100" };
+
+  const [bellProps, setBellProps] = useState(isOpen ? opened : closed);
+
   const showBadge = useRef(hasNotifications);
+
+  useEffect(() => {
+    setBellProps(isOpen ? opened : closed);
+  }, [isOpen]);
+
   useEffect(() => {
     showBadge.current = hasNotifications;
   }, [showBadge, hasNotifications]);
@@ -81,8 +89,8 @@ export function Bell({
                 transition={spring}
                 pointerEvents="none"
                 position="absolute"
-                h={"14px"}
-                w={"14px"}
+                height={"14px"}
+                width={"14px"}
                 borderWidth={"2px"}
                 borderColor={"inherit"}
                 borderRadius="50%"
@@ -106,6 +114,7 @@ export function Bell({
         background: activeBackgroundColor,
         borderColor: activeBackgroundColor,
       }}
+      {...bellProps}
       {...props}
     />
   );

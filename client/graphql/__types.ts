@@ -4877,16 +4877,6 @@ export type GenerateNewTokenDialog_generateUserAuthTokenMutation = {
   };
 };
 
-export type IconsPreview_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment;
-
-export type IconsPreviewUserQueryVariables = Exact<{ [key: string]: never }>;
-
-export type IconsPreviewUserQuery = {
-  me: { __typename?: "User" } & IconsPreview_UserFragment;
-};
-
 export type Admin_UserFragment = {
   __typename?: "User";
 } & AppLayout_UserFragment;
@@ -6913,12 +6903,6 @@ export const AppLayout_UserFragmentDoc = gql`
   }
   ${AppLayoutNavbar_UserFragmentDoc}
   ${OnboardingTour_UserFragmentDoc}
-`;
-export const IconsPreview_UserFragmentDoc = gql`
-  fragment IconsPreview_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
 `;
 export const Admin_UserFragmentDoc = gql`
   fragment Admin_User on User {
@@ -10664,44 +10648,6 @@ export function useGenerateNewTokenDialog_generateUserAuthTokenMutation(
 }
 export type GenerateNewTokenDialog_generateUserAuthTokenMutationHookResult =
   ReturnType<typeof useGenerateNewTokenDialog_generateUserAuthTokenMutation>;
-export const IconsPreviewUserDocument = gql`
-  query IconsPreviewUser {
-    me {
-      ...IconsPreview_User
-    }
-  }
-  ${IconsPreview_UserFragmentDoc}
-`;
-export function useIconsPreviewUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    IconsPreviewUserQuery,
-    IconsPreviewUserQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<IconsPreviewUserQuery, IconsPreviewUserQueryVariables>(
-    IconsPreviewUserDocument,
-    options
-  );
-}
-export function useIconsPreviewUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    IconsPreviewUserQuery,
-    IconsPreviewUserQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    IconsPreviewUserQuery,
-    IconsPreviewUserQueryVariables
-  >(IconsPreviewUserDocument, options);
-}
-export type IconsPreviewUserQueryHookResult = ReturnType<
-  typeof useIconsPreviewUserQuery
->;
-export type IconsPreviewUserLazyQueryHookResult = ReturnType<
-  typeof useIconsPreviewUserLazyQuery
->;
 export const AdminDocument = gql`
   query Admin {
     me {

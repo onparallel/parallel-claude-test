@@ -838,7 +838,7 @@ export const EmailOpenedIcon = createIcon({
     <g
       stroke="currentColor"
       fill="none"
-      strokeWidth="2"
+      strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
@@ -1525,6 +1525,22 @@ export const MapIcon = createIcon({
   ),
 });
 
+export const RadioButtonSelected = createIcon({
+  displayName: "RadioButtonSelected",
+  viewBox: "0 0 24 24",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle xmlns="http://www.w3.org/2000/svg" cx="12" cy="12" r="4" />
+    </g>
+  ),
+});
+
 export const icons = [
   TwitterIcon,
   LinkedInIcon,
@@ -1609,6 +1625,7 @@ export const icons = [
   CloudUploadIcon,
   CloudOkIcon,
   CloudErrorIcon,
+  RadioButtonSelected,
   ThumbUpIcon,
   SignatureIcon,
   SignaturePlusIcon,
@@ -1620,19 +1637,3 @@ export const icons = [
   UserGroupXIcon,
   MapIcon,
 ];
-
-export const RadioButtonSelected = createIcon({
-  displayName: "RadioButtonSelected",
-  viewBox: "0 0 24 24",
-  path: (
-    <g
-      stroke="currentColor"
-      fill="currentColor"
-      strokeWidth="1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle xmlns="http://www.w3.org/2000/svg" cx="12" cy="12" r="4" />
-    </g>
-  ),
-});

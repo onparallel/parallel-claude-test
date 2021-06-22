@@ -15,6 +15,31 @@
     "context": "Admin panel"
   },
   {
+    "term": "ccomponent.notification-email-bounced.body",
+    "definition": "Error al enviar la petición a <b>{name}</b> ({email}).",
+    "context": "Error sending request to recipient <b>{name}</b> ({email})."
+  },
+  {
+    "term": "ccomponent.notification-internal-comment.body",
+    "definition": "<b>{name}</b> ha escrito un comentario interno en el campo \"{field}\".",
+    "context": "<b>{name}</b> has written an internal comment in the field \"{field}\"."
+  },
+  {
+    "term": "ccomponent.notification-petition-completed.body",
+    "definition": "<b>{name}</b> completó la petición.",
+    "context": "<b>{name}</b> completed the petition."
+  },
+  {
+    "term": "ccomponent.notification-petition-shared-group.body",
+    "definition": "<b>{name}</b> ha compartido la petición con el grupo \"{group}\" al que perteneces.",
+    "context": "<b>{name}</b> has shared the request with the group \"{group}\" to which you belong."
+  },
+  {
+    "term": "ccomponent.notification-petition-shared.body",
+    "definition": "<b>{name}</b> te ha compartido la petición como {permissionType}.",
+    "context": "<b>{name}</b> has shared the request with you as {permissionType}."
+  },
+  {
     "term": "component.add-member-group-dialog.members-label",
     "definition": "Añadir al grupo",
     "context": "Add to group"
@@ -685,9 +710,44 @@
     "context": "The email was opened on {date}"
   },
   {
+    "term": "component.notification-comment.body",
+    "definition": "<b>{name}</b> ha escrito un comentario en el campo \"{field}\".",
+    "context": "<b>{name}</b> has written a comment in the field \"{field}\"."
+  },
+  {
+    "term": "component.notification-signature-canceled.body",
+    "definition": "Se ha cancelado la firma digital.",
+    "context": "The digital signature has been canceled."
+  },
+  {
+    "term": "component.notification-signature-completed.body",
+    "definition": "Se ha completado la firma digital.",
+    "context": "The digital signature has been completed."
+  },
+  {
+    "term": "component.notification.mark-as-read",
+    "definition": "Marcar como leído",
+    "context": "Mark as read"
+  },
+  {
+    "term": "component.notification.mark-as-unread",
+    "definition": "Marcar como no leído",
+    "context": "Mark as unread"
+  },
+  {
     "term": "component.notifications-drawer.header",
     "definition": "Notificaciones",
     "context": "Notifications"
+  },
+  {
+    "term": "component.notifications-drawer.mark-all-as-read",
+    "definition": "Marcar todo como leído",
+    "context": "Mark all as read"
+  },
+  {
+    "term": "component.notifications-list.empty-notifications",
+    "definition": "No hay notificaciones todavía",
+    "context": "There's no notifications yet"
   },
   {
     "term": "component.notifications-select.all-notifications",
