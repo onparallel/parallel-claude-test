@@ -5396,12 +5396,12 @@
   },
   {
     "term": "recipient-view.petition-signature-request-sent-alert",
-    "definition": "<b>Hemos enviado el document a firmar</b> a {name} ({email}) {count, plural, =0{} other{y <a># más</a>}} para finalizar la petición.",
+    "definition": "<b>Hemos enviado el documento a firmar</b> a {name} ({email}) {count, plural, =0{} other{y <a># más</a>}} para finalizar la petición.",
     "context": "<b>We have sent the document to sign</b> to {name} ({email}) {count, plural, =0{} other{and <a># more</a>}} in order to finalize the petition."
   },
   {
     "term": "recipient-view.petition-signature-request-sent-alert.unknown-signer",
-    "definition": "<b>Hemos enviado el document a firmar</b> a a la persona indicada para finalizar la petición.",
+    "definition": "<b>Hemos enviado el documento a firmar</b> a a la persona indicada para finalizar la petición.",
     "context": "<b>We have sent the document to sign</b> to the specified person in order to finalize the petition."
   },
   {
