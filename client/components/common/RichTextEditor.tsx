@@ -7,6 +7,7 @@ import {
   useFormControl,
   useId,
   useMultiStyleConfig,
+  usePopper,
 } from "@chakra-ui/react";
 import {
   BoldIcon,
@@ -22,7 +23,7 @@ import {
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
 import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
 import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
-import { CustomEditor, CustomElement } from "@parallel/utils/slate/types";
+import { CustomElement } from "@parallel/utils/slate/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import {
   AutoformatRule,
@@ -51,16 +52,14 @@ import {
   forwardRef,
   memo,
   MouseEvent,
-  RefObject,
   useCallback,
   useEffect,
   useImperativeHandle,
   useMemo,
-  useRef,
 } from "react";
 import { useIntl } from "react-intl";
 import { omit, pick } from "remeda";
-import { createEditor, Editor, Range, Transforms } from "slate";
+import { createEditor, Editor, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import { ReactEditor, Slate, useSlate, withReact } from "slate-react";
 import {
@@ -274,8 +273,56 @@ export const RichTextEditor = forwardRef<
   const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
   const itemIdPrefix = useId(undefined, "rte-placeholder-menu-item");
 
-  const menuRef = useRef<HTMLElement>(null);
-  useRepositionPlaceholderMenu(isMenuOpen, target, editor, menuRef);
+  const { referenceRef, popperRef, forceUpdate } = usePopper({
+    placement: "bottom-start",
+    enabled: isMenuOpen,
+  });
+  useEffect(() => {
+    if (isMenuOpen && target) {
+      reposition();
+      document.addEventListener("scroll", reposition, true);
+      return () => document.removeEventListener("scroll", reposition, true);
+    }
+    function reposition() {
+      /**
+       * The main idea of this function is to place the placeholders menu next to the #.
+       * This function gets the node of the piece of text where the anchor is.
+       * This node will always be a span.
+       * We create a "fake" paragraph and we insert the text of the node but:
+       * - We split the text in two different children spans, before the # and after the #.
+       * - We add a marginLeft to the first one so it matches the horizontal position
+       * We insert this fake paragraph and we compute the boundingClientRect of the second
+       * children which we will use to create a popper virtual element.
+       */
+      const { path, offset } = target!.anchor;
+
+      const node = ReactEditor.toDOMNode(editor, getNode(editor, path)!);
+      const parentRect = (
+        node.parentNode! as HTMLElement
+      ).getBoundingClientRect();
+      const fake = document.createElement("div");
+      fake.style.visibility = "hidden";
+      const prefix = document.createElement("span");
+      const style = window.getComputedStyle(node.offsetParent!);
+      prefix.style.marginLeft = `${
+        node.offsetLeft - parseInt(style.paddingLeft)
+      }px`;
+      prefix.innerText = node.textContent!.slice(0, offset + 1);
+      fake.appendChild(prefix);
+      const _target = document.createElement("span");
+      _target.innerText = node.textContent!.slice(offset + 1);
+      fake.appendChild(_target);
+      fake.style.position = "fixed";
+      fake.style.top = `${parentRect.top}px`;
+      fake.style.left = `${parentRect.left}px`;
+      fake.style.width = `${parentRect.width}px`;
+      node.parentElement!.appendChild(fake);
+      const rect = _target.getBoundingClientRect();
+      node.parentElement!.removeChild(fake);
+      referenceRef({ getBoundingClientRect: () => rect, contextElement: node });
+      forceUpdate?.();
+    }
+  }, [isMenuOpen, target?.anchor.offset]);
 
   return (
     <Box
@@ -322,7 +369,7 @@ export const RichTextEditor = forwardRef<
       </Slate>
       <Portal>
         <PlaceholderMenu
-          ref={menuRef as any}
+          ref={popperRef}
           menuId={placeholderMenuId}
           itemIdPrefix={itemIdPrefix}
           search={search}
@@ -335,6 +382,7 @@ export const RichTextEditor = forwardRef<
           onHighlightOption={onHighlightOption}
           width="fit-content"
           position="relative"
+          opacity={isMenuOpen ? 1 : 0}
         />
       </Portal>
     </Box>
@@ -409,36 +457,6 @@ const Toolbar = memo(function _Toolbar({
     </Stack>
   );
 });
-
-function useRepositionPlaceholderMenu(
-  isMenuOpen: boolean,
-  target: Range | null,
-  editor: CustomEditor,
-  menuRef: RefObject<HTMLElement>
-) {
-  useEffect(() => {
-    if (isMenuOpen && target) {
-      reposition();
-      document.addEventListener("scroll", reposition, true);
-      return () => document.removeEventListener("scroll", reposition, true);
-    }
-    function reposition() {
-      const { path, offset } = target!.anchor;
-
-      const node = ReactEditor.toDOMNode(editor, getNode(editor, path)!);
-      const clone = node.cloneNode() as HTMLElement;
-      clone.textContent = node.textContent!.slice(0, offset);
-      clone.style.position = "fixed";
-      clone.style.visibility = "hidden";
-      const rect = node.getBoundingClientRect();
-      node.parentElement!.appendChild(clone);
-      const cloneRect = clone.getBoundingClientRect();
-      node.parentElement!.removeChild(clone);
-      menuRef.current!.style.top = `${rect.bottom + 5}px`;
-      menuRef.current!.style.left = `${rect.left + cloneRect.width}px`;
-    }
-  }, [isMenuOpen, target?.anchor]);
-}
 
 function ListButton({
   type,
