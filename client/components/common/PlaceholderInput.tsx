@@ -123,24 +123,7 @@ export const PlaceholderInput = chakraForwardRef<
   const { referenceRef, popperRef } = usePopper({
     placement: "bottom",
     gutter: 2,
-    modifiers: [
-      // https://github.com/popperjs/popper-core/issues/794#issuecomment-824220211
-      {
-        name: "sameWidth",
-        enabled: true,
-        phase: "beforeWrite",
-        requires: ["computeStyles"],
-        fn({ state }) {
-          state.styles.popper.minWidth = `${state.rects.reference.width}px`;
-        },
-        effect({ state }) {
-          return () => {
-            const reference = state.elements.reference as HTMLElement;
-            state.elements.popper.style.minWidth = `${reference.offsetWidth}px`;
-          };
-        },
-      },
-    ],
+    matchWidth: true,
   });
 
   return (
