@@ -151,7 +151,11 @@ export function PetitionFieldVisibilityEditor({
         return [...conditions, { ...last, value: 0 }];
 
       const field = fields.find((f) => f.id === last.fieldId)!;
-      if (field.type === "SELECT" || field.type === "CHECKBOX") {
+      if (
+        (field.type === "SELECT" || field.type === "CHECKBOX") &&
+        last.modifier !== "NUMBER_OF_REPLIES" &&
+        last.operator !== "NUMBER_OF_SUBREPLIES"
+      ) {
         // if the previous condition is of type SELECT or CHECKBOX try to get the next value
         const values = field.options.values as string[];
         const index = Math.min(
