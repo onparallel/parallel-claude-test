@@ -1,5 +1,6 @@
 import {
   core,
+  enumType,
   interfaceType,
   list,
   nonNull,
@@ -25,6 +26,12 @@ export const UserOrContact = unionType({
   `,
 });
 
+export const PetitionUserNotificationFilter = enumType({
+  name: "PetitionUserNotificationFilter",
+  description: "The types of notifications available for filtering",
+  members: ["UNREAD", "COMMENTS", "COMPLETED", "SHARED", "OTHER"],
+});
+
 export const PetitionUserNotification = interfaceType({
   name: "PetitionUserNotification",
   rootTyping: "db.PetitionUserNotification",
@@ -43,17 +50,17 @@ export const PetitionUserNotification = interfaceType({
   resolveType: (o) => {
     switch (o.type) {
       case "COMMENT_CREATED":
-        return "CommentCreatedNotification";
+        return "CommentCreatedUserNotification";
       case "MESSAGE_EMAIL_BOUNCED":
-        return "MessageEmailBouncedNotification";
+        return "MessageEmailBouncedUserNotification";
       case "PETITION_COMPLETED":
-        return "PetitionCompletedNotification";
+        return "PetitionCompletedUserNotification";
       case "PETITION_SHARED":
-        return "PetitionSharedNotification";
+        return "PetitionSharedUserNotification";
       case "SIGNATURE_CANCELLED":
-        return "SignatureCancelledNotification";
+        return "SignatureCancelledUserNotification";
       case "SIGNATURE_COMPLETED":
-        return "SignatureCompletedNotification";
+        return "SignatureCompletedUserNotification";
     }
   },
 });
@@ -72,8 +79,8 @@ function createPetitionUserNotification<TypeName extends string>(
   });
 }
 
-export const CommentCreatedNotification = createPetitionUserNotification(
-  "CommentCreatedNotification",
+export const CommentCreatedUserNotification = createPetitionUserNotification(
+  "CommentCreatedUserNotification",
   (t) => {
     t.field("author", {
       type: "UserOrPetitionAccess",
@@ -93,7 +100,7 @@ export const CommentCreatedNotification = createPetitionUserNotification(
           };
         } else {
           throw new Error(
-            `Expected user_id or petition_access_id to be set in PetitionFieldComment:${comment.id}`
+            `Expected user_id or petition_access_id to be set in PetitionFieldComment:${root.data.petition_field_comment_id}`
           );
         }
       },
@@ -109,8 +116,8 @@ export const CommentCreatedNotification = createPetitionUserNotification(
   }
 );
 
-export const PetitionCompletedNotification = createPetitionUserNotification(
-  "PetitionCompletedNotification",
+export const PetitionCompletedUserNotification = createPetitionUserNotification(
+  "PetitionCompletedUserNotification",
   (t) => {
     t.field("access", {
       type: "PetitionAccess",
@@ -121,39 +128,20 @@ export const PetitionCompletedNotification = createPetitionUserNotification(
   }
 );
 
-export const SignatureCompletedNotification = createPetitionUserNotification(
-  "SignatureCompletedNotification",
-  (t) => {
-    t.field("contact", {
-      type: "Contact",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.contacts.loadContact(root.data.contact_id))!;
-      },
-    });
-  }
-);
+export const SignatureCompletedUserNotification =
+  createPetitionUserNotification(
+    "SignatureCompletedUserNotification",
+    () => {}
+  );
 
-export const SignatureCancelledNotification = createPetitionUserNotification(
-  "SignatureCancelledNotification",
-  (t) => {
-    t.field("author", {
-      type: "UserOrContact",
-      resolve: async (root, _, ctx) => {
-        if (root.data.user_id) {
-          const user = await ctx.users.loadUser(root.data.user_id!);
-          return { __type: "User", ...user! };
-        } else if (root.data.contact_id) {
-          const contact = await ctx.contacts.loadContact(root.data.contact_id!);
-          return { __type: "Contact", ...contact! };
-        }
-        throw new Error(`Both "data.user_id" and "data.contact_id" are null`);
-      },
-    });
-  }
-);
+export const SignatureCancelledUserNotification =
+  createPetitionUserNotification(
+    "SignatureCancelledUserNotification",
+    () => {}
+  );
 
-export const PetitionSharedNotification = createPetitionUserNotification(
-  "PetitionSharedNotification",
+export const PetitionSharedUserNotification = createPetitionUserNotification(
+  "PetitionSharedUserNotification",
   (t) => {
     t.field("owner", {
       type: "User",
@@ -167,32 +155,28 @@ export const PetitionSharedNotification = createPetitionUserNotification(
     t.field("sharedWith", {
       type: nonNull(list("UserOrUserGroup")),
       resolve: async (root, _, ctx) => {
-        const users = await ctx.users.loadUser(root.data.user_ids as number[]);
-        const groups = await ctx.userGroups.loadUserGroup(
-          root.data.user_group_ids as number[]
-        );
+        const user = root.data.user_id
+          ? await ctx.users.loadUser(root.data.user_id)
+          : null;
+        const group = root.data.user_group_id
+          ? await ctx.userGroups.loadUserGroup(root.data.user_group_id)
+          : null;
 
         return [
-          ...users
-            .filter(isDefined)
-            .map((u) => ({ __type: "User", ...u } as const)),
-          ...groups
-            .filter(isDefined)
-            .map((c) => ({ __type: "UserGroup", ...c } as const)),
-        ];
+          user ? ({ __type: "User", ...user } as const) : null,
+          group ? ({ __type: "UserGroup", ...group } as const) : null,
+        ].filter(isDefined);
       },
     });
   }
 );
 
-export const MessageEmailBouncedNotification = createPetitionUserNotification(
-  "MessageEmailBouncedNotification",
-  (t) => {
+export const MessageEmailBouncedUserNotification =
+  createPetitionUserNotification("MessageEmailBouncedUserNotification", (t) => {
     t.field("access", {
       type: "PetitionAccess",
       resolve: async (root, _, ctx) => {
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-  }
-);
+  });

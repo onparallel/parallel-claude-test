@@ -210,6 +210,12 @@ export interface NexusGenEnums {
     | "ENQUEUED"
     | "PROCESSING";
   PetitionStatus: db.PetitionStatus;
+  PetitionUserNotificationFilter:
+    | "COMMENTS"
+    | "COMPLETED"
+    | "OTHER"
+    | "SHARED"
+    | "UNREAD";
   PublicSignatureStatus: "COMPLETED" | "STARTED";
   QueryContacts_OrderBy:
     | "createdAt_ASC"
@@ -273,7 +279,7 @@ export interface NexusGenObjects {
   AccessDeactivatedEvent: events.AccessDeactivatedEvent;
   AccessDelegatedEvent: events.AccessDelegatedEvent;
   AccessOpenedEvent: events.AccessOpenedEvent;
-  CommentCreatedNotification: notifications.CommentCreatedNotification;
+  CommentCreatedUserNotification: notifications.CommentCreatedUserNotification;
   CommentDeletedEvent: events.CommentDeletedEvent;
   CommentPublishedEvent: events.CommentPublishedEvent;
   Contact: db.Contact;
@@ -312,7 +318,7 @@ export interface NexusGenObjects {
   GroupPermissionEditedEvent: events.GroupPermissionEditedEvent;
   GroupPermissionRemovedEvent: events.GroupPermissionRemovedEvent;
   MessageCancelledEvent: events.MessageCancelledEvent;
-  MessageEmailBouncedNotification: notifications.MessageEmailBouncedNotification;
+  MessageEmailBouncedUserNotification: notifications.MessageEmailBouncedUserNotification;
   MessageScheduledEvent: events.MessageScheduledEvent;
   MessageSentEvent: events.MessageSentEvent;
   Mutation: {};
@@ -350,7 +356,7 @@ export interface NexusGenObjects {
   PetitionClosedEvent: events.PetitionClosedEvent;
   PetitionClosedNotifiedEvent: events.PetitionClosedNotifiedEvent;
   PetitionCompletedEvent: events.PetitionCompletedEvent;
-  PetitionCompletedNotification: notifications.PetitionCompletedNotification;
+  PetitionCompletedUserNotification: notifications.PetitionCompletedUserNotification;
   PetitionCreatedEvent: events.PetitionCreatedEvent;
   PetitionDeletedEvent: events.PetitionDeletedEvent;
   PetitionEventPagination: {
@@ -372,7 +378,7 @@ export interface NexusGenObjects {
   };
   PetitionReminder: db.PetitionReminder;
   PetitionReopenedEvent: events.PetitionReopenedEvent;
-  PetitionSharedNotification: notifications.PetitionSharedNotification;
+  PetitionSharedUserNotification: notifications.PetitionSharedUserNotification;
   PetitionSignatureRequest: db.PetitionSignatureRequest;
   PetitionTemplate: db.Petition;
   PetitionTemplateAndField: {
@@ -386,6 +392,11 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   PetitionUserGroupPermission: db.PetitionPermission;
+  PetitionUserNotificationPagination: {
+    // root type
+    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
+    totalCount: number; // Int!
+  };
   PetitionUserPermission: db.PetitionPermission;
   PetitionWithFieldAndReplies: {
     // root type
@@ -433,9 +444,9 @@ export interface NexusGenObjects {
     result: NexusGenEnums["Result"]; // Result!
   };
   SignatureCancelledEvent: events.SignatureCancelledEvent;
-  SignatureCancelledNotification: notifications.SignatureCancelledNotification;
+  SignatureCancelledUserNotification: notifications.SignatureCancelledUserNotification;
   SignatureCompletedEvent: events.SignatureCompletedEvent;
-  SignatureCompletedNotification: notifications.SignatureCompletedNotification;
+  SignatureCompletedUserNotification: notifications.SignatureCompletedUserNotification;
   SignatureConfig: {
     provider: string;
     contactIds: number[];
@@ -566,7 +577,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
   };
-  CommentCreatedNotification: {
+  CommentCreatedUserNotification: {
     // field return type
     author: NexusGenRootTypes["UserOrPetitionAccess"]; // UserOrPetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -667,7 +678,7 @@ export interface NexusGenFieldTypes {
     message: NexusGenRootTypes["PetitionMessage"]; // PetitionMessage!
     user: NexusGenRootTypes["User"] | null; // User
   };
-  MessageEmailBouncedNotification: {
+  MessageEmailBouncedUserNotification: {
     // field return type
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -776,6 +787,7 @@ export interface NexusGenFieldTypes {
     updatePetitionFieldRepliesStatus: NexusGenRootTypes["PetitionWithFieldAndReplies"]; // PetitionWithFieldAndReplies!
     updatePetitionFieldReplyMetadata: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updatePetitionPermissionSubscription: NexusGenRootTypes["Petition"]; // Petition!
+    updatePetitionUserNotificationReadStatus: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
     updateSignatureRequestMetadata: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     updateSimpleReply: NexusGenRootTypes["PetitionFieldReply"]; // PetitionFieldReply!
     updateTag: NexusGenRootTypes["Tag"]; // Tag!
@@ -914,7 +926,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
   };
-  PetitionCompletedNotification: {
+  PetitionCompletedUserNotification: {
     // field return type
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1018,7 +1030,7 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     user: NexusGenRootTypes["User"] | null; // User
   };
-  PetitionSharedNotification: {
+  PetitionSharedUserNotification: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
@@ -1081,6 +1093,11 @@ export interface NexusGenFieldTypes {
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     petition: NexusGenRootTypes["Petition"]; // Petition!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  PetitionUserNotificationPagination: {
+    // field return type
+    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
+    totalCount: number; // Int!
   };
   PetitionUserPermission: {
     // field return type
@@ -1271,9 +1288,8 @@ export interface NexusGenFieldTypes {
     id: NexusGenScalars["GID"]; // GID!
     user: NexusGenRootTypes["User"] | null; // User
   };
-  SignatureCancelledNotification: {
+  SignatureCancelledUserNotification: {
     // field return type
-    author: NexusGenRootTypes["UserOrContact"]; // UserOrContact!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"]; // Petition!
@@ -1283,9 +1299,8 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
   };
-  SignatureCompletedNotification: {
+  SignatureCompletedUserNotification: {
     // field return type
-    contact: NexusGenRootTypes["Contact"]; // Contact!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     petition: NexusGenRootTypes["Petition"]; // Petition!
@@ -1346,11 +1361,12 @@ export interface NexusGenFieldTypes {
     isSuperAdmin: boolean; // Boolean!
     lastActiveAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastName: string | null; // String
+    notifications: NexusGenRootTypes["PetitionUserNotificationPagination"]; // PetitionUserNotificationPagination!
     onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
-    unreadNotificationIds: string[]; // [String!]!
+    unreadNotificationIds: NexusGenScalars["GID"][]; // [GID!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   UserAuthenticationToken: {
@@ -1513,7 +1529,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
   };
-  CommentCreatedNotification: {
+  CommentCreatedUserNotification: {
     // field return type name
     author: "UserOrPetitionAccess";
     createdAt: "DateTime";
@@ -1614,7 +1630,7 @@ export interface NexusGenFieldTypeNames {
     message: "PetitionMessage";
     user: "User";
   };
-  MessageEmailBouncedNotification: {
+  MessageEmailBouncedUserNotification: {
     // field return type name
     access: "PetitionAccess";
     createdAt: "DateTime";
@@ -1723,6 +1739,7 @@ export interface NexusGenFieldTypeNames {
     updatePetitionFieldRepliesStatus: "PetitionWithFieldAndReplies";
     updatePetitionFieldReplyMetadata: "PetitionFieldReply";
     updatePetitionPermissionSubscription: "Petition";
+    updatePetitionUserNotificationReadStatus: "PetitionUserNotification";
     updateSignatureRequestMetadata: "PetitionSignatureRequest";
     updateSimpleReply: "PetitionFieldReply";
     updateTag: "Tag";
@@ -1857,7 +1874,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
   };
-  PetitionCompletedNotification: {
+  PetitionCompletedUserNotification: {
     // field return type name
     access: "PetitionAccess";
     createdAt: "DateTime";
@@ -1961,7 +1978,7 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     user: "User";
   };
-  PetitionSharedNotification: {
+  PetitionSharedUserNotification: {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
@@ -2022,6 +2039,11 @@ export interface NexusGenFieldTypeNames {
     permissionType: "PetitionPermissionType";
     petition: "Petition";
     updatedAt: "DateTime";
+  };
+  PetitionUserNotificationPagination: {
+    // field return type name
+    items: "PetitionUserNotification";
+    totalCount: "Int";
   };
   PetitionUserPermission: {
     // field return type name
@@ -2212,9 +2234,8 @@ export interface NexusGenFieldTypeNames {
     id: "GID";
     user: "User";
   };
-  SignatureCancelledNotification: {
+  SignatureCancelledUserNotification: {
     // field return type name
-    author: "UserOrContact";
     createdAt: "DateTime";
     id: "GID";
     petition: "Petition";
@@ -2224,9 +2245,8 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
   };
-  SignatureCompletedNotification: {
+  SignatureCompletedUserNotification: {
     // field return type name
-    contact: "Contact";
     createdAt: "DateTime";
     id: "GID";
     petition: "Petition";
@@ -2287,11 +2307,12 @@ export interface NexusGenFieldTypeNames {
     isSuperAdmin: "Boolean";
     lastActiveAt: "DateTime";
     lastName: "String";
+    notifications: "PetitionUserNotificationPagination";
     onboardingStatus: "JSONObject";
     organization: "Organization";
     role: "OrganizationRole";
     status: "UserStatus";
-    unreadNotificationIds: "String";
+    unreadNotificationIds: "GID";
     updatedAt: "DateTime";
   };
   UserAuthenticationToken: {
@@ -2925,6 +2946,12 @@ export interface NexusGenArgTypes {
       isSubscribed: boolean; // Boolean!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
+    updatePetitionUserNotificationReadStatus: {
+      // args
+      filter?: NexusGenEnums["PetitionUserNotificationFilter"] | null; // PetitionUserNotificationFilter
+      isRead: boolean; // Boolean!
+      petitionUserNotificationIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
     updateSignatureRequestMetadata: {
       // args
       metadata: NexusGenScalars["JSONObject"]; // JSONObject!
@@ -3124,6 +3151,12 @@ export interface NexusGenArgTypes {
       // args
       featureFlag: NexusGenEnums["FeatureFlag"]; // FeatureFlag!
     };
+    notifications: {
+      // args
+      filter?: NexusGenEnums["PetitionUserNotificationFilter"] | null; // PetitionUserNotificationFilter
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+    };
   };
 }
 
@@ -3173,12 +3206,12 @@ export interface NexusGenAbstractTypeMembers {
     | "UserPermissionRemovedEvent";
   PetitionPermission: "PetitionUserGroupPermission" | "PetitionUserPermission";
   PetitionUserNotification:
-    | "CommentCreatedNotification"
-    | "MessageEmailBouncedNotification"
-    | "PetitionCompletedNotification"
-    | "PetitionSharedNotification"
-    | "SignatureCancelledNotification"
-    | "SignatureCompletedNotification";
+    | "CommentCreatedUserNotification"
+    | "MessageEmailBouncedUserNotification"
+    | "PetitionCompletedUserNotification"
+    | "PetitionSharedUserNotification"
+    | "SignatureCancelledUserNotification"
+    | "SignatureCompletedUserNotification";
   Timestamps:
     | "Contact"
     | "Organization"
@@ -3199,7 +3232,7 @@ export interface NexusGenTypeInterfaces {
   AccessDeactivatedEvent: "PetitionEvent";
   AccessDelegatedEvent: "PetitionEvent";
   AccessOpenedEvent: "PetitionEvent";
-  CommentCreatedNotification: "PetitionUserNotification";
+  CommentCreatedUserNotification: "PetitionUserNotification";
   CommentDeletedEvent: "PetitionEvent";
   CommentPublishedEvent: "PetitionEvent";
   Contact: "Timestamps";
@@ -3207,7 +3240,7 @@ export interface NexusGenTypeInterfaces {
   GroupPermissionEditedEvent: "PetitionEvent";
   GroupPermissionRemovedEvent: "PetitionEvent";
   MessageCancelledEvent: "PetitionEvent";
-  MessageEmailBouncedNotification: "PetitionUserNotification";
+  MessageEmailBouncedUserNotification: "PetitionUserNotification";
   MessageScheduledEvent: "PetitionEvent";
   MessageSentEvent: "PetitionEvent";
   Organization: "Timestamps";
@@ -3219,7 +3252,7 @@ export interface NexusGenTypeInterfaces {
   PetitionClosedEvent: "PetitionEvent";
   PetitionClosedNotifiedEvent: "PetitionEvent";
   PetitionCompletedEvent: "PetitionEvent";
-  PetitionCompletedNotification: "PetitionUserNotification";
+  PetitionCompletedUserNotification: "PetitionUserNotification";
   PetitionCreatedEvent: "PetitionEvent";
   PetitionDeletedEvent: "PetitionEvent";
   PetitionFieldAttachment: "CreatedAt";
@@ -3227,7 +3260,7 @@ export interface NexusGenTypeInterfaces {
   PetitionMessage: "CreatedAt";
   PetitionReminder: "CreatedAt";
   PetitionReopenedEvent: "PetitionEvent";
-  PetitionSharedNotification: "PetitionUserNotification";
+  PetitionSharedUserNotification: "PetitionUserNotification";
   PetitionSignatureRequest: "Timestamps";
   PetitionTemplate: "PetitionBase";
   PetitionTemplateAndField: "PetitionBaseAndField";
@@ -3240,9 +3273,9 @@ export interface NexusGenTypeInterfaces {
   ReplyDeletedEvent: "PetitionEvent";
   ReplyUpdatedEvent: "PetitionEvent";
   SignatureCancelledEvent: "PetitionEvent";
-  SignatureCancelledNotification: "PetitionUserNotification";
+  SignatureCancelledUserNotification: "PetitionUserNotification";
   SignatureCompletedEvent: "PetitionEvent";
-  SignatureCompletedNotification: "PetitionUserNotification";
+  SignatureCompletedUserNotification: "PetitionUserNotification";
   SignatureStartedEvent: "PetitionEvent";
   Subscription: "Timestamps";
   TemplateUsedEvent: "PetitionEvent";

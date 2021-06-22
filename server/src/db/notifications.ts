@@ -19,16 +19,14 @@ export type PetitionUserNotificationPayload<
   PETITION_SHARED: {
     owner_id: number;
     permission_type: "READ" | "WRITE";
-    user_ids: number[];
-    user_group_ids: number[];
+    user_id?: number;
+    user_group_id?: number;
   };
   SIGNATURE_CANCELLED: {
-    // one or the other
-    user_id?: number;
-    contact_id?: number;
+    petition_signature_request_id: number;
   };
   SIGNATURE_COMPLETED: {
-    contact_id: number;
+    petition_signature_request_id: number;
   };
 }[TType];
 
@@ -43,25 +41,29 @@ type GenericPetitionUserNotification<
   data: PetitionUserNotificationPayload<TType>;
 };
 
-export type CommentCreatedNotification<IsCreate extends boolean = false> =
+export type CommentCreatedUserNotification<IsCreate extends boolean = false> =
   GenericPetitionUserNotification<"COMMENT_CREATED", IsCreate>;
-export type MessageEmailBouncedNotification<IsCreate extends boolean = false> =
-  GenericPetitionUserNotification<"MESSAGE_EMAIL_BOUNCED", IsCreate>;
-export type PetitionCompletedNotification<IsCreate extends boolean = false> =
-  GenericPetitionUserNotification<"PETITION_COMPLETED", IsCreate>;
-export type PetitionSharedNotification<IsCreate extends boolean = false> =
+export type MessageEmailBouncedUserNotification<
+  IsCreate extends boolean = false
+> = GenericPetitionUserNotification<"MESSAGE_EMAIL_BOUNCED", IsCreate>;
+export type PetitionCompletedUserNotification<
+  IsCreate extends boolean = false
+> = GenericPetitionUserNotification<"PETITION_COMPLETED", IsCreate>;
+export type PetitionSharedUserNotification<IsCreate extends boolean = false> =
   GenericPetitionUserNotification<"PETITION_SHARED", IsCreate>;
-export type SignatureCancelledNotification<IsCreate extends boolean = false> =
-  GenericPetitionUserNotification<"SIGNATURE_CANCELLED", IsCreate>;
-export type SignatureCompletedNotification<IsCreate extends boolean = false> =
-  GenericPetitionUserNotification<"SIGNATURE_COMPLETED", IsCreate>;
+export type SignatureCancelledUserNotification<
+  IsCreate extends boolean = false
+> = GenericPetitionUserNotification<"SIGNATURE_CANCELLED", IsCreate>;
+export type SignatureCompletedUserNotification<
+  IsCreate extends boolean = false
+> = GenericPetitionUserNotification<"SIGNATURE_COMPLETED", IsCreate>;
 
 export type PetitionUserNotification<IsCreate extends boolean = false> =
-  | CommentCreatedNotification<IsCreate>
-  | MessageEmailBouncedNotification<IsCreate>
-  | PetitionCompletedNotification<IsCreate>
-  | PetitionSharedNotification<IsCreate>
-  | SignatureCancelledNotification<IsCreate>
-  | SignatureCompletedNotification<IsCreate>;
+  | CommentCreatedUserNotification<IsCreate>
+  | MessageEmailBouncedUserNotification<IsCreate>
+  | PetitionCompletedUserNotification<IsCreate>
+  | PetitionSharedUserNotification<IsCreate>
+  | SignatureCancelledUserNotification<IsCreate>
+  | SignatureCompletedUserNotification<IsCreate>;
 
 export type CreatePetitionUserNotification = PetitionUserNotification<true>;

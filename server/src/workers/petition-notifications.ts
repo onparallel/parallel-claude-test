@@ -2,6 +2,7 @@ import { differenceInMinutes } from "date-fns";
 import { groupBy, maxBy } from "remeda";
 import { Config } from "../config";
 import { WorkerContext } from "../context";
+import { CommentCreatedUserNotification } from "../db/notifications";
 import {
   PetitionContactNotification,
   PetitionUserNotification,
@@ -26,7 +27,7 @@ function shouldBeProcessed(
  * was created more than `config.minutesBeforeNotify` minutes ago
  */
 async function processCommentCreatedUserNotification(
-  notifications: PetitionUserNotification[],
+  notifications: CommentCreatedUserNotification[],
   context: WorkerContext,
   config: Config["cronWorkers"]["petition-notifications"]
 ) {

@@ -3,6 +3,7 @@ import { PetitionEvent, SystemEvent } from "../db/events";
 import { PetitionEventType, SystemEventType } from "../db/__types";
 import { analyticsEventListener } from "./event-listeners/analytics-event-listener";
 import { eventSubscriptionsListener } from "./event-listeners/event-subscriptions-listener";
+import { userNotificationsListener } from "./event-listeners/user-notifications-listener";
 import { createQueueWorker } from "./helpers/createQueueWorker";
 
 type Event = PetitionEvent | SystemEvent;
@@ -94,6 +95,18 @@ createQueueWorker(
         "USER_PERMISSION_REMOVED",
       ],
       eventSubscriptionsListener
+    )
+    .register(
+      [
+        "PETITION_COMPLETED",
+        "COMMENT_PUBLISHED",
+        "EMAIL_BOUNCED",
+        "SIGNATURE_COMPLETED",
+        "SIGNATURE_CANCELLED",
+        "USER_PERMISSION_ADDED",
+        "GROUP_PERMISSION_ADDED",
+      ],
+      userNotificationsListener
     )
     .listen()
 );

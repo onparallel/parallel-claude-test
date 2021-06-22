@@ -3,28 +3,28 @@ import { inject, injectable } from "inversify";
 import { CONFIG, Config } from "./config";
 import { ContactRepository } from "./db/repositories/ContactRepository";
 import { EmailLogRepository } from "./db/repositories/EmailLogRepository";
+import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
 import { FileRepository } from "./db/repositories/FileRepository";
+import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
 import { OrganizationRepository } from "./db/repositories/OrganizationRepository";
+import { PetitionEventSubscriptionRepository } from "./db/repositories/PetitionEventSubscriptionRepository";
 import { PetitionRepository } from "./db/repositories/PetitionRepository";
 import { ReportingRepository } from "./db/repositories/ReportingRepository";
+import { SystemRepository } from "./db/repositories/SystemRepository";
+import { TagRepository } from "./db/repositories/TagRepository";
+import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
+import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
 import { UserRepository } from "./db/repositories/UserRepository";
 import { Contact, Organization, PetitionAccess, User } from "./db/__types";
+import { ANALYTICS, AnalyticsService } from "./services/analytics";
 import { AUTH, Auth } from "./services/auth";
 import { Aws, AWS_SERVICE } from "./services/aws";
 import { EMAILS, EmailsService } from "./services/emails";
 import { LOGGER, Logger } from "./services/logger";
 import { PRINTER, Printer } from "./services/printer";
-import { Smtp } from "./services/smtp";
-import { ANALYTICS, AnalyticsService } from "./services/analytics";
-import { FeatureFlagRepository } from "./db/repositories/FeatureFlagRepository";
-import { IntegrationRepository } from "./db/repositories/IntegrationRepository";
-import { SIGNATURE, SignatureService } from "./services/signature";
 import { SECURITY, SecurityService } from "./services/security";
-import { UserAuthenticationRepository } from "./db/repositories/UserAuthenticationRepository";
-import { PetitionEventSubscriptionRepository } from "./db/repositories/PetitionEventSubscriptionRepository";
-import { TagRepository } from "./db/repositories/TagRepository";
-import { UserGroupRepository } from "./db/repositories/UserGroupRepository";
-import { SystemRepository } from "./db/repositories/SystemRepository";
+import { SIGNATURE, SignatureService } from "./services/signature";
+import { Smtp } from "./services/smtp";
 
 @injectable()
 export class ApiContext {
@@ -82,6 +82,7 @@ export class WorkerContext {
     public readonly petitions: PetitionRepository,
     public readonly reporting: ReportingRepository,
     public readonly subscriptions: PetitionEventSubscriptionRepository,
-    public readonly system: SystemRepository
+    public readonly system: SystemRepository,
+    public readonly userGroups: UserGroupRepository
   ) {}
 }

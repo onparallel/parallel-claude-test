@@ -36,7 +36,7 @@ import {
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
 import {
-  CommentCreatedNotification,
+  CommentCreatedUserNotification,
   CreatePetitionUserNotification,
   PetitionUserNotification,
 } from "../notifications";
@@ -75,6 +75,13 @@ type PetitionFilter = {
   type?: PetitionType | null;
   tagIds?: string[] | null;
 };
+
+type PetitionUserNotificationFilter =
+  | "COMMENTS"
+  | "COMPLETED"
+  | "OTHER"
+  | "SHARED"
+  | "UNREAD";
 
 type EffectivePetitionPermission = Pick<
   PetitionPermission,
@@ -1921,7 +1928,7 @@ export class PetitionRepository extends BaseRepository {
   );
 
   async loadUnprocessedCommentCreatedUserNotifications() {
-    return await this.raw<PetitionUserNotification>(/* sql */ `
+    return await this.raw<CommentCreatedUserNotification>(/* sql */ `
       SELECT * from petition_user_notification 
       where processed_at is null
       and is_read = false
@@ -1940,18 +1947,78 @@ export class PetitionRepository extends BaseRepository {
     `);
   }
 
+  readonly loadPetitionUserNotifications = this.buildLoadById(
+    "petition_user_notification",
+    "id"
+  );
+
   readonly loadUnreadPetitionUserNotificationsByUserId =
     this.buildLoadMultipleBy("petition_user_notification", "user_id", (q) =>
       q.where({ is_read: false })
     );
 
+  async loadPetitionUserNotificationsByUserId(
+    userId: number,
+    opts: PageOpts,
+    filter?: Maybe<PetitionUserNotificationFilter>
+  ) {
+    return this.loadPageAndCount(
+      this.from("petition_user_notification")
+        .where("user_id", userId)
+        .mmodify((q) => {
+          if (filter === "UNREAD") {
+            q.where("is_read", false);
+          } else if (filter === "COMMENTS") {
+            q.where("type", "COMMENT_CREATED");
+          } else if (filter === "COMPLETED") {
+            q.whereIn("type", ["PETITION_COMPLETED", "SIGNATURE_COMPLETED"]);
+          } else if (filter === "SHARED") {
+            q.where("type", "PETITION_SHARED");
+          } else if (filter === "OTHER") {
+            q.whereIn("type", ["MESSAGE_EMAIL_BOUNCED", "SIGNATURE_CANCELLED"]);
+          }
+        }),
+      opts
+    );
+  }
+
   async updatePetitionUserNotifications(
     petitionUserNotificationIds: number[],
-    data: Partial<CreatePetitionUserNotification>
+    data: Partial<CreatePetitionUserNotification>,
+    filter?: Maybe<PetitionUserNotificationFilter>
   ) {
     return await this.from("petition_user_notification")
       .whereIn("id", petitionUserNotificationIds)
+      .mmodify((q) => {
+        if (filter === "UNREAD") {
+          q.where("is_read", false);
+        } else if (filter === "COMMENTS") {
+          q.where("type", "COMMENT_CREATED");
+        } else if (filter === "COMPLETED") {
+          q.whereIn("type", ["PETITION_COMPLETED", "SIGNATURE_COMPLETED"]);
+        } else if (filter === "SHARED") {
+          q.where("type", "PETITION_SHARED");
+        } else if (filter === "OTHER") {
+          q.whereIn("type", ["MESSAGE_EMAIL_BOUNCED", "SIGNATURE_CANCELLED"]);
+        }
+      })
       .update(data, "*");
+  }
+
+  async createPetitionUserNotification(data: CreatePetitionUserNotification[]) {
+    if (data.length === 0) {
+      return [];
+    }
+    return await this.insert("petition_user_notification", data);
+  }
+
+  async createPetitionContactNotification(
+    data: CreatePetitionContactNotification[]
+  ) {
+    if (data.length === 0) {
+      return [];
+    }
+    return await this.insert("petition_contact_notification", data);
   }
 
   async updatePetitionContactNotifications(
@@ -2007,7 +2074,7 @@ export class PetitionRepository extends BaseRepository {
           .select("*");
 
         const byId = indexBy(
-          rows as CommentCreatedNotification[],
+          rows as CommentCreatedUserNotification[],
           keyBuilder([
             "user_id",
             "petition_id",
@@ -2133,68 +2200,17 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      // Create contact and user notifications
-      const [accesses, users] = await Promise.all([
-        data.isInternal ? [] : this.loadAccessesForPetition(data.petitionId),
-        this.loadUsersOnPetition(data.petitionId),
-      ]);
-
-      //every active access
-      const accessIds = accesses
-        .filter((a) => a.status === "ACTIVE")
-        .map((a) => a.id);
-      // every user with permissions on the petition, except the one sending the notification
-      const userIds = users.filter((u) => u.id !== user.id).map((u) => u.id);
-
-      const contactNotifications = accessIds.map(
-        (id) =>
-          ({
-            type: "COMMENT_CREATED",
-            petition_id: comment.petition_id,
-            petition_access_id: id,
-            data: {
-              petition_field_id: comment.petition_field_id,
-              petition_field_comment_id: comment.id,
-            },
-          } as CreatePetitionContactNotification)
-      );
-
-      const userNotifications = userIds.map(
-        (id) =>
-          ({
-            type: "COMMENT_CREATED",
-            petition_id: comment.petition_id,
-            user_id: id,
-            data: {
-              petition_field_id: comment.petition_field_id,
-              petition_field_comment_id: comment.id,
-            },
-          } as CreatePetitionUserNotification)
-      );
-
-      await Promise.all([
-        contactNotifications.length > 0
-          ? this.insert(
-              "petition_contact_notification",
-              contactNotifications,
-              t
-            )
-          : [],
-        userNotifications.length > 0
-          ? this.insert("petition_user_notification", userNotifications, t)
-          : [],
-        this.createEvent(
-          {
-            type: "COMMENT_PUBLISHED",
-            petition_id: data.petitionId,
-            data: {
-              petition_field_id: comment.petition_field_id,
-              petition_field_comment_id: comment.id,
-            },
+      await this.createEvent(
+        {
+          type: "COMMENT_PUBLISHED",
+          petition_id: data.petitionId,
+          data: {
+            petition_field_id: comment.petition_field_id,
+            petition_field_comment_id: comment.id,
           },
-          t
-        ),
-      ]);
+        },
+        t
+      );
 
       return comment;
     });
@@ -2221,68 +2237,17 @@ export class PetitionRepository extends BaseRepository {
         t
       );
 
-      // Create notifications and events
-      const [users, accesses] = await Promise.all([
-        this.loadUsersOnPetition(data.petitionId),
-        this.loadAccessesForPetition(data.petitionId),
-      ]);
-
-      // every user with permission on the petition
-      const userIds = users.map((u) => u.id);
-      // all active accesses, except the one sending the notification
-      const accessIds = accesses
-        .filter((a) => a.id !== access.id && a.status === "ACTIVE")
-        .map((a) => a.id);
-
-      const userNotifications = userIds.map(
-        (userId) =>
-          ({
-            type: "COMMENT_CREATED",
-            petition_id: comment.petition_id,
-            user_id: userId,
-            data: {
-              petition_field_id: comment.petition_field_id,
-              petition_field_comment_id: comment.id,
-            },
-          } as CreatePetitionUserNotification)
-      );
-
-      const contactNotifications = accessIds.map(
-        (id) =>
-          ({
-            type: "COMMENT_CREATED",
-            petition_id: comment.petition_id,
-            petition_access_id: id,
-            data: {
-              petition_field_id: comment.petition_field_id,
-              petition_field_comment_id: comment.id,
-            },
-          } as CreatePetitionContactNotification)
-      );
-
-      await Promise.all([
-        userNotifications.length > 0
-          ? this.insert("petition_user_notification", userNotifications, t)
-          : [],
-        contactNotifications.length > 0
-          ? this.insert(
-              "petition_contact_notification",
-              contactNotifications,
-              t
-            )
-          : [],
-        this.createEvent(
-          {
-            type: "COMMENT_PUBLISHED",
-            petition_id: data.petitionId,
-            data: {
-              petition_field_id: comment.petition_field_id,
-              petition_field_comment_id: comment.id,
-            },
+      await this.createEvent(
+        {
+          type: "COMMENT_PUBLISHED",
+          petition_id: data.petitionId,
+          data: {
+            petition_field_id: comment.petition_field_id,
+            petition_field_comment_id: comment.id,
           },
-          t
-        ),
-      ]);
+        },
+        t
+      );
 
       return comment;
     });

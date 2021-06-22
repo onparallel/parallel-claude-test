@@ -40,3 +40,4 @@ export * from "./tag/mutations";
 export * from "./tag/types";
 
 export * from "./notifications/types";
+export * from "./notifications/mutations";

@@ -42,7 +42,7 @@ enum ChangePasswordResult {
   SUCCESS
 }
 
-type CommentCreatedNotification implements PetitionUserNotification {
+type CommentCreatedUserNotification implements PetitionUserNotification {
   author: UserOrPetitionAccess!
   createdAt: DateTime!
   id: GID!
@@ -270,7 +270,7 @@ type MessageCancelledEvent implements PetitionEvent {
   user: User
 }
 
-type MessageEmailBouncedNotification implements PetitionUserNotification {
+type MessageEmailBouncedUserNotification implements PetitionUserNotification {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
@@ -1021,6 +1021,15 @@ type Mutation {
     isSubscribed: Boolean!
     petitionId: GID!
   ): Petition!
+
+  """
+  Updates the read status of a user's notification
+  """
+  updatePetitionUserNotificationReadStatus(
+    filter: PetitionUserNotificationFilter
+    isRead: Boolean!
+    petitionUserNotificationIds: [GID!]!
+  ): [PetitionUserNotification!]!
   updateSignatureRequestMetadata(
     metadata: JSONObject!
     petitionSignatureRequestId: GID!
@@ -1647,7 +1656,7 @@ type PetitionCompletedEvent implements PetitionEvent {
   id: GID!
 }
 
-type PetitionCompletedNotification implements PetitionUserNotification {
+type PetitionCompletedUserNotification implements PetitionUserNotification {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
@@ -2133,7 +2142,7 @@ type PetitionReopenedEvent implements PetitionEvent {
   user: User
 }
 
-type PetitionSharedNotification implements PetitionUserNotification {
+type PetitionSharedUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   owner: User!
@@ -2360,6 +2369,29 @@ interface PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   petition: Petition!
+}
+
+"""
+The types of notifications available for filtering
+"""
+enum PetitionUserNotificationFilter {
+  COMMENTS
+  COMPLETED
+  OTHER
+  SHARED
+  UNREAD
+}
+
+type PetitionUserNotificationPagination {
+  """
+  The requested slice of items.
+  """
+  items: [PetitionUserNotification!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
 }
 
 """
@@ -3111,8 +3143,7 @@ type SignatureCancelledEvent implements PetitionEvent {
   user: User
 }
 
-type SignatureCancelledNotification implements PetitionUserNotification {
-  author: UserOrContact!
+type SignatureCancelledUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   petition: Petition!
@@ -3123,8 +3154,7 @@ type SignatureCompletedEvent implements PetitionEvent {
   id: GID!
 }
 
-type SignatureCompletedNotification implements PetitionUserNotification {
-  contact: Contact!
+type SignatureCompletedUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   petition: Petition!
@@ -3372,13 +3402,30 @@ type User implements Timestamps {
   lastName: String
 
   """
+  Read and unread user notifications about events on their petitions
+  """
+  notifications(
+    filter: PetitionUserNotificationFilter
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): PetitionUserNotificationPagination!
+
+  """
   The onboarding status for the different views of the app.
   """
   onboardingStatus: JSONObject!
   organization: Organization!
   role: OrganizationRole!
   status: UserStatus!
-  unreadNotificationIds: [String!]!
+  unreadNotificationIds: [GID!]!
 
   """
   Time when the resource was last updated.
