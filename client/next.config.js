@@ -6,7 +6,9 @@ const config = {
   env: {
     ROOT: __dirname,
   },
-  future: { webpack5: true },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   crossOrigin: "anonymous",
   assetPrefix: process.env.NEXT_PUBLIC_ASSETS_URL,
   poweredByHeader: false,

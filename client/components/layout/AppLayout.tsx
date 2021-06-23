@@ -156,14 +156,6 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
         onUpdateTour={handleUpdateTour}
         status={user.onboardingStatus as any}
       />
-      <style global jsx>{`
-        body #hubspot-messages-iframe-container {
-          display: none !important;
-        }
-        body iframe#launcher {
-          display: none;
-        }
-      `}</style>
     </>
   );
 }
