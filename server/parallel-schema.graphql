@@ -1023,12 +1023,14 @@ type Mutation {
   ): Petition!
 
   """
-  Updates the read status of a user's notification
+  Updates the read status of a user's notification.
+  Must pass either petitionUserNotificationIds or filter argument.
+  If petitionUserNotificationIds is provided, filter argument will be ignored.
   """
   updatePetitionUserNotificationReadStatus(
     filter: PetitionUserNotificationFilter
     isRead: Boolean!
-    petitionUserNotificationIds: [GID!]!
+    petitionUserNotificationIds: [GID!]
   ): [PetitionUserNotification!]!
   updateSignatureRequestMetadata(
     metadata: JSONObject!
@@ -2375,6 +2377,7 @@ interface PetitionUserNotification {
 The types of notifications available for filtering
 """
 enum PetitionUserNotificationFilter {
+  ALL
   COMMENTS
   COMPLETED
   OTHER
@@ -3425,7 +3428,7 @@ type User implements Timestamps {
   organization: Organization!
   role: OrganizationRole!
   status: UserStatus!
-  unreadNotificationIds: [GID!]!
+  unreadNotificationIds: [String!]!
 
   """
   Time when the resource was last updated.

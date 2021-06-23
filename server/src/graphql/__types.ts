@@ -211,6 +211,7 @@ export interface NexusGenEnums {
     | "PROCESSING";
   PetitionStatus: db.PetitionStatus;
   PetitionUserNotificationFilter:
+    | "ALL"
     | "COMMENTS"
     | "COMPLETED"
     | "OTHER"
@@ -1366,7 +1367,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
-    unreadNotificationIds: NexusGenScalars["GID"][]; // [GID!]!
+    unreadNotificationIds: string[]; // [String!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   UserAuthenticationToken: {
@@ -2312,7 +2313,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     role: "OrganizationRole";
     status: "UserStatus";
-    unreadNotificationIds: "GID";
+    unreadNotificationIds: "String";
     updatedAt: "DateTime";
   };
   UserAuthenticationToken: {
@@ -2950,7 +2951,7 @@ export interface NexusGenArgTypes {
       // args
       filter?: NexusGenEnums["PetitionUserNotificationFilter"] | null; // PetitionUserNotificationFilter
       isRead: boolean; // Boolean!
-      petitionUserNotificationIds: NexusGenScalars["GID"][]; // [GID!]!
+      petitionUserNotificationIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     updateSignatureRequestMetadata: {
       // args

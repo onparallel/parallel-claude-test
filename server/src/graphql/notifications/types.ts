@@ -29,7 +29,7 @@ export const UserOrContact = unionType({
 export const PetitionUserNotificationFilter = enumType({
   name: "PetitionUserNotificationFilter",
   description: "The types of notifications available for filtering",
-  members: ["UNREAD", "COMMENTS", "COMPLETED", "SHARED", "OTHER"],
+  members: ["ALL", "UNREAD", "COMMENTS", "COMPLETED", "SHARED", "OTHER"],
 });
 
 export const PetitionUserNotification = interfaceType({

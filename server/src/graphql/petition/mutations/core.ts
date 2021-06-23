@@ -310,18 +310,25 @@ export const deletePetitions = mutationField("deletePetitions", {
         (p) => p.type === "OWNER"
       );
 
-      // make sure to also remove every remaining permission on deleted owned petitions
-      await ctx.petitions.deleteAllPermissions(
-        ownerPermissions.map((p) => p.petition_id),
-        ctx.user!,
-        t
-      );
-      //finally, delete only petitions OWNED by me
-      const deletedPetitions = await ctx.petitions.deletePetitionById(
-        ownerPermissions.map((p) => p.petition_id),
-        ctx.user!,
-        t
-      );
+      const [, deletedPetitions] = await Promise.all([
+        // make sure to also remove every remaining permission on deleted owned petitions
+        ctx.petitions.deleteAllPermissions(
+          ownerPermissions.map((p) => p.petition_id),
+          ctx.user!,
+          t
+        ),
+        //finally, delete only petitions OWNED by me
+        ctx.petitions.deletePetitionById(
+          ownerPermissions.map((p) => p.petition_id),
+          ctx.user!,
+          t
+        ),
+        // delete every user notification on the deleted petitions
+        ctx.petitions.deletePetitionUserNotificationsByPetitionId(
+          ownerPermissions.map((p) => p.petition_id),
+          t
+        ),
+      ]);
 
       await ctx.petitions.createEvent(
         deletedPetitions.map((petition) => ({

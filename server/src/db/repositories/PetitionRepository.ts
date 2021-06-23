@@ -77,6 +77,7 @@ type PetitionFilter = {
 };
 
 type PetitionUserNotificationFilter =
+  | "ALL"
   | "COMMENTS"
   | "COMPLETED"
   | "OTHER"
@@ -1982,13 +1983,24 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  async updatePetitionUserNotifications(
+  async updatePetitionUserNotificationsReadStatus(
     petitionUserNotificationIds: number[],
-    data: Partial<CreatePetitionUserNotification>,
-    filter?: Maybe<PetitionUserNotificationFilter>
+    isRead: boolean
   ) {
     return await this.from("petition_user_notification")
       .whereIn("id", petitionUserNotificationIds)
+      .where("is_read", !isRead) // to return only the updated notifications
+      .update({ is_read: isRead }, "*");
+  }
+
+  async updatePetitionUserNotificationsReadStatusByUserId(
+    userId: number,
+    isRead: boolean,
+    filter?: Maybe<PetitionUserNotificationFilter>
+  ) {
+    return await this.from("petition_user_notification")
+      .where("user_id", userId)
+      .where("is_read", !isRead)
       .mmodify((q) => {
         if (filter === "UNREAD") {
           q.where("is_read", false);
@@ -2002,7 +2014,7 @@ export class PetitionRepository extends BaseRepository {
           q.whereIn("type", ["MESSAGE_EMAIL_BOUNCED", "SIGNATURE_CANCELLED"]);
         }
       })
-      .update(data, "*");
+      .update({ is_read: isRead }, "*");
   }
 
   async createPetitionUserNotification(data: CreatePetitionUserNotification[]) {
@@ -2010,6 +2022,18 @@ export class PetitionRepository extends BaseRepository {
       return [];
     }
     return await this.insert("petition_user_notification", data);
+  }
+
+  async deletePetitionUserNotificationsByPetitionId(
+    petitionIds: number[],
+    t?: Knex.Transaction
+  ) {
+    if (petitionIds.length === 0) {
+      return [];
+    }
+    return await this.from("petition_user_notification", t)
+      .whereIn("petition_id", petitionIds)
+      .delete();
   }
 
   async createPetitionContactNotification(

@@ -17,6 +17,7 @@ import {
   CreateTag,
   CreateUser,
   CreateUserGroup,
+  EmailLog,
   FileUpload,
   Organization,
   Petition,
@@ -24,10 +25,13 @@ import {
   PetitionEventSubscription,
   PetitionField,
   PetitionFieldAttachment,
+  PetitionFieldComment,
   PetitionFieldReply,
   PetitionFieldType,
+  PetitionMessage,
   PetitionPermission,
   PetitionPermissionType,
+  PetitionUserNotification,
   Tag,
   User,
   UserAuthenticationToken,
@@ -129,12 +133,12 @@ export class Mocks {
   async createRandomPetitions(
     orgId: number,
     ownerId: number,
-    amount: number,
+    amount?: number,
     builder?: (index: number) => Partial<Petition>
   ) {
     const petitions = await this.knex<Petition>("petition")
       .insert(
-        range(0, amount).map<CreatePetition>((index) => {
+        range(0, amount || 1).map<CreatePetition>((index) => {
           return {
             org_id: orgId,
             is_template: false,
@@ -305,7 +309,8 @@ export class Mocks {
   async sharePetitions(
     petitionIds: number[],
     toUserId: number,
-    permissionType: PetitionPermissionType
+    permissionType: PetitionPermissionType,
+    builder?: () => Partial<PetitionPermission>
   ) {
     return await this.knex<PetitionPermission>("petition_permission")
       .insert(
@@ -313,6 +318,7 @@ export class Mocks {
           petition_id: petitionId,
           user_id: toUserId,
           type: permissionType,
+          ...builder?.(),
         }))
       )
       .returning("*");
@@ -414,13 +420,91 @@ export class Mocks {
 
   async createContactAuthentication(contactId: number) {
     const cookieValue = random(48);
-    await this.knex<ContactAuthentication>("contact_authentication")
+    await this.knex<ContactAuthentication>("contact_authentication").insert({
+      contact_id: contactId,
+      cookie_value_hash: await hash(cookieValue, contactId.toString()),
+    });
+    return cookieValue;
+  }
+
+  async clearUserNotifications() {
+    return await this.knex<PetitionUserNotification>(
+      "petition_user_notification"
+    ).delete();
+  }
+
+  async createRandomCommentsFromUser(
+    userId: number,
+    petitionFieldId: number,
+    petitionId: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldComment>
+  ) {
+    return await this.knex<PetitionFieldComment>("petition_field_comment")
+      .insert(
+        range(0, amount || 1).map((i) => ({
+          content: faker.lorem.words(),
+          user_id: userId,
+          petition_field_id: petitionFieldId,
+          petition_id: petitionId,
+          ...builder?.(i),
+        }))
+      )
+      .returning("*");
+  }
+
+  async createRandomCommentsFromAccess(
+    petitionAccessId: number,
+    petitionFieldId: number,
+    petitionId: number,
+    amount?: number,
+    builder?: (index: number) => Partial<PetitionFieldComment>
+  ) {
+    return await this.knex<PetitionFieldComment>("petition_field_comment")
+      .insert(
+        range(0, amount || 1).map((i) => ({
+          content: faker.lorem.words(),
+          petition_access_id: petitionAccessId,
+          petition_field_id: petitionFieldId,
+          petition_id: petitionId,
+          ...builder?.(i),
+        }))
+      )
+      .returning("*");
+  }
+
+  async createRandomPetitionMessage(
+    petitionId: number,
+    petitionAccessId: number,
+    senderId: number,
+    builder?: () => Partial<PetitionMessage>
+  ) {
+    return await this.knex<PetitionMessage>("petition_message")
       .insert({
-        contact_id: contactId,
-        cookie_value_hash: await hash(cookieValue, contactId.toString()),
+        email_body: faker.lorem.paragraphs(),
+        email_subject: faker.lorem.words(),
+        petition_access_id: petitionAccessId,
+        petition_id: petitionId,
+        sender_id: senderId,
+        status: "PROCESSED",
+        ...builder?.(),
       })
       .returning("*");
-    return cookieValue;
+  }
+
+  async createRandomEmailLog() {
+    return await this.knex<EmailLog>("email_log")
+      .insert({
+        to: faker.internet.email(),
+        from: faker.internet.email(),
+        subject: faker.lorem.words(),
+        text: faker.lorem.paragraphs(),
+        html: faker.lorem.paragraphs(),
+        track_opens: false,
+        created_at: new Date(),
+        created_from: faker.internet.email(),
+      })
+      .returning("*");
   }
 }
 
