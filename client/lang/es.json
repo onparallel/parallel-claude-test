@@ -4770,6 +4770,131 @@
     "context": "For more information, please review our <a>Privacy Policy</a>."
   },
   {
+    "term": "public.law-firms.benefits-control-message",
+    "definition": "",
+    "context": "Visualize the status of the on-going cases and remaining work of your team."
+  },
+  {
+    "term": "public.law-firms.benefits-control-title",
+    "definition": "",
+    "context": "All your affairs under control"
+  },
+  {
+    "term": "public.law-firms.benefits-efficency-message",
+    "definition": "",
+    "context": "Use templates to reuse knowledge and reduce mistakes in your workflow."
+  },
+  {
+    "term": "public.law-firms.benefits-efficency-title",
+    "definition": "",
+    "context": "Enhance the efficiency of your team"
+  },
+  {
+    "term": "public.law-firms.benefits-experience-message",
+    "definition": "",
+    "context": "Provide a secure portal where your clients can colaborate and communicate with you."
+  },
+  {
+    "term": "public.law-firms.benefits-experience-title",
+    "definition": "",
+    "context": "Improve your customer experience"
+  },
+  {
+    "term": "public.law-firms.book-cta-title",
+    "definition": "",
+    "context": "We help you?"
+  },
+  {
+    "term": "public.law-firms.hero-subtitle",
+    "definition": "",
+    "context": "Increase your team’s billable hours provinding them with a tool that takes care of repetitive processes and accelerates his project completion."
+  },
+  {
+    "term": "public.law-firms.hero-title",
+    "definition": "",
+    "context": "Increase your team’s billing and return"
+  },
+  {
+    "term": "public.law-firms.security",
+    "definition": "",
+    "context": "Security"
+  },
+  {
+    "term": "public.law-firms.security-body",
+    "definition": "",
+    "context": "Our priority is to make the experience as agile and secure as possible for both you and yout clients."
+  },
+  {
+    "term": "public.law-firms.security-encrypted",
+    "definition": "",
+    "context": "Your information secure and encrypted"
+  },
+  {
+    "term": "public.law-firms.security-title",
+    "definition": "",
+    "context": "We protect your client information"
+  },
+  {
+    "term": "public.law-firms.security-tls",
+    "definition": "",
+    "context": "Security protocol TLS"
+  },
+  {
+    "term": "public.law-firms.security-two-factor",
+    "definition": "",
+    "context": "Two-factor authentication"
+  },
+  {
+    "term": "public.law-firms.speed-up-body",
+    "definition": "",
+    "context": "It facilitates the <b>control and monitoring of regulatory compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
+  },
+  {
+    "term": "public.law-firms.speed-up-title",
+    "definition": "",
+    "context": "We speed up your new clients registration, quickly and securely."
+  },
+  {
+    "term": "public.law-firms.title",
+    "definition": "",
+    "context": "Increase your team’s billing and return"
+  },
+  {
+    "term": "public.law-firms.use-case",
+    "definition": "",
+    "context": "Use case"
+  },
+  {
+    "term": "public.law-use-cases.colaborate-description",
+    "definition": "",
+    "context": "Share your cases with your colleagues to work efficiently."
+  },
+  {
+    "term": "public.law-use-cases.colaborate-title",
+    "definition": "",
+    "context": "Colaborate with your team"
+  },
+  {
+    "term": "public.law-use-cases.esignature-description",
+    "definition": "",
+    "context": "Enable easily an advance eSignature to your proccess, completely secure and legally valid.."
+  },
+  {
+    "term": "public.law-use-cases.esignature-title",
+    "definition": "",
+    "context": "eSignature integration"
+  },
+  {
+    "term": "public.law-use-cases.smart-forms-description",
+    "definition": "",
+    "context": "Use conditions to set up smart decisions and ensure that your clients responds only to what is needed."
+  },
+  {
+    "term": "public.law-use-cases.smart-forms-title",
+    "definition": "",
+    "context": "Smart forms"
+  },
+  {
     "term": "public.login-button",
     "definition": "Acceso",
     "context": "Login"
@@ -5428,6 +5553,26 @@
     "term": "public.showcase-hero-alt",
     "definition": "Una imagen de la aplicación mostrando la información recibida utilizando Parallel",
     "context": "A screenshot of the app showcasing the information received using Parallel"
+  },
+  {
+    "term": "public.solutions-law-firms.title",
+    "definition": "",
+    "context": "Solutions for law firms"
+  },
+  {
+    "term": "public.solutions-link",
+    "definition": "Soluciones",
+    "context": "Solutions"
+  },
+  {
+    "term": "public.solutions.accountants-link",
+    "definition": "Asesorías",
+    "context": "Accountants"
+  },
+  {
+    "term": "public.solutions.law-firms-link",
+    "definition": "Despacho de abogados",
+    "context": "Law firms"
   },
   {
     "term": "public.support.faq",

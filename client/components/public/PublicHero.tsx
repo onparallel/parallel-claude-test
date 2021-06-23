@@ -8,15 +8,28 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
-import { useRouter } from "next/router";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 
-export type PublicHeroProps = BoxProps;
+export interface PublicHeroProps extends BoxProps {
+  image: string;
+  ratio: number;
+  title: string;
+  subtitle: string;
+  buttonText: string;
+  url: string;
+}
 
-export function PublicMainHero({ ...props }: PublicHeroProps) {
+export function PublicHero({
+  image,
+  ratio,
+  title,
+  subtitle,
+  buttonText,
+  url,
+  ...props
+}: PublicHeroProps) {
   const intl = useIntl();
-  const { query } = useRouter();
-  const imageName = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/showcase_hero_${query.locale}`;
+
   const breakpoint = "lg";
   return (
     <Stack
@@ -36,19 +49,13 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
             size="3xl"
             lineHeight="1.2"
           >
-            <FormattedMessage
-              id="public.home.hero-title"
-              defaultMessage="Automate your workflows with clients"
-            />
+            {title}
           </Heading>
           <Heading as="h2" size="md" fontWeight="light">
-            <FormattedMessage
-              id="public.home.hero-subtitle"
-              defaultMessage="With Parallel you can easily automate forms with documents and make it an agile and safe process."
-            />
+            {subtitle}
           </Heading>
           <Box>
-            <NakedLink href="/book-demo">
+            <NakedLink href={url}>
               <Button
                 as="a"
                 size="lg"
@@ -56,24 +63,21 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
                 marginBottom={{ base: 2, [breakpoint]: 0 }}
                 marginRight={{ base: 0, [breakpoint]: 2 }}
               >
-                <FormattedMessage
-                  id="public.book-demo-button"
-                  defaultMessage="Book a demo"
-                />
+                {buttonText}
               </Button>
             </NakedLink>
           </Box>
         </Stack>
       </Center>
       <AspectRatio
-        ratio={1426 / 1140}
+        ratio={ratio}
         flex="1"
         width={{ base: "80vw", [breakpoint]: "auto" }}
         alignSelf={{ base: "flex-end", [breakpoint]: "auto" }}
       >
         <Box as="picture" margin="auto">
           <source
-            srcSet={`${imageName}.webp?v=${process.env.BUILD_ID}`}
+            srcSet={`${image}.webp?v=${process.env.BUILD_ID}`}
             type="image/webp"
           />
           <img
@@ -82,7 +86,7 @@ export function PublicMainHero({ ...props }: PublicHeroProps) {
               defaultMessage:
                 "A screenshot of the app showcasing the information received using Parallel",
             })}
-            src={`${imageName}.png?v=${process.env.BUILD_ID}`}
+            src={`${image}.png?v=${process.env.BUILD_ID}`}
           />
         </Box>
       </AspectRatio>

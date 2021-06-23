@@ -4770,6 +4770,131 @@
     "context": "For more information, please review our <a>Privacy Policy</a>."
   },
   {
+    "term": "public.law-firms.benefits-control-message",
+    "definition": "Visualize the status of the on-going cases and remaining work of your team.",
+    "context": "Visualize the status of the on-going cases and remaining work of your team."
+  },
+  {
+    "term": "public.law-firms.benefits-control-title",
+    "definition": "All your affairs under control",
+    "context": "All your affairs under control"
+  },
+  {
+    "term": "public.law-firms.benefits-efficency-message",
+    "definition": "Use templates to reuse knowledge and reduce mistakes in your workflow.",
+    "context": "Use templates to reuse knowledge and reduce mistakes in your workflow."
+  },
+  {
+    "term": "public.law-firms.benefits-efficency-title",
+    "definition": "Enhance the efficiency of your team",
+    "context": "Enhance the efficiency of your team"
+  },
+  {
+    "term": "public.law-firms.benefits-experience-message",
+    "definition": "Provide a secure portal where your clients can colaborate and communicate with you.",
+    "context": "Provide a secure portal where your clients can colaborate and communicate with you."
+  },
+  {
+    "term": "public.law-firms.benefits-experience-title",
+    "definition": "Improve your customer experience",
+    "context": "Improve your customer experience"
+  },
+  {
+    "term": "public.law-firms.book-cta-title",
+    "definition": "We help you?",
+    "context": "We help you?"
+  },
+  {
+    "term": "public.law-firms.hero-subtitle",
+    "definition": "Increase your team’s billable hours provinding them with a tool that takes care of repetitive processes and accelerates his project completion.",
+    "context": "Increase your team’s billable hours provinding them with a tool that takes care of repetitive processes and accelerates his project completion."
+  },
+  {
+    "term": "public.law-firms.hero-title",
+    "definition": "Increase your team’s billing and return",
+    "context": "Increase your team’s billing and return"
+  },
+  {
+    "term": "public.law-firms.security",
+    "definition": "Security",
+    "context": "Security"
+  },
+  {
+    "term": "public.law-firms.security-body",
+    "definition": "Our priority is to make the experience as agile and secure as possible for both you and yout clients.",
+    "context": "Our priority is to make the experience as agile and secure as possible for both you and yout clients."
+  },
+  {
+    "term": "public.law-firms.security-encrypted",
+    "definition": "Your information secure and encrypted",
+    "context": "Your information secure and encrypted"
+  },
+  {
+    "term": "public.law-firms.security-title",
+    "definition": "We protect your client information",
+    "context": "We protect your client information"
+  },
+  {
+    "term": "public.law-firms.security-tls",
+    "definition": "Security protocol TLS",
+    "context": "Security protocol TLS"
+  },
+  {
+    "term": "public.law-firms.security-two-factor",
+    "definition": "Two-factor authentication",
+    "context": "Two-factor authentication"
+  },
+  {
+    "term": "public.law-firms.speed-up-body",
+    "definition": "It facilitates the <b>control and monitoring of regulatory compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance.",
+    "context": "It facilitates the <b>control and monitoring of regulatory compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
+  },
+  {
+    "term": "public.law-firms.speed-up-title",
+    "definition": "We speed up your new clients registration, quickly and securely.",
+    "context": "We speed up your new clients registration, quickly and securely."
+  },
+  {
+    "term": "public.law-firms.title",
+    "definition": "Increase your team’s billing and return",
+    "context": "Increase your team’s billing and return"
+  },
+  {
+    "term": "public.law-firms.use-case",
+    "definition": "Use case",
+    "context": "Use case"
+  },
+  {
+    "term": "public.law-use-cases.colaborate-description",
+    "definition": "Share your cases with your colleagues to work efficiently.",
+    "context": "Share your cases with your colleagues to work efficiently."
+  },
+  {
+    "term": "public.law-use-cases.colaborate-title",
+    "definition": "Colaborate with your team",
+    "context": "Colaborate with your team"
+  },
+  {
+    "term": "public.law-use-cases.esignature-description",
+    "definition": "Enable easily an advance eSignature to your proccess, completely secure and legally valid..",
+    "context": "Enable easily an advance eSignature to your proccess, completely secure and legally valid.."
+  },
+  {
+    "term": "public.law-use-cases.esignature-title",
+    "definition": "eSignature integration",
+    "context": "eSignature integration"
+  },
+  {
+    "term": "public.law-use-cases.smart-forms-description",
+    "definition": "Use conditions to set up smart decisions and ensure that your clients responds only to what is needed.",
+    "context": "Use conditions to set up smart decisions and ensure that your clients responds only to what is needed."
+  },
+  {
+    "term": "public.law-use-cases.smart-forms-title",
+    "definition": "Smart forms",
+    "context": "Smart forms"
+  },
+  {
     "term": "public.login-button",
     "definition": "Login",
     "context": "Login"
@@ -5428,6 +5553,26 @@
     "term": "public.showcase-hero-alt",
     "definition": "A screenshot of the app showcasing the information received using Parallel",
     "context": "A screenshot of the app showcasing the information received using Parallel"
+  },
+  {
+    "term": "public.solutions-law-firms.title",
+    "definition": "Solutions for law firms",
+    "context": "Solutions for law firms"
+  },
+  {
+    "term": "public.solutions-link",
+    "definition": "Solutions",
+    "context": "Solutions"
+  },
+  {
+    "term": "public.solutions.accountants-link",
+    "definition": "Accountants",
+    "context": "Accountants"
+  },
+  {
+    "term": "public.solutions.law-firms-link",
+    "definition": "Law firms",
+    "context": "Law firms"
   },
   {
     "term": "public.support.faq",

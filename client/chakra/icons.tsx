@@ -1573,6 +1573,23 @@ export const RadioButtonSelected = createIcon({
   ),
 });
 
+export const CircleCheckIcon = createIcon({
+  displayName: "CircleCheckIcon",
+  viewBox: "0 0 16 17",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m14 8.50012c0-3.3125-2.6875-6-6-6s-6 2.6875-6 6c0 3.31248 2.6875 5.99998 6 5.99998s6-2.6875 6-5.99998z" />
+      <path d="m10.9999 6.00037-4.19996 5.00003-1.8-2.00004" />
+    </g>
+  ),
+});
+
 export const ShieldIcon = createIcon({
   displayName: "ShieldIcon",
   viewBox: "0 0 24 24",
