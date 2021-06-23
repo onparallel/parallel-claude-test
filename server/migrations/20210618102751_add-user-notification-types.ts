@@ -21,6 +21,13 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
+  await knex.raw(/* sql */ `
+    drop index "pun__comment_created__petition_id__data";
+    drop index "pun__comment_created__user_id__petition_id__data";
+    drop index "petition_user_notification__user_id__is_read";
+    drop index "petition_user_notification__user_id";
+  `);
+
   await removeUserNotificationType(knex, "PETITION_COMPLETED");
   await removeUserNotificationType(knex, "SIGNATURE_COMPLETED");
   await removeUserNotificationType(knex, "SIGNATURE_CANCELLED");
@@ -28,11 +35,16 @@ export async function down(knex: Knex): Promise<void> {
   await removeUserNotificationType(knex, "MESSAGE_EMAIL_BOUNCED");
 
   await knex.raw(/* sql */ `
-      drop index "petition_user_notification__user_id__is_read";
-      drop index "petition_user_notification__user_id";
+  create index "pun__comment_created__petition_id__data" on petition_user_notification (
+    petition_id,
+    ((data ->> 'petition_field_id')::int),
+    ((data ->> 'petition_field_comment_id')::int)
+  ) where type = 'COMMENT_CREATED';
+  create unique index "pun__comment_created__user_id__petition_id__data" on petition_user_notification (
+    user_id,
+    petition_id,
+    ((data ->> 'petition_field_id')::int),
+    ((data ->> 'petition_field_comment_id')::int)
+  ) where type = 'COMMENT_CREATED';
   `);
 }
-
-export const config = {
-  transaction: false,
-};
