@@ -259,7 +259,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
   it("should mark a list of notifications as unread", async () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
-        mutation ($notificationIds: [GID!]!, $isRead: Boolean!) {
+        mutation ($notificationIds: [GID!], $isRead: Boolean!) {
           updatePetitionUserNotificationReadStatus(
             petitionUserNotificationIds: $notificationIds
             isRead: $isRead
@@ -285,7 +285,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
   it("should return only the updated notifications when marking read status", async () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
-        mutation ($notificationIds: [GID!]!, $isRead: Boolean!) {
+        mutation ($notificationIds: [GID!], $isRead: Boolean!) {
           updatePetitionUserNotificationReadStatus(
             petitionUserNotificationIds: $notificationIds
             isRead: $isRead
@@ -312,7 +312,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
   it("should send error if trying to update the read status of another user's notification", async () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
-        mutation ($notificationIds: [GID!]!, $isRead: Boolean!) {
+        mutation ($notificationIds: [GID!], $isRead: Boolean!) {
           updatePetitionUserNotificationReadStatus(
             petitionUserNotificationIds: $notificationIds
             isRead: $isRead
@@ -331,6 +331,58 @@ describe("GraphQL - PetitionUserNotifications", () => {
 
     expect(errors).toContainGraphQLError("FORBIDDEN");
     expect(data).toBeNull();
+  });
+
+  it("should send error if pasing neither petitionUserNotificationIds nor filter arguments", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($isRead: Boolean!) {
+          updatePetitionUserNotificationReadStatus(isRead: $isRead) {
+            id
+          }
+        }
+      `,
+      variables: {
+        isRead: true,
+      },
+    });
+
+    expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+    expect(data).toBeNull();
+  });
+
+  it("should ignore filter argument if passing both petitionUserNotificationIds and filter", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation (
+          $isRead: Boolean!
+          $filter: PetitionUserNotificationFilter
+          $petitionUserNotificationIds: [GID!]
+        ) {
+          updatePetitionUserNotificationReadStatus(
+            isRead: $isRead
+            filter: $filter
+            petitionUserNotificationIds: $petitionUserNotificationIds
+          ) {
+            id
+          }
+        }
+      `,
+      variables: {
+        isRead: true,
+        petitionUserNotificationIds: [
+          toGlobalId("PetitionUserNotification", notifications[2].id),
+          toGlobalId("PetitionUserNotification", notifications[3].id),
+        ],
+        filter: "COMMENTS",
+      },
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
+      { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
+      { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
+    ]);
   });
 
   it("notification should be deleted if the user comments a field and then deletes the comment", async () => {
