@@ -123,10 +123,30 @@ const MenuItemLink = chakraForwardRef<"a", MenuItemLinkProps>(
 );
 
 function PublicHeaderMenu(props: StackProps) {
+  const router = useRouter();
+  const current = router.pathname.startsWith("/[locale]")
+    ? router.asPath.replace(/^\/[^\/]+/, "")
+    : router.asPath;
+
   return (
     <Stack {...props}>
       <Menu placement="bottom">
-        <MenuButton as={Button} variant="ghost" rightIcon={<ChevronDownIcon />}>
+        <MenuButton
+          as={Button}
+          variant="ghost"
+          rightIcon={<ChevronDownIcon />}
+          {...(current.includes("/product/")
+            ? {
+                fontWeight: "bold",
+                color: "purple.500",
+              }
+            : {})}
+          sx={{
+            "svg g": {
+              strokeWidth: "3.2",
+            },
+          }}
+        >
           <FormattedMessage id="public.product-link" defaultMessage="Product" />
         </MenuButton>
         <Portal>
@@ -165,7 +185,22 @@ function PublicHeaderMenu(props: StackProps) {
         </Portal>
       </Menu>
       <Menu placement="bottom">
-        <MenuButton as={Button} variant="ghost" rightIcon={<ChevronDownIcon />}>
+        <MenuButton
+          as={Button}
+          variant="ghost"
+          rightIcon={<ChevronDownIcon />}
+          {...(current.includes("/solutions/")
+            ? {
+                fontWeight: "bold",
+                color: "purple.600",
+              }
+            : {})}
+          sx={{
+            "svg g": {
+              strokeWidth: "3.2",
+            },
+          }}
+        >
           <FormattedMessage
             id="public.solutions-link"
             defaultMessage="Solutions"
@@ -189,7 +224,16 @@ function PublicHeaderMenu(props: StackProps) {
         </Portal>
       </Menu>
       <NakedLink href="/about">
-        <Button as="a" variant="ghost">
+        <Button
+          as="a"
+          variant="ghost"
+          {...(current.includes("/about")
+            ? {
+                fontWeight: "bold",
+                color: "purple.500",
+              }
+            : {})}
+        >
           <FormattedMessage id="public.about-link" defaultMessage="About" />
         </Button>
       </NakedLink>
@@ -197,7 +241,17 @@ function PublicHeaderMenu(props: StackProps) {
         <FormattedMessage id="public.blog-link" defaultMessage="Blog" />
       </Button>
       <NakedLink href="/login">
-        <Button as="a" variant="outline" id="pw-public-login">
+        <Button
+          as="a"
+          variant="outline"
+          id="pw-public-login"
+          {...(current.includes("/login")
+            ? {
+                fontWeight: "bold",
+                color: "purple.500",
+              }
+            : {})}
+        >
           <FormattedMessage id="public.login-button" defaultMessage="Login" />
         </Button>
       </NakedLink>

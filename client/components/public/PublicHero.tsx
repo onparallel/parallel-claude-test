@@ -17,6 +17,7 @@ export interface PublicHeroProps extends BoxProps {
   subtitle: string;
   buttonText: string;
   url: string;
+  sectionTitle?: string;
 }
 
 export function PublicHero({
@@ -26,6 +27,7 @@ export function PublicHero({
   subtitle,
   buttonText,
   url,
+  sectionTitle,
   ...props
 }: PublicHeroProps) {
   const intl = useIntl();
@@ -46,9 +48,21 @@ export function PublicHero({
             as="h1"
             fontFamily="hero"
             fontWeight="600"
-            size="3xl"
+            size={sectionTitle ? "3xl" : "2xl"}
             lineHeight="1.2"
           >
+            {sectionTitle ? (
+              <Heading
+                as="h4"
+                size="xs"
+                lineHeight="24px"
+                color="gray.600"
+                textTransform="uppercase"
+                marginTop={4}
+              >
+                {sectionTitle}
+              </Heading>
+            ) : null}
             {title}
           </Heading>
           <Heading as="h2" size="md" fontWeight="light">
@@ -73,7 +87,7 @@ export function PublicHero({
         ratio={ratio}
         flex="1"
         width={{ base: "80vw", [breakpoint]: "auto" }}
-        alignSelf={{ base: "flex-end", [breakpoint]: "auto" }}
+        alignSelf={{ base: "flex-end", [breakpoint]: "flex-start" }}
       >
         <Box as="picture" margin="auto">
           <source

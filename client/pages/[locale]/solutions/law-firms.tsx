@@ -39,6 +39,10 @@ function Home() {
       id: "public.book-demo-button",
       defaultMessage: "Book a demo",
     }),
+    sectionTitle: intl.formatMessage({
+      id: "public.law-firms",
+      defaultMessage: "Law firms",
+    }),
     url: "/book-demo",
   };
 
@@ -55,6 +59,7 @@ function Home() {
         title={hero.title}
         subtitle={hero.subtitle}
         buttonText={hero.buttonText}
+        sectionTitle={hero.sectionTitle}
         url={hero.url}
       />
       <PublicTrust />
@@ -159,6 +164,10 @@ function Home() {
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel_usecase_kyc_${query.locale}.svg`}
           imageSize="330px"
+          description={intl.formatMessage({
+            id: "public.law-firms.actual-data-kyc",
+            defaultMessage: "*Actual data in a KYC case.",
+          })}
         >
           <Heading
             as="h4"

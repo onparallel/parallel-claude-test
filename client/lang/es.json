@@ -4770,6 +4770,16 @@
     "context": "For more information, please review our <a>Privacy Policy</a>."
   },
   {
+    "term": "public.law-firms",
+    "definition": "Despachos de abogados",
+    "context": "Law firms"
+  },
+  {
+    "term": "public.law-firms.actual-data-kyc",
+    "definition": "*Datos reales en un caso de uso de KYC.",
+    "context": "*Actual data in a KYC case."
+  },
+  {
     "term": "public.law-firms.benefits-control-message",
     "definition": "Visualiza el estado de los casos en curso y el trabajo pendiente de tu equipo.",
     "context": "Visualize the status of the on-going cases and remaining work of your team."
