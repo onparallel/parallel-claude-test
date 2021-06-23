@@ -3415,7 +3415,7 @@ type User implements Timestamps {
   organization: Organization!
   role: OrganizationRole!
   status: UserStatus!
-  unreadNotificationIds: [GID!]!
+  unreadNotificationIds: [String!]!
 
   """
   Time when the resource was last updated.

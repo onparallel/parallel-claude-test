@@ -1373,7 +1373,7 @@ export interface NexusGenFieldTypes {
     organization: NexusGenRootTypes["Organization"]; // Organization!
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
-    unreadNotificationIds: NexusGenScalars["GID"][]; // [GID!]!
+    unreadNotificationIds: string[]; // [String!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   UserAuthenticationToken: {
@@ -2326,7 +2326,7 @@ export interface NexusGenFieldTypeNames {
     organization: "Organization";
     role: "OrganizationRole";
     status: "UserStatus";
-    unreadNotificationIds: "GID";
+    unreadNotificationIds: "String";
     updatedAt: "DateTime";
   };
   UserAuthenticationToken: {
