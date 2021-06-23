@@ -4801,8 +4801,8 @@
   },
   {
     "term": "public.law-firms.book-cta-title",
-    "definition": "We help you?",
-    "context": "We help you?"
+    "definition": "Can we help you?",
+    "context": "Can we help you?"
   },
   {
     "term": "public.law-firms.hero-subtitle",
@@ -4846,13 +4846,13 @@
   },
   {
     "term": "public.law-firms.speed-up-body",
-    "definition": "It facilitates the <b>control and monitoring of regulatory compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance.",
-    "context": "It facilitates the <b>control and monitoring of regulatory compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
+    "definition": "Improves <b>control and monitoring of compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance.",
+    "context": "Improves <b>control and monitoring of compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
   },
   {
     "term": "public.law-firms.speed-up-title",
-    "definition": "We speed up your new clients registration, quickly and securely.",
-    "context": "We speed up your new clients registration, quickly and securely."
+    "definition": "Speed up your new clients registration, quickly and securely.",
+    "context": "Speed up your new clients registration, quickly and securely."
   },
   {
     "term": "public.law-firms.title",

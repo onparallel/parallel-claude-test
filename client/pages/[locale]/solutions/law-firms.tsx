@@ -182,13 +182,13 @@ function Home() {
           >
             <FormattedMessage
               id="public.law-firms.speed-up-title"
-              defaultMessage="We speed up your new clients registration, quickly and securely. "
+              defaultMessage="Speed up your new clients registration, quickly and securely. "
             />
           </Heading>
           <Text>
             <FormattedMessage
               id="public.law-firms.speed-up-body"
-              defaultMessage="It facilitates the <b>control and monitoring of regulatory compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
+              defaultMessage="Improves <b>control and monitoring of compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
               values={{
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
               }}
@@ -259,7 +259,7 @@ function Home() {
       <PublicDemoCta>
         <FormattedMessage
           id="public.law-firms.book-cta-title"
-          defaultMessage="We help you?"
+          defaultMessage="Can we help you?"
         />
       </PublicDemoCta>
     </PublicLayout>

@@ -14,6 +14,7 @@ export function PublicDemoCta({ children, ...props }: BoxProps) {
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
+        backgroundColor: "#6b66ea",
         ...props,
       }}
     >

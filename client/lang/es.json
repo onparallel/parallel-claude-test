@@ -4771,127 +4771,127 @@
   },
   {
     "term": "public.law-firms.benefits-control-message",
-    "definition": "",
+    "definition": "Visualiza el estado de los casos en curso y el trabajo pendiente de tu equipo.",
     "context": "Visualize the status of the on-going cases and remaining work of your team."
   },
   {
     "term": "public.law-firms.benefits-control-title",
-    "definition": "",
+    "definition": "Todos tus asuntos bajo control",
     "context": "All your affairs under control"
   },
   {
     "term": "public.law-firms.benefits-efficency-message",
-    "definition": "",
+    "definition": "Utiliza plantillas para reutilizar el conocimiento y minimizar errores en tu trabajo.",
     "context": "Use templates to reuse knowledge and reduce mistakes in your workflow."
   },
   {
     "term": "public.law-firms.benefits-efficency-title",
-    "definition": "",
+    "definition": "Aumenta la eficiencia de tu equipo",
     "context": "Enhance the efficiency of your team"
   },
   {
     "term": "public.law-firms.benefits-experience-message",
-    "definition": "",
+    "definition": "Ofrece un portal seguro dónde tus clientes puedan colaborar y comunicarse contigo.",
     "context": "Provide a secure portal where your clients can colaborate and communicate with you."
   },
   {
     "term": "public.law-firms.benefits-experience-title",
-    "definition": "",
+    "definition": "Mejora la experiencia de tus clientes.",
     "context": "Improve your customer experience"
   },
   {
     "term": "public.law-firms.book-cta-title",
-    "definition": "",
-    "context": "We help you?"
+    "definition": "¿Te ayudamos?",
+    "context": "Can we help you?"
   },
   {
     "term": "public.law-firms.hero-subtitle",
-    "definition": "",
+    "definition": "Aumenta las horas facturables de tu equipo, ofreciéndoles una herramienta que se encargue de los procesos repetitivos y acelere el cierre de los asuntos.",
     "context": "Increase your team’s billable hours provinding them with a tool that takes care of repetitive processes and accelerates his project completion."
   },
   {
     "term": "public.law-firms.hero-title",
-    "definition": "",
+    "definition": "Aumenta la facturación y el retorno de tu equipo",
     "context": "Increase your team’s billing and return"
   },
   {
     "term": "public.law-firms.security",
-    "definition": "",
+    "definition": "Seguridad",
     "context": "Security"
   },
   {
     "term": "public.law-firms.security-body",
-    "definition": "",
+    "definition": "Nuestra prioridad es que la experiencia sea lo más ágil y segura posible tanto para ti como para tus clientes.",
     "context": "Our priority is to make the experience as agile and secure as possible for both you and yout clients."
   },
   {
     "term": "public.law-firms.security-encrypted",
-    "definition": "",
+    "definition": "Tu información segura y encriptada",
     "context": "Your information secure and encrypted"
   },
   {
     "term": "public.law-firms.security-title",
-    "definition": "",
+    "definition": "Protegemos la información de tus clientes",
     "context": "We protect your client information"
   },
   {
     "term": "public.law-firms.security-tls",
-    "definition": "",
+    "definition": "Protocolos de seguridad TLS",
     "context": "Security protocol TLS"
   },
   {
     "term": "public.law-firms.security-two-factor",
-    "definition": "",
+    "definition": "Doble factor de autenticación",
     "context": "Two-factor authentication"
   },
   {
     "term": "public.law-firms.speed-up-body",
-    "definition": "",
-    "context": "It facilitates the <b>control and monitoring of regulatory compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
+    "definition": "Facilita el <b>control y seguimiento del cumplimiento normativo</b> de la Prevención de Blanqueo de Capitales, y evita sanciones por incumplimiento.",
+    "context": "Improves <b>control and monitoring of compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
   },
   {
     "term": "public.law-firms.speed-up-title",
-    "definition": "",
-    "context": "We speed up your new clients registration, quickly and securely."
+    "definition": "Aceleramos el alta de tus clientes de una forma ágil y segura",
+    "context": "Speed up your new clients registration, quickly and securely."
   },
   {
     "term": "public.law-firms.title",
-    "definition": "",
+    "definition": "Aumenta la facturación y el retorno de tu equipo",
     "context": "Increase your team’s billing and return"
   },
   {
     "term": "public.law-firms.use-case",
-    "definition": "",
+    "definition": "Caso de uso",
     "context": "Use case"
   },
   {
     "term": "public.law-use-cases.colaborate-description",
-    "definition": "",
+    "definition": "Comparte tus procesos para trabajar con tus compañeros de una forma más eficiente.",
     "context": "Share your cases with your colleagues to work efficiently."
   },
   {
     "term": "public.law-use-cases.colaborate-title",
-    "definition": "",
+    "definition": "Colabora con tu equipo",
     "context": "Colaborate with your team"
   },
   {
     "term": "public.law-use-cases.esignature-description",
-    "definition": "",
+    "definition": "Añade una firma digital avanzada a tus procesos de forma sencilla, completamente segura y legalmente válida.",
     "context": "Enable easily an advance eSignature to your proccess, completely secure and legally valid.."
   },
   {
     "term": "public.law-use-cases.esignature-title",
-    "definition": "",
+    "definition": "Integración con firma electrónica ",
     "context": "eSignature integration"
   },
   {
     "term": "public.law-use-cases.smart-forms-description",
-    "definition": "",
+    "definition": "Utiliza condiciones para configurar decisiones inteligentes y asegurarte de que tu cliente responda solo necesario.",
     "context": "Use conditions to set up smart decisions and ensure that your clients responds only to what is needed."
   },
   {
     "term": "public.law-use-cases.smart-forms-title",
-    "definition": "",
+    "definition": "Formularios inteligentes",
     "context": "Smart forms"
   },
   {
@@ -5556,7 +5556,7 @@
   },
   {
     "term": "public.solutions-law-firms.title",
-    "definition": "",
+    "definition": "Soluciones para Despachos",
     "context": "Solutions for law firms"
   },
   {
