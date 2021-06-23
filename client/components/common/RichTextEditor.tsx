@@ -289,8 +289,9 @@ export const RichTextEditor = forwardRef<
        * This function gets the node of the piece of text where the anchor is.
        * This node will always be a span.
        * We create a "fake" paragraph and we insert the text of the node but:
-       * - We split the text in two different children spans, before the # and after the #.
-       * - We add a marginLeft to the first one so it matches the horizontal position
+       * - We insert a span with all the previous text before and including the #.
+       * - We add a marginLeft to this span to ensure it overlaps the text in the real editor.
+       * - We add an empty span which we will use as the needle to position the menu
        * We insert this fake paragraph and we compute the boundingClientRect of the second
        * children which we will use to create a popper virtual element.
        */
@@ -310,7 +311,6 @@ export const RichTextEditor = forwardRef<
       prefix.innerText = node.textContent!.slice(0, offset + 1);
       fake.appendChild(prefix);
       const _target = document.createElement("span");
-      _target.innerText = node.textContent!.slice(offset + 1);
       fake.appendChild(_target);
       fake.style.position = "fixed";
       fake.style.top = `${parentRect.top}px`;
