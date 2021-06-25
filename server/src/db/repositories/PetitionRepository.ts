@@ -2054,7 +2054,7 @@ export class PetitionRepository extends BaseRepository {
       .update(data, "*");
   }
 
-  readonly getPetitionFieldCommentIsUnreadForUser = fromDataLoader(
+  readonly loadPetitionFieldCommentIsUnreadForUser = fromDataLoader(
     new DataLoader<
       {
         userId: number;
@@ -2066,44 +2066,39 @@ export class PetitionRepository extends BaseRepository {
       string
     >(
       async (ids) => {
-        const rows = await this.from("petition_user_notification")
-          .where((qb) => {
-            for (const {
-              userId,
-              petitionId,
-              petitionFieldId,
-              petitionFieldCommentId,
-            } of ids) {
-              qb = qb.orWhere(
-                (qb2: Knex.QueryBuilder<PetitionUserNotification>) => {
-                  qb2
-                    .where({
-                      user_id: userId,
-                      petition_id: petitionId,
-                      type: "COMMENT_CREATED",
-                    })
-                    .whereRaw(
-                      "data ->> 'petition_field_id' = ?",
-                      petitionFieldId
-                    )
-                    .whereRaw(
-                      "data ->> 'petition_field_comment_id' = ?",
-                      petitionFieldCommentId
-                    );
-                }
-              );
-            }
-          })
+        const userIds = uniq(ids.map((x) => x.userId));
+        const petitionIds = uniq(ids.map((x) => x.petitionId));
+        const petitionFieldIds = uniq(ids.map((x) => x.petitionFieldId));
+        const petitionFieldCommentId = uniq(
+          ids.map((x) => x.petitionFieldCommentId)
+        );
+        const rows = await this.knex<CommentCreatedUserNotification>(
+          "petition_user_notification"
+        )
           .where("type", "COMMENT_CREATED")
+          .whereIn("user_id", userIds)
+          .whereIn("petition_id", petitionIds)
+          .whereRaw(
+            `data ->> 'petition_field_id' in (${petitionFieldIds
+              .map(() => "?")
+              .join(",")})`,
+            petitionFieldIds
+          )
+          .whereRaw(
+            `data ->> 'petition_field_comment_id' in (${petitionFieldCommentId
+              .map(() => "?")
+              .join(",")})`,
+            petitionFieldCommentId
+          )
           .select("*");
 
         const byId = indexBy(
-          rows as CommentCreatedUserNotification[],
+          rows,
           keyBuilder([
             "user_id",
             "petition_id",
-            (r) => r.data.petition_field_id.toString(),
-            (r) => r.data.petition_field_comment_id.toString(),
+            (r) => r.data.petition_field_id,
+            (r) => r.data.petition_field_comment_id,
           ])
         );
         return ids
@@ -2128,7 +2123,7 @@ export class PetitionRepository extends BaseRepository {
     )
   );
 
-  readonly getPetitionFieldCommentIsUnreadForContact = fromDataLoader(
+  readonly loadPetitionFieldCommentIsUnreadForContact = fromDataLoader(
     new DataLoader<
       {
         petitionAccessId: number;
@@ -2140,34 +2135,28 @@ export class PetitionRepository extends BaseRepository {
       string
     >(
       async (ids) => {
+        const petitionAccessIds = uniq(ids.map((x) => x.petitionAccessId));
+        const petitionIds = uniq(ids.map((x) => x.petitionId));
+        const petitionFieldIds = uniq(ids.map((x) => x.petitionFieldId));
+        const petitionFieldCommentId = uniq(
+          ids.map((x) => x.petitionFieldCommentId)
+        );
         const rows = await this.from("petition_contact_notification")
-          .where((qb) => {
-            for (const {
-              petitionAccessId,
-              petitionId,
-              petitionFieldId,
-              petitionFieldCommentId,
-            } of ids) {
-              qb = qb.orWhere(
-                (qb2: Knex.QueryBuilder<PetitionContactNotification>) => {
-                  qb2
-                    .where({
-                      petition_access_id: petitionAccessId,
-                      petition_id: petitionId,
-                    })
-                    .whereRaw(
-                      "data ->> 'petition_field_id' = ?",
-                      petitionFieldId
-                    )
-                    .whereRaw(
-                      "data ->> 'petition_field_comment_id' = ?",
-                      petitionFieldCommentId
-                    );
-                }
-              );
-            }
-          })
           .where("type", "COMMENT_CREATED")
+          .whereIn("petition_access_id", petitionAccessIds)
+          .whereIn("petition_id", petitionIds)
+          .whereRaw(
+            `data ->> 'petition_field_id' in (${petitionFieldIds
+              .map(() => "?")
+              .join(",")})`,
+            petitionFieldIds
+          )
+          .whereRaw(
+            `data ->> 'petition_field_comment_id' in (${petitionFieldCommentId
+              .map(() => "?")
+              .join(",")})`,
+            petitionFieldCommentId
+          )
           .select("*");
 
         const byId = indexBy(

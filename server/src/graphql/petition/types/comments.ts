@@ -50,7 +50,7 @@ export const PetitionFieldComment = objectType({
     t.boolean("isUnread", {
       description: "Whether the comment has been read or not.",
       resolve: async (root, _, ctx) => {
-        return ctx.petitions.getPetitionFieldCommentIsUnreadForUser({
+        return ctx.petitions.loadPetitionFieldCommentIsUnreadForUser({
           userId: ctx.user!.id,
           petitionId: root.petition_id,
           petitionFieldId: root.petition_field_id,

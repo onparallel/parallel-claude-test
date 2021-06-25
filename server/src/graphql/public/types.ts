@@ -436,7 +436,7 @@ export const PublicPetitionFieldComment = objectType({
     t.boolean("isUnread", {
       description: "Whether the comment has been read or not.",
       resolve: async (root, _, ctx) => {
-        return ctx.petitions.getPetitionFieldCommentIsUnreadForContact({
+        return ctx.petitions.loadPetitionFieldCommentIsUnreadForContact({
           petitionAccessId: ctx.access!.id,
           petitionId: root.petition_id,
           petitionFieldId: root.petition_field_id,
