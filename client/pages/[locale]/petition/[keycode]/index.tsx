@@ -404,6 +404,7 @@ function isInsecureBrowser(userAgent: string | undefined) {
     IE: "999",
     Edge: "89",
     Safari: "13.3",
+    Firefox: "60.5",
   };
   if (
     browser.name &&
