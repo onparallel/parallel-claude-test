@@ -43,10 +43,11 @@ enum ChangePasswordResult {
 }
 
 type CommentCreatedUserNotification implements PetitionUserNotification {
-  author: UserOrPetitionAccess!
+  comment: PetitionFieldComment!
   createdAt: DateTime!
+  field: PetitionField!
   id: GID!
-  isInternal: Boolean!
+  isRead: Boolean!
   petition: Petition!
 }
 
@@ -274,6 +275,7 @@ type MessageEmailBouncedUserNotification implements PetitionUserNotification {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+  isRead: Boolean!
   petition: Petition!
 }
 
@@ -1662,6 +1664,7 @@ type PetitionCompletedUserNotification implements PetitionUserNotification {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+  isRead: Boolean!
   petition: Petition!
 }
 
@@ -2147,6 +2150,7 @@ type PetitionReopenedEvent implements PetitionEvent {
 type PetitionSharedUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
+  isRead: Boolean!
   owner: User!
   permissionType: PetitionPermissionTypeRW!
   petition: Petition!
@@ -2370,6 +2374,7 @@ type PetitionUserGroupPermission implements PetitionPermission & Timestamps {
 interface PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
+  isRead: Boolean!
   petition: Petition!
 }
 
@@ -3149,6 +3154,7 @@ type SignatureCancelledEvent implements PetitionEvent {
 type SignatureCancelledUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
+  isRead: Boolean!
   petition: Petition!
 }
 
@@ -3160,6 +3166,7 @@ type SignatureCompletedEvent implements PetitionEvent {
 type SignatureCompletedUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
+  isRead: Boolean!
   petition: Petition!
 }
 

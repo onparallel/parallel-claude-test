@@ -580,10 +580,11 @@ export interface NexusGenFieldTypes {
   };
   CommentCreatedUserNotification: {
     // field return type
-    author: NexusGenRootTypes["UserOrPetitionAccess"]; // UserOrPetitionAccess!
+    comment: NexusGenRootTypes["PetitionFieldComment"]; // PetitionFieldComment!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    field: NexusGenRootTypes["PetitionField"]; // PetitionField!
     id: NexusGenScalars["GID"]; // GID!
-    isInternal: boolean; // Boolean!
+    isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
   CommentDeletedEvent: {
@@ -684,6 +685,7 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
   MessageScheduledEvent: {
@@ -932,6 +934,7 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
   PetitionCreatedEvent: {
@@ -1035,6 +1038,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
     owner: NexusGenRootTypes["User"]; // User!
     permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
     petition: NexusGenRootTypes["Petition"]; // Petition!
@@ -1293,6 +1297,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
   SignatureCompletedEvent: {
@@ -1304,6 +1309,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
   SignatureConfig: {
@@ -1488,6 +1494,7 @@ export interface NexusGenFieldTypes {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
     petition: NexusGenRootTypes["Petition"]; // Petition!
   };
   Timestamps: {
@@ -1532,10 +1539,11 @@ export interface NexusGenFieldTypeNames {
   };
   CommentCreatedUserNotification: {
     // field return type name
-    author: "UserOrPetitionAccess";
+    comment: "PetitionFieldComment";
     createdAt: "DateTime";
+    field: "PetitionField";
     id: "GID";
-    isInternal: "Boolean";
+    isRead: "Boolean";
     petition: "Petition";
   };
   CommentDeletedEvent: {
@@ -1636,6 +1644,7 @@ export interface NexusGenFieldTypeNames {
     access: "PetitionAccess";
     createdAt: "DateTime";
     id: "GID";
+    isRead: "Boolean";
     petition: "Petition";
   };
   MessageScheduledEvent: {
@@ -1880,6 +1889,7 @@ export interface NexusGenFieldTypeNames {
     access: "PetitionAccess";
     createdAt: "DateTime";
     id: "GID";
+    isRead: "Boolean";
     petition: "Petition";
   };
   PetitionCreatedEvent: {
@@ -1983,6 +1993,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    isRead: "Boolean";
     owner: "User";
     permissionType: "PetitionPermissionTypeRW";
     petition: "Petition";
@@ -2239,6 +2250,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    isRead: "Boolean";
     petition: "Petition";
   };
   SignatureCompletedEvent: {
@@ -2250,6 +2262,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    isRead: "Boolean";
     petition: "Petition";
   };
   SignatureConfig: {
@@ -2432,6 +2445,7 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     createdAt: "DateTime";
     id: "GID";
+    isRead: "Boolean";
     petition: "Petition";
   };
   Timestamps: {

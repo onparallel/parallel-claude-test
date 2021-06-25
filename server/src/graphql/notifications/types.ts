@@ -43,6 +43,9 @@ export const PetitionUserNotification = interfaceType({
         return (await ctx.petitions.loadPetition(root.petition_id))!;
       },
     });
+    t.boolean("isRead", {
+      resolve: (o) => o.is_read,
+    });
     t.datetime("createdAt", {
       resolve: (o) => o.created_at,
     });
@@ -82,36 +85,17 @@ function createPetitionUserNotification<TypeName extends string>(
 export const CommentCreatedUserNotification = createPetitionUserNotification(
   "CommentCreatedUserNotification",
   (t) => {
-    t.field("author", {
-      type: "UserOrPetitionAccess",
-      resolve: async (root, _, ctx) => {
-        const comment = (await ctx.petitions.loadPetitionFieldComment(
-          root.data.petition_field_comment_id
-        ))!;
-        if (comment.user_id) {
-          return {
-            __type: "User",
-            ...(await ctx.users.loadUser(comment.user_id))!,
-          };
-        } else if (comment.petition_access_id) {
-          return {
-            __type: "PetitionAccess",
-            ...(await ctx.petitions.loadAccess(comment.petition_access_id))!,
-          };
-        } else {
-          throw new Error(
-            `Expected user_id or petition_access_id to be set in PetitionFieldComment:${root.data.petition_field_comment_id}`
-          );
-        }
-      },
+    t.field("comment", {
+      type: "PetitionFieldComment",
+      resolve: async (o, _, ctx) =>
+        (await ctx.petitions.loadPetitionFieldComment(
+          o.data.petition_field_comment_id
+        ))!,
     });
-    t.boolean("isInternal", {
-      resolve: async (root, _, ctx) => {
-        const comment = (await ctx.petitions.loadPetitionFieldComment(
-          root.data.petition_field_comment_id
-        ))!;
-        return comment.is_internal;
-      },
+    t.field("field", {
+      type: "PetitionField",
+      resolve: async (o, _, ctx) =>
+        (await ctx.petitions.loadField(o.data.petition_field_id))!,
     });
   }
 );
