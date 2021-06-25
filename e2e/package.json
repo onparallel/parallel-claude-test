@@ -9,13 +9,15 @@
     "@babel/core": "^7.14.6",
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-typescript": "^7.14.5",
-    "@types/jest": "^26.0.23"
+    "@types/jest": "^26.0.23",
+    "@types/jsdom": "^16.2.12"
   },
   "dependencies": {
     "babel-jest": "^27.0.5",
     "dotenv": "^10.0.0",
     "faker": "^5.5.3",
     "jest": "^27.0.5",
+    "jsdom": "^16.6.0",
     "node-fetch": "^2.6.1",
     "playwright": "^1.12.2",
     "ts-jest": "^27.0.3",

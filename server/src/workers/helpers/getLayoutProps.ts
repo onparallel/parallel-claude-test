@@ -8,6 +8,7 @@ export async function getLayoutProps(orgId: number, context: WorkerContext) {
   if (!org) {
     throw new Error(`Org not found for org_id ${orgId}`);
   }
+  console.log(org, context.config.misc);
   const { assetsUrl, parallelUrl } = context.config.misc;
   return {
     assetsUrl,

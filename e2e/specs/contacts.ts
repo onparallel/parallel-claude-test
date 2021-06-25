@@ -1,4 +1,3 @@
-import * as faker from "faker";
 import { createContact, createRandomContact } from "../helpers/contacts";
 import { createTestSession } from "../helpers/createTestSession";
 import { login } from "../helpers/login";

@@ -1,3 +1,4 @@
+import { JSDOM } from "jsdom";
 import {
   addPetitionField,
   fillPetitionField,
@@ -7,7 +8,8 @@ import { createRandomContact } from "../helpers/contacts";
 import { createContact } from "../helpers/contactSelect";
 import { createPetition } from "../helpers/createPetition";
 import { createTestSession } from "../helpers/createTestSession";
-import { waitForEmail } from "../helpers/emails";
+import { waitForInbox as waitForInbox } from "../helpers/emails";
+import { goTo } from "../helpers/goTo";
 import { waitForGraphQL } from "../helpers/graphql";
 import { login } from "../helpers/login";
 import { skipOnboarding } from "../helpers/skipOnboarding";
@@ -15,7 +17,7 @@ import { user1 } from "../helpers/users";
 
 createTestSession("petitions", (context) => {
   it("should create and send a petition with fields", async () => {
-    const { page } = context;
+    const { page, browserContext } = context;
     await login(page, user1);
     expect(page.url()).toMatch(/\/app\/petitions$/);
     await skipOnboarding(page);
@@ -77,7 +79,16 @@ createTestSession("petitions", (context) => {
     expect(page.url()).toMatch(/\/app\/petitions$/);
 
     // Wait for the email
-    const email = await waitForEmail(recipient.email);
-    expect(email.result).toBe("success");
+    const inbox = await waitForInbox(recipient.email);
+    expect(inbox.result).toBe("success");
+    const dom = new JSDOM(inbox.emails[0].html);
+    const button = [...dom.window.document.querySelectorAll("a")].find(
+      (button) => button.textContent === "Complete the information here"
+    );
+    const petitionUrl = button.getAttribute("href");
+
+    const page2 = await browserContext.newPage();
+    await goTo(page2, petitionUrl);
+    expect(await page2.title()).toBe("Welcome | Parallel");
   });
 });

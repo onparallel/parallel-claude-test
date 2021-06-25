@@ -7,19 +7,23 @@ export function generateEmail() {
   const namespace = process.env.TESTMAIL_NAMESPACE!;
   return `${namespace}.${tag}@inbox.testmail.app`;
 }
-interface EmailsFetchResponse {
+interface Inbox {
   result: "success" | "fail";
   message: string | null;
   count: number;
   limit: number;
   offset: number;
-  emails: any[];
+  emails: Email[];
 }
 
-export async function waitForEmail(
+interface Email {
+  html: string;
+}
+
+export async function waitForInbox(
   email: string,
   options: { timeout?: number } = {}
-): Promise<EmailsFetchResponse> {
+): Promise<Inbox> {
   const { timeout } = { timeout: 60000, ...options };
   const params = new URLSearchParams({
     apikey: process.env.TESTMAIL_APIKEY!,
@@ -27,8 +31,6 @@ export async function waitForEmail(
     tag: /[^\.]+.(.*)@.*/.exec(email)![1],
     livequery: "true",
   });
-  console.log(params);
-  console.log(`https://api.testmail.app/api/json?${params}`);
   const controller = new AbortController();
   const res = await Promise.race([
     fetch(`https://api.testmail.app/api/json?${params}`, {
