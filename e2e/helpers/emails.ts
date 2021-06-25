@@ -1,12 +1,12 @@
-import { random, name } from "faker";
+import faker from "faker";
 import fetch from "node-fetch";
+import { URLSearchParams } from "url";
 
-const config = {
-  domain: process.env.RECIPIENT_EMAIL_DOMAIN,
-  workspace: process.env.RECIPIENT_EMAIL_WORKSPACE,
-  apikey: process.env.TESTMAIL_APIKEY,
-};
-
+export function generateEmail() {
+  const tag = faker.random.alphaNumeric(10);
+  const namespace = process.env.TESTMAIL_NAMESPACE!;
+  return `${namespace}.${tag}@inbox.testmail.app`;
+}
 interface EmailsFetchResponse {
   result: "success" | "fail";
   message: string | null;
@@ -16,27 +16,29 @@ interface EmailsFetchResponse {
   emails: any[];
 }
 
-export async function waitForEmailReceipt(
-  tag: string
+export async function waitForEmail(
+  email: string,
+  options: { timeout?: number } = {}
 ): Promise<EmailsFetchResponse> {
-  return await fetch(
-    `https://api.testmail.app/api/json?apikey=${config.apikey}&namespace=${config.workspace}&tag=${tag}&livequery=true`
-  ).then((res) => res.json());
-}
-
-export interface Recipient {
-  email: string;
-  firstName: string;
-  lastName: string;
-  emailTag: string;
-}
-
-export function getRandomRecipientData(): Recipient {
-  const tag = random.alphaNumeric(10);
-  return {
-    email: `${config.workspace}.${tag}@${config.domain}`,
-    firstName: name.firstName(),
-    lastName: name.lastName(),
-    emailTag: tag,
-  };
+  const { timeout } = { timeout: 60000, ...options };
+  const params = new URLSearchParams({
+    apikey: process.env.TESTMAIL_APIKEY!,
+    namespace: process.env.TESTMAIL_NAMESPACE!,
+    tag: /[^\.]+.(.*)@.*/.exec(email)![1],
+    livequery: "true",
+  });
+  console.log(params);
+  console.log(`https://api.testmail.app/api/json?${params}`);
+  const controller = new AbortController();
+  const res = await Promise.race([
+    fetch(`https://api.testmail.app/api/json?${params}`, {
+      signal: controller.signal as any,
+    }),
+    (async function () {
+      await new Promise((resolve) => setTimeout(resolve, timeout));
+      controller.abort();
+      throw new Error(`Email timeout ${timeout}ms exceeded.`);
+    })(),
+  ]);
+  return await res.json();
 }

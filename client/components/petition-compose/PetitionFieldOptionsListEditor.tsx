@@ -192,6 +192,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
           <Editable
             renderElement={renderElement}
             renderLeaf={renderLeaf}
+            {...props}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
           />

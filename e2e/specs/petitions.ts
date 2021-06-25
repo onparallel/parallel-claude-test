@@ -3,74 +3,81 @@ import {
   fillPetitionField,
   getFields,
 } from "../helpers/compose";
+import { createRandomContact } from "../helpers/contacts";
+import { createContact } from "../helpers/contactSelect";
 import { createPetition } from "../helpers/createPetition";
 import { createTestSession } from "../helpers/createTestSession";
-import { Recipient, waitForEmailReceipt } from "../helpers/emails";
+import { waitForEmail } from "../helpers/emails";
+import { waitForGraphQL } from "../helpers/graphql";
 import { login } from "../helpers/login";
-import { sendPetition } from "../helpers/sendPetition";
 import { skipOnboarding } from "../helpers/skipOnboarding";
 import { user1 } from "../helpers/users";
 
 createTestSession("petitions", (context) => {
-  describe("Sending a simple petition to a new recipient", () => {
-    let recipient: Recipient;
-    it("should login", async () => {
-      await login(context.page, user1);
-      expect(context.page.url()).toMatch(/\/app\/petitions$/);
+  it("should create and send a petition with fields", async () => {
+    const { page } = context;
+    await login(page, user1);
+    expect(page.url()).toMatch(/\/app\/petitions$/);
+    await skipOnboarding(page);
+
+    // Create a petition with 5 fields
+    await createPetition(page);
+    await skipOnboarding(page);
+    expect(page.url()).toMatch(/\/compose$/);
+
+    await addPetitionField(page, "SELECT");
+    await addPetitionField(page, "TEXT");
+    await addPetitionField(page, "FILE_UPLOAD");
+    const fields = await getFields(page);
+    // by default the petition is created with 2 fields
+    expect(fields.length).toBe(5);
+
+    await fillPetitionField(page, fields[0], {
+      title: "Welcome",
+      description: "Fill the following fields",
+    });
+    await fillPetitionField(page, fields[1], {
+      title: "What's your name?",
+      description: "Your real name, please",
+    });
+    await fillPetitionField(page, fields[2], {
+      title: "Where are you from?",
+      description: "Select a country from the following list",
+      values: ["Spain", "France", "Germany"],
+    });
+    await fillPetitionField(page, fields[3], {
+      title: "Explain a bit about yourself",
+    });
+    await fillPetitionField(page, fields[4], {
+      title: "A photo of you",
+      description: "Your face must be perfectly visible.",
     });
 
-    it("should create a petition", async () => {
-      await skipOnboarding(context.page);
-      await createPetition(context.page);
-      await skipOnboarding(context.page);
-      expect(context.page.url()).toMatch(/\/compose$/);
-    });
+    // Fill email details
+    const recipient = createRandomContact();
+    await page.click("#petition-next");
 
-    it("should add fields to the petition", async () => {
-      await addPetitionField(context.page, "SELECT");
-      await addPetitionField(context.page, "TEXT");
-      await addPetitionField(context.page, "FILE_UPLOAD");
-      const fields = await getFields(context.page);
-      // by default the petition is created with 2 fields
-      expect(fields.length).toBe(5);
-    });
+    await createContact(page, "#petition-recipients-0", recipient);
 
-    it("should fill the petition fields", async () => {
-      const fields = await getFields(context.page);
-      await fillPetitionField(fields[0], {
-        title: "Welcome",
-        description: "Fill the following fields",
-      });
-      await fillPetitionField(fields[1], {
-        title: "What's your name?",
-        description: "Your real name, please",
-      });
-      await fillPetitionField(fields[2], {
-        title: "Where are you from?",
-        description: "Select a country from the following list",
-        values: ["Spain", "France", "Germany"],
-      });
-      await fillPetitionField(fields[3], {
-        title: "Explain a bit about yourself",
-      });
-      await fillPetitionField(fields[4], {
-        title: "A photo of you",
-        description: "Your face must be perfectly visible.",
-      });
-    });
-
-    it("should send the petition", async () => {
-      recipient = await sendPetition(context.page);
-      expect(context.page.url()).toMatch(/\/app\/petitions$/);
-    });
-
-    it(
-      "recipient should receive an email with an access to the petition",
-      async () => {
-        const email = await waitForEmailReceipt(recipient.emailTag);
-        expect(email.result).toBe("success");
-      },
-      1000 * 60 // 1 min timeout
+    await page.fill(
+      "#input-message-email-editor-subject",
+      `KYC - ${recipient.firstName} ${recipient.lastName}`
     );
+    await page.type(
+      "#petition-message-body",
+      "Please, fill this information about yourself.\nKind Regards."
+    );
+
+    await waitForGraphQL(
+      page,
+      (o) => o.operationName === "PetitionCompose_updatePetition"
+    );
+    await page.click("#send-button");
+    await page.waitForNavigation();
+    expect(page.url()).toMatch(/\/app\/petitions$/);
+
+    // Wait for the email
+    const email = await waitForEmail(recipient.email);
+    expect(email.result).toBe("success");
   });
 });

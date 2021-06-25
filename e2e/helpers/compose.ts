@@ -1,4 +1,5 @@
 import { ElementHandle, Page } from "playwright";
+import { ElementLike, getElement } from "./getElement";
 import { toggleMenu } from "./toggleMenu";
 
 export interface PetitionFieldData {
@@ -8,17 +9,19 @@ export interface PetitionFieldData {
 }
 
 export async function fillPetitionField(
-  element: ElementHandle,
+  page: Page,
+  element: ElementLike,
   data: PetitionFieldData
 ) {
-  const title = await element.$(`[id^="field-title-"]`);
-  await title!.type(data.title);
+  const el = await getElement(page, element);
+  const title = await el.$(`[id^="field-title-"]`);
+  await title!.fill(data.title);
   if (data.description) {
-    const description = await element.$(`[id^="field-description-"]`);
-    await description!.type(data.description);
+    const description = await el.$(`[id^="field-description-"]`);
+    await description!.fill(data.description);
   }
   if (data.values) {
-    const values = await element.$(`[id^="field-select-values-"]`);
+    const values = await el.$(`[id^="field-options-list-"]`);
     await values!.type(data.values.join("\n"));
   }
 }

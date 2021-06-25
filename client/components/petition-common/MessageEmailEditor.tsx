@@ -59,7 +59,7 @@ export function MessageEmailEditor({
       <FormControl
         isInvalid={showErrors && isEmptyRTEValue(body)}
         marginTop={4}
-        id="rich-text-editor-textarea"
+        id="petition-message-body"
       >
         <RichTextEditor
           value={body}

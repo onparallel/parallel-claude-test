@@ -1,28 +1,18 @@
 import * as faker from "faker";
-import { createContact } from "../helpers/createContact";
+import { createContact, createRandomContact } from "../helpers/contacts";
 import { createTestSession } from "../helpers/createTestSession";
 import { login } from "../helpers/login";
 import { user1 } from "../helpers/users";
 
 createTestSession("contacts", (context) => {
   describe("Creating a new contact", () => {
-    it("should login", async () => {
+    it("should create a contact", async () => {
       await login(context.page, user1);
       expect(context.page.url()).toMatch(/\/app\/petitions$/);
-    });
 
-    let contact: { email: string; firstName: string; lastName: string };
-    it("should create a contact", async () => {
-      contact = {
-        email: `${faker.datatype.uuid()}@onparallel.com`,
-        firstName: faker.name.firstName(),
-        lastName: faker.name.lastName(),
-      };
+      const contact = createRandomContact();
       await createContact(context.page, contact);
-      return contact;
-    });
 
-    it("new contact should be available on search", async () => {
       // Search for created contact
       await context.page.click("#contacts-reload");
       await context.page.type("#contacts-search", contact.email);

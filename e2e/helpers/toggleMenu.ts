@@ -1,9 +1,9 @@
-import { ElementHandle, Page } from "playwright";
-import { getElement } from "./getElement";
+import { Page } from "playwright";
+import { ElementLike, getElement } from "./getElement";
 
 export async function toggleMenu(
   page: Page,
-  element: string | ElementHandle,
+  element: ElementLike,
   isOpen = true
 ) {
   const button = await getElement(page, element);
