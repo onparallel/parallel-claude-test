@@ -144,19 +144,22 @@ export const User = objectType({
         );
       },
     });
-    t.paginationField("notifications", {
+    t.field("notifications", {
       authorize: rootIsContextUser(),
       description:
         "Read and unread user notifications about events on their petitions",
-      type: "PetitionUserNotification",
-      additionalArgs: {
+      type: nonNull(list(nonNull("PetitionUserNotification"))),
+      args: {
+        limit: nonNull(intArg()),
         filter: arg({ type: "PetitionUserNotificationFilter" }),
+        before: datetimeArg(),
       },
-      resolve: async (_, { limit, offset, filter }, ctx) => {
+      resolve: async (_, { limit, filter, before }, ctx) => {
         return await ctx.petitions.loadPetitionUserNotificationsByUserId(
           ctx.user!.id,
-          { limit, offset },
-          filter
+          limit,
+          filter,
+          before
         );
       },
     });
