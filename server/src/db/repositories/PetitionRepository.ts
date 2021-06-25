@@ -2103,7 +2103,6 @@ export class PetitionRepository extends BaseRepository {
     data: {
       petitionId: number;
       petitionFieldId: number;
-      petitionFieldReplyId: number | null;
       content: string;
       isInternal: boolean;
     },
@@ -2115,7 +2114,6 @@ export class PetitionRepository extends BaseRepository {
         {
           petition_id: data.petitionId,
           petition_field_id: data.petitionFieldId,
-          petition_field_reply_id: data.petitionFieldReplyId,
           content: data.content,
           user_id: user.id,
           is_internal: data.isInternal,
@@ -2195,7 +2193,6 @@ export class PetitionRepository extends BaseRepository {
     data: {
       petitionId: number;
       petitionFieldId: number;
-      petitionFieldReplyId: number | null;
       content: string;
     },
     access: PetitionAccess
@@ -2206,7 +2203,6 @@ export class PetitionRepository extends BaseRepository {
         {
           petition_id: data.petitionId,
           petition_field_id: data.petitionFieldId,
-          petition_field_reply_id: data.petitionFieldReplyId,
           content: data.content,
           petition_access_id: access.id,
           created_by: `PetitionAccess:${access.id}`,

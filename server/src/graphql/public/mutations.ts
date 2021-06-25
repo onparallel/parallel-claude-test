@@ -728,7 +728,6 @@ export const publicCreatePetitionFieldComment = mutationField(
         {
           petitionId: petitionId,
           petitionFieldId: args.petitionFieldId,
-          petitionFieldReplyId: null,
           content: args.content,
         },
         ctx.access!

@@ -937,7 +937,6 @@ export interface NexusGenFieldTypes {
     isEdited: boolean; // Boolean!
     isInternal: boolean; // Boolean!
     isUnread: boolean; // Boolean!
-    reply: NexusGenRootTypes["PetitionFieldReply"] | null; // PetitionFieldReply
   };
   PetitionFieldReply: {
     // field return type
@@ -1127,7 +1126,6 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     isUnread: boolean; // Boolean!
-    reply: NexusGenRootTypes["PublicPetitionFieldReply"] | null; // PublicPetitionFieldReply
   };
   PublicPetitionFieldReply: {
     // field return type
@@ -1830,7 +1828,6 @@ export interface NexusGenFieldTypeNames {
     isEdited: "Boolean";
     isInternal: "Boolean";
     isUnread: "Boolean";
-    reply: "PetitionFieldReply";
   };
   PetitionFieldReply: {
     // field return type name
@@ -2018,7 +2015,6 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
     isUnread: "Boolean";
-    reply: "PublicPetitionFieldReply";
   };
   PublicPetitionFieldReply: {
     // field return type name
@@ -2433,7 +2429,6 @@ export interface NexusGenArgTypes {
       content: string; // String!
       isInternal?: boolean | null; // Boolean
       petitionFieldId: NexusGenScalars["GID"]; // GID!
-      petitionFieldReplyId?: NexusGenScalars["GID"] | null; // GID
       petitionId: NexusGenScalars["GID"]; // GID!
     };
     createPetitionSubscription: {

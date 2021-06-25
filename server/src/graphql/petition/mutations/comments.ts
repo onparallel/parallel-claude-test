@@ -5,26 +5,24 @@ import {
   nonNull,
   stringArg,
 } from "@nexus/schema";
+import { prop } from "remeda";
 import {
   and,
   authenticate,
   authenticateAnd,
   chain,
-  ifArgDefined,
   ifArgEquals,
 } from "../../helpers/authorize";
+import { WhitelistedError } from "../../helpers/errors";
+import { globalIdArg } from "../../helpers/globalIdPlugin";
+import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
 import {
   commentsBelongsToPetition,
   fieldsBelongsToPetition,
-  repliesBelongsToPetition,
   userHasAccessToPetitions,
   userHasFeatureFlag,
 } from "../authorizers";
-import { prop } from "remeda";
-import { notEmptyArray } from "../../helpers/validators/notEmptyArray";
-import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { userIsCommentAuthor } from "./authorizers";
-import { WhitelistedError } from "../../helpers/errors";
 
 export const createPetitionFieldComment = mutationField(
   "createPetitionFieldComment",
@@ -36,17 +34,12 @@ export const createPetitionFieldComment = mutationField(
       and(
         userHasAccessToPetitions("petitionId"),
         fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-        ifArgDefined(
-          "petitionFieldReplyId",
-          repliesBelongsToPetition("petitionId", "petitionFieldReplyId" as any)
-        ),
         ifArgEquals("isInternal", true, userHasFeatureFlag("INTERNAL_COMMENTS"))
       )
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
       petitionFieldId: nonNull(globalIdArg("PetitionField")),
-      petitionFieldReplyId: globalIdArg("PetitionFieldReply"),
       content: nonNull(stringArg()),
       isInternal: booleanArg(),
     },
@@ -62,7 +55,6 @@ export const createPetitionFieldComment = mutationField(
         {
           petitionId: args.petitionId,
           petitionFieldId: args.petitionFieldId,
-          petitionFieldReplyId: args.petitionFieldReplyId ?? null,
           content: args.content,
           isInternal: args.isInternal ?? false,
         },

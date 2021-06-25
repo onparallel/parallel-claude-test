@@ -551,7 +551,6 @@ export interface MutationcreatePetitionFieldCommentArgs {
   content: Scalars["String"];
   isInternal?: Maybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
-  petitionFieldReplyId?: Maybe<Scalars["GID"]>;
   petitionId: Scalars["GID"];
 }
 
@@ -1391,8 +1390,6 @@ export interface PetitionFieldComment {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** The reply the comment is refering to. */
-  reply?: Maybe<PetitionFieldReply>;
 }
 
 /** A reply to a petition field */
@@ -1816,8 +1813,6 @@ export interface PublicPetitionFieldComment {
   id: Scalars["GID"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** The reply the comment is refering to. */
-  reply?: Maybe<PublicPetitionFieldReply>;
 }
 
 /** A reply to a petition field */
@@ -5831,7 +5826,6 @@ export type PetitionReplies_createPetitionFieldCommentMutationVariables =
   Exact<{
     petitionId: Scalars["GID"];
     petitionFieldId: Scalars["GID"];
-    petitionFieldReplyId?: Maybe<Scalars["GID"]>;
     content: Scalars["String"];
     isInternal?: Maybe<Scalars["Boolean"]>;
     hasInternalComments: Scalars["Boolean"];
@@ -12354,7 +12348,6 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
   mutation PetitionReplies_createPetitionFieldComment(
     $petitionId: GID!
     $petitionFieldId: GID!
-    $petitionFieldReplyId: GID
     $content: String!
     $isInternal: Boolean
     $hasInternalComments: Boolean!
@@ -12362,7 +12355,6 @@ export const PetitionReplies_createPetitionFieldCommentDocument = gql`
     createPetitionFieldComment(
       petitionId: $petitionId
       petitionFieldId: $petitionFieldId
-      petitionFieldReplyId: $petitionFieldReplyId
       content: $content
       isInternal: $isInternal
     ) {

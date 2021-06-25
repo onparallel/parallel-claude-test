@@ -43,15 +43,6 @@ export const PetitionFieldComment = objectType({
     t.string("content", {
       description: "The content of the comment.",
     });
-    t.nullable.field("reply", {
-      description: "The reply the comment is refering to.",
-      type: "PetitionFieldReply",
-      resolve: async (root, _, ctx) => {
-        return root.petition_field_reply_id !== null
-          ? await ctx.petitions.loadFieldReply(root.petition_field_reply_id)
-          : null;
-      },
-    });
     t.datetime("createdAt", {
       description: "Time when the comment was created.",
       resolve: (o) => o.created_at,

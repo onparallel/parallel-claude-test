@@ -602,7 +602,6 @@ export interface PetitionFieldComment {
   id: number; // int4
   petition_id: number; // int4
   petition_field_id: number; // int4
-  petition_field_reply_id: Maybe<number>; // int4
   content: string; // text
   user_id: Maybe<number>; // int4
   petition_access_id: Maybe<number>; // int4
@@ -617,7 +616,6 @@ export interface PetitionFieldComment {
 
 export type CreatePetitionFieldComment = PartialProps<
   Omit<PetitionFieldComment, "id">,
-  | "petition_field_reply_id"
   | "user_id"
   | "petition_access_id"
   | "created_at"

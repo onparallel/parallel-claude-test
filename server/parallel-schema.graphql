@@ -458,7 +458,6 @@ type Mutation {
     content: String!
     isInternal: Boolean
     petitionFieldId: GID!
-    petitionFieldReplyId: GID
     petitionId: GID!
   ): PetitionField!
 
@@ -1787,11 +1786,6 @@ type PetitionFieldComment {
   Whether the comment has been read or not.
   """
   isUnread: Boolean!
-
-  """
-  The reply the comment is refering to.
-  """
-  reply: PetitionFieldReply
 }
 
 """
@@ -2607,11 +2601,6 @@ type PublicPetitionFieldComment {
   Whether the comment has been read or not.
   """
   isUnread: Boolean!
-
-  """
-  The reply the comment is refering to.
-  """
-  reply: PublicPetitionFieldReply
 }
 
 """

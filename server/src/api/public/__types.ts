@@ -526,7 +526,6 @@ export type MutationcreatePetitionFieldCommentArgs = {
   content: Scalars["String"];
   isInternal?: Maybe<Scalars["Boolean"]>;
   petitionFieldId: Scalars["GID"];
-  petitionFieldReplyId?: Maybe<Scalars["GID"]>;
   petitionId: Scalars["GID"];
 };
 
@@ -1346,8 +1345,6 @@ export type PetitionFieldComment = {
   isInternal: Scalars["Boolean"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** The reply the comment is refering to. */
-  reply: Maybe<PetitionFieldReply>;
 };
 
 /** A reply to a petition field */
@@ -1752,8 +1749,6 @@ export type PublicPetitionFieldComment = {
   id: Scalars["GID"];
   /** Whether the comment has been read or not. */
   isUnread: Scalars["Boolean"];
-  /** The reply the comment is refering to. */
-  reply: Maybe<PublicPetitionFieldReply>;
 };
 
 /** A reply to a petition field */

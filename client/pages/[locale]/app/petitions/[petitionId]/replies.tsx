@@ -808,7 +808,6 @@ PetitionReplies.mutations = [
     mutation PetitionReplies_createPetitionFieldComment(
       $petitionId: GID!
       $petitionFieldId: GID!
-      $petitionFieldReplyId: GID
       $content: String!
       $isInternal: Boolean
       $hasInternalComments: Boolean!
@@ -816,7 +815,6 @@ PetitionReplies.mutations = [
       createPetitionFieldComment(
         petitionId: $petitionId
         petitionFieldId: $petitionFieldId
-        petitionFieldReplyId: $petitionFieldReplyId
         content: $content
         isInternal: $isInternal
       ) {
