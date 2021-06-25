@@ -2097,12 +2097,12 @@ export class PetitionRepository extends BaseRepository {
           .select("*");
 
         const byId = indexBy(
-          rows as CommentCreatedUserNotification[],
+          rows,
           keyBuilder([
             "user_id",
             "petition_id",
-            (r) => r.data.petition_field_id.toString(),
-            (r) => r.data.petition_field_comment_id.toString(),
+            (r) => r.data.petition_field_id,
+            (r) => r.data.petition_field_comment_id,
           ])
         );
         return ids
