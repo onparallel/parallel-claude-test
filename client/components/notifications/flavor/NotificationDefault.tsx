@@ -1,23 +1,23 @@
 import { gql } from "@apollo/client";
+import { BellIcon } from "@parallel/chakra/icons";
 import { Notification } from "./Notification";
 import { Avatar } from "@chakra-ui/react";
-import { SignatureIcon } from "@parallel/chakra/icons";
-import { FormattedMessage, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import { PetitionBase } from "@parallel/graphql/__types";
 
-export interface NotificationSignatureCanceledProps {
+export interface NotificationDefaultProps {
   id: string;
   petition: PetitionBase;
   createdAt: string;
   isRead: boolean;
 }
 
-export function NotificationSignatureCanceled({
+export function NotificationDefault({
   id,
   petition,
   createdAt,
   isRead,
-}: NotificationSignatureCanceledProps) {
+}: NotificationDefaultProps) {
   const intl = useIntl();
 
   const petitionTitle =
@@ -27,16 +27,13 @@ export function NotificationSignatureCanceled({
       defaultMessage: "Untitled petition",
     });
 
+  const body = "";
+
   return (
     <Notification
       id={id}
       icon={<NotificationAvatar />}
-      body={
-        <FormattedMessage
-          id="component.notification-signature-canceled.body"
-          defaultMessage="The digital signature has been canceled."
-        />
-      }
+      body={body}
       title={petitionTitle}
       timestamp={createdAt}
       isRead={isRead}
@@ -49,22 +46,22 @@ function NotificationAvatar() {
     <Avatar
       height="36px"
       width="36px"
-      background="red.500"
-      icon={<SignatureIcon color="white" fontSize="1rem" />}
+      background="gray.200"
+      icon={<BellIcon fontSize="1rem" />}
     />
   );
 }
 
-NotificationSignatureCanceled.fragments = {
-  SignatureCancelledUserNotification: gql`
-    fragment NotificationEmailBounced_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
+NotificationDefault.fragments = {
+  PetitionUserNotification: gql`
+    fragment NotificationDefault_PetitionUserNotification on PetitionUserNotification {
       id
+      createdAt
+      isRead
       petition {
         id
         name
       }
-      createdAt
-      isRead
     }
   `,
 };

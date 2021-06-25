@@ -63,10 +63,11 @@ export type ChangePasswordResult =
   | "SUCCESS";
 
 export type CommentCreatedUserNotification = PetitionUserNotification & {
-  author: UserOrPetitionAccess;
+  comment: PetitionFieldComment;
   createdAt: Scalars["DateTime"];
+  field: PetitionField;
   id: Scalars["GID"];
-  isInternal: Scalars["Boolean"];
+  isRead: Scalars["Boolean"];
   petition: Petition;
 };
 
@@ -218,6 +219,7 @@ export type MessageEmailBouncedUserNotification = PetitionUserNotification & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
   petition: Petition;
 };
 
@@ -1296,6 +1298,7 @@ export type PetitionCompletedUserNotification = PetitionUserNotification & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
   petition: Petition;
 };
 
@@ -1535,6 +1538,7 @@ export type PetitionReopenedEvent = PetitionEvent & {
 export type PetitionSharedUserNotification = PetitionUserNotification & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
   owner: User;
   permissionType: PetitionPermissionTypeRW;
   petition: Petition;
@@ -1655,6 +1659,7 @@ export type PetitionUserGroupPermission = PetitionPermission &
 export type PetitionUserNotification = {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
   petition: Petition;
 };
 
@@ -2125,6 +2130,7 @@ export type SignatureCancelledEvent = PetitionEvent & {
 export type SignatureCancelledUserNotification = PetitionUserNotification & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
   petition: Petition;
 };
 
@@ -2136,6 +2142,7 @@ export type SignatureCompletedEvent = PetitionEvent & {
 export type SignatureCompletedUserNotification = PetitionUserNotification & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
   petition: Petition;
 };
 

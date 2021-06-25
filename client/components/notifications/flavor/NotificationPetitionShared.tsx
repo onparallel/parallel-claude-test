@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Notification, NotificationBody } from "./Notification";
+import { Notification } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
 import { UserArrowIcon, UserGroupArrowIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -72,7 +72,7 @@ export function NotificationPetitionShared({
     <Notification
       id={id}
       icon={<NotificationAvatar isGroup={isSharedGroup} />}
-      body={<NotificationBody body={body} />}
+      body={body}
       title={petitionTitle}
       timestamp={createdAt}
       isRead={isRead}
@@ -101,11 +101,6 @@ function NotificationAvatar({ isGroup }: { isGroup: boolean }) {
 NotificationPetitionShared.fragments = {
   PetitionSharedUserNotification: gql`
     fragment NotificationEmailBounced_PetitionSharedUserNotification on PetitionSharedUserNotification {
-      id
-      petition {
-        id
-        name
-      }
       owner {
         id
         fullName
@@ -121,7 +116,6 @@ NotificationPetitionShared.fragments = {
         }
       }
       permissionType
-      createdAt
     }
   `,
 };

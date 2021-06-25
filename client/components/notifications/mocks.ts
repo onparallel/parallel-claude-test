@@ -5,6 +5,8 @@ import {
   PetitionPermissionType,
   UserGroup,
   PetitionField,
+  PetitionFieldComment,
+  Notifications_PetitionUserNotificationFragment,
 } from "@parallel/graphql/__types";
 
 const petition = {
@@ -40,80 +42,88 @@ const petitionAccess = {
   },
 } as PetitionAccess;
 
+const internalComment = {
+  isInternal: true,
+  author: user,
+} as PetitionFieldComment;
+
+const externalComment = {
+  isInternal: false,
+  author: petitionAccess,
+} as PetitionFieldComment;
+
 const permissionType = "READ" as PetitionPermissionType;
 
 export const notificationsMock = [
   {
+    __typename: "CommentCreatedUserNotification",
     id: "0",
-    type: "COMMENT_CREATED",
-    petition,
-    author: user,
-    field,
-    isInternal: true,
+    petition: petition,
+    field: field,
+    comment: internalComment,
     createdAt: new Date().getTime(),
     isRead: true,
   },
   {
+    __typename: "CommentCreatedUserNotification",
     id: "1",
-    type: "COMMENT_CREATED",
-    petition,
-    author: petitionAccess,
-    field,
-    isInternal: false,
-    createdAt: new Date().getTime(),
+    petition: petition,
+    field: field,
+    comment: externalComment,
+    createdAt: new Date().toISOString(),
     isRead: true,
   },
   {
+    __typename: "PetitionCompletedUserNotification",
     id: "2",
-    type: "PETITION_COMPLETED",
-    petition,
+    petition: petition,
     access: petitionAccess,
-    createdAt: new Date().getTime(),
+    createdAt: new Date().toISOString(),
     isRead: false,
   },
   {
+    __typename: "SignatureCompletedUserNotification",
     id: "3",
-    type: "SIGNATURE_COMPLETED",
-    petition,
-    createdAt: new Date().getTime(),
+    petition: petition,
+    createdAt: new Date().toISOString(),
     isRead: false,
   },
   {
+    __typename: "SignatureCancelledUserNotification",
     id: "4",
-    type: "SIGNATURE_CANCELLED",
-    petition,
-    createdAt: new Date().getTime(),
+    petition: petition,
+    createdAt: new Date().toISOString(),
     isRead: true,
   },
   {
+    __typename: "PetitionSharedUserNotification",
     id: "5",
-    type: "PETITION_SHARED",
-    petition,
+    petition: petition,
     owner: user,
     sharedWith: user,
-    permissionType,
-    createdAt: new Date().getTime(),
+    permissionType: permissionType,
+    createdAt: new Date().toISOString(),
     isRead: true,
   },
   {
+    __typename: "PetitionSharedUserNotification",
     id: "6",
-    type: "PETITION_SHARED",
-    petition,
+    petition: petition,
     owner: user,
     sharedWith: userGroup,
-    permissionType,
-    createdAt: new Date().getTime(),
+    permissionType: permissionType,
+    createdAt: new Date().toISOString(),
     isRead: true,
   },
   {
+    __typename: "MessageEmailBouncedUserNotification",
     id: "7",
-    type: "MESSAGE_EMAIL_BOUNCED",
-    petition,
+    petition: petition,
     access: petitionAccess,
-    createdAt: new Date().getTime(),
+    createdAt: new Date().toISOString(),
     isRead: false,
   },
-] as any[];
+] as Notifications_PetitionUserNotificationFragment[];
 
 export const unreadedNotificationsMock = notificationsMock.filter(
   (n) => !n.isRead

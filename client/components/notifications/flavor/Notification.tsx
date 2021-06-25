@@ -1,8 +1,10 @@
+import { gql } from "@apollo/client";
 import { Center, Stack, Text } from "@chakra-ui/layout";
 import { Circle } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { useNotification_updatePetitionUserNotificationReadStatusMutation } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useIntl } from "react-intl";
 
@@ -32,8 +34,16 @@ export function Notification({
         defaultMessage: "Mark as read",
       });
 
-  const handleMarkAsReadUnread = () => {
-    console.log(`mark as ${isRead ? "unread" : "read"}`, id);
+  const [updateIsReadNotification] =
+    useNotification_updatePetitionUserNotificationReadStatusMutation();
+
+  const handleMarkAsReadUnread = async () => {
+    await updateIsReadNotification({
+      variables: {
+        petitionUserNotificationIds: [id],
+        isRead: !isRead,
+      },
+    });
   };
 
   return (
@@ -88,7 +98,9 @@ export function Notification({
         </Center>
 
         <NotificationTitle title={title} />
-        {body}
+        <Text color="black" noOfLines={2}>
+          {body}
+        </Text>
         <NotificationTimestamp time={timestamp} />
       </Stack>
     </Stack>
@@ -112,14 +124,6 @@ export function NotificationTitle({ title, ...props }: { title: string }) {
   );
 }
 
-export function NotificationBody({ body }: { body: any }) {
-  return (
-    <Text color="black" noOfLines={2}>
-      {body}
-    </Text>
-  );
-}
-
 function NotificationTimestamp({ time }: { time: string }) {
   return (
     <Text fontSize="14px" color="gray.500">
@@ -132,3 +136,22 @@ function NotificationTimestamp({ time }: { time: string }) {
     </Text>
   );
 }
+
+Notification.mutations = [
+  gql`
+    mutation Notification_updatePetitionUserNotificationReadStatus(
+      $petitionUserNotificationIds: [GID!]!
+      $isRead: Boolean!
+    ) {
+      updatePetitionUserNotificationReadStatus(
+        petitionUserNotificationIds: $petitionUserNotificationIds
+        isRead: $isRead
+      ) {
+        ... on PetitionUserNotification {
+          id
+          isRead
+        }
+      }
+    }
+  `,
+];

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Notification, NotificationBody } from "./Notification";
+import { Notification } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -44,7 +44,7 @@ export function NotificationPetitionCompleted({
     <Notification
       id={id}
       icon={<NotificationAvatar />}
-      body={<NotificationBody body={body} />}
+      body={body}
       title={petitionTitle}
       timestamp={createdAt}
       isRead={isRead}
@@ -66,11 +66,6 @@ function NotificationAvatar() {
 NotificationPetitionCompleted.fragments = {
   PetitionCompletedUserNotification: gql`
     fragment NotificationEmailBounced_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
-      id
-      petition {
-        id
-        name
-      }
       access {
         contact {
           id
@@ -78,7 +73,6 @@ NotificationPetitionCompleted.fragments = {
           email
         }
       }
-      createdAt
     }
   `,
 };

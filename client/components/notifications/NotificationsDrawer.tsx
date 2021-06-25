@@ -10,6 +10,10 @@ import {
 } from "@chakra-ui/modal";
 import { BoxProps, Button } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
+import {
+  Notifications_PetitionUserNotificationFragment,
+  PetitionUserNotificationFilter,
+} from "@parallel/graphql/__types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { useRef } from "react";
@@ -20,10 +24,10 @@ import { NotificationsSelect } from "./NotificationsSelect";
 export interface NotificationsDrawerProps {
   onClose: () => void;
   isOpen: boolean;
-  notifications: any[];
+  notifications: Notifications_PetitionUserNotificationFragment[];
   fetchData: () => void;
-  onChangeFilterBy: (arg0: string) => void;
-  selectedFilter: string;
+  onChangeFilterBy: (arg0: PetitionUserNotificationFilter) => void;
+  selectedFilter: PetitionUserNotificationFilter;
   hasMore: boolean;
   onMarkAllAsRead: () => void;
 }

@@ -3,7 +3,7 @@ import { Avatar } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { PetitionBase } from "@parallel/graphql/__types";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Notification, NotificationBody } from "./Notification";
+import { Notification } from "./Notification";
 
 export interface NotificationSignatureCompletedProps {
   id: string;
@@ -32,13 +32,9 @@ export function NotificationSignatureCompleted({
       id={id}
       icon={<NotificationAvatar />}
       body={
-        <NotificationBody
-          body={
-            <FormattedMessage
-              id="component.notification-signature-completed.body"
-              defaultMessage="The digital signature has been completed."
-            />
-          }
+        <FormattedMessage
+          id="component.notification-signature-completed.body"
+          defaultMessage="The digital signature has been completed."
         />
       }
       title={petitionTitle}
@@ -68,6 +64,7 @@ NotificationSignatureCompleted.fragments = {
         name
       }
       createdAt
+      isRead
     }
   `,
 };

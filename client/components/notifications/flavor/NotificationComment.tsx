@@ -1,20 +1,19 @@
 import { gql } from "@apollo/client";
 import { CommentIcon } from "@parallel/chakra/icons";
-import { Notification, NotificationBody } from "./Notification";
+import { Notification } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   PetitionBase,
   PetitionField,
-  UserOrPetitionAccess,
+  PetitionFieldComment,
 } from "@parallel/graphql/__types";
 
 export interface NotificationCommentProps {
   id: string;
   petition: PetitionBase;
-  author: UserOrPetitionAccess;
   field: PetitionField;
-  isInternal: boolean;
+  comment: PetitionFieldComment;
   createdAt: string;
   isRead: boolean;
 }
@@ -22,20 +21,22 @@ export interface NotificationCommentProps {
 export function NotificationComment({
   id,
   petition,
-  author,
   field,
-  isInternal,
+  comment,
   createdAt,
   isRead,
 }: NotificationCommentProps) {
   const intl = useIntl();
 
-  const name =
-    author.__typename === "PetitionAccess"
+  const { author, isInternal } = comment;
+
+  const name = author
+    ? author.__typename === "PetitionAccess"
       ? author.contact?.fullName
       : author.__typename === "User"
       ? author.fullName
-      : "";
+      : ""
+    : "";
 
   const petitionTitle =
     petition.name ??
@@ -77,7 +78,7 @@ export function NotificationComment({
     <Notification
       id={id}
       icon={<NotificationAvatar />}
-      body={<NotificationBody body={body} />}
+      body={body}
       title={petitionTitle}
       timestamp={createdAt}
       isRead={isRead}
@@ -99,26 +100,26 @@ function NotificationAvatar() {
 NotificationComment.fragments = {
   CommentCreatedUserNotification: gql`
     fragment NotificationComment_CommentCreatedUserNotification on CommentCreatedUserNotification {
-      id
-      petition {
+      field {
         id
-        name
+        title
       }
-      author {
-        ... on User {
-          id
-          fullName
-        }
-        ... on PetitionAccess {
-          contact {
+      comment {
+        isInternal
+        author {
+          ... on User {
             id
             fullName
-            email
+          }
+          ... on PetitionAccess {
+            contact {
+              id
+              fullName
+              email
+            }
           }
         }
       }
-      isInternal
-      createdAt
     }
   `,
 };

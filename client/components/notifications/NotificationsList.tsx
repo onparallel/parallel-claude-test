@@ -10,9 +10,11 @@ import { NotificationPetitionShared } from "./flavor/NotificationPetitionShared"
 import { NotificationSignatureCanceled } from "./flavor/NotificationSignatureCanceled";
 import { NotificationSignatureCompleted } from "./flavor/NotificationSignatureCompleted";
 import { useEffect, useState } from "react";
+import { NotificationDefault } from "./flavor/NotificationDefault";
+import { Notifications_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 
 export interface NotificationListProps {
-  notifications: any[];
+  notifications: Notifications_PetitionUserNotificationFragment[];
   scrollRef: any;
   fetchData: () => void;
   hasMore: boolean;
@@ -24,22 +26,24 @@ export function NotificationsList({
   fetchData,
   hasMore,
 }: NotificationListProps) {
-  const getNotificationByType = (notification) => {
-    switch (notification.type) {
-      case "PETITION_COMPLETED":
+  const getNotificationByType = (
+    notification: Notifications_PetitionUserNotificationFragment
+  ) => {
+    switch (notification.__typename) {
+      case "PetitionCompletedUserNotification":
         return NotificationPetitionCompleted;
-      case "SIGNATURE_COMPLETED":
+      case "SignatureCompletedUserNotification":
         return NotificationSignatureCompleted;
-      case "SIGNATURE_CANCELLED":
+      case "SignatureCancelledUserNotification":
         return NotificationSignatureCanceled;
-      case "PETITION_SHARED":
+      case "PetitionSharedUserNotification":
         return NotificationPetitionShared;
-      case "MESSAGE_EMAIL_BOUNCED":
+      case "MessageEmailBouncedUserNotification":
         return NotificationEmailBounced;
-      case "COMMENT_CREATED":
+      case "CommentCreatedUserNotification":
         return NotificationComment;
       default:
-        return NotificationComment;
+        return NotificationDefault;
     }
   };
 
@@ -71,7 +75,7 @@ export function NotificationsList({
           scrollableTarget={scroll}
         >
           <Box>
-            {notifications.map((notification, index) => {
+            {notifications.map((notification) => {
               const Notification = getNotificationByType(notification);
               return (
                 <LinkBox tabIndex={0} key={notification.id}>

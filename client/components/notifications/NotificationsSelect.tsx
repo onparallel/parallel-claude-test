@@ -3,13 +3,14 @@ import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hoo
 import { OptionType } from "@parallel/utils/react-select/types";
 import { useIntl } from "react-intl";
 import { useState } from "react";
+import { PetitionUserNotificationFilter } from "@parallel/graphql/__types";
 
 export function NotificationsSelect({
   onChange,
   selectedOption,
 }: {
-  onChange: (arg0: string) => void;
-  selectedOption: string;
+  onChange: (arg0: PetitionUserNotificationFilter) => void;
+  selectedOption: PetitionUserNotificationFilter;
 }) {
   const reactSelectProps = useFieldSelectReactSelectProps({});
   const intl = useIntl();
@@ -55,7 +56,7 @@ export function NotificationsSelect({
         id: "component.notifications-select.others",
         defaultMessage: "Others",
       }),
-      value: "OTHERS",
+      value: "OTHER",
     },
   ];
 
@@ -66,7 +67,7 @@ export function NotificationsSelect({
   const handleChangeSelect = (_selected: OptionType | null) => {
     if (_selected && _selected.value !== selected?.value) {
       setSelected(_selected);
-      onChange(_selected.value);
+      onChange(_selected.value as PetitionUserNotificationFilter);
     }
   };
 
