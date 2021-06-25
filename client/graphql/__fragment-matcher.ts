@@ -50,6 +50,14 @@ const result: PossibleTypesResultData = {
       "PetitionUserGroupPermission",
       "PetitionUserPermission",
     ],
+    PetitionUserNotification: [
+      "CommentCreatedUserNotification",
+      "MessageEmailBouncedUserNotification",
+      "PetitionCompletedUserNotification",
+      "PetitionSharedUserNotification",
+      "SignatureCancelledUserNotification",
+      "SignatureCompletedUserNotification",
+    ],
     PublicUserOrContact: ["PublicContact", "PublicUser"],
     Timestamps: [
       "Contact",
@@ -65,6 +73,7 @@ const result: PossibleTypesResultData = {
       "User",
       "UserGroup",
     ],
+    UserOrContact: ["Contact", "User"],
     UserOrPetitionAccess: ["PetitionAccess", "User"],
     UserOrUserGroup: ["User", "UserGroup"],
   },

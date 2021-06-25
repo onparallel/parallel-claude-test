@@ -75,7 +75,7 @@ export function NotificationsList({
               const Notification = getNotificationByType(notification);
               return (
                 <LinkBox tabIndex={0} key={notification.id}>
-                  <Notification notification={notification} />
+                  <Notification {...notification} />
                 </LinkBox>
               );
             })}

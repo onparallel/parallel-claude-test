@@ -1,4 +1,4 @@
-import { Box, Center, Stack, Text } from "@chakra-ui/layout";
+import { Center, Stack, Text } from "@chakra-ui/layout";
 import { Circle } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";

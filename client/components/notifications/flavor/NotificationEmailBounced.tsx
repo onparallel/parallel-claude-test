@@ -2,7 +2,56 @@ import { gql } from "@apollo/client";
 import { Notification, NotificationBody } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
 import { EmailXIcon } from "@parallel/chakra/icons";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { PetitionAccess, PetitionBase } from "@parallel/graphql/__types";
+
+export interface NotificationEmailBouncedProps {
+  id: string;
+  petition: PetitionBase;
+  access: PetitionAccess;
+  createdAt: string;
+  isRead: boolean;
+}
+
+export function NotificationEmailBounced({
+  id,
+  petition,
+  access,
+  createdAt,
+  isRead,
+}: NotificationEmailBouncedProps) {
+  const intl = useIntl();
+
+  const petitionTitle =
+    petition.name ??
+    intl.formatMessage({
+      id: "generic.untitled-petition",
+      defaultMessage: "Untitled petition",
+    });
+
+  const body = (
+    <FormattedMessage
+      id="ccomponent.notification-email-bounced.body"
+      defaultMessage="Error sending request to recipient <b>{name}</b> ({email})."
+      values={{
+        name: access.contact?.fullName,
+        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+        email: access.contact?.email,
+      }}
+    />
+  );
+
+  return (
+    <Notification
+      id={id}
+      icon={<NotificationAvatar />}
+      body={<NotificationBody body={body} />}
+      title={petitionTitle}
+      timestamp={createdAt}
+      isRead={isRead}
+    />
+  );
+}
 
 function NotificationAvatar() {
   return (
@@ -15,42 +64,21 @@ function NotificationAvatar() {
   );
 }
 
-export function NotificationEmailBounced({ notification }) {
-  const { id, timestamp, isRead, title } = notification;
-
-  const body = (
-    <FormattedMessage
-      id="ccomponent.notification-email-bounced.body"
-      defaultMessage="Error sending request to recipient <b>{name}</b> ({email})."
-      values={{
-        name: "Fullname destinatario",
-        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-        email: "destinatario@sumail.com",
-      }}
-    />
-  );
-
-  const createdAt = timestamp;
-  const petition = { name: title };
-
-  return (
-    <Notification
-      id={id}
-      icon={<NotificationAvatar />}
-      body={<NotificationBody body={body} />}
-      title={petition.name}
-      timestamp={createdAt}
-      isRead={isRead}
-    />
-  );
-}
-
 NotificationEmailBounced.fragments = {
-  MessageEmailBouncedNotification: gql`
-    fragment NotificationEmailBounced_MessageEmailBouncedNotification on MessageEmailBouncedNotification {
+  MessageEmailBouncedUserNotification: gql`
+    fragment NotificationEmailBounced_MessageEmailBouncedUserNotification on MessageEmailBouncedUserNotification {
       id
-      petition
-      access
+      petition {
+        id
+        name
+      }
+      access {
+        contact {
+          id
+          fullName
+          email
+        }
+      }
       createdAt
     }
   `,

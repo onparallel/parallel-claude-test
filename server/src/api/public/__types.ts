@@ -62,6 +62,14 @@ export type ChangePasswordResult =
   | "INVALID_NEW_PASSWORD"
   | "SUCCESS";
 
+export type CommentCreatedUserNotification = PetitionUserNotification & {
+  author: UserOrPetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isInternal: Scalars["Boolean"];
+  petition: Petition;
+};
+
 export type CommentDeletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   deletedBy: Maybe<UserOrPetitionAccess>;
@@ -204,6 +212,13 @@ export type MessageCancelledEvent = PetitionEvent & {
   id: Scalars["GID"];
   message: PetitionMessage;
   user: Maybe<User>;
+};
+
+export type MessageEmailBouncedUserNotification = PetitionUserNotification & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
 };
 
 export type MessageScheduledEvent = PetitionEvent & {
@@ -393,6 +408,12 @@ export type Mutation = {
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
   updatePetitionPermissionSubscription: Petition;
+  /**
+   * Updates the read status of a user's notification.
+   * Must pass either petitionUserNotificationIds or filter argument.
+   * If petitionUserNotificationIds is provided, filter argument will be ignored.
+   */
+  updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
@@ -908,6 +929,12 @@ export type MutationupdatePetitionPermissionSubscriptionArgs = {
   petitionId: Scalars["GID"];
 };
 
+export type MutationupdatePetitionUserNotificationReadStatusArgs = {
+  filter?: Maybe<PetitionUserNotificationFilter>;
+  isRead: Scalars["Boolean"];
+  petitionUserNotificationIds?: Maybe<Array<Scalars["GID"]>>;
+};
+
 export type MutationupdateSignatureRequestMetadataArgs = {
   metadata: Scalars["JSONObject"];
   petitionSignatureRequestId: Scalars["GID"];
@@ -1265,6 +1292,13 @@ export type PetitionCompletedEvent = PetitionEvent & {
   id: Scalars["GID"];
 };
 
+export type PetitionCompletedUserNotification = PetitionUserNotification & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
+};
+
 export type PetitionCreatedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -1498,6 +1532,15 @@ export type PetitionReopenedEvent = PetitionEvent & {
   user: Maybe<User>;
 };
 
+export type PetitionSharedUserNotification = PetitionUserNotification & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  owner: User;
+  permissionType: PetitionPermissionTypeRW;
+  petition: Petition;
+  sharedWith: Array<UserOrUserGroup>;
+};
+
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
@@ -1608,6 +1651,28 @@ export type PetitionUserGroupPermission = PetitionPermission &
     /** Time when the resource was last updated. */
     updatedAt: Scalars["DateTime"];
   };
+
+export type PetitionUserNotification = {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
+};
+
+/** The types of notifications available for filtering */
+export type PetitionUserNotificationFilter =
+  | "ALL"
+  | "COMMENTS"
+  | "COMPLETED"
+  | "OTHER"
+  | "SHARED"
+  | "UNREAD";
+
+export type PetitionUserNotificationPagination = {
+  /** The requested slice of items. */
+  items: Array<PetitionUserNotification>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
 
 /** The permission for a petition and user */
 export type PetitionUserPermission = PetitionPermission &
@@ -2057,9 +2122,21 @@ export type SignatureCancelledEvent = PetitionEvent & {
   user: Maybe<User>;
 };
 
+export type SignatureCancelledUserNotification = PetitionUserNotification & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
+};
+
 export type SignatureCompletedEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+};
+
+export type SignatureCompletedUserNotification = PetitionUserNotification & {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
 };
 
 /** The signature settings of a petition */
@@ -2201,11 +2278,14 @@ export type User = Timestamps & {
   lastActiveAt: Maybe<Scalars["DateTime"]>;
   /** The last name of the user. */
   lastName: Maybe<Scalars["String"]>;
+  /** Read and unread user notifications about events on their petitions */
+  notifications: PetitionUserNotificationPagination;
   /** The onboarding status for the different views of the app. */
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
   role: OrganizationRole;
   status: UserStatus;
+  unreadNotificationIds: Array<Scalars["String"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -2221,6 +2301,13 @@ export type UserauthenticationTokensArgs = {
 /** A user in the system. */
 export type UserhasFeatureFlagArgs = {
   featureFlag: FeatureFlag;
+};
+
+/** A user in the system. */
+export type UsernotificationsArgs = {
+  filter?: Maybe<PetitionUserNotificationFilter>;
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
 };
 
 export type UserAuthenticationToken = CreatedAt & {
@@ -2270,6 +2357,8 @@ export type UserGroupPagination = {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 };
+
+export type UserOrContact = Contact | User;
 
 export type UserOrPetitionAccess = PetitionAccess | User;
 

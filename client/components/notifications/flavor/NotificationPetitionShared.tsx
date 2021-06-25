@@ -2,42 +2,52 @@ import { gql } from "@apollo/client";
 import { Notification, NotificationBody } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
 import { UserArrowIcon, UserGroupArrowIcon } from "@parallel/chakra/icons";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionPermissionTypeText } from "@parallel/components/petition-common/PetitionPermissionType";
+import {
+  PetitionBase,
+  PetitionPermissionType,
+  User,
+  UserOrUserGroup,
+} from "@parallel/graphql/__types";
 
-function NotificationAvatar() {
-  const isGroup = false;
-  return isGroup ? (
-    <Avatar
-      height="36px"
-      width="36px"
-      background="purple.500"
-      icon={<UserGroupArrowIcon color="white" fontSize="1rem" />}
-    />
-  ) : (
-    <Avatar
-      height="36px"
-      width="36px"
-      background="purple.500"
-      icon={<UserArrowIcon color="white" fontSize="1rem" />}
-    />
-  );
+export interface NotificationPetitionSharedProps {
+  id: string;
+  petition: PetitionBase;
+  owner: User;
+  sharedWith: UserOrUserGroup;
+  permissionType: PetitionPermissionType;
+  createdAt: string;
+  isRead: boolean;
 }
 
-export function NotificationPetitionShared({ notification }) {
-  const { id, timestamp, isRead, title } = notification;
+export function NotificationPetitionShared({
+  id,
+  petition,
+  owner,
+  sharedWith,
+  permissionType,
+  createdAt,
+  isRead,
+}: NotificationPetitionSharedProps) {
+  const intl = useIntl();
 
-  const sharedGroup = false;
+  const petitionTitle =
+    petition.name ??
+    intl.formatMessage({
+      id: "generic.untitled-petition",
+      defaultMessage: "Untitled petition",
+    });
 
-  const permissionType = "OWNER";
+  const isSharedGroup = sharedWith.__typename === "UserGroup";
 
-  const body = sharedGroup ? (
+  const body = isSharedGroup ? (
     <FormattedMessage
       id="ccomponent.notification-petition-shared-group.body"
       defaultMessage='<b>{name}</b> has shared the request with the group "{group}" to which you belong.'
       values={{
-        name: "Fullname destinatario",
-        group: "Grupo 1",
+        name: owner.fullName,
+        group: sharedWith.__typename === "UserGroup" ? sharedWith.name : "",
         b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
       }}
     />
@@ -58,29 +68,59 @@ export function NotificationPetitionShared({ notification }) {
     />
   );
 
-  const createdAt = timestamp;
-  const petition = { name: title };
-
   return (
     <Notification
       id={id}
-      icon={<NotificationAvatar />}
+      icon={<NotificationAvatar isGroup={isSharedGroup} />}
       body={<NotificationBody body={body} />}
-      title={petition.name}
+      title={petitionTitle}
       timestamp={createdAt}
       isRead={isRead}
     />
   );
 }
 
+function NotificationAvatar({ isGroup }: { isGroup: boolean }) {
+  return isGroup ? (
+    <Avatar
+      height="36px"
+      width="36px"
+      background="purple.500"
+      icon={<UserGroupArrowIcon color="white" fontSize="1rem" />}
+    />
+  ) : (
+    <Avatar
+      height="36px"
+      width="36px"
+      background="purple.500"
+      icon={<UserArrowIcon color="white" fontSize="1rem" />}
+    />
+  );
+}
+
 NotificationPetitionShared.fragments = {
-  PetitionSharedNotification: gql`
-    fragment NotificationEmailBounced_PetitionSharedNotification on PetitionSharedNotification {
+  PetitionSharedUserNotification: gql`
+    fragment NotificationEmailBounced_PetitionSharedUserNotification on PetitionSharedUserNotification {
       id
-      petition
-      owner
+      petition {
+        id
+        name
+      }
+      owner {
+        id
+        fullName
+      }
+      sharedWith {
+        ... on User {
+          id
+          fullName
+        }
+        ... on UserGroup {
+          id
+          name
+        }
+      }
       permissionType
-      sharedWith
       createdAt
     }
   `,

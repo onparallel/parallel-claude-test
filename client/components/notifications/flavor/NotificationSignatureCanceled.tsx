@@ -2,24 +2,30 @@ import { gql } from "@apollo/client";
 import { Notification, NotificationBody } from "./Notification";
 import { Avatar } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { PetitionBase } from "@parallel/graphql/__types";
 
-function NotificationAvatar() {
-  return (
-    <Avatar
-      height="36px"
-      width="36px"
-      background="red.500"
-      icon={<SignatureIcon color="white" fontSize="1rem" />}
-    />
-  );
+export interface NotificationSignatureCanceledProps {
+  id: string;
+  petition: PetitionBase;
+  createdAt: string;
+  isRead: boolean;
 }
 
-export function NotificationSignatureCanceled({ notification }) {
-  const { id, timestamp, isRead, title } = notification;
+export function NotificationSignatureCanceled({
+  id,
+  petition,
+  createdAt,
+  isRead,
+}: NotificationSignatureCanceledProps) {
+  const intl = useIntl();
 
-  const createdAt = timestamp;
-  const petition = { name: title };
+  const petitionTitle =
+    petition.name ??
+    intl.formatMessage({
+      id: "generic.untitled-petition",
+      defaultMessage: "Untitled petition",
+    });
 
   return (
     <Notification
@@ -35,19 +41,32 @@ export function NotificationSignatureCanceled({ notification }) {
           }
         />
       }
-      title={petition.name}
+      title={petitionTitle}
       timestamp={createdAt}
       isRead={isRead}
     />
   );
 }
 
+function NotificationAvatar() {
+  return (
+    <Avatar
+      height="36px"
+      width="36px"
+      background="red.500"
+      icon={<SignatureIcon color="white" fontSize="1rem" />}
+    />
+  );
+}
+
 NotificationSignatureCanceled.fragments = {
-  SignatureCancelledNotification: gql`
-    fragment NotificationEmailBounced_SignatureCancelledNotification on SignatureCancelledNotification {
+  SignatureCancelledUserNotification: gql`
+    fragment NotificationEmailBounced_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
       id
-      petition
-      author
+      petition {
+        id
+        name
+      }
       createdAt
     }
   `,

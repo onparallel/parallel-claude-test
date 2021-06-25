@@ -2,7 +2,55 @@ import { gql } from "@apollo/client";
 import { Notification, NotificationBody } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
+import { PetitionAccess, PetitionBase } from "@parallel/graphql/__types";
+
+export interface NotificationPetitionCompletedProps {
+  id: string;
+  petition: PetitionBase;
+  access: PetitionAccess;
+  createdAt: string;
+  isRead: boolean;
+}
+
+export function NotificationPetitionCompleted({
+  id,
+  petition,
+  access,
+  createdAt,
+  isRead,
+}: NotificationPetitionCompletedProps) {
+  const intl = useIntl();
+
+  const petitionTitle =
+    petition.name ??
+    intl.formatMessage({
+      id: "generic.untitled-petition",
+      defaultMessage: "Untitled petition",
+    });
+
+  const body = (
+    <FormattedMessage
+      id="ccomponent.notification-petition-completed.body"
+      defaultMessage="<b>{name}</b> completed the petition."
+      values={{
+        name: access.contact?.fullName,
+        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
+      }}
+    />
+  );
+
+  return (
+    <Notification
+      id={id}
+      icon={<NotificationAvatar />}
+      body={<NotificationBody body={body} />}
+      title={petitionTitle}
+      timestamp={createdAt}
+      isRead={isRead}
+    />
+  );
+}
 
 function NotificationAvatar() {
   return (
@@ -15,41 +63,21 @@ function NotificationAvatar() {
   );
 }
 
-export function NotificationPetitionCompleted({ notification }) {
-  const { id, timestamp, isRead, title } = notification;
-
-  const body = (
-    <FormattedMessage
-      id="ccomponent.notification-petition-completed.body"
-      defaultMessage="<b>{name}</b> completed the petition."
-      values={{
-        name: "Fullname destinatario",
-        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-      }}
-    />
-  );
-
-  const createdAt = timestamp;
-  const petition = { name: title };
-
-  return (
-    <Notification
-      id={id}
-      icon={<NotificationAvatar />}
-      body={<NotificationBody body={body} />}
-      title={petition.name}
-      timestamp={createdAt}
-      isRead={isRead}
-    />
-  );
-}
-
 NotificationPetitionCompleted.fragments = {
-  PetitionCompletedNotification: gql`
-    fragment NotificationEmailBounced_PetitionCompletedNotification on PetitionCompletedNotification {
+  PetitionCompletedUserNotification: gql`
+    fragment NotificationEmailBounced_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
       id
-      petition
-      access
+      petition {
+        id
+        name
+      }
+      access {
+        contact {
+          id
+          fullName
+          email
+        }
+      }
       createdAt
     }
   `,

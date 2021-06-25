@@ -70,6 +70,16 @@ export type ChangePasswordResult =
   | "INVALID_NEW_PASSWORD"
   | "SUCCESS";
 
+export interface CommentCreatedUserNotification
+  extends PetitionUserNotification {
+  __typename?: "CommentCreatedUserNotification";
+  author: UserOrPetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isInternal: Scalars["Boolean"];
+  petition: Petition;
+}
+
 export interface CommentDeletedEvent extends PetitionEvent {
   __typename?: "CommentDeletedEvent";
   createdAt: Scalars["DateTime"];
@@ -226,6 +236,15 @@ export interface MessageCancelledEvent extends PetitionEvent {
   id: Scalars["GID"];
   message: PetitionMessage;
   user?: Maybe<User>;
+}
+
+export interface MessageEmailBouncedUserNotification
+  extends PetitionUserNotification {
+  __typename?: "MessageEmailBouncedUserNotification";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
 }
 
 export interface MessageScheduledEvent extends PetitionEvent {
@@ -418,6 +437,12 @@ export interface Mutation {
   updatePetitionFieldReplyMetadata: PetitionFieldReply;
   /** Updates the subscription flag on a PetitionPermission */
   updatePetitionPermissionSubscription: Petition;
+  /**
+   * Updates the read status of a user's notification.
+   * Must pass either petitionUserNotificationIds or filter argument.
+   * If petitionUserNotificationIds is provided, filter argument will be ignored.
+   */
+  updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
   /** Updates a reply to a text or select field. */
   updateSimpleReply: PetitionFieldReply;
@@ -933,6 +958,12 @@ export interface MutationupdatePetitionPermissionSubscriptionArgs {
   petitionId: Scalars["GID"];
 }
 
+export interface MutationupdatePetitionUserNotificationReadStatusArgs {
+  filter?: Maybe<PetitionUserNotificationFilter>;
+  isRead: Scalars["Boolean"];
+  petitionUserNotificationIds?: Maybe<Array<Scalars["GID"]>>;
+}
+
 export interface MutationupdateSignatureRequestMetadataArgs {
   metadata: Scalars["JSONObject"];
   petitionSignatureRequestId: Scalars["GID"];
@@ -1304,6 +1335,15 @@ export interface PetitionCompletedEvent extends PetitionEvent {
   id: Scalars["GID"];
 }
 
+export interface PetitionCompletedUserNotification
+  extends PetitionUserNotification {
+  __typename?: "PetitionCompletedUserNotification";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
+}
+
 export interface PetitionCreatedEvent extends PetitionEvent {
   __typename?: "PetitionCreatedEvent";
   createdAt: Scalars["DateTime"];
@@ -1548,6 +1588,17 @@ export interface PetitionReopenedEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
+export interface PetitionSharedUserNotification
+  extends PetitionUserNotification {
+  __typename?: "PetitionSharedUserNotification";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  owner: User;
+  permissionType: PetitionPermissionTypeRW;
+  petition: Petition;
+  sharedWith: Array<UserOrUserGroup>;
+}
+
 export type PetitionSignatureCancelReason =
   | "CANCELLED_BY_USER"
   | "DECLINED_BY_SIGNER"
@@ -1663,6 +1714,29 @@ export interface PetitionUserGroupPermission
   petition: Petition;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
+}
+
+export interface PetitionUserNotification {
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
+}
+
+/** The types of notifications available for filtering */
+export type PetitionUserNotificationFilter =
+  | "ALL"
+  | "COMMENTS"
+  | "COMPLETED"
+  | "OTHER"
+  | "SHARED"
+  | "UNREAD";
+
+export interface PetitionUserNotificationPagination {
+  __typename?: "PetitionUserNotificationPagination";
+  /** The requested slice of items. */
+  items: Array<PetitionUserNotification>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
 }
 
 /** The permission for a petition and user */
@@ -2133,10 +2207,26 @@ export interface SignatureCancelledEvent extends PetitionEvent {
   user?: Maybe<User>;
 }
 
+export interface SignatureCancelledUserNotification
+  extends PetitionUserNotification {
+  __typename?: "SignatureCancelledUserNotification";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
+}
+
 export interface SignatureCompletedEvent extends PetitionEvent {
   __typename?: "SignatureCompletedEvent";
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+}
+
+export interface SignatureCompletedUserNotification
+  extends PetitionUserNotification {
+  __typename?: "SignatureCompletedUserNotification";
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  petition: Petition;
 }
 
 /** The signature settings of a petition */
@@ -2286,11 +2376,14 @@ export interface User extends Timestamps {
   lastActiveAt?: Maybe<Scalars["DateTime"]>;
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
+  /** Read and unread user notifications about events on their petitions */
+  notifications: PetitionUserNotificationPagination;
   /** The onboarding status for the different views of the app. */
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
   role: OrganizationRole;
   status: UserStatus;
+  unreadNotificationIds: Array<Scalars["String"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 }
@@ -2306,6 +2399,13 @@ export interface UserauthenticationTokensArgs {
 /** A user in the system. */
 export interface UserhasFeatureFlagArgs {
   featureFlag: FeatureFlag;
+}
+
+/** A user in the system. */
+export interface UsernotificationsArgs {
+  filter?: Maybe<PetitionUserNotificationFilter>;
+  limit?: Maybe<Scalars["Int"]>;
+  offset?: Maybe<Scalars["Int"]>;
 }
 
 export interface UserAuthenticationToken extends CreatedAt {
@@ -2360,6 +2460,8 @@ export interface UserGroupPagination {
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
 }
+
+export type UserOrContact = Contact | User;
 
 export type UserOrPetitionAccess = PetitionAccess | User;
 
@@ -2869,6 +2971,88 @@ export type UserMenu_UserFragment = {
   isSuperAdmin: boolean;
   role: OrganizationRole;
 };
+
+export type NotificationComment_CommentCreatedUserNotificationFragment = {
+  __typename?: "CommentCreatedUserNotification";
+  id: string;
+  isInternal: boolean;
+  createdAt: string;
+  petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  author:
+    | {
+        __typename?: "PetitionAccess";
+        contact?: Maybe<{
+          __typename?: "Contact";
+          id: string;
+          fullName?: Maybe<string>;
+          email: string;
+        }>;
+      }
+    | { __typename?: "User"; id: string; fullName?: Maybe<string> };
+};
+
+export type NotificationEmailBounced_MessageEmailBouncedUserNotificationFragment =
+  {
+    __typename?: "MessageEmailBouncedUserNotification";
+    id: string;
+    createdAt: string;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    };
+  };
+
+export type NotificationEmailBounced_PetitionCompletedUserNotificationFragment =
+  {
+    __typename?: "PetitionCompletedUserNotification";
+    id: string;
+    createdAt: string;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{
+        __typename?: "Contact";
+        id: string;
+        fullName?: Maybe<string>;
+        email: string;
+      }>;
+    };
+  };
+
+export type NotificationEmailBounced_PetitionSharedUserNotificationFragment = {
+  __typename?: "PetitionSharedUserNotification";
+  id: string;
+  permissionType: PetitionPermissionTypeRW;
+  createdAt: string;
+  petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
+  sharedWith: Array<
+    | { __typename?: "User"; id: string; fullName?: Maybe<string> }
+    | { __typename?: "UserGroup"; id: string; name: string }
+  >;
+};
+
+export type NotificationEmailBounced_SignatureCancelledUserNotificationFragment =
+  {
+    __typename?: "SignatureCancelledUserNotification";
+    id: string;
+    createdAt: string;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  };
+
+export type NotificationEmailBounced_SignatureCompletedUserNotificationFragment =
+  {
+    __typename?: "SignatureCompletedUserNotification";
+    id: string;
+    createdAt: string;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  };
 
 export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
   email: Scalars["String"];
@@ -6621,6 +6805,109 @@ export const UserSelect_UserGroupFragmentDoc = gql`
 export const PetitionTemplateHeader_UserFragmentDoc = gql`
   fragment PetitionTemplateHeader_User on User {
     id
+  }
+`;
+export const NotificationComment_CommentCreatedUserNotificationFragmentDoc = gql`
+  fragment NotificationComment_CommentCreatedUserNotification on CommentCreatedUserNotification {
+    id
+    petition {
+      id
+      name
+    }
+    author {
+      ... on User {
+        id
+        fullName
+      }
+      ... on PetitionAccess {
+        contact {
+          id
+          fullName
+          email
+        }
+      }
+    }
+    isInternal
+    createdAt
+  }
+`;
+export const NotificationEmailBounced_MessageEmailBouncedUserNotificationFragmentDoc = gql`
+  fragment NotificationEmailBounced_MessageEmailBouncedUserNotification on MessageEmailBouncedUserNotification {
+    id
+    petition {
+      id
+      name
+    }
+    access {
+      contact {
+        id
+        fullName
+        email
+      }
+    }
+    createdAt
+  }
+`;
+export const NotificationEmailBounced_PetitionCompletedUserNotificationFragmentDoc = gql`
+  fragment NotificationEmailBounced_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
+    id
+    petition {
+      id
+      name
+    }
+    access {
+      contact {
+        id
+        fullName
+        email
+      }
+    }
+    createdAt
+  }
+`;
+export const NotificationEmailBounced_PetitionSharedUserNotificationFragmentDoc = gql`
+  fragment NotificationEmailBounced_PetitionSharedUserNotification on PetitionSharedUserNotification {
+    id
+    petition {
+      id
+      name
+    }
+    owner {
+      id
+      fullName
+    }
+    sharedWith {
+      ... on User {
+        id
+        fullName
+      }
+      ... on UserGroup {
+        id
+        name
+      }
+    }
+    permissionType
+    createdAt
+  }
+`;
+export const NotificationEmailBounced_SignatureCancelledUserNotificationFragmentDoc = gql`
+  fragment NotificationEmailBounced_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
+    id
+    petition {
+      id
+      name
+    }
+    createdAt
+  }
+`;
+export const NotificationEmailBounced_SignatureCompletedUserNotificationFragmentDoc = gql`
+  fragment NotificationEmailBounced_SignatureCompletedUserNotification on SignatureCompletedUserNotification {
+    id
+    petition {
+      id
+      name
+    }
+    createdAt
   }
 `;
 export const PetitionSharingModal_UserFragmentDoc = gql`

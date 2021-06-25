@@ -1,75 +1,117 @@
+import {
+  PetitionBase,
+  User,
+  PetitionAccess,
+  PetitionPermissionType,
+  UserGroup,
+  PetitionField,
+} from "@parallel/graphql/__types";
+
+const petition = {
+  id: "123123Aca",
+  name: "KYC_Cuatrecasas_2345",
+} as PetitionBase;
+
+const user = {
+  __typename: "User",
+  id: "adawda1",
+  fullName: "Lucas Ramírez",
+} as User;
+
+const field = {
+  __typename: "PetitionField",
+  id: "wadawdf1",
+  title: "Field name mock",
+} as PetitionField;
+
+const userGroup = {
+  __typename: "UserGroup",
+  id: "gadawdadawd1",
+  name: "Group Mockito 1",
+} as UserGroup;
+
+const petitionAccess = {
+  __typename: "PetitionAccess",
+  id: "adawda1",
+  contact: {
+    id: "wadwdawd",
+    fullName: "Nathan Drake",
+    email: "nathan@email.com",
+  },
+} as PetitionAccess;
+
+const permissionType = "READ" as PetitionPermissionType;
+
 export const notificationsMock = [
   {
     id: "0",
     type: "COMMENT_CREATED",
-    title: "KYC_Cuatrecasas_2345",
-    body: "Lucas Ramírez ha escrito un comentario en el campo “Adjunta la fotocopia de tu DNI/NIE.”",
-    timestamp: new Date().getTime(),
+    petition,
+    author: user,
+    field,
+    isInternal: true,
+    createdAt: new Date().getTime(),
     isRead: true,
-    meta: {},
   },
   {
     id: "1",
     type: "COMMENT_CREATED",
-    title: "KYC_Cuatrecasas_2345",
-    body: "Lucas Ramírez ha escrito un comentario en el campo “Adjunta la fotocopia de tu DNI/NIE texto más largo”",
-    timestamp: new Date().getTime(),
+    petition,
+    author: petitionAccess,
+    field,
+    isInternal: false,
+    createdAt: new Date().getTime(),
     isRead: true,
-    meta: {},
   },
   {
     id: "2",
     type: "PETITION_COMPLETED",
-    title: "KYC_Cuatrecasas_234524",
-    body: "Nathan Drake completó la petición.",
-    timestamp: new Date().getTime(),
+    petition,
+    access: petitionAccess,
+    createdAt: new Date().getTime(),
     isRead: false,
-    meta: {},
   },
   {
     id: "3",
     type: "SIGNATURE_COMPLETED",
-    title: "KYC_Cuatrecasas_2aAdc24-213",
-    body: "Óscar Mayer ha completado la firma digital.",
-    timestamp: new Date().getTime(),
+    petition,
+    createdAt: new Date().getTime(),
     isRead: false,
-    meta: {},
   },
   {
     id: "4",
     type: "SIGNATURE_CANCELLED",
-    title: "KYC_Cuatrecasas_2345 Enviada a Pepito Castañas",
-    body: "Jordi García canceló la firma digital.",
-    timestamp: new Date().getTime(),
+    petition,
+    createdAt: new Date().getTime(),
     isRead: true,
-    meta: {},
   },
   {
     id: "5",
     type: "PETITION_SHARED",
-    title: "KYC_Cuatrecasas_2345",
-    body: "Juan Fernández te ha compartido la petición como editor. ",
-    timestamp: new Date().getTime(),
+    petition,
+    owner: user,
+    sharedWith: user,
+    permissionType,
+    createdAt: new Date().getTime(),
     isRead: true,
-    meta: {},
   },
   {
     id: "6",
     type: "PETITION_SHARED",
-    title: "KYC_Cuatrecasas_2345",
-    body: "Juan Fernández ha compartido al grupo Unidad Técnica al que perteneces la petición.",
-    timestamp: new Date().getTime(),
+    petition,
+    owner: user,
+    sharedWith: userGroup,
+    permissionType,
+    createdAt: new Date().getTime(),
     isRead: true,
-    meta: {},
   },
   {
     id: "7",
     type: "MESSAGE_EMAIL_BOUNCED",
-    title: "KYC_Cuatrecasas_2345",
-    body: "Error al enviar la petición a Fullname destinatario (destinatario@sumail.com).",
-    timestamp: new Date().getTime(),
+    petition,
+    access: petitionAccess,
+    createdAt: new Date().getTime(),
     isRead: false,
-    meta: {},
   },
 ] as any[];
 

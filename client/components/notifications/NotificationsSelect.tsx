@@ -64,7 +64,7 @@ export function NotificationsSelect({
   );
 
   const handleChangeSelect = (_selected: OptionType | null) => {
-    if (_selected && _selected.value != selected?.value) {
+    if (_selected && _selected.value !== selected?.value) {
       setSelected(_selected);
       onChange(_selected.value);
     }
