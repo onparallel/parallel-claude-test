@@ -263,7 +263,7 @@ export function RecipientViewHeader({
                       marginLeft={2}
                     >
                       <FormattedMessage
-                        id="recipient-view.delegate-access.help"
+                        id="recipient-view.invite-collaborator.help"
                         defaultMessage="Use this option to request someone else to complete the information for you."
                       />
                     </HelpPopover>

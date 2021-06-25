@@ -116,8 +116,8 @@ function DelegateAccessDialog({
           </Circle>
           <Text as="div" flex="1">
             <FormattedMessage
-              id="recipient-view.delegate-access"
-              defaultMessage="Delegate access"
+              id="recipient-view.invite-collaborator.title"
+              defaultMessage="Invite collaborator"
             />
           </Text>
         </Stack>
@@ -127,13 +127,13 @@ function DelegateAccessDialog({
           <Box fontSize="sm" fontStyle="italic">
             <Text>
               <FormattedMessage
-                id="recipient-view.delegate-access-dialog.subtitle-1"
+                id="recipient-view.invite-collaborator-dialog.subtitle-1"
                 defaultMessage="Please fill out the contact details of the person you want to delegate your access."
               />
             </Text>
             <Text>
               <FormattedMessage
-                id="recipient-view.delegate-access-dialog.subtitle-2"
+                id="recipient-view.invite-collaborator-dialog.subtitle-2"
                 defaultMessage="We will send them an email with instructions on how to proceed."
               />
             </Text>

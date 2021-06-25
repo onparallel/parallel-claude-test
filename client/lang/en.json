@@ -5275,26 +5275,6 @@
     "context": "Contents"
   },
   {
-    "term": "recipient-view.delegate-access",
-    "definition": "Delegate access",
-    "context": "Delegate access"
-  },
-  {
-    "term": "recipient-view.delegate-access-dialog.subtitle-1",
-    "definition": "Please fill out the contact details of the person you want to delegate your access.",
-    "context": "Please fill out the contact details of the person you want to delegate your access."
-  },
-  {
-    "term": "recipient-view.delegate-access-dialog.subtitle-2",
-    "definition": "We will send them an email with instructions on how to proceed.",
-    "context": "We will send them an email with instructions on how to proceed."
-  },
-  {
-    "term": "recipient-view.delegate-access.help",
-    "definition": "Use this option to request someone else to complete the information for you.",
-    "context": "Use this option to request someone else to complete the information for you."
-  },
-  {
     "term": "recipient-view.expired-code-description",
     "definition": "The code has expired. Please try again.",
     "context": "The code has expired. Please try again."
@@ -5351,6 +5331,26 @@
   },
   {
     "term": "recipient-view.invite-collaborator",
+    "definition": "Invite collaborator",
+    "context": "Invite collaborator"
+  },
+  {
+    "term": "recipient-view.invite-collaborator-dialog.subtitle-1",
+    "definition": "Please fill out the contact details of the person you want to delegate your access.",
+    "context": "Please fill out the contact details of the person you want to delegate your access."
+  },
+  {
+    "term": "recipient-view.invite-collaborator-dialog.subtitle-2",
+    "definition": "We will send them an email with instructions on how to proceed.",
+    "context": "We will send them an email with instructions on how to proceed."
+  },
+  {
+    "term": "recipient-view.invite-collaborator.help",
+    "definition": "Use this option to request someone else to complete the information for you.",
+    "context": "Use this option to request someone else to complete the information for you."
+  },
+  {
+    "term": "recipient-view.invite-collaborator.title",
     "definition": "Invite collaborator",
     "context": "Invite collaborator"
   },
