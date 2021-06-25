@@ -1672,13 +1672,6 @@ export type PetitionUserNotificationFilter =
   | "SHARED"
   | "UNREAD";
 
-export type PetitionUserNotificationPagination = {
-  /** The requested slice of items. */
-  items: Array<PetitionUserNotification>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
-};
-
 /** The permission for a petition and user */
 export type PetitionUserPermission = PetitionPermission &
   Timestamps & {
@@ -2286,7 +2279,7 @@ export type User = Timestamps & {
   /** The last name of the user. */
   lastName: Maybe<Scalars["String"]>;
   /** Read and unread user notifications about events on their petitions */
-  notifications: PetitionUserNotificationPagination;
+  notifications: Array<PetitionUserNotification>;
   /** The onboarding status for the different views of the app. */
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
@@ -2312,9 +2305,9 @@ export type UserhasFeatureFlagArgs = {
 
 /** A user in the system. */
 export type UsernotificationsArgs = {
+  before?: Maybe<Scalars["DateTime"]>;
   filter?: Maybe<PetitionUserNotificationFilter>;
-  limit?: Maybe<Scalars["Int"]>;
-  offset?: Maybe<Scalars["Int"]>;
+  limit: Scalars["Int"];
 };
 
 export type UserAuthenticationToken = CreatedAt & {

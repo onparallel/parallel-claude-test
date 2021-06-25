@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
 import {
   Drawer,
@@ -11,46 +12,94 @@ import {
 import { BoxProps, Button } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import {
-  Notifications_PetitionUserNotificationFragment,
   PetitionUserNotificationFilter,
+  useNotificationsDrawer_PetitionUserNotificationsQuery,
+  useNotificationsDrawer_updatePetitionUserNotificationReadStatusMutation,
 } from "@parallel/graphql/__types";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRef } from "react";
 import { FormattedMessage } from "react-intl";
+import { NotificationComment } from "./flavor/NotificationComment";
+import { NotificationDefault } from "./flavor/NotificationDefault";
+import { NotificationEmailBounced } from "./flavor/NotificationEmailBounced";
+import { NotificationPetitionCompleted } from "./flavor/NotificationPetitionCompleted";
+import { NotificationPetitionShared } from "./flavor/NotificationPetitionShared";
 import { NotificationsList } from "./NotificationsList";
 import { NotificationsSelect } from "./NotificationsSelect";
 
 export interface NotificationsDrawerProps {
   onClose: () => void;
   isOpen: boolean;
-  notifications: Notifications_PetitionUserNotificationFragment[];
-  fetchData: () => void;
-  onChangeFilterBy: (arg0: PetitionUserNotificationFilter) => void;
-  selectedFilter: PetitionUserNotificationFilter;
-  hasMore: boolean;
-  onMarkAllAsRead: () => void;
 }
 
 export function NotificationsDrawer({
   onClose,
   isOpen,
-  notifications,
-  fetchData,
-  onChangeFilterBy,
-  selectedFilter,
-  hasMore,
-  onMarkAllAsRead,
 }: NotificationsDrawerProps) {
   const MotionFooter = motion<BoxProps>(DrawerFooter);
   const scrollRef = useRef(null);
 
+  const hasMore = useRef(false);
+  const lastNotificationDate = useRef(undefined);
+  const selectedFilter = useRef<PetitionUserNotificationFilter>("ALL");
+
+  const { data, refetch } =
+    useNotificationsDrawer_PetitionUserNotificationsQuery({
+      variables: {
+        limit: 50,
+        before: lastNotificationDate.current,
+        filter: selectedFilter.current,
+      },
+    });
+
+  const [notifications, setNotifications] = useState(
+    data?.me.notifications ?? []
+  );
+
   const hasUnreaded = notifications.filter((n) => !n.isRead).length > 0;
-  const showFooter = useRef(hasUnreaded);
 
   useEffect(() => {
-    showFooter.current = hasUnreaded;
-  }, [notifications]);
+    if (isOpen) refetch();
+  }, [isOpen]);
+
+  useEffect(() => {
+    setNotifications(data?.me.notifications ?? []);
+  }, [data]);
+
+  const fetchData = () => {
+    refetch({
+      limit: 50,
+      before: lastNotificationDate.current,
+      filter: selectedFilter.current,
+    });
+    console.log("FETCH MORE DATA");
+  };
+
+  const handleChangeFilterBy = (type: PetitionUserNotificationFilter) => {
+    selectedFilter.current = type;
+    refetch({
+      limit: 50,
+      before: lastNotificationDate.current,
+      filter: type,
+    });
+    console.log("FETCH DATA HERE, TYPE: ", selectedFilter.current);
+  };
+
+  const [updateIsReadNotifications] =
+    useNotificationsDrawer_updatePetitionUserNotificationReadStatusMutation();
+
+  const handleMarkAllAsRead = async () => {
+    const unReaded = await updateIsReadNotifications({
+      variables: {
+        petitionUserNotificationIds: notifications.map((n) => n.id),
+        filter: selectedFilter.current,
+        isRead: true,
+      },
+    });
+
+    console.log("Unreaded: ", unReaded);
+  };
 
   return (
     <Drawer
@@ -78,8 +127,8 @@ export function NotificationsDrawer({
             </Text>
           </Stack>
           <NotificationsSelect
-            selectedOption={selectedFilter}
-            onChange={onChangeFilterBy}
+            selectedOption={selectedFilter.current}
+            onChange={handleChangeFilterBy}
           />
         </DrawerHeader>
         <DrawerBody
@@ -92,7 +141,7 @@ export function NotificationsDrawer({
           ref={scrollRef}
         >
           <NotificationsList
-            hasMore={hasMore}
+            hasMore={hasMore.current}
             fetchData={fetchData}
             scrollRef={scrollRef}
             notifications={notifications}
@@ -103,7 +152,7 @@ export function NotificationsDrawer({
           {hasUnreaded && (
             <MotionFooter
               initial={
-                showFooter.current
+                hasUnreaded
                   ? { transform: "translateY(0px)" }
                   : { transform: "translateY(48px)" }
               }
@@ -130,7 +179,7 @@ export function NotificationsDrawer({
                 leftIcon={
                   <EmailOpenedIcon fontSize="16px" role="presentation" />
                 }
-                onClick={onMarkAllAsRead}
+                onClick={handleMarkAllAsRead}
               >
                 <Text fontSize="16px" fontWeight="600">
                   <FormattedMessage
@@ -146,3 +195,72 @@ export function NotificationsDrawer({
     </Drawer>
   );
 }
+
+NotificationsDrawer.fragments = {
+  PetitionUserNotification: gql`
+    fragment NotificationsDrawer_PetitionUserNotification on PetitionUserNotification {
+      ...NotificationDefault_PetitionUserNotification
+      ... on CommentCreatedUserNotification {
+        ...NotificationComment_CommentCreatedUserNotification
+      }
+      ... on MessageEmailBouncedUserNotification {
+        ...NotificationEmailBounced_MessageEmailBouncedUserNotification
+      }
+      ... on PetitionCompletedUserNotification {
+        ...NotificationEmailBounced_PetitionCompletedUserNotification
+      }
+      ... on PetitionSharedUserNotification {
+        ...NotificationEmailBounced_PetitionSharedUserNotification
+      }
+      ... on SignatureCancelledUserNotification {
+        ...NotificationDefault_PetitionUserNotification
+      }
+      ... on SignatureCompletedUserNotification {
+        ...NotificationDefault_PetitionUserNotification
+      }
+    }
+    ${NotificationComment.fragments.CommentCreatedUserNotification}
+    ${NotificationEmailBounced.fragments.MessageEmailBouncedUserNotification}
+    ${NotificationPetitionCompleted.fragments.PetitionCompletedUserNotification}
+    ${NotificationPetitionShared.fragments.PetitionSharedUserNotification}
+    ${NotificationDefault.fragments.PetitionUserNotification}
+  `,
+};
+
+NotificationsDrawer.mutations = [
+  gql`
+    mutation NotificationsDrawer_updatePetitionUserNotificationReadStatus(
+      $petitionUserNotificationIds: [GID!]!
+      $filter: PetitionUserNotificationFilter
+      $isRead: Boolean!
+    ) {
+      updatePetitionUserNotificationReadStatus(
+        petitionUserNotificationIds: $petitionUserNotificationIds
+        filter: $filter
+        isRead: $isRead
+      ) {
+        ... on PetitionUserNotification {
+          id
+          isRead
+        }
+      }
+    }
+  `,
+];
+
+NotificationsDrawer.queries = [
+  gql`
+    query NotificationsDrawer_PetitionUserNotifications(
+      $limit: Int!
+      $before: DateTime
+      $filter: PetitionUserNotificationFilter
+    ) {
+      me {
+        notifications(limit: $limit, before: $before, filter: $filter) {
+          ...NotificationsDrawer_PetitionUserNotification
+        }
+      }
+    }
+    ${NotificationsDrawer.fragments.PetitionUserNotification}
+  `,
+];

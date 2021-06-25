@@ -11,10 +11,10 @@ import { NotificationSignatureCanceled } from "./flavor/NotificationSignatureCan
 import { NotificationSignatureCompleted } from "./flavor/NotificationSignatureCompleted";
 import { useEffect, useState } from "react";
 import { NotificationDefault } from "./flavor/NotificationDefault";
-import { Notifications_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
+import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 
 export interface NotificationListProps {
-  notifications: Notifications_PetitionUserNotificationFragment[];
+  notifications: NotificationsDrawer_PetitionUserNotificationFragment[];
   scrollRef: any;
   fetchData: () => void;
   hasMore: boolean;
@@ -27,7 +27,7 @@ export function NotificationsList({
   hasMore,
 }: NotificationListProps) {
   const getNotificationByType = (
-    notification: Notifications_PetitionUserNotificationFragment
+    notification: NotificationsDrawer_PetitionUserNotificationFragment
   ) => {
     switch (notification.__typename) {
       case "PetitionCompletedUserNotification":
