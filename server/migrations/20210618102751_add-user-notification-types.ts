@@ -13,10 +13,10 @@ export async function up(knex: Knex): Promise<void> {
 
   await knex.raw(/* sql */ `
     -- useful to search every unread notification of a user
-    create index "petition_user_notification__user_id__is_read" on petition_user_notification(user_id) where is_read = false;
+    create index "petition_user_notification__user_id__created_at__is_read" on petition_user_notification(user_id, created_at) include (type) where is_read = false;
 
     -- useful to search every read and unread notification of a user
-    create index "petition_user_notification__user_id" on petition_user_notification(user_id);
+    create index "petition_user_notification__user_id_created_at" on petition_user_notification(user_id, created_at) include (type);
 `);
 }
 
@@ -24,8 +24,8 @@ export async function down(knex: Knex): Promise<void> {
   await knex.raw(/* sql */ `
     drop index "pun__comment_created__petition_id__data";
     drop index "pun__comment_created__user_id__petition_id__data";
-    drop index "petition_user_notification__user_id__is_read";
-    drop index "petition_user_notification__user_id";
+    drop index "petition_user_notification__user_id__created_at__is_read";
+    drop index "petition_user_notification__user_id_created_at";
   `);
 
   await removeUserNotificationType(knex, "PETITION_COMPLETED");

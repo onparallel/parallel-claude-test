@@ -2390,18 +2390,6 @@ enum PetitionUserNotificationFilter {
   UNREAD
 }
 
-type PetitionUserNotificationPagination {
-  """
-  The requested slice of items.
-  """
-  items: [PetitionUserNotification!]!
-
-  """
-  The total count of items in the list.
-  """
-  totalCount: Int!
-}
-
 """
 The permission for a petition and user
 """
@@ -3415,18 +3403,10 @@ type User implements Timestamps {
   Read and unread user notifications about events on their petitions
   """
   notifications(
+    before: DateTime
     filter: PetitionUserNotificationFilter
-
-    """
-    Number of elements to take from the list.
-    """
-    limit: Int
-
-    """
-    Number of elements to skip from the list.
-    """
-    offset: Int
-  ): PetitionUserNotificationPagination!
+    limit: Int!
+  ): [PetitionUserNotification!]!
 
   """
   The onboarding status for the different views of the app.

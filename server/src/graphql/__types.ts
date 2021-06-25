@@ -393,11 +393,6 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   PetitionUserGroupPermission: db.PetitionPermission;
-  PetitionUserNotificationPagination: {
-    // root type
-    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
-    totalCount: number; // Int!
-  };
   PetitionUserPermission: db.PetitionPermission;
   PetitionWithFieldAndReplies: {
     // root type
@@ -1099,11 +1094,6 @@ export interface NexusGenFieldTypes {
     petition: NexusGenRootTypes["Petition"]; // Petition!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
-  PetitionUserNotificationPagination: {
-    // field return type
-    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
-    totalCount: number; // Int!
-  };
   PetitionUserPermission: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1368,7 +1358,7 @@ export interface NexusGenFieldTypes {
     isSuperAdmin: boolean; // Boolean!
     lastActiveAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastName: string | null; // String
-    notifications: NexusGenRootTypes["PetitionUserNotificationPagination"]; // PetitionUserNotificationPagination!
+    notifications: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
     onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
@@ -2052,11 +2042,6 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     updatedAt: "DateTime";
   };
-  PetitionUserNotificationPagination: {
-    // field return type name
-    items: "PetitionUserNotification";
-    totalCount: "Int";
-  };
   PetitionUserPermission: {
     // field return type name
     createdAt: "DateTime";
@@ -2321,7 +2306,7 @@ export interface NexusGenFieldTypeNames {
     isSuperAdmin: "Boolean";
     lastActiveAt: "DateTime";
     lastName: "String";
-    notifications: "PetitionUserNotificationPagination";
+    notifications: "PetitionUserNotification";
     onboardingStatus: "JSONObject";
     organization: "Organization";
     role: "OrganizationRole";
@@ -3168,9 +3153,9 @@ export interface NexusGenArgTypes {
     };
     notifications: {
       // args
+      before?: NexusGenScalars["DateTime"] | null; // DateTime
       filter?: NexusGenEnums["PetitionUserNotificationFilter"] | null; // PetitionUserNotificationFilter
-      limit?: number | null; // Int
-      offset?: number | null; // Int
+      limit: number; // Int!
     };
   };
 }

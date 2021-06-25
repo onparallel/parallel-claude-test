@@ -63,6 +63,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     notifications = await knex("petition_user_notification")
       .insert([
         {
+          created_at: "2021-06-10T10:00:00Z",
           type: "PETITION_SHARED",
           user_id: sessionUser.id,
           is_read: true,
@@ -74,6 +75,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
           },
         },
         {
+          created_at: "2021-06-10T09:00:00Z",
           type: "COMMENT_CREATED",
           user_id: otherUser.id,
           petition_id: petition.id,
@@ -83,6 +85,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
           },
         },
         {
+          created_at: "2021-01-10T10:00:00Z",
           type: "PETITION_COMPLETED",
           user_id: sessionUser.id,
           petition_id: petition.id,
@@ -91,6 +94,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
           },
         },
         {
+          created_at: "2021-01-01T10:00:00Z",
           type: "SIGNATURE_COMPLETED",
           user_id: sessionUser.id,
           petition_id: petition.id,
@@ -112,11 +116,8 @@ describe("GraphQL - PetitionUserNotifications", () => {
       query: gql`
         query {
           me {
-            notifications(limit: 100, offset: 0) {
-              totalCount
-              items {
-                id
-              }
+            notifications(limit: 100) {
+              id
             }
             unreadNotificationIds
           }
@@ -126,7 +127,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
 
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
-      notifications: { totalCount: 0, items: [] },
+      notifications: [],
       unreadNotificationIds: [],
     });
   });
@@ -136,11 +137,8 @@ describe("GraphQL - PetitionUserNotifications", () => {
       query: gql`
         query {
           me {
-            notifications(limit: 2, offset: 1) {
-              totalCount
-              items {
-                id
-              }
+            notifications(limit: 2) {
+              id
             }
           }
         }
@@ -149,17 +147,14 @@ describe("GraphQL - PetitionUserNotifications", () => {
 
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
-      notifications: {
-        totalCount: 3,
-        items: [
-          {
-            id: toGlobalId("PetitionUserNotification", notifications[2].id),
-          },
-          {
-            id: toGlobalId("PetitionUserNotification", notifications[3].id),
-          },
-        ],
-      },
+      notifications: [
+        {
+          id: toGlobalId("PetitionUserNotification", notifications[0].id),
+        },
+        {
+          id: toGlobalId("PetitionUserNotification", notifications[2].id),
+        },
+      ],
     });
   });
 
@@ -168,11 +163,8 @@ describe("GraphQL - PetitionUserNotifications", () => {
       query: gql`
         query {
           me {
-            notifications(limit: 10, offset: 0, filter: SHARED) {
-              totalCount
-              items {
-                id
-              }
+            notifications(limit: 10, filter: SHARED) {
+              id
             }
           }
         }
@@ -180,12 +172,47 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
-      notifications: {
-        totalCount: 1,
-        items: [
-          { id: toGlobalId("PetitionUserNotification", notifications[0].id) },
-        ],
-      },
+      notifications: [
+        { id: toGlobalId("PetitionUserNotification", notifications[0].id) },
+      ],
+    });
+  });
+
+  it("should query a list of notifications created before given Date", async () => {
+    const { errors, data } = await testClient.query({
+      query: gql`
+        query {
+          me {
+            notifications(limit: 10, before: "2021-01-10T10:00:00Z") {
+              id
+            }
+          }
+        }
+      `,
+    });
+    expect(errors).toBeUndefined();
+    expect(data.me).toEqual({
+      notifications: [
+        { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
+      ],
+    });
+  });
+
+  it("should return an empty list when passing a before date older than the oldest notification", async () => {
+    const { errors, data } = await testClient.query({
+      query: gql`
+        query {
+          me {
+            notifications(limit: 10, before: "2000-01-11T10:00:00Z") {
+              id
+            }
+          }
+        }
+      `,
+    });
+    expect(errors).toBeUndefined();
+    expect(data.me).toEqual({
+      notifications: [],
     });
   });
 
