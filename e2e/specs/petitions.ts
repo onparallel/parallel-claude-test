@@ -58,6 +58,7 @@ createTestSession("petitions", (context) => {
     // Fill email details
     const recipient = createRandomContact();
     await page.click("#petition-next");
+    await page.waitForSelector("#chakra-modal-send-petition-dialog");
 
     await createContact(page, "#petition-recipients-0", recipient);
 

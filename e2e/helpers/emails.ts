@@ -32,15 +32,12 @@ export async function waitForInbox(
     livequery: "true",
   });
   const controller = new AbortController();
-  const res = await Promise.race([
-    fetch(`https://api.testmail.app/api/json?${params}`, {
-      signal: controller.signal as any,
-    }),
-    (async function () {
-      await new Promise((resolve) => setTimeout(resolve, timeout));
-      controller.abort();
-      throw new Error(`Email timeout ${timeout}ms exceeded.`);
-    })(),
-  ]);
+  const ref = setTimeout(() => {
+    controller.abort();
+  }, timeout);
+  const res = await fetch(`https://api.testmail.app/api/json?${params}`, {
+    signal: controller.signal as any,
+  });
+  clearTimeout(ref);
   return await res.json();
 }

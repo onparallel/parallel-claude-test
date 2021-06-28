@@ -14,14 +14,15 @@ export async function fillPetitionField(
   data: PetitionFieldData
 ) {
   const el = await getElement(page, element);
-  const title = await el.$(`[id^="field-title-"]`);
-  await title!.fill(data.title);
+  const elementId = await el.getAttribute("id");
+  const id = elementId!.replace(/^field-/, "");
+  await page.fill(`#field-title-${id}`, data.title);
   if (data.description) {
-    const description = await el.$(`[id^="field-description-"]`);
-    await description!.fill(data.description);
+    await page.fill(`#field-description-${id}`, data.description);
   }
   if (data.values) {
-    await page.keyboard.press("ArrowDown"); // arrow down should put focus on field options
+    // arrow down should put focus on field options
+    await page.keyboard.press("ArrowDown");
     await page.keyboard.type(data.values.join("\n"));
   }
 }
