@@ -42,7 +42,7 @@ import {
   values,
 } from "@parallel/utils/queryState";
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
-import { useCallback, useMemo, useState } from "react";
+import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const SORTING = ["name", "createdAt"] as const;
@@ -186,7 +186,10 @@ function Petitions() {
     } catch {}
   };
 
-  const handleRowClick = useCallback(function (row: PetitionSelection) {
+  const handleRowClick = useCallback(function (
+    row: PetitionSelection,
+    event: MouseEvent
+  ) {
     goToPetition(
       row.id,
       row.__typename === "Petition"
@@ -198,9 +201,11 @@ function Petitions() {
               CLOSED: "replies",
             } as const
           )[row.status]
-        : "compose"
+        : "compose",
+      { openNewWindow: event.metaKey || event.ctrlKey }
     );
-  }, []);
+  },
+  []);
 
   const columns = usePetitionsTableColumns(
     petitions.items.length > 0

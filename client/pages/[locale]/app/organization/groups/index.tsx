@@ -55,6 +55,7 @@ import {
   useOrganizationGroups_deleteUserGroupMutation,
 } from "@parallel/graphql/__types";
 import { withError } from "@parallel/utils/promises/withError";
+import { MouseEvent } from "react";
 
 const SORTING = ["name", "members", "createdAt"] as const;
 
@@ -133,9 +134,18 @@ function OrganizationGroups() {
     [debouncedOnSearchChange]
   );
 
-  const handleRowClick = useCallback(function (row: any) {
-    router.push(`/${localeRef.current}/app/organization/groups/${row.id}`);
-  }, []);
+  const handleRowClick = useCallback(function (
+    row: OrganizationGroups_UserGroupFragment,
+    event: MouseEvent
+  ) {
+    const url = `/${localeRef.current}/app/organization/groups/${row.id}`;
+    if (event.metaKey || event.ctrlKey) {
+      window.open(url, "_blank");
+    } else {
+      router.push(url);
+    }
+  },
+  []);
 
   const [cloneUserGroup] = useOrganizationGroups_cloneUserGroupMutation();
   const handleCloneClick = useCallback(

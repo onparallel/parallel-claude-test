@@ -9,8 +9,17 @@ export function useGoToPetition() {
   const localeRef = useRef<string>(intl.locale);
   assignRef(localeRef, intl.locale);
   return useCallback(
-    (id: string, section: "compose" | "replies" | "activity") => {
-      router.push(`/${localeRef.current}/app/petitions/${id}/${section}`);
+    (
+      id: string,
+      section: "compose" | "replies" | "activity",
+      options: { openNewWindow?: boolean } = {}
+    ) => {
+      const url = `/${localeRef.current}/app/petitions/${id}/${section}`;
+      if (options.openNewWindow) {
+        window.open(url, "_blank");
+      } else {
+        router.push(url);
+      }
     },
     []
   );

@@ -47,7 +47,7 @@ import {
 import { UnwrapArray } from "@parallel/utils/types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { MouseEvent, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 const SORTING = [
@@ -112,8 +112,13 @@ function Contacts() {
     }));
   }
 
-  function handleRowClick(row: ContactSelection) {
-    router.push(`/${router.query.locale}/app/contacts/${row.id}`);
+  function handleRowClick(row: ContactSelection, event: MouseEvent) {
+    const url = `/${router.query.locale}/app/contacts/${row.id}`;
+    if (event.metaKey || event.ctrlKey) {
+      window.open(url, "_blank");
+    } else {
+      router.push(url);
+    }
   }
 
   async function handleCreateClick() {
