@@ -21,8 +21,8 @@ export async function fillPetitionField(
     await description!.fill(data.description);
   }
   if (data.values) {
-    const values = await el.$(`[id^="field-options-list-"]`);
-    await values!.type(data.values.join("\n"));
+    await page.keyboard.press("ArrowDown"); // arrow down should put focus on field options
+    await page.keyboard.type(data.values.join("\n"));
   }
 }
 

@@ -14,7 +14,7 @@ createTestSession("contacts", (context) => {
 
       // Search for created contact
       await context.page.click("#contacts-reload");
-      await context.page.type("#contacts-search", contact.email);
+      await context.page.fill("#contacts-search", contact.email);
       const element = await context.page.waitForSelector(
         `text="${contact.email}"`
       );

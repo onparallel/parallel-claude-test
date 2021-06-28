@@ -8,7 +8,7 @@ import { createRandomContact } from "../helpers/contacts";
 import { createContact } from "../helpers/contactSelect";
 import { createPetition } from "../helpers/createPetition";
 import { createTestSession } from "../helpers/createTestSession";
-import { waitForInbox as waitForInbox } from "../helpers/emails";
+import { waitForInbox } from "../helpers/emails";
 import { goTo } from "../helpers/goTo";
 import { waitForGraphQL } from "../helpers/graphql";
 import { login } from "../helpers/login";
