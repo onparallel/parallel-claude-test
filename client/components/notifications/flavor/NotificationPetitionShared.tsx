@@ -1,8 +1,6 @@
 import { gql } from "@apollo/client";
-import { Notification } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
 import { UserArrowIcon, UserGroupArrowIcon } from "@parallel/chakra/icons";
-import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionPermissionTypeText } from "@parallel/components/petition-common/PetitionPermissionType";
 import {
   PetitionBase,
@@ -10,6 +8,8 @@ import {
   User,
   UserOrUserGroup,
 } from "@parallel/graphql/__types";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Notification } from "./Notification";
 
 export interface NotificationPetitionSharedProps {
   id: string;

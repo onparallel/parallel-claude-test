@@ -50,6 +50,7 @@ function NotificationAvatar() {
       height="36px"
       width="36px"
       background="red.500"
+      Ø
       icon={<SignatureIcon color="white" fontSize="1rem" />}
     />
   );

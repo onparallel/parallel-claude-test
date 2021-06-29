@@ -25,15 +25,13 @@ export function Notifications() {
     onOpen();
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refetch();
-    }, 10000);
+  const handleRefetch = () => {
+    refetch();
+  };
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  useEffect(() => {
+    console.log("%c --- Notifications RENDER ---", "color: #018a11");
+  });
 
   return (
     <>
@@ -42,7 +40,11 @@ export function Notifications() {
         hasNotifications={unreadNotificationIds.length > 0}
         isOpen={isOpen}
       />
-      <NotificationsDrawer isOpen={isOpen} onClose={handleClose} />
+      <NotificationsDrawer
+        isOpen={isOpen}
+        onClose={handleClose}
+        onPull={handleRefetch}
+      />
     </>
   );
 }
@@ -51,6 +53,7 @@ Notifications.queries = [
   gql`
     query Notifications_UnreadPetitionUserNotificationIds {
       me {
+        id
         unreadNotificationIds
       }
     }

@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { BellIcon } from "@parallel/chakra/icons";
-import { Notification } from "./Notification";
 import { Avatar } from "@chakra-ui/react";
-import { useIntl } from "react-intl";
+import { BellIcon } from "@parallel/chakra/icons";
 import { PetitionBase } from "@parallel/graphql/__types";
+import { useIntl } from "react-intl";
+import { Notification } from "./Notification";
 
 export interface NotificationDefaultProps {
   id: string;

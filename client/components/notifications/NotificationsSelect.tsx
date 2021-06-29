@@ -1,9 +1,8 @@
-import Select from "react-select";
-import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { OptionType } from "@parallel/utils/react-select/types";
-import { useIntl } from "react-intl";
-import { useState } from "react";
 import { PetitionUserNotificationFilter } from "@parallel/graphql/__types";
+import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { useEffect, useMemo } from "react";
+import { useIntl } from "react-intl";
+import Select from "react-select";
 
 export function NotificationsSelect({
   onChange,
@@ -15,67 +14,65 @@ export function NotificationsSelect({
   const reactSelectProps = useFieldSelectReactSelectProps({});
   const intl = useIntl();
 
-  const options = [
-    {
-      label: intl.formatMessage({
-        id: "component.notifications-select.all-notifications",
-        defaultMessage: "All notifications",
-      }),
-      value: "ALL",
-    },
-    {
-      label: intl.formatMessage({
-        id: "component.notifications-select.unread",
-        defaultMessage: "Unread",
-      }),
-      value: "UNREAD",
-    },
-    {
-      label: intl.formatMessage({
-        id: "component.notifications-select.comments",
-        defaultMessage: "Comments",
-      }),
-      value: "COMMENTS",
-    },
-    {
-      label: intl.formatMessage({
-        id: "component.notifications-select.completed",
-        defaultMessage: "Completed",
-      }),
-      value: "COMPLETED",
-    },
-    {
-      label: intl.formatMessage({
-        id: "component.notifications-select.SHARED",
-        defaultMessage: "Shared",
-      }),
-      value: "SHARED",
-    },
-    {
-      label: intl.formatMessage({
-        id: "component.notifications-select.others",
-        defaultMessage: "Others",
-      }),
-      value: "OTHER",
-    },
-  ];
-
-  const [selected, setSelected] = useState(
-    options.find((o) => o.value === selectedOption)
+  const options = useMemo(
+    () => [
+      {
+        label: intl.formatMessage({
+          id: "component.notifications-select.all-notifications",
+          defaultMessage: "All notifications",
+        }),
+        value: "ALL",
+      },
+      {
+        label: intl.formatMessage({
+          id: "component.notifications-select.unread",
+          defaultMessage: "Unread",
+        }),
+        value: "UNREAD",
+      },
+      {
+        label: intl.formatMessage({
+          id: "component.notifications-select.comments",
+          defaultMessage: "Comments",
+        }),
+        value: "COMMENTS",
+      },
+      {
+        label: intl.formatMessage({
+          id: "component.notifications-select.completed",
+          defaultMessage: "Completed",
+        }),
+        value: "COMPLETED",
+      },
+      {
+        label: intl.formatMessage({
+          id: "component.notifications-select.SHARED",
+          defaultMessage: "Shared",
+        }),
+        value: "SHARED",
+      },
+      {
+        label: intl.formatMessage({
+          id: "component.notifications-select.others",
+          defaultMessage: "Others",
+        }),
+        value: "OTHER",
+      },
+    ],
+    [intl.locale]
   );
 
-  const handleChangeSelect = (_selected: OptionType | null) => {
-    if (_selected && _selected.value !== selected?.value) {
-      setSelected(_selected);
-      onChange(_selected.value as PetitionUserNotificationFilter);
-    }
-  };
+  useEffect(() => {
+    console.log("%c --- NotificationsSelect RENDER ---", "color: #63676e");
+  });
 
   return (
     <Select
       options={options}
-      value={selected}
-      onChange={handleChangeSelect}
+      value={options.find((o) => o.value === selectedOption)}
+      onChange={(selected) =>
+        onChange((selected?.value as PetitionUserNotificationFilter) ?? "ALL")
+      }
       {...reactSelectProps}
     />
   );

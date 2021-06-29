@@ -1,11 +1,10 @@
-import { gql } from "@apollo/client";
 import { Center, Stack, Text } from "@chakra-ui/layout";
 import { Circle } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { useNotification_updatePetitionUserNotificationReadStatusMutation } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { useIntl } from "react-intl";
 
 export function Notification({
@@ -34,15 +33,12 @@ export function Notification({
         defaultMessage: "Mark as read",
       });
 
-  const [updateIsReadNotification] =
-    useNotification_updatePetitionUserNotificationReadStatusMutation();
+  const updateIsReadNotification = useUpdateIsReadNotification();
 
   const handleMarkAsReadUnread = async () => {
     await updateIsReadNotification({
-      variables: {
-        petitionUserNotificationIds: [id],
-        isRead: !isRead,
-      },
+      petitionUserNotificationIds: [id],
+      isRead: !isRead,
     });
   };
 
@@ -136,22 +132,3 @@ function NotificationTimestamp({ time }: { time: string }) {
     </Text>
   );
 }
-
-Notification.mutations = [
-  gql`
-    mutation Notification_updatePetitionUserNotificationReadStatus(
-      $petitionUserNotificationIds: [GID!]!
-      $isRead: Boolean!
-    ) {
-      updatePetitionUserNotificationReadStatus(
-        petitionUserNotificationIds: $petitionUserNotificationIds
-        isRead: $isRead
-      ) {
-        ... on PetitionUserNotification {
-          id
-          isRead
-        }
-      }
-    }
-  `,
-];

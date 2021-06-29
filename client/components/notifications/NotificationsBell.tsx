@@ -2,8 +2,7 @@ import { IconButton, IconButtonProps } from "@chakra-ui/button";
 import { Box, BoxProps } from "@chakra-ui/layout";
 import { BellIcon } from "@parallel/chakra/icons";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
 export interface NotificationsBellProps
@@ -39,6 +38,10 @@ export function NotificationsBell({
   useEffect(() => {
     showBadge.current = hasNotifications;
   }, [showBadge, hasNotifications]);
+
+  useEffect(() => {
+    console.log("%c --- NotificationsBell RENDER ---", "color: #1397cf");
+  });
 
   const amplifier = 3;
   const animationBell = {
@@ -89,14 +92,14 @@ export function NotificationsBell({
                 transition={spring}
                 pointerEvents="none"
                 position="absolute"
-                height={"14px"}
-                width={"14px"}
-                borderWidth={"2px"}
-                borderColor={"inherit"}
+                height="14px"
+                width="14px"
+                borderWidth="2px"
+                borderColor="inherit"
                 borderRadius="50%"
                 background={badgeColor}
-                right={"6px"}
-                top={"6px"}
+                right="6px"
+                top="6px"
               ></MotionBox>
             )}
           </AnimatePresence>

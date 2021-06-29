@@ -1,13 +1,13 @@
 import { gql } from "@apollo/client";
-import { CommentIcon } from "@parallel/chakra/icons";
-import { Notification } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { CommentIcon } from "@parallel/chakra/icons";
 import {
   PetitionBase,
   PetitionField,
   PetitionFieldComment,
 } from "@parallel/graphql/__types";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Notification } from "./Notification";
 
 export interface NotificationCommentProps {
   id: string;

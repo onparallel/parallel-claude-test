@@ -12,13 +12,14 @@ import {
 import { BoxProps, Button } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import {
+  NotificationsDrawer_PetitionUserNotificationFragment,
   PetitionUserNotificationFilter,
-  useNotificationsDrawer_PetitionUserNotificationsQuery,
-  useNotificationsDrawer_updatePetitionUserNotificationReadStatusMutation,
+  useNotificationsDrawer_PetitionUserNotificationsLazyQuery,
 } from "@parallel/graphql/__types";
+import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
+import { useQueryState, values } from "@parallel/utils/queryState";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { NotificationComment } from "./flavor/NotificationComment";
 import { NotificationDefault } from "./flavor/NotificationDefault";
@@ -30,83 +31,118 @@ import { NotificationsSelect } from "./NotificationsSelect";
 
 export interface NotificationsDrawerProps {
   onClose: () => void;
+  onPull: () => void;
   isOpen: boolean;
 }
 
+const NOTIFICATIONS_LIMIT = 16;
+
+const QUERY_STATE = {
+  n_filter: values<PetitionUserNotificationFilter>([
+    "ALL",
+    "COMMENTS",
+    "COMPLETED",
+    "OTHER",
+    "SHARED",
+    "UNREAD",
+  ]).orDefault("ALL"),
+};
+
 export function NotificationsDrawer({
   onClose,
+  onPull,
   isOpen,
 }: NotificationsDrawerProps) {
-  const MotionFooter = motion<BoxProps>(DrawerFooter);
-  const scrollRef = useRef(null);
+  const [state, setQueryState] = useQueryState(QUERY_STATE);
+  const [hasMore, setHasMore] = useState(false);
+  const lastNotificationDate = useRef<string | undefined>(undefined);
 
-  const hasMore = useRef(false);
-  const lastNotificationDate = useRef(undefined);
-  const selectedFilter = useRef<PetitionUserNotificationFilter>("ALL");
+  const [getData, { data, loading, refetch, fetchMore }] =
+    useNotificationsDrawer_PetitionUserNotificationsLazyQuery();
 
-  const { data, refetch } =
-    useNotificationsDrawer_PetitionUserNotificationsQuery({
-      variables: {
-        limit: 50,
-        before: lastNotificationDate.current,
-        filter: selectedFilter.current,
-      },
-    });
-
-  const [notifications, setNotifications] = useState(
-    data?.me.notifications ?? []
-  );
-
+  const notifications = getNotificationsFiltered(data?.me.notifications ?? []);
   const hasUnreaded = notifications.filter((n) => !n.isRead).length > 0;
 
   useEffect(() => {
-    if (isOpen) refetch();
+    if (isOpen) {
+      getData({
+        variables: {
+          limit: NOTIFICATIONS_LIMIT,
+          filter: state.n_filter,
+        },
+      });
+    }
+
+    const interval = setInterval(() => {
+      if (isOpen) {
+        refetch?.({
+          limit: NOTIFICATIONS_LIMIT,
+          filter: state.n_filter,
+        });
+      }
+      onPull();
+    }, 10000);
+
+    return () => {
+      clearInterval(interval);
+    };
   }, [isOpen]);
 
   useEffect(() => {
-    setNotifications(data?.me.notifications ?? []);
-  }, [data]);
+    console.log("%c --- NotificationsDrawer RENDER ---", "color: #cf132c");
+  });
 
-  const fetchData = () => {
-    refetch({
-      limit: 50,
-      before: lastNotificationDate.current,
-      filter: selectedFilter.current,
-    });
-    console.log("FETCH MORE DATA");
-  };
+  function getNotificationsFiltered(
+    notifications: NotificationsDrawer_PetitionUserNotificationFragment[]
+  ) {
+    return state.n_filter === "UNREAD"
+      ? notifications.filter((n) => !n.isRead)
+      : notifications;
+  }
 
-  const handleChangeFilterBy = (type: PetitionUserNotificationFilter) => {
-    selectedFilter.current = type;
-    refetch({
-      limit: 50,
-      before: lastNotificationDate.current,
-      filter: type,
-    });
-    console.log("FETCH DATA HERE, TYPE: ", selectedFilter.current);
-  };
-
-  const [updateIsReadNotifications] =
-    useNotificationsDrawer_updatePetitionUserNotificationReadStatusMutation();
-
-  const handleMarkAllAsRead = async () => {
-    const unReaded = await updateIsReadNotifications({
+  const onFetchData = async () => {
+    const result = await fetchMore?.({
       variables: {
-        petitionUserNotificationIds: notifications.map((n) => n.id),
-        filter: selectedFilter.current,
-        isRead: true,
+        limit: NOTIFICATIONS_LIMIT,
+        before:
+          data?.me.notifications[data?.me.notifications.length - 1]?.createdAt,
+        filter: state.n_filter,
       },
     });
 
-    console.log("Unreaded: ", unReaded);
+    const notificationLength = result?.data?.me?.notifications.length ?? 0;
+    setHasMore(notificationLength < NOTIFICATIONS_LIMIT ? false : true);
   };
+
+  const handleChangeFilterBy = async (type: PetitionUserNotificationFilter) => {
+    setQueryState((s) => ({ ...s, n_filter: type }));
+    lastNotificationDate.current = undefined;
+
+    const result = await refetch?.({
+      limit: NOTIFICATIONS_LIMIT,
+      filter: type,
+    });
+
+    const notificationLength = result?.data?.me?.notifications.length ?? 0;
+    setHasMore(notificationLength < NOTIFICATIONS_LIMIT ? false : true);
+  };
+
+  const updateIsReadNotification = useUpdateIsReadNotification();
+  const handleMarkAllAsRead = async () => {
+    await updateIsReadNotification({
+      filter: state.n_filter,
+      isRead: true,
+    });
+  };
+
+  const MotionFooter = motion<BoxProps>(DrawerFooter);
 
   return (
     <Drawer
-      placement={"right"}
+      placement="right"
       onClose={onClose}
       isOpen={isOpen}
-      size={"sm"}
+      size="sm"
       isFullHeight
     >
       <DrawerOverlay />
@@ -117,7 +153,7 @@ export function NotificationsDrawer({
           paddingInlineEnd={4}
           paddingBottom={2}
         >
-          <Stack direction={"row"} marginBottom={6} spacing={2} align="center">
+          <Stack direction="row" marginBottom={6} spacing={2} align="center">
             <BellIcon fontSize="20px" role="presentation" />
             <Text>
               <FormattedMessage
@@ -127,27 +163,26 @@ export function NotificationsDrawer({
             </Text>
           </Stack>
           <NotificationsSelect
-            selectedOption={selectedFilter.current}
+            selectedOption={state.n_filter}
             onChange={handleChangeFilterBy}
           />
         </DrawerHeader>
         <DrawerBody
+          id="notifications-body"
           paddingInlineStart={0}
           paddingInlineEnd={0}
           paddingY={0}
           paddingBottom={hasUnreaded ? "48px" : "0px"}
           display="flex"
           flexDirection="column"
-          ref={scrollRef}
         >
           <NotificationsList
-            hasMore={hasMore.current}
-            fetchData={fetchData}
-            scrollRef={scrollRef}
+            hasMore={hasMore}
+            onFetchData={onFetchData}
             notifications={notifications}
+            loading={loading}
           />
         </DrawerBody>
-
         <AnimatePresence>
           {hasUnreaded && (
             <MotionFooter
@@ -227,27 +262,6 @@ NotificationsDrawer.fragments = {
   `,
 };
 
-NotificationsDrawer.mutations = [
-  gql`
-    mutation NotificationsDrawer_updatePetitionUserNotificationReadStatus(
-      $petitionUserNotificationIds: [GID!]!
-      $filter: PetitionUserNotificationFilter
-      $isRead: Boolean!
-    ) {
-      updatePetitionUserNotificationReadStatus(
-        petitionUserNotificationIds: $petitionUserNotificationIds
-        filter: $filter
-        isRead: $isRead
-      ) {
-        ... on PetitionUserNotification {
-          id
-          isRead
-        }
-      }
-    }
-  `,
-];
-
 NotificationsDrawer.queries = [
   gql`
     query NotificationsDrawer_PetitionUserNotifications(
@@ -256,6 +270,7 @@ NotificationsDrawer.queries = [
       $filter: PetitionUserNotificationFilter
     ) {
       me {
+        id
         notifications(limit: $limit, before: $before, filter: $filter) {
           ...NotificationsDrawer_PetitionUserNotification
         }

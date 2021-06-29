@@ -2975,7 +2975,7 @@ export type Notifications_UnreadPetitionUserNotificationIdsQueryVariables =
   Exact<{ [key: string]: never }>;
 
 export type Notifications_UnreadPetitionUserNotificationIdsQuery = {
-  me: { __typename?: "User"; unreadNotificationIds: Array<string> };
+  me: { __typename?: "User"; id: string; unreadNotificationIds: Array<string> };
 };
 
 export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
@@ -3022,49 +3022,6 @@ export type NotificationsDrawer_PetitionUserNotificationFragment =
   | NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
-export type NotificationsDrawer_updatePetitionUserNotificationReadStatusMutationVariables =
-  Exact<{
-    petitionUserNotificationIds: Array<Scalars["GID"]> | Scalars["GID"];
-    filter?: Maybe<PetitionUserNotificationFilter>;
-    isRead: Scalars["Boolean"];
-  }>;
-
-export type NotificationsDrawer_updatePetitionUserNotificationReadStatusMutation =
-  {
-    updatePetitionUserNotificationReadStatus: Array<
-      | {
-          __typename?: "CommentCreatedUserNotification";
-          id: string;
-          isRead: boolean;
-        }
-      | {
-          __typename?: "MessageEmailBouncedUserNotification";
-          id: string;
-          isRead: boolean;
-        }
-      | {
-          __typename?: "PetitionCompletedUserNotification";
-          id: string;
-          isRead: boolean;
-        }
-      | {
-          __typename?: "PetitionSharedUserNotification";
-          id: string;
-          isRead: boolean;
-        }
-      | {
-          __typename?: "SignatureCancelledUserNotification";
-          id: string;
-          isRead: boolean;
-        }
-      | {
-          __typename?: "SignatureCompletedUserNotification";
-          id: string;
-          isRead: boolean;
-        }
-    >;
-  };
-
 export type NotificationsDrawer_PetitionUserNotificationsQueryVariables =
   Exact<{
     limit: Scalars["Int"];
@@ -3075,6 +3032,7 @@ export type NotificationsDrawer_PetitionUserNotificationsQueryVariables =
 export type NotificationsDrawer_PetitionUserNotificationsQuery = {
   me: {
     __typename?: "User";
+    id: string;
     notifications: Array<
       | ({
           __typename?: "CommentCreatedUserNotification";
@@ -3096,47 +3054,6 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
         } & NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment)
     >;
   };
-};
-
-export type Notification_updatePetitionUserNotificationReadStatusMutationVariables =
-  Exact<{
-    petitionUserNotificationIds: Array<Scalars["GID"]> | Scalars["GID"];
-    isRead: Scalars["Boolean"];
-  }>;
-
-export type Notification_updatePetitionUserNotificationReadStatusMutation = {
-  updatePetitionUserNotificationReadStatus: Array<
-    | {
-        __typename?: "CommentCreatedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "MessageEmailBouncedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "PetitionCompletedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "PetitionSharedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "SignatureCancelledUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
-        __typename?: "SignatureCompletedUserNotification";
-        id: string;
-        isRead: boolean;
-      }
-  >;
 };
 
 export type NotificationComment_CommentCreatedUserNotificationFragment = {
@@ -6764,6 +6681,10 @@ export type Thanks_PetitionLogoQueryVariables = Exact<{
 
 export type Thanks_PetitionLogoQuery = { publicOrgLogoUrl?: Maybe<string> };
 
+export type GetMyIdQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetMyIdQuery = { me: { __typename?: "User"; id: string } };
+
 export type useFieldVisibility_PublicPetitionFieldFragment = {
   __typename?: "PublicPetitionField";
   id: string;
@@ -6858,6 +6779,53 @@ export type ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment 
 export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
   | ConfirmDeletePetitionsDialog_PetitionBase_Petition_Fragment
   | ConfirmDeletePetitionsDialog_PetitionBase_PetitionTemplate_Fragment;
+
+export type useUpdateIsReadNotificationMutationVariables = Exact<{
+  petitionUserNotificationIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  filter?: Maybe<PetitionUserNotificationFilter>;
+  isRead: Scalars["Boolean"];
+}>;
+
+export type useUpdateIsReadNotificationMutation = {
+  updatePetitionUserNotificationReadStatus: Array<
+    | {
+        __typename?: "CommentCreatedUserNotification";
+        id: string;
+        isRead: boolean;
+      }
+    | {
+        __typename?: "MessageEmailBouncedUserNotification";
+        id: string;
+        isRead: boolean;
+      }
+    | {
+        __typename?: "PetitionCompletedUserNotification";
+        id: string;
+        isRead: boolean;
+      }
+    | {
+        __typename?: "PetitionSharedUserNotification";
+        id: string;
+        isRead: boolean;
+      }
+    | {
+        __typename?: "SignatureCancelledUserNotification";
+        id: string;
+        isRead: boolean;
+      }
+    | {
+        __typename?: "SignatureCompletedUserNotification";
+        id: string;
+        isRead: boolean;
+      }
+  >;
+};
+
+export type updateUnreadNotificationIdsFragment = {
+  __typename?: "User";
+  id: string;
+  unreadNotificationIds: Array<string>;
+};
 
 export type uploadFile_AWSPresignedPostDataFragment = {
   __typename?: "AWSPresignedPostData";
@@ -9250,6 +9218,12 @@ export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
     name
   }
 `;
+export const updateUnreadNotificationIdsFragmentDoc = gql`
+  fragment updateUnreadNotificationIds on User {
+    id
+    unreadNotificationIds
+  }
+`;
 export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
   fragment uploadFile_AWSPresignedPostData on AWSPresignedPostData {
     url
@@ -9763,6 +9737,7 @@ export type PetitionHeader_updatePetitionPermissionSubscriptionMutationHookResul
 export const Notifications_UnreadPetitionUserNotificationIdsDocument = gql`
   query Notifications_UnreadPetitionUserNotificationIds {
     me {
+      id
       unreadNotificationIds
     }
   }
@@ -9797,43 +9772,6 @@ export type Notifications_UnreadPetitionUserNotificationIdsLazyQueryHookResult =
   ReturnType<
     typeof useNotifications_UnreadPetitionUserNotificationIdsLazyQuery
   >;
-export const NotificationsDrawer_updatePetitionUserNotificationReadStatusDocument = gql`
-  mutation NotificationsDrawer_updatePetitionUserNotificationReadStatus(
-    $petitionUserNotificationIds: [GID!]!
-    $filter: PetitionUserNotificationFilter
-    $isRead: Boolean!
-  ) {
-    updatePetitionUserNotificationReadStatus(
-      petitionUserNotificationIds: $petitionUserNotificationIds
-      filter: $filter
-      isRead: $isRead
-    ) {
-      ... on PetitionUserNotification {
-        id
-        isRead
-      }
-    }
-  }
-`;
-export function useNotificationsDrawer_updatePetitionUserNotificationReadStatusMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    NotificationsDrawer_updatePetitionUserNotificationReadStatusMutation,
-    NotificationsDrawer_updatePetitionUserNotificationReadStatusMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    NotificationsDrawer_updatePetitionUserNotificationReadStatusMutation,
-    NotificationsDrawer_updatePetitionUserNotificationReadStatusMutationVariables
-  >(
-    NotificationsDrawer_updatePetitionUserNotificationReadStatusDocument,
-    options
-  );
-}
-export type NotificationsDrawer_updatePetitionUserNotificationReadStatusMutationHookResult =
-  ReturnType<
-    typeof useNotificationsDrawer_updatePetitionUserNotificationReadStatusMutation
-  >;
 export const NotificationsDrawer_PetitionUserNotificationsDocument = gql`
   query NotificationsDrawer_PetitionUserNotifications(
     $limit: Int!
@@ -9841,6 +9779,7 @@ export const NotificationsDrawer_PetitionUserNotificationsDocument = gql`
     $filter: PetitionUserNotificationFilter
   ) {
     me {
+      id
       notifications(limit: $limit, before: $before, filter: $filter) {
         ...NotificationsDrawer_PetitionUserNotification
       }
@@ -9876,38 +9815,6 @@ export type NotificationsDrawer_PetitionUserNotificationsQueryHookResult =
   ReturnType<typeof useNotificationsDrawer_PetitionUserNotificationsQuery>;
 export type NotificationsDrawer_PetitionUserNotificationsLazyQueryHookResult =
   ReturnType<typeof useNotificationsDrawer_PetitionUserNotificationsLazyQuery>;
-export const Notification_updatePetitionUserNotificationReadStatusDocument = gql`
-  mutation Notification_updatePetitionUserNotificationReadStatus(
-    $petitionUserNotificationIds: [GID!]!
-    $isRead: Boolean!
-  ) {
-    updatePetitionUserNotificationReadStatus(
-      petitionUserNotificationIds: $petitionUserNotificationIds
-      isRead: $isRead
-    ) {
-      ... on PetitionUserNotification {
-        id
-        isRead
-      }
-    }
-  }
-`;
-export function useNotification_updatePetitionUserNotificationReadStatusMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    Notification_updatePetitionUserNotificationReadStatusMutation,
-    Notification_updatePetitionUserNotificationReadStatusMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    Notification_updatePetitionUserNotificationReadStatusMutation,
-    Notification_updatePetitionUserNotificationReadStatusMutationVariables
-  >(Notification_updatePetitionUserNotificationReadStatusDocument, options);
-}
-export type Notification_updatePetitionUserNotificationReadStatusMutationHookResult =
-  ReturnType<
-    typeof useNotification_updatePetitionUserNotificationReadStatusMutation
-  >;
 export const CreateUserDialog_emailIsAvailableDocument = gql`
   query CreateUserDialog_emailIsAvailable($email: String!) {
     emailIsAvailable(email: $email)
@@ -14013,6 +13920,33 @@ export type Thanks_PetitionLogoQueryHookResult = ReturnType<
 export type Thanks_PetitionLogoLazyQueryHookResult = ReturnType<
   typeof useThanks_PetitionLogoLazyQuery
 >;
+export const GetMyIdDocument = gql`
+  query GetMyId {
+    me {
+      id
+    }
+  }
+`;
+export function useGetMyIdQuery(
+  baseOptions?: Apollo.QueryHookOptions<GetMyIdQuery, GetMyIdQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<GetMyIdQuery, GetMyIdQueryVariables>(
+    GetMyIdDocument,
+    options
+  );
+}
+export function useGetMyIdLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<GetMyIdQuery, GetMyIdQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<GetMyIdQuery, GetMyIdQueryVariables>(
+    GetMyIdDocument,
+    options
+  );
+}
+export type GetMyIdQueryHookResult = ReturnType<typeof useGetMyIdQuery>;
+export type GetMyIdLazyQueryHookResult = ReturnType<typeof useGetMyIdLazyQuery>;
 export const useClonePetitions_clonePetitionsDocument = gql`
   mutation useClonePetitions_clonePetitions($petitionIds: [GID!]!) {
     clonePetitions(petitionIds: $petitionIds) {
@@ -14112,6 +14046,37 @@ export function useuseDeletePetitions_deletePetitionsMutation(
 }
 export type useDeletePetitions_deletePetitionsMutationHookResult = ReturnType<
   typeof useuseDeletePetitions_deletePetitionsMutation
+>;
+export const useUpdateIsReadNotificationDocument = gql`
+  mutation useUpdateIsReadNotification(
+    $petitionUserNotificationIds: [GID!]
+    $filter: PetitionUserNotificationFilter
+    $isRead: Boolean!
+  ) {
+    updatePetitionUserNotificationReadStatus(
+      petitionUserNotificationIds: $petitionUserNotificationIds
+      filter: $filter
+      isRead: $isRead
+    ) {
+      id
+      isRead
+    }
+  }
+`;
+export function useuseUpdateIsReadNotificationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    useUpdateIsReadNotificationMutation,
+    useUpdateIsReadNotificationMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    useUpdateIsReadNotificationMutation,
+    useUpdateIsReadNotificationMutationVariables
+  >(useUpdateIsReadNotificationDocument, options);
+}
+export type useUpdateIsReadNotificationMutationHookResult = ReturnType<
+  typeof useuseUpdateIsReadNotificationMutation
 >;
 export const PetitionComposeSearchContactsDocument = gql`
   query PetitionComposeSearchContacts($search: String, $exclude: [GID!]) {

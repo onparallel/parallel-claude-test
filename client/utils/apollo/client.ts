@@ -11,7 +11,7 @@ import { createUploadLink } from "apollo-upload-client";
 import { parse as parseCookie, serialize as serializeCookie } from "cookie";
 import { IncomingMessage } from "http";
 import Router from "next/router";
-import { filter, indexBy, map, pipe } from "remeda";
+import { filter, indexBy, map, pipe, sortBy, uniqBy } from "remeda";
 
 export interface CreateApolloClientOptions {
   req?: IncomingMessage;
@@ -196,6 +196,20 @@ export function createApolloClient(
         User: {
           fields: {
             authenticationTokens: { merge: false },
+            notifications: {
+              keyArgs: ["filter"],
+              merge(existing = [], incoming, { readField }) {
+                return pipe(
+                  [...existing, ...incoming],
+                  (arr) => uniqBy(arr, (obj) => readField("id", obj)),
+                  (arr) =>
+                    sortBy(arr, [
+                      (obj) => new Date(readField("createdAt", obj) as string),
+                      "desc",
+                    ])
+                );
+              },
+            },
           },
         },
       },

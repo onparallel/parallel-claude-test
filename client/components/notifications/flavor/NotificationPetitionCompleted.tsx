@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
-import { Notification } from "./Notification";
 import { Avatar, Text } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { FormattedMessage, useIntl } from "react-intl";
 import { PetitionAccess, PetitionBase } from "@parallel/graphql/__types";
+import { FormattedMessage, useIntl } from "react-intl";
+import { Notification } from "./Notification";
 
 export interface NotificationPetitionCompletedProps {
   id: string;
