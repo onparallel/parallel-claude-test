@@ -82,6 +82,7 @@ export function NotificationComment({
       title={petitionTitle}
       timestamp={createdAt}
       isRead={isRead}
+      url={`/${intl.locale}/app/petitions/${petition.id}/replies?comments=${field.id}`}
     />
   );
 }
@@ -105,6 +106,7 @@ NotificationComment.fragments = {
         title
       }
       comment {
+        id
         isInternal
         author {
           ... on User {

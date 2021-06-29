@@ -1736,6 +1736,14 @@ export type PetitionUserNotificationFilter =
   | "SHARED"
   | "UNREAD";
 
+export interface PetitionUserNotificationPagination {
+  __typename?: "PetitionUserNotificationPagination";
+  /** The requested slice of items. */
+  items: Array<PetitionUserNotification>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+}
+
 /** The permission for a petition and user */
 export interface PetitionUserPermission extends PetitionPermission, Timestamps {
   __typename?: "PetitionUserPermission";
@@ -3061,6 +3069,7 @@ export type NotificationComment_CommentCreatedUserNotificationFragment = {
   field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
   comment: {
     __typename?: "PetitionFieldComment";
+    id: string;
     isInternal: boolean;
     author?: Maybe<
       | {
@@ -7017,6 +7026,7 @@ export const NotificationComment_CommentCreatedUserNotificationFragmentDoc = gql
       title
     }
     comment {
+      id
       isInternal
       author {
         ... on User {

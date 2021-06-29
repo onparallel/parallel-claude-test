@@ -40,6 +40,7 @@ export function NotificationSignatureCompleted({
       title={petitionTitle}
       timestamp={createdAt}
       isRead={isRead}
+      url={`/${intl.locale}/app/petitions/${petition.id}/replies#signatures`}
     />
   );
 }

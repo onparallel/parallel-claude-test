@@ -90,7 +90,7 @@ export function NotificationsList({
             {notifications.map((notification) => {
               const Notification = getNotificationByType(notification);
               return (
-                <LinkBox tabIndex={0} key={notification.id}>
+                <LinkBox key={notification.id}>
                   <Notification {...notification} />
                 </LinkBox>
               );

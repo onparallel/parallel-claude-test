@@ -2390,6 +2390,18 @@ enum PetitionUserNotificationFilter {
   UNREAD
 }
 
+type PetitionUserNotificationPagination {
+  """
+  The requested slice of items.
+  """
+  items: [PetitionUserNotification!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
 """
 The permission for a petition and user
 """
