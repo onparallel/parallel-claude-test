@@ -567,15 +567,17 @@ export class PetitionRepository extends BaseRepository {
             }))
           );
 
-    await this.createEvent(
-      rows.map((message) => ({
-        type: scheduledAt ? "MESSAGE_SCHEDULED" : "MESSAGE_SENT",
-        petition_id: petitionId,
-        data: {
-          petition_message_id: message.id,
-        },
-      }))
-    );
+    if (scheduledAt) {
+      await this.createEvent(
+        rows.map((message) => ({
+          type: "MESSAGE_SCHEDULED",
+          petition_id: petitionId,
+          data: {
+            petition_message_id: message.id,
+          },
+        }))
+      );
+    }
 
     return rows;
   }
@@ -1484,7 +1486,7 @@ export class PetitionRepository extends BaseRepository {
       .where("status", "SCHEDULED")
       .whereNotNull("scheduled_at")
       .where("scheduled_at", "<=", this.knex.raw("CURRENT_TIMESTAMP"))
-      .update({ status: "PROCESSING" }, "id");
+      .update({ status: "PROCESSING" }, "*");
   }
 
   async getRemindableAccesses() {
