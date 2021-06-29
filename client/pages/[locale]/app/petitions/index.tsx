@@ -185,7 +185,6 @@ function Petitions() {
       });
     } catch {}
   };
-
   const handleRowClick = useCallback(function (
     row: PetitionSelection,
     event: MouseEvent
@@ -202,7 +201,7 @@ function Petitions() {
             } as const
           )[row.status]
         : "compose",
-      { openNewWindow: event.metaKey || event.ctrlKey }
+      event
     );
   },
   []);

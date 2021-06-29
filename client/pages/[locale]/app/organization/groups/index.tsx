@@ -1,47 +1,27 @@
+import { Button } from "@chakra-ui/button";
 import { Flex, Heading } from "@chakra-ui/layout";
 import { Text } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
-import { FormattedMessage, useIntl } from "react-intl";
-import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
+import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import { DateTime } from "@parallel/components/common/DateTime";
 import {
   DialogProps,
   useDialog,
   withDialogs,
 } from "@parallel/components/common/DialogProvider";
-import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import { compose } from "@parallel/utils/compose";
-import {
-  integer,
-  parseQuery,
-  sorting,
-  string,
-  useQueryState,
-  values,
-} from "@parallel/utils/queryState";
-import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
-import { DateTime } from "@parallel/components/common/DateTime";
-import { useCallback, useMemo, useRef, useState } from "react";
-import { FORMATS } from "@parallel/utils/dates";
-import { TablePage } from "@parallel/components/common/TablePage";
-import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
-import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
-import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useCreateGroupDialog } from "@parallel/components/organization/CreateGroupDialog";
+import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
+import { TablePage } from "@parallel/components/common/TablePage";
+import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
+import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { OverflownText } from "@parallel/components/common/OverflownText";
-import { useRouter } from "next/router";
-import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import { Button } from "@chakra-ui/button";
-import gql from "graphql-tag";
-import {
-  assertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/assertQuery";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
+import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
+import { useCreateGroupDialog } from "@parallel/components/organization/CreateGroupDialog";
+import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
 import {
   OrganizationGroupsQuery,
   OrganizationGroupsQueryVariables,
@@ -54,8 +34,27 @@ import {
   useOrganizationGroups_createUserGroupMutation,
   useOrganizationGroups_deleteUserGroupMutation,
 } from "@parallel/graphql/__types";
+import {
+  assertQuery,
+  useAssertQueryOrPreviousData,
+} from "@parallel/utils/apollo/assertQuery";
+import { compose } from "@parallel/utils/compose";
+import { FORMATS } from "@parallel/utils/dates";
+import { useHandleNavigation } from "@parallel/utils/navigation";
 import { withError } from "@parallel/utils/promises/withError";
-import { MouseEvent } from "react";
+import {
+  integer,
+  parseQuery,
+  sorting,
+  string,
+  useQueryState,
+  values,
+} from "@parallel/utils/queryState";
+import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
+import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
+import gql from "graphql-tag";
+import { MouseEvent, useCallback, useMemo, useState } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 
 const SORTING = ["name", "members", "createdAt"] as const;
 
@@ -72,8 +71,6 @@ const QUERY_STATE = {
 function OrganizationGroups() {
   const intl = useIntl();
   const toast = useToast();
-  const localeRef = useRef<string>(intl.locale);
-  const router = useRouter();
 
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const [selected, setSelected] = useState<string[]>([]);
@@ -134,16 +131,12 @@ function OrganizationGroups() {
     [debouncedOnSearchChange]
   );
 
+  const navigate = useHandleNavigation();
   const handleRowClick = useCallback(function (
     row: OrganizationGroups_UserGroupFragment,
     event: MouseEvent
   ) {
-    const url = `/${localeRef.current}/app/organization/groups/${row.id}`;
-    if (event.metaKey || event.ctrlKey) {
-      window.open(url, "_blank");
-    } else {
-      router.push(url);
-    }
+    navigate(`/app/organization/groups/${row.id}`, event);
   },
   []);
 

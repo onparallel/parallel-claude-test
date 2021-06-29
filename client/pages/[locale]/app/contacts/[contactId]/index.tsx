@@ -42,7 +42,7 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useCallback, useMemo, useState } from "react";
+import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -79,7 +79,7 @@ function Contact({ contactId }: ContactProps) {
   });
 
   const goToPetition = useGoToPetition();
-  function handleRowClick(row: PetitionAccessSelection) {
+  function handleRowClick(row: PetitionAccessSelection, event: MouseEvent) {
     goToPetition(
       row.petition!.id,
       (
@@ -89,7 +89,8 @@ function Contact({ contactId }: ContactProps) {
           COMPLETED: "replies",
           CLOSED: "replies",
         } as const
-      )[row.petition!.status]
+      )[row.petition!.status],
+      event
     );
   }
 

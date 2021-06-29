@@ -34,6 +34,7 @@ import {
 import { clearCache } from "@parallel/utils/apollo/clearCache";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { useGoToContact } from "@parallel/utils/goToContact";
 import { useCreateContact } from "@parallel/utils/mutations/useCreateContact";
 import { withError } from "@parallel/utils/promises/withError";
 import {
@@ -46,7 +47,6 @@ import {
 } from "@parallel/utils/queryState";
 import { UnwrapArray } from "@parallel/utils/types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
-import { useRouter } from "next/router";
 import { MouseEvent, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -71,7 +71,6 @@ const QUERY_STATE = {
 function Contacts() {
   const intl = useIntl();
   const errorToast = useExistingContactToast();
-  const router = useRouter();
   const [state, setQueryState] = useQueryState(QUERY_STATE);
   const {
     data: { me },
@@ -112,13 +111,9 @@ function Contacts() {
     }));
   }
 
+  const goToContact = useGoToContact();
   function handleRowClick(row: ContactSelection, event: MouseEvent) {
-    const url = `/${router.query.locale}/app/contacts/${row.id}`;
-    if (event.metaKey || event.ctrlKey) {
-      window.open(url, "_blank");
-    } else {
-      router.push(url);
-    }
+    goToContact(row.id, event);
   }
 
   async function handleCreateClick() {
