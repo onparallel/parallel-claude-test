@@ -26,7 +26,7 @@ export function TimelinePetitionCreatedEvent({
           backgroundColor="purple.500"
         />
       }
-      paddingTop={0}
+      paddingBottom={0}
     >
       <FormattedMessage
         id="timeline.petition-created-description"
