@@ -112,12 +112,9 @@ export class ContactRepository extends BaseRepository {
   }
 
   async createOrUpdate(
-    contacts: {
-      email: string;
-      orgId: number;
-      firstName: string;
-      lastName: string;
-    }[],
+    contacts: MaybeArray<
+      Pick<CreateContact, "first_name" | "last_name" | "email" | "org_id">
+    >,
     updatedBy: string
   ) {
     return await this.raw<Contact>(
@@ -130,11 +127,9 @@ export class ContactRepository extends BaseRepository {
       RETURNING *;`,
       [
         this.from("contact").insert(
-          contacts.map((contact) => ({
+          unMaybeArray(contacts).map((contact) => ({
+            ...contact,
             email: contact.email.toLowerCase().trim(),
-            org_id: contact.orgId,
-            first_name: contact.firstName,
-            last_name: contact.lastName,
             created_by: updatedBy,
             updated_by: updatedBy,
           }))

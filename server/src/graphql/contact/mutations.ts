@@ -153,9 +153,9 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
           ctx.contacts.createOrUpdate(
             chunk.map((parsed) => ({
               email: parsed.email,
-              firstName: parsed.firstName,
-              lastName: parsed.lastName,
-              orgId: ctx.user!.org_id,
+              first_name: parsed.firstName,
+              last_name: parsed.lastName,
+              org_id: ctx.user!.org_id,
             })),
             `User:${ctx.user!.id}`
           ),

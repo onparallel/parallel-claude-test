@@ -2,7 +2,7 @@ import { EMAIL_REGEX } from "./validators/validEmail";
 
 type ParsedContact = {
   firstName: string;
-  lastName: string;
+  lastName?: string;
   email: string;
 };
 
@@ -11,15 +11,12 @@ export function parseContactList(data: string[][]): ParsedContact[] {
     .slice(1) // first row is column headers
     .filter((row) => row.some((c) => !!c))
     .map((row) => {
-      const entry = row.filter((cell) => !!cell);
-      if (entry.length !== 3) {
-        throw new Error("Not enough data");
+      const firstName = row[0]?.trim();
+      if (!firstName) {
+        throw new Error("First name is required");
       }
-
-      const firstName = entry[0].trim();
-      const lastName = entry[1].trim();
-      const email = entry[2].trim().toLowerCase();
-
+      const lastName = row[1]?.trim();
+      const email = row[2]?.trim().toLowerCase();
       if (!EMAIL_REGEX.test(email)) {
         throw new Error(`${email} is not a valid email`);
       }
