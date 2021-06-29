@@ -48,7 +48,7 @@ export function PublicHero({
             as="h1"
             fontFamily="hero"
             fontWeight="600"
-            size={sectionTitle ? "3xl" : "2xl"}
+            size={sectionTitle ? "2xl" : "3xl"}
             lineHeight="1.2"
           >
             {sectionTitle ? (

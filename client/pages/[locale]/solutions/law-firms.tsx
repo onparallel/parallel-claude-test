@@ -83,7 +83,7 @@ function Home() {
                 <Image
                   src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/benefits_efficiency.svg`}
                   loading="lazy"
-                  height="48px"
+                  minWidth="52px"
                   role="presentation"
                   objectFit="contain"
                 />
@@ -108,7 +108,7 @@ function Home() {
                 <Image
                   src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/benefits_control.svg`}
                   loading="lazy"
-                  height="48px"
+                  minWidth="52px"
                   role="presentation"
                   objectFit="contain"
                 />
@@ -133,7 +133,7 @@ function Home() {
                 <Image
                   src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/benefits_experience.svg`}
                   loading="lazy"
-                  height="48px"
+                  minWidth="52px"
                   role="presentation"
                   objectFit="contain"
                 />
