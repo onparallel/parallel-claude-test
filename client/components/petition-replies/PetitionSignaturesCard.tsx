@@ -16,6 +16,7 @@ import {
   SignaturePlusIcon,
   TimeIcon,
 } from "@parallel/chakra/icons";
+import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
   PetitionSignatureRequestStatus,
   PetitionSignaturesCard_PetitionFragment,
@@ -32,7 +33,7 @@ import { Maybe, UnwrapArray } from "@parallel/utils/types";
 import { useCallback } from "react";
 import { FormattedList, FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
-import { Card, CardProps, GenericCardHeader } from "../common/Card";
+import { Card, GenericCardHeader } from "../common/Card";
 import { ContactLink } from "../common/ContactLink";
 import { Divider } from "../common/Divider";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
@@ -45,195 +46,294 @@ import {
 import { useConfirmRestartSignatureRequestDialog } from "./ConfirmRestartSignatureRequestDialog";
 import { useSignerSelectDialog } from "./SignerSelectDialog";
 
-export interface PetitionSignaturesCardProps extends CardProps {
+export interface PetitionSignaturesCardProps {
   petition: PetitionSignaturesCard_PetitionFragment;
   user: PetitionSignaturesCard_UserFragment;
   onRefetchPetition: () => void;
 }
 
-export function PetitionSignaturesCard({
-  petition,
-  user,
-  onRefetchPetition,
-  ...props
-}: PetitionSignaturesCardProps) {
-  let current: Maybe<
-    UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>
-  > = petition.signatureRequests![0];
-  const older = petition.signatureRequests!.slice(1);
-  /**
-   * If the signature config is defined on the petition and the last request is finished,
-   * we consider that a new signature will be needed.
-   * So we move the current to the older requests to give space in the Card for a new request
-   */
-  if (
-    petition.signatureConfig &&
-    (current?.status === "COMPLETED" || current?.status === "CANCELLED")
-  ) {
-    older.unshift(current);
-    current = null;
-  }
-
-  const [cancelSignatureRequest] =
-    usePetitionSignaturesCard_cancelSignatureRequestMutation();
-  const [startSignatureRequest] =
-    usePetitionSignaturesCard_startSignatureRequestMutation();
-
-  const [updateSignatureConfig] =
-    usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
-
-  const [downloadSignedDoc] =
-    usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
-
-  const handleCancelSignatureProcess = useCallback(
-    async (petitionSignatureRequestId: string) => {
-      await updateSignatureConfig({
-        variables: { petitionId: petition.id, signatureConfig: null },
-      });
-      await cancelSignatureRequest({
-        variables: { petitionSignatureRequestId },
-      });
-    },
-    [updateSignatureConfig, cancelSignatureRequest]
-  );
-
-  const handleStartSignatureProcess = useCallback(async () => {
-    await startSignatureRequest({
-      variables: { petitionId: petition.id },
-    });
-    await onRefetchPetition();
-  }, [startSignatureRequest, petition]);
-
-  const handleDownloadSignedDoc = useCallback(
-    (petitionSignatureRequestId: string) => {
-      openNewWindow(async () => {
-        const { data } = await downloadSignedDoc({
-          variables: { petitionSignatureRequestId, preview: true },
-        });
-        const { url, result } = data!.signedPetitionDownloadLink;
-        if (result !== "SUCCESS") {
-          throw new Error();
+const fragments = {
+  User: gql`
+    fragment PetitionSignaturesCard_User on User {
+      organization {
+        signatureIntegrations: integrations(type: SIGNATURE) {
+          ...SignatureConfigDialog_OrgIntegration
         }
-        return url!;
-      });
-    },
-    [downloadSignedDoc]
-  );
-  const showSignatureConfigDialog = useSignatureConfigDialog();
-
-  const showConfirmRestartSignature = useConfirmRestartSignatureRequestDialog();
-  async function handleAddNewSignature() {
-    try {
-      if (current?.status === "COMPLETED") {
-        await showConfirmRestartSignature({});
       }
-      const signatureConfig = await showSignatureConfigDialog({
-        petition,
-        providers: user.organization.signatureIntegrations,
-      });
-      await updateSignatureConfig({
-        variables: { petitionId: petition.id, signatureConfig },
-      });
-
-      if (["COMPLETED", "CLOSED"].includes(petition.status)) {
-        await handleStartSignatureProcess();
-      }
-    } catch {}
-  }
-
-  async function handleUpdateSignatureConfig(
-    signatureConfig: SignatureConfigInput | null
-  ) {
-    await updateSignatureConfig({
-      variables: { petitionId: petition.id, signatureConfig },
-    });
-  }
-
-  const intl = useIntl();
-
-  return (
-    <Card {...props}>
-      <GenericCardHeader
-        rightAction={
-          !petition.signatureConfig ||
-          current?.status === "COMPLETED" ||
-          current?.status === "CANCELLED" ? (
-            <IconButtonWithTooltip
-              label={intl.formatMessage({
-                id: "component.petition-signatures-card.add-signature.label",
-                defaultMessage: "Add signature",
-              })}
-              size="sm"
-              icon={<SignaturePlusIcon fontSize="20px" />}
-              onClick={handleAddNewSignature}
-              borderColor="gray.300"
-              borderWidth="1px"
-              backgroundColor="white"
-            />
-          ) : null
+    }
+    ${SignatureConfigDialog.fragments.OrgIntegration}
+  `,
+  Petition: gql`
+    fragment PetitionSignaturesCard_Petition on Petition {
+      id
+      status
+      signatureConfig {
+        timezone
+        contacts {
+          ...ContactLink_Contact
         }
-      >
-        <Box as="span" display="flex">
-          <SignatureIcon fontSize="20px" marginRight={2} lineHeight={5} />
-          <FormattedMessage
-            id="component.petition-signatures-card.header"
-            defaultMessage="Petition eSignature"
-          />
-        </Box>
-      </GenericCardHeader>
-      {current || older.length > 0 || petition.signatureConfig ? (
-        <>
-          {petition.signatureConfig && !current ? (
-            <NewSignatureRequestRow
-              petition={petition}
-              onStart={handleStartSignatureProcess}
-              onUpdateConfig={handleUpdateSignatureConfig}
-            />
-          ) : current ? (
-            <CurrentSignatureRequestRow
-              signatureRequest={current}
-              onCancel={handleCancelSignatureProcess}
-              onDownload={handleDownloadSignedDoc}
-            />
-          ) : null}
-          {older.length ? (
-            <OlderSignatureRequests
-              signatures={older}
-              onDownload={handleDownloadSignedDoc}
-            />
-          ) : null}
-        </>
-      ) : (
-        <Center
-          flexDirection="column"
-          minHeight={24}
-          textStyle="hint"
-          textAlign="center"
+      }
+      signatureRequests {
+        ...PetitionSignaturesCard_PetitionSignatureRequest
+      }
+      ...SignatureConfigDialog_Petition
+    }
+
+    fragment PetitionSignaturesCard_PetitionSignatureRequest on PetitionSignatureRequest {
+      id
+      status
+      signatureConfig {
+        contacts {
+          ...ContactLink_Contact
+        }
+      }
+    }
+    ${SignatureConfigDialog.fragments.Petition}
+    ${ContactLink.fragments.Contact}
+  `,
+};
+const mutations = [
+  gql`
+    mutation PetitionSignaturesCard_updatePetitionSignatureConfig(
+      $petitionId: GID!
+      $signatureConfig: SignatureConfigInput
+    ) {
+      updatePetition(
+        petitionId: $petitionId
+        data: { signatureConfig: $signatureConfig }
+      ) {
+        ... on Petition {
+          ...PetitionSignaturesCard_Petition
+        }
+      }
+    }
+    ${fragments.Petition}
+  `,
+  gql`
+    mutation PetitionSignaturesCard_cancelSignatureRequest(
+      $petitionSignatureRequestId: GID!
+    ) {
+      cancelSignatureRequest(
+        petitionSignatureRequestId: $petitionSignatureRequestId
+      ) {
+        id
+        status
+      }
+    }
+  `,
+  gql`
+    mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!) {
+      startSignatureRequest(petitionId: $petitionId) {
+        id
+        status
+      }
+    }
+  `,
+  gql`
+    mutation PetitionSignaturesCard_signedPetitionDownloadLink(
+      $petitionSignatureRequestId: GID!
+      $preview: Boolean
+    ) {
+      signedPetitionDownloadLink(
+        petitionSignatureRequestId: $petitionSignatureRequestId
+        preview: $preview
+      ) {
+        result
+        url
+      }
+    }
+  `,
+];
+
+export const PetitionSignaturesCard = Object.assign(
+  chakraForwardRef<"section", PetitionSignaturesCardProps>(
+    function PetitionSignaturesCard(
+      { petition, user, onRefetchPetition, ...props },
+      ref
+    ) {
+      let current: Maybe<
+        UnwrapArray<
+          PetitionSignaturesCard_PetitionFragment["signatureRequests"]
         >
-          <Text>
-            <FormattedMessage
-              id="component.petition-signatures-card.no-signature-configured"
-              defaultMessage="No signature has been configured for this petition."
-            />
-          </Text>
-          <Text>
-            <FormattedMessage
-              id="component.petition-signatures-card.no-signature-configured-2"
-              defaultMessage="If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
-              values={{
-                a: (chunks: any[]) => (
-                  <Link href={`/app/petitions/${petition.id}/compose`}>
-                    {chunks}
-                  </Link>
-                ),
-              }}
-            />
-          </Text>
-        </Center>
-      )}
-    </Card>
-  );
-}
+      > = petition.signatureRequests![0];
+      const older = petition.signatureRequests!.slice(1);
+      /**
+       * If the signature config is defined on the petition and the last request is finished,
+       * we consider that a new signature will be needed.
+       * So we move the current to the older requests to give space in the Card for a new request
+       */
+      if (
+        petition.signatureConfig &&
+        (current?.status === "COMPLETED" || current?.status === "CANCELLED")
+      ) {
+        older.unshift(current);
+        current = null;
+      }
+
+      const [cancelSignatureRequest] =
+        usePetitionSignaturesCard_cancelSignatureRequestMutation();
+      const [startSignatureRequest] =
+        usePetitionSignaturesCard_startSignatureRequestMutation();
+
+      const [updateSignatureConfig] =
+        usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
+
+      const [downloadSignedDoc] =
+        usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
+
+      const handleCancelSignatureProcess = useCallback(
+        async (petitionSignatureRequestId: string) => {
+          await updateSignatureConfig({
+            variables: { petitionId: petition.id, signatureConfig: null },
+          });
+          await cancelSignatureRequest({
+            variables: { petitionSignatureRequestId },
+          });
+        },
+        [updateSignatureConfig, cancelSignatureRequest]
+      );
+
+      const handleStartSignatureProcess = useCallback(async () => {
+        await startSignatureRequest({
+          variables: { petitionId: petition.id },
+        });
+        await onRefetchPetition();
+      }, [startSignatureRequest, petition]);
+
+      const handleDownloadSignedDoc = useCallback(
+        (petitionSignatureRequestId: string) => {
+          openNewWindow(async () => {
+            const { data } = await downloadSignedDoc({
+              variables: { petitionSignatureRequestId, preview: true },
+            });
+            const { url, result } = data!.signedPetitionDownloadLink;
+            if (result !== "SUCCESS") {
+              throw new Error();
+            }
+            return url!;
+          });
+        },
+        [downloadSignedDoc]
+      );
+      const showSignatureConfigDialog = useSignatureConfigDialog();
+
+      const showConfirmRestartSignature =
+        useConfirmRestartSignatureRequestDialog();
+      async function handleAddNewSignature() {
+        try {
+          if (current?.status === "COMPLETED") {
+            await showConfirmRestartSignature({});
+          }
+          const signatureConfig = await showSignatureConfigDialog({
+            petition,
+            providers: user.organization.signatureIntegrations,
+          });
+          await updateSignatureConfig({
+            variables: { petitionId: petition.id, signatureConfig },
+          });
+
+          if (["COMPLETED", "CLOSED"].includes(petition.status)) {
+            await handleStartSignatureProcess();
+          }
+        } catch {}
+      }
+
+      async function handleUpdateSignatureConfig(
+        signatureConfig: SignatureConfigInput | null
+      ) {
+        await updateSignatureConfig({
+          variables: { petitionId: petition.id, signatureConfig },
+        });
+      }
+
+      const intl = useIntl();
+
+      return (
+        <Card ref={ref} {...props}>
+          <GenericCardHeader
+            rightAction={
+              !petition.signatureConfig ||
+              current?.status === "COMPLETED" ||
+              current?.status === "CANCELLED" ? (
+                <IconButtonWithTooltip
+                  label={intl.formatMessage({
+                    id: "component.petition-signatures-card.add-signature.label",
+                    defaultMessage: "Add signature",
+                  })}
+                  size="sm"
+                  icon={<SignaturePlusIcon fontSize="20px" />}
+                  onClick={handleAddNewSignature}
+                  borderColor="gray.300"
+                  borderWidth="1px"
+                  backgroundColor="white"
+                />
+              ) : null
+            }
+          >
+            <Box as="span" display="flex">
+              <SignatureIcon fontSize="20px" marginRight={2} lineHeight={5} />
+              <FormattedMessage
+                id="component.petition-signatures-card.header"
+                defaultMessage="Petition eSignature"
+              />
+            </Box>
+          </GenericCardHeader>
+          {current || older.length > 0 || petition.signatureConfig ? (
+            <>
+              {petition.signatureConfig && !current ? (
+                <NewSignatureRequestRow
+                  petition={petition}
+                  onStart={handleStartSignatureProcess}
+                  onUpdateConfig={handleUpdateSignatureConfig}
+                />
+              ) : current ? (
+                <CurrentSignatureRequestRow
+                  signatureRequest={current}
+                  onCancel={handleCancelSignatureProcess}
+                  onDownload={handleDownloadSignedDoc}
+                />
+              ) : null}
+              {older.length ? (
+                <OlderSignatureRequests
+                  signatures={older}
+                  onDownload={handleDownloadSignedDoc}
+                />
+              ) : null}
+            </>
+          ) : (
+            <Center
+              flexDirection="column"
+              minHeight={24}
+              textStyle="hint"
+              textAlign="center"
+            >
+              <Text>
+                <FormattedMessage
+                  id="component.petition-signatures-card.no-signature-configured"
+                  defaultMessage="No signature has been configured for this petition."
+                />
+              </Text>
+              <Text>
+                <FormattedMessage
+                  id="component.petition-signatures-card.no-signature-configured-2"
+                  defaultMessage="If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
+                  values={{
+                    a: (chunks: any[]) => (
+                      <Link href={`/app/petitions/${petition.id}/compose`}>
+                        {chunks}
+                      </Link>
+                    ),
+                  }}
+                />
+              </Text>
+            </Center>
+          )}
+        </Card>
+      );
+    }
+  ),
+  { fragments, mutations }
+);
 
 type NewSignatureRequestRowProps = {
   petition: PetitionSignaturesCard_PetitionFragment;
@@ -559,97 +659,3 @@ function PetitionSignatureRequestStatusText({
       );
   }
 }
-
-PetitionSignaturesCard.fragments = {
-  User: gql`
-    fragment PetitionSignaturesCard_User on User {
-      organization {
-        signatureIntegrations: integrations(type: SIGNATURE) {
-          ...SignatureConfigDialog_OrgIntegration
-        }
-      }
-    }
-    ${SignatureConfigDialog.fragments.OrgIntegration}
-  `,
-  Petition: gql`
-    fragment PetitionSignaturesCard_Petition on Petition {
-      id
-      status
-      signatureConfig {
-        timezone
-        contacts {
-          ...ContactLink_Contact
-        }
-      }
-      signatureRequests {
-        ...PetitionSignaturesCard_PetitionSignatureRequest
-      }
-      ...SignatureConfigDialog_Petition
-    }
-
-    fragment PetitionSignaturesCard_PetitionSignatureRequest on PetitionSignatureRequest {
-      id
-      status
-      signatureConfig {
-        contacts {
-          ...ContactLink_Contact
-        }
-      }
-    }
-    ${SignatureConfigDialog.fragments.Petition}
-    ${ContactLink.fragments.Contact}
-  `,
-};
-
-PetitionSignaturesCard.mutations = [
-  gql`
-    mutation PetitionSignaturesCard_updatePetitionSignatureConfig(
-      $petitionId: GID!
-      $signatureConfig: SignatureConfigInput
-    ) {
-      updatePetition(
-        petitionId: $petitionId
-        data: { signatureConfig: $signatureConfig }
-      ) {
-        ... on Petition {
-          ...PetitionSignaturesCard_Petition
-        }
-      }
-    }
-    ${PetitionSignaturesCard.fragments.Petition}
-  `,
-  gql`
-    mutation PetitionSignaturesCard_cancelSignatureRequest(
-      $petitionSignatureRequestId: GID!
-    ) {
-      cancelSignatureRequest(
-        petitionSignatureRequestId: $petitionSignatureRequestId
-      ) {
-        id
-        status
-      }
-    }
-  `,
-  gql`
-    mutation PetitionSignaturesCard_startSignatureRequest($petitionId: GID!) {
-      startSignatureRequest(petitionId: $petitionId) {
-        id
-        status
-      }
-    }
-  `,
-  gql`
-    mutation PetitionSignaturesCard_signedPetitionDownloadLink(
-      $petitionSignatureRequestId: GID!
-      $preview: Boolean
-    ) {
-      signedPetitionDownloadLink(
-        petitionSignatureRequestId: $petitionSignatureRequestId
-        preview: $preview
-      ) {
-        result
-        url
-      }
-    }
-  `,
-];

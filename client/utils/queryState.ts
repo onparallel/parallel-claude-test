@@ -5,7 +5,7 @@ import {
 import { useRouter } from "next/router";
 import * as qs from "querystring";
 import { ParsedUrlQuery } from "querystring";
-import { useCallback, useMemo } from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { equals } from "remeda";
 import { pathParams, resolveUrl } from "./next";
 
@@ -124,7 +124,7 @@ export interface QueryStateOptions {
 export function useQueryState<T extends {}>(
   shape: { [P in keyof T]: QueryItem<T[P]> },
   { prefix }: QueryStateOptions = {}
-) {
+): [T, Dispatch<SetStateAction<Partial<T>>>] {
   const router = useRouter();
   const state = useMemo(() => {
     const state = parseQuery(router.query, shape, { prefix });
@@ -133,11 +133,7 @@ export function useQueryState<T extends {}>(
   return [
     state,
     useCallback(
-      async function (
-        state:
-          | { [P in keyof T]?: T[P] }
-          | ((current: { [P in keyof T]?: T[P] }) => { [P in keyof T]?: T[P] })
-      ) {
+      async function (state) {
         const newState =
           typeof state === "function"
             ? state(parseQuery(router.query, shape, { prefix }))
@@ -174,5 +170,27 @@ export function useQueryState<T extends {}>(
       },
       [router.query, router.pathname]
     ),
-  ] as const;
+  ];
+}
+
+export function useQueryStateSlice<T extends {}, K extends keyof T>(
+  state: T,
+  setState: Dispatch<SetStateAction<Partial<T>>>,
+  slice: K
+): [T[K], Dispatch<SetStateAction<T[K]>>] {
+  return [
+    state[slice],
+    useCallback(
+      function (value) {
+        setState((prevState) => ({
+          ...prevState,
+          [slice]:
+            typeof value === "function"
+              ? (value as any)(prevState[slice])
+              : value,
+        }));
+      },
+      [setState]
+    ),
+  ];
 }

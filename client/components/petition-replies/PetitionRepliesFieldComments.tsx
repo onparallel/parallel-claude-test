@@ -213,52 +213,60 @@ export function PetitionRepliesFieldComments({
           onChange={handleDraftChange as any}
           {...inputFocusBind}
         />
-        <PaddedCollapse in={isExpanded}>
-          <Stack
-            paddingTop={2}
-            direction="row"
-            justifyContent={
-              user.hasInternalComments ? "space-between" : "flex-end"
-            }
-          >
-            {user.hasInternalComments && (
-              <Stack display="flex" alignItems="center" direction="row">
-                <Checkbox
-                  marginLeft={1}
+        <Box minHeight="4px">
+          <PaddedCollapse in={isExpanded}>
+            <Stack
+              paddingTop={2}
+              direction="row"
+              justifyContent={
+                user.hasInternalComments ? "space-between" : "flex-end"
+              }
+            >
+              {user.hasInternalComments && (
+                <Stack display="flex" alignItems="center" direction="row">
+                  <Checkbox
+                    marginLeft={1}
+                    colorScheme="purple"
+                    isChecked={isInternalComment}
+                    isDisabled={hasCommentsEnabled ? false : true}
+                    onChange={() => setInternalComment(!isInternalComment)}
+                  >
+                    <FormattedMessage
+                      id="petition-replies.internal-comment-check.label"
+                      defaultMessage="Internal comment"
+                    />
+                  </Checkbox>
+                  <HelpPopover marginLeft={2}>
+                    <FormattedMessage
+                      id="petition-replies.internal-comment-check.help"
+                      defaultMessage="By checking this field, the comment will be visible only to users in your organization."
+                    />
+                  </HelpPopover>
+                </Stack>
+              )}
+              <Stack direction="row">
+                <Button size="sm" onClick={handleCancelClick}>
+                  <FormattedMessage
+                    id="generic.cancel"
+                    defaultMessage="Cancel"
+                  />
+                </Button>
+                <Button
+                  marginLeft={2}
+                  size="sm"
                   colorScheme="purple"
-                  isChecked={isInternalComment}
-                  isDisabled={hasCommentsEnabled ? false : true}
-                  onChange={() => setInternalComment(!isInternalComment)}
+                  isDisabled={draft.trim().length === 0}
+                  onClick={handleSubmitClick}
                 >
                   <FormattedMessage
-                    id="petition-replies.internal-comment-check.label"
-                    defaultMessage="Internal comment"
+                    id="generic.submit"
+                    defaultMessage="Submit"
                   />
-                </Checkbox>
-                <HelpPopover marginLeft={2}>
-                  <FormattedMessage
-                    id="petition-replies.internal-comment-check.help"
-                    defaultMessage="By checking this field, the comment will be visible only to users in your organization."
-                  />
-                </HelpPopover>
+                </Button>
               </Stack>
-            )}
-            <Stack direction="row">
-              <Button size="sm" onClick={handleCancelClick}>
-                <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
-              </Button>
-              <Button
-                marginLeft={2}
-                size="sm"
-                colorScheme="purple"
-                isDisabled={draft.trim().length === 0}
-                onClick={handleSubmitClick}
-              >
-                <FormattedMessage id="generic.submit" defaultMessage="Submit" />
-              </Button>
             </Stack>
-          </Stack>
-        </PaddedCollapse>
+          </PaddedCollapse>
+        </Box>
       </Box>
     </Card>
   );

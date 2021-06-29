@@ -62,9 +62,9 @@ import {
   usePetitionReplies_createPetitionFieldCommentMutation,
   usePetitionReplies_deletePetitionFieldCommentMutation,
   usePetitionReplies_fileUploadReplyDownloadLinkMutation,
-  usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation,
   usePetitionReplies_sendPetitionClosedNotificationMutation,
   usePetitionReplies_updatePetitionFieldCommentMutation,
+  usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation,
   usePetitionReplies_updatePetitionFieldRepliesStatusMutation,
   usePetitionReplies_updatePetitionMutation,
   usePetitionReplies_validatePetitionFieldsMutation,
@@ -81,11 +81,17 @@ import {
 } from "@parallel/utils/filterPetitionFields";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
+import {
+  string,
+  useQueryState,
+  useQueryStateSlice,
+} from "@parallel/utils/queryState";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { usePetitionCurrentSignatureStatus } from "@parallel/utils/usePetitionCurrentSignatureStatus";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -93,6 +99,10 @@ import scrollIntoView from "smooth-scroll-into-view-if-needed";
 type PetitionRepliesProps = UnwrapPromise<
   ReturnType<typeof PetitionReplies.getInitialProps>
 >;
+
+const QUERY_STATE = {
+  comments: string(),
+};
 
 function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const intl = useIntl();
@@ -113,15 +123,23 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const fieldVisibility = useFieldVisibility(petition.fields);
   const toast = useToast();
 
-  const [activeFieldId, setActiveFieldId] = useState<string | null>(null);
+  const [queryState, setQueryState] = useQueryState(QUERY_STATE);
+  const [activeFieldId, setActiveFieldId] = useQueryStateSlice(
+    queryState,
+    setQueryState,
+    "comments"
+  );
   const activeField = activeFieldId
     ? petition.fields.find((f) => f.id === activeFieldId)
     : null;
-  const activeFieldElement = useMemo(() => {
-    return activeFieldId
-      ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)!
-      : null;
-  }, [activeFieldId]);
+  const fieldRefs = useMultipleRefs<HTMLElement>();
+  const signaturesRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    // force a rerender when active field is coming from url so the flyout repositions
+    if (activeFieldId) {
+      setActiveFieldId(activeFieldId);
+    }
+  }, []);
 
   useEffect(() => {
     if (activeFieldId) {
@@ -350,10 +368,10 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const highlight = useHighlightElement();
   const handlePetitionContentsFieldClick = useCallback((fieldId: string) => {
-    highlight(document.querySelector(`#field-${fieldId}`));
+    highlight(fieldRefs[fieldId].current);
   }, []);
   const handlePetitionContentsSignatureClick = useCallback(() => {
-    highlight(document.querySelector("#petition-replies-signatures-card"));
+    highlight(signaturesRef.current);
   }, []);
 
   const indices = useFieldIndices(petition.fields);
@@ -578,7 +596,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       <Box flex="1" overflow="auto">
         <PaneWithFlyout
           isFlyoutActive={Boolean(activeFieldId)}
-          alignWith={activeFieldElement}
+          alignWith={activeFieldId ? fieldRefs[activeFieldId].current : null}
           flyout={
             <Box padding={4} paddingLeft={{ md: 0 }}>
               {activeFieldId ? (
@@ -645,6 +663,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
               ).map((x, index) =>
                 x.type === "FIELD" ? (
                   <PetitionRepliesField
+                    ref={fieldRefs[x.field.id]}
                     id={`field-${x.field.id}`}
                     key={x.field.id}
                     petitionId={petition.id}
@@ -672,7 +691,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
             </Stack>
             {me.hasPetitionSignature ? (
               <PetitionSignaturesCard
-                id="petition-replies-signatures-card"
+                ref={signaturesRef as any}
+                id="signatures"
                 petition={petition}
                 user={me}
                 layerStyle="highlightable"
