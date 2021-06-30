@@ -1,8 +1,10 @@
 import { gql } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
-import { Center, LinkBox, Spinner } from "@chakra-ui/react";
+import { Box, Center, Flex, LinkBox, Spinner } from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
-import { useEffect } from "react";
+import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
+import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
+import { KeyboardEvent, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage } from "react-intl";
 import { CommentCreatedUserNotification } from "./flavor/CommentCreatedUserNotification";
@@ -12,6 +14,7 @@ import { PetitionSharedUserNotification } from "./flavor/PetitionSharedUserNotif
 import { SignatureCancelledUserNotification } from "./flavor/SignatureCancelledUserNotification";
 import { SignatureCompletedUserNotification } from "./flavor/SignatureCompletedUserNotification";
 import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 export interface NotificationListProps {
   notifications: NotificationsDrawer_PetitionUserNotificationFragment[];
@@ -30,6 +33,38 @@ export function NotificationsList({
     console.log("%c --- NotificationsList RENDER ---", "color: #d49e22");
   });
 
+  const notificationElementsRefs = useMultipleRefs<HTMLElement>();
+  const notificationsRef = useUpdatingRef(notifications);
+
+  const handleKeyDown = function (event: KeyboardEvent) {
+    switch (event.key) {
+      case "ArrowDown":
+      case "ArrowUp": {
+        const parent = (event.target as HTMLElement).closest("article");
+        const notificationId = parent!.getAttribute("data-notification-id");
+        const index = notificationsRef.current.findIndex(
+          (n) => n.id === notificationId
+        );
+        if (index === -1) {
+          return;
+        }
+        const nextIndex = index + (event.key === "ArrowDown" ? +1 : -1);
+        if (nextIndex < 0 || nextIndex >= notificationsRef.current.length) {
+          return;
+        }
+        const nextNotification = notificationsRef.current[nextIndex];
+        notificationElementsRefs[nextNotification.id]
+          .current!.querySelector("a")!
+          .focus();
+        scrollIntoView(notificationElementsRefs[nextNotification.id].current!, {
+          behavior: "smooth",
+          scrollMode: "if-needed",
+          block: "nearest",
+        });
+      }
+    }
+  };
+
   if (loading && !hasMore) {
     return (
       <Center height="100%">
@@ -43,64 +78,99 @@ export function NotificationsList({
       </Center>
     );
   }
-
   return (
-    <>
-      {notifications && notifications.length ? (
-        <InfiniteScroll
-          dataLength={notifications.length} //This is important field to render the next data
-          next={onFetchData}
-          hasMore={hasMore}
-          scrollThreshold={0.7}
-          loader={
-            <Center height="42px" background="gray.75">
-              <Spinner
-                thickness="2px"
-                speed="0.65s"
-                emptyColor="gray.200"
-                color="gray.600"
-                size="md"
-              />
-            </Center>
-          }
-          endMessage={null}
-          scrollableTarget="notifications-body"
-        >
-          {notifications.map((n) => (
-            <LinkBox key={n.id}>
-              {n.__typename === "PetitionCompletedUserNotification" ? (
-                <PetitionCompletedUserNotification notification={n} />
-              ) : n.__typename === "SignatureCompletedUserNotification" ? (
-                <SignatureCompletedUserNotification notification={n} />
-              ) : n.__typename === "SignatureCancelledUserNotification" ? (
-                <SignatureCancelledUserNotification notification={n} />
-              ) : n.__typename === "PetitionSharedUserNotification" ? (
-                <PetitionSharedUserNotification notification={n} />
-              ) : n.__typename === "MessageEmailBouncedUserNotification" ? (
-                <MessageEmailBouncedUserNotification notification={n} />
-              ) : n.__typename === "CommentCreatedUserNotification" ? (
-                <CommentCreatedUserNotification notification={n} />
+    <Flex
+      flex="1"
+      flexDirection="column"
+      sx={{ "& > *": { flex: 1, display: "flex", flexDirection: "column" } }}
+      onKeyDown={handleKeyDown}
+    >
+      <InfiniteScroll
+        dataLength={notifications.length}
+        next={onFetchData}
+        hasMore={hasMore}
+        scrollThreshold={0.7}
+        style={{ flex: 1, display: "flex", flexDirection: "column" }}
+        loader={
+          <Center height="42px" background="gray.75">
+            <Spinner
+              thickness="2px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="gray.600"
+              size="md"
+            />
+          </Center>
+        }
+        endMessage={
+          notifications.length === 0 ? (
+            <Stack
+              height="100%"
+              alignItems="center"
+              justifyContent="center"
+              spacing={10}
+            >
+              <EmptyNotificationsIcon width="300px" height="200px" />
+              <Text>
+                <FormattedMessage
+                  id="component.notifications-list.empty-notifications"
+                  defaultMessage="There's no notifications yet"
+                />
+              </Text>
+            </Stack>
+          ) : null
+        }
+        scrollableTarget="notifications-body"
+      >
+        {notifications.map((notification, i) => {
+          const props = {
+            ref: notificationElementsRefs[notification.id],
+            isFocusable: i === 0,
+          };
+          return (
+            <LinkBox key={notification.id}>
+              {notification.__typename ===
+              "PetitionCompletedUserNotification" ? (
+                <PetitionCompletedUserNotification
+                  notification={notification}
+                  {...props}
+                />
+              ) : notification.__typename ===
+                "SignatureCompletedUserNotification" ? (
+                <SignatureCompletedUserNotification
+                  notification={notification}
+                  {...props}
+                />
+              ) : notification.__typename ===
+                "SignatureCancelledUserNotification" ? (
+                <SignatureCancelledUserNotification
+                  notification={notification}
+                  {...props}
+                />
+              ) : notification.__typename ===
+                "PetitionSharedUserNotification" ? (
+                <PetitionSharedUserNotification
+                  notification={notification}
+                  {...props}
+                />
+              ) : notification.__typename ===
+                "MessageEmailBouncedUserNotification" ? (
+                <MessageEmailBouncedUserNotification
+                  notification={notification}
+                  {...props}
+                />
+              ) : notification.__typename ===
+                "CommentCreatedUserNotification" ? (
+                <CommentCreatedUserNotification
+                  notification={notification}
+                  {...props}
+                />
               ) : null}
             </LinkBox>
-          ))}
-        </InfiniteScroll>
-      ) : (
-        <Stack
-          height="100%"
-          alignItems="center"
-          justifyContent="center"
-          spacing={10}
-        >
-          <EmptyNotificationsIcon width="300px" height="200px" />
-          <Text>
-            <FormattedMessage
-              id="component.notifications-list.empty-notifications"
-              defaultMessage="There's no notifications yet"
-            />
-          </Text>
-        </Stack>
-      )}
-    </>
+          );
+        })}
+      </InfiniteScroll>
+    </Flex>
   );
 }
 

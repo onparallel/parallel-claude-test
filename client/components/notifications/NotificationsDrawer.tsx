@@ -68,13 +68,8 @@ export function NotificationsDrawer({
       notifyOnNetworkStatusChange: true,
     });
 
-  const notifications = getNotificationsFiltered(data?.me.notifications ?? []);
-  const hasUnreaded = notifications.filter((n) => !n.isRead).length > 0;
-  const prevHasUnreaded = useRef(hasUnreaded);
-
-  useEffect(() => {
-    prevHasUnreaded.current = hasUnreaded;
-  }, [hasUnreaded]);
+  const notifications = data?.me.notifications ?? [];
+  const hasUnread = notifications.some((n) => !n.isRead);
 
   useEffect(() => {
     if (isOpen) {
@@ -87,34 +82,25 @@ export function NotificationsDrawer({
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (isOpen) {
-        ignoreLoading.current = true;
-        refetch?.({
-          limit: NOTIFICATIONS_LIMIT,
-          filter,
-        });
-      }
-      onPull();
-    }, 10000);
-
-    return () => {
-      clearInterval(interval);
-    };
-  }, [isOpen, filter]);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (isOpen) {
+  //       ignoreLoading.current = true;
+  //       refetch?.({
+  //         limit: NOTIFICATIONS_LIMIT,
+  //         filter,
+  //       });
+  //     }
+  //     onPull();
+  //   }, 10000);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, [isOpen, filter]);
 
   useEffect(() => {
     console.log("%c --- NotificationsDrawer RENDER ---", "color: #cf132c");
   });
-
-  function getNotificationsFiltered(
-    notifications: NotificationsDrawer_PetitionUserNotificationFragment[]
-  ) {
-    return filter === "UNREAD"
-      ? notifications.filter((n) => !n.isRead)
-      : notifications;
-  }
 
   const onFetchData = async () => {
     ignoreLoading.current = true;
@@ -172,6 +158,8 @@ export function NotificationsDrawer({
           paddingInlineStart={4}
           paddingInlineEnd={4}
           paddingBottom={2}
+          borderBottom="1px solid"
+          borderColor="gray.200"
         >
           <Stack direction="row" marginBottom={6} spacing={2} align="center">
             <BellIcon fontSize="20px" role="presentation" />
@@ -192,9 +180,13 @@ export function NotificationsDrawer({
           paddingInlineStart={0}
           paddingInlineEnd={0}
           paddingY={0}
-          paddingBottom={hasUnreaded ? "48px" : "0px"}
           display="flex"
           flexDirection="column"
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+              e.preventDefault();
+            }
+          }}
         >
           <NotificationsList
             hasMore={hasMore}
@@ -204,45 +196,35 @@ export function NotificationsDrawer({
           />
         </DrawerBody>
         <AnimatePresence>
-          {hasUnreaded && (
+          {hasUnread && (
             <MotionFooter
-              initial={
-                prevHasUnreaded.current
-                  ? { transform: "translateY(0px)" }
-                  : { transform: "translateY(48px)" }
-              }
-              animate={{ transform: "translateY(0px)" }}
+              initial={{ transform: "translateY(48px)" }}
               exit={{ transform: "translateY(48px)" }}
+              animate={{ transform: "translateY(0px)" }}
               transition={spring}
-              position="absolute"
-              bottom="0px"
-              width="100%"
               height="48px"
               justifyContent="center"
-              alignItems="center"
               boxShadow="0px -2px 10px 0px #1A202C1A"
               zIndex="1"
               padding="0"
+              backgroundColor="white"
             >
               <Button
+                variant="outline"
+                colorScheme="purple"
+                border="none"
                 width="100%"
                 height="48px"
-                borderRadius="2px"
-                background="white"
-                color="purple.600"
-                _hover={{ background: "purple.50" }}
-                _active={{ background: "purple.50" }}
+                borderRadius={0}
                 leftIcon={
                   <EmailOpenedIcon fontSize="16px" role="presentation" />
                 }
                 onClick={handleMarkAllAsRead}
               >
-                <Text fontSize="16px" fontWeight="600">
-                  <FormattedMessage
-                    id="component.notifications-drawer.mark-all-as-read"
-                    defaultMessage="Mark all as read"
-                  />
-                </Text>
+                <FormattedMessage
+                  id="component.notifications-drawer.mark-all-as-read"
+                  defaultMessage="Mark all as read"
+                />
               </Button>
             </MotionFooter>
           )}
