@@ -295,6 +295,36 @@
     "context": "Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>."
   },
   {
+    "term": "component.copy-signature-config-dialog.body",
+    "definition": "You have assigned {contacts} to sign the first petition.",
+    "context": "You have assigned {contacts} to sign the first petition."
+  },
+  {
+    "term": "component.copy-signature-config-dialog.body-2",
+    "definition": "Do you want this {count, plural, =1{contact} other{contacts}} to sign the petitions of each recipient group?",
+    "context": "Do you want this {count, plural, =1{contact} other{contacts}} to sign the petitions of each recipient group?"
+  },
+  {
+    "term": "component.copy-signature-config-dialog.header",
+    "definition": "Petition eSignature",
+    "context": "Petition eSignature"
+  },
+  {
+    "term": "component.copy-signature-config-dialog.option-1",
+    "definition": "Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the petitions.",
+    "context": "Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the petitions."
+  },
+  {
+    "term": "component.copy-signature-config-dialog.option-2",
+    "definition": "No, let each recipient choose who will sign the petitions.",
+    "context": "No, let each recipient choose who will sign the petitions."
+  },
+  {
+    "term": "component.copy-signature-config-dialog.option-3",
+    "definition": "Disable eSignature from all the petitions.",
+    "context": "Disable eSignature from all the petitions."
+  },
+  {
     "term": "component.copy-to-clipboard-button.copied-label",
     "definition": "Copied to clipboard!",
     "context": "Copied to clipboard!"

@@ -295,6 +295,36 @@
     "context": "Cookies help us improve your experience and personalize the content and advertising. By using our website, you agree to our <a>use of cookies</a>."
   },
   {
+    "term": "component.copy-signature-config-dialog.body",
+    "definition": "Has asignado a {contacts} para firmar la primer petición.",
+    "context": "You have assigned {contacts} to sign the first petition."
+  },
+  {
+    "term": "component.copy-signature-config-dialog.body-2",
+    "definition": "¿Quieres que {count, plural, =1{este contacto firme} other{estos contactos firmen}} las peticiones de cada grupo de destinatarios?",
+    "context": "Do you want this {count, plural, =1{contact} other{contacts}} to sign the petitions of each recipient group?"
+  },
+  {
+    "term": "component.copy-signature-config-dialog.header",
+    "definition": "Firma digital de petición",
+    "context": "Petition eSignature"
+  },
+  {
+    "term": "component.copy-signature-config-dialog.option-1",
+    "definition": "Si, permitir a {count, plural, =1{este contacto} other{estos contactos}} firmar todas las peticiones.",
+    "context": "Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the petitions."
+  },
+  {
+    "term": "component.copy-signature-config-dialog.option-2",
+    "definition": "No, dejar que los destinatarios escojan quién firma.",
+    "context": "No, let each recipient choose who will sign the petitions."
+  },
+  {
+    "term": "component.copy-signature-config-dialog.option-3",
+    "definition": "Desactivar la firma digital de todas las peticiones.",
+    "context": "Disable eSignature from all the petitions."
+  },
+  {
     "term": "component.copy-to-clipboard-button.copied-label",
     "definition": "¡Copiado al portapapeles!",
     "context": "Copied to clipboard!"
