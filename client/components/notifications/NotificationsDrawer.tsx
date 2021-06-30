@@ -9,7 +9,7 @@ import {
   DrawerHeader,
   DrawerOverlay,
 } from "@chakra-ui/modal";
-import { BoxProps, Button } from "@chakra-ui/react";
+import { Button, ModalFooterProps } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import {
   NotificationsDrawer_PetitionUserNotificationFragment,
@@ -153,7 +153,8 @@ export function NotificationsDrawer({
     });
   };
 
-  const MotionFooter = motion<BoxProps>(DrawerFooter);
+  const MotionFooter =
+    motion<Omit<ModalFooterProps, "transition">>(DrawerFooter);
   const spring = { type: "spring", damping: 20, stiffness: 240 };
 
   return (

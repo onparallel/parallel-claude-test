@@ -60,7 +60,7 @@ export function NotificationsBell({
 
   const spring = { type: "spring", damping: 8, stiffness: 160 };
 
-  const MotionBox = motion<BoxProps>(Box);
+  const MotionBox = motion<Omit<BoxProps, "transition">>(Box);
 
   return (
     <IconButton

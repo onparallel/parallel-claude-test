@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
-import { Box, Center, LinkBox, Spinner } from "@chakra-ui/react";
+import { Center, LinkBox, Spinner } from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
