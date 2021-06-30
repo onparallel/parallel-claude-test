@@ -2162,7 +2162,7 @@ type PetitionSharedUserNotification implements PetitionUserNotification {
   owner: User!
   permissionType: PetitionPermissionTypeRW!
   petition: Petition!
-  sharedWith: [UserOrUserGroup!]!
+  sharedWith: UserOrUserGroup!
 }
 
 enum PetitionSignatureCancelReason {

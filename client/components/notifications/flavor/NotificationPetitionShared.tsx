@@ -1,83 +1,54 @@
 import { gql } from "@apollo/client";
 import { Avatar, Text } from "@chakra-ui/react";
 import { UserArrowIcon, UserGroupArrowIcon } from "@parallel/chakra/icons";
+import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import { PetitionPermissionTypeText } from "@parallel/components/petition-common/PetitionPermissionType";
-import {
-  PetitionBase,
-  PetitionPermissionType,
-  User,
-  UserOrUserGroup,
-} from "@parallel/graphql/__types";
-import { FormattedMessage, useIntl } from "react-intl";
+import { NotificationPetitionShared_PetitionSharedUserNotificationFragment } from "@parallel/graphql/__types";
+import { FormattedMessage } from "react-intl";
 import { Notification } from "./Notification";
 
 export interface NotificationPetitionSharedProps {
-  id: string;
-  petition: PetitionBase;
-  owner: User;
-  sharedWith: UserOrUserGroup;
-  permissionType: PetitionPermissionType;
-  createdAt: string;
-  isRead: boolean;
+  notification: NotificationPetitionShared_PetitionSharedUserNotificationFragment;
 }
 
 export function NotificationPetitionShared({
-  id,
-  petition,
-  owner,
-  sharedWith,
-  permissionType,
-  createdAt,
-  isRead,
+  notification,
 }: NotificationPetitionSharedProps) {
-  const intl = useIntl();
-
-  const petitionTitle =
-    petition.name ??
-    intl.formatMessage({
-      id: "generic.untitled-petition",
-      defaultMessage: "Untitled petition",
-    });
-
-  const isSharedGroup = sharedWith.__typename === "UserGroup";
-
-  const body = isSharedGroup ? (
-    <FormattedMessage
-      id="ccomponent.notification-petition-shared-group.body"
-      defaultMessage='<b>{name}</b> has shared the request with the group "{group}" to which you belong.'
-      values={{
-        name: owner.fullName,
-        group: sharedWith.__typename === "UserGroup" ? sharedWith.name : "",
-        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-      }}
-    />
-  ) : (
-    <FormattedMessage
-      id="ccomponent.notification-petition-shared.body"
-      defaultMessage="<b>{name}</b> has shared the request with you as {permissionType}."
-      values={{
-        name: "Fullname destinatario",
-        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-        permissionType: (
-          <PetitionPermissionTypeText
-            type={permissionType}
-            textTransform="lowercase"
-          />
-        ),
-      }}
-    />
-  );
-
   return (
     <Notification
-      id={id}
-      icon={<NotificationAvatar isGroup={isSharedGroup} />}
-      body={body}
-      title={petitionTitle}
-      timestamp={createdAt}
-      isRead={isRead}
-      url={`/${intl.locale}/app/petitions/${petition.id}`}
-    />
+      notification={notification}
+      icon={
+        <NotificationAvatar
+          isGroup={notification.sharedWith.__typename === "UserGroup"}
+        />
+      }
+      path={``}
+    >
+      {notification.sharedWith.__typename === "UserGroup" ? (
+        <FormattedMessage
+          id="component.notification-petition-shared-group.body"
+          defaultMessage='{name} has shared the request with the group "{group}" to which you belong.'
+          values={{
+            name: <UserReference user={notification.owner} />,
+            group: notification.sharedWith.name,
+          }}
+        />
+      ) : (
+        <FormattedMessage
+          id="component.notification-petition-shared.body"
+          defaultMessage="{name} has shared the request with you as {permissionType}."
+          values={{
+            name: <UserReference user={notification.owner} />,
+            permissionType: (
+              <PetitionPermissionTypeText
+                type={notification.permissionType}
+                textTransform="lowercase"
+              />
+            ),
+          }}
+        />
+      )}
+    </Notification>
   );
 }
 
@@ -101,15 +72,14 @@ function NotificationAvatar({ isGroup }: { isGroup: boolean }) {
 
 NotificationPetitionShared.fragments = {
   PetitionSharedUserNotification: gql`
-    fragment NotificationEmailBounced_PetitionSharedUserNotification on PetitionSharedUserNotification {
+    fragment NotificationPetitionShared_PetitionSharedUserNotification on PetitionSharedUserNotification {
+      ...Notification_PetitionUserNotification
       owner {
-        id
-        fullName
+        ...UserReference_User
       }
       sharedWith {
         ... on User {
-          id
-          fullName
+          ...UserReference_User
         }
         ... on UserGroup {
           id
@@ -118,5 +88,7 @@ NotificationPetitionShared.fragments = {
       }
       permissionType
     }
+    ${Notification.fragments.PetitionUserNotification}
+    ${UserReference.fragments.User}
   `,
 };

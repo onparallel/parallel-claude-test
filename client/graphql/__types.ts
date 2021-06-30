@@ -1608,7 +1608,7 @@ export interface PetitionSharedUserNotification
   owner: User;
   permissionType: PetitionPermissionTypeRW;
   petition: Petition;
-  sharedWith: Array<UserOrUserGroup>;
+  sharedWith: UserOrUserGroup;
 }
 
 export type PetitionSignatureCancelReason =
@@ -2989,38 +2989,32 @@ export type Notifications_UnreadPetitionUserNotificationIdsQuery = {
 export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
   {
     __typename?: "CommentCreatedUserNotification";
-  } & NotificationComment_CommentCreatedUserNotificationFragment &
-    NotificationDefault_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
+  } & NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
 
 export type NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
   {
     __typename?: "MessageEmailBouncedUserNotification";
-  } & NotificationEmailBounced_MessageEmailBouncedUserNotificationFragment &
-    NotificationDefault_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment;
+  } & NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment;
 
 export type NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
   {
     __typename?: "PetitionCompletedUserNotification";
-  } & NotificationEmailBounced_PetitionCompletedUserNotificationFragment &
-    NotificationDefault_PetitionUserNotification_PetitionCompletedUserNotification_Fragment;
+  } & NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment;
 
 export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment =
   {
     __typename?: "PetitionSharedUserNotification";
-  } & NotificationEmailBounced_PetitionSharedUserNotificationFragment &
-    NotificationDefault_PetitionUserNotification_PetitionSharedUserNotification_Fragment;
+  } & NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment;
 
 export type NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
   {
     __typename?: "SignatureCancelledUserNotification";
-  } & NotificationDefault_PetitionUserNotification_SignatureCancelledUserNotification_Fragment &
-    NotificationDefault_PetitionUserNotification_SignatureCancelledUserNotification_Fragment;
+  } & NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment;
 
 export type NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
   {
     __typename?: "SignatureCompletedUserNotification";
-  } & NotificationDefault_PetitionUserNotification_SignatureCompletedUserNotification_Fragment &
-    NotificationDefault_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
+  } & NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
 export type NotificationsDrawer_PetitionUserNotificationFragment =
   | NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment
@@ -3064,6 +3058,106 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
   };
 };
 
+export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
+  {
+    __typename?: "CommentCreatedUserNotification";
+  } & NotificationComment_CommentCreatedUserNotificationFragment;
+
+export type NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
+  {
+    __typename?: "MessageEmailBouncedUserNotification";
+  } & NotificationEmailBounced_MessageEmailBouncedUserNotificationFragment;
+
+export type NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
+  {
+    __typename?: "PetitionCompletedUserNotification";
+  } & NotificationPetitionCompleted_PetitionCompletedUserNotificationFragment;
+
+export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment =
+  {
+    __typename?: "PetitionSharedUserNotification";
+  } & NotificationPetitionShared_PetitionSharedUserNotificationFragment;
+
+export type NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
+  {
+    __typename?: "SignatureCancelledUserNotification";
+  } & NotificationSignatureCanceled_SignatureCancelledUserNotificationFragment;
+
+export type NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
+  {
+    __typename?: "SignatureCompletedUserNotification";
+  } & NotificationSignatureCompleted_SignatureCompletedUserNotificationFragment;
+
+export type NotificationsList_PetitionUserNotificationFragment =
+  | NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment
+  | NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
+  | NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
+  | NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment
+  | NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
+  | NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
+
+export type Notification_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
+  {
+    __typename?: "CommentCreatedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  };
+
+export type Notification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
+  {
+    __typename?: "MessageEmailBouncedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  };
+
+export type Notification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
+  {
+    __typename?: "PetitionCompletedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  };
+
+export type Notification_PetitionUserNotification_PetitionSharedUserNotification_Fragment =
+  {
+    __typename?: "PetitionSharedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  };
+
+export type Notification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
+  {
+    __typename?: "SignatureCancelledUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  };
+
+export type Notification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
+  {
+    __typename?: "SignatureCompletedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+  };
+
+export type Notification_PetitionUserNotificationFragment =
+  | Notification_PetitionUserNotification_CommentCreatedUserNotification_Fragment
+  | Notification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
+  | Notification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
+  | Notification_PetitionUserNotification_PetitionSharedUserNotification_Fragment
+  | Notification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
+  | Notification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
+
 export type NotificationComment_CommentCreatedUserNotificationFragment = {
   __typename?: "CommentCreatedUserNotification";
   field: { __typename?: "PetitionField"; id: string; title?: Maybe<string> };
@@ -3074,135 +3168,52 @@ export type NotificationComment_CommentCreatedUserNotificationFragment = {
     author?: Maybe<
       | {
           __typename?: "PetitionAccess";
-          contact?: Maybe<{
-            __typename?: "Contact";
-            id: string;
-            fullName?: Maybe<string>;
-            email: string;
-          }>;
+          contact?: Maybe<
+            { __typename?: "Contact" } & ContactLink_ContactFragment
+          >;
         }
-      | { __typename?: "User"; id: string; fullName?: Maybe<string> }
+      | ({ __typename?: "User" } & UserReference_UserFragment)
     >;
   };
-};
-
-export type NotificationDefault_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
-  {
-    __typename?: "CommentCreatedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
-  };
-
-export type NotificationDefault_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
-  {
-    __typename?: "MessageEmailBouncedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
-  };
-
-export type NotificationDefault_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
-  {
-    __typename?: "PetitionCompletedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
-  };
-
-export type NotificationDefault_PetitionUserNotification_PetitionSharedUserNotification_Fragment =
-  {
-    __typename?: "PetitionSharedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
-  };
-
-export type NotificationDefault_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
-  {
-    __typename?: "SignatureCancelledUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
-  };
-
-export type NotificationDefault_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
-  {
-    __typename?: "SignatureCompletedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
-  };
-
-export type NotificationDefault_PetitionUserNotificationFragment =
-  | NotificationDefault_PetitionUserNotification_CommentCreatedUserNotification_Fragment
-  | NotificationDefault_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
-  | NotificationDefault_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
-  | NotificationDefault_PetitionUserNotification_PetitionSharedUserNotification_Fragment
-  | NotificationDefault_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
-  | NotificationDefault_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
+} & Notification_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
 
 export type NotificationEmailBounced_MessageEmailBouncedUserNotificationFragment =
   {
     __typename?: "MessageEmailBouncedUserNotification";
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
-  };
+  } & Notification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment;
 
-export type NotificationEmailBounced_PetitionCompletedUserNotificationFragment =
+export type NotificationPetitionCompleted_PetitionCompletedUserNotificationFragment =
   {
     __typename?: "PetitionCompletedUserNotification";
     access: {
       __typename?: "PetitionAccess";
-      contact?: Maybe<{
-        __typename?: "Contact";
-        id: string;
-        fullName?: Maybe<string>;
-        email: string;
-      }>;
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
-  };
+  } & Notification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment;
 
-export type NotificationEmailBounced_PetitionSharedUserNotificationFragment = {
-  __typename?: "PetitionSharedUserNotification";
-  permissionType: PetitionPermissionTypeRW;
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
-  sharedWith: Array<
-    | { __typename?: "User"; id: string; fullName?: Maybe<string> }
-    | { __typename?: "UserGroup"; id: string; name: string }
-  >;
-};
+export type NotificationPetitionShared_PetitionSharedUserNotificationFragment =
+  {
+    __typename?: "PetitionSharedUserNotification";
+    permissionType: PetitionPermissionTypeRW;
+    owner: { __typename?: "User" } & UserReference_UserFragment;
+    sharedWith:
+      | ({ __typename?: "User" } & UserReference_UserFragment)
+      | { __typename?: "UserGroup"; id: string; name: string };
+  } & Notification_PetitionUserNotification_PetitionSharedUserNotification_Fragment;
 
-export type NotificationEmailBounced_SignatureCancelledUserNotificationFragment =
+export type NotificationSignatureCanceled_SignatureCancelledUserNotificationFragment =
   {
     __typename?: "SignatureCancelledUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
-  };
+  } & Notification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment;
 
-export type NotificationEmailBounced_SignatureCompletedUserNotificationFragment =
+export type NotificationSignatureCompleted_SignatureCompletedUserNotificationFragment =
   {
     __typename?: "SignatureCompletedUserNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
-  };
+  } & Notification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
 export type CreateUserDialog_emailIsAvailableQueryVariables = Exact<{
   email: Scalars["String"];
@@ -7008,19 +7019,34 @@ export const PetitionTemplateHeader_UserFragmentDoc = gql`
     id
   }
 `;
-export const NotificationDefault_PetitionUserNotificationFragmentDoc = gql`
-  fragment NotificationDefault_PetitionUserNotification on PetitionUserNotification {
+export const Notification_PetitionUserNotificationFragmentDoc = gql`
+  fragment Notification_PetitionUserNotification on PetitionUserNotification {
     id
-    createdAt
-    isRead
     petition {
       id
       name
     }
+    createdAt
+    isRead
+  }
+`;
+export const UserReference_UserFragmentDoc = gql`
+  fragment UserReference_User on User {
+    id
+    fullName
+    status
+  }
+`;
+export const ContactLink_ContactFragmentDoc = gql`
+  fragment ContactLink_Contact on Contact {
+    id
+    fullName
+    email
   }
 `;
 export const NotificationComment_CommentCreatedUserNotificationFragmentDoc = gql`
   fragment NotificationComment_CommentCreatedUserNotification on CommentCreatedUserNotification {
+    ...Notification_PetitionUserNotification
     field {
       id
       title
@@ -7030,52 +7056,53 @@ export const NotificationComment_CommentCreatedUserNotificationFragmentDoc = gql
       isInternal
       author {
         ... on User {
-          id
-          fullName
+          ...UserReference_User
         }
         ... on PetitionAccess {
           contact {
-            id
-            fullName
-            email
+            ...ContactLink_Contact
           }
         }
       }
     }
   }
+  ${Notification_PetitionUserNotificationFragmentDoc}
+  ${UserReference_UserFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
 `;
 export const NotificationEmailBounced_MessageEmailBouncedUserNotificationFragmentDoc = gql`
   fragment NotificationEmailBounced_MessageEmailBouncedUserNotification on MessageEmailBouncedUserNotification {
+    ...Notification_PetitionUserNotification
     access {
       contact {
-        id
-        fullName
-        email
+        ...ContactLink_Contact
       }
     }
   }
+  ${Notification_PetitionUserNotificationFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
 `;
-export const NotificationEmailBounced_PetitionCompletedUserNotificationFragmentDoc = gql`
-  fragment NotificationEmailBounced_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
+export const NotificationPetitionCompleted_PetitionCompletedUserNotificationFragmentDoc = gql`
+  fragment NotificationPetitionCompleted_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
+    ...Notification_PetitionUserNotification
     access {
       contact {
-        id
-        fullName
-        email
+        ...ContactLink_Contact
       }
     }
   }
+  ${Notification_PetitionUserNotificationFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
 `;
-export const NotificationEmailBounced_PetitionSharedUserNotificationFragmentDoc = gql`
-  fragment NotificationEmailBounced_PetitionSharedUserNotification on PetitionSharedUserNotification {
+export const NotificationPetitionShared_PetitionSharedUserNotificationFragmentDoc = gql`
+  fragment NotificationPetitionShared_PetitionSharedUserNotification on PetitionSharedUserNotification {
+    ...Notification_PetitionUserNotification
     owner {
-      id
-      fullName
+      ...UserReference_User
     }
     sharedWith {
       ... on User {
-        id
-        fullName
+        ...UserReference_User
       }
       ... on UserGroup {
         id
@@ -7084,10 +7111,23 @@ export const NotificationEmailBounced_PetitionSharedUserNotificationFragmentDoc 
     }
     permissionType
   }
+  ${Notification_PetitionUserNotificationFragmentDoc}
+  ${UserReference_UserFragmentDoc}
 `;
-export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
-  fragment NotificationsDrawer_PetitionUserNotification on PetitionUserNotification {
-    ...NotificationDefault_PetitionUserNotification
+export const NotificationSignatureCanceled_SignatureCancelledUserNotificationFragmentDoc = gql`
+  fragment NotificationSignatureCanceled_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
+    ...Notification_PetitionUserNotification
+  }
+  ${Notification_PetitionUserNotificationFragmentDoc}
+`;
+export const NotificationSignatureCompleted_SignatureCompletedUserNotificationFragmentDoc = gql`
+  fragment NotificationSignatureCompleted_SignatureCompletedUserNotification on SignatureCompletedUserNotification {
+    ...Notification_PetitionUserNotification
+  }
+  ${Notification_PetitionUserNotificationFragmentDoc}
+`;
+export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
+  fragment NotificationsList_PetitionUserNotification on PetitionUserNotification {
     ... on CommentCreatedUserNotification {
       ...NotificationComment_CommentCreatedUserNotification
     }
@@ -7095,45 +7135,30 @@ export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
       ...NotificationEmailBounced_MessageEmailBouncedUserNotification
     }
     ... on PetitionCompletedUserNotification {
-      ...NotificationEmailBounced_PetitionCompletedUserNotification
+      ...NotificationPetitionCompleted_PetitionCompletedUserNotification
     }
     ... on PetitionSharedUserNotification {
-      ...NotificationEmailBounced_PetitionSharedUserNotification
+      ...NotificationPetitionShared_PetitionSharedUserNotification
     }
     ... on SignatureCancelledUserNotification {
-      ...NotificationDefault_PetitionUserNotification
+      ...NotificationSignatureCanceled_SignatureCancelledUserNotification
     }
     ... on SignatureCompletedUserNotification {
-      ...NotificationDefault_PetitionUserNotification
+      ...NotificationSignatureCompleted_SignatureCompletedUserNotification
     }
   }
-  ${NotificationDefault_PetitionUserNotificationFragmentDoc}
   ${NotificationComment_CommentCreatedUserNotificationFragmentDoc}
   ${NotificationEmailBounced_MessageEmailBouncedUserNotificationFragmentDoc}
-  ${NotificationEmailBounced_PetitionCompletedUserNotificationFragmentDoc}
-  ${NotificationEmailBounced_PetitionSharedUserNotificationFragmentDoc}
+  ${NotificationPetitionCompleted_PetitionCompletedUserNotificationFragmentDoc}
+  ${NotificationPetitionShared_PetitionSharedUserNotificationFragmentDoc}
+  ${NotificationSignatureCanceled_SignatureCancelledUserNotificationFragmentDoc}
+  ${NotificationSignatureCompleted_SignatureCompletedUserNotificationFragmentDoc}
 `;
-export const NotificationEmailBounced_SignatureCancelledUserNotificationFragmentDoc = gql`
-  fragment NotificationEmailBounced_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
-    id
-    petition {
-      id
-      name
-    }
-    createdAt
-    isRead
+export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
+  fragment NotificationsDrawer_PetitionUserNotification on PetitionUserNotification {
+    ...NotificationsList_PetitionUserNotification
   }
-`;
-export const NotificationEmailBounced_SignatureCompletedUserNotificationFragmentDoc = gql`
-  fragment NotificationEmailBounced_SignatureCompletedUserNotification on SignatureCompletedUserNotification {
-    id
-    petition {
-      id
-      name
-    }
-    createdAt
-    isRead
-  }
+  ${NotificationsList_PetitionUserNotificationFragmentDoc}
 `;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
@@ -7692,13 +7717,6 @@ export const PetitionLayout_PetitionBaseFragmentDoc = gql`
   ${PetitionHeader_PetitionFragmentDoc}
   ${PetitionTemplateHeader_PetitionTemplateFragmentDoc}
 `;
-export const ContactLink_ContactFragmentDoc = gql`
-  fragment ContactLink_Contact on Contact {
-    id
-    fullName
-    email
-  }
-`;
 export const PetitionAccessTable_PetitionAccessRemindersConfigFragmentDoc = gql`
   fragment PetitionAccessTable_PetitionAccessRemindersConfig on RemindersConfig {
     offset
@@ -7734,13 +7752,6 @@ export const PetitionAccessTable_PetitionFragmentDoc = gql`
     }
   }
   ${PetitionAccessTable_PetitionAccessFragmentDoc}
-`;
-export const UserReference_UserFragmentDoc = gql`
-  fragment UserReference_User on User {
-    id
-    fullName
-    status
-  }
 `;
 export const TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc = gql`
   fragment TimelinePetitionCreatedEvent_PetitionCreatedEvent on PetitionCreatedEvent {

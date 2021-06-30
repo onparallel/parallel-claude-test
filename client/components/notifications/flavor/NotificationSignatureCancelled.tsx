@@ -4,13 +4,13 @@ import { SignatureIcon } from "@parallel/chakra/icons";
 import { FormattedMessage } from "react-intl";
 import { Notification } from "./Notification";
 
-export interface NotificationSignatureCompletedProps {
+export interface NotificationSignatureCancelledProps {
   notification: any;
 }
 
-export function NotificationSignatureCompleted({
+export function NotificationSignatureCancelled({
   notification,
-}: NotificationSignatureCompletedProps) {
+}: NotificationSignatureCancelledProps) {
   return (
     <Notification
       notification={notification}
@@ -18,8 +18,8 @@ export function NotificationSignatureCompleted({
       path={`/replies#signatures`}
     >
       <FormattedMessage
-        id="component.notification-signature-completed.body"
-        defaultMessage="The eSignature has been completed."
+        id="component.notification-signature-cancelled.body"
+        defaultMessage="The eSignature has been cancelled."
       />
     </Notification>
   );
@@ -30,15 +30,15 @@ function NotificationAvatar() {
     <Avatar
       height="36px"
       width="36px"
-      background="green.500"
+      background="red.500"
       icon={<SignatureIcon color="white" fontSize="1rem" />}
     />
   );
 }
 
-NotificationSignatureCompleted.fragments = {
-  SignatureCompletedUserNotification: gql`
-    fragment NotificationSignatureCompleted_SignatureCompletedUserNotification on SignatureCompletedUserNotification {
+NotificationSignatureCancelled.fragments = {
+  SignatureCancelledUserNotification: gql`
+    fragment NotificationSignatureCanceled_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
       ...Notification_PetitionUserNotification
     }
     ${Notification.fragments.PetitionUserNotification}

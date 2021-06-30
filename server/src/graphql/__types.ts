@@ -1037,7 +1037,7 @@ export interface NexusGenFieldTypes {
     owner: NexusGenRootTypes["User"]; // User!
     permissionType: NexusGenEnums["PetitionPermissionTypeRW"]; // PetitionPermissionTypeRW!
     petition: NexusGenRootTypes["Petition"]; // Petition!
-    sharedWith: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
+    sharedWith: NexusGenRootTypes["UserOrUserGroup"]; // UserOrUserGroup!
   };
   PetitionSignatureRequest: {
     // field return type

@@ -137,19 +137,19 @@ export const PetitionSharedUserNotification = createPetitionUserNotification(
       resolve: (root) => root.data.permission_type,
     });
     t.field("sharedWith", {
-      type: nonNull(list("UserOrUserGroup")),
+      type: nonNull("UserOrUserGroup"),
       resolve: async (root, _, ctx) => {
-        const user = root.data.user_id
-          ? await ctx.users.loadUser(root.data.user_id)
-          : null;
-        const group = root.data.user_group_id
-          ? await ctx.userGroups.loadUserGroup(root.data.user_group_id)
-          : null;
-
-        return [
-          user ? ({ __type: "User", ...user } as const) : null,
-          group ? ({ __type: "UserGroup", ...group } as const) : null,
-        ].filter(isDefined);
+        return root.data.user_id
+          ? {
+              __type: "User",
+              ...(await ctx.users.loadUser(root.data.user_id))!,
+            }
+          : {
+              __type: "UserGroup",
+              ...(await ctx.userGroups.loadUserGroup(
+                root.data.user_group_id!
+              ))!,
+            };
       },
     });
   }

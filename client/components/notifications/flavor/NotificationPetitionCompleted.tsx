@@ -1,55 +1,32 @@
 import { gql } from "@apollo/client";
 import { Avatar, Text } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
-import { PetitionAccess, PetitionBase } from "@parallel/graphql/__types";
-import { FormattedMessage, useIntl } from "react-intl";
+import { ContactLink } from "@parallel/components/common/ContactLink";
+import { NotificationPetitionCompleted_PetitionCompletedUserNotificationFragment } from "@parallel/graphql/__types";
+import { FormattedMessage } from "react-intl";
 import { Notification } from "./Notification";
 
 export interface NotificationPetitionCompletedProps {
-  id: string;
-  petition: PetitionBase;
-  access: PetitionAccess;
-  createdAt: string;
-  isRead: boolean;
+  notification: NotificationPetitionCompleted_PetitionCompletedUserNotificationFragment;
 }
 
 export function NotificationPetitionCompleted({
-  id,
-  petition,
-  access,
-  createdAt,
-  isRead,
+  notification,
 }: NotificationPetitionCompletedProps) {
-  const intl = useIntl();
-
-  const petitionTitle =
-    petition.name ??
-    intl.formatMessage({
-      id: "generic.untitled-petition",
-      defaultMessage: "Untitled petition",
-    });
-
-  const body = (
-    <FormattedMessage
-      id="ccomponent.notification-petition-completed.body"
-      defaultMessage="<b>{name}</b> completed the petition."
-      values={{
-        name: access.contact?.fullName,
-        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-      }}
-    />
-  );
-
   return (
     <Notification
-      id={id}
+      notification={notification}
       icon={<NotificationAvatar />}
-      body={body}
-      title={petitionTitle}
-      timestamp={createdAt}
-      isRead={isRead}
-      url={`/${intl.locale}/app/petitions/${petition.id}/replies`}
-    />
+      path={`/replies`}
+    >
+      <FormattedMessage
+        id="component.notification-petition-completed.body"
+        defaultMessage="{name} completed the petition."
+        values={{
+          name: <ContactLink contact={notification.access.contact} />,
+        }}
+      />
+    </Notification>
   );
 }
 
@@ -66,14 +43,15 @@ function NotificationAvatar() {
 
 NotificationPetitionCompleted.fragments = {
   PetitionCompletedUserNotification: gql`
-    fragment NotificationEmailBounced_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
+    fragment NotificationPetitionCompleted_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
+      ...Notification_PetitionUserNotification
       access {
         contact {
-          id
-          fullName
-          email
+          ...ContactLink_Contact
         }
       }
     }
+    ${Notification.fragments.PetitionUserNotification}
+    ${ContactLink.fragments.Contact}
   `,
 };

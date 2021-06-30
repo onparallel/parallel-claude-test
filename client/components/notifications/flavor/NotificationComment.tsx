@@ -1,89 +1,60 @@
 import { gql } from "@apollo/client";
 import { Avatar, Text } from "@chakra-ui/react";
 import { CommentIcon } from "@parallel/chakra/icons";
-import {
-  PetitionBase,
-  PetitionField,
-  PetitionFieldComment,
-} from "@parallel/graphql/__types";
-import { FormattedMessage, useIntl } from "react-intl";
+import { ContactLink } from "@parallel/components/common/ContactLink";
+import { UserReference } from "@parallel/components/petition-activity/UserReference";
+import { NotificationComment_CommentCreatedUserNotificationFragment } from "@parallel/graphql/__types";
+import { FormattedMessage } from "react-intl";
 import { Notification } from "./Notification";
 
 export interface NotificationCommentProps {
-  id: string;
-  petition: PetitionBase;
-  field: PetitionField;
-  comment: PetitionFieldComment;
-  createdAt: string;
-  isRead: boolean;
+  notification: NotificationComment_CommentCreatedUserNotificationFragment;
 }
 
 export function NotificationComment({
-  id,
-  petition,
-  field,
-  comment,
-  createdAt,
-  isRead,
+  notification,
 }: NotificationCommentProps) {
-  const intl = useIntl();
-
-  const { author, isInternal } = comment;
-
-  const name = author
-    ? author.__typename === "PetitionAccess"
-      ? author.contact?.fullName
-      : author.__typename === "User"
-      ? author.fullName
-      : ""
-    : "";
-
-  const petitionTitle =
-    petition.name ??
-    intl.formatMessage({
-      id: "generic.untitled-petition",
-      defaultMessage: "Untitled petition",
-    });
-
-  const fieldTitle =
-    field.title ??
-    intl.formatMessage({
-      id: "generic.untitled-field",
-      defaultMessage: "Untitled field",
-    });
-
-  const body = isInternal ? (
-    <FormattedMessage
-      id="ccomponent.notification-internal-comment.body"
-      defaultMessage='<b>{name}</b> has written an internal comment in the field "{field}".'
-      values={{
-        name: name,
-        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-        field: fieldTitle,
-      }}
-    />
+  const { author, isInternal } = notification.comment;
+  const name =
+    author?.__typename === "PetitionAccess" ? (
+      <ContactLink contact={author.contact} />
+    ) : (
+      <UserReference user={author as any} />
+    );
+  const field = notification.field.title ? (
+    <Text as="span">
+      {'"'}
+      {notification.field.title}
+      {'"'}
+    </Text>
   ) : (
-    <FormattedMessage
-      id="component.notification-comment.body"
-      defaultMessage='<b>{name}</b> has written a comment in the field "{field}".'
-      values={{
-        name: name,
-        b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-        field: fieldTitle,
-      }}
-    />
+    <Text as="span" textStyle="hint">
+      <FormattedMessage
+        id="generic.untitled-field"
+        defaultMessage="Untitled field"
+      />
+    </Text>
   );
-
   return (
     <Notification
-      id={id}
+      notification={notification}
       icon={<NotificationAvatar />}
-      body={body}
-      title={petitionTitle}
-      timestamp={createdAt}
-      isRead={isRead}
-      url={`/${intl.locale}/app/petitions/${petition.id}/replies?comments=${field.id}`}
-    />
+      path={`/replies?comments=${notification.field.id}`}
+    >
+      {isInternal ? (
+        <FormattedMessage
+          id="component.notification-internal-comment.body"
+          defaultMessage="{name} has written an internal comment in the field {field}."
+          values={{ name, field }}
+        />
+      ) : (
+        <FormattedMessage
+          id="component.notification-comment.body"
+          defaultMessage="{name} has written a comment in the field {field}."
+          values={{ name, field }}
+        />
+      )}
+    </Notification>
   );
 }
 
@@ -101,6 +72,7 @@ function NotificationAvatar() {
 NotificationComment.fragments = {
   CommentCreatedUserNotification: gql`
     fragment NotificationComment_CommentCreatedUserNotification on CommentCreatedUserNotification {
+      ...Notification_PetitionUserNotification
       field {
         id
         title
@@ -110,18 +82,18 @@ NotificationComment.fragments = {
         isInternal
         author {
           ... on User {
-            id
-            fullName
+            ...UserReference_User
           }
           ... on PetitionAccess {
             contact {
-              id
-              fullName
-              email
+              ...ContactLink_Contact
             }
           }
         }
       }
     }
+    ${Notification.fragments.PetitionUserNotification}
+    ${UserReference.fragments.User}
+    ${ContactLink.fragments.Contact}
   `,
 };

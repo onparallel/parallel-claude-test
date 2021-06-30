@@ -15,31 +15,6 @@
     "context": "Admin panel"
   },
   {
-    "term": "ccomponent.notification-email-bounced.body",
-    "definition": "Error al enviar la petición a <b>{name}</b> ({email}).",
-    "context": "Error sending request to recipient <b>{name}</b> ({email})."
-  },
-  {
-    "term": "ccomponent.notification-internal-comment.body",
-    "definition": "<b>{name}</b> ha escrito un comentario interno en el campo \"{field}\".",
-    "context": "<b>{name}</b> has written an internal comment in the field \"{field}\"."
-  },
-  {
-    "term": "ccomponent.notification-petition-completed.body",
-    "definition": "<b>{name}</b> completó la petición.",
-    "context": "<b>{name}</b> completed the petition."
-  },
-  {
-    "term": "ccomponent.notification-petition-shared-group.body",
-    "definition": "<b>{name}</b> ha compartido la petición con el grupo \"{group}\" al que perteneces.",
-    "context": "<b>{name}</b> has shared the request with the group \"{group}\" to which you belong."
-  },
-  {
-    "term": "ccomponent.notification-petition-shared.body",
-    "definition": "<b>{name}</b> te ha compartido la petición como {permissionType}.",
-    "context": "<b>{name}</b> has shared the request with you as {permissionType}."
-  },
-  {
     "term": "component.add-member-group-dialog.members-label",
     "definition": "Añadir al grupo",
     "context": "Add to group"
@@ -711,18 +686,43 @@
   },
   {
     "term": "component.notification-comment.body",
-    "definition": "<b>{name}</b> ha escrito un comentario en el campo \"{field}\".",
-    "context": "<b>{name}</b> has written a comment in the field \"{field}\"."
+    "definition": "{name} ha escrito un comentario en el campo {field}.",
+    "context": "{name} has written a comment in the field {field}."
   },
   {
-    "term": "component.notification-signature-canceled.body",
+    "term": "component.notification-email-bounced.body",
+    "definition": "Error al enviar la petición a {name}.",
+    "context": "Error sending request to recipient {name}."
+  },
+  {
+    "term": "component.notification-internal-comment.body",
+    "definition": "{name} ha escrito un comentario interno en el campo \"{field}\".",
+    "context": "{name} has written an internal comment in the field {field}."
+  },
+  {
+    "term": "component.notification-petition-completed.body",
+    "definition": "{name} completó la petición.",
+    "context": "{name} completed the petition."
+  },
+  {
+    "term": "component.notification-petition-shared-group.body",
+    "definition": "{name} ha compartido la petición con el grupo \"{group}\" al que perteneces.",
+    "context": "{name} has shared the request with the group \"{group}\" to which you belong."
+  },
+  {
+    "term": "component.notification-petition-shared.body",
+    "definition": "{name} te ha compartido la petición como {permissionType}.",
+    "context": "{name} has shared the request with you as {permissionType}."
+  },
+  {
+    "term": "component.notification-signature-cancelled.body",
     "definition": "Se ha cancelado la firma digital.",
-    "context": "The digital signature has been canceled."
+    "context": "The eSignature has been cancelled."
   },
   {
     "term": "component.notification-signature-completed.body",
     "definition": "Se ha completado la firma digital.",
-    "context": "The digital signature has been completed."
+    "context": "The eSignature has been completed."
   },
   {
     "term": "component.notification.mark-as-read",

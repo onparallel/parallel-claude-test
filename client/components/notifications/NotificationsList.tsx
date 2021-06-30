@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
 import { Box, Center, LinkBox, Spinner } from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
@@ -5,11 +6,10 @@ import { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage } from "react-intl";
 import { NotificationComment } from "./flavor/NotificationComment";
-import { NotificationDefault } from "./flavor/NotificationDefault";
 import { NotificationEmailBounced } from "./flavor/NotificationEmailBounced";
 import { NotificationPetitionCompleted } from "./flavor/NotificationPetitionCompleted";
 import { NotificationPetitionShared } from "./flavor/NotificationPetitionShared";
-import { NotificationSignatureCanceled } from "./flavor/NotificationSignatureCanceled";
+import { NotificationSignatureCancelled } from "./flavor/NotificationSignatureCancelled";
 import { NotificationSignatureCompleted } from "./flavor/NotificationSignatureCompleted";
 import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
 
@@ -26,27 +26,6 @@ export function NotificationsList({
   hasMore,
   loading,
 }: NotificationListProps) {
-  const getNotificationByType = (
-    notification: NotificationsDrawer_PetitionUserNotificationFragment
-  ) => {
-    switch (notification.__typename) {
-      case "PetitionCompletedUserNotification":
-        return NotificationPetitionCompleted;
-      case "SignatureCompletedUserNotification":
-        return NotificationSignatureCompleted;
-      case "SignatureCancelledUserNotification":
-        return NotificationSignatureCanceled;
-      case "PetitionSharedUserNotification":
-        return NotificationPetitionShared;
-      case "MessageEmailBouncedUserNotification":
-        return NotificationEmailBounced;
-      case "CommentCreatedUserNotification":
-        return NotificationComment;
-      default:
-        return NotificationDefault;
-    }
-  };
-
   useEffect(() => {
     console.log("%c --- NotificationsList RENDER ---", "color: #d49e22");
   });
@@ -88,15 +67,23 @@ export function NotificationsList({
           scrollableTarget="notifications-body"
         >
           <Box>
-            {notifications.map((notification) => {
-              const Notification = getNotificationByType(notification);
-
-              return (
-                <LinkBox key={notification.id}>
-                  <Notification {...notification} />
-                </LinkBox>
-              );
-            })}
+            {notifications.map((n) => (
+              <LinkBox key={n.id}>
+                {n.__typename === "PetitionCompletedUserNotification" ? (
+                  <NotificationPetitionCompleted notification={n} />
+                ) : n.__typename === "SignatureCompletedUserNotification" ? (
+                  <NotificationSignatureCompleted notification={n} />
+                ) : n.__typename === "SignatureCancelledUserNotification" ? (
+                  <NotificationSignatureCancelled notification={n} />
+                ) : n.__typename === "PetitionSharedUserNotification" ? (
+                  <NotificationPetitionShared notification={n} />
+                ) : n.__typename === "MessageEmailBouncedUserNotification" ? (
+                  <NotificationEmailBounced notification={n} />
+                ) : n.__typename === "CommentCreatedUserNotification" ? (
+                  <NotificationComment notification={n} />
+                ) : null}
+              </LinkBox>
+            ))}
           </Box>
         </InfiniteScroll>
       ) : (
@@ -118,3 +105,36 @@ export function NotificationsList({
     </>
   );
 }
+
+NotificationsList.fragments = {
+  PetitionUserNotification: gql`
+    fragment NotificationsList_PetitionUserNotification on PetitionUserNotification {
+      ... on CommentCreatedUserNotification {
+        ...NotificationComment_CommentCreatedUserNotification
+      }
+      ... on MessageEmailBouncedUserNotification {
+        ...NotificationEmailBounced_MessageEmailBouncedUserNotification
+      }
+      ... on PetitionCompletedUserNotification {
+        ...NotificationPetitionCompleted_PetitionCompletedUserNotification
+      }
+      ... on PetitionSharedUserNotification {
+        ...NotificationPetitionShared_PetitionSharedUserNotification
+      }
+      ... on SignatureCancelledUserNotification {
+        ...NotificationSignatureCanceled_SignatureCancelledUserNotification
+      }
+      ... on SignatureCompletedUserNotification {
+        ...NotificationSignatureCompleted_SignatureCompletedUserNotification
+      }
+    }
+    ${NotificationComment.fragments.CommentCreatedUserNotification}
+    ${NotificationEmailBounced.fragments.MessageEmailBouncedUserNotification}
+    ${NotificationPetitionCompleted.fragments.PetitionCompletedUserNotification}
+    ${NotificationPetitionShared.fragments.PetitionSharedUserNotification}
+    ${NotificationSignatureCancelled.fragments
+      .SignatureCancelledUserNotification}
+    ${NotificationSignatureCompleted.fragments
+      .SignatureCompletedUserNotification}
+  `,
+};

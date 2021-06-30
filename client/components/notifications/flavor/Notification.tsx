@@ -1,29 +1,29 @@
+import { gql } from "@apollo/client";
 import { Center, Stack, Text } from "@chakra-ui/layout";
 import { Circle, LinkOverlay } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
+import { Notification_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
+import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 
+export interface NotificationProps {
+  icon: ReactNode;
+  path: string;
+  notification: Notification_PetitionUserNotificationFragment;
+  children: ReactNode;
+}
+
 export function Notification({
-  id,
   icon,
-  body,
-  title,
-  timestamp,
-  isRead,
-  url,
-}: {
-  id: string;
-  icon: any;
-  body: any;
-  title: string;
-  timestamp: string;
-  isRead: boolean;
-  url: string;
-}) {
+  path,
+  notification,
+  children,
+}: NotificationProps) {
+  const { isRead, petition, createdAt } = notification;
   const intl = useIntl();
   const markAsReadText = isRead
     ? intl.formatMessage({
@@ -39,14 +39,14 @@ export function Notification({
 
   const handleMarkAsReadUnread = async () => {
     await updateIsReadNotification({
-      petitionUserNotificationIds: [id],
+      petitionUserNotificationIds: [notification.id],
       isRead: !isRead,
     });
   };
 
   return (
     <LinkOverlay
-      href={url}
+      href={`/${intl.locale}/app/petitions/${petition.id}${path}`}
       _focus={{
         outline: "none",
         ".notification-body": {
@@ -90,16 +90,25 @@ export function Notification({
             isTruncated
             maxWidth="290px"
             fontSize="14px"
-            fontWeight="600"
+            fontWeight={petition.name ? "bold" : "normal"}
+            fontStyle={petition.name ? "normal" : "italic"}
             color="gray.600"
-            title={title}
           >
-            {title}
+            {petition.name ??
+              intl.formatMessage({
+                id: "generic.untitled-petition",
+                defaultMessage: "Untitled petition",
+              })}
           </Text>
-          <Text color="black" noOfLines={2}>
-            {body}
-          </Text>
-          <NotificationTimestamp time={timestamp} />
+          <Text noOfLines={2}>{children}</Text>
+          <DateTime
+            fontSize="14px"
+            color="gray.500"
+            value={createdAt}
+            format={FORMATS.LLL}
+            whiteSpace="nowrap"
+            useRelativeTime
+          />
         </Stack>
         <Center
           display="none"
@@ -126,7 +135,6 @@ export function Notification({
             borderRadius="5px"
             background="white"
             _hover={{ background: "gray.100" }}
-            aria-label={markAsReadText}
             label={markAsReadText}
           />
         </Center>
@@ -135,15 +143,16 @@ export function Notification({
   );
 }
 
-function NotificationTimestamp({ time }: { time: string }) {
-  return (
-    <Text fontSize="14px" color="gray.500">
-      <DateTime
-        value={time}
-        format={FORMATS.LLL}
-        whiteSpace="nowrap"
-        useRelativeTime
-      />
-    </Text>
-  );
-}
+Notification.fragments = {
+  PetitionUserNotification: gql`
+    fragment Notification_PetitionUserNotification on PetitionUserNotification {
+      id
+      petition {
+        id
+        name
+      }
+      createdAt
+      isRead
+    }
+  `,
+};

@@ -26,7 +26,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { NotificationComment } from "./flavor/NotificationComment";
-import { NotificationDefault } from "./flavor/NotificationDefault";
 import { NotificationEmailBounced } from "./flavor/NotificationEmailBounced";
 import { NotificationPetitionCompleted } from "./flavor/NotificationPetitionCompleted";
 import { NotificationPetitionShared } from "./flavor/NotificationPetitionShared";
@@ -254,31 +253,9 @@ export function NotificationsDrawer({
 NotificationsDrawer.fragments = {
   PetitionUserNotification: gql`
     fragment NotificationsDrawer_PetitionUserNotification on PetitionUserNotification {
-      ...NotificationDefault_PetitionUserNotification
-      ... on CommentCreatedUserNotification {
-        ...NotificationComment_CommentCreatedUserNotification
-      }
-      ... on MessageEmailBouncedUserNotification {
-        ...NotificationEmailBounced_MessageEmailBouncedUserNotification
-      }
-      ... on PetitionCompletedUserNotification {
-        ...NotificationEmailBounced_PetitionCompletedUserNotification
-      }
-      ... on PetitionSharedUserNotification {
-        ...NotificationEmailBounced_PetitionSharedUserNotification
-      }
-      ... on SignatureCancelledUserNotification {
-        ...NotificationDefault_PetitionUserNotification
-      }
-      ... on SignatureCompletedUserNotification {
-        ...NotificationDefault_PetitionUserNotification
-      }
+      ...NotificationsList_PetitionUserNotification
     }
-    ${NotificationComment.fragments.CommentCreatedUserNotification}
-    ${NotificationEmailBounced.fragments.MessageEmailBouncedUserNotification}
-    ${NotificationPetitionCompleted.fragments.PetitionCompletedUserNotification}
-    ${NotificationPetitionShared.fragments.PetitionSharedUserNotification}
-    ${NotificationDefault.fragments.PetitionUserNotification}
+    ${NotificationsList.fragments.PetitionUserNotification}
   `,
 };
 
