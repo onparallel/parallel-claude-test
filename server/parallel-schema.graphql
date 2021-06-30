@@ -36,6 +36,23 @@ type AccessOpenedEvent implements PetitionEvent {
   id: GID!
 }
 
+enum BatchSendSigningMode {
+  """
+  Allow configured signer(s) to sign every petition on the batch
+  """
+  ALLOW
+
+  """
+  Disable eSignature on every petition of this batch.
+  """
+  DISABLE
+
+  """
+  Let recipients of each group to choose who will sign the petitions.
+  """
+  RECIPIENT_CHOOSE
+}
+
 enum ChangePasswordResult {
   INCORRECT_PASSWORD
   INVALID_NEW_PASSWORD
@@ -337,6 +354,7 @@ type Mutation {
   Sends different petitions to each of the specified contact groups, creating corresponding accesses and messages
   """
   batchSendPetition(
+    batchSendSigningMode: BatchSendSigningMode
     body: JSON!
     contactIdGroups: [[GID!]!]!
     petitionId: GID!

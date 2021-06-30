@@ -65,6 +65,14 @@ export interface AccessOpenedEvent extends PetitionEvent {
   id: Scalars["GID"];
 }
 
+export type BatchSendSigningMode =
+  /** Allow configured signer(s) to sign every petition on the batch */
+  | "ALLOW"
+  /** Disable eSignature on every petition of this batch. */
+  | "DISABLE"
+  /** Let recipients of each group to choose who will sign the petitions. */
+  | "RECIPIENT_CHOOSE";
+
 export type ChangePasswordResult =
   | "INCORRECT_PASSWORD"
   | "INVALID_NEW_PASSWORD"
@@ -490,6 +498,7 @@ export interface MutationassignPetitionToUserArgs {
 }
 
 export interface MutationbatchSendPetitionArgs {
+  batchSendSigningMode?: Maybe<BatchSendSigningMode>;
   body: Scalars["JSON"];
   contactIdGroups: Array<Array<Scalars["GID"]>>;
   petitionId: Scalars["GID"];
@@ -3241,6 +3250,14 @@ export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
   emailSubject?: Maybe<string>;
   emailBody?: Maybe<any>;
+  signatureConfig?: Maybe<{
+    __typename?: "SignatureConfig";
+    contacts: Array<
+      Maybe<
+        { __typename?: "Contact" } & CopySignatureConfigDialog_ContactFragment
+      >
+    >;
+  }>;
   remindersConfig?: Maybe<{
     __typename?: "RemindersConfig";
     offset: number;
@@ -4255,6 +4272,13 @@ export type TemplateDetailsDialog_PetitionTemplateFragment = {
     __typename?: "EffectivePetitionUserPermission";
     permissionType: PetitionPermissionType;
   }>;
+};
+
+export type CopySignatureConfigDialog_ContactFragment = {
+  __typename?: "Contact";
+  id: string;
+  fullName?: Maybe<string>;
+  email: string;
 };
 
 export type DynamicSelectSettings_uploadDynamicSelectFieldFileMutationVariables =
@@ -6047,6 +6071,7 @@ export type PetitionCompose_batchSendPetitionMutationVariables = Exact<{
   body: Scalars["JSON"];
   remindersConfig?: Maybe<RemindersConfigInput>;
   scheduledAt?: Maybe<Scalars["DateTime"]>;
+  batchSendSigningMode?: Maybe<BatchSendSigningMode>;
 }>;
 
 export type PetitionCompose_batchSendPetitionMutation = {
@@ -8433,10 +8458,22 @@ export const PetitionActivity_UserFragmentDoc = gql`
   ${PetitionLayout_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
 `;
+export const CopySignatureConfigDialog_ContactFragmentDoc = gql`
+  fragment CopySignatureConfigDialog_Contact on Contact {
+    id
+    fullName
+    email
+  }
+`;
 export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
   fragment AddPetitionAccessDialog_Petition on Petition {
     emailSubject
     emailBody
+    signatureConfig {
+      contacts {
+        ...CopySignatureConfigDialog_Contact
+      }
+    }
     remindersConfig {
       offset
       time
@@ -8444,6 +8481,7 @@ export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
       weekdaysOnly
     }
   }
+  ${CopySignatureConfigDialog_ContactFragmentDoc}
 `;
 export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
   fragment PetitionTemplateComposeMessageEditor_Petition on PetitionTemplate {
@@ -12742,6 +12780,7 @@ export const PetitionCompose_batchSendPetitionDocument = gql`
     $body: JSON!
     $remindersConfig: RemindersConfigInput
     $scheduledAt: DateTime
+    $batchSendSigningMode: BatchSendSigningMode
   ) {
     batchSendPetition(
       petitionId: $petitionId
@@ -12750,6 +12789,7 @@ export const PetitionCompose_batchSendPetitionDocument = gql`
       body: $body
       remindersConfig: $remindersConfig
       scheduledAt: $scheduledAt
+      batchSendSigningMode: $batchSendSigningMode
     ) {
       result
       petition {

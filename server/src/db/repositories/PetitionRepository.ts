@@ -900,13 +900,17 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async updatePetition(
-    petitionId: number,
+    petitionIds: MaybeArray<number>,
     data: Partial<CreatePetition>,
     updatedBy: string,
     t?: Knex.Transaction
   ) {
+    const ids = unMaybeArray(petitionIds);
+    if (ids.length === 0) {
+      return [];
+    }
     const [row] = await this.from("petition", t)
-      .where("id", petitionId)
+      .whereIn("id", ids)
       .update(
         {
           ...data,
@@ -1548,7 +1552,6 @@ export class PetitionRepository extends BaseRepository {
             "updated_at",
             "template_public",
             "from_template_id",
-            "signature_config",
             // avoid copying reminders and deadline data if creating a template or cloning from a template
             ...(data?.is_template || sourcePetition?.is_template
               ? (["reminders_active", "reminders_config", "deadline"] as const)

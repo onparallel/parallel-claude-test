@@ -164,6 +164,7 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
+  BatchSendSigningMode: "ALLOW" | "DISABLE" | "RECIPIENT_CHOOSE";
   ChangePasswordResult:
     | "INCORRECT_PASSWORD"
     | "INVALID_NEW_PASSWORD"
@@ -2486,6 +2487,7 @@ export interface NexusGenArgTypes {
     };
     batchSendPetition: {
       // args
+      batchSendSigningMode?: NexusGenEnums["BatchSendSigningMode"] | null; // BatchSendSigningMode
       body: NexusGenScalars["JSON"]; // JSON!
       contactIdGroups: NexusGenScalars["GID"][][]; // [[GID!]!]!
       petitionId: NexusGenScalars["GID"]; // GID!

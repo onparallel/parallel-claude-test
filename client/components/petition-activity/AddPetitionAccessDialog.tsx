@@ -16,6 +16,8 @@ import {
 import {
   AddPetitionAccessDialog_contactsByEmailQuery,
   AddPetitionAccessDialog_contactsByEmailQueryVariables,
+  AddPetitionAccessDialog_PetitionFragment,
+  CopySignatureConfigDialog_ContactFragment,
   RemindersConfig,
   UpdatePetitionInput,
 } from "@parallel/graphql/__types";
@@ -38,6 +40,11 @@ import { RecipientSelectGroups } from "../common/RecipientSelectGroups";
 import { RichTextEditorValue } from "../common/RichTextEditor";
 import { MessageEmailEditor } from "../petition-common/MessageEmailEditor";
 import { SendButton } from "../petition-common/SendButton";
+import {
+  BatchSendSigningMode,
+  CopySignatureConfigDialog,
+  useCopySignatureConfigDialog,
+} from "../petition-compose/CopySignatureConfigDialog";
 import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersConfig";
 import { useScheduleMessageDialog } from "../petition-compose/ScheduleMessageDialog";
 
@@ -46,9 +53,7 @@ export type AddPetitionAccessDialogProps = {
   onCreateContact?: ContactSelectProps["onCreateContact"];
   onUpdatePetition?: (data: UpdatePetitionInput) => void;
   canAddRecipientGroups?: boolean;
-  defaultSubject?: Maybe<string>;
-  defaultBody?: Maybe<RichTextEditorValue>;
-  defaultRemindersConfig?: Maybe<RemindersConfig>;
+  petition: AddPetitionAccessDialog_PetitionFragment;
 };
 
 export type AddPetitionAccessDialogResult = {
@@ -57,12 +62,11 @@ export type AddPetitionAccessDialogResult = {
   body: RichTextEditorValue;
   remindersConfig: Maybe<RemindersConfig>;
   scheduledAt: Maybe<Date>;
+  batchSendSigningMode?: BatchSendSigningMode;
 };
 
 export function AddPetitionAccessDialog({
-  defaultSubject,
-  defaultBody,
-  defaultRemindersConfig,
+  petition,
   canAddRecipientGroups,
   onUpdatePetition = noop,
   // TODO: fix this
@@ -75,14 +79,16 @@ export function AddPetitionAccessDialog({
     ContactSelectSelection[][]
   >([[]]);
 
-  const [subject, setSubject] = useState(defaultSubject ?? "");
+  const [subject, setSubject] = useState(petition.emailSubject ?? "");
   const [body, setBody] = useState<RichTextEditorValue>(
-    defaultBody ?? emptyRTEValue()
+    petition.emailBody ?? emptyRTEValue()
   );
   const [remindersConfig, setRemindersConfig] = useState<
     Maybe<RemindersConfig>
   >(
-    defaultRemindersConfig ? omit(defaultRemindersConfig, ["__typename"]) : null
+    petition.remindersConfig
+      ? omit(petition.remindersConfig, ["__typename"])
+      : null
   );
 
   const handleSearchContactsByEmail = useSearchContactsByEmail();
@@ -130,6 +136,7 @@ export function AddPetitionAccessDialog({
   );
 
   const showScheduleMessageDialog = useScheduleMessageDialog();
+  const showCopySignatureConfigDialog = useCopySignatureConfigDialog();
   const handleSendClick = async (schedule: boolean) => {
     try {
       if (!isValid) {
@@ -137,6 +144,22 @@ export function AddPetitionAccessDialog({
         return;
       }
       const scheduledAt = schedule ? await showScheduleMessageDialog({}) : null;
+
+      // if the petition has signer contacts configured,
+      // ask user if they want that contact(s) to sign all the petitions
+      let batchSendSigningMode: BatchSendSigningMode | undefined;
+      if (
+        petition.signatureConfig &&
+        petition.signatureConfig.contacts.length > 0
+      ) {
+        const option = await showCopySignatureConfigDialog({
+          signers: petition.signatureConfig
+            .contacts as CopySignatureConfigDialog_ContactFragment[],
+        });
+
+        batchSendSigningMode = option;
+      }
+
       props.onResolve({
         recipientIdGroups: recipientGroups.map((group) =>
           group.map((g) => g.id)
@@ -145,6 +168,7 @@ export function AddPetitionAccessDialog({
         body,
         remindersConfig,
         scheduledAt,
+        batchSendSigningMode,
       });
     } catch {}
   };
@@ -261,6 +285,11 @@ AddPetitionAccessDialog.fragments = {
     fragment AddPetitionAccessDialog_Petition on Petition {
       emailSubject
       emailBody
+      signatureConfig {
+        contacts {
+          ...CopySignatureConfigDialog_Contact
+        }
+      }
       remindersConfig {
         offset
         time
@@ -268,6 +297,7 @@ AddPetitionAccessDialog.fragments = {
         weekdaysOnly
       }
     }
+    ${CopySignatureConfigDialog.fragments.Contact}
   `,
 };
 

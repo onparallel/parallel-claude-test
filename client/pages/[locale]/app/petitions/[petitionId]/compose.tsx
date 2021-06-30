@@ -384,14 +384,18 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     }
 
     try {
-      const { recipientIdGroups, subject, body, remindersConfig, scheduledAt } =
-        await showAddPetitionAccessDialog({
-          defaultSubject: petition.emailSubject,
-          defaultBody: petition.emailBody,
-          defaultRemindersConfig: petition.remindersConfig,
-          onUpdatePetition: handleUpdatePetition,
-          canAddRecipientGroups: true,
-        });
+      const {
+        recipientIdGroups,
+        subject,
+        body,
+        remindersConfig,
+        scheduledAt,
+        batchSendSigningMode,
+      } = await showAddPetitionAccessDialog({
+        petition,
+        onUpdatePetition: handleUpdatePetition,
+        canAddRecipientGroups: true,
+      });
       const task = batchSendPetition({
         variables: {
           petitionId: petition.id,
@@ -400,6 +404,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           body,
           remindersConfig,
           scheduledAt: scheduledAt?.toISOString() ?? null,
+          batchSendSigningMode,
         },
       });
       if (recipientIdGroups.length > 20) {
@@ -882,6 +887,7 @@ PetitionCompose.mutations = [
       $body: JSON!
       $remindersConfig: RemindersConfigInput
       $scheduledAt: DateTime
+      $batchSendSigningMode: BatchSendSigningMode
     ) {
       batchSendPetition(
         petitionId: $petitionId
@@ -890,6 +896,7 @@ PetitionCompose.mutations = [
         body: $body
         remindersConfig: $remindersConfig
         scheduledAt: $scheduledAt
+        batchSendSigningMode: $batchSendSigningMode
       ) {
         result
         petition {

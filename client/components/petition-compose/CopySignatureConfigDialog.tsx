@@ -1,0 +1,117 @@
+import { gql } from "@apollo/client";
+import { Button, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react";
+import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
+import {
+  DialogProps,
+  useDialog,
+} from "@parallel/components/common/DialogProvider";
+import { CopySignatureConfigDialog_ContactFragment } from "@parallel/graphql/__types";
+import { useState } from "react";
+import { FormattedList, FormattedMessage } from "react-intl";
+
+export type BatchSendSigningMode = "ALLOW" | "RECIPIENT_CHOOSE" | "DISABLE";
+
+export function CopySignatureConfigDialog({
+  signers,
+  ...props
+}: DialogProps<
+  { signers: CopySignatureConfigDialog_ContactFragment[] },
+  BatchSendSigningMode
+>) {
+  const [option, setOption] = useState<BatchSendSigningMode>();
+
+  return (
+    <ConfirmDialog
+      size="xl"
+      closeOnEsc={false}
+      closeOnOverlayClick={false}
+      header={
+        <FormattedMessage
+          id="component.copy-signature-config-dialog.header"
+          defaultMessage="Petition eSignature"
+        />
+      }
+      body={
+        <>
+          <FormattedMessage
+            id="component.copy-signature-config-dialog.body"
+            defaultMessage="You have assigned {contacts} to sign the first petition."
+            values={{
+              contacts: (
+                <FormattedList
+                  value={signers.map((contact, i) => [
+                    <Text as="strong" key={i}>
+                      {contact.fullName ?? contact.email}
+                    </Text>,
+                  ])}
+                />
+              ),
+            }}
+          />
+          <Text>
+            <FormattedMessage
+              id="component.copy-signature-config-dialog.body-2"
+              defaultMessage="Do you want this {count, plural, =1{contact} other{contacts}} to sign the petitions of each recipient group?"
+              values={{ count: signers.length }}
+            />
+          </Text>
+          <RadioGroup paddingTop={4} onChange={setOption as any} value={option}>
+            <Stack>
+              <Radio value="ALLOW" isChecked={option === "ALLOW"}>
+                <FormattedMessage
+                  id="component.copy-signature-config-dialog.option-1"
+                  defaultMessage="Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the petitions."
+                  values={{ count: signers.length }}
+                />
+              </Radio>
+              <Radio
+                value="RECIPIENT_CHOOSE"
+                isChecked={option === "RECIPIENT_CHOOSE"}
+              >
+                <FormattedMessage
+                  id="component.copy-signature-config-dialog.option-2"
+                  defaultMessage="No, let each recipient choose who will sign the petitions."
+                />
+              </Radio>
+              <Radio value="DISABLE" isChecked={option === "DISABLE"}>
+                <FormattedMessage
+                  id="component.copy-signature-config-dialog.option-3"
+                  defaultMessage="Disable eSignature from all the petitions."
+                />
+              </Radio>
+            </Stack>
+          </RadioGroup>
+        </>
+      }
+      confirm={
+        <Button
+          isDisabled={option === undefined}
+          colorScheme="purple"
+          onClick={() => props.onResolve(option)}
+        >
+          <FormattedMessage id="generic.send" defaultMessage="Send" />
+        </Button>
+      }
+      cancel={
+        <Button onClick={props.onReject}>
+          <FormattedMessage id="generic.go-back" defaultMessage="Go back" />
+        </Button>
+      }
+      {...props}
+    />
+  );
+}
+
+CopySignatureConfigDialog.fragments = {
+  Contact: gql`
+    fragment CopySignatureConfigDialog_Contact on Contact {
+      id
+      fullName
+      email
+    }
+  `,
+};
+
+export function useCopySignatureConfigDialog() {
+  return useDialog(CopySignatureConfigDialog);
+}

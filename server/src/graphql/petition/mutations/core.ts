@@ -1,6 +1,7 @@
 import {
   arg,
   booleanArg,
+  enumType,
   inputObjectType,
   intArg,
   list,
@@ -1109,6 +1110,27 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     body: nonNull(jsonArg()),
     scheduledAt: datetimeArg(),
     remindersConfig: arg({ type: "RemindersConfigInput" }),
+    batchSendSigningMode: arg({
+      type: enumType({
+        name: "BatchSendSigningMode",
+        members: [
+          {
+            name: "ALLOW",
+            description:
+              "Allow configured signer(s) to sign every petition on the batch",
+          },
+          {
+            name: "RECIPIENT_CHOOSE",
+            description:
+              "Let recipients of each group to choose who will sign the petitions.",
+          },
+          {
+            name: "DISABLE",
+            description: "Disable eSignature on every petition of this batch.",
+          },
+        ],
+      }),
+    }),
   },
   validateArgs: validateAnd(
     notEmptyArray((args) => args.contactIdGroups, "contactIdGroups"),
@@ -1127,6 +1149,26 @@ export const batchSendPetition = mutationField("batchSendPetition", {
         .slice(1)
         .map(() => ctx.petitions.clonePetition(args.petitionId, ctx.user!))
     );
+
+    if (
+      isDefined(args.batchSendSigningMode) &&
+      args.batchSendSigningMode !== "ALLOW"
+    ) {
+      await ctx.petitions.updatePetition(
+        [petition.id, ...clonedPetitions.map((p) => p.id)],
+        {
+          signature_config:
+            args.batchSendSigningMode === "RECIPIENT_CHOOSE"
+              ? {
+                  ...petition.signature_config,
+                  review: false,
+                  contactIds: [],
+                }
+              : null,
+        },
+        `User:${ctx.user!.id}`
+      );
+    }
 
     if (clonedPetitions.length > 0) {
       await Promise.all([

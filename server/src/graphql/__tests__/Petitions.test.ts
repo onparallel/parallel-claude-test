@@ -30,6 +30,16 @@ function petitionsBuilder(orgId: number) {
     locale: "en",
     name: index > 5 ? `Template ${index}` : `Petition ${index}`,
     template_description: index > 5 ? `Template description ${index}` : null,
+    signature_config:
+      index === 5
+        ? {
+            contactIds: [],
+            provider: "SIGNATURIT",
+            review: false,
+            timezone: "Europe/Madrid",
+            title: "Signature",
+          }
+        : null,
   });
 }
 
@@ -1340,6 +1350,42 @@ describe("GraphQL/Petitions", () => {
 
       expect(errors).toBeUndefined();
       expect(data.clonePetitions[0].tags).toHaveLength(1);
+    });
+
+    it("copies signature configuration when cloning the petition", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              ... on Petition {
+                signatureConfig {
+                  contacts {
+                    id
+                  }
+                  provider
+                  review
+                  timezone
+                  title
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", petitions[5].id)],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.clonePetitions[0]).toEqual({
+        signatureConfig: {
+          contacts: [],
+          provider: "SIGNATURIT",
+          review: false,
+          timezone: "Europe/Madrid",
+          title: "Signature",
+        },
+      });
     });
   });
 

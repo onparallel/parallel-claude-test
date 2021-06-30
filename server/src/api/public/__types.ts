@@ -57,6 +57,14 @@ export type AccessOpenedEvent = PetitionEvent & {
   id: Scalars["GID"];
 };
 
+export type BatchSendSigningMode =
+  /** Allow configured signer(s) to sign every petition on the batch */
+  | "ALLOW"
+  /** Disable eSignature on every petition of this batch. */
+  | "DISABLE"
+  /** Let recipients of each group to choose who will sign the petitions. */
+  | "RECIPIENT_CHOOSE";
+
 export type ChangePasswordResult =
   | "INCORRECT_PASSWORD"
   | "INVALID_NEW_PASSWORD"
@@ -461,6 +469,7 @@ export type MutationassignPetitionToUserArgs = {
 };
 
 export type MutationbatchSendPetitionArgs = {
+  batchSendSigningMode?: Maybe<BatchSendSigningMode>;
   body: Scalars["JSON"];
   contactIdGroups: Array<Array<Scalars["GID"]>>;
   petitionId: Scalars["GID"];
