@@ -45,7 +45,7 @@ const QUERY_STATE = {
     "OTHER",
     "SHARED",
     "UNREAD",
-  ]).orDefault("ALL"),
+  ]),
 };
 
 export function NotificationsDrawer({
@@ -62,6 +62,11 @@ export function NotificationsDrawer({
 
   const notifications = getNotificationsFiltered(data?.me.notifications ?? []);
   const hasUnreaded = notifications.filter((n) => !n.isRead).length > 0;
+  const prevHasUnreaded = useRef(hasUnreaded);
+
+  useEffect(() => {
+    prevHasUnreaded.current = hasUnreaded;
+  }, [hasUnreaded]);
 
   useEffect(() => {
     if (isOpen) {
@@ -72,7 +77,9 @@ export function NotificationsDrawer({
         },
       });
     }
+  }, [isOpen]);
 
+  useEffect(() => {
     const interval = setInterval(() => {
       if (isOpen) {
         refetch?.({
@@ -86,7 +93,7 @@ export function NotificationsDrawer({
     return () => {
       clearInterval(interval);
     };
-  }, [isOpen]);
+  }, [isOpen, state.n_filter]);
 
   useEffect(() => {
     console.log("%c --- NotificationsDrawer RENDER ---", "color: #cf132c");
@@ -136,6 +143,7 @@ export function NotificationsDrawer({
   };
 
   const MotionFooter = motion<BoxProps>(DrawerFooter);
+  const spring = { type: "spring", damping: 20, stiffness: 240 };
 
   return (
     <Drawer
@@ -187,12 +195,13 @@ export function NotificationsDrawer({
           {hasUnreaded && (
             <MotionFooter
               initial={
-                hasUnreaded
+                prevHasUnreaded.current
                   ? { transform: "translateY(0px)" }
                   : { transform: "translateY(48px)" }
               }
               animate={{ transform: "translateY(0px)" }}
               exit={{ transform: "translateY(48px)" }}
+              transition={spring}
               position="absolute"
               bottom="0px"
               width="100%"

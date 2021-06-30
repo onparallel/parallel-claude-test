@@ -51,7 +51,7 @@ export function NotificationsList({
     console.log("%c --- NotificationsList RENDER ---", "color: #d49e22");
   });
 
-  if (loading)
+  if (loading) {
     return (
       <Center height="100%">
         <Spinner
@@ -63,15 +63,16 @@ export function NotificationsList({
         />
       </Center>
     );
+  }
 
   return (
-    <Stack flex="1" spacing={0}>
+    <>
       {notifications && notifications.length ? (
         <InfiniteScroll
           dataLength={notifications.length} //This is important field to render the next data
           next={onFetchData}
           hasMore={hasMore}
-          scrollThreshold={0.65}
+          scrollThreshold={0.7}
           loader={
             <Center height="42px" background="gray.75">
               <Spinner
@@ -113,6 +114,6 @@ export function NotificationsList({
           </Text>
         </Stack>
       )}
-    </Stack>
+    </>
   );
 }
