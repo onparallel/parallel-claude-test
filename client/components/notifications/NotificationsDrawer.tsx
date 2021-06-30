@@ -17,7 +17,11 @@ import {
   useNotificationsDrawer_PetitionUserNotificationsLazyQuery,
 } from "@parallel/graphql/__types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
-import { useQueryState, values } from "@parallel/utils/queryState";
+import {
+  useQueryState,
+  useQueryStateSlice,
+  values,
+} from "@parallel/utils/queryState";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
@@ -38,7 +42,7 @@ export interface NotificationsDrawerProps {
 const NOTIFICATIONS_LIMIT = 16;
 
 const QUERY_STATE = {
-  n_filter: values<PetitionUserNotificationFilter>([
+  notifications: values<PetitionUserNotificationFilter>([
     "ALL",
     "COMMENTS",
     "COMPLETED",
@@ -53,12 +57,19 @@ export function NotificationsDrawer({
   onPull,
   isOpen,
 }: NotificationsDrawerProps) {
-  const [state, setQueryState] = useQueryState(QUERY_STATE);
+  const [queryState, setQueryState] = useQueryState(QUERY_STATE);
+  const [filter, setFilter] = useQueryStateSlice(
+    queryState,
+    setQueryState,
+    "notifications"
+  );
   const [hasMore, setHasMore] = useState(false);
   const lastNotificationDate = useRef<string | undefined>(undefined);
 
   const [getData, { data, loading, refetch, fetchMore }] =
-    useNotificationsDrawer_PetitionUserNotificationsLazyQuery();
+    useNotificationsDrawer_PetitionUserNotificationsLazyQuery({
+      notifyOnNetworkStatusChange: true,
+    });
 
   const notifications = getNotificationsFiltered(data?.me.notifications ?? []);
   const hasUnreaded = notifications.filter((n) => !n.isRead).length > 0;
@@ -73,7 +84,7 @@ export function NotificationsDrawer({
       getData({
         variables: {
           limit: NOTIFICATIONS_LIMIT,
-          filter: state.n_filter,
+          filter,
         },
       });
     }
@@ -84,7 +95,7 @@ export function NotificationsDrawer({
       if (isOpen) {
         refetch?.({
           limit: NOTIFICATIONS_LIMIT,
-          filter: state.n_filter,
+          filter,
         });
       }
       onPull();
@@ -93,7 +104,7 @@ export function NotificationsDrawer({
     return () => {
       clearInterval(interval);
     };
-  }, [isOpen, state.n_filter]);
+  }, [isOpen, filter]);
 
   useEffect(() => {
     console.log("%c --- NotificationsDrawer RENDER ---", "color: #cf132c");
@@ -102,7 +113,7 @@ export function NotificationsDrawer({
   function getNotificationsFiltered(
     notifications: NotificationsDrawer_PetitionUserNotificationFragment[]
   ) {
-    return state.n_filter === "UNREAD"
+    return filter === "UNREAD"
       ? notifications.filter((n) => !n.isRead)
       : notifications;
   }
@@ -113,7 +124,7 @@ export function NotificationsDrawer({
         limit: NOTIFICATIONS_LIMIT,
         before:
           data?.me.notifications[data?.me.notifications.length - 1]?.createdAt,
-        filter: state.n_filter,
+        filter,
       },
     });
 
@@ -122,7 +133,7 @@ export function NotificationsDrawer({
   };
 
   const handleChangeFilterBy = async (type: PetitionUserNotificationFilter) => {
-    setQueryState((s) => ({ ...s, n_filter: type }));
+    setFilter(type);
     lastNotificationDate.current = undefined;
 
     const result = await refetch?.({
@@ -137,7 +148,7 @@ export function NotificationsDrawer({
   const updateIsReadNotification = useUpdateIsReadNotification();
   const handleMarkAllAsRead = async () => {
     await updateIsReadNotification({
-      filter: state.n_filter,
+      filter: filter,
       isRead: true,
     });
   };
@@ -171,7 +182,7 @@ export function NotificationsDrawer({
             </Text>
           </Stack>
           <NotificationsSelect
-            selectedOption={state.n_filter}
+            selectedOption={filter}
             onChange={handleChangeFilterBy}
           />
         </DrawerHeader>

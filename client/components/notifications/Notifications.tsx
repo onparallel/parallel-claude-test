@@ -1,15 +1,38 @@
 import { gql } from "@apollo/client";
-import { useDisclosure } from "@chakra-ui/hooks";
-import { useNotifications_UnreadPetitionUserNotificationIdsQuery } from "@parallel/graphql/__types";
+import {
+  PetitionUserNotificationFilter,
+  useNotifications_UnreadPetitionUserNotificationIdsQuery,
+} from "@parallel/graphql/__types";
+import {
+  values,
+  useQueryState,
+  useQueryStateSlice,
+} from "@parallel/utils/queryState";
 import { useEffect } from "react";
 import { NotificationsBell } from "./NotificationsBell";
 import { NotificationsDrawer } from "./NotificationsDrawer";
 
+const QUERY_STATE = {
+  notifications: values<PetitionUserNotificationFilter>([
+    "ALL",
+    "COMMENTS",
+    "COMPLETED",
+    "OTHER",
+    "SHARED",
+    "UNREAD",
+  ]),
+};
+
 export function Notifications() {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [queryState, setQueryState] = useQueryState(QUERY_STATE);
+  const [filter, setFilter] = useQueryStateSlice(
+    queryState,
+    setQueryState,
+    "notifications"
+  );
 
   const handleBellClick = () => {
-    isOpen ? handleClose() : handleOpen();
+    filter ? handleClose() : handleOpen();
   };
 
   const { data, refetch } =
@@ -18,11 +41,11 @@ export function Notifications() {
   const unreadNotificationIds = data?.me.unreadNotificationIds ?? [];
 
   const handleClose = () => {
-    onClose();
+    setFilter(null);
   };
 
   const handleOpen = () => {
-    onOpen();
+    setFilter("ALL");
   };
 
   const handleRefetch = () => {
@@ -38,10 +61,10 @@ export function Notifications() {
       <NotificationsBell
         onClick={handleBellClick}
         hasNotifications={unreadNotificationIds.length > 0}
-        isOpen={isOpen}
+        isOpen={filter !== null}
       />
       <NotificationsDrawer
-        isOpen={isOpen}
+        isOpen={filter !== null}
         onClose={handleClose}
         onPull={handleRefetch}
       />

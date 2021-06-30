@@ -431,7 +431,10 @@ export interface Mutation {
   updatePetitionField: PetitionBaseAndField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionField;
-  /** Marks the specified comments as read or unread. */
+  /**
+   * Marks the specified comments as read or unread.
+   * @deprecated Use `updatePetitionUserNotificationReadStatus` instead.
+   */
   updatePetitionFieldCommentsReadStatus: Array<PetitionFieldComment>;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
@@ -441,8 +444,11 @@ export interface Mutation {
   updatePetitionPermissionSubscription: Petition;
   /**
    * Updates the read status of a user's notification.
-   * Must pass either petitionUserNotificationIds or filter argument.
-   * If petitionUserNotificationIds is provided, filter argument will be ignored.
+   * Must pass ONLY one of:
+   *   - petitionUserNotificationIds
+   *   - filter
+   *   - petitionIds
+   *   - petitionFieldCommentIds
    */
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
@@ -963,6 +969,8 @@ export interface MutationupdatePetitionPermissionSubscriptionArgs {
 export interface MutationupdatePetitionUserNotificationReadStatusArgs {
   filter?: Maybe<PetitionUserNotificationFilter>;
   isRead: Scalars["Boolean"];
+  petitionFieldCommentIds?: Maybe<Array<Scalars["GID"]>>;
+  petitionIds?: Maybe<Array<Scalars["GID"]>>;
   petitionUserNotificationIds?: Maybe<Array<Scalars["GID"]>>;
 }
 
@@ -1735,14 +1743,6 @@ export type PetitionUserNotificationFilter =
   | "OTHER"
   | "SHARED"
   | "UNREAD";
-
-export interface PetitionUserNotificationPagination {
-  __typename?: "PetitionUserNotificationPagination";
-  /** The requested slice of items. */
-  items: Array<PetitionUserNotification>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
-}
 
 /** The permission for a petition and user */
 export interface PetitionUserPermission extends PetitionPermission, Timestamps {

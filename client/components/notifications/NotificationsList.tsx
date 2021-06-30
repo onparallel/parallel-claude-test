@@ -51,7 +51,7 @@ export function NotificationsList({
     console.log("%c --- NotificationsList RENDER ---", "color: #d49e22");
   });
 
-  if (loading) {
+  if (loading && !hasMore) {
     return (
       <Center height="100%">
         <Spinner
@@ -90,6 +90,7 @@ export function NotificationsList({
           <Box>
             {notifications.map((notification) => {
               const Notification = getNotificationByType(notification);
+
               return (
                 <LinkBox key={notification.id}>
                   <Notification {...notification} />

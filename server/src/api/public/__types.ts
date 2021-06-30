@@ -402,7 +402,10 @@ export type Mutation = {
   updatePetitionField: PetitionBaseAndField;
   /** Update a petition field comment. */
   updatePetitionFieldComment: PetitionField;
-  /** Marks the specified comments as read or unread. */
+  /**
+   * Marks the specified comments as read or unread.
+   * @deprecated Use `updatePetitionUserNotificationReadStatus` instead.
+   */
   updatePetitionFieldCommentsReadStatus: Array<PetitionFieldComment>;
   /** Updates the status of a petition field reply and sets the petition as closed if all fields are validated. */
   updatePetitionFieldRepliesStatus: PetitionWithFieldAndReplies;
@@ -412,8 +415,11 @@ export type Mutation = {
   updatePetitionPermissionSubscription: Petition;
   /**
    * Updates the read status of a user's notification.
-   * Must pass either petitionUserNotificationIds or filter argument.
-   * If petitionUserNotificationIds is provided, filter argument will be ignored.
+   * Must pass ONLY one of:
+   *   - petitionUserNotificationIds
+   *   - filter
+   *   - petitionIds
+   *   - petitionFieldCommentIds
    */
   updatePetitionUserNotificationReadStatus: Array<PetitionUserNotification>;
   updateSignatureRequestMetadata: PetitionSignatureRequest;
@@ -934,6 +940,8 @@ export type MutationupdatePetitionPermissionSubscriptionArgs = {
 export type MutationupdatePetitionUserNotificationReadStatusArgs = {
   filter?: Maybe<PetitionUserNotificationFilter>;
   isRead: Scalars["Boolean"];
+  petitionFieldCommentIds?: Maybe<Array<Scalars["GID"]>>;
+  petitionIds?: Maybe<Array<Scalars["GID"]>>;
   petitionUserNotificationIds?: Maybe<Array<Scalars["GID"]>>;
 };
 
