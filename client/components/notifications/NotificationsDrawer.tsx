@@ -25,10 +25,6 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { CommentCreatedUserNotification } from "./flavor/CommentCreatedUserNotification";
-import { MessageEmailBouncedUserNotification } from "./flavor/MessageEmailBouncedUserNotification";
-import { PetitionCompletedUserNotification } from "./flavor/PetitionCompletedUserNotification";
-import { PetitionSharedUserNotification } from "./flavor/PetitionSharedUserNotification";
 import { NotificationsList } from "./NotificationsList";
 import { NotificationsSelect } from "./NotificationsSelect";
 
@@ -63,6 +59,8 @@ export function NotificationsDrawer({
     "notifications"
   );
   const [hasMore, setHasMore] = useState(false);
+  const ignoreLoading = useRef(false);
+
   const lastNotificationDate = useRef<string | undefined>(undefined);
 
   const [getData, { data, loading, refetch, fetchMore }] =
@@ -92,6 +90,7 @@ export function NotificationsDrawer({
   useEffect(() => {
     const interval = setInterval(() => {
       if (isOpen) {
+        ignoreLoading.current = true;
         refetch?.({
           limit: NOTIFICATIONS_LIMIT,
           filter,
@@ -118,6 +117,7 @@ export function NotificationsDrawer({
   }
 
   const onFetchData = async () => {
+    ignoreLoading.current = true;
     const result = await fetchMore?.({
       variables: {
         limit: NOTIFICATIONS_LIMIT,
@@ -133,6 +133,7 @@ export function NotificationsDrawer({
 
   const handleChangeFilterBy = async (type: PetitionUserNotificationFilter) => {
     setFilter(type);
+    ignoreLoading.current = false;
     lastNotificationDate.current = undefined;
 
     const result = await refetch?.({
@@ -181,7 +182,7 @@ export function NotificationsDrawer({
             </Text>
           </Stack>
           <NotificationsSelect
-            selectedOption={filter}
+            selectedOption={filter ?? "ALL"}
             onChange={handleChangeFilterBy}
           />
         </DrawerHeader>
@@ -198,7 +199,7 @@ export function NotificationsDrawer({
             hasMore={hasMore}
             onFetchData={onFetchData}
             notifications={notifications}
-            loading={loading}
+            loading={ignoreLoading.current ? false : loading}
           />
         </DrawerBody>
         <AnimatePresence>

@@ -3,17 +3,17 @@ import { Avatar, Text } from "@chakra-ui/react";
 import { CommentIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
-import { NotificationComment_CommentCreatedUserNotificationFragment } from "@parallel/graphql/__types";
+import { CommentCreatedUserNotification_CommentCreatedUserNotificationFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
-export interface NotificationCommentProps {
-  notification: NotificationComment_CommentCreatedUserNotificationFragment;
+export interface CommentCreatedUserNotificationProps {
+  notification: CommentCreatedUserNotification_CommentCreatedUserNotificationFragment;
 }
 
 export function CommentCreatedUserNotification({
   notification,
-}: NotificationCommentProps) {
+}: CommentCreatedUserNotificationProps) {
   const { author, isInternal } = notification.comment;
   const name =
     author?.__typename === "PetitionAccess" ? (

@@ -1,18 +1,18 @@
 import { gql } from "@apollo/client";
-import { Avatar, Text } from "@chakra-ui/react";
+import { Avatar } from "@chakra-ui/react";
 import { CheckIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
-import { NotificationPetitionCompleted_PetitionCompletedUserNotificationFragment } from "@parallel/graphql/__types";
+import { PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
-export interface NotificationPetitionCompletedProps {
-  notification: NotificationPetitionCompleted_PetitionCompletedUserNotificationFragment;
+export interface PetitionCompletedUserNotificationProps {
+  notification: PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment;
 }
 
 export function PetitionCompletedUserNotification({
   notification,
-}: NotificationPetitionCompletedProps) {
+}: PetitionCompletedUserNotificationProps) {
   return (
     <PetitionUserNotification
       notification={notification}

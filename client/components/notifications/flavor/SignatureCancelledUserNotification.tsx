@@ -4,13 +4,13 @@ import { SignatureIcon } from "@parallel/chakra/icons";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
-export interface NotificationSignatureCancelledProps {
+export interface SignatureCancelledUserNotificationProps {
   notification: any;
 }
 
 export function SignatureCancelledUserNotification({
   notification,
-}: NotificationSignatureCancelledProps) {
+}: SignatureCancelledUserNotificationProps) {
   return (
     <PetitionUserNotification
       notification={notification}

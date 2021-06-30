@@ -10,7 +10,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
 
-export interface NotificationProps {
+export interface PetitionUserNotificationProps {
   icon: ReactNode;
   path: string;
   notification: PetitionUserNotification_PetitionUserNotificationFragment;
@@ -22,7 +22,7 @@ export function PetitionUserNotification({
   path,
   notification,
   children,
-}: NotificationProps) {
+}: PetitionUserNotificationProps) {
   const { isRead, petition, createdAt } = notification;
   const intl = useIntl();
   const markAsReadText = isRead

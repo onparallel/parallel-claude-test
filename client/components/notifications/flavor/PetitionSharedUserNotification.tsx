@@ -1,19 +1,19 @@
 import { gql } from "@apollo/client";
-import { Avatar, Text } from "@chakra-ui/react";
+import { Avatar } from "@chakra-ui/react";
 import { UserArrowIcon, UserGroupArrowIcon } from "@parallel/chakra/icons";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import { PetitionPermissionTypeText } from "@parallel/components/petition-common/PetitionPermissionType";
-import { NotificationPetitionShared_PetitionSharedUserNotificationFragment } from "@parallel/graphql/__types";
+import { PetitionSharedUserNotification_PetitionSharedUserNotificationFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
-export interface NotificationPetitionSharedProps {
-  notification: NotificationPetitionShared_PetitionSharedUserNotificationFragment;
+export interface PetitionSharedUserNotificationProps {
+  notification: PetitionSharedUserNotification_PetitionSharedUserNotificationFragment;
 }
 
 export function PetitionSharedUserNotification({
   notification,
-}: NotificationPetitionSharedProps) {
+}: PetitionSharedUserNotificationProps) {
   return (
     <PetitionUserNotification
       notification={notification}

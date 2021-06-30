@@ -4,9 +4,9 @@ import {
   useNotifications_UnreadPetitionUserNotificationIdsQuery,
 } from "@parallel/graphql/__types";
 import {
-  values,
   useQueryState,
   useQueryStateSlice,
+  values,
 } from "@parallel/utils/queryState";
 import { useEffect } from "react";
 import { NotificationsBell } from "./NotificationsBell";

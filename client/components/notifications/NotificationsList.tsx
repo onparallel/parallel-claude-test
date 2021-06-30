@@ -66,25 +66,23 @@ export function NotificationsList({
           endMessage={null}
           scrollableTarget="notifications-body"
         >
-          <Box>
-            {notifications.map((n) => (
-              <LinkBox key={n.id}>
-                {n.__typename === "PetitionCompletedUserNotification" ? (
-                  <PetitionCompletedUserNotification notification={n} />
-                ) : n.__typename === "SignatureCompletedUserNotification" ? (
-                  <SignatureCompletedUserNotification notification={n} />
-                ) : n.__typename === "SignatureCancelledUserNotification" ? (
-                  <SignatureCancelledUserNotification notification={n} />
-                ) : n.__typename === "PetitionSharedUserNotification" ? (
-                  <PetitionSharedUserNotification notification={n} />
-                ) : n.__typename === "MessageEmailBouncedUserNotification" ? (
-                  <MessageEmailBouncedUserNotification notification={n} />
-                ) : n.__typename === "CommentCreatedUserNotification" ? (
-                  <CommentCreatedUserNotification notification={n} />
-                ) : null}
-              </LinkBox>
-            ))}
-          </Box>
+          {notifications.map((n) => (
+            <LinkBox key={n.id}>
+              {n.__typename === "PetitionCompletedUserNotification" ? (
+                <PetitionCompletedUserNotification notification={n} />
+              ) : n.__typename === "SignatureCompletedUserNotification" ? (
+                <SignatureCompletedUserNotification notification={n} />
+              ) : n.__typename === "SignatureCancelledUserNotification" ? (
+                <SignatureCancelledUserNotification notification={n} />
+              ) : n.__typename === "PetitionSharedUserNotification" ? (
+                <PetitionSharedUserNotification notification={n} />
+              ) : n.__typename === "MessageEmailBouncedUserNotification" ? (
+                <MessageEmailBouncedUserNotification notification={n} />
+              ) : n.__typename === "CommentCreatedUserNotification" ? (
+                <CommentCreatedUserNotification notification={n} />
+              ) : null}
+            </LinkBox>
+          ))}
         </InfiniteScroll>
       ) : (
         <Stack

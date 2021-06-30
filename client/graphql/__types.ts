@@ -6804,6 +6804,8 @@ export type ConfirmDeletePetitionsDialog_PetitionBaseFragment =
 export type useUpdateIsReadNotificationMutationVariables = Exact<{
   petitionUserNotificationIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
   filter?: Maybe<PetitionUserNotificationFilter>;
+  petitionIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
+  petitionFieldCommentIds?: Maybe<Array<Scalars["GID"]> | Scalars["GID"]>;
   isRead: Scalars["Boolean"];
 }>;
 
@@ -14073,11 +14075,15 @@ export const useUpdateIsReadNotificationDocument = gql`
   mutation useUpdateIsReadNotification(
     $petitionUserNotificationIds: [GID!]
     $filter: PetitionUserNotificationFilter
+    $petitionIds: [GID!]
+    $petitionFieldCommentIds: [GID!]
     $isRead: Boolean!
   ) {
     updatePetitionUserNotificationReadStatus(
       petitionUserNotificationIds: $petitionUserNotificationIds
       filter: $filter
+      petitionIds: $petitionIds
+      petitionFieldCommentIds: $petitionFieldCommentIds
       isRead: $isRead
     ) {
       id

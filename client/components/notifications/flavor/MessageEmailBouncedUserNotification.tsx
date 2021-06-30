@@ -2,17 +2,17 @@ import { gql } from "@apollo/client";
 import { Avatar } from "@chakra-ui/react";
 import { EmailXIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
-import { NotificationEmailBounced_MessageEmailBouncedUserNotificationFragment } from "@parallel/graphql/__types";
+import { MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
-export interface NotificationEmailBouncedProps {
-  notification: NotificationEmailBounced_MessageEmailBouncedUserNotificationFragment;
+export interface MessageEmailBouncedUserNotificationProps {
+  notification: MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment;
 }
 
 export function MessageEmailBouncedUserNotification({
   notification,
-}: NotificationEmailBouncedProps) {
+}: MessageEmailBouncedUserNotificationProps) {
   return (
     <PetitionUserNotification
       notification={notification}
