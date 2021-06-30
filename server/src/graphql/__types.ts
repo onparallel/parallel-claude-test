@@ -393,11 +393,6 @@ export interface NexusGenObjects {
     totalCount: number; // Int!
   };
   PetitionUserGroupPermission: db.PetitionPermission;
-  PetitionUserNotificationPagination: {
-    // root type
-    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
-    totalCount: number; // Int!
-  };
   PetitionUserPermission: db.PetitionPermission;
   PetitionWithFieldAndReplies: {
     // root type
@@ -1098,11 +1093,6 @@ export interface NexusGenFieldTypes {
     permissionType: NexusGenEnums["PetitionPermissionType"]; // PetitionPermissionType!
     petition: NexusGenRootTypes["Petition"]; // Petition!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
-  };
-  PetitionUserNotificationPagination: {
-    // field return type
-    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
-    totalCount: number; // Int!
   };
   PetitionUserPermission: {
     // field return type
@@ -2052,11 +2042,6 @@ export interface NexusGenFieldTypeNames {
     petition: "Petition";
     updatedAt: "DateTime";
   };
-  PetitionUserNotificationPagination: {
-    // field return type name
-    items: "PetitionUserNotification";
-    totalCount: "Int";
-  };
   PetitionUserPermission: {
     // field return type name
     createdAt: "DateTime";
@@ -2965,6 +2950,8 @@ export interface NexusGenArgTypes {
       // args
       filter?: NexusGenEnums["PetitionUserNotificationFilter"] | null; // PetitionUserNotificationFilter
       isRead: boolean; // Boolean!
+      petitionFieldCommentIds?: NexusGenScalars["GID"][] | null; // [GID!]
+      petitionIds?: NexusGenScalars["GID"][] | null; // [GID!]
       petitionUserNotificationIds?: NexusGenScalars["GID"][] | null; // [GID!]
     };
     updateSignatureRequestMetadata: {

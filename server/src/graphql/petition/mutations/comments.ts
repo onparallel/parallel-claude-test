@@ -129,6 +129,7 @@ export const updatePetitionFieldComment = mutationField(
 export const updatePetitionFieldCommentsReadStatus = mutationField(
   "updatePetitionFieldCommentsReadStatus",
   {
+    deprecation: "Use `updatePetitionUserNotificationReadStatus` instead.",
     description: "Marks the specified comments as read or unread.",
     type: list(nonNull("PetitionFieldComment")),
     authorize: authenticateAnd(

@@ -996,6 +996,9 @@ type Mutation {
     petitionFieldCommentIds: [GID!]!
     petitionId: GID!
   ): [PetitionFieldComment!]!
+    @deprecated(
+      reason: "Use `updatePetitionUserNotificationReadStatus` instead."
+    )
 
   """
   Updates the status of a petition field reply and sets the petition as closed if all fields are validated.
@@ -1026,12 +1029,17 @@ type Mutation {
 
   """
   Updates the read status of a user's notification.
-  Must pass either petitionUserNotificationIds or filter argument.
-  If petitionUserNotificationIds is provided, filter argument will be ignored.
+  Must pass ONLY one of:
+    - petitionUserNotificationIds
+    - filter
+    - petitionIds
+    - petitionFieldCommentIds
   """
   updatePetitionUserNotificationReadStatus(
     filter: PetitionUserNotificationFilter
     isRead: Boolean!
+    petitionFieldCommentIds: [GID!]
+    petitionIds: [GID!]
     petitionUserNotificationIds: [GID!]
   ): [PetitionUserNotification!]!
   updateSignatureRequestMetadata(
@@ -2388,18 +2396,6 @@ enum PetitionUserNotificationFilter {
   OTHER
   SHARED
   UNREAD
-}
-
-type PetitionUserNotificationPagination {
-  """
-  The requested slice of items.
-  """
-  items: [PetitionUserNotification!]!
-
-  """
-  The total count of items in the list.
-  """
-  totalCount: Int!
 }
 
 """

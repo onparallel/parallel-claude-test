@@ -76,6 +76,26 @@ export function userHasAccessToSubscriptions<
   };
 }
 
+export function userHasAccessToPetitionFieldComments<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const commentIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      if (commentIds.length === 0) {
+        return true;
+      }
+      return await ctx.petitions.userHasAccessToPetitionFieldComments(
+        ctx.user!.id,
+        commentIds
+      );
+    } catch {}
+    return false;
+  };
+}
+
 export function petitionsArePublicTemplates<
   TypeName extends string,
   FieldName extends string,

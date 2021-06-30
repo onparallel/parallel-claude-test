@@ -147,6 +147,22 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(petitionIds).size;
   }
 
+  async userHasAccessToPetitionFieldComments(
+    userId: number,
+    petitionFieldCommentIds: number[]
+  ) {
+    const comments = await this.loadPetitionFieldComment(
+      petitionFieldCommentIds
+    );
+    return (
+      comments.every((c) => !!c) &&
+      (await this.userHasAccessToPetitions(
+        userId,
+        comments.map((c) => c!.petition_id)
+      ))
+    );
+  }
+
   async fieldsBelongToPetition(petitionId: number, fieldIds: number[]) {
     const [{ count }] = await this.from("petition_field")
       .where({
@@ -1989,18 +2005,61 @@ export class PetitionRepository extends BaseRepository {
 
   async updatePetitionUserNotificationsReadStatus(
     petitionUserNotificationIds: number[],
-    isRead: boolean
+    isRead: boolean,
+    userId: number
   ) {
     return await this.from("petition_user_notification")
       .whereIn("id", petitionUserNotificationIds)
+      .where("user_id", userId)
       .where("is_read", !isRead) // to return only the updated notifications
       .update({ is_read: isRead }, "*");
   }
 
-  async updatePetitionUserNotificationsReadStatusByUserId(
-    userId: number,
+  async updatePetitionUserNotificationsReadStatusByPetitionId(
+    petitionIds: number[],
     isRead: boolean,
-    filter?: Maybe<PetitionUserNotificationFilter>
+    userId: number
+  ) {
+    return await this.from("petition_user_notification")
+      .whereIn("petition_id", petitionIds)
+      .where("user_id", userId)
+      .where("is_read", !isRead)
+      .update({ is_read: isRead }, "*");
+  }
+
+  async updatePetitionUserNotificationsReadStatusByCommentIds(
+    petitionFieldCommentIds: number[],
+    isRead: boolean,
+    userId: number
+  ) {
+    const comments = (await this.loadPetitionFieldComment(
+      petitionFieldCommentIds
+    )) as PetitionFieldComment[];
+    return await this.from("petition_user_notification")
+      .where({
+        user_id: userId,
+        type: "COMMENT_CREATED",
+      })
+      .where("is_read", !isRead)
+      .where((qb) => {
+        for (const comment of comments) {
+          qb = qb.orWhere((qb) => {
+            qb.where({ petition_id: comment.petition_id })
+              .whereRaw(
+                "data ->> 'petition_field_id' = ?",
+                comment.petition_field_id
+              )
+              .whereRaw("data ->> 'petition_field_comment_id' = ?", comment.id);
+          });
+        }
+      })
+      .update({ is_read: isRead }, "*");
+  }
+
+  async updatePetitionUserNotificationsReadStatusByUserId(
+    filter: PetitionUserNotificationFilter,
+    isRead: boolean,
+    userId: number
   ) {
     return await this.from("petition_user_notification")
       .where("user_id", userId)
@@ -2382,6 +2441,7 @@ export class PetitionRepository extends BaseRepository {
     return comment;
   }
 
+  /** @deprecated delete when removing `Mutation.updatePetitionFieldCommentsReadStatus` */
   async updatePetitionFieldCommentsReadStatusForUser(
     petitionFieldCommentIds: number[],
     isRead: boolean,

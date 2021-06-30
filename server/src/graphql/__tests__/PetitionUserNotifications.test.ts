@@ -102,6 +102,16 @@ describe("GraphQL - PetitionUserNotifications", () => {
             petition_signature_request_id: 1,
           },
         },
+        {
+          created_at: "2019-06-10T09:00:00Z",
+          type: "COMMENT_CREATED",
+          user_id: sessionUser.id,
+          petition_id: petition.id,
+          data: {
+            petition_field_id: petitionField.id,
+            petition_field_comment_id: petitionFieldComment.id,
+          },
+        },
       ])
       .returning("*");
   });
@@ -194,6 +204,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(data.me).toEqual({
       notifications: [
         { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
+        { id: toGlobalId("PetitionUserNotification", notifications[4].id) },
       ],
     });
   });
@@ -231,6 +242,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       unreadNotificationIds: [
         toGlobalId("PetitionUserNotification", notifications[2].id),
         toGlobalId("PetitionUserNotification", notifications[3].id),
+        toGlobalId("PetitionUserNotification", notifications[4].id),
       ],
     });
   });
@@ -256,6 +268,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(data.updatePetitionUserNotificationReadStatus).toEqual([
       { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
       { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
+      { id: toGlobalId("PetitionUserNotification", notifications[4].id) },
     ]);
   });
 
@@ -280,6 +293,56 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(data.updatePetitionUserNotificationReadStatus).toEqual([
       { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
       { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
+    ]);
+  });
+
+  it("should mark as read the notifications of a list of petitions", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($isRead: Boolean!, $petitionIds: [GID!]) {
+          updatePetitionUserNotificationReadStatus(
+            isRead: $isRead
+            petitionIds: $petitionIds
+          ) {
+            id
+          }
+        }
+      `,
+      variables: {
+        isRead: true,
+        petitionIds: [toGlobalId("Petition", petition.id)],
+      },
+    });
+    expect(errors).toBeUndefined();
+    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
+      { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
+      { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
+      { id: toGlobalId("PetitionUserNotification", notifications[4].id) },
+    ]);
+  });
+
+  it("should mark as read the notifications of a list of comments", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($isRead: Boolean!, $petitionFieldCommentIds: [GID!]) {
+          updatePetitionUserNotificationReadStatus(
+            isRead: $isRead
+            petitionFieldCommentIds: $petitionFieldCommentIds
+          ) {
+            id
+          }
+        }
+      `,
+      variables: {
+        isRead: true,
+        petitionFieldCommentIds: [
+          toGlobalId("PetitionFieldComment", petitionFieldComment.id),
+        ],
+      },
+    });
+    expect(errors).toBeUndefined();
+    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
+      { id: toGlobalId("PetitionUserNotification", notifications[4].id) },
     ]);
   });
 
@@ -378,7 +441,25 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(data).toBeNull();
   });
 
-  it("should ignore filter argument if passing both petitionUserNotificationIds and filter", async () => {
+  it("should throw error if not passing any of the optional arguments", async () => {
+    const { errors, data } = await testClient.mutate({
+      mutation: gql`
+        mutation ($isRead: Boolean!) {
+          updatePetitionUserNotificationReadStatus(isRead: $isRead) {
+            id
+          }
+        }
+      `,
+      variables: {
+        isRead: true,
+      },
+    });
+
+    expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+    expect(data).toBeNull();
+  });
+
+  it("should throw error if passing both petitionUserNotificationIds and filter", async () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
         mutation (
@@ -405,11 +486,8 @@ describe("GraphQL - PetitionUserNotifications", () => {
       },
     });
 
-    expect(errors).toBeUndefined();
-    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
-      { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
-      { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
-    ]);
+    expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+    expect(data).toBeNull();
   });
 
   it("notification should be deleted if the user comments a field and then deletes the comment", async () => {
