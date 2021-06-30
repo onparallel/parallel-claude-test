@@ -36,26 +36,29 @@ export function useUpdateIsReadNotification() {
     `
   );
 
-  return useCallback(async (variables) => {
-    await updateIsReadNotification({
-      variables,
-      update(cache, { data }) {
-        updateUnreadNotificationIds(cache, (user) => {
-          const notificationIds =
-            data!.updatePetitionUserNotificationReadStatus.map(
-              (notification) => notification.id
-            );
+  return useCallback(
+    async (variables: useUpdateIsReadNotificationMutationVariables) => {
+      await updateIsReadNotification({
+        variables,
+        update(cache, { data }) {
+          updateUnreadNotificationIds(cache, (user) => {
+            const notificationIds =
+              data!.updatePetitionUserNotificationReadStatus.map(
+                (notification) => notification.id
+              );
 
-          return {
-            ...user,
-            unreadNotificationIds: variables.isRead
-              ? difference(user.unreadNotificationIds, notificationIds)
-              : uniq([...user.unreadNotificationIds, ...notificationIds]),
-          };
-        });
-      },
-    });
-  }, []);
+            return {
+              ...user,
+              unreadNotificationIds: variables.isRead
+                ? difference(user.unreadNotificationIds, notificationIds)
+                : uniq([...user.unreadNotificationIds, ...notificationIds]),
+            };
+          });
+        },
+      });
+    },
+    []
+  );
 }
 
 function updateUnreadNotificationIds(
@@ -67,13 +70,17 @@ function updateUnreadNotificationIds(
   const id = getMyId(cache);
 
   return updateFragment<updateUnreadNotificationIdsFragment>(cache, {
-    fragment: gql`
-      fragment updateUnreadNotificationIds on User {
-        id
-        unreadNotificationIds
-      }
-    `,
+    fragment: useUpdateIsReadNotification.fragments.User,
     id: id,
     data: (user) => updateFn(user!),
   });
 }
+
+useUpdateIsReadNotification.fragments = {
+  User: gql`
+    fragment useUpdateIsReadNotification_User on User {
+      id
+      unreadNotificationIds
+    }
+  `,
+};

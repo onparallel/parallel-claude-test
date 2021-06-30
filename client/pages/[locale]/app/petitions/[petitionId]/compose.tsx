@@ -70,6 +70,7 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
 import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
+import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
@@ -104,6 +105,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       },
     })
   );
+
+  const updateIsReadNotification = useUpdateIsReadNotification();
+  useEffect(() => {
+    updateIsReadNotification({ isRead: true, filter: "SHARED" });
+  }, []);
 
   const indices = useFieldIndices(petition!.fields);
   const petitionDataRef = useUpdatingRef({ fields: petition!.fields, indices });
@@ -704,9 +710,11 @@ PetitionCompose.fragments = {
       fragment PetitionCompose_User on User {
         ...PetitionLayout_User
         ...PetitionSettings_User
+        ...useUpdateIsReadNotification_User
       }
       ${PetitionLayout.fragments.User}
       ${PetitionSettings.fragments.User}
+      ${useUpdateIsReadNotification.fragments.User}
     `;
   },
 };

@@ -38,6 +38,7 @@ import { KNEX } from "../knex";
 import {
   CommentCreatedUserNotification,
   CreatePetitionUserNotification,
+  PetitionUserNotification,
 } from "../notifications";
 import {
   Contact,
@@ -62,7 +63,6 @@ import {
   PetitionPermissionType,
   PetitionSignatureRequest,
   PetitionStatus,
-  PetitionUserNotification,
   User,
 } from "../__types";
 
@@ -2034,6 +2034,7 @@ export class PetitionRepository extends BaseRepository {
       .whereIn("petition_id", petitionIds)
       .where("user_id", userId)
       .where("is_read", !isRead)
+      .whereNot("type", "COMMENT_CREATED")
       .update({ is_read: isRead }, "*");
   }
 

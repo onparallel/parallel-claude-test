@@ -296,7 +296,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     ]);
   });
 
-  it("should mark as read the notifications of a list of petitions", async () => {
+  it("should mark as read the notifications of a list of petitions, except the comments", async () => {
     const { errors, data } = await testClient.mutate({
       mutation: gql`
         mutation ($isRead: Boolean!, $petitionIds: [GID!]) {
@@ -317,7 +317,6 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(data.updatePetitionUserNotificationReadStatus).toEqual([
       { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
       { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
-      { id: toGlobalId("PetitionUserNotification", notifications[4].id) },
     ]);
   });
 

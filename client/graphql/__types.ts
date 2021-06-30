@@ -5687,7 +5687,8 @@ export type PetitionActivity_PetitionFragment = {
 
 export type PetitionActivity_UserFragment = {
   __typename?: "User";
-} & PetitionLayout_UserFragment;
+} & PetitionLayout_UserFragment &
+  useUpdateIsReadNotification_UserFragment;
 
 export type PetitionActivity_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -5827,7 +5828,8 @@ export type PetitionCompose_PetitionFieldFragment = {
 export type PetitionCompose_UserFragment = {
   __typename?: "User";
 } & PetitionLayout_UserFragment &
-  PetitionSettings_UserFragment;
+  PetitionSettings_UserFragment &
+  useUpdateIsReadNotification_UserFragment;
 
 export type PetitionCompose_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -6112,7 +6114,8 @@ export type PetitionReplies_UserFragment = {
 } & PetitionLayout_UserFragment &
   PetitionRepliesFieldComments_UserFragment &
   ExportRepliesDialog_UserFragment &
-  PetitionSignaturesCard_UserFragment;
+  PetitionSignaturesCard_UserFragment &
+  useUpdateIsReadNotification_UserFragment;
 
 export type PetitionReplies_updatePetitionMutationVariables = Exact<{
   petitionId: Scalars["GID"];
@@ -6844,7 +6847,7 @@ export type useUpdateIsReadNotificationMutation = {
   >;
 };
 
-export type updateUnreadNotificationIdsFragment = {
+export type useUpdateIsReadNotification_UserFragment = {
   __typename?: "User";
   id: string;
   unreadNotificationIds: Array<string>;
@@ -8403,11 +8406,19 @@ export const PetitionLayout_UserFragmentDoc = gql`
   ${AppLayout_UserFragmentDoc}
   ${PetitionHeader_UserFragmentDoc}
 `;
+export const useUpdateIsReadNotification_UserFragmentDoc = gql`
+  fragment useUpdateIsReadNotification_User on User {
+    id
+    unreadNotificationIds
+  }
+`;
 export const PetitionActivity_UserFragmentDoc = gql`
   fragment PetitionActivity_User on User {
     ...PetitionLayout_User
+    ...useUpdateIsReadNotification_User
   }
   ${PetitionLayout_UserFragmentDoc}
+  ${useUpdateIsReadNotification_UserFragmentDoc}
 `;
 export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
   fragment AddPetitionAccessDialog_Petition on Petition {
@@ -8562,9 +8573,11 @@ export const PetitionCompose_UserFragmentDoc = gql`
   fragment PetitionCompose_User on User {
     ...PetitionLayout_User
     ...PetitionSettings_User
+    ...useUpdateIsReadNotification_User
   }
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionSettings_UserFragmentDoc}
+  ${useUpdateIsReadNotification_UserFragmentDoc}
 `;
 export const PetitionRepliesFieldReply_PetitionFieldReplyFragmentDoc = gql`
   fragment PetitionRepliesFieldReply_PetitionFieldReply on PetitionFieldReply {
@@ -8783,11 +8796,13 @@ export const PetitionReplies_UserFragmentDoc = gql`
     ...PetitionRepliesFieldComments_User
     ...ExportRepliesDialog_User
     ...PetitionSignaturesCard_User
+    ...useUpdateIsReadNotification_User
   }
   ${PetitionLayout_UserFragmentDoc}
   ${PetitionRepliesFieldComments_UserFragmentDoc}
   ${ExportRepliesDialog_UserFragmentDoc}
   ${PetitionSignaturesCard_UserFragmentDoc}
+  ${useUpdateIsReadNotification_UserFragmentDoc}
 `;
 export const PetitionTagListCellContent_TagFragmentDoc = gql`
   fragment PetitionTagListCellContent_Tag on Tag {
@@ -9240,12 +9255,6 @@ export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
     id
     name
-  }
-`;
-export const updateUnreadNotificationIdsFragmentDoc = gql`
-  fragment updateUnreadNotificationIds on User {
-    id
-    unreadNotificationIds
   }
 `;
 export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`

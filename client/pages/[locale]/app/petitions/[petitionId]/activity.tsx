@@ -42,9 +42,11 @@ import {
 } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
+import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { usePetitionState } from "@parallel/utils/usePetitionState";
 import { useSearchContacts } from "@parallel/utils/useSearchContacts";
+import { useEffect } from "react";
 import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
@@ -62,6 +64,12 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const { data, refetch } = assertQuery(
     usePetitionActivityQuery({ variables: { id: petitionId } })
   );
+
+  const updateIsReadNotification = useUpdateIsReadNotification();
+  useEffect(() => {
+    updateIsReadNotification({ isRead: true, filter: "OTHER" });
+  }, []);
+
   const petition = data!.petition as PetitionActivity_PetitionFragment;
 
   const [state, wrapper] = usePetitionState();
@@ -378,8 +386,10 @@ PetitionActivity.fragments = {
   User: gql`
     fragment PetitionActivity_User on User {
       ...PetitionLayout_User
+      ...useUpdateIsReadNotification_User
     }
     ${PetitionLayout.fragments.User}
+    ${useUpdateIsReadNotification.fragments.User}
   `,
 };
 

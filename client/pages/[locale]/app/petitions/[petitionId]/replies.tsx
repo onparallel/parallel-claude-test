@@ -79,6 +79,7 @@ import {
   filterPetitionFields,
   PetitionFieldFilter,
 } from "@parallel/utils/filterPetitionFields";
+import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
 import {
@@ -118,6 +119,12 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       },
     })
   );
+
+  const updateIsReadNotification = useUpdateIsReadNotification();
+  useEffect(() => {
+    updateIsReadNotification({ isRead: true, petitionIds: [petitionId] });
+  }, []);
+
   const petition = data!.petition as PetitionReplies_PetitionFragment;
 
   const fieldVisibility = useFieldVisibility(petition.fields);
@@ -759,11 +766,13 @@ PetitionReplies.fragments = {
         ...PetitionRepliesFieldComments_User
         ...ExportRepliesDialog_User
         ...PetitionSignaturesCard_User
+        ...useUpdateIsReadNotification_User
       }
       ${PetitionLayout.fragments.User}
       ${PetitionRepliesFieldComments.fragments.User}
       ${ExportRepliesDialog.fragments.User}
       ${PetitionSignaturesCard.fragments.User}
+      ${useUpdateIsReadNotification.fragments.User}
     `;
   },
 };
