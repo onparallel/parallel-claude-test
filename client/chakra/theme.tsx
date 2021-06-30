@@ -199,6 +199,7 @@ Tooltip.defaultProps = {
 
 Menu.defaultProps = {
   isLazy: true,
+  strategy: "fixed",
 } as any;
 
 Popover.defaultProps = {
