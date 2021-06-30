@@ -524,11 +524,12 @@ export const updatePetition = mutationField("updatePetition", {
       data.template_description = description?.trim() || null;
     }
 
-    return await ctx.petitions.updatePetition(
+    const [petition] = await ctx.petitions.updatePetition(
       args.petitionId,
       data,
       `User:${ctx.user!.id}`
     );
+    return petition;
   },
 });
 
@@ -1074,7 +1075,7 @@ async function presendPetition(
       ctx.user!
     );
 
-    const updatedPetition = await ctx.petitions.updatePetition(
+    const [updatedPetition] = await ctx.petitions.updatePetition(
       petition.id,
       { name: petition.name ?? args.subject, status: "PENDING" },
       `User:${ctx.user!.id}`
@@ -1590,7 +1591,7 @@ export const reopenPetition = mutationField("reopenPetition", {
   },
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.withTransaction(async (t) => {
-      const [petition] = await Promise.all([
+      const [[petition]] = await Promise.all([
         ctx.petitions.updatePetition(
           args.petitionId,
           { status: "PENDING" },

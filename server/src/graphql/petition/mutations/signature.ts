@@ -21,7 +21,7 @@ export const startSignatureRequest = mutationField("startSignatureRequest", {
     userHasAccessToPetitions("petitionId", ["OWNER", "WRITE"])
   ),
   resolve: async (_, { petitionId }, ctx) => {
-    const petition = await ctx.petitions.updatePetition(
+    const [petition] = await ctx.petitions.updatePetition(
       petitionId,
       { status: "COMPLETED" },
       `User:${ctx.user!.id}`

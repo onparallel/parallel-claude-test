@@ -909,7 +909,7 @@ export class PetitionRepository extends BaseRepository {
     if (ids.length === 0) {
       return [];
     }
-    const [row] = await this.from("petition", t)
+    return await this.from("petition", t)
       .whereIn("id", ids)
       .update(
         {
@@ -919,7 +919,6 @@ export class PetitionRepository extends BaseRepository {
         },
         "*"
       );
-    return row;
   }
 
   async updateFieldPositions(
