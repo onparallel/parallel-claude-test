@@ -18,11 +18,15 @@ export function useUpdateIsReadNotification() {
       mutation useUpdateIsReadNotification(
         $petitionUserNotificationIds: [GID!]
         $filter: PetitionUserNotificationFilter
+        $petitionIds: [GID!]
+        $petitionFieldCommentIds: [GID!]
         $isRead: Boolean!
       ) {
         updatePetitionUserNotificationReadStatus(
           petitionUserNotificationIds: $petitionUserNotificationIds
           filter: $filter
+          petitionIds: $petitionIds
+          petitionFieldCommentIds: $petitionFieldCommentIds
           isRead: $isRead
         ) {
           id

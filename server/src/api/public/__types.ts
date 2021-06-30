@@ -1550,7 +1550,7 @@ export type PetitionSharedUserNotification = PetitionUserNotification & {
   owner: User;
   permissionType: PetitionPermissionTypeRW;
   petition: Petition;
-  sharedWith: Array<UserOrUserGroup>;
+  sharedWith: UserOrUserGroup;
 };
 
 export type PetitionSignatureCancelReason =
