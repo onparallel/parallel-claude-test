@@ -62,6 +62,7 @@ import {
   PetitionPermissionType,
   PetitionSignatureRequest,
   PetitionStatus,
+  PetitionUserNotification,
   User,
 } from "../__types";
 
@@ -2001,6 +2002,15 @@ export class PetitionRepository extends BaseRepository {
         }
       })
       .orderBy("created_at", "desc");
+  }
+
+  async updatePetitionUserNotifications(
+    petitionUserNotificationIds: number[],
+    data: Partial<PetitionUserNotification>
+  ) {
+    return await this.from("petition_user_notification")
+      .whereIn("id", petitionUserNotificationIds)
+      .update(data, "*");
   }
 
   async updatePetitionUserNotificationsReadStatus(
