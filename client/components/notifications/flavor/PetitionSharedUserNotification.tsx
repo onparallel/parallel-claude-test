@@ -5,17 +5,17 @@ import { UserReference } from "@parallel/components/petition-activity/UserRefere
 import { PetitionPermissionTypeText } from "@parallel/components/petition-common/PetitionPermissionType";
 import { NotificationPetitionShared_PetitionSharedUserNotificationFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Notification } from "./Notification";
+import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface NotificationPetitionSharedProps {
   notification: NotificationPetitionShared_PetitionSharedUserNotificationFragment;
 }
 
-export function NotificationPetitionShared({
+export function PetitionSharedUserNotification({
   notification,
 }: NotificationPetitionSharedProps) {
   return (
-    <Notification
+    <PetitionUserNotification
       notification={notification}
       icon={
         <NotificationAvatar
@@ -48,7 +48,7 @@ export function NotificationPetitionShared({
           }}
         />
       )}
-    </Notification>
+    </PetitionUserNotification>
   );
 }
 
@@ -70,10 +70,10 @@ function NotificationAvatar({ isGroup }: { isGroup: boolean }) {
   );
 }
 
-NotificationPetitionShared.fragments = {
+PetitionSharedUserNotification.fragments = {
   PetitionSharedUserNotification: gql`
-    fragment NotificationPetitionShared_PetitionSharedUserNotification on PetitionSharedUserNotification {
-      ...Notification_PetitionUserNotification
+    fragment PetitionSharedUserNotification_PetitionSharedUserNotification on PetitionSharedUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
       owner {
         ...UserReference_User
       }
@@ -88,7 +88,7 @@ NotificationPetitionShared.fragments = {
       }
       permissionType
     }
-    ${Notification.fragments.PetitionUserNotification}
+    ${PetitionUserNotification.fragments.PetitionUserNotification}
     ${UserReference.fragments.User}
   `,
 };

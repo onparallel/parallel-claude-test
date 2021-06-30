@@ -5,12 +5,12 @@ import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/
 import { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage } from "react-intl";
-import { NotificationComment } from "./flavor/NotificationComment";
-import { NotificationEmailBounced } from "./flavor/NotificationEmailBounced";
-import { NotificationPetitionCompleted } from "./flavor/NotificationPetitionCompleted";
-import { NotificationPetitionShared } from "./flavor/NotificationPetitionShared";
-import { NotificationSignatureCancelled } from "./flavor/NotificationSignatureCancelled";
-import { NotificationSignatureCompleted } from "./flavor/NotificationSignatureCompleted";
+import { CommentCreatedUserNotification } from "./flavor/CommentCreatedUserNotification";
+import { MessageEmailBouncedUserNotification } from "./flavor/MessageEmailBouncedUserNotification";
+import { PetitionCompletedUserNotification } from "./flavor/PetitionCompletedUserNotification";
+import { PetitionSharedUserNotification } from "./flavor/PetitionSharedUserNotification";
+import { SignatureCancelledUserNotification } from "./flavor/SignatureCancelledUserNotification";
+import { SignatureCompletedUserNotification } from "./flavor/SignatureCompletedUserNotification";
 import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
 
 export interface NotificationListProps {
@@ -70,17 +70,17 @@ export function NotificationsList({
             {notifications.map((n) => (
               <LinkBox key={n.id}>
                 {n.__typename === "PetitionCompletedUserNotification" ? (
-                  <NotificationPetitionCompleted notification={n} />
+                  <PetitionCompletedUserNotification notification={n} />
                 ) : n.__typename === "SignatureCompletedUserNotification" ? (
-                  <NotificationSignatureCompleted notification={n} />
+                  <SignatureCompletedUserNotification notification={n} />
                 ) : n.__typename === "SignatureCancelledUserNotification" ? (
-                  <NotificationSignatureCancelled notification={n} />
+                  <SignatureCancelledUserNotification notification={n} />
                 ) : n.__typename === "PetitionSharedUserNotification" ? (
-                  <NotificationPetitionShared notification={n} />
+                  <PetitionSharedUserNotification notification={n} />
                 ) : n.__typename === "MessageEmailBouncedUserNotification" ? (
-                  <NotificationEmailBounced notification={n} />
+                  <MessageEmailBouncedUserNotification notification={n} />
                 ) : n.__typename === "CommentCreatedUserNotification" ? (
-                  <NotificationComment notification={n} />
+                  <CommentCreatedUserNotification notification={n} />
                 ) : null}
               </LinkBox>
             ))}
@@ -110,31 +110,33 @@ NotificationsList.fragments = {
   PetitionUserNotification: gql`
     fragment NotificationsList_PetitionUserNotification on PetitionUserNotification {
       ... on CommentCreatedUserNotification {
-        ...NotificationComment_CommentCreatedUserNotification
+        ...CommentCreatedUserNotification_CommentCreatedUserNotification
       }
       ... on MessageEmailBouncedUserNotification {
-        ...NotificationEmailBounced_MessageEmailBouncedUserNotification
+        ...MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotification
       }
       ... on PetitionCompletedUserNotification {
-        ...NotificationPetitionCompleted_PetitionCompletedUserNotification
+        ...PetitionCompletedUserNotification_PetitionCompletedUserNotification
       }
       ... on PetitionSharedUserNotification {
-        ...NotificationPetitionShared_PetitionSharedUserNotification
+        ...PetitionSharedUserNotification_PetitionSharedUserNotification
       }
       ... on SignatureCancelledUserNotification {
-        ...NotificationSignatureCanceled_SignatureCancelledUserNotification
+        ...SignatureCancelledUserNotification_SignatureCancelledUserNotification
       }
       ... on SignatureCompletedUserNotification {
-        ...NotificationSignatureCompleted_SignatureCompletedUserNotification
+        ...SignatureCompletedUserNotification_SignatureCompletedUserNotification
       }
     }
-    ${NotificationComment.fragments.CommentCreatedUserNotification}
-    ${NotificationEmailBounced.fragments.MessageEmailBouncedUserNotification}
-    ${NotificationPetitionCompleted.fragments.PetitionCompletedUserNotification}
-    ${NotificationPetitionShared.fragments.PetitionSharedUserNotification}
-    ${NotificationSignatureCancelled.fragments
+    ${CommentCreatedUserNotification.fragments.CommentCreatedUserNotification}
+    ${MessageEmailBouncedUserNotification.fragments
+      .MessageEmailBouncedUserNotification}
+    ${PetitionCompletedUserNotification.fragments
+      .PetitionCompletedUserNotification}
+    ${PetitionSharedUserNotification.fragments.PetitionSharedUserNotification}
+    ${SignatureCancelledUserNotification.fragments
       .SignatureCancelledUserNotification}
-    ${NotificationSignatureCompleted.fragments
+    ${SignatureCompletedUserNotification.fragments
       .SignatureCompletedUserNotification}
   `,
 };

@@ -5,13 +5,13 @@ import { ContactLink } from "@parallel/components/common/ContactLink";
 import { UserReference } from "@parallel/components/petition-activity/UserReference";
 import { NotificationComment_CommentCreatedUserNotificationFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Notification } from "./Notification";
+import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface NotificationCommentProps {
   notification: NotificationComment_CommentCreatedUserNotificationFragment;
 }
 
-export function NotificationComment({
+export function CommentCreatedUserNotification({
   notification,
 }: NotificationCommentProps) {
   const { author, isInternal } = notification.comment;
@@ -36,7 +36,7 @@ export function NotificationComment({
     </Text>
   );
   return (
-    <Notification
+    <PetitionUserNotification
       notification={notification}
       icon={<NotificationAvatar />}
       path={`/replies?comments=${notification.field.id}`}
@@ -54,7 +54,7 @@ export function NotificationComment({
           values={{ name, field }}
         />
       )}
-    </Notification>
+    </PetitionUserNotification>
   );
 }
 
@@ -69,10 +69,10 @@ function NotificationAvatar() {
   );
 }
 
-NotificationComment.fragments = {
+CommentCreatedUserNotification.fragments = {
   CommentCreatedUserNotification: gql`
-    fragment NotificationComment_CommentCreatedUserNotification on CommentCreatedUserNotification {
-      ...Notification_PetitionUserNotification
+    fragment CommentCreatedUserNotification_CommentCreatedUserNotification on CommentCreatedUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
       field {
         id
         title
@@ -92,7 +92,7 @@ NotificationComment.fragments = {
         }
       }
     }
-    ${Notification.fragments.PetitionUserNotification}
+    ${PetitionUserNotification.fragments.PetitionUserNotification}
     ${UserReference.fragments.User}
     ${ContactLink.fragments.Contact}
   `,

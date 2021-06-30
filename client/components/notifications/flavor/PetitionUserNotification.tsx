@@ -4,7 +4,7 @@ import { Circle, LinkOverlay } from "@chakra-ui/react";
 import { EmailIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
-import { Notification_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
+import { PetitionUserNotification_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { ReactNode } from "react";
@@ -13,11 +13,11 @@ import { useIntl } from "react-intl";
 export interface NotificationProps {
   icon: ReactNode;
   path: string;
-  notification: Notification_PetitionUserNotificationFragment;
+  notification: PetitionUserNotification_PetitionUserNotificationFragment;
   children: ReactNode;
 }
 
-export function Notification({
+export function PetitionUserNotification({
   icon,
   path,
   notification,
@@ -143,9 +143,9 @@ export function Notification({
   );
 }
 
-Notification.fragments = {
+PetitionUserNotification.fragments = {
   PetitionUserNotification: gql`
-    fragment Notification_PetitionUserNotification on PetitionUserNotification {
+    fragment PetitionUserNotification_PetitionUserNotification on PetitionUserNotification {
       id
       petition {
         id

@@ -4,17 +4,17 @@ import { EmailXIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { NotificationEmailBounced_MessageEmailBouncedUserNotificationFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Notification } from "./Notification";
+import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface NotificationEmailBouncedProps {
   notification: NotificationEmailBounced_MessageEmailBouncedUserNotificationFragment;
 }
 
-export function NotificationEmailBounced({
+export function MessageEmailBouncedUserNotification({
   notification,
 }: NotificationEmailBouncedProps) {
   return (
-    <Notification
+    <PetitionUserNotification
       notification={notification}
       icon={<NotificationAvatar />}
       path={`/activity`}
@@ -26,7 +26,7 @@ export function NotificationEmailBounced({
           name: <ContactLink contact={notification.access.contact} isFull />,
         }}
       />
-    </Notification>
+    </PetitionUserNotification>
   );
 }
 
@@ -41,17 +41,17 @@ function NotificationAvatar() {
   );
 }
 
-NotificationEmailBounced.fragments = {
+MessageEmailBouncedUserNotification.fragments = {
   MessageEmailBouncedUserNotification: gql`
-    fragment NotificationEmailBounced_MessageEmailBouncedUserNotification on MessageEmailBouncedUserNotification {
-      ...Notification_PetitionUserNotification
+    fragment MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotification on MessageEmailBouncedUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
       access {
         contact {
           ...ContactLink_Contact
         }
       }
     }
-    ${Notification.fragments.PetitionUserNotification}
+    ${PetitionUserNotification.fragments.PetitionUserNotification}
     ${ContactLink.fragments.Contact}
   `,
 };

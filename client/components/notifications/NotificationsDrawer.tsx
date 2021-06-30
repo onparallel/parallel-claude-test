@@ -25,10 +25,10 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { NotificationComment } from "./flavor/NotificationComment";
-import { NotificationEmailBounced } from "./flavor/NotificationEmailBounced";
-import { NotificationPetitionCompleted } from "./flavor/NotificationPetitionCompleted";
-import { NotificationPetitionShared } from "./flavor/NotificationPetitionShared";
+import { CommentCreatedUserNotification } from "./flavor/CommentCreatedUserNotification";
+import { MessageEmailBouncedUserNotification } from "./flavor/MessageEmailBouncedUserNotification";
+import { PetitionCompletedUserNotification } from "./flavor/PetitionCompletedUserNotification";
+import { PetitionSharedUserNotification } from "./flavor/PetitionSharedUserNotification";
 import { NotificationsList } from "./NotificationsList";
 import { NotificationsSelect } from "./NotificationsSelect";
 

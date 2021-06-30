@@ -4,17 +4,17 @@ import { CheckIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { NotificationPetitionCompleted_PetitionCompletedUserNotificationFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
-import { Notification } from "./Notification";
+import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface NotificationPetitionCompletedProps {
   notification: NotificationPetitionCompleted_PetitionCompletedUserNotificationFragment;
 }
 
-export function NotificationPetitionCompleted({
+export function PetitionCompletedUserNotification({
   notification,
 }: NotificationPetitionCompletedProps) {
   return (
-    <Notification
+    <PetitionUserNotification
       notification={notification}
       icon={<NotificationAvatar />}
       path={`/replies`}
@@ -26,7 +26,7 @@ export function NotificationPetitionCompleted({
           name: <ContactLink contact={notification.access.contact} />,
         }}
       />
-    </Notification>
+    </PetitionUserNotification>
   );
 }
 
@@ -41,17 +41,17 @@ function NotificationAvatar() {
   );
 }
 
-NotificationPetitionCompleted.fragments = {
+PetitionCompletedUserNotification.fragments = {
   PetitionCompletedUserNotification: gql`
-    fragment NotificationPetitionCompleted_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
-      ...Notification_PetitionUserNotification
+    fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
       access {
         contact {
           ...ContactLink_Contact
         }
       }
     }
-    ${Notification.fragments.PetitionUserNotification}
+    ${PetitionUserNotification.fragments.PetitionUserNotification}
     ${ContactLink.fragments.Contact}
   `,
 };

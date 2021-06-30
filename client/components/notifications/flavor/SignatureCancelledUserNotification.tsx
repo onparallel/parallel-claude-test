@@ -2,17 +2,17 @@ import { gql } from "@apollo/client";
 import { Avatar } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { FormattedMessage } from "react-intl";
-import { Notification } from "./Notification";
+import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface NotificationSignatureCancelledProps {
   notification: any;
 }
 
-export function NotificationSignatureCancelled({
+export function SignatureCancelledUserNotification({
   notification,
 }: NotificationSignatureCancelledProps) {
   return (
-    <Notification
+    <PetitionUserNotification
       notification={notification}
       icon={<NotificationAvatar />}
       path={`/replies#signatures`}
@@ -21,7 +21,7 @@ export function NotificationSignatureCancelled({
         id="component.notification-signature-cancelled.body"
         defaultMessage="The eSignature has been cancelled."
       />
-    </Notification>
+    </PetitionUserNotification>
   );
 }
 
@@ -36,11 +36,11 @@ function NotificationAvatar() {
   );
 }
 
-NotificationSignatureCancelled.fragments = {
+SignatureCancelledUserNotification.fragments = {
   SignatureCancelledUserNotification: gql`
-    fragment NotificationSignatureCanceled_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
-      ...Notification_PetitionUserNotification
+    fragment SignatureCancelledUserNotification_SignatureCancelledUserNotification on SignatureCancelledUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
     }
-    ${Notification.fragments.PetitionUserNotification}
+    ${PetitionUserNotification.fragments.PetitionUserNotification}
   `,
 };

@@ -2,17 +2,17 @@ import { gql } from "@apollo/client";
 import { Avatar } from "@chakra-ui/react";
 import { SignatureIcon } from "@parallel/chakra/icons";
 import { FormattedMessage } from "react-intl";
-import { Notification } from "./Notification";
+import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface NotificationSignatureCompletedProps {
   notification: any;
 }
 
-export function NotificationSignatureCompleted({
+export function SignatureCompletedUserNotification({
   notification,
 }: NotificationSignatureCompletedProps) {
   return (
-    <Notification
+    <PetitionUserNotification
       notification={notification}
       icon={<NotificationAvatar />}
       path={`/replies#signatures`}
@@ -21,7 +21,7 @@ export function NotificationSignatureCompleted({
         id="component.notification-signature-completed.body"
         defaultMessage="The eSignature has been completed."
       />
-    </Notification>
+    </PetitionUserNotification>
   );
 }
 
@@ -36,11 +36,11 @@ function NotificationAvatar() {
   );
 }
 
-NotificationSignatureCompleted.fragments = {
+SignatureCompletedUserNotification.fragments = {
   SignatureCompletedUserNotification: gql`
-    fragment NotificationSignatureCompleted_SignatureCompletedUserNotification on SignatureCompletedUserNotification {
-      ...Notification_PetitionUserNotification
+    fragment SignatureCompletedUserNotification_SignatureCompletedUserNotification on SignatureCompletedUserNotification {
+      ...PetitionUserNotification_PetitionUserNotification
     }
-    ${Notification.fragments.PetitionUserNotification}
+    ${PetitionUserNotification.fragments.PetitionUserNotification}
   `,
 };
