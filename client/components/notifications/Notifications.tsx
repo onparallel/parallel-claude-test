@@ -55,7 +55,7 @@ export function Notifications() {
     <>
       <NotificationsButton
         onClick={handleBellClick}
-        hasNotifications={unreadNotificationIds.length > 0}
+        unreadNotificationsCount={unreadNotificationIds.length}
         isOpen={filter !== null}
       />
       <NotificationsDrawer isOpen={filter !== null} onClose={handleClose} />

@@ -8,7 +8,7 @@ import { useIntl } from "react-intl";
 
 export interface NotificationsButtonProps {
   isOpen: boolean;
-  hasNotifications: boolean;
+  unreadNotificationsCount: boolean;
 }
 
 const MotionBox = motion<Omit<BoxProps, "transition">>(Box);
@@ -16,7 +16,10 @@ const MotionBox = motion<Omit<BoxProps, "transition">>(Box);
 export const NotificationsButton = chakraForwardRef<
   "button",
   NotificationsButtonProps
->(function NotificationsBell({ isOpen, hasNotifications, ...props }, ref) {
+>(function NotificationsBell(
+  { isOpen, unreadNotificationsCount, ...props },
+  ref
+) {
   const intl = useIntl();
 
   const bellAnimation = {
@@ -27,10 +30,14 @@ export const NotificationsButton = chakraForwardRef<
     <IconButton
       ref={ref}
       aria-pressed={isOpen}
-      aria-label={intl.formatMessage({
-        id: "component.app-layout-navbar.notifications",
-        defaultMessage: "Notifications",
-      })}
+      aria-label={intl.formatMessage(
+        {
+          id: "component.notifications-button.notifications",
+          defaultMessage:
+            "Notifications{count, plural, =0 {} other {, # unread}}",
+        },
+        { count: unreadNotificationsCount }
+      )}
       position="relative"
       size="md"
       variant={isOpen ? "solid" : "ghost"}
@@ -39,14 +46,14 @@ export const NotificationsButton = chakraForwardRef<
       icon={
         <>
           <motion.div
-            whileHover={hasNotifications ? bellAnimation : {}}
+            whileHover={unreadNotificationsCount ? bellAnimation : {}}
             whileTap={{ scale: 0.9 }}
-            animate={hasNotifications ? bellAnimation : {}}
+            animate={unreadNotificationsCount ? bellAnimation : {}}
           >
             <BellIcon fontSize="22px" />
           </motion.div>
           <AnimatePresence>
-            {hasNotifications && (
+            {unreadNotificationsCount ? (
               <MotionBox
                 initial={{ opacity: 0.8, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -63,7 +70,7 @@ export const NotificationsButton = chakraForwardRef<
               >
                 <Circle boxSize="10px" background="purple.500" />
               </MotionBox>
-            )}
+            ) : null}
           </AnimatePresence>
         </>
       }

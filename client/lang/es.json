@@ -50,11 +50,6 @@
     "context": "Recipients"
   },
   {
-    "term": "component.app-layout-navbar.notifications",
-    "definition": "Notificaciones",
-    "context": "Notifications"
-  },
-  {
     "term": "component.burger-button.label-close",
     "definition": "Cerrar menú",
     "context": "Close menu"
@@ -733,6 +728,11 @@
     "term": "component.notification.mark-as-unread",
     "definition": "Marcar como no leído",
     "context": "Mark as unread"
+  },
+  {
+    "term": "component.notifications-button.notifications",
+    "definition": "Notificaciones{count, plural, =0 {} other {, # sin leer}}",
+    "context": "Notifications{count, plural, =0 {} other {, # unread}}"
   },
   {
     "term": "component.notifications-drawer.header",
