@@ -33,7 +33,7 @@ export interface NotificationsDrawerProps {
   isOpen: boolean;
 }
 
-const NOTIFICATIONS_LIMIT = 6;
+const NOTIFICATIONS_LIMIT = 16;
 
 const QUERY_STATE = {
   notifications: values<PetitionUserNotificationFilter>([
@@ -203,9 +203,9 @@ export function NotificationsDrawer({
         <AnimatePresence>
           {hasUnread && (
             <MotionFooter
-              initial={{ transform: "translateY(48px)" }}
-              exit={{ transform: "translateY(48px)" }}
-              animate={{ transform: "translateY(0px)" }}
+              initial={{ transform: "translateY(48px)", height: "0px" }}
+              exit={{ transform: "translateY(48px)", height: "0px" }}
+              animate={{ transform: "translateY(0px)", height: "48px" }}
               transition={spring}
               height="48px"
               justifyContent="center"

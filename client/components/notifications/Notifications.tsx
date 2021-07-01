@@ -8,6 +8,7 @@ import {
   useQueryStateSlice,
   values,
 } from "@parallel/utils/queryState";
+import { useEffect } from "react";
 import { NotificationsButton } from "./NotificationsButton";
 import { NotificationsDrawer } from "./NotificationsDrawer";
 
