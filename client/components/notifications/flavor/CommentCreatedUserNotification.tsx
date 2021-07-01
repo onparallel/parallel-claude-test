@@ -9,16 +9,13 @@ import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface CommentCreatedUserNotificationProps {
-  isFocusable?: boolean;
+  isFirst?: boolean;
   notification: CommentCreatedUserNotification_CommentCreatedUserNotificationFragment;
 }
 
 export const CommentCreatedUserNotification = Object.assign(
   forwardRef<HTMLElement, CommentCreatedUserNotificationProps>(
-    function CommentCreatedUserNotification(
-      { isFocusable, notification },
-      ref
-    ) {
+    function CommentCreatedUserNotification({ isFirst, notification }, ref) {
       const { author, isInternal } = notification.comment;
       const name =
         author?.__typename === "PetitionAccess" ? (
@@ -43,7 +40,7 @@ export const CommentCreatedUserNotification = Object.assign(
       return (
         <PetitionUserNotification
           ref={ref}
-          isFocusable={isFocusable}
+          isFirst={isFirst}
           notification={notification}
           icon={
             <Avatar

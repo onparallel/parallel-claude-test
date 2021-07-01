@@ -186,6 +186,7 @@ export function NotificationsDrawer({
           paddingY={0}
           display="flex"
           flexDirection="column"
+          tabIndex={-1}
           onKeyDown={(e) => {
             if (e.key === "ArrowDown" || e.key === "ArrowUp") {
               e.preventDefault();

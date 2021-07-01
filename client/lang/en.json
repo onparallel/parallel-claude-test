@@ -720,12 +720,12 @@
     "context": "The eSignature has been completed."
   },
   {
-    "term": "component.notification.mark-as-read",
+    "term": "component.petition-user-notification.mark-as-read",
     "definition": "Mark as read",
     "context": "Mark as read"
   },
   {
-    "term": "component.notification.mark-as-unread",
+    "term": "component.petition-user-notification.mark-as-unread",
     "definition": "Mark as unread",
     "context": "Mark as unread"
   },

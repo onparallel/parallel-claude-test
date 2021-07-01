@@ -8,7 +8,7 @@ import { useIntl } from "react-intl";
 
 export interface NotificationsButtonProps {
   isOpen: boolean;
-  unreadNotificationsCount: boolean;
+  unreadNotificationsCount: number;
 }
 
 const MotionBox = motion<Omit<BoxProps, "transition">>(Box);

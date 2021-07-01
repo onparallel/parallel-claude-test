@@ -8,20 +8,20 @@ import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface MessageEmailBouncedUserNotificationProps {
-  isFocusable?: boolean;
+  isFirst?: boolean;
   notification: MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment;
 }
 
 export const MessageEmailBouncedUserNotification = Object.assign(
   forwardRef<HTMLElement, MessageEmailBouncedUserNotificationProps>(
     function MessageEmailBouncedUserNotification(
-      { isFocusable, notification },
+      { isFirst, notification },
       ref
     ) {
       return (
         <PetitionUserNotification
           ref={ref}
-          isFocusable={isFocusable}
+          isFirst={isFirst}
           notification={notification}
           icon={
             <Avatar

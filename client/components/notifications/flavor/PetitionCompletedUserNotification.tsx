@@ -8,20 +8,17 @@ import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface PetitionCompletedUserNotificationProps {
-  isFocusable?: boolean;
+  isFirst?: boolean;
   notification: PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragment;
 }
 
 export const PetitionCompletedUserNotification = Object.assign(
   forwardRef<HTMLElement, PetitionCompletedUserNotificationProps>(
-    function PetitionCompletedUserNotification(
-      { isFocusable, notification },
-      ref
-    ) {
+    function PetitionCompletedUserNotification({ isFirst, notification }, ref) {
       return (
         <PetitionUserNotification
           ref={ref}
-          isFocusable={isFocusable}
+          isFirst={isFirst}
           notification={notification}
           icon={
             <Avatar

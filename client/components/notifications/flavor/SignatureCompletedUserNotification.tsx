@@ -6,20 +6,20 @@ import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface SignatureCompletedUserNotificationProps {
-  isFocusable?: boolean;
+  isFirst?: boolean;
   notification: any;
 }
 
 export const SignatureCompletedUserNotification = Object.assign(
   forwardRef<HTMLElement, SignatureCompletedUserNotificationProps>(
     function SignatureCompletedUserNotification(
-      { isFocusable, notification },
+      { isFirst, notification },
       ref
     ) {
       return (
         <PetitionUserNotification
           ref={ref}
-          isFocusable={isFocusable}
+          isFirst={isFirst}
           notification={notification}
           icon={
             <Avatar

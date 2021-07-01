@@ -6,20 +6,20 @@ import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface SignatureCancelledUserNotificationProps {
-  isFocusable?: boolean;
+  isFirst?: boolean;
   notification: any;
 }
 
 export const SignatureCancelledUserNotification = Object.assign(
   forwardRef<HTMLElement, SignatureCancelledUserNotificationProps>(
     function SignatureCancelledUserNotification(
-      { isFocusable, notification },
+      { isFirst, notification },
       ref
     ) {
       return (
         <PetitionUserNotification
           ref={ref}
-          isFocusable={isFocusable}
+          isFirst={isFirst}
           notification={notification}
           icon={
             <Avatar

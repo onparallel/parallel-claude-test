@@ -9,20 +9,17 @@ import { FormattedMessage } from "react-intl";
 import { PetitionUserNotification } from "./PetitionUserNotification";
 
 export interface PetitionSharedUserNotificationProps {
-  isFocusable?: boolean;
+  isFirst?: boolean;
   notification: PetitionSharedUserNotification_PetitionSharedUserNotificationFragment;
 }
 
 export const PetitionSharedUserNotification = Object.assign(
   forwardRef<HTMLElement, PetitionSharedUserNotificationProps>(
-    function PetitionSharedUserNotification(
-      { isFocusable, notification },
-      ref
-    ) {
+    function PetitionSharedUserNotification({ isFirst, notification }, ref) {
       return (
         <PetitionUserNotification
           ref={ref}
-          isFocusable={isFocusable}
+          isFirst={isFirst}
           notification={notification}
           icon={
             <Avatar

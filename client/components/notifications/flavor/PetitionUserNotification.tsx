@@ -8,11 +8,13 @@ import { PetitionUserNotification_PetitionUserNotificationFragment } from "@para
 import { FORMATS } from "@parallel/utils/dates";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import Link from "next/link";
+import { useRef } from "react";
+import { useEffect } from "react";
 import { forwardRef, ReactNode } from "react";
 import { useIntl } from "react-intl";
 
 export interface PetitionUserNotificationProps {
-  isFocusable?: boolean;
+  isFirst?: boolean;
   icon: ReactNode;
   path: string;
   notification: PetitionUserNotification_PetitionUserNotificationFragment;
@@ -22,18 +24,18 @@ export interface PetitionUserNotificationProps {
 export const PetitionUserNotification = Object.assign(
   forwardRef<HTMLElement, PetitionUserNotificationProps>(
     function PetitionUserNotification(
-      { isFocusable, icon, path, notification, children },
+      { isFirst, icon, path, notification, children },
       ref
     ) {
       const { isRead, petition, createdAt } = notification;
       const intl = useIntl();
       const markAsReadText = isRead
         ? intl.formatMessage({
-            id: "component.notification.mark-as-unread",
+            id: "component.petition-user-notification.mark-as-unread",
             defaultMessage: "Mark as unread",
           })
         : intl.formatMessage({
-            id: "component.notification.mark-as-read",
+            id: "component.petition-user-notification.mark-as-read",
             defaultMessage: "Mark as read",
           });
 
@@ -46,9 +48,25 @@ export const PetitionUserNotification = Object.assign(
         });
       };
 
+      const linkRef = useRef<HTMLAnchorElement>(null);
+      const bodyRef = useRef<HTMLDivElement>(null);
+      useEffect(() => {
+        const content = bodyRef.current!.innerText.replace(/\n+/g, " - ");
+        if (isFirst) {
+          linkRef.current!.setAttribute(
+            "aria-label",
+            `${content} - ${intl.formatMessage({
+              id: "component.petition-user-notification.instructions",
+              defaultMessage:
+                "Use up and down arrows to navigate to other notifications. Use space to toggle read status.",
+            })}`
+          );
+        } else {
+          linkRef.current!.setAttribute("aria-label", content);
+        }
+      }, [intl.locale]);
       return (
         <Stack
-          as="article"
           data-notification-id={notification.id}
           ref={ref as any}
           direction="row"
@@ -77,13 +95,14 @@ export const PetitionUserNotification = Object.assign(
             )}
             {icon}
           </Flex>
-          <Stack flex="1 1 auto" minWidth="0" spacing={0}>
+          <Stack flex="1 1 auto" minWidth="0" spacing={0} ref={bodyRef}>
             <Link
               href={`/${intl.locale}/app/petitions/${petition.id}${path}`}
               passHref
             >
               <LinkOverlay
-                tabIndex={isFocusable ? 0 : -1}
+                ref={linkRef}
+                tabIndex={isFirst ? 0 : -1}
                 _focus={{
                   outline: "none",
                   _before: { boxShadow: "inline" },
@@ -97,7 +116,7 @@ export const PetitionUserNotification = Object.assign(
                 }}
               >
                 <Text
-                  as="header"
+                  as="span"
                   position="relative"
                   paddingX={4}
                   isTruncated

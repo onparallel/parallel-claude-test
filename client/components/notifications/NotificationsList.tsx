@@ -40,7 +40,9 @@ export function NotificationsList({
     switch (event.key) {
       case "ArrowDown":
       case "ArrowUp": {
-        const parent = (event.target as HTMLElement).closest("article");
+        const parent = (event.target as HTMLElement).closest(
+          "[data-notification-id]"
+        );
         const notificationId = parent!.getAttribute("data-notification-id");
         const index = notificationsRef.current.findIndex(
           (n) => n.id === notificationId
@@ -125,7 +127,7 @@ export function NotificationsList({
         {notifications.map((notification, i) => {
           const props = {
             ref: notificationElementsRefs[notification.id],
-            isFocusable: i === 0,
+            isFirst: i === 0,
           };
           return (
             <LinkBox key={notification.id}>
