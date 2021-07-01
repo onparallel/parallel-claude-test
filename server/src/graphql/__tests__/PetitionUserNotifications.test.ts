@@ -6,6 +6,7 @@ import { PetitionUserNotification } from "../../db/notifications";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
   Petition,
+  PetitionAccess,
   PetitionField,
   PetitionFieldComment,
   User,
@@ -24,6 +25,8 @@ describe("GraphQL - PetitionUserNotifications", () => {
   let petitionFieldComment: PetitionFieldComment;
   let otherUser: User;
   let notifications: PetitionUserNotification[];
+
+  let petitionAccess: PetitionAccess;
 
   beforeAll(async () => {
     testClient = await initServer();
@@ -52,6 +55,14 @@ describe("GraphQL - PetitionUserNotifications", () => {
       petitionField.id,
       petition.id,
       1
+    );
+
+    const [contact] = await mocks.createRandomContacts(organization.id, 1);
+    [petitionAccess] = await mocks.createPetitionAccess(
+      petition.id,
+      sessionUser.id,
+      [contact.id],
+      sessionUser.id
     );
   });
 
@@ -90,7 +101,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
           user_id: sessionUser.id,
           petition_id: petition.id,
           data: {
-            petition_access_id: 1,
+            petition_access_id: petitionAccess.id,
           },
         },
         {
@@ -149,6 +160,10 @@ describe("GraphQL - PetitionUserNotifications", () => {
           me {
             notifications(limit: 2) {
               id
+              isRead
+              petition {
+                id
+              }
             }
           }
         }
@@ -160,9 +175,13 @@ describe("GraphQL - PetitionUserNotifications", () => {
       notifications: [
         {
           id: toGlobalId("PetitionUserNotification", notifications[0].id),
+          isRead: true,
+          petition: { id: toGlobalId("Petition", petition.id) },
         },
         {
           id: toGlobalId("PetitionUserNotification", notifications[2].id),
+          isRead: false,
+          petition: { id: toGlobalId("Petition", petition.id) },
         },
       ],
     });
@@ -175,6 +194,21 @@ describe("GraphQL - PetitionUserNotifications", () => {
           me {
             notifications(limit: 10, filter: SHARED) {
               id
+              ... on PetitionSharedUserNotification {
+                owner {
+                  id
+                }
+                permissionType
+                sharedWith {
+                  __typename
+                  ... on User {
+                    id
+                  }
+                  ... on UserGroup {
+                    id
+                  }
+                }
+              }
             }
           }
         }
@@ -183,7 +217,15 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
       notifications: [
-        { id: toGlobalId("PetitionUserNotification", notifications[0].id) },
+        {
+          id: toGlobalId("PetitionUserNotification", notifications[0].id),
+          owner: { id: toGlobalId("User", otherUser.id) },
+          permissionType: "READ",
+          sharedWith: {
+            __typename: "User",
+            id: toGlobalId("User", sessionUser.id),
+          },
+        },
       ],
     });
   });
@@ -195,6 +237,14 @@ describe("GraphQL - PetitionUserNotifications", () => {
           me {
             notifications(limit: 10, before: "2021-01-10T10:00:00Z") {
               id
+              ... on CommentCreatedUserNotification {
+                comment {
+                  id
+                }
+                field {
+                  id
+                }
+              }
             }
           }
         }
@@ -204,7 +254,15 @@ describe("GraphQL - PetitionUserNotifications", () => {
     expect(data.me).toEqual({
       notifications: [
         { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
-        { id: toGlobalId("PetitionUserNotification", notifications[4].id) },
+        {
+          id: toGlobalId("PetitionUserNotification", notifications[4].id),
+          comment: {
+            id: toGlobalId("PetitionFieldComment", petitionFieldComment.id),
+          },
+          field: {
+            id: toGlobalId("PetitionField", petitionField.id),
+          },
+        },
       ],
     });
   });
@@ -281,6 +339,11 @@ describe("GraphQL - PetitionUserNotifications", () => {
             filter: $filter
           ) {
             id
+            ... on PetitionCompletedUserNotification {
+              access {
+                id
+              }
+            }
           }
         }
       `,
@@ -291,7 +354,10 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
     expect(errors).toBeUndefined();
     expect(data.updatePetitionUserNotificationReadStatus).toEqual([
-      { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
+      {
+        id: toGlobalId("PetitionUserNotification", notifications[2].id),
+        access: { id: toGlobalId("PetitionAccess", petitionAccess.id) },
+      },
       { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
     ]);
   });
