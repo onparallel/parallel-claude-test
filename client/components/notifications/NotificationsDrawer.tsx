@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import { gql, NetworkStatus } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
 import {
   Drawer,
@@ -16,62 +16,50 @@ import {
   useNotificationsDrawer_PetitionUserNotificationsLazyQuery,
 } from "@parallel/graphql/__types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
-import {
-  useQueryState,
-  useQueryStateSlice,
-  values,
-} from "@parallel/utils/queryState";
 import { Focusable } from "@parallel/utils/types";
+import { ValueProps } from "@parallel/utils/ValueProps";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 import { NotificationsFilterSelect } from "./NotificationsFilterSelect";
 import { NotificationsList } from "./NotificationsList";
 
-export interface NotificationsDrawerProps {
-  onClose: () => void;
-  isOpen: boolean;
-}
+export type NotificationsDrawerProps =
+  ValueProps<PetitionUserNotificationFilter>;
 
 const NOTIFICATIONS_LIMIT = 16;
-
-const QUERY_STATE = {
-  notifications: values<PetitionUserNotificationFilter>([
-    "ALL",
-    "COMMENTS",
-    "COMPLETED",
-    "OTHER",
-    "SHARED",
-    "UNREAD",
-  ]),
-};
+const POLL_INTERVAL = 15000;
 
 const MotionFooter = motion<Omit<ModalFooterProps, "transition">>(DrawerFooter);
 
 export function NotificationsDrawer({
-  onClose,
-  isOpen,
+  value: filter,
+  onChange: onFilterChange,
 }: NotificationsDrawerProps) {
-  const [queryState, setQueryState] = useQueryState(QUERY_STATE);
-  const [filter, setFilter] = useQueryStateSlice(
-    queryState,
-    setQueryState,
-    "notifications"
-  );
-  const [hasMore, setHasMore] = useState(false);
-  const ignoreLoading = useRef(false);
-
   const lastNotificationDate = useRef<string | undefined>(undefined);
+  const [
+    getData,
+    {
+      data,
+      loading,
+      refetch,
+      fetchMore,
+      networkStatus,
+      startPolling,
+      stopPolling,
+    },
+  ] = useNotificationsDrawer_PetitionUserNotificationsLazyQuery({
+    pollInterval: POLL_INTERVAL,
+    notifyOnNetworkStatusChange: true,
+  });
+  const isInitialLoading = loading && networkStatus !== NetworkStatus.fetchMore;
+  const selectRef = useRef<Focusable>(null);
 
-  const [getData, { data, loading, refetch, fetchMore, networkStatus }] =
-    useNotificationsDrawer_PetitionUserNotificationsLazyQuery({
-      notifyOnNetworkStatusChange: true,
-    });
-  console.log({ loading, networkStatus });
-
-  const notifications = data?.me.notifications ?? [];
+  const notifications = data?.me.notifications.items ?? [];
+  const hasMore = data?.me.notifications.hasMore ?? true;
   const hasUnread = notifications.some((n) => !n.isRead);
 
+  const isOpen = filter !== null;
   useEffect(() => {
     if (isOpen) {
       getData({
@@ -80,75 +68,44 @@ export function NotificationsDrawer({
           filter,
         },
       });
+      startPolling?.(POLL_INTERVAL);
+    } else {
+      stopPolling?.();
     }
   }, [isOpen]);
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (isOpen) {
-  //       ignoreLoading.current = true;
-  //       refetch?.({
-  //         limit: NOTIFICATIONS_LIMIT,
-  //         filter,
-  //       });
-  //     }
-  //     onPull();
-  //   }, 10000);
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, [isOpen, filter]);
-
-  useEffect(() => {
-    console.log("%c --- NotificationsDrawer RENDER ---", "color: #cf132c");
-  });
-
-  const onFetchData = async () => {
-    ignoreLoading.current = true;
-    const result = await fetchMore?.({
+  const handleFetchMore = async () => {
+    await fetchMore!({
       variables: {
         limit: NOTIFICATIONS_LIMIT,
-        before:
-          data?.me.notifications[data?.me.notifications.length - 1]?.createdAt,
+        before: notifications[notifications.length - 1]?.createdAt,
         filter,
       },
     });
-
-    const notificationLength = result?.data?.me?.notifications.length ?? 0;
-    setHasMore(notificationLength >= NOTIFICATIONS_LIMIT);
   };
 
   const handleFilterChange = async (
     type: PetitionUserNotificationFilter | null
   ) => {
-    setFilter(type);
-    ignoreLoading.current = false;
+    onFilterChange(type);
     lastNotificationDate.current = undefined;
 
-    const result = await refetch?.({
+    await refetch!({
       limit: NOTIFICATIONS_LIMIT,
       filter: type,
     });
-
-    const notificationLength = result?.data?.me?.notifications.length ?? 0;
-    setHasMore(notificationLength >= NOTIFICATIONS_LIMIT);
   };
 
   const updateIsReadNotification = useUpdateIsReadNotification();
   const handleMarkAllAsRead = async () => {
-    await updateIsReadNotification({
-      filter: filter,
-      isRead: true,
-    });
+    await updateIsReadNotification({ filter, isRead: true });
   };
+
   const spring = { type: "spring", damping: 20, stiffness: 240 };
-
-  const selectRef = useRef<Focusable>(null);
-
   return (
     <Drawer
       placement="right"
-      onClose={onClose}
+      onClose={() => onFilterChange(null)}
       isOpen={isOpen}
       size="sm"
       isFullHeight
@@ -180,24 +137,19 @@ export function NotificationsDrawer({
           />
         </DrawerHeader>
         <DrawerBody
-          id="notifications-body"
           paddingInlineStart={0}
           paddingInlineEnd={0}
           paddingY={0}
           display="flex"
           flexDirection="column"
-          tabIndex={-1}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-              e.preventDefault();
-            }
-          }}
+          overflow="initial"
+          minHeight={0}
         >
           <NotificationsList
             hasMore={hasMore}
-            onFetchData={onFetchData}
+            onFetchMore={handleFetchMore}
             notifications={notifications}
-            loading={ignoreLoading.current ? false : loading}
+            isLoading={isInitialLoading && !data}
           />
         </DrawerBody>
         <AnimatePresence>
@@ -258,7 +210,10 @@ NotificationsDrawer.queries = [
       me {
         id
         notifications(limit: $limit, before: $before, filter: $filter) {
-          ...NotificationsDrawer_PetitionUserNotification
+          items {
+            ...NotificationsDrawer_PetitionUserNotification
+          }
+          hasMore
         }
       }
     }

@@ -30,7 +30,7 @@ export const organizationQueries = queryField((t) => {
     authorize: chain(authenticate(), userIsSuperAdmin()),
     searchable: true,
     sortableBy: ["name", "createdAt"],
-    additionalArgs: {
+    extendArgs: {
       status: nullable(
         arg({
           type: "OrganizationStatus",

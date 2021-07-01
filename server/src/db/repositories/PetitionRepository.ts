@@ -1976,30 +1976,30 @@ export class PetitionRepository extends BaseRepository {
 
   async loadPetitionUserNotificationsByUserId(
     userId: number,
-    limit?: Maybe<number>,
-    filter?: Maybe<PetitionUserNotificationFilter>,
-    before?: Maybe<Date>
+    opts: {
+      limit?: Maybe<number>;
+      filter?: Maybe<PetitionUserNotificationFilter>;
+      before?: Maybe<Date>;
+    }
   ) {
     return this.from("petition_user_notification")
       .where("user_id", userId)
       .mmodify((q) => {
-        if (filter === "UNREAD") {
+        if (opts.filter === "UNREAD") {
           q.where("is_read", false);
-        } else if (filter === "COMMENTS") {
+        } else if (opts.filter === "COMMENTS") {
           q.where("type", "COMMENT_CREATED");
-        } else if (filter === "COMPLETED") {
+        } else if (opts.filter === "COMPLETED") {
           q.whereIn("type", ["PETITION_COMPLETED", "SIGNATURE_COMPLETED"]);
-        } else if (filter === "SHARED") {
+        } else if (opts.filter === "SHARED") {
           q.where("type", "PETITION_SHARED");
-        } else if (filter === "OTHER") {
+        } else if (opts.filter === "OTHER") {
           q.whereIn("type", ["MESSAGE_EMAIL_BOUNCED", "SIGNATURE_CANCELLED"]);
         }
-        if (before) {
-          q.where("created_at", "<", before);
+        if (opts.before) {
+          q.where("created_at", "<", opts.before);
         }
-        if (limit) {
-          q.limit(limit);
-        }
+        q.limit(opts.limit ?? 0);
       })
       .orderBy("created_at", "desc");
   }

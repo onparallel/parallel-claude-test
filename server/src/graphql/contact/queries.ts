@@ -14,7 +14,7 @@ export const contactQueries = queryField((t) => {
     description: "The contacts of the user",
     authorize: authenticate(),
     searchable: true,
-    additionalArgs: {
+    extendArgs: {
       exclude: list(nonNull(globalIdArg("Contact"))),
     },
     sortableBy: ["firstName", "lastName", "fullName", "email", "createdAt"],

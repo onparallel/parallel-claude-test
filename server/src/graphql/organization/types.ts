@@ -104,7 +104,7 @@ export const Organization = objectType({
         "lastActiveAt",
       ],
       authorize: isOwnOrgOrSuperAdmin(),
-      additionalArgs: {
+      extendArgs: {
         exclude: list(nonNull(globalIdArg("User"))),
         includeInactive: booleanArg(),
       },

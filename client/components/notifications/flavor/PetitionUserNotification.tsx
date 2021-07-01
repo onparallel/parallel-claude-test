@@ -116,7 +116,7 @@ export const PetitionUserNotification = Object.assign(
                 }}
               >
                 <Text
-                  as="span"
+                  as="div"
                   position="relative"
                   paddingX={4}
                   isTruncated

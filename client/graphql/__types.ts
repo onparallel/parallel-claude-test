@@ -2384,13 +2384,13 @@ export interface User extends Timestamps {
   /** The last name of the user. */
   lastName?: Maybe<Scalars["String"]>;
   /** Read and unread user notifications about events on their petitions */
-  notifications: Array<PetitionUserNotification>;
+  notifications: UserNotifications_Pagination;
   /** The onboarding status for the different views of the app. */
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
   role: OrganizationRole;
   status: UserStatus;
-  unreadNotificationIds: Array<Scalars["String"]>;
+  unreadNotificationIds: Array<Scalars["ID"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 }
@@ -2412,7 +2412,7 @@ export interface UserhasFeatureFlagArgs {
 export interface UsernotificationsArgs {
   before?: Maybe<Scalars["DateTime"]>;
   filter?: Maybe<PetitionUserNotificationFilter>;
-  limit: Scalars["Int"];
+  limit?: Maybe<Scalars["Int"]>;
 }
 
 export interface UserAuthenticationToken extends CreatedAt {
@@ -2466,6 +2466,14 @@ export interface UserGroupPagination {
   items: Array<UserGroup>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
+}
+
+export interface UserNotifications_Pagination {
+  __typename?: "UserNotifications_Pagination";
+  /** Whether this resource has more items. */
+  hasMore: Scalars["Boolean"];
+  /** The requested slice of items. */
+  items: Array<PetitionUserNotification>;
 }
 
 export type UserOrContact = Contact | User;
@@ -3035,26 +3043,30 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
   me: {
     __typename?: "User";
     id: string;
-    notifications: Array<
-      | ({
-          __typename?: "CommentCreatedUserNotification";
-        } & NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment)
-      | ({
-          __typename?: "MessageEmailBouncedUserNotification";
-        } & NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment)
-      | ({
-          __typename?: "PetitionCompletedUserNotification";
-        } & NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment)
-      | ({
-          __typename?: "PetitionSharedUserNotification";
-        } & NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment)
-      | ({
-          __typename?: "SignatureCancelledUserNotification";
-        } & NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment)
-      | ({
-          __typename?: "SignatureCompletedUserNotification";
-        } & NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment)
-    >;
+    notifications: {
+      __typename?: "UserNotifications_Pagination";
+      hasMore: boolean;
+      items: Array<
+        | ({
+            __typename?: "CommentCreatedUserNotification";
+          } & NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment)
+        | ({
+            __typename?: "MessageEmailBouncedUserNotification";
+          } & NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment)
+        | ({
+            __typename?: "PetitionCompletedUserNotification";
+          } & NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment)
+        | ({
+            __typename?: "PetitionSharedUserNotification";
+          } & NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment)
+        | ({
+            __typename?: "SignatureCancelledUserNotification";
+          } & NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment)
+        | ({
+            __typename?: "SignatureCompletedUserNotification";
+          } & NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment)
+      >;
+    };
   };
 };
 
@@ -9814,7 +9826,10 @@ export const NotificationsDrawer_PetitionUserNotificationsDocument = gql`
     me {
       id
       notifications(limit: $limit, before: $before, filter: $filter) {
-        ...NotificationsDrawer_PetitionUserNotification
+        items {
+          ...NotificationsDrawer_PetitionUserNotification
+        }
+        hasMore
       }
     }
   }

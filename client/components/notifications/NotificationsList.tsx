@@ -1,12 +1,13 @@
 import { gql } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
-import { Box, Center, Flex, LinkBox, Spinner } from "@chakra-ui/react";
+import { Center, Flex, LinkBox, Spinner } from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { KeyboardEvent, useEffect } from "react";
+import { KeyboardEvent } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage } from "react-intl";
+import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { CommentCreatedUserNotification } from "./flavor/CommentCreatedUserNotification";
 import { MessageEmailBouncedUserNotification } from "./flavor/MessageEmailBouncedUserNotification";
 import { PetitionCompletedUserNotification } from "./flavor/PetitionCompletedUserNotification";
@@ -14,25 +15,20 @@ import { PetitionSharedUserNotification } from "./flavor/PetitionSharedUserNotif
 import { SignatureCancelledUserNotification } from "./flavor/SignatureCancelledUserNotification";
 import { SignatureCompletedUserNotification } from "./flavor/SignatureCompletedUserNotification";
 import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
-import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
 export interface NotificationListProps {
   notifications: NotificationsDrawer_PetitionUserNotificationFragment[];
-  onFetchData: () => void;
+  onFetchMore: () => void;
   hasMore: boolean;
-  loading: boolean;
+  isLoading: boolean;
 }
 
 export function NotificationsList({
-  notifications = [],
-  onFetchData,
+  notifications,
+  onFetchMore,
   hasMore,
-  loading,
+  isLoading,
 }: NotificationListProps) {
-  useEffect(() => {
-    console.log("%c --- NotificationsList RENDER ---", "color: #d49e22");
-  });
-
   const notificationElementsRefs = useMultipleRefs<HTMLElement>();
   const notificationsRef = useUpdatingRef(notifications);
 
@@ -40,6 +36,7 @@ export function NotificationsList({
     switch (event.key) {
       case "ArrowDown":
       case "ArrowUp": {
+        event.preventDefault();
         const parent = (event.target as HTMLElement).closest(
           "[data-notification-id]"
         );
@@ -67,7 +64,7 @@ export function NotificationsList({
     }
   };
 
-  if (loading && !hasMore) {
+  if (isLoading) {
     return (
       <Center height="100%">
         <Spinner
@@ -82,16 +79,19 @@ export function NotificationsList({
   }
   return (
     <Flex
+      id="notifications-list"
       flex="1"
       flexDirection="column"
+      minHeight={0}
+      overflow="auto"
       sx={{ "& > *": { flex: 1, display: "flex", flexDirection: "column" } }}
       onKeyDown={handleKeyDown}
+      tabIndex={-1}
     >
       <InfiniteScroll
         dataLength={notifications.length}
-        next={onFetchData}
+        next={onFetchMore}
         hasMore={hasMore}
-        scrollThreshold={0.7}
         style={{ flex: 1, display: "flex", flexDirection: "column" }}
         loader={
           <Center height="42px" background="gray.75">
@@ -122,7 +122,7 @@ export function NotificationsList({
             </Stack>
           ) : null
         }
-        scrollableTarget="notifications-body"
+        scrollableTarget="notifications-list"
       >
         {notifications.map((notification, i) => {
           const props = {

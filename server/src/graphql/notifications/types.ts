@@ -2,12 +2,10 @@ import {
   core,
   enumType,
   interfaceType,
-  list,
   nonNull,
   objectType,
   unionType,
 } from "@nexus/schema";
-import { isDefined } from "../../util/remedaExtensions";
 
 export const UserOrContact = unionType({
   name: "UserOrContact",

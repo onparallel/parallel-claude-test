@@ -88,12 +88,14 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
-        <script
-          id="ze-snippet"
-          async
-          defer
-          src="//static.zdassets.com/ekr/snippet.js?key=f96da31d-cc9a-4568-a1f9-4d2ae55939f5"
-        />
+        {process.env.NODE_ENV !== "development" ? (
+          <script
+            id="ze-snippet"
+            async
+            defer
+            src="//static.zdassets.com/ekr/snippet.js?key=f96da31d-cc9a-4568-a1f9-4d2ae55939f5"
+          />
+        ) : null}
       </Head>
       <Flex
         alignItems="stretch"

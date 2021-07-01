@@ -1,8 +1,8 @@
-import { DataProxy, gql, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import {
-  updateUnreadNotificationIdsFragment,
   useUpdateIsReadNotificationMutation,
   useUpdateIsReadNotificationMutationVariables,
+  useUpdateIsReadNotification_UserFragment,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { difference, uniq } from "remeda";
@@ -41,39 +41,26 @@ export function useUpdateIsReadNotification() {
       await updateIsReadNotification({
         variables,
         update(cache, { data }) {
-          updateUnreadNotificationIds(cache, (user) => {
-            const notificationIds =
-              data!.updatePetitionUserNotificationReadStatus.map(
-                (notification) => notification.id
-              );
+          const notificationIds =
+            data!.updatePetitionUserNotificationReadStatus.map(
+              (notification) => notification.id
+            );
 
-            return {
-              ...user,
+          updateFragment<useUpdateIsReadNotification_UserFragment>(cache, {
+            fragment: useUpdateIsReadNotification.fragments.User,
+            id: getMyId(cache),
+            data: (user) => ({
+              ...user!,
               unreadNotificationIds: variables.isRead
-                ? difference(user.unreadNotificationIds, notificationIds)
-                : uniq([...user.unreadNotificationIds, ...notificationIds]),
-            };
+                ? difference(user!.unreadNotificationIds, notificationIds)
+                : uniq([...user!.unreadNotificationIds, ...notificationIds]),
+            }),
           });
         },
       });
     },
     []
   );
-}
-
-function updateUnreadNotificationIds(
-  cache: DataProxy,
-  updateFn: (
-    cached: updateUnreadNotificationIdsFragment
-  ) => updateUnreadNotificationIdsFragment
-) {
-  const id = getMyId(cache);
-
-  return updateFragment<updateUnreadNotificationIdsFragment>(cache, {
-    fragment: useUpdateIsReadNotification.fragments.User,
-    id: id,
-    data: (user) => updateFn(user!),
-  });
 }
 
 useUpdateIsReadNotification.fragments = {

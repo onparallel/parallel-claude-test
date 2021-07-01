@@ -3411,10 +3411,17 @@ type User implements Timestamps {
   Read and unread user notifications about events on their petitions
   """
   notifications(
+    """
+    Return notifications after the specified date.
+    """
     before: DateTime
     filter: PetitionUserNotificationFilter
-    limit: Int!
-  ): [PetitionUserNotification!]!
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+  ): UserNotifications_Pagination!
 
   """
   The onboarding status for the different views of the app.
@@ -3423,7 +3430,7 @@ type User implements Timestamps {
   organization: Organization!
   role: OrganizationRole!
   status: UserStatus!
-  unreadNotificationIds: [String!]!
+  unreadNotificationIds: [ID!]!
 
   """
   Time when the resource was last updated.
@@ -3499,6 +3506,18 @@ type UserGroupPagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type UserNotifications_Pagination {
+  """
+  Whether this resource has more items.
+  """
+  hasMore: Boolean!
+
+  """
+  The requested slice of items.
+  """
+  items: [PetitionUserNotification!]!
 }
 
 union UserOrContact = Contact | User

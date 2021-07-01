@@ -24,7 +24,7 @@ export const petitionsQuery = queryField((t) => {
     type: "PetitionBase",
     description: "The petitions of the user",
     authorize: authenticate(),
-    additionalArgs: {
+    extendArgs: {
       filters: inputObjectType({
         name: "PetitionFilter",
         definition(t) {
@@ -106,7 +106,7 @@ export const publicTemplatesQuery = queryField((t) => {
     type: "PetitionTemplate",
     description: "The publicly available templates",
     authorize: authenticate(),
-    additionalArgs: {
+    extendArgs: {
       locale: arg({ type: "PetitionLocale" }),
     },
     searchable: true,

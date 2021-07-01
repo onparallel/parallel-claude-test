@@ -1,12 +1,12 @@
 import {
   arg,
   enumType,
-  intArg,
   list,
   nonNull,
   objectType,
   unionType,
 } from "@nexus/schema";
+import { omit } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { datetimeArg } from "../helpers/date";
@@ -135,7 +135,7 @@ export const User = objectType({
     });
     t.field("unreadNotificationIds", {
       authorize: rootIsContextUser(),
-      type: nonNull(list(nonNull("String"))),
+      type: list("ID"),
       resolve: async ({ id }, _, ctx) => {
         const notifications =
           await ctx.petitions.loadUnreadPetitionUserNotificationsByUserId(id);
@@ -144,23 +144,33 @@ export const User = objectType({
         );
       },
     });
-    t.field("notifications", {
+    t.paginationField("notifications", {
       authorize: rootIsContextUser(),
       description:
         "Read and unread user notifications about events on their petitions",
-      type: nonNull(list(nonNull("PetitionUserNotification"))),
-      args: {
-        limit: nonNull(intArg()),
+      type: "PetitionUserNotification",
+      hasTotalCount: false,
+      extendArgs: (args) => ({
+        ...omit(args, ["offset"]),
         filter: arg({ type: "PetitionUserNotificationFilter" }),
-        before: datetimeArg(),
+        before: datetimeArg({
+          description: "Return notifications after the specified date.",
+        }),
+      }),
+      extendPagination(t) {
+        t.boolean("hasMore", {
+          description: "Whether this resource has more items.",
+        });
       },
       resolve: async (_, { limit, filter, before }, ctx) => {
-        return await ctx.petitions.loadPetitionUserNotificationsByUserId(
+        const items = await ctx.petitions.loadPetitionUserNotificationsByUserId(
           ctx.user!.id,
-          limit,
-          filter,
-          before
+          { limit: (limit ?? 0) + 1, filter, before }
         );
+        return {
+          items: items.slice(0, -1),
+          hasMore: items.length > (limit ?? 0),
+        };
       },
     });
   },

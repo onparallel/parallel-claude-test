@@ -8,7 +8,6 @@ import {
   useQueryStateSlice,
   values,
 } from "@parallel/utils/queryState";
-import { useEffect } from "react";
 import { NotificationsButton } from "./NotificationsButton";
 import { NotificationsDrawer } from "./NotificationsDrawer";
 
@@ -31,13 +30,11 @@ export function Notifications() {
     "notifications"
   );
 
-  const { data } = useNotifications_UnreadPetitionUserNotificationIdsQuery();
+  const { data } = useNotifications_UnreadPetitionUserNotificationIdsQuery({
+    pollInterval: 15000,
+  });
 
   const unreadNotificationIds = data?.me.unreadNotificationIds ?? [];
-
-  useEffect(() => {
-    console.log("%c --- Notifications RENDER ---", "color: #018a11");
-  });
 
   return (
     <>
@@ -46,10 +43,7 @@ export function Notifications() {
         unreadNotificationsCount={unreadNotificationIds.length}
         isOpen={filter !== null}
       />
-      <NotificationsDrawer
-        isOpen={filter !== null}
-        onClose={() => setFilter(null)}
-      />
+      <NotificationsDrawer value={filter} onChange={setFilter} />
     </>
   );
 }

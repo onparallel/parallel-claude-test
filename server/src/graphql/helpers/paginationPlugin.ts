@@ -63,7 +63,7 @@ export type PaginationFieldConfig<
   /**
    * Additional args to use for just this field
    */
-  additionalArgs?: core.ArgsRecord;
+  extendArgs?: core.ArgsRecord | ((args: core.ArgsRecord) => core.ArgsRecord);
   /**
    * The description to annotate the GraphQL SDL
    */
@@ -78,6 +78,10 @@ export type PaginationFieldConfig<
    * so as not to conflict with any non-extended paginations.
    */
   extendPagination?: (def: core.ObjectDefinitionBlock<any>) => void;
+  /**
+   * Allows removing totalCount from the output
+   */
+  hasTotalCount?: boolean;
   /**
    * Implement the full resolve, including `items` and `totalCount`.
    */
@@ -163,9 +167,11 @@ export function paginationPlugin() {
                       type: targetType,
                       description: "The requested slice of items.",
                     });
-                    t2.nonNull.int("totalCount", {
-                      description: "The total count of items in the list.",
-                    });
+                    if (!(fieldConfig.hasTotalCount === false)) {
+                      t2.nonNull.int("totalCount", {
+                        description: "The total count of items in the list.",
+                      });
+                    }
                     if (fieldConfig.extendPagination instanceof Function) {
                       fieldConfig.extendPagination(t2);
                     }
@@ -188,34 +194,38 @@ export function paginationPlugin() {
             }
 
             // Add the field to the type.
+            const args = {
+              ...PaginationArgs,
+              ...(fieldConfig.searchable
+                ? {
+                    search: stringArg({
+                      description: "Optional text to search in the collection.",
+                    }),
+                  }
+                : {}),
+              ...(fieldConfig.sortableBy
+                ? {
+                    sortBy: nullable(
+                      list(
+                        nonNull(
+                          arg({
+                            description: "Sorting to use on the collection",
+                            type: sortByName as any,
+                          })
+                        )
+                      )
+                    ),
+                  }
+                : {}),
+            };
             t.field(fieldName, {
               ...nonPaginationFieldProps(fieldConfig),
-              args: {
-                ...PaginationArgs,
-                ...(fieldConfig.searchable
-                  ? {
-                      search: stringArg({
-                        description:
-                          "Optional text to search in the collection.",
-                      }),
-                    }
-                  : {}),
-                ...(fieldConfig.sortableBy
-                  ? {
-                      sortBy: nullable(
-                        list(
-                          nonNull(
-                            arg({
-                              description: "Sorting to use on the collection",
-                              type: sortByName as any,
-                            })
-                          )
-                        )
-                      ),
-                    }
-                  : {}),
-                ...(fieldConfig.additionalArgs ?? {}),
-              },
+              args:
+                typeof fieldConfig.extendArgs === "function"
+                  ? fieldConfig.extendArgs(args)
+                  : typeof fieldConfig.extendArgs === "object"
+                  ? { ...args, ...(fieldConfig.extendArgs ?? {}) }
+                  : args,
               type: paginationName as any,
               resolve(root, args, ctx, info) {
                 validateArgs(args, info);
@@ -236,7 +246,7 @@ function nonPaginationFieldProps(
   return omit(fieldConfig, [
     "searchable",
     "sortableBy",
-    "additionalArgs",
+    "extendArgs",
     "extendPagination",
     "resolve",
     "type",

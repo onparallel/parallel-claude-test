@@ -478,6 +478,11 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     totalCount: number; // Int!
   };
+  UserNotifications_Pagination: {
+    // root type
+    hasMore: boolean; // Boolean!
+    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
+  };
   UserPagination: {
     // root type
     items: NexusGenRootTypes["User"][]; // [User!]!
@@ -1358,12 +1363,12 @@ export interface NexusGenFieldTypes {
     isSuperAdmin: boolean; // Boolean!
     lastActiveAt: NexusGenScalars["DateTime"] | null; // DateTime
     lastName: string | null; // String
-    notifications: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
+    notifications: NexusGenRootTypes["UserNotifications_Pagination"]; // UserNotifications_Pagination!
     onboardingStatus: NexusGenScalars["JSONObject"]; // JSONObject!
     organization: NexusGenRootTypes["Organization"]; // Organization!
     role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
     status: NexusGenEnums["UserStatus"]; // UserStatus!
-    unreadNotificationIds: string[]; // [String!]!
+    unreadNotificationIds: string[]; // [ID!]!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   UserAuthenticationToken: {
@@ -1396,6 +1401,11 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["UserGroup"][]; // [UserGroup!]!
     totalCount: number; // Int!
+  };
+  UserNotifications_Pagination: {
+    // field return type
+    hasMore: boolean; // Boolean!
+    items: NexusGenRootTypes["PetitionUserNotification"][]; // [PetitionUserNotification!]!
   };
   UserPagination: {
     // field return type
@@ -2306,12 +2316,12 @@ export interface NexusGenFieldTypeNames {
     isSuperAdmin: "Boolean";
     lastActiveAt: "DateTime";
     lastName: "String";
-    notifications: "PetitionUserNotification";
+    notifications: "UserNotifications_Pagination";
     onboardingStatus: "JSONObject";
     organization: "Organization";
     role: "OrganizationRole";
     status: "UserStatus";
-    unreadNotificationIds: "String";
+    unreadNotificationIds: "ID";
     updatedAt: "DateTime";
   };
   UserAuthenticationToken: {
@@ -2344,6 +2354,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "UserGroup";
     totalCount: "Int";
+  };
+  UserNotifications_Pagination: {
+    // field return type name
+    hasMore: "Boolean";
+    items: "PetitionUserNotification";
   };
   UserPagination: {
     // field return type name
@@ -3157,7 +3172,7 @@ export interface NexusGenArgTypes {
       // args
       before?: NexusGenScalars["DateTime"] | null; // DateTime
       filter?: NexusGenEnums["PetitionUserNotificationFilter"] | null; // PetitionUserNotificationFilter
-      limit: number; // Int!
+      limit?: number | null; // Int
     };
   };
 }

@@ -198,16 +198,25 @@ export function createApolloClient(
             authenticationTokens: { merge: false },
             notifications: {
               keyArgs: ["filter"],
-              merge(existing = [], incoming, { readField }) {
-                return pipe(
-                  [...existing, ...incoming],
-                  (arr) => uniqBy(arr, (obj) => readField("id", obj)),
-                  (arr) =>
-                    sortBy(arr, [
-                      (obj) => new Date(readField("createdAt", obj) as string),
-                      "desc",
-                    ])
-                );
+              merge(existing, incoming, { readField }) {
+                if (existing === undefined) {
+                  return incoming;
+                } else {
+                  return {
+                    items: pipe(
+                      [...existing.items, ...incoming.items],
+                      (arr) => uniqBy(arr, (obj) => readField("id", obj)),
+                      (arr) =>
+                        sortBy(arr, [
+                          (obj) =>
+                            new Date(readField("createdAt", obj) as string),
+                          "desc",
+                        ])
+                    ),
+                    hasMore: incoming.hasMore,
+                  };
+                }
+                return;
               },
             },
           },
