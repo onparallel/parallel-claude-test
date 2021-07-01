@@ -9,7 +9,7 @@ import {
   values,
 } from "@parallel/utils/queryState";
 import { useEffect } from "react";
-import { NotificationsBell } from "./NotificationsBell";
+import { NotificationsButton } from "./NotificationsButton";
 import { NotificationsDrawer } from "./NotificationsDrawer";
 
 const QUERY_STATE = {
@@ -35,8 +35,7 @@ export function Notifications() {
     filter ? handleClose() : handleOpen();
   };
 
-  const { data, refetch } =
-    useNotifications_UnreadPetitionUserNotificationIdsQuery();
+  const { data } = useNotifications_UnreadPetitionUserNotificationIdsQuery();
 
   const unreadNotificationIds = data?.me.unreadNotificationIds ?? [];
 
@@ -48,26 +47,18 @@ export function Notifications() {
     setFilter("ALL");
   };
 
-  const handleRefetch = () => {
-    refetch();
-  };
-
   useEffect(() => {
     console.log("%c --- Notifications RENDER ---", "color: #018a11");
   });
 
   return (
     <>
-      <NotificationsBell
+      <NotificationsButton
         onClick={handleBellClick}
         hasNotifications={unreadNotificationIds.length > 0}
         isOpen={filter !== null}
       />
-      <NotificationsDrawer
-        isOpen={filter !== null}
-        onClose={handleClose}
-        onPull={handleRefetch}
-      />
+      <NotificationsDrawer isOpen={filter !== null} onClose={handleClose} />
     </>
   );
 }

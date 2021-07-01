@@ -8,3 +8,7 @@ export type Assert<T> = Exclude<T, null | undefined>;
 export function unMaybeArray<T>(items: MaybeArray<T>) {
   return Array.isArray(items) ? items : [items];
 }
+
+export interface Focusable {
+  focus(options?: FocusOptions): void;
+}

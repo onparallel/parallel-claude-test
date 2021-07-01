@@ -1,16 +1,16 @@
 import { PetitionUserNotificationFilter } from "@parallel/graphql/__types";
+import { assignRef } from "@parallel/utils/assignRef";
 import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
-import { useEffect, useMemo } from "react";
+import { Focusable } from "@parallel/utils/types";
+import { ValueProps } from "@parallel/utils/ValueProps";
+import { forwardRef, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 
-export function NotificationsSelect({
-  onChange,
-  selectedOption,
-}: {
-  onChange: (arg0: PetitionUserNotificationFilter) => void;
-  selectedOption: PetitionUserNotificationFilter;
-}) {
+export const NotificationsFilterSelect = forwardRef<
+  Focusable,
+  ValueProps<PetitionUserNotificationFilter>
+>(function NotificationsFilterSelect({ value, onChange }, ref) {
   const reactSelectProps = useFieldSelectReactSelectProps({});
   const intl = useIntl();
 
@@ -62,18 +62,22 @@ export function NotificationsSelect({
     [intl.locale]
   );
 
-  useEffect(() => {
-    console.log("%c --- NotificationsSelect RENDER ---", "color: #63676e");
+  const _value = options.find((o) => o.value === value) ?? null;
+
+  const _ref = useRef<Select<any, false, never>>(null);
+  assignRef(ref, {
+    focus: () => setTimeout(() => _ref.current?.focus()),
   });
 
   return (
     <Select
+      ref={_ref}
       options={options}
-      value={options.find((o) => o.value === selectedOption)}
+      value={_value}
       onChange={(selected) =>
         onChange((selected?.value as PetitionUserNotificationFilter) ?? "ALL")
       }
       {...reactSelectProps}
     />
   );
-}
+});

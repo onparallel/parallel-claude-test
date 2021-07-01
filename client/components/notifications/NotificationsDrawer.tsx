@@ -12,7 +12,6 @@ import {
 import { Button, ModalFooterProps } from "@chakra-ui/react";
 import { BellIcon, EmailOpenedIcon } from "@parallel/chakra/icons";
 import {
-  NotificationsDrawer_PetitionUserNotificationFragment,
   PetitionUserNotificationFilter,
   useNotificationsDrawer_PetitionUserNotificationsLazyQuery,
 } from "@parallel/graphql/__types";
@@ -22,19 +21,19 @@ import {
   useQueryStateSlice,
   values,
 } from "@parallel/utils/queryState";
+import { Focusable } from "@parallel/utils/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { NotificationsFilterSelect } from "./NotificationsFilterSelect";
 import { NotificationsList } from "./NotificationsList";
-import { NotificationsSelect } from "./NotificationsSelect";
 
 export interface NotificationsDrawerProps {
   onClose: () => void;
-  onPull: () => void;
   isOpen: boolean;
 }
 
-const NOTIFICATIONS_LIMIT = 16;
+const NOTIFICATIONS_LIMIT = 6;
 
 const QUERY_STATE = {
   notifications: values<PetitionUserNotificationFilter>([
@@ -47,9 +46,10 @@ const QUERY_STATE = {
   ]),
 };
 
+const MotionFooter = motion<Omit<ModalFooterProps, "transition">>(DrawerFooter);
+
 export function NotificationsDrawer({
   onClose,
-  onPull,
   isOpen,
 }: NotificationsDrawerProps) {
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
@@ -63,10 +63,11 @@ export function NotificationsDrawer({
 
   const lastNotificationDate = useRef<string | undefined>(undefined);
 
-  const [getData, { data, loading, refetch, fetchMore }] =
+  const [getData, { data, loading, refetch, fetchMore, networkStatus }] =
     useNotificationsDrawer_PetitionUserNotificationsLazyQuery({
       notifyOnNetworkStatusChange: true,
     });
+  console.log({ loading, networkStatus });
 
   const notifications = data?.me.notifications ?? [];
   const hasUnread = notifications.some((n) => !n.isRead);
@@ -114,10 +115,12 @@ export function NotificationsDrawer({
     });
 
     const notificationLength = result?.data?.me?.notifications.length ?? 0;
-    setHasMore(notificationLength < NOTIFICATIONS_LIMIT ? false : true);
+    setHasMore(notificationLength >= NOTIFICATIONS_LIMIT);
   };
 
-  const handleChangeFilterBy = async (type: PetitionUserNotificationFilter) => {
+  const handleFilterChange = async (
+    type: PetitionUserNotificationFilter | null
+  ) => {
     setFilter(type);
     ignoreLoading.current = false;
     lastNotificationDate.current = undefined;
@@ -128,7 +131,7 @@ export function NotificationsDrawer({
     });
 
     const notificationLength = result?.data?.me?.notifications.length ?? 0;
-    setHasMore(notificationLength < NOTIFICATIONS_LIMIT ? false : true);
+    setHasMore(notificationLength >= NOTIFICATIONS_LIMIT);
   };
 
   const updateIsReadNotification = useUpdateIsReadNotification();
@@ -138,10 +141,9 @@ export function NotificationsDrawer({
       isRead: true,
     });
   };
-
-  const MotionFooter =
-    motion<Omit<ModalFooterProps, "transition">>(DrawerFooter);
   const spring = { type: "spring", damping: 20, stiffness: 240 };
+
+  const selectRef = useRef<Focusable>(null);
 
   return (
     <Drawer
@@ -150,6 +152,7 @@ export function NotificationsDrawer({
       isOpen={isOpen}
       size="sm"
       isFullHeight
+      initialFocusRef={selectRef}
     >
       <DrawerOverlay />
       <DrawerContent>
@@ -170,9 +173,10 @@ export function NotificationsDrawer({
               />
             </Text>
           </Stack>
-          <NotificationsSelect
-            selectedOption={filter ?? "ALL"}
-            onChange={handleChangeFilterBy}
+          <NotificationsFilterSelect
+            ref={selectRef}
+            value={filter}
+            onChange={handleFilterChange}
           />
         </DrawerHeader>
         <DrawerBody
