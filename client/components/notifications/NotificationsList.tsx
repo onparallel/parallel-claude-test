@@ -98,7 +98,13 @@ export function NotificationsList({
         {isRefreshing ? (
           <MotionCenter
             initial={{ transform: "translateY(0px)" }}
-            exit={{ transform: "translateY(-60px)" }}
+            exit={{
+              transform: [
+                "translateY(0px)",
+                "translateY(0px)",
+                "translateY(-60px)",
+              ],
+            }}
             transition={{ type: "spring", damping: 20, stiffness: 240 }}
             flex="0"
             pointerEvents="none"
