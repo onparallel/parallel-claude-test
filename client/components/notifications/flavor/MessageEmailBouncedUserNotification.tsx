@@ -34,7 +34,7 @@ export const MessageEmailBouncedUserNotification = Object.assign(
         >
           <FormattedMessage
             id="component.notification-email-bounced.body"
-            defaultMessage="Error sending request to recipient {name}."
+            defaultMessage="Error sending petition to recipient {name}."
             values={{
               name: (
                 <ContactLink

@@ -687,7 +687,7 @@
   {
     "term": "component.notification-email-bounced.body",
     "definition": "Error al enviar la petición a {name}.",
-    "context": "Error sending request to recipient {name}."
+    "context": "Error sending petition to recipient {name}."
   },
   {
     "term": "component.notification-internal-comment.body",
@@ -702,12 +702,12 @@
   {
     "term": "component.notification-petition-shared-group.body",
     "definition": "{name} ha compartido la petición con el grupo \"{group}\" al que perteneces.",
-    "context": "{name} has shared the request with the group \"{group}\" to which you belong."
+    "context": "{name} has shared the petition with the group \"{group}\" to which you belong."
   },
   {
     "term": "component.notification-petition-shared.body",
     "definition": "{name} te ha compartido la petición como {permissionType}.",
-    "context": "{name} has shared the request with you as {permissionType}."
+    "context": "{name} has shared the petition with you as {permissionType}."
   },
   {
     "term": "component.notification-signature-cancelled.body",
