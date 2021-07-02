@@ -168,7 +168,6 @@ export const User = objectType({
           ctx.user!.id,
           { limit: _limit + 1, filter, before }
         );
-        console.log(items);
         return {
           items: items.length > _limit ? items.slice(0, -1) : items,
           hasMore: items.length > _limit,
