@@ -105,7 +105,7 @@ export function NotificationsList({
                 "translateY(-60px)",
               ],
             }}
-            transition={{ type: "spring", damping: 20, stiffness: 240 }}
+            transition={{ times: [0, 0.7, 1] }}
             flex="0"
             pointerEvents="none"
             position="absolute"
