@@ -702,12 +702,12 @@
   {
     "term": "component.notification-petition-shared-group.body",
     "definition": "{name} ha compartido la petición con el grupo \"{group}\" al que perteneces.",
-    "context": "{name} has shared the petition with the group \"{group}\" to which you belong."
+    "context": "{name} has shared the request with the group \"{group}\" to which you belong."
   },
   {
     "term": "component.notification-petition-shared.body",
     "definition": "{name} te ha compartido la petición como {permissionType}.",
-    "context": "{name} has shared the petition with you as {permissionType}."
+    "context": "{name} has shared the request with you as {permissionType}."
   },
   {
     "term": "component.notification-signature-cancelled.body",
@@ -738,6 +738,16 @@
     "term": "component.notifications-list.empty-notifications",
     "definition": "No hay notificaciones todavía",
     "context": "There's no notifications yet"
+  },
+  {
+    "term": "component.notifications-list.pull-to-refresh",
+    "definition": "Tire hacia abajo para refrescar",
+    "context": "Pull down to refresh"
+  },
+  {
+    "term": "component.notifications-list.release-to-refresh",
+    "definition": "Suelte para actualizar",
+    "context": "Release to refresh"
   },
   {
     "term": "component.notifications-select.all-notifications",

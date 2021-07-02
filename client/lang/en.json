@@ -701,13 +701,13 @@
   },
   {
     "term": "component.notification-petition-shared-group.body",
-    "definition": "{name} has shared the petition with the group \"{group}\" to which you belong.",
-    "context": "{name} has shared the petition with the group \"{group}\" to which you belong."
+    "definition": "{name} has shared the request with the group \"{group}\" to which you belong.",
+    "context": "{name} has shared the request with the group \"{group}\" to which you belong."
   },
   {
     "term": "component.notification-petition-shared.body",
-    "definition": "{name} has shared the petition with you as {permissionType}.",
-    "context": "{name} has shared the petition with you as {permissionType}."
+    "definition": "{name} has shared the request with you as {permissionType}.",
+    "context": "{name} has shared the request with you as {permissionType}."
   },
   {
     "term": "component.notification-signature-cancelled.body",
@@ -738,6 +738,16 @@
     "term": "component.notifications-list.empty-notifications",
     "definition": "There's no notifications yet",
     "context": "There's no notifications yet"
+  },
+  {
+    "term": "component.notifications-list.pull-to-refresh",
+    "definition": "Pull down to refresh",
+    "context": "Pull down to refresh"
+  },
+  {
+    "term": "component.notifications-list.release-to-refresh",
+    "definition": "Release to refresh",
+    "context": "Release to refresh"
   },
   {
     "term": "component.notifications-select.all-notifications",
