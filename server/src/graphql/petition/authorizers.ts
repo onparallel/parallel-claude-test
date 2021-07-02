@@ -4,6 +4,7 @@ import { FeatureFlagName, PetitionPermissionType } from "../../db/__types";
 import { MaybeArray } from "../../util/types";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { countBy } from "remeda";
+import { isDefined } from "../../util/remedaExtensions";
 
 export function userHasAccessToPetitions<
   TypeName extends string,
@@ -308,6 +309,22 @@ export function petitionHasRepliableFields<
       }
 
       return true;
+    } catch {}
+    return false;
+  };
+}
+
+export function petitionsAreEditable<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argNamePetitionIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const petitions = await ctx.petitions.loadPetition(
+        unMaybeArray(args[argNamePetitionIds] as MaybeArray<number>)
+      );
+      return petitions.every((p) => isDefined(p) && !p.is_readonly);
     } catch {}
     return false;
   };

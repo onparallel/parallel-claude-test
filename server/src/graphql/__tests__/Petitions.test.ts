@@ -9,6 +9,7 @@ import {
   Organization,
   Petition,
   PetitionField,
+  PetitionFieldType,
   PetitionPermission,
   Tag,
   User,
@@ -1918,6 +1919,375 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("Read-only petitions", () => {
+    let readonlyPetition: Petition;
+    let fields: PetitionField[];
+    beforeEach(async () => {
+      [readonlyPetition] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({ is_readonly: true })
+      );
+
+      fields = await mocks.createRandomPetitionFields(
+        readonlyPetition.id,
+        3,
+        (i) => ({
+          type: ["HEADING", "TEXT", "DYNAMIC_SELECT"][i] as PetitionFieldType,
+        })
+      );
+    });
+
+    it("should not allow to edit the petition title", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          data: { name: "my new title" },
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to edit the petition language", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          data: { locale: "en" },
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to turn on/off the comments", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $data: UpdatePetitionInput!) {
+            updatePetition(petitionId: $petitionId, data: $data) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          data: { hasCommentsEnabled: true },
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to edit field title and description", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[1].id),
+          data: { title: "...", description: "..." },
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to add a new field to the petition", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $type: PetitionFieldType!) {
+            createPetitionField(petitionId: $petitionId, type: $type) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          type: "CHECKBOX",
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to reorder fields", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldIds: [GID!]!) {
+            updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          fieldIds: [
+            toGlobalId("PetitionField", fields[0].id),
+            toGlobalId("PetitionField", fields[2].id),
+            toGlobalId("PetitionField", fields[1].id),
+          ],
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to switch 'required' option on field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[1].id),
+          data: {
+            optional: false,
+          },
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to add visibility conditions on field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+          data: {
+            visibility: {
+              type: "SHOW",
+              operator: "AND",
+              conditions: [
+                {
+                  fieldId: toGlobalId("PetitionField", fields[1].id),
+                  modifier: "NUMBER_OF_REPLIES",
+                  operator: "EQUAL",
+                  value: 1,
+                },
+              ],
+            },
+          },
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to clone a petition field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to delete a petition field", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $fieldId: GID!) {
+            deletePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              force: true
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to change the field type", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $type: PetitionFieldType!
+          ) {
+            changePetitionFieldType(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              type: $type
+              force: true
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[2].id),
+          type: "SHORT_TEXT",
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to add tags to the petition", async () => {
+      const [tag] = await mocks.createRandomTags(organization.id, 1);
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $tagId: GID!) {
+            tagPetition(petitionId: $petitionId, tagId: $tagId) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          tagId: toGlobalId("Tag", tag.id),
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to remove tags from the petition", async () => {
+      const [tag] = await mocks.createRandomTags(organization.id, 1);
+      await mocks.tagPetitions([readonlyPetition.id], tag.id);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionId: GID!, $tagId: GID!) {
+            untagPetition(petitionId: $petitionId, tagId: $tagId) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          tagId: toGlobalId("Tag", tag.id),
+        },
+      });
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("should not allow to edit field options", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation (
+            $petitionId: GID!
+            $fieldId: GID!
+            $data: UpdatePetitionFieldInput!
+          ) {
+            updatePetitionField(
+              petitionId: $petitionId
+              fieldId: $fieldId
+              data: $data
+            ) {
+              petition {
+                id
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionId: toGlobalId("Petition", readonlyPetition.id),
+          fieldId: toGlobalId("PetitionField", fields[1].id),
+          data: {
+            multiple: false,
+            options: {
+              placeholder: "foo",
+            },
+          },
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });

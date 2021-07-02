@@ -131,6 +131,21 @@ export function ifArgDefined<
   };
 }
 
+export function ifSomeDefined<
+  TypeName extends string,
+  FieldName extends string
+>(
+  props: (args: core.ArgsValue<TypeName, FieldName>) => any[],
+  thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>
+): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (root, args, ctx, info) => {
+    if (props(args).some((value) => value !== undefined)) {
+      return await thenAuthorizer(root, args, ctx, info);
+    }
+    return true;
+  };
+}
+
 export function ifArgEquals<
   TypeName extends string,
   FieldName extends string,

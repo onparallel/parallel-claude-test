@@ -43,6 +43,7 @@ import {
   authenticateAnd,
   chain,
   ifArgDefined,
+  ifSomeDefined,
   or,
 } from "../../helpers/authorize";
 import { datetimeArg } from "../../helpers/date";
@@ -78,6 +79,7 @@ import {
   fieldsBelongsToPetition,
   messageBelongToPetition,
   petitionHasRepliableFields,
+  petitionsAreEditable,
   petitionsArePublicTemplates,
   repliesBelongsToField,
   repliesBelongsToPetition,
@@ -351,7 +353,10 @@ export const deletePetitions = mutationField("deletePetitions", {
 export const updateFieldPositions = mutationField("updateFieldPositions", {
   description: "Updates the positions of the petition fields",
   type: "PetitionBase",
-  authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    petitionsAreEditable("petitionId")
+  ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     fieldIds: nonNull(list(nonNull(globalIdArg("PetitionField")))),
@@ -426,7 +431,17 @@ export const SignatureConfigInput = inputObjectType({
 export const updatePetition = mutationField("updatePetition", {
   description: "Updates a petition.",
   type: "PetitionBase",
-  authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    ifSomeDefined(
+      (args) => [
+        args.data.name,
+        args.data.locale,
+        args.data.hasCommentsEnabled,
+      ],
+      petitionsAreEditable("petitionId")
+    )
+  ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     data: nonNull(
@@ -543,7 +558,10 @@ export const updatePetition = mutationField("updatePetition", {
 export const createPetitionField = mutationField("createPetitionField", {
   description: "Creates a petition field",
   type: "PetitionBaseAndField",
-  authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    petitionsAreEditable("petitionId")
+  ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     type: nonNull(arg({ type: "PetitionFieldType" })),
@@ -566,12 +584,10 @@ export const createPetitionField = mutationField("createPetitionField", {
 export const clonePetitionField = mutationField("clonePetitionField", {
   description: "Clones a petition field",
   type: "PetitionBaseAndField",
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "fieldId")
-    )
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    petitionsAreEditable("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -589,13 +605,11 @@ export const clonePetitionField = mutationField("clonePetitionField", {
 export const deletePetitionField = mutationField("deletePetitionField", {
   description: "Deletes a petition field.",
   type: "PetitionBase",
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "fieldId"),
-      fieldIsNotFixed("fieldId")
-    )
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldIsNotFixed("fieldId"),
+    petitionsAreEditable("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -637,12 +651,10 @@ export const deletePetitionField = mutationField("deletePetitionField", {
 export const updatePetitionField = mutationField("updatePetitionField", {
   description: "Updates a petition field.",
   type: "PetitionBaseAndField",
-  authorize: chain(
-    authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "fieldId")
-    )
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    petitionsAreEditable("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1495,12 +1507,10 @@ export const changePetitionFieldType = mutationField(
   {
     description: "Changes the type of a petition Field",
     type: "PetitionBaseAndField",
-    authorize: chain(
-      authenticate(),
-      and(
-        userHasAccessToPetitions("petitionId"),
-        fieldsBelongsToPetition("petitionId", "fieldId")
-      )
+    authorize: authenticateAnd(
+      userHasAccessToPetitions("petitionId"),
+      fieldsBelongsToPetition("petitionId", "fieldId"),
+      petitionsAreEditable("petitionId")
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
