@@ -55,10 +55,14 @@ export function NotificationsList({
         notificationElementsRefs[nextNotification.id]
           .current!.querySelector("a")!
           .focus();
-        scrollIntoView(notificationElementsRefs[nextNotification.id].current!, {
-          behavior: "smooth",
-          scrollMode: "if-needed",
-          block: "nearest",
+        const element = notificationElementsRefs[nextNotification.id].current!;
+        // chrome does weird shit without the requestAnimationFrame
+        requestAnimationFrame(() => {
+          scrollIntoView(element, {
+            scrollMode: "if-needed",
+            behavior: "smooth",
+            block: "nearest",
+          });
         });
       }
     }

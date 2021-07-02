@@ -74,6 +74,7 @@ export const NotificationsFilterSelect = forwardRef<
       ref={_ref}
       options={options}
       value={_value}
+      isSearchable={false}
       onChange={(selected) =>
         onChange((selected?.value as PetitionUserNotificationFilter) ?? "ALL")
       }
