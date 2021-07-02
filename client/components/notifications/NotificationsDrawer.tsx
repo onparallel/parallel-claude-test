@@ -20,7 +20,7 @@ import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdate
 import { Focusable } from "@parallel/utils/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { NotificationsFilterSelect } from "./NotificationsFilterSelect";
 import { NotificationsList } from "./NotificationsList";
@@ -103,11 +103,15 @@ export function NotificationsDrawer({
     });
   };
 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const handleRefresh = async () => {
+    setIsRefreshing(true);
     await refetch!({
       limit: NOTIFICATIONS_LIMIT,
       filter,
     });
+    setIsRefreshing(false);
   };
 
   const updateIsReadNotification = useUpdateIsReadNotification();
@@ -115,7 +119,6 @@ export function NotificationsDrawer({
     await updateIsReadNotification({ filter, isRead: true });
   };
 
-  const spring = { type: "spring", damping: 20, stiffness: 240 };
   return (
     <Drawer
       placement="right"
@@ -165,7 +168,7 @@ export function NotificationsDrawer({
             onRefresh={handleRefresh}
             notifications={notifications}
             isLoading={isInitialLoading && !data}
-            isRefetching={loading}
+            isRefreshing={isRefreshing}
           />
         </DrawerBody>
         <AnimatePresence>
@@ -174,7 +177,7 @@ export function NotificationsDrawer({
               initial={{ transform: "translateY(48px)", height: "0px" }}
               exit={{ transform: "translateY(48px)", height: "0px" }}
               animate={{ transform: "translateY(0px)", height: "48px" }}
-              transition={spring}
+              transition={{ type: "spring", damping: 20, stiffness: 240 }}
               height="48px"
               justifyContent="center"
               boxShadow="0px -2px 10px 0px #1A202C1A"

@@ -7,13 +7,12 @@ import {
   Flex,
   LinkBox,
   Spinner,
-  SquareProps,
 } from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
 import { AnimatePresence, motion } from "framer-motion";
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { KeyboardEvent } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage } from "react-intl";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -31,8 +30,10 @@ export interface NotificationListProps {
   onRefresh: () => void;
   hasMore: boolean;
   isLoading: boolean;
-  isRefetching: boolean;
+  isRefreshing: boolean;
 }
+
+const MotionCenter = motion<Omit<AbsoluteCenterProps, "transition">>(Center);
 
 export function NotificationsList({
   notifications,
@@ -40,30 +41,10 @@ export function NotificationsList({
   onRefresh,
   hasMore,
   isLoading,
-  isRefetching,
+  isRefreshing,
 }: NotificationListProps) {
   const notificationElementsRefs = useMultipleRefs<HTMLElement>();
   const notificationsRef = useUpdatingRef(notifications);
-
-  const MotionCircle = motion<Omit<SquareProps, "transition">>(Circle);
-  const MotionCenter = motion<Omit<AbsoluteCenterProps, "transition">>(Center);
-
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const prevIsRefreshing = useRef(false);
-
-  useEffect(() => {
-    prevIsRefreshing.current = isRefreshing;
-  }, [isRefreshing]);
-
-  useEffect(() => {
-    if (isRefreshing) {
-      const timeout = setTimeout(() => setIsRefreshing(false), 1000);
-
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
-  }, [isRefetching]);
 
   const handleKeyDown = function (event: KeyboardEvent) {
     switch (event.key) {
@@ -101,8 +82,6 @@ export function NotificationsList({
     }
   };
 
-  const spring = { type: "spring", damping: 20, stiffness: 240 };
-
   return (
     <Flex
       id="notifications-list"
@@ -118,28 +97,20 @@ export function NotificationsList({
       <AnimatePresence>
         {isRefreshing ? (
           <MotionCenter
-            initial={{ transform: "translateY(0px)", height: "20px" }}
-            exit={{ transform: "translateY(-20px)", height: "0px" }}
-            animate={{ transform: "translateY(0px)", height: "20px" }}
-            transition={spring}
+            initial={{ transform: "translateY(0px)" }}
+            exit={{ transform: "translateY(-60px)" }}
+            transition={{ type: "spring", damping: 20, stiffness: 240 }}
             flex="0"
-            height="20px"
-            background="gray.75"
+            pointerEvents="none"
+            position="absolute"
+            width="100%"
             zIndex="1"
+            paddingTop={4}
           >
-            <MotionCircle
-              initial={
-                prevIsRefreshing.current
-                  ? { transform: "translateY(0px)" }
-                  : { transform: "translateY(-28px)" }
-              }
-              exit={{ transform: "translateY(-28px)" }}
-              animate={{ transform: "translateY(0px)" }}
-              transition={spring}
+            <Circle
               size="40px"
               boxShadow="md"
               background="white"
-              marginTop={6}
               border="1px solid"
               borderColor="gray.75"
             >
@@ -150,7 +121,7 @@ export function NotificationsList({
                 color="gray.600"
                 size="md"
               />
-            </MotionCircle>
+            </Circle>
           </MotionCenter>
         ) : null}
       </AnimatePresence>
@@ -188,30 +159,33 @@ export function NotificationsList({
             </Stack>
           ) : null
         }
-        refreshFunction={() => {
-          setIsRefreshing(true);
-          onRefresh();
-        }}
+        refreshFunction={onRefresh}
         pullDownToRefresh
         pullDownToRefreshThreshold={50}
         pullDownToRefreshContent={
-          <Center background="gray.75">
-            <Text as="span">
-              <FormattedMessage
-                id="component.notifications-list.pull-to-refresh"
-                defaultMessage="Pull down to refresh"
-              />
-            </Text>
+          <Center
+            fontSize="sm"
+            paddingY={2}
+            borderBottom="1px solid"
+            borderColor="gray.200"
+          >
+            <FormattedMessage
+              id="component.notifications-list.pull-to-refresh"
+              defaultMessage="Pull down to refresh"
+            />
           </Center>
         }
         releaseToRefreshContent={
-          <Center background="gray.75">
-            <Text as="span">
-              <FormattedMessage
-                id="component.notifications-list.release-to-refresh"
-                defaultMessage="Release to refresh"
-              />
-            </Text>
+          <Center
+            fontSize="sm"
+            paddingY={2}
+            borderBottom="1px solid"
+            borderColor="gray.200"
+          >
+            <FormattedMessage
+              id="component.notifications-list.release-to-refresh"
+              defaultMessage="Release to refresh"
+            />
           </Center>
         }
         scrollableTarget="notifications-list"
