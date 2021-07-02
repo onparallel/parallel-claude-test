@@ -701,13 +701,13 @@
   },
   {
     "term": "component.notification-petition-shared-group.body",
-    "definition": "{name} has shared the request with the group \"{group}\" to which you belong.",
-    "context": "{name} has shared the request with the group \"{group}\" to which you belong."
+    "definition": "{name} has shared the petition with the group \"{group}\" to which you belong.",
+    "context": "{name} has shared the petition with the group \"{group}\" to which you belong."
   },
   {
     "term": "component.notification-petition-shared.body",
-    "definition": "{name} has shared the request with you as {permissionType}.",
-    "context": "{name} has shared the request with you as {permissionType}."
+    "definition": "{name} has shared the petition with you as {permissionType}.",
+    "context": "{name} has shared the petition with you as {permissionType}."
   },
   {
     "term": "component.notification-signature-cancelled.body",
