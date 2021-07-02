@@ -5720,7 +5720,8 @@ export type PetitionActivity_PetitionFragment = {
 } & PetitionLayout_PetitionBase_Petition_Fragment &
   PetitionAccessTable_PetitionFragment &
   PetitionActivityTimeline_PetitionFragment &
-  ShareButton_PetitionBase_Petition_Fragment;
+  ShareButton_PetitionBase_Petition_Fragment &
+  AddPetitionAccessDialog_PetitionFragment;
 
 export type PetitionActivity_UserFragment = {
   __typename?: "User";
@@ -8417,6 +8418,31 @@ export const ShareButton_PetitionBaseFragmentDoc = gql`
     }
   }
 `;
+export const CopySignatureConfigDialog_ContactFragmentDoc = gql`
+  fragment CopySignatureConfigDialog_Contact on Contact {
+    id
+    fullName
+    email
+  }
+`;
+export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
+  fragment AddPetitionAccessDialog_Petition on Petition {
+    emailSubject
+    emailBody
+    signatureConfig {
+      contacts {
+        ...CopySignatureConfigDialog_Contact
+      }
+    }
+    remindersConfig {
+      offset
+      time
+      timezone
+      weekdaysOnly
+    }
+  }
+  ${CopySignatureConfigDialog_ContactFragmentDoc}
+`;
 export const PetitionActivity_PetitionFragmentDoc = gql`
   fragment PetitionActivity_Petition on Petition {
     id
@@ -8424,11 +8450,13 @@ export const PetitionActivity_PetitionFragmentDoc = gql`
     ...PetitionAccessTable_Petition
     ...PetitionActivityTimeline_Petition
     ...ShareButton_PetitionBase
+    ...AddPetitionAccessDialog_Petition
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
   ${PetitionAccessTable_PetitionFragmentDoc}
   ${PetitionActivityTimeline_PetitionFragmentDoc}
   ${ShareButton_PetitionBaseFragmentDoc}
+  ${AddPetitionAccessDialog_PetitionFragmentDoc}
 `;
 export const PetitionHeader_UserFragmentDoc = gql`
   fragment PetitionHeader_User on User {
@@ -8457,31 +8485,6 @@ export const PetitionActivity_UserFragmentDoc = gql`
   }
   ${PetitionLayout_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
-`;
-export const CopySignatureConfigDialog_ContactFragmentDoc = gql`
-  fragment CopySignatureConfigDialog_Contact on Contact {
-    id
-    fullName
-    email
-  }
-`;
-export const AddPetitionAccessDialog_PetitionFragmentDoc = gql`
-  fragment AddPetitionAccessDialog_Petition on Petition {
-    emailSubject
-    emailBody
-    signatureConfig {
-      contacts {
-        ...CopySignatureConfigDialog_Contact
-      }
-    }
-    remindersConfig {
-      offset
-      time
-      timezone
-      weekdaysOnly
-    }
-  }
-  ${CopySignatureConfigDialog_ContactFragmentDoc}
 `;
 export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
   fragment PetitionTemplateComposeMessageEditor_Petition on PetitionTemplate {

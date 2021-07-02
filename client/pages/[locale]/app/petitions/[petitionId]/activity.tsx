@@ -15,7 +15,10 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
-import { useAddPetitionAccessDialog } from "@parallel/components/petition-activity/AddPetitionAccessDialog";
+import {
+  AddPetitionAccessDialog,
+  useAddPetitionAccessDialog,
+} from "@parallel/components/petition-activity/AddPetitionAccessDialog";
 import { useConfigureRemindersDialog } from "@parallel/components/petition-activity/ConfigureRemindersDialog";
 import { useConfirmCancelScheduledMessageDialog } from "@parallel/components/petition-activity/ConfirmCancelScheduledMessageDialog";
 import { useConfirmDeactivateAccessDialog } from "@parallel/components/petition-activity/ConfirmDeactivateAccessDialog";
@@ -165,6 +168,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         scheduledAt,
         remindersConfig,
       } = await addPetitionAccessDialog({
+        petition,
         onSearchContacts: async (search: string, exclude: string[]) => {
           return await handleSearchContacts(search, [
             ...exclude,
@@ -377,11 +381,13 @@ PetitionActivity.fragments = {
       ...PetitionAccessTable_Petition
       ...PetitionActivityTimeline_Petition
       ...ShareButton_PetitionBase
+      ...AddPetitionAccessDialog_Petition
     }
     ${PetitionLayout.fragments.PetitionBase}
     ${PetitionAccessesTable.fragments.Petition}
     ${PetitionActivityTimeline.fragments.Petition}
     ${ShareButton.fragments.PetitionBase}
+    ${AddPetitionAccessDialog.fragments.Petition}
   `,
   User: gql`
     fragment PetitionActivity_User on User {
