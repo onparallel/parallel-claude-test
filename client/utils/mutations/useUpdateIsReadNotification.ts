@@ -3,6 +3,7 @@ import {
   useUpdateIsReadNotificationMutation,
   useUpdateIsReadNotificationMutationVariables,
   useUpdateIsReadNotification_UserFragment,
+  useUpdateIsReadNotification_PetitionFieldCommentFragment,
 } from "@parallel/graphql/__types";
 import { useCallback } from "react";
 import { difference, uniq } from "remeda";
@@ -31,6 +32,11 @@ export function useUpdateIsReadNotification() {
         ) {
           id
           isRead
+          ... on CommentCreatedUserNotification {
+            comment {
+              id
+            }
+          }
         }
       }
     `
@@ -41,11 +47,9 @@ export function useUpdateIsReadNotification() {
       await updateIsReadNotification({
         variables,
         update(cache, { data }) {
-          const notificationIds =
-            data!.updatePetitionUserNotificationReadStatus.map(
-              (notification) => notification.id
-            );
+          const notifications = data!.updatePetitionUserNotificationReadStatus;
 
+          const notificationIds = notifications.map((n) => n.id);
           updateFragment<useUpdateIsReadNotification_UserFragment>(cache, {
             fragment: useUpdateIsReadNotification.fragments.User,
             id: getMyId(cache),
@@ -56,6 +60,23 @@ export function useUpdateIsReadNotification() {
                 : uniq([...user!.unreadNotificationIds, ...notificationIds]),
             }),
           });
+
+          for (const notification of notifications) {
+            if (notification.__typename === "CommentCreatedUserNotification") {
+              updateFragment<useUpdateIsReadNotification_PetitionFieldCommentFragment>(
+                cache,
+                {
+                  fragment:
+                    useUpdateIsReadNotification.fragments.PetitionFieldComment,
+                  id: notification.comment.id,
+                  data: (comment) => ({
+                    ...comment!,
+                    isUnread: !notification.isRead,
+                  }),
+                }
+              );
+            }
+          }
         },
       });
     },
@@ -68,6 +89,12 @@ useUpdateIsReadNotification.fragments = {
     fragment useUpdateIsReadNotification_User on User {
       id
       unreadNotificationIds
+    }
+  `,
+  PetitionFieldComment: gql`
+    fragment useUpdateIsReadNotification_PetitionFieldComment on PetitionFieldComment {
+      id
+      isUnread
     }
   `,
 };

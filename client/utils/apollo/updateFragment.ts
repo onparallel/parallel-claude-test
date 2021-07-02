@@ -16,8 +16,10 @@ export function updateFragment<TData = any, TVariables = any>(
   const cached = cache.readFragment<TData, TVariables>(
     omit(options, ["broadcast"])
   );
-  cache.writeFragment<TData, TVariables>({
-    ...omit(options, ["returnPartialData", "optimistic"]),
-    data: data(cached),
-  });
+  if (cached !== null) {
+    cache.writeFragment<TData, TVariables>({
+      ...omit(options, ["returnPartialData", "optimistic"]),
+      data: data(cached),
+    });
+  }
 }

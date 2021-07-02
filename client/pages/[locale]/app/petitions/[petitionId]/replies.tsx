@@ -64,7 +64,6 @@ import {
   usePetitionReplies_fileUploadReplyDownloadLinkMutation,
   usePetitionReplies_sendPetitionClosedNotificationMutation,
   usePetitionReplies_updatePetitionFieldCommentMutation,
-  usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation,
   usePetitionReplies_updatePetitionFieldRepliesStatusMutation,
   usePetitionReplies_updatePetitionMutation,
   usePetitionReplies_validatePetitionFieldsMutation,
@@ -157,8 +156,6 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     return () => document.body.classList.remove("hide-hubspot");
   }, [Boolean(activeFieldId)]);
 
-  const [updatePetitionFieldCommentsReadStatus] =
-    usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation();
   useEffect(() => {
     if (activeFieldId) {
       const timeout = setTimeout(async () => {
@@ -166,8 +163,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           .filter((c) => c.isUnread)
           .map((c) => c.id);
         if (petitionFieldCommentIds.length > 0) {
-          await updatePetitionFieldCommentsReadStatus({
-            variables: { petitionId, petitionFieldCommentIds, isRead: true },
+          await updateIsReadNotification({
+            petitionFieldCommentIds,
+            isRead: true,
           });
         }
       }, 1000);
@@ -364,12 +362,9 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   }
 
   async function handleMarkAsUnread(petitionFieldCommentId: string) {
-    await updatePetitionFieldCommentsReadStatus({
-      variables: {
-        petitionId,
-        petitionFieldCommentIds: [petitionFieldCommentId],
-        isRead: false,
-      },
+    await updateIsReadNotification({
+      petitionFieldCommentIds: [petitionFieldCommentId],
+      isRead: false,
     });
   }
 
@@ -887,22 +882,6 @@ PetitionReplies.mutations = [
       }
     }
     ${PetitionRepliesFieldComments.fragments.PetitionField}
-  `,
-  gql`
-    mutation PetitionReplies_updatePetitionFieldCommentsReadStatus(
-      $petitionId: GID!
-      $petitionFieldCommentIds: [GID!]!
-      $isRead: Boolean!
-    ) {
-      updatePetitionFieldCommentsReadStatus(
-        petitionId: $petitionId
-        petitionFieldCommentIds: $petitionFieldCommentIds
-        isRead: $isRead
-      ) {
-        id
-        isUnread
-      }
-    }
   `,
   gql`
     mutation PetitionReplies_updatePetitionFieldRepliesStatus(

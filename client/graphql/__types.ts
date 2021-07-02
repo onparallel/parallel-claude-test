@@ -6254,21 +6254,6 @@ export type PetitionReplies_deletePetitionFieldCommentMutation = {
   } & PetitionRepliesFieldComments_PetitionFieldFragment;
 };
 
-export type PetitionReplies_updatePetitionFieldCommentsReadStatusMutationVariables =
-  Exact<{
-    petitionId: Scalars["GID"];
-    petitionFieldCommentIds: Array<Scalars["GID"]> | Scalars["GID"];
-    isRead: Scalars["Boolean"];
-  }>;
-
-export type PetitionReplies_updatePetitionFieldCommentsReadStatusMutation = {
-  updatePetitionFieldCommentsReadStatus: Array<{
-    __typename?: "PetitionFieldComment";
-    id: string;
-    isUnread: boolean;
-  }>;
-};
-
 export type PetitionReplies_updatePetitionFieldRepliesStatusMutationVariables =
   Exact<{
     petitionId: Scalars["GID"];
@@ -6857,6 +6842,7 @@ export type useUpdateIsReadNotificationMutation = {
         __typename?: "CommentCreatedUserNotification";
         id: string;
         isRead: boolean;
+        comment: { __typename?: "PetitionFieldComment"; id: string };
       }
     | {
         __typename?: "MessageEmailBouncedUserNotification";
@@ -6890,6 +6876,12 @@ export type useUpdateIsReadNotification_UserFragment = {
   __typename?: "User";
   id: string;
   unreadNotificationIds: Array<string>;
+};
+
+export type useUpdateIsReadNotification_PetitionFieldCommentFragment = {
+  __typename?: "PetitionFieldComment";
+  id: string;
+  isUnread: boolean;
 };
 
 export type uploadFile_AWSPresignedPostDataFragment = {
@@ -9309,6 +9301,12 @@ export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
     id
     name
+  }
+`;
+export const useUpdateIsReadNotification_PetitionFieldCommentFragmentDoc = gql`
+  fragment useUpdateIsReadNotification_PetitionFieldComment on PetitionFieldComment {
+    id
+    isUnread
   }
 `;
 export const uploadFile_AWSPresignedPostDataFragmentDoc = gql`
@@ -13123,38 +13121,6 @@ export function usePetitionReplies_deletePetitionFieldCommentMutation(
 }
 export type PetitionReplies_deletePetitionFieldCommentMutationHookResult =
   ReturnType<typeof usePetitionReplies_deletePetitionFieldCommentMutation>;
-export const PetitionReplies_updatePetitionFieldCommentsReadStatusDocument = gql`
-  mutation PetitionReplies_updatePetitionFieldCommentsReadStatus(
-    $petitionId: GID!
-    $petitionFieldCommentIds: [GID!]!
-    $isRead: Boolean!
-  ) {
-    updatePetitionFieldCommentsReadStatus(
-      petitionId: $petitionId
-      petitionFieldCommentIds: $petitionFieldCommentIds
-      isRead: $isRead
-    ) {
-      id
-      isUnread
-    }
-  }
-`;
-export function usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    PetitionReplies_updatePetitionFieldCommentsReadStatusMutation,
-    PetitionReplies_updatePetitionFieldCommentsReadStatusMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useMutation<
-    PetitionReplies_updatePetitionFieldCommentsReadStatusMutation,
-    PetitionReplies_updatePetitionFieldCommentsReadStatusMutationVariables
-  >(PetitionReplies_updatePetitionFieldCommentsReadStatusDocument, options);
-}
-export type PetitionReplies_updatePetitionFieldCommentsReadStatusMutationHookResult =
-  ReturnType<
-    typeof usePetitionReplies_updatePetitionFieldCommentsReadStatusMutation
-  >;
 export const PetitionReplies_updatePetitionFieldRepliesStatusDocument = gql`
   mutation PetitionReplies_updatePetitionFieldRepliesStatus(
     $petitionId: GID!
@@ -14157,6 +14123,11 @@ export const useUpdateIsReadNotificationDocument = gql`
     ) {
       id
       isRead
+      ... on CommentCreatedUserNotification {
+        comment {
+          id
+        }
+      }
     }
   }
 `;
