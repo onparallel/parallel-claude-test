@@ -138,7 +138,10 @@ describe("GraphQL - PetitionUserNotifications", () => {
         query {
           me {
             notifications(limit: 100) {
-              id
+              hasMore
+              items {
+                id
+              }
             }
             unreadNotificationIds
           }
@@ -148,7 +151,10 @@ describe("GraphQL - PetitionUserNotifications", () => {
 
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
-      notifications: [],
+      notifications: {
+        hasMore: false,
+        items: [],
+      },
       unreadNotificationIds: [],
     });
   });
@@ -159,10 +165,13 @@ describe("GraphQL - PetitionUserNotifications", () => {
         query {
           me {
             notifications(limit: 2) {
-              id
-              isRead
-              petition {
+              hasMore
+              items {
                 id
+                isRead
+                petition {
+                  id
+                }
               }
             }
           }
@@ -172,18 +181,21 @@ describe("GraphQL - PetitionUserNotifications", () => {
 
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
-      notifications: [
-        {
-          id: toGlobalId("PetitionUserNotification", notifications[0].id),
-          isRead: true,
-          petition: { id: toGlobalId("Petition", petition.id) },
-        },
-        {
-          id: toGlobalId("PetitionUserNotification", notifications[2].id),
-          isRead: false,
-          petition: { id: toGlobalId("Petition", petition.id) },
-        },
-      ],
+      notifications: {
+        hasMore: true,
+        items: [
+          {
+            id: toGlobalId("PetitionUserNotification", notifications[0].id),
+            isRead: true,
+            petition: { id: toGlobalId("Petition", petition.id) },
+          },
+          {
+            id: toGlobalId("PetitionUserNotification", notifications[2].id),
+            isRead: false,
+            petition: { id: toGlobalId("Petition", petition.id) },
+          },
+        ],
+      },
     });
   });
 
@@ -193,19 +205,22 @@ describe("GraphQL - PetitionUserNotifications", () => {
         query {
           me {
             notifications(limit: 10, filter: SHARED) {
-              id
-              ... on PetitionSharedUserNotification {
-                owner {
-                  id
-                }
-                permissionType
-                sharedWith {
-                  __typename
-                  ... on User {
+              hasMore
+              items {
+                id
+                ... on PetitionSharedUserNotification {
+                  owner {
                     id
                   }
-                  ... on UserGroup {
-                    id
+                  permissionType
+                  sharedWith {
+                    __typename
+                    ... on User {
+                      id
+                    }
+                    ... on UserGroup {
+                      id
+                    }
                   }
                 }
               }
@@ -216,17 +231,20 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
-      notifications: [
-        {
-          id: toGlobalId("PetitionUserNotification", notifications[0].id),
-          owner: { id: toGlobalId("User", otherUser.id) },
-          permissionType: "READ",
-          sharedWith: {
-            __typename: "User",
-            id: toGlobalId("User", sessionUser.id),
+      notifications: {
+        hasMore: false,
+        items: [
+          {
+            id: toGlobalId("PetitionUserNotification", notifications[0].id),
+            owner: { id: toGlobalId("User", otherUser.id) },
+            permissionType: "READ",
+            sharedWith: {
+              __typename: "User",
+              id: toGlobalId("User", sessionUser.id),
+            },
           },
-        },
-      ],
+        ],
+      },
     });
   });
 
@@ -236,13 +254,16 @@ describe("GraphQL - PetitionUserNotifications", () => {
         query {
           me {
             notifications(limit: 10, before: "2021-01-10T10:00:00Z") {
-              id
-              ... on CommentCreatedUserNotification {
-                comment {
-                  id
-                }
-                field {
-                  id
+              hasMore
+              items {
+                id
+                ... on CommentCreatedUserNotification {
+                  comment {
+                    id
+                  }
+                  field {
+                    id
+                  }
                 }
               }
             }
@@ -252,18 +273,21 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
-      notifications: [
-        { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
-        {
-          id: toGlobalId("PetitionUserNotification", notifications[4].id),
-          comment: {
-            id: toGlobalId("PetitionFieldComment", petitionFieldComment.id),
+      notifications: {
+        hasMore: false,
+        items: [
+          { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
+          {
+            id: toGlobalId("PetitionUserNotification", notifications[4].id),
+            comment: {
+              id: toGlobalId("PetitionFieldComment", petitionFieldComment.id),
+            },
+            field: {
+              id: toGlobalId("PetitionField", petitionField.id),
+            },
           },
-          field: {
-            id: toGlobalId("PetitionField", petitionField.id),
-          },
-        },
-      ],
+        ],
+      },
     });
   });
 
@@ -273,7 +297,9 @@ describe("GraphQL - PetitionUserNotifications", () => {
         query {
           me {
             notifications(limit: 10, before: "2000-01-11T10:00:00Z") {
-              id
+              items {
+                id
+              }
             }
           }
         }
@@ -281,7 +307,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
     expect(errors).toBeUndefined();
     expect(data.me).toEqual({
-      notifications: [],
+      notifications: { items: [] },
     });
   });
 

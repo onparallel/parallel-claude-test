@@ -720,16 +720,6 @@
     "context": "The eSignature has been completed."
   },
   {
-    "term": "component.petition-user-notification.mark-as-read",
-    "definition": "Marcar como leído",
-    "context": "Mark as read"
-  },
-  {
-    "term": "component.petition-user-notification.mark-as-unread",
-    "definition": "Marcar como no leído",
-    "context": "Mark as unread"
-  },
-  {
     "term": "component.notifications-button.notifications",
     "definition": "Notificaciones{count, plural, =0 {} other {, # sin leer}}",
     "context": "Notifications{count, plural, =0 {} other {, # unread}}"
@@ -1493,6 +1483,21 @@
     "term": "component.petition-template.delete-label",
     "definition": "Eliminar plantilla",
     "context": "Delete template"
+  },
+  {
+    "term": "component.petition-user-notification.instructions",
+    "definition": "Usa las flechas arriba y abajo para navegar a otras notificaciones. Usa la barra de espacio para cambiar el estado de lectura.",
+    "context": "Use up and down arrows to navigate to other notifications. Use space to toggle read status."
+  },
+  {
+    "term": "component.petition-user-notification.mark-as-read",
+    "definition": "Marcar como leído",
+    "context": "Mark as read"
+  },
+  {
+    "term": "component.petition-user-notification.mark-as-unread",
+    "definition": "Marcar como no leído",
+    "context": "Mark as unread"
   },
   {
     "term": "component.placeholder-input.hint",
