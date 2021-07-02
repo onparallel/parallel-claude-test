@@ -164,7 +164,10 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  BatchSendSigningMode: "ALLOW" | "DISABLE" | "RECIPIENT_CHOOSE";
+  BatchSendSigningMode:
+    | "COPY_SIGNATURE_SETTINGS"
+    | "DISABLE_SIGNATURE"
+    | "LET_RECIPIENT_CHOOSE";
   ChangePasswordResult:
     | "INCORRECT_PASSWORD"
     | "INVALID_NEW_PASSWORD"

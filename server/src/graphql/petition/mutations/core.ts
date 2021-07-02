@@ -1116,17 +1116,17 @@ export const batchSendPetition = mutationField("batchSendPetition", {
         name: "BatchSendSigningMode",
         members: [
           {
-            name: "ALLOW",
+            name: "COPY_SIGNATURE_SETTINGS",
             description:
               "Allow configured signer(s) to sign every petition on the batch",
           },
           {
-            name: "RECIPIENT_CHOOSE",
+            name: "LET_RECIPIENT_CHOOSE",
             description:
               "Let recipients of each group to choose who will sign the petitions.",
           },
           {
-            name: "DISABLE",
+            name: "DISABLE_SIGNATURE",
             description: "Disable eSignature on every petition of this batch.",
           },
         ],
@@ -1153,13 +1153,13 @@ export const batchSendPetition = mutationField("batchSendPetition", {
 
     if (
       isDefined(args.batchSendSigningMode) &&
-      args.batchSendSigningMode !== "ALLOW"
+      args.batchSendSigningMode !== "COPY_SIGNATURE_SETTINGS"
     ) {
       await ctx.petitions.updatePetition(
         [petition.id, ...clonedPetitions.map((p) => p.id)],
         {
           signature_config:
-            args.batchSendSigningMode === "RECIPIENT_CHOOSE"
+            args.batchSendSigningMode === "LET_RECIPIENT_CHOOSE"
               ? {
                   ...petition.signature_config,
                   review: false,

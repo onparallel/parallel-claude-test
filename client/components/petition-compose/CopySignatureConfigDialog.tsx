@@ -9,7 +9,10 @@ import { CopySignatureConfigDialog_ContactFragment } from "@parallel/graphql/__t
 import { useState } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
 
-export type BatchSendSigningMode = "ALLOW" | "RECIPIENT_CHOOSE" | "DISABLE";
+export type BatchSendSigningMode =
+  | "COPY_SIGNATURE_SETTINGS"
+  | "LET_RECIPIENT_CHOOSE"
+  | "DISABLE_SIGNATURE";
 
 export function CopySignatureConfigDialog({
   signers,
@@ -57,7 +60,10 @@ export function CopySignatureConfigDialog({
           </Text>
           <RadioGroup paddingTop={4} onChange={setOption as any} value={option}>
             <Stack>
-              <Radio value="ALLOW" isChecked={option === "ALLOW"}>
+              <Radio
+                value="COPY_SIGNATURE_SETTINGS"
+                isChecked={option === "COPY_SIGNATURE_SETTINGS"}
+              >
                 <FormattedMessage
                   id="component.copy-signature-config-dialog.option-1"
                   defaultMessage="Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the petitions."
@@ -65,15 +71,18 @@ export function CopySignatureConfigDialog({
                 />
               </Radio>
               <Radio
-                value="RECIPIENT_CHOOSE"
-                isChecked={option === "RECIPIENT_CHOOSE"}
+                value="LET_RECIPIENT_CHOOSE"
+                isChecked={option === "LET_RECIPIENT_CHOOSE"}
               >
                 <FormattedMessage
                   id="component.copy-signature-config-dialog.option-2"
                   defaultMessage="No, let each recipient choose who will sign the petitions."
                 />
               </Radio>
-              <Radio value="DISABLE" isChecked={option === "DISABLE"}>
+              <Radio
+                value="DISABLE_SIGNATURE"
+                isChecked={option === "DISABLE_SIGNATURE"}
+              >
                 <FormattedMessage
                   id="component.copy-signature-config-dialog.option-3"
                   defaultMessage="Disable eSignature from all the petitions."

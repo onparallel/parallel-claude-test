@@ -67,11 +67,11 @@ export interface AccessOpenedEvent extends PetitionEvent {
 
 export type BatchSendSigningMode =
   /** Allow configured signer(s) to sign every petition on the batch */
-  | "ALLOW"
+  | "COPY_SIGNATURE_SETTINGS"
   /** Disable eSignature on every petition of this batch. */
-  | "DISABLE"
+  | "DISABLE_SIGNATURE"
   /** Let recipients of each group to choose who will sign the petitions. */
-  | "RECIPIENT_CHOOSE";
+  | "LET_RECIPIENT_CHOOSE";
 
 export type ChangePasswordResult =
   | "INCORRECT_PASSWORD"
