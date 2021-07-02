@@ -3043,6 +3043,7 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
   me: {
     __typename?: "User";
     id: string;
+    unreadNotificationIds: Array<string>;
     notifications: {
       __typename?: "UserNotifications_Pagination";
       hasMore: boolean;
@@ -9825,6 +9826,7 @@ export const NotificationsDrawer_PetitionUserNotificationsDocument = gql`
   ) {
     me {
       id
+      unreadNotificationIds
       notifications(limit: $limit, before: $before, filter: $filter) {
         items {
           ...NotificationsDrawer_PetitionUserNotification

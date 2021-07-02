@@ -8,6 +8,7 @@ import {
   useQueryStateSlice,
   values,
 } from "@parallel/utils/queryState";
+import { useEffect } from "react";
 import { NotificationsButton } from "./NotificationsButton";
 import { NotificationsDrawer } from "./NotificationsDrawer";
 
@@ -22,6 +23,8 @@ const QUERY_STATE = {
   ]),
 };
 
+export const POLL_INTERVAL = 20000;
+
 export function Notifications() {
   const [queryState, setQueryState] = useQueryState(QUERY_STATE);
   const [filter, setFilter] = useQueryStateSlice(
@@ -29,10 +32,20 @@ export function Notifications() {
     setQueryState,
     "notifications"
   );
+  const isOpen = filter !== null;
 
-  const { data } = useNotifications_UnreadPetitionUserNotificationIdsQuery({
-    pollInterval: 15000,
-  });
+  const { data, startPolling, stopPolling } =
+    useNotifications_UnreadPetitionUserNotificationIdsQuery({
+      pollInterval: POLL_INTERVAL,
+    });
+
+  useEffect(() => {
+    if (isOpen) {
+      stopPolling();
+    } else {
+      startPolling(POLL_INTERVAL);
+    }
+  }, [isOpen]);
 
   const unreadNotificationIds = data?.me.unreadNotificationIds ?? [];
 
@@ -41,7 +54,7 @@ export function Notifications() {
       <NotificationsButton
         onClick={() => setFilter(filter ? null : "ALL")}
         unreadNotificationsCount={unreadNotificationIds.length}
-        isOpen={filter !== null}
+        isOpen={isOpen}
       />
       <NotificationsDrawer value={filter} onChange={setFilter} />
     </>

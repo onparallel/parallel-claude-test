@@ -29,7 +29,7 @@ export type NotificationsDrawerProps =
   ValueProps<PetitionUserNotificationFilter>;
 
 const NOTIFICATIONS_LIMIT = 16;
-const POLL_INTERVAL = 15000;
+const POLL_INTERVAL = 10000;
 
 const MotionFooter = motion<Omit<ModalFooterProps, "transition">>(DrawerFooter);
 
@@ -216,6 +216,7 @@ NotificationsDrawer.queries = [
     ) {
       me {
         id
+        unreadNotificationIds
         notifications(limit: $limit, before: $before, filter: $filter) {
           items {
             ...NotificationsDrawer_PetitionUserNotification

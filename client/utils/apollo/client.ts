@@ -204,7 +204,8 @@ export function createApolloClient(
                 } else {
                   return {
                     items: pipe(
-                      [...existing.items, ...incoming.items],
+                      // incoming first so more recent isUnread status is preserved
+                      [...incoming.items, ...existing.items],
                       (arr) => uniqBy(arr, (obj) => readField("id", obj)),
                       (arr) =>
                         sortBy(arr, [
