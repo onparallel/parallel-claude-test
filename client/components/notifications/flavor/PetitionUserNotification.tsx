@@ -8,9 +8,7 @@ import { PetitionUserNotification_PetitionUserNotificationFragment } from "@para
 import { FORMATS } from "@parallel/utils/dates";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import Link from "next/link";
-import { useRef } from "react";
-import { useEffect } from "react";
-import { forwardRef, ReactNode } from "react";
+import { forwardRef, ReactNode, useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 
 export interface PetitionUserNotificationProps {
@@ -102,6 +100,7 @@ export const PetitionUserNotification = Object.assign(
             >
               <LinkOverlay
                 ref={linkRef}
+                draggable="false"
                 tabIndex={isFirst ? 0 : -1}
                 _focus={{
                   outline: "none",

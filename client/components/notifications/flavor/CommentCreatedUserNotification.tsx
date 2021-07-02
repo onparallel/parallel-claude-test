@@ -19,7 +19,11 @@ export const CommentCreatedUserNotification = Object.assign(
       const { author, isInternal } = notification.comment;
       const name =
         author?.__typename === "PetitionAccess" ? (
-          <ContactLink tabIndex={-1} contact={author.contact} />
+          <ContactLink
+            draggable="false"
+            tabIndex={-1}
+            contact={author.contact}
+          />
         ) : (
           <UserReference user={author as any} />
         );

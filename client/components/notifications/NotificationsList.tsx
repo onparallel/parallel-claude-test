@@ -1,10 +1,19 @@
 import { gql } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
-import { Center, Flex, LinkBox, Spinner } from "@chakra-ui/react";
+import {
+  AbsoluteCenterProps,
+  Center,
+  Circle,
+  Flex,
+  LinkBox,
+  Spinner,
+  SquareProps,
+} from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
-import { KeyboardEvent } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage } from "react-intl";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
@@ -19,18 +28,42 @@ import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
 export interface NotificationListProps {
   notifications: NotificationsDrawer_PetitionUserNotificationFragment[];
   onFetchMore: () => void;
+  onRefresh: () => void;
   hasMore: boolean;
   isLoading: boolean;
+  isRefetching: boolean;
 }
 
 export function NotificationsList({
   notifications,
   onFetchMore,
+  onRefresh,
   hasMore,
   isLoading,
+  isRefetching,
 }: NotificationListProps) {
   const notificationElementsRefs = useMultipleRefs<HTMLElement>();
   const notificationsRef = useUpdatingRef(notifications);
+
+  const MotionCircle = motion<Omit<SquareProps, "transition">>(Circle);
+  const MotionCenter = motion<Omit<AbsoluteCenterProps, "transition">>(Center);
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const prevIsRefreshing = useRef(false);
+
+  useEffect(() => {
+    prevIsRefreshing.current = isRefreshing;
+  }, [isRefreshing]);
+
+  useEffect(() => {
+    if (isRefreshing) {
+      const timeout = setTimeout(() => setIsRefreshing(false), 1000);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+  }, [isRefetching]);
 
   const handleKeyDown = function (event: KeyboardEvent) {
     switch (event.key) {
@@ -68,19 +101,8 @@ export function NotificationsList({
     }
   };
 
-  if (isLoading) {
-    return (
-      <Center height="100%">
-        <Spinner
-          thickness="2px"
-          speed="0.65s"
-          emptyColor="gray.200"
-          color="gray.600"
-          size="xl"
-        />
-      </Center>
-    );
-  }
+  const spring = { type: "spring", damping: 20, stiffness: 240 };
+
   return (
     <Flex
       id="notifications-list"
@@ -91,11 +113,51 @@ export function NotificationsList({
       sx={{ "& > *": { flex: 1, display: "flex", flexDirection: "column" } }}
       onKeyDown={handleKeyDown}
       tabIndex={-1}
+      position="relative"
     >
+      <AnimatePresence>
+        {isRefreshing ? (
+          <MotionCenter
+            initial={{ transform: "translateY(0px)", height: "20px" }}
+            exit={{ transform: "translateY(-20px)", height: "0px" }}
+            animate={{ transform: "translateY(0px)", height: "20px" }}
+            transition={spring}
+            flex="0"
+            height="20px"
+            background="gray.75"
+            zIndex="1"
+          >
+            <MotionCircle
+              initial={
+                prevIsRefreshing.current
+                  ? { transform: "translateY(0px)" }
+                  : { transform: "translateY(-28px)" }
+              }
+              exit={{ transform: "translateY(-28px)" }}
+              animate={{ transform: "translateY(0px)" }}
+              transition={spring}
+              size="40px"
+              boxShadow="md"
+              background="white"
+              marginTop={6}
+              border="1px solid"
+              borderColor="gray.75"
+            >
+              <Spinner
+                thickness="2px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="gray.600"
+                size="md"
+              />
+            </MotionCircle>
+          </MotionCenter>
+        ) : null}
+      </AnimatePresence>
       <InfiniteScroll
         dataLength={notifications.length}
         next={onFetchMore}
-        hasMore={hasMore}
+        hasMore={notifications.length && hasMore ? true : false}
         style={{ flex: 1, display: "flex", flexDirection: "column" }}
         loader={
           <Center height="42px" background="gray.75">
@@ -125,6 +187,32 @@ export function NotificationsList({
               </Text>
             </Stack>
           ) : null
+        }
+        refreshFunction={() => {
+          setIsRefreshing(true);
+          onRefresh();
+        }}
+        pullDownToRefresh
+        pullDownToRefreshThreshold={50}
+        pullDownToRefreshContent={
+          <Center background="gray.75">
+            <Text as="span">
+              <FormattedMessage
+                id="component.notifications-list.pull-to-refresh"
+                defaultMessage="Pull down to refresh"
+              />
+            </Text>
+          </Center>
+        }
+        releaseToRefreshContent={
+          <Center background="gray.75">
+            <Text as="span">
+              <FormattedMessage
+                id="component.notifications-list.release-to-refresh"
+                defaultMessage="Release to refresh"
+              />
+            </Text>
+          </Center>
         }
         scrollableTarget="notifications-list"
       >
@@ -176,6 +264,24 @@ export function NotificationsList({
           );
         })}
       </InfiniteScroll>
+
+      {isLoading ? (
+        <Center
+          height="100%"
+          width="100%"
+          position="absolute"
+          background="whiteAlpha.700"
+          zIndex="1"
+        >
+          <Spinner
+            thickness="2px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="gray.600"
+            size="xl"
+          />
+        </Center>
+      ) : null}
     </Flex>
   );
 }

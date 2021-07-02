@@ -38,6 +38,7 @@ export const MessageEmailBouncedUserNotification = Object.assign(
             values={{
               name: (
                 <ContactLink
+                  draggable="false"
                   tabIndex={-1}
                   contact={notification.access.contact}
                   isFull

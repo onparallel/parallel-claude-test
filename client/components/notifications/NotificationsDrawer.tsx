@@ -103,6 +103,13 @@ export function NotificationsDrawer({
     });
   };
 
+  const handleRefresh = async () => {
+    await refetch!({
+      limit: NOTIFICATIONS_LIMIT,
+      filter,
+    });
+  };
+
   const updateIsReadNotification = useUpdateIsReadNotification();
   const handleMarkAllAsRead = async () => {
     await updateIsReadNotification({ filter, isRead: true });
@@ -155,8 +162,10 @@ export function NotificationsDrawer({
           <NotificationsList
             hasMore={hasMore}
             onFetchMore={handleFetchMore}
+            onRefresh={handleRefresh}
             notifications={notifications}
             isLoading={isInitialLoading && !data}
+            isRefetching={loading}
           />
         </DrawerBody>
         <AnimatePresence>

@@ -2287,13 +2287,13 @@ export type User = Timestamps & {
   /** The last name of the user. */
   lastName: Maybe<Scalars["String"]>;
   /** Read and unread user notifications about events on their petitions */
-  notifications: Array<PetitionUserNotification>;
+  notifications: UserNotifications_Pagination;
   /** The onboarding status for the different views of the app. */
   onboardingStatus: Scalars["JSONObject"];
   organization: Organization;
   role: OrganizationRole;
   status: UserStatus;
-  unreadNotificationIds: Array<Scalars["String"]>;
+  unreadNotificationIds: Array<Scalars["ID"]>;
   /** Time when the resource was last updated. */
   updatedAt: Scalars["DateTime"];
 };
@@ -2315,7 +2315,7 @@ export type UserhasFeatureFlagArgs = {
 export type UsernotificationsArgs = {
   before?: Maybe<Scalars["DateTime"]>;
   filter?: Maybe<PetitionUserNotificationFilter>;
-  limit: Scalars["Int"];
+  limit?: Maybe<Scalars["Int"]>;
 };
 
 export type UserAuthenticationToken = CreatedAt & {
@@ -2364,6 +2364,13 @@ export type UserGroupPagination = {
   items: Array<UserGroup>;
   /** The total count of items in the list. */
   totalCount: Scalars["Int"];
+};
+
+export type UserNotifications_Pagination = {
+  /** Whether this resource has more items. */
+  hasMore: Scalars["Boolean"];
+  /** The requested slice of items. */
+  items: Array<PetitionUserNotification>;
 };
 
 export type UserOrContact = Contact | User;

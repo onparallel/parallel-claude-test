@@ -39,7 +39,7 @@ export const PetitionSharedUserNotification = Object.assign(
           {notification.sharedWith.__typename === "UserGroup" ? (
             <FormattedMessage
               id="component.notification-petition-shared-group.body"
-              defaultMessage='{name} has shared the petition with the group "{group}" to which you belong.'
+              defaultMessage='{name} has shared the request with the group "{group}" to which you belong.'
               values={{
                 name: <UserReference user={notification.owner} />,
                 group: notification.sharedWith.name,
@@ -48,7 +48,7 @@ export const PetitionSharedUserNotification = Object.assign(
           ) : (
             <FormattedMessage
               id="component.notification-petition-shared.body"
-              defaultMessage="{name} has shared the petition with you as {permissionType}."
+              defaultMessage="{name} has shared the request with you as {permissionType}."
               values={{
                 name: <UserReference user={notification.owner} />,
                 permissionType: (
