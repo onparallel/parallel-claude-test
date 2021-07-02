@@ -1,4 +1,4 @@
-import { gql, NetworkStatus } from "@apollo/client";
+import { gql, NetworkStatus, useApolloClient } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
 import {
   Drawer,
@@ -15,6 +15,7 @@ import {
   PetitionUserNotificationFilter,
   useNotificationsDrawer_PetitionUserNotificationsLazyQuery,
 } from "@parallel/graphql/__types";
+import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { Focusable } from "@parallel/utils/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
@@ -84,9 +85,15 @@ export function NotificationsDrawer({
     });
   };
 
+  const client = useApolloClient();
   const handleFilterChange = async (
     type: PetitionUserNotificationFilter | null
   ) => {
+    client.cache.evict({
+      id: getMyId(client),
+      fieldName: "notifications",
+      args: { filter: "UNREAD" },
+    });
     onFilterChange(type);
     lastNotificationDate.current = undefined;
 

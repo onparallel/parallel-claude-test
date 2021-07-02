@@ -163,8 +163,9 @@ export const PetitionUserNotification = Object.assign(
             }}
             size="sm"
             background="white"
+            boxShadow="md"
             _hover={{
-              boxShadow: "md",
+              boxShadow: "lg",
             }}
           />
         </Stack>

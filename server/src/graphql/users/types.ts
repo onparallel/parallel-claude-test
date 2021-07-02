@@ -163,13 +163,15 @@ export const User = objectType({
         });
       },
       resolve: async (_, { limit, filter, before }, ctx) => {
+        const _limit = limit ?? 0;
         const items = await ctx.petitions.loadPetitionUserNotificationsByUserId(
           ctx.user!.id,
-          { limit: (limit ?? 0) + 1, filter, before }
+          { limit: _limit + 1, filter, before }
         );
+        console.log(items);
         return {
-          items: items.slice(0, -1),
-          hasMore: items.length > (limit ?? 0),
+          items: items.length > _limit ? items.slice(0, -1) : items,
+          hasMore: items.length > _limit,
         };
       },
     });
