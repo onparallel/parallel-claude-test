@@ -73,19 +73,53 @@ export const BusinessIcon = createIcon({
   ),
 });
 
-export const LockIcon = createIcon({
-  displayName: "LockIcon",
-  viewBox: "0 0 24 24",
+export const LockClosedFillIcon = createIcon({
+  displayName: "LockClosedFillIcon",
+  viewBox: "0 0 16 16",
   path: (
     <g
       stroke="currentColor"
-      strokeWidth={2}
+      strokeWidth={1.5}
       fill="none"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      <path d="M12.6667 7.33333L3.33333 7.33333C2.59695 7.33333 2 7.93029 2 8.66667L2 13.3333C2 14.0697 2.59695 14.6667 3.33333 14.6667H12.6667C13.403 14.6667 14 14.0697 14 13.3333V8.66667C14 7.93029 13.403 7.33333 12.6667 7.33333Z" />
+      <path d="M4.66675 7.33333L4.66675 4.66667C4.66675 3.78261 5.01794 2.93477 5.64306 2.30964C6.26818 1.68452 7.11603 1.33333 8.00008 1.33333C8.88414 1.33333 9.73198 1.68452 10.3571 2.30964C10.9822 2.93477 11.3334 3.78261 11.3334 4.66667V7.33333" />
+    </g>
+  ),
+});
+
+export const LockClosedIcon = createIcon({
+  displayName: "LockClosedIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={1.5}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12.6667 7.33334H3.33333C2.59695 7.33334 2 7.9303 2 8.66668V13.3333C2 14.0697 2.59695 14.6667 3.33333 14.6667H12.6667C13.403 14.6667 14 14.0697 14 13.3333V8.66668C14 7.9303 13.403 7.33334 12.6667 7.33334Z" />
+      <path d="M4.66675 7.33334V4.66668C4.66675 3.78262 5.01794 2.93478 5.64306 2.30965C6.26818 1.68453 7.11603 1.33334 8.00008 1.33334C8.88414 1.33334 9.73198 1.68453 10.3571 2.30965C10.9822 2.93478 11.3334 3.78262 11.3334 4.66668V7.33334" />
+    </g>
+  ),
+});
+
+export const LockOpenIcon = createIcon({
+  displayName: "LockOpenIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={1.5}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12.6667 7.33334H3.33333C2.59695 7.33334 2 7.9303 2 8.66668V13.3333C2 14.0697 2.59695 14.6667 3.33333 14.6667H12.6667C13.403 14.6667 14 14.0697 14 13.3333V8.66668C14 7.9303 13.403 7.33334 12.6667 7.33334Z" />
+      <path d="M4.66663 7.33362V4.66695C4.6658 3.84032 4.97215 3.04286 5.52621 2.4294C6.08027 1.81593 6.84251 1.43022 7.66496 1.34714C8.48741 1.26407 9.31139 1.48955 9.97694 1.97983C10.6425 2.4701 11.1021 3.19018 11.2666 4.00029" />
     </g>
   ),
 });
@@ -1537,6 +1571,22 @@ export const RadioButtonSelected = createIcon({
       strokeLinejoin="round"
     >
       <circle xmlns="http://www.w3.org/2000/svg" cx="12" cy="12" r="4" />
+    </g>
+  ),
+});
+
+export const ShieldIcon = createIcon({
+  displayName: "ShieldIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <g
+      stroke="currentColor"
+      fill="none"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M8.00008 14.6667C8.00008 14.6667 13.3334 12 13.3334 8.00001V3.33334L8.00008 1.33334L2.66675 3.33334V8.00001C2.66675 12 8.00008 14.6667 8.00008 14.6667Z" />
     </g>
   ),
 });

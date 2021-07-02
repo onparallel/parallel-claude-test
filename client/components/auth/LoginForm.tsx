@@ -10,7 +10,7 @@ import {
   Input,
   Text,
 } from "@chakra-ui/react";
-import { LockIcon } from "@parallel/chakra/icons";
+import { LockClosedIcon } from "@parallel/chakra/icons";
 import { Link } from "@parallel/components/common/Link";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
@@ -117,7 +117,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
         </FormControl>
         {ssoUrl && !forcePassword ? (
           <Center marginTop={2} height="72px">
-            <LockIcon marginRight={2} />
+            <LockClosedIcon marginRight={2} />
             <FormattedMessage
               id="public.login.sso-enabled"
               defaultMessage="Single sign-on enabled"

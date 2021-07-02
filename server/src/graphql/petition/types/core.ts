@@ -158,6 +158,9 @@ export const PetitionBase = interfaceType({
         return await ctx.tags.loadTagsByPetitionId(root.id);
       },
     });
+    t.nonNull.boolean("isReadOnly", {
+      resolve: (o) => o.is_readonly,
+    });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),
   rootTyping: "db.Petition",

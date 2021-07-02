@@ -1135,6 +1135,7 @@ export type Petition = PetitionBase & {
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -1249,6 +1250,7 @@ export type PetitionBase = {
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -1621,6 +1623,7 @@ export type PetitionTemplate = PetitionBase & {
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
+  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -2253,6 +2256,7 @@ export type UpdatePetitionInput = {
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
   hasCommentsEnabled?: Maybe<Scalars["Boolean"]>;
+  isReadOnly?: Maybe<Scalars["Boolean"]>;
   isRecipientViewContentsHidden?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;

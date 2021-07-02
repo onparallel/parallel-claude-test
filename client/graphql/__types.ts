@@ -1169,6 +1169,7 @@ export interface Petition extends PetitionBase {
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -1289,6 +1290,7 @@ export interface PetitionBase {
   hasCommentsEnabled: Scalars["Boolean"];
   /** The ID of the petition or template. */
   id: Scalars["GID"];
+  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -1683,6 +1685,7 @@ export interface PetitionTemplate extends PetitionBase {
   id: Scalars["GID"];
   /** Whether the template is publicly available or not */
   isPublic: Scalars["Boolean"];
+  isReadOnly: Scalars["Boolean"];
   /**
    * Whether the contents card is hidden in the recipient view.
    * @deprecated Don't use this
@@ -2353,6 +2356,7 @@ export interface UpdatePetitionInput {
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
   hasCommentsEnabled?: Maybe<Scalars["Boolean"]>;
+  isReadOnly?: Maybe<Scalars["Boolean"]>;
   isRecipientViewContentsHidden?: Maybe<Scalars["Boolean"]>;
   locale?: Maybe<PetitionLocale>;
   name?: Maybe<Scalars["String"]>;
@@ -2915,6 +2919,7 @@ export type PetitionHeader_PetitionFragment = {
   locale: PetitionLocale;
   deadline?: Maybe<string>;
   status: PetitionStatus;
+  isReadOnly: boolean;
   myEffectivePermission?: Maybe<{
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -4070,6 +4075,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
   hasCommentsEnabled: boolean;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
+  isReadOnly: boolean;
   currentSignatureRequest?: Maybe<{
     __typename?: "PetitionSignatureRequest";
     id: string;
@@ -4084,6 +4090,7 @@ export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   hasCommentsEnabled: boolean;
   skipForwardSecurity: boolean;
   isRecipientViewContentsHidden: boolean;
+  isReadOnly: boolean;
 };
 
 export type PetitionSettings_PetitionBaseFragment =
@@ -7794,6 +7801,7 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     myEffectivePermission {
       isSubscribed
     }
+    isReadOnly
     ...HeaderNameEditable_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
@@ -8581,6 +8589,7 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
     hasCommentsEnabled
     skipForwardSecurity
     isRecipientViewContentsHidden
+    isReadOnly
     ... on Petition {
       status
       deadline

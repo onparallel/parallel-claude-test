@@ -441,6 +441,7 @@ export interface Petition {
   comments_enabled: boolean; // bool
   hide_recipient_view_contents: boolean; // bool
   skip_forward_security: boolean; // bool
+  is_readonly: boolean; // bool
 }
 
 export type CreatePetition = PartialProps<
@@ -467,6 +468,7 @@ export type CreatePetition = PartialProps<
   | "comments_enabled"
   | "hide_recipient_view_contents"
   | "skip_forward_security"
+  | "is_readonly"
 >;
 
 export interface PetitionAccess {

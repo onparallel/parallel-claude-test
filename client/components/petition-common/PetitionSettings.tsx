@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   CloseButton,
+  Collapse,
   Flex,
   FormControl,
   FormLabel,
@@ -14,7 +15,15 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import { SignatureIcon, TimeIcon } from "@parallel/chakra/icons";
+import {
+  CommentIcon,
+  ListIcon,
+  LockClosedIcon,
+  LockOpenIcon,
+  ShieldIcon,
+  SignatureIcon,
+  TimeIcon,
+} from "@parallel/chakra/icons";
 import {
   PetitionSettings_PetitionBaseFragment,
   PetitionSettings_UserFragment,
@@ -31,7 +40,6 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
 import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
-import { PaddedCollapse } from "../common/PaddedCollapse";
 import { Spacer } from "../common/Spacer";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
 import {
@@ -157,12 +165,6 @@ function _PetitionSettings({
               defaultMessage="Language of the template"
             />
           )}
-          <HelpPopover marginLeft={2}>
-            <FormattedMessage
-              id="component.petition-settings.locale-description"
-              defaultMessage="This is the language that will be used in the communications with the recipients of this petition."
-            />
-          </HelpPopover>
         </FormLabel>
         <Select
           name="petition-locale"
@@ -201,16 +203,11 @@ function _PetitionSettings({
         </FormControl>
       ) : null}
       <SwitchSetting
+        icon={<CommentIcon />}
         title={
           <FormattedMessage
             id="component.petition-settings.petition-comments-enable"
             defaultMessage="Enable comments"
-          />
-        }
-        help={
-          <FormattedMessage
-            id="component.petition-settings.petition-comments-description"
-            defaultMessage="By enabling comments, recipients of the petition will be able to ask you questions within the recipient view."
           />
         }
         isChecked={petition.hasCommentsEnabled}
@@ -222,23 +219,18 @@ function _PetitionSettings({
       (petition.signatureConfig || hasSignature) ? (
         <Box>
           <SwitchSetting
+            icon={<SignatureIcon />}
             title={
               <FormattedMessage
                 id="component.petition-settings.petition-signature-enable"
                 defaultMessage="Enable eSignature"
               />
             }
-            help={
-              <FormattedMessage
-                id="component.petition-settings.petition-signature-description"
-                defaultMessage="By enabling eSignature, once the petition is completed by the recipient, Parallel will generate a PDF document with all the replies and send it to the selected eSignature provider to start the signature process."
-              />
-            }
             onChange={handleSignatureChange}
             isChecked={Boolean(petition.signatureConfig)}
             isDisabled={!hasSignature}
           />
-          <PaddedCollapse in={Boolean(petition.signatureConfig)}>
+          <Collapse in={Boolean(petition.signatureConfig)}>
             <Flex justifyContent="center" marginTop={2}>
               <Button
                 leftIcon={<SignatureIcon fontSize="18px" />}
@@ -253,11 +245,31 @@ function _PetitionSettings({
                 </Text>
               </Button>
             </Flex>
-          </PaddedCollapse>
+          </Collapse>
         </Box>
       ) : null}
+      <SwitchSetting
+        icon={petition.isReadOnly ? <LockClosedIcon /> : <LockOpenIcon />}
+        title={
+          <FormattedMessage
+            id="component.petition-settings.restrict-editing"
+            defaultMessage="Restrict editing"
+          />
+        }
+        help={
+          <FormattedMessage
+            id="component.petition-settings.restrict-editing-description"
+            defaultMessage="Allows to limit edition in the petition fields."
+          />
+        }
+        isChecked={petition.isReadOnly}
+        onChange={async (value) => {
+          await onUpdatePetition({ isReadOnly: value });
+        }}
+      />
       {user.hasSkipForwardSecurity ? (
         <SwitchSetting
+          icon={<ShieldIcon />}
           title={
             <FormattedMessage
               id="component.petition-settings.skip-forward-security"
@@ -276,6 +288,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasHideRecipientViewContents ? (
         <SwitchSetting
+          icon={<ListIcon />}
           title={
             <FormattedMessage
               id="component.petition-settings.hide-recipient-view-contents"
@@ -322,6 +335,7 @@ const fragments = {
       hasCommentsEnabled
       skipForwardSecurity
       isRecipientViewContentsHidden
+      isReadOnly
       ... on Petition {
         status
         deadline
@@ -372,12 +386,14 @@ export const PetitionSettings = Object.assign(
 function SwitchSetting({
   title,
   help,
+  icon,
   isChecked,
   isDisabled,
   onChange,
 }: {
   title: ReactNode;
-  help: ReactNode;
+  help?: ReactNode;
+  icon?: ReactNode;
   isChecked: boolean;
   isDisabled?: boolean;
   onChange: (value: boolean) => void;
@@ -385,8 +401,9 @@ function SwitchSetting({
   return (
     <FormControl as={Stack} direction="row">
       <FormLabel margin={0} display="flex" alignItems="center">
+        {icon ? <Flex marginRight={1}>{icon}</Flex> : null}
         {title}
-        <HelpPopover marginLeft={2}>{help}</HelpPopover>
+        {help ? <HelpPopover marginLeft={2}>{help}</HelpPopover> : null}
       </FormLabel>
       <Spacer />
       <Switch

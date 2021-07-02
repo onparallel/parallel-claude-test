@@ -24,6 +24,7 @@ import {
   DeleteIcon,
   DownloadIcon,
   EditIcon,
+  LockClosedIcon,
   MoreVerticalIcon,
   UserArrowIcon,
 } from "@parallel/chakra/icons";
@@ -131,6 +132,17 @@ export function PetitionHeader({
   const sections = useMemo(
     () => [
       {
+        rightIcon: petition.isReadOnly ? (
+          <SmallPopover
+            content={intl.formatMessage({
+              id: "component.petition-header.compose-tab.readonly",
+              defaultMessage:
+                "Edition restricted. To make changes, you can disable the protection on the Settings tab.",
+            })}
+          >
+            <LockClosedIcon color="gray.500" _hover={{ color: "gray.600" }} />
+          </SmallPopover>
+        ) : undefined,
         section: "compose",
         label: intl.formatMessage({
           id: "petition.header.compose-tab",
@@ -170,7 +182,7 @@ export function PetitionHeader({
         ),
       },
     ],
-    [petition.status, intl.locale]
+    [petition.status, petition.isReadOnly, intl.locale]
   );
 
   const [reopenPetition] = usePetitionHeader_reopenPetitionMutation();
@@ -402,27 +414,33 @@ export function PetitionHeader({
         marginBottom={{ base: "10px", md: 0 }}
         direction="row"
       >
-        {sections.map(({ section, label, isDisabled, popoverContent }) => {
-          return isDisabled ? (
-            <PetitionHeaderTab
-              key={section}
-              isActive={current === section}
-              isDisabled
-              popoverContent={popoverContent}
-            >
-              {label}
-            </PetitionHeaderTab>
-          ) : (
-            <NakedLink
-              key={section}
-              href={`/app/petitions/${petition.id}/${section}`}
-            >
-              <PetitionHeaderTab isActive={current === section}>
+        {sections.map(
+          ({ section, label, isDisabled, popoverContent, rightIcon }) => {
+            return isDisabled ? (
+              <PetitionHeaderTab
+                key={section}
+                isActive={current === section}
+                isDisabled
+                popoverContent={popoverContent}
+                rightIcon={rightIcon}
+              >
                 {label}
               </PetitionHeaderTab>
-            </NakedLink>
-          );
-        })}
+            ) : (
+              <NakedLink
+                key={section}
+                href={`/app/petitions/${petition.id}/${section}`}
+              >
+                <PetitionHeaderTab
+                  isActive={current === section}
+                  rightIcon={rightIcon}
+                >
+                  {label}
+                </PetitionHeaderTab>
+              </NakedLink>
+            );
+          }
+        )}
       </Stack>
     </Box>
   );
@@ -434,10 +452,11 @@ const PetitionHeaderTab = chakraForwardRef<
     isActive?: boolean;
     isDisabled?: boolean;
     popoverContent?: ReactNode;
+    rightIcon?: ReactNode;
     children: ReactNode;
   }
 >(function (
-  { isActive, isDisabled, children, popoverContent, ...props },
+  { isActive, isDisabled, children, popoverContent, rightIcon, ...props },
   ref: Ref<any>
 ) {
   const link = (
@@ -446,6 +465,7 @@ const PetitionHeaderTab = chakraForwardRef<
       ref={ref}
       textTransform="uppercase"
       isDisabled={isDisabled}
+      rightIcon={rightIcon}
       variant={isActive ? "solid" : "ghost"}
       {...(isActive ? { "aria-current": "page" } : {})}
       {...(props as any)}
@@ -475,6 +495,7 @@ PetitionHeader.fragments = {
       myEffectivePermission {
         isSubscribed
       }
+      isReadOnly
       ...HeaderNameEditable_PetitionBase
     }
     ${HeaderNameEditable.fragments.PetitionBase}

@@ -140,6 +140,7 @@ export interface NexusGenInputs {
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
     hasCommentsEnabled?: boolean | null; // Boolean
+    isReadOnly?: boolean | null; // Boolean
     isRecipientViewContentsHidden?: boolean | null; // Boolean
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     name?: string | null; // String
@@ -856,6 +857,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     myEffectivePermission:
@@ -1074,6 +1076,7 @@ export interface NexusGenFieldTypes {
     hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     isPublic: boolean; // Boolean!
+    isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     myEffectivePermission:
@@ -1466,6 +1469,7 @@ export interface NexusGenFieldTypes {
     fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
     hasCommentsEnabled: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     myEffectivePermission:
@@ -1814,6 +1818,7 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     hasCommentsEnabled: "Boolean";
     id: "GID";
+    isReadOnly: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     myEffectivePermission: "EffectivePetitionUserPermission";
@@ -2030,6 +2035,7 @@ export interface NexusGenFieldTypeNames {
     hasCommentsEnabled: "Boolean";
     id: "GID";
     isPublic: "Boolean";
+    isReadOnly: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     myEffectivePermission: "EffectivePetitionUserPermission";
@@ -2420,6 +2426,7 @@ export interface NexusGenFieldTypeNames {
     fields: "PetitionField";
     hasCommentsEnabled: "Boolean";
     id: "GID";
+    isReadOnly: "Boolean";
     isRecipientViewContentsHidden: "Boolean";
     locale: "PetitionLocale";
     myEffectivePermission: "EffectivePetitionUserPermission";

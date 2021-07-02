@@ -448,6 +448,7 @@ export const updatePetition = mutationField("updatePetition", {
             type: "SignatureConfigInput",
           });
           t.nullable.string("description");
+          t.nullable.boolean("isReadOnly");
         },
       }).asArg()
     ),
@@ -480,6 +481,7 @@ export const updatePetition = mutationField("updatePetition", {
       isRecipientViewContentsHidden,
       signatureConfig,
       description,
+      isReadOnly,
     } = args.data;
     const data: Partial<CreatePetition> = {};
     if (name !== undefined) {
@@ -523,6 +525,10 @@ export const updatePetition = mutationField("updatePetition", {
     }
     if (description !== undefined) {
       data.template_description = description?.trim() || null;
+    }
+
+    if (isDefined(isReadOnly)) {
+      data.is_readonly = isReadOnly;
     }
 
     const [petition] = await ctx.petitions.updatePetition(
