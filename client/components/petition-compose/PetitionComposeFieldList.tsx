@@ -453,7 +453,16 @@ export const PetitionComposeFieldList = Object.assign(
 
     return (
       <>
-        <Card id="petition-fields" overflow="hidden" {...props}>
+        <Card
+          id="petition-fields"
+          overflow="hidden"
+          sx={{
+            // safari fix round corners + overflow
+            WebkitBackfaceVisibility: "hidden",
+            WebkitTransform: "translate3d(0, 0, 0)",
+          }}
+          {...props}
+        >
           {fieldIds.map((fieldId, index) => {
             const field = fieldsById[fieldId];
             const isActive = active === fieldId;
