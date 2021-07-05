@@ -414,7 +414,8 @@ const Toolbar = memo(function _Toolbar({
     >
       <MarkButton
         type="bold"
-        icon={<BoldIcon />}
+        size="sm"
+        icon={<BoldIcon fontSize="16px" />}
         isDisabled={isDisabled}
         label={intl.formatMessage({
           id: "generic.richtext.bold",
@@ -423,7 +424,8 @@ const Toolbar = memo(function _Toolbar({
       />
       <MarkButton
         type="italic"
-        icon={<ItalicIcon />}
+        size="sm"
+        icon={<ItalicIcon fontSize="16px" />}
         isDisabled={isDisabled}
         label={intl.formatMessage({
           id: "generic.richtext.italic",
@@ -432,7 +434,8 @@ const Toolbar = memo(function _Toolbar({
       />
       <MarkButton
         type="underline"
-        icon={<UnderlineIcon />}
+        size="sm"
+        icon={<UnderlineIcon fontSize="16px" />}
         isDisabled={isDisabled}
         label={intl.formatMessage({
           id: "generic.richtext.underline",
@@ -441,7 +444,8 @@ const Toolbar = memo(function _Toolbar({
       />
       <ListButton
         type="bulleted-list"
-        icon={<ListIcon />}
+        size="sm"
+        icon={<ListIcon fontSize="16px" />}
         isDisabled={isDisabled}
         label={intl.formatMessage({
           id: "generic.richtext.list",
@@ -450,7 +454,8 @@ const Toolbar = memo(function _Toolbar({
       />
       {hasPlaceholders ? (
         <PlaceholderButton
-          icon={<SharpIcon />}
+          size="sm"
+          icon={<SharpIcon fontSize="16px" />}
           isDisabled={isDisabled}
           label={intl.formatMessage({
             id: "generic.richtext.personalize",
@@ -475,7 +480,6 @@ function ListButton({
       placement="bottom"
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
-      height="100%"
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
         toggleList(editor, {
@@ -501,7 +505,6 @@ function MarkButton({
       placement="bottom"
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
-      height="100%"
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
         toggleMark(editor, type);
@@ -517,7 +520,6 @@ function PlaceholderButton(props: IconButtonWithTooltipProps) {
     <IconButtonWithTooltip
       placement="bottom"
       variant="ghost"
-      height="100%"
       tabIndex={-1}
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
