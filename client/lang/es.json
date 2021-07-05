@@ -296,7 +296,7 @@
   },
   {
     "term": "component.copy-signature-config-dialog.body",
-    "definition": "Has asignado a {contacts} para firmar la primer petición.",
+    "definition": "Has asignado a {contacts} para firmar la primera petición.",
     "context": "You have assigned {contacts} to sign the first petition."
   },
   {
@@ -311,7 +311,7 @@
   },
   {
     "term": "component.copy-signature-config-dialog.option-1",
-    "definition": "Si, permitir a {count, plural, =1{este contacto} other{estos contactos}} firmar todas las peticiones.",
+    "definition": "Sí, permitir a {count, plural, =1{este contacto} other{estos contactos}} firmar todas las peticiones.",
     "context": "Yes, allow this {count, plural, =1{contact} other{contacts}} to sign all the petitions."
   },
   {
