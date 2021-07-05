@@ -35,7 +35,7 @@ import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
 import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
-import { Notifications } from "../notifications/Notifications";
+import { NotificationsButton } from "../notifications/NotificationsButton";
 import { UserMenu } from "./UserMenu";
 
 export interface AppLayoutNavbarProps extends BoxProps {
@@ -220,7 +220,7 @@ export const AppLayoutNavbar = Object.assign(
         </Flex>
         <Spacer display={{ base: "none", sm: "block" }} />
         <Center display={{ base: "none", sm: "flex" }} marginBottom={6}>
-          <Notifications />
+          <NotificationsButton />
         </Center>
         <Center>
           <UserMenu

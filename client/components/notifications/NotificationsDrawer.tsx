@@ -18,25 +18,20 @@ import {
 import { getMyId } from "@parallel/utils/apollo/getMyId";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { Focusable } from "@parallel/utils/types";
-import { ValueProps } from "@parallel/utils/ValueProps";
+import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { NotificationsFilterSelect } from "./NotificationsFilterSelect";
 import { NotificationsList } from "./NotificationsList";
 
-export type NotificationsDrawerProps =
-  ValueProps<PetitionUserNotificationFilter>;
-
 const NOTIFICATIONS_LIMIT = 16;
 const POLL_INTERVAL = 10000;
 
 const MotionFooter = motion<Omit<ModalFooterProps, "transition">>(DrawerFooter);
 
-export function NotificationsDrawer({
-  value: filter,
-  onChange: onFilterChange,
-}: NotificationsDrawerProps) {
+export function NotificationsDrawer() {
+  const { isOpen, filter, onFilterChange, onClose } = useNotificationsState();
   const lastNotificationDate = useRef<string | undefined>(undefined);
   const [
     getData,
@@ -61,7 +56,6 @@ export function NotificationsDrawer({
   const hasMore = data?.me.notifications.hasMore ?? true;
   const hasUnread = notifications.some((n) => !n.isRead);
 
-  const isOpen = filter !== null;
   useEffect(() => {
     if (isOpen) {
       if (called) {
@@ -124,7 +118,7 @@ export function NotificationsDrawer({
   return (
     <Drawer
       placement="right"
-      onClose={() => onFilterChange(null)}
+      onClose={onClose}
       isOpen={isOpen}
       size="sm"
       isFullHeight

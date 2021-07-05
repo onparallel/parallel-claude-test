@@ -14,6 +14,7 @@ import {
   OnboardingTour,
   OnboardingTourContext,
 } from "../common/OnboardingTour";
+import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
 export interface AppLayoutProps extends BoxProps {
@@ -158,6 +159,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
         onUpdateTour={handleUpdateTour}
         status={user.onboardingStatus as any}
       />
+      <NotificationsDrawer />
     </>
   );
 }

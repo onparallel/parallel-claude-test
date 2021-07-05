@@ -10,9 +10,11 @@ import {
   MenuList,
   MenuOptionGroup,
   Portal,
+  useBreakpointValue,
   UsePopperProps,
 } from "@chakra-ui/react";
 import {
+  BellIcon,
   BusinessIcon,
   HelpOutlineIcon,
   KeyIcon,
@@ -21,6 +23,7 @@ import {
   UserIcon,
 } from "@parallel/chakra/icons";
 import { UserMenu_UserFragment } from "@parallel/graphql/__types";
+import { useNotificationsState } from "@parallel/utils/useNotificationsState";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -58,6 +61,9 @@ export function UserMenu({
     });
   }
 
+  const isMobile = useBreakpointValue({ base: true, sm: false });
+  const { onOpen: onOpenNotifications } = useNotificationsState();
+
   return (
     <Menu placement={placement}>
       <MenuButton
@@ -75,6 +81,17 @@ export function UserMenu({
       </MenuButton>
       <Portal>
         <MenuList>
+          {isMobile ? (
+            <MenuItem
+              onClick={onOpenNotifications}
+              icon={<BellIcon display="block" boxSize={4} />}
+            >
+              <FormattedMessage
+                id="component.user-menu.notifications"
+                defaultMessage="Notifications"
+              />
+            </MenuItem>
+          ) : null}
           <NakedLink href="/app/settings">
             <MenuItem as="a" icon={<UserIcon display="block" boxSize={4} />}>
               <FormattedMessage id="settings.title" defaultMessage="Settings" />

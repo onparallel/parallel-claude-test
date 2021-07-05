@@ -2,12 +2,13 @@ import {
   TableSorting,
   TableSortingDirection,
 } from "@parallel/components/common/Table";
-import { useRouter } from "next/router";
+import { NextRouter, useRouter } from "next/router";
 import * as qs from "querystring";
 import { ParsedUrlQuery } from "querystring";
 import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
-import { equals } from "remeda";
+import { equals, pick } from "remeda";
 import { pathParams, resolveUrl } from "./next";
+import { useUpdatingRef } from "./useUpdatingRef";
 
 export class QueryItem<T> {
   defaultValue: T | null = null;
@@ -127,49 +128,49 @@ export function useQueryState<T extends {}>(
 ): [T, Dispatch<SetStateAction<Partial<T>>>] {
   const router = useRouter();
   const state = useMemo(() => {
-    const state = parseQuery(router.query, shape, { prefix });
-    return state;
+    return parseQuery(router.query, shape, { prefix });
   }, [router.query, router.pathname]);
+  const ref = useUpdatingRef<Pick<NextRouter, "query" | "pathname">>(
+    pick(router, ["query", "pathname"])
+  );
   return [
     state,
-    useCallback(
-      async function (state) {
-        const newState =
-          typeof state === "function"
-            ? state(parseQuery(router.query, shape, { prefix }))
-            : state;
-        const fromPath = pathParams(router.pathname);
-        const fromState = Object.keys(shape).map((key) =>
-          prefix ? prefix + key : key
-        );
-        const query = qs.stringify(
-          Object.fromEntries([
-            ...Object.entries(newState)
-              .filter(
-                ([key, value]) =>
-                  value !== null &&
-                  value !== undefined &&
-                  !shape[key as keyof T].isDefault(value as any)
-              )
-              .map(([key, value]) => [
-                prefix ? prefix + key : key,
-                shape[key as keyof T].serialize(value as any),
-              ]),
-            // keep other params
-            ...Object.entries(router.query).filter(
-              ([key]) => !fromState.includes(key) && !fromPath.includes(key)
-            ),
-          ])
-        );
-        const route = resolveUrl(router.pathname, router.query);
-        await router.replace(
-          `${router.pathname}${query ? "?" + query : ""}`,
-          `${route}${query ? "?" + query : ""}`,
-          { shallow: true }
-        );
-      },
-      [router.query, router.pathname]
-    ),
+    useCallback(async function (state) {
+      const { query, pathname } = ref.current;
+      const newState =
+        typeof state === "function"
+          ? state(parseQuery(query, shape, { prefix }))
+          : state;
+      const fromPath = pathParams(pathname);
+      const fromState = Object.keys(shape).map((key) =>
+        prefix ? prefix + key : key
+      );
+      const newQuery = qs.stringify(
+        Object.fromEntries([
+          ...Object.entries(newState)
+            .filter(
+              ([key, value]) =>
+                value !== null &&
+                value !== undefined &&
+                !shape[key as keyof T].isDefault(value as any)
+            )
+            .map(([key, value]) => [
+              prefix ? prefix + key : key,
+              shape[key as keyof T].serialize(value as any),
+            ]),
+          // keep other params
+          ...Object.entries(query).filter(
+            ([key]) => !fromState.includes(key) && !fromPath.includes(key)
+          ),
+        ])
+      );
+      const route = resolveUrl(pathname, query);
+      await router.replace(
+        `${pathname}${newQuery ? "?" + newQuery : ""}`,
+        `${route}${newQuery ? "?" + newQuery : ""}`,
+        { shallow: true }
+      );
+    }, []),
   ];
 }
 

@@ -1910,6 +1910,11 @@
     "context": "Log out"
   },
   {
+    "term": "component.user-menu.notifications",
+    "definition": "Notifications",
+    "context": "Notifications"
+  },
+  {
     "term": "component.user-menu.ui-language",
     "definition": "Language",
     "context": "Language"
