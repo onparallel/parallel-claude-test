@@ -125,11 +125,15 @@ export const PetitionUserNotification = Object.assign(
                   fontStyle={petition.name ? "normal" : "italic"}
                   color="gray.600"
                 >
-                  {petition.name ??
-                    intl.formatMessage({
-                      id: "generic.untitled-petition",
-                      defaultMessage: "Untitled petition",
-                    })}
+                  {petition.name ?? petition.__typename === "Petition"
+                    ? intl.formatMessage({
+                        id: "generic.untitled-petition",
+                        defaultMessage: "Untitled petition",
+                      })
+                    : intl.formatMessage({
+                        id: "generic.untitled-template",
+                        defaultMessage: "Untitled template",
+                      })}
                 </Text>
               </LinkOverlay>
             </Link>

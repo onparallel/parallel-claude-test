@@ -36,7 +36,7 @@ export const PetitionUserNotification = interfaceType({
   definition(t) {
     t.globalId("id");
     t.field("petition", {
-      type: "Petition",
+      type: "PetitionBase",
       resolve: async (root, _, ctx) => {
         return (await ctx.petitions.loadPetition(root.petition_id))!;
       },

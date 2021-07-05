@@ -731,13 +731,13 @@
   },
   {
     "term": "component.notification-petition-shared-group.body",
-    "definition": "{name} ha compartido la petición con el grupo \"{group}\" al que perteneces.",
-    "context": "{name} has shared the petition with the group \"{group}\" to which you belong."
+    "definition": "{name} ha compartido la {isTemplate, select, true {plantilla} other {petición}} con el grupo \"{group}\" al que perteneces.",
+    "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with the group \"{group}\" to which you belong."
   },
   {
     "term": "component.notification-petition-shared.body",
-    "definition": "{name} te ha compartido la petición como {permissionType}.",
-    "context": "{name} has shared the petition with you as {permissionType}."
+    "definition": "{name} te ha compartido la {isTemplate, select, true {plantilla} other {petición}} como {permissionType}.",
+    "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with you as {permissionType}."
   },
   {
     "term": "component.notification-signature-cancelled.body",

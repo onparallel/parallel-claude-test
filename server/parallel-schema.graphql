@@ -65,7 +65,7 @@ type CommentCreatedUserNotification implements PetitionUserNotification {
   field: PetitionField!
   id: GID!
   isRead: Boolean!
-  petition: Petition!
+  petition: PetitionBase!
 }
 
 type CommentDeletedEvent implements PetitionEvent {
@@ -293,7 +293,7 @@ type MessageEmailBouncedUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   isRead: Boolean!
-  petition: Petition!
+  petition: PetitionBase!
 }
 
 type MessageScheduledEvent implements PetitionEvent {
@@ -1691,7 +1691,7 @@ type PetitionCompletedUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   isRead: Boolean!
-  petition: Petition!
+  petition: PetitionBase!
 }
 
 type PetitionCreatedEvent implements PetitionEvent {
@@ -2179,7 +2179,7 @@ type PetitionSharedUserNotification implements PetitionUserNotification {
   isRead: Boolean!
   owner: User!
   permissionType: PetitionPermissionTypeRW!
-  petition: Petition!
+  petition: PetitionBase!
   sharedWith: UserOrUserGroup!
 }
 
@@ -2401,7 +2401,7 @@ interface PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   isRead: Boolean!
-  petition: Petition!
+  petition: PetitionBase!
 }
 
 """
@@ -3169,7 +3169,7 @@ type SignatureCancelledUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   isRead: Boolean!
-  petition: Petition!
+  petition: PetitionBase!
 }
 
 type SignatureCompletedEvent implements PetitionEvent {
@@ -3181,7 +3181,7 @@ type SignatureCompletedUserNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   isRead: Boolean!
-  petition: Petition!
+  petition: PetitionBase!
 }
 
 """

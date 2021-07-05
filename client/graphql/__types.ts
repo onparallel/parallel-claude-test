@@ -86,7 +86,7 @@ export interface CommentCreatedUserNotification
   field: PetitionField;
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
-  petition: Petition;
+  petition: PetitionBase;
 }
 
 export interface CommentDeletedEvent extends PetitionEvent {
@@ -254,7 +254,7 @@ export interface MessageEmailBouncedUserNotification
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
-  petition: Petition;
+  petition: PetitionBase;
 }
 
 export interface MessageScheduledEvent extends PetitionEvent {
@@ -1361,7 +1361,7 @@ export interface PetitionCompletedUserNotification
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
-  petition: Petition;
+  petition: PetitionBase;
 }
 
 export interface PetitionCreatedEvent extends PetitionEvent {
@@ -1616,7 +1616,7 @@ export interface PetitionSharedUserNotification
   isRead: Scalars["Boolean"];
   owner: User;
   permissionType: PetitionPermissionTypeRW;
-  petition: Petition;
+  petition: PetitionBase;
   sharedWith: UserOrUserGroup;
 }
 
@@ -1741,7 +1741,7 @@ export interface PetitionUserNotification {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
-  petition: Petition;
+  petition: PetitionBase;
 }
 
 /** The types of notifications available for filtering */
@@ -2227,7 +2227,7 @@ export interface SignatureCancelledUserNotification
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
-  petition: Petition;
+  petition: PetitionBase;
 }
 
 export interface SignatureCompletedEvent extends PetitionEvent {
@@ -2242,7 +2242,7 @@ export interface SignatureCompletedUserNotification
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
-  petition: Petition;
+  petition: PetitionBase;
 }
 
 /** The signature settings of a petition */
@@ -3160,6 +3160,7 @@ export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragmen
   {
     __typename?: "PetitionSharedUserNotification";
     permissionType: PetitionPermissionTypeRW;
+    petition: { __typename: "Petition" } | { __typename: "PetitionTemplate" };
     owner: { __typename?: "User" } & UserReference_UserFragment;
     sharedWith:
       | ({ __typename?: "User" } & UserReference_UserFragment)
@@ -3172,7 +3173,9 @@ export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUser
     id: string;
     createdAt: string;
     isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
@@ -3181,7 +3184,9 @@ export type PetitionUserNotification_PetitionUserNotification_MessageEmailBounce
     id: string;
     createdAt: string;
     isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment =
@@ -3190,7 +3195,9 @@ export type PetitionUserNotification_PetitionUserNotification_PetitionCompletedU
     id: string;
     createdAt: string;
     isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_PetitionSharedUserNotification_Fragment =
@@ -3199,7 +3206,9 @@ export type PetitionUserNotification_PetitionUserNotification_PetitionSharedUser
     id: string;
     createdAt: string;
     isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
@@ -3208,7 +3217,9 @@ export type PetitionUserNotification_PetitionUserNotification_SignatureCancelled
     id: string;
     createdAt: string;
     isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
 export type PetitionUserNotification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment =
@@ -3217,7 +3228,9 @@ export type PetitionUserNotification_PetitionUserNotification_SignatureCompleted
     id: string;
     createdAt: string;
     isRead: boolean;
-    petition: { __typename?: "Petition"; id: string; name?: Maybe<string> };
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
 export type PetitionUserNotification_PetitionUserNotificationFragment =
@@ -7134,6 +7147,9 @@ export const PetitionCompletedUserNotification_PetitionCompletedUserNotification
 export const PetitionSharedUserNotification_PetitionSharedUserNotificationFragmentDoc = gql`
   fragment PetitionSharedUserNotification_PetitionSharedUserNotification on PetitionSharedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
+    petition {
+      __typename
+    }
     owner {
       ...UserReference_User
     }

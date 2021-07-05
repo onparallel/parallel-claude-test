@@ -16,6 +16,7 @@ export interface PetitionSharedUserNotificationProps {
 export const PetitionSharedUserNotification = Object.assign(
   forwardRef<HTMLElement, PetitionSharedUserNotificationProps>(
     function PetitionSharedUserNotification({ isFirst, notification }, ref) {
+      const { petition, sharedWith } = notification;
       return (
         <PetitionUserNotification
           ref={ref}
@@ -26,7 +27,7 @@ export const PetitionSharedUserNotification = Object.assign(
               boxSize="36px"
               background="purple.500"
               icon={
-                notification.sharedWith.__typename === "UserGroup" ? (
+                sharedWith.__typename === "UserGroup" ? (
                   <UserGroupArrowIcon color="white" fontSize="1rem" />
                 ) : (
                   <UserArrowIcon color="white" fontSize="1rem" />
@@ -36,20 +37,22 @@ export const PetitionSharedUserNotification = Object.assign(
           }
           path={``}
         >
-          {notification.sharedWith.__typename === "UserGroup" ? (
+          {sharedWith.__typename === "UserGroup" ? (
             <FormattedMessage
               id="component.notification-petition-shared-group.body"
-              defaultMessage='{name} has shared the petition with the group "{group}" to which you belong.'
+              defaultMessage='{name} has shared the {isTemplate, select, true {template} other {petition}} with the group "{group}" to which you belong.'
               values={{
+                isTemplate: petition.__typename === "PetitionTemplate",
                 name: <UserReference user={notification.owner} />,
-                group: notification.sharedWith.name,
+                group: sharedWith.name,
               }}
             />
           ) : (
             <FormattedMessage
               id="component.notification-petition-shared.body"
-              defaultMessage="{name} has shared the petition with you as {permissionType}."
+              defaultMessage="{name} has shared the {isTemplate, select, true {template} other {petition}} with you as {permissionType}."
               values={{
+                isTemplate: petition.__typename === "PetitionTemplate",
                 name: <UserReference user={notification.owner} />,
                 permissionType: (
                   <PetitionPermissionTypeText
@@ -69,6 +72,9 @@ export const PetitionSharedUserNotification = Object.assign(
       PetitionSharedUserNotification: gql`
         fragment PetitionSharedUserNotification_PetitionSharedUserNotification on PetitionSharedUserNotification {
           ...PetitionUserNotification_PetitionUserNotification
+          petition {
+            __typename
+          }
           owner {
             ...UserReference_User
           }
