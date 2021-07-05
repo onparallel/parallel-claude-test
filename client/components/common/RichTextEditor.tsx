@@ -339,11 +339,12 @@ export const RichTextEditor = forwardRef<
     >
       <Slate editor={editor} value={value} onChange={handleChange}>
         <Toolbar
+          height="40px"
           isDisabled={formControl.disabled || formControl.readOnly}
           hasPlaceholders={placeholderOptions.length > 0}
         />
         <Box
-          maxHeight="360px"
+          maxHeight="250px"
           overflow="auto"
           sx={{
             '[contenteditable="false"]': {
@@ -474,6 +475,7 @@ function ListButton({
       placement="bottom"
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
+      height="100%"
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
         toggleList(editor, {
@@ -499,6 +501,7 @@ function MarkButton({
       placement="bottom"
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
+      height="100%"
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
         toggleMark(editor, type);
@@ -514,6 +517,7 @@ function PlaceholderButton(props: IconButtonWithTooltipProps) {
     <IconButtonWithTooltip
       placement="bottom"
       variant="ghost"
+      height="100%"
       tabIndex={-1}
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
