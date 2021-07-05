@@ -14,6 +14,6 @@ export async function openNewWindow(
     const url = typeof value === "function" ? await value() : await value;
     _window.location.href = url!;
   } catch {
-    _window.close();
+    _window?.close();
   }
 }
