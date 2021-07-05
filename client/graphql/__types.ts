@@ -2901,12 +2901,14 @@ export type HeaderNameEditable_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   name?: Maybe<string>;
   updatedAt: string;
+  isReadOnly: boolean;
 };
 
 export type HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
   name?: Maybe<string>;
   updatedAt: string;
+  isReadOnly: boolean;
 };
 
 export type HeaderNameEditable_PetitionBaseFragment =
@@ -2919,7 +2921,6 @@ export type PetitionHeader_PetitionFragment = {
   locale: PetitionLocale;
   deadline?: Maybe<string>;
   status: PetitionStatus;
-  isReadOnly: boolean;
   myEffectivePermission?: Maybe<{
     __typename?: "EffectivePetitionUserPermission";
     isSubscribed: boolean;
@@ -7790,6 +7791,7 @@ export const HeaderNameEditable_PetitionBaseFragmentDoc = gql`
   fragment HeaderNameEditable_PetitionBase on PetitionBase {
     name
     updatedAt
+    isReadOnly
   }
 `;
 export const PetitionHeader_PetitionFragmentDoc = gql`
@@ -7801,7 +7803,6 @@ export const PetitionHeader_PetitionFragmentDoc = gql`
     myEffectivePermission {
       isSubscribed
     }
-    isReadOnly
     ...HeaderNameEditable_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}

@@ -53,29 +53,41 @@ export const HeaderNameEditable = Object.assign(
         {({ isEditing }: { isEditing: boolean }) => (
           <>
             <Flex flex="1 1 auto" minWidth={0} padding={1}>
-              <Tooltip
-                placement="bottom"
-                label={intl.formatMessage({
-                  id: "component.header-name-editable.change-name",
-                  defaultMessage: "Change name",
-                })}
-                offset={[0, -1]}
-              >
-                <EditablePreview
-                  color={name ? undefined : "gray.400"}
-                  paddingY={1}
+              {petition.isReadOnly ? (
+                <Text
+                  color={name ? "default" : "gray.400"}
                   paddingX={2}
-                  display="block"
                   isTruncated
-                />
-              </Tooltip>
-              <EditableInput
-                paddingY={1}
-                paddingX={2}
-                maxLength={255}
-                width={props.maxWidth}
-                transition="all 250ms, width 0s"
-              />
+                >
+                  {name || props.placeholder}
+                </Text>
+              ) : (
+                <>
+                  <Tooltip
+                    placement="bottom"
+                    label={intl.formatMessage({
+                      id: "component.header-name-editable.change-name",
+                      defaultMessage: "Change name",
+                    })}
+                    offset={[0, -1]}
+                  >
+                    <EditablePreview
+                      color={name ? undefined : "gray.400"}
+                      paddingY={1}
+                      paddingX={2}
+                      display="block"
+                      isTruncated
+                    />
+                  </Tooltip>
+                  <EditableInput
+                    paddingY={1}
+                    paddingX={2}
+                    maxLength={255}
+                    width={props.maxWidth}
+                    transition="all 250ms, width 0s"
+                  />
+                </>
+              )}
             </Flex>
             {!isEditing && (
               <Flex
@@ -162,6 +174,7 @@ export const HeaderNameEditable = Object.assign(
         fragment HeaderNameEditable_PetitionBase on PetitionBase {
           name
           updatedAt
+          isReadOnly
         }
       `,
     },

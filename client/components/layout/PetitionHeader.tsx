@@ -495,7 +495,6 @@ PetitionHeader.fragments = {
       myEffectivePermission {
         isSubscribed
       }
-      isReadOnly
       ...HeaderNameEditable_PetitionBase
     }
     ${HeaderNameEditable.fragments.PetitionBase}

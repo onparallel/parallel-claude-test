@@ -1926,7 +1926,7 @@ describe("GraphQL/Petitions", () => {
   describe("Read-only petitions", () => {
     let readonlyPetition: Petition;
     let fields: PetitionField[];
-    beforeEach(async () => {
+    beforeAll(async () => {
       [readonlyPetition] = await mocks.createRandomPetitions(
         organization.id,
         sessionUser.id,
