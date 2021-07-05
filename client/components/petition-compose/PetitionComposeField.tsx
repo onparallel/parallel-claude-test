@@ -560,8 +560,6 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             onBlur={() => {
               const trimmed = title?.trim() ?? null;
               setNativeValue(titleRef.current!, trimmed ?? "");
-              titleRef.current!.selectionStart =
-                titleRef.current!.selectionEnd = 0;
               if (field.title !== trimmed) {
                 onFieldEdit({ title: trimmed });
               }
