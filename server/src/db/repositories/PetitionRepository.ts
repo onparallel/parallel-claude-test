@@ -20,7 +20,7 @@ import {
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { fromGlobalId } from "../../util/globalId";
 import { keyBuilder } from "../../util/keyBuilder";
-import { isDefined } from "../../util/remedaExtensions";
+import { isDefined, removeNotDefined } from "../../util/remedaExtensions";
 import {
   calculateNextReminder,
   PetitionAccessReminderConfig,
@@ -2012,7 +2012,13 @@ export class PetitionRepository extends BaseRepository {
   ) {
     return await this.from("petition_user_notification")
       .whereIn("id", petitionUserNotificationIds)
-      .update(data, "*");
+      .update(
+        removeNotDefined({
+          ...data,
+          processed_at: data.is_read ? this.now() : undefined,
+        }),
+        "*"
+      );
   }
 
   async updatePetitionUserNotificationsReadStatus(
@@ -2024,7 +2030,13 @@ export class PetitionRepository extends BaseRepository {
       .whereIn("id", petitionUserNotificationIds)
       .where("user_id", userId)
       .where("is_read", !isRead) // to return only the updated notifications
-      .update({ is_read: isRead }, "*");
+      .update(
+        removeNotDefined({
+          is_read: isRead,
+          processed_at: isRead ? this.now() : undefined,
+        }),
+        "*"
+      );
   }
 
   async updatePetitionUserNotificationsReadStatusByPetitionId(
@@ -2037,7 +2049,13 @@ export class PetitionRepository extends BaseRepository {
       .where("user_id", userId)
       .where("is_read", !isRead)
       .whereNot("type", "COMMENT_CREATED")
-      .update({ is_read: isRead }, "*");
+      .update(
+        removeNotDefined({
+          is_read: isRead,
+          processed_at: isRead ? this.now() : undefined,
+        }),
+        "*"
+      );
   }
 
   async updatePetitionUserNotificationsReadStatusByCommentIds(
@@ -2066,7 +2084,13 @@ export class PetitionRepository extends BaseRepository {
           });
         }
       })
-      .update({ is_read: isRead }, "*");
+      .update(
+        removeNotDefined({
+          is_read: isRead,
+          processed_at: isRead ? this.now() : undefined,
+        }),
+        "*"
+      );
   }
 
   async updatePetitionUserNotificationsReadStatusByUserId(
@@ -2090,7 +2114,13 @@ export class PetitionRepository extends BaseRepository {
           q.whereIn("type", ["MESSAGE_EMAIL_BOUNCED", "SIGNATURE_CANCELLED"]);
         }
       })
-      .update({ is_read: isRead }, "*");
+      .update(
+        removeNotDefined({
+          is_read: isRead,
+          processed_at: isRead ? this.now() : undefined,
+        }),
+        "*"
+      );
   }
 
   async createPetitionUserNotification(data: CreatePetitionUserNotification[]) {

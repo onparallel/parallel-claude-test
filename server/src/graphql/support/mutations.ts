@@ -62,6 +62,10 @@ export const deletePetition = mutationField("deletePetition", {
 
       await ctx.petitions.withTransaction(async (t) => {
         await ctx.petitions.deleteAllPermissions([petitionId], ctx.user!, t);
+        await ctx.petitions.deletePetitionUserNotificationsByPetitionId(
+          [petitionId],
+          t
+        );
         await ctx.petitions.deletePetitionById(petitionId, ctx.user!, t);
       });
       return {
