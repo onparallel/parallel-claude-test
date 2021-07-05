@@ -42,6 +42,7 @@ export function NotificationsDrawer({
     getData,
     {
       data,
+      called,
       loading,
       refetch,
       fetchMore,
@@ -63,12 +64,16 @@ export function NotificationsDrawer({
   const isOpen = filter !== null;
   useEffect(() => {
     if (isOpen) {
-      getData({
-        variables: {
-          limit: NOTIFICATIONS_LIMIT,
-          filter,
-        },
-      });
+      if (called) {
+        refetch!();
+      } else {
+        getData({
+          variables: {
+            limit: NOTIFICATIONS_LIMIT,
+            filter,
+          },
+        });
+      }
       startPolling?.(POLL_INTERVAL);
     } else {
       stopPolling?.();
@@ -107,10 +112,7 @@ export function NotificationsDrawer({
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await refetch!({
-      limit: NOTIFICATIONS_LIMIT,
-      filter,
-    });
+    await refetch!();
     setIsRefreshing(false);
   };
 

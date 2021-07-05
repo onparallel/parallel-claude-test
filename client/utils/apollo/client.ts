@@ -103,9 +103,7 @@ export function createApolloClient(
       typePolicies: {
         Query: {
           fields: {
-            petitionFieldComments: {
-              merge: false,
-            },
+            petitionFieldComments: { merge: false },
           },
         },
         PetitionBase: {
@@ -160,22 +158,14 @@ export function createApolloClient(
                 });
               },
             },
-            emailBody: {
-              merge: false,
-            },
-            signatureConfig: {
-              merge: true,
-            },
+            emailBody: { merge: false },
+            signatureConfig: { merge: true },
           },
         },
         PetitionField: {
           fields: {
-            options: {
-              merge: false,
-            },
-            replies: {
-              merge: false,
-            },
+            options: { merge: false },
+            replies: { merge: false },
             attachments: {
               merge: mergeArraysBy(["id"]),
             },
@@ -196,6 +186,7 @@ export function createApolloClient(
         User: {
           fields: {
             authenticationTokens: { merge: false },
+            unreadNotificationIds: { merge: false },
             notifications: {
               keyArgs: ["filter"],
               merge(existing, incoming, { readField }) {
