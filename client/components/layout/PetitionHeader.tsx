@@ -198,7 +198,6 @@ export function PetitionHeader({
       borderBottom="2px solid"
       borderBottomColor="gray.200"
       position="relative"
-      height={{ base: "102px", md: 16 }}
       {...props}
     >
       <Flex height={16} alignItems="center" paddingX={4}>
@@ -394,13 +393,14 @@ export function PetitionHeader({
       </Flex>
       <Stack
         alignItems="center"
-        position="absolute"
+        justifyContent="center"
+        transform={{ base: "none", md: "translate(-50%)" }}
+        left={{ base: 0, md: "50%" }}
         bottom="0"
-        left="50%"
-        height={{ base: "56px", md: 16 }}
-        transform="translateX(-50%)"
+        position={{ base: "relative", md: "absolute" }}
+        height={{ base: "40px", md: "64px" }}
+        marginBottom={{ base: "10px", md: 0 }}
         direction="row"
-        marginBottom="-2px"
       >
         {sections.map(({ section, label, isDisabled, popoverContent }) => {
           return isDisabled ? (
