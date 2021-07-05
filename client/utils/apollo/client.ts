@@ -208,7 +208,6 @@ export function createApolloClient(
                     hasMore: incoming.hasMore,
                   };
                 }
-                return;
               },
             },
           },
