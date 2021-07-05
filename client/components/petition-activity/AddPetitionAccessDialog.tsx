@@ -150,7 +150,8 @@ export function AddPetitionAccessDialog({
       let batchSendSigningMode: BatchSendSigningMode | undefined;
       if (
         petition.signatureConfig &&
-        petition.signatureConfig.contacts.length > 0
+        petition.signatureConfig.contacts.length > 0 &&
+        recipientGroups.length > 1
       ) {
         const option = await showCopySignatureConfigDialog({
           signers: petition.signatureConfig
