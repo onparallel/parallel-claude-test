@@ -1,10 +1,11 @@
 import { PetitionUserNotificationFilter } from "@parallel/graphql/__types";
 import {
+  useQueryState,
   useQueryStateSlice,
   values,
-  useQueryState,
 } from "@parallel/utils/queryState";
-import { useCallback } from "react";
+import { useMemo } from "react";
+import { localStorageGet, localStorageSet } from "./localStorage";
 
 const QUERY_STATE = {
   notifications: values<PetitionUserNotificationFilter>([
@@ -26,8 +27,24 @@ export function useNotificationsState() {
   return {
     isOpen: filter !== null,
     filter,
-    onFilterChange,
-    onOpen: useCallback(() => onFilterChange("ALL"), [onFilterChange]),
-    onClose: useCallback(() => onFilterChange(null), [onFilterChange]),
+    ...useMemo(
+      () => ({
+        onFilterChange: (value: PetitionUserNotificationFilter | null) => {
+          if (value !== null) {
+            localStorageSet("notifications-filter", value);
+          }
+          onFilterChange(value);
+        },
+        onOpen: () => {
+          const prevValue = localStorageGet<PetitionUserNotificationFilter>(
+            "notifications-filter",
+            "ALL"
+          );
+          onFilterChange(prevValue);
+        },
+        onClose: () => onFilterChange(null),
+      }),
+      [onFilterChange]
+    ),
   };
 }
