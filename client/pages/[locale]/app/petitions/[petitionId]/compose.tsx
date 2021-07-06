@@ -69,7 +69,10 @@ import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useFieldIndices } from "@parallel/utils/fieldIndices";
-import { PetitionFieldVisibility } from "@parallel/utils/fieldVisibility/types";
+import {
+  PetitionFieldVisibility,
+  PetitionFieldVisibilityCondition,
+} from "@parallel/utils/fieldVisibility/types";
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { withError } from "@parallel/utils/promises/withError";
 import { Maybe, UnwrapPromise } from "@parallel/utils/types";
@@ -223,20 +226,28 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       const field = fields.find((f) => f.id === fieldId);
       if (data.multiple === false) {
         // check no field is referencing with invalid NUMBER_OF_REPLIES condition
-        const referencing = zip(fields, indices).filter(([f]) =>
-          (f.visibility as PetitionFieldVisibility)?.conditions.some(
-            (c) =>
-              c.fieldId === fieldId &&
-              c.modifier === "NUMBER_OF_REPLIES" &&
-              !(
+        const validCondition = (c: PetitionFieldVisibilityCondition) => {
+          if (c.fieldId === fieldId) {
+            if (c.modifier === "NUMBER_OF_REPLIES") {
+              return (
                 c.value === 0 &&
                 (c.operator === "EQUAL" || c.operator === "GREATER_THAN")
-              )
+              );
+            } else if (c.modifier === "ALL" || c.modifier === "NONE") {
+              return false;
+            }
+          }
+          return true;
+        };
+        const referencing = zip(fields, indices).filter(([f]) =>
+          (f.visibility as PetitionFieldVisibility)?.conditions.some(
+            (c) => !validCondition(c)
           )
         );
         if (referencing.length) {
           try {
             await showReferencedFieldDialog({
+              type: "INVALID_CONDITION",
               fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
                 field,
                 fieldIndex,
@@ -245,9 +256,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             await Promise.all(
               referencing.map(async ([field]) => {
                 const visibility = field.visibility! as PetitionFieldVisibility;
-                const conditions = visibility.conditions.filter(
-                  (c) => c.fieldId !== fieldId
-                );
+                const conditions = visibility.conditions.filter(validCondition);
                 await _handleFieldEdit(field.id, {
                   visibility:
                     conditions.length > 0
@@ -308,6 +317,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         } else {
           try {
             await showReferencedFieldDialog({
+              type: "INVALID_CONDITION",
               fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
                 field,
                 fieldIndex,

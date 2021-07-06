@@ -181,6 +181,7 @@ export const PetitionComposeFieldList = Object.assign(
           if (referencing.length > 0) {
             try {
               await showReferencedFieldDialog({
+                type: "DELETING_FIELD",
                 fieldsWithIndices: referencing.map(([field, fieldIndex]) => ({
                   field,
                   fieldIndex,

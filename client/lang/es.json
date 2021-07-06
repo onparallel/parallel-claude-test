@@ -1705,6 +1705,16 @@
     "context": "To proceed you need to remove the referencing conditions."
   },
   {
+    "term": "component.referenced-field-dialog.description-2-invalid-conditions",
+    "definition": "Para proceder, necesitas borrar las condiciones inválidas que hacen referencia.",
+    "context": "To proceed you need to remove the referencing invalid conditions."
+  },
+  {
+    "term": "component.referenced-field-dialog.description-invalid-conditions",
+    "definition": "{count, plural, =1 {El campo siguiente hace} other {Los campos siguientes hacen}} referencia a este campo con condiciones inválidas:",
+    "context": "The following {count, plural, =1 {field is} other {fields are}} referencing this field with invalid conditions:"
+  },
+  {
     "term": "component.referenced-field-dialog.header",
     "definition": "Este campo está siendo referenciado",
     "context": "This field is being referenced"

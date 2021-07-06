@@ -12,9 +12,11 @@ export function useReferencedFieldDialog() {
 }
 
 export function ReferencedFieldDialog({
+  type,
   fieldsWithIndices,
   ...props
 }: DialogProps<{
+  type: "DELETING_FIELD" | "INVALID_CONDITION";
   fieldsWithIndices: {
     field: PetitionComposeFieldList_PetitionFragment["fields"][0];
     fieldIndex: PetitionFieldIndex;
@@ -33,11 +35,19 @@ export function ReferencedFieldDialog({
       body={
         <Stack>
           <Text>
-            <FormattedMessage
-              id="component.referenced-field-dialog.description"
-              defaultMessage="The following {count, plural, =1 {field is} other {fields are}} referencing this field:"
-              values={{ count: fieldsWithIndices.length }}
-            />
+            {type === "DELETING_FIELD" ? (
+              <FormattedMessage
+                id="component.referenced-field-dialog.description"
+                defaultMessage="The following {count, plural, =1 {field is} other {fields are}} referencing this field:"
+                values={{ count: fieldsWithIndices.length }}
+              />
+            ) : type === "INVALID_CONDITION" ? (
+              <FormattedMessage
+                id="component.referenced-field-dialog.description-invalid-conditions"
+                defaultMessage="The following {count, plural, =1 {field is} other {fields are}} referencing this field with invalid conditions:"
+                values={{ count: fieldsWithIndices.length }}
+              />
+            ) : null}
           </Text>
           {fieldsWithIndices.map(({ field, fieldIndex }) => (
             <Flex key={field.id} paddingLeft={2}>
@@ -63,10 +73,17 @@ export function ReferencedFieldDialog({
             </Flex>
           ))}
           <Text>
-            <FormattedMessage
-              id="component.referenced-field-dialog.description-2"
-              defaultMessage="To proceed you need to remove the referencing conditions."
-            />
+            {type === "DELETING_FIELD" ? (
+              <FormattedMessage
+                id="component.referenced-field-dialog.description-2"
+                defaultMessage="To proceed you need to remove the referencing conditions."
+              />
+            ) : type === "INVALID_CONDITION" ? (
+              <FormattedMessage
+                id="component.referenced-field-dialog.description-2-invalid-conditions"
+                defaultMessage="To proceed you need to remove the referencing invalid conditions."
+              />
+            ) : null}
           </Text>
         </Stack>
       }
