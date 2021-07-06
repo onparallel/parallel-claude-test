@@ -2015,7 +2015,8 @@ export class PetitionRepository extends BaseRepository {
       .update(
         removeNotDefined({
           ...data,
-          processed_at: data.is_read ? this.now() : undefined,
+          processed_at:
+            data.processed_at ?? (data.is_read ? this.now() : undefined),
         }),
         "*"
       );
