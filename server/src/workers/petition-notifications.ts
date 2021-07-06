@@ -46,11 +46,8 @@ async function processCommentCreatedUserNotification(
       );
     }
 
-    await context.petitions.updatePetitionUserNotifications(
-      notifications.map((n) => n.id),
-      {
-        processed_at: new Date(),
-      }
+    await context.petitions.updatePetitionUserNotificationsProcessedAt(
+      notifications.map((n) => n.id)
     );
   }
 }

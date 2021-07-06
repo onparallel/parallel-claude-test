@@ -38,7 +38,6 @@ import { KNEX } from "../knex";
 import {
   CommentCreatedUserNotification,
   CreatePetitionUserNotification,
-  PetitionUserNotification,
 } from "../notifications";
 import {
   Contact,
@@ -2006,20 +2005,12 @@ export class PetitionRepository extends BaseRepository {
       .orderBy("created_at", "desc");
   }
 
-  async updatePetitionUserNotifications(
-    petitionUserNotificationIds: number[],
-    data: Partial<PetitionUserNotification>
+  async updatePetitionUserNotificationsProcessedAt(
+    petitionUserNotificationIds: number[]
   ) {
     return await this.from("petition_user_notification")
       .whereIn("id", petitionUserNotificationIds)
-      .update(
-        removeNotDefined({
-          ...data,
-          processed_at:
-            data.processed_at ?? (data.is_read ? this.now() : undefined),
-        }),
-        "*"
-      );
+      .update({ processed_at: this.now() }, "*");
   }
 
   async updatePetitionUserNotificationsReadStatus(
