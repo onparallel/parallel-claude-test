@@ -70,6 +70,12 @@ export function NotificationsDrawer() {
       }
       startPolling?.(POLL_INTERVAL);
     } else {
+      // force unread to refresh on next open
+      client.cache.evict({
+        id: getMyId(client),
+        fieldName: "notifications",
+        args: { filter: "UNREAD" },
+      });
       stopPolling?.();
     }
   }, [isOpen]);
