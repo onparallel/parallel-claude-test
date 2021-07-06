@@ -1532,7 +1532,10 @@ export class PetitionRepository extends BaseRepository {
     user: User,
     data?: Partial<CreatePetition>
   ) {
-    const sourcePetition = await this.loadPetition(petitionId);
+    const [sourcePetition, [userOriginalPermission]] = await Promise.all([
+      this.loadPetition(petitionId),
+      this.loadUserPermissionsByPetitionId(petitionId),
+    ]);
 
     return await this.withTransaction(async (t) => {
       const fromTemplateId =
@@ -1594,6 +1597,7 @@ export class PetitionRepository extends BaseRepository {
           {
             petition_id: cloned.id,
             user_id: user.id,
+            is_subscribed: userOriginalPermission.is_subscribed,
             created_by: `User:${user.id}`,
             updated_by: `User:${user.id}`,
           },
@@ -2683,7 +2687,7 @@ export class PetitionRepository extends BaseRepository {
   );
 
   /**
-   * grab the permissions of the other users on `fromPetitionIds` and set them into `toPetitionIds` with WRITE access
+   * grab the permissions of the other users on `fromPetitionId` and set them into `toPetitionIds` with WRITE access
    */
   async clonePetitionPermissions(
     fromPetitionId: number,

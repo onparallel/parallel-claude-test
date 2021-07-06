@@ -134,7 +134,8 @@ export class Mocks {
     orgId: number,
     ownerId: number,
     amount?: number,
-    builder?: (index: number) => Partial<Petition>
+    builder?: (index: number) => Partial<Petition>,
+    permissionBuilder?: (index: number) => Partial<PetitionPermission>
   ) {
     const petitions = await this.knex<Petition>("petition")
       .insert(
@@ -152,10 +153,11 @@ export class Mocks {
       .returning("*");
 
     await this.knex<PetitionPermission>("petition_permission").insert(
-      petitions.map(({ id }) => ({
+      petitions.map(({ id }, index) => ({
         created_by: `User:${ownerId}`,
         petition_id: id,
         user_id: ownerId,
+        ...permissionBuilder?.(index),
       }))
     );
 

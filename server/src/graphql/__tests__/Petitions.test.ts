@@ -1387,6 +1387,36 @@ describe("GraphQL/Petitions", () => {
         },
       });
     });
+
+    it("copies subscription flag when cloning a petition", async () => {
+      const [unsubscribed] = await mocks.createRandomPetitions(
+        organization.id,
+        sessionUser.id,
+        1,
+        () => ({}),
+        () => ({ is_subscribed: false })
+      );
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!) {
+            clonePetitions(petitionIds: $petitionIds) {
+              myEffectivePermission {
+                isSubscribed
+              }
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", unsubscribed.id)],
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.clonePetitions).toEqual([
+        { myEffectivePermission: { isSubscribed: false } },
+      ]);
+    });
   });
 
   describe("deletePetitions", () => {
