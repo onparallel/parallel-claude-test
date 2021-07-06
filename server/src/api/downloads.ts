@@ -6,6 +6,7 @@ import sanitize from "sanitize-filename";
 import { URLSearchParams } from "url";
 import { ApiContext } from "../context";
 import { createZipFile, ZipFileInput } from "../util/createZipFile";
+import { evaluateFieldVisibility } from "../util/fieldVisibility";
 import { fromGlobalId } from "../util/globalId";
 import { isDefined } from "../util/remedaExtensions";
 import { authenticate } from "./helpers/authenticate";
@@ -120,9 +121,23 @@ async function* getPetitionFiles(
   locale = "en"
 ) {
   const fields = await ctx.petitions.loadFieldsForPetition(petitionId);
-  const fieldReplies = await ctx.petitions.loadRepliesForField(
-    fields.map((f) => f.id)
+  const fieldIds = fields.map((f) => f.id);
+  const fieldReplies = await ctx.petitions.loadRepliesForField(fieldIds);
+  const repliesByFieldId = Object.fromEntries(
+    fieldIds.map((id, index) => [id, fieldReplies[index]])
   );
+  const fieldsWithReplies = fields.map((f) => ({
+    ...f,
+    replies: repliesByFieldId[f.id],
+  }));
+
+  const visibleFields = zip(
+    fieldsWithReplies,
+    evaluateFieldVisibility(fieldsWithReplies)
+  )
+    .filter(([, isVisible]) => isVisible)
+    .map(([field]) => field);
+
   const files = await ctx.files.loadFileUpload(
     fieldReplies
       .flat()
@@ -137,11 +152,11 @@ async function* getPetitionFiles(
   const seen = new Set<string>();
   let headingCount = 0;
 
-  for (const [field, replies] of zip(fields, fieldReplies)) {
+  for (const field of visibleFields) {
     if (field.type === "HEADING") {
       headingCount++;
     } else if (field.type === "FILE_UPLOAD") {
-      for (const reply of replies) {
+      for (const reply of field.replies) {
         const file = filesById[reply.content["file_upload_id"]];
         if (file) {
           const extension = file.filename.match(/\.[a-z0-9]+$/i)?.[0] ?? "";
@@ -175,7 +190,7 @@ async function* getPetitionFiles(
         field.type
       )
     ) {
-      excelWorkbook.addPetitionFieldReply(field, replies);
+      excelWorkbook.addPetitionFieldReply(field, field.replies);
     }
 
     await excelWorkbook.addPetitionFieldComments(field);
