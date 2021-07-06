@@ -31,7 +31,7 @@ export function MessageEmailEditor({
   const placeholderOptions = usePetitionMessagePlaceholderOptions();
   return (
     <>
-      <FormControl isInvalid={showErrors && !subject}>
+      <FormControl isInvalid={showErrors && !subject} isDisabled={isReadOnly}>
         <FormLabel paddingBottom={0}>
           <FormattedMessage
             id="component.message-email-editor.subject-label"
