@@ -374,7 +374,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       await withError(showErrorDialog({ message: errorMessage }));
       if (error === "NO_REPLIABLE_FIELDS") {
         document
-          .querySelector<HTMLButtonElement>(".big-add-field-button")
+          .querySelector<HTMLButtonElement>("#menu-button-big-add-field-button")
           ?.click();
       } else if (field) {
         const node = document.querySelector(`#field-${field.id}`);

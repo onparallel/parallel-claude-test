@@ -312,8 +312,10 @@ export const PetitionComposeFieldList = Object.assign(
           const index = fields.findIndex((f) => f.id === fieldId);
           if (index === fields.length - 1) {
             document
-              .querySelector<HTMLButtonElement>(".big-add-field-button")!
-              .click();
+              .querySelector<HTMLButtonElement>(
+                "#menu-button-big-add-field-button"
+              )
+              ?.click();
           } else {
             setHoveredFieldId(fieldId);
             setTimeout(() => {
