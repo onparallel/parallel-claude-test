@@ -72,6 +72,7 @@ export interface PetitionComposeFieldListProps extends BoxProps {
     fieldId: string,
     data: UpdatePetitionFieldInput
   ) => Promise<void>;
+  isReadOnly?: boolean;
 }
 
 export const PetitionComposeFieldList = Object.assign(
@@ -86,6 +87,7 @@ export const PetitionComposeFieldList = Object.assign(
     onDeleteField,
     onAddField,
     onFieldEdit,
+    isReadOnly,
     ...props
   }: PetitionComposeFieldListProps) {
     const [{ fieldsById, fieldIds }, setState] = useState(reset(fields));
@@ -488,10 +490,11 @@ export const PetitionComposeFieldList = Object.assign(
                   index={index}
                   isActive={isActive}
                   showError={showErrors}
+                  isReadOnly={isReadOnly}
                   {...fieldProps(fieldId)}
                   {...fieldMouseHandlers(fieldId)}
                 />
-                {nextFieldId ? (
+                {nextFieldId && !isReadOnly ? (
                   <Box
                     className="add-field-button-wrapper"
                     position="relative"
@@ -512,12 +515,14 @@ export const PetitionComposeFieldList = Object.assign(
             );
           })}
         </Card>
-        <Flex marginTop={4} justifyContent="center">
-          <BigAddFieldButton
-            id="big-add-field-button"
-            onSelectFieldType={onAddField}
-          />
-        </Flex>
+        {!isReadOnly ? (
+          <Flex marginTop={4} justifyContent="center">
+            <BigAddFieldButton
+              id="big-add-field-button"
+              onSelectFieldType={onAddField}
+            />
+          </Flex>
+        ) : null}
       </>
     );
   }),

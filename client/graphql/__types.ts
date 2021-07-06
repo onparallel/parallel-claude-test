@@ -4504,6 +4504,7 @@ export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   emailSubject?: Maybe<string>;
   emailBody?: Maybe<any>;
   description?: Maybe<string>;
+  isReadOnly: boolean;
 };
 
 export type ReferencedFieldDialogDialog_PetitionFieldFragment = {
@@ -8559,6 +8560,7 @@ export const PetitionTemplateComposeMessageEditor_PetitionFragmentDoc = gql`
     emailSubject
     emailBody
     description
+    isReadOnly
   }
 `;
 export const ContactSelect_ContactFragmentDoc = gql`

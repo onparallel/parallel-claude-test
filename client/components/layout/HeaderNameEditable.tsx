@@ -33,6 +33,8 @@ export const HeaderNameEditable = Object.assign(
   ) {
     const intl = useIntl();
     const [name, setName] = useState(petition.name ?? "");
+    const isReadOnly = petition.isReadOnly;
+
     return (
       <Editable
         ref={ref}
@@ -53,7 +55,7 @@ export const HeaderNameEditable = Object.assign(
         {({ isEditing }: { isEditing: boolean }) => (
           <>
             <Flex flex="1 1 auto" minWidth={0} padding={1}>
-              {petition.isReadOnly ? (
+              {isReadOnly ? (
                 <Text
                   color={name ? "default" : "gray.400"}
                   paddingX={2}

@@ -24,7 +24,11 @@ import {
 export function CheckboxSettings({
   field,
   onFieldEdit,
-}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit">) {
+  isReadOnly,
+}: Pick<
+  PetitionComposeFieldSettingsProps,
+  "field" | "onFieldEdit" | "isReadOnly"
+>) {
   const intl = useIntl();
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 180, [field.id]);
@@ -204,6 +208,7 @@ export function CheckboxSettings({
   return (
     <Stack spacing={4}>
       <SettingsRow
+        isDisabled={isReadOnly}
         label={
           <FormattedMessage
             id="field-settings.multiple-label"
@@ -239,6 +244,7 @@ export function CheckboxSettings({
               },
             });
           }}
+          isDisabled={isReadOnly}
         />
       </SettingsRow>
       {type !== "RADIO" ? (
@@ -250,6 +256,7 @@ export function CheckboxSettings({
               isSearchable={false}
               onChange={handleChangeSelect}
               {...reactSelectProps}
+              isDisabled={isReadOnly}
             />
           </Box>
 
@@ -258,9 +265,10 @@ export function CheckboxSettings({
               value={min}
               min={field.optional ? 0 : 1}
               max={Number(max) > 1 ? Number(max) - 1 : field.optional ? 0 : 1}
-              w={"72px"}
+              width={"72px"}
               onChange={handleMinOnChange}
               allowMouseWheel={true}
+              isDisabled={isReadOnly}
             >
               <NumberInputField ref={refMin} />
               <NumberInputStepper>
@@ -274,9 +282,10 @@ export function CheckboxSettings({
               value={max}
               min={type === "EXACT" ? 1 : Number(min)}
               max={field.options.values.length ?? 1}
-              w={"72px"}
+              width={"72px"}
               onChange={handleMaxOnChange}
               allowMouseWheel={true}
+              isDisabled={isReadOnly}
             >
               <NumberInputField ref={refMax} />
               <NumberInputStepper>

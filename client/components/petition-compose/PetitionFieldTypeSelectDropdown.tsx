@@ -30,21 +30,31 @@ export interface PetitionFieldTypeSelectProps
   extends Omit<SelectProps, "onChange"> {
   type: PetitionFieldType;
   onChange: (type: PetitionFieldType) => void;
+  isReadOnly?: boolean;
 }
 
 export const PetitionFieldTypeSelect = chakraForwardRef<
   "div",
   PetitionFieldTypeSelectProps
->(function PetitionFieldTypeSelect({ type, onChange, ...props }, ref) {
+>(function PetitionFieldTypeSelect(
+  { type, onChange, isReadOnly, ...props },
+  ref
+) {
   return (
     <Menu placement="bottom" gutter={2}>
-      <MenuButton as={SelectLikeButton} ref={ref as any} {...(props as any)}>
+      <MenuButton
+        as={SelectLikeButton}
+        ref={ref as any}
+        disabled={isReadOnly}
+        {...(props as any)}
+      >
         <PetitionFieldTypeLabel type={type} display="flex" />
       </MenuButton>
       <Portal>
         <PetitionFieldTypeSelectDropdown
           onSelectFieldType={onChange}
           role="listbox"
+          isReadOnly={isReadOnly}
         />
       </Portal>
     </Menu>
@@ -117,13 +127,21 @@ export interface PetitionFieldTypeSelectDropdownProps extends MenuListProps {
   showHeader?: boolean;
   showDescription?: boolean;
   onSelectFieldType: (type: PetitionFieldType) => void;
+  isReadOnly?: boolean;
 }
 
 export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
   "div",
   PetitionFieldTypeSelectDropdownProps
 >(function PetitionFieldTypeSelectDropdown(
-  { onSelectFieldType, showHeader, showDescription, role = "menu", ...props },
+  {
+    onSelectFieldType,
+    showHeader,
+    showDescription,
+    role = "menu",
+    isReadOnly,
+    ...props
+  },
   ref
 ) {
   const intl = useIntl();
@@ -207,6 +225,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
                 data-field-type={type}
                 onClick={() => onSelectFieldType(type)}
                 onFocus={() => setActiveType(type)}
+                isDisabled={isReadOnly}
               >
                 <PetitionFieldTypeLabel type={type} />
               </MenuItem>

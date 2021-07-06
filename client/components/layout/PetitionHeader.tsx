@@ -140,7 +140,7 @@ export function PetitionHeader({
                 "Edition restricted. To make changes, you can disable the protection on the Settings tab.",
             })}
           >
-            <LockClosedIcon color="gray.500" _hover={{ color: "gray.600" }} />
+            <LockClosedIcon color="gray.600" _hover={{ color: "gray.700" }} />
           </SmallPopover>
         ) : undefined,
         section: "compose",

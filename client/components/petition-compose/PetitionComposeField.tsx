@@ -89,6 +89,7 @@ export interface PetitionComposeFieldProps {
   onFocusNextField: () => void;
   onFocusPrevField: () => void;
   onAddField: () => void;
+  isReadOnly?: boolean;
 }
 
 export type PetitionComposeFieldRef = {
@@ -119,6 +120,7 @@ const _PetitionComposeField = chakraForwardRef<
     onFocusNextField,
     onFocusPrevField,
     onAddField,
+    isReadOnly,
     ...props
   },
   ref
@@ -335,7 +337,7 @@ const _PetitionComposeField = chakraForwardRef<
           },
         }}
       >
-        {field.isFixed ? (
+        {field.isFixed || isReadOnly ? (
           <Box width="32px" />
         ) : (
           <Box
@@ -411,6 +413,7 @@ const _PetitionComposeField = chakraForwardRef<
           onAddField={onAddField}
           onRemoveAttachment={handleRemoveAttachment}
           onDownloadAttachment={handleDownloadAttachment}
+          isReadOnly={isReadOnly}
         />
         <PetitionComposeFieldActions
           field={field}
@@ -424,6 +427,7 @@ const _PetitionComposeField = chakraForwardRef<
           position="absolute"
           bottom={0}
           right={2}
+          isReadOnly={isReadOnly}
         />
       </Box>
     </Box>
@@ -445,6 +449,7 @@ interface PetitionComposeFieldInnerProps
   attachmentUploadProgress: Record<string, number>;
   onRemoveAttachment: (attachmentId: string) => void;
   onDownloadAttachment: (attachmentId: string) => void;
+  isReadOnly?: boolean;
 }
 
 // This component was extracted so the whole PetitionComposeField doesn't rerender
@@ -466,6 +471,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
     onAddField,
     onDownloadAttachment,
     onRemoveAttachment,
+    isReadOnly,
     ...props
   },
   ref
@@ -592,6 +598,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                   break;
               }
             }}
+            isDisabled={isReadOnly}
           />
         </Box>
         {field.isReadOnly ? null : (
@@ -601,6 +608,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             alignItems="center"
             width="auto"
             height="24px"
+            isDisabled={isReadOnly}
           >
             <FormLabel
               htmlFor={`field-required-${field.id}`}
@@ -640,69 +648,73 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                   onFieldEdit({ optional: !event.target.checked });
                 }
               }}
+              isDisabled={isReadOnly}
             />
           </FormControl>
         )}
       </Stack>
-      <GrowingTextarea
-        ref={descriptionRef}
-        id={`field-description-${field.id}`}
-        className={"field-description"}
-        placeholder={intl.formatMessage({
-          id: "component.petition-compose-field.field-description-placeholder",
-          defaultMessage: "Add a description...",
-        })}
-        aria-label={intl.formatMessage({
-          id: "component.petition-compose-field.field-description-label",
-          defaultMessage: "Field description",
-        })}
-        fontSize="sm"
-        background="transparent"
-        value={description ?? ""}
-        maxLength={4000}
-        border="none"
-        height="20px"
-        padding={0}
-        minHeight={0}
-        rows={1}
-        _focus={{
-          boxShadow: "none",
-        }}
-        onChange={(event) => setDescription(event.target.value ?? null)}
-        onBlur={() => {
-          const trimmed = description?.trim() ?? null;
-          setNativeValue(descriptionRef.current!, trimmed ?? "");
-          if (field.description !== trimmed) {
-            onFieldEdit({ description: trimmed });
-          }
-        }}
-        onKeyDown={(event) => {
-          const textarea = event.target as HTMLTextAreaElement;
-          const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
-          const beforeCursor = textarea.value.substr(
-            0,
-            textarea.selectionStart
-          );
-          const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
-          switch (event.key) {
-            case "ArrowDown":
-              if (currentLine === totalLines - 1) {
-                if (field.type === "SELECT") {
-                  event.preventDefault();
-                  focusFieldOptions(true);
-                } else {
-                  onFocusNextField();
+      {!description && isReadOnly ? null : (
+        <GrowingTextarea
+          ref={descriptionRef}
+          id={`field-description-${field.id}`}
+          className={"field-description"}
+          placeholder={intl.formatMessage({
+            id: "component.petition-compose-field.field-description-placeholder",
+            defaultMessage: "Add a description...",
+          })}
+          aria-label={intl.formatMessage({
+            id: "component.petition-compose-field.field-description-label",
+            defaultMessage: "Field description",
+          })}
+          fontSize="sm"
+          background="transparent"
+          value={description ?? ""}
+          maxLength={4000}
+          border="none"
+          height="20px"
+          padding={0}
+          minHeight={0}
+          rows={1}
+          _focus={{
+            boxShadow: "none",
+          }}
+          onChange={(event) => setDescription(event.target.value ?? null)}
+          onBlur={() => {
+            const trimmed = description?.trim() ?? null;
+            setNativeValue(descriptionRef.current!, trimmed ?? "");
+            if (field.description !== trimmed) {
+              onFieldEdit({ description: trimmed });
+            }
+          }}
+          onKeyDown={(event) => {
+            const textarea = event.target as HTMLTextAreaElement;
+            const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
+            const beforeCursor = textarea.value.substr(
+              0,
+              textarea.selectionStart
+            );
+            const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
+            switch (event.key) {
+              case "ArrowDown":
+                if (currentLine === totalLines - 1) {
+                  if (field.type === "SELECT") {
+                    event.preventDefault();
+                    focusFieldOptions(true);
+                  } else {
+                    onFocusNextField();
+                  }
                 }
-              }
-              break;
-            case "ArrowUp":
-              if (currentLine === 0) {
-                focusTitle();
-              }
-              break;
-          }
-        }}
-      />
+                break;
+              case "ArrowUp":
+                if (currentLine === 0) {
+                  focusTitle();
+                }
+                break;
+            }
+          }}
+          isDisabled={isReadOnly}
+        />
+      )}
       {field.attachments.length ? (
         <Box>
           <Flex flexWrap="wrap" margin={-1}>
@@ -723,7 +735,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
         <CheckboxTypeLabel
           options={field.options}
           fontSize="xs"
-          color="gray.600"
+          color={isReadOnly ? undefined : "gray.600"}
+          textStyle={isReadOnly ? "muted" : undefined}
         />
       ) : null}
       {field.type === "SELECT" || field.type === "CHECKBOX" ? (
@@ -735,9 +748,10 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           showError={showError}
           onFocusNextField={onFocusNextField}
           onFocusDescription={focusDescription}
+          isReadOnly={isReadOnly}
         />
       ) : field.type === "DYNAMIC_SELECT" ? (
-        <Box>
+        <Box textStyle={isReadOnly ? "muted" : undefined}>
           {field.options.labels?.length ? (
             <>
               <Text as="h6" fontSize="sm">
@@ -798,6 +812,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             visibility={field.visibility as any}
             fields={fields}
             onVisibilityEdit={(visibility) => onFieldEdit({ visibility })}
+            isReadOnly={isReadOnly}
           />
         </Box>
       ) : null}
@@ -813,6 +828,7 @@ interface PetitionComposeFieldActionsProps
   canChangeVisibility: boolean;
   onVisibilityClick: () => void;
   onAttachmentClick: () => void;
+  isReadOnly?: boolean;
 }
 
 const _PetitionComposeFieldActions = chakraForwardRef<
@@ -827,6 +843,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
     onCloneField,
     onSettingsClick,
     onDeleteClick,
+    isReadOnly,
     ...props
   },
   ref
@@ -839,8 +856,9 @@ const _PetitionComposeFieldActions = chakraForwardRef<
         <IconButtonWithTooltip
           icon={<ConditionIcon />}
           isDisabled={
-            field.type === "HEADING" &&
-            (field.isFixed || field.options.hasPageBreak)
+            (field.type === "HEADING" &&
+              (field.isFixed || field.options.hasPageBreak)) ||
+            isReadOnly
           }
           size="sm"
           variant="ghost"
@@ -912,6 +930,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
           defaultMessage: "Clone field",
         })}
         onClick={onCloneField}
+        isDisabled={isReadOnly}
       />
       <IconButtonWithTooltip
         className="field-settings-button"
@@ -929,7 +948,7 @@ const _PetitionComposeFieldActions = chakraForwardRef<
       />
       <IconButtonWithTooltip
         icon={<DeleteIcon />}
-        isDisabled={field.isFixed}
+        isDisabled={field.isFixed || isReadOnly}
         size="sm"
         variant="ghost"
         placement="bottom"

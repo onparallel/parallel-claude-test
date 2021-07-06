@@ -114,6 +114,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     updateIsReadNotification({ isRead: true, filter: "SHARED" });
   }, []);
 
+  const isReadOnly = petition!.isReadOnly;
+
   const indices = useFieldIndices(petition!.fields);
   const petitionDataRef = useUpdatingRef({ fields: petition!.fields, indices });
 
@@ -572,6 +574,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 onFieldEdit={handleFieldEdit}
                 onFieldTypeChange={handleFieldTypeChange}
                 onClose={handleSettingsClose}
+                isReadOnly={isReadOnly}
               />
             ) : (
               <Card
@@ -635,12 +638,14 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             onUpdateFieldPositions={handleUpdateFieldPositions}
             onFieldEdit={handleFieldEdit}
             onFieldSettingsClick={handleFieldSettingsClick}
+            isReadOnly={isReadOnly}
           />
           {petition?.__typename === "PetitionTemplate" ? (
             <PetitionTemplateDescriptionEdit
               marginTop="4"
               description={petition.description}
               onUpdatePetition={handleUpdatePetition}
+              isReadOnly={isReadOnly}
             />
           ) : null}
           {petition && petition.__typename === "Petition" ? (

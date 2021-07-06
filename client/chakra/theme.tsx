@@ -71,6 +71,9 @@ export const theme = extendTheme({
       color: "gray.400",
       fontStyle: "italic",
     },
+    muted: {
+      color: "gray.400",
+    },
   },
   components: {
     Input: {

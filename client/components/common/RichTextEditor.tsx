@@ -246,8 +246,9 @@ export const RichTextEditor = forwardRef<
       ({
         padding: "12px 16px",
         minHeight: "120px !important",
+        color: isDisabled ? "#A0AEC0" : undefined,
       } as CSSProperties),
-    []
+    [isDisabled]
   );
 
   const {

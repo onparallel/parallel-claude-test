@@ -36,6 +36,7 @@ export interface PetitionFieldOptionsListEditorProps extends EditableProps {
   onFieldEdit: (data: UpdatePetitionFieldInput) => void;
   onFocusNextField: () => void;
   onFocusDescription: () => void;
+  isReadOnly?: boolean;
 }
 
 function renderElement({ attributes, children, element }: RenderElementProps) {
@@ -97,6 +98,7 @@ export const PetitionFieldOptionsListEditor = Object.assign(
       onFieldEdit,
       onFocusNextField,
       onFocusDescription,
+      isReadOnly,
       ...props
     },
     ref
@@ -186,7 +188,23 @@ export const PetitionFieldOptionsListEditor = Object.assign(
         }
       }
     }, [field.options.values, value, onFieldEdit, onChange]);
-    return (
+
+    return isReadOnly ? (
+      <Box textStyle="muted">
+        {field.options.values.map((value: string, index: number) => {
+          return (
+            <Text
+              key={index}
+              fontSize="sm"
+              marginY={0}
+              _before={{ content: "'-'", marginRight: 1 }}
+            >
+              {value}
+            </Text>
+          );
+        })}
+      </Box>
+    ) : (
       <Slate editor={editor} value={value} onChange={onChange as any}>
         <Box maxHeight="200px" overflow="auto" fontSize="sm">
           <Editable

@@ -17,6 +17,7 @@ export function MessageEmailEditor({
   body,
   onSubjectChange,
   onBodyChange,
+  isReadOnly,
 }: {
   showErrors: boolean;
   subjectRef?: Ref<HTMLInputElement>;
@@ -24,6 +25,7 @@ export function MessageEmailEditor({
   body: RichTextEditorValue;
   onSubjectChange: (value: string) => void;
   onBodyChange: (value: RichTextEditorValue) => void;
+  isReadOnly?: boolean;
 }) {
   const intl = useIntl();
   const placeholderOptions = usePetitionMessagePlaceholderOptions();
@@ -48,6 +50,7 @@ export function MessageEmailEditor({
             id: "component.message-email-editor.subject-placeholder",
             defaultMessage: "Enter the subject of the email",
           })}
+          isDisabled={isReadOnly}
         />
         <FormErrorMessage>
           <FormattedMessage
@@ -69,6 +72,7 @@ export function MessageEmailEditor({
             defaultMessage: "Write a message to include in the email",
           })}
           placeholderOptions={placeholderOptions}
+          isDisabled={isReadOnly}
         />
         <FormErrorMessage>
           <FormattedMessage

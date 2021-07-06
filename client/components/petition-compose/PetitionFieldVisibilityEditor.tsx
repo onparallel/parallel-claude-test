@@ -63,6 +63,7 @@ export interface PetitionFieldVisibilityProps {
   fields: PetitionFieldVisibilityEditor_PetitionFieldFragment[];
   showError: boolean;
   onVisibilityEdit: (visibility: PetitionFieldVisibility) => void;
+  isReadOnly?: boolean;
 }
 
 export function PetitionFieldVisibilityEditor({
@@ -71,6 +72,7 @@ export function PetitionFieldVisibilityEditor({
   fields,
   showError,
   onVisibilityEdit,
+  isReadOnly,
 }: PetitionFieldVisibilityProps) {
   const intl = useIntl();
   const indices = useFieldIndices(fields);
@@ -201,6 +203,7 @@ export function PetitionFieldVisibilityEditor({
                   <VisibilityTypeSelect
                     value={visibility.type}
                     onChange={(type) => setVisibilityType(type!)}
+                    isDisabled={isReadOnly}
                   />
                 ) : (
                   <Stack direction="row">
@@ -213,6 +216,7 @@ export function PetitionFieldVisibilityEditor({
                         defaultMessage: "Remove",
                       })}
                       onClick={() => removeCondition(index)}
+                      isDisabled={isReadOnly}
                     />
                     {index === 1 ? (
                       <Box flex="1">
@@ -221,10 +225,16 @@ export function PetitionFieldVisibilityEditor({
                           onChange={(operator) =>
                             setVisibilityOperator(operator!)
                           }
+                          isDisabled={isReadOnly}
                         />
                       </Box>
                     ) : (
-                      <Flex flex="1" alignItems="center" paddingLeft="11px">
+                      <Flex
+                        flex="1"
+                        alignItems="center"
+                        paddingLeft="11px"
+                        textStyle={isReadOnly ? "muted" : undefined}
+                      >
                         {visibility.operator === "AND" ? (
                           <FormattedMessage
                             id="component.petition-field-visibility-editor.and"
@@ -257,6 +267,7 @@ export function PetitionFieldVisibilityEditor({
                     onChange={(value) =>
                       updateCondition(index, defaultCondition(value!))
                     }
+                    isReadOnly={isReadOnly}
                   />
                   <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>
                     {conditionField.multiple ? (
@@ -266,6 +277,7 @@ export function PetitionFieldVisibilityEditor({
                         onChange={(condition) => {
                           updateCondition(index, condition);
                         }}
+                        isReadOnly={isReadOnly}
                       />
                     ) : null}
                     <ConditionPredicate
@@ -275,6 +287,7 @@ export function PetitionFieldVisibilityEditor({
                       onChange={(condition) =>
                         updateCondition(index, condition)
                       }
+                      isReadOnly={isReadOnly}
                     />
                   </Stack>
                 </>
@@ -286,7 +299,7 @@ export function PetitionFieldVisibilityEditor({
         })}
       </Grid>
 
-      {visibility.conditions.length < 5 ? (
+      {visibility.conditions.length < 5 && !isReadOnly ? (
         <Button
           variant="ghost"
           fontWeight="normal"
@@ -323,8 +336,10 @@ function ConditionMultipleFieldModifier({
   value: condition,
   field,
   onChange,
+  isReadOnly,
 }: ValueProps<PetitionFieldVisibilityCondition, false> & {
   field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
+  isReadOnly?: boolean;
 }) {
   const intl = useIntl();
   const options = useMemo<
@@ -396,6 +411,7 @@ function ConditionMultipleFieldModifier({
     never
   >({
     size: "sm",
+    isDisabled: isReadOnly,
   });
 
   const handleChange = useCallback(
@@ -420,6 +436,7 @@ interface ConditionPredicateProps
   field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
   showError: boolean;
   max?: number;
+  isReadOnly?: boolean;
 }
 
 function ConditionPredicate({
@@ -427,6 +444,7 @@ function ConditionPredicate({
   value: condition,
   onChange,
   showError,
+  isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const { modifier } = condition!;
@@ -599,12 +617,12 @@ function ConditionPredicate({
     OptionType<PseudoPetitionFieldVisibilityConditionOperator>,
     false,
     never
-  >({ size: "sm" });
+  >({ size: "sm", isDisabled: isReadOnly });
   const props = useReactSelectProps<
     OptionType<PseudoPetitionFieldVisibilityConditionOperator>,
     false,
     never
-  >({ size: "sm" });
+  >({ size: "sm", isDisabled: isReadOnly });
   const handleChange = useCallback(
     function (
       value: OptionType<PseudoPetitionFieldVisibilityConditionOperator> | null
@@ -642,6 +660,7 @@ function ConditionPredicate({
             max={
               field.type === "CHECKBOX" ? field.options.values.length : Infinity
             }
+            isReadOnly={isReadOnly}
           />
         ) : field.type === "CHECKBOX" ||
           field.type === "SELECT" ||
@@ -652,6 +671,7 @@ function ConditionPredicate({
             showError={showError}
             value={condition}
             onChange={onChange}
+            isReadOnly={isReadOnly}
           />
         ) : (
           <ConditionPredicateValueString
@@ -659,6 +679,7 @@ function ConditionPredicate({
             showError={showError}
             value={condition}
             onChange={onChange}
+            isReadOnly={isReadOnly}
           />
         )}
       </Box>
@@ -670,6 +691,7 @@ function ConditionPredicateValueNumber({
   value: condition,
   max = Infinity,
   onChange,
+  isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const [value, setValue] = useState((condition.value as number) ?? 0);
@@ -689,6 +711,7 @@ function ConditionPredicateValueNumber({
       onBlur={() => onChange({ ...condition, value })}
       keepWithinRange
       clampValueOnBlur
+      isDisabled={isReadOnly}
     >
       <NumberInputField
         type="number"
@@ -713,6 +736,7 @@ function ConditionPredicateValueSelect({
   showError,
   value: condition,
   onChange,
+  isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
 
@@ -722,6 +746,7 @@ function ConditionPredicateValueSelect({
     components: {
       MenuList: OptimizedMenuList,
     },
+    isDisabled: isReadOnly,
     placeholder: intl.formatMessage({
       id: "component.react-select.no-options",
       defaultMessage: "No options",
@@ -764,6 +789,7 @@ function ConditionPredicateValueString({
   showError,
   value: condition,
   onChange,
+  isReadOnly,
 }: ConditionPredicateProps) {
   const intl = useIntl();
   const [value, setValue] = useState(condition.value as string | null);
@@ -779,6 +805,7 @@ function ConditionPredicateValueString({
         id: "generic.enter-a-value",
         defaultMessage: "Enter a value",
       })}
+      isDisabled={isReadOnly}
     />
   );
 }

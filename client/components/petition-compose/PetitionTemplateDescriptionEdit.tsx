@@ -9,11 +9,13 @@ import { FormattedMessage, useIntl } from "react-intl";
 export interface PetitionTemplateDescriptionEditProps extends BoxProps {
   onUpdatePetition: (data: UpdatePetitionInput) => void;
   description?: Maybe<string>;
+  isReadOnly?: boolean;
 }
 
 export function PetitionTemplateDescriptionEdit({
   onUpdatePetition,
   description,
+  isReadOnly,
   ...props
 }: PetitionTemplateDescriptionEditProps) {
   const intl = useIntl();
@@ -49,6 +51,7 @@ export function PetitionTemplateDescriptionEdit({
             id: "template.description-edit.placeholder",
             defaultMessage: "Write a short description of this template.",
           })}
+          isDisabled={isReadOnly}
         />
       </Stack>
     </Card>

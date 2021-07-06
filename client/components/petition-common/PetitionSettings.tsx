@@ -71,6 +71,8 @@ function _PetitionSettings({
       ? petition.currentSignatureRequest
       : null;
 
+  const isReadOnly = petition.isReadOnly;
+
   const showSignatureConfigDialog = useSignatureConfigDialog();
 
   const showConfirmConfigureOngoingSignature = useDialog(
@@ -152,7 +154,7 @@ function _PetitionSettings({
 
   return (
     <Stack padding={4} spacing={4}>
-      <FormControl id="petition-locale">
+      <FormControl id="petition-locale" isDisabled={isReadOnly}>
         <FormLabel display="flex" alignItems="center">
           {petition.__typename === "Petition" ? (
             <FormattedMessage
@@ -172,6 +174,7 @@ function _PetitionSettings({
           onChange={(event) =>
             onUpdatePetition({ locale: event.target.value as any })
           }
+          isDisabled={isReadOnly}
         >
           {locales.map((locale) => (
             <option key={locale.key} value={locale.key}>
@@ -214,6 +217,7 @@ function _PetitionSettings({
         onChange={async (value) =>
           await onUpdatePetition({ hasCommentsEnabled: value })
         }
+        isDisabled={isReadOnly}
       />
       {petition.__typename === "Petition" &&
       (petition.signatureConfig || hasSignature) ? (
@@ -399,7 +403,7 @@ function SwitchSetting({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <FormControl as={Stack} direction="row">
+    <FormControl as={Stack} direction="row" isDisabled={isDisabled}>
       <FormLabel margin={0} display="flex" alignItems="center">
         {icon ? <Flex marginRight={1}>{icon}</Flex> : null}
         {title}

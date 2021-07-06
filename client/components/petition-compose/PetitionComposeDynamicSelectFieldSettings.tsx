@@ -36,9 +36,10 @@ export function DynamicSelectSettings({
   petitionId,
   field,
   onFieldEdit,
+  isReadOnly,
 }: { petitionId: string } & Pick<
   PetitionComposeFieldSettingsProps,
-  "field" | "onFieldEdit"
+  "field" | "onFieldEdit" | "isReadOnly"
 >) {
   const intl = useIntl();
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
@@ -66,6 +67,7 @@ export function DynamicSelectSettings({
   return (
     <Stack spacing={4}>
       <SettingsRow
+        isDisabled={isReadOnly}
         flexDirection="column"
         alignItems="start"
         label={
@@ -92,11 +94,13 @@ export function DynamicSelectSettings({
               options={fieldOptions}
               onRemoveOptions={handleRemoveOptions}
               onDownloadOptions={handleDownloadListingsFile}
+              isReadOnly={isReadOnly}
             />
           ) : (
             <DynamicSelectOptionsDropzone
               petitionId={petitionId}
               fieldId={field.id}
+              isReadOnly={isReadOnly}
             />
           )}
           <NormalLink
@@ -121,10 +125,12 @@ function UploadedFileData({
   file,
   onDownload,
   onRemoveOptions,
+  isReadOnly,
 }: {
   file?: { name: string; size: number; updatedAt: Date };
   onDownload?: () => void;
   onRemoveOptions?: () => void;
+  isReadOnly?: boolean;
 }) {
   const intl = useIntl();
   return (
@@ -186,7 +192,7 @@ function UploadedFileData({
       />
       <IconButtonWithTooltip
         variant="ghost"
-        isDisabled={!file}
+        isDisabled={!file || isReadOnly}
         icon={<DeleteIcon />}
         label={intl.formatMessage({
           id: "generic.delete",
@@ -202,12 +208,14 @@ interface DynamicSelectLoadedOptionsProps {
   options: FieldOptions["DYNAMIC_SELECT"];
   onRemoveOptions: () => void;
   onDownloadOptions: () => void;
+  isReadOnly?: boolean;
 }
 
 function DynamicSelectLoadedOptions({
   options,
   onRemoveOptions,
   onDownloadOptions,
+  isReadOnly,
 }: DynamicSelectLoadedOptionsProps) {
   const firstRowFlattened = useMemo(
     () => options.values[0].flat(options.labels.length),
@@ -220,6 +228,7 @@ function DynamicSelectLoadedOptions({
         file={options.file!}
         onRemoveOptions={onRemoveOptions}
         onDownload={onDownloadOptions}
+        isReadOnly={isReadOnly}
       />
 
       <Stack fontSize="sm" color="gray.600" spacing={0}>
@@ -242,9 +251,11 @@ function DynamicSelectLoadedOptions({
 function DynamicSelectOptionsDropzone({
   petitionId,
   fieldId,
+  isReadOnly,
 }: {
   petitionId: string;
   fieldId: string;
+  isReadOnly?: boolean;
 }) {
   const MAX_FILESIZE = 1024 * 1024 * 10; // 10 MB
 
