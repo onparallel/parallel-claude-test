@@ -2636,6 +2636,7 @@ export type PetitionTagListCellContent_TagFragment = {
 export type PetitionTagListCellContent_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
   id: string;
+  isReadOnly: boolean;
   tags: Array<{ __typename?: "Tag" } & PetitionTagListCellContent_TagFragment>;
 };
 
@@ -2643,6 +2644,7 @@ export type PetitionTagListCellContent_PetitionBase_PetitionTemplate_Fragment =
   {
     __typename?: "PetitionTemplate";
     id: string;
+    isReadOnly: boolean;
     tags: Array<
       { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
     >;
@@ -8938,6 +8940,7 @@ export const PetitionTagListCellContent_TagFragmentDoc = gql`
 export const PetitionTagListCellContent_PetitionBaseFragmentDoc = gql`
   fragment PetitionTagListCellContent_PetitionBase on PetitionBase {
     id
+    isReadOnly
     tags {
       ...PetitionTagListCellContent_Tag
     }

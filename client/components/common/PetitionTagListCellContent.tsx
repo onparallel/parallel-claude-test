@@ -66,9 +66,10 @@ export function PetitionTagListCellContent({
     300,
     []
   );
+  const isReadOnly = petition.isReadOnly;
   const handleClick = async function (e: MouseEvent) {
     e.stopPropagation();
-    if (!isEditing) {
+    if (!isEditing && !isReadOnly) {
       if (selectWrapperRef.current?.scrollIntoView) {
         selectWrapperRef.current!.scrollIntoView({
           block: "nearest",
@@ -147,6 +148,7 @@ export function PetitionTagListCellContent({
       sx={{ scrollMarginTop: "38px" }}
       position="relative"
       onClick={handleClick}
+      cursor={isReadOnly ? "not-allowed" : "inherit"}
     >
       {isEditing ? (
         <Box position="absolute" inset={0} zIndex="1">
@@ -268,6 +270,7 @@ PetitionTagListCellContent.fragments = {
     return gql`
       fragment PetitionTagListCellContent_PetitionBase on PetitionBase {
         id
+        isReadOnly
         tags {
           ...PetitionTagListCellContent_Tag
         }
