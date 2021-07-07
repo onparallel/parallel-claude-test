@@ -6,6 +6,10 @@ import {
   Flex,
   HTMLChakraProps,
   IconButton,
+  Portal,
+  useDisclosure,
+  useOutsideClick,
+  usePopper,
 } from "@chakra-ui/react";
 import { getColor } from "@chakra-ui/theme-tools";
 import {
@@ -13,8 +17,11 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   ChevronUpIcon,
+  FilterIcon,
 } from "@parallel/chakra/icons";
 import { useSelectionState } from "@parallel/utils/useSelectionState";
+import useMergedRef from "@react-hook/merged-ref";
+import { useRef } from "react";
 import {
   ComponentType,
   memo,
@@ -25,6 +32,7 @@ import {
   useState,
 } from "react";
 import { useIntl } from "react-intl";
+import { Card } from "./Card";
 
 export type TableSortingDirection = "ASC" | "DESC";
 
@@ -81,6 +89,7 @@ export interface TableColumn<TRow, TContext = unknown> {
   align?: BoxProps["textAlign"];
   context?: TContext;
   isSortable?: true;
+  isFilterable?: true;
   header: string;
   Header?: ComponentType<TableHeaderProps<TRow, TContext>>;
   headerProps?: HTMLChakraProps<"th">;
@@ -132,6 +141,7 @@ function _Table<TRow, TContext = unknown>({
   );
 
   const [expanded, setExpanded] = useState<string | null>(null);
+
   const handleToggleExpand = useCallback(function (
     key: string,
     value: boolean
@@ -450,85 +460,149 @@ export function DefaultHeader({
   ...props
 }: TableHeaderProps<any>) {
   const intl = useIntl();
+  const {
+    onClose: onCloseFilter,
+    onToggle: onToggleFilter,
+    isOpen: isFilterOpen,
+    getButtonProps: getFilterButtonProps,
+    getDisclosureProps: getFilterPopoverProps,
+  } = useDisclosure();
+  const { referenceRef, popperRef } = usePopper({
+    enabled: isFilterOpen,
+    placement: "bottom-start",
+    gutter: 2,
+    modifiers: [
+      {
+        name: "matchMinWidth",
+        enabled: true,
+        phase: "beforeWrite",
+        requires: ["computeStyles"],
+        fn: ({ state }) => {
+          state.styles.popper.minWidth = `${state.rects.reference.width}px`;
+        },
+        effect:
+          ({ state }) =>
+          () => {
+            const reference = state.elements.reference as HTMLElement;
+            state.elements.popper.style.minWidth = `${reference.offsetWidth}px`;
+          },
+      },
+    ],
+  });
+  const ref = useRef<HTMLElement>(null);
+  useOutsideClick({
+    ref,
+    handler: onCloseFilter,
+  });
+  const _ref = useMergedRef(ref, popperRef);
   return (
-    <Box
-      key={column.key}
-      as="th"
-      paddingX={2}
-      paddingY={1}
-      _last={{ paddingRight: 5 }}
-      _first={{ paddingLeft: 5 }}
-      height="38px"
-      fontSize="sm"
-      fontWeight="normal"
-      textTransform="uppercase"
-      userSelect="none"
-      whiteSpace="nowrap"
-      className={sort?.field === column.key ? "sort-active" : undefined}
-      aria-sort={
-        column.isSortable
-          ? sort?.field === column.key
-            ? sort.direction === "ASC"
-              ? "ascending"
-              : "descending"
-            : "none"
-          : undefined
-      }
-      sx={{
-        ".sort-by-button": {
-          opacity: 0,
-        },
-        "&.sort-active .sort-by-button": {
-          opacity: 1,
-        },
-        "&:hover, &:focus-within": {
+    <>
+      <Box
+        ref={referenceRef}
+        key={column.key}
+        as="th"
+        paddingX={2}
+        paddingY={1}
+        _last={{ paddingRight: 5 }}
+        _first={{ paddingLeft: 5 }}
+        height="38px"
+        fontSize="sm"
+        fontWeight="normal"
+        textTransform="uppercase"
+        userSelect="none"
+        whiteSpace="nowrap"
+        className={sort?.field === column.key ? "sort-active" : undefined}
+        aria-sort={
+          column.isSortable
+            ? sort?.field === column.key
+              ? sort.direction === "ASC"
+                ? "ascending"
+                : "descending"
+              : "none"
+            : undefined
+        }
+        sx={{
           ".sort-by-button": {
+            opacity: 0,
+          },
+          "&.sort-active .sort-by-button": {
             opacity: 1,
           },
-        },
-      }}
-      {...props}
-    >
-      <Flex alignItems="center" justifyContent={column.align ?? "left"}>
-        {column.header}
-        {column.isSortable ? (
-          <IconButton
-            className="sort-by-button"
-            onClick={(event) => onSortByClick?.(column.key, event)}
-            marginLeft={1}
-            icon={
-              sort?.field === column.key ? (
-                sort.direction === "ASC" ? (
-                  <ChevronUpIcon />
+          "&:hover, &:focus-within": {
+            ".sort-by-button": {
+              opacity: 1,
+            },
+          },
+        }}
+        {...props}
+      >
+        <Flex alignItems="center" justifyContent={column.align ?? "left"}>
+          {column.header}
+          {column.isSortable ? (
+            <IconButton
+              className="sort-by-button"
+              onClick={(event) => onSortByClick?.(column.key, event)}
+              marginLeft={1}
+              icon={
+                sort?.field === column.key ? (
+                  sort.direction === "ASC" ? (
+                    <ChevronUpIcon />
+                  ) : (
+                    <ChevronDownIcon />
+                  )
                 ) : (
-                  <ChevronDownIcon />
+                  <ArrowUpDownIcon />
                 )
-              ) : (
-                <ArrowUpDownIcon />
-              )
-            }
-            size="xs"
-            variant="ghost"
-            aria-label={
-              sort?.field === column.key
-                ? intl.formatMessage(
-                    {
-                      id: "components.table.change-sorting",
-                      defaultMessage: 'Change sorting for "{column}"',
-                    },
-                    { column: column.header }
-                  )
-                : intl.formatMessage(
-                    {
-                      id: "components.table.sort by",
-                      defaultMessage: 'Sort by "{column}"',
-                    },
-                    { column: column.header }
-                  )
-            }
-          />
-        ) : null}
-      </Flex>
-    </Box>
+              }
+              size="xs"
+              variant="ghost"
+              aria-label={
+                sort?.field === column.key
+                  ? intl.formatMessage(
+                      {
+                        id: "components.table.change-sorting",
+                        defaultMessage: 'Change sorting for "{column}"',
+                      },
+                      { column: column.header }
+                    )
+                  : intl.formatMessage(
+                      {
+                        id: "components.table.sort-by",
+                        defaultMessage: 'Sort by "{column}"',
+                      },
+                      { column: column.header }
+                    )
+              }
+            />
+          ) : null}
+
+          {column.isFilterable ? (
+            <IconButton
+              marginLeft={1}
+              icon={<FilterIcon />}
+              size="xs"
+              variant="ghost"
+              aria-label={intl.formatMessage(
+                {
+                  id: "components.table.filter",
+                  defaultMessage: 'Filter "{column}"',
+                },
+                { column: column.header }
+              )}
+              {...getFilterButtonProps()}
+              onClick={onToggleFilter}
+            />
+          ) : null}
+        </Flex>
+      </Box>
+      <Portal>
+        <Card ref={_ref} {...getFilterPopoverProps()}>
+          Hola
+          <Box minWidth="200px" backgroundColor="red">
+            soy un box muy ancho
+          </Box>
+        </Card>
+      </Portal>
+    </>
   );
 }

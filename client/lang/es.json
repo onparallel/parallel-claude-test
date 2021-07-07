@@ -2070,7 +2070,7 @@
     "context": "Change sorting for \"{column}\""
   },
   {
-    "term": "components.table.sort by",
+    "term": "components.table.sort-by",
     "definition": "Ordenar por \"{column}\"",
     "context": "Sort by \"{column}\""
   },
