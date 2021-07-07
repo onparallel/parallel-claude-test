@@ -67,6 +67,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           },
           cellProps: {
             maxWidth: 0,
+            fontSize: "14px",
           },
           CellContent: ({ row }) => (
             <OverflownText textStyle={row.name ? undefined : "hint"}>
@@ -95,6 +96,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 cellProps: {
                   minWidth: "200px",
                   whiteSpace: "nowrap",
+                  fontSize: "14px",
                 },
                 CellContent: ({ row }) => {
                   const recipients = row.accesses

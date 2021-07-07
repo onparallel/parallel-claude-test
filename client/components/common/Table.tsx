@@ -5,8 +5,8 @@ import {
   Collapse,
   Flex,
   HTMLChakraProps,
-  IconButton,
   Portal,
+  Text,
   useDisclosure,
   useOutsideClick,
   usePopper,
@@ -21,7 +21,6 @@ import {
 } from "@parallel/chakra/icons";
 import { useSelectionState } from "@parallel/utils/useSelectionState";
 import useMergedRef from "@react-hook/merged-ref";
-import { useRef } from "react";
 import {
   ComponentType,
   memo,
@@ -29,10 +28,12 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useIntl } from "react-intl";
 import { Card } from "./Card";
+import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 
 export type TableSortingDirection = "ASC" | "DESC";
 
@@ -495,6 +496,7 @@ export function DefaultHeader({
     handler: onCloseFilter,
   });
   const _ref = useMergedRef(ref, popperRef);
+
   return (
     <>
       <Box
@@ -522,24 +524,51 @@ export function DefaultHeader({
             : undefined
         }
         sx={{
-          ".sort-by-button": {
-            opacity: 0,
+          ".sort-by-button,.filter-by-button": {
+            display: "none",
           },
           "&.sort-active .sort-by-button": {
-            opacity: 1,
+            display: "block",
+          },
+          "&.filter-active .filter-by-button": {
+            display: "block",
           },
           "&:hover, &:focus-within": {
-            ".sort-by-button": {
-              opacity: 1,
+            ".sort-by-button,.filter-by-button": {
+              display: "block",
             },
           },
         }}
         {...props}
       >
         <Flex alignItems="center" justifyContent={column.align ?? "left"}>
-          {column.header}
+          <Text isTruncated as="span">
+            {column.header}
+          </Text>
+          {column.isFilterable ? (
+            <IconButtonWithTooltip
+              className="filter-by-button"
+              marginLeft={1}
+              icon={<FilterIcon />}
+              label={intl.formatMessage({
+                id: "components.table.filter",
+                defaultMessage: "Filter",
+              })}
+              size="xs"
+              variant="ghost"
+              aria-label={intl.formatMessage(
+                {
+                  id: "components.table.filter",
+                  defaultMessage: 'Filter "{column}"',
+                },
+                { column: column.header }
+              )}
+              {...getFilterButtonProps()}
+              onClick={onToggleFilter}
+            />
+          ) : null}
           {column.isSortable ? (
-            <IconButton
+            <IconButtonWithTooltip
               className="sort-by-button"
               onClick={(event) => onSortByClick?.(column.key, event)}
               marginLeft={1}
@@ -554,6 +583,10 @@ export function DefaultHeader({
                   <ArrowUpDownIcon />
                 )
               }
+              label={intl.formatMessage({
+                id: "components.table.sort",
+                defaultMessage: "Sort",
+              })}
               size="xs"
               variant="ghost"
               aria-label={
@@ -573,24 +606,6 @@ export function DefaultHeader({
                       { column: column.header }
                     )
               }
-            />
-          ) : null}
-
-          {column.isFilterable ? (
-            <IconButton
-              marginLeft={1}
-              icon={<FilterIcon />}
-              size="xs"
-              variant="ghost"
-              aria-label={intl.formatMessage(
-                {
-                  id: "components.table.filter",
-                  defaultMessage: 'Filter "{column}"',
-                },
-                { column: column.header }
-              )}
-              {...getFilterButtonProps()}
-              onClick={onToggleFilter}
             />
           ) : null}
         </Flex>

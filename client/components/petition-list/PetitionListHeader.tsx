@@ -71,9 +71,6 @@ export function PetitionListHeader({
 
   return (
     <Stack direction="row" padding={2}>
-      <Box flex="0 1 400px">
-        <SearchInput value={search ?? ""} onChange={handleSearchChange} />
-      </Box>
       <IconButtonWithTooltip
         onClick={() => onReload()}
         icon={<RepeatIcon />}
@@ -84,6 +81,10 @@ export function PetitionListHeader({
           defaultMessage: "Reload",
         })}
       />
+      <Box flex="0 1 400px">
+        <SearchInput value={search ?? ""} onChange={handleSearchChange} />
+      </Box>
+
       <Box>
         <PetitionListFilter
           status={filter.status ?? null}
