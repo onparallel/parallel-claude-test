@@ -1530,7 +1530,8 @@ export class PetitionRepository extends BaseRepository {
   async clonePetition(
     petitionId: number,
     user: User,
-    data?: Partial<CreatePetition>
+    data?: Partial<CreatePetition>,
+    insertUserPermissions = true
   ) {
     const [sourcePetition, userPermissions] = await Promise.all([
       this.loadPetition(petitionId),
@@ -1591,19 +1592,22 @@ export class PetitionRepository extends BaseRepository {
               })),
               t
             ).returning("*"),
-        this.insert(
-          "petition_permission",
-          {
-            petition_id: cloned.id,
-            user_id: user.id,
-            is_subscribed:
-              userPermissions.find((p) => p.user_id === user.id)
-                ?.is_subscribed ?? true,
-            created_by: `User:${user.id}`,
-            updated_by: `User:${user.id}`,
-          },
-          t
-        ),
+        insertUserPermissions
+          ? this.insert(
+              "petition_permission",
+              {
+                petition_id: cloned.id,
+                user_id: user.id,
+                type: "OWNER",
+                is_subscribed:
+                  userPermissions.find((p) => p.user_id === user.id)
+                    ?.is_subscribed ?? true,
+                created_by: `User:${user.id}`,
+                updated_by: `User:${user.id}`,
+              },
+              t
+            )
+          : [],
       ]);
       const newIds = Object.fromEntries(
         zip(
@@ -2688,25 +2692,24 @@ export class PetitionRepository extends BaseRepository {
   );
 
   /**
-   * grab the permissions of the other users on `fromPetitionId` and set them into `toPetitionIds` with WRITE access
+   * clones every permission on `fromPetitionId` into `toPetitionIds`
    */
   async clonePetitionPermissions(
     fromPetitionId: number,
     toPetitionIds: number[],
-    user: User,
     t?: Knex.Transaction
   ) {
     await this.raw(
       /* sql */ `
         with
-          u as (select user_id, user_group_id, from_user_group_id, is_subscribed from petition_permission where petition_id = ? and (user_id != ? or user_id is null) and deleted_at is null),
+          u as (select user_id, type, is_subscribed, user_group_id, from_user_group_id from petition_permission where petition_id = ? and deleted_at is null),
           p as (select * from (values ${toPetitionIds
             .map(() => "(?::int)")
             .join(",")}) as t (petition_id))
-        insert into petition_permission(petition_id, user_id, user_group_id, from_user_group_id, is_subscribed, type)
-        select p.petition_id, u.user_id, u.user_group_id, u.from_user_group_id, u.is_subscribed, 'WRITE' from u cross join p
+        insert into petition_permission(petition_id, user_id, type, is_subscribed, user_group_id, from_user_group_id)
+        select p.petition_id, u.user_id, u.type, u.is_subscribed, u.user_group_id, u.from_user_group_id from u cross join p
         `,
-      [fromPetitionId, user.id, ...toPetitionIds],
+      [fromPetitionId, ...toPetitionIds],
       t
     );
   }
