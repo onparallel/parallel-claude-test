@@ -31,8 +31,10 @@ createQueueWorker(
       payload: JSON.stringify((payload as any)[event]),
     });
 
-    if (event === "bounce") {
-      await context.emails.sendPetitionMessageBouncedEmail(emailLogId);
+    const message = await context.petitions.loadMessageByEmailLogId(emailLogId);
+    // only process the bounce if it came with a PetitionMessage (when sending a petition)
+    if (event === "bounce" && message) {
+      await context.emails.sendPetitionMessageBouncedEmail(message.id);
       await context.system.createEvent({
         type: "EMAIL_BOUNCED",
         data: { email_log_id: emailLogId },
