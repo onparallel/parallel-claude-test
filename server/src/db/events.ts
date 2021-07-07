@@ -243,8 +243,8 @@ export type SystemEventPayload<TType extends SystemEventType> = {
   USER_CREATED: {
     user_id: number;
   };
-  EMAIL_BOUNCED: {
-    email_log_id: number;
+  PETITION_MESSAGE_BOUNCED: {
+    petition_message_id: number;
   };
 }[TType];
 
@@ -263,12 +263,12 @@ export type UserCreatedEvent<IsCreate extends boolean = false> =
   GenericSystemEvent<"USER_CREATED", IsCreate>;
 export type UserLoggedInEvent<IsCreate extends boolean = false> =
   GenericSystemEvent<"USER_LOGGED_IN", IsCreate>;
-export type EmailBouncedEvent<IsCreate extends boolean = false> =
-  GenericSystemEvent<"EMAIL_BOUNCED", IsCreate>;
+export type PetitionMessageBouncedEvent<IsCreate extends boolean = false> =
+  GenericSystemEvent<"PETITION_MESSAGE_BOUNCED", IsCreate>;
 
 export type SystemEvent<IsCreate extends boolean = false> =
   | UserLoggedInEvent<IsCreate>
   | UserCreatedEvent<IsCreate>
-  | EmailBouncedEvent<IsCreate>;
+  | PetitionMessageBouncedEvent<IsCreate>;
 
 export type CreateSystemEvent = SystemEvent<true>;

@@ -1,7 +1,7 @@
 import { WorkerContext } from "../../context";
 import {
   CommentPublishedEvent,
-  EmailBouncedEvent,
+  PetitionMessageBouncedEvent,
   GroupPermissionAddedEvent,
   PetitionCompletedEvent,
   SignatureCancelledEvent,
@@ -83,16 +83,16 @@ async function createCommentPublishedUserNotifications(
   ]);
 }
 
-async function createEmailBouncedUserNotifications(
-  event: EmailBouncedEvent,
+async function createPetitionMessageBouncedUserNotifications(
+  event: PetitionMessageBouncedEvent,
   ctx: WorkerContext
 ) {
-  const message = await ctx.petitions.loadMessageByEmailLogId(
-    event.data.email_log_id
+  const message = await ctx.petitions.loadMessage(
+    event.data.petition_message_id
   );
   if (!message) {
     throw new Error(
-      `PetitionMessage for EmailLog:${event.data.email_log_id} not found.`
+      `PetitionMessage:${event.data.petition_message_id} not found.`
     );
   }
   const sender = await ctx.users.loadUser(message.sender_id);
@@ -199,8 +199,8 @@ export const userNotificationsListener: EventListener = async (event, ctx) => {
     case "COMMENT_PUBLISHED":
       await createCommentPublishedUserNotifications(event, ctx);
       break;
-    case "EMAIL_BOUNCED":
-      await createEmailBouncedUserNotifications(event, ctx);
+    case "PETITION_MESSAGE_BOUNCED":
+      await createPetitionMessageBouncedUserNotifications(event, ctx);
       break;
     case "SIGNATURE_COMPLETED":
       await createSignatureCompletedUserNotifications(event, ctx);

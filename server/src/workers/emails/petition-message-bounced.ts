@@ -8,15 +8,16 @@ import { slateParser } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionMessageBounced(
-  payload: { email_log_id: number },
+  payload: { petition_message_id: number },
   context: WorkerContext
 ) {
-  const message = await context.petitions.loadMessageByEmailLogId(
-    payload.email_log_id
+  const message = await context.petitions.loadMessage(
+    payload.petition_message_id
   );
   if (!message) {
-    // if the bounce doesn't come from a PetitionMessage, ignore it
-    return;
+    throw new Error(
+      `PetitionMessage:${payload.petition_message_id} not found.`
+    );
   }
   const [petition, sender, access] = await Promise.all([
     context.petitions.loadPetition(message.petition_id),
@@ -68,6 +69,6 @@ export async function petitionMessageBounced(
     subject,
     text,
     html,
-    created_from: `EmailLog:${payload.email_log_id}`,
+    created_from: `EmailLog:${message.email_log_id}`,
   });
 }

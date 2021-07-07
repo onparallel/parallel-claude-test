@@ -103,7 +103,7 @@ export type PetitionUserNotificationType =
   | "SIGNATURE_COMPLETED";
 
 export type SystemEventType =
-  | "EMAIL_BOUNCED"
+  | "PETITION_MESSAGE_BOUNCED"
   | "USER_CREATED"
   | "USER_LOGGED_IN";
 

@@ -386,7 +386,7 @@ describe("Worker - User Notifications Listener", () => {
 
   it("users should receive a notification when a petition email is bounced", async () => {
     const [emailLog] = await mocks.createRandomEmailLog();
-    await mocks.createRandomPetitionMessage(
+    const [message] = await mocks.createRandomPetitionMessage(
       petition.id,
       access.id,
       users[0].id,
@@ -396,9 +396,9 @@ describe("Worker - User Notifications Listener", () => {
       {
         id: 1,
         created_at: new Date(),
-        type: "EMAIL_BOUNCED",
+        type: "PETITION_MESSAGE_BOUNCED",
         data: {
-          email_log_id: 1,
+          petition_message_id: message.id,
         },
       },
       ctx

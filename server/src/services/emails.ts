@@ -178,10 +178,10 @@ export class EmailsService implements IEmailsService {
     });
   }
 
-  async sendPetitionMessageBouncedEmail(emailLogId: number) {
+  async sendPetitionMessageBouncedEmail(petitionMessageId: number) {
     return await this.enqueueEmail("petition-message-bounced", {
-      id: this.buildQueueId("PetitionMessageBounced", emailLogId),
-      email_log_id: emailLogId,
+      id: this.buildQueueId("PetitionMessageBounced", petitionMessageId),
+      petition_message_id: petitionMessageId,
     });
   }
 
