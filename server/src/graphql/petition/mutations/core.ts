@@ -1141,14 +1141,23 @@ export const batchSendPetition = mutationField("batchSendPetition", {
     validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
   ),
   resolve: async (_, args, ctx) => {
-    const petition = await ctx.petitions.loadPetition(args.petitionId);
+    const [petition, petitionOwner] = await Promise.all([
+      ctx.petitions.loadPetition(args.petitionId),
+      ctx.petitions.loadPetitionOwner(args.petitionId),
+    ]);
+
     if (!petition) {
-      throw new Error("Petition not available");
+      throw new Error(`Petition:${args.petitionId} not found`);
     }
+    if (!petitionOwner) {
+      throw new Error(`Owner of Petition:${args.petitionId} not found`);
+    }
+
     const clonedPetitions = await Promise.all(
       args.contactIdGroups
         .slice(1)
-        .map(() => ctx.petitions.clonePetition(args.petitionId, ctx.user!))
+        // set the owner of the original petition as owner of the cloned ones
+        .map(() => ctx.petitions.clonePetition(args.petitionId, petitionOwner))
     );
 
     if (
@@ -1183,11 +1192,11 @@ export const batchSendPetition = mutationField("batchSendPetition", {
             petition_id: p.id,
           }))
         ),
-        // copy the user permissions of the original petition to the cloned ones
+        // copy the permissions of the original petition to the cloned ones
         ctx.petitions.clonePetitionPermissions(
           args.petitionId,
           clonedPetitions.map((p) => p.id),
-          ctx.user!
+          petitionOwner
         ),
       ]);
     }

@@ -1532,11 +1532,10 @@ export class PetitionRepository extends BaseRepository {
     user: User,
     data?: Partial<CreatePetition>
   ) {
-    const [sourcePetition, [userOriginalPermission]] = await Promise.all([
+    const [sourcePetition, userPermissions] = await Promise.all([
       this.loadPetition(petitionId),
       this.loadUserPermissionsByPetitionId(petitionId),
     ]);
-
     return await this.withTransaction(async (t) => {
       const fromTemplateId =
         !data?.is_template &&
@@ -1597,7 +1596,9 @@ export class PetitionRepository extends BaseRepository {
           {
             petition_id: cloned.id,
             user_id: user.id,
-            is_subscribed: userOriginalPermission.is_subscribed,
+            is_subscribed:
+              userPermissions.find((p) => p.user_id === user.id)
+                ?.is_subscribed ?? true,
             created_by: `User:${user.id}`,
             updated_by: `User:${user.id}`,
           },
@@ -2698,12 +2699,12 @@ export class PetitionRepository extends BaseRepository {
     await this.raw(
       /* sql */ `
         with
-          u as (select user_id, user_group_id, from_user_group_id from petition_permission where petition_id = ? and user_id != ? and deleted_at is null),
+          u as (select user_id, user_group_id, from_user_group_id, is_subscribed from petition_permission where petition_id = ? and (user_id != ? or user_id is null) and deleted_at is null),
           p as (select * from (values ${toPetitionIds
             .map(() => "(?::int)")
             .join(",")}) as t (petition_id))
-        insert into petition_permission(petition_id, user_id, user_group_id, from_user_group_id, type)
-        select p.petition_id, u.user_id, u.user_group_id, u.from_user_group_id, 'WRITE' from u cross join p
+        insert into petition_permission(petition_id, user_id, user_group_id, from_user_group_id, is_subscribed, type)
+        select p.petition_id, u.user_id, u.user_group_id, u.from_user_group_id, u.is_subscribed, 'WRITE' from u cross join p
         `,
       [fromPetitionId, user.id, ...toPetitionIds],
       t
