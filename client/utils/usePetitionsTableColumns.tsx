@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -20,7 +20,7 @@ import {
 import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { MouseEvent, useMemo } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
 
@@ -204,24 +204,51 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
             </Flex>
           ),
         },
-        {
-          key: "createdAt",
-          isSortable: true,
-          header: intl.formatMessage({
-            id: "generic.created-at",
-            defaultMessage: "Created at",
-          }),
-          cellProps: { width: "1%" },
-          CellContent: ({ row: { createdAt } }) => (
-            <DateTime
-              value={createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime
-              fontSize="sm"
-              whiteSpace="nowrap"
-            />
-          ),
-        },
+        type === "PETITION"
+          ? ({
+              key: "sentAt",
+              isSortable: true,
+              header: intl.formatMessage({
+                id: "generic.sent-at",
+                defaultMessage: "Sent at",
+              }),
+              cellProps: { width: "1%" },
+              CellContent: ({ row: { sentAt } }) =>
+                sentAt ? (
+                  <DateTime
+                    value={sentAt}
+                    format={FORMATS.LLL}
+                    useRelativeTime
+                    fontSize="sm"
+                    whiteSpace="nowrap"
+                  />
+                ) : (
+                  <Text as="span" textStyle="hint" fontSize="sm">
+                    <FormattedMessage
+                      id="generic.not-sent"
+                      defaultMessage="Not sent"
+                    />
+                  </Text>
+                ),
+            } as PetitionTableColumn)
+          : {
+              key: "createdAt",
+              isSortable: true,
+              header: intl.formatMessage({
+                id: "generic.created-at",
+                defaultMessage: "Created at",
+              }),
+              cellProps: { width: "1%" },
+              CellContent: ({ row: { createdAt } }) => (
+                <DateTime
+                  value={createdAt}
+                  format={FORMATS.LLL}
+                  useRelativeTime
+                  fontSize="sm"
+                  whiteSpace="nowrap"
+                />
+              ),
+            },
         {
           key: "tags",
           header: intl.formatMessage({
@@ -273,6 +300,7 @@ usePetitionsTableColumns.fragments = {
             ...ContactLink_Contact
           }
         }
+        sentAt
         ...PetitionStatusCellContent_Petition
         ...PetitionSignatureCellContent_Petition
       }

@@ -1420,6 +1420,11 @@ type Petition implements PetitionBase {
   remindersConfig: RemindersConfig
 
   """
+  Date when the petition was first sent
+  """
+  sentAt: DateTime
+
+  """
   The signature configuration for the petition.
   """
   signatureConfig: SignatureConfig
@@ -3051,6 +3056,8 @@ enum QueryPetitions_OrderBy {
   lastUsedAt_DESC
   name_ASC
   name_DESC
+  sentAt_ASC
+  sentAt_DESC
 }
 
 """

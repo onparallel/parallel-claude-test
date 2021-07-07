@@ -2810,6 +2810,11 @@
     "context": "No name"
   },
   {
+    "term": "generic.not-sent",
+    "definition": "Not sent",
+    "context": "Not sent"
+  },
+  {
     "term": "generic.not-specified",
     "definition": "Not specified",
     "context": "Not specified"
@@ -2923,6 +2928,11 @@
     "term": "generic.send",
     "definition": "Send",
     "context": "Send"
+  },
+  {
+    "term": "generic.sent-at",
+    "definition": "Sent at",
+    "context": "Sent at"
   },
   {
     "term": "generic.share",

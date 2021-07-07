@@ -322,16 +322,16 @@ function useContactPetitionAccessesColumns() {
           ),
         },
         {
-          key: "createdAt",
-          isSortable: true,
+          key: "sentAt",
           header: intl.formatMessage({
-            id: "generic.created-at",
-            defaultMessage: "Created at",
+            id: "generic.sent-at",
+            defaultMessage: "Sent at",
           }),
           cellProps: { width: "1%" },
           CellContent: ({ row: { petition } }) => (
             <DateTime
-              value={petition!.createdAt}
+              fontSize="sm"
+              value={petition!.sentAt!}
               format={FORMATS.LLL}
               useRelativeTime
               whiteSpace="nowrap"
@@ -388,7 +388,7 @@ Contact.fragments = {
     fragment Contact_Petition on Petition {
       id
       name
-      createdAt
+      sentAt
       permissions {
         permissionType
         ... on PetitionUserPermission {

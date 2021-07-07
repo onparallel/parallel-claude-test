@@ -7,6 +7,7 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { extension } from "mime-types";
+import { minBy } from "remeda";
 import { toGlobalId } from "../../../util/globalId";
 import { isDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
@@ -181,6 +182,18 @@ export const Petition = objectType({
       description: "The progress of the petition.",
       resolve: async (root, _, ctx) => {
         return await ctx.petitions.loadStatusForPetition(root.id);
+      },
+    });
+    t.nullable.datetime("sentAt", {
+      description: "Date when the petition was first sent",
+      resolve: async (root, _, ctx) => {
+        const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
+        return (
+          minBy(
+            accesses.filter((a) => a.status === "ACTIVE"),
+            (a) => a.created_at.valueOf()
+          )?.created_at ?? null
+        );
       },
     });
     t.list.nonNull.field("accesses", {

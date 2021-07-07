@@ -1188,6 +1188,8 @@ export interface Petition extends PetitionBase {
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
   remindersConfig?: Maybe<RemindersConfig>;
+  /** Date when the petition was first sent */
+  sentAt?: Maybe<Scalars["DateTime"]>;
   /** The signature configuration for the petition. */
   signatureConfig?: Maybe<SignatureConfig>;
   /** The list of signature requests. */
@@ -2134,7 +2136,9 @@ export type QueryPetitions_OrderBy =
   | "lastUsedAt_ASC"
   | "lastUsedAt_DESC"
   | "name_ASC"
-  | "name_DESC";
+  | "name_DESC"
+  | "sentAt_ASC"
+  | "sentAt_DESC";
 
 /** Order to use on Query.userGroups */
 export type QueryUserGroups_OrderBy =
@@ -5368,7 +5372,7 @@ export type Contact_PetitionFragment = {
   __typename?: "Petition";
   id: string;
   name?: Maybe<string>;
-  createdAt: string;
+  sentAt?: Maybe<string>;
   permissions: Array<
     | {
         __typename?: "PetitionUserGroupPermission";
@@ -6927,6 +6931,7 @@ export type usePetitionCurrentSignatureStatus_PetitionFragment = {
 
 export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   __typename?: "Petition";
+  sentAt?: Maybe<string>;
   id: string;
   name?: Maybe<string>;
   createdAt: string;
@@ -7585,7 +7590,7 @@ export const Contact_PetitionFragmentDoc = gql`
   fragment Contact_Petition on Petition {
     id
     name
-    createdAt
+    sentAt
     permissions {
       permissionType
       ... on PetitionUserPermission {
@@ -8908,6 +8913,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
           ...ContactLink_Contact
         }
       }
+      sentAt
       ...PetitionStatusCellContent_Petition
       ...PetitionSignatureCellContent_Petition
     }

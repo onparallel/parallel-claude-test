@@ -244,7 +244,9 @@ export interface NexusGenEnums {
     | "lastUsedAt_ASC"
     | "lastUsedAt_DESC"
     | "name_ASC"
-    | "name_DESC";
+    | "name_DESC"
+    | "sentAt_ASC"
+    | "sentAt_DESC";
   QueryUserGroups_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -865,6 +867,7 @@ export interface NexusGenFieldTypes {
     permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
     progress: NexusGenRootTypes["PetitionProgress"]; // PetitionProgress!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
+    sentAt: NexusGenScalars["DateTime"] | null; // DateTime
     signatureConfig: NexusGenRootTypes["SignatureConfig"] | null; // SignatureConfig
     signatureRequests: NexusGenRootTypes["PetitionSignatureRequest"][] | null; // [PetitionSignatureRequest!]
     skipForwardSecurity: boolean; // Boolean!
@@ -1820,6 +1823,7 @@ export interface NexusGenFieldTypeNames {
     permissions: "PetitionPermission";
     progress: "PetitionProgress";
     remindersConfig: "RemindersConfig";
+    sentAt: "DateTime";
     signatureConfig: "SignatureConfig";
     signatureRequests: "PetitionSignatureRequest";
     skipForwardSecurity: "Boolean";

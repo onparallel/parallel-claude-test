@@ -258,127 +258,118 @@ export class PetitionRepository extends BaseRepository {
     userId: number,
     opts: {
       search?: string | null;
-      sortBy?: SortBy<keyof Petition | "last_used_at">[];
+      sortBy?: SortBy<keyof Petition | "last_used_at" | "sent_at">[];
       filters?: PetitionFilter | null;
     } & PageOpts
   ) {
-    const petitionType = opts.filters?.type || "PETITION";
-    const hasOrderByLastUsed =
-      petitionType === "TEMPLATE" &&
-      opts.sortBy?.some((o) => o.column === "last_used_at");
-    return await this.loadPageAndCount(
-      this.from("petition")
-        .leftJoin(
-          { pp: "petition_permission" },
-          "petition.id",
-          "pp.petition_id"
-        )
-        .where({
-          "pp.user_id": userId,
-          is_template: petitionType === "TEMPLATE",
-          "pp.deleted_at": null,
-        })
-        .mmodify((q) => {
-          const { search, filters } = opts;
-          if (filters?.locale) {
-            q.where("locale", filters.locale);
-          }
-          if (search) {
-            if (petitionType === "PETITION") {
-              q.joinRaw(/* sql */ `
-                left join petition_access pa on petition.id = pa.petition_id and pa.status = 'ACTIVE'
-                left join contact c on pa.contact_id = c.id and c.deleted_at is null
-              `);
-            }
-            q.andWhere((q2) => {
-              q2.whereIlike("name", `%${escapeLike(search, "\\")}%`, "\\");
-              if (petitionType === "PETITION") {
-                q2.or
-                  .whereIlike(
-                    this.knex.raw(`concat(c.first_name, ' ', c.last_name)`),
-                    `%${escapeLike(search, "\\")}%`,
-                    "\\"
-                  )
-                  .or.whereIlike(
-                    "c.email",
-                    `%${escapeLike(search, "\\")}%`,
-                    "\\"
-                  );
-              } else {
-                q2.or.whereIlike(
-                  "template_description",
-                  `%${escapeLike(search, "\\")}%`,
-                  "\\"
-                );
-              }
-            });
-          }
-          if (filters?.status && petitionType === "PETITION") {
-            q.where("petition.status", filters.status);
-          }
+    const type = opts.filters?.type || "PETITION";
+    const query = this.from("petition")
+      .joinRaw(
+        /* sql */ `
+        join petition_permission pp on petition.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
+        left join petition_access pa on petition.id = pa.petition_id and pa.status = 'ACTIVE'
+        left join contact c on pa.contact_id = c.id and c.deleted_at is null
+      `,
+        [userId]
+      )
+      .where("is_template", type === "TEMPLATE")
+      .mmodify((q) => {
+        const { search, filters } = opts;
+        if (filters?.locale) {
+          q.where("locale", filters.locale);
+        }
+        if (search) {
+          q.andWhereRaw(
+            type === "PETITION"
+              ? /* sql */ ` 
+                petition.name ilike :search escape '\\'
+                or concat(c.first_name, ' ', c.last_name) ilike :search escape '\\'
+                or c.email ilike :search escape '\\'
+              `
+              : /* sql */ ` 
+                petition.name ilike :search escape '\\'
+                or petition.template_description ilike :search escape '\\'
+              `,
+            { search: `%${escapeLike(search, "\\")}%` }
+          );
+        }
+        if (filters?.status && type === "PETITION") {
+          q.where("petition.status", filters.status);
+        }
 
-          if (filters?.tagIds) {
-            if (filters.tagIds.length > 0) {
-              filters.tagIds.forEach((tagId, i) => {
-                q.joinRaw(
-                  `join petition_tag pt${i} on (pt${i}.petition_id = petition.id and pt${i}.tag_id = ?)`,
-                  [fromGlobalId(tagId, "Tag").id]
-                );
-              });
-            } else {
-              // exclude petitions with tags
-              q.whereRaw(
+        if (filters?.tagIds) {
+          if (filters.tagIds.length > 0) {
+            filters.tagIds.forEach((tagId, i) => {
+              q.joinRaw(
                 /* sql */ `
+                  join petition_tag pt${i} on (pt${i}.petition_id = petition.id and pt${i}.tag_id = ?)
+                `,
+                [fromGlobalId(tagId, "Tag").id]
+              );
+            });
+          } else {
+            // exclude petitions with tags
+            q.whereRaw(
+              /* sql */ `
                 petition.id not in (
                   select distinct pt.petition_id
                     from petition_permission pp
                     join petition_tag pt on pt.petition_id = pp.petition_id
                     where pp.user_id = ? and pp.deleted_at is null
-                )`,
-                [userId]
-              );
-            }
-          }
-
-          if (hasOrderByLastUsed) {
-            q.leftJoin(
-              this.knex.raw(
-                /* sql */ `(
-                  select
-                    p.from_template_id as template_id,
-                    max(p.created_at) as last_used_at
-                  from petition as p
-                    where created_by = ?
-                    group by p.from_template_id
-                ) as lj
-                `,
-                [`User:${userId}`]
-              ),
-              "lj.template_id",
-              "petition.id"
-            ).orderByRaw(
-              opts
-                .sortBy!.map((s) => {
-                  const table = s.column === "last_used_at" ? "lj" : "petition";
-                  return `${table}.${s.column} ${s.order} NULLS LAST`;
-                })
-                .join(", ")
+                )
+            `,
+              [userId]
             );
-          } else if (opts.sortBy?.length) {
-            // last_used_at is only for templates
-            q.orderBy(opts.sortBy.filter((o) => o.column !== "last_used_at"));
           }
-        })
-        // default order by to ensure result consistency
-        // applies after any previously specified order by
-        .orderBy("petition.id")
-        .distinct(
-          "petition.*",
-          // when using distinct pg requires any order by clause to be included on the select
-          ...(hasOrderByLastUsed ? ["lj.last_used_at"] : [])
-        ),
-      opts
-    );
+        }
+      });
+    const [{ count }] = await query
+      .clone()
+      .select<{ count: number }[]>(
+        this.knex.raw("count(distinct petition.id)::int as count")
+      );
+    if (count === 0) {
+      return { totalCount: count, items: [] };
+    } else {
+      return {
+        totalCount: count,
+        items: await query
+          .clone()
+          .mmodify((q) => {
+            for (const { column, order } of opts.sortBy ?? []) {
+              if (column === "last_used_at") {
+                q.joinRaw(
+                  /* sql */ `
+                left join (
+                  select p.from_template_id as template_id, max(p.created_at) as t_last_used_at
+                  from petition as p where p.created_by = ? group by p.from_template_id
+                ) as t on t.template_id = petition.id
+                `,
+                  [`User:${userId}`]
+                );
+                q.orderByRaw(`last_used_at ${order} NULLS LAST`);
+              } else if (column === "sent_at") {
+                q.orderBy("sent_at", order);
+              } else {
+                q.orderBy(`petition.${column}`, order);
+              }
+            }
+          })
+          // default order by to ensure result consistency
+          // applies after any previously specified order by
+          .orderBy("petition.id")
+          .groupBy("petition.id")
+          .offset(opts.offset ?? 0)
+          .limit(opts.limit ?? 0)
+          .select(
+            "petition.*",
+            this.knex.raw("min(pa.created_at) as sent_at"),
+            ...(opts.sortBy?.some((s) => s.column === "last_used_at")
+              ? [this.knex.raw("min(t.t_last_used_at) as last_used_at")]
+              : [])
+          ),
+      };
+    }
   }
 
   readonly loadFieldsForPetition = this.buildLoadMultipleBy(

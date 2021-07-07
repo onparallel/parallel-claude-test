@@ -42,7 +42,7 @@ export const petitionsQuery = queryField((t) => {
       }).asArg(),
     },
     searchable: true,
-    sortableBy: ["createdAt", "name", "lastUsedAt" as any],
+    sortableBy: ["createdAt", "sentAt", "name", "lastUsedAt" as any],
     resolve: async (_, { offset, limit, search, sortBy, filters }, ctx) => {
       // move this to validator if it grows in complexity
       if (filters?.tagIds) {
@@ -58,6 +58,7 @@ export const petitionsQuery = queryField((t) => {
       }
       const columnMap = {
         createdAt: "created_at",
+        sentAt: "sent_at",
         name: "name",
         lastUsedAt: "last_used_at",
       } as const;

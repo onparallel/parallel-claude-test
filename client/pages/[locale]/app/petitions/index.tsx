@@ -19,7 +19,6 @@ import {
   PetitionStatus,
   PetitionsUserQuery,
   Petitions_PetitionBaseFragment,
-  QueryPetitions_OrderBy,
   usePetitionsQuery,
   usePetitionsUserQuery,
 } from "@parallel/graphql/__types";
@@ -45,7 +44,7 @@ import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColum
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-const SORTING = ["name", "createdAt"] as const;
+const SORTING = ["name", "createdAt", "sentAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -64,16 +63,18 @@ const QUERY_STATE = {
         : null,
     (value) => (value.length === 0 ? "NO_TAGS" : value.join(","))
   ),
-  sort: sorting(SORTING).orDefault({
-    field: "createdAt",
-    direction: "DESC",
-  }),
+  sort: sorting(SORTING),
 };
 
 function Petitions() {
   const intl = useIntl();
 
   const [state, setQueryState] = useQueryState(QUERY_STATE);
+  const sort =
+    state.sort ??
+    (state.type === "PETITION"
+      ? ({ field: "sentAt", direction: "DESC" } as const)
+      : ({ field: "createdAt", direction: "DESC" } as const));
   const {
     data: { me },
   } = assertQuery(usePetitionsUserQuery());
@@ -92,9 +93,7 @@ function Petitions() {
           type: state.type,
           tagIds: state.tags,
         },
-        sortBy: [
-          `${state.sort.field}_${state.sort.direction}` as QueryPetitions_OrderBy,
-        ],
+        sortBy: [`${sort.field}_${sort.direction}`],
         hasPetitionSignature: me.hasPetitionSignature,
       },
     })
@@ -117,6 +116,13 @@ function Petitions() {
       type: filter.type ?? undefined,
       tags: filter.tagIds,
       page: 1,
+      // avoid invalid filter/sort combinations
+      sort:
+        filter.type === "TEMPLATE" && current.sort?.field === "sentAt"
+          ? { ...current.sort, field: "createdAt" }
+          : filter.type !== "TEMPLATE" && current.sort?.field === "createdAt"
+          ? { ...current.sort, field: "sentAt" }
+          : current.sort,
     }));
   }
 
@@ -246,7 +252,7 @@ function Petitions() {
           page={state.page}
           pageSize={state.items}
           totalCount={petitions.totalCount}
-          sort={state.sort}
+          sort={sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) =>
@@ -357,10 +363,12 @@ Petitions.getInitialProps = async ({
     }
     ${Petitions.fragments.User}
   `);
-  const { page, search, sort, status, type, items, tags } = parseQuery(
-    query,
-    QUERY_STATE
-  );
+  const state = parseQuery(query, QUERY_STATE);
+  const sort =
+    state.sort ??
+    (state.type === "PETITION"
+      ? ({ field: "sentAt", direction: "DESC" } as const)
+      : ({ field: "createdAt", direction: "DESC" } as const));
   await fetchQuery<PetitionsQuery, PetitionsQueryVariables>(
     gql`
       query Petitions(
@@ -385,11 +393,11 @@ Petitions.getInitialProps = async ({
     `,
     {
       variables: {
-        offset: items * (page - 1),
-        limit: items,
-        search,
-        sortBy: [`${sort.field}_${sort.direction}` as QueryPetitions_OrderBy],
-        filters: { type, status, tagIds: tags },
+        offset: state.items * (state.page - 1),
+        limit: state.items,
+        search: state.search,
+        sortBy: [`${sort.field}_${sort.direction}`],
+        filters: { type: state.type, status: state.status, tagIds: state.tags },
         hasPetitionSignature: me.hasPetitionSignature,
       },
     }
