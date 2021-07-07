@@ -438,6 +438,9 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.name,
         args.data.locale,
         args.data.hasCommentsEnabled,
+        args.data.description,
+        args.data.emailSubject,
+        args.data.emailBody,
       ],
       petitionsAreEditable("petitionId")
     )
