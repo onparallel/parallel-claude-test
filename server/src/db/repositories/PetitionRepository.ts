@@ -3313,7 +3313,7 @@ export class PetitionRepository extends BaseRepository {
       .where("petition_permission.petition_id", petitionId)
       .whereNull("petition_permission.deleted_at")
       .whereNull("user.deleted_at")
-      .select<User[]>("user.*");
+      .distinct<User[]>("user.*");
   }
 
   async isUserSubscribedToPetition(userId: number, petitionId: number) {
