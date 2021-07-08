@@ -1682,6 +1682,11 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadReminder = this.buildLoadBy("petition_reminder", "id");
 
+  readonly loadReminderByEmailLogId = this.buildLoadBy(
+    "petition_reminder",
+    "email_log_id"
+  );
+
   readonly loadReminderCountForAccess = this.buildLoadCountBy(
     "petition_reminder",
     "petition_access_id"

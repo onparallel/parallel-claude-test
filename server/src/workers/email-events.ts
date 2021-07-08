@@ -31,14 +31,35 @@ createQueueWorker(
       payload: JSON.stringify((payload as any)[event]),
     });
 
-    const message = await context.petitions.loadMessageByEmailLogId(emailLogId);
-    // only process the bounce if it came with a PetitionMessage (when sending a petition)
-    if (event === "bounce" && message) {
-      await context.emails.sendPetitionMessageBouncedEmail(message.id);
-      await context.system.createEvent({
-        type: "PETITION_MESSAGE_BOUNCED",
-        data: { petition_message_id: message.id },
-      });
+    if (event === "bounce") {
+      // bounce can come from a PetitionMessage or a PetitionReminder
+      const [message, reminder] = await Promise.all([
+        context.petitions.loadMessageByEmailLogId(emailLogId),
+        context.petitions.loadReminderByEmailLogId(emailLogId),
+      ]);
+
+      if (message) {
+        await Promise.all([
+          context.emails.sendPetitionMessageBouncedEmail(message.id),
+          context.petitions.updateRemindersForPetition(
+            message.petition_id,
+            null
+          ),
+          context.system.createEvent({
+            type: "PETITION_MESSAGE_BOUNCED",
+            data: { petition_message_id: message.id },
+          }),
+        ]);
+      } else if (reminder) {
+        const access = (await context.petitions.loadAccess(
+          reminder.petition_access_id
+        ))!;
+
+        await context.petitions.updateRemindersForPetition(
+          access.petition_id,
+          null
+        );
+      }
     }
   },
   {
