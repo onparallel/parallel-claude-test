@@ -100,7 +100,7 @@ createQueueWorker(
       [
         "PETITION_COMPLETED",
         "COMMENT_PUBLISHED",
-        "EMAIL_BOUNCED",
+        "PETITION_MESSAGE_BOUNCED",
         "SIGNATURE_COMPLETED",
         "SIGNATURE_CANCELLED",
         "USER_PERMISSION_ADDED",
