@@ -267,7 +267,7 @@ export class PetitionRepository extends BaseRepository {
       .joinRaw(
         /* sql */ `
         join petition_permission pp on petition.id = pp.petition_id and pp.user_id = ? and pp.deleted_at is null
-        left join petition_access pa on petition.id = pa.petition_id and pa.status = 'ACTIVE'
+        left join petition_access pa on petition.id = pa.petition_id
         left join contact c on pa.contact_id = c.id and c.deleted_at is null
       `,
         [userId]

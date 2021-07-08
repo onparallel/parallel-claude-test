@@ -189,10 +189,7 @@ export const Petition = objectType({
       resolve: async (root, _, ctx) => {
         const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
         return (
-          minBy(
-            accesses.filter((a) => a.status === "ACTIVE"),
-            (a) => a.created_at.valueOf()
-          )?.created_at ?? null
+          minBy(accesses, (a) => a.created_at.valueOf())?.created_at ?? null
         );
       },
     });
