@@ -1,17 +1,10 @@
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
-export function useOrganizationSections() {
+export function useOrganizationSections(isAdmin: boolean) {
   const intl = useIntl();
   return useMemo(
     () => [
-      {
-        title: intl.formatMessage({
-          id: "organization.branding.title",
-          defaultMessage: "Branding",
-        }),
-        path: "/app/organization/branding",
-      },
       {
         title: intl.formatMessage({
           id: "organization.users.title",
@@ -26,7 +19,18 @@ export function useOrganizationSections() {
         }),
         path: "/app/organization/groups",
       },
+      ...(isAdmin
+        ? [
+            {
+              title: intl.formatMessage({
+                id: "organization.branding.title",
+                defaultMessage: "Branding",
+              }),
+              path: "/app/organization/branding",
+            },
+          ]
+        : []),
     ],
-    [intl.locale]
+    [intl.locale, isAdmin]
   );
 }

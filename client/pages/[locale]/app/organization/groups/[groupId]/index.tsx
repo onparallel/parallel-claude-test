@@ -28,7 +28,6 @@ import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -65,6 +64,7 @@ import {
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
+import { ValueProps } from "@parallel/utils/ValueProps";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -155,7 +155,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     setName(userGroup?.name ?? "");
   }, [userGroup]);
 
-  const sections = useOrganizationSections();
+  const sections = useOrganizationSections(me.role === "ADMIN");
 
   const columns = useOrganizationGroupTableColumns();
 
@@ -249,14 +249,12 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     useOrganizationGroup_removeUsersFromGroupMutation();
   const showConfirmRemoveMemberDialog = useConfirmRemoveMemberDialog();
 
-  const handleRemoveMember = async (
-    members: OrganizationGroup_UserGroupMemberFragment[]
-  ) => {
+  const handleRemoveMember = async () => {
     try {
       await showConfirmRemoveMemberDialog({
-        selected: members,
+        selected: selectedMembers,
       });
-      const userIds = members.map(({ user }) => user.id);
+      const userIds = selectedMembers.map((m) => m.user.id);
       await removeUsersFromGroup({
         variables: { userGroupId: groupId, userIds },
       });
@@ -279,9 +277,10 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
           <EditableHeading
+            isDisabled={me.role !== "ADMIN"}
             value={name}
-            onSubmit={handleChangeGroupName}
-          ></EditableHeading>
+            onChange={handleChangeGroupName}
+          />
           <Menu>
             <Tooltip
               placement="left"
@@ -353,6 +352,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <OrganizationGroupListTableHeader
+              me={me}
               search={search}
               selectedMembers={selectedMembers}
               onReload={() => refetch()}
@@ -452,17 +452,15 @@ const EditableControls = ({ ...props }) => {
   );
 };
 
-type EditableHeadingProps = {
-  value: string;
-  onChange?: (value: string) => void;
-  onSubmit?: (value: string) => void;
-};
+interface EditableHeadingProps extends ValueProps<string, false> {
+  isDisabled?: boolean;
+}
 
-const EditableHeading = ({
+function EditableHeading({
+  isDisabled,
   value,
-  onChange = () => {},
-  onSubmit = () => {},
-}: EditableHeadingProps) => {
+  onChange,
+}: EditableHeadingProps) {
   const intl = useIntl();
   const [name, setName] = useState(value);
   const [inputWidth, setInputWidth] = useState(0);
@@ -475,56 +473,57 @@ const EditableHeading = ({
 
   return (
     <Heading as="h3" size="md">
-      <Editable
-        value={name}
-        onChange={(n) => {
-          setName(n);
-          onChange(n);
-        }}
-        onSubmit={onSubmit}
-        display="flex"
-        alignItems="center"
-        submitOnBlur
-      >
-        <EditablePreview
-          paddingY={1}
-          paddingX={2}
-          ref={previewRef}
-          borderRadius="md"
-          borderWidth="2px"
-          borderColor="transparent"
-          transition="border 0.26s ease"
-          _hover={{
-            borderWidth: "2px",
-            borderColor: "gray.300",
-          }}
-          whiteSpace="nowrap"
-          overflow="hidden"
-          maxWidth={655}
-          textOverflow="ellipsis"
-        ></EditablePreview>
+      {isDisabled ? (
+        <Text as="span" paddingX={2} paddingY={1}>
+          {name}
+        </Text>
+      ) : (
+        <Editable
+          value={name}
+          onChange={setName}
+          onSubmit={onChange}
+          display="flex"
+          alignItems="center"
+          submitOnBlur
+        >
+          <EditablePreview
+            paddingY={1}
+            paddingX={1.5}
+            ref={previewRef}
+            borderRadius="md"
+            borderWidth="2px"
+            borderColor="transparent"
+            transitionProperty="border"
+            transitionDuration="normal"
+            _hover={{
+              borderColor: "gray.300",
+            }}
+            isTruncated
+            maxWidth={655}
+          />
 
-        <EditableInput
-          paddingY={1}
-          paddingX={2}
-          minWidth={255}
-          width={inputWidth}
-        />
-        <EditableControls
-          marginLeft={1}
-          background={"white"}
-          color={"gray.400"}
-          fontSize={18}
-          _hover={{ backgroundColor: "white", color: "gray.600" }}
-          label={intl.formatMessage({
-            id: "view.group.edit-name",
-            defaultMessage: "Edit name",
-          })}
-        />
-      </Editable>
+          <EditableInput
+            paddingY={1}
+            paddingX={2}
+            minWidth={255}
+            width={inputWidth}
+          />
+          <EditableControls
+            marginLeft={1}
+            background={"white"}
+            color={"gray.400"}
+            fontSize={18}
+            _hover={{ backgroundColor: "white", color: "gray.600" }}
+            label={intl.formatMessage({
+              id: "view.group.edit-name",
+              defaultMessage: "Edit name",
+            })}
+          />
+        </Editable>
+      )}
     </Heading>
   );
-};
+}
 
 OrganizationGroup.fragments = {
   get UserGroup() {
@@ -637,9 +636,11 @@ OrganizationGroup.getInitialProps = async ({
         query OrganizationGroupUser {
           me {
             ...OrganizationGroup_User
+            ...OrganizationGroupListTableHeader_User
           }
         }
         ${OrganizationGroup.fragments.User}
+        ${OrganizationGroupListTableHeader.fragments.User}
       `
     ),
   ]);
@@ -648,8 +649,4 @@ OrganizationGroup.getInitialProps = async ({
   };
 };
 
-export default compose(
-  withAdminOrganizationRole,
-  withDialogs,
-  withApolloData
-)(OrganizationGroup);
+export default compose(withDialogs, withApolloData)(OrganizationGroup);

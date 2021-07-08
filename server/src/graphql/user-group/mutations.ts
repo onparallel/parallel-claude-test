@@ -53,7 +53,10 @@ export const createUserGroup = mutationField("createUserGroup", {
 export const updateUserGroup = mutationField("updateUserGroup", {
   description: "Updates the name of a given user group",
   type: "UserGroup",
-  authorize: authenticateAnd(userHasAccessToUserGroups("id")),
+  authorize: authenticateAnd(
+    contextUserIsAdmin(),
+    userHasAccessToUserGroups("id")
+  ),
   validateArgs: validateAnd(
     notEmptyString((args) => args.data.name, "data.name"),
     maxLength((args) => args.data.name, "data.name", 100)
@@ -87,7 +90,10 @@ export const updateUserGroup = mutationField("updateUserGroup", {
 export const deleteUserGroup = mutationField("deleteUserGroup", {
   description: "Deletes a group",
   type: "Result",
-  authorize: authenticateAnd(userHasAccessToUserGroups("ids")),
+  authorize: authenticateAnd(
+    contextUserIsAdmin(),
+    userHasAccessToUserGroups("ids")
+  ),
   args: {
     ids: nonNull(list(nonNull(globalIdArg("UserGroup")))),
   },
@@ -109,6 +115,7 @@ export const addUsersToUserGroup = mutationField("addUsersToUserGroup", {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
   authorize: authenticateAnd(
+    contextUserIsAdmin(),
     userHasAccessToUserGroups("userGroupId"),
     userHasAccessToUsers("userIds")
   ),
@@ -130,6 +137,7 @@ export const removeUsersFromGroup = mutationField("removeUsersFromGroup", {
     userIds: nonNull(list(nonNull(globalIdArg("User")))),
   },
   authorize: authenticateAnd(
+    contextUserIsAdmin(),
     userHasAccessToUserGroups("userGroupId"),
     userHasAccessToUsers("userIds")
   ),
@@ -150,7 +158,10 @@ export const cloneUserGroup = mutationField("cloneUserGroup", {
     userGroupIds: nonNull(list(nonNull(globalIdArg("UserGroup")))),
     locale: stringArg(),
   },
-  authorize: authenticateAnd(userHasAccessToUserGroups("userGroupIds")),
+  authorize: authenticateAnd(
+    contextUserIsAdmin(),
+    userHasAccessToUserGroups("userGroupIds")
+  ),
   resolve: async (_, args, ctx) => {
     const groups = (await ctx.userGroups.loadUserGroup(
       args.userGroupIds

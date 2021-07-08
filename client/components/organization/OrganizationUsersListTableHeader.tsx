@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   Box,
   Button,
@@ -16,7 +17,7 @@ import {
   UserXIcon,
 } from "@parallel/chakra/icons";
 import {
-  AppLayout_UserFragment,
+  OrganizationUsersListTableHeader_UserFragment,
   OrganizationUsers_UserFragment,
   UserStatus,
 } from "@parallel/graphql/__types";
@@ -28,7 +29,7 @@ import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
 export type OrganizationUsersListTableHeaderProps = {
-  me: AppLayout_UserFragment;
+  me: OrganizationUsersListTableHeader_UserFragment;
   search: string | null;
   selectedUsers: OrganizationUsers_UserFragment[];
   hasSsoProvider: boolean;
@@ -103,59 +104,76 @@ export function OrganizationUsersListTableHeader({
           defaultMessage: "Reload",
         })}
       />
-      <Spacer />
-      <Box>
-        <Menu>
-          <MenuButton
-            as={Button}
-            rightIcon={<ChevronDownIcon />}
-            isDisabled={!showActions}
-          >
-            <FormattedMessage
-              id="generic.actions-button"
-              defaultMessage="Actions"
-            />
-          </MenuButton>
-          <Portal>
-            <MenuList minWidth="160px">
-              <MenuItem
-                isDisabled={selectedUsers.every((u) => u.status === "ACTIVE")}
-                onClick={() => handleUpdateSelectedUsersStatus("ACTIVE")}
-                icon={<UserCheckIcon display="block" boxSize={4} />}
+      {me.role === "ADMIN" ? (
+        <>
+          <Spacer />
+          <Box>
+            <Menu>
+              <MenuButton
+                as={Button}
+                rightIcon={<ChevronDownIcon />}
+                isDisabled={!showActions}
               >
                 <FormattedMessage
-                  id="organization-users.activate"
-                  defaultMessage="Activate {count, plural, =1{user} other {users}}"
-                  values={{ count: selectedUsers.length }}
+                  id="generic.actions-button"
+                  defaultMessage="Actions"
                 />
-              </MenuItem>
-              <MenuItem
-                isDisabled={selectedUsers.every((u) => u.status === "INACTIVE")}
-                onClick={() => handleUpdateSelectedUsersStatus("INACTIVE")}
-                icon={<UserXIcon display="block" boxSize={4} />}
-              >
-                <FormattedMessage
-                  id="organization-users.deactivate"
-                  defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
-                  values={{ count: selectedUsers.length }}
-                />
-              </MenuItem>
-            </MenuList>
-          </Portal>
-        </Menu>
-      </Box>
-      {hasSsoProvider ? null : (
-        <Button
-          colorScheme="purple"
-          leftIcon={<UserPlusIcon fontSize="18px" />}
-          onClick={onCreateUser}
-        >
-          <FormattedMessage
-            id="organization-users.create-user"
-            defaultMessage="Create user"
-          />
-        </Button>
-      )}
+              </MenuButton>
+              <Portal>
+                <MenuList minWidth="160px">
+                  <MenuItem
+                    isDisabled={selectedUsers.every(
+                      (u) => u.status === "ACTIVE"
+                    )}
+                    onClick={() => handleUpdateSelectedUsersStatus("ACTIVE")}
+                    icon={<UserCheckIcon display="block" boxSize={4} />}
+                  >
+                    <FormattedMessage
+                      id="organization-users.activate"
+                      defaultMessage="Activate {count, plural, =1{user} other {users}}"
+                      values={{ count: selectedUsers.length }}
+                    />
+                  </MenuItem>
+                  <MenuItem
+                    isDisabled={selectedUsers.every(
+                      (u) => u.status === "INACTIVE"
+                    )}
+                    onClick={() => handleUpdateSelectedUsersStatus("INACTIVE")}
+                    icon={<UserXIcon display="block" boxSize={4} />}
+                  >
+                    <FormattedMessage
+                      id="organization-users.deactivate"
+                      defaultMessage="Deactivate {count, plural, =1{user} other {users}}"
+                      values={{ count: selectedUsers.length }}
+                    />
+                  </MenuItem>
+                </MenuList>
+              </Portal>
+            </Menu>
+          </Box>
+          {hasSsoProvider ? null : (
+            <Button
+              colorScheme="purple"
+              leftIcon={<UserPlusIcon fontSize="18px" />}
+              onClick={onCreateUser}
+            >
+              <FormattedMessage
+                id="organization-users.create-user"
+                defaultMessage="Create user"
+              />
+            </Button>
+          )}
+        </>
+      ) : null}
     </Stack>
   );
 }
+
+OrganizationUsersListTableHeader.fragments = {
+  User: gql`
+    fragment OrganizationUsersListTableHeader_User on User {
+      id
+      role
+    }
+  `,
+};

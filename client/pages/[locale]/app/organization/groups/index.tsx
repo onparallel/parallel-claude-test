@@ -13,12 +13,10 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
-import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useCreateGroupDialog } from "@parallel/components/organization/CreateGroupDialog";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
@@ -106,7 +104,7 @@ function OrganizationGroups() {
 
   const [search, setSearch] = useState(state.search);
 
-  const sections = useOrganizationSections();
+  const sections = useOrganizationSections(me.role === "ADMIN");
 
   const columns = useOrganizationGroupsTableColumns();
 
@@ -484,9 +482,9 @@ OrganizationGroups.fragments = {
   get User() {
     return gql`
       fragment OrganizationGroups_User on User {
-        ...AppLayout_User
+        ...SettingsLayout_User
       }
-      ${AppLayout.fragments.User}
+      ${SettingsLayout.fragments.User}
     `;
   },
 };
@@ -562,16 +560,14 @@ OrganizationGroups.getInitialProps = async ({
         query OrganizationGroupsUser {
           me {
             ...OrganizationGroups_User
+            ...OrganizationGroupsListTableHeader_User
           }
         }
         ${OrganizationGroups.fragments.User}
+        ${OrganizationGroupsListTableHeader.fragments.User}
       `
     ),
   ]);
 };
 
-export default compose(
-  withAdminOrganizationRole,
-  withDialogs,
-  withApolloData
-)(OrganizationGroups);
+export default compose(withDialogs, withApolloData)(OrganizationGroups);

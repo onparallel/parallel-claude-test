@@ -97,19 +97,17 @@ export function UserMenu({
               <FormattedMessage id="settings.title" defaultMessage="Settings" />
             </MenuItem>
           </NakedLink>
-          {user.role === "ADMIN" ? (
-            <NakedLink href="/app/organization">
-              <MenuItem
-                as="a"
-                icon={<BusinessIcon display="block" boxSize={4} />}
-              >
-                <FormattedMessage
-                  id="view.organization.title"
-                  defaultMessage="Organization"
-                />
-              </MenuItem>
-            </NakedLink>
-          ) : null}
+          <NakedLink href="/app/organization">
+            <MenuItem
+              as="a"
+              icon={<BusinessIcon display="block" boxSize={4} />}
+            >
+              <FormattedMessage
+                id="view.organization.title"
+                defaultMessage="Organization"
+              />
+            </MenuItem>
+          </NakedLink>
           {user.isSuperAdmin ? (
             <NakedLink href="/app/admin">
               <MenuItem as="a" icon={<KeyIcon display="block" boxSize={4} />}>

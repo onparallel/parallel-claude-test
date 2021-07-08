@@ -15,7 +15,7 @@ export interface IconButtonWithTooltipProps
 export const IconButtonWithTooltip = chakraForwardRef<
   "button",
   IconButtonWithTooltipProps
->(function ({ label, placement, ...props }, ref) {
+>(function IconButtonWithTooltip({ label, placement, ...props }, ref) {
   return (
     <Tooltip label={label} placement={placement} isDisabled={props.isDisabled}>
       <IconButton aria-label={label} {...props} ref={ref} />

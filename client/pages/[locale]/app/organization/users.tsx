@@ -13,7 +13,6 @@ import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserSelectSelection } from "@parallel/components/common/UserSelect";
-import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -98,7 +97,7 @@ function OrganizationUsers() {
 
   const [search, setSearch] = useState(state.search);
 
-  const sections = useOrganizationSections();
+  const sections = useOrganizationSections(me.role === "ADMIN");
 
   const columns = useOrganizationUsersTableColumns();
 
@@ -486,10 +485,12 @@ OrganizationUsers.getInitialProps = async ({
             }
           }
           ...SettingsLayout_User
+          ...OrganizationUsersListTableHeader_User
         }
       }
       ${SettingsLayout.fragments.User}
       ${OrganizationUsers.fragments.User}
+      ${OrganizationUsersListTableHeader.fragments.User}
     `,
     {
       variables: {
@@ -504,8 +505,4 @@ OrganizationUsers.getInitialProps = async ({
   );
 };
 
-export default compose(
-  withAdminOrganizationRole,
-  withDialogs,
-  withApolloData
-)(OrganizationUsers);
+export default compose(withDialogs, withApolloData)(OrganizationUsers);

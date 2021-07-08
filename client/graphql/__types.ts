@@ -3263,6 +3263,24 @@ export type CreateUserDialog_emailIsAvailableQuery = {
   emailIsAvailable: boolean;
 };
 
+export type OrganizationGroupListTableHeader_UserFragment = {
+  __typename?: "User";
+  id: string;
+  role: OrganizationRole;
+};
+
+export type OrganizationGroupsListTableHeader_UserFragment = {
+  __typename?: "User";
+  id: string;
+  role: OrganizationRole;
+};
+
+export type OrganizationUsersListTableHeader_UserFragment = {
+  __typename?: "User";
+  id: string;
+  role: OrganizationRole;
+};
+
 export type AddPetitionAccessDialog_PetitionFragment = {
   __typename?: "Petition";
   emailSubject?: Maybe<string>;
@@ -5584,7 +5602,8 @@ export type OrganizationGroupUserQueryVariables = Exact<{
 }>;
 
 export type OrganizationGroupUserQuery = {
-  me: { __typename?: "User" } & OrganizationGroup_UserFragment;
+  me: { __typename?: "User" } & OrganizationGroup_UserFragment &
+    OrganizationGroupListTableHeader_UserFragment;
 };
 
 export type OrganizationGroups_UserGroupPaginationFragment = {
@@ -5608,7 +5627,7 @@ export type OrganizationGroups_UserGroupFragment = {
 
 export type OrganizationGroups_UserFragment = {
   __typename?: "User";
-} & AppLayout_UserFragment;
+} & SettingsLayout_UserFragment;
 
 export type OrganizationGroups_createUserGroupMutationVariables = Exact<{
   name: Scalars["String"];
@@ -5658,7 +5677,8 @@ export type OrganizationGroupsUserQueryVariables = Exact<{
 }>;
 
 export type OrganizationGroupsUserQuery = {
-  me: { __typename?: "User" } & OrganizationGroups_UserFragment;
+  me: { __typename?: "User" } & OrganizationGroups_UserFragment &
+    OrganizationGroupsListTableHeader_UserFragment;
 };
 
 export type OrganizationSettingsQueryVariables = Exact<{
@@ -5728,7 +5748,8 @@ export type OrganizationUsersQuery = {
         items: Array<{ __typename?: "User" } & OrganizationUsers_UserFragment>;
       };
     };
-  } & SettingsLayout_UserFragment;
+  } & SettingsLayout_UserFragment &
+    OrganizationUsersListTableHeader_UserFragment;
 };
 
 export type PetitionActivity_PetitionFragment = {
@@ -7218,6 +7239,24 @@ export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
   }
   ${NotificationsList_PetitionUserNotificationFragmentDoc}
 `;
+export const OrganizationGroupListTableHeader_UserFragmentDoc = gql`
+  fragment OrganizationGroupListTableHeader_User on User {
+    id
+    role
+  }
+`;
+export const OrganizationGroupsListTableHeader_UserFragmentDoc = gql`
+  fragment OrganizationGroupsListTableHeader_User on User {
+    id
+    role
+  }
+`;
+export const OrganizationUsersListTableHeader_UserFragmentDoc = gql`
+  fragment OrganizationUsersListTableHeader_User on User {
+    id
+    role
+  }
+`;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
     id
@@ -7716,11 +7755,17 @@ export const OrganizationGroups_UserGroupPaginationFragmentDoc = gql`
   }
   ${OrganizationGroups_UserGroupFragmentDoc}
 `;
-export const OrganizationGroups_UserFragmentDoc = gql`
-  fragment OrganizationGroups_User on User {
+export const SettingsLayout_UserFragmentDoc = gql`
+  fragment SettingsLayout_User on User {
     ...AppLayout_User
   }
   ${AppLayout_UserFragmentDoc}
+`;
+export const OrganizationGroups_UserFragmentDoc = gql`
+  fragment OrganizationGroups_User on User {
+    ...SettingsLayout_User
+  }
+  ${SettingsLayout_UserFragmentDoc}
 `;
 export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
@@ -8971,12 +9016,6 @@ export const NewPetition_PetitionTemplateFragmentDoc = gql`
 `;
 export const NewPetition_UserFragmentDoc = gql`
   fragment NewPetition_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
-`;
-export const SettingsLayout_UserFragmentDoc = gql`
-  fragment SettingsLayout_User on User {
     ...AppLayout_User
   }
   ${AppLayout_UserFragmentDoc}
@@ -11916,9 +11955,11 @@ export const OrganizationGroupUserDocument = gql`
   query OrganizationGroupUser {
     me {
       ...OrganizationGroup_User
+      ...OrganizationGroupListTableHeader_User
     }
   }
   ${OrganizationGroup_UserFragmentDoc}
+  ${OrganizationGroupListTableHeader_UserFragmentDoc}
 `;
 export function useOrganizationGroupUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
@@ -12071,9 +12112,11 @@ export const OrganizationGroupsUserDocument = gql`
   query OrganizationGroupsUser {
     me {
       ...OrganizationGroups_User
+      ...OrganizationGroupsListTableHeader_User
     }
   }
   ${OrganizationGroups_UserFragmentDoc}
+  ${OrganizationGroupsListTableHeader_UserFragmentDoc}
 `;
 export function useOrganizationGroupsUserQuery(
   baseOptions?: Apollo.QueryHookOptions<
@@ -12232,10 +12275,12 @@ export const OrganizationUsersDocument = gql`
         }
       }
       ...SettingsLayout_User
+      ...OrganizationUsersListTableHeader_User
     }
   }
   ${OrganizationUsers_UserFragmentDoc}
   ${SettingsLayout_UserFragmentDoc}
+  ${OrganizationUsersListTableHeader_UserFragmentDoc}
 `;
 export function useOrganizationUsersQuery(
   baseOptions: Apollo.QueryHookOptions<

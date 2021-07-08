@@ -1,5 +1,4 @@
 import { gql } from "@apollo/client";
-import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
 import {
   withApolloData,
   WithApolloDataContext,
@@ -19,7 +18,7 @@ function OrganizationSettings() {
   const {
     data: { me },
   } = assertQuery(useOrganizationSettingsQuery());
-  const sections = useOrganizationSections();
+  const sections = useOrganizationSections(me.role === "ADMIN");
 
   return (
     <SettingsLayout
@@ -56,7 +55,4 @@ OrganizationSettings.getInitialProps = async ({
   `);
 };
 
-export default compose(
-  withAdminOrganizationRole,
-  withApolloData
-)(OrganizationSettings);
+export default compose(withApolloData)(OrganizationSettings);
