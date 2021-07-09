@@ -298,36 +298,46 @@ export class PetitionRepository extends BaseRepository {
         }
 
         if (filters?.tagIds) {
-          if (filters.tagIds.length > 0) {
-            filters.tagIds.forEach((tagId, i) => {
-              q.joinRaw(
-                /* sql */ `
-                  join petition_tag pt${i} on (pt${i}.petition_id = petition.id and pt${i}.tag_id = ?)
-                `,
-                [fromGlobalId(tagId, "Tag").id]
-              );
-            });
-          } else {
-            // exclude petitions with tags
-            q.whereRaw(
+          q.joinRaw(
+            /* sql */ `join petition_tag pt on pt.petition_id = petition.id`
+          );
+          if (filters.tagIds.length) {
+            q.havingRaw(
               /* sql */ `
-                petition.id not in (
-                  select distinct pt.petition_id
-                    from petition_permission pp
-                    join petition_tag pt on pt.petition_id = pp.petition_id
-                    where pp.user_id = ? and pp.deleted_at is null
-                )
+              array_agg(distinct pt.tag_id) @>
+                array[${filters.tagIds.map(() => "?").join(", ")}]::int[]
             `,
-              [userId]
+              filters.tagIds.map((id) => fromGlobalId(id, "Tag").id)
             );
+          } else {
+            q.havingRaw(/* sql */ `
+              array_length(array_remove(array_agg(distinct pt.tag_id), null)) = 0
+            `);
           }
         }
-      });
-    const [{ count }] = await query
-      .clone()
-      .select<{ count: number }[]>(
-        this.knex.raw("count(distinct petition.id)::int as count")
-      );
+
+        // search on shared with
+        if (false) {
+          const userId = 4;
+          q.joinRaw(
+            /* sql */ `join petition_permission pp2 on pp2.petition_id = petition.id and pp2.deleted_at is null`
+          );
+          // contains
+          q.havingRaw(`?=any(array_agg(distinct pp2.user_id))`, [userId]);
+          // not contains
+          q.havingRaw(`not(?=any(array_agg(distinct pp2.user_id)))`, [userId]);
+          // is owner
+          q.havingRaw(
+            `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) > 0`,
+            [userId]
+          );
+        }
+      })
+      .groupBy("petition.id");
+    const [{ count }] = await this.knex
+      .with("p", query.clone().select("petition.*"))
+      .from("p")
+      .select(this.count());
     if (count === 0) {
       return { totalCount: count, items: [] };
     } else {
@@ -358,7 +368,6 @@ export class PetitionRepository extends BaseRepository {
           // default order by to ensure result consistency
           // applies after any previously specified order by
           .orderBy("petition.id")
-          .groupBy("petition.id")
           .offset(opts.offset ?? 0)
           .limit(opts.limit ?? 0)
           .select(
