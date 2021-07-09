@@ -17,11 +17,15 @@ export async function up(knex: Knex): Promise<void> {
       .from("petition_message")
       .where({ email_log_id: event.data.email_log_id })
       .select("*");
-
-    await knex
-      .from("system_event")
-      .where({ id: event.id })
-      .update({ data: { petition_message_id: message.id } });
+    if (!message) {
+      // bounce from reminder
+      await knex.from("system_event").where({ id: event.id }).delete();
+    } else {
+      await knex
+        .from("system_event")
+        .where({ id: event.id })
+        .update({ data: { petition_message_id: message.id } });
+    }
   }
 }
 
