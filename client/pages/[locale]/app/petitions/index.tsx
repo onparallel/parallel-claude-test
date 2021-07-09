@@ -32,6 +32,7 @@ import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
+  filtering,
   integer,
   parseQuery,
   QueryItem,
@@ -64,6 +65,7 @@ const QUERY_STATE = {
     (value) => (value.length === 0 ? "NO_TAGS" : value.join(","))
   ),
   sort: sorting(SORTING),
+  filter: filtering(),
 };
 
 function Petitions() {
@@ -220,6 +222,27 @@ function Petitions() {
       : state.type
   );
 
+  const handleSharedWithFilter = (value: any) => {
+    if (value.filters.length) {
+      setQueryState((current) => ({
+        ...current,
+        filter: {
+          ...current.filter,
+          sharedWith: value,
+        },
+      }));
+    } else {
+      setQueryState(({ filter: { sharedWith, ...rest }, ...current }) => {
+        // If we dont have more filters we return the object without the property
+        if (Object.keys(rest).length === 0 && rest.constructor === Object)
+          return current;
+
+        // If we have we return them except sharedWith
+        return { ...current, filter: rest };
+      });
+    }
+  };
+
   const context = useMemo(() => ({ user: me! }), [me]);
 
   return (
@@ -253,6 +276,12 @@ function Petitions() {
           pageSize={state.items}
           totalCount={petitions.totalCount}
           sort={sort}
+          filter={state.filter}
+          onFilterChange={(key, value) => {
+            if (key === "sharedWith") {
+              handleSharedWithFilter(value);
+            }
+          }}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
           onPageSizeChange={(items) =>

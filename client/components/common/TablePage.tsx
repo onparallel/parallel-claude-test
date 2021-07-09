@@ -40,6 +40,8 @@ export function TablePage<T, TContext = unknown>({
   isSelectable,
   isHighlightable,
   sort,
+  filter,
+  onFilterChange,
   onSelectionChange,
   onRowClick,
   onSortChange,
@@ -104,6 +106,8 @@ export function TablePage<T, TContext = unknown>({
             isSelectable={isSelectable}
             isHighlightable={isHighlightable}
             sort={sort}
+            filter={filter}
+            onFilterChange={onFilterChange}
             onSelectionChange={onSelectionChange}
             onRowClick={onRowClick}
             onSortChange={onSortChange}

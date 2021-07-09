@@ -15,6 +15,16 @@
     "context": "Admin panel"
   },
   {
+    "term": "common.filter",
+    "definition": "Filtro",
+    "context": "Filter"
+  },
+  {
+    "term": "common.no-filter-applied",
+    "definition": "No se está aplicando ningún filtro.",
+    "context": "No filter is being applied."
+  },
+  {
     "term": "component.add-member-group-dialog.members-label",
     "definition": "Añadir al grupo",
     "context": "Add to group"
@@ -1795,6 +1805,46 @@
     "context": "This template has not been shared yet."
   },
   {
+    "term": "component.shared-filter.add-filter",
+    "definition": "Añadir filtro",
+    "context": "Add filter"
+  },
+  {
+    "term": "component.shared-filter.add-user-or-group",
+    "definition": "Selecciona un usuario o grupo",
+    "context": "Select a user or group"
+  },
+  {
+    "term": "component.shared-filter.and",
+    "definition": "y",
+    "context": "and"
+  },
+  {
+    "term": "component.shared-filter.is",
+    "definition": "está",
+    "context": "is"
+  },
+  {
+    "term": "component.shared-filter.is-owner",
+    "definition": "es propietario",
+    "context": "is owner"
+  },
+  {
+    "term": "component.shared-filter.it-is-not",
+    "definition": "no está",
+    "context": "it is not"
+  },
+  {
+    "term": "component.shared-filter.or",
+    "definition": "o",
+    "context": "or"
+  },
+  {
+    "term": "component.shared-filter.where",
+    "definition": "Donde",
+    "context": "Where"
+  },
+  {
     "term": "component.signature-config-dialog.confirm-start",
     "definition": "Iniciar firma",
     "context": "Start signature"
@@ -2068,6 +2118,21 @@
     "term": "components.table.change-sorting",
     "definition": "Cambiar ordenación para \"{column}\"",
     "context": "Change sorting for \"{column}\""
+  },
+  {
+    "term": "components.table.filter",
+    "definition": "Filtrar \"{column}\"",
+    "context": "Filter \"{column}\""
+  },
+  {
+    "term": "components.table.filter-button",
+    "definition": "Filtrar",
+    "context": "Filter"
+  },
+  {
+    "term": "components.table.sort-button",
+    "definition": "Ordenar",
+    "context": "Sort"
   },
   {
     "term": "components.table.sort-by",

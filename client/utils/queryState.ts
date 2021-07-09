@@ -2,6 +2,11 @@ import {
   TableSorting,
   TableSortingDirection,
 } from "@parallel/components/common/Table";
+import {
+  FilterSharedBy,
+  flatShared,
+  unflatShared,
+} from "@parallel/components/petition-list/filters/PetitionListSharedByFilterContainer";
 import { NextRouter, useRouter } from "next/router";
 import * as qs from "querystring";
 import { ParsedUrlQuery } from "querystring";
@@ -94,6 +99,51 @@ export function sorting<T extends string>(fields: readonly T[]) {
       return null;
     },
     ({ field, direction }) => `${field}_${direction}`
+  );
+}
+
+export function filtering() {
+  return new QueryItem(
+    (value) => {
+      if (value && typeof value === "string") {
+        const decoded = decodeURI(value);
+        const filters = JSON.parse(atob(decoded));
+
+        Object.entries(filters).forEach(([key, value]) => {
+          switch (key) {
+            case "sharedWith": {
+              filters.sharedWith = unflatShared(value as string[]);
+              break;
+            }
+            default: {
+              break;
+            }
+          }
+        });
+
+        return filters;
+      }
+      return null;
+    },
+    (filters) => {
+      if (!filters) return "";
+
+      Object.entries(filters).forEach(([key, value]) => {
+        switch (key) {
+          case "sharedWith": {
+            filters.sharedWith = flatShared(value as FilterSharedBy);
+            break;
+          }
+          default: {
+            break;
+          }
+        }
+      });
+
+      const base64 = btoa(JSON.stringify(filters));
+      const encoded = encodeURI(base64);
+      return encoded;
+    }
   );
 }
 

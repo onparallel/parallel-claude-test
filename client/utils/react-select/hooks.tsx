@@ -70,6 +70,7 @@ export type UseReactSelectProps = {
   isInvalid?: boolean;
   styles?: StylesConfig<any, any, any>;
   components?: SelectComponentsConfig<any, any, any>;
+  usePortal?: boolean;
 };
 
 export function useMemoReactSelectProps<
@@ -95,6 +96,7 @@ export function useReactSelectProps<
   placeholder,
   styles,
   components,
+  usePortal = true,
   ...props
 }: UseReactSelectProps = {}): SelectProps<OptionType, IsMulti, GroupType> {
   const intl = useIntl();
@@ -122,7 +124,7 @@ export function useReactSelectProps<
       placeholder,
       inputId,
       isDisabled,
-      menuPortalTarget: rehydrated ? document.body : undefined,
+      menuPortalTarget: usePortal && rehydrated ? document.body : undefined,
       menuPlacement: "auto",
       theme: (theme) => ({
         spacing: SIZES[size].spacing,

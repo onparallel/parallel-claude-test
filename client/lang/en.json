@@ -15,6 +15,16 @@
     "context": "Admin panel"
   },
   {
+    "term": "common.filter",
+    "definition": "Filter",
+    "context": "Filter"
+  },
+  {
+    "term": "common.no-filter-applied",
+    "definition": "No filter is being applied.",
+    "context": "No filter is being applied."
+  },
+  {
     "term": "component.add-member-group-dialog.members-label",
     "definition": "Add to group",
     "context": "Add to group"
@@ -1795,6 +1805,46 @@
     "context": "This template has not been shared yet."
   },
   {
+    "term": "component.shared-filter.add-filter",
+    "definition": "Add filter",
+    "context": "Add filter"
+  },
+  {
+    "term": "component.shared-filter.add-user-or-group",
+    "definition": "Select a user or group",
+    "context": "Select a user or group"
+  },
+  {
+    "term": "component.shared-filter.and",
+    "definition": "and",
+    "context": "and"
+  },
+  {
+    "term": "component.shared-filter.is",
+    "definition": "is",
+    "context": "is"
+  },
+  {
+    "term": "component.shared-filter.is-owner",
+    "definition": "is owner",
+    "context": "is owner"
+  },
+  {
+    "term": "component.shared-filter.it-is-not",
+    "definition": "it is not",
+    "context": "it is not"
+  },
+  {
+    "term": "component.shared-filter.or",
+    "definition": "or",
+    "context": "or"
+  },
+  {
+    "term": "component.shared-filter.where",
+    "definition": "Where",
+    "context": "Where"
+  },
+  {
     "term": "component.signature-config-dialog.confirm-start",
     "definition": "Start signature",
     "context": "Start signature"
@@ -2068,6 +2118,21 @@
     "term": "components.table.change-sorting",
     "definition": "Change sorting for \"{column}\"",
     "context": "Change sorting for \"{column}\""
+  },
+  {
+    "term": "components.table.filter",
+    "definition": "Filter \"{column}\"",
+    "context": "Filter \"{column}\""
+  },
+  {
+    "term": "components.table.filter-button",
+    "definition": "Filter",
+    "context": "Filter"
+  },
+  {
+    "term": "components.table.sort-button",
+    "definition": "Sort",
+    "context": "Sort"
   },
   {
     "term": "components.table.sort-by",

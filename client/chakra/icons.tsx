@@ -369,6 +369,21 @@ export const PlusCircleIcon = createIcon({
   ),
 });
 
+export const PlusCircleFilledIcon = createIcon({
+  displayName: "PlusCircleFilledIcon",
+  viewBox: "0 0 20 20",
+  path: (
+    <g strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path
+        d="M10.0001 18.3332C14.6025 18.3332 18.3334 14.6022 18.3334 9.99984C18.3334 5.39746 14.6025 1.6665 10.0001 1.6665C5.39771 1.6665 1.66675 5.39746 1.66675 9.99984C1.66675 14.6022 5.39771 18.3332 10.0001 18.3332Z"
+        fill="currentColor"
+      />
+      <path d="M10 6.6665V13.3332" stroke="white" />
+      <path d="M6.66675 10H13.3334" stroke="white" />
+    </g>
+  ),
+});
+
 export const XCircleIcon = createIcon({
   displayName: "XCircleIcon",
   viewBox: "0 0 24 24",
