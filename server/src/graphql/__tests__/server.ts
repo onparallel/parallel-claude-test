@@ -40,6 +40,14 @@ export const initServer = async () => {
     setNextReq(req: any) {
       stack.push(req);
     },
+    withApiKey(key: string) {
+      stack.push({
+        headers: {
+          authorization: `Bearer ${key}`,
+        },
+      });
+      return this;
+    },
     container,
     async stop() {
       await knex.destroy();

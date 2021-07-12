@@ -5,6 +5,7 @@ import { KNEX } from "../../db/knex";
 import { PetitionUserNotification } from "../../db/notifications";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
+  Organization,
   Petition,
   PetitionAccess,
   PetitionField,
@@ -28,18 +29,32 @@ describe("GraphQL - PetitionUserNotifications", () => {
 
   let petitionAccess: PetitionAccess;
 
+  let organization: Organization;
+
+  let otherUserApiKey: string;
+
   beforeAll(async () => {
     testClient = await initServer();
     knex = testClient.container.get<Knex>(KNEX);
     mocks = new Mocks(knex);
-
-    const [organization] = await mocks.createRandomOrganizations(1);
+    [organization] = await mocks.createRandomOrganizations(1);
     [sessionUser] = await mocks.createRandomUsers(organization.id, 1, () => ({
       cognito_id: USER_COGNITO_ID,
     }));
 
     [otherUser] = await mocks.createRandomUsers(organization.id, 1);
 
+    ({ apiKey: otherUserApiKey } = await mocks.createUserAuthToken(
+      "other-user-token",
+      otherUser.id
+    ));
+  });
+
+  afterAll(async () => {
+    await testClient.stop();
+  });
+
+  beforeEach(async () => {
     [petition] = await mocks.createRandomPetitions(
       organization.id,
       sessionUser.id
@@ -56,7 +71,6 @@ describe("GraphQL - PetitionUserNotifications", () => {
       petition.id,
       1
     );
-
     const [contact] = await mocks.createRandomContacts(organization.id, 1);
     [petitionAccess] = await mocks.createPetitionAccess(
       petition.id,
@@ -64,13 +78,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       [contact.id],
       sessionUser.id
     );
-  });
 
-  afterAll(async () => {
-    await testClient.stop();
-  });
-
-  beforeEach(async () => {
     notifications = await knex("petition_user_notification")
       .insert([
         {
@@ -639,5 +647,268 @@ describe("GraphQL - PetitionUserNotifications", () => {
       .select("id");
 
     expect(petitionNotifications).toEqual([]);
+  });
+
+  it("notifications should be deleted if user transfers the ownership of their petition and then deletes it", async () => {
+    const { errors: transferErrors } = await testClient.mutate({
+      mutation: gql`
+        mutation ($petitionIds: [GID!]!, $userId: GID!) {
+          transferPetitionOwnership(
+            petitionIds: $petitionIds
+            userId: $userId
+          ) {
+            id
+          }
+        }
+      `,
+      variables: {
+        petitionIds: [toGlobalId("Petition", petition.id)],
+        userId: toGlobalId("User", otherUser.id),
+      },
+    });
+    expect(transferErrors).toBeUndefined();
+
+    const { errors: deleteErrors } = await testClient.mutate({
+      mutation: gql`
+        mutation ($petitionIds: [GID!]!) {
+          deletePetitions(ids: $petitionIds)
+        }
+      `,
+      variables: {
+        petitionIds: [toGlobalId("Petition", petition.id)],
+      },
+    });
+    expect(deleteErrors).toBeUndefined();
+
+    const { data, errors } = await testClient.query({
+      query: gql`
+        query {
+          me {
+            notifications(limit: 100) {
+              items {
+                id
+              }
+              hasMore
+            }
+          }
+        }
+      `,
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.me).toEqual({
+      notifications: {
+        items: [],
+        hasMore: false,
+      },
+    });
+  });
+
+  it("notifications should be deleted if other user stops sharing the petition with me", async () => {
+    const { errors: transferErrors } = await testClient.mutate({
+      mutation: gql`
+        mutation ($petitionIds: [GID!]!, $userId: GID!) {
+          transferPetitionOwnership(
+            petitionIds: $petitionIds
+            userId: $userId
+          ) {
+            id
+          }
+        }
+      `,
+      variables: {
+        petitionIds: [toGlobalId("Petition", petition.id)],
+        userId: toGlobalId("User", otherUser.id),
+      },
+    });
+    expect(transferErrors).toBeUndefined();
+
+    const { errors: otherUserStopSharingError } = await testClient
+      .withApiKey(otherUserApiKey)
+      .mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!, $userIds: [GID!]) {
+            removePetitionPermission(
+              petitionIds: $petitionIds
+              userIds: $userIds
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", petition.id)],
+          userIds: [toGlobalId("User", sessionUser.id)],
+        },
+      });
+    expect(otherUserStopSharingError).toBeUndefined();
+
+    const { data, errors } = await testClient.query({
+      query: gql`
+        query {
+          me {
+            id
+            notifications(limit: 100) {
+              items {
+                id
+              }
+              hasMore
+            }
+          }
+        }
+      `,
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.me).toEqual({
+      id: toGlobalId("User", sessionUser.id),
+      notifications: {
+        items: [],
+        hasMore: false,
+      },
+    });
+  });
+
+  it("notifications should be deleted if other user stops sharing the petition with a group i'm in", async () => {
+    const [userGroup] = await mocks.createUserGroups(1, organization.id);
+    await mocks.insertUserGroupMembers(userGroup.id, [sessionUser.id]);
+    const [groupPetition] = await mocks.createRandomPetitions(
+      organization.id,
+      otherUser.id,
+      1
+    );
+    await mocks.sharePetitionWithGroups(groupPetition.id, [userGroup.id]);
+    await knex("petition_user_notification").insert({
+      created_at: "2021-07-10T10:00:00Z",
+      type: "PETITION_SHARED",
+      user_id: sessionUser.id,
+      is_read: true,
+      petition_id: groupPetition.id,
+      data: {
+        owner_id: otherUser.id,
+        permission_type: "READ",
+        user_group_id: userGroup.id,
+      },
+    });
+
+    // at this point, `groupPetition` is shared with a group which sessionUser is member.
+
+    // next request is executed by `otherUser`
+    const { errors: otherUserStopSharingError } = await testClient
+      .withApiKey(otherUserApiKey)
+      .mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!, $userGroupIds: [GID!]) {
+            removePetitionPermission(
+              petitionIds: $petitionIds
+              userGroupIds: $userGroupIds
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", groupPetition.id)],
+          userGroupIds: [toGlobalId("UserGroup", userGroup.id)],
+        },
+      });
+    expect(otherUserStopSharingError).toBeUndefined();
+
+    const { data, errors } = await testClient.query({
+      query: gql`
+        query {
+          me {
+            id
+            notifications(limit: 100) {
+              items {
+                petition {
+                  id
+                }
+                id
+              }
+              hasMore
+            }
+          }
+        }
+      `,
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.me).toEqual({
+      id: toGlobalId("User", sessionUser.id),
+      notifications: {
+        // only notification that should be deleted is the "group shared" created in this case
+        items: notifications
+          .filter((n) => n.user_id === sessionUser.id)
+          .map((n) => ({
+            id: toGlobalId("PetitionUserNotification", n.id),
+            petition: {
+              id: toGlobalId("Petition", petition.id),
+            },
+          })),
+        hasMore: false,
+      },
+    });
+  });
+
+  it("notifications should not be deleted if other user stops sharing with a group but user still has direct access", async () => {
+    const [userGroup] = await mocks.createUserGroups(1, organization.id);
+    await mocks.insertUserGroupMembers(userGroup.id, [sessionUser.id]);
+    const [otherPetition] = await mocks.createRandomPetitions(
+      organization.id,
+      otherUser.id
+    );
+
+    await mocks.sharePetitionWithGroups(otherPetition.id, [userGroup.id]);
+    await mocks.sharePetitions([otherPetition.id], sessionUser.id, "READ");
+
+    const { errors: otherUserStopSharingError } = await testClient
+      .withApiKey(otherUserApiKey)
+      .mutate({
+        mutation: gql`
+          mutation ($petitionIds: [GID!]!, $userGroupIds: [GID!]) {
+            removePetitionPermission(
+              petitionIds: $petitionIds
+              userGroupIds: $userGroupIds
+            ) {
+              id
+            }
+          }
+        `,
+        variables: {
+          petitionIds: [toGlobalId("Petition", otherPetition.id)],
+          userGroupIds: [toGlobalId("UserGroup", userGroup.id)],
+        },
+      });
+    expect(otherUserStopSharingError).toBeUndefined();
+
+    const { data, errors } = await testClient.query({
+      query: gql`
+        query {
+          me {
+            id
+            notifications(limit: 100) {
+              items {
+                id
+              }
+              hasMore
+            }
+          }
+        }
+      `,
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.me).toEqual({
+      id: toGlobalId("User", sessionUser.id),
+      notifications: {
+        items: notifications
+          .filter((n) => n.user_id === sessionUser.id)
+          .map((n) => ({
+            id: toGlobalId("PetitionUserNotification", n.id),
+          })),
+        hasMore: false,
+      },
+    });
   });
 });

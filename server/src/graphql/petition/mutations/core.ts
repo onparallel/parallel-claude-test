@@ -326,7 +326,8 @@ export const deletePetitions = mutationField("deletePetitions", {
         ),
         // delete every user notification on the deleted petitions
         ctx.petitions.deletePetitionUserNotificationsByPetitionId(
-          ownerPermissions.map((p) => p.petition_id),
+          deletedPermissions.map((p) => p.petition_id),
+          undefined,
           t
         ),
       ]);

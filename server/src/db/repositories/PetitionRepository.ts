@@ -2129,6 +2129,7 @@ export class PetitionRepository extends BaseRepository {
 
   async deletePetitionUserNotificationsByPetitionId(
     petitionIds: number[],
+    userIds?: number[],
     t?: Knex.Transaction
   ) {
     if (petitionIds.length === 0) {
@@ -2136,6 +2137,11 @@ export class PetitionRepository extends BaseRepository {
     }
     return await this.from("petition_user_notification", t)
       .whereIn("petition_id", petitionIds)
+      .mmodify((q) => {
+        if (userIds && userIds.length > 0) {
+          q.whereIn("user_id", userIds);
+        }
+      })
       .delete();
   }
 
@@ -2950,34 +2956,28 @@ export class PetitionRepository extends BaseRepository {
         (p) => p.user_group_id === null
       );
 
-      const [petitions] = await Promise.all([
-        this.from("petition", t)
-          .whereNull("deleted_at")
-          .whereIn("id", petitionIds)
-          .returning("*"),
-        this.createEvent(
-          [
-            ...directlyAssigned.map((p) => ({
-              petition_id: p.petition_id,
-              type: "USER_PERMISSION_REMOVED" as const,
-              data: {
-                user_id: user.id,
-                permission_user_id: p.user_id!,
-              },
-            })),
-            ...groupAssigned.map((p) => ({
-              petition_id: p.petition_id,
-              type: "GROUP_PERMISSION_REMOVED" as const,
-              data: {
-                user_id: user.id,
-                user_group_id: p.user_group_id!,
-              },
-            })),
-          ],
-          t
-        ),
-      ]);
-      return petitions;
+      await this.createEvent(
+        [
+          ...directlyAssigned.map((p) => ({
+            petition_id: p.petition_id,
+            type: "USER_PERMISSION_REMOVED" as const,
+            data: {
+              user_id: user.id,
+              permission_user_id: p.user_id!,
+            },
+          })),
+          ...groupAssigned.map((p) => ({
+            petition_id: p.petition_id,
+            type: "GROUP_PERMISSION_REMOVED" as const,
+            data: {
+              user_id: user.id,
+              user_group_id: p.user_group_id!,
+            },
+          })),
+        ],
+        t
+      );
+      return removedPermissions;
     }, t);
   }
 

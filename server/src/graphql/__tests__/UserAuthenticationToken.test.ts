@@ -51,13 +51,13 @@ describe("GraphQL/UserAuthenticationToken", () => {
       authTokens = [
         await mocks
           .createUserAuthToken("My First Token", user.id)
-          .then((t) => t[0]),
+          .then(({ auth }) => auth),
         await mocks
           .createUserAuthToken("My Second Token", user.id)
-          .then((t) => t[0]),
+          .then(({ auth }) => auth),
         await mocks
           .createUserAuthToken("My Third Token", user.id)
-          .then((t) => t[0]),
+          .then(({ auth }) => auth),
       ];
     });
 
@@ -206,16 +206,16 @@ describe("GraphQL/UserAuthenticationToken", () => {
     let anotherUserToken: UserAuthenticationToken;
 
     beforeEach(async () => {
-      [userAuthToken] = await mocks.createUserAuthToken(
+      ({ auth: userAuthToken } = await mocks.createUserAuthToken(
         "My First Token",
         user.id
-      );
+      ));
 
       [anotherUser] = await mocks.createRandomUsers(organization.id, 1);
-      [anotherUserToken] = await mocks.createUserAuthToken(
+      ({ auth: anotherUserToken } = await mocks.createUserAuthToken(
         "Another Token",
         anotherUser.id
-      );
+      ));
     });
 
     afterEach(async () => {

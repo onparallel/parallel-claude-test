@@ -1,3 +1,4 @@
+import { IncomingMessage } from "http";
 import { injectable } from "inversify";
 import { UserRepository } from "../src/db/repositories/UserRepository";
 import { IAnalyticsService } from "../src/services/analytics";
@@ -12,7 +13,15 @@ export const USER_COGNITO_ID = "test-cognito-id";
 @injectable()
 export class MockAuth implements IAuth {
   constructor(private users: UserRepository) {}
-  async validateSession() {
+  async validateSession(req: IncomingMessage) {
+    if (req.headers.authorization?.startsWith("Bearer ")) {
+      /*
+        if an apiKey is set in headers, return null 
+        so authentication can be resolved by UserAuthenticationRepository.validateApiKey method
+        This is useful for executing queries/mutations as other users when testing
+       */
+      return null;
+    }
     return await this.users.loadUserByCognitoId(USER_COGNITO_ID);
   }
   async guessLogin() {}

@@ -12,7 +12,6 @@ import {
   CreatePetition,
   CreatePetitionAccess,
   CreatePetitionField,
-  CreatePetitionFieldAttachment,
   CreatePetitionFieldReply,
   CreateTag,
   CreateUser,
@@ -334,7 +333,9 @@ export class Mocks {
 
   async createUserAuthToken(tokenName: string, userId: number) {
     const apiKey = random(48);
-    return await this.knex<UserAuthenticationToken>("user_authentication_token")
+    const [auth] = await this.knex<UserAuthenticationToken>(
+      "user_authentication_token"
+    )
       .insert({
         token_name: tokenName,
         token_hash: await hash(apiKey, ""),
@@ -342,6 +343,8 @@ export class Mocks {
         created_by: `User:${userId}`,
       })
       .returning("*");
+
+    return { apiKey, auth };
   }
 
   async clearUserAuthTokens() {

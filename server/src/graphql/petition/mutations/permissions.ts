@@ -6,6 +6,9 @@ import {
   nonNull,
   stringArg,
 } from "@nexus/schema";
+import pMap from "p-map";
+import { groupBy, uniq, zip } from "remeda";
+import { Petition } from "../../../db/__types";
 import { partition } from "../../../util/arrays";
 import { isDefined } from "../../../util/remedaExtensions";
 import {
@@ -268,13 +271,54 @@ export const removePetitionPermission = mutationField(
       notEmptyArray((args) => args.userGroupIds, "userGroupId")
     ),
     resolve: async (_, args, ctx) => {
-      return await ctx.petitions.removePetitionPermissions(
+      const deletedPermissions = await ctx.petitions.removePetitionPermissions(
         args.petitionIds,
         args.userIds ?? [],
         args.userGroupIds ?? [],
         args.removeAll ?? false,
         ctx.user!
       );
+      const deletedPermissionsByPetitionId = groupBy(
+        deletedPermissions,
+        (p) => p.petition_id
+      );
+
+      const petitionIds = uniq(deletedPermissions.map((p) => p.petition_id));
+
+      const effectivePermissions = await ctx.petitions.loadEffectivePermissions(
+        petitionIds
+      );
+
+      // For each petition, delete permissions not present in effectivePermissions
+      await pMap(
+        zip(
+          petitionIds.map((id) => deletedPermissionsByPetitionId[id]),
+          effectivePermissions
+        ),
+        async ([deletedPermissions, effectivePermissions]) => {
+          const petitionId = deletedPermissions[0].petition_id;
+          const hasPermissions = new Set(
+            effectivePermissions.map((p) => p.user_id!)
+          );
+
+          // users of deletedPermissions that dont have any effectivePermission lost
+          // access to the petitions, their notifications need to be deleted
+          const userIds = uniq(
+            deletedPermissions
+              .filter((p) => p.user_id !== null)
+              .map((p) => p.user_id!)
+              .filter((userId) => !hasPermissions.has(userId))
+          );
+
+          await ctx.petitions.deletePetitionUserNotificationsByPetitionId(
+            [petitionId],
+            userIds
+          );
+        },
+        { concurrency: 20 }
+      );
+
+      return (await ctx.petitions.loadPetition(args.petitionIds)) as Petition[];
     },
   }
 );
