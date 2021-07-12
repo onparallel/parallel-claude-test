@@ -94,6 +94,10 @@ export function NotificationsDrawer() {
   const handleFilterChange = async (
     type: PetitionUserNotificationFilter | null
   ) => {
+    (window as any).analytics?.track?.("Notifications Filter", {
+      filter: type,
+    });
+
     client.cache.evict({
       id: getMyId(client),
       fieldName: "notifications",

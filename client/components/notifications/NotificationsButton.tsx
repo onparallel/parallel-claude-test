@@ -46,6 +46,11 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(
       rotate: [0, 5, -5, 4, -4, 2, -2, 1, 0].map((x) => x * 3),
     };
 
+    const handleBellClick = () => {
+      (window as any).analytics?.track?.("Notifications Bell Click");
+      onOpen();
+    };
+
     return (
       <IconButton
         ref={ref}
@@ -63,7 +68,7 @@ export const NotificationsButton = chakraForwardRef<"button", {}>(
         variant={isOpen ? "solid" : "ghost"}
         backgroundColor="white"
         isRound
-        onClick={onOpen}
+        onClick={handleBellClick}
         icon={
           <>
             <motion.div
