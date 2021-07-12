@@ -77,10 +77,10 @@ export const contactQueries = queryField((t) => {
         args.emails,
         (email) =>
           ctx.contacts.loadContactByEmail({
-            email,
+            email: email.toLowerCase(),
             orgId: ctx.user!.org_id,
           }),
-        { concurrency: 5 }
+        { concurrency: 20 }
       );
     },
   });
