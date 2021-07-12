@@ -1,5 +1,6 @@
 import { Flex } from "@chakra-ui/react";
 import { Hubspot } from "@parallel/components/scripts/Hubspot";
+import { Segment } from "@parallel/components/scripts/Segment";
 import languages from "@parallel/lang/languages.json";
 import { resolveUrl } from "@parallel/utils/next";
 import Head from "next/head";
@@ -56,7 +57,12 @@ export function PublicLayout({
           />
         ))}
       </Head>
-      <Hubspot />
+      {process.env.NODE_ENV !== "development" ? (
+        <>
+          <Hubspot />
+          <Segment />
+        </>
+      ) : null}
       <Flex direction="column" minHeight="100vh">
         {hideHeader ? null : (
           <PublicHeader position="sticky" top={0} zIndex={1} />

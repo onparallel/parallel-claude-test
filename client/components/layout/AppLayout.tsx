@@ -15,6 +15,8 @@ import {
   OnboardingTourContext,
 } from "../common/OnboardingTour";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
+import { Segment } from "../scripts/Segment";
+import { Zendesk } from "../scripts/Zendesk";
 import { AppLayoutNavbar } from "./AppLayoutNavbar";
 
 export interface AppLayoutProps extends BoxProps {
@@ -89,15 +91,13 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
-        {process.env.NODE_ENV !== "development" ? (
-          <script
-            id="ze-snippet"
-            async
-            defer
-            src="//static.zdassets.com/ekr/snippet.js?key=f96da31d-cc9a-4568-a1f9-4d2ae55939f5"
-          />
-        ) : null}
       </Head>
+      {process.env.NODE_ENV !== "development" ? (
+        <>
+          <Zendesk />
+          <Segment />
+        </>
+      ) : null}
       <Flex
         alignItems="stretch"
         overflow="hidden"
