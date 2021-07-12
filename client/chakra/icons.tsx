@@ -73,23 +73,6 @@ export const BusinessIcon = createIcon({
   ),
 });
 
-export const LockClosedFillIcon = createIcon({
-  displayName: "LockClosedFillIcon",
-  viewBox: "0 0 16 16",
-  path: (
-    <g
-      stroke="currentColor"
-      strokeWidth={1.5}
-      fill="none"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12.6667 7.33333L3.33333 7.33333C2.59695 7.33333 2 7.93029 2 8.66667L2 13.3333C2 14.0697 2.59695 14.6667 3.33333 14.6667H12.6667C13.403 14.6667 14 14.0697 14 13.3333V8.66667C14 7.93029 13.403 7.33333 12.6667 7.33333Z" />
-      <path d="M4.66675 7.33333L4.66675 4.66667C4.66675 3.78261 5.01794 2.93477 5.64306 2.30964C6.26818 1.68452 7.11603 1.33333 8.00008 1.33333C8.88414 1.33333 9.73198 1.68452 10.3571 2.30964C10.9822 2.93477 11.3334 3.78261 11.3334 4.66667V7.33333" />
-    </g>
-  ),
-});
-
 export const LockClosedIcon = createIcon({
   displayName: "LockClosedIcon",
   viewBox: "0 0 16 16",
