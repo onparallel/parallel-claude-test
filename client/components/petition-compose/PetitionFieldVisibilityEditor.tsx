@@ -267,7 +267,7 @@ export function PetitionFieldVisibilityEditor({
                     onChange={(value) =>
                       updateCondition(index, defaultCondition(value!))
                     }
-                    isReadOnly={isReadOnly}
+                    isDisabled={isReadOnly}
                   />
                   <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>
                     {conditionField.multiple ? (

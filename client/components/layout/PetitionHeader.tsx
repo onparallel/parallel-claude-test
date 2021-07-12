@@ -134,11 +134,14 @@ export function PetitionHeader({
       {
         rightIcon: petition.isReadOnly ? (
           <SmallPopover
-            content={intl.formatMessage({
-              id: "component.petition-header.compose-tab.readonly",
-              defaultMessage:
-                "Edition restricted. To make changes, you can disable the protection on the Settings tab.",
-            })}
+            content={
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-header.compose-tab.readonly"
+                  defaultMessage="Edition restricted. To make changes, you can disable the protection on the Settings tab."
+                />
+              </Text>
+            }
           >
             <LockClosedIcon color="gray.600" _hover={{ color: "gray.700" }} />
           </SmallPopover>

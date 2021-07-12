@@ -25,7 +25,6 @@ export interface PetitionFieldSelectProps<
   fields: T[];
   indices: PetitionFieldIndex[];
   expandFields?: ExpandFields;
-  isReadOnly?: boolean;
 }
 
 export function PetitionFieldSelect<
@@ -37,7 +36,6 @@ export function PetitionFieldSelect<
   fields,
   indices,
   expandFields,
-  isReadOnly,
   ...props
 }: PetitionFieldSelectProps<T, ExpandFields>) {
   const intl = useIntl();
@@ -157,7 +155,6 @@ export function PetitionFieldSelect<
         id: "component.petition-field-select.placeholder",
         defaultMessage: "Select a field",
       })}
-      isDisabled={isReadOnly}
     />
   );
 }

@@ -246,9 +246,8 @@ export const RichTextEditor = forwardRef<
       ({
         padding: "12px 16px",
         minHeight: "120px !important",
-        color: isDisabled ? "#A0AEC0" : undefined,
       } as CSSProperties),
-    [isDisabled]
+    []
   );
 
   const {
@@ -329,12 +328,14 @@ export const RichTextEditor = forwardRef<
 
   return (
     <Box
+      role="application"
       {...pick(formControl, [
         "aria-invalid",
         "aria-required",
         "aria-readonly",
         "aria-describedby",
       ])}
+      aria-disabled={formControl.disabled}
       {...inputStyles}
       overflow="hidden"
     >
