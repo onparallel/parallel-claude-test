@@ -59,16 +59,11 @@ export function PetitionRemindersConfig({
           offset: 2,
           time: "09:00",
           timezone,
-          weekdaysOnly: false,
+          weekdaysOnly: true,
         }
       );
     } else {
-      assignRef(previousValueRef, {
-        offset: value?.offset || 2,
-        time: value?.time || "09:00",
-        timezone: value?.timezone || timezone,
-        weekdaysOnly: value?.weekdaysOnly || false,
-      });
+      assignRef(previousValueRef, value);
       onChange(null);
     }
   }
