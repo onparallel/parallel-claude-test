@@ -25,6 +25,7 @@
     "@sentry/integrations": "^6.7.2",
     "@sentry/node": "^6.7.2",
     "@sentry/webpack-plugin": "^1.15.1",
+    "@types/segment-analytics": "^0.0.34",
     "@udecode/slate-plugins": "^0.75.2",
     "@udecode/slate-plugins-core": "^0.75.2",
     "@welldone-software/why-did-you-render": "^6.2.0",

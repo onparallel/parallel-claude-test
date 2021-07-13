@@ -83,6 +83,9 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
       window.removeEventListener("load", hide);
     };
   }, []);
+  useEffect(() => {
+    window.analytics?.identify(user.id);
+  }, [user.id]);
   return (
     <>
       <Head>
