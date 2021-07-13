@@ -68,11 +68,20 @@ import {
 type PetitionType = "PETITION" | "TEMPLATE";
 type PetitionLocale = "en" | "es";
 
+type PetitionSharedWithFilter = {
+  operator: "AND" | "OR";
+  filters: {
+    value: string;
+    operator: "SHARED_WITH" | "NOT_SHARED_WITH" | "IS_OWNER";
+  }[];
+};
+
 type PetitionFilter = {
   status?: PetitionStatus | null;
   locale?: PetitionLocale | null;
   type?: PetitionType | null;
   tagIds?: string[] | null;
+  sharedWith?: PetitionSharedWithFilter | null;
 };
 
 type PetitionUserNotificationFilter =
@@ -311,26 +320,44 @@ export class PetitionRepository extends BaseRepository {
             );
           } else {
             q.havingRaw(/* sql */ `
-              array_length(array_remove(array_agg(distinct pt.tag_id), null)) = 0
+              array_length(array_remove(array_agg(distinct pt.tag_id), null), 1) = 0
             `);
           }
         }
 
         // search on shared with
-        if (false) {
-          const userId = 4;
+        const sharedWith = filters?.sharedWith;
+        if (sharedWith && sharedWith.filters.length > 0) {
           q.joinRaw(
             /* sql */ `join petition_permission pp2 on pp2.petition_id = petition.id and pp2.deleted_at is null`
           );
-          // contains
-          q.havingRaw(`?=any(array_agg(distinct pp2.user_id))`, [userId]);
-          // not contains
-          q.havingRaw(`not(?=any(array_agg(distinct pp2.user_id)))`, [userId]);
-          // is owner
-          q.havingRaw(
-            `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) > 0`,
-            [userId]
-          );
+
+          for (const filter of sharedWith.filters) {
+            q = sharedWith.operator === "AND" ? q.and : q.or;
+
+            const { id, type } = fromGlobalId(filter.value);
+            if (type !== "User" && type !== "UserGroup") {
+              throw new Error(`Expected User or UserGroup, got ${type}`);
+            }
+
+            const column = type === "User" ? "user_id" : "user_group_id";
+            if (filter.operator === "SHARED_WITH") {
+              q.havingRaw(
+                `?=any(array_remove(array_agg(distinct pp2.${column}),null))`,
+                [id]
+              );
+            } else if (filter.operator === "NOT_SHARED_WITH") {
+              q.havingRaw(
+                `not(?=any(array_remove(array_agg(distinct pp2.${column}), null)))`,
+                [id]
+              );
+            } else if (filter.operator === "IS_OWNER") {
+              q.havingRaw(
+                `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) > 0`,
+                [id]
+              );
+            }
+          }
         }
       })
       .groupBy("petition.id");

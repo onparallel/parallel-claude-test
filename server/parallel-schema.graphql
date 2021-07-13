@@ -1959,6 +1959,7 @@ enum PetitionFieldType {
 
 input PetitionFilter {
   locale: PetitionLocale
+  sharedWith: PetitionSharedWith
   status: PetitionStatus
   tagIds: [ID!]
   type: PetitionBaseType
@@ -2188,6 +2189,27 @@ type PetitionSharedUserNotification implements PetitionUserNotification {
   permissionType: PetitionPermissionTypeRW!
   petition: PetitionBase!
   sharedWith: UserOrUserGroup!
+}
+
+input PetitionSharedWith {
+  filters: [PetitionSharedWithFilter!]!
+  operator: PetitionSharedWithOperator!
+}
+
+input PetitionSharedWithFilter {
+  operator: PetitionSharedWithFilterOperator!
+  value: ID!
+}
+
+enum PetitionSharedWithFilterOperator {
+  IS_OWNER
+  NOT_SHARED_WITH
+  SHARED_WITH
+}
+
+enum PetitionSharedWithOperator {
+  AND
+  OR
 }
 
 enum PetitionSignatureCancelReason {

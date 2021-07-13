@@ -1,5 +1,6 @@
 import {
   arg,
+  enumType,
   inputObjectType,
   list,
   nonNull,
@@ -8,7 +9,7 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { decode } from "jsonwebtoken";
-import { fromGlobalIds } from "../../util/globalId";
+import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -38,6 +39,37 @@ export const petitionsQuery = queryField((t) => {
             type: "PetitionBaseType",
           });
           t.nullable.list.nonNull.id("tagIds");
+          t.nullable.field("sharedWith", {
+            type: inputObjectType({
+              name: "PetitionSharedWith",
+              definition(t) {
+                t.nonNull.field("operator", {
+                  type: enumType({
+                    name: "PetitionSharedWithOperator",
+                    members: ["AND", "OR"],
+                  }),
+                });
+                t.nonNull.list.nonNull.field("filters", {
+                  type: inputObjectType({
+                    name: "PetitionSharedWithFilter",
+                    definition(t) {
+                      t.nonNull.id("value");
+                      t.nonNull.field("operator", {
+                        type: enumType({
+                          name: "PetitionSharedWithFilterOperator",
+                          members: [
+                            "SHARED_WITH",
+                            "NOT_SHARED_WITH",
+                            "IS_OWNER",
+                          ],
+                        }),
+                      });
+                    },
+                  }),
+                });
+              },
+            }),
+          });
         },
       }).asArg(),
     },
@@ -56,6 +88,17 @@ export const petitionsQuery = queryField((t) => {
           throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
         }
       }
+
+      if (
+        filters?.sharedWith &&
+        filters.sharedWith.filters.some((f) => {
+          const type = fromGlobalId(f.value).type;
+          return type !== "User" && type !== "UserGroup";
+        })
+      ) {
+        throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
+      }
+
       const columnMap = {
         createdAt: "created_at",
         sentAt: "sent_at",

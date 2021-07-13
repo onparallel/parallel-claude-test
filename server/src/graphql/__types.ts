@@ -93,9 +93,20 @@ export interface NexusGenInputs {
   PetitionFilter: {
     // input type
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
+    sharedWith?: NexusGenInputs["PetitionSharedWith"] | null; // PetitionSharedWith
     status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
     tagIds?: string[] | null; // [ID!]
     type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
+  };
+  PetitionSharedWith: {
+    // input type
+    filters: NexusGenInputs["PetitionSharedWithFilter"][]; // [PetitionSharedWithFilter!]!
+    operator: NexusGenEnums["PetitionSharedWithOperator"]; // PetitionSharedWithOperator!
+  };
+  PetitionSharedWithFilter: {
+    // input type
+    operator: NexusGenEnums["PetitionSharedWithFilterOperator"]; // PetitionSharedWithFilterOperator!
+    value: string; // ID!
   };
   PublicPetitionSignerData: {
     // input type
@@ -208,6 +219,11 @@ export interface NexusGenEnums {
   PetitionPermissionType: db.PetitionPermissionType;
   PetitionPermissionTypeRW: "READ" | "WRITE";
   PetitionReminderType: db.PetitionReminderType;
+  PetitionSharedWithFilterOperator:
+    | "IS_OWNER"
+    | "NOT_SHARED_WITH"
+    | "SHARED_WITH";
+  PetitionSharedWithOperator: "AND" | "OR";
   PetitionSignatureCancelReason: db.PetitionSignatureCancelReason;
   PetitionSignatureRequestStatus:
     | "CANCELLED"
