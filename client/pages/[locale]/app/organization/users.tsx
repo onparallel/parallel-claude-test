@@ -99,7 +99,7 @@ function OrganizationUsers() {
 
   const sections = useOrganizationSections(me.role === "ADMIN");
 
-  const columns = useOrganizationUsersTableColumns();
+  const columns = useOrganizationUsersTableColumns(me.role === "ADMIN");
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (value) => {
@@ -260,9 +260,9 @@ function OrganizationUsers() {
   );
 }
 
-function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserFragment>[] {
+function useOrganizationUsersTableColumns(isAdmin: boolean) {
   const intl = useIntl();
-  return useMemo(
+  return useMemo<TableColumn<OrganizationUsers_UserFragment>[]>(
     () => [
       {
         key: "fullName",
@@ -352,30 +352,34 @@ function useOrganizationUsersTableColumns(): TableColumn<OrganizationUsers_UserF
           </Badge>
         ),
       },
-      {
-        key: "lastActiveAt",
-        header: intl.formatMessage({
-          id: "generic.last-active-at",
-          defaultMessage: "Last active at",
-        }),
-        isSortable: true,
-        CellContent: ({ row }) =>
-          row.lastActiveAt ? (
-            <DateTime
-              value={row.lastActiveAt}
-              format={FORMATS.LLL}
-              useRelativeTime
-              whiteSpace="nowrap"
-            />
-          ) : (
-            <Text textStyle="hint">
-              <FormattedMessage
-                id="generic.never-active"
-                defaultMessage="Never active"
-              />
-            </Text>
-          ),
-      },
+      ...(isAdmin
+        ? ([
+            {
+              key: "lastActiveAt",
+              header: intl.formatMessage({
+                id: "generic.last-active-at",
+                defaultMessage: "Last active at",
+              }),
+              isSortable: true,
+              CellContent: ({ row }) =>
+                row.lastActiveAt ? (
+                  <DateTime
+                    value={row.lastActiveAt}
+                    format={FORMATS.LLL}
+                    useRelativeTime
+                    whiteSpace="nowrap"
+                  />
+                ) : (
+                  <Text textStyle="hint">
+                    <FormattedMessage
+                      id="generic.never-active"
+                      defaultMessage="Never active"
+                    />
+                  </Text>
+                ),
+            },
+          ] as TableColumn<OrganizationUsers_UserFragment>[])
+        : []),
       {
         key: "createdAt",
         isSortable: true,
