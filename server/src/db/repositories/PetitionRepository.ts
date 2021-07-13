@@ -282,13 +282,13 @@ export class PetitionRepository extends BaseRepository {
           q.andWhereRaw(
             type === "PETITION"
               ? /* sql */ ` 
-                petition.name ilike :search escape '\\'
+                (petition.name ilike :search escape '\\'
                 or concat(c.first_name, ' ', c.last_name) ilike :search escape '\\'
-                or c.email ilike :search escape '\\'
+                or c.email ilike :search escape '\\')
               `
               : /* sql */ ` 
-                petition.name ilike :search escape '\\'
-                or petition.template_description ilike :search escape '\\'
+                (petition.name ilike :search escape '\\'
+                or petition.template_description ilike :search escape '\\')
               `,
             { search: `%${escapeLike(search, "\\")}%` }
           );
