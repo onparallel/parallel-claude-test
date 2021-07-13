@@ -36,25 +36,17 @@ export interface PetitionFieldTypeSelectProps
 export const PetitionFieldTypeSelect = chakraForwardRef<
   "div",
   PetitionFieldTypeSelectProps
->(function PetitionFieldTypeSelect(
-  { type, onChange, isReadOnly, ...props },
-  ref
-) {
+>(function PetitionFieldTypeSelect({ type, onChange, ...props }, ref) {
+  console.log(props);
   return (
     <Menu placement="bottom" gutter={2}>
-      <MenuButton
-        as={SelectLikeButton}
-        ref={ref as any}
-        disabled={isReadOnly}
-        {...(props as any)}
-      >
+      <MenuButton as={SelectLikeButton} ref={ref as any} {...(props as any)}>
         <PetitionFieldTypeLabel type={type} display="flex" />
       </MenuButton>
       <Portal>
         <PetitionFieldTypeSelectDropdown
           onSelectFieldType={onChange}
           role="listbox"
-          isReadOnly={isReadOnly}
         />
       </Portal>
     </Menu>
@@ -127,21 +119,13 @@ export interface PetitionFieldTypeSelectDropdownProps extends MenuListProps {
   showHeader?: boolean;
   showDescription?: boolean;
   onSelectFieldType: (type: PetitionFieldType) => void;
-  isReadOnly?: boolean;
 }
 
 export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
   "div",
   PetitionFieldTypeSelectDropdownProps
 >(function PetitionFieldTypeSelectDropdown(
-  {
-    onSelectFieldType,
-    showHeader,
-    showDescription,
-    role = "menu",
-    isReadOnly,
-    ...props
-  },
+  { onSelectFieldType, showHeader, showDescription, role = "menu", ...props },
   ref
 ) {
   const intl = useIntl();
@@ -225,7 +209,6 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
                 data-field-type={type}
                 onClick={() => onSelectFieldType(type)}
                 onFocus={() => setActiveType(type)}
-                isDisabled={isReadOnly}
               >
                 <PetitionFieldTypeLabel type={type} />
               </MenuItem>

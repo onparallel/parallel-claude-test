@@ -54,7 +54,7 @@ export function PetitionComposeFieldSettings({
       </CardHeader>
       <Stack spacing={4} padding={4} direction="column">
         {!field.isFixed && (
-          <Box textStyle={isReadOnly ? "muted" : undefined}>
+          <Box>
             <PetitionFieldTypeSelect
               type={field.type}
               onChange={(type) => {
@@ -62,7 +62,7 @@ export function PetitionComposeFieldSettings({
                   onFieldTypeChange(field.id, type);
                 }
               }}
-              isReadOnly={isReadOnly}
+              isDisabled={isReadOnly}
             />
           </Box>
         )}
