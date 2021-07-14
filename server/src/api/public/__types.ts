@@ -1155,6 +1155,8 @@ export type Petition = PetitionBase & {
   progress: PetitionProgress;
   /** The reminders configuration for the petition. */
   remindersConfig: Maybe<RemindersConfig>;
+  /** Date when the petition was first sent */
+  sentAt: Maybe<Scalars["DateTime"]>;
   /** The signature configuration for the petition. */
   signatureConfig: Maybe<SignatureConfig>;
   /** The list of signature requests. */
@@ -2060,7 +2062,9 @@ export type QueryPetitions_OrderBy =
   | "lastUsedAt_ASC"
   | "lastUsedAt_DESC"
   | "name_ASC"
-  | "name_DESC";
+  | "name_DESC"
+  | "sentAt_ASC"
+  | "sentAt_DESC";
 
 /** Order to use on Query.userGroups */
 export type QueryUserGroups_OrderBy =

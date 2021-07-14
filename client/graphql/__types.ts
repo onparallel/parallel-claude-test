@@ -6356,55 +6356,6 @@ export type PetitionRepliesQuery = {
   >;
 };
 
-export type Petitions_PetitionBasePaginationFragment = {
-  __typename?: "PetitionBasePagination";
-  totalCount: number;
-  items: Array<
-    | ({ __typename?: "Petition" } & Petitions_PetitionBase_Petition_Fragment)
-    | ({
-        __typename?: "PetitionTemplate";
-      } & Petitions_PetitionBase_PetitionTemplate_Fragment)
-  >;
-};
-
-export type Petitions_PetitionBase_Petition_Fragment = {
-  __typename?: "Petition";
-} & usePetitionsTableColumns_PetitionBase_Petition_Fragment;
-
-export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
-  __typename?: "PetitionTemplate";
-} & usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
-
-export type Petitions_PetitionBaseFragment =
-  | Petitions_PetitionBase_Petition_Fragment
-  | Petitions_PetitionBase_PetitionTemplate_Fragment;
-
-export type Petitions_UserFragment = {
-  __typename?: "User";
-} & AppLayout_UserFragment &
-  usePetitionsTableColumns_UserFragment;
-
-export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
-
-export type PetitionsUserQuery = {
-  me: { __typename?: "User" } & Petitions_UserFragment;
-};
-
-export type PetitionsQueryVariables = Exact<{
-  offset: Scalars["Int"];
-  limit: Scalars["Int"];
-  search?: Maybe<Scalars["String"]>;
-  sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
-  hasPetitionSignature: Scalars["Boolean"];
-  filters?: Maybe<PetitionFilter>;
-}>;
-
-export type PetitionsQuery = {
-  petitions: {
-    __typename?: "PetitionBasePagination";
-  } & Petitions_PetitionBasePaginationFragment;
-};
-
 export type NewPetition_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
@@ -6460,6 +6411,55 @@ export type NewPetitionUserQueryVariables = Exact<{ [key: string]: never }>;
 
 export type NewPetitionUserQuery = {
   me: { __typename?: "User" } & NewPetition_UserFragment;
+};
+
+export type Petitions_PetitionBasePaginationFragment = {
+  __typename?: "PetitionBasePagination";
+  totalCount: number;
+  items: Array<
+    | ({ __typename?: "Petition" } & Petitions_PetitionBase_Petition_Fragment)
+    | ({
+        __typename?: "PetitionTemplate";
+      } & Petitions_PetitionBase_PetitionTemplate_Fragment)
+  >;
+};
+
+export type Petitions_PetitionBase_Petition_Fragment = {
+  __typename?: "Petition";
+} & usePetitionsTableColumns_PetitionBase_Petition_Fragment;
+
+export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
+  __typename?: "PetitionTemplate";
+} & usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
+
+export type Petitions_PetitionBaseFragment =
+  | Petitions_PetitionBase_Petition_Fragment
+  | Petitions_PetitionBase_PetitionTemplate_Fragment;
+
+export type Petitions_UserFragment = {
+  __typename?: "User";
+} & AppLayout_UserFragment &
+  usePetitionsTableColumns_UserFragment;
+
+export type PetitionsUserQueryVariables = Exact<{ [key: string]: never }>;
+
+export type PetitionsUserQuery = {
+  me: { __typename?: "User" } & Petitions_UserFragment;
+};
+
+export type PetitionsQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  search?: Maybe<Scalars["String"]>;
+  sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
+  hasPetitionSignature: Scalars["Boolean"];
+  filters?: Maybe<PetitionFilter>;
+}>;
+
+export type PetitionsQuery = {
+  petitions: {
+    __typename?: "PetitionBasePagination";
+  } & Petitions_PetitionBasePaginationFragment;
 };
 
 export type Account_UserFragment = {
@@ -8930,6 +8930,24 @@ export const PetitionReplies_UserFragmentDoc = gql`
   ${PetitionSignaturesCard_UserFragmentDoc}
   ${useUpdateIsReadNotification_UserFragmentDoc}
 `;
+export const NewPetition_PetitionTemplateFragmentDoc = gql`
+  fragment NewPetition_PetitionTemplate on PetitionTemplate {
+    id
+    name
+    description
+    locale
+    owner {
+      id
+      fullName
+    }
+  }
+`;
+export const NewPetition_UserFragmentDoc = gql`
+  fragment NewPetition_User on User {
+    ...AppLayout_User
+  }
+  ${AppLayout_UserFragmentDoc}
+`;
 export const PetitionTagListCellContent_TagFragmentDoc = gql`
   fragment PetitionTagListCellContent_Tag on Tag {
     id
@@ -9016,24 +9034,6 @@ export const Petitions_UserFragmentDoc = gql`
   }
   ${AppLayout_UserFragmentDoc}
   ${usePetitionsTableColumns_UserFragmentDoc}
-`;
-export const NewPetition_PetitionTemplateFragmentDoc = gql`
-  fragment NewPetition_PetitionTemplate on PetitionTemplate {
-    id
-    name
-    description
-    locale
-    owner {
-      id
-      fullName
-    }
-  }
-`;
-export const NewPetition_UserFragmentDoc = gql`
-  fragment NewPetition_User on User {
-    ...AppLayout_User
-  }
-  ${AppLayout_UserFragmentDoc}
 `;
 export const useSettingsSections_UserFragmentDoc = gql`
   fragment useSettingsSections_User on User {
@@ -13360,90 +13360,6 @@ export type PetitionRepliesQueryHookResult = ReturnType<
 export type PetitionRepliesLazyQueryHookResult = ReturnType<
   typeof usePetitionRepliesLazyQuery
 >;
-export const PetitionsUserDocument = gql`
-  query PetitionsUser {
-    me {
-      ...Petitions_User
-    }
-  }
-  ${Petitions_UserFragmentDoc}
-`;
-export function usePetitionsUserQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    PetitionsUserQuery,
-    PetitionsUserQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
-    PetitionsUserDocument,
-    options
-  );
-}
-export function usePetitionsUserLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionsUserQuery,
-    PetitionsUserQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
-    PetitionsUserDocument,
-    options
-  );
-}
-export type PetitionsUserQueryHookResult = ReturnType<
-  typeof usePetitionsUserQuery
->;
-export type PetitionsUserLazyQueryHookResult = ReturnType<
-  typeof usePetitionsUserLazyQuery
->;
-export const PetitionsDocument = gql`
-  query Petitions(
-    $offset: Int!
-    $limit: Int!
-    $search: String
-    $sortBy: [QueryPetitions_OrderBy!]
-    $hasPetitionSignature: Boolean!
-    $filters: PetitionFilter
-  ) {
-    petitions(
-      offset: $offset
-      limit: $limit
-      search: $search
-      sortBy: $sortBy
-      filters: $filters
-    ) {
-      ...Petitions_PetitionBasePagination
-    }
-  }
-  ${Petitions_PetitionBasePaginationFragmentDoc}
-`;
-export function usePetitionsQuery(
-  baseOptions: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<PetitionsQuery, PetitionsQueryVariables>(
-    PetitionsDocument,
-    options
-  );
-}
-export function usePetitionsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionsQuery,
-    PetitionsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<PetitionsQuery, PetitionsQueryVariables>(
-    PetitionsDocument,
-    options
-  );
-}
-export type PetitionsQueryHookResult = ReturnType<typeof usePetitionsQuery>;
-export type PetitionsLazyQueryHookResult = ReturnType<
-  typeof usePetitionsLazyQuery
->;
 export const NewPetitionPublicTemplatesDocument = gql`
   query NewPetitionPublicTemplates(
     $offset: Int!
@@ -13587,6 +13503,90 @@ export type NewPetitionUserQueryHookResult = ReturnType<
 >;
 export type NewPetitionUserLazyQueryHookResult = ReturnType<
   typeof useNewPetitionUserLazyQuery
+>;
+export const PetitionsUserDocument = gql`
+  query PetitionsUser {
+    me {
+      ...Petitions_User
+    }
+  }
+  ${Petitions_UserFragmentDoc}
+`;
+export function usePetitionsUserQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PetitionsUserQuery,
+    PetitionsUserQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
+    PetitionsUserDocument,
+    options
+  );
+}
+export function usePetitionsUserLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionsUserQuery,
+    PetitionsUserQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<PetitionsUserQuery, PetitionsUserQueryVariables>(
+    PetitionsUserDocument,
+    options
+  );
+}
+export type PetitionsUserQueryHookResult = ReturnType<
+  typeof usePetitionsUserQuery
+>;
+export type PetitionsUserLazyQueryHookResult = ReturnType<
+  typeof usePetitionsUserLazyQuery
+>;
+export const PetitionsDocument = gql`
+  query Petitions(
+    $offset: Int!
+    $limit: Int!
+    $search: String
+    $sortBy: [QueryPetitions_OrderBy!]
+    $hasPetitionSignature: Boolean!
+    $filters: PetitionFilter
+  ) {
+    petitions(
+      offset: $offset
+      limit: $limit
+      search: $search
+      sortBy: $sortBy
+      filters: $filters
+    ) {
+      ...Petitions_PetitionBasePagination
+    }
+  }
+  ${Petitions_PetitionBasePaginationFragmentDoc}
+`;
+export function usePetitionsQuery(
+  baseOptions: Apollo.QueryHookOptions<PetitionsQuery, PetitionsQueryVariables>
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<PetitionsQuery, PetitionsQueryVariables>(
+    PetitionsDocument,
+    options
+  );
+}
+export function usePetitionsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionsQuery,
+    PetitionsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<PetitionsQuery, PetitionsQueryVariables>(
+    PetitionsDocument,
+    options
+  );
+}
+export type PetitionsQueryHookResult = ReturnType<typeof usePetitionsQuery>;
+export type PetitionsLazyQueryHookResult = ReturnType<
+  typeof usePetitionsLazyQuery
 >;
 export const Account_updateAccountDocument = gql`
   mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {

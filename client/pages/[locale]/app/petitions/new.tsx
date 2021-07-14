@@ -1,31 +1,27 @@
 import { gql } from "@apollo/client";
 import {
-  Avatar,
-  Box,
-  BoxProps,
   Button,
-  Collapse,
+  Container,
   Flex,
-  Grid,
-  Heading,
-  Select,
   Stack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
-  useDisclosure,
 } from "@chakra-ui/react";
-import { AddIcon, ChevronDownIcon } from "@parallel/chakra/icons";
-import { BreakLines } from "@parallel/components/common/BreakLines";
-import { Card } from "@parallel/components/common/Card";
+import { AddIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
-import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
-import { SearchInput } from "@parallel/components/common/SearchInput";
-import { Spacer } from "@parallel/components/common/Spacer";
 import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useTemplateDetailsDialog } from "@parallel/components/petition-common/TemplateDetailsDialog";
+import { NewPetitionMyTemplatesHeader } from "@parallel/components/petition-new/NewPetitionMyTemplatesHeader";
+import { NewPetitionPublicTemplatesHeader } from "@parallel/components/petition-new/NewPetitionPublicTemplatesHeader";
+import { NewPetitionTemplatesList } from "@parallel/components/petition-new/NewPetitionTemplatesList";
 import {
   NewPetitionPublicTemplatesQuery,
   NewPetitionPublicTemplatesQueryVariables,
@@ -45,19 +41,7 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
-import { useRehydratedEffect } from "@parallel/utils/useRehydrated";
-import { useRoleButton } from "@parallel/utils/useRoleButton";
-import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
-import {
-  ChangeEvent,
-  memo,
-  ReactNode,
-  Ref,
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 function NewPetition() {
@@ -74,7 +58,7 @@ function NewPetition() {
     useNewPetitionPublicTemplatesQuery({
       variables: {
         offset: 0,
-        limit: 6,
+        limit: 20,
         locale: null,
         search: null,
       },
@@ -93,7 +77,7 @@ function NewPetition() {
     useNewPetitionTemplatesQuery({
       variables: {
         offset: 0,
-        limit: 2,
+        limit: 20,
         search: null,
         filters: {
           locale: null,
@@ -108,10 +92,13 @@ function NewPetition() {
     templatesData.templates.items.length === templatesData.templates.totalCount;
   const hasTemplates = templatesData.hasTemplates.totalCount > 0;
 
-  const [{ search, locale }, setState] = useState({
-    search: "",
-    locale: null as Maybe<PetitionLocale>,
-  });
+  const [search, setSearch] = useState("");
+  const [locale, setLocale] = useState(null as Maybe<PetitionLocale>);
+
+  const [publicSearch, setPublicSearch] = useState("");
+  const [publicLocale, setPublicLocale] = useState(
+    null as Maybe<PetitionLocale>
+  );
 
   const debouncedPublicTemplatesRefetch = useDebouncedCallback(
     publicTemplatesRefetch,
@@ -126,43 +113,61 @@ function NewPetition() {
 
   const handleSearchChange = useCallback(
     (search: string) => {
-      setState({ locale, search });
-      debouncedPublicTemplatesRefetch({
-        offset: 0,
-        limit: 6,
-        search: search || null,
-      });
+      setSearch(search);
+
       debouncedTemplatesRefetch({
         offset: 0,
-        limit: 2,
+        limit: 20,
         search: search || null,
       });
     },
-    [locale, debouncedPublicTemplatesRefetch, debouncedTemplatesRefetch]
+    [locale, debouncedTemplatesRefetch]
   );
 
   const handleLocaleChange = useCallback(
     (locale: Maybe<PetitionLocale>) => {
-      setState({ locale, search });
-      debouncedPublicTemplatesRefetch.immediate({
-        offset: 0,
-        limit: 6,
-        locale,
-      });
+      console.log("handleLocaleChange: ", locale);
+
+      setLocale(locale);
+
       debouncedTemplatesRefetch.immediate({
         offset: 0,
-        limit: 2,
+        limit: 20,
         filters: { locale, type: "TEMPLATE" },
       });
     },
-    [search, debouncedPublicTemplatesRefetch, debouncedTemplatesRefetch]
+    [search, debouncedTemplatesRefetch]
+  );
+
+  const handlePublicSearchChange = useCallback(
+    (search: string) => {
+      setPublicSearch(search);
+      debouncedPublicTemplatesRefetch({
+        offset: 0,
+        limit: 20,
+        search: search || null,
+      });
+    },
+    [publicSearch, debouncedPublicTemplatesRefetch]
+  );
+
+  const handlePublicLocaleChange = useCallback(
+    (locale: Maybe<PetitionLocale>) => {
+      setPublicLocale(locale);
+      debouncedPublicTemplatesRefetch.immediate({
+        offset: 0,
+        limit: 20,
+        locale,
+      });
+    },
+    [publicLocale, debouncedPublicTemplatesRefetch]
   );
 
   const handlePublicTemplatesLoadMore = useCallback(() => {
     publicTemplatesFetchMore({
       variables: {
         offset: publicTemplates.length,
-        limit: 6,
+        limit: 20,
       },
       updateQuery(prev, { fetchMoreResult }) {
         return {
@@ -182,7 +187,7 @@ function NewPetition() {
     templatesFetchMore({
       variables: {
         offset: templates.length,
-        limit: 6,
+        limit: 20,
       },
       updateQuery(prev, { fetchMoreResult }) {
         return {
@@ -223,95 +228,50 @@ function NewPetition() {
     } catch {}
   }, [goToPetition, createPetition]);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-  useRehydratedEffect(() => {
-    inputRef.current!.focus();
-  }, []);
+  const selectTabStyles = {
+    color: "blue.500",
+    fontWeight: "semibold",
+    borderBottom: "2px solid",
+    borderColor: "blue.500",
+  };
 
   return (
     <AppLayout
+      id="main-container"
       title={intl.formatMessage({
         id: "new-petition.title",
         defaultMessage: "New petition",
       })}
       user={me}
     >
-      <NewPetitionHeader
-        inputRef={inputRef}
-        search={search}
-        locale={locale}
-        onSearchChange={handleSearchChange}
-        onLocaleChange={handleLocaleChange}
-        paddingTop={6}
-        paddingBottom={4}
-        backgroundColor="gray.50"
-        position="sticky"
-        top={0}
-        zIndex={1}
-        borderBottom="1px solid"
-        borderBottomColor="gray.200"
-      />
-      <NewPetitionSection
-        header={intl.formatMessage({
-          id: "new-petition.my-templates",
-          defaultMessage: "My templates",
-        })}
-        marginTop={4}
-      >
-        {templates.length === 0 ? (
-          <Stack justifyContent="center" alignItems="center" minHeight="120px">
-            <Text color="gray.500">
-              {hasTemplates ? (
-                <FormattedMessage
-                  id="new-petition.no-templates-found"
-                  defaultMessage="We couldn't find any templates with that search"
-                />
-              ) : (
-                <FormattedMessage
-                  id="new-petition.no-templates"
-                  defaultMessage="You don't have any templates yet"
-                />
-              )}
-            </Text>
-            <Button
-              variant="ghost"
-              colorScheme="purple"
-              size="sm"
-              onClick={handleCreatePetitionTemplate}
+      <Container maxWidth="container.xl" padding={10}>
+        <Tabs>
+          <TabList flexWrap="wrap-reverse">
+            <Tab
+              borderTopLeftRadius="md"
+              borderTopRightRadius="md"
+              _selected={selectTabStyles}
             >
               <FormattedMessage
-                id="new-petition.create-new-template"
-                defaultMessage="Create new template"
+                id="new-petition.my-templates"
+                defaultMessage="My templates"
               />
-            </Button>
-          </Stack>
-        ) : (
-          <>
-            <Grid
-              templateColumns={{
-                md: "repeat(2, 1fr)",
-                lg: "repeat(3, 1fr)",
-              }}
-              gap={4}
-              padding={4}
+            </Tab>
+            <Tab
+              borderTopLeftRadius="md"
+              borderTopRightRadius="md"
+              _selected={selectTabStyles}
             >
-              <EmptyPetitionCard
-                id="empty-petition-card"
-                onPress={handleTemplateClick(null)}
+              <FormattedMessage
+                id="new-petition.public-templates"
+                defaultMessage="Public templates"
               />
-              {templates.map((template) => (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  onPress={handleTemplateClick(template.id)}
-                />
-              ))}
-            </Grid>
-            <Stack direction="row" justifyContent="flex-end">
+            </Tab>
+            <Flex flex="1" justifyContent="flex-end" paddingBottom={4}>
               <Button
-                variant="ghost"
-                colorScheme="purple"
-                size="sm"
+                alignSelf="flex-end"
+                borderColor="gray.100"
+                leftIcon={<AddIcon fontSize="12px" />}
                 onClick={handleCreatePetitionTemplate}
               >
                 <FormattedMessage
@@ -319,354 +279,93 @@ function NewPetition() {
                   defaultMessage="Create new template"
                 />
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                colorScheme="purple"
-                isDisabled={allTemplatesLoaded}
-                onClick={handleTemplatesLoadMore}
-              >
-                <FormattedMessage
-                  id="generic.load-more"
-                  defaultMessage="Load more"
-                />
-              </Button>
-            </Stack>
-          </>
-        )}
-      </NewPetitionSection>
-      <NewPetitionSection header={"Parallel"} marginTop={4} paddingBottom={2}>
-        <Grid
-          templateColumns={{
-            md: "repeat(2, 1fr)",
-            lg: "repeat(3, 1fr)",
-          }}
-          gap={4}
-          padding={4}
-        >
-          {publicTemplates.map(
-            (template: NewPetition_PetitionTemplateFragment) => (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                onPress={handleTemplateClick(template.id)}
+            </Flex>
+          </TabList>
+          <TabPanels>
+            <TabPanel paddingX={0} paddingY={8}>
+              <NewPetitionMyTemplatesHeader
+                search={search}
+                onSearchChange={handleSearchChange}
+                locale={locale}
+                onLocaleChange={handleLocaleChange}
               />
-            )
-          )}
-        </Grid>
-        <Stack direction="row" justifyContent="flex-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            colorScheme="purple"
-            isDisabled={allPublicTemplatesLoaded}
-            onClick={handlePublicTemplatesLoadMore}
-          >
-            <FormattedMessage
-              id="generic.load-more"
-              defaultMessage="Load more"
-            />
-          </Button>
-        </Stack>
-      </NewPetitionSection>
+              {templates.length === 0 ? (
+                <Stack
+                  justifyContent="center"
+                  alignItems="center"
+                  minHeight="160px"
+                >
+                  <Text color="gray.500">
+                    {hasTemplates ? (
+                      <FormattedMessage
+                        id="new-petition.no-templates-found"
+                        defaultMessage="We couldn't find any templates with that search"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="new-petition.no-templates"
+                        defaultMessage="You don't have any templates yet"
+                      />
+                    )}
+                  </Text>
+                  <Button
+                    variant="ghost"
+                    colorScheme="purple"
+                    size="sm"
+                    onClick={handleCreatePetitionTemplate}
+                  >
+                    <FormattedMessage
+                      id="new-petition.create-new-template"
+                      defaultMessage="Create new template"
+                    />
+                  </Button>
+                </Stack>
+              ) : (
+                <NewPetitionTemplatesList
+                  items={templates}
+                  isPublic={false}
+                  onLoadMore={handleTemplatesLoadMore}
+                  hasMore={!allTemplatesLoaded}
+                  onClickTemplate={handleTemplateClick}
+                />
+              )}
+            </TabPanel>
+            <TabPanel paddingX={0} paddingY={8}>
+              <NewPetitionPublicTemplatesHeader
+                search={publicSearch}
+                onSearchChange={handlePublicSearchChange}
+                locale={publicLocale}
+                onLocaleChange={handlePublicLocaleChange}
+              />
+              {publicTemplates.length === 0 && hasTemplates ? (
+                <Stack
+                  justifyContent="center"
+                  alignItems="center"
+                  minHeight="160px"
+                >
+                  <Text color="gray.500">
+                    <FormattedMessage
+                      id="new-petition.no-templates-found"
+                      defaultMessage="We couldn't find any templates with that search"
+                    />
+                  </Text>
+                </Stack>
+              ) : (
+                <NewPetitionTemplatesList
+                  items={publicTemplates}
+                  isPublic={true}
+                  onLoadMore={handlePublicTemplatesLoadMore}
+                  hasMore={!allPublicTemplatesLoaded}
+                  onClickTemplate={handleTemplateClick}
+                />
+              )}
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </Container>
     </AppLayout>
   );
 }
-
-function NewPetitionContainer({ children, ...props }: BoxProps) {
-  return (
-    <Box {...props}>
-      <Box
-        margin="auto"
-        width={{
-          base: "100%",
-          sm: "calc(min(360px, 100vw - 7rem))",
-          md: "calc(min(1024px, 100vw - 7rem))",
-        }}
-        paddingX={4}
-      >
-        {children}
-      </Box>
-    </Box>
-  );
-}
-
-interface NewPetitionHeader extends BoxProps {
-  inputRef: Ref<HTMLInputElement>;
-  search: string;
-  locale: Maybe<PetitionLocale>;
-  onSearchChange: (search: string) => void;
-  onLocaleChange: (locale: Maybe<PetitionLocale>) => void;
-}
-
-function NewPetitionHeader({
-  inputRef,
-  search,
-  locale,
-  onSearchChange,
-  onLocaleChange,
-  ...props
-}: NewPetitionHeader) {
-  const intl = useIntl();
-  const suggestions = useMemo(
-    () => [
-      intl.formatMessage({
-        id: "new-petition.suggestion-kyc",
-        defaultMessage: "KYC",
-      }),
-      intl.formatMessage({
-        id: "new-petition.suggestion-corporate",
-        defaultMessage: "corporate",
-      }),
-      intl.formatMessage({
-        id: "new-petition.suggestion-due",
-        defaultMessage: "due diligence",
-      }),
-      intl.formatMessage({
-        id: "new-petition.suggestion-sales",
-        defaultMessage: "sales",
-      }),
-      intl.formatMessage({
-        id: "new-petition.suggestion-tax",
-        defaultMessage: "tax",
-      }),
-    ],
-    [intl.locale]
-  );
-  const locales = useSupportedLocales();
-  const handleSearchChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      onSearchChange(event.target.value);
-    },
-    [onSearchChange]
-  );
-  const handleLocaleChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      onLocaleChange((event.target.value || null) as Maybe<PetitionLocale>);
-    },
-    [onLocaleChange]
-  );
-  const handleAddSuggestion = useMemoFactory(
-    (suggestion: string) => () => onSearchChange(suggestion),
-    [onSearchChange]
-  );
-  return (
-    <NewPetitionContainer {...props}>
-      <SearchInput
-        ref={inputRef}
-        placeholder={intl.formatMessage({
-          id: "new-petition.search-placeholder",
-          defaultMessage: "What are you looking for?",
-        })}
-        value={search}
-        onChange={handleSearchChange}
-        backgroundColor="white"
-      />
-      <Flex marginTop={2} fontSize="sm">
-        <Flex flexWrap="wrap" paddingLeft={2}>
-          <Box marginRight={2} marginLeft={2}>
-            <Text as="strong">
-              <FormattedMessage
-                id="new-petition.suggested-searches"
-                defaultMessage="Suggested searches:"
-              />
-            </Text>
-          </Box>
-          {suggestions.map((suggestion, index) => (
-            <Button
-              key={index}
-              variant="link"
-              marginX={2}
-              size="sm"
-              onClick={handleAddSuggestion(suggestion)}
-            >
-              {suggestion}
-            </Button>
-          ))}
-        </Flex>
-        <Spacer />
-        <Select
-          flexShrink={0}
-          aria-label={intl.formatMessage({
-            id: "new-petition.select-label",
-            defaultMessage: "Language filter",
-          })}
-          variant="unstyled"
-          size="sm"
-          width="auto"
-          textAlign="right"
-          height={5}
-          value={locale ?? ""}
-          onChange={handleLocaleChange}
-        >
-          <option value="">
-            {intl.formatMessage({
-              id: "generic.all-languages",
-              defaultMessage: "All languages",
-            })}
-          </option>
-          {locales.map(({ key, localizedLabel }) => (
-            <option key={key} value={key}>
-              {localizedLabel}
-            </option>
-          ))}
-        </Select>
-      </Flex>
-    </NewPetitionContainer>
-  );
-}
-
-const NewPetitionSection = memo(function NewPetitionSection({
-  header,
-  children,
-  ...props
-}: {
-  header: ReactNode;
-} & BoxProps) {
-  const { isOpen, onToggle } = useDisclosure({ defaultIsOpen: true });
-  return (
-    <NewPetitionContainer {...props}>
-      <Flex>
-        <Flex
-          as="button"
-          outline="none"
-          alignItems="center"
-          aria-expanded={isOpen}
-          onClick={onToggle}
-        >
-          <ChevronDownIcon
-            transition="transform 250ms ease"
-            transform={isOpen ? "none" : "rotate(-90deg)"}
-          />
-          <Heading as="h3" size="sm" marginLeft={2}>
-            {header}
-          </Heading>
-        </Flex>
-      </Flex>
-      <Collapse in={isOpen}>
-        <Box>{children}</Box>
-      </Collapse>
-    </NewPetitionContainer>
-  );
-});
-
-interface TemplateCardProps extends BoxProps {
-  template: NewPetition_PetitionTemplateFragment;
-  onPress: () => void;
-}
-
-const TemplateCard = memo(function TemplateCard({
-  template,
-  onPress,
-  ...props
-}: TemplateCardProps) {
-  const intl = useIntl();
-  const buttonProps = useRoleButton(onPress, [onPress]);
-
-  return (
-    <Card
-      display="flex"
-      flexDirection="column"
-      padding={4}
-      minHeight="160px"
-      outline="none"
-      transition="all 150ms ease"
-      _hover={{
-        borderColor: "gray.300",
-        boxShadow: "lg",
-        transform: "scale(1.025)",
-      }}
-      _focus={{
-        boxShadow: "outline",
-        borderColor: "gray.200",
-      }}
-      minWidth={0}
-      {...buttonProps}
-      {...props}
-    >
-      <Heading size="xs" noOfLines={2}>
-        {template.name ||
-          intl.formatMessage({
-            id: "generic.untitled-template",
-            defaultMessage: "Untitled template",
-          })}
-      </Heading>
-      {template.description ? (
-        <Text fontSize="sm" noOfLines={2}>
-          <BreakLines>{template.description}</BreakLines>
-        </Text>
-      ) : (
-        <Text fontSize="sm" fontStyle="italic">
-          <FormattedMessage
-            id="template-details.no-description-provided"
-            defaultMessage="No description provided."
-          />
-        </Text>
-      )}
-      <Spacer />
-      <Flex alignItems="center" marginTop={2}>
-        <LocaleBadge locale={template.locale} />
-        <Spacer />
-        <Avatar name={template.owner.fullName!} size="xs" role="presentation" />
-        <Text fontSize="xs" marginLeft={2}>
-          <FormattedMessage
-            id="generic.by"
-            defaultMessage="by {name}"
-            values={{ name: template.owner.fullName }}
-          />
-        </Text>
-      </Flex>
-    </Card>
-  );
-});
-
-interface EmptyPetitionCardProps extends BoxProps {
-  onPress: () => void;
-}
-
-const EmptyPetitionCard = memo(function EmptyPetitionCard({
-  onPress,
-  ...props
-}: EmptyPetitionCardProps) {
-  const buttonProps = useRoleButton(onPress, [onPress]);
-  return (
-    <Card
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      padding={4}
-      minHeight="160px"
-      outline="none"
-      transition="all 150ms ease"
-      _hover={{
-        borderColor: "gray.300",
-        boxShadow: "lg",
-        transform: "scale(1.025)",
-      }}
-      _focus={{
-        boxShadow: "outline",
-        borderColor: "gray.200",
-      }}
-      {...buttonProps}
-      {...props}
-    >
-      <Heading size="xs" marginBottom={4}>
-        <FormattedMessage
-          id="new-petition.empty-petition-header"
-          defaultMessage="Not finding what you're looking for?"
-        />
-      </Heading>
-      <AddIcon boxSize="36px" color="purple.500" marginBottom={4} />
-      <Heading size="xs">
-        <FormattedMessage
-          id="new-petition.empty-petition-create"
-          defaultMessage="Create a blank petition"
-        />
-      </Heading>
-    </Card>
-  );
-});
 
 NewPetition.fragments = {
   get PetitionTemplate() {
@@ -726,7 +425,7 @@ NewPetition.getInitialProps = async ({
       {
         variables: {
           offset: 0,
-          limit: 6,
+          limit: 20,
           search: null,
           locale: null,
         },
@@ -761,7 +460,7 @@ NewPetition.getInitialProps = async ({
       {
         variables: {
           offset: 0,
-          limit: 2,
+          limit: 20,
           search: null,
           filters: {
             locale: null,
