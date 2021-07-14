@@ -40,7 +40,6 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -204,8 +203,8 @@ function NewPetition() {
   const createPetition = useCreatePetition();
   const goToPetition = useGoToPetition();
   const showTemplateDetails = useTemplateDetailsDialog();
-  const handleTemplateClick = useMemoFactory(
-    (templateId: string | null) => async () => {
+  const handleTemplateClick = useCallback(
+    async (templateId: string | null) => {
       try {
         if (templateId) {
           await showTemplateDetails(templateId, me.id);
