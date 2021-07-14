@@ -1,9 +1,9 @@
-import * as Sentry from "@sentry/node";
 import { RewriteFrames } from "@sentry/integrations";
+import * as Sentry from "@sentry/node";
 
 export const init = () => {
   const integrations = [];
-  if (!process.browser) {
+  if (typeof window === "undefined") {
     // For Node.js, rewrite Error.stack to use relative paths, so that source
     // maps starting with ~/_next map to files in Error.stack with path
     // app:///_next

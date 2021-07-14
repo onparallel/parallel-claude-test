@@ -33,9 +33,10 @@ export function I18nProvider({
   children,
   ...props
 }: I18nProps & { children: ReactNode }) {
-  const { locale, messages, setLocale } = process.browser
-    ? useTranslations()
-    : (props as I18nProps & { setLocale: undefined });
+  const { locale, messages, setLocale } =
+    typeof window !== "undefined"
+      ? useTranslations()
+      : (props as I18nProps & { setLocale: undefined });
   return (
     <SetLocaleProvider.Provider value={setLocale}>
       <IntlProvider locale={locale} messages={messages}>

@@ -28,7 +28,7 @@ export type WithServerState<P> = P & {
 };
 
 export function redirect(context: NextPageContext, location: string) {
-  if (process.browser) {
+  if (typeof window !== "undefined") {
     Router.push(location);
   } else {
     context.res!.writeHead(302, { Location: location }).end();
@@ -77,7 +77,7 @@ export function withApolloData<P = {}>(
                       // On the browser we fetch from cache and fire a request
                       // that will update the cache when it arrives
                       const fetchPolicy =
-                        process.browser && !options?.ignoreCache
+                        typeof window !== "undefined" && !options?.ignoreCache
                           ? "cache-and-network"
                           : "network-only";
                       const subscription = apollo
@@ -102,7 +102,7 @@ export function withApolloData<P = {}>(
                 },
               })) ?? ({} as P);
 
-            if (process.browser) {
+            if (typeof window !== "undefined") {
               return {
                 ...props,
                 [SERVER_STATE]: {},

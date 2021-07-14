@@ -11,7 +11,7 @@ Redirect.getInitialProps = async (context: NextPageContext) => {
   // this only runs in development
   const url = context.query.url;
   const locale = negotiate(
-    process.browser
+    typeof window !== "undefined"
       ? navigator.languages
       : context.req!.headers["accept-language"]!,
     languages.map((l) => l.locale),

@@ -62,19 +62,22 @@ export function createApolloClient(
 ) {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections
-  if (process.browser && _cached) {
+  if (typeof window !== "undefined" && _cached) {
     return _cached;
   }
 
   const httpLink = createUploadLink({
-    uri: process.browser ? "/graphql" : "http://localhost:4000/graphql",
+    uri:
+      typeof window !== "undefined"
+        ? "/graphql"
+        : "http://localhost:4000/graphql",
   });
 
   const authLink = setContext((_, { headers, ...re }) => {
     return {
       headers: {
         ...headers,
-        ...(process.browser
+        ...(typeof window !== "undefined"
           ? {}
           : { cookie: filterCookies(req!.headers["cookie"]!) }),
       },
@@ -82,7 +85,7 @@ export function createApolloClient(
   });
 
   const authErrorHandler = onError(({ graphQLErrors, operation }) => {
-    if (process.browser) {
+    if (typeof window !== "undefined") {
       // CurrentUser is the operation used in the login page, if we dont
       // check for it we get into a redirect loop
       if (
@@ -96,7 +99,7 @@ export function createApolloClient(
 
   const client = new ApolloClient({
     link: from([authLink, authErrorHandler, httpLink]),
-    ssrMode: !process.browser,
+    ssrMode: typeof window === "undefined",
     cache: new InMemoryCache({
       dataIdFromObject: (o) => o.id as string,
       possibleTypes: fragmentMatcher.possibleTypes,
@@ -215,7 +218,7 @@ export function createApolloClient(
       },
     }).restore(initialState ?? {}),
     connectToDevTools:
-      process.browser && process.env.NODE_ENV === "development",
+      typeof window !== "undefined" && process.env.NODE_ENV === "development",
   });
   _cached = client;
   return client;

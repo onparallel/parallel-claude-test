@@ -5,7 +5,7 @@ export function useOnMediaQueryChange(
   mediaQuery: string,
   handler: (match: boolean) => void
 ) {
-  if (!process.browser) {
+  if (typeof window === "undefined") {
     return;
   }
 
