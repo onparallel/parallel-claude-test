@@ -33,7 +33,11 @@ export async function petitionClosedNotification(
     throw new Error(`User not found for user_id ${payload.user_id}`);
   }
 
-  const layoutProps = await getLayoutProps(sender.org_id, context);
+  const { emailFrom, ...layoutProps } = await getLayoutProps(
+    sender.org_id,
+    context
+  );
+
   const emails: EmailLog[] = [];
   for (const accessId of payload.petition_access_ids) {
     const access = await context.petitions.loadAccess(accessId);
@@ -53,7 +57,7 @@ export async function petitionClosedNotification(
       { locale: petition.locale }
     );
     const email = await context.emailLogs.createEmail({
-      from: buildFrom(from, context.config.misc.emailFrom),
+      from: buildFrom(from, emailFrom),
       to: contact!.email,
       subject,
       text,

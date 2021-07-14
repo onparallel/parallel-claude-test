@@ -40,7 +40,10 @@ export async function commentsContactNotification(
       `Access not found for petition_access_id ${payload.petition_access_id}`
     );
   }
-  const layoutProps = await getLayoutProps(petition.org_id, context);
+  const { emailFrom, ...layoutProps } = await getLayoutProps(
+    petition.org_id,
+    context
+  );
   const comments = _comments.filter(isDefined);
   const fieldIds = uniq(comments.map((c) => c!.petition_field_id));
   const _fields = (await context.petitions.loadField(fieldIds)).filter(
@@ -63,7 +66,7 @@ export async function commentsContactNotification(
     { locale: petition.locale }
   );
   const email = await context.emailLogs.createEmail({
-    from: buildFrom(from, context.config.misc.emailFrom),
+    from: buildFrom(from, emailFrom),
     to: contact.email,
     subject,
     text,

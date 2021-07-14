@@ -44,6 +44,11 @@ export async function petitionMessage(
       `Contact not found for petition_access.contact_id ${access.contact_id}`
     );
   }
+
+  const { emailFrom, ...layoutProps } = await getLayoutProps(
+    sender.org_id,
+    context
+  );
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const slate = slateParser({ contact, user: sender, petition });
   const { html, text, subject, from } = await buildEmail(
@@ -57,12 +62,12 @@ export async function petitionMessage(
       bodyPlainText: slate.toPlainText(bodyJson),
       deadline: petition.deadline,
       keycode: access.keycode,
-      ...(await getLayoutProps(sender.org_id, context)),
+      ...layoutProps,
     },
     { locale: petition.locale }
   );
   const email = await context.emailLogs.createEmail({
-    from: buildFrom(from, context.config.misc.emailFrom),
+    from: buildFrom(from, emailFrom),
     to: contact.email,
     subject,
     text,

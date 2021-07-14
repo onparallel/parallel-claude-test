@@ -38,6 +38,11 @@ export async function developerWebhookFailed(
     );
   }
 
+  const { emailFrom, ...layoutProps } = await getLayoutProps(
+    user.org_id,
+    context
+  );
+
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,
     {
@@ -45,13 +50,13 @@ export async function developerWebhookFailed(
       errorMessage: payload.error_message,
       subscriptionId: toGlobalId("Subscription", subscription.id),
       postBody: payload.post_body,
-      ...(await getLayoutProps(user.org_id, context)),
+      ...layoutProps,
     },
     { locale: petition.locale }
   );
 
   return await context.emailLogs.createEmail({
-    from: buildFrom(from, context.config.misc.emailFrom),
+    from: buildFrom(from, emailFrom),
     to: user.email,
     subject,
     text,

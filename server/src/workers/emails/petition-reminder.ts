@@ -73,6 +73,11 @@ export async function petitionReminder(
         isVisible && field.type !== "HEADING" && field.replies.length === 0
     );
 
+    const { emailFrom, ...layoutProps } = await getLayoutProps(
+      granter.org_id,
+      context
+    );
+
     const bodyJson = reminder.email_body
       ? JSON.parse(reminder.email_body)
       : null;
@@ -88,12 +93,12 @@ export async function petitionReminder(
         bodyPlainText: bodyJson ? slate.toPlainText(bodyJson) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
-        ...(await getLayoutProps(granter.org_id, context)),
+        ...layoutProps,
       },
       { locale: petition.locale }
     );
     const email = await context.emailLogs.createEmail({
-      from: buildFrom(from, context.config.misc.emailFrom),
+      from: buildFrom(from, emailFrom),
       to: contact.email,
       subject,
       text,

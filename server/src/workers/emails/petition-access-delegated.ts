@@ -54,6 +54,11 @@ export async function petitionAccessDelegated(
     throw new Error(`User with id ${originalAccess.granter_id} not found`);
   }
 
+  const { emailFrom, ...layoutProps } = await getLayoutProps(
+    petition.org_id,
+    context
+  );
+
   const { html, text, subject, from } = await buildEmail(
     AccessDelegatedEmail,
     {
@@ -69,13 +74,13 @@ export async function petitionAccessDelegated(
       bodyHtml: toHtml(payload.message_body),
       bodyPlainText: toPlainText(payload.message_body),
       keycode: newAccess.keycode,
-      ...(await getLayoutProps(petition.org_id, context)),
+      ...layoutProps,
     },
     { locale: petition.locale }
   );
 
   return await context.emailLogs.createEmail({
-    from: buildFrom(from, context.config.misc.emailFrom),
+    from: buildFrom(from, emailFrom),
     to: contact.email,
     subject,
     text,

@@ -40,7 +40,10 @@ export async function petitionSharingNotification(
   );
   const petitionsById = indexBy(petitions.filter(isDefined), (p) => p.id);
   const emails: EmailLog[] = [];
-  const layoutProps = await getLayoutProps(user.org_id, context);
+  const { emailFrom, ...layoutProps } = await getLayoutProps(
+    user.org_id,
+    context
+  );
 
   for (const permission of permissions) {
     if (permission) {
@@ -62,7 +65,7 @@ export async function petitionSharingNotification(
         { locale: petition.locale }
       );
       const email = await context.emailLogs.createEmail({
-        from: buildFrom(from, context.config.misc.emailFrom),
+        from: buildFrom(from, emailFrom),
         to: permissionUser.email,
         subject,
         text,

@@ -39,6 +39,12 @@ export async function contactAuthenticationRequest(
     );
   }
   const ua = request.user_agent ? new UAParser(request.user_agent) : null;
+
+  const { emailFrom, ...layoutProps } = await getLayoutProps(
+    petition.org_id,
+    context
+  );
+
   const { html, text, subject, from } = await buildEmail(
     ContactAuthenticationRequest,
     {
@@ -46,12 +52,12 @@ export async function contactAuthenticationRequest(
       code: request.code,
       browserName: ua?.getBrowser()?.name ?? "Unknown",
       osName: ua?.getOS()?.name ?? "Unknown",
-      ...(await getLayoutProps(petition.org_id, context)),
+      ...layoutProps,
     },
     { locale: petition.locale }
   );
   const email = await context.emailLogs.createEmail({
-    from: buildFrom(from, context.config.misc.emailFrom),
+    from: buildFrom(from, emailFrom),
     to: contact.email,
     subject,
     text,

@@ -387,6 +387,7 @@ export interface Organization {
   deleted_by: Maybe<string>; // varchar
   public_file_logo_id: Maybe<number>; // int4
   custom_host: Maybe<string>; // varchar
+  custom_email_from: Maybe<string>; // varchar
 }
 
 export type CreateOrganization = PartialProps<
@@ -399,6 +400,7 @@ export type CreateOrganization = PartialProps<
   | "deleted_by"
   | "public_file_logo_id"
   | "custom_host"
+  | "custom_email_from"
 >;
 
 export interface OrgIntegration {

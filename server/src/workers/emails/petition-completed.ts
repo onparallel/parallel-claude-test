@@ -58,7 +58,10 @@ export async function petitionCompleted(
     return;
   }
 
-  const layoutProps = await getLayoutProps(petition.org_id, context);
+  const { emailFrom, ...layoutProps } = await getLayoutProps(
+    petition.org_id,
+    context
+  );
 
   const fieldIds = fields.map((f) => f.id);
   const fieldReplies = await context.petitions.loadRepliesForField(fieldIds);
@@ -102,7 +105,7 @@ export async function petitionCompleted(
     );
     emails.push(
       await context.emailLogs.createEmail({
-        from: buildFrom(from, context.config.misc.emailFrom),
+        from: buildFrom(from, emailFrom),
         to: user!.email,
         subject,
         text,

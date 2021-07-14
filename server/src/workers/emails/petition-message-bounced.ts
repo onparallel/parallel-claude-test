@@ -46,6 +46,11 @@ export async function petitionMessageBounced(
     );
   }
 
+  const { emailFrom, ...layoutProps } = await getLayoutProps(
+    sender.org_id,
+    context
+  );
+
   const slate = slateParser({ contact, user: sender, petition });
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const { html, text, subject, from } = await buildEmail(
@@ -58,13 +63,13 @@ export async function petitionMessageBounced(
       bodyHtml: slate.toHtml(bodyJson),
       bodyPlainText: slate.toPlainText(bodyJson),
       contactEmail: contact.email,
-      ...(await getLayoutProps(sender.org_id, context)),
+      ...layoutProps,
     },
     { locale: petition.locale }
   );
 
   return await context.emailLogs.createEmail({
-    from: buildFrom(from, context.config.misc.emailFrom),
+    from: buildFrom(from, emailFrom),
     to: sender.email,
     subject,
     text,
