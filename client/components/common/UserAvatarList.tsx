@@ -83,7 +83,6 @@ export const UserAvatarList = Object.assign(
           return (
             <Tooltip key={u.id} label={label} isDisabled={!name}>
               <Box
-                paddingY={1}
                 marginY={-1}
                 marginRight={-2}
                 sx={{
@@ -93,22 +92,15 @@ export const UserAvatarList = Object.assign(
                   },
                 }}
               >
-                <Box
-                  border="2px solid"
-                  borderColor="white"
-                  borderRadius="full"
-                  transition="transform 150ms ease"
-                  position="relative"
+                <Avatar
+                  size="xs"
+                  name={name ?? undefined}
+                  transitionProperty="transform"
+                  transitionDuration="150ms"
                   boxSize={7}
-                  overflow="hidden"
-                >
-                  <Avatar
-                    size="xs"
-                    name={name ?? undefined}
-                    boxSize="100%"
-                    borderRadius="none"
-                  />
-                </Box>
+                  borderWidth="2px"
+                  borderColor="white"
+                />
               </Box>
             </Tooltip>
           );
