@@ -48,7 +48,7 @@ export const NewPetitionPublicTemplatesHeader = ({
     <Stack spacing={4}>
       <NewPetitionSearch search={search} handleSearchChange={onSearchChange}>
         <NewPetitionLanguageFilter
-          key={locale}
+          locale={locale}
           onFilterChange={onLocaleChange}
           backgroundColor="white"
         />

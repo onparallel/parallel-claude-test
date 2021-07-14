@@ -15,12 +15,12 @@ import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useIntl } from "react-intl";
 
 export interface NewPetitionLanguageFilterProps extends MenuButtonProps {
-  key: Maybe<PetitionLocale>;
+  locale: Maybe<PetitionLocale>;
   onFilterChange: (args: Maybe<PetitionLocale>) => void;
 }
 
 export function NewPetitionLanguageFilter({
-  key,
+  locale,
   onFilterChange,
   ...props
 }: NewPetitionLanguageFilterProps) {
@@ -47,12 +47,12 @@ export function NewPetitionLanguageFilter({
         rightIcon={<ChevronDownIcon />}
         {...props}
       >
-        {locales.find((locale) => locale.key === key)?.localizedLabel ??
+        {locales.find((l) => l.key === locale)?.localizedLabel ??
           locales[0].localizedLabel}
       </MenuButton>
       <Portal>
         <MenuList>
-          <MenuOptionGroup value={key ?? "all"}>
+          <MenuOptionGroup value={locale ?? "all"}>
             {locales.map((locale) => (
               <MenuItemOption
                 key={locale.key}

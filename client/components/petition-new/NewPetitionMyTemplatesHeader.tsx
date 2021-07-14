@@ -19,7 +19,7 @@ export const NewPetitionMyTemplatesHeader = ({
     <Stack>
       <NewPetitionSearch search={search} handleSearchChange={onSearchChange}>
         <NewPetitionLanguageFilter
-          key={locale}
+          locale={locale}
           onFilterChange={onLocaleChange}
           backgroundColor="white"
         />

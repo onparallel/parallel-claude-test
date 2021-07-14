@@ -126,10 +126,7 @@ function NewPetition() {
 
   const handleLocaleChange = useCallback(
     (locale: Maybe<PetitionLocale>) => {
-      console.log("handleLocaleChange: ", locale);
-
       setLocale(locale);
-
       debouncedTemplatesRefetch.immediate({
         offset: 0,
         limit: 20,
