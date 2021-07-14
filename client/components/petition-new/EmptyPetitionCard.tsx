@@ -45,8 +45,8 @@ export const EmptyPetitionCard = memo(function EmptyPetitionCard({
       <AddIcon boxSize="36px" color="purple.500" marginBottom={4} />
       <Heading size="xs">
         <FormattedMessage
-          id="new-petition.empty-petition-create"
-          defaultMessage="Create a blank petition"
+          id="new-petition.create-new-template"
+          defaultMessage="Create new template"
         />
       </Heading>
     </Card>

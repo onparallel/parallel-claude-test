@@ -218,12 +218,15 @@ function NewPetition() {
     [goToPetition, showTemplateDetails, createPetition]
   );
 
-  const handleCreatePetitionTemplate = useCallback(async () => {
-    try {
-      const id = await createPetition({ type: "TEMPLATE" });
-      goToPetition(id, "compose");
-    } catch {}
-  }, [goToPetition, createPetition]);
+  const handleCreatePetitionTemplate = useCallback(
+    async (type = "TEMPLATE") => {
+      try {
+        const id = await createPetition({ type });
+        goToPetition(id, "compose");
+      } catch {}
+    },
+    [goToPetition, createPetition]
+  );
 
   const selectTabStyles = {
     color: "blue.500",
@@ -269,11 +272,11 @@ function NewPetition() {
                 alignSelf="flex-end"
                 borderColor="gray.100"
                 leftIcon={<AddIcon fontSize="12px" />}
-                onClick={handleCreatePetitionTemplate}
+                onClick={() => handleCreatePetitionTemplate("PETITION")}
               >
                 <FormattedMessage
-                  id="new-petition.create-new-template"
-                  defaultMessage="Create new template"
+                  id="new-petition.empty-petition-create"
+                  defaultMessage="Create a blank petition"
                 />
               </Button>
             </Flex>
