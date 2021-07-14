@@ -244,7 +244,7 @@ function NewPetition() {
       })}
       user={me}
     >
-      <Container maxWidth="container.xl" padding={10}>
+      <Container maxWidth="container.xl" paddingY={10} paddingX={6}>
         <Tabs defaultIndex={templates.length === 0 && !hasTemplates ? 1 : 0}>
           <TabList flexWrap="wrap-reverse">
             <Tab
