@@ -6,6 +6,7 @@ import {
   AspectRatio,
   Heading,
   Stack,
+  Flex,
 } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { useIntl } from "react-intl";
@@ -43,7 +44,19 @@ export function PublicHero({
         marginLeft={{ base: 8, [breakpoint]: 20 }}
         marginRight={{ base: 8, [breakpoint]: 0 }}
       >
-        <Stack spacing={8}>
+        <Flex flexDirection="column">
+          {sectionTitle ? (
+            <Heading
+              as="h4"
+              size="xs"
+              lineHeight="24px"
+              color="gray.600"
+              textTransform="uppercase"
+              marginTop={4}
+            >
+              {sectionTitle}
+            </Heading>
+          ) : null}
           <Heading
             as="h1"
             fontFamily="hero"
@@ -51,24 +64,12 @@ export function PublicHero({
             size={sectionTitle ? "2xl" : "3xl"}
             lineHeight="1.2"
           >
-            {sectionTitle ? (
-              <Heading
-                as="h4"
-                size="xs"
-                lineHeight="24px"
-                color="gray.600"
-                textTransform="uppercase"
-                marginTop={4}
-              >
-                {sectionTitle}
-              </Heading>
-            ) : null}
             {title}
           </Heading>
-          <Heading as="h2" size="md" fontWeight="light">
+          <Heading as="h2" size="md" fontWeight="light" paddingTop={8}>
             {subtitle}
           </Heading>
-          <Box>
+          <Box paddingTop={8}>
             <NakedLink href={url}>
               <Button
                 as="a"
@@ -81,7 +82,7 @@ export function PublicHero({
               </Button>
             </NakedLink>
           </Box>
-        </Stack>
+        </Flex>
       </Center>
       <AspectRatio
         ratio={ratio}

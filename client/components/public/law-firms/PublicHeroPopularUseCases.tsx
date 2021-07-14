@@ -12,6 +12,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         textAlign: "center",
         backgroundColor: "white",
       }}
+      maxWidth="container.lg"
     >
       <Heading as="h2" size="xl" fontWeight="bold">
         <FormattedMessage

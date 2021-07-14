@@ -20,7 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { CircleCheckIcon } from "@parallel/chakra/icons";
 
-function LawFirms() {
+function Accounting() {
   const intl = useIntl();
   const { query } = useRouter();
 
@@ -286,4 +286,4 @@ export function getStaticPaths() {
   };
 }
 
-export default LawFirms;
+export default Accounting;
