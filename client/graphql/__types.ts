@@ -1979,6 +1979,8 @@ export interface Query {
   contactsByEmail: Array<Maybe<Contact>>;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
+  /** Get users or groups from IDs */
+  getUsersOrGroups: Array<UserOrUserGroup>;
   /** Decodes the given Global ID into an entity in the database. */
   globalIdDecode: SupportMethodResponse;
   /** Encodes the given ID into a Global ID. */
@@ -2028,6 +2030,10 @@ export interface QuerycontactsByEmailArgs {
 
 export interface QueryemailIsAvailableArgs {
   email: Scalars["String"];
+}
+
+export interface QuerygetUsersOrGroupsArgs {
+  ids: Array<Scalars["ID"]>;
 }
 
 export interface QueryglobalIdDecodeArgs {
@@ -2839,6 +2845,17 @@ export type useSearchUsers_searchUsersQueryVariables = Exact<{
 
 export type useSearchUsers_searchUsersQuery = {
   searchUsers: Array<
+    | ({ __typename?: "User" } & UserSelect_UserFragment)
+    | ({ __typename?: "UserGroup" } & UserSelect_UserGroupFragment)
+  >;
+};
+
+export type useGetUsersOrGroupsQueryVariables = Exact<{
+  ids: Array<Scalars["ID"]> | Scalars["ID"];
+}>;
+
+export type useGetUsersOrGroupsQuery = {
+  getUsersOrGroups: Array<
     | ({ __typename?: "User" } & UserSelect_UserFragment)
     | ({ __typename?: "UserGroup" } & UserSelect_UserGroupFragment)
   >;
@@ -9679,6 +9696,50 @@ export type useSearchUsers_searchUsersQueryHookResult = ReturnType<
 >;
 export type useSearchUsers_searchUsersLazyQueryHookResult = ReturnType<
   typeof useuseSearchUsers_searchUsersLazyQuery
+>;
+export const useGetUsersOrGroupsDocument = gql`
+  query useGetUsersOrGroups($ids: [ID!]!) {
+    getUsersOrGroups(ids: $ids) {
+      ... on User {
+        ...UserSelect_User
+      }
+      ... on UserGroup {
+        ...UserSelect_UserGroup
+      }
+    }
+  }
+  ${UserSelect_UserFragmentDoc}
+  ${UserSelect_UserGroupFragmentDoc}
+`;
+export function useuseGetUsersOrGroupsQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    useGetUsersOrGroupsQuery,
+    useGetUsersOrGroupsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    useGetUsersOrGroupsQuery,
+    useGetUsersOrGroupsQueryVariables
+  >(useGetUsersOrGroupsDocument, options);
+}
+export function useuseGetUsersOrGroupsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    useGetUsersOrGroupsQuery,
+    useGetUsersOrGroupsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    useGetUsersOrGroupsQuery,
+    useGetUsersOrGroupsQueryVariables
+  >(useGetUsersOrGroupsDocument, options);
+}
+export type useGetUsersOrGroupsQueryHookResult = ReturnType<
+  typeof useuseGetUsersOrGroupsQuery
+>;
+export type useGetUsersOrGroupsLazyQueryHookResult = ReturnType<
+  typeof useuseGetUsersOrGroupsLazyQuery
 >;
 export const WithAdminOrganizationRoleDocument = gql`
   query WithAdminOrganizationRole {

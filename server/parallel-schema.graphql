@@ -2853,6 +2853,11 @@ type Query {
   emailIsAvailable(email: String!): Boolean!
 
   """
+  Get users or groups from IDs
+  """
+  getUsersOrGroups(ids: [ID!]!): [UserOrUserGroup!]!
+
+  """
   Decodes the given Global ID into an entity in the database.
   """
   globalIdDecode(

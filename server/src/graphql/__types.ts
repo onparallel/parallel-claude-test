@@ -1230,6 +1230,7 @@ export interface NexusGenFieldTypes {
     contacts: NexusGenRootTypes["ContactPagination"]; // ContactPagination!
     contactsByEmail: Array<NexusGenRootTypes["Contact"] | null>; // [Contact]!
     emailIsAvailable: boolean; // Boolean!
+    getUsersOrGroups: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     me: NexusGenRootTypes["User"]; // User!
@@ -2187,6 +2188,7 @@ export interface NexusGenFieldTypeNames {
     contacts: "ContactPagination";
     contactsByEmail: "Contact";
     emailIsAvailable: "Boolean";
+    getUsersOrGroups: "UserOrUserGroup";
     globalIdDecode: "SupportMethodResponse";
     globalIdEncode: "SupportMethodResponse";
     me: "User";
@@ -3088,6 +3090,10 @@ export interface NexusGenArgTypes {
     emailIsAvailable: {
       // args
       email: string; // String!
+    };
+    getUsersOrGroups: {
+      // args
+      ids: string[]; // [ID!]!
     };
     globalIdDecode: {
       // args

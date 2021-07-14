@@ -2,6 +2,8 @@ import { gql, useApolloClient } from "@apollo/client";
 import { Box, Image, Stack, Text } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import {
+  useGetUsersOrGroupsQuery,
+  useGetUsersOrGroupsQueryVariables,
   UserSelect_UserFragment,
   UserSelect_UserGroupFragment,
   useSearchUsers_searchUsersQuery,
@@ -11,8 +13,8 @@ import {
   useReactSelectProps,
   UseReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
-import { CustomAsyncSelectProps } from "@parallel/utils/react-select/types";
-import { unMaybeArray } from "@parallel/utils/types";
+import { MaybeArray, unMaybeArray } from "@parallel/utils/types";
+import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import {
   ForwardedRef,
   forwardRef,
@@ -21,10 +23,12 @@ import {
   RefAttributes,
   useCallback,
   useMemo,
+  useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components } from "react-select";
 import AsyncSelect, { Props as AsyncSelectProps } from "react-select/async";
+import { indexBy, zip } from "remeda";
 import { NormalLink } from "./Link";
 import { UserListPopover } from "./UserListPopover";
 
@@ -37,12 +41,49 @@ export type UserSelectInstance<
   IncludeGroups extends boolean = false
 > = AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>;
 
+const fragments = {
+  get User() {
+    return gql`
+      fragment UserSelect_User on User {
+        id
+        fullName
+        email
+      }
+    `;
+  },
+  get UserGroup() {
+    return gql`
+      fragment UserSelect_UserGroup on UserGroup {
+        id
+        name
+        members {
+          user {
+            ...UserSelect_User
+          }
+        }
+      }
+      ${this.User}
+    `;
+  },
+};
+
 interface UserSelectProps<
   IsMulti extends boolean = false,
   IncludeGroups extends boolean = false
 > extends UseReactSelectProps,
-    CustomAsyncSelectProps<UserSelectSelection<IncludeGroups>, IsMulti, never> {
+    Omit<
+      AsyncSelectProps<UserSelectSelection<IncludeGroups>, IsMulti, never>,
+      "value" | "onChange" | "options"
+    > {
   isMulti?: IsMulti;
+  value: IsMulti extends true
+    ? UserSelectSelection<IncludeGroups>[] | string[]
+    : UserSelectSelection<IncludeGroups> | string;
+  onChange: (
+    value: IsMulti extends true
+      ? UserSelectSelection<IncludeGroups>[]
+      : UserSelectSelection<IncludeGroups> | null
+  ) => void;
   includeGroups?: IncludeGroups;
   onSearch: (
     search: string,
@@ -65,10 +106,23 @@ export const UserSelect = Object.assign(
     }: UserSelectProps<IsMulti, IncludeGroups>,
     ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups>>
   ) {
+    const needsLoading =
+      typeof value === "string" ||
+      (Array.isArray(value) && typeof value[0] === "string");
+    const getUsersOrGroups = useGetUsersOrGroups();
+    const _value = useAsyncMemo(async () => {
+      if (needsLoading) {
+        return await getUsersOrGroups(value as any);
+      }
+    }, [
+      needsLoading,
+      needsLoading ? unMaybeArray(value as any).join(",") : null,
+    ]);
+
     const loadOptions = useCallback(
       async (search) => {
         const items = unMaybeArray(
-          value ?? []
+          _value ?? []
         ) as UserSelectSelection<IncludeGroups>[];
         return await onSearch(
           search,
@@ -80,7 +134,7 @@ export const UserSelect = Object.assign(
             .map((item) => item.id)
         );
       },
-      [onSearch, value]
+      [onSearch, _value]
     );
 
     const reactSelectProps = useUserSelectReactSelectProps<
@@ -91,7 +145,7 @@ export const UserSelect = Object.assign(
     return (
       <AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>
         ref={ref}
-        value={value}
+        value={_value}
         onChange={onChange as any}
         isMulti={isMulti ?? (false as any)}
         loadOptions={loadOptions}
@@ -105,33 +159,7 @@ export const UserSelect = Object.assign(
     props: UserSelectProps<IsMulti, IncludeGroups> &
       RefAttributes<UserSelectInstance<IsMulti, IncludeGroups>>
   ) => ReactElement | null,
-  {
-    fragments: {
-      get User() {
-        return gql`
-          fragment UserSelect_User on User {
-            id
-            fullName
-            email
-          }
-        `;
-      },
-      get UserGroup() {
-        return gql`
-          fragment UserSelect_UserGroup on UserGroup {
-            id
-            name
-            members {
-              user {
-                ...UserSelect_User
-              }
-            }
-          }
-          ${this.User}
-        `;
-      },
-    },
-  }
+  { fragments }
 );
 
 type AsyncUserSelectProps<
@@ -396,4 +424,71 @@ export function useSearchUsers() {
     },
     []
   );
+}
+
+function useGetUsersOrGroups() {
+  const client = useApolloClient();
+  return useCallback(async (ids: MaybeArray<string>) => {
+    const _ids = unMaybeArray(ids);
+    const fromCache = zip(
+      _ids,
+      _ids.map((id) => {
+        const user = client.readFragment<UserSelect_UserFragment>({
+          fragment: fragments.User,
+          id,
+        });
+        if (user?.__typename === "User") {
+          return user;
+        }
+        const userGroup = client.readFragment<UserSelect_UserGroupFragment>({
+          fragment: fragments.UserGroup,
+          id,
+          fragmentName: "UserSelect_UserGroup",
+        });
+        if (userGroup?.__typename === "UserGroup") {
+          return userGroup;
+        }
+        return null;
+      })
+    );
+    const missing = fromCache
+      .filter(([, value]) => value === null)
+      .map(([id]) => id);
+    if (missing.length) {
+      const fromServer = await client.query<
+        useGetUsersOrGroupsQuery,
+        useGetUsersOrGroupsQueryVariables
+      >({
+        query: gql`
+          query useGetUsersOrGroups($ids: [ID!]!) {
+            getUsersOrGroups(ids: $ids) {
+              ... on User {
+                ...UserSelect_User
+              }
+              ... on UserGroup {
+                ...UserSelect_UserGroup
+              }
+            }
+          }
+          ${fragments.User}
+          ${fragments.UserGroup}
+        `,
+        variables: {
+          ids: missing,
+        },
+        fetchPolicy: "network-only",
+      });
+      const fromServerById = indexBy(
+        fromServer.data.getUsersOrGroups,
+        (x) => x.id
+      );
+      const result = fromCache.map(
+        ([id, value]) => value ?? fromServerById[id]!
+      );
+      return Array.isArray(ids) ? result : result[0];
+    } else {
+      const result = fromCache.map(([, value]) => value!);
+      return Array.isArray(ids) ? result : result[0];
+    }
+  }, []);
 }

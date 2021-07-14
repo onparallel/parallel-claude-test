@@ -1,10 +1,15 @@
 import {
   booleanArg,
+  idArg,
   list,
   nonNull,
   queryField,
   stringArg,
 } from "@nexus/schema";
+import { ForbiddenError } from "apollo-server-express";
+import { zip } from "remeda";
+import { partition } from "../../util/arrays";
+import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
 import {
   authenticate,
   authenticateAnd,
@@ -68,5 +73,33 @@ export const searchUsers = queryField("searchUsers", {
       excludeUsers: excludeUsers ?? [],
       excludeUserGroups: excludeUserGroups ?? [],
     });
+  },
+});
+
+export const getUsersOrGroups = queryField("getUsersOrGroups", {
+  type: list("UserOrUserGroup"),
+  description: "Get users or groups from IDs",
+  authorize: authenticate(),
+  args: {
+    ids: nonNull(list(nonNull(idArg()))),
+  },
+  resolve: async (_, { ids }, ctx) => {
+    const decoded = ids.map((id) => fromGlobalId(id));
+    const result = await Promise.all(
+      decoded.map(async ({ type, id }) =>
+        type === "User"
+          ? { __type: "User" as const, ...(await ctx.users.loadUser(id))! }
+          : {
+              __type: "UserGroup" as const,
+              ...(await ctx.userGroups.loadUserGroup(id))!,
+            }
+      )
+    );
+    for (const item of result) {
+      if (item.org_id !== ctx.user!.org_id) {
+        throw new ForbiddenError("Not authorized");
+      }
+    }
+    return result;
   },
 });

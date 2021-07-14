@@ -10,6 +10,11 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
+import {
+  flatShared,
+  unflatShared,
+} from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
+import { SharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/types";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
   PetitionBaseType,
@@ -26,13 +31,13 @@ import {
   assertQuery,
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/assertQuery";
+import { fromBase64, toBase64 } from "@parallel/utils/base64";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
-  filtering,
   integer,
   parseQuery,
   QueryItem,
@@ -44,6 +49,7 @@ import {
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { mapValues } from "remeda";
 
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 
@@ -340,6 +346,40 @@ function Petitions() {
         />
       </Flex>
     </AppLayout>
+  );
+}
+
+export function filtering() {
+  return new QueryItem<{ sharedWith?: SharedWithFilter }>(
+    (value) => {
+      if (value && typeof value === "string") {
+        const decoded = JSON.parse(
+          fromBase64(
+            value.replaceAll("-", "+").replaceAll("_", "/").replaceAll(".", "=")
+          )
+        );
+        return mapValues(decoded, (value, key) => {
+          switch (key) {
+            case "sharedWith":
+              return unflatShared(value);
+          }
+        });
+      }
+      return null;
+    },
+    (filters) => {
+      if (!filters) return "";
+      const flattened = mapValues(filters, (value, key) => {
+        switch (key) {
+          case "sharedWith":
+            return flatShared(value!);
+        }
+      });
+      return toBase64(JSON.stringify(flattened))
+        .replaceAll("+", "-")
+        .replaceAll("/", "_")
+        .replaceAll("=", ".");
+    }
   );
 }
 

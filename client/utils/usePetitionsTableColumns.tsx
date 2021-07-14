@@ -10,7 +10,7 @@ import { PetitionStatusCellContent } from "@parallel/components/common/PetitionS
 import { PetitionTagListCellContent } from "@parallel/components/common/PetitionTagListCellContent";
 import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
-import { PetitionListSharedByFilterContainer } from "@parallel/components/petition-list/filters/PetitionListSharedByFilterContainer";
+import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
 import {
   PetitionBaseType,
   usePetitionsTableColumns_PetitionBaseFragment,
@@ -192,7 +192,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
             defaultMessage: "Shared with",
           }),
           isFilterable: true,
-          Filter: PetitionListSharedByFilterContainer,
+          Filter: PetitionListSharedWithFilter,
           align: "left",
           cellProps: { width: "1%" },
           CellContent: ({ row: { permissions }, column }) => (
