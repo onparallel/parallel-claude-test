@@ -228,10 +228,10 @@ function NewPetition() {
   );
 
   const selectTabStyles = {
-    color: "blue.500",
+    color: "blue.600",
     fontWeight: "semibold",
     borderBottom: "2px solid",
-    borderColor: "blue.500",
+    borderColor: "blue.600",
   };
 
   return (
@@ -269,7 +269,6 @@ function NewPetition() {
             <Flex flex="1" justifyContent="flex-end" paddingBottom={4}>
               <Button
                 alignSelf="flex-end"
-                borderColor="gray.100"
                 leftIcon={<AddIcon fontSize="12px" />}
                 onClick={() => handleCreatePetitionTemplate("PETITION")}
               >

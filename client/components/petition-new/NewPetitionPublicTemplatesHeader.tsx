@@ -45,7 +45,7 @@ export const NewPetitionPublicTemplatesHeader = ({
   );
 
   return (
-    <Stack spacing={4}>
+    <Stack spacing={4} paddingX={6}>
       <NewPetitionSearch search={search} handleSearchChange={onSearchChange}>
         <NewPetitionLanguageFilter
           locale={locale}
