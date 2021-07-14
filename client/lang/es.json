@@ -1426,8 +1426,8 @@
   },
   {
     "term": "component.petition-settings.restrict-editing-description",
-    "definition": "Permite limitar la edición de los campos de la petición.",
-    "context": "Allows to limit edition in the petition fields."
+    "definition": "Activa esta opción para prevenir que otros usuarios hagan cambios accidentalmente en esta petición.",
+    "context": "Enable this option to prevent users from accidentally making changes to this petition."
   },
   {
     "term": "component.petition-settings.skip-forward-security",

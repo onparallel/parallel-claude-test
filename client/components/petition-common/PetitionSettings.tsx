@@ -263,7 +263,7 @@ function _PetitionSettings({
         help={
           <FormattedMessage
             id="component.petition-settings.restrict-editing-description"
-            defaultMessage="Allows to limit edition in the petition fields."
+            defaultMessage="Enable this option to prevent users from accidentally making changes to this petition."
           />
         }
         isChecked={petition.isReadOnly}

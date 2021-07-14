@@ -1426,8 +1426,8 @@
   },
   {
     "term": "component.petition-settings.restrict-editing-description",
-    "definition": "Allows to limit edition in the petition fields.",
-    "context": "Allows to limit edition in the petition fields."
+    "definition": "Enable this option to prevent users from accidentally making changes to this petition.",
+    "context": "Enable this option to prevent users from accidentally making changes to this petition."
   },
   {
     "term": "component.petition-settings.skip-forward-security",
