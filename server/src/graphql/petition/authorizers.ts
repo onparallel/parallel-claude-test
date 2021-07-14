@@ -1,10 +1,10 @@
-import { Arg } from "../helpers/authorize";
-import { unMaybeArray } from "../../util/arrays";
-import { FeatureFlagName, PetitionPermissionType } from "../../db/__types";
-import { MaybeArray } from "../../util/types";
 import { FieldAuthorizeResolver } from "@nexus/schema/dist/plugins/fieldAuthorizePlugin";
 import { countBy } from "remeda";
+import { FeatureFlagName, PetitionPermissionType } from "../../db/__types";
+import { unMaybeArray } from "../../util/arrays";
 import { isDefined } from "../../util/remedaExtensions";
+import { MaybeArray } from "../../util/types";
+import { Arg } from "../helpers/authorize";
 
 export function userHasAccessToPetitions<
   TypeName extends string,
@@ -106,6 +106,21 @@ export function petitionsArePublicTemplates<
     try {
       const templateIds = args[argName];
       return await ctx.petitions.arePublicTemplates(templateIds);
+    } catch {}
+    return false;
+  };
+}
+
+export function petitionsAreOfTypePetition<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const petitionIds = unMaybeArray(args[argName] as MaybeArray<number>);
+      const petitions = await ctx.petitions.loadPetition(petitionIds);
+      return petitions.every((p) => p && !p.is_template);
     } catch {}
     return false;
   };

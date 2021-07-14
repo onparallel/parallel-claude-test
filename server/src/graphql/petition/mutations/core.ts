@@ -80,6 +80,7 @@ import {
   messageBelongToPetition,
   petitionHasRepliableFields,
   petitionsAreEditable,
+  petitionsAreOfTypePetition,
   petitionsArePublicTemplates,
   repliesBelongsToField,
   repliesBelongsToPetition,
@@ -439,10 +440,15 @@ export const updatePetition = mutationField("updatePetition", {
         args.data.locale,
         args.data.hasCommentsEnabled,
         args.data.description,
-        args.data.emailSubject,
-        args.data.emailBody,
       ],
       petitionsAreEditable("petitionId")
+    ),
+    ifSomeDefined(
+      (args) => [args.data.emailBody, args.data.emailSubject],
+      or(
+        petitionsAreEditable("petitionId"),
+        petitionsAreOfTypePetition("petitionId")
+      )
     )
   ),
   args: {
