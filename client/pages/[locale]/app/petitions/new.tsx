@@ -209,7 +209,7 @@ function NewPetition() {
         if (templateId) {
           await showTemplateDetails(templateId, me.id);
         } else {
-          const id = await createPetition();
+          const id = await createPetition({ type: "TEMPLATE" });
           goToPetition(id, "compose");
         }
       } catch {}
@@ -311,7 +311,7 @@ function NewPetition() {
                     variant="ghost"
                     colorScheme="purple"
                     size="sm"
-                    onClick={handleCreatePetitionTemplate}
+                    onClick={() => handleCreatePetitionTemplate()}
                   >
                     <FormattedMessage
                       id="new-petition.create-new-template"
