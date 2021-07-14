@@ -51,7 +51,8 @@ export const NewPetitionTemplatesList = ({
             lg: "repeat(3, 1fr)",
           }}
           gap={4}
-          padding={4}
+          paddingTop={4}
+          paddingX={6}
           paddingBottom={12}
         >
           {!isPublic && items.length ? (

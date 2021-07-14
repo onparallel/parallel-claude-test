@@ -16,7 +16,7 @@ export const NewPetitionMyTemplatesHeader = ({
   onLocaleChange: (args: Maybe<PetitionLocale>) => void;
 }) => {
   return (
-    <Stack>
+    <Stack paddingX={6}>
       <NewPetitionSearch search={search} handleSearchChange={onSearchChange}>
         <NewPetitionLanguageFilter
           locale={locale}
