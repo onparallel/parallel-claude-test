@@ -1,8 +1,17 @@
-import { Box, Center, Grid, Spinner } from "@chakra-ui/react";
+import { Box, BoxProps, Center, Grid, Spinner } from "@chakra-ui/react";
 import { NewPetition_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { EmptyPetitionCard } from "./EmptyPetitionCard";
 import { TemplateCard } from "./TemplateCard";
+
+export interface NewPetitionTemplatesListProps extends BoxProps {
+  items: NewPetition_PetitionTemplateFragment[];
+  isPublic: boolean;
+  onLoadMore: () => void;
+  hasMore: boolean;
+  onClickTemplate: (args: Maybe<string>) => void;
+}
 
 export const NewPetitionTemplatesList = ({
   items,
@@ -11,8 +20,7 @@ export const NewPetitionTemplatesList = ({
   hasMore,
   onClickTemplate,
   ...props
-}) => {
-  console.log(items);
+}: NewPetitionTemplatesListProps) => {
   return (
     <Box pt={4} {...props}>
       <InfiniteScroll
@@ -49,14 +57,14 @@ export const NewPetitionTemplatesList = ({
           {!isPublic && items.length ? (
             <EmptyPetitionCard
               id="empty-petition-card"
-              onPress={onClickTemplate(null)}
+              onPress={() => onClickTemplate(null)}
             />
           ) : null}
           {items.map((template: NewPetition_PetitionTemplateFragment) => (
             <TemplateCard
               key={template.id}
               template={template}
-              onPress={onClickTemplate(template.id)}
+              onPress={() => onClickTemplate(template.id)}
             />
           ))}
         </Grid>

@@ -2,16 +2,28 @@ import {
   Button,
   Menu,
   MenuButton,
+  MenuButtonProps,
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
   Portal,
 } from "@chakra-ui/react";
 import { ChevronDownIcon } from "@parallel/chakra/icons";
+import { PetitionLocale } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 import { useIntl } from "react-intl";
 
-export function NewPetitionLanguageFilter({ value, onFilterChange, ...props }) {
+export interface NewPetitionLanguageFilterProps extends MenuButtonProps {
+  key: Maybe<PetitionLocale>;
+  onFilterChange: (args: Maybe<PetitionLocale>) => void;
+}
+
+export function NewPetitionLanguageFilter({
+  key,
+  onFilterChange,
+  ...props
+}: NewPetitionLanguageFilterProps) {
   const intl = useIntl();
   let locales = useSupportedLocales();
 
@@ -35,18 +47,20 @@ export function NewPetitionLanguageFilter({ value, onFilterChange, ...props }) {
         rightIcon={<ChevronDownIcon />}
         {...props}
       >
-        {locales.find((locale) => locale.key === value)?.localizedLabel ??
+        {locales.find((locale) => locale.key === key)?.localizedLabel ??
           locales[0].localizedLabel}
       </MenuButton>
       <Portal>
         <MenuList>
-          <MenuOptionGroup value={value ?? "all"}>
+          <MenuOptionGroup value={key ?? "all"}>
             {locales.map((locale) => (
               <MenuItemOption
                 key={locale.key}
                 value={locale.key}
                 onClick={() =>
-                  onFilterChange(locale.key === "all" ? null : locale.key)
+                  onFilterChange(
+                    locale.key === "all" ? null : (locale.key as PetitionLocale)
+                  )
                 }
               >
                 {locale.localizedLabel}

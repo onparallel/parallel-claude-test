@@ -245,7 +245,7 @@ function NewPetition() {
       user={me}
     >
       <Container maxWidth="container.xl" padding={10}>
-        <Tabs>
+        <Tabs defaultIndex={templates.length === 0 && !hasTemplates ? 1 : 0}>
           <TabList flexWrap="wrap-reverse">
             <Tab
               borderTopLeftRadius="md"
@@ -337,17 +337,24 @@ function NewPetition() {
                 locale={publicLocale}
                 onLocaleChange={handlePublicLocaleChange}
               />
-              {publicTemplates.length === 0 && hasTemplates ? (
+              {publicTemplates.length === 0 ? (
                 <Stack
                   justifyContent="center"
                   alignItems="center"
                   minHeight="160px"
                 >
                   <Text color="gray.500">
-                    <FormattedMessage
-                      id="new-petition.no-templates-found"
-                      defaultMessage="We couldn't find any templates with that search"
-                    />
+                    {publicSearch ? (
+                      <FormattedMessage
+                        id="new-petition.no-templates-found"
+                        defaultMessage="We couldn't find any templates with that search"
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="new-petition.no-public-templates"
+                        defaultMessage="There are no public templates yet"
+                      />
+                    )}
                   </Text>
                 </Stack>
               ) : (

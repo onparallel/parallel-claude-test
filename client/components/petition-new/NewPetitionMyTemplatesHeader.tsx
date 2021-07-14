@@ -1,4 +1,6 @@
 import { Stack } from "@chakra-ui/react";
+import { PetitionLocale } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { NewPetitionLanguageFilter } from "./NewPetitionLanguageFilter";
 import { NewPetitionSearch } from "./NewPetitionSearch";
 
@@ -7,22 +9,21 @@ export const NewPetitionMyTemplatesHeader = ({
   onSearchChange,
   locale,
   onLocaleChange,
+}: {
+  search: string;
+  onSearchChange: (args: string) => void;
+  locale: Maybe<PetitionLocale>;
+  onLocaleChange: (args: Maybe<PetitionLocale>) => void;
 }) => {
-  const filters = (
-    <NewPetitionLanguageFilter
-      value={locale}
-      onFilterChange={onLocaleChange}
-      backgroundColor="white"
-    />
-  );
-
   return (
     <Stack>
-      <NewPetitionSearch
-        search={search}
-        handleSearchChange={onSearchChange}
-        filtersElement={filters}
-      />
+      <NewPetitionSearch search={search} handleSearchChange={onSearchChange}>
+        <NewPetitionLanguageFilter
+          key={locale}
+          onFilterChange={onLocaleChange}
+          backgroundColor="white"
+        />
+      </NewPetitionSearch>
     </Stack>
   );
 };

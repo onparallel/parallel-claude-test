@@ -1,4 +1,6 @@
 import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
+import { PetitionLocale } from "@parallel/graphql/__types";
+import { Maybe } from "@parallel/utils/types";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NewPetitionLanguageFilter } from "./NewPetitionLanguageFilter";
@@ -9,6 +11,11 @@ export const NewPetitionPublicTemplatesHeader = ({
   onSearchChange,
   locale,
   onLocaleChange,
+}: {
+  search: string;
+  onSearchChange: (args: string) => void;
+  locale: Maybe<PetitionLocale>;
+  onLocaleChange: (args: Maybe<PetitionLocale>) => void;
 }) => {
   const intl = useIntl();
   const suggestions = useMemo(
@@ -37,21 +44,15 @@ export const NewPetitionPublicTemplatesHeader = ({
     [intl.locale]
   );
 
-  const filters = (
-    <NewPetitionLanguageFilter
-      value={locale}
-      onFilterChange={onLocaleChange}
-      backgroundColor="white"
-    />
-  );
-
   return (
     <Stack spacing={4}>
-      <NewPetitionSearch
-        search={search}
-        handleSearchChange={onSearchChange}
-        filtersElement={filters}
-      />
+      <NewPetitionSearch search={search} handleSearchChange={onSearchChange}>
+        <NewPetitionLanguageFilter
+          key={locale}
+          onFilterChange={onLocaleChange}
+          backgroundColor="white"
+        />
+      </NewPetitionSearch>
       <Flex flexWrap="wrap" paddingLeft={2}>
         <Box marginRight={2} marginLeft={2}>
           <Text as="strong">

@@ -1,13 +1,19 @@
-import { Grid } from "@chakra-ui/react";
+import { Grid, GridProps } from "@chakra-ui/react";
 import { useIntl } from "react-intl";
 import { SearchInput } from "../common/SearchInput";
+
+export interface NewPetitionSearchProps extends GridProps {
+  search: string;
+  handleSearchChange: (args: string) => void;
+  children: any;
+}
 
 export const NewPetitionSearch = ({
   search,
   handleSearchChange,
-  filtersElement,
+  children,
   ...props
-}) => {
+}: NewPetitionSearchProps) => {
   const intl = useIntl();
 
   return (
@@ -21,7 +27,7 @@ export const NewPetitionSearch = ({
           defaultMessage: "What are you looking for?",
         })}
       />
-      {filtersElement}
+      {children}
     </Grid>
   );
 };
