@@ -407,7 +407,11 @@ function SwitchSetting({
       <FormLabel margin={0} display="flex" alignItems="center">
         {icon ? <Flex marginRight={1}>{icon}</Flex> : null}
         {title}
-        {help ? <HelpPopover marginLeft={2}>{help}</HelpPopover> : null}
+        {help ? (
+          <HelpPopover marginLeft={2}>
+            <Text fontSize="sm">{help}</Text>
+          </HelpPopover>
+        ) : null}
       </FormLabel>
       <Spacer />
       <Switch
