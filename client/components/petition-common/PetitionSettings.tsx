@@ -191,10 +191,12 @@ function _PetitionSettings({
               defaultMessage="Deadline"
             />
             <HelpPopover marginLeft={2}>
-              <FormattedMessage
-                id="component.petition-settings.deadline-description"
-                defaultMessage="This date is used to inform the recipients of the deadline for which you need to have the information."
-              />
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-settings.deadline-description"
+                  defaultMessage="This date is used to inform the recipients of the deadline for which you need to have the information."
+                />
+              </Text>
             </HelpPopover>
           </FormLabel>
           <DeadlineInput
