@@ -1,3 +1,4 @@
+import { If } from "../util/types";
 import {
   PetitionEvent as DbPetitionEvent,
   PetitionEventType,
@@ -130,7 +131,7 @@ type GenericPetitionEvent<
   IsCreate extends boolean = false
 > = Omit<
   DbPetitionEvent,
-  "type" | "data" | (IsCreate extends true ? "id" | "created_at" : never)
+  "type" | "data" | If<IsCreate, "id" | "created_at">
 > & {
   type: TType;
   data: PetitionEventPayload<TType>;
@@ -251,10 +252,7 @@ export type SystemEventPayload<TType extends SystemEventType> = {
 type GenericSystemEvent<
   TType extends SystemEventType,
   IsCreate extends boolean = false
-> = Omit<
-  DbSystemEvent,
-  "type" | "data" | (IsCreate extends true ? "id" | "created_at" : never)
-> & {
+> = Omit<DbSystemEvent, "type" | "data" | If<IsCreate, "id" | "created_at">> & {
   type: TType;
   data: SystemEventPayload<TType>;
 };

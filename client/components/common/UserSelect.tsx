@@ -13,7 +13,7 @@ import {
   useReactSelectProps,
   UseReactSelectProps,
 } from "@parallel/utils/react-select/hooks";
-import { MaybeArray, unMaybeArray } from "@parallel/utils/types";
+import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import {
   ForwardedRef,
@@ -23,7 +23,6 @@ import {
   RefAttributes,
   useCallback,
   useMemo,
-  useState,
 } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { components } from "react-select";
@@ -34,7 +33,7 @@ import { UserListPopover } from "./UserListPopover";
 
 export type UserSelectSelection<IncludeGroups extends boolean = false> =
   | UserSelect_UserFragment
-  | (IncludeGroups extends true ? UserSelect_UserGroupFragment : never);
+  | If<IncludeGroups, UserSelect_UserGroupFragment>;
 
 export type UserSelectInstance<
   IsMulti extends boolean,
@@ -76,13 +75,17 @@ interface UserSelectProps<
       "value" | "onChange" | "options"
     > {
   isMulti?: IsMulti;
-  value: IsMulti extends true
-    ? UserSelectSelection<IncludeGroups>[] | string[]
-    : UserSelectSelection<IncludeGroups> | string;
+  value: If<
+    IsMulti,
+    UserSelectSelection<IncludeGroups>[] | string[],
+    UserSelectSelection<IncludeGroups> | string | null
+  >;
   onChange: (
-    value: IsMulti extends true
-      ? UserSelectSelection<IncludeGroups>[]
-      : UserSelectSelection<IncludeGroups> | null
+    value: If<
+      IsMulti,
+      UserSelectSelection<IncludeGroups>[],
+      UserSelectSelection<IncludeGroups> | null
+    >
   ) => void;
   includeGroups?: IncludeGroups;
   onSearch: (
@@ -111,6 +114,9 @@ export const UserSelect = Object.assign(
       (Array.isArray(value) && typeof value[0] === "string");
     const getUsersOrGroups = useGetUsersOrGroups();
     const _value = useAsyncMemo(async () => {
+      if (value === null) {
+        return null;
+      }
       if (needsLoading) {
         return await getUsersOrGroups(value as any);
       }

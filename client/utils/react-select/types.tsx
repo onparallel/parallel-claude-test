@@ -5,6 +5,7 @@ import {
 } from "react-select";
 import { Props as _AsyncSelectProps } from "react-select/async";
 import { Props as _AsyncCreatableSelectProps } from "react-select/async-creatable";
+import { If } from "../types";
 import { ValueProps } from "../ValueProps";
 
 export interface OptionType<T extends string = string> {
@@ -18,6 +19,8 @@ export type OptionTypeValue<T extends OptionType<any>> = T extends OptionType<
   ? U
   : never;
 
+export type ValueType<T, IsMulti extends boolean> = If<IsMulti, T[], T>;
+
 export interface CustomSelectProps<
   T,
   IsMulti extends boolean = false,
@@ -26,7 +29,7 @@ export interface CustomSelectProps<
       SelectProps<T, IsMulti, GroupType>,
       "value" | "onChange" | "options"
     >,
-    ValueProps<IsMulti extends true ? T[] : T> {}
+    ValueProps<ValueType<T, IsMulti>> {}
 
 export interface SelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string },
@@ -42,7 +45,7 @@ export interface CustomAsyncSelectProps<
       _AsyncSelectProps<T, IsMulti, GroupType>,
       "value" | "onChange" | "options"
     >,
-    ValueProps<IsMulti extends true ? T[] : T> {}
+    ValueProps<ValueType<T, IsMulti>> {}
 
 export interface AsyncSelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string },
@@ -58,7 +61,7 @@ export interface CustomAsyncCreatableSelectProps<
       _AsyncCreatableSelectProps<T, IsMulti, GroupType>,
       "value" | "onChange" | "options"
     >,
-    ValueProps<IsMulti extends true ? T[] : T> {}
+    ValueProps<ValueType<T, IsMulti>> {}
 
 export interface AsyncCreatableSelectProps<
   OptionType extends OptionTypeBase = { label: string; value: string },

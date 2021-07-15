@@ -204,6 +204,13 @@ export interface FileUploadInput {
   size: Scalars["Int"];
 }
 
+export type FilterSharedWithLogicalOperator = "AND" | "OR";
+
+export type FilterSharedWithOperator =
+  | "IS_OWNER"
+  | "NOT_SHARED_WITH"
+  | "SHARED_WITH";
+
 export interface GenerateUserAuthTokenResponse {
   __typename?: "GenerateUserAuthTokenResponse";
   apiKey: Scalars["String"];
@@ -1503,6 +1510,7 @@ export type PetitionFieldType =
 
 export interface PetitionFilter {
   locale?: Maybe<PetitionLocale>;
+  sharedWith?: Maybe<PetitionSharedWithFilter>;
   status?: Maybe<PetitionStatus>;
   tagIds?: Maybe<Array<Scalars["ID"]>>;
   type?: Maybe<PetitionBaseType>;
@@ -1622,6 +1630,16 @@ export interface PetitionSharedUserNotification
   permissionType: PetitionPermissionTypeRW;
   petition: PetitionBase;
   sharedWith: UserOrUserGroup;
+}
+
+export interface PetitionSharedWithFilter {
+  filters: Array<PetitionSharedWithFilterLine>;
+  operator: FilterSharedWithLogicalOperator;
+}
+
+export interface PetitionSharedWithFilterLine {
+  operator: FilterSharedWithOperator;
+  value: Scalars["ID"];
 }
 
 export type PetitionSignatureCancelReason =

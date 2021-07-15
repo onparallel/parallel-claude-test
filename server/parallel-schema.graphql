@@ -228,6 +228,17 @@ input FileUploadInput {
   size: Int!
 }
 
+enum FilterSharedWithLogicalOperator {
+  AND
+  OR
+}
+
+enum FilterSharedWithOperator {
+  IS_OWNER
+  NOT_SHARED_WITH
+  SHARED_WITH
+}
+
 scalar GID
 
 type GenerateUserAuthTokenResponse {
@@ -1959,7 +1970,7 @@ enum PetitionFieldType {
 
 input PetitionFilter {
   locale: PetitionLocale
-  sharedWith: PetitionSharedWith
+  sharedWith: PetitionSharedWithFilter
   status: PetitionStatus
   tagIds: [ID!]
   type: PetitionBaseType
@@ -2191,25 +2202,14 @@ type PetitionSharedUserNotification implements PetitionUserNotification {
   sharedWith: UserOrUserGroup!
 }
 
-input PetitionSharedWith {
-  filters: [PetitionSharedWithFilter!]!
-  operator: PetitionSharedWithOperator!
-}
-
 input PetitionSharedWithFilter {
-  operator: PetitionSharedWithFilterOperator!
+  filters: [PetitionSharedWithFilterLine!]!
+  operator: FilterSharedWithLogicalOperator!
+}
+
+input PetitionSharedWithFilterLine {
+  operator: FilterSharedWithOperator!
   value: ID!
-}
-
-enum PetitionSharedWithFilterOperator {
-  IS_OWNER
-  NOT_SHARED_WITH
-  SHARED_WITH
-}
-
-enum PetitionSharedWithOperator {
-  AND
-  OR
 }
 
 enum PetitionSignatureCancelReason {

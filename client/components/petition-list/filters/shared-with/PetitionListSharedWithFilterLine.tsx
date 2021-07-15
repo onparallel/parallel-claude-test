@@ -6,10 +6,13 @@ import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { UserSelect, useSearchUsers } from "../../../common/UserSelect";
-import { SharedWithFilterLine, FilterSharedWithOperator } from "./types";
+import {
+  PetitionSharedWithFilterLine,
+  FilterSharedWithOperator,
+} from "@parallel/graphql/__types";
 
 export interface PetitionListSharedWithFilterProps
-  extends ValueProps<SharedWithFilterLine, false> {
+  extends ValueProps<PetitionSharedWithFilterLine, false> {
   onRemove: () => void;
 }
 
@@ -81,7 +84,7 @@ export function PetitionListSharedWithFilterLine({
       <Box flex="1" minWidth="240px">
         <UserSelect
           size="sm"
-          includeGroups
+          includeGroups={value.operator !== "IS_OWNER"}
           value={value.value}
           onKeyDown={(e: KeyboardEvent) => {
             if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {

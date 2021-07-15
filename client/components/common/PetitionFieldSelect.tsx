@@ -13,6 +13,7 @@ import {
   CustomSelectProps,
   SelectProps,
 } from "@parallel/utils/react-select/types";
+import { If } from "@parallel/utils/types";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { components } from "react-select";
@@ -21,7 +22,7 @@ import { zip } from "remeda";
 export interface PetitionFieldSelectProps<
   T extends PetitionFieldSelect_PetitionFieldFragment,
   ExpandFields extends boolean
-> extends CustomSelectProps<ExpandFields extends true ? T | [T, number] : T> {
+> extends CustomSelectProps<If<ExpandFields, T | [T, number], T>> {
   fields: T[];
   indices: PetitionFieldIndex[];
   expandFields?: ExpandFields;

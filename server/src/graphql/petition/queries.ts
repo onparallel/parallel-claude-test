@@ -41,22 +41,22 @@ export const petitionsQuery = queryField((t) => {
           t.nullable.list.nonNull.id("tagIds");
           t.nullable.field("sharedWith", {
             type: inputObjectType({
-              name: "PetitionSharedWith",
+              name: "PetitionSharedWithFilter",
               definition(t) {
                 t.nonNull.field("operator", {
                   type: enumType({
-                    name: "PetitionSharedWithOperator",
+                    name: "FilterSharedWithLogicalOperator",
                     members: ["AND", "OR"],
                   }),
                 });
                 t.nonNull.list.nonNull.field("filters", {
                   type: inputObjectType({
-                    name: "PetitionSharedWithFilter",
+                    name: "PetitionSharedWithFilterLine",
                     definition(t) {
                       t.nonNull.id("value");
                       t.nonNull.field("operator", {
                         type: enumType({
-                          name: "PetitionSharedWithFilterOperator",
+                          name: "FilterSharedWithOperator",
                           members: [
                             "SHARED_WITH",
                             "NOT_SHARED_WITH",

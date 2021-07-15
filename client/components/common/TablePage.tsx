@@ -87,6 +87,21 @@ export function TablePage<T, TContext = unknown>({
             />
           </Flex>
         ) : null}
+        <Table
+          columns={columns}
+          rows={rows}
+          context={context}
+          rowKeyProp={rowKeyProp}
+          isExpandable={isExpandable}
+          isSelectable={isSelectable}
+          isHighlightable={isHighlightable}
+          sort={sort}
+          filter={filter}
+          onFilterChange={onFilterChange}
+          onSelectionChange={onSelectionChange}
+          onRowClick={onRowClick}
+          onSortChange={onSortChange}
+        />
         {body ? (
           <Flex
             flexDirection="column"
@@ -96,23 +111,7 @@ export function TablePage<T, TContext = unknown>({
           >
             {body}
           </Flex>
-        ) : (
-          <Table
-            columns={columns}
-            rows={rows}
-            context={context}
-            rowKeyProp={rowKeyProp}
-            isExpandable={isExpandable}
-            isSelectable={isSelectable}
-            isHighlightable={isHighlightable}
-            sort={sort}
-            filter={filter}
-            onFilterChange={onFilterChange}
-            onSelectionChange={onSelectionChange}
-            onRowClick={onRowClick}
-            onSortChange={onSortChange}
-          />
-        )}
+        ) : null}
       </Flex>
       <Stack
         flexShrink={0}

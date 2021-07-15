@@ -12,13 +12,14 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
 import {
   flatShared,
+  removeInvalidLines,
   unflatShared,
 } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
-import { SharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/types";
 import { PetitionListHeader } from "@parallel/components/petition-list/PetitionListHeader";
 import {
   PetitionBaseType,
   PetitionFilter,
+  PetitionSharedWithFilter,
   PetitionsQuery,
   PetitionsQueryVariables,
   PetitionStatus,
@@ -39,6 +40,7 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
   integer,
+  object,
   parseQuery,
   QueryItem,
   sorting,
@@ -49,7 +51,7 @@ import {
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { mapValues } from "remeda";
+import { mapValues, omit, pick } from "remeda";
 
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 
@@ -71,7 +73,10 @@ const QUERY_STATE = {
     (value) => (value.length === 0 ? "NO_TAGS" : value.join(","))
   ),
   sort: sorting(SORTING),
-  filter: filtering(),
+  sharedWith: object<PetitionSharedWithFilter>({
+    flatten: flatShared,
+    unflatten: unflatShared,
+  }),
 };
 
 function Petitions() {
@@ -100,6 +105,7 @@ function Petitions() {
           status: state.status,
           type: state.type,
           tagIds: state.tags,
+          sharedWith: removeInvalidLines(state.sharedWith),
         },
         sortBy: [`${sort.field}_${sort.direction}`],
         hasPetitionSignature: me.hasPetitionSignature,
@@ -228,26 +234,15 @@ function Petitions() {
       : state.type
   );
 
-  const handleSharedWithFilter = (value: any) => {
-    if (value.filters.length) {
+  const handleSharedWithFilterChange = useCallback(
+    (value: PetitionSharedWithFilter | null) => {
       setQueryState((current) => ({
         ...current,
-        filter: {
-          ...current.filter,
-          sharedWith: value,
-        },
+        sharedWith: value,
       }));
-    } else {
-      setQueryState(({ filter: { sharedWith, ...rest }, ...current }) => {
-        // If we dont have more filters we return the object without the property
-        if (Object.keys(rest).length === 0 && rest.constructor === Object)
-          return current;
-
-        // If we have we return them except sharedWith
-        return { ...current, filter: rest };
-      });
-    }
-  };
+    },
+    []
+  );
 
   const context = useMemo(() => ({ user: me! }), [me]);
 
@@ -282,10 +277,10 @@ function Petitions() {
           pageSize={state.items}
           totalCount={petitions.totalCount}
           sort={sort}
-          filter={state.filter}
+          filter={pick(state, ["sharedWith"])}
           onFilterChange={(key, value) => {
             if (key === "sharedWith") {
-              handleSharedWithFilter(value);
+              handleSharedWithFilterChange(value);
             }
           }}
           onSelectionChange={setSelected}
@@ -315,12 +310,12 @@ function Petitions() {
           }
           body={
             petitions.totalCount === 0 && !loading ? (
-              state.search ? (
+              state.search || state.sharedWith || state.tags ? (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
                       id="petitions.no-results"
-                      defaultMessage="There's no petitions matching your search"
+                      defaultMessage="There's no petitions matching your criteria"
                     />
                   </Text>
                 </Flex>
@@ -346,40 +341,6 @@ function Petitions() {
         />
       </Flex>
     </AppLayout>
-  );
-}
-
-export function filtering() {
-  return new QueryItem<{ sharedWith?: SharedWithFilter }>(
-    (value) => {
-      if (value && typeof value === "string") {
-        const decoded = JSON.parse(
-          fromBase64(
-            value.replaceAll("-", "+").replaceAll("_", "/").replaceAll(".", "=")
-          )
-        );
-        return mapValues(decoded, (value, key) => {
-          switch (key) {
-            case "sharedWith":
-              return unflatShared(value);
-          }
-        });
-      }
-      return null;
-    },
-    (filters) => {
-      if (!filters) return "";
-      const flattened = mapValues(filters, (value, key) => {
-        switch (key) {
-          case "sharedWith":
-            return flatShared(value!);
-        }
-      });
-      return toBase64(JSON.stringify(flattened))
-        .replaceAll("+", "-")
-        .replaceAll("/", "_")
-        .replaceAll("=", ".");
-    }
   );
 }
 
@@ -466,7 +427,12 @@ Petitions.getInitialProps = async ({
         limit: state.items,
         search: state.search,
         sortBy: [`${sort.field}_${sort.direction}`],
-        filters: { type: state.type, status: state.status, tagIds: state.tags },
+        filters: {
+          type: state.type,
+          status: state.status,
+          tagIds: state.tags,
+          sharedWith: removeInvalidLines(state.sharedWith),
+        },
         hasPetitionSignature: me.hasPetitionSignature,
       },
     }

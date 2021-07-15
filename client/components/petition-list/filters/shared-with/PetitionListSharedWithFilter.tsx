@@ -1,27 +1,21 @@
-import {
-  Box,
-  Button,
-  Heading,
-  Center,
-  Grid,
-  HStack,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Grid, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { TableColumnFilterProps } from "@parallel/components/common/Table";
+import { useInlineReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { PetitionListSharedWithFilterLine } from "./PetitionListSharedWithFilterLine";
-import { FilterSharedWithLogicalOperator, SharedWithFilter } from "./types";
 import Select from "react-select";
-import { useInlineReactSelectProps } from "@parallel/utils/react-select/hooks";
+import { PetitionListSharedWithFilterLine } from "./PetitionListSharedWithFilterLine";
+import {
+  FilterSharedWithLogicalOperator,
+  PetitionSharedWithFilter,
+} from "@parallel/graphql/__types";
 
 export function PetitionListSharedWithFilter({
   value,
   onChange,
-}: TableColumnFilterProps<SharedWithFilter>) {
+}: TableColumnFilterProps<PetitionSharedWithFilter>) {
   const intl = useIntl();
 
   const logicalOperators = useMemo<
@@ -89,17 +83,21 @@ export function PetitionListSharedWithFilter({
                   })
                 }
                 onRemove={() =>
-                  onChange({
-                    ...value,
-                    filters: value.filters.filter((_, i) => i !== index),
-                  })
+                  onChange(
+                    value.filters.length === 1
+                      ? null
+                      : {
+                          ...value,
+                          filters: value.filters.filter((_, i) => i !== index),
+                        }
+                  )
                 }
               />
             );
           })}
         </Grid>
       ) : (
-        <Text textStyle="hint">
+        <Text textStyle="hint" textAlign="center" minWidth="300px">
           <FormattedMessage
             id="common.no-filter-applied"
             defaultMessage="No filter is being applied."
@@ -140,14 +138,14 @@ export function PetitionListSharedWithFilter({
   );
 }
 
-export function flatShared(data: SharedWithFilter) {
+export function flatShared(data: PetitionSharedWithFilter) {
   return ([data.operator] as any[]).concat(
     data.filters.flatMap((f) => [f.operator, f.value])
   );
 }
 
-export function unflatShared(data: any[]): SharedWithFilter {
-  const value: SharedWithFilter = {
+export function unflatShared(data: any[]): PetitionSharedWithFilter {
+  const value: PetitionSharedWithFilter = {
     operator: data[0] as FilterSharedWithLogicalOperator,
     filters: [],
   };
@@ -160,4 +158,11 @@ export function unflatShared(data: any[]): SharedWithFilter {
     i += 2;
   }
   return value;
+}
+
+export function removeInvalidLines(
+  value: PetitionSharedWithFilter | null
+): PetitionSharedWithFilter | null {
+  const filters = value?.filters.filter((l) => l.value !== null) ?? [];
+  return filters.length > 0 ? { ...value, filters } : null;
 }

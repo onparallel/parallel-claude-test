@@ -9,6 +9,7 @@ import {
 import { mapValues, omit } from "remeda";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
+import { If } from "../../util/types";
 
 export type GlobalIdConfig = {
   prefixName?: string;
@@ -53,9 +54,11 @@ type ResultValueWithReturnType<
   TypeName extends string,
   FieldName extends string,
   ReturnType
-> = IsNullable<core.GetGen3<"fieldTypes", TypeName, FieldName>> extends true
-  ? ReturnType | null
-  : ReturnType;
+> = If<
+  IsNullable<core.GetGen3<"fieldTypes", TypeName, FieldName>>,
+  ReturnType | null,
+  ReturnType
+>;
 
 type IsNullable<T> = null extends T ? true : false;
 

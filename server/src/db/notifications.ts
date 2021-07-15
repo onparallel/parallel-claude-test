@@ -1,3 +1,4 @@
+import { If } from "../util/types";
 import {
   PetitionUserNotification as DbPetitionUserNotification,
   PetitionUserNotificationType,
@@ -35,7 +36,7 @@ type GenericPetitionUserNotification<
   IsCreate extends boolean = false
 > = Omit<
   DbPetitionUserNotification,
-  "type" | "data" | (IsCreate extends true ? "id" | "created_at" : never)
+  "type" | "data" | If<IsCreate, "id" | "created_at">
 > & {
   type: TType;
   data: PetitionUserNotificationPayload<TType>;

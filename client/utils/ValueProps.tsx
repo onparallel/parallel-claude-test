@@ -1,4 +1,6 @@
+import { If } from "./types";
+
 export interface ValueProps<T, IsNullable extends boolean = true> {
-  value: IsNullable extends true ? T | null : T;
-  onChange: (value: IsNullable extends true ? T | null : T) => void;
+  value: If<IsNullable, T | null, T>;
+  onChange: (value: If<IsNullable, T | null, T>) => void;
 }

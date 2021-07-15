@@ -4181,8 +4181,8 @@
   },
   {
     "term": "petitions.no-results",
-    "definition": "There's no petitions matching your search",
-    "context": "There's no petitions matching your search"
+    "definition": "There's no petitions matching your criteria",
+    "context": "There's no petitions matching your criteria"
   },
   {
     "term": "petitions.no-templates",

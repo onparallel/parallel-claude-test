@@ -7,9 +7,7 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { ForbiddenError } from "apollo-server-express";
-import { zip } from "remeda";
-import { partition } from "../../util/arrays";
-import { fromGlobalId, fromGlobalIds } from "../../util/globalId";
+import { fromGlobalId } from "../../util/globalId";
 import {
   authenticate,
   authenticateAnd,

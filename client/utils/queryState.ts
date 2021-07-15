@@ -3,10 +3,12 @@ import {
   TableSortingDirection,
 } from "@parallel/components/common/Table";
 import { NextRouter, useRouter } from "next/router";
+import { decode } from "punycode";
 import * as qs from "querystring";
 import { ParsedUrlQuery } from "querystring";
 import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
 import { equals, pick } from "remeda";
+import { fromBase64, toBase64 } from "./base64";
 import { pathParams, resolveUrl } from "./next";
 import { useUpdatingRef } from "./useUpdatingRef";
 
@@ -94,6 +96,34 @@ export function sorting<T extends string>(fields: readonly T[]) {
       return null;
     },
     ({ field, direction }) => `${field}_${direction}`
+  );
+}
+
+export function object<T>({
+  flatten,
+  unflatten,
+}: {
+  flatten?: (value: T) => any;
+  unflatten?: (value: any) => T;
+}) {
+  return new QueryItem<T | null>(
+    (value) => {
+      if (value && typeof value === "string") {
+        const decoded = JSON.parse(
+          fromBase64(
+            value.replaceAll("-", "+").replaceAll("_", "/").replaceAll(".", "=")
+          )
+        );
+        return unflatten ? unflatten(decoded) : decoded;
+      }
+      return null;
+    },
+    (value) => {
+      return toBase64(JSON.stringify(flatten ? flatten(value) : value))
+        .replaceAll("+", "-")
+        .replaceAll("/", "_")
+        .replaceAll("=", ".");
+    }
   );
 }
 export interface ParseQueryOptions {

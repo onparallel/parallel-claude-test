@@ -1,5 +1,5 @@
 import { OpenAPIV3 } from "openapi-types";
-import { MaybePromise } from "../../util/types";
+import { If, MaybePromise } from "../../util/types";
 import { RestParameter } from "./core";
 import { JsonSchema } from "./schemas";
 
@@ -9,9 +9,7 @@ export class ParseError extends Error {
   }
 }
 
-type ArrayIfTrue<T, IsArray extends boolean | undefined> = IsArray extends true
-  ? T[]
-  : T;
+type ArrayIfTrue<T, IsArray extends boolean | undefined> = If<IsArray, T[], T>;
 
 export interface BaseParameterOptions<
   T,
@@ -38,18 +36,20 @@ export type ParameterOptions<
   TArray extends boolean | undefined = undefined,
   TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
 > = BaseParameterOptions<T, TRequired, TArray, TDefaultValue> &
-  (TArray extends true ? ArrayParameterOptions : {});
+  If<TArray, ArrayParameterOptions, {}>;
 
 export type GeneratedParameterType<
   T,
   TRequired extends boolean = true,
   TArray extends boolean | undefined = undefined,
   TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
-> = TRequired extends true | undefined
-  ? ArrayIfTrue<T, TArray>
-  : TDefaultValue extends undefined
-  ? ArrayIfTrue<T, TArray> | undefined
-  : ArrayIfTrue<T, TArray>;
+> = If<
+  TRequired,
+  ArrayIfTrue<T, TArray>,
+  TDefaultValue extends undefined
+    ? ArrayIfTrue<T, TArray> | undefined
+    : ArrayIfTrue<T, TArray>
+>;
 
 export interface ParameterParser<
   T,

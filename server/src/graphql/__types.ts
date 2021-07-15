@@ -93,19 +93,19 @@ export interface NexusGenInputs {
   PetitionFilter: {
     // input type
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
-    sharedWith?: NexusGenInputs["PetitionSharedWith"] | null; // PetitionSharedWith
+    sharedWith?: NexusGenInputs["PetitionSharedWithFilter"] | null; // PetitionSharedWithFilter
     status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
     tagIds?: string[] | null; // [ID!]
     type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
   };
-  PetitionSharedWith: {
-    // input type
-    filters: NexusGenInputs["PetitionSharedWithFilter"][]; // [PetitionSharedWithFilter!]!
-    operator: NexusGenEnums["PetitionSharedWithOperator"]; // PetitionSharedWithOperator!
-  };
   PetitionSharedWithFilter: {
     // input type
-    operator: NexusGenEnums["PetitionSharedWithFilterOperator"]; // PetitionSharedWithFilterOperator!
+    filters: NexusGenInputs["PetitionSharedWithFilterLine"][]; // [PetitionSharedWithFilterLine!]!
+    operator: NexusGenEnums["FilterSharedWithLogicalOperator"]; // FilterSharedWithLogicalOperator!
+  };
+  PetitionSharedWithFilterLine: {
+    // input type
+    operator: NexusGenEnums["FilterSharedWithOperator"]; // FilterSharedWithOperator!
     value: string; // ID!
   };
   PublicPetitionSignerData: {
@@ -186,6 +186,8 @@ export interface NexusGenEnums {
     | "SUCCESS";
   EntityType: "Contact" | "Organization" | "Petition" | "User";
   FeatureFlag: db.FeatureFlagName;
+  FilterSharedWithLogicalOperator: "AND" | "OR";
+  FilterSharedWithOperator: "IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
   IntegrationType: db.IntegrationType;
   OnboardingKey:
     | "CONTACT_DETAILS"
@@ -219,11 +221,6 @@ export interface NexusGenEnums {
   PetitionPermissionType: db.PetitionPermissionType;
   PetitionPermissionTypeRW: "READ" | "WRITE";
   PetitionReminderType: db.PetitionReminderType;
-  PetitionSharedWithFilterOperator:
-    | "IS_OWNER"
-    | "NOT_SHARED_WITH"
-    | "SHARED_WITH";
-  PetitionSharedWithOperator: "AND" | "OR";
   PetitionSignatureCancelReason: db.PetitionSignatureCancelReason;
   PetitionSignatureRequestStatus:
     | "CANCELLED"

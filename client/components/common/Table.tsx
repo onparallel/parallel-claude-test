@@ -574,84 +574,84 @@ export function DefaultHeader({
         alignItems="center"
         justifyContent={column.align ?? "left"}
       >
-        <Text isTruncated>{column.header}</Text>
-        <Flex
-          flex={column.isFilterable || column.isFilterable ? "1" : undefined}
-        >
-          {column.isFilterable ? (
-            <IconButtonWithTooltip
-              ref={filterButtonRef}
-              className="filter-by-button"
-              icon={<FilterIcon />}
-              label={intl.formatMessage({
-                id: "components.table.filter-button",
-                defaultMessage: "Filter",
-              })}
-              size="xs"
-              variant={isFilterActive ? "outline" : "ghost"}
-              colorScheme={isFilterActive ? "purple" : "gray"}
-              aria-label={intl.formatMessage(
-                {
-                  id: "components.table.filter",
-                  defaultMessage: 'Filter "{column}"',
-                },
-                { column: column.header }
-              )}
-              {...getFilterButtonProps()}
-              onClick={onToggleFilter}
-            />
-          ) : null}
-          {column.isSortable ? (
-            <IconButtonWithTooltip
-              className="sort-by-button"
-              onClick={(event) => onSortByClick?.(column.key, event)}
-              icon={
-                sort?.field === column.key ? (
-                  sort.direction === "ASC" ? (
-                    <ChevronUpIcon />
-                  ) : (
-                    <ChevronDownIcon />
-                  )
+        <Text as="div" isTruncated>
+          {column.header}
+        </Text>
+        {column.isFilterable ? (
+          <IconButtonWithTooltip
+            ref={filterButtonRef}
+            className="filter-by-button"
+            icon={<FilterIcon />}
+            label={intl.formatMessage({
+              id: "components.table.filter-button",
+              defaultMessage: "Filter",
+            })}
+            size="xs"
+            variant={isFilterActive ? "outline" : "ghost"}
+            colorScheme={isFilterActive ? "purple" : "gray"}
+            aria-label={intl.formatMessage(
+              {
+                id: "components.table.filter",
+                defaultMessage: 'Filter "{column}"',
+              },
+              { column: column.header }
+            )}
+            {...getFilterButtonProps()}
+            onClick={onToggleFilter}
+          />
+        ) : null}
+        {column.isSortable ? (
+          <IconButtonWithTooltip
+            className="sort-by-button"
+            onClick={(event) => onSortByClick?.(column.key, event)}
+            icon={
+              sort?.field === column.key ? (
+                sort.direction === "ASC" ? (
+                  <ChevronUpIcon />
                 ) : (
-                  <ArrowUpDownIcon />
+                  <ChevronDownIcon />
                 )
-              }
-              label={intl.formatMessage({
-                id: "components.table.sort-button",
-                defaultMessage: "Sort",
-              })}
-              size="xs"
-              variant="ghost"
-              aria-label={
-                sort?.field === column.key
-                  ? intl.formatMessage(
-                      {
-                        id: "components.table.change-sorting",
-                        defaultMessage: 'Change sorting for "{column}"',
-                      },
-                      { column: column.header }
-                    )
-                  : intl.formatMessage(
-                      {
-                        id: "components.table.sort-by",
-                        defaultMessage: 'Sort by "{column}"',
-                      },
-                      { column: column.header }
-                    )
-              }
-            />
-          ) : null}
-        </Flex>
+              ) : (
+                <ArrowUpDownIcon />
+              )
+            }
+            label={intl.formatMessage({
+              id: "components.table.sort-button",
+              defaultMessage: "Sort",
+            })}
+            size="xs"
+            variant="ghost"
+            aria-label={
+              sort?.field === column.key
+                ? intl.formatMessage(
+                    {
+                      id: "components.table.change-sorting",
+                      defaultMessage: 'Change sorting for "{column}"',
+                    },
+                    { column: column.header }
+                  )
+                : intl.formatMessage(
+                    {
+                      id: "components.table.sort-by",
+                      defaultMessage: 'Sort by "{column}"',
+                    },
+                    { column: column.header }
+                  )
+            }
+          />
+        ) : null}
       </HStack>
       {column.isFilterable && column.Filter ? (
         <Portal>
-          <Card ref={_ref} {...getFilterPopoverProps()}>
-            <column.Filter
-              value={filter}
-              onChange={onFilterChange}
-              context={context}
-            />
-          </Card>
+          {isFilterOpen ? (
+            <Card ref={_ref} {...getFilterPopoverProps()}>
+              <column.Filter
+                value={filter}
+                onChange={onFilterChange}
+                context={context}
+              />
+            </Card>
+          ) : null}
         </Portal>
       ) : null}
     </Box>
