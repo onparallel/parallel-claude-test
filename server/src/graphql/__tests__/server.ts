@@ -1,6 +1,5 @@
 import { VariableValues } from "apollo-server-core";
 import { ApolloServer } from "apollo-server-express";
-import { createTestClient } from "apollo-server-testing";
 import { serialize as serializeCookie } from "cookie";
 import { DocumentNode } from "graphql";
 import { Knex } from "knex";
