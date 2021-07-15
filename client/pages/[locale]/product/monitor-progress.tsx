@@ -27,7 +27,7 @@ function Follow() {
         <Heading as="h1" size="2xl" fontFamily="hero">
           <FormattedMessage
             id="public.product.monitor-progress.hero-title"
-            defaultMessage="Following-up on your requests has never been so easy"
+            defaultMessage="Following-up on your petitions has never been so easy"
           />
         </Heading>
         <Text marginTop={8} fontSize="lg">
@@ -117,7 +117,7 @@ function Follow() {
       <PublicDemoCta>
         <FormattedMessage
           id="public.monitor-progress.cta-title"
-          defaultMessage="All your requests in a single place"
+          defaultMessage="All your petitions in a single place"
         />
       </PublicDemoCta>
     </PublicLayout>

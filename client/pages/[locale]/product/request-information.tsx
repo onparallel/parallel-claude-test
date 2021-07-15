@@ -142,7 +142,7 @@ function Request() {
       <PublicDemoCta>
         <FormattedMessage
           id="public.request-information.cta-title"
-          defaultMessage="Start streamlining your requests for information"
+          defaultMessage="Start streamlining your petitions for information"
         />
       </PublicDemoCta>
     </PublicLayout>

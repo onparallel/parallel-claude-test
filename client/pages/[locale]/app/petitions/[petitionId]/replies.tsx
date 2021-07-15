@@ -1123,7 +1123,7 @@ export default compose(
         title: (
           <FormattedMessage
             id="tour.petition-replies.page-title"
-            defaultMessage="Here you have your information on the requests"
+            defaultMessage="Here you have your information on the petitions"
           />
         ),
         content: (

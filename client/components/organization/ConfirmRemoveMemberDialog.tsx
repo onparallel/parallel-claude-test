@@ -42,7 +42,7 @@ function ConfirmRemoveMemberDialog({
           <Text>
             <FormattedMessage
               id="component.confirm-remove-member-dialog.body"
-              defaultMessage="Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
+              defaultMessage="Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the group."
               values={{
                 b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                 count: selected.length,

@@ -600,7 +600,7 @@ export default compose(
         title: (
           <FormattedMessage
             id="tour.petition-activity.events-title"
-            defaultMessage="Monitor your requests"
+            defaultMessage="Monitor your petitions"
           />
         ),
         content: (

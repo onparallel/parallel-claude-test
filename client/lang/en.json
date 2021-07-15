@@ -161,8 +161,8 @@
   },
   {
     "term": "component.confirm-remove-member-dialog.body",
-    "definition": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group.",
-    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to requests shared with the group."
+    "definition": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the group.",
+    "context": "Are you sure you want to <b>remove</b> {count, plural, =1{{fullName}} other {the selected members}} from the group? If you continue, {count, plural, =1{he} other {they}} will lose access to petitions shared with the group."
   },
   {
     "term": "component.confirm-remove-member-dialog.confirm",
@@ -1451,8 +1451,8 @@
   },
   {
     "term": "component.petition-sharing-dialog.subscribe-help",
-    "definition": "Users will receive notifications about the activity of this request.",
-    "context": "Users will receive notifications about the activity of this request."
+    "definition": "Users will receive notifications about the activity of this petition.",
+    "context": "Users will receive notifications about the activity of this petition."
   },
   {
     "term": "component.petition-sigatures-card.awaiting",
@@ -4236,8 +4236,8 @@
   },
   {
     "term": "public.book-demo.follow",
-    "definition": "<b>Follow the status of your requests:</b> progress, delivery and read receipts.",
-    "context": "<b>Follow the status of your requests:</b> progress, delivery and read receipts."
+    "definition": "<b>Follow the status of your petitions:</b> progress, delivery and read receipts.",
+    "context": "<b>Follow the status of your petitions:</b> progress, delivery and read receipts."
   },
   {
     "term": "public.book-demo.other-functionalities",
@@ -4781,8 +4781,8 @@
   },
   {
     "term": "public.monitor-progress.cta-title",
-    "definition": "All your requests in a single place",
-    "context": "All your requests in a single place"
+    "definition": "All your petitions in a single place",
+    "context": "All your petitions in a single place"
   },
   {
     "term": "public.parallel-use-cases.aml-description",
@@ -4911,8 +4911,8 @@
   },
   {
     "term": "public.product.monitor-progress.hero-title",
-    "definition": "Following-up on your requests has never been so easy",
-    "context": "Following-up on your requests has never been so easy"
+    "definition": "Following-up on your petitions has never been so easy",
+    "context": "Following-up on your petitions has never been so easy"
   },
   {
     "term": "public.product.monitor-progress.interface",
@@ -5141,8 +5141,8 @@
   },
   {
     "term": "public.request-information.cta-title",
-    "definition": "Start streamlining your requests for information",
-    "context": "Start streamlining your requests for information"
+    "definition": "Start streamlining your petitions for information",
+    "context": "Start streamlining your petitions for information"
   },
   {
     "term": "public.review-files.cta-title",
@@ -6101,8 +6101,8 @@
   },
   {
     "term": "tour.petition-activity.events-title",
-    "definition": "Monitor your requests",
-    "context": "Monitor your requests"
+    "definition": "Monitor your petitions",
+    "context": "Monitor your petitions"
   },
   {
     "term": "tour.petition-activity.page-content",
@@ -6206,8 +6206,8 @@
   },
   {
     "term": "tour.petition-replies.page-title",
-    "definition": "Here you have your information on the requests",
-    "context": "Here you have your information on the requests"
+    "definition": "Here you have your information on the petitions",
+    "context": "Here you have your information on the petitions"
   },
   {
     "term": "tour.petition-replies.review-items-content-1",
@@ -6291,8 +6291,8 @@
   },
   {
     "term": "view.groups.confirm-delete-body",
-    "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}.",
-    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
+    "definition": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {group} other {groups}}.",
+    "context": "Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {group} other {groups}}."
   },
   {
     "term": "view.groups.confirm-delete-button",

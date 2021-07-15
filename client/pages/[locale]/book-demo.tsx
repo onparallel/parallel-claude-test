@@ -95,7 +95,7 @@ function BookDemo() {
               <ListItem>
                 <FormattedMessage
                   id="public.book-demo.follow"
-                  defaultMessage="<b>Follow the status of your requests:</b> progress, delivery and read receipts."
+                  defaultMessage="<b>Follow the status of your petitions:</b> progress, delivery and read receipts."
                   values={{
                     b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
                   }}

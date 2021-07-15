@@ -431,7 +431,7 @@ function ConfirmDeleteGroupsDialog({
       body={
         <FormattedMessage
           id="view.groups.confirm-delete-body"
-          defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to requests shared with the {count, plural, =1 {group} other {groups}}."
+          defaultMessage="Are you sure you want to delete {count, plural, =1 {<b>{name}</b>} other {the <b>#</b> selected groups}}? If you continue, all members will lose access to petitions shared with the {count, plural, =1 {group} other {groups}}."
           values={{
             count,
             name,
