@@ -11,7 +11,7 @@ export async function stallFor<T>(
     func().catch((e) => {
       error = e;
     }),
-    new Promise((resolve) => setTimeout(resolve, millis)),
+    new Promise<void>((resolve) => setTimeout(resolve, millis)),
   ]);
   if (error) {
     throw error;

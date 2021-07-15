@@ -12,6 +12,10 @@ import { schema } from "./schema";
 import { LOGGER, Logger } from "./services/logger";
 import { stopwatchEnd } from "./util/stopwatch";
 import { graphqlUploadExpress } from "graphql-upload";
+import {
+  ApolloServerPluginLandingPageDisabled,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from "apollo-server-core";
 
 const app = express();
 const container = createContainer();
@@ -20,18 +24,16 @@ app.use("/api", json(), cors(), cookieParser(), api(container));
 
 app.use("/graphql", graphqlUploadExpress());
 const server = new ApolloServer({
-  // Disable the built in file upload implementation that uses an outdated
-  // `graphql-upload` version, see:
-  // https://github.com/apollographql/apollo-server/issues/3508#issuecomment-662371289
-  uploads: false,
   schema,
-  tracing: process.env.NODE_ENV === "development",
   plugins: [
+    process.env.NODE_ENV === "production"
+      ? ApolloServerPluginLandingPageDisabled()
+      : ApolloServerPluginLandingPageGraphQLPlayground(),
     {
-      requestDidStart() {
+      async requestDidStart() {
         const time = process.hrtime();
         return {
-          willSendResponse({
+          async willSendResponse({
             request: { operationName, variables },
             response,
             context,
@@ -75,15 +77,19 @@ const server = new ApolloServer({
   },
 });
 
-server.applyMiddleware({ app });
+server.start().then(() => {
+  server.applyMiddleware({ app });
 
-const port = process.env.PORT || 4000;
+  const port = process.env.PORT || 4000;
 
-app.listen(port, () => {
-  const host = `http://localhost:${port}`;
-  const logger = container.get<Logger>(LOGGER);
-  logger.info(`Ready on ${host}`);
-  if (process.env.NODE_ENV !== "production") {
-    logger.info(`GraphQL playground available on ${host}${server.graphqlPath}`);
-  }
+  app.listen(port, () => {
+    const host = `http://localhost:${port}`;
+    const logger = container.get<Logger>(LOGGER);
+    logger.info(`Ready on ${host}`);
+    if (process.env.NODE_ENV !== "production") {
+      logger.info(
+        `GraphQL playground available on ${host}${server.graphqlPath}`
+      );
+    }
+  });
 });
