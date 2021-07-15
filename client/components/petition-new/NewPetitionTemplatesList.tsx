@@ -2,12 +2,10 @@ import { Box, BoxProps, Center, Grid, Spinner } from "@chakra-ui/react";
 import { NewPetition_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { EmptyPetitionCard } from "./EmptyPetitionCard";
 import { TemplateCard } from "./TemplateCard";
 
 export interface NewPetitionTemplatesListProps extends BoxProps {
   items: NewPetition_PetitionTemplateFragment[];
-  isPublic: boolean;
   onLoadMore: () => void;
   hasMore: boolean;
   onClickTemplate: (args: Maybe<string>) => void;
@@ -15,7 +13,6 @@ export interface NewPetitionTemplatesListProps extends BoxProps {
 
 export const NewPetitionTemplatesList = ({
   items,
-  isPublic,
   onLoadMore,
   hasMore,
   onClickTemplate,

@@ -386,7 +386,6 @@ function NewPetition() {
               ) : (
                 <NewPetitionTemplatesList
                   items={templates}
-                  isPublic={false}
                   onLoadMore={handleTemplatesLoadMore}
                   hasMore={!allTemplatesLoaded}
                   onClickTemplate={handleTemplateClick}
@@ -417,7 +416,6 @@ function NewPetition() {
               ) : (
                 <NewPetitionTemplatesList
                   items={publicTemplates}
-                  isPublic={true}
                   onLoadMore={handlePublicTemplatesLoadMore}
                   hasMore={!allPublicTemplatesLoaded}
                   onClickTemplate={handleTemplateClick}
