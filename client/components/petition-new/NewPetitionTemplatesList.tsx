@@ -22,18 +22,13 @@ export const NewPetitionTemplatesList = ({
   ...props
 }: NewPetitionTemplatesListProps) => {
   return (
-    <Box pt={4} {...props}>
+    <Box pt={0} {...props}>
       <InfiniteScroll
         dataLength={items?.length ?? 0} //This is important field to render the next data
         next={onLoadMore}
         hasMore={hasMore}
         loader={
-          <Center
-            height="140px"
-            width="100%"
-            background="whiteAlpha.700"
-            zIndex="1"
-          >
+          <Center height="100px" width="100%" zIndex="1">
             <Spinner
               thickness="2px"
               speed="0.65s"
@@ -51,16 +46,10 @@ export const NewPetitionTemplatesList = ({
             lg: "repeat(3, 1fr)",
           }}
           gap={4}
-          paddingTop={4}
+          paddingTop={2}
           paddingX={6}
-          paddingBottom={12}
+          paddingBottom={8}
         >
-          {!isPublic && items.length ? (
-            <EmptyPetitionCard
-              id="empty-petition-card"
-              onPress={() => onClickTemplate(null)}
-            />
-          ) : null}
           {items.map((template: NewPetition_PetitionTemplateFragment) => (
             <TemplateCard
               key={template.id}

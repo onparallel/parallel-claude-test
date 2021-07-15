@@ -710,6 +710,26 @@
     "context": "The email was opened on {date}"
   },
   {
+    "term": "component.new-petition-empty-search.no-results",
+    "definition": "There are no results for your search.",
+    "context": "There are no results for your search."
+  },
+  {
+    "term": "component.new-petition-empty-search.other-terms-or-create",
+    "definition": "Try other terms or <LinkTemplate>create a new template</LinkTemplate>",
+    "context": "Try other terms or <LinkTemplate>create a new template</LinkTemplate>"
+  },
+  {
+    "term": "component.new-petition-empty-search.try-public-or-create",
+    "definition": "Try on our <LinkPublic>public templates</LinkPublic> or <LinkTemplate>create your own</LinkTemplate>",
+    "context": "Try on our <LinkPublic>public templates</LinkPublic> or <LinkTemplate>create your own</LinkTemplate>"
+  },
+  {
+    "term": "component.new-petition-empty-templates.try-public-or-create",
+    "definition": "Try one of our <LinkPublic>public templates</LinkPublic> or <LinkTemplate>create your own</LinkTemplate>!",
+    "context": "Try one of our <LinkPublic>public templates</LinkPublic> or <LinkTemplate>create your own</LinkTemplate>!"
+  },
+  {
     "term": "component.new-petition-language-filter.all",
     "definition": "All languages",
     "context": "All languages"
@@ -3050,21 +3070,6 @@
     "context": "Contacts"
   },
   {
-    "term": "navbar.create-new-petition",
-    "definition": "Create new petition",
-    "context": "Create new petition"
-  },
-  {
-    "term": "navbar.create-new-petition-blank",
-    "definition": "Blank petition",
-    "context": "Blank petition"
-  },
-  {
-    "term": "navbar.create-new-petition-from-template",
-    "definition": "Use a template",
-    "context": "Use a template"
-  },
-  {
     "term": "navbar.help-center",
     "definition": "Help center",
     "context": "Help center"
@@ -3080,14 +3085,19 @@
     "context": "Guide me around"
   },
   {
+    "term": "new-petition.blank-petition",
+    "definition": "Blank petition",
+    "context": "Blank petition"
+  },
+  {
+    "term": "new-petition.create",
+    "definition": "Create",
+    "context": "Create"
+  },
+  {
     "term": "new-petition.create-new-template",
     "definition": "Create new template",
     "context": "Create new template"
-  },
-  {
-    "term": "new-petition.empty-petition-create",
-    "definition": "Create a blank petition",
-    "context": "Create a blank petition"
   },
   {
     "term": "new-petition.empty-petition-header",
@@ -3100,19 +3110,14 @@
     "context": "My templates"
   },
   {
-    "term": "new-petition.no-public-templates",
-    "definition": "There are no public templates yet",
-    "context": "There are no public templates yet"
+    "term": "new-petition.new-template",
+    "definition": "New template",
+    "context": "New template"
   },
   {
     "term": "new-petition.no-templates",
-    "definition": "You don't have any templates yet",
-    "context": "You don't have any templates yet"
-  },
-  {
-    "term": "new-petition.no-templates-found",
-    "definition": "We couldn't find any templates with that search",
-    "context": "We couldn't find any templates with that search"
+    "definition": "You don't have any templates here yet.",
+    "context": "You don't have any templates here yet."
   },
   {
     "term": "new-petition.public-templates",

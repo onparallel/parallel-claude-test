@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Stack, StackProps, Text } from "@chakra-ui/react";
 import { PetitionLocale } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useMemo } from "react";
@@ -6,17 +6,20 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { NewPetitionLanguageFilter } from "./NewPetitionLanguageFilter";
 import { NewPetitionSearch } from "./NewPetitionSearch";
 
+export interface NewPetitionPublicTemplatesHeaderProps extends StackProps {
+  search: string;
+  onSearchChange: (args: string) => void;
+  locale: Maybe<PetitionLocale>;
+  onLocaleChange: (args: Maybe<PetitionLocale>) => void;
+}
+
 export const NewPetitionPublicTemplatesHeader = ({
   search,
   onSearchChange,
   locale,
   onLocaleChange,
-}: {
-  search: string;
-  onSearchChange: (args: string) => void;
-  locale: Maybe<PetitionLocale>;
-  onLocaleChange: (args: Maybe<PetitionLocale>) => void;
-}) => {
+  ...props
+}: NewPetitionPublicTemplatesHeaderProps) => {
   const intl = useIntl();
   const suggestions = useMemo(
     () => [
@@ -45,7 +48,7 @@ export const NewPetitionPublicTemplatesHeader = ({
   );
 
   return (
-    <Stack spacing={4} paddingX={6}>
+    <Stack {...props}>
       <NewPetitionSearch search={search} handleSearchChange={onSearchChange}>
         <NewPetitionLanguageFilter
           locale={locale}

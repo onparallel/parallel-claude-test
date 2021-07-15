@@ -1,17 +1,26 @@
 import { gql } from "@apollo/client";
 import {
+  Box,
   Button,
   Container,
   Flex,
-  Stack,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Portal,
   Tab,
   TabList,
   TabPanel,
   TabPanels,
   Tabs,
-  Text,
 } from "@chakra-ui/react";
-import { AddIcon } from "@parallel/chakra/icons";
+import {
+  AddIcon,
+  ChevronDownIcon,
+  FileNewIcon,
+  PaperPlaneIcon,
+} from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import {
   withApolloData,
@@ -19,6 +28,8 @@ import {
 } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useTemplateDetailsDialog } from "@parallel/components/petition-common/TemplateDetailsDialog";
+import { NewPetitionEmptySearch } from "@parallel/components/petition-new/NewPetitionEmptySearch";
+import { NewPetitionEmptyTempaltes } from "@parallel/components/petition-new/NewPetitionEmptyTemplates";
 import { NewPetitionMyTemplatesHeader } from "@parallel/components/petition-new/NewPetitionMyTemplatesHeader";
 import { NewPetitionPublicTemplatesHeader } from "@parallel/components/petition-new/NewPetitionPublicTemplatesHeader";
 import { NewPetitionTemplatesList } from "@parallel/components/petition-new/NewPetitionTemplatesList";
@@ -40,8 +51,9 @@ import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { Maybe } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import ResizeObserver, { DOMRect } from "react-resize-observer";
 
 function NewPetition() {
   const intl = useIntl();
@@ -98,6 +110,14 @@ function NewPetition() {
   const [publicLocale, setPublicLocale] = useState(
     null as Maybe<PetitionLocale>
   );
+
+  const [headerTop, setHeaderTop] = useState(74);
+
+  const publicTemplatesTabRef = useRef<HTMLButtonElement>(null);
+
+  const readjustHeight = useCallback(function (rect: DOMRect) {
+    setHeaderTop(rect.height);
+  }, []);
 
   const debouncedPublicTemplatesRefetch = useDebouncedCallback(
     publicTemplatesRefetch,
@@ -243,81 +263,126 @@ function NewPetition() {
       })}
       user={me}
     >
-      <Container maxWidth="container.xl" paddingY={10}>
-        <Tabs defaultIndex={templates.length === 0 && !hasTemplates ? 1 : 0}>
-          <TabList flexWrap="wrap-reverse" marginX={6}>
-            <Tab
-              borderTopLeftRadius="md"
-              borderTopRightRadius="md"
-              _selected={selectTabStyles}
-            >
-              <FormattedMessage
-                id="new-petition.my-templates"
-                defaultMessage="My templates"
-              />
-            </Tab>
-            <Tab
-              borderTopLeftRadius="md"
-              borderTopRightRadius="md"
-              _selected={selectTabStyles}
-            >
-              <FormattedMessage
-                id="new-petition.public-templates"
-                defaultMessage="Public templates"
-              />
-            </Tab>
-            <Flex flex="1" justifyContent="flex-end" paddingBottom={4}>
-              <Button
-                alignSelf="flex-end"
-                leftIcon={<AddIcon fontSize="12px" />}
-                onClick={() => handleCreatePetitionTemplate("PETITION")}
+      <Container maxWidth="container.xl">
+        <Tabs
+          defaultIndex={templates.length === 0 && !hasTemplates ? 1 : 0}
+          paddingY={4}
+        >
+          <Box
+            position="sticky"
+            top="0px"
+            paddingTop={6}
+            backgroundColor="gray.50"
+            zIndex={1}
+            paddingX={2}
+          >
+            <TabList flexWrap="wrap-reverse" marginX={4}>
+              <Tab
+                borderTopLeftRadius="md"
+                borderTopRightRadius="md"
+                _selected={selectTabStyles}
               >
                 <FormattedMessage
-                  id="new-petition.empty-petition-create"
-                  defaultMessage="Create a blank petition"
+                  id="new-petition.my-templates"
+                  defaultMessage="My templates"
                 />
-              </Button>
-            </Flex>
-          </TabList>
+              </Tab>
+              <Tab
+                borderTopLeftRadius="md"
+                borderTopRightRadius="md"
+                _selected={selectTabStyles}
+                ref={publicTemplatesTabRef}
+              >
+                <FormattedMessage
+                  id="new-petition.public-templates"
+                  defaultMessage="Public templates"
+                />
+              </Tab>
+              <Flex flex="1" justifyContent="flex-end" paddingBottom={4}>
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    alignSelf="flex-end"
+                    leftIcon={<AddIcon fontSize="12px" />}
+                    rightIcon={<ChevronDownIcon />}
+                    colorScheme="purple"
+                    aria-label={intl.formatMessage({
+                      id: "new-petition.create",
+                      defaultMessage: "Create",
+                    })}
+                  >
+                    <FormattedMessage
+                      id="new-petition.create"
+                      defaultMessage="Create"
+                    />
+                  </MenuButton>
+                  <Portal>
+                    <MenuList
+                      width="min-content"
+                      minWidth="154px"
+                      whiteSpace="nowrap"
+                    >
+                      <MenuItem
+                        onClick={() => handleCreatePetitionTemplate("TEMPLATE")}
+                        icon={<FileNewIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="new-petition.new-template"
+                          defaultMessage="New template"
+                        />
+                      </MenuItem>
+                      <MenuItem
+                        onClick={() => handleCreatePetitionTemplate("PETITION")}
+                        icon={<PaperPlaneIcon display="block" boxSize={4} />}
+                      >
+                        <FormattedMessage
+                          id="new-petition.blank-petition"
+                          defaultMessage="Blank petition"
+                        />
+                      </MenuItem>
+                    </MenuList>
+                  </Portal>
+                </Menu>
+              </Flex>
+            </TabList>
+            <ResizeObserver onResize={readjustHeight} />
+          </Box>
+
           <TabPanels>
-            <TabPanel paddingX={0} paddingY={8}>
+            <TabPanel paddingX={0} paddingY={0}>
               <NewPetitionMyTemplatesHeader
                 search={search}
                 onSearchChange={handleSearchChange}
                 locale={locale}
                 onLocaleChange={handleLocaleChange}
+                paddingX={6}
+                paddingTop={8}
+                paddingBottom={6}
+                position="sticky"
+                top={`${headerTop}px`}
+                backgroundColor="gray.50"
+                zIndex={1}
               />
               {templates.length === 0 ? (
-                <Stack
-                  justifyContent="center"
-                  alignItems="center"
-                  minHeight="160px"
-                >
-                  <Text color="gray.500">
-                    {hasTemplates ? (
-                      <FormattedMessage
-                        id="new-petition.no-templates-found"
-                        defaultMessage="We couldn't find any templates with that search"
-                      />
-                    ) : (
-                      <FormattedMessage
-                        id="new-petition.no-templates"
-                        defaultMessage="You don't have any templates yet"
-                      />
-                    )}
-                  </Text>
-                  <Button
-                    variant="ghost"
-                    colorScheme="purple"
-                    size="sm"
-                    onClick={() => handleCreatePetitionTemplate()}
-                  >
-                    <FormattedMessage
-                      id="new-petition.create-new-template"
-                      defaultMessage="Create new template"
-                    />
-                  </Button>
-                </Stack>
+                hasTemplates ? (
+                  <NewPetitionEmptySearch
+                    onClickNewTemplate={() =>
+                      handleCreatePetitionTemplate("TEMPLATE")
+                    }
+                    onClickPublicTemplates={() =>
+                      publicTemplatesTabRef?.current?.click()
+                    }
+                  />
+                ) : (
+                  <NewPetitionEmptyTempaltes
+                    onClickNewTemplate={() =>
+                      handleCreatePetitionTemplate("TEMPLATE")
+                    }
+                    onClickPublicTemplates={() =>
+                      publicTemplatesTabRef?.current?.click()
+                    }
+                  />
+                )
               ) : (
                 <NewPetitionTemplatesList
                   items={templates}
@@ -328,33 +393,27 @@ function NewPetition() {
                 />
               )}
             </TabPanel>
-            <TabPanel paddingX={0} paddingY={8}>
+            <TabPanel paddingX={0} paddingY={0}>
               <NewPetitionPublicTemplatesHeader
                 search={publicSearch}
                 onSearchChange={handlePublicSearchChange}
                 locale={publicLocale}
                 onLocaleChange={handlePublicLocaleChange}
+                spacing={4}
+                paddingX={6}
+                paddingTop={8}
+                paddingBottom={6}
+                position="sticky"
+                top={`${headerTop}px`}
+                backgroundColor="gray.50"
+                zIndex={1}
               />
               {publicTemplates.length === 0 ? (
-                <Stack
-                  justifyContent="center"
-                  alignItems="center"
-                  minHeight="160px"
-                >
-                  <Text color="gray.500">
-                    {publicSearch ? (
-                      <FormattedMessage
-                        id="new-petition.no-templates-found"
-                        defaultMessage="We couldn't find any templates with that search"
-                      />
-                    ) : (
-                      <FormattedMessage
-                        id="new-petition.no-public-templates"
-                        defaultMessage="There are no public templates yet"
-                      />
-                    )}
-                  </Text>
-                </Stack>
+                <NewPetitionEmptySearch
+                  onClickNewTemplate={() =>
+                    handleCreatePetitionTemplate("TEMPLATE")
+                  }
+                />
               ) : (
                 <NewPetitionTemplatesList
                   items={publicTemplates}

@@ -7,35 +7,25 @@ import {
   IconButton,
   List,
   ListItem,
-  Menu,
-  MenuButton,
-  MenuGroup,
-  MenuItem,
-  MenuList,
-  Portal,
   Tooltip,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import {
   AddIcon,
-  FileNewIcon,
-  FileTextIcon,
   PaperPlaneIcon,
   PaperPlanesIcon,
   UsersIcon,
 } from "@parallel/chakra/icons";
 import { AppLayoutNavbar_UserFragment } from "@parallel/graphql/__types";
-import { useGoToPetition } from "@parallel/utils/goToPetition";
-import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { resolveUrl } from "@parallel/utils/next";
 import { useRouter } from "next/router";
-import { memo, useCallback, useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { memo, useMemo } from "react";
+import { useIntl } from "react-intl";
 import { NakedLink } from "../common/Link";
 import { Logo } from "../common/Logo";
 import { Spacer } from "../common/Spacer";
-import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { NotificationsButton } from "../notifications/NotificationsButton";
+import { AppLayoutNavbarLink } from "./AppLayoutNavbarLink";
 import { UserMenu } from "./UserMenu";
 
 export interface AppLayoutNavbarProps extends BoxProps {
@@ -52,14 +42,6 @@ export const AppLayoutNavbar = Object.assign(
     const intl = useIntl();
     const router = useRouter();
     const { pathname, query } = router;
-    const createPetition = useCreatePetition();
-    const goToPetition = useGoToPetition();
-    const handleCreatePetition = useCallback(async () => {
-      try {
-        const petitionId = await createPetition();
-        goToPetition(petitionId, "compose");
-      } catch {}
-    }, [createPetition, goToPetition]);
     const items = useMemo(
       () => [
         {
@@ -140,61 +122,29 @@ export const AppLayoutNavbar = Object.assign(
           </NakedLink>
         </Center>
         <Flex justifyContent="center" alignItems="center">
-          <Menu
-            id="create-petition"
-            placement={isMobile ? "top-start" : "right"}
+          <Tooltip
+            label={intl.formatMessage({
+              id: "new-petition.title",
+              defaultMessage: "New petition",
+            })}
+            placement={isMobile ? "top" : "right"}
           >
-            <Tooltip
-              label={intl.formatMessage({
-                id: "navbar.create-new-petition",
-                defaultMessage: "Create new petition",
+            <IconButton
+              id="create-petition"
+              placement={isMobile ? "top-start" : "right"}
+              colorScheme="purple"
+              icon={<AddIcon />}
+              size="lg"
+              isRound
+              onClick={() =>
+                router.push(`/${router.query.locale}/app/petitions/new`)
+              }
+              aria-label={intl.formatMessage({
+                id: "new-petition.title",
+                defaultMessage: "New petition",
               })}
-              placement={isMobile ? "top" : "right"}
-            >
-              <MenuButton
-                as={IconButton}
-                colorScheme="purple"
-                icon={<AddIcon />}
-                size="lg"
-                isRound
-                aria-label={intl.formatMessage({
-                  id: "navbar.create-new-petition",
-                  defaultMessage: "Create new petition",
-                })}
-              />
-            </Tooltip>
-            <Portal>
-              <MenuList>
-                <MenuGroup
-                  title={intl.formatMessage({
-                    id: "navbar.create-new-petition",
-                    defaultMessage: "Create new petition",
-                  })}
-                >
-                  <NakedLink href="/app/petitions/new">
-                    <MenuItem
-                      as="a"
-                      icon={<FileTextIcon display="block" boxSize={4} />}
-                    >
-                      <FormattedMessage
-                        id="navbar.create-new-petition-from-template"
-                        defaultMessage="Use a template"
-                      />
-                    </MenuItem>
-                  </NakedLink>
-                  <MenuItem
-                    onClick={handleCreatePetition}
-                    icon={<FileNewIcon display="block" boxSize={4} />}
-                  >
-                    <FormattedMessage
-                      id="navbar.create-new-petition-blank"
-                      defaultMessage="Blank petition"
-                    />
-                  </MenuItem>
-                </MenuGroup>
-              </MenuList>
-            </Portal>
-          </Menu>
+            />
+          </Tooltip>
         </Flex>
         <Flex
           as={List}

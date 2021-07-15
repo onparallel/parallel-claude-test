@@ -51,7 +51,7 @@ export function NewPetitionLanguageFilter({
           locales[0].localizedLabel}
       </MenuButton>
       <Portal>
-        <MenuList>
+        <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
           <MenuOptionGroup value={locale ?? "all"}>
             {locales.map((locale) => (
               <MenuItemOption
