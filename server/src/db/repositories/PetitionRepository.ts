@@ -1636,35 +1636,37 @@ export class PetitionRepository extends BaseRepository {
         );
       }
 
-      // copy original tag ids to cloned petition
-      if (!sourcePetition!.is_template) {
-        await this.raw(
-          /* sql */ `
+      if (sourcePetition?.org_id === user.org_id) {
+        // copy original tag ids to cloned petition
+        if (!sourcePetition!.is_template) {
+          await this.raw(
+            /* sql */ `
         insert into petition_tag (petition_id, tag_id)
         select ?, tag_id from petition_tag where petition_id = ?
       `,
-          [cloned.id, petitionId],
-          t
-        );
-      }
+            [cloned.id, petitionId],
+            t
+          );
+        }
 
-      // copy field attachments to new fields, using the original file_upload_id
-      // TODO maybe this can be done in just one query
-      const attachments = await this.from("petition_field_attachment", t)
-        .whereNull("deleted_at")
-        .whereIn("petition_field_id", uniq(fields.map((f) => f.id)))
-        .select("*");
+        // copy field attachments to new fields, using the original file_upload_id
+        // TODO maybe this can be done in just one query
+        const attachments = await this.from("petition_field_attachment", t)
+          .whereNull("deleted_at")
+          .whereIn("petition_field_id", uniq(fields.map((f) => f.id)))
+          .select("*");
 
-      if (attachments.length > 0) {
-        await this.insert(
-          "petition_field_attachment",
-          attachments.map((a) => ({
-            file_upload_id: a.file_upload_id,
-            petition_field_id: newIds[a.petition_field_id],
-            created_by: `User:${user.id}`,
-          })),
-          t
-        );
+        if (attachments.length > 0) {
+          await this.insert(
+            "petition_field_attachment",
+            attachments.map((a) => ({
+              file_upload_id: a.file_upload_id,
+              petition_field_id: newIds[a.petition_field_id],
+              created_by: `User:${user.id}`,
+            })),
+            t
+          );
+        }
       }
 
       return cloned;
