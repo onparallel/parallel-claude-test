@@ -1,3 +1,4 @@
+import { nameCase } from "@foundernest/namecase";
 import { inputObjectType, list, mutationField, nonNull } from "@nexus/schema";
 import pMap from "p-map";
 import { chunk, uniqBy } from "remeda";
@@ -153,8 +154,8 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
           ctx.contacts.createOrUpdate(
             chunk.map((parsed) => ({
               email: parsed.email,
-              first_name: parsed.firstName,
-              last_name: parsed.lastName,
+              first_name: nameCase(parsed.firstName),
+              last_name: parsed.lastName ? nameCase(parsed.lastName) : null,
               org_id: ctx.user!.org_id,
             })),
             `User:${ctx.user!.id}`

@@ -33,6 +33,7 @@
     "run-ts-script": "ts-node --project tsconfig.json --transpile-only"
   },
   "dependencies": {
+    "@foundernest/namecase": "^1.0.5",
     "@nexus/schema": "^0.20.1",
     "ajv": "^8.6.0",
     "ajv-formats": "^2.1.0",

@@ -2902,6 +2902,11 @@
     "@formatjs/icu-messageformat-parser" "2.0.6"
     tslib "^2.1.0"
 
+"@foundernest/namecase@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@foundernest/namecase/-/namecase-1.0.5.tgz#a35b08bb577053774bce83cc1ea392aa115c8d3b"
+  integrity sha512-MyQ4xb0dlIc0T3V0iiMzm2PSm5IQgwLUiHXyjD8FZiqfXewLMpoknCipVyrPU6jUczjN8VTHno5mRfjRXlTI5A==
+
 "@graphql-codegen/cli@^1.21.5":
   version "1.21.5"
   resolved "https://registry.yarnpkg.com/@graphql-codegen/cli/-/cli-1.21.5.tgz#b9041553747cfb2dee7c3473a2e2461ec3e7ada5"
