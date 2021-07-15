@@ -158,7 +158,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       notifications: {
         hasMore: false,
         items: [],
@@ -188,7 +188,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       notifications: {
         hasMore: true,
         items: [
@@ -238,7 +238,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       `,
     });
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       notifications: {
         hasMore: false,
         items: [
@@ -280,7 +280,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       `,
     });
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       notifications: {
         hasMore: false,
         items: [
@@ -314,7 +314,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       `,
     });
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       notifications: { items: [] },
     });
   });
@@ -330,7 +330,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       `,
     });
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       unreadNotificationIds: [
         toGlobalId("PetitionUserNotification", notifications[2].id),
         toGlobalId("PetitionUserNotification", notifications[3].id),
@@ -357,7 +357,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
+    expect(data?.updatePetitionUserNotificationReadStatus).toEqual([
       { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
       { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
       { id: toGlobalId("PetitionUserNotification", notifications[4].id) },
@@ -387,7 +387,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
+    expect(data?.updatePetitionUserNotificationReadStatus).toEqual([
       {
         id: toGlobalId("PetitionUserNotification", notifications[2].id),
         access: { id: toGlobalId("PetitionAccess", petitionAccess.id) },
@@ -414,7 +414,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
+    expect(data?.updatePetitionUserNotificationReadStatus).toEqual([
       { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
       { id: toGlobalId("PetitionUserNotification", notifications[3].id) },
     ]);
@@ -440,7 +440,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
+    expect(data?.updatePetitionUserNotificationReadStatus).toEqual([
       { id: toGlobalId("PetitionUserNotification", notifications[4].id) },
     ]);
   });
@@ -466,7 +466,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
+    expect(data?.updatePetitionUserNotificationReadStatus).toEqual([
       { id: toGlobalId("PetitionUserNotification", notifications[0].id) },
     ]);
   });
@@ -493,7 +493,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updatePetitionUserNotificationReadStatus).toEqual([
+    expect(data?.updatePetitionUserNotificationReadStatus).toEqual([
       { id: toGlobalId("PetitionUserNotification", notifications[2].id) },
     ]);
   });
@@ -696,7 +696,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       notifications: {
         items: [],
         hasMore: false,
@@ -760,7 +760,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       id: toGlobalId("User", sessionUser.id),
       notifications: {
         items: [],
@@ -834,7 +834,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       id: toGlobalId("User", sessionUser.id),
       notifications: {
         // only notification that should be deleted is the "group shared" created in this case
@@ -899,7 +899,7 @@ describe("GraphQL - PetitionUserNotifications", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.me).toEqual({
+    expect(data?.me).toEqual({
       id: toGlobalId("User", sessionUser.id),
       notifications: {
         items: notifications

@@ -80,7 +80,7 @@ describe("GraphQL/Tags", () => {
         `,
       });
       expect(errors).toBeUndefined();
-      expect(data.tags).toEqual({
+      expect(data?.tags).toEqual({
         totalCount: tags.length,
         items: tags.map((t) => ({
           id: toGlobalId("Tag", t.id),
@@ -91,7 +91,7 @@ describe("GraphQL/Tags", () => {
     it("should paginate the result when passing limit and offset arguments", async () => {
       const { data, errors } = await testClient.query({
         query: gql`
-          query($limit: Int, $offset: Int) {
+          query ($limit: Int, $offset: Int) {
             tags(limit: $limit, offset: $offset) {
               totalCount
               items {
@@ -107,7 +107,7 @@ describe("GraphQL/Tags", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.tags).toEqual({
+      expect(data?.tags).toEqual({
         totalCount: tags.length,
         items: tags.slice(1, 3).map((t) => ({
           id: toGlobalId("Tag", t.id),
@@ -118,7 +118,7 @@ describe("GraphQL/Tags", () => {
     it("should do a fuzzy search of the organization tags", async () => {
       const { data, errors } = await testClient.query({
         query: gql`
-          query($search: String) {
+          query ($search: String) {
             tags(search: $search) {
               totalCount
               items {
@@ -137,7 +137,7 @@ describe("GraphQL/Tags", () => {
         (t) => t.name === "todo" || t.name === "to do"
       );
       expect(errors).toBeUndefined();
-      expect(data.tags).toEqual({
+      expect(data?.tags).toEqual({
         totalCount: expectedTags.length,
         items: expectedTags.map((t) => ({
           id: toGlobalId("Tag", t.id),
@@ -149,7 +149,7 @@ describe("GraphQL/Tags", () => {
     it("should match with a slight search typo", async () => {
       const { data, errors } = await testClient.query({
         query: gql`
-          query($search: String) {
+          query ($search: String) {
             tags(search: $search) {
               totalCount
               items {
@@ -165,7 +165,7 @@ describe("GraphQL/Tags", () => {
       });
       const expectedTags = tags.filter((t) => t.name === "important");
       expect(errors).toBeUndefined();
-      expect(data.tags).toEqual({
+      expect(data?.tags).toEqual({
         totalCount: 1,
         items: expectedTags.map((t) => ({
           id: toGlobalId("Tag", t.id),
@@ -179,7 +179,7 @@ describe("GraphQL/Tags", () => {
     it("creates a new tag available on the organization", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($name: String!, $color: String!) {
+          mutation ($name: String!, $color: String!) {
             createTag(name: $name, color: $color) {
               name
               color
@@ -192,7 +192,7 @@ describe("GraphQL/Tags", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.createTag).toEqual({
+      expect(data?.createTag).toEqual({
         name: "my new tag",
         color: "#a59dfa",
       });
@@ -201,7 +201,7 @@ describe("GraphQL/Tags", () => {
     it("sends error when passing an invalid color value", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($name: String!, $color: String!) {
+          mutation ($name: String!, $color: String!) {
             createTag(name: $name, color: $color) {
               name
               color
@@ -220,7 +220,7 @@ describe("GraphQL/Tags", () => {
     it("sends error when passing a tag name longer than 100 chars", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($name: String!, $color: String!) {
+          mutation ($name: String!, $color: String!) {
             createTag(name: $name, color: $color) {
               name
               color
@@ -239,7 +239,7 @@ describe("GraphQL/Tags", () => {
     it("sends error when trying to duplicate tag name", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($name: String!, $color: String!) {
+          mutation ($name: String!, $color: String!) {
             createTag(name: $name, color: $color) {
               name
               color
@@ -260,7 +260,7 @@ describe("GraphQL/Tags", () => {
     it("updates the organization tag", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($id: GID!, $name: String) {
+          mutation ($id: GID!, $name: String) {
             updateTag(id: $id, data: { name: $name }) {
               id
               name
@@ -274,7 +274,7 @@ describe("GraphQL/Tags", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.updateTag).toEqual({
+      expect(data?.updateTag).toEqual({
         id: toGlobalId("Tag", tags[0].id),
         name: "new tag name",
         color: tags[0].color,
@@ -284,7 +284,7 @@ describe("GraphQL/Tags", () => {
     it("sends error when trying to update a tag on another organization", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($id: GID!, $name: String) {
+          mutation ($id: GID!, $name: String) {
             updateTag(id: $id, data: { name: $name }) {
               id
               name
@@ -307,7 +307,7 @@ describe("GraphQL/Tags", () => {
       const { errors: deleteError, data: deleteData } = await testClient.mutate(
         {
           mutation: gql`
-            mutation($id: GID!) {
+            mutation ($id: GID!) {
               deleteTag(id: $id)
             }
           `,
@@ -318,29 +318,27 @@ describe("GraphQL/Tags", () => {
       );
 
       expect(deleteError).toBeUndefined();
-      expect(deleteData.deleteTag).toEqual("SUCCESS");
+      expect(deleteData?.deleteTag).toEqual("SUCCESS");
 
-      const {
-        errors: petitionError,
-        data: petitionData,
-      } = await testClient.query({
-        query: gql`
-          query($id: GID!) {
-            petition(id: $id) {
-              id
-              tags {
+      const { errors: petitionError, data: petitionData } =
+        await testClient.query({
+          query: gql`
+            query ($id: GID!) {
+              petition(id: $id) {
                 id
+                tags {
+                  id
+                }
               }
             }
-          }
-        `,
-        variables: {
-          id: toGlobalId("Petition", petition.id),
-        },
-      });
+          `,
+          variables: {
+            id: toGlobalId("Petition", petition.id),
+          },
+        });
 
       expect(petitionError).toBeUndefined();
-      expect(petitionData.petition).toEqual({
+      expect(petitionData?.petition).toEqual({
         id: toGlobalId("Petition", petition.id),
         tags: [],
       });
@@ -349,7 +347,7 @@ describe("GraphQL/Tags", () => {
     it("sends error when trying to delete a private tag", async () => {
       const { data, errors } = await testClient.mutate({
         mutation: gql`
-          mutation($id: GID!) {
+          mutation ($id: GID!) {
             deleteTag(id: $id)
           }
         `,
@@ -371,7 +369,7 @@ describe("GraphQL/Tags", () => {
     it("tags a petition with the given tag", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($tagId: GID!, $petitionId: GID!) {
+          mutation ($tagId: GID!, $petitionId: GID!) {
             tagPetition(tagId: $tagId, petitionId: $petitionId) {
               id
               tags {
@@ -386,7 +384,7 @@ describe("GraphQL/Tags", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.tagPetition).toEqual({
+      expect(data?.tagPetition).toEqual({
         id: toGlobalId("Petition", petition.id),
         tags: [
           { id: toGlobalId("Tag", tags[3].id) },
@@ -398,7 +396,7 @@ describe("GraphQL/Tags", () => {
     it("sends error when trying to tag a petition with the same tag more than once", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($tagId: GID!, $petitionId: GID!) {
+          mutation ($tagId: GID!, $petitionId: GID!) {
             tagPetition(tagId: $tagId, petitionId: $petitionId) {
               id
             }
@@ -417,7 +415,7 @@ describe("GraphQL/Tags", () => {
     it("sends error when trying to apply a private tag to a petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($tagId: GID!, $petitionId: GID!) {
+          mutation ($tagId: GID!, $petitionId: GID!) {
             tagPetition(tagId: $tagId, petitionId: $petitionId) {
               id
             }
@@ -443,7 +441,7 @@ describe("GraphQL/Tags", () => {
     it("removes the tag from a petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($tagId: GID!, $petitionId: GID!) {
+          mutation ($tagId: GID!, $petitionId: GID!) {
             untagPetition(tagId: $tagId, petitionId: $petitionId) {
               id
               tags {
@@ -458,7 +456,7 @@ describe("GraphQL/Tags", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.untagPetition).toEqual({
+      expect(data?.untagPetition).toEqual({
         id: toGlobalId("Petition", petition.id),
         tags: [],
       });
@@ -467,7 +465,7 @@ describe("GraphQL/Tags", () => {
     it("sends error when trying to untag a private petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation($tagId: GID!, $petitionId: GID!) {
+          mutation ($tagId: GID!, $petitionId: GID!) {
             untagPetition(tagId: $tagId, petitionId: $petitionId) {
               id
               tags {

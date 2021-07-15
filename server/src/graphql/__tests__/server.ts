@@ -1,6 +1,8 @@
+import { VariableValues } from "apollo-server-core";
 import { ApolloServer } from "apollo-server-express";
 import { createTestClient } from "apollo-server-testing";
 import { serialize as serializeCookie } from "cookie";
+import { DocumentNode } from "graphql";
 import { Knex } from "knex";
 import { createTestContainer } from "../../../test/testContainer";
 import { ApiContext } from "../../context";
@@ -29,14 +31,28 @@ export const initServer = async () => {
     },
   });
 
-  const { query, mutate } = createTestClient(server);
-
   const knex = container.get<Knex>(KNEX);
   await deleteAllData(knex);
 
   return {
-    query,
-    mutate,
+    async query({
+      query,
+      variables,
+    }: {
+      query: string | DocumentNode;
+      variables?: VariableValues;
+    }) {
+      return await server.executeOperation({ query, variables });
+    },
+    async mutate({
+      mutation,
+      variables,
+    }: {
+      mutation: string | DocumentNode;
+      variables?: VariableValues;
+    }) {
+      return await server.executeOperation({ query: mutation, variables });
+    },
     setNextReq(req: any) {
       stack.push(req);
     },

@@ -113,7 +113,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.petition).toEqual({
+      expect(data?.petition).toEqual({
         permissions: [
           {
             permissionType: "OWNER",
@@ -145,7 +145,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.petition).toEqual({
+      expect(data?.petition).toEqual({
         myEffectivePermission: {
           permissionType: "OWNER",
           isSubscribed: true,
@@ -319,7 +319,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.transferPetitionOwnership).toEqual([
+      expect(data?.transferPetitionOwnership).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -382,7 +382,7 @@ describe("GraphQL/Petition Permissions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.addPetitionPermission).toEqual([
+      expect(data?.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           events: {
@@ -740,7 +740,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionPermission).toEqual([
+      expect(data?.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -956,7 +956,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionPermission).toEqual([
+      expect(data?.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1017,7 +1017,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionPermission).toEqual([
+      expect(data?.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1081,7 +1081,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionPermission).toEqual([
+      expect(data?.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -1154,7 +1154,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.addPetitionPermission).toEqual([
+      expect(data?.addPetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           events: {
@@ -1970,7 +1970,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.removePetitionPermission).toEqual([
+      expect(data?.removePetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [
@@ -2044,7 +2044,7 @@ describe("GraphQL/Petition Permissions", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.removePetitionPermission).toEqual([
+      expect(data?.removePetitionPermission).toEqual([
         {
           id: toGlobalId("Petition", userPetition.id),
           permissions: [

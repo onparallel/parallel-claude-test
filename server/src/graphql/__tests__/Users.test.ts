@@ -197,7 +197,7 @@ describe("GraphQL/Users", () => {
         });
 
       expect(petitionErrors).toBeUndefined();
-      expect(petitionData.petition).toEqual({
+      expect(petitionData?.petition).toEqual({
         id: toGlobalId("Petition", user0Petition.id),
         permissions: [
           {
@@ -314,7 +314,7 @@ describe("GraphQL/Users", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.updateUserStatus).toEqual([
+      expect(data?.updateUserStatus).toEqual([
         {
           id: toGlobalId("User", activeUsers[0].id),
           status: "INACTIVE",

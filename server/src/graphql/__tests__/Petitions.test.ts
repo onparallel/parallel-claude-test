@@ -282,7 +282,7 @@ describe("GraphQL/Petitions", () => {
           !p.is_template && p.id !== petitions[0].id && p.id !== petitions[1].id
       );
       expect(errors).toBeUndefined();
-      expect(data.petitions).toEqual({
+      expect(data?.petitions).toEqual({
         totalCount: 4,
         items: expectedPetitions.map((p) => ({
           id: toGlobalId("Petition", p.id),
@@ -823,7 +823,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.createPetition).toEqual({ tags: [] });
+      expect(data?.createPetition).toEqual({ tags: [] });
     });
 
     it("don't copy reminders configuration when creating a petition from a template", async () => {
@@ -868,7 +868,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.createPetition).toEqual({ remindersConfig: null });
+      expect(data?.createPetition).toEqual({ remindersConfig: null });
     });
 
     it("don't copy deadline configuration when creating a petition from a template", async () => {
@@ -902,7 +902,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.createPetition).toEqual({ deadline: null });
+      expect(data?.createPetition).toEqual({ deadline: null });
     });
 
     it("copy reminders and deadline config when cloning a petition", async () => {
@@ -950,7 +950,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.createPetition).toEqual({
+      expect(data?.createPetition).toEqual({
         remindersConfig: {
           time: "12:00",
           offset: 1,
@@ -1315,8 +1315,8 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.clonePetitions[0].fields[0].attachments).toHaveLength(1);
-      expect(data.clonePetitions[0].fields[1].attachments).toHaveLength(0);
+      expect(data?.clonePetitions[0].fields[0].attachments).toHaveLength(1);
+      expect(data?.clonePetitions[0].fields[1].attachments).toHaveLength(0);
     });
 
     it("copies tags when cloning the petition", async () => {
@@ -1350,7 +1350,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.clonePetitions[0].tags).toHaveLength(1);
+      expect(data?.clonePetitions[0].tags).toHaveLength(1);
     });
 
     it("copies signature configuration when cloning the petition", async () => {
@@ -1378,7 +1378,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.clonePetitions[0]).toEqual({
+      expect(data?.clonePetitions[0]).toEqual({
         signatureConfig: {
           contacts: [],
           provider: "SIGNATURIT",
@@ -1414,7 +1414,7 @@ describe("GraphQL/Petitions", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.clonePetitions).toEqual([
+      expect(data?.clonePetitions).toEqual([
         { myEffectivePermission: { isSubscribed: false } },
       ]);
     });
@@ -1654,7 +1654,7 @@ describe("GraphQL/Petitions", () => {
         variables: { ids: [toGlobalId("Petition", petition.id)] },
       });
       expect(errors).toBeUndefined();
-      expect(data.deletePetitions).toBe("SUCCESS");
+      expect(data?.deletePetitions).toBe("SUCCESS");
 
       const petitionPermissions = await mocks.knex
         .from("petition_permission")

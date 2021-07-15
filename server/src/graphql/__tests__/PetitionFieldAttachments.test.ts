@@ -68,7 +68,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.petition).toEqual({
+      expect(data?.petition).toEqual({
         fields: [
           {
             attachments: attachments.map((a) => ({
@@ -120,7 +120,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.createPetitionFieldAttachmentUploadLink).toEqual({
+      expect(data?.createPetitionFieldAttachmentUploadLink).toEqual({
         presignedPostData: {
           url: "", // mocked
         },
@@ -303,7 +303,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.petitionFieldAttachmentUploadComplete).toEqual({
+      expect(data?.petitionFieldAttachmentUploadComplete).toEqual({
         id: toGlobalId("PetitionFieldAttachment", attachment.id),
         file: {
           isComplete: true,
@@ -353,7 +353,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.petitionFieldAttachmentDownloadLink).toEqual({
+      expect(data?.petitionFieldAttachmentDownloadLink).toEqual({
         result: "SUCCESS",
         url: "", // mocked
         file: {
@@ -402,7 +402,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.petitionFieldAttachmentDownloadLink).toEqual({
+      expect(data?.petitionFieldAttachmentDownloadLink).toEqual({
         result: "SUCCESS",
         file: {
           isComplete: true,
@@ -475,7 +475,7 @@ describe("GraphQL/PetitionFieldAttachments", () => {
       });
 
       expect(errors).toBeUndefined();
-      expect(data.removePetitionFieldAttachment).toEqual("SUCCESS");
+      expect(data!.removePetitionFieldAttachment).toEqual("SUCCESS");
 
       const attachments = await mocks.knex
         .from("petition_field_attachment")

@@ -271,7 +271,7 @@ describe("GraphQL/UserGroups", () => {
       },
     });
     expect(deleteError).toBeUndefined();
-    expect(deleteData.deleteUserGroup).toEqual("SUCCESS");
+    expect(deleteData?.deleteUserGroup).toEqual("SUCCESS");
 
     const { data, errors } = await testClient.query({
       query: gql`
@@ -286,7 +286,7 @@ describe("GraphQL/UserGroups", () => {
       `,
     });
     expect(errors).toBeUndefined();
-    expect(data.userGroups).toEqual({
+    expect(data?.userGroups).toEqual({
       totalCount: 2,
       items: [
         { id: toGlobalId("UserGroup", userGroups[0].id) },
@@ -307,7 +307,7 @@ describe("GraphQL/UserGroups", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.deleteUserGroup).toEqual("SUCCESS");
+    expect(data?.deleteUserGroup).toEqual("SUCCESS");
 
     const groupPermissions = await mocks
       .knex<PetitionPermission>("petition_permission")
@@ -345,7 +345,7 @@ describe("GraphQL/UserGroups", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.addUsersToUserGroup).toEqual({
+    expect(data?.addUsersToUserGroup).toEqual({
       id: toGlobalId("UserGroup", userGroups[1].id),
       name: userGroups[1].name,
       members: [{ user: { id: toGlobalId("User", users[0].id) } }],
@@ -376,7 +376,7 @@ describe("GraphQL/UserGroups", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.addUsersToUserGroup).toEqual({
+    expect(data?.addUsersToUserGroup).toEqual({
       id: toGlobalId("UserGroup", userGroups[0].id),
       name: userGroups[0].name,
       members: users.map((m) => ({
@@ -421,7 +421,7 @@ describe("GraphQL/UserGroups", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.removeUsersFromGroup).toEqual({
+    expect(data?.removeUsersFromGroup).toEqual({
       id: toGlobalId("UserGroup", userGroups[0].id),
       name: userGroups[0].name,
       members: [{ user: { id: toGlobalId("User", users[2].id) } }],
@@ -455,7 +455,7 @@ describe("GraphQL/UserGroups", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.removeUsersFromGroup).toEqual({
+    expect(data?.removeUsersFromGroup).toEqual({
       id: toGlobalId("UserGroup", userGroups[0].id),
       name: userGroups[0].name,
       members: [{ user: { id: toGlobalId("User", users[2].id) } }],
@@ -490,7 +490,7 @@ describe("GraphQL/UserGroups", () => {
       },
     });
     expect(errors).toBeUndefined();
-    expect(data.cloneUserGroup).toEqual([
+    expect(data?.cloneUserGroup).toEqual([
       {
         name: userGroups[0].name.concat(" (copy)"),
         members: users
@@ -514,7 +514,7 @@ describe("GraphQL/UserGroups", () => {
       },
     });
     expect(errors).toBeUndefined();
-    const newGroupId = fromGlobalId(data.cloneUserGroup[0].id, "UserGroup").id;
+    const newGroupId = fromGlobalId(data?.cloneUserGroup[0].id, "UserGroup").id;
     const newGroupPermissions = await mocks
       .knex<PetitionPermission>("petition_permission")
       .whereNull("deleted_at")

@@ -184,7 +184,7 @@ describe("GraphQL/Public", () => {
       `,
       variables: {
         keycode: access.keycode,
-        token: res1.data.publicSendVerificationCode.token,
+        token: res1.data?.publicSendVerificationCode.token,
         code,
       },
     });
@@ -285,7 +285,7 @@ describe("GraphQL/Public", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.publicPetitionFieldAttachmentDownloadLink).toEqual({
+      expect(data?.publicPetitionFieldAttachmentDownloadLink).toEqual({
         result: "SUCCESS",
         file: {
           contentType: "image/png",
@@ -335,7 +335,7 @@ describe("GraphQL/Public", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.publicPetitionFieldAttachmentDownloadLink).toEqual({
+      expect(data?.publicPetitionFieldAttachmentDownloadLink).toEqual({
         result: "SUCCESS",
         file: {
           contentType: "image/png",
@@ -451,11 +451,11 @@ describe("GraphQL/Public", () => {
         },
       });
 
-      checkboxReply = data.publicCreateCheckboxReply;
+      checkboxReply = data?.publicCreateCheckboxReply;
 
       expect(errors).toBeUndefined();
-      expect(data.publicCreateCheckboxReply).toEqual({
-        id: data.publicCreateCheckboxReply.id,
+      expect(data?.publicCreateCheckboxReply).toEqual({
+        id: data?.publicCreateCheckboxReply.id,
         content: { choices: ["Option 1"] },
       });
     });
@@ -503,7 +503,7 @@ describe("GraphQL/Public", () => {
         },
       });
       expect(errors).toBeUndefined();
-      expect(data.publicUpdateCheckboxReply).toEqual({
+      expect(data?.publicUpdateCheckboxReply).toEqual({
         content: { choices: ["Option 1", "Option 2"] },
       });
     });
