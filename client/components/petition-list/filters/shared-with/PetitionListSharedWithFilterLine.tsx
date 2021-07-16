@@ -1,4 +1,8 @@
 import { Box, CloseButton } from "@chakra-ui/react";
+import {
+  FilterSharedWithOperator,
+  PetitionSharedWithFilterLine,
+} from "@parallel/graphql/__types";
 import { useInlineReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
@@ -6,10 +10,6 @@ import { useCallback, useMemo } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { UserSelect, useSearchUsers } from "../../../common/UserSelect";
-import {
-  PetitionSharedWithFilterLine,
-  FilterSharedWithOperator,
-} from "@parallel/graphql/__types";
 
 export interface PetitionListSharedWithFilterProps
   extends ValueProps<PetitionSharedWithFilterLine, false> {
@@ -36,34 +36,34 @@ export function PetitionListSharedWithFilterLine({
       excludeUserGroups: string[]
     ) => {
       return await _handleSearchUsers(search, {
-        includeGroups: true,
+        includeGroups: value.operator !== "IS_OWNER",
         excludeUsers: [...excludeUsers],
         excludeUserGroups: [...excludeUserGroups],
       });
     },
-    [_handleSearchUsers]
+    [_handleSearchUsers, value.operator]
   );
 
   const operators = useMemo<OptionType<FilterSharedWithOperator>[]>(() => {
     return [
       {
         label: intl.formatMessage({
-          id: "component.shared-filter.shared-with",
-          defaultMessage: "shared with",
+          id: "component.petition-list-shared-with-filter.shared-with",
+          defaultMessage: "Shared with",
         }),
         value: "SHARED_WITH",
       },
       {
         label: intl.formatMessage({
-          id: "component.shared-filter.not-shared-with",
-          defaultMessage: "not shared with",
+          id: "component.petition-list-shared-with-filter.not-shared-with",
+          defaultMessage: "Not shared with",
         }),
         value: "NOT_SHARED_WITH",
       },
       {
         label: intl.formatMessage({
-          id: "component.shared-filter.is-owner",
-          defaultMessage: "is owner",
+          id: "component.petition-list-shared-with-filter.is-owner",
+          defaultMessage: "Owner is",
         }),
         value: "IS_OWNER",
       },
@@ -72,8 +72,17 @@ export function PetitionListSharedWithFilterLine({
 
   return (
     <>
-      <CloseButton size="md" onClick={onRemove} />
+      <CloseButton
+        gridRow={{ base: "span 2", sm: "auto" }}
+        aria-label={intl.formatMessage({
+          id: "generic.remove",
+          defaultMessage: "Remove",
+        })}
+        size="md"
+        onClick={onRemove}
+      />
       <Select
+        isSearchable={false}
         options={operators}
         value={operators.find((o) => o.value === value.operator)}
         onChange={(option: OptionType<FilterSharedWithOperator>) => {
@@ -92,7 +101,7 @@ export function PetitionListSharedWithFilterLine({
             }
           }}
           onChange={(userOrGroup) => {
-            onChange({ ...value, value: userOrGroup?.id ?? null });
+            onChange({ ...value, value: (userOrGroup?.id ?? null) as any });
           }}
           onSearch={handleSearchUsers}
           placeholder={intl.formatMessage({

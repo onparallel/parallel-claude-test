@@ -151,7 +151,7 @@ export const UserSelect = Object.assign(
     return (
       <AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>
         ref={ref}
-        value={_value}
+        value={_value as any}
         onChange={onChange as any}
         isMulti={isMulti ?? (false as any)}
         loadOptions={loadOptions}

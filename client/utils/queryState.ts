@@ -3,7 +3,6 @@ import {
   TableSortingDirection,
 } from "@parallel/components/common/Table";
 import { NextRouter, useRouter } from "next/router";
-import { decode } from "punycode";
 import * as qs from "querystring";
 import { ParsedUrlQuery } from "querystring";
 import { Dispatch, SetStateAction, useCallback, useMemo } from "react";

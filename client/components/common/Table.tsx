@@ -4,10 +4,18 @@ import {
   Checkbox,
   Collapse,
   Flex,
+  Heading,
   HStack,
   HTMLChakraProps,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
   Portal,
   Text,
+  useBreakpointValue,
   useDisclosure,
   useOutsideClick,
   usePopper,
@@ -33,7 +41,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Card } from "./Card";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 
@@ -514,12 +522,18 @@ export function DefaultHeader({
   const ref = useRef<HTMLElement>(null);
   const filterButtonRef = useRef<HTMLElement>(null);
 
+  const isMobile = useBreakpointValue({ base: true, sm: false });
   useOutsideClick({
     ref,
     handler: (event) => {
-      if (!filterButtonRef?.current?.contains(event.target as HTMLElement)) {
-        onCloseFilter();
+      if (filterButtonRef?.current?.contains(event.target as HTMLElement)) {
+        // ignore
+        return;
       }
+      if (isMobile) {
+        return;
+      }
+      onCloseFilter();
     },
   });
 
@@ -642,17 +656,57 @@ export function DefaultHeader({
         ) : null}
       </HStack>
       {column.isFilterable && column.Filter ? (
-        <Portal>
-          {isFilterOpen ? (
-            <Card ref={_ref} {...getFilterPopoverProps()}>
-              <column.Filter
-                value={filter}
-                onChange={onFilterChange}
-                context={context}
-              />
-            </Card>
-          ) : null}
-        </Portal>
+        isMobile ? (
+          <Modal isOpen={isFilterOpen} onClose={onCloseFilter}>
+            <ModalOverlay>
+              <ModalContent>
+                <ModalCloseButton
+                  aria-label={intl.formatMessage({
+                    id: "generic.close",
+                    defaultMessage: "Close",
+                  })}
+                />
+                <ModalHeader>
+                  <FormattedMessage
+                    id="component.table.filter-header"
+                    defaultMessage="Filter"
+                  />
+                </ModalHeader>
+                <ModalBody paddingTop={0} paddingX={4} paddingBottom={6}>
+                  <column.Filter
+                    value={filter}
+                    onChange={onFilterChange}
+                    context={context}
+                  />
+                </ModalBody>
+              </ModalContent>
+            </ModalOverlay>
+          </Modal>
+        ) : (
+          <Portal>
+            {isFilterOpen ? (
+              <Card padding={2} ref={_ref} {...getFilterPopoverProps()}>
+                <Heading
+                  as="h4"
+                  size="xs"
+                  textTransform="uppercase"
+                  marginTop={1}
+                  marginBottom={2}
+                >
+                  <FormattedMessage
+                    id="component.table.filter-header"
+                    defaultMessage="Filter"
+                  />
+                </Heading>
+                <column.Filter
+                  value={filter}
+                  onChange={onFilterChange}
+                  context={context}
+                />
+              </Card>
+            ) : null}
+          </Portal>
+        )
       ) : null}
     </Box>
   );

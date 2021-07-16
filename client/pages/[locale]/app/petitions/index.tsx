@@ -32,7 +32,6 @@ import {
   assertQuery,
   useAssertQueryOrPreviousData,
 } from "@parallel/utils/apollo/assertQuery";
-import { fromBase64, toBase64 } from "@parallel/utils/base64";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
@@ -51,7 +50,7 @@ import {
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { MouseEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { mapValues, omit, pick } from "remeda";
+import { pick } from "remeda";
 
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 

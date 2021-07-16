@@ -1,16 +1,16 @@
-import { Button, Grid, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { Button, Grid, HStack, Stack, Text } from "@chakra-ui/react";
 import { PlusCircleFilledIcon } from "@parallel/chakra/icons";
 import { TableColumnFilterProps } from "@parallel/components/common/Table";
+import {
+  FilterSharedWithLogicalOperator,
+  PetitionSharedWithFilter,
+} from "@parallel/graphql/__types";
 import { useInlineReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 import { PetitionListSharedWithFilterLine } from "./PetitionListSharedWithFilterLine";
-import {
-  FilterSharedWithLogicalOperator,
-  PetitionSharedWithFilter,
-} from "@parallel/graphql/__types";
 
 export function PetitionListSharedWithFilter({
   value,
@@ -24,14 +24,14 @@ export function PetitionListSharedWithFilter({
     return [
       {
         label: intl.formatMessage({
-          id: "component.shared-filter.or",
+          id: "component.petition-list-shared-with-filter.or",
           defaultMessage: "or",
         }),
         value: "OR",
       },
       {
         label: intl.formatMessage({
-          id: "component.shared-filter.and",
+          id: "component.petition-list-shared-with-filter.and",
           defaultMessage: "and",
         }),
         value: "AND",
@@ -51,23 +51,23 @@ export function PetitionListSharedWithFilter({
         ...(value?.filters ?? []),
         {
           operator: "SHARED_WITH",
-          value: null,
+          value: null as any,
         },
       ],
     });
   };
 
   return (
-    <Stack padding={2}>
-      <Heading as="h4" size="xs" textTransform="uppercase">
-        <FormattedMessage id="common.filter" defaultMessage="Filter" />
-      </Heading>
+    <Stack>
       {value?.filters.length ? (
         <Grid
-          templateColumns={"auto auto 1fr"}
+          templateColumns={{
+            base: "auto 1fr",
+            sm: "auto auto 1fr",
+          }}
           alignItems="center"
-          columnGap={2}
-          rowGap={3}
+          columnGap={1}
+          rowGap={2}
         >
           {value.filters.map((filter, index) => {
             return (
@@ -99,7 +99,7 @@ export function PetitionListSharedWithFilter({
       ) : (
         <Text textStyle="hint" textAlign="center" minWidth="300px">
           <FormattedMessage
-            id="common.no-filter-applied"
+            id="component.petition-list-shared-with-filter.no-filter"
             defaultMessage="No filter is being applied."
           />
         </Text>
@@ -119,13 +119,14 @@ export function PetitionListSharedWithFilter({
           isDisabled={value?.filters && value.filters.length > 4}
         >
           <FormattedMessage
-            id="component.shared-filter.add-filter"
+            id="component.petition-list-shared-with-filter.add-filter"
             defaultMessage="Add filter"
           />
         </Button>
         {value && value.filters.length > 1 ? (
           <Select
             {...selectProps}
+            isSearchable={false}
             options={logicalOperators}
             value={logicalOperators.find((o) => value!.operator === o.value)}
             onChange={(option) =>
@@ -164,5 +165,5 @@ export function removeInvalidLines(
   value: PetitionSharedWithFilter | null
 ): PetitionSharedWithFilter | null {
   const filters = value?.filters.filter((l) => l.value !== null) ?? [];
-  return filters.length > 0 ? { ...value, filters } : null;
+  return filters.length > 0 ? { ...value!, filters } : null;
 }

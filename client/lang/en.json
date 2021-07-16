@@ -15,16 +15,6 @@
     "context": "Admin panel"
   },
   {
-    "term": "common.filter",
-    "definition": "Filter",
-    "context": "Filter"
-  },
-  {
-    "term": "common.no-filter-applied",
-    "definition": "No filter is being applied.",
-    "context": "No filter is being applied."
-  },
-  {
     "term": "component.add-member-group-dialog.members-label",
     "definition": "Add to group",
     "context": "Add to group"
@@ -1280,6 +1270,41 @@
     "context": "Use template"
   },
   {
+    "term": "component.petition-list-shared-with-filter.add-filter",
+    "definition": "Add filter",
+    "context": "Add filter"
+  },
+  {
+    "term": "component.petition-list-shared-with-filter.and",
+    "definition": "and",
+    "context": "and"
+  },
+  {
+    "term": "component.petition-list-shared-with-filter.is-owner",
+    "definition": "Owner is",
+    "context": "Owner is"
+  },
+  {
+    "term": "component.petition-list-shared-with-filter.no-filter",
+    "definition": "No filter is being applied.",
+    "context": "No filter is being applied."
+  },
+  {
+    "term": "component.petition-list-shared-with-filter.not-shared-with",
+    "definition": "Not shared with",
+    "context": "Not shared with"
+  },
+  {
+    "term": "component.petition-list-shared-with-filter.or",
+    "definition": "or",
+    "context": "or"
+  },
+  {
+    "term": "component.petition-list-shared-with-filter.shared-with",
+    "definition": "Shared with",
+    "context": "Shared with"
+  },
+  {
     "term": "component.petition-permission-type.owner",
     "definition": "Owner",
     "context": "Owner"
@@ -1805,44 +1830,9 @@
     "context": "This template has not been shared yet."
   },
   {
-    "term": "component.shared-filter.add-filter",
-    "definition": "Add filter",
-    "context": "Add filter"
-  },
-  {
     "term": "component.shared-filter.add-user-or-group",
     "definition": "Select a user or group",
     "context": "Select a user or group"
-  },
-  {
-    "term": "component.shared-filter.and",
-    "definition": "and",
-    "context": "and"
-  },
-  {
-    "term": "component.shared-filter.is",
-    "definition": "is",
-    "context": "is"
-  },
-  {
-    "term": "component.shared-filter.is-owner",
-    "definition": "is owner",
-    "context": "is owner"
-  },
-  {
-    "term": "component.shared-filter.it-is-not",
-    "definition": "it is not",
-    "context": "it is not"
-  },
-  {
-    "term": "component.shared-filter.or",
-    "definition": "or",
-    "context": "or"
-  },
-  {
-    "term": "component.shared-filter.where",
-    "definition": "Where",
-    "context": "Where"
   },
   {
     "term": "component.signature-config-dialog.confirm-start",
@@ -1943,6 +1933,11 @@
     "term": "component.solve-unreviewed-replies-dialog.subheading",
     "definition": "What would you like to do with them?",
     "context": "What would you like to do with them?"
+  },
+  {
+    "term": "component.table.filter-header",
+    "definition": "Filter",
+    "context": "Filter"
   },
   {
     "term": "component.table.next-page-button",
