@@ -194,17 +194,21 @@ export function PetitionTemplateHeader({
                   defaultMessage="Clone template"
                 />
               </MenuItem>
-              <MenuDivider />
-              <MenuItem
-                color="red.500"
-                onClick={handleDeleteClick}
-                icon={<DeleteIcon display="block" boxSize={4} />}
-              >
-                <FormattedMessage
-                  id="component.petition-template.delete-label"
-                  defaultMessage="Delete template"
-                />
-              </MenuItem>
+              {petition.isPublic ? null : (
+                <>
+                  <MenuDivider />
+                  <MenuItem
+                    color="red.500"
+                    onClick={handleDeleteClick}
+                    icon={<DeleteIcon display="block" boxSize={4} />}
+                  >
+                    <FormattedMessage
+                      id="component.petition-template.delete-label"
+                      defaultMessage="Delete template"
+                    />
+                  </MenuItem>
+                </>
+              )}
             </MenuList>
           </Portal>
         </Menu>
@@ -218,6 +222,7 @@ PetitionTemplateHeader.fragments = {
     fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
       id
       locale
+      isPublic
       ...HeaderNameEditable_PetitionBase
     }
     ${HeaderNameEditable.fragments.PetitionBase}

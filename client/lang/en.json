@@ -420,6 +420,16 @@
     "context": "The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a group."
   },
   {
+    "term": "component.delete-petitions.public-templates-error-plural",
+    "definition": "The following templates cannot be deleted because they are public:",
+    "context": "The following templates cannot be deleted because they are public:"
+  },
+  {
+    "term": "component.delete-petitions.public-templates-error-singular",
+    "definition": "The {name} template cannot be deleted because it is public.",
+    "context": "The {name} template cannot be deleted because it is public."
+  },
+  {
     "term": "component.delete-petitions.shared-error-plural-1",
     "definition": "The following {type, select, PETITION {petitions} other{templates}} could not be removed because they are being shared:",
     "context": "The following {type, select, PETITION {petitions} other{templates}} could not be removed because they are being shared:"
@@ -4003,6 +4013,16 @@
     "term": "petition.print-pdf.signatures-disclaimer",
     "definition": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information.",
     "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
+  },
+  {
+    "term": "petition.public-template-dialog.body",
+    "definition": "This is a public template and edition is blocked. If you want to make any changes, please contact us.",
+    "context": "This is a public template and edition is blocked. If you want to make any changes, please contact us."
+  },
+  {
+    "term": "petition.public-template-dialog.header",
+    "definition": "Edition restricted",
+    "context": "Edition restricted"
   },
   {
     "term": "petition.reminder-sent.toast-description",

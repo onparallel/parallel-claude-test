@@ -3026,6 +3026,7 @@ export type PetitionTemplateHeader_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
   locale: PetitionLocale;
+  isPublic: boolean;
 } & HeaderNameEditable_PetitionBase_PetitionTemplate_Fragment;
 
 export type PetitionTemplateHeader_UserFragment = {
@@ -4124,6 +4125,7 @@ export type PetitionSettings_PetitionBase_Petition_Fragment = {
 
 export type PetitionSettings_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  isPublic: boolean;
   id: string;
   locale: PetitionLocale;
   hasCommentsEnabled: boolean;
@@ -5930,6 +5932,7 @@ export type PetitionCompose_PetitionBase_Petition_Fragment = {
 
 export type PetitionCompose_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  isPublic: boolean;
   id: string;
   fields: Array<
     { __typename?: "PetitionField" } & PetitionCompose_PetitionFieldFragment
@@ -6409,6 +6412,7 @@ export type Petitions_PetitionBase_Petition_Fragment = {
 
 export type Petitions_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
+  isPublic: boolean;
 } & usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment;
 
 export type Petitions_PetitionBaseFragment =
@@ -7852,6 +7856,7 @@ export const PetitionTemplateHeader_PetitionTemplateFragmentDoc = gql`
   fragment PetitionTemplateHeader_PetitionTemplate on PetitionTemplate {
     id
     locale
+    isPublic
     ...HeaderNameEditable_PetitionBase
   }
   ${HeaderNameEditable_PetitionBaseFragmentDoc}
@@ -8642,6 +8647,9 @@ export const PetitionSettings_PetitionBaseFragmentDoc = gql`
         status
       }
     }
+    ... on PetitionTemplate {
+      isPublic
+    }
   }
   ${SignatureConfigDialog_PetitionFragmentDoc}
 `;
@@ -8703,6 +8711,9 @@ export const PetitionCompose_PetitionBaseFragmentDoc = gql`
     }
     ... on Petition {
       status
+    }
+    ... on PetitionTemplate {
+      isPublic
     }
   }
   ${PetitionLayout_PetitionBaseFragmentDoc}
@@ -9033,6 +9044,9 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
 export const Petitions_PetitionBaseFragmentDoc = gql`
   fragment Petitions_PetitionBase on PetitionBase {
     ...usePetitionsTableColumns_PetitionBase
+    ... on PetitionTemplate {
+      isPublic
+    }
   }
   ${usePetitionsTableColumns_PetitionBaseFragmentDoc}
 `;

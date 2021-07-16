@@ -362,6 +362,9 @@ Petitions.fragments = {
     return gql`
       fragment Petitions_PetitionBase on PetitionBase {
         ...usePetitionsTableColumns_PetitionBase
+        ... on PetitionTemplate {
+          isPublic
+        }
       }
       ${usePetitionsTableColumns.fragments.PetitionBase}
     `;

@@ -420,6 +420,16 @@
     "context": "The {name} {type, select, PETITION {petition} other{template}} cannot be deleted because it has been shared with you through a group."
   },
   {
+    "term": "component.delete-petitions.public-templates-error-plural",
+    "definition": "Las siguientes plantillas no pueden ser eliminadas porque son públicas:",
+    "context": "The following templates cannot be deleted because they are public:"
+  },
+  {
+    "term": "component.delete-petitions.public-templates-error-singular",
+    "definition": "La plantilla {name} no puede ser eliminada porque es pública.",
+    "context": "The {name} template cannot be deleted because it is public."
+  },
+  {
     "term": "component.delete-petitions.shared-error-plural-1",
     "definition": "Las siguientes {type, select, PETITION {peticiones} other{plantillas}} no se han podido eliminar porque están siendo compartidas:",
     "context": "The following {type, select, PETITION {petitions} other{templates}} could not be removed because they are being shared:"
@@ -4003,6 +4013,16 @@
     "term": "petition.print-pdf.signatures-disclaimer",
     "definition": "Declaro que los datos y la documentación facilitados, así como las copias o fotocopias enviadas, reproducen fielmente los documentos originales y la información actual de identificación.",
     "context": "I declare that the data and documentation provided, as well as the copies or photocopies sent, faithfully reproduce the original documents and the current identification information."
+  },
+  {
+    "term": "petition.public-template-dialog.body",
+    "definition": "Esta es una plantilla pública, la edición está bloqueada. Si quieres hacer algún cambio, por favor ponte en contacto con nosotros.",
+    "context": "This is a public template and edition is blocked. If you want to make any changes, please contact us."
+  },
+  {
+    "term": "petition.public-template-dialog.header",
+    "definition": "Edición restringida",
+    "context": "Edition restricted"
   },
   {
     "term": "petition.reminder-sent.toast-description",

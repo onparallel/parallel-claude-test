@@ -80,6 +80,7 @@ import {
   messageBelongToPetition,
   petitionHasRepliableFields,
   petitionsAreEditable,
+  petitionsAreNotPublicTemplates,
   petitionsAreOfTypePetition,
   petitionsArePublicTemplates,
   repliesBelongsToField,
@@ -301,6 +302,22 @@ export const deletePetitions = mutationField("deletePetitions", {
       );
     }
 
+    const petitions = await ctx.petitions.loadPetition(args.ids);
+    const publicTemplates = petitions.filter(
+      (p) => p && p.is_template && p.template_public
+    );
+    if (publicTemplates.length > 0) {
+      throw new WhitelistedError(
+        "Can't delete a public template",
+        "DELETE_PUBLIC_TEMPLATE_ERROR",
+        {
+          petitionIds: publicTemplates.map((p) =>
+            toGlobalId("Petition", p!.id)
+          ),
+        }
+      );
+    }
+
     await ctx.petitions.withTransaction(async (t) => {
       // delete my permissions to the petitions
       const deletedPermissions = await ctx.petitions.deleteUserPermissions(
@@ -356,7 +373,8 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    petitionsAreEditable("petitionId")
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -434,6 +452,7 @@ export const updatePetition = mutationField("updatePetition", {
   type: "PetitionBase",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId"),
     ifSomeDefined(
       (args) => [
         args.data.name,
@@ -569,7 +588,8 @@ export const createPetitionField = mutationField("createPetitionField", {
   type: "PetitionBaseAndField",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
-    petitionsAreEditable("petitionId")
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -596,7 +616,8 @@ export const clonePetitionField = mutationField("clonePetitionField", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    petitionsAreEditable("petitionId")
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -618,7 +639,8 @@ export const deletePetitionField = mutationField("deletePetitionField", {
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
     fieldIsNotFixed("fieldId"),
-    petitionsAreEditable("petitionId")
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -663,7 +685,8 @@ export const updatePetitionField = mutationField("updatePetitionField", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
     fieldsBelongsToPetition("petitionId", "fieldId"),
-    petitionsAreEditable("petitionId")
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId")
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -753,7 +776,8 @@ export const uploadDynamicSelectFile = mutationField(
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
-      fieldHasType("fieldId", ["DYNAMIC_SELECT"])
+      fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
+      petitionsAreNotPublicTemplates("petitionId")
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
@@ -1519,7 +1543,8 @@ export const changePetitionFieldType = mutationField(
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
-      petitionsAreEditable("petitionId")
+      petitionsAreEditable("petitionId"),
+      petitionsAreNotPublicTemplates("petitionId")
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),

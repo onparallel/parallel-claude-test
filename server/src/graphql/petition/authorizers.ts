@@ -344,3 +344,19 @@ export function petitionsAreEditable<
     return false;
   };
 }
+
+export function petitionsAreNotPublicTemplates<
+  TypeName extends string,
+  FieldName extends string,
+  TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
+>(argNamePetitionIds: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
+  return async (_, args, ctx) => {
+    try {
+      const petitions = await ctx.petitions.loadPetition(
+        unMaybeArray(args[argNamePetitionIds] as MaybeArray<number>)
+      );
+      return petitions.every((p) => isDefined(p) && !p.template_public);
+    } catch {}
+    return false;
+  };
+}

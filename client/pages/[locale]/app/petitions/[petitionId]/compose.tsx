@@ -45,6 +45,7 @@ import { PetitionComposeFieldList } from "@parallel/components/petition-compose/
 import { PetitionComposeFieldSettings } from "@parallel/components/petition-compose/PetitionComposeFieldSettings";
 import { PetitionTemplateComposeMessageEditor } from "@parallel/components/petition-compose/PetitionTemplateComposeMessageEditor";
 import { PetitionTemplateDescriptionEdit } from "@parallel/components/petition-compose/PetitionTemplateDescriptionEdit";
+import { usePublicTemplateDialog } from "@parallel/components/petition-compose/PublicTemplateDialog";
 import { useReferencedFieldDialog } from "@parallel/components/petition-compose/ReferencedFieldDialog";
 import {
   PetitionComposeQuery,
@@ -115,6 +116,8 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, []);
 
   const isReadOnly = petition!.isReadOnly;
+  const isPublicTemplate =
+    petition?.__typename === "PetitionTemplate" && petition.isPublic;
 
   const indices = useFieldIndices(petition!.fields);
   const petitionDataRef = useUpdatingRef({ fields: petition!.fields, indices });
@@ -134,6 +137,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       : null;
   }, [activeFieldId]);
 
+  const showPublicTemplateDialog = usePublicTemplateDialog();
   // When the petition is completed show a dialog to avoid unintended changes
   const completedDialog = useCompletedPetitionDialog();
   useEffect(() => {
@@ -142,6 +146,10 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       ["COMPLETED", "CLOSED"].includes(petition.status)
     ) {
       completedDialog({});
+    }
+
+    if (isPublicTemplate) {
+      showPublicTemplateDialog({});
     }
   }, []);
 
@@ -639,6 +647,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             onFieldEdit={handleFieldEdit}
             onFieldSettingsClick={handleFieldSettingsClick}
             isReadOnly={isReadOnly}
+            isPublicTemplate={isPublicTemplate}
           />
           {petition?.__typename === "PetitionTemplate" ? (
             <PetitionTemplateDescriptionEdit
@@ -704,6 +713,9 @@ PetitionCompose.fragments = {
         }
         ... on Petition {
           status
+        }
+        ... on PetitionTemplate {
+          isPublic
         }
       }
       ${PetitionLayout.fragments.PetitionBase}

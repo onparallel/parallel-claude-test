@@ -159,7 +159,7 @@ export const PetitionBase = interfaceType({
       },
     });
     t.nonNull.boolean("isReadOnly", {
-      resolve: (o) => o.is_readonly,
+      resolve: (o) => o.is_readonly || o.template_public,
     });
   },
   resolveType: (p) => (p.is_template ? "PetitionTemplate" : "Petition"),

@@ -255,6 +255,9 @@ function _PetitionSettings({
         </Box>
       ) : null}
       <SwitchSetting
+        isDisabled={
+          petition.__typename === "PetitionTemplate" && petition.isPublic
+        }
         icon={petition.isReadOnly ? <LockClosedIcon /> : <LockOpenIcon />}
         title={
           <FormattedMessage
@@ -275,6 +278,9 @@ function _PetitionSettings({
       />
       {user.hasSkipForwardSecurity ? (
         <SwitchSetting
+          isDisabled={
+            petition.__typename === "PetitionTemplate" && petition.isPublic
+          }
           icon={<ShieldIcon />}
           title={
             <FormattedMessage
@@ -294,6 +300,9 @@ function _PetitionSettings({
       ) : null}
       {user.hasHideRecipientViewContents ? (
         <SwitchSetting
+          isDisabled={
+            petition.__typename === "PetitionTemplate" && petition.isPublic
+          }
           icon={<ListIcon />}
           title={
             <FormattedMessage
@@ -350,6 +359,9 @@ const fragments = {
           id
           status
         }
+      }
+      ... on PetitionTemplate {
+        isPublic
       }
     }
     ${SignatureConfigDialog.fragments.Petition}

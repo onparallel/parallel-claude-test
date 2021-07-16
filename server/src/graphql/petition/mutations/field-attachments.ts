@@ -7,6 +7,7 @@ import { RESULT } from "../../helpers/result";
 import {
   fieldAttachmentBelongsToField,
   fieldsBelongsToPetition,
+  petitionsAreNotPublicTemplates,
   userHasAccessToPetitions,
 } from "../authorizers";
 
@@ -26,7 +27,8 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
     }),
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "fieldId")
+      fieldsBelongsToPetition("petitionId", "fieldId"),
+      petitionsAreNotPublicTemplates("petitionId")
     ),
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
@@ -123,7 +125,8 @@ export const removePetitionFieldAttachment = mutationField(
     authorize: authenticateAnd(
       userHasAccessToPetitions("petitionId"),
       fieldsBelongsToPetition("petitionId", "fieldId"),
-      fieldAttachmentBelongsToField("fieldId", "attachmentId")
+      fieldAttachmentBelongsToField("fieldId", "attachmentId"),
+      petitionsAreNotPublicTemplates("petitionId")
     ),
     resolve: async (_, args, ctx) => {
       await ctx.petitions.removePetitionFieldAttachment(

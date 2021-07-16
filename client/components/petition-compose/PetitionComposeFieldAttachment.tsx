@@ -13,12 +13,13 @@ interface PetitionComposeFieldAttachmentProps {
   attachment: PetitionComposeFieldAttachment_PetitionFieldAttachmentFragment;
   onDownload: () => void;
   onRemove: () => void;
+  isDisabled?: boolean;
 }
 
 export const PetitionComposeFieldAttachment = Object.assign(
   chakraForwardRef<"div", PetitionComposeFieldAttachmentProps>(
     function PetitionComposeFieldAttachment(
-      { progress, attachment, onDownload, onRemove, ...props },
+      { progress, attachment, onDownload, onRemove, isDisabled, ...props },
       ref
     ) {
       const intl = useIntl();
@@ -106,28 +107,30 @@ export const PetitionComposeFieldAttachment = Object.assign(
             size="20px"
             display={attachment.file.isComplete ? "none" : "block"}
           />
-          <IconButton
-            display={attachment.file.isComplete ? "block" : "none"}
-            tabIndex={-1}
-            variant="ghost"
-            aria-label={intl.formatMessage({
-              id: "component.petition-compose-field-attachment.remove-attachment",
-              defaultMessage: "Remove attachment",
-            })}
-            _active={{
-              shadow: "none",
-            }}
-            _focus={{
-              shadow: "none",
-            }}
-            icon={<CloseIcon />}
-            boxSize={5}
-            minWidth={0}
-            fontSize="9px"
-            paddingX={0}
-            shadow="none"
-            onClick={onRemove}
-          />
+          {!isDisabled ? (
+            <IconButton
+              display={attachment.file.isComplete ? "block" : "none"}
+              tabIndex={-1}
+              variant="ghost"
+              aria-label={intl.formatMessage({
+                id: "component.petition-compose-field-attachment.remove-attachment",
+                defaultMessage: "Remove attachment",
+              })}
+              _active={{
+                shadow: "none",
+              }}
+              _focus={{
+                shadow: "none",
+              }}
+              icon={<CloseIcon />}
+              boxSize={5}
+              minWidth={0}
+              fontSize="9px"
+              paddingX={0}
+              shadow="none"
+              onClick={onRemove}
+            />
+          ) : null}
         </Flex>
       );
     }

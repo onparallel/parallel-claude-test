@@ -184,6 +184,47 @@ export function useDeletePetitions() {
             header: errorHeader,
             message: errorMessage,
           });
+        } else if (errorCode === "DELETE_PUBLIC_TEMPLATE_ERROR") {
+          const singlePetitionMessage = (
+            <FormattedMessage
+              id="component.delete-petitions.public-templates-error-singular"
+              defaultMessage="The {name} template cannot be deleted because it is public."
+              values={{ name: <b>{petitionName}</b> }}
+            />
+          );
+
+          const multiplePetitionMessage = (
+            <>
+              <FormattedMessage
+                id="component.delete-petitions.public-templates-error-plural"
+                defaultMessage="The following templates cannot be deleted because they are public:"
+              />
+              <UnorderedList paddingLeft={2} pt={2}>
+                {cachedPetitions.map((petition) => (
+                  <ListItem
+                    key={petition!.id}
+                    textStyle={petition!.name ? undefined : "hint"}
+                  >
+                    {petition?.name ??
+                      intl.formatMessage({
+                        id: "generic.untitled-template",
+                        defaultMessage: "Untitled template",
+                      })}
+                  </ListItem>
+                ))}
+              </UnorderedList>
+            </>
+          );
+
+          const errorMessage =
+            conflictingPetitionIds.length === 1
+              ? singlePetitionMessage
+              : multiplePetitionMessage;
+
+          await showErrorDialog({
+            header: errorHeader,
+            message: errorMessage,
+          });
         }
         throw error;
       }
