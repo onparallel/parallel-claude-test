@@ -62,7 +62,7 @@ export default function UpdateBrowser() {
               <Stack alignItems="center">
                 <Image
                   boxSize={10}
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/${browser.code}.png`}
+                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/browsers/${browser.code}.png`}
                 />
                 <Text as="span" whiteSpace="nowrap">
                   {browser.name}
