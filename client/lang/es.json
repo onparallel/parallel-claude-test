@@ -4300,6 +4300,106 @@
     "context": "About"
   },
   {
+    "term": "public.accounting",
+    "definition": "BPO y gestoría",
+    "context": "BPO and Accounting"
+  },
+  {
+    "term": "public.accounting.api-title",
+    "definition": "Usa nuestra API para integrarlo con tus sistemas",
+    "context": "Use our API to integrate it with your sistems"
+  },
+  {
+    "term": "public.accounting.benefits-accelerate-message",
+    "definition": "Te ayudamos a ponérselo fácil a tu destinatario para que recibas toda la información lo antes posible.",
+    "context": "We help you make it easy for your recipient to receive all the information as soon as possible."
+  },
+  {
+    "term": "public.accounting.benefits-accelerate-title",
+    "definition": "Acelera el cierre de procesos",
+    "context": "Accelerates project completion"
+  },
+  {
+    "term": "public.accounting.benefits-collaborate-message",
+    "definition": "Asigna procesos a tu equipo para su gestión y controla en todo momento su progreso.",
+    "context": "Assign work to your team and keep track of the progress any times."
+  },
+  {
+    "term": "public.accounting.benefits-collaborate-title",
+    "definition": "Trabaja en equipo",
+    "context": "Work in teams"
+  },
+  {
+    "term": "public.accounting.benefits-efficiency-message",
+    "definition": "Una plataforma pensada para que envíes y gestiones múltiples procesos sin esfuerzo.",
+    "context": "A platform designed to send and manage multiple processes without effort."
+  },
+  {
+    "term": "public.accounting.benefits-efficiency-title",
+    "definition": "Gestiona el trabajo de forma más eficiente.",
+    "context": "Manage the work more efficiently"
+  },
+  {
+    "term": "public.accounting.hero-subtitle",
+    "definition": "Solicita la información que necesitan tus clientes sin esfuerzo. Configura el proceso en minutos y deja que los recordatorios automáticos te ayuden a acelerar tus procesos.",
+    "context": "Request easily the information your customers need. Set up the process in minutes and let automatic reminders help you to speed up them."
+  },
+  {
+    "term": "public.accounting.hero-title",
+    "definition": "Acelera procesos automatizando servicios para tu cliente",
+    "context": "Accelerates processes by automating your clients services"
+  },
+  {
+    "term": "public.accounting.solutions-title",
+    "definition": "Soluciones para gestorías y BPOs",
+    "context": "Solutions for BPOs and Accountings"
+  },
+  {
+    "term": "public.accounting.title",
+    "definition": "Acelera procesos automatizando servicios para tu cliente",
+    "context": "Accelerates processes by automating your clients services"
+  },
+  {
+    "term": "public.accounting.use-cases-control-description",
+    "definition": "Obtén el control de la información que recibes y podrás seguir los cambios de estado de tus procesos.",
+    "context": "Get control of the information you receive and you can track the status changes of your processes."
+  },
+  {
+    "term": "public.accounting.use-cases-control-title",
+    "definition": "Controla y sigue el proceso",
+    "context": "Control and monitor the process"
+  },
+  {
+    "term": "public.accounting.use-cases-mailing-description",
+    "definition": "Solicita la información para tus campañas a todos tus clientes al mismo tiempo.",
+    "context": "Request information for your campaigns from all your customers at the same time."
+  },
+  {
+    "term": "public.accounting.use-cases-mailing-title",
+    "definition": "Envíos masivos",
+    "context": "Mass mailing"
+  },
+  {
+    "term": "public.accounting.use-cases-remainders-description",
+    "definition": "Olvídate de perseguir clientes. Configura recordatorios periódicos y deja que Parallel se encargue mientras tu recibes información.",
+    "context": "Forget about chasing customers. Set up periodic reminders and let Parallel handle it while you receive the information."
+  },
+  {
+    "term": "public.accounting.use-cases-remainders-title",
+    "definition": "Recordatorios configurables",
+    "context": "Configurable reminders"
+  },
+  {
+    "term": "public.accounting.use-cases-reminders-description",
+    "definition": "Configura recordatorios para que Parallel se encargue de todo, mientras tu recopilas la información que necesitas.",
+    "context": "Forget about chasing customers. Set up periodic reminders and let Parallel handle it while you receive the information."
+  },
+  {
+    "term": "public.accounting.use-cases-reminders-title",
+    "definition": "Recordatorios automáticos",
+    "context": "Automatic reminders"
+  },
+  {
     "term": "public.api-docs-link",
     "definition": "Documentación API",
     "context": "API Documentation"
@@ -4468,6 +4568,96 @@
     "term": "public.case.laura.without-parallel",
     "definition": "Sin Parallel",
     "context": "Without Parallel"
+  },
+  {
+    "term": "public.consultancy",
+    "definition": "Asesorías",
+    "context": "Consultancy"
+  },
+  {
+    "term": "public.consultancy.api-title",
+    "definition": "Utiliza nuestra API para integrarlo en tu flujo de trabajo",
+    "context": "Use our API to integrate it into your workflow"
+  },
+  {
+    "term": "public.consultancy.benefits-control-message",
+    "definition": "Automatiza el seguimiento y deja que seamos nosotros quién recordemos a tus clientes subir la información para que podáis centraros en otras tareas.",
+    "context": "Automate monitoring and we will remember your clients to upload de informations requested so you can focus on other matters."
+  },
+  {
+    "term": "public.consultancy.benefits-control-title",
+    "definition": "Gana tiempo para tu equipo",
+    "context": "Save time for your team"
+  },
+  {
+    "term": "public.consultancy.benefits-experience-message",
+    "definition": "Gestiona tus asuntos con Parallel para ser más eficiente. Sustituye completamente el uso de papel y las cadenas de emails.",
+    "context": "Manage your matters with Parallel for more efficiency. It completely replaces the use of paper and email chains."
+  },
+  {
+    "term": "public.consultancy.benefits-experience-title",
+    "definition": "Digitaliza tus servicios",
+    "context": "Digitize yours services"
+  },
+  {
+    "term": "public.consultancy.benefits-template-message",
+    "definition": "Estandariza tus procesos para enviar checklist rápidamente y evitar errores en tus procesos.",
+    "context": "Standardize your processes to send your checklist quickly and avoid mistakes."
+  },
+  {
+    "term": "public.consultancy.benefits-template-title",
+    "definition": "Crea plantillas para tus procedimientos más habituales",
+    "context": "Create templates for your daily proccesses"
+  },
+  {
+    "term": "public.consultancy.hero-subtitle",
+    "definition": "Plataforma para trabajar con tu cliente de una forma más eficiente. Usa plantillas para reducir el tiempo de tu equipo en tareas repetitivas.",
+    "context": "Platform to work efficiently with your client. Use templates to reduce your team’s time on repetitive tasks."
+  },
+  {
+    "term": "public.consultancy.hero-title",
+    "definition": "Agiliza el trabajo con tus clientes",
+    "context": "Speeds up the work with your clients"
+  },
+  {
+    "term": "public.consultancy.solutions-title",
+    "definition": "Soluciones para Asesorías",
+    "context": "Solutions for Consultancy"
+  },
+  {
+    "term": "public.consultancy.speed-up-body",
+    "definition": "Facilitamos la gestión y el envío en segundos de más de 150 rentas. Consiguiendo acelerar la recepción de información y tener, en menos de 5 días, el 40% de los procesos completados.",
+    "context": "We facilitate the management and masive mailing of more than 150 rents. Speeding up the receive of information and having, in less than 5 days, 40% of the processes completed."
+  },
+  {
+    "term": "public.consultancy.speed-up-title",
+    "definition": "Gestión de la Declaración de la renta 2020 con Parallel",
+    "context": "Management of Income Tax 2020 with Parallel"
+  },
+  {
+    "term": "public.consultancy.title",
+    "definition": "Agiliza el trabajo con tus clientes",
+    "context": "Speeds up the work with your clients"
+  },
+  {
+    "term": "public.consultancy.use-cases-mailing-description",
+    "definition": "Solicita la información para tus campañas a todos tus clientes al mismo tiempo.",
+    "context": "Request information for your campaigns from all your customers at the same time."
+  },
+  {
+    "term": "public.consultancy.use-cases-mailing-title",
+    "definition": "Envíos masivos",
+    "context": "Mass mailing"
+  },
+  {
+    "term": "public.consultancy.use-cases-smart-form-description",
+    "definition": "Personaliza la experiencia de tu cliente con el uso de condiciones y otras funcionalidades.",
+    "context": "Personalize your customers experience by using conditionals and other useful features."
+  },
+  {
+    "term": "public.consultancy.use-cases-smart-form-title",
+    "definition": "Plantillas inteligentes",
+    "context": "Smart templates"
   },
   {
     "term": "public.contact-link",
@@ -4790,12 +4980,12 @@
     "context": "All your affairs under control"
   },
   {
-    "term": "public.law-firms.benefits-efficency-message",
+    "term": "public.law-firms.benefits-efficiency-message",
     "definition": "Utiliza plantillas para reutilizar el conocimiento y minimizar errores en tu trabajo.",
     "context": "Use templates to reuse knowledge and reduce mistakes in your workflow."
   },
   {
-    "term": "public.law-firms.benefits-efficency-title",
+    "term": "public.law-firms.benefits-efficiency-title",
     "definition": "Aumenta la eficiencia de tu equipo",
     "context": "Enhance the efficiency of your team"
   },
@@ -4825,34 +5015,9 @@
     "context": "Increase your team’s billing and return"
   },
   {
-    "term": "public.law-firms.security",
-    "definition": "Seguridad",
-    "context": "Security"
-  },
-  {
-    "term": "public.law-firms.security-body",
-    "definition": "Nuestra prioridad es que la experiencia sea lo más ágil y segura posible tanto para ti como para tus clientes.",
-    "context": "Our priority is to make the experience as agile and secure as possible for both you and yout clients."
-  },
-  {
-    "term": "public.law-firms.security-encrypted",
-    "definition": "Tu información segura y encriptada",
-    "context": "Your information secure and encrypted"
-  },
-  {
-    "term": "public.law-firms.security-title",
-    "definition": "Protegemos la información de tus clientes",
-    "context": "We protect your client information"
-  },
-  {
-    "term": "public.law-firms.security-tls",
-    "definition": "Protocolos de seguridad TLS",
-    "context": "Security protocol TLS"
-  },
-  {
-    "term": "public.law-firms.security-two-factor",
-    "definition": "Doble factor de autenticación",
-    "context": "Two-factor authentication"
+    "term": "public.law-firms.solutions-title",
+    "definition": "Soluciones para despachos",
+    "context": "Solutions for law firms"
   },
   {
     "term": "public.law-firms.speed-up-body",
@@ -4862,7 +5027,7 @@
   {
     "term": "public.law-firms.speed-up-title",
     "definition": "Aceleramos el alta de tus clientes de una forma ágil y segura",
-    "context": "Speed up your new clients registration, quickly and securely."
+    "context": "We speed up your new clients registration, quickly and securely"
   },
   {
     "term": "public.law-firms.title",
@@ -5565,24 +5730,54 @@
     "context": "A screenshot of the app showcasing the information received using Parallel"
   },
   {
-    "term": "public.solutions-law-firms.title",
-    "definition": "Soluciones para Despachos",
-    "context": "Solutions for law firms"
-  },
-  {
     "term": "public.solutions-link",
     "definition": "Soluciones",
     "context": "Solutions"
   },
   {
-    "term": "public.solutions.accountants-link",
+    "term": "public.solutions.accounting-link",
+    "definition": "BPOs y gestorías",
+    "context": "BPO and accounting"
+  },
+  {
+    "term": "public.solutions.consultancy-link",
     "definition": "Asesorías",
-    "context": "Accountants"
+    "context": "Consultancy"
   },
   {
     "term": "public.solutions.law-firms-link",
-    "definition": "Despacho de abogados",
+    "definition": "Despachos de abogados",
     "context": "Law firms"
+  },
+  {
+    "term": "public.solutions.security",
+    "definition": "seguridad",
+    "context": "Security"
+  },
+  {
+    "term": "public.solutions.security-body",
+    "definition": "Nuestra prioridad es que la experiencia sea lo más ágil y segura posible tanto para ti como para tus clientes.",
+    "context": "Our priority is to make the experience as agile and secure as possible for both you and yout clients."
+  },
+  {
+    "term": "public.solutions.security-encrypted",
+    "definition": "Tu información segura y encriptada",
+    "context": "Your information secure and encrypted"
+  },
+  {
+    "term": "public.solutions.security-title",
+    "definition": "Protegemos la información de tus clientes",
+    "context": "We protect your client information"
+  },
+  {
+    "term": "public.solutions.security-tls",
+    "definition": "Protocolos de seguridad TLS",
+    "context": "Security protocol TLS"
+  },
+  {
+    "term": "public.solutions.security-two-factor",
+    "definition": "Doble factor de autenticación",
+    "context": "Two-factor authentication"
   },
   {
     "term": "public.support.faq",

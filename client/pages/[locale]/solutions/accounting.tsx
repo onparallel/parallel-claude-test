@@ -5,6 +5,7 @@ import {
   ListIcon,
   ListItem,
   Text,
+  Center,
 } from "@chakra-ui/react";
 import { CircleCheckIcon } from "@parallel/chakra/icons";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
@@ -19,85 +20,85 @@ import languages from "@parallel/lang/languages.json";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 
-function LawFirms() {
+function Accounting() {
   const intl = useIntl();
   const { query } = useRouter();
 
   const hero = {
-    image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/lawfirms_hero_${query.locale}`,
+    image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/accounting_hero_${query.locale}`,
     title: intl.formatMessage({
-      id: "public.law-firms.hero-title",
-      defaultMessage: "Increase your team’s billing and return",
+      id: "public.accounting.hero-title",
+      defaultMessage:
+        "Accelerates processes by automating your clients services ",
     }),
     subtitle: intl.formatMessage({
-      id: "public.law-firms.hero-subtitle",
+      id: "public.accounting.hero-subtitle",
       defaultMessage:
-        "Increase your team’s billable hours provinding them with a tool that takes care of repetitive processes and accelerates his project completion.",
+        "Request easily the information your customers need. Set up the process in minutes and let automatic reminders help you to speed up them.",
     }),
     buttonText: intl.formatMessage({
       id: "public.book-demo-button",
       defaultMessage: "Book a demo",
     }),
     sectionTitle: intl.formatMessage({
-      id: "public.law-firms",
-      defaultMessage: "Law firms",
+      id: "public.accounting",
+      defaultMessage: "BPO and Accounting",
     }),
     url: "/book-demo",
   };
 
-  const benefitsImage = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/lawfirms_benefits_${query.locale}.svg`;
+  const benefitsImage = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/accounting_benefits_${query.locale}.png`;
   const benefits = [
     {
       image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_efficiency.svg`,
       heading: intl.formatMessage({
-        id: "public.law-firms.benefits-efficiency-title",
-        defaultMessage: "Enhance the efficiency of your team",
+        id: "public.accounting.benefits-efficiency-title",
+        defaultMessage: "Manage the work more efficiently",
       }),
       text: intl.formatMessage({
-        id: "public.law-firms.benefits-efficiency-message",
+        id: "public.accounting.benefits-efficiency-message",
         defaultMessage:
-          "Use templates to reuse knowledge and reduce mistakes in your workflow.",
+          "A platform designed to send and manage multiple processes without effort.",
       }),
     },
     {
-      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_control.svg`,
+      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_accelerate.svg`,
       heading: intl.formatMessage({
-        id: "public.law-firms.benefits-control-title",
-        defaultMessage: "All your affairs under control",
+        id: "public.accounting.benefits-accelerate-title",
+        defaultMessage: "Accelerates project completion",
       }),
       text: intl.formatMessage({
-        id: "public.law-firms.benefits-control-message",
+        id: "public.accounting.benefits-accelerate-message",
         defaultMessage:
-          "Visualize the status of the on-going cases and remaining work of your team.",
+          "We help you make it easy for your recipient to receive all the information as soon as possible.",
       }),
     },
     {
-      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_experience.svg`,
+      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_colaborate.svg`,
       heading: intl.formatMessage({
-        id: "public.law-firms.benefits-experience-title",
-        defaultMessage: "Improve your customer experience",
+        id: "public.accounting.benefits-collaborate-title",
+        defaultMessage: "Work in teams",
       }),
       text: intl.formatMessage({
-        id: "public.law-firms.benefits-experience-message",
+        id: "public.accounting.benefits-collaborate-message",
         defaultMessage:
-          "Provide a secure portal where your clients can colaborate and communicate with you.",
+          "Assign work to your team and keep track of the progress any times.",
       }),
     },
   ];
-
   const logos = [
     {
-      alt: "Cuatrecasas Acelera",
-      href: "https://www.cuatrecasas.com",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/cuatrecasas_black.svg`,
+      alt: "Tecnotramit logo",
+      href: "https://web.tecnotramit.com/",
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/tecnotramit_black.svg`,
     },
     {
-      alt: "Andersen",
-      href: "https://es.andersen.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/andersen_black.svg`,
+      alt: "Prontopiso logo",
+      href: "https://prontopiso.com/",
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/prontopiso_black.svg`,
     },
     {
-      alt: "Gestoría Pons",
+      alt: "Gestoría Pons logo",
       href: "https://www.gestoriapons.com/",
       src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.svg`,
     },
@@ -107,57 +108,57 @@ function LawFirms() {
     {
       image: (
         <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_smart_forms.svg`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_mailing.svg`}
         />
       ),
       header: (
         <FormattedMessage
-          id="public.law-use-cases.smart-forms-title"
-          defaultMessage="Smart forms"
+          id="public.accounting.use-cases-mailing-title"
+          defaultMessage="Mass mailing"
         />
       ),
       description: (
         <FormattedMessage
-          id="public.law-use-cases.smart-forms-description"
-          defaultMessage="Use conditions to set up smart decisions and ensure that your clients responds only to what is needed."
+          id="public.accounting.use-cases-mailing-description"
+          defaultMessage="Request information for your campaigns from all your customers at the same time."
         />
       ),
     },
     {
       image: (
         <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_esignature.svg`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_control.svg`}
         />
       ),
       header: (
         <FormattedMessage
-          id="public.law-use-cases.esignature-title"
-          defaultMessage="eSignature integration"
+          id="public.accounting.use-cases-control-title"
+          defaultMessage="Control and monitor the process"
         />
       ),
       description: (
         <FormattedMessage
-          id="public.law-use-cases.esignature-description"
-          defaultMessage="Enable easily an advance eSignature to your proccess, completely secure and legally valid.."
+          id="public.accounting.use-cases-control-description"
+          defaultMessage="Get control of the information you receive and you can track the status changes of your processes."
         />
       ),
     },
     {
       image: (
         <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_colaborate.svg`}
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_reminders.svg`}
         />
       ),
       header: (
         <FormattedMessage
-          id="public.law-use-cases.colaborate-title"
-          defaultMessage="Colaborate with your team"
+          id="public.accounting.use-cases-reminders-title"
+          defaultMessage="Automatic reminders"
         />
       ),
       description: (
         <FormattedMessage
-          id="public.law-use-cases.colaborate-description"
-          defaultMessage="Share your cases with your colleagues to work efficiently."
+          id="public.accounting.use-cases-reminders-description"
+          defaultMessage="Forget about chasing customers. Set up periodic reminders and let Parallel handle it while you receive the information."
         />
       ),
     },
@@ -166,8 +167,9 @@ function LawFirms() {
   return (
     <PublicLayout
       title={intl.formatMessage({
-        id: "public.law-firms.title",
-        defaultMessage: "Increase your team’s billing and return",
+        id: "public.accounting.title",
+        defaultMessage:
+          "Accelerates processes by automating your clients services",
       })}
     >
       <PublicHero
@@ -184,71 +186,11 @@ function LawFirms() {
       <PublicContainer
         paddingY={8}
         maxWidth="container.xl"
-        wrapper={{ paddingY: 16 }}
-      >
-        <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/lawfirms_usecase_${query.locale}.svg`}
-          imageSize="330px"
-          description={intl.formatMessage({
-            id: "public.law-firms.actual-data-kyc",
-            defaultMessage: "*Actual data in a KYC case.",
-          })}
-        >
-          <Heading
-            as="h4"
-            size="xs"
-            lineHeight="24px"
-            color="gray.600"
-            textTransform="uppercase"
-          >
-            <FormattedMessage
-              id="public.law-firms.use-case"
-              defaultMessage="Use case"
-            />
-          </Heading>
-          <Heading
-            as="h3"
-            size="xl"
-            color="gray.800"
-            lineHeight="1.5"
-            letterSpacing="-0,019em"
-            marginBottom={4}
-          >
-            <FormattedMessage
-              id="public.law-firms.speed-up-title"
-              defaultMessage="We speed up your new clients registration, quickly and securely"
-            />
-          </Heading>
-          <Text>
-            <FormattedMessage
-              id="public.law-firms.speed-up-body"
-              defaultMessage="Improves <b>control and monitoring of compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
-            />
-          </Text>
-        </PublicShowcase>
-      </PublicContainer>
-      <SolutionsPopularUseCases
-        heading={
-          <FormattedMessage
-            id="public.law-firms.solutions-title"
-            defaultMessage="Solutions for law firms"
-          />
-        }
-        features={solutions}
-      />
-      <PublicContainer
-        paddingTop={8}
-        paddingBottom={20}
-        maxWidth="container.xl"
-        wrapper={{ paddingY: 16, paddingBottom: 32 }}
+        wrapper={{ paddingY: 16, paddingBottom: 20 }}
       >
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/security.svg`}
           imageSize="300px"
-          isReversed
         >
           <Heading
             as="h4"
@@ -299,6 +241,38 @@ function LawFirms() {
           </List>
         </PublicShowcase>
       </PublicContainer>
+      <SolutionsPopularUseCases
+        heading={
+          <FormattedMessage
+            id="public.accounting.solutions-title"
+            defaultMessage="Solutions for BPOs and Accountings"
+          />
+        }
+        features={solutions}
+      />
+      <PublicContainer
+        paddingY={8}
+        maxWidth="container.xl"
+        wrapper={{
+          paddingY: 16,
+          textAlign: "center",
+          backgroundColor: "white",
+          paddingBottom: 28,
+        }}
+      >
+        <Heading as="h2" size="xl" fontWeight="bold">
+          <FormattedMessage
+            id="public.accounting.api-title"
+            defaultMessage="Use our API to integrate it with your sistems"
+          />
+        </Heading>
+        <Center marginTop={14}>
+          <Image
+            maxWidth="730px"
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/api/api_accounting.png`}
+          />
+        </Center>
+      </PublicContainer>
       <SolutionsDemoCta>
         <FormattedMessage
           id="public.law-firms.book-cta-title"
@@ -320,4 +294,4 @@ export function getStaticPaths() {
   };
 }
 
-export default LawFirms;
+export default Accounting;

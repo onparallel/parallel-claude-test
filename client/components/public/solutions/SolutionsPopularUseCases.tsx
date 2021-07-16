@@ -1,15 +1,14 @@
-import { Box, BoxProps, Grid, Heading, Text, Image } from "@chakra-ui/react";
+import { Box, BoxProps, Grid, Heading, Text } from "@chakra-ui/react";
 import { ReactNode } from "react";
-import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "../layout/PublicContainer";
 
 interface SolutionsPopularUseCasesProps extends BoxProps {
-  image: string;
+  heading: ReactNode;
   features: FeatureProps[];
 }
 
 export function SolutionsPopularUseCases({
-  image,
+  heading,
   features,
   ...props
 }: SolutionsPopularUseCasesProps) {
@@ -20,17 +19,14 @@ export function SolutionsPopularUseCases({
         textAlign: "center",
         backgroundColor: "white",
       }}
-      maxWidth="container.lg"
+      maxWidth="container.xl"
       {...props}
     >
       <Heading as="h2" size="xl" fontWeight="bold">
-        <FormattedMessage
-          id="public.solutions-law-firms.title"
-          defaultMessage="Solutions for law firms"
-        />
+        {heading}
       </Heading>
       <Grid
-        marginTop={12}
+        marginTop={14}
         justifyContent="space-evenly"
         gridGap={6}
         templateColumns={{
@@ -39,63 +35,9 @@ export function SolutionsPopularUseCases({
           lg: "repeat(3, 1fr)",
         }}
       >
-        <Feature
-          image={
-            <Image
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_smart_forms.svg`}
-            />
-          }
-          header={
-            <FormattedMessage
-              id="public.law-use-cases.smart-forms-title"
-              defaultMessage="Smart forms"
-            />
-          }
-          description={
-            <FormattedMessage
-              id="public.law-use-cases.smart-forms-description"
-              defaultMessage="Use conditions to set up smart decisions and ensure that your clients responds only to what is needed."
-            />
-          }
-        />
-        <Feature
-          image={
-            <Image
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_esignature.svg`}
-            />
-          }
-          header={
-            <FormattedMessage
-              id="public.law-use-cases.esignature-title"
-              defaultMessage="eSignature integration"
-            />
-          }
-          description={
-            <FormattedMessage
-              id="public.law-use-cases.esignature-description"
-              defaultMessage="Enable easily an advance eSignature to your proccess, completely secure and legally valid.."
-            />
-          }
-        />
-        <Feature
-          image={
-            <Image
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_colaborate.svg`}
-            />
-          }
-          header={
-            <FormattedMessage
-              id="public.law-use-cases.colaborate-title"
-              defaultMessage="Colaborate with your team"
-            />
-          }
-          description={
-            <FormattedMessage
-              id="public.law-use-cases.colaborate-description"
-              defaultMessage="Share your cases with your colleagues to work efficiently."
-            />
-          }
-        />
+        {features?.map((feature, index) => {
+          return <Feature key={index} {...feature} />;
+        })}
       </Grid>
     </PublicContainer>
   );
@@ -111,7 +53,7 @@ function Feature({ image, header, description, ...props }: FeatureProps) {
   return (
     <Box padding={5} textAlign="left" {...props}>
       {image}
-      <Heading as="h4" marginTop={4} size="sm">
+      <Heading as="h4" marginTop={4} size="lg">
         {header}
       </Heading>
       <Text marginTop={2} fontSize="md">

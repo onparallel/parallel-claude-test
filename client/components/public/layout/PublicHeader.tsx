@@ -214,16 +214,16 @@ function PublicHeaderMenu(props: StackProps) {
                 defaultMessage="Law firms"
               />
             </MenuItemLink>
-            <MenuItemLink href="/solutions/accountants">
+            <MenuItemLink href="/solutions/consultancy">
               <FormattedMessage
-                id="public.solutions.accountants-link"
-                defaultMessage="Accountants"
+                id="public.solutions.consultancy-link"
+                defaultMessage="Consultancy"
               />
             </MenuItemLink>
-            <MenuItemLink href="/solutions/consultants">
+            <MenuItemLink href="/solutions/accounting">
               <FormattedMessage
-                id="public.solutions.consultants-link"
-                defaultMessage="Consultants"
+                id="public.solutions.accounting-link"
+                defaultMessage="BPO and accounting"
               />
             </MenuItemLink>
           </MenuList>

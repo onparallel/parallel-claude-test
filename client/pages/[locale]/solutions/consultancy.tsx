@@ -1,4 +1,4 @@
-import { Heading, Text } from "@chakra-ui/react";
+import { Heading, Image, Text, Center } from "@chakra-ui/react";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicHero } from "@parallel/components/public/PublicHero";
@@ -11,18 +11,18 @@ import languages from "@parallel/lang/languages.json";
 import { useRouter } from "next/router";
 import { FormattedMessage, useIntl } from "react-intl";
 
-function Consultants() {
+function Consultancy() {
   const intl = useIntl();
   const { query } = useRouter();
 
   const hero = {
-    image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/consultants_hero_${query.locale}`,
+    image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/consultancy_hero_${query.locale}`,
     title: intl.formatMessage({
-      id: "public.consultants.hero-title",
+      id: "public.consultancy.hero-title",
       defaultMessage: "Speeds up the work with your clients",
     }),
     subtitle: intl.formatMessage({
-      id: "public.consultants.hero-subtitle",
+      id: "public.consultancy.hero-subtitle",
       defaultMessage:
         "Platform to work efficiently with your client. Use templates to reduce your team’s time on repetitive tasks.",
     }),
@@ -37,16 +37,16 @@ function Consultants() {
     url: "/book-demo",
   };
 
-  const benefitsImage = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/consultants_benefits_${query.locale}.png`;
+  const benefitsImage = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/consultancy_benefits_${query.locale}.png`;
   const benefits = [
     {
       image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_experience.svg`,
       heading: intl.formatMessage({
-        id: "public.consultants.benefits-experience-title",
+        id: "public.consultancy.benefits-experience-title",
         defaultMessage: "Digitize yours services",
       }),
       text: intl.formatMessage({
-        id: "public.consultants.benefits-experience-message",
+        id: "public.consultancy.benefits-experience-message",
         defaultMessage:
           "Manage your matters with Parallel for more efficiency. It completely replaces the use of paper and email chains.",
       }),
@@ -54,11 +54,11 @@ function Consultants() {
     {
       image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_template.svg`,
       heading: intl.formatMessage({
-        id: "public.consultants.benefits-template-title",
+        id: "public.consultancy.benefits-template-title",
         defaultMessage: "Create templates for your daily proccesses",
       }),
       text: intl.formatMessage({
-        id: "public.consultants.benefits-template-message",
+        id: "public.consultancy.benefits-template-message",
         defaultMessage:
           "Standardize your processes to send your checklist quickly and avoid mistakes.",
       }),
@@ -66,11 +66,11 @@ function Consultants() {
     {
       image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_control.svg`,
       heading: intl.formatMessage({
-        id: "public.consultants.benefits-control-title",
+        id: "public.consultancy.benefits-control-title",
         defaultMessage: "Save time for your team",
       }),
       text: intl.formatMessage({
-        id: "public.consultants.benefits-control-message",
+        id: "public.consultancy.benefits-control-message",
         defaultMessage:
           "Automate monitoring and we will remember your clients to upload de informations requested so you can focus on other matters.",
       }),
@@ -79,26 +79,81 @@ function Consultants() {
 
   const logos = [
     {
-      alt: "Tecnotramit logo",
-      href: "https://web.tecnotramit.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/tecnotramit_black.svg`,
-    },
-    {
-      alt: "Prontopiso logo",
-      href: "https://prontopiso.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/prontopiso_black.svg`,
-    },
-    {
-      alt: "Gestoría Pons logo",
+      alt: "Gestoría Pons",
       href: "https://www.gestoriapons.com/",
       src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.svg`,
+    },
+    {
+      alt: "Delvy",
+      href: "https://delvy.es/",
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/delvy_black.svg`,
+    },
+  ];
+
+  const solutions = [
+    {
+      image: (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_smart_forms.svg`}
+        />
+      ),
+      header: (
+        <FormattedMessage
+          id="public.consultancy.use-cases-smart-form-title"
+          defaultMessage="Smart templates"
+        />
+      ),
+      description: (
+        <FormattedMessage
+          id="public.consultancy.use-cases-smart-form-description"
+          defaultMessage="Personalize your customers experience by using conditionals and other useful features."
+        />
+      ),
+    },
+    {
+      image: (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_reminders.svg`}
+        />
+      ),
+      header: (
+        <FormattedMessage
+          id="public.accounting.use-cases-remainders-title"
+          defaultMessage="Configurable reminders"
+        />
+      ),
+      description: (
+        <FormattedMessage
+          id="public.accounting.use-cases-remainders-description"
+          defaultMessage="Forget about chasing customers. Set up periodic reminders and let Parallel handle it while you receive the information."
+        />
+      ),
+    },
+    {
+      image: (
+        <Image
+          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_mailing.svg`}
+        />
+      ),
+      header: (
+        <FormattedMessage
+          id="public.consultancy.use-cases-mailing-title"
+          defaultMessage="Mass mailing"
+        />
+      ),
+      description: (
+        <FormattedMessage
+          id="public.consultancy.use-cases-mailing-description"
+          defaultMessage="Request information for your campaigns from all your customers at the same time."
+        />
+      ),
     },
   ];
 
   return (
     <PublicLayout
       title={intl.formatMessage({
-        id: "public.consultants.title",
+        id: "public.consultancy.title",
         defaultMessage: "Speeds up the work with your clients",
       })}
     >
@@ -115,16 +170,12 @@ function Consultants() {
       <SolutionsBenefits image={benefitsImage} benefits={benefits} />
       <PublicContainer
         paddingY={8}
-        maxWidth="container.lg"
+        maxWidth="container.xl"
         wrapper={{ paddingY: 16 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/consultants_usecase_${query.locale}.svg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/consultancy_usecase_${query.locale}.svg`}
           imageSize="330px"
-          description={intl.formatMessage({
-            id: "public.law-firms.actual-data-kyc",
-            defaultMessage: "*Actual data in a KYC case.",
-          })}
         >
           <Heading
             as="h4"
@@ -140,29 +191,57 @@ function Consultants() {
           </Heading>
           <Heading
             as="h3"
-            size="lg"
+            size="xl"
             color="gray.800"
             lineHeight="1.5"
             letterSpacing="-0,019em"
             marginBottom={4}
           >
             <FormattedMessage
-              id="public.law-firms.speed-up-title"
-              defaultMessage="Speed up your new clients registration, quickly and securely. "
+              id="public.consultancy.speed-up-title"
+              defaultMessage="Management of Income Tax 2020 with Parallel "
             />
           </Heading>
           <Text>
             <FormattedMessage
-              id="public.law-firms.speed-up-body"
-              defaultMessage="Improves <b>control and monitoring of compliance</b> with the Prevention of Money Laundering, and avoids penalties for non-compliance."
-              values={{
-                b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
-              }}
+              id="public.consultancy.speed-up-body"
+              defaultMessage="We facilitate the management and masive mailing of more than 150 rents. Speeding up the receive of information and having, in less than 5 days, 40% of the processes completed."
             />
           </Text>
         </PublicShowcase>
       </PublicContainer>
-      <SolutionsPopularUseCases />
+      <SolutionsPopularUseCases
+        heading={
+          <FormattedMessage
+            id="public.consultancy.solutions-title"
+            defaultMessage="Solutions for Consultancy"
+          />
+        }
+        features={solutions}
+      />
+      <PublicContainer
+        paddingY={8}
+        maxWidth="container.xl"
+        wrapper={{
+          paddingY: 16,
+          textAlign: "center",
+          backgroundColor: "white",
+          paddingBottom: 28,
+        }}
+      >
+        <Heading as="h2" size="xl" fontWeight="bold">
+          <FormattedMessage
+            id="public.consultancy.api-title"
+            defaultMessage="Use our API to integrate it into your workflow"
+          />
+        </Heading>
+        <Center marginTop={14}>
+          <Image
+            maxWidth="730px"
+            src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/api/api_consultancy.png`}
+          />
+        </Center>
+      </PublicContainer>
       <SolutionsDemoCta>
         <FormattedMessage
           id="public.law-firms.book-cta-title"
@@ -184,4 +263,4 @@ export function getStaticPaths() {
   };
 }
 
-export default Consultants;
+export default Consultancy;

@@ -17,7 +17,7 @@ export function SolutionsTrust({ logos, ...props }: SolutionsTrust) {
     >
       <Heading
         as="h2"
-        size="xl"
+        size="lg"
         fontWeight="bold"
         marginBottom={8}
         textAlign="center"

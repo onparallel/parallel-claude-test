@@ -15,7 +15,7 @@ export const SolutionsBenefits = ({
   return (
     <PublicContainer
       paddingY={8}
-      maxWidth="container.lg"
+      maxWidth="container.xl"
       wrapper={{ paddingY: 16, backgroundColor: "purple.50" }}
       {...props}
     >
