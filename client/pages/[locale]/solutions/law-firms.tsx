@@ -1,31 +1,23 @@
-import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
-import { PublicDemoCta } from "@parallel/components/public/law-firms/PublicDemoCta";
-import { PublicHeroPopularUseCases } from "@parallel/components/public/law-firms/PublicHeroPopularUseCases";
-import { PublicHero } from "@parallel/components/public/PublicHero";
-import { PublicTrust } from "@parallel/components/public/law-firms/PublicTrust";
-import languages from "@parallel/lang/languages.json";
-import { FormattedMessage, useIntl } from "react-intl";
-import { useRouter } from "next/router";
-import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
-import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
-import {
-  Box,
-  Heading,
-  Image,
-  List,
-  ListIcon,
-  ListItem,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Heading, List, ListIcon, ListItem, Text } from "@chakra-ui/react";
 import { CircleCheckIcon } from "@parallel/chakra/icons";
+import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
+import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicHero } from "@parallel/components/public/PublicHero";
+import { PublicShowcase } from "@parallel/components/public/PublicShowcase";
+import { SolutionsBenefits } from "@parallel/components/public/solutions/SolutionsBenefits";
+import { SolutionsDemoCta } from "@parallel/components/public/solutions/SolutionsDemoCta";
+import { SolutionsPopularUseCases } from "@parallel/components/public/solutions/SolutionsPopularUseCases";
+import { SolutionsTrust } from "@parallel/components/public/solutions/SolutionsTrust";
+import languages from "@parallel/lang/languages.json";
+import { useRouter } from "next/router";
+import { FormattedMessage, useIntl } from "react-intl";
 
 function LawFirms() {
   const intl = useIntl();
   const { query } = useRouter();
 
   const hero = {
-    image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/lawfirms_hero_${query.locale}`,
+    image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/lawfirms_hero_${query.locale}`,
     title: intl.formatMessage({
       id: "public.law-firms.hero-title",
       defaultMessage: "Increase your team’s billing and return",
@@ -46,6 +38,64 @@ function LawFirms() {
     url: "/book-demo",
   };
 
+  const benefitsImage = `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/lawfirms_benefits_${query.locale}.svg`;
+  const benefits = [
+    {
+      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_efficiency.svg`,
+      heading: intl.formatMessage({
+        id: "public.law-firms.benefits-efficency-title",
+        defaultMessage: "Enhance the efficiency of your team",
+      }),
+      text: intl.formatMessage({
+        id: "public.law-firms.benefits-efficency-message",
+        defaultMessage:
+          "Use templates to reuse knowledge and reduce mistakes in your workflow.",
+      }),
+    },
+    {
+      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_control.svg`,
+      heading: intl.formatMessage({
+        id: "public.law-firms.benefits-control-title",
+        defaultMessage: "All your affairs under control",
+      }),
+      text: intl.formatMessage({
+        id: "public.law-firms.benefits-control-message",
+        defaultMessage:
+          "Visualize the status of the on-going cases and remaining work of your team.",
+      }),
+    },
+    {
+      image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_experience.svg`,
+      heading: intl.formatMessage({
+        id: "public.law-firms.benefits-experience-title",
+        defaultMessage: "Improve your customer experience",
+      }),
+      text: intl.formatMessage({
+        id: "public.law-firms.benefits-experience-message",
+        defaultMessage:
+          "Provide a secure portal where your clients can colaborate and communicate with you.",
+      }),
+    },
+  ];
+
+  const logos = [
+    {
+      alt: "Cuatrecasas Acelera",
+      href: "https://www.cuatrecasas.com",
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/cuatrecasas_black.svg`,
+    },
+    {
+      alt: "Andersen",
+      href: "https://es.andersen.com/",
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/andersen_black.svg`,
+    },
+    {
+      alt: "Gestoría Pons",
+      href: "https://www.gestoriapons.com/",
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.svg`,
+    },
+  ];
+
   return (
     <PublicLayout
       title={intl.formatMessage({
@@ -62,107 +112,15 @@ function LawFirms() {
         sectionTitle={hero.sectionTitle}
         url={hero.url}
       />
-      <PublicTrust />
-      <PublicContainer
-        paddingY={8}
-        maxWidth="container.lg"
-        wrapper={{ paddingY: 16, backgroundColor: "purple.50" }}
-      >
-        <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel_benefits_${query.locale}.svg`}
-          imageSize="350px"
-          isReversed
-        >
-          <Stack
-            direction="column"
-            spacing={12}
-            paddingX={{ base: 4, sm: 8, md: 12 }}
-          >
-            <Stack direction="row" spacing={4}>
-              <Box>
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/benefits_efficiency.svg`}
-                  loading="lazy"
-                  minWidth="52px"
-                  role="presentation"
-                  objectFit="contain"
-                />
-              </Box>
-              <Box>
-                <Heading as="h3" size="md" color="gray.800" marginBottom={2}>
-                  <FormattedMessage
-                    id="public.law-firms.benefits-efficency-title"
-                    defaultMessage="Enhance the efficiency of your team"
-                  />
-                </Heading>
-                <Text marginBottom={2}>
-                  <FormattedMessage
-                    id="public.law-firms.benefits-efficency-message"
-                    defaultMessage="Use templates to reuse knowledge and reduce mistakes in your workflow."
-                  />
-                </Text>
-              </Box>
-            </Stack>
-            <Stack direction="row" spacing={4}>
-              <Box>
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/benefits_control.svg`}
-                  loading="lazy"
-                  minWidth="52px"
-                  role="presentation"
-                  objectFit="contain"
-                />
-              </Box>
-              <Box>
-                <Heading as="h3" size="md" color="gray.800" marginBottom={2}>
-                  <FormattedMessage
-                    id="public.law-firms.benefits-control-title"
-                    defaultMessage="All your affairs under control"
-                  />
-                </Heading>
-                <Text marginBottom={2}>
-                  <FormattedMessage
-                    id="public.law-firms.benefits-control-message"
-                    defaultMessage="Visualize the status of the on-going cases and remaining work of your team."
-                  />
-                </Text>
-              </Box>
-            </Stack>
-            <Stack direction="row" spacing={4}>
-              <Box>
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/benefits_experience.svg`}
-                  loading="lazy"
-                  minWidth="52px"
-                  role="presentation"
-                  objectFit="contain"
-                />
-              </Box>
-              <Box>
-                <Heading as="h3" size="md" color="gray.800" marginBottom={2}>
-                  <FormattedMessage
-                    id="public.law-firms.benefits-experience-title"
-                    defaultMessage="Improve your customer experience"
-                  />
-                </Heading>
-                <Text marginBottom={2}>
-                  <FormattedMessage
-                    id="public.law-firms.benefits-experience-message"
-                    defaultMessage="Provide a secure portal where your clients can colaborate and communicate with you."
-                  />
-                </Text>
-              </Box>
-            </Stack>
-          </Stack>
-        </PublicShowcase>
-      </PublicContainer>
+      <SolutionsTrust logos={logos} />
+      <SolutionsBenefits image={benefitsImage} benefits={benefits} />
       <PublicContainer
         paddingY={8}
         maxWidth="container.lg"
         wrapper={{ paddingY: 16 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel_usecase_kyc_${query.locale}.svg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/lawfirms_usecase_${query.locale}.svg`}
           imageSize="330px"
           description={intl.formatMessage({
             id: "public.law-firms.actual-data-kyc",
@@ -205,7 +163,7 @@ function LawFirms() {
           </Text>
         </PublicShowcase>
       </PublicContainer>
-      <PublicHeroPopularUseCases />
+      <SolutionsPopularUseCases />
       <PublicContainer
         paddingY={8}
         maxWidth="container.lg"
@@ -265,12 +223,12 @@ function LawFirms() {
           </List>
         </PublicShowcase>
       </PublicContainer>
-      <PublicDemoCta>
+      <SolutionsDemoCta>
         <FormattedMessage
           id="public.law-firms.book-cta-title"
           defaultMessage="Can we help you?"
         />
-      </PublicDemoCta>
+      </SolutionsDemoCta>
     </PublicLayout>
   );
 }

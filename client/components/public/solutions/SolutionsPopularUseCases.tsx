@@ -3,16 +3,25 @@ import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "../layout/PublicContainer";
 
-export function PublicHeroPopularUseCases(props: BoxProps) {
+interface SolutionsPopularUseCasesProps extends BoxProps {
+  image: string;
+  features: FeatureProps[];
+}
+
+export function SolutionsPopularUseCases({
+  image,
+  features,
+  ...props
+}: SolutionsPopularUseCasesProps) {
   return (
     <PublicContainer
-      {...props}
       wrapper={{
         paddingY: 16,
         textAlign: "center",
         backgroundColor: "white",
       }}
       maxWidth="container.lg"
+      {...props}
     >
       <Heading as="h2" size="xl" fontWeight="bold">
         <FormattedMessage
@@ -33,7 +42,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         <Feature
           image={
             <Image
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/law_smart_forms.svg`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_smart_forms.svg`}
             />
           }
           header={
@@ -52,7 +61,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         <Feature
           image={
             <Image
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/law_esignature.svg`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_esignature.svg`}
             />
           }
           header={
@@ -71,7 +80,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         <Feature
           image={
             <Image
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/law_colaborate.svg`}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_colaborate.svg`}
             />
           }
           header={

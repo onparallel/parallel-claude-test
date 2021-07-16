@@ -67,7 +67,7 @@ function Request() {
         wrapper={{ paddingY: 16 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel_template_${query.locale}.png`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/request-information/parallel_template_${query.locale}.png`}
           imageSize="300px"
           isReversed
         >
@@ -91,7 +91,7 @@ function Request() {
         wrapper={{ paddingY: 16 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel_conditions_${query.locale}.png`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/request-information/parallel_conditions_${query.locale}.png`}
           imageSize="300px"
         >
           <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
@@ -115,7 +115,7 @@ function Request() {
       >
         <PublicShowcase
           isReversed
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-branding.png`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/request-information/parallel-branding.png`}
           imageSize="300px"
         >
           <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>

@@ -67,7 +67,7 @@ function Review() {
         wrapper={{ paddingY: 16, backgroundColor: "purple.50" }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-export-${query.locale}.svg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/review-files/parallel-export-${query.locale}.svg`}
           imageSize="350px"
           isReversed
         >
@@ -91,7 +91,7 @@ function Review() {
         wrapper={{ paddingY: 16 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-activity-${query.locale}.svg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/review-files/parallel-activity-${query.locale}.svg`}
           imageSize="350px"
         >
           <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>

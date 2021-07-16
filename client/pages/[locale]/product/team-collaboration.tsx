@@ -73,7 +73,7 @@ function Collaborate() {
         wrapper={{ background: "purple.50" }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-share-${query.locale}.png`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/team-collaboration/parallel-share-${query.locale}.png`}
           imageSize="350px"
           isReversed
         >
@@ -97,7 +97,7 @@ function Collaborate() {
         wrapper={{ paddingY: 16 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-internal-comments-${query.locale}.svg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/team-collaboration/parallel-internal-comments-${query.locale}.svg`}
           imageSize="350px"
         >
           <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>

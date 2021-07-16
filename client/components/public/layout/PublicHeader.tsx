@@ -220,6 +220,12 @@ function PublicHeaderMenu(props: StackProps) {
                 defaultMessage="Accountants"
               />
             </MenuItemLink>
+            <MenuItemLink href="/solutions/consultants">
+              <FormattedMessage
+                id="public.solutions.consultants-link"
+                defaultMessage="Consultants"
+              />
+            </MenuItemLink>
           </MenuList>
         </Portal>
       </Menu>

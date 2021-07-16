@@ -67,7 +67,7 @@ function Follow() {
         wrapper={{ paddingY: 16, backgroundColor: "purple.50" }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-reminder-${query.locale}.svg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/monitor-progress/parallel-reminder-${query.locale}.svg`}
           imageSize="350px"
           isReversed
         >
@@ -91,7 +91,7 @@ function Follow() {
         wrapper={{ paddingY: 16 }}
       >
         <PublicShowcase
-          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/parallel-conversation-${query.locale}.svg`}
+          imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/monitor-progress/parallel-conversation-${query.locale}.svg`}
           imageSize="350px"
         >
           <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>

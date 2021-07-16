@@ -45,7 +45,7 @@ function Security() {
       <PublicContainer paddingY={16} maxWidth="container.lg">
         <Stack spacing={{ base: 16, sm: 24, md: 32 }}>
           <PublicShowcase
-            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_safe.svg`}
+            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/security/undraw_safe.svg`}
             imageSize="150px"
           >
             <Heading as="h4" size="md" color="purple.500" marginBottom={4}>
@@ -69,7 +69,7 @@ function Security() {
           </PublicShowcase>
           <PublicShowcase
             isReversed
-            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_secure_server.svg`}
+            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/security/undraw_secure_server.svg`}
             imageSize="150px"
           >
             <Heading as="h4" size="md" color="purple.500" marginBottom={4}>
@@ -86,7 +86,7 @@ function Security() {
             </Text>
           </PublicShowcase>
           <PublicShowcase
-            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_personal_information.svg`}
+            imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/security/undraw_personal_information.svg`}
             imageSize="150px"
           >
             <Heading as="h4" size="md" color="purple.500" marginBottom={4}>

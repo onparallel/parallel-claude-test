@@ -15,7 +15,7 @@ function Home() {
   const { query } = useRouter();
 
   const hero = {
-    image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/showcase_hero_${query.locale}`,
+    image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/showcase_hero_${query.locale}`,
     title: intl.formatMessage({
       id: "public.home.hero-title",
       defaultMessage: "Automate your workflows with clients",

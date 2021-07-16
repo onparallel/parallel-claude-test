@@ -3,14 +3,14 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { FormattedMessage } from "react-intl";
 import { PublicContainer } from "../layout/PublicContainer";
 
-export function PublicDemoCta({ children, ...props }: BoxProps) {
+export function SolutionsDemoCta({ children, ...props }: BoxProps) {
   return (
     <PublicContainer
       paddingY={20}
       maxWidth="container.lg"
       textAlign="center"
       wrapper={{
-        backgroundImage: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/law-firms-book-bg.png`,
+        backgroundImage: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/bg/book-footer-bg.png`,
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",
