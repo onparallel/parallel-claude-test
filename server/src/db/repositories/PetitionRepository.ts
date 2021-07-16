@@ -308,7 +308,7 @@ export class PetitionRepository extends BaseRepository {
 
         if (filters?.tagIds) {
           q.joinRaw(
-            /* sql */ `join petition_tag pt on pt.petition_id = petition.id`
+            /* sql */ `left join petition_tag pt on pt.petition_id = petition.id`
           );
           if (filters.tagIds.length) {
             q.havingRaw(
@@ -320,7 +320,7 @@ export class PetitionRepository extends BaseRepository {
             );
           } else {
             q.havingRaw(/* sql */ `
-              array_length(array_remove(array_agg(distinct pt.tag_id), null), 1) = 0
+              count(distinct pt.tag_id) = 0
             `);
           }
         }
