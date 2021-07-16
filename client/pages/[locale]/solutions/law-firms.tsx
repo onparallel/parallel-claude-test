@@ -89,17 +89,20 @@ function LawFirms() {
     {
       alt: "Cuatrecasas Acelera",
       href: "https://www.cuatrecasas.com",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/cuatrecasas_black.svg`,
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/cuatrecasas_black.png`,
+      maxWidth: "180px",
     },
     {
       alt: "Andersen",
       href: "https://es.andersen.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/andersen_black.svg`,
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/andersen_black.png`,
+      maxWidth: "157px",
     },
     {
       alt: "Gestoría Pons",
       href: "https://www.gestoriapons.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.svg`,
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.png`,
+      maxWidth: "190px",
     },
   ];
 

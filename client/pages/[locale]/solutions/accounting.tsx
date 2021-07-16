@@ -90,17 +90,20 @@ function Accounting() {
     {
       alt: "Tecnotramit logo",
       href: "https://web.tecnotramit.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/tecnotramit_black.svg`,
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/tecnotramit_black.png`,
+      maxWidth: "155px",
     },
     {
       alt: "Prontopiso logo",
       href: "https://prontopiso.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/prontopiso_black.svg`,
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/prontopiso_black.png`,
+      maxWidth: "180px",
     },
     {
       alt: "Gestoría Pons logo",
       href: "https://www.gestoriapons.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.svg`,
+      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.png`,
+      maxWidth: "190px",
     },
   ];
 
@@ -269,6 +272,7 @@ function Accounting() {
         <Center marginTop={14}>
           <Image
             maxWidth="730px"
+            width="100%"
             src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/api/api_accounting.png`}
           />
         </Center>

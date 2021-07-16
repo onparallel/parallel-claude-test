@@ -48,13 +48,14 @@ type LogoProps = {
   src: string;
   alt: string;
   href: string;
+  maxWidth?: string;
 };
 
-function Logo({ src, alt, href }: LogoProps) {
+function Logo({ src, alt, href, maxWidth }: LogoProps) {
   return (
     <Center>
       <NormalLink href={href} isExternal>
-        <Image alt={alt} loading="lazy" src={src} />
+        <Image alt={alt} loading="lazy" src={src} maxWidth={maxWidth} />
       </NormalLink>
     </Center>
   );
