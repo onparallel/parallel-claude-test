@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, IconButton, Text } from "@chakra-ui/react";
+import { BellSettingsIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
 import { DateTime } from "@parallel/components/common/DateTime";
@@ -8,6 +9,7 @@ import { OverflownText } from "@parallel/components/common/OverflownText";
 import { PetitionSignatureCellContent } from "@parallel/components/common/PetitionSignatureCellContent";
 import { PetitionStatusCellContent } from "@parallel/components/common/PetitionStatusCellContent";
 import { PetitionTagListCellContent } from "@parallel/components/common/PetitionTagListCellContent";
+import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
@@ -22,8 +24,10 @@ import { FORMATS } from "@parallel/utils/dates";
 import { ellipsis } from "@parallel/utils/ellipsis";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { maxBy, minBy } from "remeda";
 import { EnumerateList } from "./EnumerateList";
 import { useGoToContact } from "./goToContact";
+import { useGoToPetition } from "./goToPetition";
 
 export type PetitionsTableColumnsContext = {
   user: usePetitionsTableColumns_UserFragment;
@@ -209,51 +213,154 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
             </Flex>
           ),
         },
-        type === "PETITION"
-          ? ({
-              key: "sentAt",
-              isSortable: true,
-              header: intl.formatMessage({
-                id: "generic.sent-at",
-                defaultMessage: "Sent at",
-              }),
-              cellProps: { width: "1%" },
-              CellContent: ({ row: { sentAt } }) =>
-                sentAt ? (
+        ...(type === "PETITION"
+          ? ([
+              {
+                key: "sentAt",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "generic.sent-at",
+                  defaultMessage: "Sent at",
+                }),
+                cellProps: { width: "1%" },
+                CellContent: ({ row: { sentAt } }) =>
+                  sentAt ? (
+                    <DateTime
+                      value={sentAt}
+                      format={FORMATS.LLL}
+                      useRelativeTime
+                      fontSize="sm"
+                      whiteSpace="nowrap"
+                    />
+                  ) : (
+                    <Text as="span" textStyle="hint" fontSize="sm">
+                      <FormattedMessage
+                        id="generic.not-sent"
+                        defaultMessage="Not sent"
+                      />
+                    </Text>
+                  ),
+              },
+              {
+                key: "lastReminder",
+                isSortable: false,
+                header: intl.formatMessage({
+                  id: "petitions.header.last-reminder",
+                  defaultMessage: "Last reminder",
+                }),
+
+                CellContent: ({ row }) => {
+                  const lastReminderDate = maxBy(
+                    row.accesses.map((a) => a.reminders[0]?.createdAt),
+                    (date) => new Date(date).valueOf()
+                  );
+
+                  const nextReminderAt = minBy(
+                    row.accesses.filter((a) => !!a.nextReminderAt),
+                    (a) => new Date(a.nextReminderAt!).valueOf()
+                  )?.nextReminderAt;
+
+                  const redirect = useGoToPetition();
+
+                  return (
+                    <Flex
+                      alignItems="center"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        redirect(
+                          row.id,
+                          row.status === "DRAFT" ? "compose" : "activity"
+                        );
+                      }}
+                    >
+                      {lastReminderDate ? (
+                        <DateTime
+                          value={lastReminderDate}
+                          format={FORMATS.MMMdd}
+                          fontSize="sm"
+                          whiteSpace="nowrap"
+                        />
+                      ) : (
+                        <Text
+                          as="span"
+                          textStyle="hint"
+                          fontSize="sm"
+                          width="max-content"
+                        >
+                          <FormattedMessage
+                            id="petitions.header.reminders-disabled"
+                            defaultMessage="No reminders"
+                          />
+                        </Text>
+                      )}
+                      {nextReminderAt ? (
+                        <SmallPopover
+                          content={
+                            <Text color="gray.800" fontSize="14px">
+                              <FormattedMessage
+                                id="petitions.header.reminders-next-reminder-at.popover"
+                                defaultMessage="Next reminder configured for {date} at {hours}"
+                                values={{
+                                  date: (
+                                    <DateTime
+                                      format={FORMATS.MMMdd}
+                                      value={nextReminderAt}
+                                    />
+                                  ),
+                                  hours: (
+                                    <DateTime
+                                      format={FORMATS.HHmm}
+                                      value={nextReminderAt}
+                                    />
+                                  ),
+                                }}
+                              />
+                            </Text>
+                          }
+                          placement="bottom-end"
+                        >
+                          <IconButton
+                            marginLeft={1}
+                            variant="ghost"
+                            aria-label={intl.formatMessage({
+                              id: "petitions.header.reminders-next-reminder-at",
+                              defaultMessage: "Next reminder configured",
+                            })}
+                            size="xs"
+                            icon={
+                              <BellSettingsIcon
+                                fontSize="16px"
+                                color="gray.500"
+                              />
+                            }
+                          />
+                        </SmallPopover>
+                      ) : null}
+                    </Flex>
+                  );
+                },
+              },
+            ] as PetitionTableColumn[])
+          : ([
+              {
+                key: "createdAt",
+                isSortable: true,
+                header: intl.formatMessage({
+                  id: "generic.created-at",
+                  defaultMessage: "Created at",
+                }),
+                cellProps: { width: "1%" },
+                CellContent: ({ row: { createdAt } }) => (
                   <DateTime
-                    value={sentAt}
+                    value={createdAt}
                     format={FORMATS.LLL}
                     useRelativeTime
                     fontSize="sm"
                     whiteSpace="nowrap"
                   />
-                ) : (
-                  <Text as="span" textStyle="hint" fontSize="sm">
-                    <FormattedMessage
-                      id="generic.not-sent"
-                      defaultMessage="Not sent"
-                    />
-                  </Text>
                 ),
-            } as PetitionTableColumn)
-          : {
-              key: "createdAt",
-              isSortable: true,
-              header: intl.formatMessage({
-                id: "generic.created-at",
-                defaultMessage: "Created at",
-              }),
-              cellProps: { width: "1%" },
-              CellContent: ({ row: { createdAt } }) => (
-                <DateTime
-                  value={createdAt}
-                  format={FORMATS.LLL}
-                  useRelativeTime
-                  fontSize="sm"
-                  whiteSpace="nowrap"
-                />
-              ),
-            },
+              },
+            ] as PetitionTemplateTableColumn[])),
         {
           key: "tags",
           header: intl.formatMessage({
@@ -303,6 +410,10 @@ usePetitionsTableColumns.fragments = {
           status
           contact {
             ...ContactLink_Contact
+          }
+          nextReminderAt
+          reminders {
+            createdAt
           }
         }
         sentAt

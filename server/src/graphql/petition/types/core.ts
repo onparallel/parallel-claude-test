@@ -558,6 +558,11 @@ export const PetitionAccess = objectType({
         return root.reminders_active;
       },
     });
+    t.nonNull.list.nonNull.field("reminders", {
+      type: "PetitionReminder",
+      resolve: async (root, _, ctx) =>
+        ctx.petitions.loadRemindersByAccessId(root.id),
+    });
   },
 });
 

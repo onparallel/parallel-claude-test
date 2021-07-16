@@ -1510,6 +1510,7 @@ type PetitionAccess implements Timestamps {
   Number of reminders sent.
   """
   reminderCount: Int!
+  reminders: [PetitionReminder!]!
 
   """
   Whether automatic reminders are active or not for this petition access

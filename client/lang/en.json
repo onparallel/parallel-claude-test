@@ -4135,6 +4135,11 @@
     "context": "Description"
   },
   {
+    "term": "petitions.header.last-reminder",
+    "definition": "Last reminder",
+    "context": "Last reminder"
+  },
+  {
     "term": "petitions.header.name",
     "definition": "Petition name",
     "context": "Petition name"
@@ -4143,6 +4148,21 @@
     "term": "petitions.header.recipient",
     "definition": "Recipient",
     "context": "Recipient"
+  },
+  {
+    "term": "petitions.header.reminders-disabled",
+    "definition": "No reminders",
+    "context": "No reminders"
+  },
+  {
+    "term": "petitions.header.reminders-next-reminder-at",
+    "definition": "Next reminder configured",
+    "context": "Next reminder configured"
+  },
+  {
+    "term": "petitions.header.reminders-next-reminder-at.popover",
+    "definition": "Next reminder configured for {date} at {hours}",
+    "context": "Next reminder configured for {date} at {hours}"
   },
   {
     "term": "petitions.header.shared-with",

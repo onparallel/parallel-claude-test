@@ -1242,6 +1242,7 @@ export interface PetitionAccess extends Timestamps {
   petition?: Maybe<Petition>;
   /** Number of reminders sent. */
   reminderCount: Scalars["Int"];
+  reminders: Array<PetitionReminder>;
   /** Whether automatic reminders are active or not for this petition access */
   remindersActive: Scalars["Boolean"];
   /** The reminder settings of the petition. */
@@ -7005,7 +7006,9 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
   accesses: Array<{
     __typename?: "PetitionAccess";
     status: PetitionAccessStatus;
+    nextReminderAt?: Maybe<string>;
     contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    reminders: Array<{ __typename?: "PetitionReminder"; createdAt: string }>;
   }>;
   permissions: Array<
     | {
@@ -9006,6 +9009,10 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
         status
         contact {
           ...ContactLink_Contact
+        }
+        nextReminderAt
+        reminders {
+          createdAt
         }
       }
       sentAt

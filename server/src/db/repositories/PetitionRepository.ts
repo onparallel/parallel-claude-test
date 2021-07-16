@@ -1721,6 +1721,12 @@ export class PetitionRepository extends BaseRepository {
     "petition_access_id"
   );
 
+  readonly loadRemindersByAccessId = this.buildLoadMultipleBy(
+    "petition_reminder",
+    "petition_access_id",
+    (q) => q.orderBy("created_at", "desc")
+  );
+
   async createReminders(data: CreatePetitionReminder[]) {
     if (data.length === 0) {
       return [];

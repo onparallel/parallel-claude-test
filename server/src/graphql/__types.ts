@@ -900,6 +900,7 @@ export interface NexusGenFieldTypes {
     nextReminderAt: NexusGenScalars["DateTime"] | null; // DateTime
     petition: NexusGenRootTypes["Petition"] | null; // Petition
     reminderCount: number; // Int!
+    reminders: NexusGenRootTypes["PetitionReminder"][]; // [PetitionReminder!]!
     remindersActive: boolean; // Boolean!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     remindersLeft: number; // Int!
@@ -1860,6 +1861,7 @@ export interface NexusGenFieldTypeNames {
     nextReminderAt: "DateTime";
     petition: "Petition";
     reminderCount: "Int";
+    reminders: "PetitionReminder";
     remindersActive: "Boolean";
     remindersConfig: "RemindersConfig";
     remindersLeft: "Int";
