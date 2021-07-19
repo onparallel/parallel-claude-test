@@ -3095,16 +3095,6 @@
     "context": "Create"
   },
   {
-    "term": "new-petition.create-new-template",
-    "definition": "Create new template",
-    "context": "Create new template"
-  },
-  {
-    "term": "new-petition.empty-petition-header",
-    "definition": "Not finding what you're looking for?",
-    "context": "Not finding what you're looking for?"
-  },
-  {
     "term": "new-petition.my-templates",
     "definition": "My templates",
     "context": "My templates"
