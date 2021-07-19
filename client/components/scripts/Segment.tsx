@@ -1,7 +1,22 @@
 import Head from "next/head";
-import { memo } from "react";
+import { useRouter } from "next/router";
+import { memo, useEffect } from "react";
 
 export const Segment = memo(() => {
+  const router = useRouter();
+
+  useEffect(() => {
+    const handleRouteChange = () => {
+      window.analytics?.page();
+    };
+
+    router.events.on("routeChangeComplete", handleRouteChange);
+
+    return () => {
+      router.events.off("routeChangeComplete", handleRouteChange);
+    };
+  }, []);
+
   return (
     <Head>
       <script
@@ -9,6 +24,7 @@ export const Segment = memo(() => {
           __html: `
             !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics._writeKey="${process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY}";analytics.SNIPPET_VERSION="4.13.2";
             analytics.load("${process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY}");
+            analytics.page();
             }}();
           `,
         }}
