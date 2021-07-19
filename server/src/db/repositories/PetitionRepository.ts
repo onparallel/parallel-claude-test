@@ -384,7 +384,7 @@ export class PetitionRepository extends BaseRepository {
                 `,
                   [`User:${userId}`]
                 );
-                q.orderByRaw(`last_used_at ${order} NULLS LAST`);
+                q.orderBy("last_used_at", order);
               } else if (column === "sent_at") {
                 q.orderByRaw(`sent_at ${order}, created_at ${order}`);
               } else {
@@ -401,7 +401,11 @@ export class PetitionRepository extends BaseRepository {
             "petition.*",
             this.knex.raw("min(pa.created_at) as sent_at"),
             ...(opts.sortBy?.some((s) => s.column === "last_used_at")
-              ? [this.knex.raw("min(t.t_last_used_at) as last_used_at")]
+              ? [
+                  this.knex.raw(
+                    "greatest(max(t.t_last_used_at), petition.created_at) as last_used_at"
+                  ),
+                ]
               : [])
           ),
       };

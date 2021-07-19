@@ -18,11 +18,19 @@ export function useOnMediaQueryChange(
     const mediaQueryList = window.matchMedia(mediaQuery);
     const changeHandler = () => handler(mediaQueryList.matches);
 
-    mediaQueryList.addEventListener("change", changeHandler);
+    if (mediaQueryList.addEventListener) {
+      mediaQueryList.addEventListener("change", changeHandler);
+    } else {
+      mediaQueryList.addListener(changeHandler);
+    }
 
     changeHandler();
     return () => {
-      mediaQueryList.removeEventListener("change", changeHandler);
+      if (mediaQueryList.removeEventListener) {
+        mediaQueryList.removeEventListener("change", changeHandler);
+      } else {
+        mediaQueryList.removeListener(changeHandler);
+      }
     };
   }, [mediaQuery, handler]);
 }
