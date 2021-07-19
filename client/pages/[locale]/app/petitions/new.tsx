@@ -299,17 +299,13 @@ function NewPetition() {
                 />
               </Tab>
               <Flex flex="1" justifyContent="flex-end" paddingBottom={4}>
-                <Menu>
+                <Menu placement="bottom-end">
                   <MenuButton
                     as={Button}
                     alignSelf="flex-end"
                     leftIcon={<AddIcon fontSize="12px" />}
                     rightIcon={<ChevronDownIcon />}
                     colorScheme="purple"
-                    aria-label={intl.formatMessage({
-                      id: "new-petition.create",
-                      defaultMessage: "Create",
-                    })}
                   >
                     <FormattedMessage
                       id="new-petition.create"
