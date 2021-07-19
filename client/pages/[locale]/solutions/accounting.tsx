@@ -1,11 +1,11 @@
 import {
+  Center,
   Heading,
   Image,
   List,
   ListIcon,
   ListItem,
   Text,
-  Center,
 } from "@chakra-ui/react";
 import { CircleCheckIcon } from "@parallel/chakra/icons";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
@@ -26,6 +26,12 @@ function Accounting() {
 
   const hero = {
     image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/accounting_hero_${query.locale}`,
+    alt: intl.formatMessage({
+      id: "public.showcase-hero-alt",
+      defaultMessage:
+        "A screenshot of the app showcasing the information received using Parallel",
+    }),
+    ratio: 1394 / 976,
     title: intl.formatMessage({
       id: "public.accounting.hero-title",
       defaultMessage:
@@ -175,15 +181,7 @@ function Accounting() {
           "Accelerates processes by automating your clients services",
       })}
     >
-      <PublicHero
-        image={hero.image}
-        ratio={1394 / 976}
-        title={hero.title}
-        subtitle={hero.subtitle}
-        buttonText={hero.buttonText}
-        sectionTitle={hero.sectionTitle}
-        url={hero.url}
-      />
+      <PublicHero {...hero} />
       <SolutionsTrust logos={logos} />
       <SolutionsBenefits image={benefitsImage} benefits={benefits} />
       <PublicContainer

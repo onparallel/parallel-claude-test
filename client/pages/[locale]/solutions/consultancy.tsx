@@ -1,4 +1,4 @@
-import { Heading, Image, Text, Center } from "@chakra-ui/react";
+import { Center, Heading, Image, Text } from "@chakra-ui/react";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicHero } from "@parallel/components/public/PublicHero";
@@ -17,6 +17,12 @@ function Consultancy() {
 
   const hero = {
     image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/consultancy_hero_${query.locale}`,
+    alt: intl.formatMessage({
+      id: "public.showcase-hero-alt",
+      defaultMessage:
+        "A screenshot of the app showcasing the information received using Parallel",
+    }),
+    ratio: 1394 / 976,
     title: intl.formatMessage({
       id: "public.consultancy.hero-title",
       defaultMessage: "Speeds up the work with your clients",
@@ -159,15 +165,7 @@ function Consultancy() {
         defaultMessage: "Speeds up the work with your clients",
       })}
     >
-      <PublicHero
-        image={hero.image}
-        ratio={1394 / 976}
-        title={hero.title}
-        subtitle={hero.subtitle}
-        buttonText={hero.buttonText}
-        sectionTitle={hero.sectionTitle}
-        url={hero.url}
-      />
+      <PublicHero {...hero} />
       <SolutionsTrust logos={logos} />
       <SolutionsBenefits image={benefitsImage} benefits={benefits} />
       <PublicContainer

@@ -185,6 +185,13 @@ export type FileUploadInput = {
   size: Scalars["Int"];
 };
 
+export type FilterSharedWithLogicalOperator = "AND" | "OR";
+
+export type FilterSharedWithOperator =
+  | "IS_OWNER"
+  | "NOT_SHARED_WITH"
+  | "SHARED_WITH";
+
 export type GenerateUserAuthTokenResponse = {
   apiKey: Scalars["String"];
   userAuthToken: UserAuthenticationToken;
@@ -1451,6 +1458,7 @@ export type PetitionFieldType =
 
 export type PetitionFilter = {
   locale?: Maybe<PetitionLocale>;
+  sharedWith?: Maybe<PetitionSharedWithFilter>;
   status?: Maybe<PetitionStatus>;
   tagIds?: Maybe<Array<Scalars["ID"]>>;
   type?: Maybe<PetitionBaseType>;
@@ -1564,6 +1572,16 @@ export type PetitionSharedUserNotification = PetitionUserNotification & {
   permissionType: PetitionPermissionTypeRW;
   petition: PetitionBase;
   sharedWith: UserOrUserGroup;
+};
+
+export type PetitionSharedWithFilter = {
+  filters: Array<PetitionSharedWithFilterLine>;
+  operator: FilterSharedWithLogicalOperator;
+};
+
+export type PetitionSharedWithFilterLine = {
+  operator: FilterSharedWithOperator;
+  value: Scalars["ID"];
 };
 
 export type PetitionSignatureCancelReason =
@@ -1902,6 +1920,8 @@ export type Query = {
   contactsByEmail: Array<Maybe<Contact>>;
   /** Checks if the provided email is available to be registered as a user on Parallel */
   emailIsAvailable: Scalars["Boolean"];
+  /** Get users or groups from IDs */
+  getUsersOrGroups: Array<UserOrUserGroup>;
   /** Decodes the given Global ID into an entity in the database. */
   globalIdDecode: SupportMethodResponse;
   /** Encodes the given ID into a Global ID. */
@@ -1951,6 +1971,10 @@ export type QuerycontactsByEmailArgs = {
 
 export type QueryemailIsAvailableArgs = {
   email: Scalars["String"];
+};
+
+export type QuerygetUsersOrGroupsArgs = {
+  ids: Array<Scalars["ID"]>;
 };
 
 export type QueryglobalIdDecodeArgs = {

@@ -1,14 +1,14 @@
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicDataProtection } from "@parallel/components/public/PublicDataProtection";
 import { PublicDemoCta } from "@parallel/components/public/PublicDemoCta";
+import { PublicFigures } from "@parallel/components/public/PublicFigures";
+import { PublicHero } from "@parallel/components/public/PublicHero";
 import { PublicHeroPopularUseCases } from "@parallel/components/public/PublicHeroPopularUseCases";
 import { PublicHowItWorksHero } from "@parallel/components/public/PublicHowItWorksHero";
-import { PublicHero } from "@parallel/components/public/PublicHero";
 import { PublicTrust } from "@parallel/components/public/PublicTrust";
-import { PublicDataProtection } from "@parallel/components/public/PublicDataProtection";
 import languages from "@parallel/lang/languages.json";
-import { FormattedMessage, useIntl } from "react-intl";
-import { PublicFigures } from "@parallel/components/public/PublicFigures";
 import { useRouter } from "next/router";
+import { FormattedMessage, useIntl } from "react-intl";
 
 function Home() {
   const intl = useIntl();
@@ -16,6 +16,12 @@ function Home() {
 
   const hero = {
     image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/showcase_hero_${query.locale}`,
+    alt: intl.formatMessage({
+      id: "public.showcase-hero-alt",
+      defaultMessage:
+        "A screenshot of the app showcasing the information received using Parallel",
+    }),
+    ratio: 1426 / 1140,
     title: intl.formatMessage({
       id: "public.home.hero-title",
       defaultMessage: "Automate your workflows with clients",
@@ -39,14 +45,7 @@ function Home() {
         defaultMessage: "Automate your workflows with clients",
       })}
     >
-      <PublicHero
-        image={hero.image}
-        ratio={1426 / 1140}
-        title={hero.title}
-        subtitle={hero.subtitle}
-        buttonText={hero.buttonText}
-        url={hero.url}
-      />
+      <PublicHero {...hero} />
       <PublicHeroPopularUseCases />
       <PublicFigures />
       <PublicHowItWorksHero />

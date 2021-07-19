@@ -1,18 +1,18 @@
 import {
+  AspectRatio,
   Box,
   BoxProps,
   Button,
   Center,
-  AspectRatio,
+  Flex,
   Heading,
   Stack,
-  Flex,
 } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
-import { useIntl } from "react-intl";
 
 export interface PublicHeroProps extends BoxProps {
   image: string;
+  alt: string;
   ratio: number;
   title: string;
   subtitle: string;
@@ -23,6 +23,7 @@ export interface PublicHeroProps extends BoxProps {
 
 export function PublicHero({
   image,
+  alt,
   ratio,
   title,
   subtitle,
@@ -31,13 +32,12 @@ export function PublicHero({
   sectionTitle,
   ...props
 }: PublicHeroProps) {
-  const intl = useIntl();
-
   const breakpoint = "lg";
   return (
     <Stack
       spacing={12}
       direction={{ base: "column-reverse", [breakpoint]: "row" }}
+      {...props}
     >
       <Center
         flex="1"
@@ -101,14 +101,7 @@ export function PublicHero({
             srcSet={`${image}.webp?v=${process.env.BUILD_ID}`}
             type="image/webp"
           />
-          <img
-            alt={intl.formatMessage({
-              id: "public.showcase-hero-alt",
-              defaultMessage:
-                "A screenshot of the app showcasing the information received using Parallel",
-            })}
-            src={`${image}.png?v=${process.env.BUILD_ID}`}
-          />
+          <img alt={alt} src={`${image}.png?v=${process.env.BUILD_ID}`} />
         </Box>
       </AspectRatio>
     </Stack>

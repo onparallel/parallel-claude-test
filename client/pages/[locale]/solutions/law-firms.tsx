@@ -25,6 +25,12 @@ function LawFirms() {
 
   const hero = {
     image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/lawfirms_hero_${query.locale}`,
+    alt: intl.formatMessage({
+      id: "public.showcase-hero-alt",
+      defaultMessage:
+        "A screenshot of the app showcasing the information received using Parallel",
+    }),
+    ratio: 1394 / 976,
     title: intl.formatMessage({
       id: "public.law-firms.hero-title",
       defaultMessage: "Increase your team’s billing and return",
@@ -173,15 +179,7 @@ function LawFirms() {
         defaultMessage: "Increase your team’s billing and return",
       })}
     >
-      <PublicHero
-        image={hero.image}
-        ratio={1394 / 976}
-        title={hero.title}
-        subtitle={hero.subtitle}
-        buttonText={hero.buttonText}
-        sectionTitle={hero.sectionTitle}
-        url={hero.url}
-      />
+      <PublicHero {...hero} />
       <SolutionsTrust logos={logos} />
       <SolutionsBenefits image={benefitsImage} benefits={benefits} />
       <PublicContainer
