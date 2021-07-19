@@ -61,6 +61,7 @@ export const petitionsQuery = queryField((t) => {
                             "SHARED_WITH",
                             "NOT_SHARED_WITH",
                             "IS_OWNER",
+                            "NOT_IS_OWNER",
                           ],
                         }),
                       });

@@ -187,7 +187,11 @@ export interface NexusGenEnums {
   EntityType: "Contact" | "Organization" | "Petition" | "User";
   FeatureFlag: db.FeatureFlagName;
   FilterSharedWithLogicalOperator: "AND" | "OR";
-  FilterSharedWithOperator: "IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
+  FilterSharedWithOperator:
+    | "IS_OWNER"
+    | "NOT_IS_OWNER"
+    | "NOT_SHARED_WITH"
+    | "SHARED_WITH";
   IntegrationType: db.IntegrationType;
   OnboardingKey:
     | "CONTACT_DETAILS"

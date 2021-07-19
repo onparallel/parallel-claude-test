@@ -356,6 +356,11 @@ export class PetitionRepository extends BaseRepository {
                 `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) > 0`,
                 [id]
               );
+            } else if (filter.operator === "NOT_IS_OWNER") {
+              q.havingRaw(
+                `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) = 0`,
+                [id]
+              );
             }
           }
         }

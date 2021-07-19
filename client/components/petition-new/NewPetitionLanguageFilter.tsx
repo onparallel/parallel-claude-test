@@ -16,12 +16,12 @@ import { useIntl } from "react-intl";
 
 export interface NewPetitionLanguageFilterProps extends MenuButtonProps {
   locale: Maybe<PetitionLocale>;
-  onFilterChange: (args: Maybe<PetitionLocale>) => void;
+  onLocaleChange: (args: Maybe<PetitionLocale>) => void;
 }
 
 export function NewPetitionLanguageFilter({
   locale,
-  onFilterChange,
+  onLocaleChange,
   ...props
 }: NewPetitionLanguageFilterProps) {
   const intl = useIntl();
@@ -58,7 +58,7 @@ export function NewPetitionLanguageFilter({
                 key={locale.key}
                 value={locale.key}
                 onClick={() =>
-                  onFilterChange(
+                  onLocaleChange(
                     locale.key === "all" ? null : (locale.key as PetitionLocale)
                   )
                 }

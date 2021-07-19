@@ -9,6 +9,7 @@ import {
   MenuItem,
   MenuList,
   Portal,
+  Stack,
   Tab,
   TabList,
   TabPanel,
@@ -30,8 +31,13 @@ import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useTemplateDetailsDialog } from "@parallel/components/petition-common/TemplateDetailsDialog";
 import { NewPetitionEmptySearch } from "@parallel/components/petition-new/NewPetitionEmptySearch";
 import { NewPetitionEmptyTempaltes } from "@parallel/components/petition-new/NewPetitionEmptyTemplates";
-import { NewPetitionMyTemplatesHeader } from "@parallel/components/petition-new/NewPetitionMyTemplatesHeader";
+import { NewPetitionLanguageFilter } from "@parallel/components/petition-new/NewPetitionLanguageFilter";
 import { NewPetitionPublicTemplatesHeader } from "@parallel/components/petition-new/NewPetitionPublicTemplatesHeader";
+import { NewPetitionSearch } from "@parallel/components/petition-new/NewPetitionSearch";
+import {
+  NewPetitionSharedFilter,
+  NewPetitionSharedFilterValues,
+} from "@parallel/components/petition-new/NewPetitionSharedFilter";
 import { NewPetitionTemplatesList } from "@parallel/components/petition-new/NewPetitionTemplatesList";
 import {
   NewPetitionPublicTemplatesQuery,
@@ -40,6 +46,7 @@ import {
   NewPetitionTemplatesQueryVariables,
   NewPetition_PetitionTemplateFragment,
   PetitionLocale,
+  PetitionSharedWithFilter,
   PetitionsUserQuery,
   useNewPetitionPublicTemplatesQuery,
   useNewPetitionTemplatesQuery,
@@ -93,6 +100,7 @@ function NewPetition() {
         filters: {
           locale: null,
           type: "TEMPLATE",
+          sharedWith: null,
         },
       },
     })
@@ -105,6 +113,9 @@ function NewPetition() {
 
   const [search, setSearch] = useState("");
   const [locale, setLocale] = useState(null as Maybe<PetitionLocale>);
+  const [sharedFilter, setSharedFilter] = useState(
+    null as Maybe<NewPetitionSharedFilterValues>
+  );
 
   const [publicSearch, setPublicSearch] = useState("");
   const [publicLocale, setPublicLocale] = useState(
@@ -140,7 +151,7 @@ function NewPetition() {
         search: search || null,
       });
     },
-    [locale, debouncedTemplatesRefetch]
+    [debouncedTemplatesRefetch]
   );
 
   const handleLocaleChange = useCallback(
@@ -149,10 +160,36 @@ function NewPetition() {
       debouncedTemplatesRefetch.immediate({
         offset: 0,
         limit: 20,
-        filters: { locale, type: "TEMPLATE" },
+        filters: {
+          locale,
+          type: "TEMPLATE",
+        },
       });
     },
-    [search, debouncedTemplatesRefetch]
+    [debouncedTemplatesRefetch]
+  );
+
+  const handleSharedFilterChange = useCallback(
+    (sharedFilter: Maybe<NewPetitionSharedFilterValues>) => {
+      const sharedFilterValue = sharedFilter
+        ? {
+            operator: "AND",
+            filters: [{ operator: sharedFilter, value: me.id }],
+          }
+        : null;
+
+      setSharedFilter(sharedFilter ?? null);
+      debouncedTemplatesRefetch.immediate({
+        offset: 0,
+        limit: 20,
+        filters: {
+          locale,
+          type: "TEMPLATE",
+          sharedWith: sharedFilterValue as PetitionSharedWithFilter,
+        },
+      });
+    },
+    [locale, debouncedTemplatesRefetch]
   );
 
   const handlePublicSearchChange = useCallback(
@@ -346,11 +383,7 @@ function NewPetition() {
 
           <TabPanels>
             <TabPanel paddingX={0} paddingY={0}>
-              <NewPetitionMyTemplatesHeader
-                search={search}
-                onSearchChange={handleSearchChange}
-                locale={locale}
-                onLocaleChange={handleLocaleChange}
+              <Stack
                 paddingX={6}
                 paddingTop={8}
                 paddingBottom={6}
@@ -358,7 +391,24 @@ function NewPetition() {
                 top={`${headerTop}px`}
                 backgroundColor="gray.50"
                 zIndex={1}
-              />
+              >
+                <NewPetitionSearch
+                  search={search}
+                  handleSearchChange={handleSearchChange}
+                  templateColumns={"1fr auto auto"}
+                >
+                  <NewPetitionSharedFilter
+                    option={sharedFilter}
+                    onSharedFilterChange={handleSharedFilterChange}
+                    backgroundColor="white"
+                  />
+                  <NewPetitionLanguageFilter
+                    locale={locale}
+                    onLocaleChange={handleLocaleChange}
+                    backgroundColor="white"
+                  />
+                </NewPetitionSearch>
+              </Stack>
               {templates.length === 0 ? (
                 hasTemplates ? (
                   <NewPetitionEmptySearch
@@ -523,6 +573,7 @@ NewPetition.getInitialProps = async ({
           filters: {
             locale: null,
             type: "TEMPLATE",
+            sharedWith: null,
           },
         },
       }

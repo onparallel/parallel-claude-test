@@ -52,7 +52,7 @@ export const NewPetitionPublicTemplatesHeader = ({
       <NewPetitionSearch search={search} handleSearchChange={onSearchChange}>
         <NewPetitionLanguageFilter
           locale={locale}
-          onFilterChange={onLocaleChange}
+          onLocaleChange={onLocaleChange}
           backgroundColor="white"
         />
       </NewPetitionSearch>
