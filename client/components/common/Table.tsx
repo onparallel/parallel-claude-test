@@ -1,3 +1,4 @@
+import { FocusLock } from "@chakra-ui/focus-lock";
 import {
   Box,
   BoxProps,
@@ -538,8 +539,6 @@ export function DefaultHeader({
   });
 
   const _ref = useMergedRef(ref, popperRef);
-  const isFilterActive = isFilterOpen || filter;
-
   return (
     <Box
       ref={referenceRef}
@@ -567,7 +566,7 @@ export function DefaultHeader({
       }
       sx={{
         ".sort-by-button,.filter-by-button": {
-          opacity: isFilterActive ? 1 : 0,
+          opacity: filter || isFilterOpen ? 1 : 0,
         },
         "&.sort-active .sort-by-button": {
           opacity: 1,
@@ -601,8 +600,8 @@ export function DefaultHeader({
               defaultMessage: "Filter",
             })}
             size="xs"
-            variant={isFilterActive ? "outline" : "ghost"}
-            colorScheme={isFilterActive ? "purple" : "gray"}
+            variant={isFilterOpen ? "solid" : filter ? "outline" : "ghost"}
+            colorScheme={isFilterOpen ? "gray" : filter ? "purple" : "gray"}
             aria-label={intl.formatMessage(
               {
                 id: "components.table.filter",
@@ -685,25 +684,36 @@ export function DefaultHeader({
         ) : (
           <Portal>
             {isFilterOpen ? (
-              <Card padding={2} ref={_ref} {...getFilterPopoverProps()}>
-                <Heading
-                  as="h4"
-                  size="xs"
-                  textTransform="uppercase"
-                  marginTop={1}
-                  marginBottom={2}
+              <FocusLock restoreFocus>
+                <Card
+                  padding={2}
+                  ref={_ref}
+                  {...getFilterPopoverProps()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      onCloseFilter();
+                    }
+                  }}
                 >
-                  <FormattedMessage
-                    id="component.table.filter-header"
-                    defaultMessage="Filter"
+                  <Heading
+                    as="h4"
+                    size="xs"
+                    textTransform="uppercase"
+                    marginTop={1}
+                    marginBottom={2}
+                  >
+                    <FormattedMessage
+                      id="component.table.filter-header"
+                      defaultMessage="Filter"
+                    />
+                  </Heading>
+                  <column.Filter
+                    value={filter}
+                    onChange={onFilterChange}
+                    context={context}
                   />
-                </Heading>
-                <column.Filter
-                  value={filter}
-                  onChange={onFilterChange}
-                  context={context}
-                />
-              </Card>
+                </Card>
+              </FocusLock>
             ) : null}
           </Portal>
         )
