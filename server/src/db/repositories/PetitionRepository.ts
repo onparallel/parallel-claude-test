@@ -72,7 +72,7 @@ type PetitionSharedWithFilter = {
   operator: "AND" | "OR";
   filters: {
     value: string;
-    operator: "SHARED_WITH" | "NOT_SHARED_WITH" | "IS_OWNER";
+    operator: "SHARED_WITH" | "NOT_SHARED_WITH" | "IS_OWNER" | "NOT_IS_OWNER";
   }[];
 };
 
