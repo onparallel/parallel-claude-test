@@ -745,6 +745,21 @@
     "context": "All languages"
   },
   {
+    "term": "component.new-petition-shared-filter.all",
+    "definition": "All templates",
+    "context": "All templates"
+  },
+  {
+    "term": "component.new-petition-shared-filter.created-by-me",
+    "definition": "Created by me",
+    "context": "Created by me"
+  },
+  {
+    "term": "component.new-petition-shared-filter.shared-with-me",
+    "definition": "Shared with me",
+    "context": "Shared with me"
+  },
+  {
     "term": "component.notification-comment.body",
     "definition": "{name} has written a comment in the field {field}.",
     "context": "{name} has written a comment in the field {field}."

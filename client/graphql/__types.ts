@@ -208,6 +208,7 @@ export type FilterSharedWithLogicalOperator = "AND" | "OR";
 
 export type FilterSharedWithOperator =
   | "IS_OWNER"
+  | "NOT_IS_OWNER"
   | "NOT_SHARED_WITH"
   | "SHARED_WITH";
 

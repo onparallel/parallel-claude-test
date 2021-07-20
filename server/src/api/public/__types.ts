@@ -189,6 +189,10 @@ export type FilterSharedWithLogicalOperator = "AND" | "OR";
 
 export type FilterSharedWithOperator =
   | "IS_OWNER"
+<<<<<<< master
+=======
+  | "NOT_IS_OWNER"
+>>>>>>> [feat/ch1466] Added translations for the new filter
   | "NOT_SHARED_WITH"
   | "SHARED_WITH";
 
