@@ -20,13 +20,18 @@ export interface NewPetitionSharedFilterProps extends MenuButtonProps {
   onSharedFilterChange: (args: Maybe<NewPetitionSharedFilterValues>) => void;
 }
 
+type OptionType = {
+  key: string;
+  label: string;
+};
+
 export function NewPetitionSharedFilter({
   option,
   onSharedFilterChange,
   ...props
 }: NewPetitionSharedFilterProps) {
   const intl = useIntl();
-  const options = useMemo(
+  const options = useMemo<OptionType[]>(
     () => [
       {
         key: "ALL",
@@ -65,19 +70,18 @@ export function NewPetitionSharedFilter({
       </MenuButton>
       <Portal>
         <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
-          <MenuOptionGroup value={option ?? "ALL"}>
+          <MenuOptionGroup
+            value={option ?? "ALL"}
+            onChange={(value) =>
+              onSharedFilterChange(
+                value === "ALL"
+                  ? null
+                  : (value as NewPetitionSharedFilterValues)
+              )
+            }
+          >
             {options.map((option) => (
-              <MenuItemOption
-                key={option.key}
-                value={option.key}
-                onClick={() =>
-                  onSharedFilterChange(
-                    option.key === "ALL"
-                      ? null
-                      : (option.key as NewPetitionSharedFilterValues)
-                  )
-                }
-              >
+              <MenuItemOption key={option.key} value={option.key}>
                 {option.label}
               </MenuItemOption>
             ))}

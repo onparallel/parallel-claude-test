@@ -52,17 +52,14 @@ export function NewPetitionLanguageFilter({
       </MenuButton>
       <Portal>
         <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
-          <MenuOptionGroup value={locale ?? "all"}>
+          <MenuOptionGroup
+            value={locale ?? "all"}
+            onChange={(value) =>
+              onLocaleChange(value === "all" ? null : (value as PetitionLocale))
+            }
+          >
             {locales.map((locale) => (
-              <MenuItemOption
-                key={locale.key}
-                value={locale.key}
-                onClick={() =>
-                  onLocaleChange(
-                    locale.key === "all" ? null : (locale.key as PetitionLocale)
-                  )
-                }
-              >
+              <MenuItemOption key={locale.key} value={locale.key}>
                 {locale.localizedLabel}
               </MenuItemOption>
             ))}
