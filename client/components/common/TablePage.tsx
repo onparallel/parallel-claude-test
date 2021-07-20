@@ -20,7 +20,11 @@ import {
 import { ReactNode, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export type TablePageProps<T, TContext = unknown> = TableProps<T, TContext> & {
+export type TablePageProps<
+  TRow,
+  TContext = unknown,
+  TImpl extends TRow = TRow
+> = TableProps<TRow, TContext, TImpl> & {
   loading: boolean;
   header?: ReactNode;
   body?: ReactNode;
@@ -31,7 +35,7 @@ export type TablePageProps<T, TContext = unknown> = TableProps<T, TContext> & {
   onPageSizeChange?: (size: number) => void;
 };
 
-export function TablePage<T, TContext = unknown>({
+export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   columns,
   rows,
   context,
@@ -55,7 +59,7 @@ export function TablePage<T, TContext = unknown>({
   onPageChange,
   color,
   ...props
-}: WithChakraProps<"section", TablePageProps<T, TContext>>) {
+}: WithChakraProps<"section", TablePageProps<TRow, TContext, TImpl>>) {
   const colors = useTableColors();
   const intl = useIntl();
   const pagination = usePagination({ current: page, pageSize, totalCount });

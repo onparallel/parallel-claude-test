@@ -58,10 +58,10 @@ function toggleSortingDirection(
   return direction === "ASC" ? "DESC" : "ASC";
 }
 
-export interface TableProps<TRow, TContext = unknown>
+export interface TableProps<TRow, TContext = unknown, TImpl extends TRow = TRow>
   extends HTMLChakraProps<"table"> {
   columns: TableColumn<TRow, TContext>[];
-  rows: TRow[];
+  rows: TImpl[];
   context?: TContext;
   rowKeyProp: keyof TRow;
   sort?: TableSorting<any>;
@@ -70,14 +70,14 @@ export interface TableProps<TRow, TContext = unknown>
   isExpandable?: boolean;
   isHighlightable?: boolean;
   onSelectionChange?: (selected: string[]) => void;
-  onRowClick?: (row: TRow, event: MouseEvent) => void;
+  onRowClick?: (row: TImpl, event: MouseEvent) => void;
   onSortChange?: (sort: TableSorting<any>) => void;
   onFilterChange?: (key: string, value: any) => void;
 }
 
-export interface TableHeaderProps<TRow, TContext = unknown>
+export interface TableHeaderProps<TRow, TContext = unknown, TFilter = unknown>
   extends HTMLChakraProps<"th"> {
-  column: TableColumn<TRow, TContext>;
+  column: TableColumn<TRow, TContext, TFilter>;
   context?: TContext;
   filter: any;
   onFilterChange: (value: any) => void;
@@ -88,11 +88,11 @@ export interface TableHeaderProps<TRow, TContext = unknown>
   onToggleAll: (event?: any) => void;
 }
 
-export interface TableCellProps<TRow, TContext = unknown> {
+export interface TableCellProps<TRow, TContext = unknown, TFilter = unknown> {
   row: TRow;
   context?: TContext;
   rowKey: string;
-  column: TableColumn<TRow, TContext>;
+  column: TableColumn<TRow, TContext, TFilter>;
   isSelected?: boolean;
   isExpanded?: boolean;
   onToggleSelection?: (event: any) => void;
@@ -107,9 +107,9 @@ export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
   isFilterable?: true;
   Filter?: ComponentType<TableColumnFilterProps<TFilter, TContext>>;
   header: string;
-  Header?: ComponentType<TableHeaderProps<TRow, TContext>>;
+  Header?: ComponentType<TableHeaderProps<TRow, TContext, TFilter>>;
   headerProps?: HTMLChakraProps<"th">;
-  CellContent: ComponentType<TableCellProps<TRow, TContext>>;
+  CellContent: ComponentType<TableCellProps<TRow, TContext, TFilter>>;
   cellProps?: HTMLChakraProps<"td">;
 }
 
@@ -118,7 +118,7 @@ export interface TableColumnFilterProps<TFilter, TContext = unknown>
   context: TContext;
 }
 
-function _Table<TRow, TContext = unknown>({
+function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   columns,
   rows,
   context,
@@ -133,7 +133,7 @@ function _Table<TRow, TContext = unknown>({
   onSortChange,
   onFilterChange,
   ...props
-}: TableProps<TRow, TContext>) {
+}: TableProps<TRow, TContext, TImpl>) {
   const { selection, allSelected, anySelected, toggle, toggleAll } =
     useSelectionState(rows, rowKeyProp);
   const colors = useTableColors();
@@ -370,7 +370,7 @@ export function useTableColors() {
   }, []);
 }
 
-function _Row<TRow, TContext = unknown>({
+function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   row,
   context,
   rowKey,
@@ -383,7 +383,7 @@ function _Row<TRow, TContext = unknown>({
   onToggleSelection,
   onToggleExpand,
 }: {
-  row: TRow;
+  row: TImpl;
   context?: TContext;
   rowKey: string;
   isSelected: boolean;
@@ -391,7 +391,7 @@ function _Row<TRow, TContext = unknown>({
   onToggleSelection: (key: string, event: any) => void;
   onToggleExpand: (key: string, value: boolean) => void;
 } & Pick<
-  TableProps<TRow, TContext>,
+  TableProps<TRow, TContext, TImpl>,
   "columns" | "isExpandable" | "isHighlightable" | "onRowClick"
 >) {
   const colors = useTableColors();

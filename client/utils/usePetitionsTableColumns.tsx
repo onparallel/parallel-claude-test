@@ -35,17 +35,20 @@ export type PetitionsTableColumnsContext = {
 
 type PetitionBaseTableColumn = TableColumn<
   usePetitionsTableColumns_PetitionBaseFragment,
-  PetitionsTableColumnsContext
+  PetitionsTableColumnsContext,
+  any
 >;
 
 type PetitionTableColumn = TableColumn<
   usePetitionsTableColumns_PetitionBase_Petition_Fragment,
-  PetitionsTableColumnsContext
+  PetitionsTableColumnsContext,
+  any
 >;
 
 type PetitionTemplateTableColumn = TableColumn<
   usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment,
-  PetitionsTableColumnsContext
+  PetitionsTableColumnsContext,
+  any
 >;
 
 export function usePetitionsTableColumns(type: PetitionBaseType) {
