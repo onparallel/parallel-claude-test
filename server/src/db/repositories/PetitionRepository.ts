@@ -403,7 +403,7 @@ export class PetitionRepository extends BaseRepository {
             ...(opts.sortBy?.some((s) => s.column === "last_used_at")
               ? [
                   this.knex.raw(
-                    "greatest(max(t.t_last_used_at), petition.created_at) as last_used_at"
+                    "greatest(max(t.t_last_used_at), min(pp.created_at)) as last_used_at"
                   ),
                 ]
               : [])
@@ -1569,11 +1569,24 @@ export class PetitionRepository extends BaseRepository {
       this.loadUserPermissionsByPetitionId(petitionId),
     ]);
     return await this.withTransaction(async (t) => {
-      const fromTemplateId =
-        !data?.is_template &&
-        (sourcePetition?.is_template || sourcePetition?.from_template_id)
-          ? sourcePetition.from_template_id ?? petitionId
-          : null;
+      // if cloning a petition, clone the petition from_template_id
+      let fromTemplateId: Maybe<number>;
+      if (data?.is_template === true) {
+        // if we are creating a template then from_template_id is null
+        fromTemplateId = null;
+      } else if (data?.is_template === false) {
+        // if we are creating a petition, use the source petition id as
+        // from_template_id only if it's a template. otherwise copy it.
+        fromTemplateId = sourcePetition!.is_template
+          ? sourcePetition!.id
+          : sourcePetition!.from_template_id;
+      } else {
+        // when cloning petitions we clone the petition from_template_id
+        // if we are cloning templates then from_template_id is null
+        fromTemplateId = sourcePetition!.is_template
+          ? null
+          : sourcePetition!.from_template_id;
+      }
 
       const [cloned] = await this.insert(
         "petition",
