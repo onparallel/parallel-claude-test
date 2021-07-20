@@ -35,12 +35,12 @@ function Accounting() {
     title: intl.formatMessage({
       id: "public.accounting.hero-title",
       defaultMessage:
-        "Accelerates processes by automating your clients services ",
+        "Accelerate processes by automating services with your clients ",
     }),
     subtitle: intl.formatMessage({
       id: "public.accounting.hero-subtitle",
       defaultMessage:
-        "Request easily the information your customers need. Set up the process in minutes and let automatic reminders help you to speed up them.",
+        "Request the information you need from your clients easily. Set it up in seconds and let automatic reminders do the magic.",
     }),
     buttonText: intl.formatMessage({
       id: "public.book-demo-button",
@@ -71,12 +71,12 @@ function Accounting() {
       image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_accelerate.svg`,
       heading: intl.formatMessage({
         id: "public.accounting.benefits-accelerate-title",
-        defaultMessage: "Accelerates project completion",
+        defaultMessage: "Accelerate project completion",
       }),
       text: intl.formatMessage({
         id: "public.accounting.benefits-accelerate-message",
         defaultMessage:
-          "We help you make it easy for your recipient to receive all the information as soon as possible.",
+          "We make it easy for your recipient to send you all the information requested as soon as possible.",
       }),
     },
     {
@@ -88,7 +88,7 @@ function Accounting() {
       text: intl.formatMessage({
         id: "public.accounting.benefits-collaborate-message",
         defaultMessage:
-          "Assign work to your team and keep track of the progress any times.",
+          "Assign work to your team and keep track of their progress.",
       }),
     },
   ];
@@ -129,7 +129,7 @@ function Accounting() {
       description: (
         <FormattedMessage
           id="public.accounting.use-cases-mailing-description"
-          defaultMessage="Request information for your campaigns from all your customers at the same time."
+          defaultMessage="Request information for your campaigns from all your clients at once."
         />
       ),
     },
@@ -148,7 +148,7 @@ function Accounting() {
       description: (
         <FormattedMessage
           id="public.accounting.use-cases-control-description"
-          defaultMessage="Get control of the information you receive and you can track the status changes of your processes."
+          defaultMessage="Get control of the information you receive and track the status changes of your processes."
         />
       ),
     },
@@ -167,7 +167,7 @@ function Accounting() {
       description: (
         <FormattedMessage
           id="public.accounting.use-cases-reminders-description"
-          defaultMessage="Forget about chasing customers. Set up periodic reminders and let Parallel handle it while you receive the information."
+          defaultMessage="Forget about chasing clients. Set up periodic reminders and let Parallel handle it while you receive the information."
         />
       ),
     },
@@ -214,7 +214,7 @@ function Accounting() {
           <Text marginBottom={2}>
             <FormattedMessage
               id="public.solutions.security-body"
-              defaultMessage="Our priority is to make the experience as agile and secure as possible for both you and yout clients."
+              defaultMessage="Our priority is to make the experience as agile and secure as possible for both you and your clients."
             />
           </Text>
           <List spacing={3}>
@@ -222,7 +222,7 @@ function Accounting() {
               <ListIcon as={CircleCheckIcon} color="green.600" />
               <FormattedMessage
                 id="public.solutions.security-encrypted"
-                defaultMessage="Your information secure and encrypted"
+                defaultMessage="Your information is secure and encrypted"
               />
             </ListItem>
             <ListItem display="flex" alignItems="center">
@@ -246,7 +246,7 @@ function Accounting() {
         heading={
           <FormattedMessage
             id="public.accounting.solutions-title"
-            defaultMessage="Solutions for BPOs and Accountings"
+            defaultMessage="Solutions for BPOs and Accounting"
           />
         }
         features={solutions}
@@ -264,7 +264,7 @@ function Accounting() {
         <Heading as="h2" size="xl" fontWeight="bold">
           <FormattedMessage
             id="public.accounting.api-title"
-            defaultMessage="Use our API to integrate it with your sistems"
+            defaultMessage="Use our API to integrate Parallel with your systems"
           />
         </Heading>
         <Center marginTop={14}>
@@ -278,7 +278,7 @@ function Accounting() {
       <SolutionsDemoCta>
         <FormattedMessage
           id="public.law-firms.book-cta-title"
-          defaultMessage="Can we help you?"
+          defaultMessage="How can we help you?"
         />
       </SolutionsDemoCta>
     </PublicLayout>

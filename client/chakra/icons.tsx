@@ -1575,17 +1575,16 @@ export const RadioButtonSelected = createIcon({
 
 export const CircleCheckIcon = createIcon({
   displayName: "CircleCheckIcon",
-  viewBox: "0 0 16 17",
+  viewBox: "0 0 24 24",
   path: (
     <g
       stroke="currentColor"
       fill="none"
-      strokeWidth="1.5"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="m14 8.50012c0-3.3125-2.6875-6-6-6s-6 2.6875-6 6c0 3.31248 2.6875 5.99998 6 5.99998s6-2.6875 6-5.99998z" />
-      <path d="m10.9999 6.00037-4.19996 5.00003-1.8-2.00004" />
+      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
     </g>
   ),
 });

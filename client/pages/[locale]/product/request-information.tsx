@@ -103,7 +103,7 @@ function Request() {
           <Text marginBottom={2}>
             <FormattedMessage
               id="public.product.request-information.decisions-processes"
-              defaultMessage="Through conditions, you can easily set up decisions in your processes to ensure that your recipient responds only to what is needed."
+              defaultMessage="Through conditions, you can easily set up decisions in your processes to ensure that your recipient only respond to what is needed."
             />
           </Text>
         </PublicShowcase>

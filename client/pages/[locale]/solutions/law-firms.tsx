@@ -38,7 +38,7 @@ function LawFirms() {
     subtitle: intl.formatMessage({
       id: "public.law-firms.hero-subtitle",
       defaultMessage:
-        "Increase your team’s billable hours provinding them with a tool that takes care of repetitive processes and accelerates his project completion.",
+        "Increase your team’s billable hours providing them with a tool that takes care of repetitive processes and accelerates their project completion.",
     }),
     buttonText: intl.formatMessage({
       id: "public.book-demo-button",
@@ -69,12 +69,12 @@ function LawFirms() {
       image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_control.svg`,
       heading: intl.formatMessage({
         id: "public.law-firms.benefits-control-title",
-        defaultMessage: "All your affairs under control",
+        defaultMessage: "All your matters under control",
       }),
       text: intl.formatMessage({
         id: "public.law-firms.benefits-control-message",
         defaultMessage:
-          "Visualize the status of the on-going cases and remaining work of your team.",
+          "Visualize the status of the on-going cases and pending tasks of your team.",
       }),
     },
     {
@@ -128,7 +128,7 @@ function LawFirms() {
       description: (
         <FormattedMessage
           id="public.law-use-cases.smart-forms-description"
-          defaultMessage="Use conditions to set up smart decisions and ensure that your clients responds only to what is needed."
+          defaultMessage="Use conditions to set up smart decisions and ensure that your clients only respond to what is needed."
         />
       ),
     },
@@ -147,7 +147,7 @@ function LawFirms() {
       description: (
         <FormattedMessage
           id="public.law-use-cases.esignature-description"
-          defaultMessage="Enable easily an advance eSignature to your proccess, completely secure and legally valid.."
+          defaultMessage="Enable an advance eSignature to your proccess, completely secure and legally valid.."
         />
       ),
     },
@@ -272,7 +272,7 @@ function LawFirms() {
           <Text marginBottom={2}>
             <FormattedMessage
               id="public.solutions.security-body"
-              defaultMessage="Our priority is to make the experience as agile and secure as possible for both you and yout clients."
+              defaultMessage="Our priority is to make the experience as agile and secure as possible for both you and your clients."
             />
           </Text>
           <List spacing={3}>
@@ -280,7 +280,7 @@ function LawFirms() {
               <ListIcon as={CircleCheckIcon} color="green.600" />
               <FormattedMessage
                 id="public.solutions.security-encrypted"
-                defaultMessage="Your information secure and encrypted"
+                defaultMessage="Your information is secure and encrypted"
               />
             </ListItem>
             <ListItem display="flex" alignItems="center">
@@ -303,7 +303,7 @@ function LawFirms() {
       <SolutionsDemoCta>
         <FormattedMessage
           id="public.law-firms.book-cta-title"
-          defaultMessage="Can we help you?"
+          defaultMessage="How can we help you?"
         />
       </SolutionsDemoCta>
     </PublicLayout>

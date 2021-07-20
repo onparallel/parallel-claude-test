@@ -25,12 +25,12 @@ function Consultancy() {
     ratio: 1394 / 976,
     title: intl.formatMessage({
       id: "public.consultancy.hero-title",
-      defaultMessage: "Speeds up the work with your clients",
+      defaultMessage: "Speed up the work with your clients",
     }),
     subtitle: intl.formatMessage({
       id: "public.consultancy.hero-subtitle",
       defaultMessage:
-        "Platform to work efficiently with your client. Use templates to reduce your team’s time on repetitive tasks.",
+        "Work more efficiently with your client. Use templates to stop wasting time on repetitive tasks.",
     }),
     buttonText: intl.formatMessage({
       id: "public.book-demo-button",
@@ -49,12 +49,12 @@ function Consultancy() {
       image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_experience.svg`,
       heading: intl.formatMessage({
         id: "public.consultancy.benefits-experience-title",
-        defaultMessage: "Digitize yours services",
+        defaultMessage: "Digitize your services",
       }),
       text: intl.formatMessage({
         id: "public.consultancy.benefits-experience-message",
         defaultMessage:
-          "Manage your matters with Parallel for more efficiency. It completely replaces the use of paper and email chains.",
+          "Manage your matters more efficiently with Parallel. Forget about long email threads and the use of pen and paper.",
       }),
     },
     {
@@ -66,7 +66,7 @@ function Consultancy() {
       text: intl.formatMessage({
         id: "public.consultancy.benefits-template-message",
         defaultMessage:
-          "Standardize your processes to send your checklist quickly and avoid mistakes.",
+          "Standardize your processes to send your checklist quickly without mistakes.",
       }),
     },
     {
@@ -78,7 +78,7 @@ function Consultancy() {
       text: intl.formatMessage({
         id: "public.consultancy.benefits-control-message",
         defaultMessage:
-          "Automate monitoring and we will remember your clients to upload de informations requested so you can focus on other matters.",
+          "Automate monitoring and let us remind your clients to upload the requested information so you can focus on other matters.",
       }),
     },
   ];
@@ -114,7 +114,7 @@ function Consultancy() {
       description: (
         <FormattedMessage
           id="public.consultancy.use-cases-smart-form-description"
-          defaultMessage="Personalize your customers experience by using conditionals and other useful features."
+          defaultMessage="Customize the experience for your clients with the use of conditional fields and other useful features."
         />
       ),
     },
@@ -126,14 +126,14 @@ function Consultancy() {
       ),
       header: (
         <FormattedMessage
-          id="public.accounting.use-cases-remainders-title"
-          defaultMessage="Configurable reminders"
+          id="public.accounting.use-cases-reminders-title"
+          defaultMessage="Automatic reminders"
         />
       ),
       description: (
         <FormattedMessage
-          id="public.accounting.use-cases-remainders-description"
-          defaultMessage="Forget about chasing customers. Set up periodic reminders and let Parallel handle it while you receive the information."
+          id="public.accounting.use-cases-reminders-description"
+          defaultMessage="Forget about chasing clients. Set up periodic reminders and let Parallel handle it while you receive the information."
         />
       ),
     },
@@ -152,7 +152,7 @@ function Consultancy() {
       description: (
         <FormattedMessage
           id="public.consultancy.use-cases-mailing-description"
-          defaultMessage="Request information for your campaigns from all your customers at the same time."
+          defaultMessage="Request information for your campaigns from all your clients at once."
         />
       ),
     },
@@ -199,13 +199,13 @@ function Consultancy() {
           >
             <FormattedMessage
               id="public.consultancy.speed-up-title"
-              defaultMessage="Management of Income Tax 2020 with Parallel "
+              defaultMessage="FY2020 Income Tax Return campaign with Parallel"
             />
           </Heading>
           <Text>
             <FormattedMessage
               id="public.consultancy.speed-up-body"
-              defaultMessage="We facilitate the management and masive mailing of more than 150 rents. Speeding up the receive of information and having, in less than 5 days, 40% of the processes completed."
+              defaultMessage="We helped manage more than 150 tax returns with our bulk processes features, speeding up the reception of the information. In less than 5 days our customer completed more than 40% of the processes."
             />
           </Text>
         </PublicShowcase>
@@ -232,7 +232,7 @@ function Consultancy() {
         <Heading as="h2" size="xl" fontWeight="bold">
           <FormattedMessage
             id="public.consultancy.api-title"
-            defaultMessage="Use our API to integrate it into your workflow"
+            defaultMessage="Use our API to integrate Parallel into your workflow"
           />
         </Heading>
         <Center marginTop={14}>
@@ -246,7 +246,7 @@ function Consultancy() {
       <SolutionsDemoCta>
         <FormattedMessage
           id="public.law-firms.book-cta-title"
-          defaultMessage="Can we help you?"
+          defaultMessage="How can we help you?"
         />
       </SolutionsDemoCta>
     </PublicLayout>
