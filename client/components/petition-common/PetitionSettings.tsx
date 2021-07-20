@@ -239,7 +239,6 @@ function _PetitionSettings({
           <Collapse in={Boolean(petition.signatureConfig)}>
             <Flex justifyContent="center" marginTop={2}>
               <Button
-                leftIcon={<SignatureIcon fontSize="18px" />}
                 onClick={handleConfigureSignatureClick}
                 isDisabled={!hasSignature}
               >

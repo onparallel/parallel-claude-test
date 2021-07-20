@@ -1207,6 +1207,7 @@ export type PetitionAccess = Timestamps & {
   petition: Maybe<Petition>;
   /** Number of reminders sent. */
   reminderCount: Scalars["Int"];
+  reminders: Array<PetitionReminder>;
   /** Whether automatic reminders are active or not for this petition access */
   remindersActive: Scalars["Boolean"];
   /** The reminder settings of the petition. */
