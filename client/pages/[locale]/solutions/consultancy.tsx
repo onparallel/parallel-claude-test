@@ -18,9 +18,9 @@ function Consultancy() {
   const hero = {
     image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/consultancy_hero_${query.locale}`,
     alt: intl.formatMessage({
-      id: "public.showcase-hero-alt",
+      id: "public.consultancy.hero-alt",
       defaultMessage:
-        "A screenshot of the app showcasing the information received using Parallel",
+        "A picture showcasing the following templates from Parallel: KYC, Due Diligence, incorporation of a limited liability company, share capital increase and carve-out of a company.",
     }),
     ratio: 1394 / 976,
     title: intl.formatMessage({
@@ -162,7 +162,7 @@ function Consultancy() {
     <PublicLayout
       title={intl.formatMessage({
         id: "public.consultancy.title",
-        defaultMessage: "Speeds up the work with your clients",
+        defaultMessage: "Software for consultancy",
       })}
     >
       <PublicHero {...hero} />

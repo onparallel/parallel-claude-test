@@ -4340,6 +4340,11 @@
     "context": "Manage the work more efficiently"
   },
   {
+    "term": "public.accounting.hero-alt",
+    "definition": "Imagen que muestra las siguientes plantillas de Parallel: compraventa de inmuebles, IRPF2020 y gestión de alquiler.",
+    "context": "A picture showcasing the following templates from Parallel: sale and purchase of a property, income tax FY2020 and rental management."
+  },
+  {
     "term": "public.accounting.hero-subtitle",
     "definition": "Solicita la información que necesitan tus clientes sin esfuerzo. Configura el proceso en minutos y deja que los recordatorios automáticos te ayuden a acelerar tus procesos.",
     "context": "Request easily the information your customers need. Set up the process in minutes and let automatic reminders help you to speed up them."
@@ -4356,8 +4361,8 @@
   },
   {
     "term": "public.accounting.title",
-    "definition": "Acelera procesos automatizando servicios para tu cliente",
-    "context": "Accelerates processes by automating your clients services"
+    "definition": "Software para BPO (business process outsourcing) y gestoría",
+    "context": "Software for BPO (business process outsourcing) and Accounting"
   },
   {
     "term": "public.accounting.use-cases-control-description",
@@ -4610,6 +4615,11 @@
     "context": "Create templates for your daily proccesses"
   },
   {
+    "term": "public.consultancy.hero-alt",
+    "definition": "Imagen que muestra las siguientes plantillas de Parallel: KYC, Due Diligence, Consitución de una S.L, ampliación de capital y escisión parcial de una sociedad.",
+    "context": "A picture showcasing the following templates from Parallel: KYC, Due Diligence, incorporation of a limited liability company, share capital increase and carve-out of a company."
+  },
+  {
     "term": "public.consultancy.hero-subtitle",
     "definition": "Plataforma para trabajar con tu cliente de una forma más eficiente. Usa plantillas para reducir el tiempo de tu equipo en tareas repetitivas.",
     "context": "Platform to work efficiently with your client. Use templates to reduce your team’s time on repetitive tasks."
@@ -4636,8 +4646,8 @@
   },
   {
     "term": "public.consultancy.title",
-    "definition": "Agiliza el trabajo con tus clientes",
-    "context": "Speeds up the work with your clients"
+    "definition": "Software para Asesorías",
+    "context": "Software for consultancy"
   },
   {
     "term": "public.consultancy.use-cases-mailing-description",
@@ -5005,6 +5015,11 @@
     "context": "Can we help you?"
   },
   {
+    "term": "public.law-firms.hero-alt",
+    "definition": "Imagen que muestra las siguientes plantillas de Parallel: KYC, Due Diligence, Consitución de una S.L, ampliación de capital y escisión parcial de una sociedad.",
+    "context": "A picture showcasing the following templates from Parallel: KYC, income tax, incorporation of a limited liability company, share capital increase and carve-out of a company."
+  },
+  {
     "term": "public.law-firms.hero-subtitle",
     "definition": "Aumenta las horas facturables de tu equipo, ofreciéndoles una herramienta que se encargue de los procesos repetitivos y acelere el cierre de los asuntos.",
     "context": "Increase your team’s billable hours provinding them with a tool that takes care of repetitive processes and accelerates his project completion."
@@ -5031,8 +5046,8 @@
   },
   {
     "term": "public.law-firms.title",
-    "definition": "Aumenta la facturación y el retorno de tu equipo",
-    "context": "Increase your team’s billing and return"
+    "definition": "Software para Despachos de Abogados",
+    "context": "Software for law firms"
   },
   {
     "term": "public.law-firms.use-case",

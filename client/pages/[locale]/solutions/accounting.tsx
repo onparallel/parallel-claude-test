@@ -27,9 +27,9 @@ function Accounting() {
   const hero = {
     image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/accounting_hero_${query.locale}`,
     alt: intl.formatMessage({
-      id: "public.showcase-hero-alt",
+      id: "public.accounting.hero-alt",
       defaultMessage:
-        "A screenshot of the app showcasing the information received using Parallel",
+        "A picture showcasing the following templates from Parallel: sale and purchase of a property, income tax FY2020 and rental management.",
     }),
     ratio: 1394 / 976,
     title: intl.formatMessage({
@@ -178,7 +178,7 @@ function Accounting() {
       title={intl.formatMessage({
         id: "public.accounting.title",
         defaultMessage:
-          "Accelerates processes by automating your clients services",
+          "Software for BPO (business process outsourcing) and Accounting",
       })}
     >
       <PublicHero {...hero} />

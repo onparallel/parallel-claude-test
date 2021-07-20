@@ -26,9 +26,9 @@ function LawFirms() {
   const hero = {
     image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/lawfirms_hero_${query.locale}`,
     alt: intl.formatMessage({
-      id: "public.showcase-hero-alt",
+      id: "public.law-firms.hero-alt",
       defaultMessage:
-        "A screenshot of the app showcasing the information received using Parallel",
+        "A picture showcasing the following templates from Parallel: KYC, income tax, incorporation of a limited liability company, share capital increase and carve-out of a company.",
     }),
     ratio: 1394 / 976,
     title: intl.formatMessage({
@@ -176,7 +176,7 @@ function LawFirms() {
     <PublicLayout
       title={intl.formatMessage({
         id: "public.law-firms.title",
-        defaultMessage: "Increase your team’s billing and return",
+        defaultMessage: "Software for law firms",
       })}
     >
       <PublicHero {...hero} />
