@@ -160,6 +160,12 @@ export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
   return body.map(serialize).join("\n");
 }
 
+export function fromPlainText(value: string): SlateNode[] {
+  return value
+    .split("\n")
+    .map((line) => ({ type: "paragraph", children: [{ text: line }] }));
+}
+
 export function slateParser(ctx?: SlateContext) {
   return {
     toHtml: (body: SlateNode[]) => toHtml(body, ctx),

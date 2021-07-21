@@ -1,23 +1,18 @@
-import { Avatar, BoxProps, Flex, Heading, Stack, Text } from "@chakra-ui/react";
-import { BreakLines } from "@parallel/components/common/BreakLines";
+import { gql } from "@apollo/client";
+import { Avatar, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { LocaleBadge } from "@parallel/components/common/LocaleBadge";
 import { Spacer } from "@parallel/components/common/Spacer";
-import { NewPetition_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import { TemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { useRoleButton } from "@parallel/utils/useRoleButton";
-import { memo } from "react";
 import { FormattedMessage } from "react-intl";
 
-export interface TemplateCardProps extends BoxProps {
-  template: NewPetition_PetitionTemplateFragment;
+export interface TemplateCardProps {
+  template: TemplateCard_PetitionTemplateFragment;
   onPress: () => void;
 }
 
-export const TemplateCard = memo(function TemplateCard({
-  template,
-  onPress,
-  ...props
-}: TemplateCardProps) {
+export function TemplateCard({ template, onPress }: TemplateCardProps) {
   const buttonProps = useRoleButton(onPress, [onPress]);
 
   return (
@@ -38,7 +33,6 @@ export const TemplateCard = memo(function TemplateCard({
       }}
       minWidth={0}
       {...buttonProps}
-      {...props}
     >
       {template.name ? (
         <Heading size="xs" noOfLines={2}>
@@ -52,9 +46,9 @@ export const TemplateCard = memo(function TemplateCard({
           />
         </Heading>
       )}
-      {template.description ? (
+      {template.descriptionExcerpt ? (
         <Text fontSize="sm" noOfLines={2}>
-          <BreakLines>{template.description}</BreakLines>
+          {template.descriptionExcerpt}
         </Text>
       ) : (
         <Text fontSize="sm" textStyle="hint">
@@ -79,4 +73,18 @@ export const TemplateCard = memo(function TemplateCard({
       </Flex>
     </Card>
   );
-});
+}
+
+TemplateCard.fragments = {
+  PetitionTemplate: gql`
+    fragment TemplateCard_PetitionTemplate on PetitionTemplate {
+      name
+      descriptionExcerpt
+      locale
+      owner {
+        id
+        fullName
+      }
+    }
+  `,
+};

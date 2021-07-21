@@ -490,7 +490,7 @@ export const updatePetition = mutationField("updatePetition", {
           t.nullable.field("signatureConfig", {
             type: "SignatureConfigInput",
           });
-          t.nullable.string("description");
+          t.nullable.json("description");
           t.nullable.boolean("isReadOnly");
         },
       }).asArg()
@@ -502,6 +502,7 @@ export const updatePetition = mutationField("updatePetition", {
     maxLength((args) => args.data.emailSubject, "data.emailSubject", 255),
     maxLength((args) => args.data.description, "data.description", 1000),
     validRichTextContent((args) => args.data.emailBody, "data.emailBody"),
+    validRichTextContent((args) => args.data.description, "data.description"),
     validRemindersConfig(
       (args) => args.data.remindersConfig,
       "data.remindersConfig"
@@ -567,7 +568,8 @@ export const updatePetition = mutationField("updatePetition", {
       };
     }
     if (description !== undefined) {
-      data.template_description = description?.trim() || null;
+      data.template_description =
+        description === null ? null : JSON.stringify(description);
     }
 
     if (isDefined(isReadOnly)) {

@@ -18,6 +18,7 @@ import {
 import { AUTH, IAuth } from "../../services/auth";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { deleteAllData } from "../../util/knexUtils";
+import { fromPlainText } from "../../util/slate";
 import { initServer, TestClient } from "./server";
 
 function petitionsBuilder(orgId: number) {
@@ -1771,14 +1772,14 @@ describe("GraphQL/Petitions", () => {
     it("updates template description with given value", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation ($petitionId: GID!, $description: String) {
+          mutation ($petitionId: GID!, $description: JSON) {
             updatePetition(
               petitionId: $petitionId
               data: { description: $description }
             ) {
               id
               ... on PetitionTemplate {
-                description
+                descriptionExcerpt
               }
               __typename
             }
@@ -1786,41 +1787,29 @@ describe("GraphQL/Petitions", () => {
         `,
         variables: {
           petitionId: toGlobalId("Petition", petitions[6].id),
-          description: "this is the description",
+          description: fromPlainText("this is the description"),
         },
       });
 
       expect(errors).toBeUndefined();
       expect(data!.updatePetition).toEqual({
         id: toGlobalId("Petition", petitions[6].id),
-        description: "this is the description",
+        descriptionExcerpt: "this is the description",
         __typename: "PetitionTemplate",
       });
     });
 
-    it("trims name, description and emailSubject before updating petition", async () => {
+    it("trims name and emailSubject before updating petition", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
-          mutation (
-            $petitionId: GID!
-            $name: String
-            $description: String
-            $emailSubject: String
-          ) {
+          mutation ($petitionId: GID!, $name: String, $emailSubject: String) {
             updatePetition(
               petitionId: $petitionId
-              data: {
-                name: $name
-                description: $description
-                emailSubject: $emailSubject
-              }
+              data: { name: $name, emailSubject: $emailSubject }
             ) {
               id
               name
               emailSubject
-              ... on PetitionTemplate {
-                description
-              }
               __typename
             }
           }
@@ -1828,10 +1817,6 @@ describe("GraphQL/Petitions", () => {
         variables: {
           petitionId: toGlobalId("Petition", petitions[6].id),
           name: "   petition  name",
-          description: `   petition description with spaces and newlines      
-          
-          
-          `,
           emailSubject: "                  ",
         },
       });
@@ -1840,7 +1825,6 @@ describe("GraphQL/Petitions", () => {
       expect(data!.updatePetition).toEqual({
         id: toGlobalId("Petition", petitions[6].id),
         name: "petition  name",
-        description: "petition description with spaces and newlines",
         emailSubject: null,
         __typename: "PetitionTemplate",
       });

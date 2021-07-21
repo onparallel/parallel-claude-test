@@ -2296,7 +2296,17 @@ type PetitionTemplate implements PetitionBase {
   """
   Description of the template.
   """
-  description: String
+  description: JSON
+
+  """
+  HTML excerpt of the template description.
+  """
+  descriptionExcerpt: String
+
+  """
+  HTML description of the template.
+  """
+  descriptionHtml: String
 
   """
   The body of the petition.
@@ -3370,7 +3380,7 @@ input UpdatePetitionFieldInput {
 
 input UpdatePetitionInput {
   deadline: DateTime
-  description: String
+  description: JSON
   emailBody: JSON
   emailSubject: String
   hasCommentsEnabled: Boolean

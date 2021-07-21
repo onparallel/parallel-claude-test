@@ -21,7 +21,6 @@ import {
   usePetitionsTableColumns_UserFragment,
 } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
-import { ellipsis } from "@parallel/utils/ellipsis";
 import { MouseEvent, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { maxBy, minBy } from "remeda";
@@ -75,7 +74,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           },
           cellProps: {
             maxWidth: 0,
-            fontSize: "14px",
+            fontSize: "sm",
           },
           CellContent: ({ row }) => (
             <OverflownText textStyle={row.name ? undefined : "hint"}>
@@ -104,7 +103,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 cellProps: {
                   minWidth: "200px",
                   whiteSpace: "nowrap",
-                  fontSize: "14px",
+                  fontSize: "sm",
                 },
                 CellContent: ({ row }) => {
                   const recipients = row.accesses
@@ -184,11 +183,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 cellProps: {
                   isTruncated: true,
                   maxWidth: 0,
+                  fontSize: "sm",
                 },
                 CellContent: ({ row }) => {
-                  return (
-                    <>{row.description && ellipsis(row.description!, 80)}</>
-                  );
+                  return <>{row.descriptionExcerpt}</>;
                 },
               },
             ] as PetitionTemplateTableColumn[])),
@@ -424,7 +422,7 @@ usePetitionsTableColumns.fragments = {
         ...PetitionSignatureCellContent_Petition
       }
       ... on PetitionTemplate {
-        description
+        descriptionExcerpt
       }
     }
     ${UserAvatarList.fragments.User}

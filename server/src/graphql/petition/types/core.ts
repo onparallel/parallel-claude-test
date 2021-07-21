@@ -11,6 +11,7 @@ import { minBy } from "remeda";
 import { toGlobalId } from "../../../util/globalId";
 import { isDefined } from "../../../util/remedaExtensions";
 import { safeJsonParse } from "../../../util/safeJsonParse";
+import { toHtml, toPlainText } from "../../../util/slate";
 import { or } from "../../helpers/authorize";
 import { userHasFeatureFlag } from "../authorizers";
 
@@ -271,9 +272,27 @@ export const PetitionTemplate = objectType({
       description: "Whether the template is publicly available or not",
       resolve: (o) => o.template_public,
     });
-    t.nullable.string("description", {
+    t.nullable.json("description", {
       description: "Description of the template.",
-      resolve: (o) => o.template_description,
+      resolve: (o) => safeJsonParse(o.template_description),
+    });
+    t.nullable.string("descriptionHtml", {
+      description: "HTML description of the template.",
+      resolve: (o) => {
+        return o.template_description
+          ? toHtml(safeJsonParse(o.template_description))
+          : null;
+      },
+    });
+    t.nullable.string("descriptionExcerpt", {
+      description: "HTML excerpt of the template description.",
+      resolve: (o) => {
+        if (o.template_description) {
+          const content = safeJsonParse(o.template_description);
+          return toPlainText([content[0]]).slice(0, 200);
+        }
+        return null;
+      },
     });
   },
   rootTyping: "db.Petition",

@@ -42,7 +42,6 @@ import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import { BaseDialog } from "../common/BaseDialog";
-import { BreakLines } from "../common/BreakLines";
 import { DateTime } from "../common/DateTime";
 import { Divider } from "../common/Divider";
 
@@ -239,10 +238,10 @@ export function TemplateDetailsDialog({
               />
             </Heading>
           </Stack>
-          {template.description ? (
-            <Text>
-              <BreakLines>{template.description}</BreakLines>
-            </Text>
+          {template.descriptionHtml ? (
+            <Text
+              dangerouslySetInnerHTML={{ __html: template.descriptionHtml }}
+            />
           ) : (
             <Text textAlign="center" textStyle="hint">
               <FormattedMessage
@@ -304,7 +303,7 @@ TemplateDetailsDialog.fragments = {
   PetitionTemplate: gql`
     fragment TemplateDetailsDialog_PetitionTemplate on PetitionTemplate {
       id
-      description
+      descriptionHtml
       name
       fields {
         id

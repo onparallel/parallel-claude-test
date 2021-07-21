@@ -476,28 +476,18 @@ function NewPetition() {
 }
 
 NewPetition.fragments = {
-  get PetitionTemplate() {
-    return gql`
-      fragment NewPetition_PetitionTemplate on PetitionTemplate {
-        id
-        name
-        description
-        locale
-        owner {
-          id
-          fullName
-        }
-      }
-    `;
-  },
-  get User() {
-    return gql`
-      fragment NewPetition_User on User {
-        ...AppLayout_User
-      }
-      ${AppLayout.fragments.User}
-    `;
-  },
+  PetitionTemplate: gql`
+    fragment NewPetition_PetitionTemplate on PetitionTemplate {
+      ...NewPetitionTemplatesList_PetitionTemplate
+    }
+    ${NewPetitionTemplatesList.fragments.PetitionTemplate}
+  `,
+  User: gql`
+    fragment NewPetition_User on User {
+      ...AppLayout_User
+    }
+    ${AppLayout.fragments.User}
+  `,
 };
 
 NewPetition.getInitialProps = async ({

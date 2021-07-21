@@ -1690,7 +1690,11 @@ export interface PetitionTemplate extends PetitionBase {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Description of the template. */
-  description?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["JSON"]>;
+  /** HTML excerpt of the template description. */
+  descriptionExcerpt?: Maybe<Scalars["String"]>;
+  /** HTML description of the template. */
+  descriptionHtml?: Maybe<Scalars["String"]>;
   /** The body of the petition. */
   emailBody?: Maybe<Scalars["JSON"]>;
   /** The subject of the petition. */
@@ -2378,7 +2382,7 @@ export interface UpdatePetitionFieldInput {
 
 export interface UpdatePetitionInput {
   deadline?: Maybe<Scalars["DateTime"]>;
-  description?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["JSON"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
   hasCommentsEnabled?: Maybe<Scalars["Boolean"]>;
@@ -4336,7 +4340,7 @@ export type useTemplateDetailsDialogPetitionQuery = {
 export type TemplateDetailsDialog_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
   id: string;
-  description?: Maybe<string>;
+  descriptionHtml?: Maybe<string>;
   name?: Maybe<string>;
   updatedAt: string;
   fields: Array<{
@@ -4544,7 +4548,7 @@ export type PetitionTemplateComposeMessageEditor_PetitionFragment = {
   id: string;
   emailSubject?: Maybe<string>;
   emailBody?: Maybe<any>;
-  description?: Maybe<string>;
+  description?: Maybe<any>;
   isReadOnly: boolean;
 };
 
@@ -4553,6 +4557,19 @@ export type ReferencedFieldDialogDialog_PetitionFieldFragment = {
   id: string;
   title?: Maybe<string>;
   type: PetitionFieldType;
+};
+
+export type NewPetitionTemplatesList_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+} & TemplateCard_PetitionTemplateFragment;
+
+export type TemplateCard_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  name?: Maybe<string>;
+  descriptionExcerpt?: Maybe<string>;
+  locale: PetitionLocale;
+  owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
 };
 
 export type ExportRepliesDialog_UserFragment = {
@@ -6448,12 +6465,7 @@ export type PetitionsQuery = {
 
 export type NewPetition_PetitionTemplateFragment = {
   __typename?: "PetitionTemplate";
-  id: string;
-  name?: Maybe<string>;
-  description?: Maybe<string>;
-  locale: PetitionLocale;
-  owner: { __typename?: "User"; id: string; fullName?: Maybe<string> };
-};
+} & NewPetitionTemplatesList_PetitionTemplateFragment;
 
 export type NewPetition_UserFragment = {
   __typename?: "User";
@@ -7033,7 +7045,7 @@ export type usePetitionsTableColumns_PetitionBase_Petition_Fragment = {
 
 export type usePetitionsTableColumns_PetitionBase_PetitionTemplate_Fragment = {
   __typename?: "PetitionTemplate";
-  description?: Maybe<string>;
+  descriptionExcerpt?: Maybe<string>;
   id: string;
   name?: Maybe<string>;
   createdAt: string;
@@ -7375,7 +7387,7 @@ export const PetitionSharingModal_UserGroupFragmentDoc = gql`
 export const TemplateDetailsDialog_PetitionTemplateFragmentDoc = gql`
   fragment TemplateDetailsDialog_PetitionTemplate on PetitionTemplate {
     id
-    description
+    descriptionHtml
     name
     fields {
       id
@@ -9032,7 +9044,7 @@ export const usePetitionsTableColumns_PetitionBaseFragmentDoc = gql`
       ...PetitionSignatureCellContent_Petition
     }
     ... on PetitionTemplate {
-      description
+      descriptionExcerpt
     }
   }
   ${UserAvatarList_UserFragmentDoc}
@@ -9074,17 +9086,29 @@ export const Petitions_UserFragmentDoc = gql`
   ${AppLayout_UserFragmentDoc}
   ${usePetitionsTableColumns_UserFragmentDoc}
 `;
-export const NewPetition_PetitionTemplateFragmentDoc = gql`
-  fragment NewPetition_PetitionTemplate on PetitionTemplate {
-    id
+export const TemplateCard_PetitionTemplateFragmentDoc = gql`
+  fragment TemplateCard_PetitionTemplate on PetitionTemplate {
     name
-    description
+    descriptionExcerpt
     locale
     owner {
       id
       fullName
     }
   }
+`;
+export const NewPetitionTemplatesList_PetitionTemplateFragmentDoc = gql`
+  fragment NewPetitionTemplatesList_PetitionTemplate on PetitionTemplate {
+    id
+    ...TemplateCard_PetitionTemplate
+  }
+  ${TemplateCard_PetitionTemplateFragmentDoc}
+`;
+export const NewPetition_PetitionTemplateFragmentDoc = gql`
+  fragment NewPetition_PetitionTemplate on PetitionTemplate {
+    ...NewPetitionTemplatesList_PetitionTemplate
+  }
+  ${NewPetitionTemplatesList_PetitionTemplateFragmentDoc}
 `;
 export const NewPetition_UserFragmentDoc = gql`
   fragment NewPetition_User on User {

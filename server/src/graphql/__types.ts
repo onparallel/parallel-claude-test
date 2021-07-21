@@ -147,7 +147,7 @@ export interface NexusGenInputs {
   UpdatePetitionInput: {
     // input type
     deadline?: NexusGenScalars["DateTime"] | null; // DateTime
-    description?: string | null; // String
+    description?: NexusGenScalars["JSON"] | null; // JSON
     emailBody?: NexusGenScalars["JSON"] | null; // JSON
     emailSubject?: string | null; // String
     hasCommentsEnabled?: boolean | null; // Boolean
@@ -1086,7 +1086,9 @@ export interface NexusGenFieldTypes {
   PetitionTemplate: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    description: string | null; // String
+    description: NexusGenScalars["JSON"] | null; // JSON
+    descriptionExcerpt: string | null; // String
+    descriptionHtml: string | null; // String
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
     fieldCount: number; // Int!
@@ -2047,7 +2049,9 @@ export interface NexusGenFieldTypeNames {
   PetitionTemplate: {
     // field return type name
     createdAt: "DateTime";
-    description: "String";
+    description: "JSON";
+    descriptionExcerpt: "String";
+    descriptionHtml: "String";
     emailBody: "JSON";
     emailSubject: "String";
     fieldCount: "Int";
