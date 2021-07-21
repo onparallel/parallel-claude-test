@@ -2,7 +2,6 @@ import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
 import { Email } from "../buildEmail";
-import { Button } from "../common/Button";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
 import { Disclaimer } from "../common/Disclaimer";
@@ -128,6 +127,7 @@ const email: Email<PetitionReminderProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         showGdprDisclaimer
+        unsubscribeUrl={`${parallelUrl}/${locale}/petition/${keycode}/unsubscribe`}
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
@@ -189,14 +189,6 @@ const email: Email<PetitionReminderProps> = {
             <CompleteInfoButton
               href={`${parallelUrl}/${locale}/petition/${keycode}`}
             />
-            <Button
-              href={`${parallelUrl}/${locale}/petition/${keycode}/unsubscribe/`}
-            >
-              <FormattedMessage
-                id="generic.unsubscribe"
-                defaultMessage="Unsubscribe"
-              />
-            </Button>
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>

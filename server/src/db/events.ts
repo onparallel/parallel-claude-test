@@ -124,7 +124,10 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     user_id: number;
     status: PetitionStatus;
   };
-  CONTACT_UNSUBSCRIBE: { petition_access_id: number };
+  CONTACT_UNSUBSCRIBE: {
+    petition_access_id: number;
+    feedback: string;
+  };
 }[TType];
 
 type GenericPetitionEvent<

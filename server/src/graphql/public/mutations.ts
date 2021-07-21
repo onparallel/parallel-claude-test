@@ -1080,3 +1080,28 @@ export const publicPetitionFieldAttachmentDownloadLink = mutationField(
     },
   }
 );
+
+export const publicCancelReminder = mutationField("publicCancelReminder", {
+  description: "Cancel a reminder for a contact.",
+  type: "PublicPetitionAccess",
+  authorize: authenticatePublicAccess("keycode"),
+  args: {
+    keycode: nonNull(idArg()),
+    feedback: nonNull(stringArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    const petitionId = ctx.access!.petition_id;
+    const access = ctx.access!;
+
+    ctx.petitions.createEvent({
+      type: "CONTACT_UNSUBSCRIBE",
+      petition_id: petitionId,
+      data: {
+        petition_access_id: access!.id,
+        feedback: args.feedback,
+      },
+    });
+
+    return (await ctx.petitions.stopAccessReminders([access!.id]))[0];
+  },
+});

@@ -766,8 +766,8 @@
   },
   {
     "term": "component.notification-contact-unsubscribe.body",
-    "definition": "{name} has unsubscribed from the reminders.",
-    "context": "{name} has unsubscribed from the reminders."
+    "definition": "{name} was unsusbscribed from automatic reminders.",
+    "context": "{name} was unsusbscribed from automatic reminders."
   },
   {
     "term": "component.notification-email-bounced.body",

@@ -308,6 +308,43 @@ export const BellIcon = createIcon({
   ),
 });
 
+export const BellOffIcon = createIcon({
+  displayName: "BellOffIcon",
+  viewBox: "0 0 16 16",
+  path: (
+    <g
+      stroke="currentColor"
+      strokeWidth={1.5}
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M9.15335 14C9.03614 14.2021 8.86791 14.3698 8.6655 14.4864C8.46309 14.6029 8.2336 14.6643 8.00001 14.6643C7.76643 14.6643 7.53694 14.6029 7.33453 14.4864C7.13212 14.3698 6.96389 14.2021 6.84668 14" />
+      <path d="M12.42 8.66671C12.1234 7.58098 11.982 6.45874 12 5.33337" />
+      <path d="M4.17333 4.17334C4.05751 4.54908 3.99907 4.94015 4 5.33334C4 10 2 11.3333 2 11.3333H11.3333" />
+      <path d="M12 5.33333C12.0011 4.6087 11.8053 3.8974 11.4336 3.27539C11.0619 2.65338 10.5281 2.14403 9.88944 1.80175C9.25075 1.45948 8.53108 1.29712 7.8073 1.33204C7.08351 1.36696 6.38281 1.59783 5.78003 2" />
+      <path d="M0.666687 0.666626L15.3334 15.3333" />
+    </g>
+  ),
+});
+
+{
+  /* <svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="16"
+  height="16"
+  viewBox="0 0 16 16"
+  fill="none"
+>
+  <g clip-path="url(#clip0)"></g>
+  <defs>
+    <clipPath id="clip0">
+      <rect width="16" height="16" fill="white" />
+    </clipPath>
+  </defs>
+</svg>; */
+}
+
 export const BellSettingsIcon = createIcon({
   displayName: "BellSettingsIcon",
   viewBox: "0 0 24 24",

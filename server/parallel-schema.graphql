@@ -699,6 +699,11 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): PetitionFieldAttachment!
+
+  """
+  Cancel a reminder for a contact.
+  """
+  publicCancelReminder(feedback: String!, keycode: ID!): PublicPetitionAccess!
   publicCheckVerificationCode(
     code: String!
     keycode: ID!

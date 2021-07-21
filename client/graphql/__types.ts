@@ -378,6 +378,8 @@ export interface Mutation {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  /** Cancel a reminder for a contact. */
+  publicCancelReminder: PublicPetitionAccess;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -730,6 +732,11 @@ export interface MutationpetitionFieldAttachmentUploadCompleteArgs {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+}
+
+export interface MutationpublicCancelReminderArgs {
+  feedback: Scalars["String"];
+  keycode: Scalars["ID"];
 }
 
 export interface MutationpublicCheckVerificationCodeArgs {
@@ -6837,6 +6844,18 @@ export type publicCheckVerificationCodeMutation = {
     __typename?: "VerificationCodeCheck";
     result: Result;
     remainingAttempts?: Maybe<number>;
+  };
+};
+
+export type UnsubscribeView_publicCancelReminderMutationVariables = Exact<{
+  keycode: Scalars["ID"];
+  feedback: Scalars["String"];
+}>;
+
+export type UnsubscribeView_publicCancelReminderMutation = {
+  publicCancelReminder: {
+    __typename?: "PublicPetitionAccess";
+    petition?: Maybe<{ __typename?: "PublicPetition"; id: string }>;
   };
 };
 
@@ -14213,6 +14232,33 @@ export function usepublicCheckVerificationCodeMutation(
 }
 export type publicCheckVerificationCodeMutationHookResult = ReturnType<
   typeof usepublicCheckVerificationCodeMutation
+>;
+export const UnsubscribeView_publicCancelReminderDocument = gql`
+  mutation UnsubscribeView_publicCancelReminder(
+    $keycode: ID!
+    $feedback: String!
+  ) {
+    publicCancelReminder(keycode: $keycode, feedback: $feedback) {
+      petition {
+        id
+      }
+    }
+  }
+`;
+export function useUnsubscribeView_publicCancelReminderMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    UnsubscribeView_publicCancelReminderMutation,
+    UnsubscribeView_publicCancelReminderMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    UnsubscribeView_publicCancelReminderMutation,
+    UnsubscribeView_publicCancelReminderMutationVariables
+  >(UnsubscribeView_publicCancelReminderDocument, options);
+}
+export type UnsubscribeView_publicCancelReminderMutationHookResult = ReturnType<
+  typeof useUnsubscribeView_publicCancelReminderMutation
 >;
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($token: String!) {

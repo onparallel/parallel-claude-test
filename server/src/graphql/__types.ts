@@ -783,6 +783,7 @@ export interface NexusGenFieldTypes {
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
+    publicCancelReminder: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateCheckboxReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -1764,6 +1765,7 @@ export interface NexusGenFieldTypeNames {
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
+    publicCancelReminder: "PublicPetitionAccess";
     publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
     publicCreateCheckboxReply: "PublicPetitionFieldReply";
@@ -2763,6 +2765,11 @@ export interface NexusGenArgTypes {
       attachmentId: NexusGenScalars["GID"]; // GID!
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    publicCancelReminder: {
+      // args
+      feedback: string; // String!
+      keycode: string; // ID!
     };
     publicCheckVerificationCode: {
       // args

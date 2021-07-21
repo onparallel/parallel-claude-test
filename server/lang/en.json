@@ -155,6 +155,11 @@
     "context": "Terms and conditions"
   },
   {
+    "term": "layout.unsubscribe",
+    "definition": "Unsubscribe",
+    "context": "Unsubscribe"
+  },
+  {
     "term": "new-petition.text",
     "definition": "{senderName} ({senderEmail}) has sent you the following petition:",
     "context": "{senderName} ({senderEmail}) has sent you the following petition:"

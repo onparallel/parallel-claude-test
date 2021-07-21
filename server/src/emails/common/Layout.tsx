@@ -28,6 +28,7 @@ export type LayoutProps = {
   assetsUrl: string;
   showGdprDisclaimer?: boolean;
   contentHeading?: Element | null;
+  unsubscribeUrl?: string;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -38,6 +39,7 @@ export const Layout: FC<LayoutProps> = function Layout({
   children,
   showGdprDisclaimer,
   contentHeading,
+  unsubscribeUrl,
 }) {
   const { locale } = useIntl();
   return (
@@ -147,6 +149,17 @@ export const Layout: FC<LayoutProps> = function Layout({
                   defaultMessage="Privacy"
                 />
               </a>
+              {unsubscribeUrl ? (
+                <>
+                  <span>&nbsp;|&nbsp;</span>
+                  <a className="link" href={unsubscribeUrl}>
+                    <FormattedMessage
+                      id="layout.unsubscribe"
+                      defaultMessage="Unsubscribe"
+                    />
+                  </a>
+                </>
+              ) : null}
             </MjmlText>
           </MjmlColumn>
         </MjmlSection>

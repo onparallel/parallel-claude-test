@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { Avatar } from "@chakra-ui/react";
-import { BellIcon } from "@parallel/chakra/icons";
+import { BellOffIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragment } from "@parallel/graphql/__types";
 import { forwardRef } from "react";
@@ -23,15 +23,15 @@ export const ContactUnsubscribeNotification = Object.assign(
           icon={
             <Avatar
               boxSize="36px"
-              background="green.600"
-              icon={<BellIcon color="white" fontSize="1rem" />}
+              background="red.600"
+              icon={<BellOffIcon color="white" fontSize="1rem" />}
             />
           }
           path={`/replies`}
         >
           <FormattedMessage
             id="component.notification-contact-unsubscribe.body"
-            defaultMessage="{name} has unsubscribed from the reminders."
+            defaultMessage="{name} was unsusbscribed from automatic reminders."
             values={{
               name: (
                 <ContactLink

@@ -29,7 +29,10 @@ export type PetitionUserNotificationPayload<
   SIGNATURE_COMPLETED: {
     petition_signature_request_id: number;
   };
-  CONTACT_UNSUBSCRIBE: { petition_access_id: number };
+  CONTACT_UNSUBSCRIBE: {
+    petition_access_id: number;
+    feedback: string;
+  };
 }[TType];
 
 type GenericPetitionUserNotification<

@@ -346,6 +346,8 @@ export type Mutation = {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
+  /** Cancel a reminder for a contact. */
+  publicCancelReminder: PublicPetitionAccess;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -698,6 +700,11 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
   attachmentId: Scalars["GID"];
   fieldId: Scalars["GID"];
   petitionId: Scalars["GID"];
+};
+
+export type MutationpublicCancelReminderArgs = {
+  feedback: Scalars["String"];
+  keycode: Scalars["ID"];
 };
 
 export type MutationpublicCheckVerificationCodeArgs = {
