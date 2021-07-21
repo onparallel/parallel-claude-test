@@ -20,6 +20,7 @@ const result: PossibleTypesResultData = {
       "AccessOpenedEvent",
       "CommentDeletedEvent",
       "CommentPublishedEvent",
+      "ContactUnsubscribeEvent",
       "GroupPermissionAddedEvent",
       "GroupPermissionEditedEvent",
       "GroupPermissionRemovedEvent",
@@ -52,6 +53,7 @@ const result: PossibleTypesResultData = {
     ],
     PetitionUserNotification: [
       "CommentCreatedUserNotification",
+      "ContactUnsubscribeNotification",
       "MessageEmailBouncedUserNotification",
       "PetitionCompletedUserNotification",
       "PetitionSharedUserNotification",

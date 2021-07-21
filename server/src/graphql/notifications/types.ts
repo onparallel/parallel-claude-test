@@ -62,6 +62,8 @@ export const PetitionUserNotification = interfaceType({
         return "SignatureCancelledUserNotification";
       case "SIGNATURE_COMPLETED":
         return "SignatureCompletedUserNotification";
+      case "CONTACT_UNSUBSCRIBE":
+        return "ContactUnsubscribeNotification";
     }
   },
 });
@@ -162,3 +164,15 @@ export const MessageEmailBouncedUserNotification =
       },
     });
   });
+
+export const ContactUnsubscribeNotification = createPetitionUserNotification(
+  "ContactUnsubscribeNotification",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+  }
+);

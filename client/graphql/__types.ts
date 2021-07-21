@@ -140,6 +140,23 @@ export interface ContactPagination {
   totalCount: Scalars["Int"];
 }
 
+export interface ContactUnsubscribeEvent extends PetitionEvent {
+  __typename?: "ContactUnsubscribeEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+}
+
+export interface ContactUnsubscribeNotification
+  extends PetitionUserNotification {
+  __typename?: "ContactUnsubscribeNotification";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
+  petition: PetitionBase;
+}
+
 export interface CreateContactInput {
   email: Scalars["String"];
   firstName?: Maybe<Scalars["String"]>;
@@ -3062,6 +3079,11 @@ export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotif
     __typename?: "CommentCreatedUserNotification";
   } & NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
 
+export type NotificationsDrawer_PetitionUserNotification_ContactUnsubscribeNotification_Fragment =
+  {
+    __typename?: "ContactUnsubscribeNotification";
+  } & NotificationsList_PetitionUserNotification_ContactUnsubscribeNotification_Fragment;
+
 export type NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
   {
     __typename?: "MessageEmailBouncedUserNotification";
@@ -3089,6 +3111,7 @@ export type NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserN
 
 export type NotificationsDrawer_PetitionUserNotificationFragment =
   | NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment
+  | NotificationsDrawer_PetitionUserNotification_ContactUnsubscribeNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment
@@ -3115,6 +3138,9 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
             __typename?: "CommentCreatedUserNotification";
           } & NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment)
         | ({
+            __typename?: "ContactUnsubscribeNotification";
+          } & NotificationsDrawer_PetitionUserNotification_ContactUnsubscribeNotification_Fragment)
+        | ({
             __typename?: "MessageEmailBouncedUserNotification";
           } & NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment)
         | ({
@@ -3138,6 +3164,11 @@ export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotific
   {
     __typename?: "CommentCreatedUserNotification";
   } & CommentCreatedUserNotification_CommentCreatedUserNotificationFragment;
+
+export type NotificationsList_PetitionUserNotification_ContactUnsubscribeNotification_Fragment =
+  {
+    __typename?: "ContactUnsubscribeNotification";
+  } & ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragment;
 
 export type NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
   {
@@ -3166,6 +3197,7 @@ export type NotificationsList_PetitionUserNotification_SignatureCompletedUserNot
 
 export type NotificationsList_PetitionUserNotificationFragment =
   | NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment
+  | NotificationsList_PetitionUserNotification_ContactUnsubscribeNotification_Fragment
   | NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment
@@ -3191,6 +3223,15 @@ export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragmen
       >;
     };
   } & PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
+
+export type ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragment =
+  {
+    __typename?: "ContactUnsubscribeNotification";
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  } & PetitionUserNotification_PetitionUserNotification_ContactUnsubscribeNotification_Fragment;
 
 export type MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment =
   {
@@ -3224,6 +3265,17 @@ export type PetitionSharedUserNotification_PetitionSharedUserNotificationFragmen
 export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment =
   {
     __typename?: "CommentCreatedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
+
+export type PetitionUserNotification_PetitionUserNotification_ContactUnsubscribeNotification_Fragment =
+  {
+    __typename?: "ContactUnsubscribeNotification";
     id: string;
     createdAt: string;
     isRead: boolean;
@@ -3289,6 +3341,7 @@ export type PetitionUserNotification_PetitionUserNotification_SignatureCompleted
 
 export type PetitionUserNotification_PetitionUserNotificationFragment =
   | PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment
+  | PetitionUserNotification_PetitionUserNotification_ContactUnsubscribeNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_PetitionSharedUserNotification_Fragment
@@ -3428,6 +3481,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
           __typename?: "CommentPublishedEvent";
         } & PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment)
       | ({
+          __typename?: "ContactUnsubscribeEvent";
+        } & PetitionActivityTimeline_PetitionEvent_ContactUnsubscribeEvent_Fragment)
+      | ({
           __typename?: "GroupPermissionAddedEvent";
         } & PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment)
       | ({
@@ -3541,6 +3597,9 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
     __typename?: "CommentPublishedEvent";
     id: string;
   } & TimelineCommentPublishedEvent_CommentPublishedEventFragment;
+
+export type PetitionActivityTimeline_PetitionEvent_ContactUnsubscribeEvent_Fragment =
+  { __typename?: "ContactUnsubscribeEvent"; id: string };
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment =
   {
@@ -3693,6 +3752,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_ContactUnsubscribeEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment
@@ -3836,6 +3896,15 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
       | ({ __typename?: "User" } & UserReference_UserFragment)
     >;
   }>;
+};
+
+export type TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragment = {
+  __typename?: "ContactUnsubscribeEvent";
+  createdAt: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  };
 };
 
 export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment =
@@ -6947,6 +7016,11 @@ export type useUpdateIsReadNotificationMutation = {
         comment: { __typename?: "PetitionFieldComment"; id: string };
       }
     | {
+        __typename?: "ContactUnsubscribeNotification";
+        id: string;
+        isRead: boolean;
+      }
+    | {
         __typename?: "MessageEmailBouncedUserNotification";
         id: string;
         isRead: boolean;
@@ -7271,6 +7345,18 @@ export const SignatureCompletedUserNotification_SignatureCompletedUserNotificati
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
 `;
+export const ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragmentDoc = gql`
+  fragment ContactUnsubscribeNotification_ContactUnsubscribeNotification on ContactUnsubscribeNotification {
+    ...PetitionUserNotification_PetitionUserNotification
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+  }
+  ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
   fragment NotificationsList_PetitionUserNotification on PetitionUserNotification {
     ... on CommentCreatedUserNotification {
@@ -7291,6 +7377,9 @@ export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
     ... on SignatureCompletedUserNotification {
       ...SignatureCompletedUserNotification_SignatureCompletedUserNotification
     }
+    ... on ContactUnsubscribeNotification {
+      ...ContactUnsubscribeNotification_ContactUnsubscribeNotification
+    }
   }
   ${CommentCreatedUserNotification_CommentCreatedUserNotificationFragmentDoc}
   ${MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragmentDoc}
@@ -7298,6 +7387,7 @@ export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
   ${PetitionSharedUserNotification_PetitionSharedUserNotificationFragmentDoc}
   ${SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragmentDoc}
   ${SignatureCompletedUserNotification_SignatureCompletedUserNotificationFragmentDoc}
+  ${ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragmentDoc}
 `;
 export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
   fragment NotificationsDrawer_PetitionUserNotification on PetitionUserNotification {
@@ -7322,6 +7412,17 @@ export const OrganizationUsersListTableHeader_UserFragmentDoc = gql`
     id
     role
   }
+`;
+export const TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragmentDoc = gql`
+  fragment TimelineContactUnsubscribeEvent_ContactUnsubscribeEvent on ContactUnsubscribeEvent {
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+  }
+  ${ContactLink_ContactFragmentDoc}
 `;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {

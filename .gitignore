@@ -6,3 +6,5 @@ client/public/static/lang
 server/dist
 server/bin/localtunnel-dev.url
 server/lang/compiled
+
+.DS_Store

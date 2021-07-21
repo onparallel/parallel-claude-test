@@ -32,6 +32,7 @@ export type PetitionEventType =
   | "ACCESS_OPENED"
   | "COMMENT_DELETED"
   | "COMMENT_PUBLISHED"
+  | "CONTACT_UNSUBSCRIBE"
   | "GROUP_PERMISSION_ADDED"
   | "GROUP_PERMISSION_EDITED"
   | "GROUP_PERMISSION_REMOVED"
@@ -96,6 +97,7 @@ export type PetitionStatus = "CLOSED" | "COMPLETED" | "DRAFT" | "PENDING";
 
 export type PetitionUserNotificationType =
   | "COMMENT_CREATED"
+  | "CONTACT_UNSUBSCRIBE"
   | "MESSAGE_EMAIL_BOUNCED"
   | "PETITION_COMPLETED"
   | "PETITION_SHARED"

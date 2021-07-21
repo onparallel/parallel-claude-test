@@ -126,6 +126,20 @@ export type ContactPagination = {
   totalCount: Scalars["Int"];
 };
 
+export type ContactUnsubscribeEvent = PetitionEvent & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+};
+
+export type ContactUnsubscribeNotification = PetitionUserNotification & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
+  petition: PetitionBase;
+};
+
 export type CreateContactInput = {
   email: Scalars["String"];
   firstName?: Maybe<Scalars["String"]>;

@@ -765,6 +765,11 @@
     "context": "{name} has written a comment in the field {field}."
   },
   {
+    "term": "component.notification-contact-unsubscribe.body",
+    "definition": "{name} se dió de baja de los recordatorios.",
+    "context": "{name} has unsubscribed from the reminders."
+  },
+  {
     "term": "component.notification-email-bounced.body",
     "definition": "Error al enviar la petición a {name}.",
     "context": "Error sending petition to recipient {name}."

@@ -313,6 +313,8 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
+  ContactUnsubscribeEvent: events.ContactUnsubscribeEvent;
+  ContactUnsubscribeNotification: notifications.ContactUnsubscribeNotification;
   CreateFileUploadFieldAttachment: {
     // root type
     attachment: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
@@ -640,6 +642,20 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
+  };
+  ContactUnsubscribeEvent: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+  };
+  ContactUnsubscribeNotification: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
   };
   CreateFileUploadFieldAttachment: {
     // field return type
@@ -1607,6 +1623,20 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "Contact";
     totalCount: "Int";
+  };
+  ContactUnsubscribeEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+  };
+  ContactUnsubscribeNotification: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+    isRead: "Boolean";
+    petition: "PetitionBase";
   };
   CreateFileUploadFieldAttachment: {
     // field return type name
@@ -3241,6 +3271,7 @@ export interface NexusGenAbstractTypeMembers {
     | "AccessOpenedEvent"
     | "CommentDeletedEvent"
     | "CommentPublishedEvent"
+    | "ContactUnsubscribeEvent"
     | "GroupPermissionAddedEvent"
     | "GroupPermissionEditedEvent"
     | "GroupPermissionRemovedEvent"
@@ -3269,6 +3300,7 @@ export interface NexusGenAbstractTypeMembers {
   PetitionPermission: "PetitionUserGroupPermission" | "PetitionUserPermission";
   PetitionUserNotification:
     | "CommentCreatedUserNotification"
+    | "ContactUnsubscribeNotification"
     | "MessageEmailBouncedUserNotification"
     | "PetitionCompletedUserNotification"
     | "PetitionSharedUserNotification"
@@ -3298,6 +3330,8 @@ export interface NexusGenTypeInterfaces {
   CommentDeletedEvent: "PetitionEvent";
   CommentPublishedEvent: "PetitionEvent";
   Contact: "Timestamps";
+  ContactUnsubscribeEvent: "PetitionEvent";
+  ContactUnsubscribeNotification: "PetitionUserNotification";
   GroupPermissionAddedEvent: "PetitionEvent";
   GroupPermissionEditedEvent: "PetitionEvent";
   GroupPermissionRemovedEvent: "PetitionEvent";

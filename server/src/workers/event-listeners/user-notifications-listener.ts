@@ -7,6 +7,7 @@ import {
   SignatureCancelledEvent,
   SignatureCompletedEvent,
   UserPermissionAddedEvent,
+  ContactUnsubscribeEvent,
 } from "../../db/events";
 import { EventListener } from "../event-processor";
 
@@ -191,6 +192,23 @@ async function createPetitionSharedUserNotifications(
   }
 }
 
+async function createContactUnsubscribeNotifications(
+  event: ContactUnsubscribeEvent,
+  ctx: WorkerContext
+) {
+  const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
+  await ctx.petitions.createPetitionUserNotification(
+    users.map((user) => ({
+      type: "CONTACT_UNSUBSCRIBE",
+      petition_id: event.petition_id,
+      user_id: user.id,
+      is_read: false,
+      processed_at: null,
+      data: { petition_access_id: event.data.petition_access_id },
+    }))
+  );
+}
+
 export const userNotificationsListener: EventListener = async (event, ctx) => {
   switch (event.type) {
     case "PETITION_COMPLETED":
@@ -211,6 +229,9 @@ export const userNotificationsListener: EventListener = async (event, ctx) => {
     case "USER_PERMISSION_ADDED":
     case "GROUP_PERMISSION_ADDED":
       await createPetitionSharedUserNotifications(event, ctx);
+      break;
+    case "CONTACT_UNSUBSCRIBE":
+      await createContactUnsubscribeNotifications(event, ctx);
       break;
     default:
       break;

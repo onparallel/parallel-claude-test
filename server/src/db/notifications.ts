@@ -29,6 +29,7 @@ export type PetitionUserNotificationPayload<
   SIGNATURE_COMPLETED: {
     petition_signature_request_id: number;
   };
+  CONTACT_UNSUBSCRIBE: { petition_access_id: number };
 }[TType];
 
 type GenericPetitionUserNotification<
@@ -58,6 +59,8 @@ export type SignatureCancelledUserNotification<
 export type SignatureCompletedUserNotification<
   IsCreate extends boolean = false
 > = GenericPetitionUserNotification<"SIGNATURE_COMPLETED", IsCreate>;
+export type ContactUnsubscribeNotification<IsCreate extends boolean = false> =
+  GenericPetitionUserNotification<"CONTACT_UNSUBSCRIBE", IsCreate>;
 
 export type PetitionUserNotification<IsCreate extends boolean = false> =
   | CommentCreatedUserNotification<IsCreate>
@@ -65,6 +68,7 @@ export type PetitionUserNotification<IsCreate extends boolean = false> =
   | PetitionCompletedUserNotification<IsCreate>
   | PetitionSharedUserNotification<IsCreate>
   | SignatureCancelledUserNotification<IsCreate>
-  | SignatureCompletedUserNotification<IsCreate>;
+  | SignatureCompletedUserNotification<IsCreate>
+  | ContactUnsubscribeNotification<IsCreate>;
 
 export type CreatePetitionUserNotification = PetitionUserNotification<true>;

@@ -149,6 +149,20 @@ type ContactPagination {
   totalCount: Int!
 }
 
+type ContactUnsubscribeEvent implements PetitionEvent {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+}
+
+type ContactUnsubscribeNotification implements PetitionUserNotification {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+  isRead: Boolean!
+  petition: PetitionBase!
+}
+
 input CreateContactInput {
   email: String!
   firstName: String

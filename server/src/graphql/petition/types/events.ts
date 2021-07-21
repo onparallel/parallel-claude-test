@@ -94,6 +94,8 @@ export const PetitionEvent = interfaceType({
         return "PetitionDeletedEvent";
       case "TEMPLATE_USED":
         return "TemplateUsedEvent";
+      case "CONTACT_UNSUBSCRIBE":
+        return "ContactUnsubscribeEvent";
     }
   },
   rootTyping: "events.PetitionEvent",
@@ -638,4 +640,16 @@ export const PetitionDeletedEvent = createPetitionEvent(
 export const TemplateUsedEvent = createPetitionEvent(
   "TemplateUsedEvent",
   (t) => {}
+);
+
+export const ContactUnsubscribeEvent = createPetitionEvent(
+  "ContactUnsubscribeEvent",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+  }
 );
