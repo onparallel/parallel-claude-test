@@ -66,6 +66,7 @@ export function useTemplateDetailsDialog() {
             }
             ${TemplateDetailsDialog.fragments.PetitionTemplate}
           `,
+          fetchPolicy: "network-only",
           variables: { templateId },
         });
         const template = data!
