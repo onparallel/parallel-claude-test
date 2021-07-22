@@ -74,7 +74,6 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
           },
           cellProps: {
             maxWidth: 0,
-            fontSize: "sm",
           },
           CellContent: ({ row }) => (
             <OverflownText textStyle={row.name ? undefined : "hint"}>
@@ -103,7 +102,6 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 cellProps: {
                   minWidth: "200px",
                   whiteSpace: "nowrap",
-                  fontSize: "sm",
                 },
                 CellContent: ({ row }) => {
                   const recipients = row.accesses
@@ -183,7 +181,6 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 cellProps: {
                   isTruncated: true,
                   maxWidth: 0,
-                  fontSize: "sm",
                 },
                 CellContent: ({ row }) => {
                   return <>{row.descriptionExcerpt}</>;
@@ -230,11 +227,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                       value={sentAt}
                       format={FORMATS.LLL}
                       useRelativeTime
-                      fontSize="sm"
                       whiteSpace="nowrap"
                     />
                   ) : (
-                    <Text as="span" textStyle="hint" fontSize="sm">
+                    <Text as="span" textStyle="hint">
                       <FormattedMessage
                         id="generic.not-sent"
                         defaultMessage="Not sent"
@@ -278,16 +274,10 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                         <DateTime
                           value={lastReminderDate}
                           format={FORMATS.MMMdd}
-                          fontSize="sm"
                           whiteSpace="nowrap"
                         />
                       ) : (
-                        <Text
-                          as="span"
-                          textStyle="hint"
-                          fontSize="sm"
-                          width="max-content"
-                        >
+                        <Text as="span" textStyle="hint">
                           <FormattedMessage
                             id="petitions.header.reminders-disabled"
                             defaultMessage="No reminders"
@@ -297,7 +287,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                       {nextReminderAt ? (
                         <SmallPopover
                           content={
-                            <Text color="gray.800" fontSize="14px">
+                            <Text color="gray.800" fontSize="sm">
                               <FormattedMessage
                                 id="petitions.header.reminders-next-reminder-at.popover"
                                 defaultMessage="Next reminder configured for {date} at {hours}"
@@ -356,7 +346,6 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                     value={createdAt}
                     format={FORMATS.LLL}
                     useRelativeTime
-                    fontSize="sm"
                     whiteSpace="nowrap"
                   />
                 ),
