@@ -766,8 +766,8 @@
   },
   {
     "term": "component.notification-contact-unsubscribe.body",
-    "definition": "{name} se ha desuscrito de los recordatorios automáticos.",
-    "context": "{name} was unsusbscribed from automatic reminders."
+    "definition": "{name} se ha desuscrito de los recordatorios automáticos: ",
+    "context": "{name} was unsusbscribed from automatic reminders:"
   },
   {
     "term": "component.notification-email-bounced.body",
@@ -5830,6 +5830,61 @@
     "context": "Terms & Conditions"
   },
   {
+    "term": "public.unsubscribe.answer-no-reminders",
+    "definition": "Subiré la información pero no quiero seguir recibiendo recordatorios",
+    "context": "I will upload the information but i do not want to receive more reminders"
+  },
+  {
+    "term": "public.unsubscribe.answer-not-interested",
+    "definition": "Ya no estoy interesado en el servicio",
+    "context": "I am not interested in this service anymore"
+  },
+  {
+    "term": "public.unsubscribe.answer-not-requested",
+    "definition": "No he solicitado este servicio",
+    "context": "I have not requested this service"
+  },
+  {
+    "term": "public.unsubscribe.answer-other",
+    "definition": "Otro",
+    "context": "Other"
+  },
+  {
+    "term": "public.unsubscribe.answer-wrong-person",
+    "definition": "No soy la persona adecuada para completar esta información",
+    "context": "I am not the person to complete this information"
+  },
+  {
+    "term": "public.unsubscribe.done-body",
+    "definition": "Hemos informado a tu remitente y no recibirás más recordatorios automáticos de esta petición.",
+    "context": "We have informed the sender and you won’t receive more automatic reminders from this petition."
+  },
+  {
+    "term": "public.unsubscribe.done-title",
+    "definition": "¡Hecho!",
+    "context": "Done!"
+  },
+  {
+    "term": "public.unsubscribe.feedback-title",
+    "definition": "Por favor, ¿podrías indicarnos el motivo para no querer recibir más recordatorios? *",
+    "context": "Please, ¿can you indicate why you do not want to receive more automatic reminders? *"
+  },
+  {
+    "term": "public.unsubscribe.other-error-message",
+    "definition": "Por favor, ingrese un motivo",
+    "context": "Please, enter a reason"
+  },
+  {
+    "term": "public.unsubscribe.other-placeholder",
+    "definition": "Indicar otros motivos",
+    "context": "Indicate other reasons"
+  },
+  {
+    "term": "public.unsubscribe.send-reply-button",
+    "definition": "Enviar respuesta",
+    "context": "Send reply"
+  },
+  {
     "term": "public.who-trust-us.feedback",
     "definition": "y esto es lo que dicen...",
     "context": "and this is what they say..."
@@ -6338,6 +6393,11 @@
     "term": "timeline.comment-published-description",
     "definition": "{same, select, true {Comentaste} other {{author} comentó}} en el campo {field} {timeAgo}",
     "context": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
+  },
+  {
+    "term": "timeline.contact-unsubscribe-description",
+    "definition": "{contact} ha desactivado los recordatorios automáticos {timeAgo}",
+    "context": "{contact} has disabled the automatic reminders {timeAgo}"
   },
   {
     "term": "timeline.edit-group-permission-description",

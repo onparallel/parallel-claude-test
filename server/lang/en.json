@@ -150,14 +150,14 @@
     "context": "Privacy"
   },
   {
+    "term": "layout.stop-automatic-reminders",
+    "definition": "Stop receiving automatic reminders",
+    "context": "Stop receiving automatic reminders"
+  },
+  {
     "term": "layout.terms-and-conditions-link",
     "definition": "Terms and conditions",
     "context": "Terms and conditions"
-  },
-  {
-    "term": "layout.unsubscribe",
-    "definition": "Unsubscribe",
-    "context": "Unsubscribe"
   },
   {
     "term": "new-petition.text",

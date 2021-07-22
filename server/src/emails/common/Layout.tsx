@@ -149,18 +149,17 @@ export const Layout: FC<LayoutProps> = function Layout({
                   defaultMessage="Privacy"
                 />
               </a>
-              {unsubscribeUrl ? (
-                <>
-                  <span>&nbsp;|&nbsp;</span>
-                  <a className="link" href={unsubscribeUrl}>
-                    <FormattedMessage
-                      id="layout.unsubscribe"
-                      defaultMessage="Unsubscribe"
-                    />
-                  </a>
-                </>
-              ) : null}
             </MjmlText>
+            {unsubscribeUrl ? (
+              <MjmlText align="center" fontSize="14px">
+                <a className="link" href={unsubscribeUrl}>
+                  <FormattedMessage
+                    id="layout.stop-automatic-reminders"
+                    defaultMessage="Stop receiving automatic reminders"
+                  />
+                </a>
+              </MjmlText>
+            ) : null}
           </MjmlColumn>
         </MjmlSection>
         {showGdprDisclaimer ? (

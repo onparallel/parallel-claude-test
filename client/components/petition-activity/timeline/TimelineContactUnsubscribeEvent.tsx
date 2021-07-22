@@ -1,9 +1,14 @@
 import { gql } from "@apollo/client";
-import { CheckIcon } from "@parallel/chakra/icons";
+import { Box, Text } from "@chakra-ui/react";
+import { BellOffIcon } from "@parallel/chakra/icons";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
+import {
+  UnsubscribeAnswersKey,
+  useUnsubscribeAnswers,
+} from "@parallel/utils/useUnsubscribeAnswers";
 import { FormattedMessage } from "react-intl";
 import { TimelineIcon, TimelineItem } from "./helpers";
 
@@ -14,30 +19,41 @@ export type TimelineContactUnsubscribeEventProps = {
 export function TimelineContactUnsubscribeEvent({
   event,
 }: TimelineContactUnsubscribeEventProps) {
+  const answers = useUnsubscribeAnswers();
+  const { otherReason, access, createdAt } = event;
+  const reason = event.reason as UnsubscribeAnswersKey;
+
   return (
     <TimelineItem
       icon={
         <TimelineIcon
-          icon={<CheckIcon />}
+          icon={<BellOffIcon />}
           color="white"
-          backgroundColor="green.500"
+          backgroundColor="red.600"
         />
       }
     >
       <FormattedMessage
-        id="timeline.petition-completed-description"
-        defaultMessage="{contact} completed the petition {timeAgo}"
+        id="timeline.contact-unsubscribe-description"
+        defaultMessage="{contact} has disabled the automatic reminders {timeAgo}"
         values={{
-          contact: <ContactLink contact={event.access.contact} />,
+          contact: <ContactLink contact={access.contact} />,
           timeAgo: (
             <DateTime
-              value={event.createdAt}
+              value={createdAt}
               format={FORMATS.LLL}
               useRelativeTime="always"
             />
           ),
         }}
       />
+      <Box paddingTop={1}>
+        {reason === "OTHER" ? (
+          <Text as="cite">{`"${answers[reason]}: ${otherReason}"`}</Text>
+        ) : (
+          <Text as="cite">{`"${answers[reason]}"`}</Text>
+        )}
+      </Box>
     </TimelineItem>
   );
 }
@@ -51,6 +67,8 @@ TimelineContactUnsubscribeEvent.fragments = {
         }
       }
       createdAt
+      reason
+      otherReason
     }
     ${ContactLink.fragments.Contact}
   `,

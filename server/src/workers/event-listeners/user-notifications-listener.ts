@@ -206,7 +206,8 @@ async function createContactUnsubscribeNotifications(
       processed_at: null,
       data: {
         petition_access_id: event.data.petition_access_id,
-        feedback: event.data.feedback,
+        reason: event.data.reason,
+        otherReason: event.data.otherReason,
       },
     }))
   );

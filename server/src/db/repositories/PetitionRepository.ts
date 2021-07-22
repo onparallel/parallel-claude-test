@@ -2067,7 +2067,11 @@ export class PetitionRepository extends BaseRepository {
         } else if (opts.filter === "SHARED") {
           q.where("type", "PETITION_SHARED");
         } else if (opts.filter === "OTHER") {
-          q.whereIn("type", ["MESSAGE_EMAIL_BOUNCED", "SIGNATURE_CANCELLED"]);
+          q.whereIn("type", [
+            "MESSAGE_EMAIL_BOUNCED",
+            "SIGNATURE_CANCELLED",
+            "CONTACT_UNSUBSCRIBE",
+          ]);
         }
         if (opts.before) {
           q.where("created_at", "<", opts.before);
@@ -2175,7 +2179,11 @@ export class PetitionRepository extends BaseRepository {
         } else if (filter === "SHARED") {
           q.where("type", "PETITION_SHARED");
         } else if (filter === "OTHER") {
-          q.whereIn("type", ["MESSAGE_EMAIL_BOUNCED", "SIGNATURE_CANCELLED"]);
+          q.whereIn("type", [
+            "MESSAGE_EMAIL_BOUNCED",
+            "SIGNATURE_CANCELLED",
+            "CONTACT_UNSUBSCRIBE",
+          ]);
         }
       })
       .update(

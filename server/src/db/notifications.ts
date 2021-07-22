@@ -31,7 +31,8 @@ export type PetitionUserNotificationPayload<
   };
   CONTACT_UNSUBSCRIBE: {
     petition_access_id: number;
-    feedback: string;
+    reason: string;
+    otherReason: string;
   };
 }[TType];
 

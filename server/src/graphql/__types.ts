@@ -648,6 +648,8 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
+    otherReason: string; // String!
+    reason: string; // String!
   };
   ContactUnsubscribeNotification: {
     // field return type
@@ -655,7 +657,9 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
+    otherReason: string; // String!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    reason: string; // String!
   };
   CreateFileUploadFieldAttachment: {
     // field return type
@@ -1630,6 +1634,8 @@ export interface NexusGenFieldTypeNames {
     access: "PetitionAccess";
     createdAt: "DateTime";
     id: "GID";
+    otherReason: "String";
+    reason: "String";
   };
   ContactUnsubscribeNotification: {
     // field return type name
@@ -1637,7 +1643,9 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
     isRead: "Boolean";
+    otherReason: "String";
     petition: "PetitionBase";
+    reason: "String";
   };
   CreateFileUploadFieldAttachment: {
     // field return type name
@@ -2768,8 +2776,9 @@ export interface NexusGenArgTypes {
     };
     publicCancelReminder: {
       // args
-      feedback: string; // String!
       keycode: string; // ID!
+      otherReason: string; // String!
+      reason: string; // String!
     };
     publicCheckVerificationCode: {
       // args

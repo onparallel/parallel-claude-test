@@ -153,6 +153,8 @@ type ContactUnsubscribeEvent implements PetitionEvent {
   access: PetitionAccess!
   createdAt: DateTime!
   id: GID!
+  otherReason: String!
+  reason: String!
 }
 
 type ContactUnsubscribeNotification implements PetitionUserNotification {
@@ -160,7 +162,9 @@ type ContactUnsubscribeNotification implements PetitionUserNotification {
   createdAt: DateTime!
   id: GID!
   isRead: Boolean!
+  otherReason: String!
   petition: PetitionBase!
+  reason: String!
 }
 
 input CreateContactInput {
@@ -703,7 +707,11 @@ type Mutation {
   """
   Cancel a reminder for a contact.
   """
-  publicCancelReminder(feedback: String!, keycode: ID!): PublicPetitionAccess!
+  publicCancelReminder(
+    keycode: ID!
+    otherReason: String!
+    reason: String!
+  ): PublicPetitionAccess!
   publicCheckVerificationCode(
     code: String!
     keycode: ID!

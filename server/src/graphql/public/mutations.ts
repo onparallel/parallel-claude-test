@@ -1087,7 +1087,8 @@ export const publicCancelReminder = mutationField("publicCancelReminder", {
   authorize: authenticatePublicAccess("keycode"),
   args: {
     keycode: nonNull(idArg()),
-    feedback: nonNull(stringArg()),
+    reason: nonNull(stringArg()),
+    otherReason: nonNull(stringArg()),
   },
   resolve: async (_, args, ctx) => {
     const petitionId = ctx.access!.petition_id;
@@ -1098,7 +1099,8 @@ export const publicCancelReminder = mutationField("publicCancelReminder", {
       petition_id: petitionId,
       data: {
         petition_access_id: access!.id,
-        feedback: args.feedback,
+        reason: args.reason,
+        otherReason: args.otherReason,
       },
     });
 

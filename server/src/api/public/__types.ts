@@ -130,6 +130,8 @@ export type ContactUnsubscribeEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  otherReason: Scalars["String"];
+  reason: Scalars["String"];
 };
 
 export type ContactUnsubscribeNotification = PetitionUserNotification & {
@@ -137,7 +139,9 @@ export type ContactUnsubscribeNotification = PetitionUserNotification & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
+  otherReason: Scalars["String"];
   petition: PetitionBase;
+  reason: Scalars["String"];
 };
 
 export type CreateContactInput = {
@@ -703,8 +707,9 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
 };
 
 export type MutationpublicCancelReminderArgs = {
-  feedback: Scalars["String"];
   keycode: Scalars["ID"];
+  otherReason: Scalars["String"];
+  reason: Scalars["String"];
 };
 
 export type MutationpublicCheckVerificationCodeArgs = {
@@ -1651,7 +1656,11 @@ export type PetitionTemplate = PetitionBase & {
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** Description of the template. */
-  description: Maybe<Scalars["String"]>;
+  description: Maybe<Scalars["JSON"]>;
+  /** HTML excerpt of the template description. */
+  descriptionExcerpt: Maybe<Scalars["String"]>;
+  /** HTML description of the template. */
+  descriptionHtml: Maybe<Scalars["String"]>;
   /** The body of the petition. */
   emailBody: Maybe<Scalars["JSON"]>;
   /** The subject of the petition. */
@@ -2303,7 +2312,7 @@ export type UpdatePetitionFieldInput = {
 
 export type UpdatePetitionInput = {
   deadline?: Maybe<Scalars["DateTime"]>;
-  description?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["JSON"]>;
   emailBody?: Maybe<Scalars["JSON"]>;
   emailSubject?: Maybe<Scalars["String"]>;
   hasCommentsEnabled?: Maybe<Scalars["Boolean"]>;

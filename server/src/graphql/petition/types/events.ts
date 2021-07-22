@@ -651,5 +651,17 @@ export const ContactUnsubscribeEvent = createPetitionEvent(
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
+    t.field("reason", {
+      type: "String",
+      resolve: async (root, _, ctx) => {
+        return root.data.reason;
+      },
+    });
+    t.field("otherReason", {
+      type: "String",
+      resolve: async (root, _, ctx) => {
+        return root.data.otherReason;
+      },
+    });
   }
 );

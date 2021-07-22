@@ -145,6 +145,8 @@ export interface ContactUnsubscribeEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
+  otherReason: Scalars["String"];
+  reason: Scalars["String"];
 }
 
 export interface ContactUnsubscribeNotification
@@ -154,7 +156,9 @@ export interface ContactUnsubscribeNotification
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
+  otherReason: Scalars["String"];
   petition: PetitionBase;
+  reason: Scalars["String"];
 }
 
 export interface CreateContactInput {
@@ -735,8 +739,9 @@ export interface MutationpetitionFieldAttachmentUploadCompleteArgs {
 }
 
 export interface MutationpublicCancelReminderArgs {
-  feedback: Scalars["String"];
   keycode: Scalars["ID"];
+  otherReason: Scalars["String"];
+  reason: Scalars["String"];
 }
 
 export interface MutationpublicCheckVerificationCodeArgs {
@@ -3234,6 +3239,8 @@ export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragmen
 export type ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragment =
   {
     __typename?: "ContactUnsubscribeNotification";
+    reason: string;
+    otherReason: string;
     access: {
       __typename?: "PetitionAccess";
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
@@ -3606,7 +3613,10 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
   } & TimelineCommentPublishedEvent_CommentPublishedEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_ContactUnsubscribeEvent_Fragment =
-  { __typename?: "ContactUnsubscribeEvent"; id: string };
+  {
+    __typename?: "ContactUnsubscribeEvent";
+    id: string;
+  } & TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment =
   {
@@ -3908,6 +3918,8 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
 export type TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragment = {
   __typename?: "ContactUnsubscribeEvent";
   createdAt: string;
+  reason: string;
+  otherReason: string;
   access: {
     __typename?: "PetitionAccess";
     contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
@@ -6849,7 +6861,8 @@ export type publicCheckVerificationCodeMutation = {
 
 export type UnsubscribeView_publicCancelReminderMutationVariables = Exact<{
   keycode: Scalars["ID"];
-  feedback: Scalars["String"];
+  reason: Scalars["String"];
+  otherReason: Scalars["String"];
 }>;
 
 export type UnsubscribeView_publicCancelReminderMutation = {
@@ -6857,6 +6870,36 @@ export type UnsubscribeView_publicCancelReminderMutation = {
     __typename?: "PublicPetitionAccess";
     petition?: Maybe<{ __typename?: "PublicPetition"; id: string }>;
   };
+};
+
+export type UnsubscribeView_PublicPetitionAccessFragment = {
+  __typename?: "PublicPetitionAccess";
+  granter?: Maybe<
+    { __typename?: "PublicUser" } & UnsubscribeView_PublicUserFragment
+  >;
+};
+
+export type UnsubscribeView_PublicUserFragment = {
+  __typename?: "PublicUser";
+  id: string;
+  organization: {
+    __typename?: "PublicOrganization";
+    name: string;
+    identifier: string;
+    logoUrl?: Maybe<string>;
+  };
+};
+
+export type UnsubscribePublicPetitionQueryVariables = Exact<{
+  keycode: Scalars["ID"];
+}>;
+
+export type UnsubscribePublicPetitionQuery = {
+  access?: Maybe<
+    {
+      __typename?: "PublicPetitionAccess";
+    } & UnsubscribeView_PublicPetitionAccessFragment
+  >;
 };
 
 export type PetitionPdf_PetitionFragment = {
@@ -7372,6 +7415,8 @@ export const ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragme
         ...ContactLink_Contact
       }
     }
+    reason
+    otherReason
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
@@ -7431,17 +7476,6 @@ export const OrganizationUsersListTableHeader_UserFragmentDoc = gql`
     id
     role
   }
-`;
-export const TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragmentDoc = gql`
-  fragment TimelineContactUnsubscribeEvent_ContactUnsubscribeEvent on ContactUnsubscribeEvent {
-    access {
-      contact {
-        ...ContactLink_Contact
-      }
-    }
-    createdAt
-  }
-  ${ContactLink_ContactFragmentDoc}
 `;
 export const PetitionSharingModal_UserFragmentDoc = gql`
   fragment PetitionSharingModal_User on User {
@@ -8511,6 +8545,19 @@ export const TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc = gql`
   }
   ${UserReference_UserFragmentDoc}
 `;
+export const TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragmentDoc = gql`
+  fragment TimelineContactUnsubscribeEvent_ContactUnsubscribeEvent on ContactUnsubscribeEvent {
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+    createdAt
+    reason
+    otherReason
+  }
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   fragment PetitionActivityTimeline_PetitionEvent on PetitionEvent {
     id
@@ -8604,6 +8651,9 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionClonedEvent {
       ...TimelinePetitionClonedEvent_PetitionClonedEvent
     }
+    ... on ContactUnsubscribeEvent {
+      ...TimelineContactUnsubscribeEvent_ContactUnsubscribeEvent
+    }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
   ${TimelinePetitionCompletedEvent_PetitionCompletedEventFragmentDoc}
@@ -8634,6 +8684,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmentDoc}
   ${TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragmentDoc}
   ${TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc}
+  ${TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -9533,6 +9584,24 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   ${useCompleteSignerInfoDialog_PublicContactFragmentDoc}
   ${RecipientView_PublicPetitionMessageFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
+`;
+export const UnsubscribeView_PublicUserFragmentDoc = gql`
+  fragment UnsubscribeView_PublicUser on PublicUser {
+    id
+    organization {
+      name
+      identifier
+      logoUrl
+    }
+  }
+`;
+export const UnsubscribeView_PublicPetitionAccessFragmentDoc = gql`
+  fragment UnsubscribeView_PublicPetitionAccess on PublicPetitionAccess {
+    granter {
+      ...UnsubscribeView_PublicUser
+    }
+  }
+  ${UnsubscribeView_PublicUserFragmentDoc}
 `;
 export const PetitionPdf_PetitionFieldFragmentDoc = gql`
   fragment PetitionPdf_PetitionField on PetitionField {
@@ -14236,9 +14305,14 @@ export type publicCheckVerificationCodeMutationHookResult = ReturnType<
 export const UnsubscribeView_publicCancelReminderDocument = gql`
   mutation UnsubscribeView_publicCancelReminder(
     $keycode: ID!
-    $feedback: String!
+    $reason: String!
+    $otherReason: String!
   ) {
-    publicCancelReminder(keycode: $keycode, feedback: $feedback) {
+    publicCancelReminder(
+      keycode: $keycode
+      reason: $reason
+      otherReason: $otherReason
+    ) {
       petition {
         id
       }
@@ -14259,6 +14333,44 @@ export function useUnsubscribeView_publicCancelReminderMutation(
 }
 export type UnsubscribeView_publicCancelReminderMutationHookResult = ReturnType<
   typeof useUnsubscribeView_publicCancelReminderMutation
+>;
+export const UnsubscribePublicPetitionDocument = gql`
+  query UnsubscribePublicPetition($keycode: ID!) {
+    access(keycode: $keycode) {
+      ...UnsubscribeView_PublicPetitionAccess
+    }
+  }
+  ${UnsubscribeView_PublicPetitionAccessFragmentDoc}
+`;
+export function useUnsubscribePublicPetitionQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    UnsubscribePublicPetitionQuery,
+    UnsubscribePublicPetitionQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    UnsubscribePublicPetitionQuery,
+    UnsubscribePublicPetitionQueryVariables
+  >(UnsubscribePublicPetitionDocument, options);
+}
+export function useUnsubscribePublicPetitionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    UnsubscribePublicPetitionQuery,
+    UnsubscribePublicPetitionQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    UnsubscribePublicPetitionQuery,
+    UnsubscribePublicPetitionQueryVariables
+  >(UnsubscribePublicPetitionDocument, options);
+}
+export type UnsubscribePublicPetitionQueryHookResult = ReturnType<
+  typeof useUnsubscribePublicPetitionQuery
+>;
+export type UnsubscribePublicPetitionLazyQueryHookResult = ReturnType<
+  typeof useUnsubscribePublicPetitionLazyQuery
 >;
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($token: String!) {

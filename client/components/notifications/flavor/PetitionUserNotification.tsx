@@ -138,7 +138,7 @@ export const PetitionUserNotification = Object.assign(
                 </Text>
               </LinkOverlay>
             </Link>
-            <Text noOfLines={2} paddingX={4} paddingBottom={1} paddingTop={0.5}>
+            <Text noOfLines={3} paddingX={4} paddingBottom={1} paddingTop={0.5}>
               {children}
             </Text>
             <DateTime
