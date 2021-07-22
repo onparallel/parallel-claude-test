@@ -2565,6 +2565,11 @@
     "context": "Deleted contact"
   },
   {
+    "term": "generic.deleted-field",
+    "definition": "Campo eliminado",
+    "context": "Deleted field"
+  },
+  {
     "term": "generic.deleted-user",
     "definition": "Usuario eliminado",
     "context": "Deleted user"
@@ -6423,11 +6428,6 @@
     "term": "timeline.remove-user-permission-description",
     "definition": "{same, select, true {Dejaste} other {{user} dejó}} de compartir esta petición con {other} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} stopped sharing this petition with {other} {timeAgo}"
-  },
-  {
-    "term": "timeline.reply-created-deleted-field",
-    "definition": "Campo eliminado",
-    "context": "Deleted field"
   },
   {
     "term": "timeline.reply-created-description",
