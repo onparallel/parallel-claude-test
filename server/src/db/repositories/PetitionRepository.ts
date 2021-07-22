@@ -1607,7 +1607,8 @@ export class PetitionRepository extends BaseRepository {
               ? (["reminders_active", "reminders_config", "deadline"] as const)
               : ([] as const)),
             // avoid copying template_description if creating a petition
-            ...(data?.is_template
+            ...(sourcePetition?.is_template &&
+            (data?.is_template === undefined || data?.is_template)
               ? ([] as const)
               : (["template_description"] as const)),
           ]),
