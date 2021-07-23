@@ -29,10 +29,10 @@ import {
 } from "../common/RichTextEditor";
 
 export function ConfirmSendReminderDialog({
-  selected,
+  accesses,
   ...props
 }: DialogProps<
-  { selected: PetitionAccessTable_PetitionAccessFragment[] },
+  { accesses: PetitionAccessTable_PetitionAccessFragment[] },
   { message: null | RichTextEditorValue }
 >) {
   const intl = useIntl();
@@ -41,8 +41,8 @@ export function ConfirmSendReminderDialog({
   const [hasMessage, setHasMessage] = useState(false);
   const messageRef = useRef<RichTextEditorInstance>(null);
 
-  const unsubscribedRemindersContacts = selected.filter(
-    (selected) => selected.remindersUnsubscribed
+  const unsubscribedRemindersContacts = accesses.filter(
+    (access) => access.remindersUnsubscribed
   );
 
   const placeholderOptions = usePetitionMessagePlaceholderOptions();
@@ -66,7 +66,7 @@ export function ConfirmSendReminderDialog({
               <Flex alignItems="center" justifyContent="flex-start">
                 <AlertIcon color="yellow.500" />
                 <AlertDescription>
-                  {selected.length > 1 ? (
+                  {accesses.length > 1 ? (
                     <>
                       <Text>
                         <FormattedMessage

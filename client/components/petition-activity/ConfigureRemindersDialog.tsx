@@ -24,13 +24,13 @@ import { FormattedMessage } from "react-intl";
 import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersConfig";
 
 export type ConfigureRemindersDialogProps = {
-  selected: PetitionAccessTable_PetitionAccessFragment[];
+  accesses: PetitionAccessTable_PetitionAccessFragment[];
   defaultRemindersConfig: Maybe<RemindersConfig>;
   remindersActive: boolean;
 };
 
 export function ConfigureRemindersDialog({
-  selected,
+  accesses,
   defaultRemindersConfig,
   remindersActive,
   ...props
@@ -39,8 +39,8 @@ export function ConfigureRemindersDialog({
     Maybe<RemindersConfig>
   >(defaultRemindersConfig);
 
-  const unsubscribedRemindersContacts = selected.filter(
-    (selected) => selected.remindersUnsubscribed
+  const unsubscribedRemindersContacts = accesses.filter(
+    (access) => access.remindersUnsubscribed
   );
 
   return (
