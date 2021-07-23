@@ -490,6 +490,7 @@ export interface PetitionAccess {
   created_by: Maybe<string>; // varchar
   updated_at: Date; // timestamptz
   updated_by: Maybe<string>; // varchar
+  reminders_opt_out: boolean; // bool
 }
 
 export type CreatePetitionAccess = PartialProps<
@@ -502,6 +503,7 @@ export type CreatePetitionAccess = PartialProps<
   | "created_by"
   | "updated_at"
   | "updated_by"
+  | "reminders_opt_out"
 >;
 
 export interface PetitionContactNotification {

@@ -150,9 +150,9 @@
     "context": "Privacy"
   },
   {
-    "term": "layout.stop-automatic-reminders",
-    "definition": "Dejar de recibir recordatorios automáticos",
-    "context": "Stop receiving automatic reminders"
+    "term": "layout.stop-reminders",
+    "definition": "Dejar de recibir recordatorios",
+    "context": "Stop receiving reminders"
   },
   {
     "term": "layout.terms-and-conditions-link",

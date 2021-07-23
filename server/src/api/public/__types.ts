@@ -1241,6 +1241,8 @@ export type PetitionAccess = Timestamps & {
   remindersConfig: Maybe<RemindersConfig>;
   /** Number of reminders left. */
   remindersLeft: Scalars["Int"];
+  /** Whether contact has unsubscribed or not for this petition access */
+  remindersUnsubscribed: Scalars["Boolean"];
   /** The status of the petition access */
   status: PetitionAccessStatus;
   /** Time when the resource was last updated. */

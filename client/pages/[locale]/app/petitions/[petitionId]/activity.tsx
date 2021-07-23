@@ -28,6 +28,7 @@ import { PetitionAccessesTable } from "@parallel/components/petition-activity/Pe
 import { PetitionActivityTimeline } from "@parallel/components/petition-activity/PetitionActivityTimeline";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
 import {
+  PetitionAccessTable_PetitionAccessFragment,
   PetitionActivityQuery,
   PetitionActivityQueryVariables,
   PetitionActivityUserQuery,
@@ -116,10 +117,11 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const confirmSendReminder = useConfirmSendReminderDialog();
   const [sendReminders] = usePetitionActivity_sendRemindersMutation();
   const handleSendReminders = useCallback(
-    async (accessIds: string[]) => {
+    async (selected: PetitionAccessTable_PetitionAccessFragment[]) => {
       try {
-        const { message } = await confirmSendReminder({});
+        const { message } = await confirmSendReminder({ selected });
         try {
+          const accessIds = selected.map((selected) => selected.id);
           await sendReminders({
             variables: { petitionId, accessIds, body: message },
           });
@@ -251,13 +253,18 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     usePetitionActivity_switchAutomaticRemindersMutation();
   const configureRemindersDialog = useConfigureRemindersDialog();
   const handleConfigureReminders = useCallback(
-    async (accessIds: string[]) => {
+    async (selected: PetitionAccessTable_PetitionAccessFragment[]) => {
       let start = false;
       try {
+        const accessIds = selected
+          .filter((selected) => !selected.remindersUnsubscribed)
+          .map((selected) => selected.id);
+
         const firstAccess = petition.accesses.find(
           (a) => a.id === accessIds[0]
         )!;
         const remindersConfig = await configureRemindersDialog({
+          selected,
           remindersActive: firstAccess.remindersActive,
           defaultRemindersConfig: firstAccess.remindersConfig || null,
         });

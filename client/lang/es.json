@@ -225,6 +225,16 @@
     "context": "Add a message to include in the email"
   },
   {
+    "term": "component.confirm-send-reminder-dialog.unsubscribed-contact",
+    "definition": "Este contacto está desuscrito de los recordatorios.",
+    "context": "This contact is unsubscribed from the reminders."
+  },
+  {
+    "term": "component.confirm-send-reminder-dialog.unsubscribed-contacts-list",
+    "definition": "Los siguientes contactos están desuscritos a los recordatorios:",
+    "context": "The following contacts are unsubscribed from reminders:"
+  },
+  {
     "term": "component.confirm-signature-config-changed.body",
     "definition": "Haz hecho cambios a la configuración de firma digital. Si continúas, el proceso será cancelado.",
     "context": "You made changes to the eSignature configuration. If you continue, the ongoing eSignature process will be cancelled."
@@ -766,8 +776,8 @@
   },
   {
     "term": "component.notification-contact-unsubscribe.body",
-    "definition": "{name} se ha desuscrito de los recordatorios automáticos: ",
-    "context": "{name} was unsusbscribed from automatic reminders:"
+    "definition": "{name} se ha desuscrito de los recordatorios: ",
+    "context": "{name} was unsusbscribed from reminders:"
   },
   {
     "term": "component.notification-email-bounced.body",
@@ -1808,6 +1818,11 @@
     "term": "component.referenced-field-dialog.header",
     "definition": "Este campo está siendo referenciado",
     "context": "This field is being referenced"
+  },
+  {
+    "term": "component.reminder-settings-dialog.unsubscribed-contacts-list",
+    "definition": "Los siguientes contactos están desuscritos a los recordatorios y no se le aplicará la configuración:",
+    "context": "The following contacts are unsubscribed to reminders and the settings will not be applied to them:"
   },
   {
     "term": "component.replies-field-comment.mark-as-unread",
@@ -3458,6 +3473,11 @@
     "term": "petition-accesses.contact-header",
     "definition": "Contacto",
     "context": "Contact"
+  },
+  {
+    "term": "petition-accesses.contact-unsubscribed-popover",
+    "definition": "Desuscrito de los recordatorios",
+    "context": "Unsubscribed from reminders"
   },
   {
     "term": "petition-accesses.deactivate-access",
@@ -5856,8 +5876,8 @@
   },
   {
     "term": "public.unsubscribe.done-body",
-    "definition": "Hemos informado a tu remitente y no recibirás más recordatorios automáticos de esta petición.",
-    "context": "We have informed the sender and you won’t receive more automatic reminders from this petition."
+    "definition": "Hemos informado a tu remitente y no recibirás más recordatorios de esta petición.",
+    "context": "We have informed the sender and you won’t receive more reminders from this petition."
   },
   {
     "term": "public.unsubscribe.done-title",
@@ -5867,7 +5887,7 @@
   {
     "term": "public.unsubscribe.feedback-title",
     "definition": "Por favor, ¿podrías indicarnos el motivo para no querer recibir más recordatorios? *",
-    "context": "Please, ¿can you indicate why you do not want to receive more automatic reminders? *"
+    "context": "Please, ¿can you indicate why you do not want to receive more reminders? *"
   },
   {
     "term": "public.unsubscribe.other-error-message",
@@ -6396,8 +6416,8 @@
   },
   {
     "term": "timeline.contact-unsubscribe-description",
-    "definition": "{contact} ha desactivado los recordatorios automáticos {timeAgo}",
-    "context": "{contact} has disabled the automatic reminders {timeAgo}"
+    "definition": "{contact} ha desactivado los recordatorios {timeAgo}",
+    "context": "{contact} has disabled the reminders {timeAgo}"
   },
   {
     "term": "timeline.edit-group-permission-description",

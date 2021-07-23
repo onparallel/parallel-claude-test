@@ -577,6 +577,13 @@ export const PetitionAccess = objectType({
         return root.reminders_active;
       },
     });
+    t.boolean("remindersUnsubscribed", {
+      description:
+        "Whether contact has unsubscribed or not for this petition access",
+      resolve: (root) => {
+        return root.reminders_opt_out;
+      },
+    });
     t.nonNull.list.nonNull.field("reminders", {
       type: "PetitionReminder",
       resolve: async (root, _, ctx) =>

@@ -62,6 +62,25 @@ export function validateAccessesRemindersLeft(
   }
 }
 
+export function validateAccessesRemindersUnsubscribed(
+  accesses: Maybe<PetitionAccess>[],
+  info: GraphQLResolveInfo
+) {
+  for (const access of accesses) {
+    if (access && access.reminders_opt_out === true) {
+      throw new ArgValidationError(
+        info,
+        `accessIds[${accesses.indexOf(access)}]`,
+        `Petition access must not ben unsubscribed from reminders.`,
+        {
+          errorCode: "UNSUBSCRIBED_PETITION_ACCESS",
+          petitionAccessId: toGlobalId("PetitionAccess", access.id),
+        }
+      );
+    }
+  }
+}
+
 /**
  * checks that auth token payload contains the required keys
  */

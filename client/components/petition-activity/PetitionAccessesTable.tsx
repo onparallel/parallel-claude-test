@@ -4,6 +4,7 @@ import {
   BoxProps,
   Button,
   Flex,
+  HStack,
   Menu,
   MenuButton,
   MenuItem,
@@ -11,9 +12,11 @@ import {
   Portal,
   Stack,
   Text,
+  Tooltip,
 } from "@chakra-ui/react";
 import {
   BellIcon,
+  BellOffIcon,
   BellSettingsIcon,
   ChevronDownIcon,
   SettingsIcon,
@@ -37,10 +40,14 @@ import { Table, TableColumn } from "../common/Table";
 export interface PetitionAccessesTable extends BoxProps {
   petition: PetitionAccessTable_PetitionFragment;
   onAddPetitionAccess: () => void;
-  onSendReminders: (accessIds: string[]) => void;
+  onSendReminders: (
+    selected: PetitionAccessTable_PetitionAccessFragment[]
+  ) => void;
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
-  onConfigureReminders: (accessIds: string[]) => void;
+  onConfigureReminders: (
+    selected: PetitionAccessTable_PetitionAccessFragment[]
+  ) => void;
 }
 
 export function PetitionAccessesTable({
@@ -60,11 +67,11 @@ export function PetitionAccessesTable({
   );
 
   const handleSendReminders = useCallback(async () => {
-    onSendReminders(selection);
-  }, [selection]);
+    onSendReminders(selected);
+  }, [selected]);
   const handleConfigureReminders = useCallback(async () => {
-    onConfigureReminders(selection);
-  }, [selection]);
+    onConfigureReminders(selected);
+  }, [selected]);
 
   const showActions =
     selection.length > 0 && selected.every((a) => a.status === "ACTIVE");
@@ -79,6 +86,10 @@ export function PetitionAccessesTable({
       onConfigureReminders,
     }),
     [petition]
+  );
+
+  const unsubscribedRemindersContacts = selected.filter(
+    (selected) => selected.remindersUnsubscribed
   );
 
   return (
@@ -113,7 +124,8 @@ export function PetitionAccessesTable({
                     <MenuItem
                       isDisabled={
                         petition.status !== "PENDING" ||
-                        selected.some((a) => a.status === "INACTIVE")
+                        selected.some((a) => a.status === "INACTIVE") ||
+                        unsubscribedRemindersContacts.length === selected.length
                       }
                       onClick={handleConfigureReminders}
                       icon={<SettingsIcon display="block" boxSize={4} />}
@@ -165,11 +177,16 @@ function usePetitionAccessesColumns(): TableColumn<
     petition: PetitionAccessTable_PetitionFragment;
     onReactivateAccess: (accessId: string) => void;
     onDeactivateAccess: (accessId: string) => void;
-    onSendReminders: (accessIds: string[]) => void;
-    onConfigureReminders: (accessIds: string[]) => void;
+    onSendReminders: (
+      selected: PetitionAccessTable_PetitionAccessFragment[]
+    ) => void;
+    onConfigureReminders: (
+      selected: PetitionAccessTable_PetitionAccessFragment[]
+    ) => void;
   }
 >[] {
   const intl = useIntl();
+
   return useMemo(
     () => [
       {
@@ -178,8 +195,26 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.contact-header",
           defaultMessage: "Contact",
         }),
-        CellContent: ({ row: { contact } }) => (
-          <ContactLink contact={contact} />
+        CellContent: ({ row: { contact, remindersUnsubscribed } }) => (
+          <HStack>
+            <ContactLink contact={contact} />
+            {remindersUnsubscribed ? (
+              <Tooltip
+                label={intl.formatMessage({
+                  id: "petition-accesses.contact-unsubscribed-popover",
+                  defaultMessage: "Unsubscribed from reminders",
+                })}
+              >
+                <Box marginLeft={1}>
+                  <BellOffIcon
+                    fontSize="16px"
+                    color="gray.500"
+                    _hover={{ color: "gray.600" }}
+                  />
+                </Box>
+              </Tooltip>
+            ) : null}
+          </HStack>
         ),
       },
       {
@@ -278,7 +313,7 @@ function usePetitionAccessesColumns(): TableColumn<
           paddingY: 1,
           width: "1px",
         },
-        CellContent: ({ row: { id, status, contact }, context }) => {
+        CellContent: ({ row, context }) => {
           const {
             petition,
             onSendReminders,
@@ -286,7 +321,9 @@ function usePetitionAccessesColumns(): TableColumn<
             onDeactivateAccess,
             onReactivateAccess,
           } = context!;
+          const { id, status, contact, remindersUnsubscribed } = row;
           const intl = useIntl();
+
           return contact ? (
             <Stack direction="row" spacing={2} justifyContent="flex-end">
               {status === "ACTIVE" ? (
@@ -297,18 +334,20 @@ function usePetitionAccessesColumns(): TableColumn<
                       id: "petition-accesses.send-reminder",
                       defaultMessage: "Send reminder",
                     })}
-                    onClick={() => onSendReminders([id])}
+                    onClick={() => onSendReminders([row])}
                     placement="bottom"
                     icon={<BellIcon fontSize="16px" />}
                     size="sm"
                   />
                   <IconButtonWithTooltip
-                    isDisabled={petition.status !== "PENDING"}
+                    isDisabled={
+                      petition.status !== "PENDING" || remindersUnsubscribed
+                    }
                     label={intl.formatMessage({
                       id: "petition-accesses.reminder-settings",
                       defaultMessage: "Reminder settings",
                     })}
-                    onClick={() => onConfigureReminders([id])}
+                    onClick={() => onConfigureReminders([row])}
                     placement="bottom"
                     icon={<BellSettingsIcon fontSize="16px" />}
                     size="sm"
@@ -369,6 +408,7 @@ PetitionAccessesTable.fragments = {
       remindersLeft
       reminderCount
       remindersActive
+      remindersUnsubscribed
       remindersConfig {
         ...PetitionAccessTable_PetitionAccessRemindersConfig
       }

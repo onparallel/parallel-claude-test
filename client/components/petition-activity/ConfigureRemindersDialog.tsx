@@ -1,21 +1,36 @@
-import { Button } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Button,
+  Flex,
+  ListItem,
+  Stack,
+  Text,
+  UnorderedList,
+} from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
-import { RemindersConfig } from "@parallel/graphql/__types";
+import {
+  PetitionAccessTable_PetitionAccessFragment,
+  RemindersConfig,
+} from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersConfig";
 
 export type ConfigureRemindersDialogProps = {
+  selected: PetitionAccessTable_PetitionAccessFragment[];
   defaultRemindersConfig: Maybe<RemindersConfig>;
   remindersActive: boolean;
 };
 
 export function ConfigureRemindersDialog({
+  selected,
   defaultRemindersConfig,
   remindersActive,
   ...props
@@ -23,6 +38,10 @@ export function ConfigureRemindersDialog({
   const [remindersConfig, setRemindersConfig] = useState<
     Maybe<RemindersConfig>
   >(defaultRemindersConfig);
+
+  const unsubscribedRemindersContacts = selected.filter(
+    (selected) => selected.remindersUnsubscribed
+  );
 
   return (
     <ConfirmDialog
@@ -34,13 +53,43 @@ export function ConfigureRemindersDialog({
         />
       }
       body={
-        <PetitionRemindersConfig
-          id="petition-reminders"
-          value={remindersConfig}
-          defaultActive={remindersActive}
-          onChange={setRemindersConfig}
-          marginTop={2}
-        />
+        <Stack spacing={4}>
+          {unsubscribedRemindersContacts.length ? (
+            <Alert
+              status="warning"
+              backgroundColor="orange.100"
+              borderRadius="md"
+            >
+              <Flex alignItems="center" justifyContent="flex-start">
+                <AlertIcon color="yellow.500" />
+                <AlertDescription>
+                  <Text>
+                    <FormattedMessage
+                      id="component.reminder-settings-dialog.unsubscribed-contacts-list"
+                      defaultMessage="The following contacts are unsubscribed to reminders and the settings will not be applied to them:"
+                    />
+                  </Text>
+                  <UnorderedList paddingLeft={2}>
+                    {unsubscribedRemindersContacts.map((petitionAccess) => (
+                      <ListItem key={petitionAccess!.id} s>
+                        <Text as="span">
+                          {petitionAccess?.contact?.fullName}
+                        </Text>
+                      </ListItem>
+                    ))}
+                  </UnorderedList>
+                </AlertDescription>
+              </Flex>
+            </Alert>
+          ) : null}
+          <PetitionRemindersConfig
+            id="petition-reminders"
+            value={remindersConfig}
+            defaultActive={remindersActive}
+            onChange={setRemindersConfig}
+            marginTop={2}
+          />
+        </Stack>
       }
       confirm={
         <Button

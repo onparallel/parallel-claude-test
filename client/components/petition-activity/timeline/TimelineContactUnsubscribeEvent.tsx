@@ -35,7 +35,7 @@ export function TimelineContactUnsubscribeEvent({
     >
       <FormattedMessage
         id="timeline.contact-unsubscribe-description"
-        defaultMessage="{contact} has disabled the automatic reminders {timeAgo}"
+        defaultMessage="{contact} has disabled the reminders {timeAgo}"
         values={{
           contact: <ContactLink contact={access.contact} />,
           timeAgo: (

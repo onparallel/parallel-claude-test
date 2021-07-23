@@ -102,7 +102,7 @@ function UnsubscribeView({ keycode, access }: UnsubscribeViewProps) {
             <Text>
               <FormattedMessage
                 id="public.unsubscribe.done-body"
-                defaultMessage="We have informed the sender and you won’t receive more automatic reminders from this petition."
+                defaultMessage="We have informed the sender and you won’t receive more reminders from this petition."
               />
             </Text>
           </Stack>
@@ -112,7 +112,7 @@ function UnsubscribeView({ keycode, access }: UnsubscribeViewProps) {
               <Heading>
                 <FormattedMessage
                   id="public.unsubscribe.feedback-title"
-                  defaultMessage="Please, ¿can you indicate why you do not want to receive more automatic reminders? *"
+                  defaultMessage="Please, ¿can you indicate why you do not want to receive more reminders? *"
                 />
               </Heading>
               <RadioGroup name="unsubscribe-reason" onChange={setReason}>

@@ -929,6 +929,7 @@ export interface NexusGenFieldTypes {
     remindersActive: boolean; // Boolean!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     remindersLeft: number; // Int!
+    remindersUnsubscribed: boolean; // Boolean!
     status: NexusGenEnums["PetitionAccessStatus"]; // PetitionAccessStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
@@ -1911,6 +1912,7 @@ export interface NexusGenFieldTypeNames {
     remindersActive: "Boolean";
     remindersConfig: "RemindersConfig";
     remindersLeft: "Int";
+    remindersUnsubscribed: "Boolean";
     status: "PetitionAccessStatus";
     updatedAt: "DateTime";
   };

@@ -1556,6 +1556,11 @@ type PetitionAccess implements Timestamps {
   remindersLeft: Int!
 
   """
+  Whether contact has unsubscribed or not for this petition access
+  """
+  remindersUnsubscribed: Boolean!
+
+  """
   The status of the petition access
   """
   status: PetitionAccessStatus!

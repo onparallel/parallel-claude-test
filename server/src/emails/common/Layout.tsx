@@ -154,8 +154,8 @@ export const Layout: FC<LayoutProps> = function Layout({
               <MjmlText align="center" fontSize="14px">
                 <a className="link" href={unsubscribeUrl}>
                   <FormattedMessage
-                    id="layout.stop-automatic-reminders"
-                    defaultMessage="Stop receiving automatic reminders"
+                    id="layout.stop-reminders"
+                    defaultMessage="Stop receiving reminders"
                   />
                 </a>
               </MjmlText>

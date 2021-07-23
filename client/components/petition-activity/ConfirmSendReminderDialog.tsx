@@ -1,9 +1,21 @@
-import { Button, Checkbox, Stack, Text } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  Button,
+  Checkbox,
+  Flex,
+  ListItem,
+  Stack,
+  Text,
+  UnorderedList,
+} from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import {
   DialogProps,
   useDialog,
 } from "@parallel/components/common/DialogProvider";
+import { PetitionAccessTable_PetitionAccessFragment } from "@parallel/graphql/__types";
 import { emptyRTEValue } from "@parallel/utils/slate/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
@@ -17,13 +29,21 @@ import {
 } from "../common/RichTextEditor";
 
 export function ConfirmSendReminderDialog({
+  selected,
   ...props
-}: DialogProps<{}, { message: null | RichTextEditorValue }>) {
+}: DialogProps<
+  { selected: PetitionAccessTable_PetitionAccessFragment[] },
+  { message: null | RichTextEditorValue }
+>) {
   const intl = useIntl();
   const [message, setMessage] = useState<RichTextEditorValue>(emptyRTEValue());
   const [isInvalid, setIsInvalid] = useState(false);
   const [hasMessage, setHasMessage] = useState(false);
   const messageRef = useRef<RichTextEditorInstance>(null);
+
+  const unsubscribedRemindersContacts = selected.filter(
+    (selected) => selected.remindersUnsubscribed
+  );
 
   const placeholderOptions = usePetitionMessagePlaceholderOptions();
   return (
@@ -37,6 +57,45 @@ export function ConfirmSendReminderDialog({
       }
       body={
         <Stack spacing={4}>
+          {unsubscribedRemindersContacts.length ? (
+            <Alert
+              status="warning"
+              backgroundColor="orange.100"
+              borderRadius="md"
+            >
+              <Flex alignItems="center" justifyContent="flex-start">
+                <AlertIcon color="yellow.500" />
+                <AlertDescription>
+                  {selected.length > 1 ? (
+                    <>
+                      <Text>
+                        <FormattedMessage
+                          id="component.confirm-send-reminder-dialog.unsubscribed-contacts-list"
+                          defaultMessage="The following contacts are unsubscribed from reminders:"
+                        />
+                      </Text>
+                      <UnorderedList paddingLeft={2}>
+                        {unsubscribedRemindersContacts.map((petitionAccess) => (
+                          <ListItem key={petitionAccess!.id} s>
+                            <Text as="span">
+                              {petitionAccess?.contact?.fullName}
+                            </Text>
+                          </ListItem>
+                        ))}
+                      </UnorderedList>
+                    </>
+                  ) : (
+                    <Text>
+                      <FormattedMessage
+                        id="component.confirm-send-reminder-dialog.unsubscribed-contact"
+                        defaultMessage="This contact is unsubscribed from the reminders."
+                      />
+                    </Text>
+                  )}
+                </AlertDescription>
+              </Flex>
+            </Alert>
+          ) : null}
           <Text>
             <FormattedMessage
               id="component.confirm-send-reminder-dialog.body"

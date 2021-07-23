@@ -39,7 +39,7 @@ export const ContactUnsubscribeNotification = Object.assign(
         >
           <FormattedMessage
             id="component.notification-contact-unsubscribe.body"
-            defaultMessage="{name} was unsusbscribed from automatic reminders: "
+            defaultMessage="{name} was unsusbscribed from reminders: "
             values={{
               name: (
                 <ContactLink

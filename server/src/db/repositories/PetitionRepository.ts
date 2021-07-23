@@ -1793,6 +1793,17 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
+  async unsubscribeReminders(accessIds: number[]) {
+    return await this.from("petition_access").whereIn("id", accessIds).update(
+      {
+        reminders_active: false,
+        next_reminder_at: null,
+        reminders_opt_out: true,
+      },
+      "*"
+    );
+  }
+
   async stopAccessReminders(accessIds: number[]) {
     return await this.from("petition_access")
       .whereIn("id", accessIds)

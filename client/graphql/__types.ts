@@ -1279,6 +1279,8 @@ export interface PetitionAccess extends Timestamps {
   remindersConfig?: Maybe<RemindersConfig>;
   /** Number of reminders left. */
   remindersLeft: Scalars["Int"];
+  /** Whether contact has unsubscribed or not for this petition access */
+  remindersUnsubscribed: Scalars["Boolean"];
   /** The status of the petition access */
   status: PetitionAccessStatus;
   /** Time when the resource was last updated. */
@@ -3462,6 +3464,7 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   remindersLeft: number;
   reminderCount: number;
   remindersActive: boolean;
+  remindersUnsubscribed: boolean;
   createdAt: string;
   contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   remindersConfig?: Maybe<
@@ -8061,6 +8064,7 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
     remindersLeft
     reminderCount
     remindersActive
+    remindersUnsubscribed
     remindersConfig {
       ...PetitionAccessTable_PetitionAccessRemindersConfig
     }

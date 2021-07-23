@@ -1094,16 +1094,18 @@ export const publicCancelReminder = mutationField("publicCancelReminder", {
     const petitionId = ctx.access!.petition_id;
     const access = ctx.access!;
 
-    ctx.petitions.createEvent({
-      type: "CONTACT_UNSUBSCRIBE",
-      petition_id: petitionId,
-      data: {
-        petition_access_id: access!.id,
-        reason: args.reason,
-        otherReason: args.otherReason,
-      },
-    });
+    if (!access.reminders_opt_out) {
+      ctx.petitions.createEvent({
+        type: "CONTACT_UNSUBSCRIBE",
+        petition_id: petitionId,
+        data: {
+          petition_access_id: access!.id,
+          reason: args.reason,
+          otherReason: args.otherReason,
+        },
+      });
+    }
 
-    return (await ctx.petitions.stopAccessReminders([access!.id]))[0];
+    return (await ctx.petitions.unsubscribeReminders([access!.id]))[0];
   },
 });
