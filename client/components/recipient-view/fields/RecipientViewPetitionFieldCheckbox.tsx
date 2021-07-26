@@ -156,33 +156,37 @@ export function RecipientViewPetitionFieldCheckbox({
               mr={2}
               color={isInvalid ? "red.600" : "gray.500"}
             >
-              {showRadio ? null : "("}
-              {type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
-                <FormattedMessage
-                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox"
-                  defaultMessage="{count, plural, =0 {No replies have been submitted yet} other {Reply submitted}}"
-                  values={{ count: checkedItems.length }}
-                />
-              ) : type === "UNLIMITED" ? (
-                <FormattedMessage
-                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
-                  defaultMessage="{count, plural, =0 {No replies have been submitted yet} other {{count} submitted}}"
-                  values={{ count: checkedItems.length }}
-                />
-              ) : type === "EXACT" ? (
-                <FormattedMessage
-                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox-exact"
-                  defaultMessage="{count, plural, =0 {No replies have been submitted yet} other {{count}/{total} submitted}}"
-                  values={{ count: checkedItems.length, total: max }}
-                />
-              ) : (
-                <FormattedMessage
-                  id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
-                  defaultMessage="{count, plural, =0 {No replies have been submitted yet} other {{count} submitted}}"
-                  values={{ count: checkedItems.length }}
-                />
-              )}
-              {showRadio ? null : ")"}
+              {checkedItems.length ? (
+                <>
+                  {showRadio ? null : "("}
+                  {type === "RADIO" || (max === 1 && type !== "UNLIMITED") ? (
+                    <FormattedMessage
+                      id="component.recipient-view-petition-field-card.replies-submitted-checkbox"
+                      defaultMessage="Reply submitted"
+                      values={{ count: checkedItems.length }}
+                    />
+                  ) : type === "UNLIMITED" ? (
+                    <FormattedMessage
+                      id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
+                      defaultMessage="{count} submitted"
+                      values={{ count: checkedItems.length }}
+                    />
+                  ) : type === "EXACT" ? (
+                    <FormattedMessage
+                      id="component.recipient-view-petition-field-card.replies-submitted-checkbox-exact"
+                      defaultMessage="{count}/{total} submitted"
+                      values={{ count: checkedItems.length, total: max }}
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="component.recipient-view-petition-field-card.replies-submitted-checkbox-count"
+                      defaultMessage="{count} submitted"
+                      values={{ count: checkedItems.length }}
+                    />
+                  )}
+                  {showRadio ? null : ")"}
+                </>
+              ) : null}
             </Text>
           ) : null}
           <Flex alignItems="center" boxSize={6}>

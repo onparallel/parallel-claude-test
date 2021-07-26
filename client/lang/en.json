@@ -1711,23 +1711,23 @@
   },
   {
     "term": "component.recipient-view-petition-field-card.replies-submitted",
-    "definition": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}",
-    "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
+    "definition": "{count, plural, =1 {1 reply submitted} other {# replies submitted}}",
+    "context": "{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
   },
   {
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox",
-    "definition": "{count, plural, =0 {No replies have been submitted yet} other {Reply submitted}}",
-    "context": "{count, plural, =0 {No replies have been submitted yet} other {Reply submitted}}"
+    "definition": "Reply submitted",
+    "context": "Reply submitted"
   },
   {
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-count",
-    "definition": "{count, plural, =0 {No replies have been submitted yet} other {{count} submitted}}",
-    "context": "{count, plural, =0 {No replies have been submitted yet} other {{count} submitted}}"
+    "definition": "{count} submitted",
+    "context": "{count} submitted"
   },
   {
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
-    "definition": "{count, plural, =0 {No replies have been submitted yet} other {{count}/{total} submitted}}",
-    "context": "{count, plural, =0 {No replies have been submitted yet} other {{count}/{total} submitted}}"
+    "definition": "{count}/{total} submitted",
+    "context": "{count}/{total} submitted"
   },
   {
     "term": "component.recipient-view-petition-field-reply.approved-file",

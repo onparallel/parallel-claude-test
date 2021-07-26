@@ -164,13 +164,13 @@ export function RecipientViewPetitionFieldCard({
               defaultMessage="{count, plural, =0 {No files have been uploaded yet} =1 {1 file uploaded} other {# files uploaded}}"
               values={{ count: fieldReplies.length }}
             />
-          ) : (
+          ) : fieldReplies.length ? (
             <FormattedMessage
               id="component.recipient-view-petition-field-card.replies-submitted"
-              defaultMessage="{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
+              defaultMessage="{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
               values={{ count: fieldReplies.length }}
             />
-          )}
+          ) : null}
         </Text>
       ) : null}
 

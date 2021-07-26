@@ -1711,23 +1711,23 @@
   },
   {
     "term": "component.recipient-view-petition-field-card.replies-submitted",
-    "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {1 respuesta enviada} other {# respuestas enviadas}}",
-    "context": "{count, plural, =0 {No replies have been submitted yet} =1 {1 reply submitted} other {# replies submitted}}"
+    "definition": "{count, plural, =1 {1 respuesta enviada} other {# respuestas enviadas}}",
+    "context": "{count, plural, =1 {1 reply submitted} other {# replies submitted}}"
   },
   {
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox",
-    "definition": "{count, plural, =0 {No se han enviado respuestas todavía} other {Respuesta enviada}}",
-    "context": "{count, plural, =0 {No replies have been submitted yet} other {Reply submitted}}"
+    "definition": "Respuesta enviada",
+    "context": "Reply submitted"
   },
   {
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-count",
-    "definition": "{count, plural, =0 {No se han enviado respuestas todavía} =1 {# enviada} other {# enviadas}}",
-    "context": "{count, plural, =0 {No replies have been submitted yet} other {{count} submitted}}"
+    "definition": "{count, plural, =1 {# enviada} other {# enviadas}}",
+    "context": "{count} submitted"
   },
   {
     "term": "component.recipient-view-petition-field-card.replies-submitted-checkbox-exact",
-    "definition": "{count, plural, =0 {No se han enviado respuestas todavía} other {{count}/{total} enviadas}}",
-    "context": "{count, plural, =0 {No replies have been submitted yet} other {{count}/{total} submitted}}"
+    "definition": "{count}/{total} enviadas",
+    "context": "{count}/{total} submitted"
   },
   {
     "term": "component.recipient-view-petition-field-reply.approved-file",
