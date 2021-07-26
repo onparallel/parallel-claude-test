@@ -6,8 +6,10 @@ import {
   Center,
   Flex,
   Heading,
+  IconButton,
   Text,
   Tooltip,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { AddIcon, CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
@@ -262,6 +264,9 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
       ),
       ...props,
     } as const;
+
+    const showIconButton = useBreakpointValue({ base: true, sm: false });
+
     return commentCount > 0 ? (
       <Button ref={ref} rightIcon={<CommentIcon fontSize="16px" />} {...common}>
         <RecipientViewCommentsBadge
@@ -270,8 +275,14 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
         />
         {intl.formatNumber(commentCount)}
       </Button>
+    ) : showIconButton ? (
+      <IconButton
+        ref={ref}
+        icon={<CommentIcon fontSize="16px" />}
+        {...common}
+      />
     ) : (
-      <Button {...common}>
+      <Button ref={ref} {...common}>
         <FormattedMessage
           id="recipient-view.questions-button"
           defaultMessage="Questions?"
