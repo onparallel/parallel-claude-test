@@ -226,12 +226,12 @@
   },
   {
     "term": "component.confirm-send-reminder-dialog.unsubscribed-contact",
-    "definition": "Este contacto está desuscrito de los recordatorios.",
+    "definition": "Este contacto está dado de baja de los recordatorios.",
     "context": "This contact is unsubscribed from the reminders."
   },
   {
     "term": "component.confirm-send-reminder-dialog.unsubscribed-contacts-list",
-    "definition": "Los siguientes contactos están desuscritos a los recordatorios:",
+    "definition": "Los siguientes contactos están dados de baja de los recordatorios:",
     "context": "The following contacts are unsubscribed from reminders:"
   },
   {
@@ -1821,7 +1821,7 @@
   },
   {
     "term": "component.reminder-settings-dialog.unsubscribed-contacts-list",
-    "definition": "Los siguientes contactos están desuscritos a los recordatorios y no se le aplicará la configuración:",
+    "definition": "Los siguientes contactos están dados de baja de los recordatorios y no se le aplicará la configuración:",
     "context": "The following contacts are unsubscribed to reminders and the settings will not be applied to them:"
   },
   {
@@ -3476,7 +3476,7 @@
   },
   {
     "term": "petition-accesses.contact-unsubscribed-popover",
-    "definition": "Desuscrito de los recordatorios",
+    "definition": "Dado de baja de los recordatorios",
     "context": "Unsubscribed from reminders"
   },
   {
