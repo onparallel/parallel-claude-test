@@ -1,20 +1,26 @@
-import { Editor, Transforms } from "slate";
+import { PlatePlugin } from "@udecode/plate-core";
 import { useEffect, useState } from "react";
+import { Editor, Transforms } from "slate";
 import { ReactEditor } from "slate-react";
+import { CustomEditor } from "./types";
 
-export function withSingleLine<T extends Editor>(editor: T) {
-  const { normalizeNode } = editor;
+export function createSingleLinePlugin(): PlatePlugin {
+  return {
+    withOverrides: ((editor: CustomEditor) => {
+      const { normalizeNode } = editor;
 
-  editor.normalizeNode = ([node, path]) => {
-    if (path.length === 0) {
-      if (editor.children.length > 1) {
-        Transforms.mergeNodes(editor);
-      }
-    }
-    return normalizeNode([node, path]);
+      editor.normalizeNode = ([node, path]) => {
+        if (path.length === 0) {
+          if (editor.children.length > 1) {
+            Transforms.mergeNodes(editor);
+          }
+        }
+        return normalizeNode([node, path]);
+      };
+
+      return editor;
+    }) as any,
   };
-
-  return editor;
 }
 
 export function useSingleLine<T extends ReactEditor>(editor: T) {

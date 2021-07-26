@@ -8,7 +8,7 @@ import { assignRef } from "@parallel/utils/assignRef";
 import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { isEmptyParagraph } from "@parallel/utils/slate/isEmptyRTEValue";
 import { ParagraphElement } from "@parallel/utils/slate/types";
-import { isSelectionExpanded, pipe } from "@udecode/slate-plugins";
+import { isSelectionExpanded } from "@udecode/plate-common";
 import {
   forwardRef,
   KeyboardEvent,
@@ -17,6 +17,7 @@ import {
   useState,
 } from "react";
 import { FormattedMessage } from "react-intl";
+import { pipe } from "remeda";
 import { shallowEqualArrays } from "shallow-equal";
 import { createEditor, Editor, Point, Transforms } from "slate";
 import { withHistory } from "slate-history";

@@ -7,7 +7,7 @@ import {
 import "@parallel/styles/global.css";
 import PlausibleProvider from "next-plausible";
 import { AppProps } from "next/app";
-import { createElement, useEffect } from "react";
+import { createElement } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { init as initSentry } from "../utils/sentry";
@@ -18,14 +18,6 @@ initSentry();
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
-  useEffect(() => {
-    // some 3rd party is adding this which makes some stuff look bad on development
-    const element = document.querySelector('style[data-merge-styles="true"]');
-    if (element) {
-      element.parentElement?.removeChild(element);
-    }
-  }, []);
-
   return (
     <>
       {[

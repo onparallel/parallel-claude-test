@@ -19,37 +19,51 @@ import {
 import {
   Placeholder,
   PlaceholderMenu,
-  PlaceholderPlugin,
+  usePlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
-import { usePlaceholders } from "@parallel/utils/slate/placeholders/usePlaceholders";
-import { withPlaceholders } from "@parallel/utils/slate/placeholders/withPlaceholders";
-import { CustomElement } from "@parallel/utils/slate/types";
+import { CustomEditor, CustomElement } from "@parallel/utils/slate/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
+import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
-  AutoformatRule,
-  BoldPlugin,
-  EditablePlugins,
-  EditablePluginsProps,
-  getNode,
-  isMarkActive,
-  ItalicPlugin,
-  ListPlugin,
   MARK_BOLD,
   MARK_ITALIC,
   MARK_UNDERLINE,
-  pipe,
-  someNode,
-  toggleList,
-  toggleMark,
-  UnderlinePlugin,
-  unwrapList,
-  withAutoformat,
-  withList,
-} from "@udecode/slate-plugins";
+  createBoldPlugin,
+  createItalicPlugin,
+  createUnderlinePlugin,
+} from "@udecode/plate-basic-marks";
 import {
-  createElement,
+  getNode,
+  getParent,
+  isMarkActive,
+  someNode,
+  toggleMark,
+  withProps,
+} from "@udecode/plate-common";
+import {
+  createReactPlugin,
+  createHistoryPlugin,
+  isElement,
+  withPlate,
+  Plate,
+} from "@udecode/plate-core";
+import {
+  ELEMENT_OL,
+  ELEMENT_UL,
+  ELEMENT_LI,
+  ELEMENT_LIC,
+  createListPlugin,
+  unwrapList,
+  toggleList,
+} from "@udecode/plate-list";
+import {
+  ELEMENT_PARAGRAPH,
+  createParagraphPlugin,
+} from "@udecode/plate-paragraph";
+import React, {
   CSSProperties,
   forwardRef,
+  KeyboardEvent,
   memo,
   MouseEvent,
   useCallback,
@@ -58,89 +72,48 @@ import {
   useMemo,
 } from "react";
 import { useIntl } from "react-intl";
-import { omit, pick } from "remeda";
-import { createEditor, Editor, Transforms } from "slate";
-import { withHistory } from "slate-history";
-import { ReactEditor, Slate, useSlate, withReact } from "slate-react";
+import { omit, pick, pipe } from "remeda";
+import { createEditor, Transforms } from "slate";
+import { ReactEditor, useSlate } from "slate-react";
+import { EditableProps } from "slate-react/dist/components/editable";
 import {
   IconButtonWithTooltip,
   IconButtonWithTooltipProps,
 } from "./IconButtonWithTooltip";
 
-function RenderComponent({
-  element,
-  leaf,
+function RenderElement({
   attributes,
-  htmlAttributes,
+  nodeProps,
   styles,
+  element,
   ...props
 }: any) {
-  return createElement(Text, {
-    ...props,
-    ...attributes,
-    ...htmlAttributes,
-    sx: styles?.root,
-  });
+  return <Text {...attributes} {...props} />;
 }
 
-export const options = {
-  p: {
-    component: RenderComponent,
-    type: "paragraph",
-    rootProps: {
-      as: "p",
-    },
-  },
-  bold: {
-    component: RenderComponent,
-    type: MARK_BOLD,
-    hotkey: "mod+b",
-    rootProps: {
-      as: "strong",
-    },
-  },
-  italic: {
-    component: RenderComponent,
-    type: MARK_ITALIC,
-    hotkey: "mod+i",
-    rootProps: {
-      as: "em",
-    },
-  },
-  underline: {
-    component: RenderComponent,
-    type: MARK_UNDERLINE,
-    hotkey: "mod+u",
-    rootProps: {
-      as: "u",
-    },
-  },
-  ul: {
-    component: RenderComponent,
-    type: "bulleted-list",
-    rootProps: {
-      as: "ul",
-    },
-  },
-  ol: {
-    component: RenderComponent,
-    type: "numbered-list",
-    rootProps: {
-      as: "ol",
-    },
-  },
-  li: {
-    component: RenderComponent,
-    type: "list-item",
-    rootProps: {
-      as: "li",
-    },
-  },
+const components = {
+  [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
+  [ELEMENT_OL]: withProps(RenderElement, { as: "ol", paddingInlineStart: 6 }),
+  [ELEMENT_UL]: withProps(RenderElement, { as: "ul", paddingInlineStart: 6 }),
+  [ELEMENT_LI]: withProps(RenderElement, { as: "li" }),
+  [ELEMENT_LIC]: withProps(RenderElement, {}),
+  [MARK_BOLD]: withProps(RenderElement, { as: "strong" }),
+  [MARK_ITALIC]: withProps(RenderElement, { as: "em" }),
+  [MARK_UNDERLINE]: withProps(RenderElement, { as: "u" }),
+};
+
+const options = {
+  [ELEMENT_PARAGRAPH]: { type: "paragraph" },
+  [ELEMENT_OL]: { type: "numbered-list" },
+  [ELEMENT_UL]: { type: "bulleted-list" },
+  [ELEMENT_LI]: { type: "list-item" },
+  [ELEMENT_LIC]: { type: "paragraph" },
 };
 
 export interface RichTextEditorProps
   extends ValueProps<RichTextEditorValue, false>,
-    EditablePluginsProps {
+    Omit<EditableProps, "value" | "onChange"> {
+  placeholder?: string;
   isDisabled?: boolean;
   isInvalid?: boolean;
   isRequired?: boolean;
@@ -166,21 +139,55 @@ export const RichTextEditor = forwardRef<
     isInvalid,
     isRequired,
     isReadOnly,
-    onKeyDown: _onKeyDown,
+    onKeyDown,
+    placeholder,
     placeholderOptions = [],
     ...props
   },
   ref
 ) {
+  const {
+    plugin,
+    onAddPlaceholder,
+    onChangePlaceholder,
+    onKeyDownPlaceholder,
+    onHighlightOption,
+    selectedIndex,
+    search,
+    target,
+    values,
+  } = usePlaceholderPlugin(placeholderOptions);
   const plugins = useMemo(
     () => [
-      BoldPlugin(options),
-      ItalicPlugin(options),
-      UnderlinePlugin(options),
-      ListPlugin(options),
-      PlaceholderPlugin(placeholderOptions),
+      createReactPlugin(),
+      createHistoryPlugin(),
+      createParagraphPlugin(),
+      createBoldPlugin(),
+      createItalicPlugin(),
+      createUnderlinePlugin(),
+      createListPlugin(),
+      createAutoformatPlugin({
+        rules: [
+          {
+            type: "list-item" as any,
+            markup: ["*", "-"],
+            preFormat: (editor: CustomEditor) => unwrapList(editor),
+            format: (editor: CustomEditor) => {
+              if (editor.selection) {
+                const parentEntry = getParent(editor, editor.selection);
+                if (!parentEntry) return;
+                const [node] = parentEntry;
+                if (isElement(node)) {
+                  toggleList(editor, { type: "bulleted-list" });
+                }
+              }
+            },
+          },
+        ],
+      }),
+      plugin,
     ],
-    [placeholderOptions]
+    [plugin]
   );
   const formControl = useFormControl({
     id,
@@ -189,27 +196,8 @@ export const RichTextEditor = forwardRef<
     isRequired,
     isReadOnly,
   });
-  const editor = useMemo(
-    () =>
-      pipe(
-        createEditor(),
-        withHistory,
-        withReact,
-        withList(options),
-        withAutoformat({
-          rules: [
-            {
-              type: options.li.type,
-              markup: ["*", "-"],
-              preFormat: (editor: Editor) => unwrapList(editor, options),
-              format: (editor) => {
-                toggleList(editor, { ...options, typeList: options.ul.type });
-              },
-            },
-          ] as AutoformatRule[],
-        }),
-        withPlaceholders(placeholderOptions)
-      ),
+  const editor = useMemo<CustomEditor>(
+    () => pipe(createEditor(), withPlate({ id, plugins, options, components })),
     []
   );
 
@@ -245,31 +233,29 @@ export const RichTextEditor = forwardRef<
     () =>
       ({
         padding: "12px 16px",
-        minHeight: "120px !important",
+        maxHeight: "250px",
+        overflow: "auto",
       } as CSSProperties),
     []
   );
-
-  const {
-    onAddPlaceholder,
-    onChangePlaceholder,
-    onKeyDownPlaceholder,
-    onHighlightOption,
-    selectedIndex,
-    search,
-    target,
-    values,
-  } = usePlaceholders(placeholderOptions);
 
   const isMenuOpen = Boolean(target && values.length > 0);
   const selected = isMenuOpen ? values[selectedIndex] : undefined;
 
   const handleChange = useCallback(
-    (value) => {
+    (value: CustomElement[]) => {
       onChangePlaceholder(editor);
       onChange(value);
     },
     [onChange, onChangePlaceholder]
+  );
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      onKeyDownPlaceholder(event, editor);
+      onKeyDown?.(event);
+    },
+    [onKeyDown, onKeyDownPlaceholder, editor]
   );
 
   const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
@@ -335,44 +321,50 @@ export const RichTextEditor = forwardRef<
         "aria-readonly",
         "aria-describedby",
       ])}
+      overflow="hidden"
       aria-disabled={formControl.disabled}
       {...inputStyles}
-      overflow="hidden"
     >
-      <Slate editor={editor} value={value} onChange={handleChange}>
+      <Plate
+        editor={editor}
+        plugins={plugins}
+        options={options}
+        components={components}
+        value={value}
+        onChange={handleChange}
+        editableProps={{
+          readOnly: isDisabled,
+          placeholder,
+          style,
+          onKeyDown: handleKeyDown,
+          "aria-controls": placeholderMenuId,
+          "aria-autocomplete": "list",
+          "aria-activedescendant": selected
+            ? `${itemIdPrefix}-${selected.value}`
+            : undefined,
+          ...props,
+        }}
+        renderEditable={(editable) => (
+          <Box
+            sx={{
+              '[contenteditable="false"]': {
+                width: "auto !important",
+              },
+              "> div": {
+                minHeight: "120px !important",
+              },
+            }}
+          >
+            {editable}
+          </Box>
+        )}
+      >
         <Toolbar
           height="40px"
           isDisabled={formControl.disabled || formControl.readOnly}
           hasPlaceholders={placeholderOptions.length > 0}
         />
-        <Box
-          maxHeight="250px"
-          overflow="auto"
-          sx={{
-            '[contenteditable="false"]': {
-              width: "auto !important",
-            },
-            "& > div": {
-              minHeight: "120px !important",
-            },
-          }}
-        >
-          <EditablePlugins
-            id={formControl.id}
-            readOnly={formControl.disabled || formControl.readOnly}
-            onKeyDown={[onKeyDownPlaceholder]}
-            onKeyDownDeps={[selectedIndex, search, target]}
-            style={style}
-            plugins={plugins}
-            aria-controls={placeholderMenuId}
-            aria-autocomplete="list"
-            aria-activedescendant={
-              selected ? `${itemIdPrefix}-${selected.value}` : undefined
-            }
-            {...props}
-          />
-        </Box>
-      </Slate>
+      </Plate>
       <Portal>
         <PlaceholderMenu
           ref={popperRef}
@@ -484,10 +476,7 @@ function ListButton({
       tabIndex={-1}
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
-        toggleList(editor, {
-          typeList: type,
-          ...options,
-        });
+        toggleList(editor as any, { type, ...options });
       }}
       {...props}
     />
