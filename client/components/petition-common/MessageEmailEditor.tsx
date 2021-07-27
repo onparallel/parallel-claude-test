@@ -65,6 +65,7 @@ export function MessageEmailEditor({
         id="petition-message-body"
       >
         <RichTextEditor
+          id="email-message"
           value={body}
           onChange={onBodyChange}
           placeholder={intl.formatMessage({

@@ -113,6 +113,8 @@ const options = {
 export interface RichTextEditorProps
   extends ValueProps<RichTextEditorValue, false>,
     Omit<EditableProps, "value" | "onChange"> {
+  // we need an id to pass it to the Plate element
+  id: string;
   placeholder?: string;
   isDisabled?: boolean;
   isInvalid?: boolean;
@@ -316,6 +318,7 @@ export const RichTextEditor = forwardRef<
     <Box
       role="application"
       {...pick(formControl, [
+        "id",
         "aria-invalid",
         "aria-required",
         "aria-readonly",
@@ -326,6 +329,7 @@ export const RichTextEditor = forwardRef<
       {...inputStyles}
     >
       <Plate
+        id={id}
         editor={editor}
         plugins={plugins}
         options={options}

@@ -212,6 +212,7 @@ function DelegateAccessDialog({
               }}
               render={({ field: { value, onChange } }) => (
                 <RichTextEditor
+                  id="delegate-access-message"
                   value={value}
                   onChange={onChange}
                   placeholder={intl.formatMessage({

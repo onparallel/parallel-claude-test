@@ -45,6 +45,7 @@ export function PetitionTemplateDescriptionEdit({
       </CardHeader>
       <Box padding={4}>
         <RichTextEditor
+          id="template-description"
           value={templateDescription}
           onChange={handleUpdateDescription}
           placeholder={intl.formatMessage({

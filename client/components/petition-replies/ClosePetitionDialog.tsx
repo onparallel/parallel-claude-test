@@ -135,6 +135,7 @@ export function ClosePetitionDialog({
             <PaddedCollapse in={requiredMessage || sendMessage}>
               <Stack>
                 <RichTextEditor
+                  id="close-petition-message"
                   isInvalid={sendMessage && isEmptyRTEValue(message)}
                   ref={messageRef}
                   value={message}
