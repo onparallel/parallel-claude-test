@@ -94,23 +94,23 @@ function Accounting() {
   ];
   const logos = [
     {
-      alt: "Tecnotramit logo",
+      alt: "Tecnotramit",
       href: "https://web.tecnotramit.com/",
       src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/tecnotramit_black.png`,
       maxWidth: "155px",
     },
     {
-      alt: "Prontopiso logo",
+      alt: "Prontopiso",
       href: "https://prontopiso.com/",
       src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/prontopiso_black.png`,
       maxWidth: "180px",
     },
-    {
-      alt: "Gestoría Pons logo",
-      href: "https://www.gestoriapons.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.png`,
-      maxWidth: "190px",
-    },
+    // {
+    //   alt: "Gestoría Pons",
+    //   href: "https://www.gestoriapons.com/",
+    //   src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.png`,
+    //   maxWidth: "190px",
+    // },
   ];
 
   const solutions = [

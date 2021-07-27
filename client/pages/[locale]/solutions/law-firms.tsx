@@ -104,12 +104,12 @@ function LawFirms() {
       src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/andersen_black.png`,
       maxWidth: "157px",
     },
-    {
-      alt: "Gestoría Pons",
-      href: "https://www.gestoriapons.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.png`,
-      maxWidth: "190px",
-    },
+    // {
+    //   alt: "Gestoría Pons",
+    //   href: "https://www.gestoriapons.com/",
+    //   src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.png`,
+    //   maxWidth: "190px",
+    // },
   ];
 
   const solutions = [

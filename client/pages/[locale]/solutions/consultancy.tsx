@@ -84,12 +84,12 @@ function Consultancy() {
   ];
 
   const logos = [
-    {
-      alt: "Gestoría Pons",
-      href: "https://www.gestoriapons.com/",
-      src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.png`,
-      maxWidth: "190px",
-    },
+    // {
+    //   alt: "Gestoría Pons",
+    //   href: "https://www.gestoriapons.com/",
+    //   src: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/logos/pons_black.png`,
+    //   maxWidth: "190px",
+    // },
     {
       alt: "Delvy",
       href: "https://delvy.es/",
