@@ -180,10 +180,10 @@ export const RemindersOptOutNotification = createPetitionUserNotification(
         return root.data.reason;
       },
     });
-    t.field("otherReason", {
+    t.field("other", {
       type: "String",
       resolve: async (root, _, ctx) => {
-        return root.data.otherReason;
+        return root.data.other;
       },
     });
   }

@@ -1198,6 +1198,33 @@ export const PetitionEvent = schema({
         },
       },
     },
+    REMINDERS_OPT_OUT: {
+      description:
+        "The contact has opted out from receiving reminders for this petition",
+      required: ["petitionAccessId", "reason"],
+      properties: {
+        petitionAccessId: {
+          description: "The ID of the petition access",
+          type: "string",
+        },
+        reason: {
+          type: "string",
+          description: "Code representing the reason for opting out.",
+          enum: [
+            "NOT_INTERESTED",
+            "NOT_REQUESTED",
+            "WRONG_PERSON",
+            "NO_REMINDERS",
+            "OTHER",
+          ],
+        },
+        other: {
+          type: "string",
+          description:
+            "If reason is OTHER, this will be the explanation added by the contact",
+        },
+      },
+    },
   } as Record<PetitionEventType, JsonSchema>).map(
     ([event, data]) =>
       ({
@@ -1227,7 +1254,7 @@ export const PetitionEvent = schema({
             type: "object",
             description: "The payload of the event",
             additionalProperties: false,
-            required: Object.keys(data.properties!),
+            required: data.required ?? Object.keys(data.properties!),
             properties: data.properties!,
           },
           createdAt: {

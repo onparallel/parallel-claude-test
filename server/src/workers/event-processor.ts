@@ -93,6 +93,7 @@ createQueueWorker(
         "USER_PERMISSION_ADDED",
         "USER_PERMISSION_EDITED",
         "USER_PERMISSION_REMOVED",
+        "REMINDERS_OPT_OUT",
       ],
       eventSubscriptionsListener
     )

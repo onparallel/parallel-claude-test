@@ -1290,7 +1290,7 @@ export interface NexusGenFieldTypes {
     access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
-    otherReason: string; // String!
+    other: string; // String!
     reason: string; // String!
   };
   RemindersOptOutNotification: {
@@ -1299,7 +1299,7 @@ export interface NexusGenFieldTypes {
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     id: NexusGenScalars["GID"]; // GID!
     isRead: boolean; // Boolean!
-    otherReason: string; // String!
+    other: string; // String!
     petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     reason: string; // String!
   };
@@ -2271,7 +2271,7 @@ export interface NexusGenFieldTypeNames {
     access: "PetitionAccess";
     createdAt: "DateTime";
     id: "GID";
-    otherReason: "String";
+    other: "String";
     reason: "String";
   };
   RemindersOptOutNotification: {
@@ -2280,7 +2280,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: "DateTime";
     id: "GID";
     isRead: "Boolean";
-    otherReason: "String";
+    other: "String";
     petition: "PetitionBase";
     reason: "String";
   };
@@ -2855,7 +2855,7 @@ export interface NexusGenArgTypes {
     publicOptOutReminders: {
       // args
       keycode: string; // ID!
-      otherReason: string; // String!
+      other: string; // String!
       reason: string; // String!
     };
     publicPetitionFieldAttachmentDownloadLink: {

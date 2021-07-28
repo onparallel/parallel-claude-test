@@ -20,7 +20,7 @@ export function TimelineRemindersOptOutEvent({
   event,
 }: TimelineRemindersOptOutEventProps) {
   const answers = useReminderOptOutReasons();
-  const { otherReason, access, createdAt } = event;
+  const { other, access, createdAt } = event;
   const reason = event.reason as ReminderOptOutReason;
 
   return (
@@ -50,9 +50,7 @@ export function TimelineRemindersOptOutEvent({
         />
       </Text>
       <Text as="cite" paddingTop={1}>
-        {reason === "OTHER"
-          ? `${answers[reason]}: ${otherReason}`
-          : answers[reason]}
+        {reason === "OTHER" ? `${answers[reason]}: ${other}` : answers[reason]}
       </Text>
     </TimelineItem>
   );
@@ -68,7 +66,7 @@ TimelineRemindersOptOutEvent.fragments = {
       }
       createdAt
       reason
-      otherReason
+      other
     }
     ${ContactLink.fragments.Contact}
   `,

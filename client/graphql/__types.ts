@@ -795,7 +795,7 @@ export interface MutationpublicMarkPetitionFieldCommentsAsReadArgs {
 
 export interface MutationpublicOptOutRemindersArgs {
   keycode: Scalars["ID"];
-  otherReason: Scalars["String"];
+  other: Scalars["String"];
   reason: Scalars["String"];
 }
 
@@ -2227,7 +2227,7 @@ export interface RemindersOptOutEvent extends PetitionEvent {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  otherReason: Scalars["String"];
+  other: Scalars["String"];
   reason: Scalars["String"];
 }
 
@@ -2237,7 +2237,7 @@ export interface RemindersOptOutNotification extends PetitionUserNotification {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
-  otherReason: Scalars["String"];
+  other: Scalars["String"];
   petition: PetitionBase;
   reason: Scalars["String"];
 }
@@ -3355,7 +3355,7 @@ export type PetitionUserNotification_PetitionUserNotificationFragment =
 export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
   __typename?: "RemindersOptOutNotification";
   reason: string;
-  otherReason: string;
+  other: string;
   access: {
     __typename?: "PetitionAccess";
     contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
@@ -4061,7 +4061,7 @@ export type TimelineRemindersOptOutEvent_RemindersOptOutEventFragment = {
   __typename?: "RemindersOptOutEvent";
   createdAt: string;
   reason: string;
-  otherReason: string;
+  other: string;
   access: {
     __typename?: "PetitionAccess";
     contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
@@ -6863,7 +6863,7 @@ export type publicCheckVerificationCodeMutation = {
 export type OptOut_publicOptOutRemindersMutationVariables = Exact<{
   keycode: Scalars["ID"];
   reason: Scalars["String"];
-  otherReason: Scalars["String"];
+  other: Scalars["String"];
 }>;
 
 export type OptOut_publicOptOutRemindersMutation = {
@@ -7415,7 +7415,7 @@ export const RemindersOptOutNotification_RemindersOptOutNotificationFragmentDoc 
       }
     }
     reason
-    otherReason
+    other
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
@@ -8554,7 +8554,7 @@ export const TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc = gql`
     }
     createdAt
     reason
-    otherReason
+    other
   }
   ${ContactLink_ContactFragmentDoc}
 `;
@@ -14306,13 +14306,9 @@ export const OptOut_publicOptOutRemindersDocument = gql`
   mutation OptOut_publicOptOutReminders(
     $keycode: ID!
     $reason: String!
-    $otherReason: String!
+    $other: String!
   ) {
-    publicOptOutReminders(
-      keycode: $keycode
-      reason: $reason
-      otherReason: $otherReason
-    ) {
+    publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other) {
       petition {
         id
       }

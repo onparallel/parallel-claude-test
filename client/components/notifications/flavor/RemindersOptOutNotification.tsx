@@ -20,7 +20,7 @@ export const RemindersOptOutNotification = Object.assign(
   forwardRef<HTMLElement, RemindersOptOutNotificationProps>(
     function RemindersOptOutNotification({ isFirst, notification }, ref) {
       const answers = useReminderOptOutReasons();
-      const { otherReason, access } = notification;
+      const { other, access } = notification;
       const reason = notification.reason as ReminderOptOutReason;
 
       return (
@@ -54,7 +54,7 @@ export const RemindersOptOutNotification = Object.assign(
           </Text>
           <Text as="cite" fontSize="sm">
             {reason === "OTHER"
-              ? `"${answers[reason]}: ${otherReason}"`
+              ? `"${answers[reason]}: ${other}"`
               : answers[reason]}
           </Text>
         </PetitionUserNotification>
@@ -72,7 +72,7 @@ export const RemindersOptOutNotification = Object.assign(
             }
           }
           reason
-          otherReason
+          other
         }
         ${PetitionUserNotification.fragments.PetitionUserNotification}
         ${ContactLink.fragments.Contact}

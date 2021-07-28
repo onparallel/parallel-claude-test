@@ -32,7 +32,7 @@ export type PetitionUserNotificationPayload<
   REMINDERS_OPT_OUT: {
     petition_access_id: number;
     reason: string;
-    otherReason: string;
+    other: string;
   };
 }[TType];
 

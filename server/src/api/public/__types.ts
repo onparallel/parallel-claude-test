@@ -690,7 +690,7 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
 
 export type MutationpublicOptOutRemindersArgs = {
   keycode: Scalars["ID"];
-  otherReason: Scalars["String"];
+  other: Scalars["String"];
   reason: Scalars["String"];
 };
 
@@ -2147,7 +2147,7 @@ export type RemindersOptOutEvent = PetitionEvent & {
   access: PetitionAccess;
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
-  otherReason: Scalars["String"];
+  other: Scalars["String"];
   reason: Scalars["String"];
 };
 
@@ -2156,7 +2156,7 @@ export type RemindersOptOutNotification = PetitionUserNotification & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
   isRead: Scalars["Boolean"];
-  otherReason: Scalars["String"];
+  other: Scalars["String"];
   petition: PetitionBase;
   reason: Scalars["String"];
 };

@@ -207,7 +207,7 @@ async function createRemindersOptOutNotifications(
       data: {
         petition_access_id: event.data.petition_access_id,
         reason: event.data.reason,
-        otherReason: event.data.otherReason,
+        other: event.data.other,
       },
     }))
   );

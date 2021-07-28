@@ -40,7 +40,7 @@ function OptOut({ keycode, access }: OptOutProps) {
 
   const [optedOut, setOptedOut] = useState(false);
   const [reason, setReason] = useState("");
-  const [otherReason, setOtherReason] = useState("");
+  const [other, setother] = useState("");
 
   const answers = useReminderOptOutReasons();
 
@@ -48,7 +48,7 @@ function OptOut({ keycode, access }: OptOutProps) {
 
   const handleOptOut = async (event: FormEvent) => {
     event.preventDefault();
-    await optOut({ variables: { keycode, reason, otherReason } });
+    await optOut({ variables: { keycode, reason, other } });
     setOptedOut(true);
   };
 
@@ -136,8 +136,8 @@ function OptOut({ keycode, access }: OptOutProps) {
                         id: "public.opt-out.other-placeholder",
                         defaultMessage: "Indicate other reasons",
                       })}
-                      onChange={(event) => setOtherReason(event.target.value)}
-                      value={otherReason}
+                      onChange={(event) => setother(event.target.value)}
+                      value={other}
                     />
                     <FormErrorMessage>
                       <FormattedMessage
@@ -175,13 +175,9 @@ OptOut.mutations = [
     mutation OptOut_publicOptOutReminders(
       $keycode: ID!
       $reason: String!
-      $otherReason: String!
+      $other: String!
     ) {
-      publicOptOutReminders(
-        keycode: $keycode
-        reason: $reason
-        otherReason: $otherReason
-      ) {
+      publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other) {
         petition {
           id
         }

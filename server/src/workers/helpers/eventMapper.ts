@@ -294,6 +294,16 @@ function mapEventPayload(event: PetitionEvent) {
         userId: toGlobalId("User", event.data.user_id),
       };
     }
+    case "REMINDERS_OPT_OUT": {
+      return {
+        petitionAccessId: toGlobalId(
+          "PetitionAccess",
+          event.data.petition_access_id
+        ),
+        reason: event.data.reason,
+        other: event.data.other,
+      };
+    }
     default:
       return {};
   }
