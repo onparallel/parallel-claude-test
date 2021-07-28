@@ -13,12 +13,16 @@ export interface ListItemElement extends SimpleElement<"list-item"> {}
 export interface PlaceholderElement extends SimpleElement<"placeholder"> {
   placeholder: string;
 }
+export interface LinkElement extends SimpleElement<"link"> {
+  url: string;
+}
 
 export type CustomElement =
   | ParagraphElement
   | BulletedListElement
   | ListItemElement
-  | PlaceholderElement;
+  | PlaceholderElement
+  | LinkElement;
 
 export interface CustomText extends BaseText {
   bold?: boolean;

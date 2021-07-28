@@ -16,8 +16,10 @@ type SlateNode = {
     | "bulleted-list"
     | "numbered-list"
     | "list-item"
-    | "placeholder";
+    | "placeholder"
+    | "link";
   placeholder?: string;
+  url?: string;
   text?: string;
   bold?: boolean;
   italic?: boolean;
@@ -76,6 +78,13 @@ function renderSlate(node: SlateNode | SlateNode[], ctx?: SlateContext) {
       case "list-item": {
         return (
           <li style={{ marginLeft: 0 }}>{renderSlate(node.children, ctx)}</li>
+        );
+      }
+      case "link": {
+        return (
+          <a href={node.url} target="_blank" rel="noopener noreferrer">
+            {renderSlate(node.children, ctx)}
+          </a>
         );
       }
     }
@@ -151,6 +160,8 @@ export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
               }
             })
             .join("\n");
+        case "link":
+          return `${node.children.map(serialize).join("")}`;
       }
     } else if (typeof node.text === "string") {
       return node.text;

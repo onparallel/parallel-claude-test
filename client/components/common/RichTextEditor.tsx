@@ -1,6 +1,11 @@
 import {
   Box,
   BoxProps,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
   Portal,
   Stack,
   Text,
@@ -12,16 +17,23 @@ import {
 import {
   BoldIcon,
   ItalicIcon,
+  LinkIcon,
   ListIcon,
   SharpIcon,
   UnderlineIcon,
 } from "@parallel/chakra/icons";
+import { withError } from "@parallel/utils/promises/withError";
+import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import {
   Placeholder,
   PlaceholderMenu,
   usePlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
-import { CustomEditor, CustomElement } from "@parallel/utils/slate/types";
+import {
+  CustomEditor,
+  CustomElement,
+  LinkElement,
+} from "@parallel/utils/slate/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
@@ -36,8 +48,11 @@ import {
   MARK_UNDERLINE,
 } from "@udecode/plate-basic-marks";
 import {
+  getAbove,
   getNode,
   getParent,
+  insertNodes,
+  isCollapsed,
   isMarkActive,
   someNode,
   toggleMark,
@@ -51,6 +66,11 @@ import {
   PlatePluginOptions,
   withPlate,
 } from "@udecode/plate-core";
+import {
+  createLinkPlugin,
+  ELEMENT_LINK,
+  upsertLinkAtSelection,
+} from "@udecode/plate-link";
 import {
   createListPlugin,
   ELEMENT_LI,
@@ -70,20 +90,22 @@ import React, {
   KeyboardEvent,
   memo,
   MouseEvent,
+  ReactElement,
   useCallback,
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
 } from "react";
-import { useIntl } from "react-intl";
+import { useForm } from "react-hook-form";
+import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick, pipe } from "remeda";
 import { createEditor, Transforms } from "slate";
 import { ReactEditor, useSlate } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
-import {
-  IconButtonWithTooltip,
-  IconButtonWithTooltipProps,
-} from "./IconButtonWithTooltip";
+import { ConfirmDialog } from "./ConfirmDialog";
+import { DialogProps, useDialog } from "./DialogProvider";
+import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 
 function RenderElement({
   attributes,
@@ -95,12 +117,28 @@ function RenderElement({
   return <Text {...attributes} {...props} />;
 }
 
+function RenderLink({ attributes, nodeProps, styles, element, ...props }: any) {
+  return (
+    <Text
+      as="a"
+      cursor="text"
+      target="_blank"
+      href={element.url}
+      color="purple.600"
+      rel="noopener noreferrer"
+      {...attributes}
+      {...props}
+    />
+  );
+}
+
 const components = {
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
   [ELEMENT_OL]: withProps(RenderElement, { as: "ol", paddingInlineStart: 6 }),
   [ELEMENT_UL]: withProps(RenderElement, { as: "ul", paddingInlineStart: 6 }),
   [ELEMENT_LI]: withProps(RenderElement, { as: "li" }),
   [ELEMENT_LIC]: withProps(RenderElement, {}),
+  [ELEMENT_LINK]: RenderLink,
   [MARK_BOLD]: withProps(RenderElement, { as: "strong" }),
   [MARK_ITALIC]: withProps(RenderElement, { as: "em" }),
   [MARK_UNDERLINE]: withProps(RenderElement, { as: "u" }),
@@ -115,6 +153,7 @@ const options = {
   [MARK_BOLD]: DEFAULTS_BOLD,
   [MARK_ITALIC]: DEFAULTS_ITALIC,
   [MARK_UNDERLINE]: DEFAULTS_UNDERLINE,
+  [ELEMENT_LINK]: { type: "link" },
 } as Record<string, PlatePluginOptions>;
 
 export interface RichTextEditorProps
@@ -195,6 +234,7 @@ export const RichTextEditor = forwardRef<
         ],
       }),
       plugin,
+      createLinkPlugin(),
     ],
     [plugin]
   );
@@ -419,69 +459,59 @@ const Toolbar = memo(function _Toolbar({
     >
       <MarkButton
         type="bold"
-        size="sm"
         icon={<BoldIcon fontSize="16px" />}
         isDisabled={isDisabled}
         label={intl.formatMessage({
-          id: "generic.richtext.bold",
+          id: "component.rich-text-editor.bold",
           defaultMessage: "Bold",
         })}
       />
       <MarkButton
         type="italic"
-        size="sm"
         icon={<ItalicIcon fontSize="16px" />}
         isDisabled={isDisabled}
         label={intl.formatMessage({
-          id: "generic.richtext.italic",
+          id: "component.rich-text-editor.italic",
           defaultMessage: "Italic",
         })}
       />
       <MarkButton
         type="underline"
-        size="sm"
         icon={<UnderlineIcon fontSize="16px" />}
         isDisabled={isDisabled}
         label={intl.formatMessage({
-          id: "generic.richtext.underline",
+          id: "component.rich-text-editor.underline",
           defaultMessage: "Underline",
         })}
       />
       <ListButton
         type="bulleted-list"
-        size="sm"
         icon={<ListIcon fontSize="16px" />}
         isDisabled={isDisabled}
         label={intl.formatMessage({
-          id: "generic.richtext.list",
+          id: "component.rich-text-editor.list",
           defaultMessage: "Bullet list",
         })}
       />
-      {hasPlaceholders ? (
-        <PlaceholderButton
-          size="sm"
-          icon={<SharpIcon fontSize="16px" />}
-          isDisabled={isDisabled}
-          label={intl.formatMessage({
-            id: "generic.richtext.personalize",
-            defaultMessage: "Personalize",
-          })}
-        />
-      ) : null}
+      {hasPlaceholders ? <PlaceholderButton isDisabled={isDisabled} /> : null}
+      <LinkButton isDisabled={isDisabled} />
     </Stack>
   );
 });
 
-function ListButton({
-  type,
-  ...props
-}: {
+interface ToolbarButtonProps {
   type: string;
-} & Omit<IconButtonWithTooltipProps, "type">) {
+  icon: ReactElement;
+  label: string;
+  isDisabled?: boolean;
+}
+
+function ListButton({ type, ...props }: ToolbarButtonProps) {
   const editor = useSlate();
   const isActive = someNode(editor, { match: { type } });
   return (
     <IconButtonWithTooltip
+      size="sm"
       placement="bottom"
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
@@ -494,16 +524,12 @@ function ListButton({
   );
 }
 
-function MarkButton({
-  type,
-  ...props
-}: {
-  type: string;
-} & Omit<IconButtonWithTooltipProps, "type">) {
+function MarkButton({ type, ...props }: ToolbarButtonProps) {
   const editor = useSlate();
   const isActive = isMarkActive(editor, type);
   return (
     <IconButtonWithTooltip
+      size="sm"
       placement="bottom"
       variant={isActive ? "solid" : "ghost"}
       tabIndex={-1}
@@ -516,13 +542,20 @@ function MarkButton({
   );
 }
 
-function PlaceholderButton(props: IconButtonWithTooltipProps) {
+function PlaceholderButton(props: Pick<ToolbarButtonProps, "isDisabled">) {
   const editor = useSlate();
+  const intl = useIntl();
   return (
     <IconButtonWithTooltip
+      size="sm"
       placement="bottom"
       variant="ghost"
       tabIndex={-1}
+      icon={<SharpIcon fontSize="16px" />}
+      label={intl.formatMessage({
+        id: "component.rich-text-editor.personalize",
+        defaultMessage: "Personalize",
+      })}
       onMouseDown={(event: MouseEvent) => {
         event.preventDefault();
         if (!editor.selection) {
@@ -535,4 +568,160 @@ function PlaceholderButton(props: IconButtonWithTooltipProps) {
       {...props}
     />
   );
+}
+
+function LinkButton(props: Pick<ToolbarButtonProps, "isDisabled">) {
+  const editor = useSlate();
+  const intl = useIntl();
+  const showAddLinkDialog = useAddLinkDialog();
+  return (
+    <IconButtonWithTooltip
+      size="sm"
+      placement="bottom"
+      variant="ghost"
+      icon={<LinkIcon />}
+      tabIndex={-1}
+      label={intl.formatMessage({
+        id: "component.rich-text-editor.link",
+        defaultMessage: "Link",
+      })}
+      onMouseDown={async (event) => {
+        const selection = editor.selection;
+        event.preventDefault();
+        const linkNode = getAbove(editor, {
+          match: { type: "link" },
+        });
+        let defaultValues: RTELink | undefined;
+        if (linkNode) {
+          const url = (linkNode[0] as LinkElement).url;
+          const text = (linkNode[0] as LinkElement).children
+            .map((c) => (c as any).text as string)
+            .join("");
+          defaultValues = { text, url };
+        }
+        const [_, link] = await withError(
+          showAddLinkDialog({
+            defaultValues,
+            showTextInput: !linkNode && isCollapsed(selection),
+          })
+        );
+        ReactEditor.focus(editor as any);
+        Transforms.select(editor, selection);
+        if (!link) {
+          return;
+        }
+        if (linkNode) {
+          return upsertLinkAtSelection(editor, { url: link.url });
+        }
+        if (isCollapsed(selection)) {
+          const text = link.text || link.url;
+          insertNodes(
+            editor,
+            {
+              type: "link",
+              url: link.url,
+              children: [{ text }],
+            },
+            { at: selection?.anchor }
+          );
+          Transforms.move(editor, { distance: text.length });
+        } else {
+          return upsertLinkAtSelection(editor, { url: link.url, wrap: true });
+        }
+      }}
+      {...props}
+    />
+  );
+}
+
+type RTELink = {
+  url: string;
+  text?: string;
+};
+
+function AddLinkDialog({
+  showTextInput,
+  defaultValues = {},
+  ...props
+}: DialogProps<
+  { showTextInput: boolean; defaultValues?: Partial<RTELink> },
+  RTELink
+>) {
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<RTELink>({
+    defaultValues,
+  });
+  const urlRef = useRef<HTMLInputElement>(null);
+  const urlProps = useRegisterWithRef(urlRef, register, "url", {
+    required: true,
+    validate: (value) => {
+      try {
+        const url = new URL(value);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch (_) {
+        return false;
+      }
+    },
+  });
+  return (
+    <ConfirmDialog
+      initialFocusRef={urlRef}
+      content={
+        {
+          as: "form",
+          onSubmit: handleSubmit((link) => props.onResolve(link)),
+          noValidate: true,
+        } as any
+      }
+      {...props}
+      header={
+        <FormattedMessage
+          id="component.rich-text-editor.add-link-header"
+          defaultMessage="Add link"
+        />
+      }
+      body={
+        <Stack>
+          <FormControl id="url" isInvalid={!!errors.url}>
+            <FormLabel>
+              <FormattedMessage
+                id="component.rich-text-editor.add-link-url"
+                defaultMessage="URL link"
+              />
+            </FormLabel>
+            <Input type="url" {...urlProps} />
+            <FormErrorMessage>
+              <FormattedMessage
+                id="component.rich-text-editor.add-link-required-url"
+                defaultMessage="A valid link is required"
+              />
+            </FormErrorMessage>
+          </FormControl>
+          {showTextInput ? (
+            <FormControl id="text">
+              <FormLabel>
+                <FormattedMessage
+                  id="component.rich-text-editor.add-link-text-to-show"
+                  defaultMessage="Text to show (optional)"
+                />
+              </FormLabel>
+              <Input {...register("text")} />
+            </FormControl>
+          ) : null}
+        </Stack>
+      }
+      confirm={
+        <Button type="submit" colorScheme="purple">
+          <FormattedMessage id="generic.done" defaultMessage="Done" />
+        </Button>
+      }
+    />
+  );
+}
+
+function useAddLinkDialog() {
+  return useDialog(AddLinkDialog);
 }

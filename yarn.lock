@@ -5711,6 +5711,15 @@
     lodash "^4.17.21"
     zustand "^3.4.2"
 
+"@udecode/plate-link@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@udecode/plate-link/-/plate-link-1.0.0.tgz#f95b98fa4cb226c2b2e72b96aab9a9ac4a9d71e5"
+  integrity sha512-wNO0yU2sR859Aop/X2Wbft2odSAn11dRQM0HLTpFvkLh2tUWtMD8TbRdKRlLMHUA3BSc8JmXhfXuFjYt8HHyqQ==
+  dependencies:
+    "@udecode/plate-common" "^1.0.0"
+    "@udecode/plate-core" "^1.0.0"
+    "@udecode/plate-normalizers" "^1.0.0"
+
 "@udecode/plate-list@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@udecode/plate-list/-/plate-list-1.0.0.tgz#24fe442e7ad58378c0238413a5645fe84a8d888d"
@@ -5719,6 +5728,14 @@
     "@udecode/plate-common" "^1.0.0"
     "@udecode/plate-core" "^1.0.0"
     "@udecode/plate-reset-node" "^1.0.0"
+
+"@udecode/plate-normalizers@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@udecode/plate-normalizers/-/plate-normalizers-1.0.0.tgz#5ff47a93f2861ba91d33dd3a7b12a5e06acf8b83"
+  integrity sha512-cEtrQ9CO/syZIIyzs42IPodEjz4IuPzanBrM5UtF98bF4gDsCmQIvN23aGz3nhLV3hPKtUOaMXUnZVGW7SG1Sw==
+  dependencies:
+    "@udecode/plate-common" "^1.0.0"
+    "@udecode/plate-core" "^1.0.0"
 
 "@udecode/plate-paragraph@^1.0.0":
   version "1.0.0"

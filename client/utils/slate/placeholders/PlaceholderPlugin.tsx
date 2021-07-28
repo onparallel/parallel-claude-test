@@ -21,9 +21,8 @@ import {
 import { Editor, Range, Transforms } from "slate";
 import { useFocused, useSelected } from "slate-react";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
-import { CustomEditor, PlaceholderElement } from "../types";
+import { PlaceholderElement } from "../types";
 import { insertPlaceholder } from "./insertPlaceholder";
-import { textWithPlaceholderToSlateNodes } from "./textWithPlaceholderToSlateNodes";
 
 export type Placeholder = {
   value: string;
@@ -142,15 +141,15 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
     onHighlightOption,
     plugin: useMemo<PlatePlugin>(
       () => ({
-        withOverrides: ((editor: CustomEditor) => {
-          editor.insertData = (data) => {
-            const text = data.getData("text/plain");
-            editor.insertFragment(
-              textWithPlaceholderToSlateNodes(text, placeholders)
-            );
-          };
-          return editor;
-        }) as any,
+        // withOverrides: ((editor: CustomEditor) => {
+        //   editor.insertData = (data) => {
+        //     const text = data.getData("text/plain");
+        //     editor.insertFragment(
+        //       textWithPlaceholderToSlateNodes(text, placeholders)
+        //     );
+        //   };
+        //   return editor;
+        // }) as any,
         inlineTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
         voidTypes: getPlatePluginTypes(ELEMENT_PLACEHOLDER),
         renderElementDeps: [placeholders],

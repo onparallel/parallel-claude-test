@@ -30,6 +30,7 @@
     "@udecode/plate-basic-marks": "^1.0.0",
     "@udecode/plate-common": "^1.0.0",
     "@udecode/plate-core": "^1.0.0",
+    "@udecode/plate-link": "^1.0.0",
     "@udecode/plate-list": "^1.0.0",
     "@udecode/plate-paragraph": "^1.0.0",
     "@welldone-software/why-did-you-render": "^6.2.0",

@@ -1840,6 +1840,56 @@
     "context": "Mark as unread"
   },
   {
+    "term": "component.rich-text-editor.add-link-header",
+    "definition": "Añadir enlace",
+    "context": "Add link"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-required-url",
+    "definition": "Se requiere un enlace URL válido",
+    "context": "A valid link is required"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-text-to-show",
+    "definition": "Texto a mostrar (opcional)",
+    "context": "Text to show (optional)"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-url",
+    "definition": "Enlace URL",
+    "context": "URL link"
+  },
+  {
+    "term": "component.rich-text-editor.bold",
+    "definition": "Negrita",
+    "context": "Bold"
+  },
+  {
+    "term": "component.rich-text-editor.italic",
+    "definition": "Cursiva",
+    "context": "Italic"
+  },
+  {
+    "term": "component.rich-text-editor.link",
+    "definition": "Enlace",
+    "context": "Link"
+  },
+  {
+    "term": "component.rich-text-editor.list",
+    "definition": "Lista",
+    "context": "Bullet list"
+  },
+  {
+    "term": "component.rich-text-editor.personalize",
+    "definition": "Personalizar",
+    "context": "Personalize"
+  },
+  {
+    "term": "component.rich-text-editor.underline",
+    "definition": "Subrayado",
+    "context": "Underline"
+  },
+  {
     "term": "component.search-input.placeholder",
     "definition": "Buscar...",
     "context": "Search..."
@@ -3013,31 +3063,6 @@
     "term": "generic.required-field",
     "definition": "Campo requerido",
     "context": "Required field"
-  },
-  {
-    "term": "generic.richtext.bold",
-    "definition": "Negrita",
-    "context": "Bold"
-  },
-  {
-    "term": "generic.richtext.italic",
-    "definition": "Cursiva",
-    "context": "Italic"
-  },
-  {
-    "term": "generic.richtext.list",
-    "definition": "Lista",
-    "context": "Bullet list"
-  },
-  {
-    "term": "generic.richtext.personalize",
-    "definition": "Personalizar",
-    "context": "Personalize"
-  },
-  {
-    "term": "generic.richtext.underline",
-    "definition": "Subrayado",
-    "context": "Underline"
   },
   {
     "term": "generic.save",

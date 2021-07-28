@@ -1840,6 +1840,56 @@
     "context": "Mark as unread"
   },
   {
+    "term": "component.rich-text-editor.add-link-header",
+    "definition": "Add link",
+    "context": "Add link"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-required-url",
+    "definition": "A valid link is required",
+    "context": "A valid link is required"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-text-to-show",
+    "definition": "Text to show (optional)",
+    "context": "Text to show (optional)"
+  },
+  {
+    "term": "component.rich-text-editor.add-link-url",
+    "definition": "URL link",
+    "context": "URL link"
+  },
+  {
+    "term": "component.rich-text-editor.bold",
+    "definition": "Bold",
+    "context": "Bold"
+  },
+  {
+    "term": "component.rich-text-editor.italic",
+    "definition": "Italic",
+    "context": "Italic"
+  },
+  {
+    "term": "component.rich-text-editor.link",
+    "definition": "Link",
+    "context": "Link"
+  },
+  {
+    "term": "component.rich-text-editor.list",
+    "definition": "Bullet list",
+    "context": "Bullet list"
+  },
+  {
+    "term": "component.rich-text-editor.personalize",
+    "definition": "Personalize",
+    "context": "Personalize"
+  },
+  {
+    "term": "component.rich-text-editor.underline",
+    "definition": "Underline",
+    "context": "Underline"
+  },
+  {
     "term": "component.search-input.placeholder",
     "definition": "Search...",
     "context": "Search..."
@@ -3013,31 +3063,6 @@
     "term": "generic.required-field",
     "definition": "Required field",
     "context": "Required field"
-  },
-  {
-    "term": "generic.richtext.bold",
-    "definition": "Bold",
-    "context": "Bold"
-  },
-  {
-    "term": "generic.richtext.italic",
-    "definition": "Italic",
-    "context": "Italic"
-  },
-  {
-    "term": "generic.richtext.list",
-    "definition": "Bullet list",
-    "context": "Bullet list"
-  },
-  {
-    "term": "generic.richtext.personalize",
-    "definition": "Personalize",
-    "context": "Personalize"
-  },
-  {
-    "term": "generic.richtext.underline",
-    "definition": "Underline",
-    "context": "Underline"
   },
   {
     "term": "generic.save",

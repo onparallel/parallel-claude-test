@@ -63,20 +63,36 @@ export const validRichTextContent = jsonSchema({
       },
       required: ["type", "placeholder"],
     },
+    link: {
+      type: "object",
+      properties: {
+        type: { const: "link" },
+        url: { type: "string" },
+        children: {
+          type: "array",
+          items: {
+            type: "object",
+            anyOf: [{ $ref: "#/definitions/text" }],
+          },
+        },
+      },
+    },
+    text: {
+      type: "object",
+      properties: {
+        text: { type: "string" },
+        bold: { type: "boolean" },
+        italic: { type: "boolean" },
+        underline: { type: "boolean" },
+      },
+      required: ["text"],
+    },
     leaf: {
       type: "object",
       anyOf: [
         { $ref: "#/definitions/placeholder" },
-        {
-          type: "object",
-          properties: {
-            text: { type: "string" },
-            bold: { type: "boolean" },
-            italic: { type: "boolean" },
-            underline: { type: "boolean" },
-          },
-          required: ["text"],
-        },
+        { $ref: "#/definitions/text" },
+        { $ref: "#/definitions/link" },
       ],
     },
     root: {
