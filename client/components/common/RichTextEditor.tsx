@@ -25,12 +25,15 @@ import { CustomEditor, CustomElement } from "@parallel/utils/slate/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
-  MARK_BOLD,
-  MARK_ITALIC,
-  MARK_UNDERLINE,
   createBoldPlugin,
   createItalicPlugin,
   createUnderlinePlugin,
+  DEFAULTS_BOLD,
+  DEFAULTS_ITALIC,
+  DEFAULTS_UNDERLINE,
+  MARK_BOLD,
+  MARK_ITALIC,
+  MARK_UNDERLINE,
 } from "@udecode/plate-basic-marks";
 import {
   getNode,
@@ -41,24 +44,24 @@ import {
   withProps,
 } from "@udecode/plate-common";
 import {
-  createReactPlugin,
   createHistoryPlugin,
+  createReactPlugin,
   isElement,
-  withPlate,
   Plate,
+  withPlate,
 } from "@udecode/plate-core";
 import {
-  ELEMENT_OL,
-  ELEMENT_UL,
+  createListPlugin,
   ELEMENT_LI,
   ELEMENT_LIC,
-  createListPlugin,
-  unwrapList,
+  ELEMENT_OL,
+  ELEMENT_UL,
   toggleList,
+  unwrapList,
 } from "@udecode/plate-list";
 import {
-  ELEMENT_PARAGRAPH,
   createParagraphPlugin,
+  ELEMENT_PARAGRAPH,
 } from "@udecode/plate-paragraph";
 import React, {
   CSSProperties,
@@ -108,6 +111,9 @@ const options = {
   [ELEMENT_UL]: { type: "bulleted-list" },
   [ELEMENT_LI]: { type: "list-item" },
   [ELEMENT_LIC]: { type: "paragraph" },
+  [MARK_BOLD]: DEFAULTS_BOLD,
+  [MARK_ITALIC]: DEFAULTS_ITALIC,
+  [MARK_UNDERLINE]: DEFAULTS_UNDERLINE,
 };
 
 export interface RichTextEditorProps
