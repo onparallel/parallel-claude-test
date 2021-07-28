@@ -48,6 +48,7 @@ import {
   createReactPlugin,
   isElement,
   Plate,
+  PlatePluginOptions,
   withPlate,
 } from "@udecode/plate-core";
 import {
@@ -114,7 +115,7 @@ const options = {
   [MARK_BOLD]: DEFAULTS_BOLD,
   [MARK_ITALIC]: DEFAULTS_ITALIC,
   [MARK_UNDERLINE]: DEFAULTS_UNDERLINE,
-};
+} as Record<string, PlatePluginOptions>;
 
 export interface RichTextEditorProps
   extends ValueProps<RichTextEditorValue, false>,
