@@ -89,7 +89,7 @@ import {
 } from "../authorizers";
 import {
   validateAccessesRemindersLeft,
-  validateAccessesRemindersUnsubscribed,
+  petitionAccessesNotOptedOut,
   validateAccessesStatus,
   validatePetitionStatus,
 } from "../validations";
@@ -1450,7 +1450,7 @@ export const switchAutomaticReminders = mutationField(
 
       validatePetitionStatus(petition, "PENDING", info);
       validateAccessesStatus(accesses, "ACTIVE", info);
-      validateAccessesRemindersUnsubscribed(accesses, info);
+      petitionAccessesNotOptedOut(accesses, info);
 
       if (args.start) {
         validateAccessesRemindersLeft(accesses, info);

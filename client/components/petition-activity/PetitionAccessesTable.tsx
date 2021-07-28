@@ -88,9 +88,7 @@ export function PetitionAccessesTable({
     [petition]
   );
 
-  const unsubscribedRemindersContacts = selected.filter(
-    (selected) => selected.remindersUnsubscribed
-  );
+  const optedOut = selected.filter((selected) => selected.remindersOptOut);
 
   return (
     <Card {...props}>
@@ -125,7 +123,7 @@ export function PetitionAccessesTable({
                       isDisabled={
                         petition.status !== "PENDING" ||
                         selected.some((a) => a.status === "INACTIVE") ||
-                        unsubscribedRemindersContacts.length === selected.length
+                        optedOut.length === selected.length
                       }
                       onClick={handleConfigureReminders}
                       icon={<SettingsIcon display="block" boxSize={4} />}
@@ -195,23 +193,26 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.contact-header",
           defaultMessage: "Contact",
         }),
-        CellContent: ({ row: { contact, remindersUnsubscribed } }) => (
+        CellContent: ({ row: { contact, remindersOptOut } }) => (
           <HStack>
             <ContactLink contact={contact} />
-            {remindersUnsubscribed ? (
+            {remindersOptOut ? (
               <Tooltip
                 label={intl.formatMessage({
-                  id: "petition-accesses.contact-unsubscribed-popover",
-                  defaultMessage: "Unsubscribed from reminders",
+                  id: "petition-accesses.reminders-opt-out-popover",
+                  defaultMessage: "Opted out from receiving reminders",
                 })}
               >
-                <Box marginLeft={1}>
-                  <BellOffIcon
-                    fontSize="16px"
-                    color="gray.500"
-                    _hover={{ color: "gray.600" }}
-                  />
-                </Box>
+                <BellOffIcon
+                  alt={intl.formatMessage({
+                    id: "petition-accesses.reminders-opt-out-popover",
+                    defaultMessage: "Opted out from receiving reminders",
+                  })}
+                  marginLeft={1}
+                  fontSize="16px"
+                  color="gray.500"
+                  _hover={{ color: "gray.600" }}
+                />
               </Tooltip>
             ) : null}
           </HStack>
@@ -321,7 +322,7 @@ function usePetitionAccessesColumns(): TableColumn<
             onDeactivateAccess,
             onReactivateAccess,
           } = context!;
-          const { id, status, contact, remindersUnsubscribed } = row;
+          const { id, status, contact, remindersOptOut } = row;
           const intl = useIntl();
 
           return contact ? (
@@ -341,7 +342,7 @@ function usePetitionAccessesColumns(): TableColumn<
                   />
                   <IconButtonWithTooltip
                     isDisabled={
-                      petition.status !== "PENDING" || remindersUnsubscribed
+                      petition.status !== "PENDING" || remindersOptOut
                     }
                     label={intl.formatMessage({
                       id: "petition-accesses.reminder-settings",
@@ -408,7 +409,7 @@ PetitionAccessesTable.fragments = {
       remindersLeft
       reminderCount
       remindersActive
-      remindersUnsubscribed
+      remindersOptOut
       remindersConfig {
         ...PetitionAccessTable_PetitionAccessRemindersConfig
       }

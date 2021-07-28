@@ -22,36 +22,34 @@ import {
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
 import {
-  UnsubscribePublicPetitionQuery,
-  UnsubscribePublicPetitionQueryVariables,
-  useUnsubscribeView_publicCancelReminderMutation,
+  PublicOptOutQuery,
+  PublicOptOutQueryVariables,
+  useOptOut_publicOptOutRemindersMutation,
 } from "@parallel/graphql/__types";
 import { UnwrapPromise } from "@parallel/utils/types";
-import { useUnsubscribeAnswers } from "@parallel/utils/useUnsubscribeAnswers";
+import { useReminderOptOutReasons } from "@parallel/utils/useReminderOptOutReasons";
 import { FormEvent, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-type UnsubscribeViewProps = UnwrapPromise<
-  ReturnType<typeof UnsubscribeView.getInitialProps>
->;
+type OptOutProps = UnwrapPromise<ReturnType<typeof OptOut.getInitialProps>>;
 
-function UnsubscribeView({ keycode, access }: UnsubscribeViewProps) {
+function OptOut({ keycode, access }: OptOutProps) {
   const intl = useIntl();
 
   const granter = access!.granter!;
 
-  const [unsubscribed, setUnsubscribed] = useState(false);
+  const [optedOut, setOptedOut] = useState(false);
   const [reason, setReason] = useState("");
   const [otherReason, setOtherReason] = useState("");
 
-  const answers = useUnsubscribeAnswers();
+  const answers = useReminderOptOutReasons();
 
-  const [unsubscribe] = useUnsubscribeView_publicCancelReminderMutation();
+  const [optOut] = useOptOut_publicOptOutRemindersMutation();
 
-  const handleUnsuscribe = async (event: FormEvent) => {
+  const handleOptOut = async (event: FormEvent) => {
     event.preventDefault();
-    await unsubscribe({ variables: { keycode, reason, otherReason } });
-    setUnsubscribed(true);
+    await optOut({ variables: { keycode, reason, otherReason } });
+    setOptedOut(true);
   };
 
   return (
@@ -80,7 +78,7 @@ function UnsubscribeView({ keycode, access }: UnsubscribeViewProps) {
         )}
       </Flex>
       <Center padding={6}>
-        {unsubscribed ? (
+        {optedOut ? (
           <Stack
             textAlign="center"
             justifyContent="center"
@@ -95,27 +93,27 @@ function UnsubscribeView({ keycode, access }: UnsubscribeViewProps) {
             />
             <Heading>
               <FormattedMessage
-                id="public.unsubscribe.done-title"
+                id="public.opt-out.done-title"
                 defaultMessage="Done!"
               />
             </Heading>
             <Text>
               <FormattedMessage
-                id="public.unsubscribe.done-body"
+                id="public.opt-out.done-body"
                 defaultMessage="We have informed the sender and you won’t receive more reminders from this petition."
               />
             </Text>
           </Stack>
         ) : (
-          <form onSubmit={handleUnsuscribe}>
+          <form onSubmit={handleOptOut}>
             <Stack spacing={6} maxWidth={"container.sm"}>
               <Heading>
                 <FormattedMessage
-                  id="public.unsubscribe.feedback-title"
-                  defaultMessage="Please, ¿can you indicate why you do not want to receive more reminders? *"
+                  id="public.opt-out.feedback-title"
+                  defaultMessage="Please, would you let us know why you don't want to receive reminders? *"
                 />
               </Heading>
-              <RadioGroup name="unsubscribe-reason" onChange={setReason}>
+              <RadioGroup name="opt-out-reason" onChange={setReason}>
                 <Stack>
                   {Object.entries(answers).map(([key, value]) => {
                     return (
@@ -135,7 +133,7 @@ function UnsubscribeView({ keycode, access }: UnsubscribeViewProps) {
                     <Input
                       type="text"
                       placeholder={intl.formatMessage({
-                        id: "public.unsubscribe.other-placeholder",
+                        id: "public.opt-out.other-placeholder",
                         defaultMessage: "Indicate other reasons",
                       })}
                       onChange={(event) => setOtherReason(event.target.value)}
@@ -143,7 +141,7 @@ function UnsubscribeView({ keycode, access }: UnsubscribeViewProps) {
                     />
                     <FormErrorMessage>
                       <FormattedMessage
-                        id="public.unsubscribe.other-error-message"
+                        id="public.opt-out.other-error-message"
                         defaultMessage="Please, enter a reason"
                       />
                     </FormErrorMessage>
@@ -160,8 +158,8 @@ function UnsubscribeView({ keycode, access }: UnsubscribeViewProps) {
                 type="submit"
               >
                 <FormattedMessage
-                  id="public.unsubscribe.send-reply-button"
-                  defaultMessage="Send reply"
+                  id="public.opt-out.opt-out-button"
+                  defaultMessage="Opt out"
                 />
               </Button>
             </Stack>
@@ -172,14 +170,14 @@ function UnsubscribeView({ keycode, access }: UnsubscribeViewProps) {
   );
 }
 
-UnsubscribeView.mutations = [
+OptOut.mutations = [
   gql`
-    mutation UnsubscribeView_publicCancelReminder(
+    mutation OptOut_publicOptOutReminders(
       $keycode: ID!
       $reason: String!
       $otherReason: String!
     ) {
-      publicCancelReminder(
+      publicOptOutReminders(
         keycode: $keycode
         reason: $reason
         otherReason: $otherReason
@@ -192,12 +190,12 @@ UnsubscribeView.mutations = [
   `,
 ];
 
-UnsubscribeView.fragments = {
+OptOut.fragments = {
   get PublicPetitionAccess() {
     return gql`
-      fragment UnsubscribeView_PublicPetitionAccess on PublicPetitionAccess {
+      fragment OptOut_PublicPetitionAccess on PublicPetitionAccess {
         granter {
-          ...UnsubscribeView_PublicUser
+          ...OptOut_PublicUser
         }
       }
       ${this.PublicUser}
@@ -205,7 +203,7 @@ UnsubscribeView.fragments = {
   },
   get PublicUser() {
     return gql`
-      fragment UnsubscribeView_PublicUser on PublicUser {
+      fragment OptOut_PublicUser on PublicUser {
         id
         organization {
           name
@@ -217,23 +215,23 @@ UnsubscribeView.fragments = {
   },
 };
 
-UnsubscribeView.getInitialProps = async ({
+OptOut.getInitialProps = async ({
   query,
   fetchQuery,
 }: WithApolloDataContext) => {
   const keycode = query.keycode as string;
 
   const result = await fetchQuery<
-    UnsubscribePublicPetitionQuery,
-    UnsubscribePublicPetitionQueryVariables
+    PublicOptOutQuery,
+    PublicOptOutQueryVariables
   >(
     gql`
-      query UnsubscribePublicPetition($keycode: ID!) {
+      query PublicOptOut($keycode: ID!) {
         access(keycode: $keycode) {
-          ...UnsubscribeView_PublicPetitionAccess
+          ...OptOut_PublicPetitionAccess
         }
       }
-      ${UnsubscribeView.fragments.PublicPetitionAccess}
+      ${OptOut.fragments.PublicPetitionAccess}
     `,
     { variables: { keycode } }
   );
@@ -248,4 +246,4 @@ UnsubscribeView.getInitialProps = async ({
   return { keycode, access };
 };
 
-export default withApolloData(UnsubscribeView);
+export default withApolloData(OptOut);

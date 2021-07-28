@@ -124,7 +124,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
     user_id: number;
     status: PetitionStatus;
   };
-  CONTACT_UNSUBSCRIBE: {
+  REMINDERS_OPT_OUT: {
     petition_access_id: number;
     reason: string;
     otherReason: string;
@@ -206,8 +206,8 @@ export type PetitionClonedEvent<IsCreate extends boolean = false> =
   GenericPetitionEvent<"PETITION_CLONED", IsCreate>;
 export type PetitionDeletedEvent<IsCreate extends boolean = false> =
   GenericPetitionEvent<"PETITION_DELETED", IsCreate>;
-export type ContactUnsubscribeEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"CONTACT_UNSUBSCRIBE", IsCreate>;
+export type RemindersOptOutEvent<IsCreate extends boolean = false> =
+  GenericPetitionEvent<"REMINDERS_OPT_OUT", IsCreate>;
 
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
@@ -241,7 +241,7 @@ export type PetitionEvent<IsCreate extends boolean = false> =
   | TemplateUsedEvent<IsCreate>
   | PetitionClonedEvent<IsCreate>
   | PetitionDeletedEvent<IsCreate>
-  | ContactUnsubscribeEvent<IsCreate>;
+  | RemindersOptOutEvent<IsCreate>;
 
 export type CreatePetitionEvent = PetitionEvent<true>;
 

@@ -21,6 +21,7 @@ import {
 import { Maybe } from "@parallel/utils/types";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
+import { ContactLink } from "../common/ContactLink";
 import { PetitionRemindersConfig } from "../petition-compose/PetitionRemindersConfig";
 
 export type ConfigureRemindersDialogProps = {
@@ -39,22 +40,20 @@ export function ConfigureRemindersDialog({
     Maybe<RemindersConfig>
   >(defaultRemindersConfig);
 
-  const unsubscribedRemindersContacts = accesses.filter(
-    (access) => access.remindersUnsubscribed
-  );
+  const optedOut = accesses.filter((access) => access.remindersOptOut);
 
   return (
     <ConfirmDialog
       size="xl"
       header={
         <FormattedMessage
-          id="petition.reminder-settings-dialog.header"
+          id="component.configure-reminder-settings-dialog.header"
           defaultMessage="Configure automatic reminders"
         />
       }
       body={
         <Stack spacing={4}>
-          {unsubscribedRemindersContacts.length ? (
+          {optedOut.length ? (
             <Alert
               status="warning"
               backgroundColor="orange.100"
@@ -65,16 +64,14 @@ export function ConfigureRemindersDialog({
                 <AlertDescription>
                   <Text>
                     <FormattedMessage
-                      id="component.reminder-settings-dialog.unsubscribed-contacts-list"
-                      defaultMessage="The following contacts are unsubscribed to reminders and the settings will not be applied to them:"
+                      id="component.configure-reminder-settings-dialog.opted-out-warning"
+                      defaultMessage="The following contacts opted out from receiving reminders and any changes will not apply to them:"
                     />
                   </Text>
                   <UnorderedList paddingLeft={2}>
-                    {unsubscribedRemindersContacts.map((petitionAccess) => (
-                      <ListItem key={petitionAccess!.id} s>
-                        <Text as="span">
-                          {petitionAccess?.contact?.fullName}
-                        </Text>
+                    {optedOut.map((pa) => (
+                      <ListItem key={pa.id}>
+                        <ContactLink contact={pa.contact} />
                       </ListItem>
                     ))}
                   </UnorderedList>
@@ -97,7 +94,7 @@ export function ConfigureRemindersDialog({
           onClick={() => props.onResolve(remindersConfig)}
         >
           <FormattedMessage
-            id="petition.reminder-settings-dialog.confirm"
+            id="component.configure-reminder-settings-dialog.confirm"
             defaultMessage="Apply changes"
           />
         </Button>

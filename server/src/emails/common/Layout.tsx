@@ -28,7 +28,7 @@ export type LayoutProps = {
   assetsUrl: string;
   showGdprDisclaimer?: boolean;
   contentHeading?: Element | null;
-  unsubscribeUrl?: string;
+  optOutUrl?: string;
 };
 
 export const Layout: FC<LayoutProps> = function Layout({
@@ -39,7 +39,7 @@ export const Layout: FC<LayoutProps> = function Layout({
   children,
   showGdprDisclaimer,
   contentHeading,
-  unsubscribeUrl,
+  optOutUrl,
 }) {
   const { locale } = useIntl();
   return (
@@ -150,9 +150,9 @@ export const Layout: FC<LayoutProps> = function Layout({
                 />
               </a>
             </MjmlText>
-            {unsubscribeUrl ? (
+            {optOutUrl ? (
               <MjmlText align="center" fontSize="14px">
-                <a className="link" href={unsubscribeUrl}>
+                <a className="link" href={optOutUrl}>
                   <FormattedMessage
                     id="layout.stop-reminders"
                     defaultMessage="Stop receiving reminders"

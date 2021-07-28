@@ -29,7 +29,7 @@ export type PetitionUserNotificationPayload<
   SIGNATURE_COMPLETED: {
     petition_signature_request_id: number;
   };
-  CONTACT_UNSUBSCRIBE: {
+  REMINDERS_OPT_OUT: {
     petition_access_id: number;
     reason: string;
     otherReason: string;
@@ -63,8 +63,8 @@ export type SignatureCancelledUserNotification<
 export type SignatureCompletedUserNotification<
   IsCreate extends boolean = false
 > = GenericPetitionUserNotification<"SIGNATURE_COMPLETED", IsCreate>;
-export type ContactUnsubscribeNotification<IsCreate extends boolean = false> =
-  GenericPetitionUserNotification<"CONTACT_UNSUBSCRIBE", IsCreate>;
+export type RemindersOptOutNotification<IsCreate extends boolean = false> =
+  GenericPetitionUserNotification<"REMINDERS_OPT_OUT", IsCreate>;
 
 export type PetitionUserNotification<IsCreate extends boolean = false> =
   | CommentCreatedUserNotification<IsCreate>
@@ -73,6 +73,6 @@ export type PetitionUserNotification<IsCreate extends boolean = false> =
   | PetitionSharedUserNotification<IsCreate>
   | SignatureCancelledUserNotification<IsCreate>
   | SignatureCompletedUserNotification<IsCreate>
-  | ContactUnsubscribeNotification<IsCreate>;
+  | RemindersOptOutNotification<IsCreate>;
 
 export type CreatePetitionUserNotification = PetitionUserNotification<true>;

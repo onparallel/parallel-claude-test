@@ -313,8 +313,6 @@ export interface NexusGenObjects {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
-  ContactUnsubscribeEvent: events.ContactUnsubscribeEvent;
-  ContactUnsubscribeNotification: notifications.ContactUnsubscribeNotification;
   CreateFileUploadFieldAttachment: {
     // root type
     attachment: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
@@ -456,6 +454,8 @@ export interface NexusGenObjects {
     timezone: string;
     weekdaysOnly: boolean;
   };
+  RemindersOptOutEvent: events.RemindersOptOutEvent;
+  RemindersOptOutNotification: notifications.RemindersOptOutNotification;
   ReplyCreatedEvent: events.ReplyCreatedEvent;
   ReplyDeletedEvent: events.ReplyDeletedEvent;
   ReplyUpdatedEvent: events.ReplyUpdatedEvent;
@@ -643,24 +643,6 @@ export interface NexusGenFieldTypes {
     items: NexusGenRootTypes["Contact"][]; // [Contact!]!
     totalCount: number; // Int!
   };
-  ContactUnsubscribeEvent: {
-    // field return type
-    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    id: NexusGenScalars["GID"]; // GID!
-    otherReason: string; // String!
-    reason: string; // String!
-  };
-  ContactUnsubscribeNotification: {
-    // field return type
-    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
-    createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    id: NexusGenScalars["GID"]; // GID!
-    isRead: boolean; // Boolean!
-    otherReason: string; // String!
-    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
-    reason: string; // String!
-  };
   CreateFileUploadFieldAttachment: {
     // field return type
     attachment: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
@@ -787,7 +769,6 @@ export interface NexusGenFieldTypes {
     generateUserAuthToken: NexusGenRootTypes["GenerateUserAuthTokenResponse"]; // GenerateUserAuthTokenResponse!
     petitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     petitionFieldAttachmentUploadComplete: NexusGenRootTypes["PetitionFieldAttachment"]; // PetitionFieldAttachment!
-    publicCancelReminder: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicCheckVerificationCode: NexusGenRootTypes["VerificationCodeCheck"]; // VerificationCodeCheck!
     publicCompletePetition: NexusGenRootTypes["PublicPetition"]; // PublicPetition!
     publicCreateCheckboxReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -801,6 +782,7 @@ export interface NexusGenFieldTypes {
     publicFileUploadReplyComplete: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
     publicFileUploadReplyDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicMarkPetitionFieldCommentsAsRead: NexusGenRootTypes["PublicPetitionFieldComment"][]; // [PublicPetitionFieldComment!]!
+    publicOptOutReminders: NexusGenRootTypes["PublicPetitionAccess"]; // PublicPetitionAccess!
     publicPetitionFieldAttachmentDownloadLink: NexusGenRootTypes["FileUploadDownloadLinkResult"]; // FileUploadDownloadLinkResult!
     publicSendVerificationCode: NexusGenRootTypes["VerificationCodeRequest"]; // VerificationCodeRequest!
     publicUpdateCheckboxReply: NexusGenRootTypes["PublicPetitionFieldReply"]; // PublicPetitionFieldReply!
@@ -929,7 +911,7 @@ export interface NexusGenFieldTypes {
     remindersActive: boolean; // Boolean!
     remindersConfig: NexusGenRootTypes["RemindersConfig"] | null; // RemindersConfig
     remindersLeft: number; // Int!
-    remindersUnsubscribed: boolean; // Boolean!
+    remindersOptOut: boolean; // Boolean!
     status: NexusGenEnums["PetitionAccessStatus"]; // PetitionAccessStatus!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
@@ -1303,6 +1285,24 @@ export interface NexusGenFieldTypes {
     timezone: string; // String!
     weekdaysOnly: boolean; // Boolean!
   };
+  RemindersOptOutEvent: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    otherReason: string; // String!
+    reason: string; // String!
+  };
+  RemindersOptOutNotification: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
+    otherReason: string; // String!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    reason: string; // String!
+  };
   ReplyCreatedEvent: {
     // field return type
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1630,24 +1630,6 @@ export interface NexusGenFieldTypeNames {
     items: "Contact";
     totalCount: "Int";
   };
-  ContactUnsubscribeEvent: {
-    // field return type name
-    access: "PetitionAccess";
-    createdAt: "DateTime";
-    id: "GID";
-    otherReason: "String";
-    reason: "String";
-  };
-  ContactUnsubscribeNotification: {
-    // field return type name
-    access: "PetitionAccess";
-    createdAt: "DateTime";
-    id: "GID";
-    isRead: "Boolean";
-    otherReason: "String";
-    petition: "PetitionBase";
-    reason: "String";
-  };
   CreateFileUploadFieldAttachment: {
     // field return type name
     attachment: "PetitionFieldAttachment";
@@ -1774,7 +1756,6 @@ export interface NexusGenFieldTypeNames {
     generateUserAuthToken: "GenerateUserAuthTokenResponse";
     petitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     petitionFieldAttachmentUploadComplete: "PetitionFieldAttachment";
-    publicCancelReminder: "PublicPetitionAccess";
     publicCheckVerificationCode: "VerificationCodeCheck";
     publicCompletePetition: "PublicPetition";
     publicCreateCheckboxReply: "PublicPetitionFieldReply";
@@ -1788,6 +1769,7 @@ export interface NexusGenFieldTypeNames {
     publicFileUploadReplyComplete: "PublicPetitionFieldReply";
     publicFileUploadReplyDownloadLink: "FileUploadDownloadLinkResult";
     publicMarkPetitionFieldCommentsAsRead: "PublicPetitionFieldComment";
+    publicOptOutReminders: "PublicPetitionAccess";
     publicPetitionFieldAttachmentDownloadLink: "FileUploadDownloadLinkResult";
     publicSendVerificationCode: "VerificationCodeRequest";
     publicUpdateCheckboxReply: "PublicPetitionFieldReply";
@@ -1912,7 +1894,7 @@ export interface NexusGenFieldTypeNames {
     remindersActive: "Boolean";
     remindersConfig: "RemindersConfig";
     remindersLeft: "Int";
-    remindersUnsubscribed: "Boolean";
+    remindersOptOut: "Boolean";
     status: "PetitionAccessStatus";
     updatedAt: "DateTime";
   };
@@ -2283,6 +2265,24 @@ export interface NexusGenFieldTypeNames {
     time: "String";
     timezone: "String";
     weekdaysOnly: "Boolean";
+  };
+  RemindersOptOutEvent: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+    otherReason: "String";
+    reason: "String";
+  };
+  RemindersOptOutNotification: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+    isRead: "Boolean";
+    otherReason: "String";
+    petition: "PetitionBase";
+    reason: "String";
   };
   ReplyCreatedEvent: {
     // field return type name
@@ -2776,12 +2776,6 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       petitionId: NexusGenScalars["GID"]; // GID!
     };
-    publicCancelReminder: {
-      // args
-      keycode: string; // ID!
-      otherReason: string; // String!
-      reason: string; // String!
-    };
     publicCheckVerificationCode: {
       // args
       code: string; // String!
@@ -2857,6 +2851,12 @@ export interface NexusGenArgTypes {
       // args
       keycode: string; // ID!
       petitionFieldCommentIds: NexusGenScalars["GID"][]; // [GID!]!
+    };
+    publicOptOutReminders: {
+      // args
+      keycode: string; // ID!
+      otherReason: string; // String!
+      reason: string; // String!
     };
     publicPetitionFieldAttachmentDownloadLink: {
       // args
@@ -3289,7 +3289,6 @@ export interface NexusGenAbstractTypeMembers {
     | "AccessOpenedEvent"
     | "CommentDeletedEvent"
     | "CommentPublishedEvent"
-    | "ContactUnsubscribeEvent"
     | "GroupPermissionAddedEvent"
     | "GroupPermissionEditedEvent"
     | "GroupPermissionRemovedEvent"
@@ -3305,6 +3304,7 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionDeletedEvent"
     | "PetitionReopenedEvent"
     | "ReminderSentEvent"
+    | "RemindersOptOutEvent"
     | "ReplyCreatedEvent"
     | "ReplyDeletedEvent"
     | "ReplyUpdatedEvent"
@@ -3318,10 +3318,10 @@ export interface NexusGenAbstractTypeMembers {
   PetitionPermission: "PetitionUserGroupPermission" | "PetitionUserPermission";
   PetitionUserNotification:
     | "CommentCreatedUserNotification"
-    | "ContactUnsubscribeNotification"
     | "MessageEmailBouncedUserNotification"
     | "PetitionCompletedUserNotification"
     | "PetitionSharedUserNotification"
+    | "RemindersOptOutNotification"
     | "SignatureCancelledUserNotification"
     | "SignatureCompletedUserNotification";
   Timestamps:
@@ -3348,8 +3348,6 @@ export interface NexusGenTypeInterfaces {
   CommentDeletedEvent: "PetitionEvent";
   CommentPublishedEvent: "PetitionEvent";
   Contact: "Timestamps";
-  ContactUnsubscribeEvent: "PetitionEvent";
-  ContactUnsubscribeNotification: "PetitionUserNotification";
   GroupPermissionAddedEvent: "PetitionEvent";
   GroupPermissionEditedEvent: "PetitionEvent";
   GroupPermissionRemovedEvent: "PetitionEvent";
@@ -3383,6 +3381,8 @@ export interface NexusGenTypeInterfaces {
   PublicPetition: "Timestamps";
   PublicPetitionFieldReply: "Timestamps";
   ReminderSentEvent: "PetitionEvent";
+  RemindersOptOutEvent: "PetitionEvent";
+  RemindersOptOutNotification: "PetitionUserNotification";
   ReplyCreatedEvent: "PetitionEvent";
   ReplyDeletedEvent: "PetitionEvent";
   ReplyUpdatedEvent: "PetitionEvent";

@@ -8,7 +8,7 @@ import { TimelineAccessDelegatedEvent } from "./timeline/TimelineAccessDelegated
 import { TimelineAccessOpenedEvent } from "./timeline/TimelineAccessOpenedEvent";
 import { TimelineCommentDeletedEvent } from "./timeline/TimelineCommentDeletedEvent";
 import { TimelineCommentPublishedEvent } from "./timeline/TimelineCommentPublishedEvent";
-import { TimelineContactUnsubscribeEvent } from "./timeline/TimelineContactUnsubscribeEvent";
+import { TimelineRemindersOptOutEvent } from "./timeline/TimelineRemindersOptOutEvent";
 import { TimelineGroupPermissionAddedEvent } from "./timeline/TimelineGroupPermissionAddedEvent";
 import { TimelineGroupPermissionEditedEvent } from "./timeline/TimelineGroupPermissionEditedEvent";
 import { TimelineGroupPermissionRemovedEvent } from "./timeline/TimelineGroupPermissionRemovedEvent";
@@ -139,8 +139,8 @@ export function PetitionActivityTimeline({
               />
             ) : event.__typename === "PetitionClonedEvent" ? (
               <TimelinePetitionClonedEvent event={event} userId={userId} />
-            ) : event.__typename === "ContactUnsubscribeEvent" ? (
-              <TimelineContactUnsubscribeEvent event={event} />
+            ) : event.__typename === "RemindersOptOutEvent" ? (
+              <TimelineRemindersOptOutEvent event={event} />
             ) : (
               <pre>{JSON.stringify(event, null, "  ")}</pre>
             )}
@@ -252,8 +252,8 @@ PetitionActivityTimeline.fragments = {
       ... on PetitionClonedEvent {
         ...TimelinePetitionClonedEvent_PetitionClonedEvent
       }
-      ... on ContactUnsubscribeEvent {
-        ...TimelineContactUnsubscribeEvent_ContactUnsubscribeEvent
+      ... on RemindersOptOutEvent {
+        ...TimelineRemindersOptOutEvent_RemindersOptOutEvent
       }
     }
     ${TimelinePetitionCreatedEvent.fragments.PetitionCreatedEvent}
@@ -285,6 +285,6 @@ PetitionActivityTimeline.fragments = {
     ${TimelineGroupPermissionEditedEvent.fragments.GroupPermissionEditedEvent}
     ${TimelineGroupPermissionRemovedEvent.fragments.GroupPermissionRemovedEvent}
     ${TimelinePetitionClonedEvent.fragments.PetitionClonedEvent}
-    ${TimelineContactUnsubscribeEvent.fragments.ContactUnsubscribeEvent}
+    ${TimelineRemindersOptOutEvent.fragments.RemindersOptOutEvent}
   `,
 };

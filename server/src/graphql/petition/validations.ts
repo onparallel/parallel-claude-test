@@ -62,7 +62,7 @@ export function validateAccessesRemindersLeft(
   }
 }
 
-export function validateAccessesRemindersUnsubscribed(
+export function petitionAccessesNotOptedOut(
   accesses: Maybe<PetitionAccess>[],
   info: GraphQLResolveInfo
 ) {
@@ -71,9 +71,9 @@ export function validateAccessesRemindersUnsubscribed(
       throw new ArgValidationError(
         info,
         `accessIds[${accesses.indexOf(access)}]`,
-        `Petition access must not ben unsubscribed from reminders.`,
+        `Petition access must not have opted out from receiving reminders.`,
         {
-          errorCode: "UNSUBSCRIBED_PETITION_ACCESS",
+          errorCode: "REMINDERS_OPT_OUT",
           petitionAccessId: toGlobalId("PetitionAccess", access.id),
         }
       );

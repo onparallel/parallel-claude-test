@@ -9,11 +9,11 @@ import {
 } from "./helpers/petitionEvents";
 
 export async function up(knex: Knex): Promise<void> {
-  await addPetitionEvent(knex, "CONTACT_UNSUBSCRIBE");
-  await addUserNotificationType(knex, "CONTACT_UNSUBSCRIBE");
+  await addPetitionEvent(knex, "REMINDERS_OPT_OUT");
+  await addUserNotificationType(knex, "REMINDERS_OPT_OUT");
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await removePetitionEvent(knex, "CONTACT_UNSUBSCRIBE");
-  await removeUserNotificationType(knex, "CONTACT_UNSUBSCRIBE");
+  await removePetitionEvent(knex, "REMINDERS_OPT_OUT");
+  await removeUserNotificationType(knex, "REMINDERS_OPT_OUT");
 }

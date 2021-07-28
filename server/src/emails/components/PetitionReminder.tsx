@@ -127,7 +127,7 @@ const email: Email<PetitionReminderProps> = {
         logoUrl={logoUrl}
         logoAlt={logoAlt}
         showGdprDisclaimer
-        unsubscribeUrl={`${parallelUrl}/${locale}/petition/${keycode}/unsubscribe`}
+        optOutUrl={`${parallelUrl}/${locale}/petition/${keycode}/opt-out`}
       >
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>

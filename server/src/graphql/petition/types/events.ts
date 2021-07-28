@@ -94,8 +94,8 @@ export const PetitionEvent = interfaceType({
         return "PetitionDeletedEvent";
       case "TEMPLATE_USED":
         return "TemplateUsedEvent";
-      case "CONTACT_UNSUBSCRIBE":
-        return "ContactUnsubscribeEvent";
+      case "REMINDERS_OPT_OUT":
+        return "RemindersOptOutEvent";
     }
   },
   rootTyping: "events.PetitionEvent",
@@ -642,8 +642,8 @@ export const TemplateUsedEvent = createPetitionEvent(
   (t) => {}
 );
 
-export const ContactUnsubscribeEvent = createPetitionEvent(
-  "ContactUnsubscribeEvent",
+export const RemindersOptOutEvent = createPetitionEvent(
+  "RemindersOptOutEvent",
   (t) => {
     t.field("access", {
       type: "PetitionAccess",

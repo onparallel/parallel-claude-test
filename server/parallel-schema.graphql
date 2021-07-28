@@ -149,24 +149,6 @@ type ContactPagination {
   totalCount: Int!
 }
 
-type ContactUnsubscribeEvent implements PetitionEvent {
-  access: PetitionAccess!
-  createdAt: DateTime!
-  id: GID!
-  otherReason: String!
-  reason: String!
-}
-
-type ContactUnsubscribeNotification implements PetitionUserNotification {
-  access: PetitionAccess!
-  createdAt: DateTime!
-  id: GID!
-  isRead: Boolean!
-  otherReason: String!
-  petition: PetitionBase!
-  reason: String!
-}
-
 input CreateContactInput {
   email: String!
   firstName: String
@@ -703,15 +685,6 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): PetitionFieldAttachment!
-
-  """
-  Cancel a reminder for a contact.
-  """
-  publicCancelReminder(
-    keycode: ID!
-    otherReason: String!
-    reason: String!
-  ): PublicPetitionAccess!
   publicCheckVerificationCode(
     code: String!
     keycode: ID!
@@ -825,6 +798,15 @@ type Mutation {
     keycode: ID!
     petitionFieldCommentIds: [GID!]!
   ): [PublicPetitionFieldComment!]!
+
+  """
+  Cancel a reminder for a contact.
+  """
+  publicOptOutReminders(
+    keycode: ID!
+    otherReason: String!
+    reason: String!
+  ): PublicPetitionAccess!
 
   """
   Generates a download link for a field attachment on a public context.
@@ -1556,9 +1538,9 @@ type PetitionAccess implements Timestamps {
   remindersLeft: Int!
 
   """
-  Whether contact has unsubscribed or not for this petition access
+  Whether contact has opted out from receiving reminders for this petition
   """
-  remindersUnsubscribed: Boolean!
+  remindersOptOut: Boolean!
 
   """
   The status of the petition access
@@ -3198,6 +3180,24 @@ input RemindersConfigInput {
   Whether to send reminders only from monday to friday.
   """
   weekdaysOnly: Boolean!
+}
+
+type RemindersOptOutEvent implements PetitionEvent {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+  otherReason: String!
+  reason: String!
+}
+
+type RemindersOptOutNotification implements PetitionUserNotification {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+  isRead: Boolean!
+  otherReason: String!
+  petition: PetitionBase!
+  reason: String!
 }
 
 type ReplyCreatedEvent implements PetitionEvent {

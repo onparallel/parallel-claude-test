@@ -62,8 +62,8 @@ export const PetitionUserNotification = interfaceType({
         return "SignatureCancelledUserNotification";
       case "SIGNATURE_COMPLETED":
         return "SignatureCompletedUserNotification";
-      case "CONTACT_UNSUBSCRIBE":
-        return "ContactUnsubscribeNotification";
+      case "REMINDERS_OPT_OUT":
+        return "RemindersOptOutNotification";
     }
   },
 });
@@ -165,8 +165,8 @@ export const MessageEmailBouncedUserNotification =
     });
   });
 
-export const ContactUnsubscribeNotification = createPetitionUserNotification(
-  "ContactUnsubscribeNotification",
+export const RemindersOptOutNotification = createPetitionUserNotification(
+  "RemindersOptOutNotification",
   (t) => {
     t.field("access", {
       type: "PetitionAccess",

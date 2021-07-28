@@ -126,24 +126,6 @@ export type ContactPagination = {
   totalCount: Scalars["Int"];
 };
 
-export type ContactUnsubscribeEvent = PetitionEvent & {
-  access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  otherReason: Scalars["String"];
-  reason: Scalars["String"];
-};
-
-export type ContactUnsubscribeNotification = PetitionUserNotification & {
-  access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
-  otherReason: Scalars["String"];
-  petition: PetitionBase;
-  reason: Scalars["String"];
-};
-
 export type CreateContactInput = {
   email: Scalars["String"];
   firstName?: Maybe<Scalars["String"]>;
@@ -351,7 +333,7 @@ export type Mutation = {
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
   /** Cancel a reminder for a contact. */
-  publicCancelReminder: PublicPetitionAccess;
+  publicOptOutReminders: PublicPetitionAccess;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -706,7 +688,7 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
   petitionId: Scalars["GID"];
 };
 
-export type MutationpublicCancelReminderArgs = {
+export type MutationpublicOptOutRemindersArgs = {
   keycode: Scalars["ID"];
   otherReason: Scalars["String"];
   reason: Scalars["String"];
@@ -1241,8 +1223,8 @@ export type PetitionAccess = Timestamps & {
   remindersConfig: Maybe<RemindersConfig>;
   /** Number of reminders left. */
   remindersLeft: Scalars["Int"];
-  /** Whether contact has unsubscribed or not for this petition access */
-  remindersUnsubscribed: Scalars["Boolean"];
+  /** Whether contact has opted out from receiving reminders for this petition */
+  remindersOptOut: Scalars["Boolean"];
   /** The status of the petition access */
   status: PetitionAccessStatus;
   /** Time when the resource was last updated. */
@@ -2159,6 +2141,24 @@ export type RemindersConfigInput = {
   timezone: Scalars["String"];
   /** Whether to send reminders only from monday to friday. */
   weekdaysOnly: Scalars["Boolean"];
+};
+
+export type RemindersOptOutEvent = PetitionEvent & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  otherReason: Scalars["String"];
+  reason: Scalars["String"];
+};
+
+export type RemindersOptOutNotification = PetitionUserNotification & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
+  otherReason: Scalars["String"];
+  petition: PetitionBase;
+  reason: Scalars["String"];
 };
 
 export type ReplyCreatedEvent = PetitionEvent & {

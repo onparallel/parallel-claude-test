@@ -257,7 +257,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       let start = false;
       try {
         const accessIds = accesses
-          .filter((access) => !access.remindersUnsubscribed)
+          .filter((access) => !access.remindersOptOut)
           .map((access) => access.id);
 
         const firstAccess = petition.accesses.find(

@@ -21,6 +21,7 @@ import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { usePetitionMessagePlaceholderOptions } from "@parallel/utils/slate/placeholders/usePetitionMessagePlaceholderOptions";
 import { useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+import { ContactLink } from "../common/ContactLink";
 import { PaddedCollapse } from "../common/PaddedCollapse";
 import {
   RichTextEditor,
@@ -41,9 +42,7 @@ export function ConfirmSendReminderDialog({
   const [hasMessage, setHasMessage] = useState(false);
   const messageRef = useRef<RichTextEditorInstance>(null);
 
-  const unsubscribedRemindersContacts = accesses.filter(
-    (access) => access.remindersUnsubscribed
-  );
+  const optedOut = accesses.filter((access) => access.remindersOptOut);
 
   const placeholderOptions = usePetitionMessagePlaceholderOptions();
   return (
@@ -57,7 +56,7 @@ export function ConfirmSendReminderDialog({
       }
       body={
         <Stack spacing={4}>
-          {unsubscribedRemindersContacts.length ? (
+          {optedOut.length ? (
             <Alert
               status="warning"
               backgroundColor="orange.100"
@@ -70,16 +69,14 @@ export function ConfirmSendReminderDialog({
                     <>
                       <Text>
                         <FormattedMessage
-                          id="component.confirm-send-reminder-dialog.unsubscribed-contacts-list"
-                          defaultMessage="The following contacts are unsubscribed from reminders:"
+                          id="component.confirm-send-reminder-dialog.opted-out-warning-multiple"
+                          defaultMessage="The following contacts have opted out from receiving reminders for this petition:"
                         />
                       </Text>
                       <UnorderedList paddingLeft={2}>
-                        {unsubscribedRemindersContacts.map((petitionAccess) => (
-                          <ListItem key={petitionAccess!.id} s>
-                            <Text as="span">
-                              {petitionAccess?.contact?.fullName}
-                            </Text>
+                        {optedOut.map((pa) => (
+                          <ListItem key={pa.id} s>
+                            <ContactLink contact={pa.contact} />
                           </ListItem>
                         ))}
                       </UnorderedList>
@@ -87,8 +84,8 @@ export function ConfirmSendReminderDialog({
                   ) : (
                     <Text>
                       <FormattedMessage
-                        id="component.confirm-send-reminder-dialog.unsubscribed-contact"
-                        defaultMessage="This contact is unsubscribed from the reminders."
+                        id="component.confirm-send-reminder-dialog.opted-out-warning"
+                        defaultMessage="This contact has opted out from receiving reminders for this petition."
                       />
                     </Text>
                   )}

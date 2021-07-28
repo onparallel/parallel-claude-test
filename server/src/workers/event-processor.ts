@@ -105,7 +105,7 @@ createQueueWorker(
         "SIGNATURE_CANCELLED",
         "USER_PERMISSION_ADDED",
         "GROUP_PERMISSION_ADDED",
-        "CONTACT_UNSUBSCRIBE",
+        "REMINDERS_OPT_OUT",
       ],
       userNotificationsListener
     )

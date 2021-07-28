@@ -1793,7 +1793,7 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  async unsubscribeReminders(accessIds: number[]) {
+  async optOutReminders(accessIds: number[]) {
     return await this.from("petition_access").whereIn("id", accessIds).update(
       {
         reminders_active: false,
@@ -2081,7 +2081,7 @@ export class PetitionRepository extends BaseRepository {
           q.whereIn("type", [
             "MESSAGE_EMAIL_BOUNCED",
             "SIGNATURE_CANCELLED",
-            "CONTACT_UNSUBSCRIBE",
+            "REMINDERS_OPT_OUT",
           ]);
         }
         if (opts.before) {
@@ -2193,7 +2193,7 @@ export class PetitionRepository extends BaseRepository {
           q.whereIn("type", [
             "MESSAGE_EMAIL_BOUNCED",
             "SIGNATURE_CANCELLED",
-            "CONTACT_UNSUBSCRIBE",
+            "REMINDERS_OPT_OUT",
           ]);
         }
       })

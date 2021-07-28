@@ -125,6 +125,21 @@
     "context": "When finishing, the petition will remain closed. You can come back anytime to review the information."
   },
   {
+    "term": "component.configure-reminder-settings-dialog.confirm",
+    "definition": "Aplicar cambios",
+    "context": "Apply changes"
+  },
+  {
+    "term": "component.configure-reminder-settings-dialog.header",
+    "definition": "Configurar recordatorios automáticos",
+    "context": "Configure automatic reminders"
+  },
+  {
+    "term": "component.configure-reminder-settings-dialog.opted-out-warning",
+    "definition": "Los siguientes contactos han optado por no recibir recordatorios y no se le aplicará la configuración:",
+    "context": "The following contacts opted out from receiving reminders and any changes will not apply to them:"
+  },
+  {
     "term": "component.confirm-configure-ongoing-signature.body",
     "definition": "Hay un proceso de firma digital pendiente. Si realiza cualquier cambio, el proceso será cancelado.",
     "context": "There is an ongoing eSignature process. If you make any changes the ongoing process will be cancelled."
@@ -225,14 +240,14 @@
     "context": "Add a message to include in the email"
   },
   {
-    "term": "component.confirm-send-reminder-dialog.unsubscribed-contact",
-    "definition": "Este contacto está dado de baja de los recordatorios.",
-    "context": "This contact is unsubscribed from the reminders."
+    "term": "component.confirm-send-reminder-dialog.opted-out-warning",
+    "definition": "Este contacto ha optado por no recibir recordatorios para esta petición.",
+    "context": "This contact has opted out from receiving reminders for this petition."
   },
   {
-    "term": "component.confirm-send-reminder-dialog.unsubscribed-contacts-list",
-    "definition": "Los siguientes contactos están dados de baja de los recordatorios:",
-    "context": "The following contacts are unsubscribed from reminders:"
+    "term": "component.confirm-send-reminder-dialog.opted-out-warning-multiple",
+    "definition": "Los siguientes contactos han optado por no recibir recordatorios para esta petición:",
+    "context": "The following contacts have opted out from receiving reminders for this petition:"
   },
   {
     "term": "component.confirm-signature-config-changed.body",
@@ -775,11 +790,6 @@
     "context": "{name} has written a comment in the field {field}."
   },
   {
-    "term": "component.notification-contact-unsubscribe.body",
-    "definition": "{name} se ha desuscrito de los recordatorios: ",
-    "context": "{name} was unsusbscribed from reminders:"
-  },
-  {
     "term": "component.notification-email-bounced.body",
     "definition": "Error al enviar la petición a {name}.",
     "context": "Error sending petition to recipient {name}."
@@ -803,6 +813,11 @@
     "term": "component.notification-petition-shared.body",
     "definition": "{name} te ha compartido la {isTemplate, select, true {plantilla} other {petición}} como {permissionType}.",
     "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with you as {permissionType}."
+  },
+  {
+    "term": "component.notification-reminders-opt-out.body",
+    "definition": "{name} se ha desuscrito de los recordatorios: ",
+    "context": "{name} has opted out from receiving reminders:"
   },
   {
     "term": "component.notification-signature-cancelled.body",
@@ -1818,11 +1833,6 @@
     "term": "component.referenced-field-dialog.header",
     "definition": "Este campo está siendo referenciado",
     "context": "This field is being referenced"
-  },
-  {
-    "term": "component.reminder-settings-dialog.unsubscribed-contacts-list",
-    "definition": "Los siguientes contactos están dados de baja de los recordatorios y no se le aplicará la configuración:",
-    "context": "The following contacts are unsubscribed to reminders and the settings will not be applied to them:"
   },
   {
     "term": "component.replies-field-comment.mark-as-unread",
@@ -3475,11 +3485,6 @@
     "context": "Contact"
   },
   {
-    "term": "petition-accesses.contact-unsubscribed-popover",
-    "definition": "Dado de baja de los recordatorios",
-    "context": "Unsubscribed from reminders"
-  },
-  {
     "term": "petition-accesses.deactivate-access",
     "definition": "Revocar acceso",
     "context": "Remove access"
@@ -3498,6 +3503,11 @@
     "term": "petition-accesses.reminder-settings",
     "definition": "Configurar recordatorios",
     "context": "Reminder settings"
+  },
+  {
+    "term": "petition-accesses.reminders-opt-out-popover",
+    "definition": "El contacto desea no recibir recordatorios",
+    "context": "Opted out from receiving reminders"
   },
   {
     "term": "petition-accesses.reminders-sent-header",
@@ -4078,16 +4088,6 @@
     "term": "petition.reminder-sent.toast-header",
     "definition": "Recordatorio enviado",
     "context": "Reminder sent"
-  },
-  {
-    "term": "petition.reminder-settings-dialog.confirm",
-    "definition": "Aplicar cambios",
-    "context": "Apply changes"
-  },
-  {
-    "term": "petition.reminder-settings-dialog.header",
-    "definition": "Configurar recordatorios automáticos",
-    "context": "Configure automatic reminders"
   },
   {
     "term": "petition.reminder-settings-error.toast-body",
@@ -5230,6 +5230,61 @@
     "context": "All your petitions in a single place"
   },
   {
+    "term": "public.opt-out.answer-no-reminders",
+    "definition": "Subiré la información pero no quiero seguir recibiendo recordatorios",
+    "context": "I will upload the information but I do not want to receive more reminders"
+  },
+  {
+    "term": "public.opt-out.answer-not-interested",
+    "definition": "Ya no estoy interesado en el servicio",
+    "context": "I am not interested in this service anymore"
+  },
+  {
+    "term": "public.opt-out.answer-not-requested",
+    "definition": "No he solicitado este servicio",
+    "context": "I have not requested this service"
+  },
+  {
+    "term": "public.opt-out.answer-other",
+    "definition": "Otro",
+    "context": "Other"
+  },
+  {
+    "term": "public.opt-out.answer-wrong-person",
+    "definition": "No soy la persona adecuada para completar esta información",
+    "context": "I am not the person to complete this information"
+  },
+  {
+    "term": "public.opt-out.done-body",
+    "definition": "Hemos informado a tu remitente y no recibirás más recordatorios de esta petición.",
+    "context": "We have informed the sender and you won’t receive more reminders from this petition."
+  },
+  {
+    "term": "public.opt-out.done-title",
+    "definition": "¡Hecho!",
+    "context": "Done!"
+  },
+  {
+    "term": "public.opt-out.feedback-title",
+    "definition": "Por favor, ¿podría indicarnos el motivo para no querer recibir más recordatorios? *",
+    "context": "Please, would you let us know why you don't want to receive reminders? *"
+  },
+  {
+    "term": "public.opt-out.opt-out-button",
+    "definition": "Dejar de recibir recordatorios",
+    "context": "Opt out"
+  },
+  {
+    "term": "public.opt-out.other-error-message",
+    "definition": "Por favor, elija un motivo",
+    "context": "Please, enter a reason"
+  },
+  {
+    "term": "public.opt-out.other-placeholder",
+    "definition": "Indicar otros motivos",
+    "context": "Indicate other reasons"
+  },
+  {
     "term": "public.parallel-use-cases.aml-description",
     "definition": "Cierra más rápido el proceso de alta e identificación.",
     "context": "Close your know your customers processes faster."
@@ -5850,61 +5905,6 @@
     "context": "Terms & Conditions"
   },
   {
-    "term": "public.unsubscribe.answer-no-reminders",
-    "definition": "Subiré la información pero no quiero seguir recibiendo recordatorios",
-    "context": "I will upload the information but i do not want to receive more reminders"
-  },
-  {
-    "term": "public.unsubscribe.answer-not-interested",
-    "definition": "Ya no estoy interesado en el servicio",
-    "context": "I am not interested in this service anymore"
-  },
-  {
-    "term": "public.unsubscribe.answer-not-requested",
-    "definition": "No he solicitado este servicio",
-    "context": "I have not requested this service"
-  },
-  {
-    "term": "public.unsubscribe.answer-other",
-    "definition": "Otro",
-    "context": "Other"
-  },
-  {
-    "term": "public.unsubscribe.answer-wrong-person",
-    "definition": "No soy la persona adecuada para completar esta información",
-    "context": "I am not the person to complete this information"
-  },
-  {
-    "term": "public.unsubscribe.done-body",
-    "definition": "Hemos informado a tu remitente y no recibirás más recordatorios de esta petición.",
-    "context": "We have informed the sender and you won’t receive more reminders from this petition."
-  },
-  {
-    "term": "public.unsubscribe.done-title",
-    "definition": "¡Hecho!",
-    "context": "Done!"
-  },
-  {
-    "term": "public.unsubscribe.feedback-title",
-    "definition": "Por favor, ¿podrías indicarnos el motivo para no querer recibir más recordatorios? *",
-    "context": "Please, ¿can you indicate why you do not want to receive more reminders? *"
-  },
-  {
-    "term": "public.unsubscribe.other-error-message",
-    "definition": "Por favor, ingrese un motivo",
-    "context": "Please, enter a reason"
-  },
-  {
-    "term": "public.unsubscribe.other-placeholder",
-    "definition": "Indicar otros motivos",
-    "context": "Indicate other reasons"
-  },
-  {
-    "term": "public.unsubscribe.send-reply-button",
-    "definition": "Enviar respuesta",
-    "context": "Send reply"
-  },
-  {
     "term": "public.who-trust-us.feedback",
     "definition": "y esto es lo que dicen...",
     "context": "and this is what they say..."
@@ -6415,11 +6415,6 @@
     "context": "{same, select, true {You} other {{author}}} commented on field {field} {timeAgo}"
   },
   {
-    "term": "timeline.contact-unsubscribe-description",
-    "definition": "{contact} ha desactivado los recordatorios {timeAgo}",
-    "context": "{contact} has disabled the reminders {timeAgo}"
-  },
-  {
     "term": "timeline.edit-group-permission-description",
     "definition": "{same, select, true {Actualizaste} other {{user} actualizó}} el permiso de {groupName} a {permissionType} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} updated {groupName}'s permission to {permissionType} {timeAgo}"
@@ -6503,6 +6498,11 @@
     "term": "timeline.reminder-sent-description-manual",
     "definition": "{same, select, true {Enviaste} other {{user} envió}} un recordatorio manual a {contact} {timeAgo}",
     "context": "{same, select, true {You} other {{user}}} sent a manual reminder to {contact} {timeAgo}"
+  },
+  {
+    "term": "timeline.reminders-opt-out-description",
+    "definition": "{contact} ha optado por no recibir recordatorios para esta petición {timeAgo}",
+    "context": "{contact} has opted out from receiving reminders for this petition {timeAgo}"
   },
   {
     "term": "timeline.remove-group-permission-description",

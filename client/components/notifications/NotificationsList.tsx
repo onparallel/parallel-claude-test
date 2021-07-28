@@ -17,7 +17,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { FormattedMessage } from "react-intl";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 import { CommentCreatedUserNotification } from "./flavor/CommentCreatedUserNotification";
-import { ContactUnsubscribeNotification } from "./flavor/ContactUnsubscribeNotification";
+import { RemindersOptOutNotification } from "./flavor/RemindersOptOutNotification";
 import { MessageEmailBouncedUserNotification } from "./flavor/MessageEmailBouncedUserNotification";
 import { PetitionCompletedUserNotification } from "./flavor/PetitionCompletedUserNotification";
 import { PetitionSharedUserNotification } from "./flavor/PetitionSharedUserNotification";
@@ -240,9 +240,8 @@ export function NotificationsList({
                   notification={notification}
                   {...props}
                 />
-              ) : notification.__typename ===
-                "ContactUnsubscribeNotification" ? (
-                <ContactUnsubscribeNotification
+              ) : notification.__typename === "RemindersOptOutNotification" ? (
+                <RemindersOptOutNotification
                   notification={notification}
                   {...props}
                 />
@@ -294,8 +293,8 @@ NotificationsList.fragments = {
       ... on SignatureCompletedUserNotification {
         ...SignatureCompletedUserNotification_SignatureCompletedUserNotification
       }
-      ... on ContactUnsubscribeNotification {
-        ...ContactUnsubscribeNotification_ContactUnsubscribeNotification
+      ... on RemindersOptOutNotification {
+        ...RemindersOptOutNotification_RemindersOptOutNotification
       }
     }
     ${CommentCreatedUserNotification.fragments.CommentCreatedUserNotification}
@@ -308,6 +307,6 @@ NotificationsList.fragments = {
       .SignatureCancelledUserNotification}
     ${SignatureCompletedUserNotification.fragments
       .SignatureCompletedUserNotification}
-    ${ContactUnsubscribeNotification.fragments.ContactUnsubscribeNotification}
+    ${RemindersOptOutNotification.fragments.RemindersOptOutNotification}
   `,
 };

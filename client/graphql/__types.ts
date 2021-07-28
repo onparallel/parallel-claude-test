@@ -140,27 +140,6 @@ export interface ContactPagination {
   totalCount: Scalars["Int"];
 }
 
-export interface ContactUnsubscribeEvent extends PetitionEvent {
-  __typename?: "ContactUnsubscribeEvent";
-  access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  otherReason: Scalars["String"];
-  reason: Scalars["String"];
-}
-
-export interface ContactUnsubscribeNotification
-  extends PetitionUserNotification {
-  __typename?: "ContactUnsubscribeNotification";
-  access: PetitionAccess;
-  createdAt: Scalars["DateTime"];
-  id: Scalars["GID"];
-  isRead: Scalars["Boolean"];
-  otherReason: Scalars["String"];
-  petition: PetitionBase;
-  reason: Scalars["String"];
-}
-
 export interface CreateContactInput {
   email: Scalars["String"];
   firstName?: Maybe<Scalars["String"]>;
@@ -382,8 +361,6 @@ export interface Mutation {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
-  /** Cancel a reminder for a contact. */
-  publicCancelReminder: PublicPetitionAccess;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -412,6 +389,8 @@ export interface Mutation {
   publicFileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
+  /** Cancel a reminder for a contact. */
+  publicOptOutReminders: PublicPetitionAccess;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendVerificationCode: VerificationCodeRequest;
@@ -738,12 +717,6 @@ export interface MutationpetitionFieldAttachmentUploadCompleteArgs {
   petitionId: Scalars["GID"];
 }
 
-export interface MutationpublicCancelReminderArgs {
-  keycode: Scalars["ID"];
-  otherReason: Scalars["String"];
-  reason: Scalars["String"];
-}
-
 export interface MutationpublicCheckVerificationCodeArgs {
   code: Scalars["String"];
   keycode: Scalars["ID"];
@@ -818,6 +791,12 @@ export interface MutationpublicFileUploadReplyDownloadLinkArgs {
 export interface MutationpublicMarkPetitionFieldCommentsAsReadArgs {
   keycode: Scalars["ID"];
   petitionFieldCommentIds: Array<Scalars["GID"]>;
+}
+
+export interface MutationpublicOptOutRemindersArgs {
+  keycode: Scalars["ID"];
+  otherReason: Scalars["String"];
+  reason: Scalars["String"];
 }
 
 export interface MutationpublicPetitionFieldAttachmentDownloadLinkArgs {
@@ -1279,8 +1258,8 @@ export interface PetitionAccess extends Timestamps {
   remindersConfig?: Maybe<RemindersConfig>;
   /** Number of reminders left. */
   remindersLeft: Scalars["Int"];
-  /** Whether contact has unsubscribed or not for this petition access */
-  remindersUnsubscribed: Scalars["Boolean"];
+  /** Whether contact has opted out from receiving reminders for this petition */
+  remindersOptOut: Scalars["Boolean"];
   /** The status of the petition access */
   status: PetitionAccessStatus;
   /** Time when the resource was last updated. */
@@ -2243,6 +2222,26 @@ export interface RemindersConfigInput {
   weekdaysOnly: Scalars["Boolean"];
 }
 
+export interface RemindersOptOutEvent extends PetitionEvent {
+  __typename?: "RemindersOptOutEvent";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  otherReason: Scalars["String"];
+  reason: Scalars["String"];
+}
+
+export interface RemindersOptOutNotification extends PetitionUserNotification {
+  __typename?: "RemindersOptOutNotification";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
+  otherReason: Scalars["String"];
+  petition: PetitionBase;
+  reason: Scalars["String"];
+}
+
 export interface ReplyCreatedEvent extends PetitionEvent {
   __typename?: "ReplyCreatedEvent";
   createdAt: Scalars["DateTime"];
@@ -3093,11 +3092,6 @@ export type NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotif
     __typename?: "CommentCreatedUserNotification";
   } & NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
 
-export type NotificationsDrawer_PetitionUserNotification_ContactUnsubscribeNotification_Fragment =
-  {
-    __typename?: "ContactUnsubscribeNotification";
-  } & NotificationsList_PetitionUserNotification_ContactUnsubscribeNotification_Fragment;
-
 export type NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
   {
     __typename?: "MessageEmailBouncedUserNotification";
@@ -3113,6 +3107,11 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotif
     __typename?: "PetitionSharedUserNotification";
   } & NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment;
 
+export type NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment =
+  {
+    __typename?: "RemindersOptOutNotification";
+  } & NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment;
+
 export type NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
   {
     __typename?: "SignatureCancelledUserNotification";
@@ -3125,10 +3124,10 @@ export type NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserN
 
 export type NotificationsDrawer_PetitionUserNotificationFragment =
   | NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment
-  | NotificationsDrawer_PetitionUserNotification_ContactUnsubscribeNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment
+  | NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
@@ -3152,9 +3151,6 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
             __typename?: "CommentCreatedUserNotification";
           } & NotificationsDrawer_PetitionUserNotification_CommentCreatedUserNotification_Fragment)
         | ({
-            __typename?: "ContactUnsubscribeNotification";
-          } & NotificationsDrawer_PetitionUserNotification_ContactUnsubscribeNotification_Fragment)
-        | ({
             __typename?: "MessageEmailBouncedUserNotification";
           } & NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment)
         | ({
@@ -3163,6 +3159,9 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
         | ({
             __typename?: "PetitionSharedUserNotification";
           } & NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment)
+        | ({
+            __typename?: "RemindersOptOutNotification";
+          } & NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment)
         | ({
             __typename?: "SignatureCancelledUserNotification";
           } & NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment)
@@ -3179,11 +3178,6 @@ export type NotificationsList_PetitionUserNotification_CommentCreatedUserNotific
     __typename?: "CommentCreatedUserNotification";
   } & CommentCreatedUserNotification_CommentCreatedUserNotificationFragment;
 
-export type NotificationsList_PetitionUserNotification_ContactUnsubscribeNotification_Fragment =
-  {
-    __typename?: "ContactUnsubscribeNotification";
-  } & ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragment;
-
 export type NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
   {
     __typename?: "MessageEmailBouncedUserNotification";
@@ -3199,6 +3193,11 @@ export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotific
     __typename?: "PetitionSharedUserNotification";
   } & PetitionSharedUserNotification_PetitionSharedUserNotificationFragment;
 
+export type NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment =
+  {
+    __typename?: "RemindersOptOutNotification";
+  } & RemindersOptOutNotification_RemindersOptOutNotificationFragment;
+
 export type NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
   {
     __typename?: "SignatureCancelledUserNotification";
@@ -3211,10 +3210,10 @@ export type NotificationsList_PetitionUserNotification_SignatureCompletedUserNot
 
 export type NotificationsList_PetitionUserNotificationFragment =
   | NotificationsList_PetitionUserNotification_CommentCreatedUserNotification_Fragment
-  | NotificationsList_PetitionUserNotification_ContactUnsubscribeNotification_Fragment
   | NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment
+  | NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment
   | NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
 
@@ -3237,17 +3236,6 @@ export type CommentCreatedUserNotification_CommentCreatedUserNotificationFragmen
       >;
     };
   } & PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment;
-
-export type ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragment =
-  {
-    __typename?: "ContactUnsubscribeNotification";
-    reason: string;
-    otherReason: string;
-    access: {
-      __typename?: "PetitionAccess";
-      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-    };
-  } & PetitionUserNotification_PetitionUserNotification_ContactUnsubscribeNotification_Fragment;
 
 export type MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragment =
   {
@@ -3289,17 +3277,6 @@ export type PetitionUserNotification_PetitionUserNotification_CommentCreatedUser
       | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
-export type PetitionUserNotification_PetitionUserNotification_ContactUnsubscribeNotification_Fragment =
-  {
-    __typename?: "ContactUnsubscribeNotification";
-    id: string;
-    createdAt: string;
-    isRead: boolean;
-    petition:
-      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
-      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
-  };
-
 export type PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment =
   {
     __typename?: "MessageEmailBouncedUserNotification";
@@ -3333,6 +3310,17 @@ export type PetitionUserNotification_PetitionUserNotification_PetitionSharedUser
       | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
+export type PetitionUserNotification_PetitionUserNotification_RemindersOptOutNotification_Fragment =
+  {
+    __typename?: "RemindersOptOutNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
+
 export type PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment =
   {
     __typename?: "SignatureCancelledUserNotification";
@@ -3357,12 +3345,22 @@ export type PetitionUserNotification_PetitionUserNotification_SignatureCompleted
 
 export type PetitionUserNotification_PetitionUserNotificationFragment =
   | PetitionUserNotification_PetitionUserNotification_CommentCreatedUserNotification_Fragment
-  | PetitionUserNotification_PetitionUserNotification_ContactUnsubscribeNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_PetitionSharedUserNotification_Fragment
+  | PetitionUserNotification_PetitionUserNotification_RemindersOptOutNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
+
+export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
+  __typename?: "RemindersOptOutNotification";
+  reason: string;
+  otherReason: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  };
+} & PetitionUserNotification_PetitionUserNotification_RemindersOptOutNotification_Fragment;
 
 export type SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragment =
   {
@@ -3464,7 +3462,7 @@ export type PetitionAccessTable_PetitionAccessFragment = {
   remindersLeft: number;
   reminderCount: number;
   remindersActive: boolean;
-  remindersUnsubscribed: boolean;
+  remindersOptOut: boolean;
   createdAt: string;
   contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
   remindersConfig?: Maybe<
@@ -3497,9 +3495,6 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | ({
           __typename?: "CommentPublishedEvent";
         } & PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment)
-      | ({
-          __typename?: "ContactUnsubscribeEvent";
-        } & PetitionActivityTimeline_PetitionEvent_ContactUnsubscribeEvent_Fragment)
       | ({
           __typename?: "GroupPermissionAddedEvent";
         } & PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment)
@@ -3545,6 +3540,9 @@ export type PetitionActivityTimeline_PetitionFragment = {
       | ({
           __typename?: "ReminderSentEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment)
+      | ({
+          __typename?: "RemindersOptOutEvent";
+        } & PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment)
       | ({
           __typename?: "ReplyCreatedEvent";
         } & PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment)
@@ -3614,12 +3612,6 @@ export type PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragmen
     __typename?: "CommentPublishedEvent";
     id: string;
   } & TimelineCommentPublishedEvent_CommentPublishedEventFragment;
-
-export type PetitionActivityTimeline_PetitionEvent_ContactUnsubscribeEvent_Fragment =
-  {
-    __typename?: "ContactUnsubscribeEvent";
-    id: string;
-  } & TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragment;
 
 export type PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment =
   {
@@ -3708,6 +3700,12 @@ export type PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment =
     id: string;
   } & TimelineReminderSentEvent_ReminderSentEventFragment;
 
+export type PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment =
+  {
+    __typename?: "RemindersOptOutEvent";
+    id: string;
+  } & TimelineRemindersOptOutEvent_RemindersOptOutEventFragment;
+
 export type PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment =
   {
     __typename?: "ReplyCreatedEvent";
@@ -3772,7 +3770,6 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_AccessOpenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_CommentDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_CommentPublishedEvent_Fragment
-  | PetitionActivityTimeline_PetitionEvent_ContactUnsubscribeEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_GroupPermissionAddedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_GroupPermissionEditedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_GroupPermissionRemovedEvent_Fragment
@@ -3788,6 +3785,7 @@ export type PetitionActivityTimeline_PetitionEventFragment =
   | PetitionActivityTimeline_PetitionEvent_PetitionDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_PetitionReopenedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReminderSentEvent_Fragment
+  | PetitionActivityTimeline_PetitionEvent_RemindersOptOutEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyCreatedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyDeletedEvent_Fragment
   | PetitionActivityTimeline_PetitionEvent_ReplyUpdatedEvent_Fragment
@@ -3916,17 +3914,6 @@ export type TimelineCommentPublishedEvent_CommentPublishedEventFragment = {
       | ({ __typename?: "User" } & UserReference_UserFragment)
     >;
   }>;
-};
-
-export type TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragment = {
-  __typename?: "ContactUnsubscribeEvent";
-  createdAt: string;
-  reason: string;
-  otherReason: string;
-  access: {
-    __typename?: "PetitionAccess";
-    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
-  };
 };
 
 export type TimelineGroupPermissionAddedEvent_GroupPermissionAddedEventFragment =
@@ -4068,6 +4055,17 @@ export type TimelineReminderSentEvent_ReminderSentEventFragment = {
       contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
     };
   } & SentReminderMessageDialog_PetitionReminderFragment;
+};
+
+export type TimelineRemindersOptOutEvent_RemindersOptOutEventFragment = {
+  __typename?: "RemindersOptOutEvent";
+  createdAt: string;
+  reason: string;
+  otherReason: string;
+  access: {
+    __typename?: "PetitionAccess";
+    contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+  };
 };
 
 export type TimelineReplyCreatedEvent_ReplyCreatedEventFragment = {
@@ -6862,27 +6860,25 @@ export type publicCheckVerificationCodeMutation = {
   };
 };
 
-export type UnsubscribeView_publicCancelReminderMutationVariables = Exact<{
+export type OptOut_publicOptOutRemindersMutationVariables = Exact<{
   keycode: Scalars["ID"];
   reason: Scalars["String"];
   otherReason: Scalars["String"];
 }>;
 
-export type UnsubscribeView_publicCancelReminderMutation = {
-  publicCancelReminder: {
+export type OptOut_publicOptOutRemindersMutation = {
+  publicOptOutReminders: {
     __typename?: "PublicPetitionAccess";
     petition?: Maybe<{ __typename?: "PublicPetition"; id: string }>;
   };
 };
 
-export type UnsubscribeView_PublicPetitionAccessFragment = {
+export type OptOut_PublicPetitionAccessFragment = {
   __typename?: "PublicPetitionAccess";
-  granter?: Maybe<
-    { __typename?: "PublicUser" } & UnsubscribeView_PublicUserFragment
-  >;
+  granter?: Maybe<{ __typename?: "PublicUser" } & OptOut_PublicUserFragment>;
 };
 
-export type UnsubscribeView_PublicUserFragment = {
+export type OptOut_PublicUserFragment = {
   __typename?: "PublicUser";
   id: string;
   organization: {
@@ -6893,15 +6889,15 @@ export type UnsubscribeView_PublicUserFragment = {
   };
 };
 
-export type UnsubscribePublicPetitionQueryVariables = Exact<{
+export type PublicOptOutQueryVariables = Exact<{
   keycode: Scalars["ID"];
 }>;
 
-export type UnsubscribePublicPetitionQuery = {
+export type PublicOptOutQuery = {
   access?: Maybe<
     {
       __typename?: "PublicPetitionAccess";
-    } & UnsubscribeView_PublicPetitionAccessFragment
+    } & OptOut_PublicPetitionAccessFragment
   >;
 };
 
@@ -7081,11 +7077,6 @@ export type useUpdateIsReadNotificationMutation = {
         comment: { __typename?: "PetitionFieldComment"; id: string };
       }
     | {
-        __typename?: "ContactUnsubscribeNotification";
-        id: string;
-        isRead: boolean;
-      }
-    | {
         __typename?: "MessageEmailBouncedUserNotification";
         id: string;
         isRead: boolean;
@@ -7097,6 +7088,11 @@ export type useUpdateIsReadNotificationMutation = {
       }
     | {
         __typename?: "PetitionSharedUserNotification";
+        id: string;
+        isRead: boolean;
+      }
+    | {
+        __typename?: "RemindersOptOutNotification";
         id: string;
         isRead: boolean;
       }
@@ -7410,8 +7406,8 @@ export const SignatureCompletedUserNotification_SignatureCompletedUserNotificati
   }
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
 `;
-export const ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragmentDoc = gql`
-  fragment ContactUnsubscribeNotification_ContactUnsubscribeNotification on ContactUnsubscribeNotification {
+export const RemindersOptOutNotification_RemindersOptOutNotificationFragmentDoc = gql`
+  fragment RemindersOptOutNotification_RemindersOptOutNotification on RemindersOptOutNotification {
     ...PetitionUserNotification_PetitionUserNotification
     access {
       contact {
@@ -7444,8 +7440,8 @@ export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
     ... on SignatureCompletedUserNotification {
       ...SignatureCompletedUserNotification_SignatureCompletedUserNotification
     }
-    ... on ContactUnsubscribeNotification {
-      ...ContactUnsubscribeNotification_ContactUnsubscribeNotification
+    ... on RemindersOptOutNotification {
+      ...RemindersOptOutNotification_RemindersOptOutNotification
     }
   }
   ${CommentCreatedUserNotification_CommentCreatedUserNotificationFragmentDoc}
@@ -7454,7 +7450,7 @@ export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
   ${PetitionSharedUserNotification_PetitionSharedUserNotificationFragmentDoc}
   ${SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragmentDoc}
   ${SignatureCompletedUserNotification_SignatureCompletedUserNotificationFragmentDoc}
-  ${ContactUnsubscribeNotification_ContactUnsubscribeNotificationFragmentDoc}
+  ${RemindersOptOutNotification_RemindersOptOutNotificationFragmentDoc}
 `;
 export const NotificationsDrawer_PetitionUserNotificationFragmentDoc = gql`
   fragment NotificationsDrawer_PetitionUserNotification on PetitionUserNotification {
@@ -8064,7 +8060,7 @@ export const PetitionAccessTable_PetitionAccessFragmentDoc = gql`
     remindersLeft
     reminderCount
     remindersActive
-    remindersUnsubscribed
+    remindersOptOut
     remindersConfig {
       ...PetitionAccessTable_PetitionAccessRemindersConfig
     }
@@ -8549,8 +8545,8 @@ export const TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc = gql`
   }
   ${UserReference_UserFragmentDoc}
 `;
-export const TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragmentDoc = gql`
-  fragment TimelineContactUnsubscribeEvent_ContactUnsubscribeEvent on ContactUnsubscribeEvent {
+export const TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc = gql`
+  fragment TimelineRemindersOptOutEvent_RemindersOptOutEvent on RemindersOptOutEvent {
     access {
       contact {
         ...ContactLink_Contact
@@ -8655,8 +8651,8 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
     ... on PetitionClonedEvent {
       ...TimelinePetitionClonedEvent_PetitionClonedEvent
     }
-    ... on ContactUnsubscribeEvent {
-      ...TimelineContactUnsubscribeEvent_ContactUnsubscribeEvent
+    ... on RemindersOptOutEvent {
+      ...TimelineRemindersOptOutEvent_RemindersOptOutEvent
     }
   }
   ${TimelinePetitionCreatedEvent_PetitionCreatedEventFragmentDoc}
@@ -8688,7 +8684,7 @@ export const PetitionActivityTimeline_PetitionEventFragmentDoc = gql`
   ${TimelineGroupPermissionEditedEvent_GroupPermissionEditedEventFragmentDoc}
   ${TimelineGroupPermissionRemovedEvent_GroupPermissionRemovedEventFragmentDoc}
   ${TimelinePetitionClonedEvent_PetitionClonedEventFragmentDoc}
-  ${TimelineContactUnsubscribeEvent_ContactUnsubscribeEventFragmentDoc}
+  ${TimelineRemindersOptOutEvent_RemindersOptOutEventFragmentDoc}
 `;
 export const PetitionActivityTimeline_PetitionFragmentDoc = gql`
   fragment PetitionActivityTimeline_Petition on Petition {
@@ -9589,8 +9585,8 @@ export const RecipientView_PublicPetitionAccessFragmentDoc = gql`
   ${RecipientView_PublicPetitionMessageFragmentDoc}
   ${RecipientViewPetitionField_PublicPetitionAccessFragmentDoc}
 `;
-export const UnsubscribeView_PublicUserFragmentDoc = gql`
-  fragment UnsubscribeView_PublicUser on PublicUser {
+export const OptOut_PublicUserFragmentDoc = gql`
+  fragment OptOut_PublicUser on PublicUser {
     id
     organization {
       name
@@ -9599,13 +9595,13 @@ export const UnsubscribeView_PublicUserFragmentDoc = gql`
     }
   }
 `;
-export const UnsubscribeView_PublicPetitionAccessFragmentDoc = gql`
-  fragment UnsubscribeView_PublicPetitionAccess on PublicPetitionAccess {
+export const OptOut_PublicPetitionAccessFragmentDoc = gql`
+  fragment OptOut_PublicPetitionAccess on PublicPetitionAccess {
     granter {
-      ...UnsubscribeView_PublicUser
+      ...OptOut_PublicUser
     }
   }
-  ${UnsubscribeView_PublicUserFragmentDoc}
+  ${OptOut_PublicUserFragmentDoc}
 `;
 export const PetitionPdf_PetitionFieldFragmentDoc = gql`
   fragment PetitionPdf_PetitionField on PetitionField {
@@ -14306,13 +14302,13 @@ export function usepublicCheckVerificationCodeMutation(
 export type publicCheckVerificationCodeMutationHookResult = ReturnType<
   typeof usepublicCheckVerificationCodeMutation
 >;
-export const UnsubscribeView_publicCancelReminderDocument = gql`
-  mutation UnsubscribeView_publicCancelReminder(
+export const OptOut_publicOptOutRemindersDocument = gql`
+  mutation OptOut_publicOptOutReminders(
     $keycode: ID!
     $reason: String!
     $otherReason: String!
   ) {
-    publicCancelReminder(
+    publicOptOutReminders(
       keycode: $keycode
       reason: $reason
       otherReason: $otherReason
@@ -14323,58 +14319,58 @@ export const UnsubscribeView_publicCancelReminderDocument = gql`
     }
   }
 `;
-export function useUnsubscribeView_publicCancelReminderMutation(
+export function useOptOut_publicOptOutRemindersMutation(
   baseOptions?: Apollo.MutationHookOptions<
-    UnsubscribeView_publicCancelReminderMutation,
-    UnsubscribeView_publicCancelReminderMutationVariables
+    OptOut_publicOptOutRemindersMutation,
+    OptOut_publicOptOutRemindersMutationVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useMutation<
-    UnsubscribeView_publicCancelReminderMutation,
-    UnsubscribeView_publicCancelReminderMutationVariables
-  >(UnsubscribeView_publicCancelReminderDocument, options);
+    OptOut_publicOptOutRemindersMutation,
+    OptOut_publicOptOutRemindersMutationVariables
+  >(OptOut_publicOptOutRemindersDocument, options);
 }
-export type UnsubscribeView_publicCancelReminderMutationHookResult = ReturnType<
-  typeof useUnsubscribeView_publicCancelReminderMutation
+export type OptOut_publicOptOutRemindersMutationHookResult = ReturnType<
+  typeof useOptOut_publicOptOutRemindersMutation
 >;
-export const UnsubscribePublicPetitionDocument = gql`
-  query UnsubscribePublicPetition($keycode: ID!) {
+export const PublicOptOutDocument = gql`
+  query PublicOptOut($keycode: ID!) {
     access(keycode: $keycode) {
-      ...UnsubscribeView_PublicPetitionAccess
+      ...OptOut_PublicPetitionAccess
     }
   }
-  ${UnsubscribeView_PublicPetitionAccessFragmentDoc}
+  ${OptOut_PublicPetitionAccessFragmentDoc}
 `;
-export function useUnsubscribePublicPetitionQuery(
+export function usePublicOptOutQuery(
   baseOptions: Apollo.QueryHookOptions<
-    UnsubscribePublicPetitionQuery,
-    UnsubscribePublicPetitionQueryVariables
+    PublicOptOutQuery,
+    PublicOptOutQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    UnsubscribePublicPetitionQuery,
-    UnsubscribePublicPetitionQueryVariables
-  >(UnsubscribePublicPetitionDocument, options);
+  return Apollo.useQuery<PublicOptOutQuery, PublicOptOutQueryVariables>(
+    PublicOptOutDocument,
+    options
+  );
 }
-export function useUnsubscribePublicPetitionLazyQuery(
+export function usePublicOptOutLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    UnsubscribePublicPetitionQuery,
-    UnsubscribePublicPetitionQueryVariables
+    PublicOptOutQuery,
+    PublicOptOutQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    UnsubscribePublicPetitionQuery,
-    UnsubscribePublicPetitionQueryVariables
-  >(UnsubscribePublicPetitionDocument, options);
+  return Apollo.useLazyQuery<PublicOptOutQuery, PublicOptOutQueryVariables>(
+    PublicOptOutDocument,
+    options
+  );
 }
-export type UnsubscribePublicPetitionQueryHookResult = ReturnType<
-  typeof useUnsubscribePublicPetitionQuery
+export type PublicOptOutQueryHookResult = ReturnType<
+  typeof usePublicOptOutQuery
 >;
-export type UnsubscribePublicPetitionLazyQueryHookResult = ReturnType<
-  typeof useUnsubscribePublicPetitionLazyQuery
+export type PublicOptOutLazyQueryHookResult = ReturnType<
+  typeof usePublicOptOutLazyQuery
 >;
 export const PdfViewPetitionDocument = gql`
   query PdfViewPetition($token: String!) {
