@@ -31,7 +31,7 @@ export function useReminderOptOutReasons(): Record<
       NO_REMINDERS: intl.formatMessage({
         id: "public.opt-out.answer-no-reminders",
         defaultMessage:
-          "I will upload the information but I do not want to receive more reminders",
+          "I will upload the information but I do not want to receive reminders anymore",
       }),
       OTHER: intl.formatMessage({
         id: "public.opt-out.answer-other",

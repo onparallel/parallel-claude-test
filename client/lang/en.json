@@ -5231,8 +5231,8 @@
   },
   {
     "term": "public.opt-out.answer-no-reminders",
-    "definition": "I will upload the information but I do not want to receive more reminders",
-    "context": "I will upload the information but I do not want to receive more reminders"
+    "definition": "I will upload the information but I do not want to receive reminders anymore",
+    "context": "I will upload the information but I do not want to receive reminders anymore"
   },
   {
     "term": "public.opt-out.answer-not-interested",
@@ -5256,8 +5256,8 @@
   },
   {
     "term": "public.opt-out.done-body",
-    "definition": "We have informed the sender and you won’t receive more reminders from this petition.",
-    "context": "We have informed the sender and you won’t receive more reminders from this petition."
+    "definition": "We have informed the sender and you will not receive reminders anymore from this request.",
+    "context": "We have informed the sender and you will not receive reminders anymore from this request."
   },
   {
     "term": "public.opt-out.done-title",
@@ -5266,8 +5266,8 @@
   },
   {
     "term": "public.opt-out.feedback-title",
-    "definition": "Please, would you let us know why you don't want to receive reminders? *",
-    "context": "Please, would you let us know why you don't want to receive reminders? *"
+    "definition": "Please, let us know why you want to stop receiving reminders? *",
+    "context": "Please, let us know why you want to stop receiving reminders? *"
   },
   {
     "term": "public.opt-out.opt-out-button",
@@ -5283,6 +5283,21 @@
     "term": "public.opt-out.other-placeholder",
     "definition": "Indicate other reasons",
     "context": "Indicate other reasons"
+  },
+  {
+    "term": "public.opt-out.review-before-opt-out",
+    "definition": "Before opting out from receiving reminders, check the requested information.",
+    "context": "Before opting out from receiving reminders, check the requested information."
+  },
+  {
+    "term": "public.opt-out.review-button",
+    "definition": "Review the information",
+    "context": "Review the information"
+  },
+  {
+    "term": "public.opt-out.title",
+    "definition": "Opt out from reminders",
+    "context": "Opt out from reminders"
   },
   {
     "term": "public.parallel-use-cases.aml-description",

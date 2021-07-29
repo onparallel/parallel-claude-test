@@ -5232,7 +5232,7 @@
   {
     "term": "public.opt-out.answer-no-reminders",
     "definition": "Subiré la información pero no quiero seguir recibiendo recordatorios",
-    "context": "I will upload the information but I do not want to receive more reminders"
+    "context": "I will upload the information but I do not want to receive reminders anymore"
   },
   {
     "term": "public.opt-out.answer-not-interested",
@@ -5256,8 +5256,8 @@
   },
   {
     "term": "public.opt-out.done-body",
-    "definition": "Hemos informado a tu remitente y no recibirás más recordatorios de esta petición.",
-    "context": "We have informed the sender and you won’t receive more reminders from this petition."
+    "definition": "Hemos informado a tu remitente y no recibirá más recordatorios de esta petición.",
+    "context": "We have informed the sender and you will not receive reminders anymore from this request."
   },
   {
     "term": "public.opt-out.done-title",
@@ -5267,7 +5267,7 @@
   {
     "term": "public.opt-out.feedback-title",
     "definition": "Por favor, ¿podría indicarnos el motivo para no querer recibir más recordatorios? *",
-    "context": "Please, would you let us know why you don't want to receive reminders? *"
+    "context": "Please, let us know why you want to stop receiving reminders? *"
   },
   {
     "term": "public.opt-out.opt-out-button",
@@ -5283,6 +5283,21 @@
     "term": "public.opt-out.other-placeholder",
     "definition": "Indicar otros motivos",
     "context": "Indicate other reasons"
+  },
+  {
+    "term": "public.opt-out.review-before-opt-out",
+    "definition": "Antes de cancelar los recordatorios, comprueba la información solicitada.",
+    "context": "Before opting out from receiving reminders, check the requested information."
+  },
+  {
+    "term": "public.opt-out.review-button",
+    "definition": "Revisar la información",
+    "context": "Review the information"
+  },
+  {
+    "term": "public.opt-out.title",
+    "definition": "Cancelar recordatorios",
+    "context": "Opt out from reminders"
   },
   {
     "term": "public.parallel-use-cases.aml-description",
