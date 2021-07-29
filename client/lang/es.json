@@ -3220,6 +3220,91 @@
     "context": "You"
   },
   {
+    "term": "global.categories.administration",
+    "definition": "Administración",
+    "context": "Administration"
+  },
+  {
+    "term": "global.categories.all-templates",
+    "definition": "Todas las plantillas",
+    "context": "All templates"
+  },
+  {
+    "term": "global.categories.business-development",
+    "definition": "Desarollo de negocio",
+    "context": "Business development"
+  },
+  {
+    "term": "global.categories.compliance",
+    "definition": "Compliance",
+    "context": "Compliance"
+  },
+  {
+    "term": "global.categories.customer-service",
+    "definition": "Servicio al cliente",
+    "context": "Customer service"
+  },
+  {
+    "term": "global.categories.engineering",
+    "definition": "Ingeniería",
+    "context": "Engineering"
+  },
+  {
+    "term": "global.categories.finance",
+    "definition": "Finanzas",
+    "context": "Finance"
+  },
+  {
+    "term": "global.categories.general-management",
+    "definition": "Gestión general",
+    "context": "General Management"
+  },
+  {
+    "term": "global.categories.hr",
+    "definition": "RRHH",
+    "context": "HR"
+  },
+  {
+    "term": "global.categories.it",
+    "definition": "IT",
+    "context": "IT"
+  },
+  {
+    "term": "global.categories.legal",
+    "definition": "Legal",
+    "context": "Legal"
+  },
+  {
+    "term": "global.categories.marketing",
+    "definition": "Marketing",
+    "context": "Marketing"
+  },
+  {
+    "term": "global.categories.operations",
+    "definition": "Operaciones",
+    "context": "Operations"
+  },
+  {
+    "term": "global.categories.other",
+    "definition": "Otros",
+    "context": "Other"
+  },
+  {
+    "term": "global.categories.procurement",
+    "definition": "Compras",
+    "context": "Procurement"
+  },
+  {
+    "term": "global.categories.product",
+    "definition": "Producto",
+    "context": "Product"
+  },
+  {
+    "term": "global.categories.sales",
+    "definition": "Ventas",
+    "context": "Sales"
+  },
+  {
     "term": "header.user-menu-button",
     "definition": "Menú de usuario",
     "context": "User menu"
@@ -5983,6 +6068,96 @@
     "term": "public.team-collaboration.cta-title",
     "definition": "¿Quieres ver cómo funciona? ¡Pruébalo ya!",
     "context": "Do you want to see how it works? Try it now!"
+  },
+  {
+    "term": "public.template-card.created-by",
+    "definition": "Creado por {name} en {orgName}",
+    "context": "Created by {name} on {orgName}"
+  },
+  {
+    "term": "public.template-category-preview.templates-for",
+    "definition": "Plantillas para {category}",
+    "context": "Templates for {category}"
+  },
+  {
+    "term": "public.template-category-preview.view-all",
+    "definition": "Ver todas",
+    "context": "View all"
+  },
+  {
+    "term": "public.template-details.conditional-fields",
+    "definition": "Campos condicionales",
+    "context": "Conditional fields"
+  },
+  {
+    "term": "public.template-details.designed-for",
+    "definition": "Pensada para",
+    "context": "Designed for"
+  },
+  {
+    "term": "public.template-details.last-updated-on",
+    "definition": "Actualizada por última vez el {date}",
+    "context": "Last updated on {date}"
+  },
+  {
+    "term": "public.template-details.list-includes",
+    "definition": "Esta plantilla incluye",
+    "context": "This template includes"
+  },
+  {
+    "term": "public.template-details.list-number-fields",
+    "definition": "{fileds} preguntas",
+    "context": "{fields} question fields"
+  },
+  {
+    "term": "public.template-details.other-similar-templates",
+    "definition": "Otras plantillas similares",
+    "context": "Other similar templates"
+  },
+  {
+    "term": "public.template-details.personalized-message",
+    "definition": "Mensaje personalizado",
+    "context": "Personalized message"
+  },
+  {
+    "term": "public.template-details.possibility-esignature",
+    "definition": "Posibilidad de habilitar eSignature",
+    "context": "Possibility to enable eSignature"
+  },
+  {
+    "term": "public.templates",
+    "definition": "Plantillas",
+    "context": "Templates"
+  },
+  {
+    "term": "public.templates-hero.template-library",
+    "definition": "Librería de plantillas",
+    "context": "Template library"
+  },
+  {
+    "term": "public.templates-hero.template-library-desc",
+    "definition": "Descubre algunas de las plantillas que ofrecemos públicamente en Parallel para mejorar tu experiencia.",
+    "context": "Discover some of the public templates that we offer on Parallel to improve your experience."
+  },
+  {
+    "term": "public.templates-link",
+    "definition": "Plantillas",
+    "context": "Templates"
+  },
+  {
+    "term": "public.templates.know-more-about",
+    "definition": "¿Quieres saber más sobre nuestras plantillas?",
+    "context": "Do you want to know more about our templates?"
+  },
+  {
+    "term": "public.templates.meta-description",
+    "definition": "Obtenga más información sobre las plantillas de Parallel",
+    "context": "Learn more about Parallel's templates"
+  },
+  {
+    "term": "public.templates.we-show-you",
+    "definition": "¡Te las enseñamos!",
+    "context": "We show you!"
   },
   {
     "term": "public.terms.title",

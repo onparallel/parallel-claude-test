@@ -3220,6 +3220,91 @@
     "context": "You"
   },
   {
+    "term": "global.categories.administration",
+    "definition": "Administration",
+    "context": "Administration"
+  },
+  {
+    "term": "global.categories.all-templates",
+    "definition": "All templates",
+    "context": "All templates"
+  },
+  {
+    "term": "global.categories.business-development",
+    "definition": "Business development",
+    "context": "Business development"
+  },
+  {
+    "term": "global.categories.compliance",
+    "definition": "Compliance",
+    "context": "Compliance"
+  },
+  {
+    "term": "global.categories.customer-service",
+    "definition": "Customer service",
+    "context": "Customer service"
+  },
+  {
+    "term": "global.categories.engineering",
+    "definition": "Engineering",
+    "context": "Engineering"
+  },
+  {
+    "term": "global.categories.finance",
+    "definition": "Finance",
+    "context": "Finance"
+  },
+  {
+    "term": "global.categories.general-management",
+    "definition": "General Management",
+    "context": "General Management"
+  },
+  {
+    "term": "global.categories.hr",
+    "definition": "HR",
+    "context": "HR"
+  },
+  {
+    "term": "global.categories.it",
+    "definition": "IT",
+    "context": "IT"
+  },
+  {
+    "term": "global.categories.legal",
+    "definition": "Legal",
+    "context": "Legal"
+  },
+  {
+    "term": "global.categories.marketing",
+    "definition": "Marketing",
+    "context": "Marketing"
+  },
+  {
+    "term": "global.categories.operations",
+    "definition": "Operations",
+    "context": "Operations"
+  },
+  {
+    "term": "global.categories.other",
+    "definition": "Other",
+    "context": "Other"
+  },
+  {
+    "term": "global.categories.procurement",
+    "definition": "Procurement",
+    "context": "Procurement"
+  },
+  {
+    "term": "global.categories.product",
+    "definition": "Product",
+    "context": "Product"
+  },
+  {
+    "term": "global.categories.sales",
+    "definition": "Sales",
+    "context": "Sales"
+  },
+  {
     "term": "header.user-menu-button",
     "definition": "User menu",
     "context": "User menu"
@@ -5983,6 +6068,96 @@
     "term": "public.team-collaboration.cta-title",
     "definition": "Do you want to see how it works? Try it now!",
     "context": "Do you want to see how it works? Try it now!"
+  },
+  {
+    "term": "public.template-card.created-by",
+    "definition": "Created by {name} on {orgName}",
+    "context": "Created by {name} on {orgName}"
+  },
+  {
+    "term": "public.template-category-preview.templates-for",
+    "definition": "Templates for {category}",
+    "context": "Templates for {category}"
+  },
+  {
+    "term": "public.template-category-preview.view-all",
+    "definition": "View all",
+    "context": "View all"
+  },
+  {
+    "term": "public.template-details.conditional-fields",
+    "definition": "Conditional fields",
+    "context": "Conditional fields"
+  },
+  {
+    "term": "public.template-details.designed-for",
+    "definition": "Designed for",
+    "context": "Designed for"
+  },
+  {
+    "term": "public.template-details.last-updated-on",
+    "definition": "Last updated on {date}",
+    "context": "Last updated on {date}"
+  },
+  {
+    "term": "public.template-details.list-includes",
+    "definition": "This template includes",
+    "context": "This template includes"
+  },
+  {
+    "term": "public.template-details.list-number-fields",
+    "definition": "{fields} question fields",
+    "context": "{fields} question fields"
+  },
+  {
+    "term": "public.template-details.other-similar-templates",
+    "definition": "Other similar templates",
+    "context": "Other similar templates"
+  },
+  {
+    "term": "public.template-details.personalized-message",
+    "definition": "Personalized message",
+    "context": "Personalized message"
+  },
+  {
+    "term": "public.template-details.possibility-esignature",
+    "definition": "Possibility to enable eSignature",
+    "context": "Possibility to enable eSignature"
+  },
+  {
+    "term": "public.templates",
+    "definition": "Templates",
+    "context": "Templates"
+  },
+  {
+    "term": "public.templates-hero.template-library",
+    "definition": "Template library",
+    "context": "Template library"
+  },
+  {
+    "term": "public.templates-hero.template-library-desc",
+    "definition": "Discover some of the public templates that we offer on Parallel to improve your experience.",
+    "context": "Discover some of the public templates that we offer on Parallel to improve your experience."
+  },
+  {
+    "term": "public.templates-link",
+    "definition": "Templates",
+    "context": "Templates"
+  },
+  {
+    "term": "public.templates.know-more-about",
+    "definition": "Do you want to know more about our templates?",
+    "context": "Do you want to know more about our templates?"
+  },
+  {
+    "term": "public.templates.meta-description",
+    "definition": "Learn more about Parallel's templates",
+    "context": "Learn more about Parallel's templates"
+  },
+  {
+    "term": "public.templates.we-show-you",
+    "definition": "We show you!",
+    "context": "We show you!"
   },
   {
     "term": "public.terms.title",

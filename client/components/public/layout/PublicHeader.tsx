@@ -2,9 +2,11 @@ import {
   Box,
   BoxProps,
   Button,
+  ButtonProps,
   Flex,
   Menu,
   MenuButton,
+  MenuButtonProps,
   MenuItem,
   MenuItemProps,
   MenuList,
@@ -96,10 +98,15 @@ export function PublicHeader(props: BoxProps) {
 
 interface MenuItemLinkProps extends MenuItemProps {
   href: string;
+  selectedFontWeight?: string;
+  selectedColor?: string;
 }
 
-const MenuItemLink = chakraForwardRef<"a", MenuItemLinkProps>(
-  function MenuItemLink({ href, ...props }, ref) {
+export const MenuItemLink = chakraForwardRef<"a", MenuItemLinkProps>(
+  function MenuItemLink(
+    { href, selectedFontWeight, selectedColor, ...props },
+    ref
+  ) {
     const router = useRouter();
     const current = router.pathname.startsWith("/[locale]")
       ? router.asPath.replace(/^\/[^\/]+/, "")
@@ -111,8 +118,8 @@ const MenuItemLink = chakraForwardRef<"a", MenuItemLinkProps>(
           ref={ref as any}
           {...(current === href
             ? {
-                fontWeight: "bold",
-                color: "purple.600",
+                fontWeight: selectedFontWeight ?? "bold",
+                color: selectedColor ?? "purple.600",
               }
             : {})}
           {...props}
@@ -130,25 +137,16 @@ function PublicHeaderMenu(props: StackProps) {
 
   return (
     <Stack {...props}>
-      <Menu placement="bottom">
-        <MenuButton
+      <Menu placement="bottom" matchWidth={true}>
+        <MenuButtonHighlight
           as={Button}
           variant="ghost"
           rightIcon={<ChevronDownIcon />}
-          {...(current.includes("/product/")
-            ? {
-                fontWeight: "bold",
-                color: "purple.500",
-              }
-            : {})}
-          sx={{
-            "svg g": {
-              strokeWidth: "3.2",
-            },
-          }}
+          current={current}
+          selectedWhen="/product"
         >
           <FormattedMessage id="public.product-link" defaultMessage="Product" />
-        </MenuButton>
+        </MenuButtonHighlight>
         <Portal>
           <MenuList>
             <MenuItemLink href="/product/request-information">
@@ -184,28 +182,19 @@ function PublicHeaderMenu(props: StackProps) {
           </MenuList>
         </Portal>
       </Menu>
-      <Menu placement="bottom">
-        <MenuButton
+      <Menu placement="bottom" matchWidth={true}>
+        <MenuButtonHighlight
           as={Button}
           variant="ghost"
           rightIcon={<ChevronDownIcon />}
-          {...(current.includes("/solutions/")
-            ? {
-                fontWeight: "bold",
-                color: "purple.600",
-              }
-            : {})}
-          sx={{
-            "svg g": {
-              strokeWidth: "3.2",
-            },
-          }}
+          current={current}
+          selectedWhen="/solutions"
         >
           <FormattedMessage
             id="public.solutions-link"
             defaultMessage="Solutions"
           />
-        </MenuButton>
+        </MenuButtonHighlight>
         <Portal>
           <MenuList>
             <MenuItemLink href="/solutions/law-firms">
@@ -229,37 +218,39 @@ function PublicHeaderMenu(props: StackProps) {
           </MenuList>
         </Portal>
       </Menu>
-      <NakedLink href="/about">
-        <Button
+      <NakedLink href="/templates">
+        <ButtonHighlight
           as="a"
           variant="ghost"
-          {...(current.includes("/about")
-            ? {
-                fontWeight: "bold",
-                color: "purple.500",
-              }
-            : {})}
+          current={current}
+          selectedWhen="/templates"
+        >
+          <FormattedMessage
+            id="public.templates-link"
+            defaultMessage="Templates"
+          />
+        </ButtonHighlight>
+      </NakedLink>
+      <NakedLink href="/about">
+        <ButtonHighlight
+          as="a"
+          variant="ghost"
+          current={current}
+          selectedWhen="/about"
         >
           <FormattedMessage id="public.about-link" defaultMessage="About" />
-        </Button>
+        </ButtonHighlight>
       </NakedLink>
-      <Button as="a" variant="ghost" href="/blog">
-        <FormattedMessage id="public.blog-link" defaultMessage="Blog" />
-      </Button>
       <NakedLink href="/login">
-        <Button
+        <ButtonHighlight
           as="a"
           variant="outline"
           id="pw-public-login"
-          {...(current.includes("/login")
-            ? {
-                fontWeight: "bold",
-                color: "purple.500",
-              }
-            : {})}
+          current={current}
+          selectedWhen="/login"
         >
           <FormattedMessage id="public.login-button" defaultMessage="Login" />
-        </Button>
+        </ButtonHighlight>
       </NakedLink>
       <NakedLink href="/book-demo">
         <Button as="a" colorScheme="purple">
@@ -270,5 +261,72 @@ function PublicHeaderMenu(props: StackProps) {
         </Button>
       </NakedLink>
     </Stack>
+  );
+}
+
+interface ButtonHighlightProps extends ButtonProps {
+  selectedFontWeight?: string;
+  selectedColor?: string;
+  selectedWhen: string;
+  current: string;
+}
+
+function ButtonHighlight({
+  selectedFontWeight,
+  selectedColor,
+  selectedWhen,
+  current,
+  children,
+  ...props
+}: ButtonHighlightProps) {
+  return (
+    <Button
+      {...(current.includes(selectedWhen)
+        ? {
+            fontWeight: selectedFontWeight ?? "bold",
+            color: selectedColor ?? "purple.500",
+          }
+        : {})}
+      {...props}
+    >
+      {children}
+    </Button>
+  );
+}
+
+interface MenuButtonHighlightProps extends MenuButtonProps, ButtonProps {
+  selectedStrokeWidth?: string;
+  selectedFontWeight?: string;
+  selectedColor?: string;
+  selectedWhen: string;
+  current: string;
+}
+
+function MenuButtonHighlight({
+  selectedStrokeWidth,
+  selectedFontWeight,
+  selectedColor,
+  selectedWhen,
+  current,
+  children,
+  ...props
+}: MenuButtonHighlightProps) {
+  return (
+    <MenuButton
+      {...(current.includes(selectedWhen)
+        ? {
+            fontWeight: selectedFontWeight ?? "bold",
+            color: selectedColor ?? "purple.600",
+          }
+        : {})}
+      sx={{
+        "svg g": {
+          strokeWidth: selectedStrokeWidth ?? "3.2",
+        },
+      }}
+      {...props}
+    >
+      {children}
+    </MenuButton>
   );
 }

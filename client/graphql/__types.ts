@@ -5047,6 +5047,18 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   };
 };
 
+export type PublicTemplateCard_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: Maybe<string>;
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: Maybe<string>;
+    organization: { __typename?: "Organization"; id: string; name: string };
+  };
+};
+
 export type useCompleteSignerInfoDialog_PublicContactFragment = {
   __typename?: "PublicContact";
   firstName?: Maybe<string>;
@@ -7029,6 +7041,25 @@ export type PdfViewPetitionQuery = {
   >;
 };
 
+export type PublicTemplateDetails_PetitionTemplateFragment = {
+  __typename?: "PetitionTemplate";
+  id: string;
+  name?: Maybe<string>;
+  descriptionHtml?: Maybe<string>;
+  updatedAt: string;
+  fields: Array<{
+    __typename?: "PetitionField";
+    id: string;
+    visibility?: Maybe<{ [key: string]: any }>;
+  }>;
+  owner: {
+    __typename?: "User";
+    id: string;
+    fullName?: Maybe<string>;
+    organization: { __typename?: "Organization"; id: string; name: string };
+  };
+};
+
 export type Thanks_PetitionLogoQueryVariables = Exact<{
   id: Scalars["GID"];
 }>;
@@ -7783,6 +7814,20 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   }
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
+`;
+export const PublicTemplateCard_PetitionTemplateFragmentDoc = gql`
+  fragment PublicTemplateCard_PetitionTemplate on PetitionTemplate {
+    id
+    name
+    owner {
+      id
+      fullName
+      organization {
+        id
+        name
+      }
+    }
+  }
 `;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc = gql`
   fragment RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment on PublicPetitionFieldComment {
@@ -9739,6 +9784,26 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
     }
   }
   ${PetitionPdf_PetitionFieldFragmentDoc}
+`;
+export const PublicTemplateDetails_PetitionTemplateFragmentDoc = gql`
+  fragment PublicTemplateDetails_PetitionTemplate on PetitionTemplate {
+    id
+    name
+    descriptionHtml
+    updatedAt
+    fields {
+      id
+      visibility
+    }
+    owner {
+      id
+      fullName
+      organization {
+        id
+        name
+      }
+    }
+  }
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
   fragment ConfirmDeletePetitionsDialog_PetitionBase on PetitionBase {
