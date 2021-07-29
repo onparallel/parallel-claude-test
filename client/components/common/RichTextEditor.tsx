@@ -111,7 +111,7 @@ const options = {
   [ELEMENT_OL]: { type: "numbered-list" },
   [ELEMENT_UL]: { type: "bulleted-list" },
   [ELEMENT_LI]: { type: "list-item" },
-  [ELEMENT_LIC]: { type: "paragraph" },
+  [ELEMENT_LIC]: { type: "list-item-child" },
   [MARK_BOLD]: DEFAULTS_BOLD,
   [MARK_ITALIC]: DEFAULTS_ITALIC,
   [MARK_UNDERLINE]: DEFAULTS_UNDERLINE,

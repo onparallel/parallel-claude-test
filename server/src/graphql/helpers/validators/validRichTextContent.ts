@@ -10,7 +10,9 @@ export const validRichTextContent = jsonSchema({
           minItems: 1,
           items: {
             anyOf: [
+              // the first child of a list-item used to be a pargraph, this is here for backwards compatibility
               { $ref: "#/definitions/paragraph" },
+              { $ref: "#/definitions/list-item-child" },
               { $ref: "#/definitions/list" },
             ],
           },
@@ -32,6 +34,16 @@ export const validRichTextContent = jsonSchema({
         },
       },
       required: ["type"],
+    },
+    "list-item-child": {
+      type: "object",
+      properties: {
+        children: {
+          type: "array",
+          items: { $ref: "#/definitions/leaf" },
+        },
+        type: { const: "list-item-child" },
+      },
     },
     paragraph: {
       type: "object",
