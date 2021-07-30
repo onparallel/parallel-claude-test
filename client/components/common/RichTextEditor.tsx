@@ -100,7 +100,7 @@ import React, {
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick, pipe } from "remeda";
-import { createEditor, Transforms } from "slate";
+import { createEditor, Editor, Transforms } from "slate";
 import { ReactEditor, useSlate } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -587,10 +587,13 @@ function LinkButton(props: Pick<ToolbarButtonProps, "isDisabled">) {
       })}
       onMouseDown={async (event) => {
         const selection = editor.selection;
+        const endOfEditor = Editor.range(editor, Editor.end(editor, []));
         event.preventDefault();
-        const linkNode = getAbove(editor, {
-          match: { type: "link" },
-        });
+        const linkNode = editor.selection
+          ? getAbove(editor, {
+              match: { type: "link" },
+            })
+          : null;
         let defaultValues: RTELink | undefined;
         if (linkNode) {
           const url = (linkNode[0] as LinkElement).url;
@@ -602,18 +605,17 @@ function LinkButton(props: Pick<ToolbarButtonProps, "isDisabled">) {
         const [_, link] = await withError(
           showAddLinkDialog({
             defaultValues,
-            showTextInput: !linkNode && isCollapsed(selection),
+            showTextInput: !linkNode && (!selection || isCollapsed(selection)),
           })
         );
         ReactEditor.focus(editor as any);
-        Transforms.select(editor, selection);
+        Transforms.select(editor, selection ?? endOfEditor);
         if (!link) {
           return;
         }
-        if (linkNode) {
-          return upsertLinkAtSelection(editor, { url: link.url });
-        }
-        if (isCollapsed(selection)) {
+        if (linkNode || (selection && !isCollapsed(selection))) {
+          upsertLinkAtSelection(editor, { url: link.url, wrap: true });
+        } else {
           const text = link.text || link.url;
           insertNodes(
             editor,
@@ -622,11 +624,9 @@ function LinkButton(props: Pick<ToolbarButtonProps, "isDisabled">) {
               url: link.url,
               children: [{ text }],
             },
-            { at: selection?.anchor }
+            { at: selection ?? endOfEditor }
           );
           Transforms.move(editor, { distance: text.length });
-        } else {
-          return upsertLinkAtSelection(editor, { url: link.url, wrap: true });
         }
       }}
       {...props}
