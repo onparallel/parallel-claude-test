@@ -14,6 +14,8 @@ function Templates() {
 
   const categories = useCategories();
 
+  const templates = [];
+
   return (
     <PublicLayout
       title={intl.formatMessage({
@@ -31,7 +33,11 @@ function Templates() {
           const { href } = category;
           if (href === "/templates") return null;
           return (
-            <PublicTemplateCategoryPreview key={index} category={category} />
+            <PublicTemplateCategoryPreview
+              key={index}
+              category={category}
+              templates={templates}
+            />
           );
         })}
       </PublicTemplatesContainer>

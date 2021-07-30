@@ -33,7 +33,6 @@ export function PublicTemplateCard({
   return (
     <Box
       tabIndex={0}
-      maxWidth="360px"
       outline="none"
       transition="all 150ms ease"
       borderRadius="md"

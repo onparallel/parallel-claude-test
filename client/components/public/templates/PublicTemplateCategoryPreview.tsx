@@ -8,20 +8,22 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
+import { PublicTemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PublicTemplateCard } from "./PublicTemplateCard";
 import { CategoryType } from "./useCategories";
 
 export function PublicTemplateCategoryPreview({
   category,
+  templates,
 }: {
   category: CategoryType;
+  templates: PublicTemplateCard_PetitionTemplateFragment[];
 }) {
   const displaySideMenu = useBreakpointValue({ base: false, md: true });
 
   const { href, label } = category;
   const templatesLength = 4;
-  const templates = [];
 
   return (
     <Grid
@@ -62,11 +64,17 @@ export function PublicTemplateCategoryPreview({
         </GridItem>
       ) : null}
       <GridItem gridArea="content">
-        <SimpleGrid minChildWidth="280px" spacing={6}>
+        <Grid
+          templateColumns={{
+            lg: "repeat(2, 1fr)",
+            xl: "repeat(3, 1fr)",
+          }}
+          gap={6}
+        >
           {templates.slice(0, 3).map((template, index) => {
             return <PublicTemplateCard key={index} template={template} />;
           })}
-        </SimpleGrid>
+        </Grid>
       </GridItem>
     </Grid>
   );

@@ -1,4 +1,4 @@
-import { Flex, SimpleGrid, Stack, Text } from "@chakra-ui/react";
+import { Flex, Grid, SimpleGrid, Stack, Text } from "@chakra-ui/react";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
@@ -12,7 +12,7 @@ function TemplateCategory() {
   const intl = useIntl();
 
   const router = useRouter();
-  const current = router.pathname.startsWith("/[locale]")
+  const currentPath = router.pathname.startsWith("/[locale]")
     ? router.asPath.replace(/^\/[^\/]+/, "")
     : router.asPath;
 
@@ -20,7 +20,8 @@ function TemplateCategory() {
 
   const currentCategory = categories.find(
     (category) =>
-      current.includes(category.href) && !current.includes(category.href + "/")
+      currentPath.includes(category.href) &&
+      !currentPath.includes(category.href + "/")
   );
 
   const templates = [];
@@ -49,11 +50,17 @@ function TemplateCategory() {
             </Text>
           </Flex>
 
-          <SimpleGrid minChildWidth="280px" spacing={6}>
+          <Grid
+            templateColumns={{
+              lg: "repeat(2, 1fr)",
+              xl: "repeat(3, 1fr)",
+            }}
+            gap={6}
+          >
             {templates.map((template, index) => {
               return <PublicTemplateCard key={index} template={template} />;
             })}
-          </SimpleGrid>
+          </Grid>
         </Stack>
       </PublicTemplatesContainer>
     </PublicLayout>
