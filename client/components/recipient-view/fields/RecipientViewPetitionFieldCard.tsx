@@ -6,16 +6,15 @@ import {
   Center,
   Flex,
   Heading,
-  IconButton,
   Text,
   Tooltip,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import { AddIcon, CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { Linkify } from "@parallel/components/common/Linkify";
+import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
 import {
   RecipientViewPetitionFieldCard_PublicPetitionAccessFragment,
   RecipientViewPetitionFieldCard_PublicPetitionFieldFragment,
@@ -265,8 +264,6 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
       ...props,
     } as const;
 
-    const showIconButton = useBreakpointValue({ base: true, sm: false });
-
     return commentCount > 0 ? (
       <Button ref={ref} rightIcon={<CommentIcon fontSize="16px" />} {...common}>
         <RecipientViewCommentsBadge
@@ -275,19 +272,18 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
         />
         {intl.formatNumber(commentCount)}
       </Button>
-    ) : showIconButton ? (
-      <IconButton
-        ref={ref}
+    ) : (
+      <ResponsiveButtonIcon
         icon={<CommentIcon fontSize="16px" />}
+        ref={ref}
+        breakpoint="sm"
+        interpolate={true}
+        label={intl.formatMessage({
+          id: "recipient-view.questions-button",
+          defaultMessage: "Questions?",
+        })}
         {...common}
       />
-    ) : (
-      <Button ref={ref} {...common}>
-        <FormattedMessage
-          id="recipient-view.questions-button"
-          defaultMessage="Questions?"
-        />
-      </Button>
     );
   }
 );
