@@ -162,6 +162,7 @@ export const publicTemplatesQuery = queryField((t) => {
           locale,
           limit,
           offset,
+          sortBy: "last_used_at",
         },
         ctx.user!.id
       );

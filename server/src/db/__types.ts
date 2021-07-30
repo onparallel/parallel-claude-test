@@ -448,6 +448,8 @@ export interface Petition {
   hide_recipient_view_contents: boolean; // bool
   skip_forward_security: boolean; // bool
   is_readonly: boolean; // bool
+  public_categories: Maybe<string[]>; // _text
+  public_metadata: Maybe<any>; // jsonb
 }
 
 export type CreatePetition = PartialProps<
@@ -475,6 +477,8 @@ export type CreatePetition = PartialProps<
   | "hide_recipient_view_contents"
   | "skip_forward_security"
   | "is_readonly"
+  | "public_categories"
+  | "public_metadata"
 >;
 
 export interface PetitionAccess {

@@ -446,6 +446,18 @@ export interface NexusGenObjects {
     contactIds: number[];
     review?: boolean;
   };
+  PublicTemplate: db.Petition;
+  PublicTemplateMetadata: {
+    // root type
+    backgroundColor?: string | null; // String
+    description?: string | null; // String
+    slug: string; // ID!
+  };
+  PublicTemplatePagination: {
+    // root type
+    items: NexusGenRootTypes["PublicTemplate"][]; // [PublicTemplate!]!
+    totalCount: number; // Int!
+  };
   PublicUser: db.User;
   Query: {};
   ReminderEmailBouncedUserNotification: notifications.ReminderEmailBouncedUserNotification;
@@ -1242,6 +1254,42 @@ export interface NexusGenFieldTypes {
     review: boolean; // Boolean!
     signers: Array<NexusGenRootTypes["PublicContact"] | null>; // [PublicContact]!
   };
+  PublicTemplate: {
+    // field return type
+    categories: string[]; // [String!]!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    emailBody: NexusGenScalars["JSON"] | null; // JSON
+    emailSubject: string | null; // String
+    fieldCount: number; // Int!
+    fields: NexusGenRootTypes["PetitionField"][]; // [PetitionField!]!
+    hasCommentsEnabled: boolean; // Boolean!
+    id: NexusGenScalars["GID"]; // GID!
+    isReadOnly: boolean; // Boolean!
+    isRecipientViewContentsHidden: boolean; // Boolean!
+    locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+    metadata: NexusGenRootTypes["PublicTemplateMetadata"]; // PublicTemplateMetadata!
+    myEffectivePermission:
+      | NexusGenRootTypes["EffectivePetitionUserPermission"]
+      | null; // EffectivePetitionUserPermission
+    name: string | null; // String
+    organization: NexusGenRootTypes["Organization"]; // Organization!
+    owner: NexusGenRootTypes["User"]; // User!
+    permissions: NexusGenRootTypes["PetitionPermission"][]; // [PetitionPermission!]!
+    skipForwardSecurity: boolean; // Boolean!
+    tags: NexusGenRootTypes["Tag"][]; // [Tag!]!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
+  };
+  PublicTemplateMetadata: {
+    // field return type
+    backgroundColor: string | null; // String
+    description: string | null; // String
+    slug: string; // ID!
+  };
+  PublicTemplatePagination: {
+    // field return type
+    items: NexusGenRootTypes["PublicTemplate"][]; // [PublicTemplate!]!
+    totalCount: number; // Int!
+  };
   PublicUser: {
     // field return type
     email: string; // String!
@@ -1261,6 +1309,7 @@ export interface NexusGenFieldTypes {
     getUsersOrGroups: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    landingPublicTemplates: NexusGenRootTypes["PublicTemplatePagination"]; // PublicTemplatePagination!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
@@ -2233,6 +2282,40 @@ export interface NexusGenFieldTypeNames {
     review: "Boolean";
     signers: "PublicContact";
   };
+  PublicTemplate: {
+    // field return type name
+    categories: "String";
+    createdAt: "DateTime";
+    emailBody: "JSON";
+    emailSubject: "String";
+    fieldCount: "Int";
+    fields: "PetitionField";
+    hasCommentsEnabled: "Boolean";
+    id: "GID";
+    isReadOnly: "Boolean";
+    isRecipientViewContentsHidden: "Boolean";
+    locale: "PetitionLocale";
+    metadata: "PublicTemplateMetadata";
+    myEffectivePermission: "EffectivePetitionUserPermission";
+    name: "String";
+    organization: "Organization";
+    owner: "User";
+    permissions: "PetitionPermission";
+    skipForwardSecurity: "Boolean";
+    tags: "Tag";
+    updatedAt: "DateTime";
+  };
+  PublicTemplateMetadata: {
+    // field return type name
+    backgroundColor: "String";
+    description: "String";
+    slug: "ID";
+  };
+  PublicTemplatePagination: {
+    // field return type name
+    items: "PublicTemplate";
+    totalCount: "Int";
+  };
   PublicUser: {
     // field return type name
     email: "String";
@@ -2252,6 +2335,7 @@ export interface NexusGenFieldTypeNames {
     getUsersOrGroups: "UserOrUserGroup";
     globalIdDecode: "SupportMethodResponse";
     globalIdEncode: "SupportMethodResponse";
+    landingPublicTemplates: "PublicTemplatePagination";
     me: "User";
     organization: "Organization";
     organizations: "OrganizationPagination";
@@ -3207,6 +3291,12 @@ export interface NexusGenArgTypes {
       id: number; // Int!
       type: NexusGenEnums["EntityType"]; // EntityType!
     };
+    landingPublicTemplates: {
+      // args
+      categories?: string[] | null; // [String!]
+      limit?: number | null; // Int
+      offset?: number | null; // Int
+    };
     organization: {
       // args
       id: NexusGenScalars["GID"]; // GID!
@@ -3312,7 +3402,7 @@ export interface NexusGenAbstractTypeMembers {
     | "PetitionMessage"
     | "PetitionReminder"
     | "UserAuthenticationToken";
-  PetitionBase: "Petition" | "PetitionTemplate";
+  PetitionBase: "Petition" | "PetitionTemplate" | "PublicTemplate";
   PetitionBaseAndField: "PetitionAndField" | "PetitionTemplateAndField";
   PetitionEvent:
     | "AccessActivatedEvent"
@@ -3414,6 +3504,7 @@ export interface NexusGenTypeInterfaces {
   PublicPetition: "Timestamps";
   PublicPetitionFieldReply: "Timestamps";
   ReminderEmailBouncedUserNotification: "PetitionUserNotification";
+  PublicTemplate: "PetitionBase";
   ReminderSentEvent: "PetitionEvent";
   RemindersOptOutEvent: "PetitionEvent";
   RemindersOptOutNotification: "PetitionUserNotification";

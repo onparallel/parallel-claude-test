@@ -2844,6 +2844,116 @@ enum PublicSignatureStatus {
 }
 
 """
+A public template
+"""
+type PublicTemplate implements PetitionBase {
+  categories: [String!]!
+
+  """
+  Time when the resource was created.
+  """
+  createdAt: DateTime!
+
+  """
+  The body of the petition.
+  """
+  emailBody: JSON
+
+  """
+  The subject of the petition.
+  """
+  emailSubject: String
+
+  """
+  The number of fields in the petition.
+  """
+  fieldCount: Int!
+
+  """
+  The definition of the petition fields.
+  """
+  fields: [PetitionField!]!
+
+  """
+  Whether comments are enabled or not.
+  """
+  hasCommentsEnabled: Boolean!
+
+  """
+  The ID of the petition or template.
+  """
+  id: GID!
+  isReadOnly: Boolean!
+
+  """
+  Whether the contents card is hidden in the recipient view.
+  """
+  isRecipientViewContentsHidden: Boolean! @deprecated(reason: "Don't use this")
+
+  """
+  The locale of the petition.
+  """
+  locale: PetitionLocale!
+  metadata: PublicTemplateMetadata!
+
+  """
+  The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates).
+  """
+  myEffectivePermission: EffectivePetitionUserPermission
+
+  """
+  The name of the petition.
+  """
+  name: String
+  organization: Organization!
+  owner: User!
+
+  """
+  The permissions linked to the petition
+  """
+  permissions: [PetitionPermission!]!
+
+  """
+  Whether to skip the forward security check on the recipient view.
+  """
+  skipForwardSecurity: Boolean!
+
+  """
+  The tags linked to the petition
+  """
+  tags: [Tag!]!
+
+  """
+  Time when the resource was last updated.
+  """
+  updatedAt: DateTime!
+}
+
+"""
+The metadata of a public template
+"""
+type PublicTemplateMetadata {
+  """
+  background color for the template card in #HEX format
+  """
+  backgroundColor: String
+  description: String
+  slug: ID!
+}
+
+type PublicTemplatePagination {
+  """
+  The requested slice of items.
+  """
+  items: [PublicTemplate!]!
+
+  """
+  The total count of items in the list.
+  """
+  totalCount: Int!
+}
+
+"""
 A public view of a user
 """
 type PublicUser {
@@ -2946,6 +3056,19 @@ type Query {
     id: Int!
     type: EntityType!
   ): SupportMethodResponse!
+  landingPublicTemplates(
+    categories: [String!]
+
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): PublicTemplatePagination!
   me: User!
   organization(id: GID!): Organization
 
