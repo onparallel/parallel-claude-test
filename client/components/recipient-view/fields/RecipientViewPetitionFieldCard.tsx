@@ -277,7 +277,7 @@ const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
         icon={<CommentIcon fontSize="16px" />}
         ref={ref}
         breakpoint="sm"
-        interpolate={true}
+        hideIconOnDesktop={true}
         label={intl.formatMessage({
           id: "recipient-view.questions-button",
           defaultMessage: "Questions?",

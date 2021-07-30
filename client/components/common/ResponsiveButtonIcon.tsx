@@ -13,7 +13,7 @@ export interface ResponsiveButtonIconProps
   extends Omit<IconButtonProps, "aria-label"> {
   label: string;
   breakpoint?: string;
-  interpolate?: boolean;
+  hideIconOnDesktop?: boolean;
   placement?: Placement;
 }
 
@@ -25,7 +25,7 @@ export const ResponsiveButtonIcon = chakraForwardRef<
     label,
     icon,
     breakpoint = "md",
-    interpolate,
+    hideIconOnDesktop,
     placement,
     ...props
   }: ResponsiveButtonIconProps,
@@ -45,14 +45,16 @@ export const ResponsiveButtonIcon = chakraForwardRef<
         ref={ref}
       >
         <chakra.span
-          marginRight={interpolate ? 0 : 2}
+          marginRight={hideIconOnDesktop ? 0 : 2}
           display={{ base: "none", [breakpoint]: "inline" }}
         >
           {label}
         </chakra.span>
         <chakra.span
           display={
-            interpolate ? { base: "inherit", [breakpoint]: "none" } : "inherit"
+            hideIconOnDesktop
+              ? { base: "inherit", [breakpoint]: "none" }
+              : "inherit"
           }
         >
           {isValidElement(icon)
