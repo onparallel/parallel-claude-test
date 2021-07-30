@@ -816,7 +816,7 @@
   },
   {
     "term": "component.notification-reminders-opt-out.body",
-    "definition": "{name} se ha desuscrito de los recordatorios: ",
+    "definition": "{name} ha optado por no recibir recordatorios: ",
     "context": "{name} has opted out from receiving reminders:"
   },
   {
