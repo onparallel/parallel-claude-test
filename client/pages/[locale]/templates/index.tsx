@@ -27,10 +27,12 @@ function Templates() {
     >
       <PublicTemplatesHero />
       <PublicTemplatesContainer>
-        {Object.entries(categories).map(([key, value], index) => {
-          const { href } = value;
+        {categories.map((category, index) => {
+          const { href } = category;
           if (href === "/templates") return null;
-          return <PublicTemplateCategoryPreview key={index} category={value} />;
+          return (
+            <PublicTemplateCategoryPreview key={index} category={category} />
+          );
         })}
       </PublicTemplatesContainer>
       <PublicContainer

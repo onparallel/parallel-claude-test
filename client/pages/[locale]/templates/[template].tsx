@@ -32,13 +32,15 @@ function PublicTemplateDetails() {
 
   const categories = useCategories();
 
-  const templateCategories = Object.entries(categories).filter(([key, value]) =>
-    ["LEGAL", "COMPLIANCE", "CUSTOMER_SERVICE"].includes(key)
+  const templateCategories = categories.filter((category) =>
+    ["LEGAL", "COMPLIANCE", "CUSTOMER_SERVICE"].includes(category.id)
   );
 
   const hasConditionalFields = true;
 
   const templates = [];
+
+  const owner = { fullName: "Derek Lou" };
 
   return (
     <PublicLayout
@@ -86,7 +88,7 @@ function PublicTemplateDetails() {
                   />{" "}
                   <EnumerateList
                     maxItems={7}
-                    values={templateCategories.map((cat) => cat[1])}
+                    values={templateCategories}
                     renderItem={({ value: { href, label } }, index) => {
                       return (
                         <Link key={index} href={href}>
@@ -101,15 +103,15 @@ function PublicTemplateDetails() {
               <HStack paddingTop={6} spacing={1}>
                 <Avatar
                   boxSize="40px"
-                  name="Dan Abrahmov"
-                  src="https://bit.ly/dan-abramov"
+                  name={owner.fullName}
+                  src={owner?.avatar ?? undefined}
                   marginRight={2}
                 />
                 <FormattedMessage
                   id="public.template-card.created-by"
                   defaultMessage="Created by {name} on {orgName}"
                   values={{
-                    name: "fullName",
+                    name: owner.fullName,
                     orgName: (
                       <Text marginLeft={1} as="b">
                         {"orgName"}

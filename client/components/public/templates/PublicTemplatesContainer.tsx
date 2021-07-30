@@ -33,12 +33,10 @@ export function PublicTemplatesContainer({
 
   const categories = useCategories();
 
-  const currentCategory = Object.entries(categories).find(
-    ([_, category]) =>
+  const currentCategory = categories.find(
+    (category) =>
       current.includes(category.href) && !current.includes(category.href + "/")
   );
-
-  const [_, category] = currentCategory ?? [];
 
   const displaySideMenu = useBreakpointValue({ base: false, md: true });
 
@@ -67,7 +65,7 @@ export function PublicTemplatesContainer({
           >
             {Object.entries(categories).map(([key, value], index) => {
               const { label, href } = value;
-              const isActive = category?.label === label;
+              const isActive = currentCategory?.label === label;
               return (
                 <NakedLink key={index} href={href}>
                   <Button
@@ -108,7 +106,7 @@ export function PublicTemplatesContainer({
                   textAlign="start"
                   backgroundColor="white"
                 >
-                  {category?.label}
+                  {currentCategory?.label}
                 </MenuButton>
                 <Portal>
                   <MenuList>

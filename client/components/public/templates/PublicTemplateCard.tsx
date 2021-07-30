@@ -33,6 +33,7 @@ export function PublicTemplateCard({
   return (
     <Box
       tabIndex={0}
+      maxWidth="360px"
       outline="none"
       transition="all 150ms ease"
       borderRadius="md"
@@ -65,8 +66,8 @@ export function PublicTemplateCard({
           <Center height="130px" backgroundColor="blue.50">
             <Image
               height="100%"
-              padding={5}
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/input_radio.png`}
+              objectFit="cover"
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/input_fondo.png`}
             />
           </Center>
           <Grid

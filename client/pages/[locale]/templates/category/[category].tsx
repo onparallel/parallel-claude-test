@@ -18,12 +18,10 @@ function TemplateCategory() {
 
   const categories = useCategories();
 
-  const currentCategory = Object.entries(categories).find(
-    ([_, category]) =>
+  const currentCategory = categories.find(
+    (category) =>
       current.includes(category.href) && !current.includes(category.href + "/")
   );
-
-  const [_, category] = currentCategory ?? [];
 
   const templates = [];
 
@@ -46,7 +44,7 @@ function TemplateCategory() {
               <FormattedMessage
                 id="public.template-category-preview.templates-for"
                 defaultMessage="Templates for {category}"
-                values={{ category: category?.label }}
+                values={{ category: currentCategory?.label }}
               />
             </Text>
           </Flex>
