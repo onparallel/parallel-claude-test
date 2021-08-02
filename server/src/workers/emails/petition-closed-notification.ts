@@ -6,7 +6,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionClosedNotification from "../../emails/components/PetitionClosedNotification";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { slateParser } from "../../util/slate";
+import { toHtml, toPlainText } from "../../util/slate";
 import { random } from "../../util/token";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
@@ -43,15 +43,15 @@ export async function petitionClosedNotification(
     const access = await context.petitions.loadAccess(accessId);
     const contact = await context.contacts.loadContact(access!.contact_id);
 
-    const slate = slateParser({ contact, user: sender, petition });
+    const renderContext = { contact, user: sender, petition };
     const { html, text, subject, from } = await buildEmail(
       PetitionClosedNotification,
       {
         contactFullName: fullName(contact!.first_name, contact!.last_name)!,
         senderName: fullName(sender.first_name, sender.last_name)!,
         senderEmail: sender.email,
-        bodyHtml: slate.toHtml(payload.message),
-        bodyPlainText: slate.toPlainText(payload.message),
+        bodyHtml: toHtml(payload.message, renderContext),
+        bodyPlainText: toPlainText(payload.message, renderContext),
         ...layoutProps,
       },
       { locale: petition.locale }

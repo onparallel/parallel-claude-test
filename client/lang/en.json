@@ -1865,6 +1865,26 @@
     "context": "Bold"
   },
   {
+    "term": "component.rich-text-editor.font-size",
+    "definition": "Font size",
+    "context": "Font size"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-body",
+    "definition": "Body",
+    "context": "Body"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-heading",
+    "definition": "Heading",
+    "context": "Heading"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-subheading",
+    "definition": "Subheading",
+    "context": "Subheading"
+  },
+  {
     "term": "component.rich-text-editor.italic",
     "definition": "Italic",
     "context": "Italic"
@@ -1878,6 +1898,11 @@
     "term": "component.rich-text-editor.list",
     "definition": "Bullet list",
     "context": "Bullet list"
+  },
+  {
+    "term": "component.rich-text-editor.ordered-list",
+    "definition": "Numbered list",
+    "context": "Numbered list"
   },
   {
     "term": "component.rich-text-editor.personalize",

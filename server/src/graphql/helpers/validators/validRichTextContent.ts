@@ -52,7 +52,7 @@ export const validRichTextContent = jsonSchema({
           type: "array",
           items: { $ref: "#/definitions/leaf" },
         },
-        type: { const: "paragraph" },
+        type: { enum: ["paragraph", "heading", "subheading"] },
       },
     },
     placeholder: {

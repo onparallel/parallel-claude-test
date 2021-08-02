@@ -5695,6 +5695,14 @@
     "@udecode/plate-common" "^1.0.0"
     "@udecode/plate-core" "^1.0.0"
 
+"@udecode/plate-break@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@udecode/plate-break/-/plate-break-1.0.0.tgz#950905216c814ddd050414e6f25e3248d6a3b7b3"
+  integrity sha512-KSEyrpKp+nHLBQ2DMk0O+uhpaVqwpGnBW6dIxpqZSarOCQsmI8zSejIo5py/BDBbhe8Zc+2wto8zeJRjoTa3ZA==
+  dependencies:
+    "@udecode/plate-common" "^1.0.0"
+    "@udecode/plate-core" "^1.0.0"
+
 "@udecode/plate-common@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@udecode/plate-common/-/plate-common-1.0.0.tgz#d42a80bba6d7894ba0e8d2fdc3fd18bce9932769"
@@ -5710,6 +5718,14 @@
   dependencies:
     lodash "^4.17.21"
     zustand "^3.4.2"
+
+"@udecode/plate-heading@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@udecode/plate-heading/-/plate-heading-1.0.0.tgz#168a4becf35009328de4eacb3463b10a4a6f80c9"
+  integrity sha512-80Eih30ctKI62Lh6ajXSJXEGlWAd2IAoRxFJqgdUG08evzyk7ANtSJkBCg454Dtk66nLy+205n1QvcolTsJ6Hw==
+  dependencies:
+    "@udecode/plate-common" "^1.0.0"
+    "@udecode/plate-core" "^1.0.0"
 
 "@udecode/plate-link@^1.0.0":
   version "1.0.0"

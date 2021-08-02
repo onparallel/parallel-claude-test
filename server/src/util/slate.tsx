@@ -1,4 +1,5 @@
-import React, { Fragment } from "react";
+import React, { Fragment, ReactNode } from "react";
+import { createElement } from "react";
 import { renderToString } from "react-dom/server";
 import { Contact, Petition, User } from "../db/__types";
 import { fullName } from "./fullName";
@@ -13,6 +14,8 @@ type SlateNode = {
   children?: SlateNode[];
   type?:
     | "paragraph"
+    | "heading"
+    | "subheading"
     | "bulleted-list"
     | "numbered-list"
     | "list-item"
@@ -50,40 +53,72 @@ function getPlaceholder(key?: string, ctx?: SlateContext) {
   }
 }
 
-function renderSlate(node: SlateNode | SlateNode[], ctx?: SlateContext) {
+interface RenderSlateToHtmlOptions {
+  startingHeadingLevel: number;
+}
+
+function renderSlate(
+  node: SlateNode | SlateNode[],
+  opts: RenderSlateToHtmlOptions,
+  ctx?: SlateContext
+): ReactNode {
   if (Array.isArray(node)) {
     return node.map((child, index) => (
-      <Fragment key={index}>{renderSlate(child, ctx)}</Fragment>
+      <Fragment key={index}>{renderSlate(child, opts, ctx)}</Fragment>
     ));
   }
   if (Array.isArray(node.children)) {
     switch (node.type) {
       case "paragraph":
-      case undefined:
+      case undefined: {
         return (
           <p style={{ margin: 0 }}>
-            {paragraphIsEmpty(node) ? <br /> : renderSlate(node.children, ctx)}
+            {paragraphIsEmpty(node) ? (
+              <br />
+            ) : (
+              renderSlate(node.children, opts, ctx)
+            )}
           </p>
         );
+      }
+      case "heading":
+      case "subheading":
+        const type =
+          node.type === "heading"
+            ? `h${opts.startingHeadingLevel}`
+            : `h${opts.startingHeadingLevel + 1}`;
+        const fontSize = node.type === "heading" ? "1.25rem" : "1.125rem";
+        return createElement(
+          type,
+          { style: { margin: 0, fontSize, fontWeight: "bold" } },
+          paragraphIsEmpty(node) ? (
+            <br />
+          ) : (
+            renderSlate(node.children, opts, ctx)
+          )
+        );
+      case "bulleted-list":
+      case "numbered-list":
+        return createElement(
+          node.type === "bulleted-list" ? "ul" : "ol",
+          { style: { margin: 0, marginLeft: "24px", paddingLeft: 0 } },
+          renderSlate(node.children, opts, ctx)
+        );
+      case "list-item": {
+        return (
+          <li style={{ marginLeft: 0 }}>
+            {renderSlate(node.children, opts, ctx)}
+          </li>
+        );
+      }
       case "placeholder":
         return (
           <span>{renderWhiteSpace(getPlaceholder(node.placeholder, ctx))}</span>
         );
-      case "bulleted-list":
-        return (
-          <ul style={{ margin: 0, marginLeft: "24px", paddingLeft: 0 }}>
-            {renderSlate(node.children, ctx)}
-          </ul>
-        );
-      case "list-item": {
-        return (
-          <li style={{ marginLeft: 0 }}>{renderSlate(node.children, ctx)}</li>
-        );
-      }
       case "link": {
         return (
           <a href={node.url} target="_blank" rel="noopener noreferrer">
-            {renderSlate(node.children, ctx)}
+            {renderSlate(node.children, opts, ctx)}
           </a>
         );
       }
@@ -125,8 +160,16 @@ function renderWhiteSpace(text: string) {
   ));
 }
 
-export function toHtml(body: SlateNode[], ctx: SlateContext = {}) {
-  return renderToString(<>{renderSlate(body, ctx)}</>).replace(
+export function toHtml(
+  body: SlateNode[],
+  ctx: SlateContext = {},
+  options?: Partial<RenderSlateToHtmlOptions>
+) {
+  const opts: RenderSlateToHtmlOptions = {
+    startingHeadingLevel: 1,
+    ...options,
+  };
+  return renderToString(<>{renderSlate(body, opts, ctx)}</>).replace(
     /<!-- --> <!-- -->(\u00A0<!-- -->)+/g,
     function (match) {
       const extra = (match.length - 17) / 9;
@@ -141,9 +184,9 @@ export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
       switch (node.type) {
         case "paragraph":
         case undefined:
+        case "heading":
+        case "subheading":
           return `${node.children.map(serialize).join("")}`;
-        case "placeholder":
-          return getPlaceholder(node.placeholder, ctx);
         case "bulleted-list":
         case "numbered-list":
           return node.children
@@ -160,6 +203,8 @@ export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
               }
             })
             .join("\n");
+        case "placeholder":
+          return getPlaceholder(node.placeholder, ctx);
         case "link":
           return `${node.children.map(serialize).join("")}`;
       }
@@ -175,11 +220,4 @@ export function fromPlainText(value: string): SlateNode[] {
   return value
     .split("\n")
     .map((line) => ({ type: "paragraph", children: [{ text: line }] }));
-}
-
-export function slateParser(ctx?: SlateContext) {
-  return {
-    toHtml: (body: SlateNode[]) => toHtml(body, ctx),
-    toPlainText: (body: SlateNode[]) => toPlainText(body, ctx),
-  };
 }

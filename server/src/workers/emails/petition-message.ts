@@ -3,7 +3,7 @@ import { buildEmail } from "../../emails/buildEmail";
 import PetitionMessage from "../../emails/components/PetitionMessage";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
-import { slateParser } from "../../util/slate";
+import { toHtml, toPlainText } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionMessage(
@@ -50,7 +50,7 @@ export async function petitionMessage(
     context
   );
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
-  const slate = slateParser({ contact, user: sender, petition });
+  const renderContext = { contact, user: sender, petition };
   const { html, text, subject, from } = await buildEmail(
     PetitionMessage,
     {
@@ -58,8 +58,8 @@ export async function petitionMessage(
       senderName: fullName(sender.first_name, sender.last_name)!,
       senderEmail: sender.email,
       subject: message.email_subject,
-      bodyHtml: slate.toHtml(bodyJson),
-      bodyPlainText: slate.toPlainText(bodyJson),
+      bodyHtml: toHtml(bodyJson, renderContext),
+      bodyPlainText: toPlainText(bodyJson, renderContext),
       deadline: petition.deadline,
       keycode: access.keycode,
       ...layoutProps,

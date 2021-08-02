@@ -280,7 +280,11 @@ export const PetitionTemplate = objectType({
       description: "HTML description of the template.",
       resolve: (o) => {
         return o.template_description
-          ? toHtml(safeJsonParse(o.template_description))
+          ? toHtml(
+              safeJsonParse(o.template_description),
+              {},
+              { startingHeadingLevel: 3 }
+            )
           : null;
       },
     });

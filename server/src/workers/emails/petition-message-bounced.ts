@@ -4,7 +4,7 @@ import MessageBouncedEmail from "../../emails/components/MessageBouncedEmail";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
-import { slateParser } from "../../util/slate";
+import { toHtml, toPlainText } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionMessageBounced(
@@ -51,7 +51,7 @@ export async function petitionMessageBounced(
     context
   );
 
-  const slate = slateParser({ contact, user: sender, petition });
+  const renderContext = { contact, user: sender, petition };
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const { html, text, subject, from } = await buildEmail(
     MessageBouncedEmail,
@@ -60,8 +60,8 @@ export async function petitionMessageBounced(
       senderName: fullName(sender.first_name, sender.last_name)!,
       petitionId: toGlobalId("Petition", petition.id),
       petitionName: petition.name,
-      bodyHtml: slate.toHtml(bodyJson),
-      bodyPlainText: slate.toPlainText(bodyJson),
+      bodyHtml: toHtml(bodyJson, renderContext),
+      bodyPlainText: toPlainText(bodyJson, renderContext),
       contactEmail: contact.email,
       ...layoutProps,
     },

@@ -1865,6 +1865,26 @@
     "context": "Bold"
   },
   {
+    "term": "component.rich-text-editor.font-size",
+    "definition": "Tamaño de texto",
+    "context": "Font size"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-body",
+    "definition": "Párrafo",
+    "context": "Body"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-heading",
+    "definition": "Título",
+    "context": "Heading"
+  },
+  {
+    "term": "component.rich-text-editor.font-size-subheading",
+    "definition": "Subtítulo",
+    "context": "Subheading"
+  },
+  {
     "term": "component.rich-text-editor.italic",
     "definition": "Cursiva",
     "context": "Italic"
@@ -1878,6 +1898,11 @@
     "term": "component.rich-text-editor.list",
     "definition": "Lista",
     "context": "Bullet list"
+  },
+  {
+    "term": "component.rich-text-editor.ordered-list",
+    "definition": "Lista numerada",
+    "context": "Numbered list"
   },
   {
     "term": "component.rich-text-editor.personalize",

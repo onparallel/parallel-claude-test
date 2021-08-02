@@ -5,7 +5,7 @@ import PetitionReminder from "../../emails/components/PetitionReminder";
 import { buildFrom } from "../../emails/utils/buildFrom";
 import { evaluateFieldVisibility } from "../../util/fieldVisibility";
 import { fullName } from "../../util/fullName";
-import { slateParser } from "../../util/slate";
+import { toHtml, toPlainText } from "../../util/slate";
 import { getLayoutProps } from "../helpers/getLayoutProps";
 
 export async function petitionReminder(
@@ -81,7 +81,7 @@ export async function petitionReminder(
     const bodyJson = reminder.email_body
       ? JSON.parse(reminder.email_body)
       : null;
-    const slate = slateParser({ contact, user: granter, petition });
+    const renderContext = { contact, user: granter, petition };
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
@@ -89,8 +89,8 @@ export async function petitionReminder(
         senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,
         missingFieldCount: missing.length,
-        bodyHtml: bodyJson ? slate.toHtml(bodyJson) : null,
-        bodyPlainText: bodyJson ? slate.toPlainText(bodyJson) : null,
+        bodyHtml: bodyJson ? toHtml(bodyJson, renderContext) : null,
+        bodyPlainText: bodyJson ? toPlainText(bodyJson, renderContext) : null,
         deadline: petition.deadline,
         keycode: access.keycode,
         ...layoutProps,

@@ -6,6 +6,11 @@ import {
   FormErrorMessage,
   FormLabel,
   Input,
+  Menu,
+  MenuButton,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
   Portal,
   Stack,
   Text,
@@ -16,9 +21,12 @@ import {
 } from "@chakra-ui/react";
 import {
   BoldIcon,
+  CheckIcon,
+  FontSizeIcon,
   ItalicIcon,
   LinkIcon,
   ListIcon,
+  OrderedListIcon,
   SharpIcon,
   UnderlineIcon,
 } from "@parallel/chakra/icons";
@@ -47,15 +55,18 @@ import {
   MARK_ITALIC,
   MARK_UNDERLINE,
 } from "@udecode/plate-basic-marks";
+import { createExitBreakPlugin } from "@udecode/plate-break";
 import {
   getAbove,
   getNode,
   getParent,
+  getPreventDefaultHandler,
   insertNodes,
   isCollapsed,
   isMarkActive,
   someNode,
   toggleMark,
+  toggleNodeType,
   withProps,
 } from "@udecode/plate-common";
 import {
@@ -66,6 +77,11 @@ import {
   PlatePluginOptions,
   withPlate,
 } from "@udecode/plate-core";
+import {
+  createHeadingPlugin,
+  ELEMENT_H1,
+  ELEMENT_H2,
+} from "@udecode/plate-heading";
 import {
   createLinkPlugin,
   ELEMENT_LINK,
@@ -100,7 +116,7 @@ import React, {
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick, pipe } from "remeda";
-import { createEditor, Editor, Transforms } from "slate";
+import { createEditor, Editor, Selection, Transforms } from "slate";
 import { ReactEditor, useSlate } from "slate-react";
 import { EditableProps } from "slate-react/dist/components/editable";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -133,6 +149,16 @@ function RenderLink({ attributes, nodeProps, styles, element, ...props }: any) {
 }
 
 const components = {
+  [ELEMENT_H1]: withProps(RenderElement, {
+    as: "h1",
+    fontSize: "xl",
+    fontWeight: "bold",
+  }),
+  [ELEMENT_H2]: withProps(RenderElement, {
+    as: "h2",
+    fontSize: "lg",
+    fontWeight: "bold",
+  }),
   [ELEMENT_PARAGRAPH]: withProps(RenderElement, { as: "p" }),
   [ELEMENT_OL]: withProps(RenderElement, { as: "ol", paddingInlineStart: 6 }),
   [ELEMENT_UL]: withProps(RenderElement, { as: "ul", paddingInlineStart: 6 }),
@@ -145,7 +171,12 @@ const components = {
 };
 
 const options = {
-  [ELEMENT_PARAGRAPH]: { type: "paragraph" },
+  [ELEMENT_H1]: { type: "heading", hotkey: ["mod+opt+1", "mod+shift+1"] },
+  [ELEMENT_H2]: { type: "subheading", hotkey: ["mod+opt+2", "mod+shift+2"] },
+  [ELEMENT_PARAGRAPH]: {
+    type: "paragraph",
+    hotkey: ["mod+opt+0", "mod+shift+0"],
+  },
   [ELEMENT_OL]: { type: "numbered-list" },
   [ELEMENT_UL]: { type: "bulleted-list" },
   [ELEMENT_LI]: { type: "list-item" },
@@ -195,7 +226,7 @@ export const RichTextEditor = forwardRef<
   ref
 ) {
   const {
-    plugin,
+    plugin: placholderPlugin,
     onAddPlaceholder,
     onChangePlaceholder,
     onKeyDownPlaceholder,
@@ -233,10 +264,23 @@ export const RichTextEditor = forwardRef<
           },
         ],
       }),
-      plugin,
+      placholderPlugin,
+      createHeadingPlugin({ levels: 2 }),
       createLinkPlugin(),
+      createExitBreakPlugin({
+        rules: [
+          {
+            hotkey: "enter",
+            query: {
+              start: true,
+              end: true,
+              allow: ["heading", "subheading"],
+            },
+          },
+        ],
+      }),
     ],
-    [plugin]
+    [placholderPlugin]
   );
   const formControl = useFormControl({
     id,
@@ -457,6 +501,7 @@ const Toolbar = memo(function _Toolbar({
       borderColor="gray.200"
       padding={1}
     >
+      <HeadingButton />
       <MarkButton
         type="bold"
         icon={<BoldIcon fontSize="16px" />}
@@ -491,6 +536,15 @@ const Toolbar = memo(function _Toolbar({
         label={intl.formatMessage({
           id: "component.rich-text-editor.list",
           defaultMessage: "Bullet list",
+        })}
+      />
+      <ListButton
+        type="numbered-list"
+        icon={<OrderedListIcon fontSize="16px" />}
+        isDisabled={isDisabled}
+        label={intl.formatMessage({
+          id: "component.rich-text-editor.ordered-list",
+          defaultMessage: "Numbered list",
         })}
       />
       {hasPlaceholders ? <PlaceholderButton isDisabled={isDisabled} /> : null}
@@ -539,6 +593,88 @@ function MarkButton({ type, ...props }: ToolbarButtonProps) {
       }}
       {...props}
     />
+  );
+}
+
+function HeadingButton({ ...props }: Pick<ToolbarButtonProps, "isDisabled">) {
+  const intl = useIntl();
+  const editor = useSlate();
+  const type =
+    ["heading", "subheading"].find((type) =>
+      someNode(editor, { match: { type } })
+    ) ?? "paragraph";
+  const selectionRef = useRef<Selection>();
+  return (
+    <Menu>
+      <MenuButton
+        as={IconButtonWithTooltip}
+        icon={<FontSizeIcon />}
+        size="sm"
+        placement="bottom"
+        variant="ghost"
+        tabIndex={-1}
+        onMouseDown={getPreventDefaultHandler(() => {
+          console.log(editor.selection);
+          selectionRef.current = editor.selection;
+        })}
+        label={intl.formatMessage({
+          id: "component.rich-text-editor.font-size",
+          defaultMessage: "Font size",
+        })}
+        {...props}
+      />
+      <Portal>
+        <MenuList minWidth="fit-content">
+          <MenuOptionGroup
+            value={type}
+            onChange={(value) => {
+              toggleNodeType(editor, {
+                activeType: value as string,
+                inactiveType: "paragraph",
+              });
+              setTimeout(() => {
+                if (selectionRef.current) {
+                  Transforms.select(editor, selectionRef.current);
+                  ReactEditor.focus(editor as any);
+                }
+              }, 100);
+            }}
+          >
+            <MenuItemOption
+              icon={<CheckIcon fontSize="sm" />}
+              value="heading"
+              fontSize="xl"
+              fontWeight="bold"
+            >
+              <FormattedMessage
+                id="component.rich-text-editor.font-size-heading"
+                defaultMessage="Heading"
+              />
+            </MenuItemOption>
+            <MenuItemOption
+              icon={<CheckIcon fontSize="sm" />}
+              value="subheading"
+              fontSize="lg"
+              fontWeight="bold"
+            >
+              <FormattedMessage
+                id="component.rich-text-editor.font-size-subheading"
+                defaultMessage="Subheading"
+              />
+            </MenuItemOption>
+            <MenuItemOption
+              icon={<CheckIcon fontSize="sm" />}
+              value="paragraph"
+            >
+              <FormattedMessage
+                id="component.rich-text-editor.font-size-body"
+                defaultMessage="Body"
+              />
+            </MenuItemOption>
+          </MenuOptionGroup>
+        </MenuList>
+      </Portal>
+    </Menu>
   );
 }
 
