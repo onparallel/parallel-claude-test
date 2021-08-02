@@ -332,8 +332,6 @@ export type Mutation = {
   petitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   /** Tells the backend that the field attachment was correctly uploaded to S3 */
   petitionFieldAttachmentUploadComplete: PetitionFieldAttachment;
-  /** Cancel a reminder for a contact. */
-  publicOptOutReminders: PublicPetitionAccess;
   publicCheckVerificationCode: VerificationCodeCheck;
   /**
    * Marks a filled petition as COMPLETED.
@@ -362,6 +360,8 @@ export type Mutation = {
   publicFileUploadReplyDownloadLink: FileUploadDownloadLinkResult;
   /** Marks the specified comments as read. */
   publicMarkPetitionFieldCommentsAsRead: Array<PublicPetitionFieldComment>;
+  /** Cancel a reminder for a contact. */
+  publicOptOutReminders: PublicPetitionAccess;
   /** Generates a download link for a field attachment on a public context. */
   publicPetitionFieldAttachmentDownloadLink: FileUploadDownloadLinkResult;
   publicSendVerificationCode: VerificationCodeRequest;
@@ -688,12 +688,6 @@ export type MutationpetitionFieldAttachmentUploadCompleteArgs = {
   petitionId: Scalars["GID"];
 };
 
-export type MutationpublicOptOutRemindersArgs = {
-  keycode: Scalars["ID"];
-  other: Scalars["String"];
-  reason: Scalars["String"];
-};
-
 export type MutationpublicCheckVerificationCodeArgs = {
   code: Scalars["String"];
   keycode: Scalars["ID"];
@@ -768,6 +762,12 @@ export type MutationpublicFileUploadReplyDownloadLinkArgs = {
 export type MutationpublicMarkPetitionFieldCommentsAsReadArgs = {
   keycode: Scalars["ID"];
   petitionFieldCommentIds: Array<Scalars["GID"]>;
+};
+
+export type MutationpublicOptOutRemindersArgs = {
+  keycode: Scalars["ID"];
+  other: Scalars["String"];
+  reason: Scalars["String"];
 };
 
 export type MutationpublicPetitionFieldAttachmentDownloadLinkArgs = {
