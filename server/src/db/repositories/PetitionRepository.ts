@@ -3001,15 +3001,7 @@ export class PetitionRepository extends BaseRepository {
       const removedPermissions = await this.from("petition_permission", t)
         .whereIn("petition_id", petitionIds)
         .whereNull("deleted_at")
-        .where((q) =>
-          q
-            // FIX
-            // .whereNot((q) =>
-            //   q.whereNull("from_user_group_id").andWhere("user_id", user.id)
-            // )
-            .whereNot("user_id", user.id)
-            .orWhereNull("user_id")
-        )
+        .whereNot((q) => q.where("user_id", user.id).andWhere("type", "OWNER"))
         .mmodify((q) => {
           if (!removeAll) {
             q.andWhere((q) =>

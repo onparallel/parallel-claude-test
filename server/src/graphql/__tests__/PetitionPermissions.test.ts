@@ -1744,6 +1744,76 @@ describe("GraphQL/Petition Permissions", () => {
       ]);
     });
 
+    it("should be able to delete owned petition after removing all permissions", async () => {
+      const { errors: removeErrors, data: removeData } =
+        await testClient.mutate({
+          mutation: gql`
+            mutation (
+              $petitionIds: [GID!]!
+              $userIds: [GID!]!
+              $userGroupIds: [GID!]!
+            ) {
+              removePetitionPermission(
+                petitionIds: $petitionIds
+                userIds: $userIds
+                userGroupIds: $userGroupIds
+              ) {
+                id
+                permissions {
+                  permissionType
+                  ... on PetitionUserPermission {
+                    user {
+                      id
+                    }
+                  }
+                  ... on PetitionUserGroupPermission {
+                    group {
+                      id
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            petitionIds: [toGlobalId("Petition", userPetition.id)],
+            userIds: [
+              toGlobalId("User", orgUsers[1].id),
+              toGlobalId("User", orgUsers[2].id),
+            ],
+            userGroupIds: [toGlobalId("UserGroup", userGroup.id)],
+          },
+        });
+
+      expect(removeErrors).toBeUndefined();
+      expect(removeData!.removePetitionPermission).toEqual([
+        {
+          id: toGlobalId("Petition", userPetition.id),
+          permissions: [
+            {
+              permissionType: "OWNER",
+              user: { id: toGlobalId("User", loggedUser.id) },
+            },
+          ],
+        },
+      ]);
+
+      const { errors: deleteErrors, data: deleteData } =
+        await testClient.mutate({
+          mutation: gql`
+            mutation ($petitionIds: [GID!]!) {
+              deletePetitions(ids: $petitionIds)
+            }
+          `,
+          variables: {
+            petitionIds: [toGlobalId("Petition", userPetition.id)],
+          },
+        });
+
+      expect(deleteErrors).toBeUndefined();
+      expect(deleteData!.deletePetitions).toEqual("SUCCESS");
+    });
+
     it("creates events when removing permissions on multiple groups and users", async () => {
       const { errors, data } = await testClient.mutate({
         mutation: gql`
