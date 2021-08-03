@@ -1309,6 +1309,7 @@ export interface NexusGenFieldTypes {
     getUsersOrGroups: NexusGenRootTypes["UserOrUserGroup"][]; // [UserOrUserGroup!]!
     globalIdDecode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
+    landingPublicTemplateBySlug: NexusGenRootTypes["PublicTemplate"] | null; // PublicTemplate
     landingPublicTemplates: NexusGenRootTypes["PublicTemplatePagination"]; // PublicTemplatePagination!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
@@ -2335,6 +2336,7 @@ export interface NexusGenFieldTypeNames {
     getUsersOrGroups: "UserOrUserGroup";
     globalIdDecode: "SupportMethodResponse";
     globalIdEncode: "SupportMethodResponse";
+    landingPublicTemplateBySlug: "PublicTemplate";
     landingPublicTemplates: "PublicTemplatePagination";
     me: "User";
     organization: "Organization";
@@ -3290,6 +3292,10 @@ export interface NexusGenArgTypes {
       // args
       id: number; // Int!
       type: NexusGenEnums["EntityType"]; // EntityType!
+    };
+    landingPublicTemplateBySlug: {
+      // args
+      slug: string; // String!
     };
     landingPublicTemplates: {
       // args

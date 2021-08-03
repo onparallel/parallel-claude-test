@@ -49,4 +49,12 @@ export const publicTemplates = queryField((t) => {
       });
     },
   });
+
+  t.nullable.field("landingPublicTemplateBySlug", {
+    type: "PublicTemplate",
+    args: { slug: nonNull(stringArg()) },
+    resolve: async (_, { slug }, ctx) => {
+      return await ctx.petitions.loadPublicTemplateBySlug(slug);
+    },
+  });
 });

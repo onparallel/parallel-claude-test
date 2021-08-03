@@ -3290,6 +3290,18 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
+  async loadPublicTemplateBySlug(slug: string): Promise<Petition | null> {
+    const [row] = await this.from("petition")
+      .where({
+        is_template: true,
+        template_public: true,
+        deleted_at: null,
+      })
+      .whereRaw(`("public_metadata" ->> 'slug') = ?`, [slug]);
+
+    return row;
+  }
+
   readonly loadPetitionSignatureByExternalId = this.buildLoadBy(
     "petition_signature_request",
     "external_id"

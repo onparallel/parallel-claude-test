@@ -3056,6 +3056,7 @@ type Query {
     id: Int!
     type: EntityType!
   ): SupportMethodResponse!
+  landingPublicTemplateBySlug(slug: String!): PublicTemplate
   landingPublicTemplates(
     categories: [String!]
 
