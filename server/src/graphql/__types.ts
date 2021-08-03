@@ -723,6 +723,7 @@ export interface NexusGenFieldTypes {
     ownerId: NexusGenScalars["GID"]; // GID!
     shortDescription: string | null; // String
     slug: string; // String!
+    updatedAt: NexusGenScalars["DateTime"]; // DateTime!
   };
   LandingTemplatePagination: {
     // field return type
@@ -1749,6 +1750,7 @@ export interface NexusGenFieldTypeNames {
     ownerId: "GID";
     shortDescription: "String";
     slug: "String";
+    updatedAt: "DateTime";
   };
   LandingTemplatePagination: {
     // field return type name

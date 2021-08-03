@@ -61,6 +61,7 @@ export const LandingTemplate = objectType({
         return fields.some((f) => isDefined(f.visibility));
       },
     });
+    t.datetime("updatedAt", { resolve: (o) => o.updated_at });
   },
 });
 

@@ -310,6 +310,7 @@ type LandingTemplate {
   ownerId: GID!
   shortDescription: String
   slug: String!
+  updatedAt: DateTime!
 }
 
 type LandingTemplatePagination {
