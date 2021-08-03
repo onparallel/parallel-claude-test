@@ -623,57 +623,52 @@ function HeadingButton({ ...props }: Pick<ToolbarButtonProps, "isDisabled">) {
         })}
         {...props}
       />
-      <Portal>
-        <MenuList minWidth="fit-content">
-          <MenuOptionGroup
-            value={type}
-            onChange={(value) => {
-              toggleNodeType(editor, {
-                activeType: value as string,
-                inactiveType: "paragraph",
-              });
-              setTimeout(() => {
-                if (selectionRef.current) {
-                  Transforms.select(editor, selectionRef.current);
-                  ReactEditor.focus(editor as any);
-                }
-              }, 100);
-            }}
+      <MenuList minWidth="fit-content">
+        <MenuOptionGroup
+          value={type}
+          onChange={(value) => {
+            toggleNodeType(editor, {
+              activeType: value as string,
+              inactiveType: "paragraph",
+            });
+            setTimeout(() => {
+              if (selectionRef.current) {
+                Transforms.select(editor, selectionRef.current);
+                ReactEditor.focus(editor as any);
+              }
+            }, 100);
+          }}
+        >
+          <MenuItemOption
+            icon={<CheckIcon fontSize="sm" />}
+            value="heading"
+            fontSize="xl"
+            fontWeight="bold"
           >
-            <MenuItemOption
-              icon={<CheckIcon fontSize="sm" />}
-              value="heading"
-              fontSize="xl"
-              fontWeight="bold"
-            >
-              <FormattedMessage
-                id="component.rich-text-editor.font-size-heading"
-                defaultMessage="Heading"
-              />
-            </MenuItemOption>
-            <MenuItemOption
-              icon={<CheckIcon fontSize="sm" />}
-              value="subheading"
-              fontSize="lg"
-              fontWeight="bold"
-            >
-              <FormattedMessage
-                id="component.rich-text-editor.font-size-subheading"
-                defaultMessage="Subheading"
-              />
-            </MenuItemOption>
-            <MenuItemOption
-              icon={<CheckIcon fontSize="sm" />}
-              value="paragraph"
-            >
-              <FormattedMessage
-                id="component.rich-text-editor.font-size-body"
-                defaultMessage="Body"
-              />
-            </MenuItemOption>
-          </MenuOptionGroup>
-        </MenuList>
-      </Portal>
+            <FormattedMessage
+              id="component.rich-text-editor.font-size-heading"
+              defaultMessage="Heading"
+            />
+          </MenuItemOption>
+          <MenuItemOption
+            icon={<CheckIcon fontSize="sm" />}
+            value="subheading"
+            fontSize="lg"
+            fontWeight="bold"
+          >
+            <FormattedMessage
+              id="component.rich-text-editor.font-size-subheading"
+              defaultMessage="Subheading"
+            />
+          </MenuItemOption>
+          <MenuItemOption icon={<CheckIcon fontSize="sm" />} value="paragraph">
+            <FormattedMessage
+              id="component.rich-text-editor.font-size-body"
+              defaultMessage="Body"
+            />
+          </MenuItemOption>
+        </MenuOptionGroup>
+      </MenuList>
     </Menu>
   );
 }
