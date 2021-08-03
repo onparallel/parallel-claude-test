@@ -1,40 +1,60 @@
 import { arg, nonNull, objectType, queryField, stringArg } from "@nexus/schema";
+import { fullName } from "../../util/fullName";
+import { safeJsonParse } from "../../util/safeJsonParse";
+import { toHtml } from "../../util/slate";
 
-export const PublicTemplateMetadata = objectType({
-  name: "PublicTemplateMetadata",
-  description: "The metadata of a public template",
-  rootTyping: `{
-    slug?: string;
-    description?: string;
-    backgroundColor?: string;
-    categories?: string[];
-  }`,
-  definition(t) {
-    t.id("slug");
-    t.nullable.string("description");
-    t.nullable.string("backgroundColor", {
-      description: "background color for the template card in #HEX format",
-    });
-    t.nullable.list.nonNull.string("categories");
-  },
-});
-
-export const PublicTemplate = objectType({
-  name: "PublicTemplate",
-  description: "A public template",
+export const LandingTemplate = objectType({
+  name: "LandingTemplate",
+  description: "A public template on landing page",
   rootTyping: "db.Petition",
   definition(t) {
-    t.implements("PetitionBase");
-    t.field("metadata", {
-      type: "PublicTemplateMetadata",
-      resolve: (o) => o.public_metadata ?? {},
+    t.globalId("id");
+    t.nullable.string("name", { resolve: (o) => o.name });
+    t.nullable.string("descriptionHtml", {
+      resolve: (o) => {
+        return o.template_description
+          ? toHtml(safeJsonParse(o.template_description))
+          : null;
+      },
+    });
+    t.string("slug", { resolve: (o) => o.public_metadata.slug });
+    t.nullable.string("shortDescription", {
+      resolve: (o) => o.public_metadata.description,
+    });
+    t.nullable.string("backgroundColor", {
+      resolve: (o) => o.public_metadata.backgroundColor,
+    });
+    t.nullable.list.nonNull.string("categories", {
+      resolve: (o) => o.public_metadata.categories,
+    });
+    t.globalId("ownerId", {
+      prefixName: "User",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadPetitionOwner(root.id))!.id;
+      },
+    });
+    t.string("ownerFullName", {
+      resolve: async (root, _, ctx) => {
+        const owner = (await ctx.petitions.loadPetitionOwner(root.id))!;
+        return fullName(owner.first_name, owner.last_name);
+      },
+    });
+    t.globalId("organizationId", {
+      prefixName: "Organization",
+      resolve: (o) => o.org_id,
+    });
+    t.string("organizationName", {
+      resolve: async (o, _, ctx) => {
+        const org = (await ctx.organizations.loadOrg(o.org_id))!;
+        return org.name;
+      },
     });
   },
 });
 
-export const landingPublicTemplates = queryField((t) => {
-  t.paginationField("landingPublicTemplates", {
-    type: "PublicTemplate",
+export const landingQueries = queryField((t) => {
+  t.paginationField("landingTemplates", {
+    type: "LandingTemplate",
     extendArgs: {
       category: nonNull(stringArg()),
       locale: nonNull(arg({ type: "PetitionLocale" })),
@@ -49,26 +69,24 @@ export const landingPublicTemplates = queryField((t) => {
     },
   });
 
-  t.nullable.field("landingPublicTemplateBySlug", {
-    type: "PublicTemplate",
+  t.nullable.field("landingTemplateBySlug", {
+    type: "LandingTemplate",
     args: { slug: nonNull(stringArg()) },
     resolve: async (_, { slug }, ctx) => {
       return await ctx.petitions.loadPublicTemplateBySlug(slug);
     },
   });
-});
 
-export const landingPublicTemplatesSamples = queryField((t) => {
-  t.list.field("landingPublicTemplatesSamples", {
+  t.list.field("landingTemplatesSamples", {
     type: objectType({
-      name: "PublicTemplateSample",
+      name: "LandingTemplateSample",
       rootTyping: "string",
       definition(t) {
         t.nonNull.string("category", {
           resolve: (category) => category,
         });
         t.paginationField("templates", {
-          type: "PublicTemplate",
+          type: "LandingTemplate",
           extendArgs: {
             locale: nonNull(arg({ type: "PetitionLocale" })),
           },

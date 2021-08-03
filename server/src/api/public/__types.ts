@@ -224,6 +224,39 @@ export type GroupPermissionRemovedEvent = PetitionEvent & {
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE";
 
+/** A public template on landing page */
+export type LandingTemplate = {
+  backgroundColor: Maybe<Scalars["String"]>;
+  categories: Maybe<Array<Scalars["String"]>>;
+  descriptionHtml: Maybe<Scalars["String"]>;
+  id: Scalars["GID"];
+  name: Maybe<Scalars["String"]>;
+  organizationId: Scalars["GID"];
+  organizationName: Scalars["String"];
+  ownerFullName: Scalars["String"];
+  ownerId: Scalars["GID"];
+  shortDescription: Maybe<Scalars["String"]>;
+  slug: Scalars["String"];
+};
+
+export type LandingTemplatePagination = {
+  /** The requested slice of items. */
+  items: Array<LandingTemplate>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+};
+
+export type LandingTemplateSample = {
+  category: Scalars["String"];
+  templates: LandingTemplatePagination;
+};
+
+export type LandingTemplateSampletemplatesArgs = {
+  limit?: Maybe<Scalars["Int"]>;
+  locale: PetitionLocale;
+  offset?: Maybe<Scalars["Int"]>;
+};
+
 export type MessageCancelledEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];
@@ -1923,63 +1956,6 @@ export type PublicSignatureConfig = {
 
 export type PublicSignatureStatus = "COMPLETED" | "STARTED";
 
-/** A public template */
-export type PublicTemplate = PetitionBase & {
-  categories: Array<Scalars["String"]>;
-  /** Time when the resource was created. */
-  createdAt: Scalars["DateTime"];
-  /** The body of the petition. */
-  emailBody: Maybe<Scalars["JSON"]>;
-  /** The subject of the petition. */
-  emailSubject: Maybe<Scalars["String"]>;
-  /** The number of fields in the petition. */
-  fieldCount: Scalars["Int"];
-  /** The definition of the petition fields. */
-  fields: Array<PetitionField>;
-  /** Whether comments are enabled or not. */
-  hasCommentsEnabled: Scalars["Boolean"];
-  /** The ID of the petition or template. */
-  id: Scalars["GID"];
-  isReadOnly: Scalars["Boolean"];
-  /**
-   * Whether the contents card is hidden in the recipient view.
-   * @deprecated Don't use this
-   */
-  isRecipientViewContentsHidden: Scalars["Boolean"];
-  /** The locale of the petition. */
-  locale: PetitionLocale;
-  metadata: PublicTemplateMetadata;
-  /** The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates). */
-  myEffectivePermission: Maybe<EffectivePetitionUserPermission>;
-  /** The name of the petition. */
-  name: Maybe<Scalars["String"]>;
-  organization: Organization;
-  owner: User;
-  /** The permissions linked to the petition */
-  permissions: Array<PetitionPermission>;
-  /** Whether to skip the forward security check on the recipient view. */
-  skipForwardSecurity: Scalars["Boolean"];
-  /** The tags linked to the petition */
-  tags: Array<Tag>;
-  /** Time when the resource was last updated. */
-  updatedAt: Scalars["DateTime"];
-};
-
-/** The metadata of a public template */
-export type PublicTemplateMetadata = {
-  /** background color for the template card in #HEX format */
-  backgroundColor: Maybe<Scalars["String"]>;
-  description: Maybe<Scalars["String"]>;
-  slug: Scalars["ID"];
-};
-
-export type PublicTemplatePagination = {
-  /** The requested slice of items. */
-  items: Array<PublicTemplate>;
-  /** The total count of items in the list. */
-  totalCount: Scalars["Int"];
-};
-
 /** A public view of a user */
 export type PublicUser = {
   /** The email of the user. */
@@ -2013,7 +1989,9 @@ export type Query = {
   globalIdDecode: SupportMethodResponse;
   /** Encodes the given ID into a Global ID. */
   globalIdEncode: SupportMethodResponse;
-  landingPublicTemplates: PublicTemplatePagination;
+  landingTemplateBySlug: Maybe<LandingTemplate>;
+  landingTemplates: LandingTemplatePagination;
+  landingTemplatesSamples: Array<LandingTemplateSample>;
   me: User;
   organization: Maybe<Organization>;
   /** The organizations registered in Parallel. */
@@ -2074,9 +2052,14 @@ export type QueryglobalIdEncodeArgs = {
   type: EntityType;
 };
 
-export type QuerylandingPublicTemplatesArgs = {
-  categories?: Maybe<Array<Scalars["String"]>>;
+export type QuerylandingTemplateBySlugArgs = {
+  slug: Scalars["String"];
+};
+
+export type QuerylandingTemplatesArgs = {
+  category: Scalars["String"];
   limit?: Maybe<Scalars["Int"]>;
+  locale: PetitionLocale;
   offset?: Maybe<Scalars["Int"]>;
 };
 
@@ -2761,13 +2744,6 @@ export type PetitionReplies_RepliesQuery = {
           }
         >;
       }
-    | {
-        fields: Array<
-          Pick<PetitionField, "id" | "type" | "options"> & {
-            replies: Array<PetitionFieldReplyFragment>;
-          }
-        >;
-      }
   >;
 };
 
@@ -2787,12 +2763,6 @@ export type GetPermissions_PermissionsQueryVariables = Exact<{
 
 export type GetPermissions_PermissionsQuery = {
   petition: Maybe<
-    | {
-        permissions: Array<
-          | Permission_PetitionUserGroupPermission_Fragment
-          | Permission_PetitionUserPermission_Fragment
-        >;
-      }
     | {
         permissions: Array<
           | Permission_PetitionUserGroupPermission_Fragment
