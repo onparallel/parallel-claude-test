@@ -713,6 +713,8 @@ export interface NexusGenFieldTypes {
     backgroundColor: string | null; // String
     categories: string[] | null; // [String!]
     descriptionHtml: string | null; // String
+    fieldCount: number; // Int!
+    hasConditionals: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     name: string | null; // String
     organizationId: NexusGenScalars["GID"]; // GID!
@@ -1737,6 +1739,8 @@ export interface NexusGenFieldTypeNames {
     backgroundColor: "String";
     categories: "String";
     descriptionHtml: "String";
+    fieldCount: "Int";
+    hasConditionals: "Boolean";
     id: "GID";
     name: "String";
     organizationId: "GID";

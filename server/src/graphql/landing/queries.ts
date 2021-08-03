@@ -1,5 +1,6 @@
 import { arg, nonNull, objectType, queryField, stringArg } from "@nexus/schema";
 import { fullName } from "../../util/fullName";
+import { isDefined } from "../../util/remedaExtensions";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { toHtml } from "../../util/slate";
 
@@ -47,6 +48,17 @@ export const LandingTemplate = objectType({
       resolve: async (o, _, ctx) => {
         const org = (await ctx.organizations.loadOrg(o.org_id))!;
         return org.name;
+      },
+    });
+    t.int("fieldCount", {
+      resolve: async (o, _, ctx) => {
+        return await ctx.petitions.loadFieldCountForPetition(o.id);
+      },
+    });
+    t.boolean("hasConditionals", {
+      resolve: async (o, _, ctx) => {
+        const fields = await ctx.petitions.loadFieldsForPetition(o.id);
+        return fields.some((f) => isDefined(f.visibility));
       },
     });
   },

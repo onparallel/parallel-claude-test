@@ -300,6 +300,8 @@ type LandingTemplate {
   backgroundColor: String
   categories: [String!]
   descriptionHtml: String
+  fieldCount: Int!
+  hasConditionals: Boolean!
   id: GID!
   name: String
   organizationId: GID!
