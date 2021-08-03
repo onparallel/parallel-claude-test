@@ -2847,8 +2847,6 @@ enum PublicSignatureStatus {
 A public template
 """
 type PublicTemplate implements PetitionBase {
-  categories: [String!]!
-
   """
   Time when the resource was created.
   """
@@ -2937,6 +2935,7 @@ type PublicTemplateMetadata {
   background color for the template card in #HEX format
   """
   backgroundColor: String
+  categories: [String!]
   description: String
   slug: ID!
 }
@@ -2951,6 +2950,22 @@ type PublicTemplatePagination {
   The total count of items in the list.
   """
   totalCount: Int!
+}
+
+type PublicTemplateSample {
+  category: String!
+  templates(
+    """
+    Number of elements to take from the list.
+    """
+    limit: Int
+    locale: PetitionLocale!
+
+    """
+    Number of elements to skip from the list.
+    """
+    offset: Int
+  ): PublicTemplatePagination!
 }
 
 """
@@ -3058,18 +3073,20 @@ type Query {
   ): SupportMethodResponse!
   landingPublicTemplateBySlug(slug: String!): PublicTemplate
   landingPublicTemplates(
-    categories: [String!]
+    category: String!
 
     """
     Number of elements to take from the list.
     """
     limit: Int
+    locale: PetitionLocale!
 
     """
     Number of elements to skip from the list.
     """
     offset: Int
   ): PublicTemplatePagination!
+  landingPublicTemplatesSamples: [PublicTemplateSample!]!
   me: User!
   organization(id: GID!): Organization
 

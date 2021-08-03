@@ -448,7 +448,6 @@ export interface Petition {
   hide_recipient_view_contents: boolean; // bool
   skip_forward_security: boolean; // bool
   is_readonly: boolean; // bool
-  public_categories: Maybe<string[]>; // _text
   public_metadata: Maybe<any>; // jsonb
 }
 
@@ -477,7 +476,6 @@ export type CreatePetition = PartialProps<
   | "hide_recipient_view_contents"
   | "skip_forward_security"
   | "is_readonly"
-  | "public_categories"
   | "public_metadata"
 >;
 
@@ -660,8 +658,8 @@ export interface PetitionFieldReply {
   deleted_by: Maybe<string>; // varchar
   petition_access_id: Maybe<number>; // int4
   status: PetitionFieldReplyStatus; // petition_field_reply_status
-  user_id: Maybe<number>; // int4
   metadata: any; // jsonb
+  user_id: Maybe<number>; // int4
 }
 
 export type CreatePetitionFieldReply = PartialProps<
@@ -674,8 +672,8 @@ export type CreatePetitionFieldReply = PartialProps<
   | "deleted_by"
   | "petition_access_id"
   | "status"
-  | "user_id"
   | "metadata"
+  | "user_id"
 >;
 
 export interface PetitionMessage {

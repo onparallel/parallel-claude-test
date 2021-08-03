@@ -448,16 +448,17 @@ export interface NexusGenObjects {
   };
   PublicTemplate: db.Petition;
   PublicTemplateMetadata: {
-    // root type
-    backgroundColor?: string | null; // String
-    description?: string | null; // String
-    slug: string; // ID!
+    slug?: string;
+    description?: string;
+    backgroundColor?: string;
+    categories?: string[];
   };
   PublicTemplatePagination: {
     // root type
     items: NexusGenRootTypes["PublicTemplate"][]; // [PublicTemplate!]!
     totalCount: number; // Int!
   };
+  PublicTemplateSample: string;
   PublicUser: db.User;
   Query: {};
   ReminderEmailBouncedUserNotification: notifications.ReminderEmailBouncedUserNotification;
@@ -1256,7 +1257,6 @@ export interface NexusGenFieldTypes {
   };
   PublicTemplate: {
     // field return type
-    categories: string[]; // [String!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
@@ -1282,6 +1282,7 @@ export interface NexusGenFieldTypes {
   PublicTemplateMetadata: {
     // field return type
     backgroundColor: string | null; // String
+    categories: string[] | null; // [String!]
     description: string | null; // String
     slug: string; // ID!
   };
@@ -1289,6 +1290,11 @@ export interface NexusGenFieldTypes {
     // field return type
     items: NexusGenRootTypes["PublicTemplate"][]; // [PublicTemplate!]!
     totalCount: number; // Int!
+  };
+  PublicTemplateSample: {
+    // field return type
+    category: string; // String!
+    templates: NexusGenRootTypes["PublicTemplatePagination"]; // PublicTemplatePagination!
   };
   PublicUser: {
     // field return type
@@ -1311,6 +1317,7 @@ export interface NexusGenFieldTypes {
     globalIdEncode: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     landingPublicTemplateBySlug: NexusGenRootTypes["PublicTemplate"] | null; // PublicTemplate
     landingPublicTemplates: NexusGenRootTypes["PublicTemplatePagination"]; // PublicTemplatePagination!
+    landingPublicTemplatesSamples: NexusGenRootTypes["PublicTemplateSample"][]; // [PublicTemplateSample!]!
     me: NexusGenRootTypes["User"]; // User!
     organization: NexusGenRootTypes["Organization"] | null; // Organization
     organizations: NexusGenRootTypes["OrganizationPagination"]; // OrganizationPagination!
@@ -2285,7 +2292,6 @@ export interface NexusGenFieldTypeNames {
   };
   PublicTemplate: {
     // field return type name
-    categories: "String";
     createdAt: "DateTime";
     emailBody: "JSON";
     emailSubject: "String";
@@ -2309,6 +2315,7 @@ export interface NexusGenFieldTypeNames {
   PublicTemplateMetadata: {
     // field return type name
     backgroundColor: "String";
+    categories: "String";
     description: "String";
     slug: "ID";
   };
@@ -2316,6 +2323,11 @@ export interface NexusGenFieldTypeNames {
     // field return type name
     items: "PublicTemplate";
     totalCount: "Int";
+  };
+  PublicTemplateSample: {
+    // field return type name
+    category: "String";
+    templates: "PublicTemplatePagination";
   };
   PublicUser: {
     // field return type name
@@ -2338,6 +2350,7 @@ export interface NexusGenFieldTypeNames {
     globalIdEncode: "SupportMethodResponse";
     landingPublicTemplateBySlug: "PublicTemplate";
     landingPublicTemplates: "PublicTemplatePagination";
+    landingPublicTemplatesSamples: "PublicTemplateSample";
     me: "User";
     organization: "Organization";
     organizations: "OrganizationPagination";
@@ -3255,6 +3268,14 @@ export interface NexusGenArgTypes {
       offset?: number | null; // Int
     };
   };
+  PublicTemplateSample: {
+    templates: {
+      // args
+      limit?: number | null; // Int
+      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
+      offset?: number | null; // Int
+    };
+  };
   Query: {
     access: {
       // args
@@ -3299,8 +3320,9 @@ export interface NexusGenArgTypes {
     };
     landingPublicTemplates: {
       // args
-      categories?: string[] | null; // [String!]
+      category: string; // String!
       limit?: number | null; // Int
+      locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       offset?: number | null; // Int
     };
     organization: {

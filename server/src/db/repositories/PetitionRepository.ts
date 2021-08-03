@@ -3224,7 +3224,7 @@ export class PetitionRepository extends BaseRepository {
       search?: string | null;
       locale?: PetitionLocale | null;
       sortBy?: "last_used_at" | "used_count";
-      categories?: string[] | null;
+      category?: string | null;
     } & PageOpts,
     userId?: number
   ) {
@@ -3236,7 +3236,7 @@ export class PetitionRepository extends BaseRepository {
           is_template: true,
         })
         .mmodify((q) => {
-          const { search, locale, sortBy, categories } = opts;
+          const { search, locale, sortBy, category } = opts;
           if (locale) {
             q.where("locale", locale);
           }
@@ -3250,16 +3250,12 @@ export class PetitionRepository extends BaseRepository {
               );
             });
           }
-          if (categories && categories.length > 0) {
+          if (category) {
             /* array overlap operator.
               selects every template with any of the passed categories */
-            q.whereRaw(
-              /* sql */ `
-              array[${categories
-                .map(() => "?")
-                .join(", ")}] && public_categories`,
-              categories
-            );
+            q.whereRaw(/* sql */ `public_metadata->'categories' \\? ?`, [
+              category,
+            ]);
           }
           if (userId !== undefined) {
             q.leftJoin(
@@ -3300,6 +3296,15 @@ export class PetitionRepository extends BaseRepository {
       .whereRaw(`("public_metadata" ->> 'slug') = ?`, [slug]);
 
     return row;
+  }
+
+  async getPublicTemplatesCategories() {
+    const rows = await this.raw<{ category: string }>(/* sql */ `
+      select distinct jsonb_array_elements(public_metadata->'categories') as category
+      from petition
+      where is_template and template_public and deleted_at is null
+    `);
+    return rows.map((r) => r.category);
   }
 
   readonly loadPetitionSignatureByExternalId = this.buildLoadBy(
