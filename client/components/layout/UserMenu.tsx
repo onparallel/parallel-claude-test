@@ -135,15 +135,17 @@ export function UserMenu({
           </MenuOptionGroup>
           <MenuDivider />
 
-          <MenuItem
-            icon={<HelpOutlineIcon display="block" boxSize={4} />}
-            onClick={handleHelpCenterClick}
-          >
-            <FormattedMessage
-              id="navbar.help-center"
-              defaultMessage="Help center"
-            />
-          </MenuItem>
+          {isMobile ? (
+            <MenuItem
+              icon={<HelpOutlineIcon display="block" boxSize={4} />}
+              onClick={handleHelpCenterClick}
+            >
+              <FormattedMessage
+                id="navbar.help-center"
+                defaultMessage="Help center"
+              />
+            </MenuItem>
+          ) : null}
           <MenuItem
             icon={<MapIcon display="block" boxSize={4} />}
             onClick={onOnboardingClick}

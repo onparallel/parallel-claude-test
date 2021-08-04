@@ -7,11 +7,13 @@ import {
   IconButton,
   List,
   ListItem,
+  Stack,
   Tooltip,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import {
   AddIcon,
+  HelpOutlineIcon,
   PaperPlaneIcon,
   PaperPlanesIcon,
   UsersIcon,
@@ -32,6 +34,8 @@ export interface AppLayoutNavbarProps extends BoxProps {
   user: AppLayoutNavbar_UserFragment;
   onOnboardingClick: () => void;
 }
+
+declare const zE: any;
 
 export const AppLayoutNavbar = Object.assign(
   memo(function AppLayoutNavbar({
@@ -85,6 +89,13 @@ export const AppLayoutNavbar = Object.assign(
           locale,
         })
       );
+    }
+
+    function handleHelpCenterClick() {
+      (window as any).zE?.(function () {
+        zE("webWidget", "setLocale", query.locale);
+        zE.activate({ hideOnClose: true });
+      });
     }
 
     const isMobile = useBreakpointValue({ base: true, sm: false });
@@ -170,8 +181,23 @@ export const AppLayoutNavbar = Object.assign(
         </Flex>
         <Spacer display={{ base: "none", sm: "block" }} />
         <Center display={{ base: "none", sm: "flex" }} marginBottom={6}>
-          <NotificationsButton />
+          <Stack spacing={6}>
+            <NotificationsButton />
+            <IconButton
+              aria-label={intl.formatMessage({
+                id: "navbar.help-center",
+                defaultMessage: "Help center",
+              })}
+              size="md"
+              variant={"ghost"}
+              backgroundColor="white"
+              isRound
+              onClick={handleHelpCenterClick}
+              icon={<HelpOutlineIcon fontSize="22px" />}
+            />
+          </Stack>
         </Center>
+
         <Center>
           <UserMenu
             placement={isMobile ? "top-end" : "right-end"}
