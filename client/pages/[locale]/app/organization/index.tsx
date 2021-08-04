@@ -18,9 +18,7 @@ function OrganizationSettings() {
   const {
     data: { me },
   } = assertQuery(useOrganizationSettingsQuery());
-  const sections = useOrganizationSections(
-    ["OWNER", "ADMIN"].includes(me.role)
-  );
+  const sections = useOrganizationSections(me);
 
   return (
     <SettingsLayout

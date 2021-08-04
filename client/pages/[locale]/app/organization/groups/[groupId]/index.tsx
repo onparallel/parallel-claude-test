@@ -53,6 +53,7 @@ import {
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { isAdmin } from "@parallel/utils/roles";
 import { withError } from "@parallel/utils/promises/withError";
 import {
   integer,
@@ -155,9 +156,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     setName(userGroup?.name ?? "");
   }, [userGroup]);
 
-  const sections = useOrganizationSections(
-    ["OWNER", "ADMIN"].includes(me.role)
-  );
+  const sections = useOrganizationSections(me);
 
   const columns = useOrganizationGroupTableColumns();
 
@@ -279,7 +278,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
           <EditableHeading
-            isDisabled={me.role === "NORMAL"}
+            isDisabled={!isAdmin(me)}
             value={name}
             onChange={handleChangeGroupName}
           />

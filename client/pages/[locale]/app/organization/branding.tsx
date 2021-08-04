@@ -40,9 +40,7 @@ function OrganizationBranding() {
     data: { me },
   } = useAssertQueryOrPreviousData(useOrganizationBrandingQuery());
 
-  const sections = useOrganizationSections(
-    ["OWNER", "ADMIN"].includes(me.role)
-  );
+  const sections = useOrganizationSections(me);
   const dropzoneRef = useRef<DropzoneRef>(null);
 
   const [logoSrc, setLogoSrc] = useState<string>(

@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { WithAdminOrganizationRoleQuery } from "@parallel/graphql/__types";
+import { isAdmin } from "@parallel/utils/roles";
 import { NextComponentType } from "next";
 import { WithApolloDataContext } from "./withApolloData";
 
@@ -33,7 +34,7 @@ export function withAdminOrganizationRole<P = {}>(
             }
           `,
         });
-      if (data?.me?.role === "ADMIN" || data?.me?.role === "OWNER") {
+      if (isAdmin(data.me)) {
         return await getInitialProps?.(context);
       } else {
         throw new Error("FORBIDDEN");

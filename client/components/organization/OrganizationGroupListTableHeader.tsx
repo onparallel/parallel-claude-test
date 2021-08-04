@@ -16,6 +16,7 @@ import {
   UserXIcon,
 } from "@parallel/chakra/icons";
 import { OrganizationGroupListTableHeader_UserFragment } from "@parallel/graphql/__types";
+import { isAdmin } from "@parallel/utils/roles";
 import { FormattedMessage, useIntl } from "react-intl";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { SearchInput } from "../common/SearchInput";
@@ -61,7 +62,7 @@ export function OrganizationGroupListTableHeader({
           defaultMessage: "Reload",
         })}
       />
-      {["OWNER", "ADMIN"].includes(me.role) ? (
+      {isAdmin(me) ? (
         <>
           <Spacer />
           <Box>

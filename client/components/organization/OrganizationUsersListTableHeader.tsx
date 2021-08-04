@@ -21,6 +21,7 @@ import {
   OrganizationUsers_UserFragment,
   UserStatus,
 } from "@parallel/graphql/__types";
+import { isAdmin } from "@parallel/utils/roles";
 import { withError } from "@parallel/utils/promises/withError";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useErrorDialog } from "../common/ErrorDialog";
@@ -104,7 +105,7 @@ export function OrganizationUsersListTableHeader({
           defaultMessage: "Reload",
         })}
       />
-      {["OWNER", "ADMIN"].includes(me.role) ? (
+      {isAdmin(me) ? (
         <>
           <Spacer />
           <Box>

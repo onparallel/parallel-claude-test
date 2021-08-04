@@ -30,11 +30,13 @@ import {
   useOrganizationUsersQuery,
   useOrganizationUsers_createOrganizationUserMutation,
   useOrganizationUsers_updateUserStatusMutation,
+  User,
   UserStatus,
 } from "@parallel/graphql/__types";
 import { useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
+import { isAdmin } from "@parallel/utils/roles";
 import {
   integer,
   parseQuery,
@@ -97,13 +99,9 @@ function OrganizationUsers() {
 
   const [search, setSearch] = useState(state.search);
 
-  const sections = useOrganizationSections(
-    ["OWNER", "ADMIN"].includes(me.role)
-  );
+  const sections = useOrganizationSections(me);
 
-  const columns = useOrganizationUsersTableColumns(
-    ["OWNER", "ADMIN"].includes(me.role)
-  );
+  const columns = useOrganizationUsersTableColumns(me);
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (value) => {
@@ -264,7 +262,8 @@ function OrganizationUsers() {
   );
 }
 
-function useOrganizationUsersTableColumns(isAdmin: boolean) {
+function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
+  const userIsAdmin = isAdmin(user);
   const intl = useIntl();
   return useMemo<TableColumn<OrganizationUsers_UserFragment>[]>(
     () => [
@@ -362,7 +361,7 @@ function useOrganizationUsersTableColumns(isAdmin: boolean) {
           </Badge>
         ),
       },
-      ...(isAdmin
+      ...(userIsAdmin
         ? ([
             {
               key: "lastActiveAt",

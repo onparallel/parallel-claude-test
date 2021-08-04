@@ -1,7 +1,10 @@
+import { User } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
+import { isAdmin } from "./roles";
 
-export function useOrganizationSections(isAdmin: boolean) {
+export function useOrganizationSections(user: Pick<User, "role">) {
+  const userIsAdmin = isAdmin(user);
   const intl = useIntl();
   return useMemo(
     () => [
@@ -19,7 +22,7 @@ export function useOrganizationSections(isAdmin: boolean) {
         }),
         path: "/app/organization/groups",
       },
-      ...(isAdmin
+      ...(userIsAdmin
         ? [
             {
               title: intl.formatMessage({
@@ -31,6 +34,6 @@ export function useOrganizationSections(isAdmin: boolean) {
           ]
         : []),
     ],
-    [intl.locale, isAdmin]
+    [intl.locale, userIsAdmin]
   );
 }
