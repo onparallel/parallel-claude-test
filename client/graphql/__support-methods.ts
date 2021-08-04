@@ -419,14 +419,6 @@ export const supportMethods: {
           deprecationReason: null,
         },
         {
-          name: "imageLocale",
-          description: null,
-          type: { kind: "ENUM", name: "PetitionLocale", ofType: null },
-          defaultValue: null,
-          isDeprecated: false,
-          deprecationReason: null,
-        },
-        {
           name: "slug",
           description: "must be URL-friendly",
           type: { kind: "SCALAR", name: "String", ofType: null },
@@ -611,30 +603,6 @@ export const schemaTypes: IntrospectionType[] = [
       },
       {
         name: "User",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
-    ],
-    possibleTypes: null,
-  },
-  {
-    kind: "ENUM",
-    name: "PetitionLocale",
-    description: "The locale used for rendering the petition to the contact.",
-    specifiedByUrl: null,
-    fields: null,
-    inputFields: null,
-    interfaces: null,
-    enumValues: [
-      {
-        name: "en",
-        description: null,
-        isDeprecated: false,
-        deprecationReason: null,
-      },
-      {
-        name: "es",
         description: null,
         isDeprecated: false,
         deprecationReason: null,

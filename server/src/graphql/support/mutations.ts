@@ -304,7 +304,6 @@ export const updateLandingTemplateMetadata = mutationField(
       ),
       slug: nullable(stringArg({ description: "must be URL-friendly" })),
       image: nullable(uploadArg()),
-      imageLocale: nullable(arg({ type: "PetitionLocale" })),
     },
     validateArgs: validateAnd(
       validateHexColor((args) => args.backgroundColor, "backgroundColor"),
@@ -346,7 +345,7 @@ export const updateLandingTemplateMetadata = mutationField(
 
         if (args.image) {
           const { createReadStream } = await args.image;
-          const path = `landing/${args.imageLocale || "en"}/${random(16)}`;
+          const path = `landing/${random(16)}`;
           await ctx.aws.publicFiles.uploadFile(
             path,
             "image/png",

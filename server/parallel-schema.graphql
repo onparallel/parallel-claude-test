@@ -1076,7 +1076,6 @@ type Mutation {
     """
     description: String
     image: Upload
-    imageLocale: PetitionLocale
 
     """
     must be URL-friendly

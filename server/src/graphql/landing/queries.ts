@@ -1,5 +1,6 @@
 import { arg, nonNull, objectType, queryField, stringArg } from "@nexus/schema";
 import { fullName } from "../../util/fullName";
+import { toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 import { safeJsonParse } from "../../util/safeJsonParse";
 import { toHtml } from "../../util/slate";
@@ -9,7 +10,7 @@ export const LandingTemplate = objectType({
   description: "A public template on landing page",
   rootTyping: "db.Petition",
   definition(t) {
-    t.globalId("id");
+    t.globalId("id", { prefixName: "Petition" });
     t.nullable.string("name", { resolve: (o) => o.name });
     t.nullable.string("descriptionHtml", {
       resolve: (o) => {
@@ -18,7 +19,9 @@ export const LandingTemplate = objectType({
           : null;
       },
     });
-    t.string("slug", { resolve: (o) => o.public_metadata.slug });
+    t.string("slug", {
+      resolve: (o) => o.public_metadata.slug || toGlobalId("Petition", o.id),
+    });
     t.nullable.string("shortDescription", {
       resolve: (o) => o.public_metadata.description,
     });

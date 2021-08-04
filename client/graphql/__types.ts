@@ -995,7 +995,6 @@ export interface MutationupdateLandingTemplateMetadataArgs {
   categories?: Maybe<Scalars["String"]>;
   description?: Maybe<Scalars["String"]>;
   image?: Maybe<Scalars["Upload"]>;
-  imageLocale?: Maybe<PetitionLocale>;
   slug?: Maybe<Scalars["String"]>;
   templateId: Scalars["ID"];
 }

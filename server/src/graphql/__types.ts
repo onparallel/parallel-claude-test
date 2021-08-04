@@ -3110,7 +3110,6 @@ export interface NexusGenArgTypes {
       categories?: string | null; // String
       description?: string | null; // String
       image?: NexusGenScalars["Upload"] | null; // Upload
-      imageLocale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
       slug?: string | null; // String
       templateId: string; // ID!
     };
