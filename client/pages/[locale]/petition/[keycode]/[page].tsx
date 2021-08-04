@@ -125,21 +125,23 @@ function RecipientView({
           if (petition.signature?.review) {
             await showReviewBeforeSigningDialog({ granter });
           }
-          toast({
-            title: intl.formatMessage({
-              id: "recipient-view.completed-petition.toast-title",
-              defaultMessage: "Petition completed!",
-            }),
-            description: intl.formatMessage(
-              {
-                id: "recipient-view.completed-petition.toast-description",
-                defaultMessage: "{name} will be notified for its revision.",
-              },
-              { name: granter.fullName }
-            ),
-            status: "success",
-            isClosable: true,
-          });
+          if (!toast.isActive("petition-completed-toast"))
+            toast({
+              id: "petition-completed-toast",
+              title: intl.formatMessage({
+                id: "recipient-view.completed-petition.toast-title",
+                defaultMessage: "Petition completed!",
+              }),
+              description: intl.formatMessage(
+                {
+                  id: "recipient-view.completed-petition.toast-description",
+                  defaultMessage: "{name} will be notified for its revision.",
+                },
+                { name: granter.fullName }
+              ),
+              status: "success",
+              isClosable: true,
+            });
         } else {
           // go to first repliable field without replies
           let page = 1;

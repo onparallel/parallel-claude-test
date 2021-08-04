@@ -1,10 +1,22 @@
 import { gql } from "@apollo/client";
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverTrigger,
+  Text,
+} from "@chakra-ui/react";
 import { RecipientViewProgressFooter_PublicPetitionFragment } from "@parallel/graphql/__types";
-import { generateCssStripe } from "@parallel/utils/css";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
+import { generateCssStripe } from "@parallel/utils/css";
 import { useFieldVisibility } from "@parallel/utils/fieldVisibility/useFieldVisibility";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { zip } from "remeda";
 import { Card, CardProps } from "../common/Card";
@@ -22,6 +34,7 @@ export function RecipientViewProgressFooter({
   ...props
 }: RecipientViewProgressFooterProps) {
   const fieldVisibility = useFieldVisibility(petition.fields);
+  const [poppoverClosed, setPoppoverClosed] = useState(false);
   const { replied, optional, total } = useMemo(() => {
     let replied = 0;
     let optional = 0;
@@ -37,6 +50,7 @@ export function RecipientViewProgressFooter({
     }
     return { replied, optional, total };
   }, [petition.fields, fieldVisibility]);
+
   const isCompleted = petition.status === "COMPLETED";
   return (
     <Card
@@ -103,24 +117,50 @@ export function RecipientViewProgressFooter({
           marginLeft={2}
         />
       </Flex>
-      <Button
-        colorScheme="purple"
-        size="sm"
-        isDisabled={isCompleted}
-        onClick={onFinalize}
+      <Popover
+        returnFocusOnClose={false}
+        isOpen={replied + optional === total && !isCompleted && !poppoverClosed}
+        placement="top"
+        closeOnBlur={false}
+        onClose={() => setPoppoverClosed(true)}
+        autoFocus={false}
       >
-        {petition.signature?.review === false ? (
-          <FormattedMessage
-            id="recipient-view.submit-and-sign-button-short"
-            defaultMessage="Finalize and sign"
-          />
-        ) : (
-          <FormattedMessage
-            id="recipient-view.submit-button-short"
-            defaultMessage="Finalize"
-          />
-        )}
-      </Button>
+        <PopoverTrigger>
+          <Button
+            colorScheme="purple"
+            size="sm"
+            isDisabled={isCompleted}
+            onClick={onFinalize}
+          >
+            {petition.signature?.review === false ? (
+              <FormattedMessage
+                id="recipient-view.submit-and-sign-button-short"
+                defaultMessage="Finalize and sign"
+              />
+            ) : (
+              <FormattedMessage
+                id="recipient-view.submit-button-short"
+                defaultMessage="Finalize"
+              />
+            )}
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent
+          backgroundColor="blue.500"
+          color="white"
+          marginRight={4}
+        >
+          <PopoverArrow backgroundColor="blue.500" />
+          <PopoverCloseButton />
+          <PopoverBody>
+            <FormattedMessage
+              id="component.recipient-view.reminder-submit"
+              defaultMessage="Remember to finalize when fields are completed."
+            />
+          </PopoverBody>
+        </PopoverContent>
+      </Popover>
     </Card>
   );
 }
