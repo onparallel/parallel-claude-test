@@ -1649,9 +1649,10 @@ export class PetitionRepository extends BaseRepository {
                 petition_id: cloned.id,
                 user_id: user.id,
                 type: "OWNER",
-                is_subscribed:
-                  userPermissions.find((p) => p.user_id === user.id)
-                    ?.is_subscribed ?? true,
+                is_subscribed: sourcePetition!.is_template
+                  ? true
+                  : userPermissions.find((p) => p.user_id === user.id)
+                      ?.is_subscribed ?? true,
                 created_by: `User:${user.id}`,
                 updated_by: `User:${user.id}`,
               },
