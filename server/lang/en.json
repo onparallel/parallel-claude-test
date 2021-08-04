@@ -255,6 +255,11 @@
     "context": "We couldn't deliver your message"
   },
   {
+    "term": "petition-reminder.remainder",
+    "definition": "[Remainder]",
+    "context": "[Remainder]"
+  },
+  {
     "term": "petition-reminder.subject",
     "definition": "Remember that {senderName} sent you a petition",
     "context": "Remember that {senderName} sent you a petition"

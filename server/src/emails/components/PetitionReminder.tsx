@@ -1,6 +1,7 @@
 import { MjmlColumn, MjmlSection, MjmlSpacer, MjmlText } from "mjml-react";
 import outdent from "outdent";
 import { FormattedMessage, IntlShape, useIntl } from "react-intl";
+import { Maybe } from "../../util/types";
 import { Email } from "../buildEmail";
 import { CompleteInfoButton } from "../common/CompleteInfoButton";
 import { DateTime } from "../common/DateTime";
@@ -11,6 +12,7 @@ import { disclaimer, greetingFormal } from "../common/texts";
 import { FORMATS } from "../utils/dates";
 
 export type PetitionReminderProps = {
+  emailSubject: Maybe<string>;
   contactFullName: string;
   senderName: string;
   senderEmail: string;
@@ -31,13 +33,22 @@ const email: Email<PetitionReminderProps> = {
       { senderName }
     );
   },
-  subject({ senderName }, intl: IntlShape) {
-    return intl.formatMessage(
-      {
-        id: "petition-reminder.subject",
-        defaultMessage: "Remember that {senderName} sent you a petition",
-      },
-      { senderName }
+  subject({ emailSubject, senderName }, intl: IntlShape) {
+    return (
+      intl.formatMessage({
+        id: "petition-reminder.remainder",
+        defaultMessage: "[Remainder]",
+      }) +
+      ` ${
+        emailSubject ||
+        intl.formatMessage(
+          {
+            id: "petition-reminder.subject",
+            defaultMessage: "Remember that {senderName} sent you a petition",
+          },
+          { senderName }
+        )
+      }`
     );
   },
   text(

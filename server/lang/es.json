@@ -255,6 +255,11 @@
     "context": "We couldn't deliver your message"
   },
   {
+    "term": "petition-reminder.remainder",
+    "definition": "[Recordatorio]",
+    "context": "[Remainder]"
+  },
+  {
     "term": "petition-reminder.subject",
     "definition": "Recuerde que {senderName} le envió una petición",
     "context": "Remember that {senderName} sent you a petition"

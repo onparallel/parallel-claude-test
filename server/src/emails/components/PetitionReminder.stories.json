@@ -9,6 +9,7 @@
         }
       },
       "args": {
+        "emailSubject": "First email subject",
         "contactFullName": "Santi Albo",
         "senderName": "Derek",
         "senderEmail": "derek@onparallel.com",
@@ -23,6 +24,7 @@
         "logoAlt": "Parallel"
       },
       "argsTypes": {
+        "emailSubject": { "control": { "type": "text" } },
         "contactFullName": { "control": { "type": "text" } },
         "senderName": { "control": { "type": "text" } },
         "senderEmail": { "control": { "type": "text" } },

@@ -85,6 +85,7 @@ export async function petitionReminder(
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
+        emailSubject: petition.email_subject,
         contactFullName: fullName(contact.first_name, contact.last_name)!,
         senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,
