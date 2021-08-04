@@ -1807,7 +1807,7 @@
   {
     "term": "component.recipient-view.reminder-submit",
     "definition": "Recuerde finalizar una vez haya completado todos los campos.",
-    "context": "Remember to finalize when fields are completed."
+    "context": "Remember to click Finalize when you finish entering all the information."
   },
   {
     "term": "component.referenced-field-dialog.confirm",

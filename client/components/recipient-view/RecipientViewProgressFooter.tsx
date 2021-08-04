@@ -156,7 +156,7 @@ export function RecipientViewProgressFooter({
           <PopoverBody>
             <FormattedMessage
               id="component.recipient-view.reminder-submit"
-              defaultMessage="Remember to finalize when fields are completed."
+              defaultMessage="Remember to click Finalize when you finish entering all the information."
             />
           </PopoverBody>
         </PopoverContent>
