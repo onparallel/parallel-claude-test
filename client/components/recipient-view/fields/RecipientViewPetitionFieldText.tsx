@@ -131,6 +131,10 @@ export function RecipientViewPetitionFieldText({
               if (newReplyElement) {
                 Object.assign(newReplyElement, selection);
                 newReplyElement.focus();
+                newReplyElement.setSelectionRange(
+                  newReplyElement.value.length,
+                  newReplyElement.value.length
+                );
               }
             });
           }
