@@ -271,28 +271,34 @@ interface ButtonHighlightProps extends ButtonProps {
   current: string;
 }
 
-function ButtonHighlight({
-  selectedFontWeight,
-  selectedColor,
-  selectedWhen,
-  current,
-  children,
-  ...props
-}: ButtonHighlightProps) {
-  return (
-    <Button
-      {...(current.includes(selectedWhen)
-        ? {
-            fontWeight: selectedFontWeight ?? "bold",
-            color: selectedColor ?? "purple.500",
-          }
-        : {})}
-      {...props}
-    >
-      {children}
-    </Button>
-  );
-}
+export const ButtonHighlight = chakraForwardRef<"button", ButtonHighlightProps>(
+  function ButtonHighlight(
+    {
+      selectedFontWeight,
+      selectedColor,
+      selectedWhen,
+      current,
+      children,
+      ...props
+    },
+    ref
+  ) {
+    return (
+      <Button
+        ref={ref as any}
+        {...(current.includes(selectedWhen)
+          ? {
+              fontWeight: selectedFontWeight ?? "bold",
+              color: selectedColor ?? "purple.500",
+            }
+          : {})}
+        {...props}
+      >
+        {children}
+      </Button>
+    );
+  }
+);
 
 interface MenuButtonHighlightProps extends MenuButtonProps, ButtonProps {
   selectedStrokeWidth?: string;
@@ -302,17 +308,24 @@ interface MenuButtonHighlightProps extends MenuButtonProps, ButtonProps {
   current: string;
 }
 
-function MenuButtonHighlight({
-  selectedStrokeWidth,
-  selectedFontWeight,
-  selectedColor,
-  selectedWhen,
-  current,
-  children,
-  ...props
-}: MenuButtonHighlightProps) {
+export const MenuButtonHighlight = chakraForwardRef<
+  "button",
+  MenuButtonHighlightProps
+>(function MenuButtonHighlight(
+  {
+    selectedStrokeWidth,
+    selectedFontWeight,
+    selectedColor,
+    selectedWhen,
+    current,
+    children,
+    ...props
+  },
+  ref
+) {
   return (
     <MenuButton
+      ref={ref as any}
       {...(current.includes(selectedWhen)
         ? {
             fontWeight: selectedFontWeight ?? "bold",
@@ -329,4 +342,4 @@ function MenuButtonHighlight({
       {children}
     </MenuButton>
   );
-}
+});

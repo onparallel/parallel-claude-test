@@ -229,6 +229,8 @@ export type LandingTemplate = {
   backgroundColor: Maybe<Scalars["String"]>;
   categories: Maybe<Array<Scalars["String"]>>;
   descriptionHtml: Maybe<Scalars["String"]>;
+  fieldCount: Scalars["Int"];
+  hasConditionals: Scalars["Boolean"];
   id: Scalars["GID"];
   name: Maybe<Scalars["String"]>;
   organizationId: Scalars["GID"];
@@ -237,6 +239,7 @@ export type LandingTemplate = {
   ownerId: Scalars["GID"];
   shortDescription: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
+  updatedAt: Scalars["DateTime"];
 };
 
 export type LandingTemplatePagination = {

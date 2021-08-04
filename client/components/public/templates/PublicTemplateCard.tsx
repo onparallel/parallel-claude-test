@@ -8,13 +8,13 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { PublicTemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
 import { FormattedMessage } from "react-intl";
 import { Card } from "../../common/Card";
 
 export interface PublicTemplateCardProps extends HTMLChakraProps<"section"> {
-  template: PublicTemplateCard_PetitionTemplateFragment;
+  template: PublicTemplateCard_LandingTemplateFragment;
 }
 
 export function PublicTemplateCard({
@@ -24,11 +24,8 @@ export function PublicTemplateCard({
   const router = useRouter();
   const { query } = router;
 
-  const { name, owner } = template ?? {};
-  const { fullName, organization } = owner ?? {};
-  const { name: orgName } = organization ?? {};
-
-  const href = "";
+  const { name, slug, backgroundColor, ownerFullName, organizationName } =
+    template ?? {};
 
   return (
     <Box
@@ -36,6 +33,7 @@ export function PublicTemplateCard({
       outline="none"
       transition="all 150ms ease"
       borderRadius="md"
+      overflow="hidden"
       _focus={{ boxShadow: "var(--chakra-shadows-outline)" }}
       _hover={{
         transform: "scale(1.025)",
@@ -43,12 +41,22 @@ export function PublicTemplateCard({
       _active={{
         transform: "scale(1.01)",
       }}
+      aria-label={name ?? ""}
       onClick={() => {
-        const url = `/${query.locale ?? "en"}/${href
+        const url = `/${query.locale ?? "en"}/templates/${slug
           .toString()
           .replace(/^\//, "")}`;
 
         router.push(url);
+      }}
+      onKeyDown={(event) => {
+        if ((event.key = "enter")) {
+          const url = `/${query.locale ?? "en"}/templates/${slug
+            .toString()
+            .replace(/^\//, "")}`;
+
+          router.push(url);
+        }
       }}
     >
       <Card
@@ -62,11 +70,11 @@ export function PublicTemplateCard({
         {...props}
       >
         <Stack>
-          <Center height="130px" backgroundColor="blue.50">
+          <Center height="130px" backgroundColor={backgroundColor as string}>
             <Image
               height="100%"
-              objectFit="cover"
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/input_fondo.png`}
+              padding={5}
+              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/es_radio_button.png`}
             />
           </Center>
           <Grid
@@ -83,8 +91,8 @@ export function PublicTemplateCard({
                 id="public.template-card.created-by"
                 defaultMessage="Created by {name} on {orgName}"
                 values={{
-                  name: fullName,
-                  orgName: <Text as="b">{orgName}</Text>,
+                  name: ownerFullName,
+                  orgName: <Text as="b">{organizationName}</Text>,
                 }}
               />
             </Text>
@@ -96,18 +104,15 @@ export function PublicTemplateCard({
 }
 
 PublicTemplateCard.fragments = {
-  PetitionTemplate: gql`
-    fragment PublicTemplateCard_PetitionTemplate on PetitionTemplate {
+  LandingTemplate: gql`
+    fragment PublicTemplateCard_LandingTemplate on LandingTemplate {
       id
       name
-      owner {
-        id
-        fullName
-        organization {
-          id
-          name
-        }
-      }
+      slug
+      backgroundColor
+      categories
+      ownerFullName
+      organizationName
     }
   `,
 };

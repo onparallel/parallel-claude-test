@@ -3,27 +3,25 @@ import {
   Flex,
   Grid,
   GridItem,
-  SimpleGrid,
   Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
-import { PublicTemplateCard_PetitionTemplateFragment } from "@parallel/graphql/__types";
+import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PublicTemplateCard } from "./PublicTemplateCard";
 import { CategoryType } from "./useCategories";
 
 export function PublicTemplateCategoryPreview({
   category,
-  templates,
 }: {
   category: CategoryType;
-  templates: PublicTemplateCard_PetitionTemplateFragment[];
 }) {
   const displaySideMenu = useBreakpointValue({ base: false, md: true });
 
   const { href, label } = category;
-  const templatesLength = 4;
+  const templates =
+    category.templates as PublicTemplateCard_LandingTemplateFragment[];
 
   return (
     <Grid
@@ -45,7 +43,7 @@ export function PublicTemplateCategoryPreview({
           />
         </Text>
       </GridItem>
-      {templatesLength > 3 ? (
+      {templates.length > 3 ? (
         <GridItem gridArea="actions">
           <NakedLink href={href}>
             <Button

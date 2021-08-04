@@ -247,6 +247,45 @@ export interface GroupPermissionRemovedEvent extends PetitionEvent {
 /** The types of integrations available. */
 export type IntegrationType = "SIGNATURE";
 
+/** A public template on landing page */
+export interface LandingTemplate {
+  __typename?: "LandingTemplate";
+  backgroundColor?: Maybe<Scalars["String"]>;
+  categories?: Maybe<Array<Scalars["String"]>>;
+  descriptionHtml?: Maybe<Scalars["String"]>;
+  fieldCount: Scalars["Int"];
+  hasConditionals: Scalars["Boolean"];
+  id: Scalars["GID"];
+  name?: Maybe<Scalars["String"]>;
+  organizationId: Scalars["GID"];
+  organizationName: Scalars["String"];
+  ownerFullName: Scalars["String"];
+  ownerId: Scalars["GID"];
+  shortDescription?: Maybe<Scalars["String"]>;
+  slug: Scalars["String"];
+  updatedAt: Scalars["DateTime"];
+}
+
+export interface LandingTemplatePagination {
+  __typename?: "LandingTemplatePagination";
+  /** The requested slice of items. */
+  items: Array<LandingTemplate>;
+  /** The total count of items in the list. */
+  totalCount: Scalars["Int"];
+}
+
+export interface LandingTemplateSample {
+  __typename?: "LandingTemplateSample";
+  category: Scalars["String"];
+  templates: LandingTemplatePagination;
+}
+
+export interface LandingTemplateSampletemplatesArgs {
+  limit?: Maybe<Scalars["Int"]>;
+  locale: PetitionLocale;
+  offset?: Maybe<Scalars["Int"]>;
+}
+
 export interface MessageCancelledEvent extends PetitionEvent {
   __typename?: "MessageCancelledEvent";
   createdAt: Scalars["DateTime"];
@@ -2033,6 +2072,9 @@ export interface Query {
   globalIdDecode: SupportMethodResponse;
   /** Encodes the given ID into a Global ID. */
   globalIdEncode: SupportMethodResponse;
+  landingTemplateBySlug?: Maybe<LandingTemplate>;
+  landingTemplates: LandingTemplatePagination;
+  landingTemplatesSamples: Array<LandingTemplateSample>;
   me: User;
   organization?: Maybe<Organization>;
   /** The organizations registered in Parallel. */
@@ -2091,6 +2133,17 @@ export interface QueryglobalIdDecodeArgs {
 export interface QueryglobalIdEncodeArgs {
   id: Scalars["Int"];
   type: EntityType;
+}
+
+export interface QuerylandingTemplateBySlugArgs {
+  slug: Scalars["String"];
+}
+
+export interface QuerylandingTemplatesArgs {
+  category: Scalars["String"];
+  limit?: Maybe<Scalars["Int"]>;
+  locale: PetitionLocale;
+  offset?: Maybe<Scalars["Int"]>;
 }
 
 export interface QueryorganizationArgs {
@@ -5047,16 +5100,15 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
   };
 };
 
-export type PublicTemplateCard_PetitionTemplateFragment = {
-  __typename?: "PetitionTemplate";
+export type PublicTemplateCard_LandingTemplateFragment = {
+  __typename?: "LandingTemplate";
   id: string;
   name?: Maybe<string>;
-  owner: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    organization: { __typename?: "Organization"; id: string; name: string };
-  };
+  slug: string;
+  backgroundColor?: Maybe<string>;
+  categories?: Maybe<Array<string>>;
+  ownerFullName: string;
+  organizationName: string;
 };
 
 export type useCompleteSignerInfoDialog_PublicContactFragment = {
@@ -7041,23 +7093,73 @@ export type PdfViewPetitionQuery = {
   >;
 };
 
-export type PublicTemplateDetails_PetitionTemplateFragment = {
-  __typename?: "PetitionTemplate";
+export type PublicTemplateDetails_LandingTemplateFragment = {
+  __typename?: "LandingTemplate";
   id: string;
   name?: Maybe<string>;
+  slug: string;
+  backgroundColor?: Maybe<string>;
+  categories?: Maybe<Array<string>>;
+  ownerFullName: string;
+  organizationName: string;
+  fieldCount: number;
+  hasConditionals: boolean;
   descriptionHtml?: Maybe<string>;
+  shortDescription?: Maybe<string>;
   updatedAt: string;
-  fields: Array<{
-    __typename?: "PetitionField";
-    id: string;
-    visibility?: Maybe<{ [key: string]: any }>;
-  }>;
-  owner: {
-    __typename?: "User";
-    id: string;
-    fullName?: Maybe<string>;
-    organization: { __typename?: "Organization"; id: string; name: string };
+};
+
+export type landingTemplateBySlugQueryVariables = Exact<{
+  slug: Scalars["String"];
+}>;
+
+export type landingTemplateBySlugQuery = {
+  landingTemplateBySlug?: Maybe<
+    {
+      __typename?: "LandingTemplate";
+    } & PublicTemplateDetails_LandingTemplateFragment
+  >;
+};
+
+export type landingTemplatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  category: Scalars["String"];
+  locale: PetitionLocale;
+}>;
+
+export type landingTemplatesQuery = {
+  landingTemplates: {
+    __typename?: "LandingTemplatePagination";
+    totalCount: number;
+    items: Array<
+      {
+        __typename?: "LandingTemplate";
+      } & PublicTemplateCard_LandingTemplateFragment
+    >;
   };
+};
+
+export type landingTemplatesSamplesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  locale: PetitionLocale;
+}>;
+
+export type landingTemplatesSamplesQuery = {
+  landingTemplatesSamples: Array<{
+    __typename?: "LandingTemplateSample";
+    category: string;
+    templates: {
+      __typename?: "LandingTemplatePagination";
+      totalCount: number;
+      items: Array<
+        {
+          __typename?: "LandingTemplate";
+        } & PublicTemplateCard_LandingTemplateFragment
+      >;
+    };
+  }>;
 };
 
 export type Thanks_PetitionLogoQueryVariables = Exact<{
@@ -7815,18 +7917,15 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
   ${useFilenamePlaceholdersRename_PetitionFieldFragmentDoc}
   ${useFilenamePlaceholdersRename_PetitionFieldReplyFragmentDoc}
 `;
-export const PublicTemplateCard_PetitionTemplateFragmentDoc = gql`
-  fragment PublicTemplateCard_PetitionTemplate on PetitionTemplate {
+export const PublicTemplateCard_LandingTemplateFragmentDoc = gql`
+  fragment PublicTemplateCard_LandingTemplate on LandingTemplate {
     id
     name
-    owner {
-      id
-      fullName
-      organization {
-        id
-        name
-      }
-    }
+    slug
+    backgroundColor
+    categories
+    ownerFullName
+    organizationName
   }
 `;
 export const RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragmentDoc = gql`
@@ -9785,24 +9884,20 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
   }
   ${PetitionPdf_PetitionFieldFragmentDoc}
 `;
-export const PublicTemplateDetails_PetitionTemplateFragmentDoc = gql`
-  fragment PublicTemplateDetails_PetitionTemplate on PetitionTemplate {
+export const PublicTemplateDetails_LandingTemplateFragmentDoc = gql`
+  fragment PublicTemplateDetails_LandingTemplate on LandingTemplate {
     id
     name
+    slug
+    backgroundColor
+    categories
+    ownerFullName
+    organizationName
+    fieldCount
+    hasConditionals
     descriptionHtml
+    shortDescription
     updatedAt
-    fields {
-      id
-      visibility
-    }
-    owner {
-      id
-      fullName
-      organization {
-        id
-        name
-      }
-    }
   }
 `;
 export const ConfirmDeletePetitionsDialog_PetitionBaseFragmentDoc = gql`
@@ -14592,6 +14687,143 @@ export type PdfViewPetitionQueryHookResult = ReturnType<
 >;
 export type PdfViewPetitionLazyQueryHookResult = ReturnType<
   typeof usePdfViewPetitionLazyQuery
+>;
+export const landingTemplateBySlugDocument = gql`
+  query landingTemplateBySlug($slug: String!) {
+    landingTemplateBySlug(slug: $slug) {
+      ...PublicTemplateDetails_LandingTemplate
+    }
+  }
+  ${PublicTemplateDetails_LandingTemplateFragmentDoc}
+`;
+export function uselandingTemplateBySlugQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    landingTemplateBySlugQuery,
+    landingTemplateBySlugQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    landingTemplateBySlugQuery,
+    landingTemplateBySlugQueryVariables
+  >(landingTemplateBySlugDocument, options);
+}
+export function uselandingTemplateBySlugLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    landingTemplateBySlugQuery,
+    landingTemplateBySlugQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    landingTemplateBySlugQuery,
+    landingTemplateBySlugQueryVariables
+  >(landingTemplateBySlugDocument, options);
+}
+export type landingTemplateBySlugQueryHookResult = ReturnType<
+  typeof uselandingTemplateBySlugQuery
+>;
+export type landingTemplateBySlugLazyQueryHookResult = ReturnType<
+  typeof uselandingTemplateBySlugLazyQuery
+>;
+export const landingTemplatesDocument = gql`
+  query landingTemplates(
+    $offset: Int!
+    $limit: Int!
+    $category: String!
+    $locale: PetitionLocale!
+  ) {
+    landingTemplates(
+      offset: $offset
+      limit: $limit
+      category: $category
+      locale: $locale
+    ) {
+      totalCount
+      items {
+        ...PublicTemplateCard_LandingTemplate
+      }
+    }
+  }
+  ${PublicTemplateCard_LandingTemplateFragmentDoc}
+`;
+export function uselandingTemplatesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    landingTemplatesQuery,
+    landingTemplatesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<landingTemplatesQuery, landingTemplatesQueryVariables>(
+    landingTemplatesDocument,
+    options
+  );
+}
+export function uselandingTemplatesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    landingTemplatesQuery,
+    landingTemplatesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    landingTemplatesQuery,
+    landingTemplatesQueryVariables
+  >(landingTemplatesDocument, options);
+}
+export type landingTemplatesQueryHookResult = ReturnType<
+  typeof uselandingTemplatesQuery
+>;
+export type landingTemplatesLazyQueryHookResult = ReturnType<
+  typeof uselandingTemplatesLazyQuery
+>;
+export const landingTemplatesSamplesDocument = gql`
+  query landingTemplatesSamples(
+    $offset: Int!
+    $limit: Int!
+    $locale: PetitionLocale!
+  ) {
+    landingTemplatesSamples {
+      category
+      templates(offset: $offset, limit: $limit, locale: $locale) {
+        items {
+          ...PublicTemplateCard_LandingTemplate
+        }
+        totalCount
+      }
+    }
+  }
+  ${PublicTemplateCard_LandingTemplateFragmentDoc}
+`;
+export function uselandingTemplatesSamplesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    landingTemplatesSamplesQuery,
+    landingTemplatesSamplesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    landingTemplatesSamplesQuery,
+    landingTemplatesSamplesQueryVariables
+  >(landingTemplatesSamplesDocument, options);
+}
+export function uselandingTemplatesSamplesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    landingTemplatesSamplesQuery,
+    landingTemplatesSamplesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    landingTemplatesSamplesQuery,
+    landingTemplatesSamplesQueryVariables
+  >(landingTemplatesSamplesDocument, options);
+}
+export type landingTemplatesSamplesQueryHookResult = ReturnType<
+  typeof uselandingTemplatesSamplesQuery
+>;
+export type landingTemplatesSamplesLazyQueryHookResult = ReturnType<
+  typeof uselandingTemplatesSamplesLazyQuery
 >;
 export const Thanks_PetitionLogoDocument = gql`
   query Thanks_PetitionLogo($id: GID!) {

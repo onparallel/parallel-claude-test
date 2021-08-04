@@ -1,20 +1,37 @@
+import { gql } from "@apollo/client";
 import { Button, Flex, Heading } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
+import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
+import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
 import { PublicTemplateCategoryPreview } from "@parallel/components/public/templates/PublicTemplateCategoryPreview";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
 import { PublicTemplatesHero } from "@parallel/components/public/templates/PublicTemplatesHero";
 import { useCategories } from "@parallel/components/public/templates/useCategories";
-import languages from "@parallel/lang/languages.json";
+import { landingTemplatesSamplesQuery } from "@parallel/graphql/__types";
+import { createApolloClient } from "@parallel/utils/apollo/client";
+import { GetServerSidePropsContext } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
 
-function Templates() {
+function Templates({ data }: { data: landingTemplatesSamplesQuery }) {
   const intl = useIntl();
 
-  const categories = useCategories();
+  let categories = useCategories();
 
-  const templates = [];
+  const { landingTemplatesSamples } = data;
+
+  categories.forEach((category) => {
+    category.templates = [
+      ...(landingTemplatesSamples.find(
+        (template) => template.category === category.slug
+      )?.templates.items ?? []),
+    ];
+  });
+
+  categories = categories.filter(
+    (category) => category.templates.length || category.slug === "all"
+  );
 
   return (
     <PublicLayout
@@ -28,16 +45,12 @@ function Templates() {
       })}
     >
       <PublicTemplatesHero />
-      <PublicTemplatesContainer>
+      <PublicTemplatesContainer categories={categories}>
         {categories.map((category, index) => {
           const { href } = category;
           if (href === "/templates") return null;
           return (
-            <PublicTemplateCategoryPreview
-              key={index}
-              category={category}
-              templates={templates}
-            />
+            <PublicTemplateCategoryPreview key={index} category={category} />
           );
         })}
       </PublicTemplatesContainer>
@@ -82,15 +95,39 @@ function Templates() {
   );
 }
 
-export function getStaticProps() {
-  return { props: {} };
+export async function getServerSideProps({
+  query: { locale },
+  req,
+}: GetServerSidePropsContext) {
+  const client = createApolloClient({}, { req });
+
+  const { data } = await client.query<landingTemplatesSamplesQuery>({
+    query: gql`
+      query landingTemplatesSamples(
+        $offset: Int!
+        $limit: Int!
+        $locale: PetitionLocale!
+      ) {
+        landingTemplatesSamples {
+          category
+          templates(offset: $offset, limit: $limit, locale: $locale) {
+            items {
+              ...PublicTemplateCard_LandingTemplate
+            }
+            totalCount
+          }
+        }
+      }
+      ${PublicTemplateCard.fragments.LandingTemplate}
+    `,
+    variables: {
+      offset: 0,
+      limit: 4,
+      locale,
+    },
+  });
+
+  return { props: { data } };
 }
 
-export function getStaticPaths() {
-  return {
-    paths: languages.map(({ locale }) => ({ params: { locale } })),
-    fallback: false,
-  };
-}
-
-export default Templates;
+export default withApolloData(Templates);

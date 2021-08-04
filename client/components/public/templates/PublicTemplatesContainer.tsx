@@ -19,19 +19,19 @@ import { PublicContainer } from "@parallel/components/public/layout/PublicContai
 import { MenuItemLink } from "@parallel/components/public/layout/PublicHeader";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { useCategories } from "./useCategories";
+import { CategoryType } from "./useCategories";
 
 export function PublicTemplatesContainer({
+  categories,
   children,
 }: {
+  categories: CategoryType[];
   children: ReactNode;
 }) {
   const router = useRouter();
   const current = router.pathname.startsWith("/[locale]")
     ? router.asPath.replace(/^\/[^\/]+/, "")
     : router.asPath;
-
-  const categories = useCategories();
 
   const currentCategory = categories.find(
     (category) =>
@@ -63,8 +63,8 @@ export function PublicTemplatesContainer({
             paddingY={12}
             spacing={0}
           >
-            {Object.entries(categories).map(([key, value], index) => {
-              const { label, href } = value;
+            {categories.map((category, index) => {
+              const { label, href } = category;
               const isActive = currentCategory?.label === label;
               return (
                 <NakedLink key={index} href={href}>
@@ -110,16 +110,14 @@ export function PublicTemplatesContainer({
                 </MenuButton>
                 <Portal>
                   <MenuList>
-                    {Object.entries(categories).map(
-                      ([key, category], index) => {
-                        const { label, href } = category;
-                        return (
-                          <MenuItemLink key={index} href={href}>
-                            {label}
-                          </MenuItemLink>
-                        );
-                      }
-                    )}
+                    {categories.map((category, index) => {
+                      const { label, href } = category;
+                      return (
+                        <MenuItemLink key={index} href={href}>
+                          {label}
+                        </MenuItemLink>
+                      );
+                    })}
                   </MenuList>
                 </Portal>
               </>

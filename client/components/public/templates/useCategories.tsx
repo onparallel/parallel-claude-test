@@ -1,3 +1,4 @@
+import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { useMemo } from "react";
 import { useIntl } from "react-intl";
 
@@ -5,6 +6,10 @@ export type CategoryType = {
   id: string;
   href: string;
   label: string;
+  slug: string;
+  templates: PublicTemplateCard_LandingTemplateFragment[];
+  title: string;
+  description: string;
 };
 
 export function useCategories(): CategoryType[] {
@@ -19,6 +24,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.all-templates",
           defaultMessage: "All templates",
         }),
+        slug: "all",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "ADMINISTRATION",
@@ -27,6 +36,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.administration",
           defaultMessage: "Administration",
         }),
+        slug: "administration",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "BUSINESS_DEVELOPMENT",
@@ -35,6 +48,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.business-development",
           defaultMessage: "Business development",
         }),
+        slug: "business-development",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "COMPLIANCE",
@@ -43,6 +60,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.compliance",
           defaultMessage: "Compliance",
         }),
+        slug: "compliance",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "CUSTOMER_SERVICE",
@@ -51,6 +72,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.customer-service",
           defaultMessage: "Customer service",
         }),
+        slug: "customer-service",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "ENGINEERING",
@@ -59,6 +84,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.engineering",
           defaultMessage: "Engineering",
         }),
+        slug: "engineering",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "FINANCE",
@@ -67,6 +96,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.finance",
           defaultMessage: "Finance",
         }),
+        slug: "finance",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "GENERAL_MANAGEMENT",
@@ -75,6 +108,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.general-management",
           defaultMessage: "General Management",
         }),
+        slug: "general-management",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "IT",
@@ -83,6 +120,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.it",
           defaultMessage: "IT",
         }),
+        slug: "information-technology",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "HR",
@@ -91,6 +132,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.hr",
           defaultMessage: "HR",
         }),
+        slug: "human-resources",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "LEGAL",
@@ -99,6 +144,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.legal",
           defaultMessage: "Legal",
         }),
+        slug: "legal",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "MARKETING",
@@ -107,6 +156,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.marketing",
           defaultMessage: "Marketing",
         }),
+        slug: "marketing",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "OPERATIONS",
@@ -115,6 +168,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.operations",
           defaultMessage: "Operations",
         }),
+        slug: "operations",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "PROCUREMENT",
@@ -123,6 +180,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.procurement",
           defaultMessage: "Procurement",
         }),
+        slug: "procurement",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "PRODUCT",
@@ -131,6 +192,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.product",
           defaultMessage: "Product",
         }),
+        slug: "product",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "SALES",
@@ -139,6 +204,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.sales",
           defaultMessage: "Sales",
         }),
+        slug: "",
+        templates: [],
+        title: "",
+        description: "",
       },
       {
         id: "OTHER",
@@ -147,6 +216,10 @@ export function useCategories(): CategoryType[] {
           id: "global.categories.other",
           defaultMessage: "Other",
         }),
+        slug: "",
+        templates: [],
+        title: "",
+        description: "",
       },
     ],
     [intl.locale]

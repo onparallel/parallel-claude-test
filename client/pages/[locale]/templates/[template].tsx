@@ -7,51 +7,64 @@ import {
   HStack,
   Image,
   ListItem,
-  SimpleGrid,
   Stack,
   Text,
   UnorderedList,
 } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
+import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
 import { useCategories } from "@parallel/components/public/templates/useCategories";
+import {
+  landingTemplateBySlugQuery,
+  landingTemplatesQuery,
+  landingTemplatesSamplesQuery,
+  PublicTemplateCard_LandingTemplateFragment,
+} from "@parallel/graphql/__types";
+import { createApolloClient } from "@parallel/utils/apollo/client";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
+import { GetServerSidePropsContext } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
 
-function PublicTemplateDetails() {
+function PublicTemplateDetails({
+  data,
+  relatedTemplates,
+}: {
+  data: landingTemplateBySlugQuery;
+  relatedTemplates: PublicTemplateCard_LandingTemplateFragment[];
+}) {
   const intl = useIntl();
-
-  const template = {
-    name: "Identificación de clientes (KYC) para Prevención de Blanqueo de Capitales",
-    updatedAt: new Date().getDate(),
-  };
 
   const categories = useCategories();
 
+  const { landingTemplateBySlug } = data;
+
+  const {
+    name,
+    slug,
+    backgroundColor,
+    ownerFullName,
+    organizationName,
+    fieldCount,
+    hasConditionals,
+    descriptionHtml,
+    shortDescription,
+    updatedAt,
+    categories: landingTemplateCategories,
+  } = landingTemplateBySlug!;
+
   const templateCategories = categories.filter((category) =>
-    ["LEGAL", "COMPLIANCE", "CUSTOMER_SERVICE"].includes(category.id)
+    landingTemplateCategories?.includes(category.slug)
   );
-
-  const hasConditionalFields = true;
-
-  const templates = [];
-
-  const owner = { fullName: "Derek Lou" };
 
   return (
     <PublicLayout
-      title={intl.formatMessage({
-        id: "public.templates",
-        defaultMessage: "Templates",
-      })}
-      description={intl.formatMessage({
-        id: "public.templates.meta-description",
-        defaultMessage: "Learn more about Parallel's templates",
-      })}
+      title={name as string}
+      description={shortDescription as string}
     >
       <PublicContainer
         maxWidth="container.xl"
@@ -69,9 +82,9 @@ function PublicTemplateDetails() {
                   values={{
                     date: (
                       <DateTime
-                        value={template.updatedAt}
+                        value={updatedAt}
                         format={FORMATS.LL}
-                        title={intl.formatDate(template.updatedAt, FORMATS.LLL)}
+                        title={intl.formatDate(updatedAt, FORMATS.LLL)}
                       />
                     ),
                   }}
@@ -79,7 +92,7 @@ function PublicTemplateDetails() {
               </Text>
               <Stack spacing={4}>
                 <Text fontSize="2xl" fontWeight="bold">
-                  {template.name}
+                  {name}
                 </Text>
                 <Text fontSize="xl">
                   <FormattedMessage
@@ -103,28 +116,33 @@ function PublicTemplateDetails() {
               <HStack paddingTop={6} spacing={1}>
                 <Avatar
                   boxSize="40px"
-                  name={owner.fullName}
-                  src={owner?.avatar ?? undefined}
+                  name={ownerFullName}
+                  src={undefined}
                   marginRight={2}
                 />
                 <FormattedMessage
                   id="public.template-card.created-by"
                   defaultMessage="Created by {name} on {orgName}"
                   values={{
-                    name: owner.fullName,
+                    name: ownerFullName,
                     orgName: (
                       <Text marginLeft={1} as="b">
-                        {"orgName"}
+                        {organizationName}
                       </Text>
                     ),
                   }}
                 />
               </HStack>
             </Grid>
-            <Center height="min-content" backgroundColor="blue.50" flex="1">
+            <Center
+              height="min-content"
+              backgroundColor={backgroundColor as any}
+              flex="1"
+              minHeight="140px"
+            >
               <Image
                 padding={10}
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/input_radio.png`}
+                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${intl.locale}_${slug}.png`}
               />
             </Center>
           </Stack>
@@ -147,10 +165,10 @@ function PublicTemplateDetails() {
                   <FormattedMessage
                     id="public.template-details.list-number-fields"
                     defaultMessage="{fields} question fields"
-                    values={{ fields: 24 }}
+                    values={{ fields: fieldCount }}
                   />
                 </ListItem>
-                {hasConditionalFields ? (
+                {hasConditionals ? (
                   <ListItem>
                     <FormattedMessage
                       id="public.template-details.conditional-fields"
@@ -180,10 +198,8 @@ function PublicTemplateDetails() {
                   defaultMessage="About this template"
                 />
               </Text>
-              {template?.descriptionHtml ? (
-                <Text
-                  dangerouslySetInnerHTML={{ __html: template.descriptionHtml }}
-                />
+              {descriptionHtml ? (
+                <Box dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
               ) : (
                 <Text textStyle="hint">
                   <FormattedMessage
@@ -205,11 +221,18 @@ function PublicTemplateDetails() {
                 defaultMessage="Other similar templates"
               />
             </Text>
-            <SimpleGrid minChildWidth="280px" spacing={10}>
-              {templates.slice(0, 3).map((template, index) => {
+
+            <Grid
+              templateColumns={{
+                lg: "repeat(2, 1fr)",
+                xl: "repeat(3, 1fr)",
+              }}
+              gap={6}
+            >
+              {relatedTemplates.slice(0, 3).map((template, index) => {
                 return <PublicTemplateCard key={index} template={template} />;
               })}
-            </SimpleGrid>
+            </Grid>
           </Stack>
         </Stack>
       </PublicContainer>
@@ -218,26 +241,133 @@ function PublicTemplateDetails() {
 }
 
 PublicTemplateDetails.fragments = {
-  PetitionTemplate: gql`
-    fragment PublicTemplateDetails_PetitionTemplate on PetitionTemplate {
+  LandingTemplate: gql`
+    fragment PublicTemplateDetails_LandingTemplate on LandingTemplate {
       id
       name
+      slug
+      backgroundColor
+      categories
+      ownerFullName
+      organizationName
+      fieldCount
+      hasConditionals
       descriptionHtml
+      shortDescription
       updatedAt
-      fields {
-        id
-        visibility
-      }
-      owner {
-        id
-        fullName
-        organization {
-          id
-          name
-        }
-      }
     }
   `,
 };
 
-export default PublicTemplateDetails;
+export async function getServerSideProps({
+  query: { locale, template },
+  req,
+}: GetServerSidePropsContext) {
+  const client = createApolloClient({}, { req });
+
+  const { data } = await client.query<landingTemplateBySlugQuery>({
+    query: gql`
+      query landingTemplateBySlug($slug: String!) {
+        landingTemplateBySlug(slug: $slug) {
+          ...PublicTemplateDetails_LandingTemplate
+        }
+      }
+      ${PublicTemplateDetails.fragments.LandingTemplate}
+    `,
+    variables: {
+      slug: template,
+    },
+  });
+
+  const categories = data.landingTemplateBySlug?.categories ?? [];
+
+  const getCategoryTemplates = async (category: string) => {
+    const { data } = await client.query<landingTemplatesQuery>({
+      query: gql`
+        query landingTemplates(
+          $offset: Int!
+          $limit: Int!
+          $category: String!
+          $locale: PetitionLocale!
+        ) {
+          landingTemplates(
+            offset: $offset
+            limit: $limit
+            category: $category
+            locale: $locale
+          ) {
+            totalCount
+            items {
+              ...PublicTemplateCard_LandingTemplate
+            }
+          }
+        }
+        ${PublicTemplateCard.fragments.LandingTemplate}
+      `,
+      variables: {
+        offset: 0,
+        limit: 4,
+        category,
+        locale,
+      },
+    });
+    return data.landingTemplates.items.filter((item) => item.slug !== template);
+  };
+
+  const getAllCategoriesTemplates = async () => {
+    const { data } = await client.query<landingTemplatesSamplesQuery>({
+      query: gql`
+        query landingTemplatesSamples(
+          $offset: Int!
+          $limit: Int!
+          $locale: PetitionLocale!
+        ) {
+          landingTemplatesSamples {
+            category
+            templates(offset: $offset, limit: $limit, locale: $locale) {
+              items {
+                ...PublicTemplateCard_LandingTemplate
+              }
+              totalCount
+            }
+          }
+        }
+        ${PublicTemplateCard.fragments.LandingTemplate}
+      `,
+      variables: {
+        offset: 0,
+        limit: 3,
+        locale,
+      },
+    });
+
+    const someTemplates = data.landingTemplatesSamples
+      .filter((sample) => sample.category !== categories[0])
+      .reduce((acc, sample) => {
+        return [...acc, ...(sample.templates.items ?? [])];
+      }, [] as PublicTemplateCard_LandingTemplateFragment[]);
+
+    return someTemplates.filter((item) => item.slug !== template);
+  };
+
+  let relatedTemplates = await getCategoryTemplates(categories[0]);
+
+  if (relatedTemplates.length < 3) {
+    let moreTemplates: PublicTemplateCard_LandingTemplateFragment[] = [];
+
+    if (categories.length > 1) {
+      moreTemplates = await getCategoryTemplates(categories[1]);
+    } else {
+      moreTemplates = [
+        ...moreTemplates,
+        ...(await getAllCategoriesTemplates()),
+      ];
+    }
+
+    relatedTemplates = [...relatedTemplates, ...moreTemplates];
+  }
+
+  return { props: { data, relatedTemplates } };
+}
+
+export default withApolloData(PublicTemplateDetails);
