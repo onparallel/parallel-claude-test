@@ -15,9 +15,8 @@ export function contextUserIsAdmin<
   TypeName extends string,
   FieldName extends string
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
-  return (root, _, ctx) => {
-    return ctx.user!.organization_role === "ADMIN";
-  };
+  return (root, _, ctx) =>
+    ["OWNER", "ADMIN"].includes(ctx.user!.organization_role);
 }
 
 export function contextUserIsNotSso<

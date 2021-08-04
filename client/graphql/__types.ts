@@ -1123,7 +1123,7 @@ export interface OrganizationPagination {
 }
 
 /** The roles of a user within an organization. */
-export type OrganizationRole = "ADMIN" | "NORMAL";
+export type OrganizationRole = "ADMIN" | "NORMAL" | "OWNER";
 
 /** The status of the organization. */
 export type OrganizationStatus =

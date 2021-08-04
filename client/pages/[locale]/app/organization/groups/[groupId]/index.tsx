@@ -155,7 +155,9 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     setName(userGroup?.name ?? "");
   }, [userGroup]);
 
-  const sections = useOrganizationSections(me.role === "ADMIN");
+  const sections = useOrganizationSections(
+    ["OWNER", "ADMIN"].includes(me.role)
+  );
 
   const columns = useOrganizationGroupTableColumns();
 
@@ -277,7 +279,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
           <EditableHeading
-            isDisabled={me.role !== "ADMIN"}
+            isDisabled={me.role === "NORMAL"}
             value={name}
             onChange={handleChangeGroupName}
           />

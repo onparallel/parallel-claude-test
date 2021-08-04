@@ -33,7 +33,7 @@ export function withAdminOrganizationRole<P = {}>(
             }
           `,
         });
-      if (data?.me?.role === "ADMIN") {
+      if (data?.me?.role === "ADMIN" || data?.me?.role === "OWNER") {
         return await getInitialProps?.(context);
       } else {
         throw new Error("FORBIDDEN");

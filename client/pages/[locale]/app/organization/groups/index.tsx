@@ -104,7 +104,9 @@ function OrganizationGroups() {
 
   const [search, setSearch] = useState(state.search);
 
-  const sections = useOrganizationSections(me.role === "ADMIN");
+  const sections = useOrganizationSections(
+    ["OWNER", "ADMIN"].includes(me.role)
+  );
 
   const columns = useOrganizationGroupsTableColumns();
 

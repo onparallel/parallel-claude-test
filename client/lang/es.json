@@ -3400,6 +3400,11 @@
     "context": "Normal"
   },
   {
+    "term": "organization-users.owner-role",
+    "definition": "Propietario",
+    "context": "Owner"
+  },
+  {
     "term": "organization-users.update-user-status.error.deactivate-own-user",
     "definition": "No puedes desactivar a tu propio usuario. Por favor, quítalo de la selección e inténtalo nuevamente.",
     "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
@@ -3473,6 +3478,11 @@
     "term": "organization.role.normal",
     "definition": "Normal",
     "context": "Normal"
+  },
+  {
+    "term": "organization.role.owner",
+    "definition": "Propietario",
+    "context": "Owner"
   },
   {
     "term": "organization.user-created-success.toast-description",

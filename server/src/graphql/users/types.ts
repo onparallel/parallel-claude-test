@@ -15,7 +15,7 @@ import { rootIsContextUser } from "./authorizers";
 
 export const OrganizationRole = enumType({
   name: "OrganizationRole",
-  members: ["NORMAL", "ADMIN"],
+  members: ["NORMAL", "ADMIN", "OWNER"],
   description: "The roles of a user within an organization.",
 });
 
@@ -58,7 +58,8 @@ export const User = objectType({
       resolve: async (o, _, ctx) => {
         const org = await ctx.organizations.loadOrg(o.org_id);
         return (
-          org?.identifier === "parallel" && o.organization_role === "ADMIN"
+          org?.identifier === "parallel" &&
+          ["OWNER", "ADMIN"].includes(o.organization_role)
         );
       },
     });

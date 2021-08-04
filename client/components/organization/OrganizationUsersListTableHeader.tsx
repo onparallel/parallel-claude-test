@@ -104,7 +104,7 @@ export function OrganizationUsersListTableHeader({
           defaultMessage: "Reload",
         })}
       />
-      {me.role === "ADMIN" ? (
+      {["OWNER", "ADMIN"].includes(me.role) ? (
         <>
           <Spacer />
           <Box>

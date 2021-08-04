@@ -109,7 +109,7 @@ export type SystemEventType =
   | "USER_CREATED"
   | "USER_LOGGED_IN";
 
-export type UserOrganizationRole = "ADMIN" | "NORMAL";
+export type UserOrganizationRole = "ADMIN" | "NORMAL" | "OWNER";
 
 export type UserStatus = "ACTIVE" | "INACTIVE";
 

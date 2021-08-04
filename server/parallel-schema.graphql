@@ -1281,6 +1281,7 @@ The roles of a user within an organization.
 enum OrganizationRole {
   ADMIN
   NORMAL
+  OWNER
 }
 
 """

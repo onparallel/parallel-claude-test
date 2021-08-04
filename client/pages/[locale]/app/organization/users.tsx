@@ -97,9 +97,13 @@ function OrganizationUsers() {
 
   const [search, setSearch] = useState(state.search);
 
-  const sections = useOrganizationSections(me.role === "ADMIN");
+  const sections = useOrganizationSections(
+    ["OWNER", "ADMIN"].includes(me.role)
+  );
 
-  const columns = useOrganizationUsersTableColumns(me.role === "ADMIN");
+  const columns = useOrganizationUsersTableColumns(
+    ["OWNER", "ADMIN"].includes(me.role)
+  );
 
   const debouncedOnSearchChange = useDebouncedCallback(
     (value) => {
@@ -332,13 +336,19 @@ function useOrganizationUsersTableColumns(isAdmin: boolean) {
             colorScheme={
               (
                 {
+                  OWNER: "purple",
                   ADMIN: "green",
                   NORMAL: "gray",
                 } as Record<OrganizationRole, string>
               )[row.role]
             }
           >
-            {row.role === "ADMIN" ? (
+            {row.role === "OWNER" ? (
+              <FormattedMessage
+                id="organization-users.owner-role"
+                defaultMessage="Owner"
+              />
+            ) : row.role === "ADMIN" ? (
               <FormattedMessage
                 id="organization-users.admin-role"
                 defaultMessage="Admin"

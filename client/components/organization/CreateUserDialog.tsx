@@ -207,6 +207,12 @@ export function CreateUserDialog({
                   defaultMessage: "Administrator",
                 })}
               </option>
+              <option value="OWNER">
+                {intl.formatMessage({
+                  id: "organization.role.owner",
+                  defaultMessage: "Owner",
+                })}
+              </option>
             </Select>
           </FormControl>
         </Stack>

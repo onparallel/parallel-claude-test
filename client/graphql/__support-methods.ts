@@ -456,6 +456,12 @@ export const schemaTypes: IntrospectionType[] = [
         isDeprecated: false,
         deprecationReason: null,
       },
+      {
+        name: "OWNER",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
     ],
     possibleTypes: null,
   },
