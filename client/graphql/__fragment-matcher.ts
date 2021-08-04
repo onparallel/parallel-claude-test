@@ -56,6 +56,7 @@ const result: PossibleTypesResultData = {
       "MessageEmailBouncedUserNotification",
       "PetitionCompletedUserNotification",
       "PetitionSharedUserNotification",
+      "ReminderEmailBouncedUserNotification",
       "RemindersOptOutNotification",
       "SignatureCancelledUserNotification",
       "SignatureCompletedUserNotification",

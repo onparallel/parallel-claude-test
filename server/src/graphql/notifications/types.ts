@@ -54,6 +54,8 @@ export const PetitionUserNotification = interfaceType({
         return "CommentCreatedUserNotification";
       case "MESSAGE_EMAIL_BOUNCED":
         return "MessageEmailBouncedUserNotification";
+      case "REMINDER_EMAIL_BOUNCED":
+        return "ReminderEmailBouncedUserNotification";
       case "PETITION_COMPLETED":
         return "PetitionCompletedUserNotification";
       case "PETITION_SHARED":
@@ -164,6 +166,21 @@ export const MessageEmailBouncedUserNotification =
       },
     });
   });
+
+export const ReminderEmailBouncedUserNotification =
+  createPetitionUserNotification(
+    "ReminderEmailBouncedUserNotification",
+    (t) => {
+      t.field("access", {
+        type: "PetitionAccess",
+        resolve: async (root, _, ctx) => {
+          return (await ctx.petitions.loadAccess(
+            root.data.petition_access_id
+          ))!;
+        },
+      });
+    }
+  );
 
 export const RemindersOptOutNotification = createPetitionUserNotification(
   "RemindersOptOutNotification",

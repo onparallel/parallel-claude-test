@@ -2081,6 +2081,7 @@ export class PetitionRepository extends BaseRepository {
         } else if (opts.filter === "OTHER") {
           q.whereIn("type", [
             "MESSAGE_EMAIL_BOUNCED",
+            "REMINDER_EMAIL_BOUNCED",
             "SIGNATURE_CANCELLED",
             "REMINDERS_OPT_OUT",
           ]);
@@ -2193,6 +2194,7 @@ export class PetitionRepository extends BaseRepository {
         } else if (filter === "OTHER") {
           q.whereIn("type", [
             "MESSAGE_EMAIL_BOUNCED",
+            "REMINDER_EMAIL_BOUNCED",
             "SIGNATURE_CANCELLED",
             "REMINDERS_OPT_OUT",
           ]);

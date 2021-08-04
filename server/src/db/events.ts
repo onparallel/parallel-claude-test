@@ -255,6 +255,10 @@ export type SystemEventPayload<TType extends SystemEventType> = {
   PETITION_MESSAGE_BOUNCED: {
     petition_message_id: number;
   };
+  PETITION_REMINDER_BOUNCED: {
+    petition_reminder_id: number;
+    petition_id: number;
+  };
 }[TType];
 
 type GenericSystemEvent<
@@ -271,10 +275,13 @@ export type UserLoggedInEvent<IsCreate extends boolean = false> =
   GenericSystemEvent<"USER_LOGGED_IN", IsCreate>;
 export type PetitionMessageBouncedEvent<IsCreate extends boolean = false> =
   GenericSystemEvent<"PETITION_MESSAGE_BOUNCED", IsCreate>;
+export type PetitionReminderBouncedEvent<IsCreate extends boolean = false> =
+  GenericSystemEvent<"PETITION_REMINDER_BOUNCED", IsCreate>;
 
 export type SystemEvent<IsCreate extends boolean = false> =
   | UserLoggedInEvent<IsCreate>
   | UserCreatedEvent<IsCreate>
-  | PetitionMessageBouncedEvent<IsCreate>;
+  | PetitionMessageBouncedEvent<IsCreate>
+  | PetitionReminderBouncedEvent<IsCreate>;
 
 export type CreateSystemEvent = SystemEvent<true>;

@@ -2204,6 +2204,16 @@ export type QueryUserGroups_OrderBy =
   | "name_ASC"
   | "name_DESC";
 
+export interface ReminderEmailBouncedUserNotification
+  extends PetitionUserNotification {
+  __typename?: "ReminderEmailBouncedUserNotification";
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
+  petition: PetitionBase;
+}
+
 export interface ReminderSentEvent extends PetitionEvent {
   __typename?: "ReminderSentEvent";
   createdAt: Scalars["DateTime"];
@@ -3104,6 +3114,11 @@ export type NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotif
     __typename?: "PetitionSharedUserNotification";
   } & NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment;
 
+export type NotificationsDrawer_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
+  {
+    __typename?: "ReminderEmailBouncedUserNotification";
+  } & NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment;
+
 export type NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment =
   {
     __typename?: "RemindersOptOutNotification";
@@ -3124,6 +3139,7 @@ export type NotificationsDrawer_PetitionUserNotificationFragment =
   | NotificationsDrawer_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment
+  | NotificationsDrawer_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | NotificationsDrawer_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
@@ -3156,6 +3172,9 @@ export type NotificationsDrawer_PetitionUserNotificationsQuery = {
         | ({
             __typename?: "PetitionSharedUserNotification";
           } & NotificationsDrawer_PetitionUserNotification_PetitionSharedUserNotification_Fragment)
+        | ({
+            __typename?: "ReminderEmailBouncedUserNotification";
+          } & NotificationsDrawer_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment)
         | ({
             __typename?: "RemindersOptOutNotification";
           } & NotificationsDrawer_PetitionUserNotification_RemindersOptOutNotification_Fragment)
@@ -3190,6 +3209,9 @@ export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotific
     __typename?: "PetitionSharedUserNotification";
   } & PetitionSharedUserNotification_PetitionSharedUserNotificationFragment;
 
+export type NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
+  { __typename?: "ReminderEmailBouncedUserNotification" };
+
 export type NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment =
   {
     __typename?: "RemindersOptOutNotification";
@@ -3210,6 +3232,7 @@ export type NotificationsList_PetitionUserNotificationFragment =
   | NotificationsList_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_PetitionSharedUserNotification_Fragment
+  | NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment
   | NotificationsList_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | NotificationsList_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
@@ -3307,6 +3330,17 @@ export type PetitionUserNotification_PetitionUserNotification_PetitionSharedUser
       | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
   };
 
+export type PetitionUserNotification_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
+  {
+    __typename?: "ReminderEmailBouncedUserNotification";
+    id: string;
+    createdAt: string;
+    isRead: boolean;
+    petition:
+      | { __typename?: "Petition"; id: string; name?: Maybe<string> }
+      | { __typename?: "PetitionTemplate"; id: string; name?: Maybe<string> };
+  };
+
 export type PetitionUserNotification_PetitionUserNotification_RemindersOptOutNotification_Fragment =
   {
     __typename?: "RemindersOptOutNotification";
@@ -3345,6 +3379,7 @@ export type PetitionUserNotification_PetitionUserNotificationFragment =
   | PetitionUserNotification_PetitionUserNotification_MessageEmailBouncedUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_PetitionCompletedUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_PetitionSharedUserNotification_Fragment
+  | PetitionUserNotification_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_RemindersOptOutNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
@@ -7116,6 +7151,11 @@ export type useUpdateIsReadNotificationMutation = {
       }
     | {
         __typename?: "PetitionSharedUserNotification";
+        id: string;
+        isRead: boolean;
+      }
+    | {
+        __typename?: "ReminderEmailBouncedUserNotification";
         id: string;
         isRead: boolean;
       }

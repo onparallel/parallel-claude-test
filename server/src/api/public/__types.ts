@@ -2120,6 +2120,14 @@ export type QueryUserGroups_OrderBy =
   | "name_ASC"
   | "name_DESC";
 
+export type ReminderEmailBouncedUserNotification = PetitionUserNotification & {
+  access: PetitionAccess;
+  createdAt: Scalars["DateTime"];
+  id: Scalars["GID"];
+  isRead: Scalars["Boolean"];
+  petition: PetitionBase;
+};
+
 export type ReminderSentEvent = PetitionEvent & {
   createdAt: Scalars["DateTime"];
   id: Scalars["GID"];

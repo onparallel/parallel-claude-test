@@ -55,10 +55,19 @@ createQueueWorker(
           reminder.petition_access_id
         ))!;
 
-        await context.petitions.updateRemindersForPetition(
-          access.petition_id,
-          null
-        );
+        await Promise.all([
+          context.petitions.updateRemindersForPetition(
+            access.petition_id,
+            null
+          ),
+          context.system.createEvent({
+            type: "PETITION_REMINDER_BOUNCED",
+            data: {
+              petition_reminder_id: reminder.id,
+              petition_id: access.petition_id,
+            },
+          }),
+        ]);
       }
     }
   },

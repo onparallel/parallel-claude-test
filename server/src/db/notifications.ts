@@ -14,6 +14,9 @@ export type PetitionUserNotificationPayload<
   MESSAGE_EMAIL_BOUNCED: {
     petition_access_id: number;
   };
+  REMINDER_EMAIL_BOUNCED: {
+    petition_access_id: number;
+  };
   PETITION_COMPLETED: {
     petition_access_id: number;
   };
@@ -52,6 +55,9 @@ export type CommentCreatedUserNotification<IsCreate extends boolean = false> =
 export type MessageEmailBouncedUserNotification<
   IsCreate extends boolean = false
 > = GenericPetitionUserNotification<"MESSAGE_EMAIL_BOUNCED", IsCreate>;
+export type ReminderEmailBouncedUserNotification<
+  IsCreate extends boolean = false
+> = GenericPetitionUserNotification<"REMINDER_EMAIL_BOUNCED", IsCreate>;
 export type PetitionCompletedUserNotification<
   IsCreate extends boolean = false
 > = GenericPetitionUserNotification<"PETITION_COMPLETED", IsCreate>;
@@ -69,6 +75,7 @@ export type RemindersOptOutNotification<IsCreate extends boolean = false> =
 export type PetitionUserNotification<IsCreate extends boolean = false> =
   | CommentCreatedUserNotification<IsCreate>
   | MessageEmailBouncedUserNotification<IsCreate>
+  | ReminderEmailBouncedUserNotification<IsCreate>
   | PetitionCompletedUserNotification<IsCreate>
   | PetitionSharedUserNotification<IsCreate>
   | SignatureCancelledUserNotification<IsCreate>

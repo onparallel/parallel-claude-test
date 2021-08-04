@@ -1,13 +1,14 @@
 import { WorkerContext } from "../../context";
 import {
   CommentPublishedEvent,
-  PetitionMessageBouncedEvent,
   GroupPermissionAddedEvent,
   PetitionCompletedEvent,
+  PetitionMessageBouncedEvent,
+  PetitionReminderBouncedEvent,
+  RemindersOptOutEvent,
   SignatureCancelledEvent,
   SignatureCompletedEvent,
   UserPermissionAddedEvent,
-  RemindersOptOutEvent,
 } from "../../db/events";
 import { EventListener } from "../event-processor";
 
@@ -109,6 +110,36 @@ async function createPetitionMessageBouncedUserNotifications(
       petition_id: message.petition_id,
       data: {
         petition_access_id: message.petition_access_id,
+      },
+    },
+  ]);
+}
+
+async function createPetitionReminderBouncedUserNotifications(
+  event: PetitionReminderBouncedEvent,
+  ctx: WorkerContext
+) {
+  const reminder = await ctx.petitions.loadReminder(
+    event.data.petition_reminder_id
+  );
+  if (!reminder) {
+    throw new Error(
+      `PetitionReminder:${event.data.petition_reminder_id} not found.`
+    );
+  }
+  const sender = await ctx.users.loadUser(reminder.sender_id!);
+  if (!sender) {
+    throw new Error(`User:${reminder.sender_id} not found.`);
+  }
+  await ctx.petitions.createPetitionUserNotification([
+    {
+      type: "REMINDER_EMAIL_BOUNCED",
+      is_read: false,
+      processed_at: null,
+      user_id: sender.id,
+      petition_id: event.data.petition_id,
+      data: {
+        petition_access_id: reminder.petition_access_id,
       },
     },
   ]);
@@ -223,6 +254,9 @@ export const userNotificationsListener: EventListener = async (event, ctx) => {
       break;
     case "PETITION_MESSAGE_BOUNCED":
       await createPetitionMessageBouncedUserNotifications(event, ctx);
+      break;
+    case "PETITION_REMINDER_BOUNCED":
+      await createPetitionReminderBouncedUserNotifications(event, ctx);
       break;
     case "SIGNATURE_COMPLETED":
       await createSignatureCompletedUserNotifications(event, ctx);

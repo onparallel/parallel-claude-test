@@ -448,6 +448,7 @@ export interface NexusGenObjects {
   };
   PublicUser: db.User;
   Query: {};
+  ReminderEmailBouncedUserNotification: notifications.ReminderEmailBouncedUserNotification;
   ReminderSentEvent: events.ReminderSentEvent;
   RemindersConfig: {
     offset: number;
@@ -1274,6 +1275,14 @@ export interface NexusGenFieldTypes {
     tags: NexusGenRootTypes["TagPagination"]; // TagPagination!
     userGroup: NexusGenRootTypes["UserGroup"] | null; // UserGroup
     userGroups: NexusGenRootTypes["UserGroupPagination"]; // UserGroupPagination!
+  };
+  ReminderEmailBouncedUserNotification: {
+    // field return type
+    access: NexusGenRootTypes["PetitionAccess"]; // PetitionAccess!
+    createdAt: NexusGenScalars["DateTime"]; // DateTime!
+    id: NexusGenScalars["GID"]; // GID!
+    isRead: boolean; // Boolean!
+    petition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
   };
   ReminderSentEvent: {
     // field return type
@@ -2257,6 +2266,14 @@ export interface NexusGenFieldTypeNames {
     tags: "TagPagination";
     userGroup: "UserGroup";
     userGroups: "UserGroupPagination";
+  };
+  ReminderEmailBouncedUserNotification: {
+    // field return type name
+    access: "PetitionAccess";
+    createdAt: "DateTime";
+    id: "GID";
+    isRead: "Boolean";
+    petition: "PetitionBase";
   };
   ReminderSentEvent: {
     // field return type name
@@ -3336,6 +3353,7 @@ export interface NexusGenAbstractTypeMembers {
     | "MessageEmailBouncedUserNotification"
     | "PetitionCompletedUserNotification"
     | "PetitionSharedUserNotification"
+    | "ReminderEmailBouncedUserNotification"
     | "RemindersOptOutNotification"
     | "SignatureCancelledUserNotification"
     | "SignatureCompletedUserNotification";
@@ -3395,6 +3413,7 @@ export interface NexusGenTypeInterfaces {
   PetitionUserPermission: "PetitionPermission" | "Timestamps";
   PublicPetition: "Timestamps";
   PublicPetitionFieldReply: "Timestamps";
+  ReminderEmailBouncedUserNotification: "PetitionUserNotification";
   ReminderSentEvent: "PetitionEvent";
   RemindersOptOutEvent: "PetitionEvent";
   RemindersOptOutNotification: "PetitionUserNotification";

@@ -3147,6 +3147,14 @@ enum QueryUserGroups_OrderBy {
   name_DESC
 }
 
+type ReminderEmailBouncedUserNotification implements PetitionUserNotification {
+  access: PetitionAccess!
+  createdAt: DateTime!
+  id: GID!
+  isRead: Boolean!
+  petition: PetitionBase!
+}
+
 type ReminderSentEvent implements PetitionEvent {
   createdAt: DateTime!
   id: GID!
