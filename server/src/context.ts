@@ -34,6 +34,7 @@ export class ApiContext {
   organization: Organization | null = null;
   req!: express.Request;
   constructor(
+    @inject(CONFIG) public config: Config,
     @inject(LOGGER) public logger: Logger,
     // Services
     @inject(AUTH) public readonly auth: Auth,

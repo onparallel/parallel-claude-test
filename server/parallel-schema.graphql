@@ -303,6 +303,7 @@ type LandingTemplate {
   fieldCount: Int!
   hasConditionals: Boolean!
   id: GID!
+  imageUrl: String
   name: String
   organizationId: GID!
   organizationName: String!
@@ -1055,6 +1056,38 @@ type Mutation {
   Updates the positions of the petition fields
   """
   updateFieldPositions(fieldIds: [GID!]!, petitionId: GID!): PetitionBase!
+
+  """
+  Updates the metadata of a public landing template.
+  """
+  updateLandingTemplateMetadata(
+    """
+    for example: #A0FFCE
+    """
+    backgroundColor: String
+
+    """
+    comma-separated list of categories
+    """
+    categories: String
+
+    """
+    meta-description for the template card
+    """
+    description: String
+    image: Upload
+    imageLocale: PetitionLocale
+
+    """
+    must be URL-friendly
+    """
+    slug: String
+
+    """
+    global ID of the template
+    """
+    templateId: ID!
+  ): SupportMethodResponse!
 
   """
   Updates the onboarding status for one of the pages.

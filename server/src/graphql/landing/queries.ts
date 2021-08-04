@@ -62,6 +62,9 @@ export const LandingTemplate = objectType({
       },
     });
     t.datetime("updatedAt", { resolve: (o) => o.updated_at });
+    t.nullable.string("imageUrl", {
+      resolve: (o) => o.public_metadata.image,
+    });
   },
 });
 

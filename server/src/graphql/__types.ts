@@ -716,6 +716,7 @@ export interface NexusGenFieldTypes {
     fieldCount: number; // Int!
     hasConditionals: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
+    imageUrl: string | null; // String
     name: string | null; // String
     organizationId: NexusGenScalars["GID"]; // GID!
     organizationName: string; // String!
@@ -845,6 +846,7 @@ export interface NexusGenFieldTypes {
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    updateLandingTemplateMetadata: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
     updateOrganizationUser: NexusGenRootTypes["User"]; // User!
@@ -1743,6 +1745,7 @@ export interface NexusGenFieldTypeNames {
     fieldCount: "Int";
     hasConditionals: "Boolean";
     id: "GID";
+    imageUrl: "String";
     name: "String";
     organizationId: "GID";
     organizationName: "String";
@@ -1872,6 +1875,7 @@ export interface NexusGenFieldTypeNames {
     untagPetition: "PetitionBase";
     updateContact: "Contact";
     updateFieldPositions: "PetitionBase";
+    updateLandingTemplateMetadata: "SupportMethodResponse";
     updateOnboardingStatus: "User";
     updateOrganizationLogo: "Organization";
     updateOrganizationUser: "User";
@@ -3099,6 +3103,16 @@ export interface NexusGenArgTypes {
       // args
       fieldIds: NexusGenScalars["GID"][]; // [GID!]!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    updateLandingTemplateMetadata: {
+      // args
+      backgroundColor?: string | null; // String
+      categories?: string | null; // String
+      description?: string | null; // String
+      image?: NexusGenScalars["Upload"] | null; // Upload
+      imageLocale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
+      slug?: string | null; // String
+      templateId: string; // ID!
     };
     updateOnboardingStatus: {
       // args

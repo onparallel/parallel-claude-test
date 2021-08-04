@@ -381,6 +381,82 @@ export const supportMethods: {
     },
     queryType: "mutation",
   },
+  {
+    field: {
+      name: "updateLandingTemplateMetadata",
+      description: "Updates the metadata of a public landing template.",
+      args: [
+        {
+          name: "backgroundColor",
+          description: "for example: #A0FFCE",
+          type: { kind: "SCALAR", name: "String", ofType: null },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "categories",
+          description: "comma-separated list of categories",
+          type: { kind: "SCALAR", name: "String", ofType: null },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "description",
+          description: "meta-description for the template card",
+          type: { kind: "SCALAR", name: "String", ofType: null },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "image",
+          description: null,
+          type: { kind: "SCALAR", name: "Upload", ofType: null },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "imageLocale",
+          description: null,
+          type: { kind: "ENUM", name: "PetitionLocale", ofType: null },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "slug",
+          description: "must be URL-friendly",
+          type: { kind: "SCALAR", name: "String", ofType: null },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "templateId",
+          description: "global ID of the template",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "ID", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
 ] as any;
 
 export const schemaTypes: IntrospectionType[] = [
@@ -535,6 +611,30 @@ export const schemaTypes: IntrospectionType[] = [
       },
       {
         name: "User",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+    ],
+    possibleTypes: null,
+  },
+  {
+    kind: "ENUM",
+    name: "PetitionLocale",
+    description: "The locale used for rendering the petition to the contact.",
+    specifiedByUrl: null,
+    fields: null,
+    inputFields: null,
+    interfaces: null,
+    enumValues: [
+      {
+        name: "en",
+        description: null,
+        isDeprecated: false,
+        deprecationReason: null,
+      },
+      {
+        name: "es",
         description: null,
         isDeprecated: false,
         deprecationReason: null,

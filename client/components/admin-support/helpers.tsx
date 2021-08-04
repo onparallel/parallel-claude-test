@@ -49,6 +49,8 @@ export function getDefaultInputTypeValue(
         schemaTypes
       );
     case "SCALAR":
+      if (type.name === "Upload") return null;
+      return "";
     default:
       return "";
   }

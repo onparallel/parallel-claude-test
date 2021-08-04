@@ -4,13 +4,20 @@ import {
   intArg,
   mutationField,
   nonNull,
+  nullable,
   stringArg,
 } from "@nexus/schema";
+import { uniq } from "remeda";
 import { fromGlobalId } from "../../util/globalId";
+import { isDefined } from "../../util/remedaExtensions";
+import { random } from "../../util/token";
 import { RESULT } from "../helpers/result";
-import { validateAnd } from "../helpers/validateArgs";
+import { uploadArg } from "../helpers/upload";
+import { validateAnd, validateIf } from "../helpers/validateArgs";
 import { emailIsAvailable } from "../helpers/validators/emailIsAvailable";
+import { validateFile } from "../helpers/validators/validateFile";
 import { validEmail } from "../helpers/validators/validEmail";
+import { validateHexColor } from "../tag/validators";
 import { supportMethodAccess } from "./authorizers";
 
 export const assignPetitionToUser = mutationField("assignPetitionToUser", {
@@ -273,6 +280,100 @@ export const transferOrganizationOwnership = mutationField(
         result: RESULT.SUCCESS,
         message: "Ownership transferred successfully",
       };
+    },
+  }
+);
+
+export const updateLandingTemplateMetadata = mutationField(
+  "updateLandingTemplateMetadata",
+  {
+    description: "Updates the metadata of a public landing template.",
+    type: "SupportMethodResponse",
+    args: {
+      templateId: nonNull(idArg({ description: "global ID of the template" })),
+      backgroundColor: nullable(
+        stringArg({
+          description: "for example: #A0FFCE",
+        })
+      ),
+      categories: nullable(
+        stringArg({ description: "comma-separated list of categories" })
+      ),
+      description: nullable(
+        stringArg({ description: "meta-description for the template card" })
+      ),
+      slug: nullable(stringArg({ description: "must be URL-friendly" })),
+      image: nullable(uploadArg()),
+      imageLocale: nullable(arg({ type: "PetitionLocale" })),
+    },
+    validateArgs: validateAnd(
+      validateHexColor((args) => args.backgroundColor, "backgroundColor"),
+      validateIf(
+        (args) => isDefined(args.image),
+        validateFile(
+          (args) => args.image!,
+          { contentType: "image/png", maxSize: 1024 * 1024 * 10 },
+          "image"
+        )
+      )
+    ),
+    authorize: supportMethodAccess(),
+    resolve: async (_, args, ctx) => {
+      try {
+        const { id } = fromGlobalId(args.templateId, "Petition");
+
+        const template = await ctx.petitions.loadPetition(id);
+        const templateMd = template!.public_metadata;
+
+        const newMetadata: any = {};
+
+        newMetadata.backgroundColor = isDefined(args.backgroundColor)
+          ? args.backgroundColor
+          : templateMd.backgroundColor || null;
+
+        newMetadata.categories =
+          isDefined(args.categories) && args.categories !== ""
+            ? uniq(args.categories.split(",").map((w) => w.trim()))
+            : templateMd.categories || null;
+
+        newMetadata.description = isDefined(args.description)
+          ? args.description
+          : templateMd.description || null;
+
+        newMetadata.slug = isDefined(args.slug)
+          ? args.slug
+          : templateMd.slug || null;
+
+        if (args.image) {
+          const { createReadStream } = await args.image;
+          const path = `landing/${args.imageLocale || "en"}/${random(16)}`;
+          await ctx.aws.publicFiles.uploadFile(
+            path,
+            "image/png",
+            createReadStream()
+          );
+
+          newMetadata.image = `${ctx.config.misc.uploadsUrl}/${path}`;
+        } else {
+          newMetadata.image = templateMd.image || null;
+        }
+
+        await ctx.petitions.updatePetition(
+          id,
+          { public_metadata: newMetadata },
+          `User:${ctx.user!.id}`
+        );
+
+        return {
+          result: RESULT.SUCCESS,
+          message: "Metadata successfully updated.",
+        };
+      } catch (error) {
+        return {
+          result: RESULT.FAILURE,
+          message: error.message,
+        };
+      }
     },
   }
 );
