@@ -305,7 +305,7 @@ function Petitions() {
           }
           body={
             petitions.totalCount === 0 && !loading ? (
-              state.search || state.sharedWith || state.tags ? (
+              state.search || state.sharedWith || state.tags || state.status ? (
                 <Flex flex="1" alignItems="center" justifyContent="center">
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
@@ -359,6 +359,8 @@ function RenderFooter({
           variant="unstyled"
           value={value}
           onChange={(e) => onChange(e.target.value as PetitionBaseType)}
+          display="flex"
+          alignItems="center"
         >
           <option value="PETITION">
             {intl.formatMessage({

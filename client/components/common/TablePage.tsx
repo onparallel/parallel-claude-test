@@ -80,6 +80,8 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
           variant="unstyled"
           value={pageSize}
           onChange={(e) => onPageSizeChange?.(parseInt(e.target.value))}
+          display="flex"
+          alignItems="center"
         >
           {[10, 25, 50].map((items) => (
             <option key={items} value={items}>
