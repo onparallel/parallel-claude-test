@@ -3,6 +3,7 @@ import {
   Grid,
   Menu,
   MenuButton,
+  MenuItem,
   MenuList,
   Portal,
   Stack,
@@ -16,7 +17,6 @@ import {
 } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
-import { MenuItemLink } from "@parallel/components/public/layout/PublicHeader";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { CategoryType } from "./useCategories";
@@ -113,9 +113,22 @@ export function PublicTemplatesContainer({
                     {categories.map((category, index) => {
                       const { label, href } = category;
                       return (
-                        <MenuItemLink key={index} href={href}>
-                          {label}
-                        </MenuItemLink>
+                        <NakedLink key={index} href={href}>
+                          <MenuItem
+                            as="a"
+                            aria-current={
+                              currentCategory?.id === category.id
+                                ? "page"
+                                : undefined
+                            }
+                            _activeLink={{
+                              fontWeight: "bold",
+                              color: "purple.600",
+                            }}
+                          >
+                            {label}
+                          </MenuItem>
+                        </NakedLink>
                       );
                     })}
                   </MenuList>
