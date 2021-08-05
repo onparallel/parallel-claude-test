@@ -1523,7 +1523,7 @@ export type PetitionFieldType =
 export interface PetitionFilter {
   locale?: Maybe<PetitionLocale>;
   sharedWith?: Maybe<PetitionSharedWithFilter>;
-  status?: Maybe<PetitionStatus>;
+  status?: Maybe<Array<PetitionStatus>>;
   tagIds?: Maybe<Array<Scalars["ID"]>>;
   type?: Maybe<PetitionBaseType>;
 }
@@ -2667,24 +2667,6 @@ export type PetitionStatusCellContent_PetitionFragment = {
     replied: number;
     optional: number;
     total: number;
-  };
-};
-
-export type PetitionTagFilter_TagFragment = {
-  __typename?: "Tag";
-  id: string;
-} & Tag_TagFragment;
-
-export type PetitionTagFilter_tagsQueryVariables = Exact<{
-  search?: Maybe<Scalars["String"]>;
-}>;
-
-export type PetitionTagFilter_tagsQuery = {
-  tags: {
-    __typename?: "TagPagination";
-    items: Array<
-      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
-    >;
   };
 };
 
@@ -4646,6 +4628,24 @@ export type ReferencedFieldDialogDialog_PetitionFieldFragment = {
   id: string;
   title?: Maybe<string>;
   type: PetitionFieldType;
+};
+
+export type PetitionListTagFilter_TagFragment = {
+  __typename?: "Tag";
+  id: string;
+} & Tag_TagFragment;
+
+export type PetitionListTagFilter_tagsQueryVariables = Exact<{
+  search?: Maybe<Scalars["String"]>;
+}>;
+
+export type PetitionListTagFilter_tagsQuery = {
+  tags: {
+    __typename?: "TagPagination";
+    items: Array<
+      { __typename?: "Tag" } & PetitionTagListCellContent_TagFragment
+    >;
+  };
 };
 
 export type NewPetitionTemplatesList_PetitionTemplateFragment = {
@@ -7251,13 +7251,6 @@ export const Tag_TagFragmentDoc = gql`
     color
   }
 `;
-export const PetitionTagFilter_TagFragmentDoc = gql`
-  fragment PetitionTagFilter_Tag on Tag {
-    id
-    ...Tag_Tag
-  }
-  ${Tag_TagFragmentDoc}
-`;
 export const TagEditDialog_TagFragmentDoc = gql`
   fragment TagEditDialog_Tag on Tag {
     id
@@ -7652,6 +7645,13 @@ export const PetitionComposeFieldList_PetitionFragmentDoc = gql`
   }
   ${PetitionComposeField_PetitionFieldFragmentDoc}
   ${ReferencedFieldDialogDialog_PetitionFieldFragmentDoc}
+`;
+export const PetitionListTagFilter_TagFragmentDoc = gql`
+  fragment PetitionListTagFilter_Tag on Tag {
+    id
+    ...Tag_Tag
+  }
+  ${Tag_TagFragmentDoc}
 `;
 export const useFilenamePlaceholdersRename_PetitionFieldFragmentDoc = gql`
   fragment useFilenamePlaceholdersRename_PetitionField on PetitionField {
@@ -9669,46 +9669,6 @@ export const validatePetitionFields_PetitionFieldFragmentDoc = gql`
     options
   }
 `;
-export const PetitionTagFilter_tagsDocument = gql`
-  query PetitionTagFilter_tags($search: String) {
-    tags(search: $search) {
-      items {
-        ...PetitionTagListCellContent_Tag
-      }
-    }
-  }
-  ${PetitionTagListCellContent_TagFragmentDoc}
-`;
-export function usePetitionTagFilter_tagsQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    PetitionTagFilter_tagsQuery,
-    PetitionTagFilter_tagsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<
-    PetitionTagFilter_tagsQuery,
-    PetitionTagFilter_tagsQueryVariables
-  >(PetitionTagFilter_tagsDocument, options);
-}
-export function usePetitionTagFilter_tagsLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    PetitionTagFilter_tagsQuery,
-    PetitionTagFilter_tagsQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    PetitionTagFilter_tagsQuery,
-    PetitionTagFilter_tagsQueryVariables
-  >(PetitionTagFilter_tagsDocument, options);
-}
-export type PetitionTagFilter_tagsQueryHookResult = ReturnType<
-  typeof usePetitionTagFilter_tagsQuery
->;
-export type PetitionTagFilter_tagsLazyQueryHookResult = ReturnType<
-  typeof usePetitionTagFilter_tagsLazyQuery
->;
 export const PetitionTagListCellContent_tagsDocument = gql`
   query PetitionTagListCellContent_tags($search: String) {
     tags(search: $search) {
@@ -10781,6 +10741,46 @@ export type PetitionComposeField_petitionFieldAttachmentDownloadLinkMutationHook
   ReturnType<
     typeof usePetitionComposeField_petitionFieldAttachmentDownloadLinkMutation
   >;
+export const PetitionListTagFilter_tagsDocument = gql`
+  query PetitionListTagFilter_tags($search: String) {
+    tags(search: $search) {
+      items {
+        ...PetitionTagListCellContent_Tag
+      }
+    }
+  }
+  ${PetitionTagListCellContent_TagFragmentDoc}
+`;
+export function usePetitionListTagFilter_tagsQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    PetitionListTagFilter_tagsQuery,
+    PetitionListTagFilter_tagsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    PetitionListTagFilter_tagsQuery,
+    PetitionListTagFilter_tagsQueryVariables
+  >(PetitionListTagFilter_tagsDocument, options);
+}
+export function usePetitionListTagFilter_tagsLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    PetitionListTagFilter_tagsQuery,
+    PetitionListTagFilter_tagsQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    PetitionListTagFilter_tagsQuery,
+    PetitionListTagFilter_tagsQueryVariables
+  >(PetitionListTagFilter_tagsDocument, options);
+}
+export type PetitionListTagFilter_tagsQueryHookResult = ReturnType<
+  typeof usePetitionListTagFilter_tagsQuery
+>;
+export type PetitionListTagFilter_tagsLazyQueryHookResult = ReturnType<
+  typeof usePetitionListTagFilter_tagsLazyQuery
+>;
 export const ExportRepliesProgressDialog_PetitionRepliesDocument = gql`
   query ExportRepliesProgressDialog_PetitionReplies($petitionId: GID!) {
     petition(id: $petitionId) {

@@ -22,8 +22,6 @@ import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { UserArrowIcon } from "../../chakra/icons";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
-import { PetitionListFilter } from "../common/PetitionListFilter";
-import { PetitionTagFilter } from "../common/PetitionTagFilter";
 import { SearchInput } from "../common/SearchInput";
 import { Spacer } from "../common/Spacer";
 
@@ -84,21 +82,6 @@ export function PetitionListHeader({
           defaultMessage: "Reload",
         })}
       />
-      <Box>
-        <PetitionListFilter
-          status={filter.status ?? null}
-          type={filter.type!}
-          onFilterChange={({ status, type }) =>
-            onFilterChange({ ...filter, status, type })
-          }
-        />
-      </Box>
-      <Box>
-        <PetitionTagFilter
-          value={filter.tagIds ?? null}
-          onChange={(tagIds) => onFilterChange({ ...filter, tagIds })}
-        />
-      </Box>
       <Spacer />
       <Box>
         <Menu>

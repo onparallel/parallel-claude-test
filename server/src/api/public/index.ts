@@ -252,7 +252,7 @@ api
           query GetPetitions_Petitions(
             $offset: Int!
             $limit: Int!
-            $status: PetitionStatus
+            $status: [PetitionStatus!]
             $sortBy: [QueryPetitions_OrderBy!]
           ) {
             petitions(

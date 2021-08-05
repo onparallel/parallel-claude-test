@@ -1471,7 +1471,7 @@ export type PetitionFieldType =
 export type PetitionFilter = {
   locale?: Maybe<PetitionLocale>;
   sharedWith?: Maybe<PetitionSharedWithFilter>;
-  status?: Maybe<PetitionStatus>;
+  status?: Maybe<Array<PetitionStatus>>;
   tagIds?: Maybe<Array<Scalars["ID"]>>;
   type?: Maybe<PetitionBaseType>;
 };
@@ -2563,7 +2563,7 @@ export type PetitionFieldReplyFragment = Pick<
 export type GetPetitions_PetitionsQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
-  status?: Maybe<PetitionStatus>;
+  status?: Maybe<Array<PetitionStatus> | PetitionStatus>;
   sortBy?: Maybe<Array<QueryPetitions_OrderBy> | QueryPetitions_OrderBy>;
 }>;
 

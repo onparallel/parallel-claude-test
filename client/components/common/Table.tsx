@@ -686,7 +686,6 @@ export function DefaultHeader({
             {isFilterOpen ? (
               <FocusLock restoreFocus>
                 <Card
-                  padding={2}
                   ref={_ref}
                   {...getFilterPopoverProps()}
                   onKeyDown={(e) => {
@@ -694,13 +693,14 @@ export function DefaultHeader({
                       onCloseFilter();
                     }
                   }}
+                  overflow="hidden"
                 >
                   <Heading
                     as="h4"
                     size="xs"
                     textTransform="uppercase"
-                    marginTop={1}
-                    marginBottom={2}
+                    paddingX={2}
+                    paddingY={2}
                   >
                     <FormattedMessage
                       id="component.table.filter-header"

@@ -17,7 +17,7 @@ import {
   TableProps,
   useTableColors,
 } from "@parallel/components/common/Table";
-import { ReactNode, useMemo } from "react";
+import { ComponentType, ReactNode, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 export type TablePageProps<
@@ -31,6 +31,12 @@ export type TablePageProps<
   totalCount: number;
   page: number;
   pageSize: number;
+  /**
+   * Esto es un apaño temporal hasta que haya mas casos de querer renderizar cosas
+   * al final de la tabla. Si aparecen más casos pensar una solución mejor.
+   */
+  Footer?: ComponentType<any>;
+  footerProps?: any;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
 };
@@ -55,6 +61,9 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   totalCount,
   page,
   pageSize,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Footer,
+  footerProps,
   onPageSizeChange,
   onPageChange,
   color,
@@ -63,6 +72,119 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   const colors = useTableColors();
   const intl = useIntl();
   const pagination = usePagination({ current: page, pageSize, totalCount });
+  const bottom = (
+    <>
+      <Box paddingLeft={1}>
+        <Select
+          size="sm"
+          variant="unstyled"
+          value={pageSize}
+          onChange={(e) => onPageSizeChange?.(parseInt(e.target.value))}
+        >
+          {[10, 25, 50].map((items) => (
+            <option key={items} value={items}>
+              {intl.formatMessage(
+                {
+                  id: "component.table.page-size",
+                  defaultMessage: "{items} items",
+                },
+                { items }
+              )}
+            </option>
+          ))}
+        </Select>
+      </Box>
+      <Box fontSize="sm">
+        {totalCount ? (
+          <FormattedMessage
+            id="component.table.total-results"
+            defaultMessage="Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}"
+            values={{
+              total: totalCount,
+              start: pageSize * (page - 1) + 1,
+              end: Math.min(pageSize * page, totalCount),
+            }}
+          />
+        ) : (
+          <FormattedMessage
+            id="component.table.no-results"
+            defaultMessage="No results"
+          />
+        )}
+      </Box>
+      <Spacer />
+      <Box as="nav">
+        <Stack as="ul" direction="row" spacing={1} listStyleType="none">
+          {pagination.map((item) => (
+            <Box
+              key={item.type === "PAGE" ? `page-${item.value}` : item.type}
+              as="li"
+              role={
+                item.type === "END_ELLIPSIS" || item.type === "START_ELLIPSIS"
+                  ? "separator"
+                  : undefined
+              }
+            >
+              {item.type === "PREVIOUS" ? (
+                <IconButton
+                  size="sm"
+                  variant="ghost"
+                  isDisabled={item.isDisabled}
+                  onClick={() => onPageChange?.(item.value)}
+                  aria-label={intl.formatMessage({
+                    id: "component.table.prev-page-button",
+                    defaultMessage: "Previous",
+                  })}
+                  icon={
+                    <ChevronLeftIcon
+                      fontSize="xl"
+                      position="relative"
+                      top="1px"
+                    />
+                  }
+                />
+              ) : item.type === "NEXT" ? (
+                <IconButton
+                  size="sm"
+                  variant="ghost"
+                  isDisabled={item.isDisabled}
+                  onClick={() => onPageChange?.(item.value)}
+                  aria-label={intl.formatMessage({
+                    id: "component.table.next-page-button",
+                    defaultMessage: "Next",
+                  })}
+                  icon={
+                    <ChevronRightIcon
+                      fontSize="xl"
+                      position="relative"
+                      top="1px"
+                    />
+                  }
+                />
+              ) : item.type === "END_ELLIPSIS" ||
+                item.type === "START_ELLIPSIS" ? (
+                <Center boxSize={8}>...</Center>
+              ) : (
+                <Button
+                  padding={0}
+                  variant={item.isCurrent ? "solid" : "ghost"}
+                  size="sm"
+                  onClick={
+                    !item.isCurrent
+                      ? () => onPageChange?.(item.value)
+                      : undefined
+                  }
+                  aria-current={item.isCurrent ? "page" : undefined}
+                >
+                  {item.value}
+                </Button>
+              )}
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+    </>
+  );
   return (
     <Card display="flex" flexDirection="column" {...props}>
       {header ? <Box flex="none">{header}</Box> : null}
@@ -119,7 +241,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
       </Flex>
       <Stack
         flexShrink={0}
-        direction={{ base: "column", sm: "row" }}
+        direction={{ base: "column", md: "row" }}
         spacing={{ base: 2, sm: 4 }}
         paddingY={2}
         paddingX={3}
@@ -127,115 +249,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         alignItems="center"
         borderTopColor={colors.border}
       >
-        <Box paddingLeft={1}>
-          <Select
-            size="sm"
-            variant="unstyled"
-            value={pageSize}
-            onChange={(e) => onPageSizeChange?.(parseInt(e.target.value))}
-          >
-            {[10, 25, 50].map((items) => (
-              <option key={items} value={items}>
-                {intl.formatMessage(
-                  {
-                    id: "component.table.page-size",
-                    defaultMessage: "{items} items",
-                  },
-                  { items }
-                )}
-              </option>
-            ))}
-          </Select>
-        </Box>
-        <Box fontSize="sm">
-          {totalCount ? (
-            <FormattedMessage
-              id="component.table.total-results"
-              defaultMessage="Showing {start}-{end} of {total, plural, =1 {# result} other {# results}}"
-              values={{
-                total: totalCount,
-                start: pageSize * (page - 1) + 1,
-                end: Math.min(pageSize * page, totalCount),
-              }}
-            />
-          ) : (
-            <FormattedMessage
-              id="component.table.no-results"
-              defaultMessage="No results"
-            />
-          )}
-        </Box>
-        <Spacer />
-        <Box as="nav">
-          <Stack as="ul" direction="row" spacing={1} listStyleType="none">
-            {pagination.map((item) => (
-              <Box
-                key={item.type === "PAGE" ? `page-${item.value}` : item.type}
-                as="li"
-                role={
-                  item.type === "END_ELLIPSIS" || item.type === "START_ELLIPSIS"
-                    ? "separator"
-                    : undefined
-                }
-              >
-                {item.type === "PREVIOUS" ? (
-                  <IconButton
-                    size="sm"
-                    variant="ghost"
-                    isDisabled={item.isDisabled}
-                    onClick={() => onPageChange?.(item.value)}
-                    aria-label={intl.formatMessage({
-                      id: "component.table.prev-page-button",
-                      defaultMessage: "Previous",
-                    })}
-                    icon={
-                      <ChevronLeftIcon
-                        fontSize="xl"
-                        position="relative"
-                        top="1px"
-                      />
-                    }
-                  />
-                ) : item.type === "NEXT" ? (
-                  <IconButton
-                    size="sm"
-                    variant="ghost"
-                    isDisabled={item.isDisabled}
-                    onClick={() => onPageChange?.(item.value)}
-                    aria-label={intl.formatMessage({
-                      id: "component.table.next-page-button",
-                      defaultMessage: "Next",
-                    })}
-                    icon={
-                      <ChevronRightIcon
-                        fontSize="xl"
-                        position="relative"
-                        top="1px"
-                      />
-                    }
-                  />
-                ) : item.type === "END_ELLIPSIS" ||
-                  item.type === "START_ELLIPSIS" ? (
-                  <Center boxSize={8}>...</Center>
-                ) : (
-                  <Button
-                    padding={0}
-                    variant={item.isCurrent ? "solid" : "ghost"}
-                    size="sm"
-                    onClick={
-                      !item.isCurrent
-                        ? () => onPageChange?.(item.value)
-                        : undefined
-                    }
-                    aria-current={item.isCurrent ? "page" : undefined}
-                  >
-                    {item.value}
-                  </Button>
-                )}
-              </Box>
-            ))}
-          </Stack>
-        </Box>
+        {Footer ? <Footer {...footerProps}>{bottom}</Footer> : <>{bottom}</>}
       </Stack>
     </Card>
   );

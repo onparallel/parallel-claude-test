@@ -58,7 +58,7 @@ export function PetitionListSharedWithFilter({
   };
 
   return (
-    <Stack>
+    <Stack paddingX={2} paddingBottom={2}>
       {value?.filters.length ? (
         <Grid
           templateColumns={{

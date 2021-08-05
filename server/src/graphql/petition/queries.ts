@@ -29,7 +29,7 @@ export const petitionsQuery = queryField((t) => {
       filters: inputObjectType({
         name: "PetitionFilter",
         definition(t) {
-          t.nullable.field("status", {
+          t.nullable.list.nonNull.field("status", {
             type: "PetitionStatus",
           });
           t.nullable.field("locale", {

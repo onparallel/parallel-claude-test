@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { Flex, Stack, Text } from "@chakra-ui/react";
+import { Box, Flex, Select, Stack, Text } from "@chakra-ui/react";
 import { ContactLink } from "@parallel/components/common/ContactLink";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
@@ -39,6 +39,7 @@ import { useCreatePetition } from "@parallel/utils/mutations/useCreatePetition";
 import { useDeletePetitions } from "@parallel/utils/mutations/useDeletePetitions";
 import {
   integer,
+  list,
   object,
   parseQuery,
   QueryItem,
@@ -48,16 +49,23 @@ import {
   values,
 } from "@parallel/utils/queryState";
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
-import { MouseEvent, useCallback, useMemo, useState } from "react";
+import { ValueProps } from "@parallel/utils/ValueProps";
+import {
+  MouseEvent,
+  PropsWithChildren,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { pick } from "remeda";
+import { omit, pick } from "remeda";
 
 const SORTING = ["name", "createdAt", "sentAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
-  status: values<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]),
+  status: list<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]),
   type: values<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault(
     "PETITION"
   ),
@@ -233,16 +241,6 @@ function Petitions() {
       : state.type
   );
 
-  const handleSharedWithFilterChange = useCallback(
-    (value: PetitionSharedWithFilter | null) => {
-      setQueryState((current) => ({
-        ...current,
-        sharedWith: value,
-      }));
-    },
-    []
-  );
-
   const context = useMemo(() => ({ user: me! }), [me]);
 
   return (
@@ -276,11 +274,9 @@ function Petitions() {
           pageSize={state.items}
           totalCount={petitions.totalCount}
           sort={sort}
-          filter={pick(state, ["sharedWith"])}
+          filter={pick(state, ["sharedWith", "status", "tags"])}
           onFilterChange={(key, value) => {
-            if (key === "sharedWith") {
-              handleSharedWithFilterChange(value);
-            }
+            setQueryState((current) => ({ ...current, [key]: value }));
           }}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
@@ -337,9 +333,49 @@ function Petitions() {
               )
             ) : null
           }
+          Footer={RenderFooter}
+          footerProps={{
+            value: state.type,
+            onChange: (type: PetitionBaseType) =>
+              setQueryState((s) => ({ ...omit(s, ["status"]), type })),
+          }}
         />
       </Flex>
     </AppLayout>
+  );
+}
+
+function RenderFooter({
+  children,
+  value,
+  onChange,
+}: PropsWithChildren<ValueProps<PetitionBaseType, false>>) {
+  const intl = useIntl();
+  return (
+    <>
+      <Box>
+        <Select
+          size="sm"
+          variant="unstyled"
+          value={value}
+          onChange={(e) => onChange(e.target.value as PetitionBaseType)}
+        >
+          <option value="PETITION">
+            {intl.formatMessage({
+              id: "generic.petition-type-plural",
+              defaultMessage: "Petitions",
+            })}
+          </option>
+          <option value="TEMPLATE">
+            {intl.formatMessage({
+              id: "generic.template-type-plural",
+              defaultMessage: "Templates",
+            })}
+          </option>
+        </Select>
+      </Box>
+      {children}
+    </>
   );
 }
 

@@ -1255,36 +1255,6 @@
     "context": "Get email notifications about activity in this petition."
   },
   {
-    "term": "component.petition-list-filter.all",
-    "definition": "All petitions",
-    "context": "All petitions"
-  },
-  {
-    "term": "component.petition-list-filter.closed",
-    "definition": "Closed",
-    "context": "Closed"
-  },
-  {
-    "term": "component.petition-list-filter.completed",
-    "definition": "Completed",
-    "context": "Completed"
-  },
-  {
-    "term": "component.petition-list-filter.draft",
-    "definition": "Draft",
-    "context": "Draft"
-  },
-  {
-    "term": "component.petition-list-filter.pending",
-    "definition": "Pending",
-    "context": "Pending"
-  },
-  {
-    "term": "component.petition-list-filter.template",
-    "definition": "Templates",
-    "context": "Templates"
-  },
-  {
     "term": "component.petition-list-header.clone-petition-label",
     "definition": "Clone {count, plural, =1{petition} other{petitions}}",
     "context": "Clone {count, plural, =1{petition} other{petitions}}"
@@ -1358,6 +1328,46 @@
     "term": "component.petition-list-shared-with-filter.shared-with",
     "definition": "Shared with",
     "context": "Shared with"
+  },
+  {
+    "term": "component.petition-list-status-filter.clear-filter",
+    "definition": "Clear filter",
+    "context": "Clear filter"
+  },
+  {
+    "term": "component.petition-list-status-filter.closed",
+    "definition": "Closed",
+    "context": "Closed"
+  },
+  {
+    "term": "component.petition-list-status-filter.completed",
+    "definition": "Completed",
+    "context": "Completed"
+  },
+  {
+    "term": "component.petition-list-status-filter.draft",
+    "definition": "Draft",
+    "context": "Draft"
+  },
+  {
+    "term": "component.petition-list-status-filter.pending",
+    "definition": "Pending",
+    "context": "Pending"
+  },
+  {
+    "term": "component.petition-list-tag-filter.clear-filter",
+    "definition": "Clear filter",
+    "context": "Clear filter"
+  },
+  {
+    "term": "component.petition-list-tag-filter.placeholder",
+    "definition": "Search for tags...",
+    "context": "Search for tags..."
+  },
+  {
+    "term": "component.petition-list-tag-filter.without-tags",
+    "definition": "Without tags",
+    "context": "Without tags"
   },
   {
     "term": "component.petition-permission-type.owner",
@@ -2188,26 +2198,6 @@
     "term": "components.multiple-emails-pasted-dialog.separate-groups",
     "definition": "Add to separate groups",
     "context": "Add to separate groups"
-  },
-  {
-    "term": "components.petition-tag-filter.clear-filter",
-    "definition": "Clear filter",
-    "context": "Clear filter"
-  },
-  {
-    "term": "components.petition-tag-filter.n-tags",
-    "definition": "{count} tags",
-    "context": "{count} tags"
-  },
-  {
-    "term": "components.petition-tag-filter.no-filter",
-    "definition": "Filter by tags",
-    "context": "Filter by tags"
-  },
-  {
-    "term": "components.petition-tag-filter.without-tags",
-    "definition": "Without tags",
-    "context": "Without tags"
   },
   {
     "term": "components.petition-tag-list-cell-content.add-tags",
@@ -3075,6 +3065,11 @@
     "context": "Pending"
   },
   {
+    "term": "generic.petition-type-plural",
+    "definition": "Petitions",
+    "context": "Petitions"
+  },
+  {
     "term": "generic.previous-page",
     "definition": "Previous page",
     "context": "Previous page"
@@ -3158,6 +3153,11 @@
     "term": "generic.template",
     "definition": "Template",
     "context": "Template"
+  },
+  {
+    "term": "generic.template-type-plural",
+    "definition": "Templates",
+    "context": "Templates"
   },
   {
     "term": "generic.thanks",

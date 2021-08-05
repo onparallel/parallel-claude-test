@@ -1255,36 +1255,6 @@
     "context": "Get email notifications about activity in this petition."
   },
   {
-    "term": "component.petition-list-filter.all",
-    "definition": "Todas las peticiones",
-    "context": "All petitions"
-  },
-  {
-    "term": "component.petition-list-filter.closed",
-    "definition": "Cerradas",
-    "context": "Closed"
-  },
-  {
-    "term": "component.petition-list-filter.completed",
-    "definition": "Completadas",
-    "context": "Completed"
-  },
-  {
-    "term": "component.petition-list-filter.draft",
-    "definition": "Borradores",
-    "context": "Draft"
-  },
-  {
-    "term": "component.petition-list-filter.pending",
-    "definition": "Pendientes",
-    "context": "Pending"
-  },
-  {
-    "term": "component.petition-list-filter.template",
-    "definition": "Plantillas",
-    "context": "Templates"
-  },
-  {
     "term": "component.petition-list-header.clone-petition-label",
     "definition": "Clonar {count, plural, =1{petición} other{peticiones}}",
     "context": "Clone {count, plural, =1{petition} other{petitions}}"
@@ -1358,6 +1328,46 @@
     "term": "component.petition-list-shared-with-filter.shared-with",
     "definition": "Compartido con",
     "context": "Shared with"
+  },
+  {
+    "term": "component.petition-list-status-filter.clear-filter",
+    "definition": "Quitar filtro",
+    "context": "Clear filter"
+  },
+  {
+    "term": "component.petition-list-status-filter.closed",
+    "definition": "Cerradas",
+    "context": "Closed"
+  },
+  {
+    "term": "component.petition-list-status-filter.completed",
+    "definition": "Completadas",
+    "context": "Completed"
+  },
+  {
+    "term": "component.petition-list-status-filter.draft",
+    "definition": "Borradores",
+    "context": "Draft"
+  },
+  {
+    "term": "component.petition-list-status-filter.pending",
+    "definition": "Pendientes",
+    "context": "Pending"
+  },
+  {
+    "term": "component.petition-list-tag-filter.clear-filter",
+    "definition": "Quitar filtro",
+    "context": "Clear filter"
+  },
+  {
+    "term": "component.petition-list-tag-filter.placeholder",
+    "definition": "Buscar etiquetas...",
+    "context": "Search for tags..."
+  },
+  {
+    "term": "component.petition-list-tag-filter.without-tags",
+    "definition": "Sin etiquetas",
+    "context": "Without tags"
   },
   {
     "term": "component.petition-permission-type.owner",
@@ -2188,26 +2198,6 @@
     "term": "components.multiple-emails-pasted-dialog.separate-groups",
     "definition": "Crear grupos separados",
     "context": "Add to separate groups"
-  },
-  {
-    "term": "components.petition-tag-filter.clear-filter",
-    "definition": "Quitar filtro",
-    "context": "Clear filter"
-  },
-  {
-    "term": "components.petition-tag-filter.n-tags",
-    "definition": "{count} etiquetas",
-    "context": "{count} tags"
-  },
-  {
-    "term": "components.petition-tag-filter.no-filter",
-    "definition": "Filtrar por etiquetas",
-    "context": "Filter by tags"
-  },
-  {
-    "term": "components.petition-tag-filter.without-tags",
-    "definition": "Sin etiquetas",
-    "context": "Without tags"
   },
   {
     "term": "components.petition-tag-list-cell-content.add-tags",
@@ -3075,6 +3065,11 @@
     "context": "Pending"
   },
   {
+    "term": "generic.petition-type-plural",
+    "definition": "Peticiones",
+    "context": "Petitions"
+  },
+  {
     "term": "generic.previous-page",
     "definition": "Página anterior",
     "context": "Previous page"
@@ -3158,6 +3153,11 @@
     "term": "generic.template",
     "definition": "Plantilla",
     "context": "Template"
+  },
+  {
+    "term": "generic.template-type-plural",
+    "definition": "Plantillas",
+    "context": "Templates"
   },
   {
     "term": "generic.thanks",

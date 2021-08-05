@@ -77,6 +77,24 @@ export function values(values: any[]): QueryItem<any> {
   });
 }
 
+export function list<T>(values: T[]): QueryItem<T[] | null>;
+export function list<T extends string>(values: T[]): QueryItem<T[] | null>;
+export function list(values: any[]): QueryItem<any> {
+  return new QueryItem<any>(
+    (value) => {
+      if (value) {
+        const parsed = (value as string)
+          .split(",")
+          .map((v) => (values.includes(v) ? v : null));
+        return parsed.includes(null) ? null : parsed;
+      } else {
+        return null;
+      }
+    },
+    (values) => values.join(",")
+  );
+}
+
 export function sorting<T extends string>(fields: readonly T[]) {
   return new QueryItem<TableSorting<T>>(
     (value) => {

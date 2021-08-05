@@ -13,6 +13,8 @@ import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { TableColumn } from "@parallel/components/common/Table";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
 import { PetitionListSharedWithFilter } from "@parallel/components/petition-list/filters/shared-with/PetitionListSharedWithFilter";
+import { PetitionListStatusFilter } from "@parallel/components/petition-list/filters/status/PetitionListStatusFilter";
+import { PetitionListTagFilter } from "@parallel/components/petition-list/tags/PetitionListTagFilter";
 import {
   PetitionBaseType,
   usePetitionsTableColumns_PetitionBaseFragment,
@@ -147,6 +149,8 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   id: "petitions.header.status",
                   defaultMessage: "Status",
                 }),
+                isFilterable: true,
+                Filter: PetitionListStatusFilter,
                 headerProps: {
                   minWidth: "180px",
                 },
@@ -366,6 +370,8 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
             width: "30%",
             minWidth: "300px",
           },
+          isFilterable: true,
+          Filter: PetitionListTagFilter,
           CellContent: ({ row }) => {
             return <PetitionTagListCellContent petition={row} />;
           },

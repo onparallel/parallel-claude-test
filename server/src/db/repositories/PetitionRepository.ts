@@ -77,7 +77,7 @@ type PetitionSharedWithFilter = {
 };
 
 type PetitionFilter = {
-  status?: PetitionStatus | null;
+  status?: PetitionStatus[] | null;
   locale?: PetitionLocale | null;
   type?: PetitionType | null;
   tagIds?: string[] | null;
@@ -303,7 +303,7 @@ export class PetitionRepository extends BaseRepository {
           );
         }
         if (filters?.status && type === "PETITION") {
-          q.where("petition.status", filters.status);
+          q.whereIn("petition.status", filters.status);
         }
 
         if (filters?.tagIds) {

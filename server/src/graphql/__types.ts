@@ -94,7 +94,7 @@ export interface NexusGenInputs {
     // input type
     locale?: NexusGenEnums["PetitionLocale"] | null; // PetitionLocale
     sharedWith?: NexusGenInputs["PetitionSharedWithFilter"] | null; // PetitionSharedWithFilter
-    status?: NexusGenEnums["PetitionStatus"] | null; // PetitionStatus
+    status?: NexusGenEnums["PetitionStatus"][] | null; // [PetitionStatus!]
     tagIds?: string[] | null; // [ID!]
     type?: NexusGenEnums["PetitionBaseType"] | null; // PetitionBaseType
   };

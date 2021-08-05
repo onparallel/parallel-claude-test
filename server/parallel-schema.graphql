@@ -1988,7 +1988,7 @@ enum PetitionFieldType {
 input PetitionFilter {
   locale: PetitionLocale
   sharedWith: PetitionSharedWithFilter
-  status: PetitionStatus
+  status: [PetitionStatus!]
   tagIds: [ID!]
   type: PetitionBaseType
 }
