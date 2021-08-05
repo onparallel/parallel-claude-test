@@ -218,7 +218,7 @@ export function PetitionListTagFilter({
               isReadOnly
               marginRight={2}
             />
-            <Tag tag={tag} />
+            <Tag tag={tag} pointerEvents="none" />
           </Flex>
         ))}
       </Flex>
