@@ -29,11 +29,14 @@ export async function petitionReminder(
         `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`
       );
     }
-    const [petition, granter, contact, fields] = await Promise.all([
+    const [petition, granter, contact, fields, messages] = await Promise.all([
       context.petitions.loadPetition(access.petition_id),
       context.users.loadUser(access.granter_id),
       context.contacts.loadContact(access.contact_id),
       context.petitions.loadFieldsForPetition(access.petition_id),
+      context.petitions.loadMessagesByPetitionAccessId(
+        reminder.petition_access_id
+      ),
     ]);
     if (!petition) {
       throw new Error(
@@ -85,7 +88,7 @@ export async function petitionReminder(
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,
       {
-        emailSubject: petition.email_subject,
+        emailSubject: messages[0].email_subject,
         contactFullName: fullName(contact.first_name, contact.last_name)!,
         senderName: fullName(granter.first_name, granter.last_name)!,
         senderEmail: granter.email,

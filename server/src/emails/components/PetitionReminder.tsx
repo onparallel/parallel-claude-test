@@ -36,8 +36,8 @@ const email: Email<PetitionReminderProps> = {
   subject({ emailSubject, senderName }, intl: IntlShape) {
     return (
       intl.formatMessage({
-        id: "petition-reminder.remainder",
-        defaultMessage: "[Remainder]",
+        id: "petition-reminder.reminder",
+        defaultMessage: "[Reminder]",
       }) +
       ` ${
         emailSubject ||

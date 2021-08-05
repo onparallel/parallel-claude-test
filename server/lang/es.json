@@ -255,9 +255,9 @@
     "context": "We couldn't deliver your message"
   },
   {
-    "term": "petition-reminder.remainder",
+    "term": "petition-reminder.reminder",
     "definition": "[Recordatorio]",
-    "context": "[Remainder]"
+    "context": "[Reminder]"
   },
   {
     "term": "petition-reminder.subject",
