@@ -45,7 +45,6 @@ export type PetitionEventType =
   | "PETITION_COMPLETED"
   | "PETITION_CREATED"
   | "PETITION_DELETED"
-  | "PETITION_REMINDER_BOUNCED"
   | "PETITION_REOPENED"
   | "REMINDER_SENT"
   | "REMINDERS_OPT_OUT"
@@ -108,6 +107,7 @@ export type PetitionUserNotificationType =
 
 export type SystemEventType =
   | "PETITION_MESSAGE_BOUNCED"
+  | "PETITION_REMINDER_BOUNCED"
   | "USER_CREATED"
   | "USER_LOGGED_IN";
 
