@@ -45,7 +45,7 @@ function PublicTemplateDetails({
 
   const {
     name,
-    slug,
+    imageUrl,
     backgroundColor,
     ownerFullName,
     organizationName,
@@ -142,7 +142,10 @@ function PublicTemplateDetails({
             >
               <Image
                 padding={10}
-                src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${intl.locale}_${slug}.png`}
+                src={
+                  imageUrl ??
+                  `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${intl.locale}_radio_button.png`
+                }
               />
             </Center>
           </Stack>
@@ -246,6 +249,7 @@ PublicTemplateDetails.fragments = {
       id
       name
       slug
+      imageUrl
       backgroundColor
       categories
       ownerFullName
@@ -263,111 +267,121 @@ export async function getServerSideProps({
   query: { locale, template },
   req,
 }: GetServerSidePropsContext) {
-  const client = createApolloClient({}, { req });
+  try {
+    const client = createApolloClient({}, { req });
 
-  const { data } = await client.query<landingTemplateBySlugQuery>({
-    query: gql`
-      query landingTemplateBySlug($slug: String!) {
-        landingTemplateBySlug(slug: $slug) {
-          ...PublicTemplateDetails_LandingTemplate
-        }
-      }
-      ${PublicTemplateDetails.fragments.LandingTemplate}
-    `,
-    variables: {
-      slug: template,
-    },
-  });
-
-  const categories = data.landingTemplateBySlug?.categories ?? [];
-
-  const getCategoryTemplates = async (category: string) => {
-    const { data } = await client.query<landingTemplatesQuery>({
+    const { data } = await client.query<landingTemplateBySlugQuery>({
       query: gql`
-        query landingTemplates(
-          $offset: Int!
-          $limit: Int!
-          $category: String!
-          $locale: PetitionLocale!
-        ) {
-          landingTemplates(
-            offset: $offset
-            limit: $limit
-            category: $category
-            locale: $locale
-          ) {
-            totalCount
-            items {
-              ...PublicTemplateCard_LandingTemplate
-            }
+        query landingTemplateBySlug($slug: String!) {
+          landingTemplateBySlug(slug: $slug) {
+            ...PublicTemplateDetails_LandingTemplate
           }
         }
-        ${PublicTemplateCard.fragments.LandingTemplate}
+        ${PublicTemplateDetails.fragments.LandingTemplate}
       `,
       variables: {
-        offset: 0,
-        limit: 4,
-        category,
-        locale,
+        slug: template,
       },
     });
-    return data.landingTemplates.items.filter((item) => item.slug !== template);
-  };
 
-  const getAllCategoriesTemplates = async () => {
-    const { data } = await client.query<landingTemplatesSamplesQuery>({
-      query: gql`
-        query landingTemplatesSamples(
-          $offset: Int!
-          $limit: Int!
-          $locale: PetitionLocale!
-        ) {
-          landingTemplatesSamples {
-            category
-            templates(offset: $offset, limit: $limit, locale: $locale) {
+    if (!data) throw new Error("404");
+
+    const categories = data?.landingTemplateBySlug?.categories ?? [];
+
+    const getCategoryTemplates = async (category: string) => {
+      const { data } = await client.query<landingTemplatesQuery>({
+        query: gql`
+          query landingTemplates(
+            $offset: Int!
+            $limit: Int!
+            $category: String!
+            $locale: PetitionLocale!
+          ) {
+            landingTemplates(
+              offset: $offset
+              limit: $limit
+              category: $category
+              locale: $locale
+            ) {
+              totalCount
               items {
                 ...PublicTemplateCard_LandingTemplate
               }
-              totalCount
             }
           }
-        }
-        ${PublicTemplateCard.fragments.LandingTemplate}
-      `,
-      variables: {
-        offset: 0,
-        limit: 3,
-        locale,
-      },
-    });
+          ${PublicTemplateCard.fragments.LandingTemplate}
+        `,
+        variables: {
+          offset: 0,
+          limit: 4,
+          category,
+          locale,
+        },
+      });
+      return data.landingTemplates.items.filter(
+        (item) => item.slug !== template
+      );
+    };
 
-    const someTemplates = data.landingTemplatesSamples
-      .filter((sample) => sample.category !== categories[0])
-      .reduce((acc, sample) => {
-        return [...acc, ...(sample.templates.items ?? [])];
-      }, [] as PublicTemplateCard_LandingTemplateFragment[]);
+    const getAllCategoriesTemplates = async () => {
+      const { data } = await client.query<landingTemplatesSamplesQuery>({
+        query: gql`
+          query landingTemplatesSamples(
+            $offset: Int!
+            $limit: Int!
+            $locale: PetitionLocale!
+          ) {
+            landingTemplatesSamples {
+              category
+              templates(offset: $offset, limit: $limit, locale: $locale) {
+                items {
+                  ...PublicTemplateCard_LandingTemplate
+                }
+                totalCount
+              }
+            }
+          }
+          ${PublicTemplateCard.fragments.LandingTemplate}
+        `,
+        variables: {
+          offset: 0,
+          limit: 3,
+          locale,
+        },
+      });
 
-    return someTemplates.filter((item) => item.slug !== template);
-  };
+      const someTemplates = data.landingTemplatesSamples
+        .filter((sample) => sample.category !== categories[0])
+        .reduce((acc, sample) => {
+          return [...acc, ...(sample.templates.items ?? [])];
+        }, [] as PublicTemplateCard_LandingTemplateFragment[]);
 
-  let relatedTemplates = await getCategoryTemplates(categories[0]);
+      return someTemplates.filter((item) => item.slug !== template);
+    };
 
-  if (relatedTemplates.length < 3) {
-    let moreTemplates: PublicTemplateCard_LandingTemplateFragment[] = [];
+    let relatedTemplates = await getCategoryTemplates(categories[0]);
 
-    if (categories.length > 1) {
-      moreTemplates = await getCategoryTemplates(categories[1]);
-    } else {
-      moreTemplates = [
-        ...moreTemplates,
-        ...(await getAllCategoriesTemplates()),
-      ];
+    if (relatedTemplates.length < 3) {
+      let moreTemplates: PublicTemplateCard_LandingTemplateFragment[] = [];
+
+      if (categories.length > 1) {
+        moreTemplates = await getCategoryTemplates(categories[1]);
+      } else {
+        moreTemplates = [
+          ...moreTemplates,
+          ...(await getAllCategoriesTemplates()),
+        ];
+      }
+
+      relatedTemplates = [...relatedTemplates, ...moreTemplates];
     }
 
-    relatedTemplates = [...relatedTemplates, ...moreTemplates];
+    return { props: { data, relatedTemplates } };
+  } catch (err) {
+    return {
+      notFound: true,
+    };
   }
-
-  return { props: { data, relatedTemplates } };
 }
 
 export default withApolloData(PublicTemplateDetails);

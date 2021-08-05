@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { Card } from "../../common/Card";
 
 export interface PublicTemplateCardProps extends HTMLChakraProps<"section"> {
@@ -24,8 +24,16 @@ export function PublicTemplateCard({
   const router = useRouter();
   const { query } = router;
 
-  const { name, slug, backgroundColor, ownerFullName, organizationName } =
-    template ?? {};
+  const intl = useIntl();
+
+  const {
+    name,
+    slug,
+    imageUrl,
+    backgroundColor,
+    ownerFullName,
+    organizationName,
+  } = template ?? {};
 
   return (
     <Box
@@ -74,7 +82,10 @@ export function PublicTemplateCard({
             <Image
               height="100%"
               padding={5}
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/es_radio_button.png`}
+              src={
+                imageUrl ??
+                `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/templates/${intl.locale}_radio_button.png`
+              }
             />
           </Center>
           <Grid
@@ -109,6 +120,7 @@ PublicTemplateCard.fragments = {
       id
       name
       slug
+      imageUrl
       backgroundColor
       categories
       ownerFullName

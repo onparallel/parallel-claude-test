@@ -5117,6 +5117,7 @@ export type PublicTemplateCard_LandingTemplateFragment = {
   id: string;
   name?: Maybe<string>;
   slug: string;
+  imageUrl?: Maybe<string>;
   backgroundColor?: Maybe<string>;
   categories?: Maybe<Array<string>>;
   ownerFullName: string;
@@ -7110,6 +7111,7 @@ export type PublicTemplateDetails_LandingTemplateFragment = {
   id: string;
   name?: Maybe<string>;
   slug: string;
+  imageUrl?: Maybe<string>;
   backgroundColor?: Maybe<string>;
   categories?: Maybe<Array<string>>;
   ownerFullName: string;
@@ -7934,6 +7936,7 @@ export const PublicTemplateCard_LandingTemplateFragmentDoc = gql`
     id
     name
     slug
+    imageUrl
     backgroundColor
     categories
     ownerFullName
@@ -9901,6 +9904,7 @@ export const PublicTemplateDetails_LandingTemplateFragmentDoc = gql`
     id
     name
     slug
+    imageUrl
     backgroundColor
     categories
     ownerFullName

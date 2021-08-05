@@ -163,6 +163,12 @@ export async function getServerSideProps({
     },
   });
 
+  if (!data || !data.landingTemplates.items.length) {
+    return {
+      notFound: true,
+    };
+  }
+
   return { props: { data, categoriesData } };
 }
 

@@ -232,6 +232,7 @@ export type LandingTemplate = {
   fieldCount: Scalars["Int"];
   hasConditionals: Scalars["Boolean"];
   id: Scalars["GID"];
+  imageUrl: Maybe<Scalars["String"]>;
   name: Maybe<Scalars["String"]>;
   organizationId: Scalars["GID"];
   organizationName: Scalars["String"];
@@ -448,6 +449,8 @@ export type Mutation = {
   updateContact: Contact;
   /** Updates the positions of the petition fields */
   updateFieldPositions: PetitionBase;
+  /** Updates the metadata of a public landing template. */
+  updateLandingTemplateMetadata: SupportMethodResponse;
   /** Updates the onboarding status for one of the pages. */
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
@@ -953,6 +956,15 @@ export type MutationupdateContactArgs = {
 export type MutationupdateFieldPositionsArgs = {
   fieldIds: Array<Scalars["GID"]>;
   petitionId: Scalars["GID"];
+};
+
+export type MutationupdateLandingTemplateMetadataArgs = {
+  backgroundColor?: Maybe<Scalars["String"]>;
+  categories?: Maybe<Scalars["String"]>;
+  description?: Maybe<Scalars["String"]>;
+  image?: Maybe<Scalars["Upload"]>;
+  slug?: Maybe<Scalars["String"]>;
+  templateId: Scalars["ID"];
 };
 
 export type MutationupdateOnboardingStatusArgs = {
