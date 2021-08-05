@@ -693,7 +693,6 @@ export function DefaultHeader({
                       onCloseFilter();
                     }
                   }}
-                  overflow="hidden"
                 >
                   <Heading
                     as="h4"
