@@ -49,6 +49,12 @@ export const LandingTemplate = objectType({
         return fullName(owner.first_name, owner.last_name);
       },
     });
+    t.nullable.string("ownerAvatarUrl", {
+      resolve: async (o, _, ctx) => {
+        const owner = (await ctx.petitions.loadPetitionOwner(o.id))!;
+        return ctx.users.loadAvatarUrl(owner.id);
+      },
+    });
     t.string("organizationName", {
       resolve: async (o, _, ctx) => {
         const org = (await ctx.organizations.loadOrg(o.org_id))!;

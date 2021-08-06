@@ -233,11 +233,11 @@ export type LandingTemplate = {
   hasConditionals: Scalars["Boolean"];
   id: Scalars["GID"];
   imageUrl: Maybe<Scalars["String"]>;
+  locale: PetitionLocale;
   name: Maybe<Scalars["String"]>;
-  organizationId: Scalars["GID"];
   organizationName: Scalars["String"];
+  ownerAvatarUrl: Maybe<Scalars["String"]>;
   ownerFullName: Scalars["String"];
-  ownerId: Scalars["GID"];
   shortDescription: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   updatedAt: Scalars["DateTime"];
@@ -2079,7 +2079,7 @@ export type QuerylandingTemplateBySlugArgs = {
 };
 
 export type QuerylandingTemplatesArgs = {
-  category: Scalars["String"];
+  categories?: Maybe<Array<Scalars["String"]>>;
   limit?: Maybe<Scalars["Int"]>;
   locale: PetitionLocale;
   offset?: Maybe<Scalars["Int"]>;

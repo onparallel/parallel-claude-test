@@ -307,6 +307,7 @@ type LandingTemplate {
   locale: PetitionLocale!
   name: String
   organizationName: String!
+  ownerAvatarUrl: String
   ownerFullName: String!
   shortDescription: String
   slug: String!

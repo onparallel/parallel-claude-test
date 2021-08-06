@@ -260,6 +260,7 @@ export interface LandingTemplate {
   locale: PetitionLocale;
   name?: Maybe<Scalars["String"]>;
   organizationName: Scalars["String"];
+  ownerAvatarUrl?: Maybe<Scalars["String"]>;
   ownerFullName: Scalars["String"];
   shortDescription?: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
@@ -2926,6 +2927,12 @@ export type TagEditDialog_updateTagMutationVariables = Exact<{
 
 export type TagEditDialog_updateTagMutation = {
   updateTag: { __typename?: "Tag" } & TagEditDialog_TagFragment;
+};
+
+export type UserAvatar_UserFragment = {
+  __typename?: "User";
+  fullName?: Maybe<string>;
+  avatarUrl?: Maybe<string>;
 };
 
 export type UserAvatarList_UserFragment = {
@@ -7127,6 +7134,7 @@ export type LandingTemplateDetails_LandingTemplateFragment = {
   backgroundColor?: Maybe<string>;
   categories?: Maybe<Array<string>>;
   ownerFullName: string;
+  ownerAvatarUrl?: Maybe<string>;
   organizationName: string;
   fieldCount: number;
   hasConditionals: boolean;
@@ -7528,6 +7536,12 @@ export const TagEditDialog_TagFragmentDoc = gql`
     createdAt
   }
   ${Tag_TagFragmentDoc}
+`;
+export const UserAvatar_UserFragmentDoc = gql`
+  fragment UserAvatar_User on User {
+    fullName
+    avatarUrl
+  }
 `;
 export const UserListPopover_UserGroupFragmentDoc = gql`
   fragment UserListPopover_UserGroup on UserGroup {
@@ -9956,6 +9970,7 @@ export const LandingTemplateDetails_LandingTemplateFragmentDoc = gql`
     backgroundColor
     categories
     ownerFullName
+    ownerAvatarUrl
     organizationName
     fieldCount
     hasConditionals

@@ -720,6 +720,7 @@ export interface NexusGenFieldTypes {
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
     organizationName: string; // String!
+    ownerAvatarUrl: string | null; // String
     ownerFullName: string; // String!
     shortDescription: string | null; // String
     slug: string; // String!
@@ -1750,6 +1751,7 @@ export interface NexusGenFieldTypeNames {
     locale: "PetitionLocale";
     name: "String";
     organizationName: "String";
+    ownerAvatarUrl: "String";
     ownerFullName: "String";
     shortDescription: "String";
     slug: "String";

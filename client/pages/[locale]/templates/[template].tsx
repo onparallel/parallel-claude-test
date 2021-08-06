@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import {
-  Avatar,
   Box,
   Center,
   Grid,
@@ -13,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
+import { UserAvatar } from "@parallel/components/common/UserAvatar";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
@@ -27,10 +27,12 @@ import { createApolloClient } from "@parallel/utils/apollo/client";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { Assert } from "@parallel/utils/types";
-import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
+import {
+  PublicTemplateCategory,
+  usePublicTemplateCategories,
+} from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
-import { isDefined } from "remeda";
 
 function LandingTemplateDetails({
   template,
@@ -44,6 +46,7 @@ function LandingTemplateDetails({
     imageUrl,
     backgroundColor,
     ownerFullName,
+    ownerAvatarUrl,
     organizationName,
     fieldCount,
     hasConditionals,
@@ -55,8 +58,9 @@ function LandingTemplateDetails({
   const categoryList = usePublicTemplateCategories();
   const categories = (template.categories ?? [])
     .map((c) => categoryList.find((category) => category.slug === c))
-    .filter(isDefined);
+    .filter((c) => c !== undefined) as PublicTemplateCategory[];
 
+  const owner = { fullName: ownerFullName, avatarUrl: ownerAvatarUrl };
   return (
     <PublicLayout
       title={name as string}
@@ -113,12 +117,7 @@ function LandingTemplateDetails({
                 </Text>
               </Stack>
               <HStack paddingTop={6} spacing={1}>
-                <Avatar
-                  boxSize="40px"
-                  name={ownerFullName}
-                  src={undefined}
-                  marginRight={2}
-                />
+                <UserAvatar boxSize="40px" user={owner} marginRight={2} />
                 <FormattedMessage
                   id="public.template-card.created-by"
                   defaultMessage="Created by {name} on {orgName}"
@@ -255,6 +254,7 @@ LandingTemplateDetails.fragments = {
       backgroundColor
       categories
       ownerFullName
+      ownerAvatarUrl
       organizationName
       fieldCount
       hasConditionals
