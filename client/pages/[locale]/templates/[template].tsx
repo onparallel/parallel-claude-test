@@ -26,6 +26,7 @@ import {
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
+import { Assert } from "@parallel/utils/types";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -59,6 +60,7 @@ function LandingTemplateDetails({
     <PublicLayout
       title={name as string}
       description={shortDescription as string}
+      og={{ image: template.imageUrl }}
     >
       <PublicContainer
         maxWidth="container.xl"

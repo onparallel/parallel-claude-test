@@ -3,6 +3,7 @@ import { Hubspot } from "@parallel/components/scripts/Hubspot";
 import { Segment } from "@parallel/components/scripts/Segment";
 import languages from "@parallel/lang/languages.json";
 import { resolveUrl } from "@parallel/utils/next";
+import { Maybe } from "@parallel/utils/types";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
@@ -17,6 +18,7 @@ export interface PublicLayoutProps {
   children?: ReactNode;
   hideHeader?: boolean;
   hideFooter?: boolean;
+  og?: Partial<Record<string, Maybe<string> | undefined>>;
 }
 
 export function PublicLayout({
@@ -25,8 +27,9 @@ export function PublicLayout({
   children,
   hideFooter,
   hideHeader,
+  og,
 }: PublicLayoutProps) {
-  const { query, pathname } = useRouter();
+  const { query, pathname, asPath } = useRouter();
   const intl = useIntl();
 
   return (
@@ -54,6 +57,29 @@ export function PublicLayout({
               pathname,
               { ...query, locale }
             )}`}
+          />
+        ))}
+        <meta property="og:title" content={og?.title ?? title} />
+        <meta property="og:type" content={og?.type ?? "website"} />
+        <meta property="og:url" content={og?.url ?? asPath} />
+        <meta
+          property="og:image"
+          content={
+            og?.image ??
+            `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/showcase_hero_${query.locale}.png?v=${process.env.BUILD_ID}`
+          }
+        />
+        <meta
+          property="og:description"
+          content={og?.description ?? description}
+        />
+        {languages.map(({ locale }) => (
+          <meta
+            key={locale}
+            property={
+              locale === query.locale ? "og:locale" : "og:locale:alternate"
+            }
+            content={locale}
           />
         ))}
       </Head>
