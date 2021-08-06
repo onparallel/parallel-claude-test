@@ -8,7 +8,7 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { uniq } from "remeda";
-import { fromGlobalId } from "../../util/globalId";
+import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
@@ -394,3 +394,47 @@ export const updateLandingTemplateMetadata = mutationField(
     },
   }
 );
+export const uploadUserAvatar = mutationField("uploadUserAvatar", {
+  description: "Uploads a user avatar image",
+  type: "SupportMethodResponse",
+  authorize: supportMethodAccess(),
+  args: {
+    userId: nonNull(intArg({ description: "Numeric ID of the user" })),
+    image: nonNull(uploadArg()),
+  },
+  validateArgs: validateFile(
+    (args) => args.image,
+    { contentType: "image/*", maxSize: 10 * 1024 * 1024 },
+    "image"
+  ),
+  resolve: async (_, { userId, image }, ctx) => {
+    const { createReadStream, mimetype } = await image;
+
+    const filename = toGlobalId("User", userId);
+    const path = `avatars/${filename}`;
+    const res = await ctx.aws.publicFiles.uploadFile(
+      path,
+      "image/png",
+      createReadStream()
+    );
+    const file = await ctx.files.createPublicFile(
+      {
+        path,
+        filename,
+        content_type: mimetype,
+        size: res["ContentLength"]!.toString(),
+      },
+      `User:${ctx.user!.id}`
+    );
+
+    await ctx.users.updateUserById(
+      userId,
+      { public_file_avatar_id: file.id },
+      `User:${ctx.user!.id}`
+    );
+    return {
+      result: RESULT.SUCCESS,
+      message: "User avatar updated successfully",
+    };
+  },
+});

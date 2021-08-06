@@ -449,6 +449,46 @@ export const supportMethods: {
     },
     queryType: "mutation",
   },
+  {
+    field: {
+      name: "uploadUserAvatar",
+      description: "Uploads a user avatar image",
+      args: [
+        {
+          name: "image",
+          description: null,
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Upload", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+        {
+          name: "userId",
+          description: "Numeric ID of the user",
+          type: {
+            kind: "NON_NULL",
+            name: null,
+            ofType: { kind: "SCALAR", name: "Int", ofType: null },
+          },
+          defaultValue: null,
+          isDeprecated: false,
+          deprecationReason: null,
+        },
+      ],
+      type: {
+        kind: "NON_NULL",
+        name: null,
+        ofType: { kind: "OBJECT", name: "SupportMethodResponse", ofType: null },
+      },
+      isDeprecated: false,
+      deprecationReason: null,
+    },
+    queryType: "mutation",
+  },
 ] as any;
 
 export const schemaTypes: IntrospectionType[] = [

@@ -2,10 +2,11 @@ import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy } from "remeda";
+import { CONFIG, Config } from "../../config";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { unMaybeArray } from "../../util/arrays";
 import { fromDataLoader } from "../../util/fromDataLoader";
-import { MaybeArray } from "../../util/types";
+import { Maybe, MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { escapeLike } from "../helpers/utils";
 import { KNEX } from "../knex";
@@ -15,6 +16,7 @@ import { SystemRepository } from "./SystemRepository";
 @injectable()
 export class UserRepository extends BaseRepository {
   constructor(
+    @inject(CONFIG) private config: Config,
     @inject(KNEX) knex: Knex,
     @inject(AWS_SERVICE) private aws: Aws,
     private system: SystemRepository
@@ -189,4 +191,23 @@ export class UserRepository extends BaseRepository {
     ]);
     return [...(userGroups ?? []), ...users];
   }
+
+  readonly loadAvatarUrl = fromDataLoader(
+    new DataLoader<number, Maybe<string>>(async (userIds) => {
+      const results = await this.raw<{ id: number; path: string }>(
+        /* sql */ `
+        select u.id, pfu.path from "user" u
+          join public_file_upload pfu on u.public_file_avatar_id = pfu.id
+          where u.id in (${userIds.map(() => "?").join(",")})
+      `,
+        [...userIds]
+      );
+      const resultsById = indexBy(results, (x) => x.id);
+      return userIds.map((id) =>
+        resultsById[id]
+          ? `${this.config.misc.uploadsUrl}/${resultsById[id].path}`
+          : null
+      );
+    })
+  );
 }

@@ -1228,6 +1228,18 @@ type Mutation {
   ): PetitionField!
 
   """
+  Uploads a user avatar image
+  """
+  uploadUserAvatar(
+    image: Upload!
+
+    """
+    Numeric ID of the user
+    """
+    userId: Int!
+  ): SupportMethodResponse!
+
+  """
   Updates the validation of a field and sets the petition as closed if all fields are validated.
   """
   validatePetitionFields(
@@ -3597,6 +3609,11 @@ type User implements Timestamps {
     """
     sortBy: [UserAuthenticationTokens_OrderBy!]
   ): UserAuthenticationTokenPagination!
+
+  """
+  URL to the user avatar
+  """
+  avatarUrl: String
 
   """
   Time when the resource was created.

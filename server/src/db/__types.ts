@@ -902,6 +902,7 @@ export interface User {
   status: UserStatus; // user_status
   is_sso_user: boolean; // bool
   external_id: Maybe<string>; // varchar
+  public_file_avatar_id: Maybe<number>; // int4
 }
 
 export type CreateUser = PartialProps<
@@ -920,6 +921,7 @@ export type CreateUser = PartialProps<
   | "status"
   | "is_sso_user"
   | "external_id"
+  | "public_file_avatar_id"
 >;
 
 export interface UserAuthenticationToken {

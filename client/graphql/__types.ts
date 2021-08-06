@@ -527,6 +527,8 @@ export interface Mutation {
   updateUserStatus: Array<User>;
   /** Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options */
   uploadDynamicSelectFieldFile: PetitionField;
+  /** Uploads a user avatar image */
+  uploadUserAvatar: SupportMethodResponse;
   /** Updates the validation of a field and sets the petition as closed if all fields are validated. */
   validatePetitionFields: PetitionAndPartialFields;
   verifyPublicAccess: PublicAccessVerification;
@@ -1099,6 +1101,11 @@ export interface MutationuploadDynamicSelectFieldFileArgs {
   fieldId: Scalars["GID"];
   file: Scalars["Upload"];
   petitionId: Scalars["GID"];
+}
+
+export interface MutationuploadUserAvatarArgs {
+  image: Scalars["Upload"];
+  userId: Scalars["Int"];
 }
 
 export interface MutationvalidatePetitionFieldsArgs {
@@ -2533,6 +2540,8 @@ export interface User extends Timestamps {
   __typename?: "User";
   /** Lists every auth token of the user */
   authenticationTokens: UserAuthenticationTokenPagination;
+  /** URL to the user avatar */
+  avatarUrl?: Maybe<Scalars["String"]>;
   /** Time when the resource was created. */
   createdAt: Scalars["DateTime"];
   /** The email of the user. */

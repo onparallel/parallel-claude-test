@@ -175,6 +175,12 @@ export const User = objectType({
         };
       },
     });
+    t.nullable.string("avatarUrl", {
+      description: "URL to the user avatar",
+      resolve: async (o, _, ctx) => {
+        return await ctx.users.loadAvatarUrl(o.id);
+      },
+    });
   },
 });
 

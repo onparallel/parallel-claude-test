@@ -864,6 +864,7 @@ export interface NexusGenFieldTypes {
     updateUserGroup: NexusGenRootTypes["UserGroup"]; // UserGroup!
     updateUserStatus: NexusGenRootTypes["User"][]; // [User!]!
     uploadDynamicSelectFieldFile: NexusGenRootTypes["PetitionField"]; // PetitionField!
+    uploadUserAvatar: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     validatePetitionFields: NexusGenRootTypes["PetitionAndPartialFields"]; // PetitionAndPartialFields!
     verifyPublicAccess: NexusGenRootTypes["PublicAccessVerification"]; // PublicAccessVerification!
   };
@@ -1456,6 +1457,7 @@ export interface NexusGenFieldTypes {
   User: {
     // field return type
     authenticationTokens: NexusGenRootTypes["UserAuthenticationTokenPagination"]; // UserAuthenticationTokenPagination!
+    avatarUrl: string | null; // String
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
     email: string; // String!
     firstName: string | null; // String
@@ -1892,6 +1894,7 @@ export interface NexusGenFieldTypeNames {
     updateUserGroup: "UserGroup";
     updateUserStatus: "User";
     uploadDynamicSelectFieldFile: "PetitionField";
+    uploadUserAvatar: "SupportMethodResponse";
     validatePetitionFields: "PetitionAndPartialFields";
     verifyPublicAccess: "PublicAccessVerification";
   };
@@ -2478,6 +2481,7 @@ export interface NexusGenFieldTypeNames {
   User: {
     // field return type name
     authenticationTokens: "UserAuthenticationTokenPagination";
+    avatarUrl: "String";
     createdAt: "DateTime";
     email: "String";
     firstName: "String";
@@ -3213,6 +3217,11 @@ export interface NexusGenArgTypes {
       fieldId: NexusGenScalars["GID"]; // GID!
       file: NexusGenScalars["Upload"]; // Upload!
       petitionId: NexusGenScalars["GID"]; // GID!
+    };
+    uploadUserAvatar: {
+      // args
+      image: NexusGenScalars["Upload"]; // Upload!
+      userId: number; // Int!
     };
     validatePetitionFields: {
       // args
