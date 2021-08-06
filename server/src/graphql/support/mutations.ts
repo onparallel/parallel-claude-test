@@ -11,6 +11,7 @@ import { uniq } from "remeda";
 import { fromGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
+import { ArgValidationError } from "../helpers/errors";
 import { RESULT } from "../helpers/result";
 import { uploadArg } from "../helpers/upload";
 import { validateAnd, validateIf } from "../helpers/validateArgs";
@@ -317,11 +318,18 @@ export const updateLandingTemplateMetadata = mutationField(
       )
     ),
     authorize: supportMethodAccess(),
-    resolve: async (_, args, ctx) => {
+    resolve: async (_, args, ctx, info) => {
       try {
         const { id } = fromGlobalId(args.templateId, "Petition");
-
         const template = await ctx.petitions.loadPetition(id);
+        if (!template || !template.is_template) {
+          throw new ArgValidationError(
+            info,
+            "templateId",
+            "Id does not correspond to a template"
+          );
+        }
+
         const templateMd = template!.public_metadata;
 
         const newMetadata: any = {};
