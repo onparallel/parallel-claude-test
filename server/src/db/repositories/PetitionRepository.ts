@@ -3289,13 +3289,24 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async loadPublicTemplateBySlug(slug: string): Promise<Petition | null> {
+    let templateId: number | null = null;
+    try {
+      // if slug is not set on a template metadata, we try to search by id using the slug as a globalId
+      templateId = fromGlobalId(slug, "Petition").id;
+    } catch {}
+
     const [row] = await this.from("petition")
       .where({
         is_template: true,
         template_public: true,
         deleted_at: null,
       })
-      .whereRaw(`("public_metadata" ->> 'slug') = ?`, [slug]);
+      .whereRaw(
+        /* sql */ `
+        (("public_metadata" ->> 'slug') is not null and ("public_metadata" ->> 'slug') = ?) or (("public_metadata" ->> 'slug') is null and "id" = ?)
+      `,
+        [slug, templateId]
+      );
 
     return row;
   }
