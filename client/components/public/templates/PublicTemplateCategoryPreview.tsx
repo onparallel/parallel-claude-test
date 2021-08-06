@@ -10,18 +10,18 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { PublicTemplateCard } from "./PublicTemplateCard";
-import { CategoryType } from "./useCategories";
+import { PublicTemplateCategory } from "../../../utils/usePublicTemplateCategories";
 
 export function PublicTemplateCategoryPreview({
   category,
+  templates,
 }: {
-  category: CategoryType;
+  category: PublicTemplateCategory;
+  templates: PublicTemplateCard_LandingTemplateFragment[];
 }) {
   const displaySideMenu = useBreakpointValue({ base: false, md: true });
 
-  const { href, label } = category;
-  const templates =
-    category.templates as PublicTemplateCard_LandingTemplateFragment[];
+  const { label, slug } = category;
 
   return (
     <Grid
@@ -43,24 +43,22 @@ export function PublicTemplateCategoryPreview({
           />
         </Text>
       </GridItem>
-      {templates.length > 3 ? (
-        <GridItem gridArea="actions">
-          <NakedLink href={href}>
-            <Button
-              as="a"
-              variant="outline"
-              cursor="pointer"
-              backgroundColor="white"
-              width={"100%"}
-            >
-              <FormattedMessage
-                id="public.template-category-preview.view-all"
-                defaultMessage="View all"
-              />
-            </Button>
-          </NakedLink>
-        </GridItem>
-      ) : null}
+      <GridItem gridArea="actions">
+        <NakedLink href={`/templates/categories/${slug}`}>
+          <Button
+            as="a"
+            variant="outline"
+            cursor="pointer"
+            backgroundColor="white"
+            width={"100%"}
+          >
+            <FormattedMessage
+              id="public.template-category-preview.view-all"
+              defaultMessage="View all"
+            />
+          </Button>
+        </NakedLink>
+      </GridItem>
       <GridItem gridArea="content">
         <Grid
           templateColumns={{
@@ -69,9 +67,9 @@ export function PublicTemplateCategoryPreview({
           }}
           gap={6}
         >
-          {templates.slice(0, 3).map((template, index) => {
-            return <PublicTemplateCard key={index} template={template} />;
-          })}
+          {templates.map((t) => (
+            <PublicTemplateCard key={t.id} template={t} showCategories />
+          ))}
         </Grid>
       </GridItem>
     </Grid>

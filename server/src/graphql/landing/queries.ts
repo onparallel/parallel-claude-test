@@ -1,4 +1,12 @@
-import { arg, nonNull, objectType, queryField, stringArg } from "@nexus/schema";
+import {
+  arg,
+  nonNull,
+  list,
+  objectType,
+  queryField,
+  stringArg,
+} from "@nexus/schema";
+import { PetitionLocale } from "../../api/public/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
@@ -22,30 +30,24 @@ export const LandingTemplate = objectType({
     t.string("slug", {
       resolve: (o) => o.public_metadata.slug || toGlobalId("Petition", o.id),
     });
+    t.field("locale", {
+      type: "PetitionLocale",
+      resolve: (o) => o.locale as PetitionLocale,
+    });
     t.nullable.string("shortDescription", {
       resolve: (o) => o.public_metadata.description,
     });
     t.nullable.string("backgroundColor", {
-      resolve: (o) => o.public_metadata.backgroundColor,
+      resolve: (o) => o.public_metadata.background_color,
     });
     t.nullable.list.nonNull.string("categories", {
       resolve: (o) => o.public_metadata.categories,
-    });
-    t.globalId("ownerId", {
-      prefixName: "User",
-      resolve: async (root, _, ctx) => {
-        return (await ctx.petitions.loadPetitionOwner(root.id))!.id;
-      },
     });
     t.string("ownerFullName", {
       resolve: async (root, _, ctx) => {
         const owner = (await ctx.petitions.loadPetitionOwner(root.id))!;
         return fullName(owner.first_name, owner.last_name);
       },
-    });
-    t.globalId("organizationId", {
-      prefixName: "Organization",
-      resolve: (o) => o.org_id,
     });
     t.string("organizationName", {
       resolve: async (o, _, ctx) => {
@@ -66,7 +68,15 @@ export const LandingTemplate = objectType({
     });
     t.datetime("updatedAt", { resolve: (o) => o.updated_at });
     t.nullable.string("imageUrl", {
-      resolve: (o) => o.public_metadata.image,
+      resolve: async (o, _, ctx) => {
+        if (o.public_metadata.image_public_file_id) {
+          const file = await ctx.files.loadPublicFile(
+            o.public_metadata.image_public_file_id
+          );
+          return `${ctx.config.misc.uploadsUrl}/${file!.path}`;
+        }
+        return null;
+      },
     });
   },
 });
@@ -75,15 +85,15 @@ export const landingQueries = queryField((t) => {
   t.paginationField("landingTemplates", {
     type: "LandingTemplate",
     extendArgs: {
-      category: nonNull(stringArg()),
+      categories: list(nonNull(stringArg())),
       locale: nonNull(arg({ type: "PetitionLocale" })),
     },
-    resolve: async (_, { offset, limit, locale, category }, ctx) => {
+    resolve: async (_, { offset, limit, locale, categories }, ctx) => {
       return await ctx.petitions.loadPublicTemplates({
         limit,
         offset,
         locale,
-        category,
+        categories,
       });
     },
   });
@@ -110,11 +120,14 @@ export const landingQueries = queryField((t) => {
             locale: nonNull(arg({ type: "PetitionLocale" })),
           },
           resolve: async (category, { limit, offset, locale }, ctx) => {
+            if (limit === 0) {
+              return [];
+            }
             return await ctx.petitions.loadPublicTemplates({
               limit,
               offset,
               locale,
-              category,
+              categories: [category],
               sortBy: "used_count",
             });
           },

@@ -404,7 +404,7 @@ export const supportMethods: {
         },
         {
           name: "description",
-          description: "meta-description for the template card",
+          description: "short description for the template",
           type: { kind: "SCALAR", name: "String", ofType: null },
           defaultValue: null,
           isDeprecated: false,

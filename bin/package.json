@@ -20,7 +20,7 @@
     "cli-table3": "^0.6.0",
     "intl-messageformat-parser": "^6.4.4",
     "outdent": "^0.8.0",
-    "remeda": "^0.0.28",
+    "remeda": "^0.0.30",
     "rimraf": "^3.0.2",
     "yargs": "^17.0.1"
   },

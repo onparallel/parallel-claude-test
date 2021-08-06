@@ -3224,7 +3224,7 @@ export class PetitionRepository extends BaseRepository {
       search?: string | null;
       locale?: PetitionLocale | null;
       sortBy?: "last_used_at" | "used_count";
-      category?: string | null;
+      categories?: string[] | null;
     } & PageOpts,
     userId?: number
   ) {
@@ -3236,7 +3236,7 @@ export class PetitionRepository extends BaseRepository {
           is_template: true,
         })
         .mmodify((q) => {
-          const { search, locale, sortBy, category } = opts;
+          const { search, locale, sortBy, categories } = opts;
           if (locale) {
             q.where("locale", locale);
           }
@@ -3250,12 +3250,14 @@ export class PetitionRepository extends BaseRepository {
               );
             });
           }
-          if (category) {
+          if (categories) {
+            const placeholders = categories.map((_) => "?").join(",");
             /* array overlap operator.
               selects every template with any of the passed categories */
-            q.whereRaw(/* sql */ `public_metadata->'categories' \\? ?`, [
-              category,
-            ]);
+            q.whereRaw(
+              /* sql */ `public_metadata->'categories' \\?| array[${placeholders}]`,
+              [...categories]
+            );
           }
           if (userId !== undefined) {
             q.leftJoin(

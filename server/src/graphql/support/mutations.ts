@@ -300,7 +300,7 @@ export const updateLandingTemplateMetadata = mutationField(
         stringArg({ description: "comma-separated list of categories" })
       ),
       description: nullable(
-        stringArg({ description: "meta-description for the template card" })
+        stringArg({ description: "short description for the template" })
       ),
       slug: nullable(stringArg({ description: "must be URL-friendly" })),
       image: nullable(uploadArg()),
@@ -326,7 +326,7 @@ export const updateLandingTemplateMetadata = mutationField(
 
         const newMetadata: any = {};
 
-        newMetadata.backgroundColor = isDefined(args.backgroundColor)
+        newMetadata.background_color = isDefined(args.backgroundColor)
           ? args.backgroundColor
           : templateMd.backgroundColor || null;
 
@@ -345,14 +345,24 @@ export const updateLandingTemplateMetadata = mutationField(
 
         if (args.image) {
           const { createReadStream } = await args.image;
-          const path = `landing/${random(16)}`;
-          await ctx.aws.publicFiles.uploadFile(
+          const filename = random(16);
+          const path = `templates/${filename}`;
+          const res = await ctx.aws.publicFiles.uploadFile(
             path,
             "image/png",
             createReadStream()
           );
+          const file = await ctx.files.createPublicFile(
+            {
+              path,
+              filename,
+              content_type: "image/png",
+              size: res["ContentLength"]!.toString(),
+            },
+            `User:${ctx.user!.id}`
+          );
 
-          newMetadata.image = `${ctx.config.misc.uploadsUrl}/${path}`;
+          newMetadata.image_public_file_id = file.id;
         } else {
           newMetadata.image = templateMd.image || null;
         }

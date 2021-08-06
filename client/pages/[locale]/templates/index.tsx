@@ -1,36 +1,32 @@
 import { gql } from "@apollo/client";
 import { Button, Flex, Heading } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
-import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
 import { PublicTemplateCategoryPreview } from "@parallel/components/public/templates/PublicTemplateCategoryPreview";
 import { PublicTemplatesContainer } from "@parallel/components/public/templates/PublicTemplatesContainer";
 import { PublicTemplatesHero } from "@parallel/components/public/templates/PublicTemplatesHero";
-import { useCategories } from "@parallel/components/public/templates/useCategories";
-import { landingTemplatesSamplesQuery } from "@parallel/graphql/__types";
+import {
+  LandingTemplates_landingTemplatesSamplesQuery,
+  LandingTemplates_landingTemplatesSamplesQueryVariables,
+  PetitionLocale,
+} from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
-import { GetServerSidePropsContext } from "next";
+import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
+import { indexBy } from "remeda";
 
-function Templates({ data }: { data: landingTemplatesSamplesQuery }) {
+function Templates({
+  samples,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
 
-  let categories = useCategories();
-
-  const { landingTemplatesSamples } = data;
-
-  categories.forEach((category) => {
-    category.templates = [
-      ...(landingTemplatesSamples.find(
-        (template) => template.category === category.slug
-      )?.templates.items ?? []),
-    ];
-  });
-
-  categories = categories.filter(
-    (category) => category.templates.length || category.slug === "all"
+  const categories = usePublicTemplateCategories();
+  const samplesByCategory = indexBy(samples, (s) => s.category);
+  const filteredCategories = categories.filter(
+    (c) => samplesByCategory[c.slug]?.templates.totalCount > 0
   );
 
   return (
@@ -41,16 +37,18 @@ function Templates({ data }: { data: landingTemplatesSamplesQuery }) {
       })}
       description={intl.formatMessage({
         id: "public.templates.meta-description",
-        defaultMessage: "Learn more about Parallel's templates",
+        defaultMessage: "Learn more about Parallel templates",
       })}
     >
       <PublicTemplatesHero />
-      <PublicTemplatesContainer categories={categories}>
-        {categories.map((category, index) => {
-          const { href } = category;
-          if (href === "/templates") return null;
+      <PublicTemplatesContainer categories={filteredCategories}>
+        {filteredCategories.map((category, index) => {
           return (
-            <PublicTemplateCategoryPreview key={index} category={category} />
+            <PublicTemplateCategoryPreview
+              key={index}
+              category={category}
+              templates={samplesByCategory[category.slug].templates.items}
+            />
           );
         })}
       </PublicTemplatesContainer>
@@ -101,9 +99,12 @@ export async function getServerSideProps({
 }: GetServerSidePropsContext) {
   const client = createApolloClient({}, { req });
 
-  const { data } = await client.query<landingTemplatesSamplesQuery>({
+  const { data } = await client.query<
+    LandingTemplates_landingTemplatesSamplesQuery,
+    LandingTemplates_landingTemplatesSamplesQueryVariables
+  >({
     query: gql`
-      query landingTemplatesSamples(
+      query LandingTemplates_landingTemplatesSamples(
         $offset: Int!
         $limit: Int!
         $locale: PetitionLocale!
@@ -122,12 +123,15 @@ export async function getServerSideProps({
     `,
     variables: {
       offset: 0,
-      limit: 4,
-      locale,
+      limit: 3,
+      locale: locale as PetitionLocale,
     },
   });
-
-  return { props: { data } };
+  return {
+    props: {
+      samples: data.landingTemplatesSamples,
+    },
+  };
 }
 
-export default withApolloData(Templates);
+export default Templates;

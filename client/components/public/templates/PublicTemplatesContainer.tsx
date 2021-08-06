@@ -7,7 +7,6 @@ import {
   MenuList,
   Portal,
   Stack,
-  Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import {
@@ -19,23 +18,20 @@ import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { CategoryType } from "./useCategories";
+import { FormattedMessage } from "react-intl";
+import { PublicTemplateCategory } from "../../../utils/usePublicTemplateCategories";
 
 export function PublicTemplatesContainer({
   categories,
   children,
 }: {
-  categories: CategoryType[];
+  categories: PublicTemplateCategory[];
   children: ReactNode;
 }) {
   const router = useRouter();
-  const current = router.pathname.startsWith("/[locale]")
-    ? router.asPath.replace(/^\/[^\/]+/, "")
-    : router.asPath;
 
   const currentCategory = categories.find(
-    (category) =>
-      current.includes(category.href) && !current.includes(category.href + "/")
+    (c) => c.slug === router.query.category
   );
 
   const displaySideMenu = useBreakpointValue({ base: false, md: true });
@@ -63,19 +59,61 @@ export function PublicTemplatesContainer({
             paddingY={12}
             spacing={0}
           >
-            {categories.map((category, index) => {
-              const { label, href } = category;
-              const isActive = currentCategory?.label === label;
+            <NakedLink href={`/templates`}>
+              <Button
+                as="a"
+                paddingY={6}
+                paddingLeft={6}
+                justifyContent="space-between"
+                borderRadius="none"
+                fontWeight="bold"
+                rightIcon={
+                  currentCategory === undefined ? (
+                    <ChevronRightIcon fontSize="2xl" />
+                  ) : undefined
+                }
+                backgroundColor="transparent"
+                _hover={{
+                  bgColor: "gray.100",
+                }}
+                aria-current={
+                  currentCategory === undefined ? "page" : undefined
+                }
+                _activeLink={{
+                  bgColor: "gray.200",
+                  fontWeight: "bold",
+                }}
+                _focus={{
+                  boxShadow: "none",
+                }}
+              >
+                <FormattedMessage
+                  id="public-templates.categories.all-categories"
+                  defaultMessage="All categories"
+                />
+              </Button>
+            </NakedLink>
+            {categories.map((c) => {
+              const isActive = currentCategory?.slug === c.slug;
               return (
-                <NakedLink key={index} href={href}>
+                <NakedLink
+                  key={c.slug}
+                  href={`/templates/categories/${c.slug}`}
+                >
                   <Button
                     as="a"
                     paddingY={6}
                     paddingLeft={6}
                     justifyContent="space-between"
                     borderRadius="none"
-                    fontWeight={isActive ? "bold" : "normal"}
-                    isActive={isActive}
+                    fontWeight="normal"
+                    aria-current={
+                      currentCategory?.slug === c.slug ? "page" : undefined
+                    }
+                    _activeLink={{
+                      bgColor: "gray.200",
+                      fontWeight: "bold",
+                    }}
                     rightIcon={
                       isActive ? <ChevronRightIcon fontSize="2xl" /> : undefined
                     }
@@ -83,11 +121,11 @@ export function PublicTemplatesContainer({
                     _hover={{
                       bgColor: "gray.100",
                     }}
-                    _active={{
-                      bgColor: "gray.200",
+                    _focus={{
+                      boxShadow: "none",
                     }}
                   >
-                    <Text as="span">{label}</Text>
+                    {c.label}
                   </Button>
                 </NakedLink>
               );
@@ -106,18 +144,44 @@ export function PublicTemplatesContainer({
                   textAlign="start"
                   backgroundColor="white"
                 >
-                  {currentCategory?.label}
+                  {currentCategory ? (
+                    currentCategory.label
+                  ) : (
+                    <FormattedMessage
+                      id="public-templates.categories.all-categories"
+                      defaultMessage="All categories"
+                    />
+                  )}
                 </MenuButton>
                 <Portal>
                   <MenuList>
-                    {categories.map((category, index) => {
-                      const { label, href } = category;
+                    <NakedLink href="/templates">
+                      <MenuItem
+                        as="a"
+                        aria-current={
+                          currentCategory === undefined ? "page" : undefined
+                        }
+                        _activeLink={{
+                          fontWeight: "bold",
+                          color: "purple.600",
+                        }}
+                      >
+                        <FormattedMessage
+                          id="public-templates.categories.all-categories"
+                          defaultMessage="All categories"
+                        />
+                      </MenuItem>
+                    </NakedLink>
+                    {categories.map((c) => {
                       return (
-                        <NakedLink key={index} href={href}>
+                        <NakedLink
+                          key={c.slug}
+                          href={`/templates/categories/${c.slug}`}
+                        >
                           <MenuItem
                             as="a"
                             aria-current={
-                              currentCategory?.id === category.id
+                              currentCategory?.slug === c.slug
                                 ? "page"
                                 : undefined
                             }
@@ -126,7 +190,7 @@ export function PublicTemplatesContainer({
                               color: "purple.600",
                             }}
                           >
-                            {label}
+                            {c.label}
                           </MenuItem>
                         </NakedLink>
                       );

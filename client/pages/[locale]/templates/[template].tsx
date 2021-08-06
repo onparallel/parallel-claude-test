@@ -13,35 +13,29 @@ import {
 } from "@chakra-ui/react";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Link } from "@parallel/components/common/Link";
-import { withApolloData } from "@parallel/components/common/withApolloData";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicTemplateCard } from "@parallel/components/public/templates/PublicTemplateCard";
-import { useCategories } from "@parallel/components/public/templates/useCategories";
 import {
-  landingTemplateBySlugQuery,
-  landingTemplatesQuery,
-  landingTemplatesSamplesQuery,
-  PublicTemplateCard_LandingTemplateFragment,
+  LandingTemplateDetails_landingTemplateBySlugQuery,
+  LandingTemplateDetails_landingTemplateBySlugQueryVariables,
+  LandingTemplateDetails_landingTemplatesQuery,
+  LandingTemplateDetails_landingTemplatesQueryVariables,
+  PetitionLocale,
 } from "@parallel/graphql/__types";
 import { createApolloClient } from "@parallel/utils/apollo/client";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
-import { GetServerSidePropsContext } from "next";
+import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
-function PublicTemplateDetails({
-  data,
+function LandingTemplateDetails({
+  template,
   relatedTemplates,
-}: {
-  data: landingTemplateBySlugQuery;
-  relatedTemplates: PublicTemplateCard_LandingTemplateFragment[];
-}) {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
-
-  const categories = useCategories();
-
-  const { landingTemplateBySlug } = data;
 
   const {
     name,
@@ -54,12 +48,12 @@ function PublicTemplateDetails({
     descriptionHtml,
     shortDescription,
     updatedAt,
-    categories: landingTemplateCategories,
-  } = landingTemplateBySlug!;
+  } = template!;
 
-  const templateCategories = categories.filter((category) =>
-    landingTemplateCategories?.includes(category.slug)
-  );
+  const categoryList = usePublicTemplateCategories();
+  const categories = (template.categories ?? [])
+    .map((c) => categoryList.find((category) => category.slug === c))
+    .filter(isDefined);
 
   return (
     <PublicLayout
@@ -101,14 +95,16 @@ function PublicTemplateDetails({
                   />{" "}
                   <EnumerateList
                     maxItems={7}
-                    values={templateCategories}
-                    renderItem={({ value: { href, label } }, index) => {
-                      return (
-                        <Link key={index} href={href}>
-                          {`${label}`}
-                        </Link>
-                      );
-                    }}
+                    values={categories}
+                    renderItem={({ value }) => (
+                      <Link
+                        key={value.slug}
+                        locale={template.locale}
+                        href={`/templates/categories/${value.slug}`}
+                      >
+                        {`${value.label}`}
+                      </Link>
+                    )}
                     type="conjunction"
                   />
                 </Text>
@@ -167,8 +163,8 @@ function PublicTemplateDetails({
                 <ListItem>
                   <FormattedMessage
                     id="public.template-details.list-number-fields"
-                    defaultMessage="{fields} question fields"
-                    values={{ fields: fieldCount }}
+                    defaultMessage="{count} question fields"
+                    values={{ count: fieldCount }}
                   />
                 </ListItem>
                 {hasConditionals ? (
@@ -186,7 +182,6 @@ function PublicTemplateDetails({
                   />
                 </ListItem>
                 <ListItem>
-                  Personalized message
                   <FormattedMessage
                     id="public.template-details.personalized-message"
                     defaultMessage="Personalized message"
@@ -232,9 +227,9 @@ function PublicTemplateDetails({
               }}
               gap={6}
             >
-              {relatedTemplates.slice(0, 3).map((template, index) => {
-                return <PublicTemplateCard key={index} template={template} />;
-              })}
+              {relatedTemplates.items.map((t) => (
+                <PublicTemplateCard key={t.id} template={t} showCategories />
+              ))}
             </Grid>
           </Stack>
         </Stack>
@@ -243,12 +238,13 @@ function PublicTemplateDetails({
   );
 }
 
-PublicTemplateDetails.fragments = {
+LandingTemplateDetails.fragments = {
   LandingTemplate: gql`
-    fragment PublicTemplateDetails_LandingTemplate on LandingTemplate {
+    fragment LandingTemplateDetails_LandingTemplate on LandingTemplate {
       id
       name
       slug
+      locale
       imageUrl
       backgroundColor
       categories
@@ -263,125 +259,83 @@ PublicTemplateDetails.fragments = {
   `,
 };
 
-export async function getServerSideProps({
-  query: { locale, template },
+export const getServerSideProps: GetServerSideProps<{
+  template: Assert<
+    LandingTemplateDetails_landingTemplateBySlugQuery["landingTemplateBySlug"]
+  >;
+  relatedTemplates: LandingTemplateDetails_landingTemplatesQuery["landingTemplates"];
+}> = async function getServerSideProps({
+  query: { locale, template: slug },
   req,
-}: GetServerSidePropsContext) {
+}) {
   try {
     const client = createApolloClient({}, { req });
 
-    const { data } = await client.query<landingTemplateBySlugQuery>({
+    const {
+      data: { landingTemplateBySlug: template },
+    } = await client.query<
+      LandingTemplateDetails_landingTemplateBySlugQuery,
+      LandingTemplateDetails_landingTemplateBySlugQueryVariables
+    >({
       query: gql`
-        query landingTemplateBySlug($slug: String!) {
+        query LandingTemplateDetails_landingTemplateBySlug($slug: String!) {
           landingTemplateBySlug(slug: $slug) {
-            ...PublicTemplateDetails_LandingTemplate
+            ...LandingTemplateDetails_LandingTemplate
           }
         }
-        ${PublicTemplateDetails.fragments.LandingTemplate}
+        ${LandingTemplateDetails.fragments.LandingTemplate}
       `,
       variables: {
-        slug: template,
+        slug: slug as string,
+      },
+    });
+    if (!template) {
+      throw new Error();
+    }
+
+    const categories = template.categories ?? [];
+
+    const {
+      data: { landingTemplates: relatedTemplates },
+    } = await client.query<
+      LandingTemplateDetails_landingTemplatesQuery,
+      LandingTemplateDetails_landingTemplatesQueryVariables
+    >({
+      query: gql`
+        query LandingTemplateDetails_landingTemplates(
+          $offset: Int!
+          $limit: Int!
+          $locale: PetitionLocale!
+          $categories: [String!]
+        ) {
+          landingTemplates(
+            offset: $offset
+            limit: $limit
+            locale: $locale
+            categories: $categories
+          ) {
+            items {
+              ...PublicTemplateCard_LandingTemplate
+            }
+            totalCount
+          }
+        }
+        ${PublicTemplateCard.fragments.LandingTemplate}
+      `,
+      variables: {
+        offset: 0,
+        limit: 3,
+        locale: locale as PetitionLocale,
+        categories,
       },
     });
 
-    if (!data) throw new Error("404");
-
-    const categories = data?.landingTemplateBySlug?.categories ?? [];
-
-    const getCategoryTemplates = async (category: string) => {
-      const { data } = await client.query<landingTemplatesQuery>({
-        query: gql`
-          query landingTemplates(
-            $offset: Int!
-            $limit: Int!
-            $category: String!
-            $locale: PetitionLocale!
-          ) {
-            landingTemplates(
-              offset: $offset
-              limit: $limit
-              category: $category
-              locale: $locale
-            ) {
-              totalCount
-              items {
-                ...PublicTemplateCard_LandingTemplate
-              }
-            }
-          }
-          ${PublicTemplateCard.fragments.LandingTemplate}
-        `,
-        variables: {
-          offset: 0,
-          limit: 4,
-          category,
-          locale,
-        },
-      });
-      return data.landingTemplates.items.filter(
-        (item) => item.slug !== template
-      );
-    };
-
-    const getAllCategoriesTemplates = async () => {
-      const { data } = await client.query<landingTemplatesSamplesQuery>({
-        query: gql`
-          query landingTemplatesSamples(
-            $offset: Int!
-            $limit: Int!
-            $locale: PetitionLocale!
-          ) {
-            landingTemplatesSamples {
-              category
-              templates(offset: $offset, limit: $limit, locale: $locale) {
-                items {
-                  ...PublicTemplateCard_LandingTemplate
-                }
-                totalCount
-              }
-            }
-          }
-          ${PublicTemplateCard.fragments.LandingTemplate}
-        `,
-        variables: {
-          offset: 0,
-          limit: 3,
-          locale,
-        },
-      });
-
-      const someTemplates = data.landingTemplatesSamples
-        .filter((sample) => sample.category !== categories[0])
-        .reduce((acc, sample) => {
-          return [...acc, ...(sample.templates.items ?? [])];
-        }, [] as PublicTemplateCard_LandingTemplateFragment[]);
-
-      return someTemplates.filter((item) => item.slug !== template);
-    };
-
-    let relatedTemplates = await getCategoryTemplates(categories[0]);
-
-    if (relatedTemplates.length < 3) {
-      let moreTemplates: PublicTemplateCard_LandingTemplateFragment[] = [];
-
-      if (categories.length > 1) {
-        moreTemplates = await getCategoryTemplates(categories[1]);
-      } else {
-        moreTemplates = [
-          ...moreTemplates,
-          ...(await getAllCategoriesTemplates()),
-        ];
-      }
-
-      relatedTemplates = [...relatedTemplates, ...moreTemplates];
-    }
-
-    return { props: { data, relatedTemplates } };
+    return { props: { template, relatedTemplates } };
   } catch (err) {
     return {
       notFound: true,
     };
   }
-}
+};
 
-export default withApolloData(PublicTemplateDetails);
+export default LandingTemplateDetails;

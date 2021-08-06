@@ -717,11 +717,10 @@ export interface NexusGenFieldTypes {
     hasConditionals: boolean; // Boolean!
     id: NexusGenScalars["GID"]; // GID!
     imageUrl: string | null; // String
+    locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
     name: string | null; // String
-    organizationId: NexusGenScalars["GID"]; // GID!
     organizationName: string; // String!
     ownerFullName: string; // String!
-    ownerId: NexusGenScalars["GID"]; // GID!
     shortDescription: string | null; // String
     slug: string; // String!
     updatedAt: NexusGenScalars["DateTime"]; // DateTime!
@@ -1746,11 +1745,10 @@ export interface NexusGenFieldTypeNames {
     hasConditionals: "Boolean";
     id: "GID";
     imageUrl: "String";
+    locale: "PetitionLocale";
     name: "String";
-    organizationId: "GID";
     organizationName: "String";
     ownerFullName: "String";
-    ownerId: "GID";
     shortDescription: "String";
     slug: "String";
     updatedAt: "DateTime";
@@ -3301,7 +3299,7 @@ export interface NexusGenArgTypes {
     };
     landingTemplates: {
       // args
-      category: string; // String!
+      categories?: string[] | null; // [String!]
       limit?: number | null; // Int
       locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
       offset?: number | null; // Int

@@ -257,11 +257,10 @@ export interface LandingTemplate {
   hasConditionals: Scalars["Boolean"];
   id: Scalars["GID"];
   imageUrl?: Maybe<Scalars["String"]>;
+  locale: PetitionLocale;
   name?: Maybe<Scalars["String"]>;
-  organizationId: Scalars["GID"];
   organizationName: Scalars["String"];
   ownerFullName: Scalars["String"];
-  ownerId: Scalars["GID"];
   shortDescription?: Maybe<Scalars["String"]>;
   slug: Scalars["String"];
   updatedAt: Scalars["DateTime"];
@@ -2152,7 +2151,7 @@ export interface QuerylandingTemplateBySlugArgs {
 }
 
 export interface QuerylandingTemplatesArgs {
-  category: Scalars["String"];
+  categories?: Maybe<Array<Scalars["String"]>>;
   limit?: Maybe<Scalars["Int"]>;
   locale: PetitionLocale;
   offset?: Maybe<Scalars["Int"]>;
@@ -5115,8 +5114,11 @@ export type PetitionSignaturesCard_signedPetitionDownloadLinkMutation = {
 export type PublicTemplateCard_LandingTemplateFragment = {
   __typename?: "LandingTemplate";
   id: string;
+  locale: PetitionLocale;
   name?: Maybe<string>;
   slug: string;
+  shortDescription?: Maybe<string>;
+  descriptionHtml?: Maybe<string>;
   imageUrl?: Maybe<string>;
   backgroundColor?: Maybe<string>;
   categories?: Maybe<Array<string>>;
@@ -7106,11 +7108,12 @@ export type PdfViewPetitionQuery = {
   >;
 };
 
-export type PublicTemplateDetails_LandingTemplateFragment = {
+export type LandingTemplateDetails_LandingTemplateFragment = {
   __typename?: "LandingTemplate";
   id: string;
   name?: Maybe<string>;
   slug: string;
+  locale: PetitionLocale;
   imageUrl?: Maybe<string>;
   backgroundColor?: Maybe<string>;
   categories?: Maybe<Array<string>>;
@@ -7123,26 +7126,26 @@ export type PublicTemplateDetails_LandingTemplateFragment = {
   updatedAt: string;
 };
 
-export type landingTemplateBySlugQueryVariables = Exact<{
+export type LandingTemplateDetails_landingTemplateBySlugQueryVariables = Exact<{
   slug: Scalars["String"];
 }>;
 
-export type landingTemplateBySlugQuery = {
+export type LandingTemplateDetails_landingTemplateBySlugQuery = {
   landingTemplateBySlug?: Maybe<
     {
       __typename?: "LandingTemplate";
-    } & PublicTemplateDetails_LandingTemplateFragment
+    } & LandingTemplateDetails_LandingTemplateFragment
   >;
 };
 
-export type landingTemplatesQueryVariables = Exact<{
+export type LandingTemplateDetails_landingTemplatesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
-  category: Scalars["String"];
   locale: PetitionLocale;
+  categories?: Maybe<Array<Scalars["String"]> | Scalars["String"]>;
 }>;
 
-export type landingTemplatesQuery = {
+export type LandingTemplateDetails_landingTemplatesQuery = {
   landingTemplates: {
     __typename?: "LandingTemplatePagination";
     totalCount: number;
@@ -7154,13 +7157,45 @@ export type landingTemplatesQuery = {
   };
 };
 
-export type landingTemplatesSamplesQueryVariables = Exact<{
+export type LandingTemplatesCategory_landingTemplatesSamplesQueryVariables =
+  Exact<{
+    locale: PetitionLocale;
+  }>;
+
+export type LandingTemplatesCategory_landingTemplatesSamplesQuery = {
+  landingTemplatesSamples: Array<{
+    __typename?: "LandingTemplateSample";
+    category: string;
+    templates: { __typename?: "LandingTemplatePagination"; totalCount: number };
+  }>;
+};
+
+export type LandingTemplatesCategory_landingTemplatesQueryVariables = Exact<{
+  offset: Scalars["Int"];
+  limit: Scalars["Int"];
+  category: Scalars["String"];
+  locale: PetitionLocale;
+}>;
+
+export type LandingTemplatesCategory_landingTemplatesQuery = {
+  landingTemplates: {
+    __typename?: "LandingTemplatePagination";
+    totalCount: number;
+    items: Array<
+      {
+        __typename?: "LandingTemplate";
+      } & PublicTemplateCard_LandingTemplateFragment
+    >;
+  };
+};
+
+export type LandingTemplates_landingTemplatesSamplesQueryVariables = Exact<{
   offset: Scalars["Int"];
   limit: Scalars["Int"];
   locale: PetitionLocale;
 }>;
 
-export type landingTemplatesSamplesQuery = {
+export type LandingTemplates_landingTemplatesSamplesQuery = {
   landingTemplatesSamples: Array<{
     __typename?: "LandingTemplateSample";
     category: string;
@@ -7934,8 +7969,11 @@ export const ExportRepliesProgressDialog_PetitionFragmentDoc = gql`
 export const PublicTemplateCard_LandingTemplateFragmentDoc = gql`
   fragment PublicTemplateCard_LandingTemplate on LandingTemplate {
     id
+    locale
     name
     slug
+    shortDescription
+    descriptionHtml
     imageUrl
     backgroundColor
     categories
@@ -9899,11 +9937,12 @@ export const PetitionPdf_PetitionFragmentDoc = gql`
   }
   ${PetitionPdf_PetitionFieldFragmentDoc}
 `;
-export const PublicTemplateDetails_LandingTemplateFragmentDoc = gql`
-  fragment PublicTemplateDetails_LandingTemplate on LandingTemplate {
+export const LandingTemplateDetails_LandingTemplateFragmentDoc = gql`
+  fragment LandingTemplateDetails_LandingTemplate on LandingTemplate {
     id
     name
     slug
+    locale
     imageUrl
     backgroundColor
     categories
@@ -14704,46 +14743,136 @@ export type PdfViewPetitionQueryHookResult = ReturnType<
 export type PdfViewPetitionLazyQueryHookResult = ReturnType<
   typeof usePdfViewPetitionLazyQuery
 >;
-export const landingTemplateBySlugDocument = gql`
-  query landingTemplateBySlug($slug: String!) {
+export const LandingTemplateDetails_landingTemplateBySlugDocument = gql`
+  query LandingTemplateDetails_landingTemplateBySlug($slug: String!) {
     landingTemplateBySlug(slug: $slug) {
-      ...PublicTemplateDetails_LandingTemplate
+      ...LandingTemplateDetails_LandingTemplate
     }
   }
-  ${PublicTemplateDetails_LandingTemplateFragmentDoc}
+  ${LandingTemplateDetails_LandingTemplateFragmentDoc}
 `;
-export function uselandingTemplateBySlugQuery(
+export function useLandingTemplateDetails_landingTemplateBySlugQuery(
   baseOptions: Apollo.QueryHookOptions<
-    landingTemplateBySlugQuery,
-    landingTemplateBySlugQueryVariables
+    LandingTemplateDetails_landingTemplateBySlugQuery,
+    LandingTemplateDetails_landingTemplateBySlugQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    landingTemplateBySlugQuery,
-    landingTemplateBySlugQueryVariables
-  >(landingTemplateBySlugDocument, options);
+    LandingTemplateDetails_landingTemplateBySlugQuery,
+    LandingTemplateDetails_landingTemplateBySlugQueryVariables
+  >(LandingTemplateDetails_landingTemplateBySlugDocument, options);
 }
-export function uselandingTemplateBySlugLazyQuery(
+export function useLandingTemplateDetails_landingTemplateBySlugLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    landingTemplateBySlugQuery,
-    landingTemplateBySlugQueryVariables
+    LandingTemplateDetails_landingTemplateBySlugQuery,
+    LandingTemplateDetails_landingTemplateBySlugQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    landingTemplateBySlugQuery,
-    landingTemplateBySlugQueryVariables
-  >(landingTemplateBySlugDocument, options);
+    LandingTemplateDetails_landingTemplateBySlugQuery,
+    LandingTemplateDetails_landingTemplateBySlugQueryVariables
+  >(LandingTemplateDetails_landingTemplateBySlugDocument, options);
 }
-export type landingTemplateBySlugQueryHookResult = ReturnType<
-  typeof uselandingTemplateBySlugQuery
+export type LandingTemplateDetails_landingTemplateBySlugQueryHookResult =
+  ReturnType<typeof useLandingTemplateDetails_landingTemplateBySlugQuery>;
+export type LandingTemplateDetails_landingTemplateBySlugLazyQueryHookResult =
+  ReturnType<typeof useLandingTemplateDetails_landingTemplateBySlugLazyQuery>;
+export const LandingTemplateDetails_landingTemplatesDocument = gql`
+  query LandingTemplateDetails_landingTemplates(
+    $offset: Int!
+    $limit: Int!
+    $locale: PetitionLocale!
+    $categories: [String!]
+  ) {
+    landingTemplates(
+      offset: $offset
+      limit: $limit
+      locale: $locale
+      categories: $categories
+    ) {
+      items {
+        ...PublicTemplateCard_LandingTemplate
+      }
+      totalCount
+    }
+  }
+  ${PublicTemplateCard_LandingTemplateFragmentDoc}
+`;
+export function useLandingTemplateDetails_landingTemplatesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    LandingTemplateDetails_landingTemplatesQuery,
+    LandingTemplateDetails_landingTemplatesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    LandingTemplateDetails_landingTemplatesQuery,
+    LandingTemplateDetails_landingTemplatesQueryVariables
+  >(LandingTemplateDetails_landingTemplatesDocument, options);
+}
+export function useLandingTemplateDetails_landingTemplatesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    LandingTemplateDetails_landingTemplatesQuery,
+    LandingTemplateDetails_landingTemplatesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    LandingTemplateDetails_landingTemplatesQuery,
+    LandingTemplateDetails_landingTemplatesQueryVariables
+  >(LandingTemplateDetails_landingTemplatesDocument, options);
+}
+export type LandingTemplateDetails_landingTemplatesQueryHookResult = ReturnType<
+  typeof useLandingTemplateDetails_landingTemplatesQuery
 >;
-export type landingTemplateBySlugLazyQueryHookResult = ReturnType<
-  typeof uselandingTemplateBySlugLazyQuery
->;
-export const landingTemplatesDocument = gql`
-  query landingTemplates(
+export type LandingTemplateDetails_landingTemplatesLazyQueryHookResult =
+  ReturnType<typeof useLandingTemplateDetails_landingTemplatesLazyQuery>;
+export const LandingTemplatesCategory_landingTemplatesSamplesDocument = gql`
+  query LandingTemplatesCategory_landingTemplatesSamples(
+    $locale: PetitionLocale!
+  ) {
+    landingTemplatesSamples {
+      category
+      templates(locale: $locale) {
+        totalCount
+      }
+    }
+  }
+`;
+export function useLandingTemplatesCategory_landingTemplatesSamplesQuery(
+  baseOptions: Apollo.QueryHookOptions<
+    LandingTemplatesCategory_landingTemplatesSamplesQuery,
+    LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<
+    LandingTemplatesCategory_landingTemplatesSamplesQuery,
+    LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
+  >(LandingTemplatesCategory_landingTemplatesSamplesDocument, options);
+}
+export function useLandingTemplatesCategory_landingTemplatesSamplesLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    LandingTemplatesCategory_landingTemplatesSamplesQuery,
+    LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<
+    LandingTemplatesCategory_landingTemplatesSamplesQuery,
+    LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
+  >(LandingTemplatesCategory_landingTemplatesSamplesDocument, options);
+}
+export type LandingTemplatesCategory_landingTemplatesSamplesQueryHookResult =
+  ReturnType<typeof useLandingTemplatesCategory_landingTemplatesSamplesQuery>;
+export type LandingTemplatesCategory_landingTemplatesSamplesLazyQueryHookResult =
+  ReturnType<
+    typeof useLandingTemplatesCategory_landingTemplatesSamplesLazyQuery
+  >;
+export const LandingTemplatesCategory_landingTemplatesDocument = gql`
+  query LandingTemplatesCategory_landingTemplates(
     $offset: Int!
     $limit: Int!
     $category: String!
@@ -14752,7 +14881,7 @@ export const landingTemplatesDocument = gql`
     landingTemplates(
       offset: $offset
       limit: $limit
-      category: $category
+      categories: [$category]
       locale: $locale
     ) {
       totalCount
@@ -14763,38 +14892,36 @@ export const landingTemplatesDocument = gql`
   }
   ${PublicTemplateCard_LandingTemplateFragmentDoc}
 `;
-export function uselandingTemplatesQuery(
+export function useLandingTemplatesCategory_landingTemplatesQuery(
   baseOptions: Apollo.QueryHookOptions<
-    landingTemplatesQuery,
-    landingTemplatesQueryVariables
+    LandingTemplatesCategory_landingTemplatesQuery,
+    LandingTemplatesCategory_landingTemplatesQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<landingTemplatesQuery, landingTemplatesQueryVariables>(
-    landingTemplatesDocument,
-    options
-  );
+  return Apollo.useQuery<
+    LandingTemplatesCategory_landingTemplatesQuery,
+    LandingTemplatesCategory_landingTemplatesQueryVariables
+  >(LandingTemplatesCategory_landingTemplatesDocument, options);
 }
-export function uselandingTemplatesLazyQuery(
+export function useLandingTemplatesCategory_landingTemplatesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    landingTemplatesQuery,
-    landingTemplatesQueryVariables
+    LandingTemplatesCategory_landingTemplatesQuery,
+    LandingTemplatesCategory_landingTemplatesQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    landingTemplatesQuery,
-    landingTemplatesQueryVariables
-  >(landingTemplatesDocument, options);
+    LandingTemplatesCategory_landingTemplatesQuery,
+    LandingTemplatesCategory_landingTemplatesQueryVariables
+  >(LandingTemplatesCategory_landingTemplatesDocument, options);
 }
-export type landingTemplatesQueryHookResult = ReturnType<
-  typeof uselandingTemplatesQuery
->;
-export type landingTemplatesLazyQueryHookResult = ReturnType<
-  typeof uselandingTemplatesLazyQuery
->;
-export const landingTemplatesSamplesDocument = gql`
-  query landingTemplatesSamples(
+export type LandingTemplatesCategory_landingTemplatesQueryHookResult =
+  ReturnType<typeof useLandingTemplatesCategory_landingTemplatesQuery>;
+export type LandingTemplatesCategory_landingTemplatesLazyQueryHookResult =
+  ReturnType<typeof useLandingTemplatesCategory_landingTemplatesLazyQuery>;
+export const LandingTemplates_landingTemplatesSamplesDocument = gql`
+  query LandingTemplates_landingTemplatesSamples(
     $offset: Int!
     $limit: Int!
     $locale: PetitionLocale!
@@ -14811,36 +14938,34 @@ export const landingTemplatesSamplesDocument = gql`
   }
   ${PublicTemplateCard_LandingTemplateFragmentDoc}
 `;
-export function uselandingTemplatesSamplesQuery(
+export function useLandingTemplates_landingTemplatesSamplesQuery(
   baseOptions: Apollo.QueryHookOptions<
-    landingTemplatesSamplesQuery,
-    landingTemplatesSamplesQueryVariables
+    LandingTemplates_landingTemplatesSamplesQuery,
+    LandingTemplates_landingTemplatesSamplesQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useQuery<
-    landingTemplatesSamplesQuery,
-    landingTemplatesSamplesQueryVariables
-  >(landingTemplatesSamplesDocument, options);
+    LandingTemplates_landingTemplatesSamplesQuery,
+    LandingTemplates_landingTemplatesSamplesQueryVariables
+  >(LandingTemplates_landingTemplatesSamplesDocument, options);
 }
-export function uselandingTemplatesSamplesLazyQuery(
+export function useLandingTemplates_landingTemplatesSamplesLazyQuery(
   baseOptions?: Apollo.LazyQueryHookOptions<
-    landingTemplatesSamplesQuery,
-    landingTemplatesSamplesQueryVariables
+    LandingTemplates_landingTemplatesSamplesQuery,
+    LandingTemplates_landingTemplatesSamplesQueryVariables
   >
 ) {
   const options = { ...defaultOptions, ...baseOptions };
   return Apollo.useLazyQuery<
-    landingTemplatesSamplesQuery,
-    landingTemplatesSamplesQueryVariables
-  >(landingTemplatesSamplesDocument, options);
+    LandingTemplates_landingTemplatesSamplesQuery,
+    LandingTemplates_landingTemplatesSamplesQueryVariables
+  >(LandingTemplates_landingTemplatesSamplesDocument, options);
 }
-export type landingTemplatesSamplesQueryHookResult = ReturnType<
-  typeof uselandingTemplatesSamplesQuery
->;
-export type landingTemplatesSamplesLazyQueryHookResult = ReturnType<
-  typeof uselandingTemplatesSamplesLazyQuery
->;
+export type LandingTemplates_landingTemplatesSamplesQueryHookResult =
+  ReturnType<typeof useLandingTemplates_landingTemplatesSamplesQuery>;
+export type LandingTemplates_landingTemplatesSamplesLazyQueryHookResult =
+  ReturnType<typeof useLandingTemplates_landingTemplatesSamplesLazyQuery>;
 export const Thanks_PetitionLogoDocument = gql`
   query Thanks_PetitionLogo($id: GID!) {
     publicOrgLogoUrl(id: $id)
