@@ -3405,6 +3405,11 @@
     "context": "Owner"
   },
   {
+    "term": "organization-users.update-user",
+    "definition": "Update user",
+    "context": "Update user"
+  },
+  {
     "term": "organization-users.update-user-status.error.deactivate-own-user",
     "definition": "You can't deactivate your own user. Please, remove it from the selection and try again.",
     "context": "You can't deactivate your own user. Please, remove it from the selection and try again."
@@ -3478,11 +3483,6 @@
     "term": "organization.role.normal",
     "definition": "Normal",
     "context": "Normal"
-  },
-  {
-    "term": "organization.role.owner",
-    "definition": "Owner",
-    "context": "Owner"
   },
   {
     "term": "organization.user-created-success.toast-description",

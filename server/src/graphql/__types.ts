@@ -172,6 +172,7 @@ export interface NexusGenInputs {
     // input type
     firstName?: string | null; // String
     lastName?: string | null; // String
+    role?: NexusGenEnums["OrganizationRole"] | null; // OrganizationRole
   };
 }
 
@@ -804,12 +805,14 @@ export interface NexusGenFieldTypes {
     startSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"]; // PetitionSignatureRequest!
     switchAutomaticReminders: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     tagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
+    transferOrganizationOwnership: NexusGenRootTypes["SupportMethodResponse"]; // SupportMethodResponse!
     transferPetitionOwnership: NexusGenRootTypes["Petition"][]; // [Petition!]!
     untagPetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateContact: NexusGenRootTypes["Contact"]; // Contact!
     updateFieldPositions: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updateOnboardingStatus: NexusGenRootTypes["User"]; // User!
     updateOrganizationLogo: NexusGenRootTypes["Organization"]; // Organization!
+    updateOrganizationUser: NexusGenRootTypes["User"]; // User!
     updatePetition: NexusGenRootTypes["PetitionBase"]; // PetitionBase!
     updatePetitionField: NexusGenRootTypes["PetitionBaseAndField"]; // PetitionBaseAndField!
     updatePetitionFieldComment: NexusGenRootTypes["PetitionField"]; // PetitionField!
@@ -1791,12 +1794,14 @@ export interface NexusGenFieldTypeNames {
     startSignatureRequest: "PetitionSignatureRequest";
     switchAutomaticReminders: "PetitionAccess";
     tagPetition: "PetitionBase";
+    transferOrganizationOwnership: "SupportMethodResponse";
     transferPetitionOwnership: "Petition";
     untagPetition: "PetitionBase";
     updateContact: "Contact";
     updateFieldPositions: "PetitionBase";
     updateOnboardingStatus: "User";
     updateOrganizationLogo: "Organization";
+    updateOrganizationUser: "User";
     updatePetition: "PetitionBase";
     updatePetitionField: "PetitionBaseAndField";
     updatePetitionFieldComment: "PetitionField";
@@ -2978,6 +2983,11 @@ export interface NexusGenArgTypes {
       petitionId: NexusGenScalars["GID"]; // GID!
       tagId: NexusGenScalars["GID"]; // GID!
     };
+    transferOrganizationOwnership: {
+      // args
+      organizationId: number; // Int!
+      userId: number; // Int!
+    };
     transferPetitionOwnership: {
       // args
       petitionIds: NexusGenScalars["GID"][]; // [GID!]!
@@ -3007,6 +3017,11 @@ export interface NexusGenArgTypes {
       // args
       file: NexusGenScalars["Upload"]; // Upload!
       orgId: NexusGenScalars["GID"]; // GID!
+    };
+    updateOrganizationUser: {
+      // args
+      role: NexusGenEnums["OrganizationRole"]; // OrganizationRole!
+      userId: NexusGenScalars["GID"]; // GID!
     };
     updatePetition: {
       // args

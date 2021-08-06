@@ -1,17 +1,16 @@
-import { initServer, TestClient } from "./server";
+import gql from "graphql-tag";
+import knex, { Knex } from "knex";
+import { USER_COGNITO_ID } from "../../../test/mocks";
+import { KNEX } from "../../db/knex";
 import { Mocks } from "../../db/repositories/__tests__/mocks";
 import {
-  Contact,
   Organization,
   Petition,
   PetitionPermission,
   User,
 } from "../../db/__types";
-import { USER_COGNITO_ID } from "../../../test/mocks";
 import { toGlobalId } from "../../util/globalId";
-import gql from "graphql-tag";
-import { KNEX } from "../../db/knex";
-import { Knex } from "knex";
+import { initServer, TestClient } from "./server";
 
 describe("GraphQL/Users", () => {
   let mocks: Mocks;
@@ -45,54 +44,58 @@ describe("GraphQL/Users", () => {
     await testClient.stop();
   });
 
-  it("fetches session user", async () => {
-    const { errors, data } = await testClient.query({
-      query: gql`
-        query {
-          me {
-            id
-            fullName
-            organization {
-              identifier
+  describe("queries", () => {
+    it("fetches session user", async () => {
+      const { errors, data } = await testClient.query({
+        query: gql`
+          query {
+            me {
+              id
+              fullName
+              organization {
+                identifier
+              }
             }
           }
-        }
-      `,
-    });
-    expect(errors).toBeUndefined();
-    expect(data!.me).toEqual({
-      id: sessionUserGID,
-      fullName: "Harvey Specter",
-      organization: {
-        identifier: "parallel",
-      },
+        `,
+      });
+      expect(errors).toBeUndefined();
+      expect(data!.me).toEqual({
+        id: sessionUserGID,
+        fullName: "Harvey Specter",
+        organization: {
+          identifier: "parallel",
+        },
+      });
     });
   });
 
-  it("changes user name", async () => {
-    const { errors, data } = await testClient.mutate({
-      mutation: gql`
-        mutation ($userId: GID!, $firstName: String, $lastName: String) {
-          updateUser(
-            id: $userId
-            data: { firstName: $firstName, lastName: $lastName }
-          ) {
-            id
-            fullName
+  describe("updateUser", () => {
+    it("changes user name", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($userId: GID!, $firstName: String, $lastName: String) {
+            updateUser(
+              id: $userId
+              data: { firstName: $firstName, lastName: $lastName }
+            ) {
+              id
+              fullName
+            }
           }
-        }
-      `,
-      variables: {
-        userId: sessionUserGID,
-        firstName: "Mike",
-        lastName: "Ross",
-      },
-    });
+        `,
+        variables: {
+          userId: sessionUserGID,
+          firstName: "Mike",
+          lastName: "Ross",
+        },
+      });
 
-    expect(errors).toBeUndefined();
-    expect(data!.updateUser).toEqual({
-      id: sessionUserGID,
-      fullName: "Mike Ross",
+      expect(errors).toBeUndefined();
+      expect(data!.updateUser).toEqual({
+        id: sessionUserGID,
+        fullName: "Mike Ross",
+      });
     });
   });
 
@@ -104,8 +107,6 @@ describe("GraphQL/Users", () => {
 
     let otherOrg: Organization;
     let otherOrgUser: User;
-
-    let contact: Contact;
 
     beforeEach(async () => {
       activeUsers = await mocks.createRandomUsers(organization.id, 3, () => ({
@@ -131,8 +132,6 @@ describe("GraphQL/Users", () => {
         activeUsers[1].id,
         3
       );
-
-      [contact] = await mocks.createRandomContacts(organization.id, 1);
 
       [otherOrg] = await mocks.createRandomOrganizations(1);
       [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1, () => ({
@@ -506,6 +505,190 @@ describe("GraphQL/Users", () => {
       });
 
       expect(errors).toContainGraphQLError("ARG_VALIDATION_ERROR");
+      expect(data).toBeNull();
+    });
+  });
+
+  describe("updateOrganizationUser", () => {
+    let orgOwner: User;
+    let adminUser: User;
+    let normalUser: User;
+
+    let ownerApiKey: string;
+    let adminApiKey: string;
+    let normalApiKey: string;
+
+    beforeEach(async () => {
+      [orgOwner, adminUser, normalUser] = await mocks.createRandomUsers(
+        organization.id,
+        3,
+        (i) => ({
+          organization_role: i === 0 ? "OWNER" : i === 1 ? "ADMIN" : "NORMAL",
+        })
+      );
+
+      [
+        { apiKey: ownerApiKey },
+        { apiKey: adminApiKey },
+        { apiKey: normalApiKey },
+      ] = await Promise.all([
+        mocks.createUserAuthToken("owner-token", orgOwner.id),
+        mocks.createUserAuthToken("admin-token", adminUser.id),
+        mocks.createUserAuthToken("normal-token", normalUser.id),
+      ]);
+    });
+
+    afterEach(async () => {
+      await mocks.knex
+        .from("user")
+        .where("organization_role", "OWNER")
+        .update("deleted_at", new Date());
+    });
+
+    it("organization owner should be able to change the role of any user in the same org", async () => {
+      const { errors, data } = await testClient.withApiKey(ownerApiKey).mutate({
+        mutation: gql`
+          mutation ($userId: GID!, $role: OrganizationRole!) {
+            updateOrganizationUser(userId: $userId, role: $role) {
+              id
+
+              role
+            }
+          }
+        `,
+        variables: {
+          userId: toGlobalId("User", adminUser.id),
+          role: "NORMAL",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateOrganizationUser).toEqual({
+        id: toGlobalId("User", adminUser.id),
+        role: "NORMAL",
+      });
+    });
+
+    it("organization owner should not be able to update their own role", async () => {
+      const { errors, data } = await testClient.withApiKey(ownerApiKey).mutate({
+        mutation: gql`
+          mutation ($userId: GID!, $role: OrganizationRole!) {
+            updateOrganizationUser(userId: $userId, role: $role) {
+              id
+            }
+          }
+        `,
+        variables: {
+          userId: toGlobalId("User", orgOwner.id),
+          role: "ADMIN",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("admin should not be able to update their own role", async () => {
+      const { errors, data } = await testClient.withApiKey(adminApiKey).mutate({
+        mutation: gql`
+          mutation ($userId: GID!, $role: OrganizationRole!) {
+            updateOrganizationUser(userId: $userId, role: $role) {
+              id
+            }
+          }
+        `,
+        variables: {
+          userId: toGlobalId("User", adminUser.id),
+          role: "NORMAL",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("org admins should be able to change the role of another admin", async () => {
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($userId: GID!, $role: OrganizationRole!) {
+            updateOrganizationUser(userId: $userId, role: $role) {
+              id
+              role
+            }
+          }
+        `,
+        variables: {
+          userId: toGlobalId("User", adminUser.id),
+          role: "NORMAL",
+        },
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data?.updateOrganizationUser).toEqual({
+        id: toGlobalId("User", adminUser.id),
+        role: "NORMAL",
+      });
+    });
+
+    it("org admins should not be able to update the role of an owner", async () => {
+      const { errors, data } = await testClient.withApiKey(adminApiKey).mutate({
+        mutation: gql`
+          mutation ($userId: GID!, $role: OrganizationRole!) {
+            updateOrganizationUser(userId: $userId, role: $role) {
+              id
+            }
+          }
+        `,
+        variables: {
+          userId: toGlobalId("User", orgOwner.id),
+          role: "NORMAL",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("admins should not be able to update the role of a user in another organization", async () => {
+      const [otherOrg] = await mocks.createRandomOrganizations(1);
+      const [otherOrgUser] = await mocks.createRandomUsers(otherOrg.id, 1);
+
+      const { errors, data } = await testClient.mutate({
+        mutation: gql`
+          mutation ($userId: GID!, $role: OrganizationRole!) {
+            updateOrganizationUser(userId: $userId, role: $role) {
+              id
+            }
+          }
+        `,
+        variables: {
+          userId: toGlobalId("User", otherOrgUser.id),
+          role: "NORMAL",
+        },
+      });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
+      expect(data).toBeNull();
+    });
+
+    it("normal users should not be able to update info of any other user", async () => {
+      const { errors, data } = await testClient
+        .withApiKey(normalApiKey)
+        .mutate({
+          mutation: gql`
+            mutation ($userId: GID!, $role: OrganizationRole!) {
+              updateOrganizationUser(userId: $userId, role: $role) {
+                id
+              }
+            }
+          `,
+          variables: {
+            userId: toGlobalId("User", adminUser.id),
+            role: "NORMAL",
+          },
+        });
+
+      expect(errors).toContainGraphQLError("FORBIDDEN");
       expect(data).toBeNull();
     });
   });

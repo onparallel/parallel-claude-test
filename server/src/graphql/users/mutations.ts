@@ -35,6 +35,8 @@ import {
 import {
   contextUserIsAdmin,
   contextUserIsNotSso,
+  userHasRole,
+  userIsNotContextUser,
   userIsNotSSO,
 } from "./authorizers";
 
@@ -50,6 +52,7 @@ export const updateUser = mutationField("updateUser", {
         definition(t) {
           t.string("firstName");
           t.string("lastName");
+          t.field("role", { type: "OrganizationRole" });
         },
       }).asArg()
     ),
@@ -142,7 +145,16 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
   },
   validateArgs: validateAnd(
     validEmail((args) => args.email, "email"),
-    emailIsAvailable((args) => args.email, "email")
+    emailIsAvailable((args) => args.email, "email"),
+    (_, { role }, ctx, info) => {
+      if (role === "OWNER") {
+        throw new ArgValidationError(
+          info,
+          "role",
+          "Can't create a new user with OWNER role."
+        );
+      }
+    }
   ),
   resolve: async (_, args, ctx) => {
     const email = args.email.trim().toLowerCase();
@@ -258,5 +270,39 @@ export const updateUserStatus = mutationField("updateUserStatus", {
         );
       });
     }
+  },
+});
+
+export const updateOrganizationUser = mutationField("updateOrganizationUser", {
+  description: "Updates the role of another user in the organization.",
+  type: "User",
+  authorize: authenticateAnd(
+    contextUserIsAdmin(),
+    userIsNotContextUser("userId"),
+    userHasAccessToUsers("userId"),
+    userIsNotSSO("userId"),
+    userHasRole("userId", ["ADMIN", "NORMAL"])
+  ),
+  args: {
+    userId: nonNull(globalIdArg("User")),
+    role: nonNull("OrganizationRole"),
+  },
+  validateArgs: (_, { role }, ctx, info) => {
+    if (role === "OWNER") {
+      throw new ArgValidationError(
+        info,
+        "role",
+        "Can't update the role of a user to OWNER."
+      );
+    }
+  },
+  resolve: async (_, { userId, role }, ctx) => {
+    const [user] = await ctx.users.updateUserById(
+      userId,
+      { organization_role: role },
+      `User:${ctx.user!.id}`
+    );
+
+    return user;
   },
 });

@@ -414,6 +414,8 @@ export type Mutation = {
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
+  /** Updates name and role of another user in the organization. */
+  updateOrganizationUser: User;
   /** Updates a petition. */
   updatePetition: PetitionBase;
   /** Updates a petition field. */
@@ -918,6 +920,11 @@ export type MutationupdateOnboardingStatusArgs = {
 export type MutationupdateOrganizationLogoArgs = {
   file: Scalars["Upload"];
   orgId: Scalars["GID"];
+};
+
+export type MutationupdateOrganizationUserArgs = {
+  data: UpdateUserInput;
+  userId: Scalars["GID"];
 };
 
 export type MutationupdatePetitionArgs = {
@@ -2339,6 +2346,7 @@ export type UpdateUserGroupInput = {
 export type UpdateUserInput = {
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
+  role?: Maybe<OrganizationRole>;
 };
 
 /** A user in the system. */

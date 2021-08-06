@@ -30,24 +30,30 @@ import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
 
-interface CreateUserDialogData {
+interface CreateOrUpdateUserDialogData {
   firstName: string;
   lastName: string;
   email: string;
   role: OrganizationRole;
 }
 
-export function CreateUserDialog({
+function CreateOrUpdateUserDialog({
   ...props
-}: DialogProps<{}, CreateUserDialogData>) {
+}: DialogProps<
+  { user?: Partial<CreateOrUpdateUserDialogData>; type?: "create" | "update" },
+  CreateOrUpdateUserDialogData
+>) {
   const intl = useIntl();
-  const { handleSubmit, register, formState } = useForm<CreateUserDialogData>({
-    mode: "onChange",
-    defaultValues: {
-      email: "",
-      role: "NORMAL",
-    },
-  });
+  const { handleSubmit, register, formState } =
+    useForm<CreateOrUpdateUserDialogData>({
+      mode: "onChange",
+      defaultValues: {
+        firstName: props.user?.firstName ?? undefined,
+        lastName: props.user?.lastName ?? undefined,
+        email: props.user?.email ?? "",
+        role: props.user?.role ?? "NORMAL",
+      },
+    });
 
   const { errors } = formState;
 
@@ -89,7 +95,7 @@ export function CreateUserDialog({
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
     required: true,
     pattern: EMAIL_REGEX,
-    validate: { emailIsAvailable },
+    validate: props.type === "update" ? undefined : { emailIsAvailable },
   });
 
   return (
@@ -101,14 +107,25 @@ export function CreateUserDialog({
       }}
       initialFocusRef={emailRef}
       header={
-        <FormattedMessage
-          id="organization-users.create-user"
-          defaultMessage="Create user"
-        />
+        props.type === "update" ? (
+          <FormattedMessage
+            id="organization-users.update-user"
+            defaultMessage="Update user"
+          />
+        ) : (
+          <FormattedMessage
+            id="organization-users.create-user"
+            defaultMessage="Create user"
+          />
+        )
       }
       body={
         <Stack>
-          <FormControl id="create-user-email" isInvalid={!!errors.email}>
+          <FormControl
+            id="create-user-email"
+            isInvalid={!!errors.email}
+            isDisabled={props.type === "update"}
+          >
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.email-label"
@@ -157,6 +174,7 @@ export function CreateUserDialog({
           <FormControl
             id="create-user-firstname"
             isInvalid={!!errors.firstName}
+            isDisabled={props.type === "update"}
           >
             <FormLabel>
               <FormattedMessage
@@ -172,7 +190,11 @@ export function CreateUserDialog({
               />
             </FormErrorMessage>
           </FormControl>
-          <FormControl id="create-user-lastname" isInvalid={!!errors.lastName}>
+          <FormControl
+            id="create-user-lastname"
+            isInvalid={!!errors.lastName}
+            isDisabled={props.type === "update"}
+          >
             <FormLabel>
               <FormattedMessage
                 id="generic.forms.last-name-label"
@@ -207,22 +229,23 @@ export function CreateUserDialog({
                   defaultMessage: "Administrator",
                 })}
               </option>
-              <option value="OWNER">
-                {intl.formatMessage({
-                  id: "organization.role.owner",
-                  defaultMessage: "Owner",
-                })}
-              </option>
             </Select>
           </FormControl>
         </Stack>
       }
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
-          <FormattedMessage
-            id="organization-users.create-user"
-            defaultMessage="Create user"
-          />
+          {props.type === "update" ? (
+            <FormattedMessage
+              id="organization-users.update-user"
+              defaultMessage="Update user"
+            />
+          ) : (
+            <FormattedMessage
+              id="organization-users.create-user"
+              defaultMessage="Create user"
+            />
+          )}
         </Button>
       }
       {...props}
@@ -230,6 +253,6 @@ export function CreateUserDialog({
   );
 }
 
-export function useCreateUserDialog() {
-  return useDialog(CreateUserDialog);
+export function useCreateOrUpdateUserDialog() {
+  return useDialog(CreateOrUpdateUserDialog);
 }

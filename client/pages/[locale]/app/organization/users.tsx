@@ -20,7 +20,7 @@ import {
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useConfirmActivateUsersDialog } from "@parallel/components/organization/ConfirmActivateUsersDialog";
 import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/ConfirmDeactivateUserDialog";
-import { useCreateUserDialog } from "@parallel/components/organization/CreateUserDialog";
+import { useCreateOrUpdateUserDialog } from "@parallel/components/organization/CreateOrUpdateUserDialog";
 import { OrganizationUsersListTableHeader } from "@parallel/components/organization/OrganizationUsersListTableHeader";
 import {
   OrganizationRole,
@@ -29,6 +29,7 @@ import {
   OrganizationUsers_UserFragment,
   useOrganizationUsersQuery,
   useOrganizationUsers_createOrganizationUserMutation,
+  useOrganizationUsers_updateOrganizationUserMutation,
   useOrganizationUsers_updateUserStatusMutation,
   User,
   UserStatus,
@@ -124,10 +125,10 @@ function OrganizationUsers() {
 
   const [createOrganizationUser] =
     useOrganizationUsers_createOrganizationUserMutation();
-  const showCreateUserDialog = useCreateUserDialog();
+  const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
-      const newUser = await showCreateUserDialog({});
+      const newUser = await showCreateOrUpdateUserDialog({ type: "create" });
       await createOrganizationUser({
         variables: newUser,
         update: () => {
@@ -147,6 +148,35 @@ function OrganizationUsers() {
           },
           { email: newUser.email }
         ),
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch {}
+  };
+
+  const [updateOrganizationUser] =
+    useOrganizationUsers_updateOrganizationUserMutation();
+  const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
+    try {
+      const { role } = await showCreateOrUpdateUserDialog({
+        type: "update",
+        user: {
+          email: user.email,
+          firstName: user.firstName ?? undefined,
+          lastName: user.lastName ?? undefined,
+          role: user.role,
+        },
+      });
+
+      await updateOrganizationUser({
+        variables: { userId: user.id, role },
+      });
+      toast({
+        title: intl.formatMessage({
+          id: "organization.user-updated-success.toast-title",
+          defaultMessage: "User updated successfully.",
+        }),
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -244,6 +274,13 @@ function OrganizationUsers() {
             setQueryState((s) => ({ ...s, items, page: 1 }))
           }
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
+          onRowClick={(user) =>
+            me.id !== user.id &&
+            isAdmin(me) &&
+            !user.isSsoUser &&
+            user.role !== "OWNER" &&
+            handleUpdateUser(user)
+          }
           header={
             <OrganizationUsersListTableHeader
               me={me}
@@ -419,6 +456,8 @@ OrganizationUsers.fragments = {
       fragment OrganizationUsers_User on User {
         id
         fullName
+        firstName
+        lastName
         email
         role
         createdAt
@@ -444,6 +483,17 @@ OrganizationUsers.mutations = [
         lastName: $lastName
         role: $role
       ) {
+        ...OrganizationUsers_User
+      }
+    }
+    ${OrganizationUsers.fragments.User}
+  `,
+  gql`
+    mutation OrganizationUsers_updateOrganizationUser(
+      $userId: GID!
+      $role: OrganizationRole!
+    ) {
+      updateOrganizationUser(userId: $userId, role: $role) {
         ...OrganizationUsers_User
       }
     }

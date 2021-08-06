@@ -431,6 +431,8 @@ export interface Mutation {
   switchAutomaticReminders: Array<PetitionAccess>;
   /** Tags a petition */
   tagPetition: PetitionBase;
+  /** Transfers the ownership of an organization to a given user. Old owner will get ADMIN role */
+  transferOrganizationOwnership: SupportMethodResponse;
   /** Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions. */
   transferPetitionOwnership: Array<Petition>;
   /** Removes the given tag from the given petition */
@@ -443,6 +445,8 @@ export interface Mutation {
   updateOnboardingStatus: User;
   /** Updates the logo of an organization */
   updateOrganizationLogo: Organization;
+  /** Updates the role of another user in the organization. */
+  updateOrganizationUser: User;
   /** Updates a petition. */
   updatePetition: PetitionBase;
   /** Updates a petition field. */
@@ -919,6 +923,11 @@ export interface MutationtagPetitionArgs {
   tagId: Scalars["GID"];
 }
 
+export interface MutationtransferOrganizationOwnershipArgs {
+  organizationId: Scalars["Int"];
+  userId: Scalars["Int"];
+}
+
 export interface MutationtransferPetitionOwnershipArgs {
   petitionIds: Array<Scalars["GID"]>;
   userId: Scalars["GID"];
@@ -947,6 +956,11 @@ export interface MutationupdateOnboardingStatusArgs {
 export interface MutationupdateOrganizationLogoArgs {
   file: Scalars["Upload"];
   orgId: Scalars["GID"];
+}
+
+export interface MutationupdateOrganizationUserArgs {
+  role: OrganizationRole;
+  userId: Scalars["GID"];
 }
 
 export interface MutationupdatePetitionArgs {
@@ -2437,6 +2451,7 @@ export interface UpdateUserGroupInput {
 export interface UpdateUserInput {
   firstName?: Maybe<Scalars["String"]>;
   lastName?: Maybe<Scalars["String"]>;
+  role?: Maybe<OrganizationRole>;
 }
 
 /** A user in the system. */
@@ -5849,6 +5864,8 @@ export type OrganizationUsers_UserFragment = {
   __typename?: "User";
   id: string;
   fullName?: Maybe<string>;
+  firstName?: Maybe<string>;
+  lastName?: Maybe<string>;
   email: string;
   role: OrganizationRole;
   createdAt: string;
@@ -5866,6 +5883,17 @@ export type OrganizationUsers_createOrganizationUserMutationVariables = Exact<{
 
 export type OrganizationUsers_createOrganizationUserMutation = {
   createOrganizationUser: {
+    __typename?: "User";
+  } & OrganizationUsers_UserFragment;
+};
+
+export type OrganizationUsers_updateOrganizationUserMutationVariables = Exact<{
+  userId: Scalars["GID"];
+  role: OrganizationRole;
+}>;
+
+export type OrganizationUsers_updateOrganizationUserMutation = {
+  updateOrganizationUser: {
     __typename?: "User";
   } & OrganizationUsers_UserFragment;
 };
@@ -7990,6 +8018,8 @@ export const OrganizationUsers_UserFragmentDoc = gql`
   fragment OrganizationUsers_User on User {
     id
     fullName
+    firstName
+    lastName
     email
     role
     createdAt
@@ -12548,6 +12578,31 @@ export function useOrganizationUsers_createOrganizationUserMutation(
 }
 export type OrganizationUsers_createOrganizationUserMutationHookResult =
   ReturnType<typeof useOrganizationUsers_createOrganizationUserMutation>;
+export const OrganizationUsers_updateOrganizationUserDocument = gql`
+  mutation OrganizationUsers_updateOrganizationUser(
+    $userId: GID!
+    $role: OrganizationRole!
+  ) {
+    updateOrganizationUser(userId: $userId, role: $role) {
+      ...OrganizationUsers_User
+    }
+  }
+  ${OrganizationUsers_UserFragmentDoc}
+`;
+export function useOrganizationUsers_updateOrganizationUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    OrganizationUsers_updateOrganizationUserMutation,
+    OrganizationUsers_updateOrganizationUserMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<
+    OrganizationUsers_updateOrganizationUserMutation,
+    OrganizationUsers_updateOrganizationUserMutationVariables
+  >(OrganizationUsers_updateOrganizationUserDocument, options);
+}
+export type OrganizationUsers_updateOrganizationUserMutationHookResult =
+  ReturnType<typeof useOrganizationUsers_updateOrganizationUserMutation>;
 export const OrganizationUsers_updateUserStatusDocument = gql`
   mutation OrganizationUsers_updateUserStatus(
     $userIds: [GID!]!

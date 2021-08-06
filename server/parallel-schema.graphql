@@ -974,6 +974,21 @@ type Mutation {
   tagPetition(petitionId: GID!, tagId: GID!): PetitionBase!
 
   """
+  Transfers the ownership of an organization to a given user. Old owner will get ADMIN role
+  """
+  transferOrganizationOwnership(
+    """
+    Numeric ID of the organization
+    """
+    organizationId: Int!
+
+    """
+    Numeric ID of the new owner
+    """
+    userId: Int!
+  ): SupportMethodResponse!
+
+  """
   Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.
   """
   transferPetitionOwnership(petitionIds: [GID!]!, userId: GID!): [Petition!]!
@@ -1002,6 +1017,11 @@ type Mutation {
   Updates the logo of an organization
   """
   updateOrganizationLogo(file: Upload!, orgId: GID!): Organization!
+
+  """
+  Updates the role of another user in the organization.
+  """
+  updateOrganizationUser(role: OrganizationRole!, userId: GID!): User!
 
   """
   Updates a petition.
@@ -3438,6 +3458,7 @@ input UpdateUserGroupInput {
 input UpdateUserInput {
   firstName: String
   lastName: String
+  role: OrganizationRole
 }
 
 """

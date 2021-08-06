@@ -221,3 +221,58 @@ export const resetUserPassword = mutationField("resetUserPassword", {
     }
   },
 });
+
+export const transferOrganizationOwnership = mutationField(
+  "transferOrganizationOwnership",
+  {
+    description:
+      "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",
+    type: "SupportMethodResponse",
+    args: {
+      organizationId: nonNull(
+        intArg({ description: "Numeric ID of the organization" })
+      ),
+      userId: nonNull(intArg({ description: "Numeric ID of the new owner" })),
+    },
+    authorize: supportMethodAccess(),
+    resolve: async (_, { organizationId, userId }, ctx) => {
+      const newOwner = await ctx.users.loadUser(userId);
+      if (!newOwner) {
+        return {
+          result: RESULT.FAILURE,
+          message: `Can't find user with id ${userId}`,
+        };
+      }
+      if (newOwner.org_id !== organizationId) {
+        return {
+          result: RESULT.FAILURE,
+          message: `User ${userId} does not belong to organization ${organizationId}.`,
+        };
+      }
+
+      const currentOwner = await ctx.organizations.getOrganizationOwner(
+        organizationId
+      );
+
+      await ctx.users.withTransaction(async (t) => {
+        await ctx.users.updateUserById(
+          currentOwner.id,
+          { organization_role: "ADMIN" },
+          `User:${ctx.user!.id}`,
+          t
+        );
+        await ctx.users.updateUserById(
+          userId,
+          { organization_role: "OWNER" },
+          `User:${ctx.user!.id}`,
+          t
+        );
+      });
+
+      return {
+        result: RESULT.SUCCESS,
+        message: "Ownership transferred successfully",
+      };
+    },
+  }
+);

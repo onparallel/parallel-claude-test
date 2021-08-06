@@ -157,4 +157,16 @@ export class OrganizationRepository extends BaseRepository {
       );
     })
   );
+
+  async getOrganizationOwner(orgId: number) {
+    const [owner] = await this.from("user")
+      .where({
+        deleted_at: null,
+        org_id: orgId,
+        organization_role: "OWNER",
+      })
+      .select("*");
+
+    return owner;
+  }
 }
