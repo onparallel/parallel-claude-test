@@ -24,7 +24,7 @@ export class OrganizationRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadOrg = this.buildLoadById("organization", "id", (q) =>
+  readonly loadOrg = this.buildLoadBy("organization", "id", (q) =>
     q.whereNull("deleted_at")
   );
 

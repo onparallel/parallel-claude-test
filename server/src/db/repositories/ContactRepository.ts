@@ -25,7 +25,7 @@ export class ContactRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadContact = this.buildLoadById("contact", "id", (q) =>
+  readonly loadContact = this.buildLoadBy("contact", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
@@ -349,7 +349,7 @@ export class ContactRepository extends BaseRepository {
     throw new Error("INVALID_TOKEN");
   }
 
-  readonly loadContactAuthenticationRequest = this.buildLoadById(
+  readonly loadContactAuthenticationRequest = this.buildLoadBy(
     "contact_authentication_request",
     "id"
   );

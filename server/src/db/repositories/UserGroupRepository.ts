@@ -39,7 +39,7 @@ export class UserGroupRepository extends BaseRepository {
     );
   }
 
-  readonly loadUserGroup = this.buildLoadById("user_group", "id", (q) =>
+  readonly loadUserGroup = this.buildLoadBy("user_group", "id", (q) =>
     q.whereNull("deleted_at")
   );
 

@@ -34,7 +34,7 @@ export class UserRepository extends BaseRepository {
     })
   );
 
-  readonly loadUser = this.buildLoadById("user", "id", (q) =>
+  readonly loadUser = this.buildLoadBy("user", "id", (q) =>
     q.whereNull("deleted_at")
   );
 

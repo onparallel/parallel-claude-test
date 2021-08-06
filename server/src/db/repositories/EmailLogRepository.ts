@@ -17,7 +17,7 @@ export class EmailLogRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadEmailLog = this.buildLoadById("email_log", "id");
+  readonly loadEmailLog = this.buildLoadBy("email_log", "id");
 
   async createEmail(data: CreateEmailLog) {
     const rows = await this.insert("email_log", data).returning("*");

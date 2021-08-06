@@ -35,7 +35,7 @@ export class PetitionEventSubscriptionRepository extends BaseRepository {
     return count === new Set(subscriptionIds).size;
   }
 
-  readonly loadSubscription = this.buildLoadById(
+  readonly loadSubscription = this.buildLoadBy(
     "petition_event_subscription",
     "id",
     (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")

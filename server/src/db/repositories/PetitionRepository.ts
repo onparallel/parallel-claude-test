@@ -102,17 +102,17 @@ export class PetitionRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadAnyPetitionById = this.buildLoadById("petition", "id");
+  readonly loadAnyPetitionById = this.buildLoadBy("petition", "id");
 
-  readonly loadPetition = this.buildLoadById("petition", "id", (q) =>
+  readonly loadPetition = this.buildLoadBy("petition", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
-  readonly loadField = this.buildLoadById("petition_field", "id", (q) =>
+  readonly loadField = this.buildLoadBy("petition_field", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
-  readonly loadFieldReply = this.buildLoadById(
+  readonly loadFieldReply = this.buildLoadBy(
     "petition_field_reply",
     "id",
     (q) => q.whereNull("deleted_at")
@@ -522,7 +522,7 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  readonly loadAccess = this.buildLoadById("petition_access", "id");
+  readonly loadAccess = this.buildLoadBy("petition_access", "id");
 
   readonly loadAccessByKeycode = this.buildLoadBy("petition_access", "keycode");
 
@@ -594,7 +594,7 @@ export class PetitionRepository extends BaseRepository {
     return access;
   }
 
-  readonly loadMessage = this.buildLoadById("petition_message", "id");
+  readonly loadMessage = this.buildLoadBy("petition_message", "id");
 
   readonly loadMessageByEmailLogId = this.buildLoadBy(
     "petition_message",
@@ -2023,7 +2023,7 @@ export class PetitionRepository extends BaseRepository {
     );
   }
 
-  readonly loadPetitionFieldComment = this.buildLoadById(
+  readonly loadPetitionFieldComment = this.buildLoadBy(
     "petition_field_comment",
     "id",
     (q) => q.whereNull("deleted_at")
@@ -2049,7 +2049,7 @@ export class PetitionRepository extends BaseRepository {
     `);
   }
 
-  readonly loadPetitionUserNotifications = this.buildLoadById(
+  readonly loadPetitionUserNotifications = this.buildLoadBy(
     "petition_user_notification",
     "id"
   );
@@ -2701,7 +2701,7 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  readonly loadPetitionPermission = this.buildLoadById(
+  readonly loadPetitionPermission = this.buildLoadBy(
     "petition_permission",
     "id",
     (q) => q.whereNull("deleted_at")
@@ -3492,7 +3492,7 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  readonly loadFieldAttachment = this.buildLoadById(
+  readonly loadFieldAttachment = this.buildLoadBy(
     "petition_field_attachment",
     "id",
     (q) => q.whereNull("deleted_at")

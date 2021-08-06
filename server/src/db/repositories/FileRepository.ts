@@ -14,7 +14,7 @@ export class FileRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadFileUpload = this.buildLoadById("file_upload", "id", (q) =>
+  readonly loadFileUpload = this.buildLoadBy("file_upload", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
@@ -45,7 +45,7 @@ export class FileRepository extends BaseRepository {
       .where("id", id);
   }
 
-  readonly loadTemporaryFile = this.buildLoadById("temporary_file", "id");
+  readonly loadTemporaryFile = this.buildLoadBy("temporary_file", "id");
 
   async createTemporaryFile(data: CreateTemporaryFile, createdBy: string) {
     const rows = await this.insert("temporary_file", {
@@ -55,10 +55,8 @@ export class FileRepository extends BaseRepository {
     return rows[0];
   }
 
-  readonly loadPublicFile = this.buildLoadById(
-    "public_file_upload",
-    "id",
-    (q) => q.whereNull("deleted_at")
+  readonly loadPublicFile = this.buildLoadBy("public_file_upload", "id", (q) =>
+    q.whereNull("deleted_at")
   );
 
   async createPublicFile(data: CreatePublicFileUpload, createdBy: string) {

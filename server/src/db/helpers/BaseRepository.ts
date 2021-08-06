@@ -3,7 +3,7 @@ import { injectable } from "inversify";
 import { Knex } from "knex";
 import { groupBy, indexBy } from "remeda";
 import { fromDataLoader } from "../../util/fromDataLoader";
-import { MaybeArray, UnwrapPromise } from "../../util/types";
+import { KeysOfType, MaybeArray, UnwrapPromise } from "../../util/types";
 import {
   CreatePetitionEvent,
   PetitionEvent,
@@ -100,17 +100,9 @@ export class BaseRepository {
     ).insert(data as any, "*");
   }
 
-  protected buildLoadById<TName extends TableNames>(
-    tableName: TName,
-    idColumn: TablePrimaryKeys[TName],
-    builder?: QueryBuilderFunction<TableTypes[TName]>
-  ) {
-    return this.buildLoadBy(tableName, idColumn, builder);
-  }
-
   protected buildLoadBy<
     TName extends TableNames,
-    TColumn extends keyof TableTypes[TName]
+    TColumn extends KeysOfType<TableTypes[TName], number | string | null>
   >(
     tableName: TName,
     column: TColumn,
@@ -133,7 +125,7 @@ export class BaseRepository {
 
   protected buildLoadMultipleBy<
     TName extends TableNames,
-    TColumn extends keyof TableTypes[TName]
+    TColumn extends KeysOfType<TableTypes[TName], number | string | null>
   >(
     tableName: TName,
     column: TColumn,
@@ -156,7 +148,7 @@ export class BaseRepository {
 
   protected buildLoadCountBy<
     TName extends TableNames,
-    TColumn extends keyof TableTypes[TName]
+    TColumn extends KeysOfType<TableTypes[TName], number | string | null>
   >(
     tableName: TName,
     column: TColumn,

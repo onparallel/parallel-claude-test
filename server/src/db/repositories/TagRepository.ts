@@ -13,7 +13,7 @@ export class TagRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadTag = this.buildLoadById("tag", "id", (q) =>
+  readonly loadTag = this.buildLoadBy("tag", "id", (q) =>
     q.whereNull("deleted_at")
   );
 
