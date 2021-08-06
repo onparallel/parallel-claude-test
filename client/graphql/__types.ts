@@ -3210,7 +3210,9 @@ export type NotificationsList_PetitionUserNotification_PetitionSharedUserNotific
   } & PetitionSharedUserNotification_PetitionSharedUserNotificationFragment;
 
 export type NotificationsList_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment =
-  { __typename?: "ReminderEmailBouncedUserNotification" };
+  {
+    __typename?: "ReminderEmailBouncedUserNotification";
+  } & ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment;
 
 export type NotificationsList_PetitionUserNotification_RemindersOptOutNotification_Fragment =
   {
@@ -3383,6 +3385,15 @@ export type PetitionUserNotification_PetitionUserNotificationFragment =
   | PetitionUserNotification_PetitionUserNotification_RemindersOptOutNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_SignatureCancelledUserNotification_Fragment
   | PetitionUserNotification_PetitionUserNotification_SignatureCompletedUserNotification_Fragment;
+
+export type ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragment =
+  {
+    __typename?: "ReminderEmailBouncedUserNotification";
+    access: {
+      __typename?: "PetitionAccess";
+      contact?: Maybe<{ __typename?: "Contact" } & ContactLink_ContactFragment>;
+    };
+  } & PetitionUserNotification_PetitionUserNotification_ReminderEmailBouncedUserNotification_Fragment;
 
 export type RemindersOptOutNotification_RemindersOptOutNotificationFragment = {
   __typename?: "RemindersOptOutNotification";
@@ -7420,6 +7431,18 @@ export const MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotifica
   ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
   ${ContactLink_ContactFragmentDoc}
 `;
+export const ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragmentDoc = gql`
+  fragment ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotification on ReminderEmailBouncedUserNotification {
+    ...PetitionUserNotification_PetitionUserNotification
+    access {
+      contact {
+        ...ContactLink_Contact
+      }
+    }
+  }
+  ${PetitionUserNotification_PetitionUserNotificationFragmentDoc}
+  ${ContactLink_ContactFragmentDoc}
+`;
 export const PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragmentDoc = gql`
   fragment PetitionCompletedUserNotification_PetitionCompletedUserNotification on PetitionCompletedUserNotification {
     ...PetitionUserNotification_PetitionUserNotification
@@ -7489,6 +7512,9 @@ export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
     ... on MessageEmailBouncedUserNotification {
       ...MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotification
     }
+    ... on ReminderEmailBouncedUserNotification {
+      ...ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotification
+    }
     ... on PetitionCompletedUserNotification {
       ...PetitionCompletedUserNotification_PetitionCompletedUserNotification
     }
@@ -7507,6 +7533,7 @@ export const NotificationsList_PetitionUserNotificationFragmentDoc = gql`
   }
   ${CommentCreatedUserNotification_CommentCreatedUserNotificationFragmentDoc}
   ${MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotificationFragmentDoc}
+  ${ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotificationFragmentDoc}
   ${PetitionCompletedUserNotification_PetitionCompletedUserNotificationFragmentDoc}
   ${PetitionSharedUserNotification_PetitionSharedUserNotificationFragmentDoc}
   ${SignatureCancelledUserNotification_SignatureCancelledUserNotificationFragmentDoc}

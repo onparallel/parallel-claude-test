@@ -815,6 +815,11 @@
     "context": "{name} has shared the {isTemplate, select, true {template} other {petition}} with you as {permissionType}."
   },
   {
+    "term": "component.notification-reminder-bounced.body",
+    "definition": "Error al enviar el recordatorio al destinatario {name}.",
+    "context": "Error sending reminder to recipient {name}."
+  },
+  {
     "term": "component.notification-reminders-opt-out.body",
     "definition": "{name} ha optado por no recibir recordatorios: ",
     "context": "{name} has opted out from receiving reminders:"

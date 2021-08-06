@@ -24,6 +24,7 @@ import { PetitionSharedUserNotification } from "./flavor/PetitionSharedUserNotif
 import { SignatureCancelledUserNotification } from "./flavor/SignatureCancelledUserNotification";
 import { SignatureCompletedUserNotification } from "./flavor/SignatureCompletedUserNotification";
 import { EmptyNotificationsIcon } from "./icons/EmptyNotificationsIcon";
+import { ReminderEmailBouncedUserNotification } from "./flavor/ReminderEmailBouncedUserNotification";
 
 export interface NotificationListProps {
   notifications: NotificationsDrawer_PetitionUserNotificationFragment[];
@@ -235,6 +236,12 @@ export function NotificationsList({
                   {...props}
                 />
               ) : notification.__typename ===
+                "ReminderEmailBouncedUserNotification" ? (
+                <ReminderEmailBouncedUserNotification
+                  notification={notification}
+                  {...props}
+                />
+              ) : notification.__typename ===
                 "CommentCreatedUserNotification" ? (
                 <CommentCreatedUserNotification
                   notification={notification}
@@ -281,6 +288,9 @@ NotificationsList.fragments = {
       ... on MessageEmailBouncedUserNotification {
         ...MessageEmailBouncedUserNotification_MessageEmailBouncedUserNotification
       }
+      ... on ReminderEmailBouncedUserNotification {
+        ...ReminderEmailBouncedUserNotification_ReminderEmailBouncedUserNotification
+      }
       ... on PetitionCompletedUserNotification {
         ...PetitionCompletedUserNotification_PetitionCompletedUserNotification
       }
@@ -300,6 +310,8 @@ NotificationsList.fragments = {
     ${CommentCreatedUserNotification.fragments.CommentCreatedUserNotification}
     ${MessageEmailBouncedUserNotification.fragments
       .MessageEmailBouncedUserNotification}
+    ${ReminderEmailBouncedUserNotification.fragments
+      .ReminderEmailBouncedUserNotification}
     ${PetitionCompletedUserNotification.fragments
       .PetitionCompletedUserNotification}
     ${PetitionSharedUserNotification.fragments.PetitionSharedUserNotification}

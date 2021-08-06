@@ -51,7 +51,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
           console.log(error);
           process.exit(1);
         }
-        process.exit(0);
+        if (process.env.NODE_ENV === "production") process.exit(0);
       }
     )
     .command(
