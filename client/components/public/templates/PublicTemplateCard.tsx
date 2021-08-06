@@ -2,7 +2,6 @@ import { gql } from "@apollo/client";
 import {
   Center,
   Grid,
-  HTMLChakraProps,
   Image,
   LinkBox,
   LinkOverlay,
