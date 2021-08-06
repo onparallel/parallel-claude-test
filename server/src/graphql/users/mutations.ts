@@ -280,7 +280,6 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
     contextUserIsAdmin(),
     userIsNotContextUser("userId"),
     userHasAccessToUsers("userId"),
-    userIsNotSSO("userId"),
     userHasRole("userId", ["ADMIN", "NORMAL"])
   ),
   args: {
