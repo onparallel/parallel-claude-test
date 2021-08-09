@@ -17,10 +17,7 @@ function About() {
         defaultMessage: "Learn more about Parallel's mission and our story",
       })}
     >
-      <PublicContainer
-        textAlign="center"
-        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
-      >
+      <PublicContainer textAlign="center" wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}>
         <Box maxWidth="700px" marginX="auto">
           <Heading as="h1" fontFamily="hero" size="3xl" fontWeight="light">
             <FormattedMessage
@@ -43,18 +40,9 @@ function About() {
         }}
       >
         <Heading size="xl" fontWeight="light" color="purple.600">
-          <FormattedMessage
-            id="public.about.our-story"
-            defaultMessage="Our story"
-          />
+          <FormattedMessage id="public.about.our-story" defaultMessage="Our story" />
         </Heading>
-        <Stack
-          spacing={8}
-          marginTop={8}
-          maxWidth="720px"
-          marginX="auto"
-          textAlign="center"
-        >
+        <Stack spacing={8} marginTop={8} maxWidth="720px" marginX="auto" textAlign="center">
           <Text>
             <FormattedMessage
               id="public.about.story-1"

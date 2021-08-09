@@ -9,10 +9,7 @@ import { SearchInput } from "@parallel/components/common/SearchInput";
 import { Spacer } from "@parallel/components/common/Spacer";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withFeatureFlag } from "@parallel/components/common/withFeatureFlag";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useDeleteAccessTokenDialog } from "@parallel/components/settings/DeleteAccessTokenDialog";
@@ -65,9 +62,7 @@ function Tokens() {
         offset: state.items * (state.page - 1),
         limit: state.items,
         search: state.search,
-        sortBy: [
-          `${state.sort.field}_${state.sort.direction}` as UserAuthenticationTokens_OrderBy,
-        ],
+        sortBy: [`${state.sort.field}_${state.sort.direction}` as UserAuthenticationTokens_OrderBy],
       },
     })
   );
@@ -130,15 +125,10 @@ function Tokens() {
       basePath="/app/settings"
       sections={sections}
       user={me}
-      sectionsHeader={
-        <FormattedMessage id="settings.title" defaultMessage="Settings" />
-      }
+      sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage
-            id="settings.api-tokens"
-            defaultMessage="API Tokens"
-          />
+          <FormattedMessage id="settings.api-tokens" defaultMessage="API Tokens" />
         </Heading>
       }
     >
@@ -171,9 +161,7 @@ function Tokens() {
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) =>
-            setQueryState((s) => ({ ...s, items, page: 1 }))
-          }
+          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <Stack direction="row" padding={2}>
@@ -200,10 +188,7 @@ function Tokens() {
                 onClick={() => handleRevokeTokens(selected)}
               >
                 <Text color="red.500">
-                  <FormattedMessage
-                    id="generic.delete"
-                    defaultMessage="Delete"
-                  />
+                  <FormattedMessage id="generic.delete" defaultMessage="Delete" />
                 </Text>
               </Button>
 
@@ -234,12 +219,7 @@ function useAuthTokensTableColumns(): TableColumn<Tokens_UserAuthenticationToken
         }),
         CellContent: ({ row }) => {
           return (
-            <Text
-              as="span"
-              display="inline-flex"
-              whiteSpace="nowrap"
-              alignItems="center"
-            >
+            <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
               {row.tokenName}
             </Text>
           );
@@ -265,10 +245,7 @@ function useAuthTokensTableColumns(): TableColumn<Tokens_UserAuthenticationToken
             />
           ) : (
             <Text textStyle="hint">
-              <FormattedMessage
-                id="generic.never-used"
-                defaultMessage="Never used"
-              />
+              <FormattedMessage id="generic.never-used" defaultMessage="Never used" />
             </Text>
           ),
       },
@@ -315,10 +292,7 @@ Tokens.mutations = [
   `,
 ];
 
-Tokens.getInitialProps = async ({
-  fetchQuery,
-  ...context
-}: WithApolloDataContext) => {
+Tokens.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContext) => {
   const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
 
   await fetchQuery<TokensQuery>(
@@ -331,12 +305,7 @@ Tokens.getInitialProps = async ({
       ) {
         me {
           id
-          authenticationTokens(
-            limit: $limit
-            offset: $offset
-            search: $search
-            sortBy: $sortBy
-          ) {
+          authenticationTokens(limit: $limit, offset: $offset, search: $search, sortBy: $sortBy) {
             totalCount
             items {
               ...Tokens_UserAuthenticationToken
@@ -355,16 +324,10 @@ Tokens.getInitialProps = async ({
         offset: items * (page - 1),
         limit: items,
         search,
-        sortBy: [
-          `${sort.field}_${sort.direction}` as UserAuthenticationTokens_OrderBy,
-        ],
+        sortBy: [`${sort.field}_${sort.direction}` as UserAuthenticationTokens_OrderBy],
       },
     }
   );
 };
 
-export default compose(
-  withDialogs,
-  withFeatureFlag("API_TOKENS"),
-  withApolloData
-)(Tokens);
+export default compose(withDialogs, withFeatureFlag("API_TOKENS"), withApolloData)(Tokens);

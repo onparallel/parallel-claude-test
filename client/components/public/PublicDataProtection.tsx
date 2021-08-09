@@ -1,12 +1,4 @@
-import {
-  Box,
-  BoxProps,
-  Grid,
-  Heading,
-  Image,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, BoxProps, Grid, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { Link } from "../common/Link";

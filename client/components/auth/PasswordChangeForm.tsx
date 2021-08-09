@@ -20,11 +20,7 @@ interface PasswordChangeFormProps {
   backLink: ReactElement;
   isSubmitting: boolean;
 }
-export function PasswordChangeForm({
-  onSubmit,
-  backLink,
-  isSubmitting,
-}: PasswordChangeFormProps) {
+export function PasswordChangeForm({ onSubmit, backLink, isSubmitting }: PasswordChangeFormProps) {
   const {
     handleSubmit,
     register,
@@ -51,10 +47,7 @@ export function PasswordChangeForm({
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <FormControl id="password" isInvalid={!!errors.password}>
           <FormLabel>
-            <FormattedMessage
-              id="generic.forms.new-password-label"
-              defaultMessage="New password"
-            />
+            <FormattedMessage id="generic.forms.new-password-label" defaultMessage="New password" />
           </FormLabel>
           <PasswordInput
             {...register("password", {

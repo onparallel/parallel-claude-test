@@ -22,10 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { BaseDialog } from "@parallel/components/common/BaseDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { PaddedCollapse } from "@parallel/components/common/PaddedCollapse";
 import {
   RecipientViewPetitionFieldCommentsDialog_createPetitionFieldCommentMutationVariables,
@@ -50,14 +47,7 @@ import { FORMATS } from "@parallel/utils/dates";
 import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../../common/BreakLines";
 import { DateTime } from "../../common/DateTime";
@@ -100,9 +90,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
   const markPetitionFieldCommentsAsRead = useMarkPetitionFieldCommentsAsRead();
   useEffect(() => {
     const timeout = setTimeout(async () => {
-      const petitionFieldCommentIds = comments
-        .filter((c) => c.isUnread)
-        .map((c) => c.id);
+      const petitionFieldCommentIds = comments.filter((c) => c.isUnread).map((c) => c.id);
       if (petitionFieldCommentIds.length > 0) {
         await markPetitionFieldCommentsAsRead({
           keycode,
@@ -190,10 +178,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
         <ModalHeader>
           {field.title || (
             <Text fontWeight="normal" textStyle="hint">
-              <FormattedMessage
-                id="generic.untitled-field"
-                defaultMessage="Untitled field"
-              />
+              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
             </Text>
           )}
         </ModalHeader>
@@ -246,9 +231,7 @@ export function RecipientViewPetitionFieldCommentsDialog({
                   key={comment.id}
                   comment={comment}
                   contactId={access.contact!.id}
-                  onEdit={(content) =>
-                    handleEditCommentContent(comment.id, content)
-                  }
+                  onEdit={(content) => handleEditCommentContent(comment.id, content)}
                   onDelete={() => handleDeleteClick(comment.id)}
                 />
               ))}
@@ -345,11 +328,7 @@ function FieldComment({
   }
 
   return (
-    <Box
-      paddingX={6}
-      paddingY={2}
-      backgroundColor={comment.isUnread ? "purple.50" : "white"}
-    >
+    <Box paddingX={6} paddingY={2} backgroundColor={comment.isUnread ? "purple.50" : "white"}>
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box as="strong" marginRight={2}>
           {comment.author?.__typename === "PublicContact" ? (
@@ -361,12 +340,7 @@ function FieldComment({
           )}
         </Box>
 
-        <DateTime
-          color="gray.500"
-          value={comment.createdAt}
-          format={FORMATS.LLL}
-          useRelativeTime
-        />
+        <DateTime color="gray.500" value={comment.createdAt} format={FORMATS.LLL} useRelativeTime />
         <Spacer />
         {contactId === comment.author?.id ? (
           <Menu placement="bottom-end">
@@ -393,10 +367,7 @@ function FieldComment({
                   <FormattedMessage id="generic.edit" defaultMessage="Edit" />
                 </MenuItem>
                 <MenuItem onClick={onDelete}>
-                  <FormattedMessage
-                    id="generic.delete"
-                    defaultMessage="Delete"
-                  />
+                  <FormattedMessage id="generic.delete" defaultMessage="Delete" />
                 </MenuItem>
               </MenuList>
             </Portal>
@@ -479,19 +450,12 @@ RecipientViewPetitionFieldCommentsDialog.fragments = {
 };
 
 const _comments = gql`
-  query RecipientViewPetitionFieldComments(
-    $keycode: ID!
-    $petitionFieldId: GID!
-  ) {
-    petitionFieldComments(
-      keycode: $keycode
-      petitionFieldId: $petitionFieldId
-    ) {
+  query RecipientViewPetitionFieldComments($keycode: ID!, $petitionFieldId: GID!) {
+    petitionFieldComments(keycode: $keycode, petitionFieldId: $petitionFieldId) {
       ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
     }
   }
-  ${RecipientViewPetitionFieldCommentsDialog.fragments
-    .PublicPetitionFieldComment}
+  ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionFieldComment}
 `;
 
 const _publicMarkPetitionFieldCommentsAsRead = gql`
@@ -522,16 +486,10 @@ function useMarkPetitionFieldCommentsAsRead() {
       variables,
       update(client, { data }) {
         if (data) {
-          updatePetitionFieldCommentCounts(
-            client,
-            petitionFieldId,
-            (field) => ({
-              ...field,
-              unreadCommentCount:
-                field.unreadCommentCount -
-                variables.petitionFieldCommentIds.length,
-            })
-          );
+          updatePetitionFieldCommentCounts(client, petitionFieldId, (field) => ({
+            ...field,
+            unreadCommentCount: field.unreadCommentCount - variables.petitionFieldCommentIds.length,
+          }));
         }
       },
     });
@@ -552,8 +510,7 @@ const _publicCreatePetitionFieldComment = gql`
       ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
     }
   }
-  ${RecipientViewPetitionFieldCommentsDialog.fragments
-    .PublicPetitionFieldComment}
+  ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionFieldComment}
 `;
 
 function useCreatePetitionFieldComment() {
@@ -571,20 +528,13 @@ function useCreatePetitionFieldComment() {
               client,
               variables.keycode,
               variables.petitionFieldId,
-              (comments) => [
-                ...comments,
-                data!.publicCreatePetitionFieldComment,
-              ]
+              (comments) => [...comments, data!.publicCreatePetitionFieldComment]
             );
 
-            updatePetitionFieldCommentCounts(
-              client,
-              variables.petitionFieldId,
-              (field) => ({
-                ...field,
-                commentCount: field.commentCount + 1,
-              })
-            );
+            updatePetitionFieldCommentCounts(client, variables.petitionFieldId, (field) => ({
+              ...field,
+              commentCount: field.commentCount + 1,
+            }));
           }
         },
       });
@@ -609,8 +559,7 @@ const _publicUpdatePetitionFieldComment = gql`
       ...RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldComment
     }
   }
-  ${RecipientViewPetitionFieldCommentsDialog.fragments
-    .PublicPetitionFieldComment}
+  ${RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionFieldComment}
 `;
 
 function useUpdatePetitionFieldComment() {
@@ -628,8 +577,7 @@ function useUpdatePetitionFieldComment() {
             apollo.readFragment<RecipientViewPetitionFieldCommentsDialog_PublicPetitionFieldCommentFragment>(
               {
                 fragment:
-                  RecipientViewPetitionFieldCommentsDialog.fragments
-                    .PublicPetitionFieldComment,
+                  RecipientViewPetitionFieldCommentsDialog.fragments.PublicPetitionFieldComment,
                 id: variables.petitionFieldCommentId,
               }
             );
@@ -675,23 +623,16 @@ function useDeletePetitionFieldComment() {
               client,
               variables.keycode,
               variables.petitionFieldId,
-              (comments) =>
-                comments.filter(
-                  (c) => c.id !== variables.petitionFieldCommentId
-                )
+              (comments) => comments.filter((c) => c.id !== variables.petitionFieldCommentId)
             );
             const removed = previous?.petitionFieldComments?.find(
               (c) => c.id === variables.petitionFieldCommentId
             );
             if (removed) {
-              updatePetitionFieldCommentCounts(
-                client,
-                variables.petitionFieldId,
-                (field) => ({
-                  ...field,
-                  commentCount: field.commentCount - 1,
-                })
-              );
+              updatePetitionFieldCommentCounts(client, variables.petitionFieldId, (field) => ({
+                ...field,
+                commentCount: field.commentCount - 1,
+              }));
             }
           }
         },

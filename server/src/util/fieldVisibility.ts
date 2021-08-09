@@ -51,11 +51,7 @@ function evaluatePredicate<T extends string | number | string[]>(
   if (reply === undefined || value === undefined) return false;
 
   const a = typeof reply === "string" ? reply.toLowerCase() : reply;
-  const b = Array.isArray(reply)
-    ? value
-    : typeof value === "string"
-    ? value.toLowerCase()
-    : value;
+  const b = Array.isArray(reply) ? value : typeof value === "string" ? value.toLowerCase() : value;
 
   if (a === null || b === null) return false;
   switch (operator) {
@@ -117,9 +113,7 @@ function conditionIsMet(
   }
 }
 
-export function evaluateFieldVisibility<T extends VisibilityField>(
-  fields: T[]
-): boolean[] {
+export function evaluateFieldVisibility<T extends VisibilityField>(fields: T[]): boolean[] {
   const fieldsById = indexBy(fields, (f) => f.id);
   const visibilitiesById: { [fieldId: string]: boolean } = {};
   for (const field of fields) {
@@ -128,18 +122,10 @@ export function evaluateFieldVisibility<T extends VisibilityField>(
       const result =
         v.operator === "OR"
           ? v.conditions.some((c) =>
-              conditionIsMet(
-                c,
-                fieldsById[c.fieldId],
-                visibilitiesById[c.fieldId]
-              )
+              conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
             )
           : v.conditions.every((c) =>
-              conditionIsMet(
-                c,
-                fieldsById[c.fieldId],
-                visibilitiesById[c.fieldId]
-              )
+              conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
             );
       visibilitiesById[field.id] = v.type === "SHOW" ? result : !result;
     } else {

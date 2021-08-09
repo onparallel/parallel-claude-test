@@ -26,15 +26,11 @@ export function greeting({ name }: { name: string | null }, intl: IntlShape) {
   );
 }
 
-export function greetingFormal(
-  { fullName }: { fullName: string | null },
-  intl: IntlShape
-) {
+export function greetingFormal({ fullName }: { fullName: string | null }, intl: IntlShape) {
   return intl.formatMessage(
     {
       id: "greeting.formal",
-      defaultMessage:
-        "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
+      defaultMessage: "{fullName, select, null {Dear Sir / Madam,} other {Dear {fullName},}}",
     },
     { fullName }
   );
@@ -70,8 +66,7 @@ export function disclaimer({ email }: { email: string }, intl: IntlShape) {
   return intl.formatMessage(
     {
       id: "disclaimer",
-      defaultMessage:
-        "This is an email sent via Parallel from the verified account {email}",
+      defaultMessage: "This is an email sent via Parallel from the verified account {email}",
     },
     { email }
   );

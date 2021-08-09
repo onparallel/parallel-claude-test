@@ -35,15 +35,7 @@ const email: Email<PetitionMessageProps> = {
     return subject || "";
   },
   text(
-    {
-      contactFullName,
-      senderName,
-      senderEmail,
-      bodyPlainText,
-      deadline,
-      keycode,
-      parallelUrl,
-    },
+    { contactFullName, senderName, senderEmail, bodyPlainText, deadline, keycode, parallelUrl },
     intl
   ) {
     return outdent`
@@ -51,8 +43,7 @@ const email: Email<PetitionMessageProps> = {
       ${intl.formatMessage(
         {
           id: "new-petition.text",
-          defaultMessage:
-            "{senderName} ({senderEmail}) has sent you the following petition:",
+          defaultMessage: "{senderName} ({senderEmail}) has sent you the following petition:",
         },
         { senderName, senderEmail }
       )}
@@ -76,8 +67,7 @@ const email: Email<PetitionMessageProps> = {
      }    
       ${intl.formatMessage({
         id: "generic.complete-information-click-link",
-        defaultMessage:
-          "Please click the link below to complete the information.",
+        defaultMessage: "Please click the link below to complete the information.",
       })}
       ${parallelUrl}/${intl.locale}/petition/${keycode}
       
@@ -122,11 +112,7 @@ const email: Email<PetitionMessageProps> = {
           </MjmlColumn>
         </MjmlSection>
         <MjmlSection padding="0 20px">
-          <MjmlColumn
-            backgroundColor="#f6f6f6"
-            borderRadius="4px"
-            padding="10px 0"
-          >
+          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
             <MjmlText>
               <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
             </MjmlText>
@@ -150,9 +136,7 @@ const email: Email<PetitionMessageProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            <CompleteInfoButton
-              href={`${parallelUrl}/${locale}/petition/${keycode}`}
-            />
+            <CompleteInfoButton href={`${parallelUrl}/${locale}/petition/${keycode}`} />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>

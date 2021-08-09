@@ -46,9 +46,7 @@ export type GeneratedParameterType<
 > = If<
   TRequired,
   ArrayIfTrue<T, TArray>,
-  TDefaultValue extends undefined
-    ? ArrayIfTrue<T, TArray> | undefined
-    : ArrayIfTrue<T, TArray>
+  TDefaultValue extends undefined ? ArrayIfTrue<T, TArray> | undefined : ArrayIfTrue<T, TArray>
 >;
 
 export interface ParameterParser<
@@ -57,9 +55,7 @@ export interface ParameterParser<
   TArray extends boolean | undefined = undefined,
   TDefaultValue extends ArrayIfTrue<T, TArray> | undefined = undefined
 > {
-  (value?: string): MaybePromise<
-    GeneratedParameterType<T, TRequired, TArray, TDefaultValue>
-  >;
+  (value?: string): MaybePromise<GeneratedParameterType<T, TRequired, TArray, TDefaultValue>>;
 }
 
 export function buildParse<
@@ -137,52 +133,31 @@ function _numberParam(integer: boolean) {
     TDefaultValue extends ArrayIfTrue<number, TArray> | undefined = undefined
   >(
     options: NumberParameterOptions<TRequired, TArray, TDefaultValue>
-  ): RestParameter<
-    GeneratedParameterType<number, TRequired, TArray, TDefaultValue>
-  > {
-    const { minimum, exclusiveMinimum, maximum, exclusiveMaximum, multipleOf } =
-      options;
+  ): RestParameter<GeneratedParameterType<number, TRequired, TArray, TDefaultValue>> {
+    const { minimum, exclusiveMinimum, maximum, exclusiveMaximum, multipleOf } = options;
     return {
       parse: buildParse(options, (value) => {
         const result = integer ? parseInt(value) : parseFloat(value);
         if (Number.isNaN(result)) {
-          throw new ParseError(
-            value,
-            `Value must be ${integer ? "an integer" : "a float"}`
-          );
+          throw new ParseError(value, `Value must be ${integer ? "an integer" : "a float"}`);
         }
         if (minimum !== undefined && result < minimum) {
-          throw new ParseError(
-            value,
-            `Value must be greater or equal than ${minimum}`
-          );
+          throw new ParseError(value, `Value must be greater or equal than ${minimum}`);
         }
         if (exclusiveMinimum !== undefined && result <= exclusiveMinimum) {
-          throw new ParseError(
-            value,
-            `Value must be greater than ${exclusiveMinimum}`
-          );
+          throw new ParseError(value, `Value must be greater than ${exclusiveMinimum}`);
         }
         if (maximum !== undefined && result > maximum) {
-          throw new ParseError(
-            value,
-            `Value must be lower or equal than ${maximum}`
-          );
+          throw new ParseError(value, `Value must be lower or equal than ${maximum}`);
         }
         if (exclusiveMaximum !== undefined && result >= exclusiveMaximum) {
-          throw new ParseError(
-            value,
-            `Value must be lower than ${exclusiveMaximum}`
-          );
+          throw new ParseError(value, `Value must be lower than ${exclusiveMaximum}`);
         }
         if (multipleOf !== undefined) {
           const rem = result % multipleOf;
           // 0.3 % 0.1 -> 0.09999999999999998
           if (rem !== 0 && Math.abs(rem - multipleOf) > Number.EPSILON) {
-            throw new ParseError(
-              value,
-              `Value must be a multiple of ${multipleOf}`
-            );
+            throw new ParseError(value, `Value must be a multiple of ${multipleOf}`);
           }
         }
         return result;
@@ -218,9 +193,7 @@ export function stringParam<
   TDefaultValue extends ArrayIfTrue<string, TArray> | undefined = undefined
 >(
   options: StringParameterOptions<TRequired, TArray, TDefaultValue>
-): RestParameter<
-  GeneratedParameterType<string, TRequired, TArray, TDefaultValue>
-> {
+): RestParameter<GeneratedParameterType<string, TRequired, TArray, TDefaultValue>> {
   const { pattern, maxLength, minLength } = options;
   return {
     parse: buildParse(options, (value) => {
@@ -231,16 +204,10 @@ export function stringParam<
         );
       }
       if (maxLength !== undefined && value.length > maxLength) {
-        throw new ParseError(
-          value,
-          `Value must not exceed maximum length of ${maxLength}`
-        );
+        throw new ParseError(value, `Value must not exceed maximum length of ${maxLength}`);
       }
       if (minLength !== undefined && value.length < minLength) {
-        throw new ParseError(
-          value,
-          `Value must not be less than minimum length of ${minLength}`
-        );
+        throw new ParseError(value, `Value must not be less than minimum length of ${minLength}`);
       }
       return value;
     }),
@@ -276,9 +243,7 @@ export function enumParam<
       if (!values.includes(value as T)) {
         throw new ParseError(
           value,
-          `Value must be one of ${values
-            .map((v) => JSON.stringify(v))
-            .join(", ")}`
+          `Value must be one of ${values.map((v) => JSON.stringify(v)).join(", ")}`
         );
       }
       return value as T;
@@ -303,9 +268,7 @@ export function booleanParam<
   TDefaultValue extends ArrayIfTrue<boolean, TArray> | undefined = undefined
 >(
   options: ParameterOptions<boolean, TRequired, TArray, TDefaultValue>
-): RestParameter<
-  GeneratedParameterType<boolean, TRequired, TArray, TDefaultValue>
-> {
+): RestParameter<GeneratedParameterType<boolean, TRequired, TArray, TDefaultValue>> {
   return {
     parse: buildParse(options, (value: string) => {
       if (!["true", "false"].includes(value)) {

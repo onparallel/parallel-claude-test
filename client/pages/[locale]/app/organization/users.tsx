@@ -1,22 +1,12 @@
 import { gql } from "@apollo/client";
-import {
-  Badge,
-  Flex,
-  Heading,
-  Text,
-  Tooltip,
-  useToast,
-} from "@chakra-ui/react";
+import { Badge, Flex, Heading, Text, Tooltip, useToast } from "@chakra-ui/react";
 import { ForbiddenIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserSelectSelection } from "@parallel/components/common/UserSelect";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useConfirmActivateUsersDialog } from "@parallel/components/organization/ConfirmActivateUsersDialog";
 import { useConfirmDeactivateUserDialog } from "@parallel/components/organization/ConfirmDeactivateUserDialog";
@@ -78,9 +68,7 @@ function OrganizationUsers() {
         offset: state.items * (state.page - 1),
         limit: state.items,
         search: state.search,
-        sortBy: [
-          `${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy,
-        ],
+        sortBy: [`${state.sort.field}_${state.sort.direction}` as OrganizationUsers_OrderBy],
       },
     })
   );
@@ -123,8 +111,7 @@ function OrganizationUsers() {
     [debouncedOnSearchChange]
   );
 
-  const [createOrganizationUser] =
-    useOrganizationUsers_createOrganizationUserMutation();
+  const [createOrganizationUser] = useOrganizationUsers_createOrganizationUserMutation();
   const showCreateOrUpdateUserDialog = useCreateOrUpdateUserDialog();
   const handleCreateUser = async () => {
     try {
@@ -155,8 +142,7 @@ function OrganizationUsers() {
     } catch {}
   };
 
-  const [updateOrganizationUser] =
-    useOrganizationUsers_updateOrganizationUserMutation();
+  const [updateOrganizationUser] = useOrganizationUsers_updateOrganizationUserMutation();
   const handleUpdateUser = async (user: OrganizationUsers_UserFragment) => {
     try {
       const { role } = await showCreateOrUpdateUserDialog({
@@ -187,10 +173,7 @@ function OrganizationUsers() {
   const showConfirmActivateUserDialog = useConfirmActivateUsersDialog();
   const showConfirmDeactivateUserDialog = useConfirmDeactivateUserDialog();
   const [updateUserStatus] = useOrganizationUsers_updateUserStatusMutation();
-  const handleUpdateUserStatus = async (
-    userIds: string[],
-    newStatus: UserStatus
-  ) => {
+  const handleUpdateUserStatus = async (userIds: string[], newStatus: UserStatus) => {
     try {
       let transferToUser: Maybe<UserSelectSelection> = null;
       if (newStatus === "ACTIVE") {
@@ -234,27 +217,15 @@ function OrganizationUsers() {
       sections={sections}
       user={me}
       sectionsHeader={
-        <FormattedMessage
-          id="view.organization.title"
-          defaultMessage="Organization"
-        />
+        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage
-            id="organization.users.title"
-            defaultMessage="Users"
-          />
+          <FormattedMessage id="organization.users.title" defaultMessage="Users" />
         </Heading>
       }
     >
-      <Flex
-        flexDirection="column"
-        flex="1"
-        minHeight={0}
-        padding={4}
-        backgroundColor={"gray.50"}
-      >
+      <Flex flexDirection="column" flex="1" minHeight={0} padding={4} backgroundColor={"gray.50"}>
         <TablePage
           flex="0 1 auto"
           minHeight={0}
@@ -270,9 +241,7 @@ function OrganizationUsers() {
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) =>
-            setQueryState((s) => ({ ...s, items, page: 1 }))
-          }
+          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           onRowClick={(user) =>
             me.id !== user.id &&
@@ -313,18 +282,8 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
         }),
         CellContent: ({ row }) => {
           return (
-            <Text
-              as="span"
-              display="inline-flex"
-              whiteSpace="nowrap"
-              alignItems="center"
-            >
-              <Text
-                as="span"
-                textDecoration={
-                  row.status === "INACTIVE" ? "line-through" : "none"
-                }
-              >
+            <Text as="span" display="inline-flex" whiteSpace="nowrap" alignItems="center">
+              <Text as="span" textDecoration={row.status === "INACTIVE" ? "line-through" : "none"}>
                 {row.fullName}
               </Text>
               {row.status === "INACTIVE" ? (
@@ -380,20 +339,11 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
             }
           >
             {row.role === "OWNER" ? (
-              <FormattedMessage
-                id="organization-users.owner-role"
-                defaultMessage="Owner"
-              />
+              <FormattedMessage id="organization-users.owner-role" defaultMessage="Owner" />
             ) : row.role === "ADMIN" ? (
-              <FormattedMessage
-                id="organization-users.admin-role"
-                defaultMessage="Admin"
-              />
+              <FormattedMessage id="organization-users.admin-role" defaultMessage="Admin" />
             ) : (
-              <FormattedMessage
-                id="organization-users.normal-role"
-                defaultMessage="Normal"
-              />
+              <FormattedMessage id="organization-users.normal-role" defaultMessage="Normal" />
             )}
           </Badge>
         ),
@@ -417,10 +367,7 @@ function useOrganizationUsersTableColumns(user: Pick<User, "role">) {
                   />
                 ) : (
                   <Text textStyle="hint">
-                    <FormattedMessage
-                      id="generic.never-active"
-                      defaultMessage="Never active"
-                    />
+                    <FormattedMessage id="generic.never-active" defaultMessage="Never active" />
                   </Text>
                 ),
             },
@@ -489,10 +436,7 @@ OrganizationUsers.mutations = [
     ${OrganizationUsers.fragments.User}
   `,
   gql`
-    mutation OrganizationUsers_updateOrganizationUser(
-      $userId: GID!
-      $role: OrganizationRole!
-    ) {
+    mutation OrganizationUsers_updateOrganizationUser($userId: GID!, $role: OrganizationRole!) {
       updateOrganizationUser(userId: $userId, role: $role) {
         ...OrganizationUsers_User
       }
@@ -505,11 +449,7 @@ OrganizationUsers.mutations = [
       $newStatus: UserStatus!
       $transferToUserId: GID
     ) {
-      updateUserStatus(
-        userIds: $userIds
-        status: $newStatus
-        transferToUserId: $transferToUserId
-      ) {
+      updateUserStatus(userIds: $userIds, status: $newStatus, transferToUserId: $transferToUserId) {
         id
         status
       }
@@ -517,10 +457,7 @@ OrganizationUsers.mutations = [
   `,
 ];
 
-OrganizationUsers.getInitialProps = async ({
-  fetchQuery,
-  ...context
-}: WithApolloDataContext) => {
+OrganizationUsers.getInitialProps = async ({ fetchQuery, ...context }: WithApolloDataContext) => {
   const { page, items, search, sort } = parseQuery(context.query, QUERY_STATE);
   await fetchQuery<OrganizationUsersQuery>(
     gql`
@@ -560,9 +497,7 @@ OrganizationUsers.getInitialProps = async ({
         offset: items * (page - 1),
         limit: items,
         search,
-        sortBy: [
-          `${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy,
-        ],
+        sortBy: [`${sort.field}_${sort.direction}` as OrganizationUsers_OrderBy],
       },
     }
   );

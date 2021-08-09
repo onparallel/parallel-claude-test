@@ -15,13 +15,10 @@ type DialogCallbacks<TResult = void> = {
   onReject: (reason?: any) => void;
 };
 
-export type DialogProps<TProps = {}, TResult = void> = TProps &
-  DialogCallbacks<TResult>;
+export type DialogProps<TProps = {}, TResult = void> = TProps & DialogCallbacks<TResult>;
 
 export type DialogOpener = <TProps = {}, TResult = void>(
-  opener: (
-    callbacks: DialogCallbacks<TResult>
-  ) => ReactElement<DialogProps<TProps, TResult>>
+  opener: (callbacks: DialogCallbacks<TResult>) => ReactElement<DialogProps<TProps, TResult>>
 ) => Promise<TResult>;
 
 export const DialogOpenerContext = createContext<DialogOpener | null>(null);

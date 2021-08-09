@@ -61,15 +61,12 @@ function exportFile(
       body.append("DocType", "41");
       body.append("File", new File([this.response], fileName));
       try {
-        const res = await fetch(
-          "https://localhost:50500/api/v1/netdocuments/uploaddocument",
-          {
-            method: "POST",
-            body,
-            headers: new Headers({ AppName: "Parallel" }),
-            signal,
-          }
-        );
+        const res = await fetch("https://localhost:50500/api/v1/netdocuments/uploaddocument", {
+          method: "POST",
+          body,
+          headers: new Headers({ AppName: "Parallel" }),
+          signal,
+        });
         const result = await res.json();
         if (res.ok) {
           resolve(result.IdND);
@@ -92,9 +89,7 @@ export function ExportRepliesProgressDialog({
 }: DialogProps<ExportRepliesProgressDialogProps>) {
   const intl = useIntl();
   const [progress, setProgress] = useState(0);
-  const [state, setState] = useState<"LOADING" | "UPLOADING" | "FINISHED">(
-    "LOADING"
-  );
+  const [state, setState] = useState<"LOADING" | "UPLOADING" | "FINISHED">("LOADING");
   const { data } = useExportRepliesProgressDialog_PetitionRepliesQuery({
     variables: { petitionId },
   });
@@ -119,9 +114,7 @@ export function ExportRepliesProgressDialog({
       }
       const rename = placeholdersRename(petition.fields);
       const files = petition.fields.flatMap((field) =>
-        field.type === "FILE_UPLOAD"
-          ? field.replies.map((reply) => ({ reply, field }))
-          : []
+        field.type === "FILE_UPLOAD" ? field.replies.map((reply) => ({ reply, field })) : []
       );
 
       const signatureDocs = [];
@@ -129,8 +122,7 @@ export function ExportRepliesProgressDialog({
         signatureDocs.push({
           type: "signed-document",
           externalId:
-            petition.currentSignatureRequest.metadata
-              .SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS,
+            petition.currentSignatureRequest.metadata.SIGNED_DOCUMENT_EXTERNAL_ID_CUATRECASAS,
           filename: petition.currentSignatureRequest.signedDocumentFilename!,
         });
 
@@ -139,8 +131,7 @@ export function ExportRepliesProgressDialog({
           signatureDocs.push({
             type: "audit-trail",
             externalId:
-              petition.currentSignatureRequest.metadata
-                .AUDIT_TRAIL_EXTERNAL_ID_CUATRECASAS,
+              petition.currentSignatureRequest.metadata.AUDIT_TRAIL_EXTERNAL_ID_CUATRECASAS,
             filename: petition.currentSignatureRequest.auditTrailFilename,
           });
         }
@@ -182,8 +173,7 @@ export function ExportRepliesProgressDialog({
             rename(field, reply, pattern),
             externalClientId,
             abort.signal,
-            ({ loaded, total }) =>
-              setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
+            ({ loaded, total }) => setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
           );
           await updatePetitionFieldReplyMetadata({
             variables: {
@@ -232,8 +222,7 @@ export function ExportRepliesProgressDialog({
             signatureDoc.filename!,
             externalClientId,
             abort.signal,
-            ({ loaded, total }) =>
-              setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
+            ({ loaded, total }) => setProgress((uploaded + (loaded / total) * 0.5) / totalFiles)
           );
 
           await updateSignatureRequestMetadata({
@@ -286,17 +275,8 @@ export function ExportRepliesProgressDialog({
         </ModalContent>
       ) : state === "FINISHED" ? (
         <ModalContent>
-          <ModalHeader
-            as={Stack}
-            alignItems="center"
-            paddingTop={8}
-            paddingBottom={3}
-          >
-            <Center
-              backgroundColor="green.500"
-              borderRadius="full"
-              boxSize="32px"
-            >
+          <ModalHeader as={Stack} alignItems="center" paddingTop={8} paddingBottom={3}>
+            <Center backgroundColor="green.500" borderRadius="full" boxSize="32px">
               <CheckIcon color="white" boxSize="20px" />
             </Center>
             <Text>
@@ -315,23 +295,14 @@ export function ExportRepliesProgressDialog({
                 />
               </Text>
               <Button colorScheme="purple" onClick={() => props.onResolve()}>
-                <FormattedMessage
-                  id="generic.continue"
-                  defaultMessage="Continue"
-                />
+                <FormattedMessage id="generic.continue" defaultMessage="Continue" />
               </Button>
             </Stack>
           </ModalBody>
         </ModalContent>
       ) : state === "UPLOADING" ? (
         <ModalContent>
-          <ModalHeader
-            as={Stack}
-            spacing={4}
-            alignItems="center"
-            paddingTop={8}
-            paddingBottom={3}
-          >
+          <ModalHeader as={Stack} spacing={4} alignItems="center" paddingTop={8} paddingBottom={3}>
             <CloudUploadIcon fontSize="32px" color="gray.400" />
             <Text>
               <FormattedMessage
@@ -343,12 +314,7 @@ export function ExportRepliesProgressDialog({
           <ModalBody>
             <Stack>
               <Stack direction="row" alignItems="center">
-                <Progress
-                  value={progress * 100}
-                  colorScheme="green"
-                  borderRadius="md"
-                  flex="1"
-                />
+                <Progress value={progress * 100} colorScheme="green" borderRadius="md" flex="1" />
                 <Box width={10} textAlign="right" fontSize="sm">
                   <FormattedNumber value={progress} style="percent" />
                 </Box>
@@ -502,10 +468,7 @@ function AlreadyExportedDialog({
   externalId,
   filename,
   ...props
-}: DialogProps<
-  AlreadyExportedDialogProps,
-  { dontAskAgain: boolean; exportAgain: boolean }
->) {
+}: DialogProps<AlreadyExportedDialogProps, { dontAskAgain: boolean; exportAgain: boolean }>) {
   const [dontAskAgain, setDontAskAgain] = useState(false);
   return (
     <ConfirmDialog
@@ -544,21 +507,13 @@ function AlreadyExportedDialog({
               defaultMessage="Do you want to export it again?"
             />
           </Text>
-          <Checkbox
-            isChecked={dontAskAgain}
-            onChange={(e) => setDontAskAgain(e.target.checked)}
-          >
-            <FormattedMessage
-              id="generic.dont-ask-again"
-              defaultMessage="Don't ask again"
-            />
+          <Checkbox isChecked={dontAskAgain} onChange={(e) => setDontAskAgain(e.target.checked)}>
+            <FormattedMessage id="generic.dont-ask-again" defaultMessage="Don't ask again" />
           </Checkbox>
         </Stack>
       }
       cancel={
-        <Button
-          onClick={() => props.onResolve({ dontAskAgain, exportAgain: false })}
-        >
+        <Button onClick={() => props.onResolve({ dontAskAgain, exportAgain: false })}>
           <FormattedMessage id="generic.omit" defaultMessage="Omit" />
         </Button>
       }

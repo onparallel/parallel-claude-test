@@ -1,24 +1,9 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  ChakraProvider,
-  CloseButton,
-  Heading,
-  Stack,
-  useId,
-} from "@chakra-ui/react";
+import { Box, Button, ChakraProvider, CloseButton, Heading, Stack, useId } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
 import { OnboardingKey, OnboardingStatus } from "@parallel/graphql/__types";
 import { NoSSR } from "@parallel/utils/NoSSR";
-import {
-  ComponentType,
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ComponentType, createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import ReactJoyride, {
   CallBackProps,
@@ -49,9 +34,7 @@ export function withOnboarding(value: Onboarding) {
     const WithTourSteps = function (props: P) {
       const [isRunning, setIsRunning] = useState(false);
       return (
-        <OnboardingTourContext.Provider
-          value={{ ...value, isRunning, toggle: setIsRunning }}
-        >
+        <OnboardingTourContext.Provider value={{ ...value, isRunning, toggle: setIsRunning }}>
           <Component {...props} />
         </OnboardingTourContext.Provider>
       );
@@ -112,11 +95,7 @@ const TourStep = ({
           <Spacer />
           {index > 0 && <Button {...backProps}>{step.locale!.back}</Button>}
           {continuous && (
-            <Button
-              {...primaryProps}
-              colorScheme="purple"
-              id="pw-onboarding-next"
-            >
+            <Button {...primaryProps} colorScheme="purple" id="pw-onboarding-next">
               {continuous
                 ? isLastStep
                   ? step.locale!.last

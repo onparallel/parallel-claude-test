@@ -17,21 +17,13 @@ import {
   useEditableControls,
   useToast,
 } from "@chakra-ui/react";
-import {
-  CopyIcon,
-  DeleteIcon,
-  EditSimpleIcon,
-  MoreVerticalIcon,
-} from "@parallel/chakra/icons";
+import { CopyIcon, DeleteIcon, EditSimpleIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useAddMemberGroupDialog } from "@parallel/components/organization/AddMemberGroupDialog";
@@ -55,13 +47,7 @@ import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { isAdmin } from "@parallel/utils/roles";
 import { withError } from "@parallel/utils/promises/withError";
-import {
-  integer,
-  sorting,
-  string,
-  useQueryState,
-  values,
-} from "@parallel/utils/queryState";
+import { integer, sorting, string, useQueryState, values } from "@parallel/utils/queryState";
 import { UnwrapPromise } from "@parallel/utils/types";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
@@ -84,9 +70,7 @@ const QUERY_STATE = {
   }),
 };
 
-type OrganizationGroupProps = UnwrapPromise<
-  ReturnType<typeof OrganizationGroup.getInitialProps>
->;
+type OrganizationGroupProps = UnwrapPromise<ReturnType<typeof OrganizationGroup.getInitialProps>>;
 
 function OrganizationGroup({ groupId }: OrganizationGroupProps) {
   const intl = useIntl();
@@ -128,9 +112,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     members =
       field === "addedAt"
         ? sortBy(members, (u) => u[field])
-        : sort(members, (a, b) =>
-            (a.user[field] ?? "").localeCompare(b.user[field] ?? "")
-          );
+        : sort(members, (a, b) => (a.user[field] ?? "").localeCompare(b.user[field] ?? ""));
 
     if (direction === "DESC") {
       members = members.reverse();
@@ -219,8 +201,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     });
   };
 
-  const [addUsersToUserGroup] =
-    useOrganizationGroup_addUsersToUserGroupMutation();
+  const [addUsersToUserGroup] = useOrganizationGroup_addUsersToUserGroupMutation();
   const showAddMemberDialog = useAddMemberGroupDialog();
   const handleAddMember = async () => {
     try {
@@ -246,8 +227,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
     } catch {}
   };
 
-  const [removeUsersFromGroup] =
-    useOrganizationGroup_removeUsersFromGroupMutation();
+  const [removeUsersFromGroup] = useOrganizationGroup_removeUsersFromGroupMutation();
   const showConfirmRemoveMemberDialog = useConfirmRemoveMemberDialog();
 
   const handleRemoveMember = async () => {
@@ -270,10 +250,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
       sections={sections}
       user={me}
       sectionsHeader={
-        <FormattedMessage
-          id="view.organization.title"
-          defaultMessage="Organization"
-        />
+        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
       header={
         <Flex width="100%" justifyContent="space-between" alignItems="center">
@@ -347,9 +324,7 @@ function OrganizationGroup({ groupId }: OrganizationGroupProps) {
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) =>
-            setQueryState((s) => ({ ...s, items, page: 1 }))
-          }
+          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <OrganizationGroupListTableHeader
@@ -426,12 +401,7 @@ function useOrganizationGroupTableColumns(): TableColumn<OrganizationGroup_UserG
           width: "1px",
         },
         CellContent: ({ row }) => (
-          <DateTime
-            value={row.addedAt}
-            format={FORMATS.LLL}
-            useRelativeTime
-            whiteSpace="nowrap"
-          />
+          <DateTime value={row.addedAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
         ),
       },
     ],
@@ -457,11 +427,7 @@ interface EditableHeadingProps extends ValueProps<string, false> {
   isDisabled?: boolean;
 }
 
-function EditableHeading({
-  isDisabled,
-  value,
-  onChange,
-}: EditableHeadingProps) {
+function EditableHeading({ isDisabled, value, onChange }: EditableHeadingProps) {
   const intl = useIntl();
   const [name, setName] = useState(value);
   const [inputWidth, setInputWidth] = useState(0);
@@ -503,12 +469,7 @@ function EditableHeading({
             maxWidth={655}
           />
 
-          <EditableInput
-            paddingY={1}
-            paddingX={2}
-            minWidth={255}
-            width={inputWidth}
-          />
+          <EditableInput paddingY={1} paddingX={2} minWidth={255} width={inputWidth} />
           <EditableControls
             marginLeft={1}
             background={"white"}
@@ -565,10 +526,7 @@ OrganizationGroup.fragments = {
 
 OrganizationGroup.mutations = [
   gql`
-    mutation OrganizationGroup_updateUserGroup(
-      $id: GID!
-      $data: UpdateUserGroupInput!
-    ) {
+    mutation OrganizationGroup_updateUserGroup($id: GID!, $data: UpdateUserGroupInput!) {
       updateUserGroup(id: $id, data: $data) {
         ...OrganizationGroup_UserGroup
       }
@@ -576,10 +534,7 @@ OrganizationGroup.mutations = [
     ${OrganizationGroup.fragments.UserGroup}
   `,
   gql`
-    mutation OrganizationGroup_addUsersToUserGroup(
-      $userGroupId: GID!
-      $userIds: [GID!]!
-    ) {
+    mutation OrganizationGroup_addUsersToUserGroup($userGroupId: GID!, $userIds: [GID!]!) {
       addUsersToUserGroup(userGroupId: $userGroupId, userIds: $userIds) {
         ...OrganizationGroup_UserGroup
       }
@@ -587,10 +542,7 @@ OrganizationGroup.mutations = [
     ${OrganizationGroup.fragments.UserGroup}
   `,
   gql`
-    mutation OrganizationGroup_removeUsersFromGroup(
-      $userGroupId: GID!
-      $userIds: [GID!]!
-    ) {
+    mutation OrganizationGroup_removeUsersFromGroup($userGroupId: GID!, $userIds: [GID!]!) {
       removeUsersFromGroup(userGroupId: $userGroupId, userIds: $userIds) {
         ...OrganizationGroup_UserGroup
       }
@@ -612,10 +564,7 @@ OrganizationGroup.mutations = [
   `,
 ];
 
-OrganizationGroup.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+OrganizationGroup.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   await Promise.all([
     fetchQuery<OrganizationGroupQuery, OrganizationGroupQueryVariables>(
       gql`

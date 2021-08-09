@@ -94,9 +94,7 @@ export const getServerSideProps: GetServerSideProps<{
       LandingTemplatesCategory_landingTemplatesSamplesQueryVariables
     >({
       query: gql`
-        query LandingTemplatesCategory_landingTemplatesSamples(
-          $locale: PetitionLocale!
-        ) {
+        query LandingTemplatesCategory_landingTemplatesSamples($locale: PetitionLocale!) {
           landingTemplatesSamples {
             category
             templates(locale: $locale) {

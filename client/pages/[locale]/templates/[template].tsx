@@ -209,11 +209,7 @@ function LandingTemplateDetails({
             </Stack>
           </Stack>
           <Stack spacing={12}>
-            <Text
-              fontSize="x-large"
-              fontWeight="bold"
-              textAlign={{ base: "left", md: "center" }}
-            >
+            <Text fontSize="x-large" fontWeight="bold" textAlign={{ base: "left", md: "center" }}>
               <FormattedMessage
                 id="public.template-details.other-similar-templates"
                 defaultMessage="Other similar templates"
@@ -264,14 +260,9 @@ LandingTemplateDetails.fragments = {
 };
 
 export const getServerSideProps: GetServerSideProps<{
-  template: Assert<
-    LandingTemplateDetails_landingTemplateBySlugQuery["landingTemplateBySlug"]
-  >;
+  template: Assert<LandingTemplateDetails_landingTemplateBySlugQuery["landingTemplateBySlug"]>;
   relatedTemplates: LandingTemplateDetails_landingTemplatesQuery["landingTemplates"];
-}> = async function getServerSideProps({
-  query: { locale, template: slug },
-  req,
-}) {
+}> = async function getServerSideProps({ query: { locale, template: slug }, req }) {
   try {
     const client = createApolloClient({}, { req });
 

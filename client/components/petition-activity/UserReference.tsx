@@ -4,11 +4,7 @@ import { UserReference_UserFragment } from "@parallel/graphql/__types";
 import { Maybe } from "@parallel/utils/types";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export function UserReference({
-  user,
-}: {
-  user?: Maybe<UserReference_UserFragment>;
-}) {
+export function UserReference({ user }: { user?: Maybe<UserReference_UserFragment> }) {
   const intl = useIntl();
 
   return user ? (
@@ -19,19 +15,13 @@ export function UserReference({
       })}
       isDisabled={user.status !== "INACTIVE"}
     >
-      <Text
-        as="strong"
-        textDecoration={user.status === "INACTIVE" ? "line-through" : "none"}
-      >
+      <Text as="strong" textDecoration={user.status === "INACTIVE" ? "line-through" : "none"}>
         {user.fullName}
       </Text>
     </Tooltip>
   ) : (
     <Text as="em">
-      <FormattedMessage
-        id="generic.deleted-user"
-        defaultMessage="Deleted user"
-      />
+      <FormattedMessage id="generic.deleted-user" defaultMessage="Deleted user" />
     </Text>
   );
 }

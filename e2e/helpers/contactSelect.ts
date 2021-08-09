@@ -8,25 +8,16 @@ async function typeSearch(page: Page, element: ElementLike, search: string) {
   await el.type(search);
   await waitForGraphQL(
     page,
-    (op) =>
-      op.operationName === "PetitionComposeSearchContacts" &&
-      op.variables?.search === search
+    (op) => op.operationName === "PetitionComposeSearchContacts" && op.variables?.search === search
   );
   return el;
 }
 
-export async function createContact(
-  page: Page,
-  element: ElementLike,
-  contact: CreateContact
-) {
+export async function createContact(page: Page, element: ElementLike, contact: CreateContact) {
   await typeSearch(page, element, contact.email);
   await page.keyboard.press("Enter");
   await page.fill("#contact-first-name", contact.firstName);
   await page.fill("#contact-last-name", contact.lastName);
   await page.click("#create-contact-submit");
-  await waitForGraphQL(
-    page,
-    (op) => op.operationName === "useCreateContact_createContact"
-  );
+  await waitForGraphQL(page, (op) => op.operationName === "useCreateContact_createContact");
 }

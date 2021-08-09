@@ -1,9 +1,4 @@
-import {
-  PetitionStatus,
-  Petition,
-  PetitionAccess,
-  PetitionAccessStatus,
-} from "../../db/__types";
+import { PetitionStatus, Petition, PetitionAccess, PetitionAccessStatus } from "../../db/__types";
 import { ArgValidationError } from "../helpers/errors";
 import { GraphQLResolveInfo } from "graphql";
 import { Maybe } from "../../util/types";
@@ -19,11 +14,7 @@ export function validatePetitionStatus(
   info: GraphQLResolveInfo
 ) {
   if (!petition || petition.status !== status) {
-    throw new ArgValidationError(
-      info,
-      "petitionId",
-      `Petition must have status "${status}".`
-    );
+    throw new ArgValidationError(info, "petitionId", `Petition must have status "${status}".`);
   }
 }
 
@@ -84,10 +75,7 @@ export function petitionAccessesNotOptedOut(
 /**
  * checks that auth token payload contains the required keys
  */
-export function validateAuthTokenPayload<
-  TypeName extends string,
-  FieldName extends string
->(
+export function validateAuthTokenPayload<TypeName extends string, FieldName extends string>(
   prop: (args: ArgsValue<TypeName, FieldName>) => string | null | undefined,
   requiredKey: string,
   argName: string

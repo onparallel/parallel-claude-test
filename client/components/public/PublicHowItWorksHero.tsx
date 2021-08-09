@@ -49,8 +49,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       image: "how_it_works_1",
       alt: intl.formatMessage({
         id: "public.how-it-works-hero.screenshot-1",
-        defaultMessage:
-          "A screenshot of the app showing the creation of a petition.",
+        defaultMessage: "A screenshot of the app showing the creation of a petition.",
       }),
     },
     {
@@ -147,10 +146,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
       }}
     >
       <Heading as="h2" size="xl" fontWeight="bold">
-        <FormattedMessage
-          id="public.how-it-works-hero.title"
-          defaultMessage="How it works"
-        />
+        <FormattedMessage id="public.how-it-works-hero.title" defaultMessage="How it works" />
       </Heading>
       <Heading as="h3" size="md" fontWeight="light" marginTop={4}>
         <FormattedMessage
@@ -188,11 +184,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
           alignItems="center"
         >
           <Box flex="1" maxWidth="720px">
-            <motion.div
-              key={index}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
+            <motion.div key={index} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <AspectRatio
                 ratio={2520 / 1606}
                 onClick={() => handleChangeStep((index + 1) % steps.length)}
@@ -241,10 +233,7 @@ export function PublicHowItWorksHero({ ...props }: BoxProps) {
             marginBottom={{ base: 2, [breakpoint]: 0 }}
             marginRight={{ base: 0, [breakpoint]: 2 }}
           >
-            <FormattedMessage
-              id="public.book-demo-button"
-              defaultMessage="Book a demo"
-            />
+            <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
           </Button>
         </NakedLink>
       </Flex>

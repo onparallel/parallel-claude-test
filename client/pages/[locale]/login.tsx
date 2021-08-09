@@ -6,15 +6,9 @@ import {
   PasswordChangeData,
   PasswordChangeForm,
 } from "@parallel/components/auth/PasswordChangeForm";
-import {
-  PasswordResetData,
-  PasswordResetForm,
-} from "@parallel/components/auth/PasswordResetForm";
+import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
 import { NormalLink } from "@parallel/components/common/Link";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
 import { useCurrentUserQuery } from "@parallel/graphql/__types";
@@ -90,9 +84,7 @@ function Login() {
     setIsSubmitting(false);
   }
 
-  async function handlePasswordChangeSubmit({
-    password: newPassword,
-  }: PasswordChangeData) {
+  async function handlePasswordChangeSubmit({ password: newPassword }: PasswordChangeData) {
     setIsSubmitting(true);
     try {
       const { email, password } = passwordChange!;
@@ -106,10 +98,7 @@ function Login() {
     setIsSubmitting(false);
   }
 
-  async function handlePasswordResetSubmit({
-    verificationCode,
-    password,
-  }: PasswordResetData) {
+  async function handlePasswordResetSubmit({ verificationCode, password }: PasswordResetData) {
     setIsSubmitting(true);
     setVerificationCodeStatus({
       hasVerificationCodeError: false,
@@ -160,9 +149,7 @@ function Login() {
           <AlreadyLoggedIn
             me={data!.me}
             onRelogin={() => setShowContinueAs(false)}
-            onContinueAs={() =>
-              router.push(`/${router.query.locale}/app/petitions`)
-            }
+            onContinueAs={() => router.push(`/${router.query.locale}/app/petitions`)}
           />
         ) : passwordChange?.type === "CHANGE" ? (
           <PasswordChangeForm
@@ -188,9 +175,7 @@ function Login() {
                 />
               </NormalLink>
             }
-            hasVerificationCodeError={
-              verificationCodeStatus.hasVerificationCodeError
-            }
+            hasVerificationCodeError={verificationCodeStatus.hasVerificationCodeError}
             isInvalidPassword={verificationCodeStatus.isInvalidPassword}
             isSubmitting={isSubmitting}
           />

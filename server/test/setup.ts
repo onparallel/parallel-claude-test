@@ -3,11 +3,7 @@ import { spawn, execSync, ChildProcessWithoutNullStreams } from "child_process";
 
 export default async function () {
   // Setting up the stack
-  const dc = spawn("docker-compose", [
-    "--file",
-    "../ops/test/docker-compose.yml",
-    "up",
-  ]);
+  const dc = spawn("docker-compose", ["--file", "../ops/test/docker-compose.yml", "up"]);
 
   await waitUntilReady(dc);
 

@@ -1,19 +1,9 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  ListItem,
-  Stack,
-  Text,
-  UnorderedList,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, ListItem, Stack, Text, UnorderedList, useToast } from "@chakra-ui/react";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { ShareButton } from "@parallel/components/common/ShareButton";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import {
   AddPetitionAccessDialog,
@@ -55,9 +45,7 @@ import { useCallback } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit } from "remeda";
 
-type PetitionActivityProps = UnwrapPromise<
-  ReturnType<typeof PetitionActivity.getInitialProps>
->;
+type PetitionActivityProps = UnwrapPromise<ReturnType<typeof PetitionActivity.getInitialProps>>;
 
 function PetitionActivity({ petitionId }: PetitionActivityProps) {
   const intl = useIntl();
@@ -97,8 +85,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
         ? intl.formatMessage(
             {
               id: "petition.no-reminders-left.toast-description",
-              defaultMessage:
-                "You have sent the maximum number of reminders to {nameOrEmail}",
+              defaultMessage: "You have sent the maximum number of reminders to {nameOrEmail}",
             },
             {
               nameOrEmail: access.contact!.fullName || access.contact!.email,
@@ -172,10 +159,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       } = await addPetitionAccessDialog({
         petition,
         onSearchContacts: async (search: string, exclude: string[]) => {
-          return await handleSearchContacts(search, [
-            ...exclude,
-            ...currentRecipientIds,
-          ]);
+          return await handleSearchContacts(search, [...exclude, ...currentRecipientIds]);
         },
       });
       await sendPetition({
@@ -192,10 +176,8 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     } catch {}
   }, [petitionId, petition.accesses]);
 
-  const confirmCancelScheduledMessage =
-    useConfirmCancelScheduledMessageDialog();
-  const [cancelScheduledMessage] =
-    usePetitionActivity_cancelScheduledMessageMutation();
+  const confirmCancelScheduledMessage = useConfirmCancelScheduledMessageDialog();
+  const [cancelScheduledMessage] = usePetitionActivity_cancelScheduledMessageMutation();
   const handleCancelScheduledMessage = useCallback(
     async (messageId: string) => {
       try {
@@ -249,8 +231,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
     [petitionId, petition.accesses]
   );
 
-  const [switchReminders] =
-    usePetitionActivity_switchAutomaticRemindersMutation();
+  const [switchReminders] = usePetitionActivity_switchAutomaticRemindersMutation();
   const configureRemindersDialog = useConfigureRemindersDialog();
   const handleConfigureReminders = useCallback(
     async (accesses: PetitionAccessTable_PetitionAccessFragment[]) => {
@@ -260,9 +241,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
           .filter((access) => !access.remindersOptOut)
           .map((access) => access.id);
 
-        const firstAccess = petition.accesses.find(
-          (a) => a.id === accessIds[0]
-        )!;
+        const firstAccess = petition.accesses.find((a) => a.id === accessIds[0])!;
         const remindersConfig = await configureRemindersDialog({
           accesses,
           remindersActive: firstAccess.remindersActive,
@@ -275,9 +254,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
             start,
             accessIds,
             petitionId,
-            remindersConfig: start
-              ? omit(remindersConfig!, ["__typename"])
-              : null,
+            remindersConfig: start ? omit(remindersConfig!, ["__typename"]) : null,
           },
         });
         await refetch();
@@ -314,8 +291,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
                 }),
                 description: intl.formatMessage({
                   id: "petition.reminder-settings-error.toast-body",
-                  defaultMessage:
-                    "There was an error setting the reminders. Please try again.",
+                  defaultMessage: "There was an error setting the reminders. Please try again.",
                 }),
                 duration: 5000,
                 isClosable: true,
@@ -350,11 +326,7 @@ function PetitionActivity({ petitionId }: PetitionActivityProps) {
       state={state}
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>
-          <ShareButton
-            petition={petition}
-            userId={me.id}
-            onClick={handlePetitionSharingClick}
-          />
+          <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
         </Box>
       }
     >
@@ -408,10 +380,7 @@ PetitionActivity.fragments = {
 
 PetitionActivity.mutations = [
   gql`
-    mutation PetitionActivity_updatePetition(
-      $petitionId: GID!
-      $data: UpdatePetitionInput!
-    ) {
+    mutation PetitionActivity_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionActivity_Petition
       }
@@ -419,19 +388,12 @@ PetitionActivity.mutations = [
     ${PetitionActivity.fragments.Petition}
   `,
   gql`
-    mutation PetitionActivity_sendReminders(
-      $petitionId: GID!
-      $accessIds: [GID!]!
-      $body: JSON
-    ) {
+    mutation PetitionActivity_sendReminders($petitionId: GID!, $accessIds: [GID!]!, $body: JSON) {
       sendReminders(petitionId: $petitionId, accessIds: $accessIds, body: $body)
     }
   `,
   gql`
-    mutation PetitionActivity_deactivateAccesses(
-      $petitionId: GID!
-      $accessIds: [GID!]!
-    ) {
+    mutation PetitionActivity_deactivateAccesses($petitionId: GID!, $accessIds: [GID!]!) {
       deactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
         id
         status
@@ -439,10 +401,7 @@ PetitionActivity.mutations = [
     }
   `,
   gql`
-    mutation PetitionActivity_reactivateAccesses(
-      $petitionId: GID!
-      $accessIds: [GID!]!
-    ) {
+    mutation PetitionActivity_reactivateAccesses($petitionId: GID!, $accessIds: [GID!]!) {
       reactivateAccesses(petitionId: $petitionId, accessIds: $accessIds) {
         id
         status
@@ -450,10 +409,7 @@ PetitionActivity.mutations = [
     }
   `,
   gql`
-    mutation PetitionActivity_cancelScheduledMessage(
-      $petitionId: GID!
-      $messageId: GID!
-    ) {
+    mutation PetitionActivity_cancelScheduledMessage($petitionId: GID!, $messageId: GID!) {
       cancelScheduledMessage(petitionId: $petitionId, messageId: $messageId) {
         id
         status
@@ -500,10 +456,7 @@ PetitionActivity.mutations = [
   `,
 ];
 
-PetitionActivity.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+PetitionActivity.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   await Promise.all([
     fetchQuery<PetitionActivityQuery, PetitionActivityQueryVariables>(
       gql`
@@ -540,10 +493,7 @@ export default compose(
     steps: [
       {
         title: (
-          <FormattedMessage
-            id="tour.petition-activity.page-title"
-            defaultMessage="Activity"
-          />
+          <FormattedMessage id="tour.petition-activity.page-title" defaultMessage="Activity" />
         ),
         content: (
           <FormattedMessage

@@ -32,17 +32,14 @@ async function main() {
           LoadBalancerArn: lb.LoadBalancerArn,
         })
         .promise();
-      const tgArn = listeners.Listeners?.find((l) => l.Protocol === "HTTPS")!
-        .DefaultActions![0].TargetGroupArn as string;
+      const tgArn = listeners.Listeners?.find((l) => l.Protocol === "HTTPS")!.DefaultActions![0]
+        .TargetGroupArn as string;
       const tgHealth = await elbv2
         .describeTargetHealth({
           TargetGroupArn: tgArn,
         })
         .promise();
-      return [
-        lb.LoadBalancerName!,
-        tgHealth.TargetHealthDescriptions![0],
-      ] as const;
+      return [lb.LoadBalancerName!, tgHealth.TargetHealthDescriptions![0]] as const;
     })
   );
   const instanceToLb = indexBy(lbs, ([_, h]) => h.Target?.Id);

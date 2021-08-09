@@ -1,12 +1,4 @@
-import {
-  Box,
-  Center,
-  Flex,
-  FormControl,
-  FormLabel,
-  List,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Center, Flex, FormControl, FormLabel, List, Stack } from "@chakra-ui/react";
 import { DeleteIcon } from "@parallel/chakra/icons";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import {
@@ -14,23 +6,14 @@ import {
   RecipientViewPetitionFieldCard_PublicPetitionFieldReplyFragment,
 } from "@parallel/graphql/__types";
 import { completedFieldReplies } from "@parallel/utils/completedFieldReplies";
-import {
-  DynamicSelectOption,
-  FieldOptions,
-} from "@parallel/utils/petitionFields";
+import { DynamicSelectOption, FieldOptions } from "@parallel/utils/petitionFields";
 import { useFieldSelectReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  forwardRef,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
 import { countBy } from "remeda";
@@ -67,12 +50,9 @@ export function RecipientViewPetitionFieldDynamicSelect({
   onDownloadAttachment,
 }: RecipientViewPetitionFieldDynamicSelectProps) {
   const [showNewReply, setShowNewReply] = useState(field.replies.length === 0);
-  const [isDeletingReply, setIsDeletingReply] = useState<
-    Record<string, boolean>
-  >({});
+  const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
   const newReplyRef = useRef<SelectInstance>(null);
-  const replyRefs =
-    useMultipleRefs<RecipientViewPetitionFieldReplyDynamicSelectInstance>();
+  const replyRefs = useMultipleRefs<RecipientViewPetitionFieldReplyDynamicSelectInstance>();
 
   const fieldOptions = field.options as FieldOptions["DYNAMIC_SELECT"];
 
@@ -103,10 +83,7 @@ export function RecipientViewPetitionFieldDynamicSelect({
       petitionId,
       keycode,
       fieldId: field.id,
-      value: fieldOptions.labels.map((label, i) => [
-        label,
-        i === 0 ? value : null,
-      ]),
+      value: fieldOptions.labels.map((label, i) => [label, i === 0 ? value : null]),
     });
     if (reply) {
       setShowNewReply(false);
@@ -212,9 +189,7 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
       return;
     }
     await onChange(
-      current.map((p, i) =>
-        i === level ? [p[0], value] : i >= level ? [p[0], null] : p
-      )
+      current.map((p, i) => (i === level ? [p[0], value] : i >= level ? [p[0], null] : p))
     );
     if (level < fieldOptions.labels.length - 1) {
       setTimeout(() => {
@@ -224,15 +199,11 @@ const RecipientViewPetitionFieldReplyDynamicSelect = forwardRef<
   }
 
   const repliedLabelsCount = reply
-    ? countBy(
-        reply.content.columns as [string, string | null][],
-        ([, value]) => value !== null
-      )
+    ? countBy(reply.content.columns as [string, string | null][], ([, value]) => value !== null)
     : 0;
 
   const options =
-    (reply?.content.columns as string[][]) ??
-    fieldOptions.labels.map((label) => [label, null]);
+    (reply?.content.columns as string[][]) ?? fieldOptions.labels.map((label) => [label, null]);
 
   return (
     <Stack>
@@ -301,9 +272,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
     const replies = (reply?.content.columns as [string, string][]) ?? [];
     for (let i = 0; i < level; ++i) {
       values =
-        (values as DynamicSelectOption[]).find(
-          ([label]) => label === replies[i][1]
-        )?.[1] ?? [];
+        (values as DynamicSelectOption[]).find(([label]) => label === replies[i][1])?.[1] ?? [];
     }
     return {
       options: (Array.isArray(values[0])
@@ -311,10 +280,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
         : (values as string[])
       ).map((value) => toSelectOption(value)!),
       value: reply
-        ? toSelectOption(
-            (reply.content.columns as [string, string | null][])[level][1] ??
-              null
-          )
+        ? toSelectOption((reply.content.columns as [string, string | null][])[level][1] ?? null)
         : toSelectOption(null),
     };
   }, [fieldOptions, reply?.content.columns, level]);
@@ -333,9 +299,7 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
   // and the recipient tries to update an option with outdated labels, backend will throw error.
   // so we disable the outdated selectors to avoid throwing error
   const labelsAreOutdated =
-    (reply &&
-      reply.content.columns[level][0] !== field.options.labels[level]) ??
-    false;
+    (reply && reply.content.columns[level][0] !== field.options.labels[level]) ?? false;
 
   return (
     <FormControl id={reactSelectProps.inputId} isDisabled={labelsAreOutdated}>
@@ -349,19 +313,13 @@ const RecipientViewPetitionFieldReplyDynamicSelectLevel = forwardRef<
             options={options}
             onChange={handleOptionChange}
             placeholder={
-              <FormattedMessage
-                id="generic.select-an-option"
-                defaultMessage="Select an option"
-              />
+              <FormattedMessage id="generic.select-an-option" defaultMessage="Select an option" />
             }
             isDisabled={labelsAreOutdated}
           />
           {reply && value && (
             <Center height="100%" position="absolute" right="42px" top={0}>
-              <RecipientViewPetitionFieldReplyStatusIndicator
-                isSaving={isSaving}
-                reply={reply}
-              />
+              <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
             </Center>
           )}
         </Box>

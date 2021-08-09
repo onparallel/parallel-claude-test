@@ -12,10 +12,7 @@ export interface SignatureCompletedUserNotificationProps {
 
 export const SignatureCompletedUserNotification = Object.assign(
   forwardRef<HTMLElement, SignatureCompletedUserNotificationProps>(
-    function SignatureCompletedUserNotification(
-      { isFirst, notification },
-      ref
-    ) {
+    function SignatureCompletedUserNotification({ isFirst, notification }, ref) {
       return (
         <PetitionUserNotification
           ref={ref}

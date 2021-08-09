@@ -9,36 +9,22 @@ export type SortBy<T> = {
   order: "asc" | "desc";
 };
 
-export const isValueCompatible = (
-  oldType: PetitionFieldType,
-  newType: PetitionFieldType
-) => {
+export const isValueCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
   return (
-    ["TEXT", "SHORT_TEXT", "SELECT"].includes(oldType) &&
-    ["TEXT", "SHORT_TEXT"].includes(newType)
+    ["TEXT", "SHORT_TEXT", "SELECT"].includes(oldType) && ["TEXT", "SHORT_TEXT"].includes(newType)
   );
 };
 
-export const isOptionsCompatible = (
-  oldType: PetitionFieldType,
-  newType: PetitionFieldType
-) => {
+export const isOptionsCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
   return (
     ["TEXT", "SHORT_TEXT", "SELECT", "CHECKBOX"].includes(oldType) &&
     ["TEXT", "SHORT_TEXT", "SELECT", "CHECKBOX"].includes(newType)
   );
 };
 
-export const isSettingsCompatible = (
-  oldType: PetitionFieldType,
-  newType: PetitionFieldType
-) => {
+export const isSettingsCompatible = (oldType: PetitionFieldType, newType: PetitionFieldType) => {
   return (
-    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(
-      oldType
-    ) &&
-    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(
-      newType
-    )
+    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(oldType) &&
+    ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(newType)
   );
 };

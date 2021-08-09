@@ -39,12 +39,9 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
   const [forcePassword, setForcePassword] = useState(false);
   const email = watch("email");
   const passwordRef = useRef<HTMLInputElement>(null);
-  const passwordRegisterProps = useRegisterWithRef(
-    passwordRef,
-    register,
-    "password",
-    { required: !ssoUrl }
-  );
+  const passwordRegisterProps = useRegisterWithRef(passwordRef, register, "password", {
+    required: !ssoUrl,
+  });
   const buttonRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     async function guessLogin() {
@@ -65,10 +62,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
     <>
       <Box marginBottom={6} textAlign="center">
         <Heading marginTop={4} marginBottom={2} size="md">
-          <FormattedMessage
-            id="public.login.header"
-            defaultMessage="Enter Parallel"
-          />
+          <FormattedMessage id="public.login.header" defaultMessage="Enter Parallel" />
         </Heading>
         <Text>
           {ssoUrl && !forcePassword ? (
@@ -96,10 +90,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
       >
         <FormControl id="email" isInvalid={!!errors.email}>
           <FormLabel>
-            <FormattedMessage
-              id="generic.forms.email-label"
-              defaultMessage="Email"
-            />
+            <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
           </FormLabel>
           <Input
             type="email"
@@ -124,16 +115,9 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
             />
           </Center>
         ) : (
-          <FormControl
-            id="password"
-            marginTop={2}
-            isInvalid={!!errors.password}
-          >
+          <FormControl id="password" marginTop={2} isInvalid={!!errors.password}>
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.password-label"
-                defaultMessage="Password"
-              />
+              <FormattedMessage id="generic.forms.password-label" defaultMessage="Password" />
             </FormLabel>
             <PasswordInput {...passwordRegisterProps} />
             {errors.password && (

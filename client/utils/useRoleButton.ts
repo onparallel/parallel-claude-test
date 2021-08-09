@@ -1,10 +1,4 @@
-import {
-  MouseEvent,
-  KeyboardEvent,
-  useCallback,
-  DependencyList,
-  MouseEventHandler,
-} from "react";
+import { MouseEvent, KeyboardEvent, useCallback, DependencyList, MouseEventHandler } from "react";
 
 /**
  * Returns the necessary properties and callbacks to ensure propper a11y when

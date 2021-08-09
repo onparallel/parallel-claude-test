@@ -1,9 +1,6 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { AppLayout_UserFragment } from "@parallel/graphql/__types";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -19,10 +16,7 @@ function ConfirmDeactivateUserDialog({
   selected,
   me,
   ...props
-}: DialogProps<
-  { selected: string[]; me: AppLayout_UserFragment },
-  UserSelectSelection
->) {
+}: DialogProps<{ selected: string[]; me: AppLayout_UserFragment }, UserSelectSelection>) {
   const intl = useIntl();
 
   const {
@@ -114,11 +108,7 @@ function ConfirmDeactivateUserDialog({
         </Stack>
       }
       confirm={
-        <Button
-          type="submit"
-          colorScheme="red"
-          isDisabled={Boolean(errors.user)}
-        >
+        <Button type="submit" colorScheme="red" isDisabled={Boolean(errors.user)}>
           <FormattedMessage
             id="petition.confirm-deactivate-users.confirm"
             defaultMessage="Deactivate and transfer petitions"

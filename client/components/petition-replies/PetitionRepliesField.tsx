@@ -16,11 +16,7 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
-import {
-  ArrowForwardIcon,
-  CommentIcon,
-  PaperclipIcon,
-} from "@parallel/chakra/icons";
+import { ArrowForwardIcon, CommentIcon, PaperclipIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
@@ -40,10 +36,7 @@ import { BreakLines } from "../common/BreakLines";
 import { Spacer } from "../common/Spacer";
 import { RecipientViewCommentsBadge } from "../recipient-view/RecipientViewCommentsBadge";
 import { PetitionRepliesFieldAttachment } from "./PetitionRepliesFieldAttachment";
-import {
-  PetitionRepliesFieldAction,
-  PetitionRepliesFieldReply,
-} from "./PetitionRepliesFieldReply";
+import { PetitionRepliesFieldAction, PetitionRepliesFieldReply } from "./PetitionRepliesFieldReply";
 
 export interface PetitionRepliesFieldProps extends BoxProps {
   petitionId: string;
@@ -56,255 +49,229 @@ export interface PetitionRepliesFieldProps extends BoxProps {
     reply: PetitionRepliesField_PetitionFieldReplyFragment
   ) => void;
   onToggleComments: () => void;
-  onUpdateReplyStatus: (
-    replyId: string,
-    status: PetitionFieldReplyStatus
-  ) => void;
+  onUpdateReplyStatus: (replyId: string, status: PetitionFieldReplyStatus) => void;
   onValidateToggle: () => void;
 }
 
 export const PetitionRepliesField = Object.assign(
-  forwardRef<HTMLElement, PetitionRepliesFieldProps>(
-    function PetitionRepliesField(
-      {
-        petitionId,
-        field,
-        fieldIndex,
-        isVisible,
-        isActive: isShowingComments,
-        onAction,
-        onToggleComments,
-        onValidateToggle,
-        onUpdateReplyStatus,
-        ...props
-      },
-      ref
-    ) {
-      const intl = useIntl();
-      const [petitionFieldAttachmentDownloadLink] =
-        usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation();
-      const handleAttachmentClick = function (attachmentId: string) {
-        openNewWindow(async () => {
-          const { data } = await petitionFieldAttachmentDownloadLink({
-            variables: { petitionId, fieldId: field.id, attachmentId },
-          });
-          const { url } = data!.petitionFieldAttachmentDownloadLink;
-          return url!;
+  forwardRef<HTMLElement, PetitionRepliesFieldProps>(function PetitionRepliesField(
+    {
+      petitionId,
+      field,
+      fieldIndex,
+      isVisible,
+      isActive: isShowingComments,
+      onAction,
+      onToggleComments,
+      onValidateToggle,
+      onUpdateReplyStatus,
+      ...props
+    },
+    ref
+  ) {
+    const intl = useIntl();
+    const [petitionFieldAttachmentDownloadLink] =
+      usePetitionRepliesField_petitionFieldAttachmentDownloadLinkMutation();
+    const handleAttachmentClick = function (attachmentId: string) {
+      openNewWindow(async () => {
+        const { data } = await petitionFieldAttachmentDownloadLink({
+          variables: { petitionId, fieldId: field.id, attachmentId },
         });
-      };
+        const { url } = data!.petitionFieldAttachmentDownloadLink;
+        return url!;
+      });
+    };
 
-      return field.type === "HEADING" ? (
-        <Stack
-          ref={ref as any}
-          spacing={1}
-          paddingX={{ base: 4, md: 6 }}
-          paddingY={2}
-          as="section"
-          {...props}
-        >
-          <Flex alignItems="center">
-            <PetitionFieldTypeIndicator
-              marginLeft="1px"
-              type={field.type}
-              fieldIndex={fieldIndex}
+    return field.type === "HEADING" ? (
+      <Stack
+        ref={ref as any}
+        spacing={1}
+        paddingX={{ base: 4, md: 6 }}
+        paddingY={2}
+        as="section"
+        {...props}
+      >
+        <Flex alignItems="center">
+          <PetitionFieldTypeIndicator marginLeft="1px" type={field.type} fieldIndex={fieldIndex} />
+          <Box flex="1" minWidth="0">
+            {field.title ? (
+              <Heading marginLeft={4} size="md" isTruncated>
+                {field.title}
+              </Heading>
+            ) : (
+              <Heading
+                marginLeft={4}
+                size="md"
+                color="gray.500"
+                fontWeight="normal"
+                fontStyle="italic"
+                isTruncated
+              >
+                <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
+              </Heading>
+            )}
+          </Box>
+        </Flex>
+        {field.description ? (
+          <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
+            <BreakLines>{field.description}</BreakLines>
+          </Text>
+        ) : null}
+        {field.attachments.length ? (
+          <Box paddingY={1}>
+            <PetitionRepliesFieldAttachments
+              attachments={field.attachments}
+              onAttachmentClick={handleAttachmentClick}
             />
-            <Box flex="1" minWidth="0">
+          </Box>
+        ) : null}
+      </Stack>
+    ) : (
+      <Card
+        ref={ref}
+        layerStyle="highlightable"
+        display="flex"
+        backgroundColor={isVisible ? "white" : "gray.50"}
+        flexDirection="column"
+        position="relative"
+        paddingY={4}
+        paddingX={{ base: 4, md: 6 }}
+        {...props}
+      >
+        <Flex flexWrap="wrap" justifyContent="space-between">
+          <Flex width={{ base: "100%", lg: "auto" }} flex="1">
+            <PetitionFieldTypeIndicator marginTop="2px" type={field.type} fieldIndex={fieldIndex} />
+            <Box marginLeft={4} flex="1">
               {field.title ? (
-                <Heading marginLeft={4} size="md" isTruncated>
+                <Text as="h4" overflowWrap="anywhere">
                   {field.title}
-                </Heading>
+                </Text>
               ) : (
-                <Heading
-                  marginLeft={4}
-                  size="md"
-                  color="gray.500"
-                  fontWeight="normal"
-                  fontStyle="italic"
-                  isTruncated
-                >
-                  <FormattedMessage
-                    id="generic.empty-heading"
-                    defaultMessage="Untitled heading"
-                  />
-                </Heading>
+                <Text as="h4" textStyle="hint" whiteSpace="nowrap">
+                  <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
+                </Text>
               )}
             </Box>
           </Flex>
+          <Flex width={{ base: "100%", lg: "auto" }}>
+            <Spacer />
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onValidateToggle}
+              aria-pressed={field.validated}
+              aria-label={
+                field.validated
+                  ? intl.formatMessage({
+                      id: "component.petition-replies-field.review-button-validated-label",
+                      defaultMessage: "Reviewed",
+                    })
+                  : intl.formatMessage({
+                      id: "component.petition-replies-field.review-button-not-validated-label",
+                      defaultMessage: "Not reviewed",
+                    })
+              }
+              marginRight={1}
+            >
+              <Switch
+                color="green"
+                isChecked={field.validated}
+                onChange={noop}
+                size="sm"
+                pointerEvents="none"
+                marginRight={2}
+                position="relative"
+                top="1px"
+                aria-hidden={field.validated}
+              />
+              <FormattedMessage
+                id="component.petition-replies-field.review-button"
+                defaultMessage="Reviewed"
+              />
+            </Button>
+            {/* This Flex element makes the reviewed buttons to be aligned */}
+            <Flex width="66px">
+              <Spacer />
+              <CommentsButton
+                isActive={isShowingComments}
+                commentCount={field.comments.length}
+                hasUnreadComments={field.comments.some((c) => c.isUnread)}
+                onClick={onToggleComments}
+              />
+            </Flex>
+          </Flex>
+        </Flex>
+        <Box marginBottom={2}>
           {field.description ? (
             <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
               <BreakLines>{field.description}</BreakLines>
             </Text>
-          ) : null}
-          {field.attachments.length ? (
-            <Box paddingY={1}>
-              <PetitionRepliesFieldAttachments
-                attachments={field.attachments}
-                onAttachmentClick={handleAttachmentClick}
-              />
-            </Box>
-          ) : null}
-        </Stack>
-      ) : (
-        <Card
-          ref={ref}
-          layerStyle="highlightable"
-          display="flex"
-          backgroundColor={isVisible ? "white" : "gray.50"}
-          flexDirection="column"
-          position="relative"
-          paddingY={4}
-          paddingX={{ base: 4, md: 6 }}
-          {...props}
-        >
-          <Flex flexWrap="wrap" justifyContent="space-between">
-            <Flex width={{ base: "100%", lg: "auto" }} flex="1">
-              <PetitionFieldTypeIndicator
-                marginTop="2px"
-                type={field.type}
-                fieldIndex={fieldIndex}
-              />
-              <Box marginLeft={4} flex="1">
-                {field.title ? (
-                  <Text as="h4" overflowWrap="anywhere">
-                    {field.title}
-                  </Text>
-                ) : (
-                  <Text as="h4" textStyle="hint" whiteSpace="nowrap">
-                    <FormattedMessage
-                      id="generic.untitled-field"
-                      defaultMessage="Untitled field"
-                    />
-                  </Text>
-                )}
-              </Box>
-            </Flex>
-            <Flex width={{ base: "100%", lg: "auto" }}>
-              <Spacer />
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={onValidateToggle}
-                aria-pressed={field.validated}
-                aria-label={
-                  field.validated
-                    ? intl.formatMessage({
-                        id: "component.petition-replies-field.review-button-validated-label",
-                        defaultMessage: "Reviewed",
-                      })
-                    : intl.formatMessage({
-                        id: "component.petition-replies-field.review-button-not-validated-label",
-                        defaultMessage: "Not reviewed",
-                      })
-                }
-                marginRight={1}
-              >
-                <Switch
-                  color="green"
-                  isChecked={field.validated}
-                  onChange={noop}
-                  size="sm"
-                  pointerEvents="none"
-                  marginRight={2}
-                  position="relative"
-                  top="1px"
-                  aria-hidden={field.validated}
-                />
-                <FormattedMessage
-                  id="component.petition-replies-field.review-button"
-                  defaultMessage="Reviewed"
-                />
-              </Button>
-              {/* This Flex element makes the reviewed buttons to be aligned */}
-              <Flex width="66px">
-                <Spacer />
-                <CommentsButton
-                  isActive={isShowingComments}
-                  commentCount={field.comments.length}
-                  hasUnreadComments={field.comments.some((c) => c.isUnread)}
-                  onClick={onToggleComments}
-                />
-              </Flex>
-            </Flex>
-          </Flex>
-          <Box marginBottom={2}>
-            {field.description ? (
-              <Text color="gray.600" fontSize="sm" overflowWrap="anywhere">
-                <BreakLines>{field.description}</BreakLines>
-              </Text>
-            ) : (
-              <Text fontSize="sm" textStyle="hint">
-                <FormattedMessage
-                  id="generic.no-description"
-                  defaultMessage="No description"
-                />
-              </Text>
-            )}
+          ) : (
+            <Text fontSize="sm" textStyle="hint">
+              <FormattedMessage id="generic.no-description" defaultMessage="No description" />
+            </Text>
+          )}
+        </Box>
+        {field.attachments.length ? (
+          <Box marginBottom={2} paddingY={1}>
+            <PetitionRepliesFieldAttachments
+              attachments={field.attachments}
+              onAttachmentClick={handleAttachmentClick}
+            />
           </Box>
-          {field.attachments.length ? (
-            <Box marginBottom={2} paddingY={1}>
-              <PetitionRepliesFieldAttachments
-                attachments={field.attachments}
-                onAttachmentClick={handleAttachmentClick}
-              />
-            </Box>
-          ) : null}
-          {field.replies.length ? (
-            <>
-              {field.type === "DYNAMIC_SELECT" ? (
-                <Stack
-                  as="ol"
-                  listStyleType="none"
-                  direction="row"
-                  alignItems="center"
-                  fontSize="sm"
-                  divider={<ArrowForwardIcon border="none" />}
-                  marginBottom={2}
-                >
-                  {(field.replies[0].content.columns as string[][])?.map(
-                    ([label], index) => (
-                      <Box key={index} as="li">
-                        {label}
-                      </Box>
-                    )
-                  )}
-                </Stack>
-              ) : null}
-              <Stack spacing={4}>
-                {field.replies.map((reply) => (
-                  <PetitionRepliesFieldReply
-                    key={reply.id}
-                    reply={reply}
-                    onAction={(action) => onAction(action, reply)}
-                    onUpdateStatus={(status) =>
-                      onUpdateReplyStatus(reply.id, status)
-                    }
-                  />
+        ) : null}
+        {field.replies.length ? (
+          <>
+            {field.type === "DYNAMIC_SELECT" ? (
+              <Stack
+                as="ol"
+                listStyleType="none"
+                direction="row"
+                alignItems="center"
+                fontSize="sm"
+                divider={<ArrowForwardIcon border="none" />}
+                marginBottom={2}
+              >
+                {(field.replies[0].content.columns as string[][])?.map(([label], index) => (
+                  <Box key={index} as="li">
+                    {label}
+                  </Box>
                 ))}
               </Stack>
-            </>
-          ) : isVisible ? (
-            <Box paddingY={4}>
-              <Text textStyle="hint" textAlign="center">
-                <FormattedMessage
-                  id="component.petition-replies-field.no-replies"
-                  defaultMessage="There are no replies to this field yet"
+            ) : null}
+            <Stack spacing={4}>
+              {field.replies.map((reply) => (
+                <PetitionRepliesFieldReply
+                  key={reply.id}
+                  reply={reply}
+                  onAction={(action) => onAction(action, reply)}
+                  onUpdateStatus={(status) => onUpdateReplyStatus(reply.id, status)}
                 />
-              </Text>
-            </Box>
-          ) : (
-            <Box paddingY={4}>
-              <Text textStyle="hint" textAlign="center">
-                <FormattedMessage
-                  id="component.petition-replies-field.conditions-not-met"
-                  defaultMessage="Visibility conditions for this field are not met"
-                />
-              </Text>
-            </Box>
-          )}
-        </Card>
-      );
-    }
-  ),
+              ))}
+            </Stack>
+          </>
+        ) : isVisible ? (
+          <Box paddingY={4}>
+            <Text textStyle="hint" textAlign="center">
+              <FormattedMessage
+                id="component.petition-replies-field.no-replies"
+                defaultMessage="There are no replies to this field yet"
+              />
+            </Text>
+          </Box>
+        ) : (
+          <Box paddingY={4}>
+            <Text textStyle="hint" textAlign="center">
+              <FormattedMessage
+                id="component.petition-replies-field.conditions-not-met"
+                defaultMessage="Visibility conditions for this field are not met"
+              />
+            </Text>
+          </Box>
+        )}
+      </Card>
+    );
+  }),
   {
     fragments: {
       PetitionField: gql`
@@ -411,70 +378,61 @@ interface CommentsButtonProps extends ButtonProps {
   isActive: boolean;
 }
 
-const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
-  function CommentsButton(
-    { commentCount, hasUnreadComments, isActive, ...props },
-    ref
-  ) {
-    const intl = useIntl();
-    const common = {
-      "aria-pressed": isActive,
-      size: "sm",
-      variant: isActive ? "solid" : "ghost",
-      colorScheme: isActive ? "purple" : "gray",
-      ...props,
-    } as const;
-    return commentCount > 0 ? (
-      <Button
-        flexDirection="row-reverse"
-        fontWeight="normal"
-        alignItems="center"
-        {...common}
-        ref={ref}
-      >
-        <Stack
-          display="inline-flex"
-          direction="row-reverse"
-          alignItems="flex-end"
+const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function CommentsButton(
+  { commentCount, hasUnreadComments, isActive, ...props },
+  ref
+) {
+  const intl = useIntl();
+  const common = {
+    "aria-pressed": isActive,
+    size: "sm",
+    variant: isActive ? "solid" : "ghost",
+    colorScheme: isActive ? "purple" : "gray",
+    ...props,
+  } as const;
+  return commentCount > 0 ? (
+    <Button
+      flexDirection="row-reverse"
+      fontWeight="normal"
+      alignItems="center"
+      {...common}
+      ref={ref}
+    >
+      <Stack display="inline-flex" direction="row-reverse" alignItems="flex-end">
+        <CommentIcon fontSize="md" color={isActive ? "inherit" : "gray.700"} />
+        <Text
+          as="span"
+          aria-label={intl.formatMessage(
+            {
+              id: "generic.comments-button-label",
+              defaultMessage:
+                "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+            },
+            { commentCount }
+          )}
         >
-          <CommentIcon
-            fontSize="md"
-            color={isActive ? "inherit" : "gray.700"}
-          />
-          <Text
-            as="span"
-            aria-label={intl.formatMessage(
-              {
-                id: "generic.comments-button-label",
-                defaultMessage:
-                  "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-              },
-              { commentCount }
-            )}
-          >
-            {intl.formatNumber(commentCount)}
-          </Text>
-        </Stack>
-        <RecipientViewCommentsBadge
-          hasUnreadComments={hasUnreadComments}
-          isReversedPurple={isActive}
-          marginRight={2}
-        />
-      </Button>
-    ) : (
-      <IconButton
-        icon={<CommentIcon />}
-        {...common}
-        aria-label={intl.formatMessage(
-          {
-            id: "generic.comments-button-label",
-            defaultMessage:
-              "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-          },
-          { commentCount }
-        )}
-        ref={ref}
+          {intl.formatNumber(commentCount)}
+        </Text>
+      </Stack>
+      <RecipientViewCommentsBadge
+        hasUnreadComments={hasUnreadComments}
+        isReversedPurple={isActive}
+        marginRight={2}
       />
-    );
-  }
-);
+    </Button>
+  ) : (
+    <IconButton
+      icon={<CommentIcon />}
+      {...common}
+      aria-label={intl.formatMessage(
+        {
+          id: "generic.comments-button-label",
+          defaultMessage:
+            "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+        },
+        { commentCount }
+      )}
+      ref={ref}
+    />
+  );
+});

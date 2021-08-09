@@ -18,11 +18,7 @@ export interface PetitionFieldVisibilityCondition {
 
 export type ConditionValue = string | number | null;
 
-export type PetitionFieldVisibilityConditionModifier =
-  | "ANY"
-  | "ALL"
-  | "NONE"
-  | "NUMBER_OF_REPLIES";
+export type PetitionFieldVisibilityConditionModifier = "ANY" | "ALL" | "NONE" | "NUMBER_OF_REPLIES";
 
 export type PetitionFieldVisibilityConditionOperator =
   | "EQUAL"

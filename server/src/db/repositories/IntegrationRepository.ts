@@ -64,9 +64,7 @@ export class IntegrationRepository extends BaseRepository {
     integrationId: number,
     settings: IntegrationSettings<K>
   ) {
-    return await this.from("org_integration")
-      .where("id", integrationId)
-      .update({ settings });
+    return await this.from("org_integration").where("id", integrationId).update({ settings });
   }
 
   async removeSignaturitBrandingIds(orgId: number) {

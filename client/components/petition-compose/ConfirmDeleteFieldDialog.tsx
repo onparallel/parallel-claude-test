@@ -1,19 +1,13 @@
 import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
 export function ConfirmDeleteFieldDialog({ ...props }: DialogProps) {
   return (
     <ConfirmDialog
       header={
-        <FormattedMessage
-          id="petition.confirm-delete-field.header"
-          defaultMessage="Delete field"
-        />
+        <FormattedMessage id="petition.confirm-delete-field.header" defaultMessage="Delete field" />
       }
       body={
         <FormattedMessage

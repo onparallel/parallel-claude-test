@@ -8,12 +8,7 @@ export function textWithPlaceholderToSlateNodes(
 ): CustomElement[] {
   return value.split("\n").map((line) => {
     const parts = line.split(
-      new RegExp(
-        `(#(?:${placeholders
-          .map((p) => escapeStringRegexp(p.value))
-          .join("|")})#)`,
-        "g"
-      )
+      new RegExp(`(#(?:${placeholders.map((p) => escapeStringRegexp(p.value)).join("|")})#)`, "g")
     );
     const children: (CustomElement | CustomText)[] = [];
     for (const part of parts) {

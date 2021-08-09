@@ -10,33 +10,24 @@ export interface TestSessionContext {
 
 function buildCreateTestSession(func: jest.Describe) {
   return function (name: string, fn: (context: TestSessionContext) => void) {
-    func.each((process.env.BROWSER ?? "chrome").split(","))(
-      `${name} - %s`,
-      (browserName) => {
-        const context = {} as Partial<TestSessionContext>;
-        beforeAll(async () => {
-          context.browser = await getBrowser(
-            browserName,
-            process.env.HEADLESS_BROWSER === "true"
-          );
-          context.browserContext = await startContext(context.browser!);
-          context.page = await context.browserContext!.newPage();
-        });
+    func.each((process.env.BROWSER ?? "chrome").split(","))(`${name} - %s`, (browserName) => {
+      const context = {} as Partial<TestSessionContext>;
+      beforeAll(async () => {
+        context.browser = await getBrowser(browserName, process.env.HEADLESS_BROWSER === "true");
+        context.browserContext = await startContext(context.browser!);
+        context.page = await context.browserContext!.newPage();
+      });
 
-        afterAll(async () => {
-          await context.browser!.close();
-        });
+      afterAll(async () => {
+        await context.browser!.close();
+      });
 
-        fn(context as TestSessionContext);
-      }
-    );
+      fn(context as TestSessionContext);
+    });
   };
 }
 
-export const createTestSession = Object.assign(
-  buildCreateTestSession(describe),
-  {
-    only: buildCreateTestSession(describe.only),
-    skip: buildCreateTestSession(describe.skip),
-  }
-);
+export const createTestSession = Object.assign(buildCreateTestSession(describe), {
+  only: buildCreateTestSession(describe.only),
+  skip: buildCreateTestSession(describe.skip),
+});

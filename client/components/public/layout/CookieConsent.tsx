@@ -75,10 +75,7 @@ export function CookieConsent({}: CookieConsentProps) {
         rightIcon={<CheckIcon />}
         onClick={handleConsentClick}
       >
-        <FormattedMessage
-          id="component.cookie-consent.accept-button"
-          defaultMessage="Accept"
-        />
+        <FormattedMessage id="component.cookie-consent.accept-button" defaultMessage="Accept" />
       </Button>
     </PublicContainer>
   ) : null;

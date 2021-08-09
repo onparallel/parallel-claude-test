@@ -4,15 +4,9 @@ import { HighlightText } from "@parallel/components/common/HighlightText";
 import { PetitionFieldTypeIndicator } from "@parallel/components/petition-common/PetitionFieldTypeIndicator";
 import { PetitionFieldSelect_PetitionFieldFragment } from "@parallel/graphql/__types";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import {
-  FieldOptions,
-  usePetitionFieldTypeColor,
-} from "@parallel/utils/petitionFields";
+import { FieldOptions, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { useReactSelectProps } from "@parallel/utils/react-select/hooks";
-import {
-  CustomSelectProps,
-  SelectProps,
-} from "@parallel/utils/react-select/types";
+import { CustomSelectProps, SelectProps } from "@parallel/utils/react-select/types";
 import { If } from "@parallel/utils/types";
 import { memo, useCallback, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -40,12 +34,8 @@ export function PetitionFieldSelect<
   ...props
 }: PetitionFieldSelectProps<T, ExpandFields>) {
   const intl = useIntl();
-  const rsProps = useReactSelectProps<PetitionFieldSelectOption<T>, any, never>(
-    props
-  );
-  const fieldSelectProps = useMemo<
-    SelectProps<PetitionFieldSelectOption<T>, any, never>
-  >(
+  const rsProps = useReactSelectProps<PetitionFieldSelectOption<T>, any, never>(props);
+  const fieldSelectProps = useMemo<SelectProps<PetitionFieldSelectOption<T>, any, never>>(
     () => ({
       ...rsProps,
       components: {
@@ -83,16 +73,13 @@ export function PetitionFieldSelect<
         },
       },
       getOptionValue(option) {
-        return option.type === "FIELD"
-          ? option.field.id
-          : `${option.field.id}-${option.column}`;
+        return option.type === "FIELD" ? option.field.id : `${option.field.id}-${option.column}`;
       },
       getOptionLabel(option) {
         if (option.type === "FIELD") {
           return option.field.title ?? "";
         } else {
-          const options = option.field
-            .options as FieldOptions["DYNAMIC_SELECT"];
+          const options = option.field.options as FieldOptions["DYNAMIC_SELECT"];
           const label = options.labels[option.column];
           return `${option.field.title ?? ""} ${label}`;
         }
@@ -101,25 +88,24 @@ export function PetitionFieldSelect<
     [rsProps, expandFields, fields, indices]
   );
   const { options, _value } = useMemo(() => {
-    const options: PetitionFieldSelectOption<T>[] = zip(
-      fields,
-      indices
-    ).flatMap(([field, fieldIndex]) => {
-      if (expandFields && field.type === "DYNAMIC_SELECT") {
-        const { labels } = field.options as FieldOptions["DYNAMIC_SELECT"];
-        return [
-          { type: "FIELD", field, fieldIndex },
-          ...labels.map((_, column) => ({
-            type: "DYNAMIC_SELECT_OPTION" as const,
-            field,
-            fieldIndex,
-            column,
-          })),
-        ];
-      } else {
-        return [{ type: "FIELD", field, fieldIndex }];
+    const options: PetitionFieldSelectOption<T>[] = zip(fields, indices).flatMap(
+      ([field, fieldIndex]) => {
+        if (expandFields && field.type === "DYNAMIC_SELECT") {
+          const { labels } = field.options as FieldOptions["DYNAMIC_SELECT"];
+          return [
+            { type: "FIELD", field, fieldIndex },
+            ...labels.map((_, column) => ({
+              type: "DYNAMIC_SELECT_OPTION" as const,
+              field,
+              fieldIndex,
+              column,
+            })),
+          ];
+        } else {
+          return [{ type: "FIELD", field, fieldIndex }];
+        }
       }
-    });
+    );
     const [field, column]: [T | null | undefined] | [T, number | undefined] = (
       Array.isArray(value) ? value : [value]
     ) as any;
@@ -128,12 +114,9 @@ export function PetitionFieldSelect<
       : column !== undefined
       ? options.find(
           (o) =>
-            o.type === "DYNAMIC_SELECT_OPTION" &&
-            o.field.id === field.id &&
-            o.column === column
+            o.type === "DYNAMIC_SELECT_OPTION" && o.field.id === field.id && o.column === column
         ) ?? null
-      : options.find((o) => o.type === "FIELD" && o.field.id === field.id) ??
-        null;
+      : options.find((o) => o.type === "FIELD" && o.field.id === field.id) ?? null;
     return { options, _value };
   }, [fields, indices, expandFields, value]);
   const handleChange = useCallback(
@@ -171,9 +154,7 @@ PetitionFieldSelect.fragments = {
   `,
 };
 
-type PetitionFieldSelectOption<
-  T extends PetitionFieldSelect_PetitionFieldFragment
-> =
+type PetitionFieldSelectOption<T extends PetitionFieldSelect_PetitionFieldFragment> =
   | {
       type: "FIELD";
       field: T;
@@ -188,13 +169,7 @@ type PetitionFieldSelectOption<
 
 const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
   T extends PetitionFieldSelect_PetitionFieldFragment
->({
-  option,
-  highlight,
-}: {
-  option: PetitionFieldSelectOption<T>;
-  highlight?: string;
-}) {
+>({ option, highlight }: { option: PetitionFieldSelectOption<T>; highlight?: string }) {
   const color = usePetitionFieldTypeColor(option.field.type);
   if (option.type === "FIELD") {
     const { field, fieldIndex } = option;
@@ -207,14 +182,7 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
           isTooltipDisabled
           flexShrink={0}
         />
-        <Box
-          fontSize="sm"
-          marginLeft={2}
-          paddingRight={1}
-          flex="1"
-          minWidth="0"
-          isTruncated
-        >
+        <Box fontSize="sm" marginLeft={2} paddingRight={1} flex="1" minWidth="0" isTruncated>
           {field.title ? (
             highlight ? (
               <HighlightText text={field.title} search={highlight} />
@@ -223,10 +191,7 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
             )
           ) : (
             <Text as="span" textStyle="hint">
-              <FormattedMessage
-                id="generic.untitled-field"
-                defaultMessage="Untitled field"
-              />
+              <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
             </Text>
           )}
         </Box>
@@ -250,19 +215,8 @@ const PetitionFieldSelectItem = memo(function PetitionFieldSelectItem<
           {fieldIndex}
           {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".charAt(column)}
         </Center>
-        <Box
-          fontSize="sm"
-          marginLeft={2}
-          paddingRight={1}
-          flex="1"
-          minWidth="0"
-          isTruncated
-        >
-          {highlight ? (
-            <HighlightText text={label} search={highlight} />
-          ) : (
-            label
-          )}
+        <Box fontSize="sm" marginLeft={2} paddingRight={1} flex="1" minWidth="0" isTruncated>
+          {highlight ? <HighlightText text={label} search={highlight} /> : label}
         </Box>
       </>
     );

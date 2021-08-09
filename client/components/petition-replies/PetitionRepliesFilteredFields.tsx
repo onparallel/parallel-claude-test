@@ -7,12 +7,7 @@ import { FormattedMessage } from "react-intl";
 export function PetitionRepliesFilteredFields({ count }: { count: number }) {
   return (
     <Center position="relative" role="separator">
-      <Divider
-        position="absolute"
-        top="50%"
-        width="100%"
-        borderStyle="dashed"
-      />
+      <Divider position="absolute" top="50%" width="100%" borderStyle="dashed" />
       <Text
         as="div"
         backgroundColor="gray.50"

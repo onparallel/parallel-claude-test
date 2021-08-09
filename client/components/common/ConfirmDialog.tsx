@@ -13,8 +13,7 @@ import { ReactNode, useRef } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BaseDialog, BaseDialogProps } from "./BaseDialog";
 
-export interface ConfirmDialogProps<TResult>
-  extends Omit<BaseDialogProps<TResult>, "children"> {
+export interface ConfirmDialogProps<TResult> extends Omit<BaseDialogProps<TResult>, "children"> {
   header: ReactNode;
   body: ReactNode;
   confirm: ReactNode;
@@ -62,10 +61,7 @@ export function ConfirmDialog<TResult = void>({
         <ModalBody>{body}</ModalBody>
         <ModalFooter as={Stack} direction="row">
           {cancel ?? (
-            <Button
-              ref={cancelRef}
-              onClick={() => props.onReject({ reason: "CANCEL" })}
-            >
+            <Button ref={cancelRef} onClick={() => props.onReject({ reason: "CANCEL" })}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
           )}

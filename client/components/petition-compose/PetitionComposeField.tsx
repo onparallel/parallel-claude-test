@@ -39,21 +39,12 @@ import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { generateCssStripe } from "@parallel/utils/css";
 import { letters, PetitionFieldIndex } from "@parallel/utils/fieldIndices";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
-import {
-  getMinMaxCheckboxLimit,
-  usePetitionFieldTypeColor,
-} from "@parallel/utils/petitionFields";
+import { getMinMaxCheckboxLimit, usePetitionFieldTypeColor } from "@parallel/utils/petitionFields";
 import { withError } from "@parallel/utils/promises/withError";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { uploadFile } from "@parallel/utils/uploadFile";
 import useMergedRef from "@react-hook/merged-ref";
-import {
-  memo,
-  useCallback,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
+import { memo, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { useDrag, useDrop, XYCoord } from "react-dnd";
 import { useDropzone } from "react-dropzone";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -143,9 +134,9 @@ const _PetitionComposeField = chakraForwardRef<
       .filter((f) => !f.isReadOnly).length > 0;
 
   const uploads = useRef<Record<string, XMLHttpRequest>>({});
-  const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<
-    Record<string, number>
-  >({});
+  const [attachmentUploadProgress, setAttachmentUploadProgress] = useState<Record<string, number>>(
+    {}
+  );
   const [createPetitionFieldAttachmentUploadLink] =
     usePetitionComposeField_createPetitionFieldAttachmentUploadLinkMutation();
   const [petitionFieldAttachmentUploadComplete] =
@@ -183,102 +174,95 @@ const _PetitionComposeField = chakraForwardRef<
 
   const showErrorDialog = useErrorDialog();
   const maxAttachmentSize = 100 * 1024 * 1024;
-  const { getRootProps, getInputProps, isDragActive, open, draggedFiles } =
-    useDropzone({
-      maxSize: maxAttachmentSize,
-      onDropRejected: async () => {
-        await withError(
-          showErrorDialog({
-            header: (
-              <FormattedMessage
-                id="component.petition-compose-field.invalid-attachment-header"
-                defaultMessage="Invalid attachment"
-              />
-            ),
-            message: (
-              <FormattedMessage
-                id="component.petition-compose-field.invalid-attachment-message"
-                defaultMessage="Only attachments of up to {size} are allowed."
-                values={{ size: <FileSize value={maxAttachmentSize} /> }}
-              />
-            ),
-          })
-        );
-      },
-      onDrop: async (files: File[], _, event) => {
-        if (field.attachments.length + files.length > 10) {
-          // on drop event already shows a message on the dropzone, type="change" means the
-          // file is coming from the "Add attachment" button which doesn't provide any feedback
-          if (event.type === "change") {
-            await withError(
-              showErrorDialog({
-                header: (
-                  <FormattedMessage
-                    id="component.petition-compose-field.too-many-attachments-header"
-                    defaultMessage="Too many attachments"
-                  />
-                ),
-                message: (
-                  <FormattedMessage
-                    id="component.petition-compose-field.too-many-attachments"
-                    defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
-                    values={{ count: 10 }}
-                  />
-                ),
-              })
-            );
-          }
-          return;
+  const { getRootProps, getInputProps, isDragActive, open, draggedFiles } = useDropzone({
+    maxSize: maxAttachmentSize,
+    onDropRejected: async () => {
+      await withError(
+        showErrorDialog({
+          header: (
+            <FormattedMessage
+              id="component.petition-compose-field.invalid-attachment-header"
+              defaultMessage="Invalid attachment"
+            />
+          ),
+          message: (
+            <FormattedMessage
+              id="component.petition-compose-field.invalid-attachment-message"
+              defaultMessage="Only attachments of up to {size} are allowed."
+              values={{ size: <FileSize value={maxAttachmentSize} /> }}
+            />
+          ),
+        })
+      );
+    },
+    onDrop: async (files: File[], _, event) => {
+      if (field.attachments.length + files.length > 10) {
+        // on drop event already shows a message on the dropzone, type="change" means the
+        // file is coming from the "Add attachment" button which doesn't provide any feedback
+        if (event.type === "change") {
+          await withError(
+            showErrorDialog({
+              header: (
+                <FormattedMessage
+                  id="component.petition-compose-field.too-many-attachments-header"
+                  defaultMessage="Too many attachments"
+                />
+              ),
+              message: (
+                <FormattedMessage
+                  id="component.petition-compose-field.too-many-attachments"
+                  defaultMessage="A maximum of {count, plural, =1 {one attachment} other {# attachments}} can be added to a field"
+                  values={{ count: 10 }}
+                />
+              ),
+            })
+          );
         }
-        await Promise.all(
-          files.map(async (file) => {
-            const { data } = await createPetitionFieldAttachmentUploadLink({
-              variables: {
-                petitionId: petitionId,
-                fieldId: field.id,
-                data: {
-                  filename: file.name,
-                  size: file.size,
-                  contentType: file.type,
-                },
+        return;
+      }
+      await Promise.all(
+        files.map(async (file) => {
+          const { data } = await createPetitionFieldAttachmentUploadLink({
+            variables: {
+              petitionId: petitionId,
+              fieldId: field.id,
+              data: {
+                filename: file.name,
+                size: file.size,
+                contentType: file.type,
               },
-              update(cache, { data }) {
-                const { attachment } =
-                  data!.createPetitionFieldAttachmentUploadLink;
-                updateFieldAttachments(cache, field.id, (attachments) => [
-                  ...attachments,
-                  attachment,
-                ]);
-              },
-            });
-            const { attachment, presignedPostData } =
-              data!.createPetitionFieldAttachmentUploadLink;
-            uploads.current[attachment.id] = uploadFile(
-              file,
-              presignedPostData,
-              {
-                onProgress(progress) {
-                  setAttachmentUploadProgress((progresses) => ({
-                    ...progresses,
-                    [attachment.id]: progress,
-                  }));
+            },
+            update(cache, { data }) {
+              const { attachment } = data!.createPetitionFieldAttachmentUploadLink;
+              updateFieldAttachments(cache, field.id, (attachments) => [
+                ...attachments,
+                attachment,
+              ]);
+            },
+          });
+          const { attachment, presignedPostData } = data!.createPetitionFieldAttachmentUploadLink;
+          uploads.current[attachment.id] = uploadFile(file, presignedPostData, {
+            onProgress(progress) {
+              setAttachmentUploadProgress((progresses) => ({
+                ...progresses,
+                [attachment.id]: progress,
+              }));
+            },
+            async onComplete() {
+              delete uploads.current[field.id];
+              await petitionFieldAttachmentUploadComplete({
+                variables: {
+                  petitionId: petitionId,
+                  fieldId: field.id,
+                  attachmentId: attachment.id,
                 },
-                async onComplete() {
-                  delete uploads.current[field.id];
-                  await petitionFieldAttachmentUploadComplete({
-                    variables: {
-                      petitionId: petitionId,
-                      fieldId: field.id,
-                      attachmentId: attachment.id,
-                    },
-                  });
-                },
-              }
-            );
-          })
-        );
-      },
-    });
+              });
+            },
+          });
+        })
+      );
+    },
+  });
 
   const _rootProps = getRootProps();
   const dropzoneRootProps = omit(_rootProps, [
@@ -300,8 +284,7 @@ const _PetitionComposeField = chakraForwardRef<
       aria-current={isActive ? "true" : "false"}
       position="relative"
       sx={{
-        ...(isDragging &&
-          generateCssStripe({ size: "1rem", color: "gray.50" })),
+        ...(isDragging && generateCssStripe({ size: "1rem", color: "gray.50" })),
       }}
       onFocus={onFocus}
       {...dropzoneRootProps}
@@ -309,10 +292,7 @@ const _PetitionComposeField = chakraForwardRef<
     >
       <input type="file" {...getInputProps()} />
       {isDragActive ? (
-        <PetitionComposeFieldDragActiveIndicator
-          field={field}
-          draggedFiles={draggedFiles}
-        />
+        <PetitionComposeFieldDragActiveIndicator field={field} draggedFiles={draggedFiles} />
       ) : null}
       <Box
         ref={previewRef}
@@ -545,8 +525,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
               field.type === "HEADING"
                 ? intl.formatMessage({
                     id: "component.petition-compose-field.heading-title-placeholder",
-                    defaultMessage:
-                      "Enter an introductory title for this section...",
+                    defaultMessage: "Enter an introductory title for this section...",
                   })
                 : field.type === "FILE_UPLOAD"
                 ? intl.formatMessage({
@@ -564,9 +543,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             border="none"
             padding={0}
             height={6}
-            _placeholder={
-              showError && !title ? { color: "red.500" } : undefined
-            }
+            _placeholder={showError && !title ? { color: "red.500" } : undefined}
             _focus={{ boxShadow: "none" }}
             onChange={(event) => setTitle(event.target.value ?? null)}
             onBlur={() => {
@@ -582,10 +559,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                   event.preventDefault();
                   if (field.description) {
                     focusDescription(true);
-                  } else if (
-                    field.type === "SELECT" ||
-                    field.type === "CHECKBOX"
-                  ) {
+                  } else if (field.type === "SELECT" || field.type === "CHECKBOX") {
                     focusFieldOptions(true);
                   } else {
                     onFocusNextField();
@@ -616,15 +590,8 @@ const _PetitionComposeFieldInner = chakraForwardRef<
             height="24px"
             isDisabled={isReadOnly}
           >
-            <FormLabel
-              htmlFor={`field-required-${field.id}`}
-              fontWeight="normal"
-              marginBottom="0"
-            >
-              <FormattedMessage
-                id="petition.required-label"
-                defaultMessage="Required"
-              />
+            <FormLabel htmlFor={`field-required-${field.id}`} fontWeight="normal" marginBottom="0">
+              <FormattedMessage id="petition.required-label" defaultMessage="Required" />
             </FormLabel>
             <Switch
               id={`field-required-${field.id}`}
@@ -695,10 +662,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
           onKeyDown={(event) => {
             const textarea = event.target as HTMLTextAreaElement;
             const totalLines = (textarea.value.match(/\n/g) ?? []).length + 1;
-            const beforeCursor = textarea.value.substr(
-              0,
-              textarea.selectionStart
-            );
+            const beforeCursor = textarea.value.substr(0, textarea.selectionStart);
             const currentLine = (beforeCursor.match(/\n/g) ?? []).length;
             switch (event.key) {
               case "ArrowDown":
@@ -768,29 +732,22 @@ const _PetitionComposeFieldInner = chakraForwardRef<
                 />
               </Text>
               <List as={Stack} spacing={1} marginTop={1}>
-                {((field.options.labels ?? []) as string[]).map(
-                  (label, index) => (
-                    <ListItem
-                      key={index}
-                      as={Stack}
-                      direction="row"
-                      alignItems="center"
+                {((field.options.labels ?? []) as string[]).map((label, index) => (
+                  <ListItem key={index} as={Stack} direction="row" alignItems="center">
+                    <Center
+                      height="20px"
+                      width="26px"
+                      fontSize="xs"
+                      borderRadius="sm"
+                      border="1px solid"
+                      borderColor={color}
                     >
-                      <Center
-                        height="20px"
-                        width="26px"
-                        fontSize="xs"
-                        borderRadius="sm"
-                        border="1px solid"
-                        borderColor={color}
-                      >
-                        {fieldIndex}
-                        {letter.next().value}
-                      </Center>
-                      <Text as="span">{label}</Text>
-                    </ListItem>
-                  )
-                )}
+                      {fieldIndex}
+                      {letter.next().value}
+                    </Center>
+                    <Text as="span">{label}</Text>
+                  </ListItem>
+                ))}
               </List>
             </>
           ) : (
@@ -809,9 +766,7 @@ const _PetitionComposeFieldInner = chakraForwardRef<
       {field.visibility ? (
         <Box
           paddingTop={1}
-          marginBottom={
-            field.visibility && field.visibility.conditions.length < 5 ? -5 : 0
-          }
+          marginBottom={field.visibility && field.visibility.conditions.length < 5 ? -5 : 0}
         >
           <PetitionFieldVisibilityEditor
             showError={showError}
@@ -839,139 +794,137 @@ interface PetitionComposeFieldActionsProps
   isPublicTemplate?: boolean;
 }
 
-const _PetitionComposeFieldActions = chakraForwardRef<
-  "div",
-  PetitionComposeFieldActionsProps
->(function PetitionComposeFieldActions(
-  {
-    field,
-    canChangeVisibility,
-    onVisibilityClick,
-    onAttachmentClick,
-    onCloneField,
-    onSettingsClick,
-    onDeleteClick,
-    isReadOnly,
-    isPublicTemplate,
-    ...props
-  },
-  ref
-) {
-  const intl = useIntl();
-  const hasCondition = field.visibility;
-  return (
-    <Stack ref={ref} direction="row" padding={1} {...props}>
-      {canChangeVisibility || field.isFixed ? (
+const _PetitionComposeFieldActions = chakraForwardRef<"div", PetitionComposeFieldActionsProps>(
+  function PetitionComposeFieldActions(
+    {
+      field,
+      canChangeVisibility,
+      onVisibilityClick,
+      onAttachmentClick,
+      onCloneField,
+      onSettingsClick,
+      onDeleteClick,
+      isReadOnly,
+      isPublicTemplate,
+      ...props
+    },
+    ref
+  ) {
+    const intl = useIntl();
+    const hasCondition = field.visibility;
+    return (
+      <Stack ref={ref} direction="row" padding={1} {...props}>
+        {canChangeVisibility || field.isFixed ? (
+          <IconButtonWithTooltip
+            icon={<ConditionIcon />}
+            isDisabled={
+              (field.type === "HEADING" && (field.isFixed || field.options.hasPageBreak)) ||
+              isReadOnly
+            }
+            size="sm"
+            variant="ghost"
+            placement="bottom"
+            color={hasCondition ? "purple.500" : "gray.600"}
+            label={
+              hasCondition
+                ? intl.formatMessage({
+                    id: "component.petition-compose-field.remove-condition",
+                    defaultMessage: "Remove condition",
+                  })
+                : intl.formatMessage({
+                    id: "component.petition-compose-field.add-condition",
+                    defaultMessage: "Add condition",
+                  })
+            }
+            onClick={onVisibilityClick}
+          />
+        ) : (
+          <SmallPopover
+            placement="top"
+            closeDelay={0}
+            content={
+              <Text fontSize="sm">
+                <FormattedMessage
+                  id="component.petition-compose-field.conditions-not-enough-fields"
+                  defaultMessage="You can only add conditions based on previous fields. Add more fields to be able to set conditions between them."
+                />
+              </Text>
+            }
+          >
+            <IconButton
+              size="sm"
+              // fake disabled look so popover still works
+              opacity={0.4}
+              cursor="not-allowed"
+              backgroundColor="transparent"
+              _hover={{ backgroundColor: "transparent" }}
+              _active={{ backgroundColor: "transparent" }}
+              as="div"
+              icon={<ConditionIcon />}
+              aria-label={intl.formatMessage({
+                id: "component.petition-compose-field.add-condition",
+                defaultMessage: "Add condition",
+              })}
+            />
+          </SmallPopover>
+        )}
         <IconButtonWithTooltip
-          icon={<ConditionIcon />}
-          isDisabled={
-            (field.type === "HEADING" &&
-              (field.isFixed || field.options.hasPageBreak)) ||
-            isReadOnly
-          }
+          isDisabled={isPublicTemplate}
+          icon={<PaperclipIcon />}
           size="sm"
           variant="ghost"
           placement="bottom"
-          color={hasCondition ? "purple.500" : "gray.600"}
-          label={
-            hasCondition
-              ? intl.formatMessage({
-                  id: "component.petition-compose-field.remove-condition",
-                  defaultMessage: "Remove condition",
-                })
-              : intl.formatMessage({
-                  id: "component.petition-compose-field.add-condition",
-                  defaultMessage: "Add condition",
-                })
-          }
-          onClick={onVisibilityClick}
+          color="gray.600"
+          label={intl.formatMessage({
+            id: "component.petition-compose-field.add-attachment",
+            defaultMessage: "Add attachment",
+          })}
+          onClick={onAttachmentClick}
         />
-      ) : (
-        <SmallPopover
-          placement="top"
-          closeDelay={0}
-          content={
-            <Text fontSize="sm">
-              <FormattedMessage
-                id="component.petition-compose-field.conditions-not-enough-fields"
-                defaultMessage="You can only add conditions based on previous fields. Add more fields to be able to set conditions between them."
-              />
-            </Text>
-          }
-        >
-          <IconButton
-            size="sm"
-            // fake disabled look so popover still works
-            opacity={0.4}
-            cursor="not-allowed"
-            backgroundColor="transparent"
-            _hover={{ backgroundColor: "transparent" }}
-            _active={{ backgroundColor: "transparent" }}
-            as="div"
-            icon={<ConditionIcon />}
-            aria-label={intl.formatMessage({
-              id: "component.petition-compose-field.add-condition",
-              defaultMessage: "Add condition",
-            })}
-          />
-        </SmallPopover>
-      )}
-      <IconButtonWithTooltip
-        isDisabled={isPublicTemplate}
-        icon={<PaperclipIcon />}
-        size="sm"
-        variant="ghost"
-        placement="bottom"
-        color="gray.600"
-        label={intl.formatMessage({
-          id: "component.petition-compose-field.add-attachment",
-          defaultMessage: "Add attachment",
-        })}
-        onClick={onAttachmentClick}
-      />
-      <IconButtonWithTooltip
-        icon={<CopyIcon />}
-        size="sm"
-        variant="ghost"
-        placement="bottom"
-        color="gray.600"
-        label={intl.formatMessage({
-          id: "component.petition-compose-field.field-clone",
-          defaultMessage: "Clone field",
-        })}
-        onClick={onCloneField}
-        isDisabled={isReadOnly}
-      />
-      <IconButtonWithTooltip
-        className="field-settings-button"
-        icon={<SettingsIcon />}
-        isDisabled={field.isFixed}
-        size="sm"
-        variant="ghost"
-        placement="bottom"
-        color="gray.600"
-        label={intl.formatMessage({
-          id: "component.petition-compose-field.field-settings",
-          defaultMessage: "Field settings",
-        })}
-        onClick={onSettingsClick}
-      />
-      <IconButtonWithTooltip
-        icon={<DeleteIcon />}
-        isDisabled={field.isFixed || isReadOnly}
-        size="sm"
-        variant="ghost"
-        placement="bottom"
-        color="gray.600"
-        label={intl.formatMessage({
-          id: "component.petition-compose-field.field-delete",
-          defaultMessage: "Delete field",
-        })}
-        onClick={onDeleteClick}
-      />
-    </Stack>
-  );
-});
+        <IconButtonWithTooltip
+          icon={<CopyIcon />}
+          size="sm"
+          variant="ghost"
+          placement="bottom"
+          color="gray.600"
+          label={intl.formatMessage({
+            id: "component.petition-compose-field.field-clone",
+            defaultMessage: "Clone field",
+          })}
+          onClick={onCloneField}
+          isDisabled={isReadOnly}
+        />
+        <IconButtonWithTooltip
+          className="field-settings-button"
+          icon={<SettingsIcon />}
+          isDisabled={field.isFixed}
+          size="sm"
+          variant="ghost"
+          placement="bottom"
+          color="gray.600"
+          label={intl.formatMessage({
+            id: "component.petition-compose-field.field-settings",
+            defaultMessage: "Field settings",
+          })}
+          onClick={onSettingsClick}
+        />
+        <IconButtonWithTooltip
+          icon={<DeleteIcon />}
+          isDisabled={field.isFixed || isReadOnly}
+          size="sm"
+          variant="ghost"
+          placement="bottom"
+          color="gray.600"
+          label={intl.formatMessage({
+            id: "component.petition-compose-field.field-delete",
+            defaultMessage: "Delete field",
+          })}
+          onClick={onDeleteClick}
+        />
+      </Stack>
+    );
+  }
+);
 
 const fragments = {
   get PetitionField() {
@@ -1092,10 +1045,7 @@ const PetitionComposeFieldInner = memo(
 ) as typeof _PetitionComposeFieldInner;
 
 export const PetitionComposeField = Object.assign(
-  memo(
-    _PetitionComposeField,
-    comparePetitionComposeFieldProps
-  ) as typeof _PetitionComposeField,
+  memo(_PetitionComposeField, comparePetitionComposeFieldProps) as typeof _PetitionComposeField,
   { fragments }
 );
 
@@ -1108,15 +1058,9 @@ function PetitionComposeFieldDragActiveIndicator({
   field,
   draggedFiles,
 }: PetitionComposeFieldDragActiveIndicatorProps) {
-  const isOverMaxAttachments =
-    field.attachments.length + draggedFiles.length > 10;
+  const isOverMaxAttachments = field.attachments.length + draggedFiles.length > 10;
   return (
-    <Center
-      position="absolute"
-      inset={0}
-      zIndex={1}
-      backgroundColor="whiteAlpha.700"
-    >
+    <Center position="absolute" inset={0} zIndex={1} backgroundColor="whiteAlpha.700">
       <Box
         position="absolute"
         inset={0}
@@ -1196,8 +1140,7 @@ function useDragAndDrop(
       const hoverBoundingRect = elementRef.current!.getBoundingClientRect();
 
       // Get vertical middle
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
       // Determine mouse position
       const clientOffset = monitor.getClientOffset();
@@ -1258,23 +1201,20 @@ function updateFieldAttachments(
     cached: PetitionComposeField_updateFieldAttachments_PetitionFieldFragment["attachments"]
   ) => PetitionComposeField_updateFieldAttachments_PetitionFieldFragment["attachments"]
 ) {
-  updateFragment<PetitionComposeField_updateFieldAttachments_PetitionFieldFragment>(
-    proxy,
-    {
-      id: fieldId,
-      fragmentName: "PetitionComposeField_updateFieldAttachments_PetitionField",
-      fragment: gql`
-        fragment PetitionComposeField_updateFieldAttachments_PetitionField on PetitionField {
-          attachments {
-            ...PetitionComposeField_PetitionFieldAttachment
-          }
+  updateFragment<PetitionComposeField_updateFieldAttachments_PetitionFieldFragment>(proxy, {
+    id: fieldId,
+    fragmentName: "PetitionComposeField_updateFieldAttachments_PetitionField",
+    fragment: gql`
+      fragment PetitionComposeField_updateFieldAttachments_PetitionField on PetitionField {
+        attachments {
+          ...PetitionComposeField_PetitionFieldAttachment
         }
-        ${fragments.PetitionFieldAttachment}
-      `,
-      data: (cached) => ({
-        ...cached,
-        attachments: updateFn(cached!.attachments),
-      }),
-    }
-  );
+      }
+      ${fragments.PetitionFieldAttachment}
+    `,
+    data: (cached) => ({
+      ...cached,
+      attachments: updateFn(cached!.attachments),
+    }),
+  });
 }

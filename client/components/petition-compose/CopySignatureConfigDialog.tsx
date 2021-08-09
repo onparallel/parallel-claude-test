@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { Button, Radio, RadioGroup, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { CopySignatureConfigDialog_ContactFragment } from "@parallel/graphql/__types";
 import { useState } from "react";
 import { FormattedList, FormattedMessage } from "react-intl";
@@ -17,10 +14,7 @@ export type BatchSendSigningMode =
 export function CopySignatureConfigDialog({
   signers,
   ...props
-}: DialogProps<
-  { signers: CopySignatureConfigDialog_ContactFragment[] },
-  BatchSendSigningMode
->) {
+}: DialogProps<{ signers: CopySignatureConfigDialog_ContactFragment[] }, BatchSendSigningMode>) {
   const [option, setOption] = useState<BatchSendSigningMode>();
 
   return (
@@ -70,19 +64,13 @@ export function CopySignatureConfigDialog({
                   values={{ count: signers.length }}
                 />
               </Radio>
-              <Radio
-                value="LET_RECIPIENT_CHOOSE"
-                isChecked={option === "LET_RECIPIENT_CHOOSE"}
-              >
+              <Radio value="LET_RECIPIENT_CHOOSE" isChecked={option === "LET_RECIPIENT_CHOOSE"}>
                 <FormattedMessage
                   id="component.copy-signature-config-dialog.option-2"
                   defaultMessage="No, let each recipient choose who will sign the petitions."
                 />
               </Radio>
-              <Radio
-                value="DISABLE_SIGNATURE"
-                isChecked={option === "DISABLE_SIGNATURE"}
-              >
+              <Radio value="DISABLE_SIGNATURE" isChecked={option === "DISABLE_SIGNATURE"}>
                 <FormattedMessage
                   id="component.copy-signature-config-dialog.option-3"
                   defaultMessage="Disable eSignature from all the petitions."

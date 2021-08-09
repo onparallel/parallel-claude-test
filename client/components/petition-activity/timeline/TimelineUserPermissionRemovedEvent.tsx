@@ -20,13 +20,7 @@ export function TimelineUserPermissionRemovedEvent({
 }: TimelineUserPermissionRemovedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<UserXIcon />}
-          color="white"
-          backgroundColor="red.500"
-        />
-      }
+      icon={<TimelineIcon icon={<UserXIcon />} color="white" backgroundColor="red.500" />}
     >
       <FormattedMessage
         id="timeline.remove-user-permission-description"
@@ -37,11 +31,7 @@ export function TimelineUserPermissionRemovedEvent({
           user: <UserReference user={event.user} />,
           other: <UserReference user={event.permissionUser} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

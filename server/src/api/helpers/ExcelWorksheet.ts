@@ -5,11 +5,7 @@ import { MaybeArray } from "../../util/types";
 export abstract class ExcelWorksheet<T> {
   protected page: Excel.Worksheet;
 
-  constructor(
-    public worksheetName: string,
-    protected locale: string,
-    wb: Excel.Workbook
-  ) {
+  constructor(public worksheetName: string, protected locale: string, wb: Excel.Workbook) {
     this.page = wb.addWorksheet(worksheetName);
   }
 

@@ -11,10 +11,7 @@ import yargs from "yargs";
 
 export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
   name: Q,
-  handler: (
-    context: WorkerContext,
-    config: Config["cronWorkers"][Q]
-  ) => Promise<void>
+  handler: (context: WorkerContext, config: Config["cronWorkers"][Q]) => Promise<void>
 ) {
   loadEnv(`.${name}.env`);
   const container = createContainer();
@@ -26,10 +23,7 @@ export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
       () => {},
       async () => {
         try {
-          await handler(
-            container.get<WorkerContext>(WorkerContext),
-            config["cronWorkers"][name]
-          );
+          await handler(container.get<WorkerContext>(WorkerContext), config["cronWorkers"][name]);
         } catch (error) {
           console.log(error);
           process.exit(1);
@@ -45,31 +39,28 @@ export function createCronWorker<Q extends keyof Config["cronWorkers"]>(
         const logger = container.get<Logger>(LOGGER);
         let running = false;
         const events = new EventEmitter();
-        const job = new CronJob(
-          config.cronWorkers[name].rule,
-          async function () {
-            try {
-              running = true;
-              logger.info(`Execution start`);
-              const duration = await stopwatch(async () => {
-                await handler(
-                  container.get<WorkerContext>(WorkerContext),
-                  config["cronWorkers"][name]
-                );
-              });
-              const nextExecution = job.nextDate().toDate().toISOString();
-              logger.info(
-                `Successful execution in ${duration}ms. Next execution on ${nextExecution}`,
-                { duration }
+        const job = new CronJob(config.cronWorkers[name].rule, async function () {
+          try {
+            running = true;
+            logger.info(`Execution start`);
+            const duration = await stopwatch(async () => {
+              await handler(
+                container.get<WorkerContext>(WorkerContext),
+                config["cronWorkers"][name]
               );
-            } catch (error) {
-              logger.error(error.stack);
-            } finally {
-              running = false;
-              events.emit("finish");
-            }
+            });
+            const nextExecution = job.nextDate().toDate().toISOString();
+            logger.info(
+              `Successful execution in ${duration}ms. Next execution on ${nextExecution}`,
+              { duration }
+            );
+          } catch (error) {
+            logger.error(error.stack);
+          } finally {
+            running = false;
+            events.emit("finish");
           }
-        );
+        });
         process.on("SIGINT", function () {
           logger.info(`Received SIGINT. Shutting down cron worker`);
           shutdown();

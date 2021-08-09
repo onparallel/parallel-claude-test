@@ -28,9 +28,7 @@ export class UserGroupRepository extends BaseRepository {
             q.whereIlike("name", `%${escapeLike(opts.search, "\\")}%`, "\\");
           }
           if (opts.sortBy) {
-            q.orderByRaw(
-              opts.sortBy.map((s) => `"${s.column}" ${s.order}`).join(", ")
-            );
+            q.orderByRaw(opts.sortBy.map((s) => `"${s.column}" ${s.order}`).join(", "));
           }
         })
         .orderBy("id")
@@ -39,9 +37,7 @@ export class UserGroupRepository extends BaseRepository {
     );
   }
 
-  readonly loadUserGroup = this.buildLoadBy("user_group", "id", (q) =>
-    q.whereNull("deleted_at")
-  );
+  readonly loadUserGroup = this.buildLoadBy("user_group", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadUserGroupMembers = this.buildLoadMultipleBy(
     "user_group_member",
@@ -66,11 +62,7 @@ export class UserGroupRepository extends BaseRepository {
       .returning("*");
   }
 
-  async createUserGroup(
-    data: CreateUserGroup,
-    createdBy: string,
-    t?: Knex.Transaction
-  ) {
+  async createUserGroup(data: CreateUserGroup, createdBy: string, t?: Knex.Transaction) {
     const [row] = await this.insert(
       "user_group",
       {
@@ -127,19 +119,13 @@ export class UserGroupRepository extends BaseRepository {
       await this.from("petition_permission", t)
         .whereNull("deleted_at")
         .andWhere((q) =>
-          q
-            .whereIn("user_group_id", userGroupIds)
-            .orWhereIn("from_user_group_id", userGroupIds)
+          q.whereIn("user_group_id", userGroupIds).orWhereIn("from_user_group_id", userGroupIds)
         )
         .update({ deleted_at: this.now(), deleted_by: deletedBy });
     });
   }
 
-  async removeUsersFromGroup(
-    userGroupId: number,
-    userIds: MaybeArray<number>,
-    deletedBy: string
-  ) {
+  async removeUsersFromGroup(userGroupId: number, userIds: MaybeArray<number>, deletedBy: string) {
     const ids = unMaybeArray(userIds);
     await this.withTransaction(async (t) => {
       await this.from("user_group_member", t)
@@ -154,12 +140,7 @@ export class UserGroupRepository extends BaseRepository {
         );
 
       /** remove group permissions on the deleted group members */
-      await this.removeUserGroupMemberPermissions(
-        userGroupId,
-        ids,
-        deletedBy,
-        t
-      );
+      await this.removeUserGroupMemberPermissions(userGroupId, ids, deletedBy, t);
     });
   }
 
@@ -206,12 +187,7 @@ export class UserGroupRepository extends BaseRepository {
         );
 
         /** add group permissions on the new group members */
-        await this.addUserGroupMemberPermissions(
-          userGroupId,
-          ids,
-          createdBy,
-          t
-        );
+        await this.addUserGroupMemberPermissions(userGroupId, ids, createdBy, t);
       }, t);
     }
   }

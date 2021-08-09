@@ -30,29 +30,13 @@ import {
   PetitionFieldVisibilityType,
   PseudoPetitionFieldVisibilityConditionOperator,
 } from "@parallel/utils/fieldVisibility/types";
-import {
-  FieldOptions,
-  getDynamicSelectValues,
-} from "@parallel/utils/petitionFields";
-import {
-  useInlineReactSelectProps,
-  useReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
+import { FieldOptions, getDynamicSelectValues } from "@parallel/utils/petitionFields";
+import { useInlineReactSelectProps, useReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptimizedMenuList } from "@parallel/utils/react-select/OptimizedMenuList";
 import { toSelectOption } from "@parallel/utils/react-select/toSelectOption";
-import {
-  CustomSelectProps,
-  OptionType,
-} from "@parallel/utils/react-select/types";
+import { CustomSelectProps, OptionType } from "@parallel/utils/react-select/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import {
-  Fragment,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { Fragment, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select, { createFilter } from "react-select";
 import { pick, uniq, zip } from "remeda";
@@ -84,14 +68,7 @@ export function PetitionFieldVisibilityEditor({
       .map(
         ([field, index]) =>
           [
-            pick(field, [
-              "id",
-              "type",
-              "title",
-              "multiple",
-              "isReadOnly",
-              "options",
-            ]),
+            pick(field, ["id", "type", "title", "multiple", "isReadOnly", "options"]),
             index,
           ] as const
       );
@@ -103,44 +80,29 @@ export function PetitionFieldVisibilityEditor({
     }
     return [_fields, _indices];
   }, [fields, indices]);
-  function setVisibility(
-    dispatch: (prev: PetitionFieldVisibility) => PetitionFieldVisibility
-  ) {
+  function setVisibility(dispatch: (prev: PetitionFieldVisibility) => PetitionFieldVisibility) {
     onVisibilityEdit(dispatch(visibility));
   }
-  function setConditions(
-    value: SetStateAction<PetitionFieldVisibilityCondition[]>
-  ) {
+  function setConditions(value: SetStateAction<PetitionFieldVisibilityCondition[]>) {
     return setVisibility((visibility) => ({
       ...visibility,
-      conditions:
-        typeof value === "function" ? value(visibility.conditions) : value,
+      conditions: typeof value === "function" ? value(visibility.conditions) : value,
     }));
   }
-  function setVisibilityOperator(
-    value: SetStateAction<PetitionFieldVisibilityOperator>
-  ) {
+  function setVisibilityOperator(value: SetStateAction<PetitionFieldVisibilityOperator>) {
     return setVisibility((visibility) => ({
       ...visibility,
-      operator:
-        typeof value === "function" ? value(visibility.operator) : value,
+      operator: typeof value === "function" ? value(visibility.operator) : value,
     }));
   }
-  function setVisibilityType(
-    value: SetStateAction<PetitionFieldVisibilityType>
-  ) {
+  function setVisibilityType(value: SetStateAction<PetitionFieldVisibilityType>) {
     return setVisibility((visibility) => ({
       ...visibility,
       type: typeof value === "function" ? value(visibility.type) : value,
     }));
   }
-  const updateCondition = function (
-    index: number,
-    condition: PetitionFieldVisibilityCondition
-  ) {
-    setConditions((conditions) =>
-      conditions.map((c, i) => (i === index ? condition : c))
-    );
+  const updateCondition = function (index: number, condition: PetitionFieldVisibilityCondition) {
+    setConditions((conditions) => conditions.map((c, i) => (i === index ? condition : c)));
   };
   const removeCondition = function (index: number) {
     setConditions((conditions) => conditions.filter((c, i) => i !== index));
@@ -149,10 +111,7 @@ export function PetitionFieldVisibilityEditor({
     setConditions((conditions) => {
       const last = conditions[conditions.length - 1];
 
-      if (
-        last.operator === "NUMBER_OF_SUBREPLIES" ||
-        last.modifier !== "NUMBER_OF_REPLIES"
-      ) {
+      if (last.operator === "NUMBER_OF_SUBREPLIES" || last.modifier !== "NUMBER_OF_REPLIES") {
         return [...conditions, { ...last }];
       }
 
@@ -160,10 +119,7 @@ export function PetitionFieldVisibilityEditor({
       if (field.type === "SELECT" || field.type === "CHECKBOX") {
         // if the previous condition is of type SELECT or CHECKBOX try to get the next value
         const values = field.options.values as string[];
-        const index = Math.min(
-          values.indexOf(last.value as string) + 1,
-          values.length - 1
-        );
+        const index = Math.min(values.indexOf(last.value as string) + 1, values.length - 1);
 
         return [
           ...conditions,
@@ -193,9 +149,7 @@ export function PetitionFieldVisibilityEditor({
         rowGap={2}
       >
         {visibility.conditions.map((condition, index) => {
-          const conditionField = _fields.find(
-            (f) => f.id === condition.fieldId
-          );
+          const conditionField = _fields.find((f) => f.id === condition.fieldId);
           return (
             <Fragment key={index}>
               <Box fontSize="sm">
@@ -222,9 +176,7 @@ export function PetitionFieldVisibilityEditor({
                       <Box flex="1">
                         <VisibilityOperatorSelect
                           value={visibility.operator}
-                          onChange={(operator) =>
-                            setVisibilityOperator(operator!)
-                          }
+                          onChange={(operator) => setVisibilityOperator(operator!)}
                           isDisabled={isReadOnly}
                         />
                       </Box>
@@ -256,17 +208,14 @@ export function PetitionFieldVisibilityEditor({
                   <PetitionFieldSelect
                     size="sm"
                     value={
-                      condition.column !== undefined &&
-                      conditionField.type === "DYNAMIC_SELECT"
+                      condition.column !== undefined && conditionField.type === "DYNAMIC_SELECT"
                         ? [conditionField, condition.column]
                         : conditionField
                     }
                     expandFields
                     fields={_fields}
                     indices={_indices}
-                    onChange={(value) =>
-                      updateCondition(index, defaultCondition(value!))
-                    }
+                    onChange={(value) => updateCondition(index, defaultCondition(value!))}
                     isDisabled={isReadOnly}
                   />
                   <Stack direction="row" gridColumn={{ base: "2", xl: "auto" }}>
@@ -284,9 +233,7 @@ export function PetitionFieldVisibilityEditor({
                       showError={showError}
                       field={conditionField}
                       value={condition}
-                      onChange={(condition) =>
-                        updateCondition(index, condition)
-                      }
+                      onChange={(condition) => updateCondition(index, condition)}
                       isReadOnly={isReadOnly}
                     />
                   </Stack>
@@ -342,9 +289,7 @@ function ConditionMultipleFieldModifier({
   isReadOnly?: boolean;
 }) {
   const intl = useIntl();
-  const options = useMemo<
-    OptionType<PetitionFieldVisibilityConditionModifier>[]
-  >(() => {
+  const options = useMemo<OptionType<PetitionFieldVisibilityConditionModifier>[]>(() => {
     if (
       field.type === "FILE_UPLOAD" ||
       (field.type === "DYNAMIC_SELECT" && condition.column === undefined)
@@ -421,18 +366,10 @@ function ConditionMultipleFieldModifier({
     [onChange, condition, field]
   );
 
-  return (
-    <Select
-      options={options}
-      value={_value}
-      onChange={handleChange}
-      {...rsProps}
-    />
-  );
+  return <Select options={options} value={_value} onChange={handleChange} {...rsProps} />;
 }
 
-interface ConditionPredicateProps
-  extends ValueProps<PetitionFieldVisibilityCondition, false> {
+interface ConditionPredicateProps extends ValueProps<PetitionFieldVisibilityCondition, false> {
   field: PetitionFieldVisibilityEditor_PetitionFieldFragment;
   showError: boolean;
   max?: number;
@@ -449,8 +386,7 @@ function ConditionPredicate({
   const intl = useIntl();
   const { modifier } = condition!;
   const options = useMemo(() => {
-    const options: OptionType<PseudoPetitionFieldVisibilityConditionOperator>[] =
-      [];
+    const options: OptionType<PseudoPetitionFieldVisibilityConditionOperator>[] = [];
     if (field.multiple && modifier === "NUMBER_OF_REPLIES") {
       options.push(
         { label: "=", value: "EQUAL" },
@@ -503,25 +439,20 @@ function ConditionPredicate({
           label: intl.formatMessage(
             {
               id: "component.petition-field-visibility-editor.not-equal-select",
-              defaultMessage:
-                "{modifier, select, ALL {are not} other {is not}}",
+              defaultMessage: "{modifier, select, ALL {are not} other {is not}}",
             },
             { modifier }
           ),
           value: "NOT_EQUAL",
         }
       );
-    } else if (
-      field.type !== "FILE_UPLOAD" &&
-      field.type !== "DYNAMIC_SELECT"
-    ) {
+    } else if (field.type !== "FILE_UPLOAD" && field.type !== "DYNAMIC_SELECT") {
       options.push(
         {
           label: intl.formatMessage(
             {
               id: "component.petition-field-visibility-editor.equal-default",
-              defaultMessage:
-                "{modifier, select, ALL {are equal to} other {is equal to}}",
+              defaultMessage: "{modifier, select, ALL {are equal to} other {is equal to}}",
             },
             { modifier }
           ),
@@ -531,8 +462,7 @@ function ConditionPredicate({
           label: intl.formatMessage(
             {
               id: "component.petition-field-visibility-editor.not-equal-default",
-              defaultMessage:
-                "{modifier, select, ALL {are not equal to} other {is not equal to}}",
+              defaultMessage: "{modifier, select, ALL {are not equal to} other {is not equal to}}",
             },
             { modifier }
           ),
@@ -542,8 +472,7 @@ function ConditionPredicate({
           label: intl.formatMessage(
             {
               id: "component.petition-field-visibility-editor.start-with-default",
-              defaultMessage:
-                "{modifier, select, ALL {start with} other {starts with}}",
+              defaultMessage: "{modifier, select, ALL {start with} other {starts with}}",
             },
             { modifier }
           ),
@@ -553,8 +482,7 @@ function ConditionPredicate({
           label: intl.formatMessage(
             {
               id: "component.petition-field-visibility-editor.end-with-default",
-              defaultMessage:
-                "{modifier, select, ALL {end with} other {ends with}}",
+              defaultMessage: "{modifier, select, ALL {end with} other {ends with}}",
             },
             { modifier }
           ),
@@ -564,8 +492,7 @@ function ConditionPredicate({
           label: intl.formatMessage(
             {
               id: "component.petition-field-visibility-editor.contain-default",
-              defaultMessage:
-                "{modifier, select, ALL {contain} other {contains}}",
+              defaultMessage: "{modifier, select, ALL {contain} other {contains}}",
             },
             { modifier }
           ),
@@ -575,8 +502,7 @@ function ConditionPredicate({
           label: intl.formatMessage(
             {
               id: "component.petition-field-visibility-editor.not-contain-default",
-              defaultMessage:
-                "{modifier, select, ALL {do not contain} other {does not contain}}",
+              defaultMessage: "{modifier, select, ALL {do not contain} other {does not contain}}",
             },
             { modifier }
           ),
@@ -624,9 +550,7 @@ function ConditionPredicate({
     never
   >({ size: "sm", isDisabled: isReadOnly });
   const handleChange = useCallback(
-    function (
-      value: OptionType<PseudoPetitionFieldVisibilityConditionOperator> | null
-    ) {
+    function (value: OptionType<PseudoPetitionFieldVisibilityConditionOperator> | null) {
       onChange(updateConditionOperator(condition, field, value!.value));
     },
     [onChange, condition, field]
@@ -634,21 +558,11 @@ function ConditionPredicate({
 
   return !field.multiple && condition.modifier === "NUMBER_OF_REPLIES" ? (
     <Box flex="1">
-      <Select
-        options={options}
-        value={operator}
-        onChange={handleChange}
-        {...props}
-      />
+      <Select options={options} value={operator} onChange={handleChange} {...props} />
     </Box>
   ) : (
     <>
-      <Select
-        options={options}
-        value={operator}
-        onChange={handleChange}
-        {...iprops}
-      />
+      <Select options={options} value={operator} onChange={handleChange} {...iprops} />
       <Box flex="1" minWidth={20}>
         {condition.modifier === "NUMBER_OF_REPLIES" ||
         condition.operator === "NUMBER_OF_SUBREPLIES" ? (
@@ -657,15 +571,12 @@ function ConditionPredicate({
             showError={showError}
             value={condition}
             onChange={onChange}
-            max={
-              field.type === "CHECKBOX" ? field.options.values.length : Infinity
-            }
+            max={field.type === "CHECKBOX" ? field.options.values.length : Infinity}
             isReadOnly={isReadOnly}
           />
         ) : field.type === "CHECKBOX" ||
           field.type === "SELECT" ||
-          (field.type === "DYNAMIC_SELECT" &&
-            condition.column !== undefined) ? (
+          (field.type === "DYNAMIC_SELECT" && condition.column !== undefined) ? (
           <ConditionPredicateValueSelect
             field={field}
             showError={showError}
@@ -821,9 +732,7 @@ function VisibilityOperatorSelect({
     size: "sm",
     ...props,
   });
-  const _options = useMemo<
-    { label: string; value: PetitionFieldVisibilityOperator }[]
-  >(
+  const _options = useMemo<{ label: string; value: PetitionFieldVisibilityOperator }[]>(
     () => [
       {
         value: "AND",
@@ -842,10 +751,7 @@ function VisibilityOperatorSelect({
     ],
     [intl.locale]
   );
-  const _value = useMemo(
-    () => _options.find((o) => o.value === value),
-    [value, _options]
-  );
+  const _value = useMemo(() => _options.find((o) => o.value === value), [value, _options]);
 
   return (
     <Select
@@ -868,9 +774,7 @@ function VisibilityTypeSelect({
     size: "sm",
     ...props,
   });
-  const _options = useMemo<
-    { label: string; value: PetitionFieldVisibilityType }[]
-  >(
+  const _options = useMemo<{ label: string; value: PetitionFieldVisibilityType }[]>(
     () => [
       {
         value: "SHOW",
@@ -889,10 +793,7 @@ function VisibilityTypeSelect({
     ],
     [intl.locale]
   );
-  const _value = useMemo(
-    () => _options.find((o) => o.value === value),
-    [value, _options]
-  );
+  const _value = useMemo(() => _options.find((o) => o.value === value), [value, _options]);
 
   return (
     <Select

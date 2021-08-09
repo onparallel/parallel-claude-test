@@ -125,9 +125,7 @@ export type AnalyticsEvent =
 export const ANALYTICS = Symbol.for("ANALYTICS");
 
 export interface IAnalyticsService {
-  identifyUser(
-    user: Pick<User, "id" | "email" | "created_at" | "last_active_at">
-  ): void;
+  identifyUser(user: Pick<User, "id" | "email" | "created_at" | "last_active_at">): void;
 
   trackEvent(events: MaybeArray<AnalyticsEvent>): void;
 }
@@ -144,9 +142,7 @@ export class AnalyticsService implements IAnalyticsService {
     }
   }
 
-  identifyUser(
-    user: Pick<User, "id" | "email" | "created_at" | "last_active_at">
-  ) {
+  identifyUser(user: Pick<User, "id" | "email" | "created_at" | "last_active_at">) {
     this.analytics?.identify({
       userId: toGlobalId("User", user.id),
       traits: {

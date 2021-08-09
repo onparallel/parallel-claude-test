@@ -53,10 +53,10 @@ export function PublicLayout({
             key={locale}
             rel="alternate"
             hrefLang={locale}
-            href={`${process.env.NEXT_PUBLIC_PARALLEL_URL}${resolveUrl(
-              pathname,
-              { ...query, locale }
-            )}`}
+            href={`${process.env.NEXT_PUBLIC_PARALLEL_URL}${resolveUrl(pathname, {
+              ...query,
+              locale,
+            })}`}
           />
         ))}
         <meta property="og:title" content={og?.title ?? title} />
@@ -69,16 +69,11 @@ export function PublicLayout({
             `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/showcase_hero_${query.locale}.png?v=${process.env.BUILD_ID}`
           }
         />
-        <meta
-          property="og:description"
-          content={og?.description ?? description}
-        />
+        <meta property="og:description" content={og?.description ?? description} />
         {languages.map(({ locale }) => (
           <meta
             key={locale}
-            property={
-              locale === query.locale ? "og:locale" : "og:locale:alternate"
-            }
+            property={locale === query.locale ? "og:locale" : "og:locale:alternate"}
             content={locale}
           />
         ))}
@@ -90,9 +85,7 @@ export function PublicLayout({
         </>
       ) : null}
       <Flex direction="column" minHeight="100vh">
-        {hideHeader ? null : (
-          <PublicHeader position="sticky" top={0} zIndex={1} />
-        )}
+        {hideHeader ? null : <PublicHeader position="sticky" top={0} zIndex={1} />}
         <Flex as="main" flex="1" direction="column">
           {children}
         </Flex>

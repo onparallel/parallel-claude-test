@@ -22,10 +22,7 @@ export async function up(knex: Knex): Promise<void> {
     if the creation date differs in less than 30 minutes
     the newest one is considered 'duplicated' and to be deleted */
     for (const event of petitionEvents) {
-      if (
-        lastEvent &&
-        differenceInMinutes(event.created_at, lastEvent.created_at) <= 30
-      ) {
+      if (lastEvent && differenceInMinutes(event.created_at, lastEvent.created_at) <= 30) {
         idsToDelete.push(event.id);
       }
       lastEvent = event;

@@ -22,20 +22,14 @@ export function useCreatePetition() {
         $petitionId: GID
         $type: PetitionBaseType
       ) {
-        createPetition(
-          name: $name
-          locale: $locale
-          petitionId: $petitionId
-          type: $type
-        ) {
+        createPetition(name: $name, locale: $locale, petitionId: $petitionId, type: $type) {
           id
         }
       }
     `,
     {
       update(cache, { data }) {
-        const isTemplate =
-          data?.createPetition.__typename === "PetitionTemplate";
+        const isTemplate = data?.createPetition.__typename === "PetitionTemplate";
         // clear caches where new item would appear
         clearCache(
           cache,

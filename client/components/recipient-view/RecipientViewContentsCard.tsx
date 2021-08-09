@@ -32,17 +32,8 @@ export function RecipientViewContentsCard({
   const { pages, fields } = useGetPagesAndFields(petition.fields, currentPage);
   return (
     <Card padding={4} display="flex" flexDirection="column" {...props}>
-      <Heading
-        display="flex"
-        as="h3"
-        fontSize="lg"
-        marginBottom={2}
-        alignItems="center"
-      >
-        <FormattedMessage
-          id="recipient-view.contents-header"
-          defaultMessage="Contents"
-        />
+      <Heading display="flex" as="h3" fontSize="lg" marginBottom={2} alignItems="center">
+        <FormattedMessage id="recipient-view.contents-header" defaultMessage="Contents" />
       </Heading>
       <Stack as={List} spacing={1} marginBottom={4}>
         {pages.map(({ title, hasUnreadComments }, index) => (
@@ -89,11 +80,7 @@ export function RecipientViewContentsCard({
               </NakedLink>
             </Text>
             {index + 1 === currentPage ? (
-              <Stack
-                as={List}
-                spacing={1}
-                paddingLeft={pages.length > 1 ? 2 : 0}
-              >
+              <Stack as={List} spacing={1} paddingLeft={pages.length > 1 ? 2 : 0}>
                 {fields.slice(1).map((field) => (
                   <ListItem key={field.id} position="relative">
                     <Text
@@ -113,11 +100,7 @@ export function RecipientViewContentsCard({
                         />
                       ) : null}
 
-                      <NakedLink
-                        href={`/petition/${query.keycode}/${index + 1}#field-${
-                          field.id
-                        }`}
-                      >
+                      <NakedLink href={`/petition/${query.keycode}/${index + 1}#field-${field.id}`}>
                         <Box
                           as="a"
                           display="block"
@@ -169,16 +152,12 @@ function useGetPagesAndFields(
   const fieldVisibility = useFieldVisibility(fields);
   const _fields: RecipientViewContentsCard_PublicPetitionFieldFragment[] = [];
   for (const [field, isVisible] of zip(fields, fieldVisibility)) {
-    if (
-      field.type === "HEADING" &&
-      (pages.length === 0 || field.options.hasPageBreak)
-    ) {
+    if (field.type === "HEADING" && (pages.length === 0 || field.options.hasPageBreak)) {
       pages.push({ title: field.title ?? null });
       page -= 1;
     }
     const currentPage = pages[pages.length - 1];
-    currentPage.hasUnreadComments =
-      currentPage.hasUnreadComments || field.unreadCommentCount > 0;
+    currentPage.hasUnreadComments = currentPage.hasUnreadComments || field.unreadCommentCount > 0;
     if (page === 0 && isVisible) {
       _fields.push(field);
     } else {

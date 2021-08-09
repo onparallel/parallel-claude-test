@@ -7,12 +7,13 @@ export interface FileIconProps {
   contentType: string;
 }
 
-export const FileIcon = chakraForwardRef<"svg", FileIconProps>(
-  function FileIcon({ filename, contentType, ...props }, ref) {
-    const [Icon, label] = useGetIconAndLabelForFile(filename, contentType);
-    return <Icon alt={label} {...props} />;
-  }
-);
+export const FileIcon = chakraForwardRef<"svg", FileIconProps>(function FileIcon(
+  { filename, contentType, ...props },
+  ref
+) {
+  const [Icon, label] = useGetIconAndLabelForFile(filename, contentType);
+  return <Icon alt={label} {...props} />;
+});
 
 function useGetIconAndLabelForFile(filename: string, contentType: string) {
   const intl = useIntl();
@@ -53,9 +54,7 @@ function useGetIconAndLabelForFile(filename: string, contentType: string) {
         defaultMessage: "PDF file",
       }),
     ] as const;
-  } else if (
-    ["application/zip", "application/x-zip-compressed"].includes(contentType)
-  ) {
+  } else if (["application/zip", "application/x-zip-compressed"].includes(contentType)) {
     return [
       FileZipIcon,
       intl.formatMessage({
@@ -211,10 +210,7 @@ const FileImageIcon = createIcon({
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path
-        d="M20.3337 15.334L15.3337 9.77734L3.66699 20.334H20.3337V15.334Z"
-        fill="#4A5568"
-      />
+      <path d="M20.3337 15.334L15.3337 9.77734L3.66699 20.334H20.3337V15.334Z" fill="#4A5568" />
     </g>
   ),
 });

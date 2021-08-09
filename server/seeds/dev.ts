@@ -11,9 +11,7 @@ import { deleteAllData } from "../src/util/knexUtils";
 
 export async function seed(knex: Knex): Promise<any> {
   await deleteAllData(knex);
-  const orgs: CreateOrganization[] = [
-    { name: "Parallel", identifier: "parallel", status: "DEV" },
-  ];
+  const orgs: CreateOrganization[] = [{ name: "Parallel", identifier: "parallel", status: "DEV" }];
   const orgIds = await knex<Organization>("organization").insert(orgs, "id");
   const users: CreateUser[] = [
     {

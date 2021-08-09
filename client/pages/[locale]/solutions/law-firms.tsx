@@ -1,11 +1,4 @@
-import {
-  Heading,
-  Image,
-  List,
-  ListIcon,
-  ListItem,
-  Text,
-} from "@chakra-ui/react";
+import { Heading, Image, List, ListIcon, ListItem, Text } from "@chakra-ui/react";
 import { CircleCheckIcon } from "@parallel/chakra/icons";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
@@ -61,8 +54,7 @@ function LawFirms() {
       }),
       text: intl.formatMessage({
         id: "public.law-firms.benefits-efficiency-message",
-        defaultMessage:
-          "Use templates to reuse knowledge and reduce mistakes in your workflow.",
+        defaultMessage: "Use templates to reuse knowledge and reduce mistakes in your workflow.",
       }),
     },
     {
@@ -115,9 +107,7 @@ function LawFirms() {
   const solutions = [
     {
       image: (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_smart_forms.svg`}
-        />
+        <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_smart_forms.svg`} />
       ),
       header: (
         <FormattedMessage
@@ -134,9 +124,7 @@ function LawFirms() {
     },
     {
       image: (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_esignature.svg`}
-        />
+        <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_esignature.svg`} />
       ),
       header: (
         <FormattedMessage
@@ -153,9 +141,7 @@ function LawFirms() {
     },
     {
       image: (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_colaborate.svg`}
-        />
+        <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_colaborate.svg`} />
       ),
       header: (
         <FormattedMessage
@@ -182,11 +168,7 @@ function LawFirms() {
       <PublicHero {...hero} />
       <SolutionsTrust logos={logos} />
       <SolutionsBenefits image={benefitsImage} benefits={benefits} />
-      <PublicContainer
-        paddingY={8}
-        maxWidth="container.xl"
-        wrapper={{ paddingY: 16 }}
-      >
+      <PublicContainer paddingY={8} maxWidth="container.xl" wrapper={{ paddingY: 16 }}>
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/lawfirms_usecase_${query.locale}.svg`}
           imageSize="330px"
@@ -195,17 +177,8 @@ function LawFirms() {
             defaultMessage: "*Actual data in a KYC case.",
           })}
         >
-          <Heading
-            as="h4"
-            size="xs"
-            lineHeight="24px"
-            color="gray.600"
-            textTransform="uppercase"
-          >
-            <FormattedMessage
-              id="public.law-firms.use-case"
-              defaultMessage="Use case"
-            />
+          <Heading as="h4" size="xs" lineHeight="24px" color="gray.600" textTransform="uppercase">
+            <FormattedMessage id="public.law-firms.use-case" defaultMessage="Use case" />
           </Heading>
           <Heading
             as="h3"
@@ -251,17 +224,8 @@ function LawFirms() {
           imageSize="300px"
           isReversed
         >
-          <Heading
-            as="h4"
-            size="xs"
-            lineHeight="24px"
-            color="gray.600"
-            textTransform="uppercase"
-          >
-            <FormattedMessage
-              id="public.solutions.security"
-              defaultMessage="Security"
-            />
+          <Heading as="h4" size="xs" lineHeight="24px" color="gray.600" textTransform="uppercase">
+            <FormattedMessage id="public.solutions.security" defaultMessage="Security" />
           </Heading>
           <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage

@@ -11,18 +11,10 @@ export type TimelineAccessDelegatedEventProps = {
   event: TimelineAccessDelegatedEvent_AccessDelegatedEventFragment;
 };
 
-export function TimelineAccessDelegatedEvent({
-  event,
-}: TimelineAccessDelegatedEventProps) {
+export function TimelineAccessDelegatedEvent({ event }: TimelineAccessDelegatedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<UserPlusIcon />}
-          color="white"
-          backgroundColor="blue.500"
-        />
-      }
+      icon={<TimelineIcon icon={<UserPlusIcon />} color="white" backgroundColor="blue.500" />}
     >
       <FormattedMessage
         id="timeline.access-delegated-description"
@@ -31,11 +23,7 @@ export function TimelineAccessDelegatedEvent({
           contact: <ContactLink contact={event.originalAccess.contact} />,
           newContact: <ContactLink contact={event.newAccess.contact} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

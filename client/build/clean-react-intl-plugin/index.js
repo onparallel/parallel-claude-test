@@ -15,10 +15,9 @@ module.exports = function cleanReactIntl({ types: t }) {
       JSXElement: {
         enter({ node }) {
           if (JSX_ELEMENTS.includes(node.openingElement.name.name)) {
-            node.openingElement.attributes =
-              node.openingElement.attributes.filter(
-                (attr) => !BLACKLISTED.includes(attr.name.name)
-              );
+            node.openingElement.attributes = node.openingElement.attributes.filter(
+              (attr) => !BLACKLISTED.includes(attr.name.name)
+            );
           }
         },
       },
@@ -33,17 +32,12 @@ module.exports = function cleanReactIntl({ types: t }) {
             node.arguments.length &&
             node.arguments[0].type === "ObjectExpression"
           ) {
-            node.arguments[0].properties = node.arguments[0].properties.filter(
-              (prop) => {
-                if (
-                  prop.key.type === "Identifier" &&
-                  BLACKLISTED.includes(prop.key.name)
-                ) {
-                  return false;
-                }
-                return true;
+            node.arguments[0].properties = node.arguments[0].properties.filter((prop) => {
+              if (prop.key.type === "Identifier" && BLACKLISTED.includes(prop.key.name)) {
+                return false;
               }
-            );
+              return true;
+            });
           }
         },
       },

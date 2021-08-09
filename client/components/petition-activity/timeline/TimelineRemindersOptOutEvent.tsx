@@ -16,22 +16,14 @@ export type TimelineRemindersOptOutEventProps = {
   event: TimelineRemindersOptOutEvent_RemindersOptOutEventFragment;
 };
 
-export function TimelineRemindersOptOutEvent({
-  event,
-}: TimelineRemindersOptOutEventProps) {
+export function TimelineRemindersOptOutEvent({ event }: TimelineRemindersOptOutEventProps) {
   const answers = useReminderOptOutReasons();
   const { other, access, createdAt } = event;
   const reason = event.reason as ReminderOptOutReason;
 
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<BellOffIcon />}
-          color="white"
-          backgroundColor="red.600"
-        />
-      }
+      icon={<TimelineIcon icon={<BellOffIcon />} color="white" backgroundColor="red.600" />}
     >
       <Text as="div">
         <FormattedMessage
@@ -39,13 +31,7 @@ export function TimelineRemindersOptOutEvent({
           defaultMessage="{contact} has opted out from receiving reminders for this petition {timeAgo}"
           values={{
             contact: <ContactLink contact={access.contact} />,
-            timeAgo: (
-              <DateTime
-                value={createdAt}
-                format={FORMATS.LLL}
-                useRelativeTime="always"
-              />
-            ),
+            timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
           }}
         />
       </Text>

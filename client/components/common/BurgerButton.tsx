@@ -37,15 +37,9 @@ export function BurgerButton({ isOpen, ...props }: BurgerButtonProps) {
       }
       {...props}
     >
-      <Box
-        {...common}
-        transform={isOpen ? "rotate(-45deg)" : "translateY(-7px)"}
-      />
+      <Box {...common} transform={isOpen ? "rotate(-45deg)" : "translateY(-7px)"} />
       <Box {...common} opacity={isOpen ? 0 : 1} />
-      <Box
-        {...common}
-        transform={isOpen ? "rotate(45deg)" : "translateY(7px)"}
-      />
+      <Box {...common} transform={isOpen ? "rotate(45deg)" : "translateY(7px)"} />
     </Button>
   );
 }

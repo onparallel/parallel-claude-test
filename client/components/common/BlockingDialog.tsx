@@ -1,13 +1,5 @@
-import {
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-} from "@chakra-ui/react";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { ModalBody, ModalContent, ModalFooter, ModalHeader } from "@chakra-ui/react";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { ReactNode, useEffect } from "react";
 import { BaseDialog } from "./BaseDialog";
 

@@ -4,10 +4,7 @@ import { ContactLink } from "@parallel/components/common/ContactLink";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { TablePage } from "@parallel/components/common/TablePage";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { usePetitionSharingDialog } from "@parallel/components/petition-common/PetitionSharingDialog";
 import {
@@ -28,10 +25,7 @@ import {
   usePetitionsQuery,
   usePetitionsUserQuery,
 } from "@parallel/graphql/__types";
-import {
-  assertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/assertQuery";
+import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useGoToPetition } from "@parallel/utils/goToPetition";
 import { useClonePetitions } from "@parallel/utils/mutations/useClonePetitions";
@@ -50,13 +44,7 @@ import {
 } from "@parallel/utils/queryState";
 import { usePetitionsTableColumns } from "@parallel/utils/usePetitionsTableColumns";
 import { ValueProps } from "@parallel/utils/ValueProps";
-import {
-  MouseEvent,
-  PropsWithChildren,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import { MouseEvent, PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { omit, pick } from "remeda";
 
@@ -66,17 +54,10 @@ const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
   items: values([10, 25, 50]).orDefault(10),
   status: list<PetitionStatus>(["DRAFT", "PENDING", "COMPLETED", "CLOSED"]),
-  type: values<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault(
-    "PETITION"
-  ),
+  type: values<PetitionBaseType>(["PETITION", "TEMPLATE"]).orDefault("PETITION"),
   search: string(),
   tags: new QueryItem<string[] | null>(
-    (value) =>
-      typeof value === "string"
-        ? value === "NO_TAGS"
-          ? []
-          : value.split(",")
-        : null,
+    (value) => (typeof value === "string" ? (value === "NO_TAGS" ? [] : value.split(",")) : null),
     (value) => (value.length === 0 ? "NO_TAGS" : value.join(","))
   ),
   sort: sorting(SORTING),
@@ -212,10 +193,7 @@ function Petitions() {
       });
     } catch {}
   };
-  const handleRowClick = useCallback(function (
-    row: PetitionSelection,
-    event: MouseEvent
-  ) {
+  const handleRowClick = useCallback(function (row: PetitionSelection, event: MouseEvent) {
     goToPetition(
       row.id,
       row.__typename === "Petition"
@@ -230,8 +208,7 @@ function Petitions() {
         : "compose",
       event
     );
-  },
-  []);
+  }, []);
 
   const columns = usePetitionsTableColumns(
     petitions.items.length > 0
@@ -280,9 +257,7 @@ function Petitions() {
           }}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) =>
-            setQueryState((s) => ({ ...s, items, page: 1 }))
-          }
+          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <PetitionListHeader
@@ -419,10 +394,7 @@ Petitions.fragments = {
   },
 };
 
-Petitions.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+Petitions.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const {
     data: { me },
   } = await fetchQuery<PetitionsUserQuery>(gql`

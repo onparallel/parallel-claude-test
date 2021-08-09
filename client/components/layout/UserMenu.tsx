@@ -38,12 +38,7 @@ export interface UserMenuProps {
 
 declare const zE: any;
 
-export function UserMenu({
-  placement,
-  user,
-  onLocaleChange,
-  onOnboardingClick,
-}: UserMenuProps) {
+export function UserMenu({ placement, user, onLocaleChange, onOnboardingClick }: UserMenuProps) {
   const intl = useIntl();
   const router = useRouter();
 
@@ -82,10 +77,7 @@ export function UserMenu({
       <Portal>
         <MenuList>
           {isMobile ? (
-            <MenuItem
-              onClick={onOpenNotifications}
-              icon={<BellIcon display="block" boxSize={4} />}
-            >
+            <MenuItem onClick={onOpenNotifications} icon={<BellIcon display="block" boxSize={4} />}>
               <FormattedMessage
                 id="component.user-menu.notifications"
                 defaultMessage="Notifications"
@@ -98,23 +90,14 @@ export function UserMenu({
             </MenuItem>
           </NakedLink>
           <NakedLink href="/app/organization">
-            <MenuItem
-              as="a"
-              icon={<BusinessIcon display="block" boxSize={4} />}
-            >
-              <FormattedMessage
-                id="view.organization.title"
-                defaultMessage="Organization"
-              />
+            <MenuItem as="a" icon={<BusinessIcon display="block" boxSize={4} />}>
+              <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
             </MenuItem>
           </NakedLink>
           {user.isSuperAdmin ? (
             <NakedLink href="/app/admin">
               <MenuItem as="a" icon={<KeyIcon display="block" boxSize={4} />}>
-                <FormattedMessage
-                  id="admin.title"
-                  defaultMessage="Admin panel"
-                />
+                <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
               </MenuItem>
             </NakedLink>
           ) : null}
@@ -140,31 +123,16 @@ export function UserMenu({
               icon={<HelpOutlineIcon display="block" boxSize={4} />}
               onClick={handleHelpCenterClick}
             >
-              <FormattedMessage
-                id="navbar.help-center"
-                defaultMessage="Help center"
-              />
+              <FormattedMessage id="navbar.help-center" defaultMessage="Help center" />
             </MenuItem>
           ) : null}
-          <MenuItem
-            icon={<MapIcon display="block" boxSize={4} />}
-            onClick={onOnboardingClick}
-          >
-            <FormattedMessage
-              id="navbar.start-tour"
-              defaultMessage="Guide me around"
-            />
+          <MenuItem icon={<MapIcon display="block" boxSize={4} />} onClick={onOnboardingClick}>
+            <FormattedMessage id="navbar.start-tour" defaultMessage="Guide me around" />
           </MenuItem>
           <MenuDivider />
 
-          <MenuItem
-            onClick={handleLogoutClick}
-            icon={<LogOutIcon display="block" boxSize={4} />}
-          >
-            <FormattedMessage
-              id="component.user-menu.log-out"
-              defaultMessage="Log out"
-            />
+          <MenuItem onClick={handleLogoutClick} icon={<LogOutIcon display="block" boxSize={4} />}>
+            <FormattedMessage id="component.user-menu.log-out" defaultMessage="Log out" />
           </MenuItem>
         </MenuList>
       </Portal>

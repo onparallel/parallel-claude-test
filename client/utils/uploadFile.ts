@@ -23,9 +23,7 @@ export function uploadFile(
   const request = new XMLHttpRequest();
   request.open("POST", presignedPostData.url);
 
-  request.upload.addEventListener("progress", (e) =>
-    onProgress?.(e.loaded / e.total)
-  );
+  request.upload.addEventListener("progress", (e) => onProgress?.(e.loaded / e.total));
   request.addEventListener("load", async () => {
     onComplete?.();
   });

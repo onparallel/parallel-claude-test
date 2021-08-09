@@ -18,10 +18,7 @@ export async function up(knex: Knex): Promise<void> {
       t.increments("id");
       t.integer("petition_id").notNullable().references("petition.id");
       t.integer("tag_id").notNullable().references("tag.id");
-      t.unique(
-        ["petition_id", "tag_id"],
-        "petition_tag__petition_id__tag_id__unique"
-      );
+      t.unique(["petition_id", "tag_id"], "petition_tag__petition_id__tag_id__unique");
       timestamps(t, { updated: false, deleted: false });
     });
 }

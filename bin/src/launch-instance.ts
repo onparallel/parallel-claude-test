@@ -86,15 +86,11 @@ async function main() {
     .promise();
   const instanceId = result.Instances![0].InstanceId!;
   const ipAddress = result.Instances![0].PrivateIpAddress!;
-  console.log(
-    chalk`Launched instance {bold ${instanceId}} on {bold ${ipAddress}}`
-  );
+  console.log(chalk`Launched instance {bold ${instanceId}} on {bold ${ipAddress}}`);
   await wait(5000);
   await waitFor(
     async () => {
-      const result = await ec2
-        .describeInstances({ InstanceIds: [instanceId] })
-        .promise();
+      const result = await ec2.describeInstances({ InstanceIds: [instanceId] }).promise();
       return result.Reservations?.[0].Instances?.[0].State?.Name === "running";
     },
     chalk`Instance {yellow pending}. Waiting 10 more seconds...`,
@@ -104,9 +100,7 @@ async function main() {
   const targetGroupName = `${commit}-${env}`;
   let targetGroupArn: string;
   try {
-    const result = await elbv2
-      .describeTargetGroups({ Names: [targetGroupName] })
-      .promise();
+    const result = await elbv2.describeTargetGroups({ Names: [targetGroupName] }).promise();
     targetGroupArn = result.TargetGroups![0].TargetGroupArn!;
   } catch (error) {
     if (error.code === "TargetGroupNotFound") {

@@ -27,10 +27,7 @@ const email: Email<SignatureCompletedProps> = {
       defaultMessage: "Signature request completed",
     });
   },
-  text(
-    { signerName, signatureProvider }: SignatureCompletedProps,
-    intl: IntlShape
-  ) {
+  text({ signerName, signatureProvider }: SignatureCompletedProps, intl: IntlShape) {
     return outdent`
       ${greetingFormal({ fullName: signerName }, intl)}
       ${intl.formatMessage(

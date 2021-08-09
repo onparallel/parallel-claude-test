@@ -31,10 +31,9 @@ export function sortByParam<T extends string>(values: T[]) {
   return {
     sortBy: enumParam({
       description: "Sort this resource list by one of the available options",
-      values: values.flatMap((option) => [
-        `${option}_ASC`,
-        `${option}_DESC`,
-      ]) as `${T}_${"ASC" | "DESC"}`[],
+      values: values.flatMap((option) => [`${option}_ASC`, `${option}_DESC`]) as `${T}_${
+        | "ASC"
+        | "DESC"}`[],
       required: false,
       array: true,
     }),
@@ -69,7 +68,5 @@ export function idParam<
 }
 
 export function containsGraphQLError(error: ClientError, errorCode: string) {
-  return (
-    ((error.response.errors![0] as any).extensions.code as string) === errorCode
-  );
+  return ((error.response.errors![0] as any).extensions.code as string) === errorCode;
 }

@@ -40,53 +40,34 @@ async function main() {
       LoadBalancerArn: loadBalancerArn,
     })
     .promise();
-  const oldTargetGroupArn = result2.Listeners!.find(
-    (l) => l.Protocol === "HTTPS"
-  )!.DefaultActions![0].TargetGroupArn!;
+  const oldTargetGroupArn = result2.Listeners!.find((l) => l.Protocol === "HTTPS")!
+    .DefaultActions![0].TargetGroupArn!;
 
   const result3 = await getTargetGroupInstances(oldTargetGroupArn);
   for (const instance of result3.Reservations!.flatMap((r) => r.Instances!)) {
     const ipAddress = instance.PrivateIpAddress!;
-    console.log(
-      chalk`Stopping workers on ${
-        instance.Tags?.find((t) => t.Key === "Name")!.Value
-      }`
-    );
+    console.log(chalk`Stopping workers on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
     execSync(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
       ${ipAddress} /home/ec2-user/workers.sh stop`);
-    console.log(
-      chalk`Workers stopped on ${
-        instance.Tags?.find((t) => t.Key === "Name")!.Value
-      }`
-    );
+    console.log(chalk`Workers stopped on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
   }
 
   console.log("Getting new target group.");
   const targetGroupName = `${commit}-${env}`;
-  const result4 = await elbv2
-    .describeTargetGroups({ Names: [targetGroupName] })
-    .promise();
+  const result4 = await elbv2.describeTargetGroups({ Names: [targetGroupName] }).promise();
   const targetGroupArn = result4.TargetGroups![0].TargetGroupArn!;
 
   const result5 = await getTargetGroupInstances(targetGroupArn);
   for (const instance of result5.Reservations!.flatMap((r) => r.Instances!)) {
     const ipAddress = instance.PrivateIpAddress!;
-    console.log(
-      chalk`Starting services on ${
-        instance.Tags?.find((t) => t.Key === "Name")!.Value
-      }`
-    );
+    console.log(chalk`Starting services on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
     execSync(`ssh \
       -o "UserKnownHostsFile=/dev/null" \
       -o StrictHostKeyChecking=no \
       ${ipAddress} /home/ec2-user/workers.sh start`);
-    console.log(
-      chalk`Workers started on ${
-        instance.Tags?.find((t) => t.Key === "Name")!.Value
-      }`
-    );
+    console.log(chalk`Workers started on ${instance.Tags?.find((t) => t.Key === "Name")!.Value}`);
   }
 
   waitFor(
@@ -97,9 +78,7 @@ async function main() {
         })
         .promise();
       return (
-        result.TargetHealthDescriptions?.every(
-          (t) => t.TargetHealth?.State === "healthy"
-        ) ?? false
+        result.TargetHealthDescriptions?.every((t) => t.TargetHealth?.State === "healthy") ?? false
       );
     },
     "Target not healthy. Waiting 5 more seconds...",
@@ -128,11 +107,8 @@ async function main() {
   console.log(
     chalk`Updating LB {blue {bold ${env}}} to point to TG {blue {bold ${targetGroupName}}}`
   );
-  const result6 = await elbv2
-    .describeListeners({ LoadBalancerArn: loadBalancerArn })
-    .promise();
-  const listenerArn = result6.Listeners!.find((l) => l.Protocol === "HTTPS")!
-    .ListenerArn!;
+  const result6 = await elbv2.describeListeners({ LoadBalancerArn: loadBalancerArn }).promise();
+  const listenerArn = result6.Listeners!.find((l) => l.Protocol === "HTTPS")!.ListenerArn!;
   await elbv2
     .modifyListener({
       ListenerArn: listenerArn,

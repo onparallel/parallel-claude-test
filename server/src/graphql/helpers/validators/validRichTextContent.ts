@@ -98,10 +98,7 @@ export const validRichTextContent = jsonSchema({
     root: {
       type: "array",
       items: {
-        anyOf: [
-          { $ref: "#/definitions/paragraph" },
-          { $ref: "#/definitions/list" },
-        ],
+        anyOf: [{ $ref: "#/definitions/paragraph" }, { $ref: "#/definitions/list" }],
       },
     },
   },

@@ -30,10 +30,7 @@ type DelegateAccessDialogData = {
   messageBody: any;
 };
 
-const messages: Record<
-  PetitionLocale,
-  (organization: string, contactName: string) => string
-> = {
+const messages: Record<PetitionLocale, (organization: string, contactName: string) => string> = {
   en: (organization, contactName) => outdent`
     Hello,
 
@@ -79,10 +76,7 @@ function DelegateAccessDialog({
       firstName: "",
       lastName: "",
       messageBody: plainTextToRTEValue(
-        (messages[intl.locale as PetitionLocale] ?? messages["en"])(
-          organizationName,
-          contactName
-        )
+        (messages[intl.locale as PetitionLocale] ?? messages["en"])(organizationName, contactName)
       ),
     },
     shouldFocusError: true,
@@ -106,12 +100,7 @@ function DelegateAccessDialog({
       }}
       header={
         <Stack direction="row">
-          <Circle
-            role="presentation"
-            size="32px"
-            backgroundColor="purple.500"
-            color="white"
-          >
+          <Circle role="presentation" size="32px" backgroundColor="purple.500" color="white">
             <UserArrowIcon />
           </Circle>
           <Text as="div" flex="1">
@@ -140,10 +129,7 @@ function DelegateAccessDialog({
           </Box>
           <FormControl id="contact-email" isInvalid={!!errors.email}>
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.email-label"
-                defaultMessage="Email"
-              />
+              <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
             </FormLabel>
             <Input
               {...emailRegisterProps}
@@ -165,10 +151,7 @@ function DelegateAccessDialog({
           </FormControl>
           <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.first-name-label"
-                defaultMessage="First name"
-              />
+              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input {...register("firstName", { required: true })} />
             {errors.firstName && (
@@ -182,10 +165,7 @@ function DelegateAccessDialog({
           </FormControl>
           <FormControl id="contact-last-name" isInvalid={!!errors.lastName}>
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.last-name-label"
-                defaultMessage="Last name"
-              />
+              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input {...register("lastName", { required: true })} />
             {errors.lastName && (
@@ -199,10 +179,7 @@ function DelegateAccessDialog({
           </FormControl>
           <FormControl id="message" isInvalid={!!errors.messageBody}>
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.message-label"
-                defaultMessage="Message"
-              />
+              <FormattedMessage id="generic.forms.message-label" defaultMessage="Message" />
             </FormLabel>
             <Controller
               name="messageBody"

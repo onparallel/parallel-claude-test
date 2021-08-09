@@ -7,8 +7,7 @@ export const PetitionMessageStatus = enumType({
   members: [
     {
       name: "SCHEDULED",
-      description:
-        "The message has been scheduled to be sent at a specific time.",
+      description: "The message has been scheduled to be sent at a specific time.",
     },
     {
       name: "CANCELLED",

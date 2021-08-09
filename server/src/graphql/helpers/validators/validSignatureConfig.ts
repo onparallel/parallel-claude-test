@@ -5,10 +5,7 @@ import { isValidTimezone } from "../../../util/validators";
 import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 
-export function validSignatureConfig<
-  TypeName extends string,
-  FieldName extends string
->(
+export function validSignatureConfig<TypeName extends string, FieldName extends string>(
   prop: (
     args: core.ArgsValue<TypeName, FieldName>
   ) => core.GetGen2<"inputTypes", "SignatureConfigInput"> | null | undefined,
@@ -32,23 +29,13 @@ export function validSignatureConfig<
       }
       if (
         !integrations.some(
-          (integration) =>
-            integration.type === "SIGNATURE" &&
-            integration.provider === provider
+          (integration) => integration.type === "SIGNATURE" && integration.provider === provider
         )
       ) {
-        throw new ArgValidationError(
-          info,
-          `${argName}.provider`,
-          `Invalid signature provider.`
-        );
+        throw new ArgValidationError(info, `${argName}.provider`, `Invalid signature provider.`);
       }
       if (contacts.some((c) => c === null || c.org_id !== ctx.user!.org_id)) {
-        throw new ArgValidationError(
-          info,
-          `${argName}.contactIds`,
-          `Invalid list of contacts.`
-        );
+        throw new ArgValidationError(info, `${argName}.contactIds`, `Invalid list of contacts.`);
       }
       if (!isValidTimezone(timezone)) {
         throw new ArgValidationError(
@@ -59,11 +46,7 @@ export function validSignatureConfig<
       }
 
       if (!isDefined(title)) {
-        throw new ArgValidationError(
-          info,
-          `${argName}.title`,
-          "Value must be defined"
-        );
+        throw new ArgValidationError(info, `${argName}.title`, "Value must be defined");
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

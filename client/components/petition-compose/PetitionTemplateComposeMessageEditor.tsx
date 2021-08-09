@@ -24,15 +24,11 @@ export function PetitionTemplateComposeMessageEditor({
   ...props
 }: PetitionTemplateComposeMessageEditorProps) {
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
-  const [body, setBody] = useState<RichTextEditorValue>(
-    petition.emailBody ?? emptyRTEValue()
-  );
+  const [body, setBody] = useState<RichTextEditorValue>(petition.emailBody ?? emptyRTEValue());
 
   const isReadOnly = petition.isReadOnly;
 
-  const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [
-    onUpdatePetition,
-  ]);
+  const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [onUpdatePetition]);
 
   const handleSubjectChange = useCallback(
     (value: string) => {

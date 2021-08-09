@@ -1,14 +1,4 @@
-import {
-  Box,
-  Center,
-  BoxProps,
-  Button,
-  Flex,
-  Grid,
-  Heading,
-  Text,
-  Image,
-} from "@chakra-ui/react";
+import { Box, Center, BoxProps, Button, Flex, Grid, Heading, Text, Image } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
@@ -49,9 +39,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
       >
         <Feature
           image={
-            <Image
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-aml.svg`}
-            />
+            <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-aml.svg`} />
           }
           header={
             <FormattedMessage
@@ -68,15 +56,10 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
         />
         <Feature
           image={
-            <Image
-              src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-tax.svg`}
-            />
+            <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/use-case-tax.svg`} />
           }
           header={
-            <FormattedMessage
-              id="public.parallel-use-cases.tax-title"
-              defaultMessage="Tax"
-            />
+            <FormattedMessage id="public.parallel-use-cases.tax-title" defaultMessage="Tax" />
           }
           description={
             <FormattedMessage
@@ -143,12 +126,7 @@ export function PublicHeroPopularUseCases(props: BoxProps) {
           }
         />
         <Center borderRadius="lg" borderWidth="3px" borderColor="purple.200">
-          <Flex
-            flexDirection="column"
-            alignItems="center"
-            marginBottom={6}
-            marginTop={7}
-          >
+          <Flex flexDirection="column" alignItems="center" marginBottom={6} marginTop={7}>
             <Center
               borderRadius="full"
               boxSize={12}

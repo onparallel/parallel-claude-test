@@ -16,10 +16,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     orgId: nonNull(globalIdArg()),
     file: nonNull(uploadArg()),
   },
-  authorize: authenticateAnd(
-    contextUserIsAdmin(),
-    contextUserBelongsToOrg("orgId")
-  ),
+  authorize: authenticateAnd(contextUserIsAdmin(), contextUserBelongsToOrg("orgId")),
   validateArgs: validateAnd(
     contentType((args) => args.file, "image/png", "file"),
     maxFileSize((args) => args.file, 50 * 1024, "file")
@@ -29,11 +26,7 @@ export const updateOrganizationLogo = mutationField("updateOrganizationLogo", {
     const filename = random(16);
     const path = `uploads/${filename}`;
 
-    const res = await ctx.aws.publicFiles.uploadFile(
-      path,
-      mimetype,
-      createReadStream()
-    );
+    const res = await ctx.aws.publicFiles.uploadFile(path, mimetype, createReadStream());
 
     const logoFile = await ctx.files.createPublicFile(
       {

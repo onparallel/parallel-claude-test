@@ -19,13 +19,7 @@ export function TimelineGroupPermissionRemovedEvent({
 }: TimelineGroupPermissionRemovedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<UserGroupXIcon />}
-          color="white"
-          backgroundColor="red.500"
-        />
-      }
+      icon={<TimelineIcon icon={<UserGroupXIcon />} color="white" backgroundColor="red.500" />}
     >
       <FormattedMessage
         id="timeline.remove-group-permission-description"
@@ -35,11 +29,7 @@ export function TimelineGroupPermissionRemovedEvent({
           user: <UserReference user={event.user} />,
           groupName: <Text as="strong">{event.permissionGroup.name}</Text>,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

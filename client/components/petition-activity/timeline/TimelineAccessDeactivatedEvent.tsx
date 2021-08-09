@@ -20,13 +20,7 @@ export function TimelineAccessDeactivatedEvent({
 }: TimelineAccessDeactivatedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<UserXIcon />}
-          color="white"
-          backgroundColor="red.500"
-        />
-      }
+      icon={<TimelineIcon icon={<UserXIcon />} color="white" backgroundColor="red.500" />}
     >
       <FormattedMessage
         id="timeline.access-deactivated-description"
@@ -37,11 +31,7 @@ export function TimelineAccessDeactivatedEvent({
           user: <UserReference user={event.user} />,
           contact: <ContactLink contact={event.access.contact} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

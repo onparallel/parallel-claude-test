@@ -35,16 +35,7 @@ export function NotificationsDrawer() {
   const lastNotificationDate = useRef<string | undefined>(undefined);
   const [
     getData,
-    {
-      data,
-      called,
-      loading,
-      refetch,
-      fetchMore,
-      networkStatus,
-      startPolling,
-      stopPolling,
-    },
+    { data, called, loading, refetch, fetchMore, networkStatus, startPolling, stopPolling },
   ] = useNotificationsDrawer_PetitionUserNotificationsLazyQuery({
     pollInterval: POLL_INTERVAL,
     notifyOnNetworkStatusChange: true,
@@ -91,9 +82,7 @@ export function NotificationsDrawer() {
   };
 
   const client = useApolloClient();
-  const handleFilterChange = async (
-    type: PetitionUserNotificationFilter | null
-  ) => {
+  const handleFilterChange = async (type: PetitionUserNotificationFilter | null) => {
     client.cache.evict({
       id: getMyId(client),
       fieldName: "notifications",
@@ -149,11 +138,7 @@ export function NotificationsDrawer() {
               />
             </Text>
           </Stack>
-          <NotificationsFilterSelect
-            ref={selectRef}
-            value={filter}
-            onChange={handleFilterChange}
-          />
+          <NotificationsFilterSelect ref={selectRef} value={filter} onChange={handleFilterChange} />
         </DrawerHeader>
         <DrawerBody
           paddingInlineStart={0}
@@ -194,9 +179,7 @@ export function NotificationsDrawer() {
                 width="100%"
                 height="48px"
                 borderRadius={0}
-                leftIcon={
-                  <EmailOpenedIcon fontSize="16px" role="presentation" />
-                }
+                leftIcon={<EmailOpenedIcon fontSize="16px" role="presentation" />}
                 onClick={handleMarkAllAsRead}
               >
                 <FormattedMessage

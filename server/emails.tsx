@@ -16,14 +16,9 @@ const LR_SCRIPT = `<script src="http://localhost:35729/livereload.js?snipver=1">
 
 async function parseArgs(req: Request) {
   const storyName = req.path.replace(/^\//, "");
-  const storyPath = path.join(
-    __dirname,
-    `src/emails/components/${storyName}.stories.json`
-  );
+  const storyPath = path.join(__dirname, `src/emails/components/${storyName}.stories.json`);
   const storyConfig = await import(storyPath);
-  const story = storyConfig.stories.find(
-    (s: any) => s.parameters.server.id === storyName
-  );
+  const story = storyConfig.stories.find((s: any) => s.parameters.server.id === storyName);
   return mapValues(story.argsTypes, ({ control: { type } }: any, key) => {
     switch (type) {
       case "object":
@@ -44,10 +39,7 @@ app.get("/:email", async (req, res, next) => {
   try {
     // clear cache
     for (const entry of Object.keys(require.cache)) {
-      if (
-        entry.startsWith(`${__dirname}/src`) ||
-        entry.startsWith(`${__dirname}/lang`)
-      ) {
+      if (entry.startsWith(`${__dirname}/src`) || entry.startsWith(`${__dirname}/lang`)) {
         delete require.cache[entry];
       }
     }

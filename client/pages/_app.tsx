@@ -1,9 +1,6 @@
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@parallel/chakra/theme";
-import {
-  I18nProps,
-  I18nProvider,
-} from "@parallel/components/common/I18nProvider";
+import { I18nProps, I18nProvider } from "@parallel/components/common/I18nProvider";
 import "@parallel/styles/global.css";
 import PlausibleProvider from "next-plausible";
 import { AppProps } from "next/app";
@@ -33,8 +30,7 @@ function MyApp({ Component, pageProps, router, ...props }: MyAppProps) {
         [ChakraProvider, { theme, resetCSS: true, portalZIndex: 40 }],
         [DndProvider, { backend: HTML5Backend }],
       ].reduceRight(
-        (acc, [provider, props]) =>
-          createElement(provider as any, props as any, acc),
+        (acc, [provider, props]) => createElement(provider as any, props as any, acc),
         <Component {...pageProps} />
       )}
     </>

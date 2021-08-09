@@ -21,9 +21,7 @@ export async function petitionReminder(
     if (reminder.status === "PROCESSED") {
       throw new Error(`Reminder with id ${reminderId} already processed`);
     }
-    const access = await context.petitions.loadAccess(
-      reminder.petition_access_id
-    );
+    const access = await context.petitions.loadAccess(reminder.petition_access_id);
     if (!access) {
       throw new Error(
         `Petition access not found for id petition_reminder.petition_access_id ${reminder.petition_access_id}`
@@ -34,14 +32,10 @@ export async function petitionReminder(
       context.users.loadUser(access.granter_id),
       context.contacts.loadContact(access.contact_id),
       context.petitions.loadFieldsForPetition(access.petition_id),
-      context.petitions.loadMessagesByPetitionAccessId(
-        reminder.petition_access_id
-      ),
+      context.petitions.loadMessagesByPetitionAccessId(reminder.petition_access_id),
     ]);
     if (!petition) {
-      throw new Error(
-        `Petition not found for petition_access.petition_id ${access.petition_id}`
-      );
+      throw new Error(`Petition not found for petition_access.petition_id ${access.petition_id}`);
     }
     if (petition.status !== "PENDING") {
       throw new Error(
@@ -49,14 +43,10 @@ export async function petitionReminder(
       );
     }
     if (!granter) {
-      throw new Error(
-        `User not found for petition_access.granter_id ${access.granter_id}`
-      );
+      throw new Error(`User not found for petition_access.granter_id ${access.granter_id}`);
     }
     if (!contact) {
-      throw new Error(
-        `Contact not found for petition_access.contact_id ${access.contact_id}`
-      );
+      throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
     }
     const fieldIds = fields.map((f) => f.id);
     const fieldReplies = await context.petitions.loadRepliesForField(fieldIds);
@@ -68,22 +58,13 @@ export async function petitionReminder(
       replies: repliesByFieldId[f.id],
     }));
 
-    const missing = zip(
-      fieldsWithReplies,
-      evaluateFieldVisibility(fieldsWithReplies)
-    ).filter(
-      ([field, isVisible]) =>
-        isVisible && field.type !== "HEADING" && field.replies.length === 0
+    const missing = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies)).filter(
+      ([field, isVisible]) => isVisible && field.type !== "HEADING" && field.replies.length === 0
     );
 
-    const { emailFrom, ...layoutProps } = await getLayoutProps(
-      granter.org_id,
-      context
-    );
+    const { emailFrom, ...layoutProps } = await getLayoutProps(granter.org_id, context);
 
-    const bodyJson = reminder.email_body
-      ? JSON.parse(reminder.email_body)
-      : null;
+    const bodyJson = reminder.email_body ? JSON.parse(reminder.email_body) : null;
     const renderContext = { contact, user: granter, petition };
     const { html, text, subject, from } = await buildEmail(
       PetitionReminder,

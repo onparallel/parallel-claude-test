@@ -11,11 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { forwardRef, useMemo, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
-import {
-  useCreateSimpleReply,
-  useDeletePetitionReply,
-  useUpdateSimpleReply,
-} from "./mutations";
+import { useCreateSimpleReply, useDeletePetitionReply, useUpdateSimpleReply } from "./mutations";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -51,9 +47,7 @@ export function RecipientViewPetitionFieldSelect({
 
   const newReplyRef = useRef<SelectInstance>(null);
   const replyRefs = useMultipleRefs<SelectInstance>();
-  const [isDeletingReply, setIsDeletingReply] = useState<
-    Record<string, boolean>
-  >({});
+  const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
   const options = field.options as FieldOptions["SELECT"];
 
@@ -117,10 +111,7 @@ export function RecipientViewPetitionFieldSelect({
     )
   );
 
-  const values = useMemo(
-    () => options.values.map(toSelectOption),
-    [options.values]
-  );
+  const values = useMemo(() => options.values.map(toSelectOption), [options.values]);
 
   return (
     <RecipientViewPetitionFieldCard
@@ -172,9 +163,7 @@ export function RecipientViewPetitionFieldSelect({
             }
           />
           <Center height="100%" position="absolute" right="42px" top={0}>
-            <RecipientViewPetitionFieldReplyStatusIndicator
-              isSaving={isSaving}
-            />
+            <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
         </Box>
       ) : null}
@@ -213,10 +202,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
     )
   );
 
-  const values = useMemo(
-    () => options.values.map(toSelectOption),
-    [options.values]
-  );
+  const values = useMemo(() => options.values.map(toSelectOption), [options.values]);
 
   async function handleOnChange(value: any) {
     setValue(value);
@@ -246,10 +232,7 @@ const RecipientViewPetitionFieldReplySelect = forwardRef<
             }
           />
           <Center height="100%" position="absolute" right="42px" top={0}>
-            <RecipientViewPetitionFieldReplyStatusIndicator
-              reply={reply}
-              isSaving={isSaving}
-            />
+            <RecipientViewPetitionFieldReplyStatusIndicator reply={reply} isSaving={isSaving} />
           </Center>
         </Box>
       </Box>

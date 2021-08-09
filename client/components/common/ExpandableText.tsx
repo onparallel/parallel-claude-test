@@ -3,11 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
 type ExpandableTextProps = TextProps & { noOfLines: number };
-export function ExpandableText({
-  children,
-  noOfLines,
-  ...props
-}: ExpandableTextProps) {
+export function ExpandableText({ children, noOfLines, ...props }: ExpandableTextProps) {
   const [isExpanded, switchExpandText] = useState(false);
   const [canExpand, setCanExpand] = useState(false);
 
@@ -39,10 +35,7 @@ export function ExpandableText({
             })
       }
     >
-      <Box
-        cursor={canExpand ? "pointer" : "default"}
-        onClick={handleSwitchExpand}
-      >
+      <Box cursor={canExpand ? "pointer" : "default"} onClick={handleSwitchExpand}>
         <Text
           wordBreak="break-word"
           display="-webkit-box"

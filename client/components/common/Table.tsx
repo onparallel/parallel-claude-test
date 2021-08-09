@@ -53,9 +53,7 @@ export interface TableSorting<T extends string> {
   direction: TableSortingDirection;
 }
 
-function toggleSortingDirection(
-  direction: TableSortingDirection
-): TableSortingDirection {
+function toggleSortingDirection(direction: TableSortingDirection): TableSortingDirection {
   return direction === "ASC" ? "DESC" : "ASC";
 }
 
@@ -114,8 +112,7 @@ export interface TableColumn<TRow, TContext = unknown, TFilter = unknown> {
   cellProps?: HTMLChakraProps<"td">;
 }
 
-export interface TableColumnFilterProps<TFilter, TContext = unknown>
-  extends ValueProps<TFilter> {
+export interface TableColumnFilterProps<TFilter, TContext = unknown> extends ValueProps<TFilter> {
   context: TContext;
 }
 
@@ -135,8 +132,10 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   onFilterChange,
   ...props
 }: TableProps<TRow, TContext, TImpl>) {
-  const { selection, allSelected, anySelected, toggle, toggleAll } =
-    useSelectionState(rows, rowKeyProp);
+  const { selection, allSelected, anySelected, toggle, toggleAll } = useSelectionState(
+    rows,
+    rowKeyProp
+  );
   const colors = useTableColors();
 
   useEffect(() => {
@@ -166,13 +165,9 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
 
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const handleToggleExpand = useCallback(function (
-    key: string,
-    value: boolean
-  ) {
+  const handleToggleExpand = useCallback(function (key: string, value: boolean) {
     setExpanded(value ? key : null);
-  },
-  []);
+  }, []);
 
   columns = useMemo(() => {
     const updated = [...columns];
@@ -232,14 +227,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
         key: "selection-checkbox",
         header: "",
         Header: ({ anySelected, allSelected, onToggleAll }) => (
-          <Box
-            as="th"
-            width="1px"
-            paddingLeft={5}
-            paddingRight={2}
-            height="38px"
-            userSelect="none"
-          >
+          <Box as="th" width="1px" paddingLeft={5} paddingRight={2} height="38px" userSelect="none">
             <Box height="16px">
               <Checkbox
                 isChecked={anySelected && allSelected}
@@ -266,11 +254,7 @@ function _Table<TRow, TContext = unknown, TImpl extends TRow = TRow>({
               cursor="pointer"
               onClick={toggle}
             >
-              <Checkbox
-                isChecked={isSelected}
-                colorScheme="purple"
-                onChange={function () {}}
-              />
+              <Checkbox isChecked={isSelected} colorScheme="purple" onChange={function () {}} />
             </Flex>
           );
         },
@@ -396,10 +380,10 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
   "columns" | "isExpandable" | "isHighlightable" | "onRowClick"
 >) {
   const colors = useTableColors();
-  const handleToggleSelection = useCallback(
-    onToggleSelection.bind(null, rowKey),
-    [onToggleSelection, rowKey]
-  );
+  const handleToggleSelection = useCallback(onToggleSelection.bind(null, rowKey), [
+    onToggleSelection,
+    rowKey,
+  ]);
   const handleToggleExpand = useCallback(onToggleExpand.bind(null, rowKey), [
     onToggleExpand,
     rowKey,
@@ -457,10 +441,7 @@ function _Row<TRow, TContext = unknown, TImpl extends TRow = TRow>({
 }
 const Row: typeof _Row = memo(_Row) as any;
 
-function _Cell<TRow, TContext>({
-  column,
-  ...props
-}: TableCellProps<TRow, TContext>) {
+function _Cell<TRow, TContext>({ column, ...props }: TableCellProps<TRow, TContext>) {
   return (
     <Box
       as="td"
@@ -582,11 +563,7 @@ export function DefaultHeader({
       }}
       {...props}
     >
-      <HStack
-        spacing={1}
-        alignItems="center"
-        justifyContent={column.align ?? "left"}
-      >
+      <HStack spacing={1} alignItems="center" justifyContent={column.align ?? "left"}>
         <Text as="div" isTruncated>
           {column.header}
         </Text>
@@ -666,17 +643,10 @@ export function DefaultHeader({
                   })}
                 />
                 <ModalHeader>
-                  <FormattedMessage
-                    id="component.table.filter-header"
-                    defaultMessage="Filter"
-                  />
+                  <FormattedMessage id="component.table.filter-header" defaultMessage="Filter" />
                 </ModalHeader>
                 <ModalBody paddingTop={0} paddingX={4} paddingBottom={6}>
-                  <column.Filter
-                    value={filter}
-                    onChange={onFilterChange}
-                    context={context}
-                  />
+                  <column.Filter value={filter} onChange={onFilterChange} context={context} />
                 </ModalBody>
               </ModalContent>
             </ModalOverlay>
@@ -694,23 +664,10 @@ export function DefaultHeader({
                     }
                   }}
                 >
-                  <Heading
-                    as="h4"
-                    size="xs"
-                    textTransform="uppercase"
-                    paddingX={2}
-                    paddingY={2}
-                  >
-                    <FormattedMessage
-                      id="component.table.filter-header"
-                      defaultMessage="Filter"
-                    />
+                  <Heading as="h4" size="xs" textTransform="uppercase" paddingX={2} paddingY={2}>
+                    <FormattedMessage id="component.table.filter-header" defaultMessage="Filter" />
                   </Heading>
-                  <column.Filter
-                    value={filter}
-                    onChange={onFilterChange}
-                    context={context}
-                  />
+                  <column.Filter value={filter} onChange={onFilterChange} context={context} />
                 </Card>
               </FocusLock>
             ) : null}

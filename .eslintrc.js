@@ -7,11 +7,7 @@ module.exports = {
     ecmaVersion: 2020,
     sourceType: "module",
   },
-  extends: [
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-    "prettier",
-  ],
+  extends: ["plugin:@typescript-eslint/recommended", "plugin:react/recommended", "prettier"],
   rules: {
     "prettier/prettier": ["error", { endOfLine: "auto" }],
     "@typescript-eslint/explicit-function-return-type": "off",

@@ -14,10 +14,7 @@ export class PetitionEventSubscriptionRepository extends BaseRepository {
    * A user will have access to the subscriptions only if he is the
    * owner of the petitions linked to those subscriptions
    */
-  async userHasAccessToSubscriptions(
-    userId: number,
-    subscriptionIds: number[]
-  ) {
+  async userHasAccessToSubscriptions(userId: number, subscriptionIds: number[]) {
     const [{ count }] = await this.raw(
       /* sql */ `
       select count(*)::int as count from petition_event_subscription pes
@@ -35,10 +32,8 @@ export class PetitionEventSubscriptionRepository extends BaseRepository {
     return count === new Set(subscriptionIds).size;
   }
 
-  readonly loadSubscription = this.buildLoadBy(
-    "petition_event_subscription",
-    "id",
-    (q) => q.whereNull("deleted_at").orderBy("created_at", "desc")
+  readonly loadSubscription = this.buildLoadBy("petition_event_subscription", "id", (q) =>
+    q.whereNull("deleted_at").orderBy("created_at", "desc")
   );
 
   readonly loadSubscriptionsByPetitionId = this.buildLoadMultipleBy(

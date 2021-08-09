@@ -9,13 +9,7 @@ import { getMinMaxCheckboxLimit } from "@parallel/utils/petitionFields";
 import { isEmptyParagraph } from "@parallel/utils/slate/isEmptyRTEValue";
 import { ParagraphElement } from "@parallel/utils/slate/types";
 import { isSelectionExpanded } from "@udecode/plate-common";
-import {
-  forwardRef,
-  KeyboardEvent,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import { forwardRef, KeyboardEvent, useCallback, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { pipe } from "remeda";
 import { shallowEqualArrays } from "shallow-equal";
@@ -89,136 +83,122 @@ function valuesToSlateNodes(values: string[]): ParagraphElement[] {
 }
 
 export const PetitionFieldOptionsListEditor = Object.assign(
-  forwardRef<
-    PetitionFieldOptionsListEditorRef,
-    PetitionFieldOptionsListEditorProps
-  >(function PetitionFieldOptionsListEditor(
-    {
-      field,
-      showError,
-      onFieldEdit,
-      onFocusNextField,
-      onFocusDescription,
-      isReadOnly,
-      ...props
-    },
-    ref
-  ) {
-    const editor = useMemo(
-      () => pipe(createEditor(), withHistory, withReact),
-      []
-    );
-    const [value, onChange] = useState<ParagraphElement[]>(
-      valuesToSlateNodes(field.options.values ?? [])
-    );
-    assignRef(
-      ref,
-      useMemo(
-        () =>
-          ({
-            focus: (position) => {
-              ReactEditor.focus(editor);
-              if (position) {
-                Transforms.select(
-                  editor,
-                  position === "START"
-                    ? Editor.start(editor, [])
-                    : Editor.end(editor, [])
-                );
-              }
-            },
-            editor,
-          } as PetitionFieldOptionsListEditorRef),
-        [editor]
-      )
-    );
-
-    const handleKeyDown = useCallback(
-      (event: KeyboardEvent) => {
-        if (editor.selection && isSelectionExpanded(editor)) {
-          return;
-        }
-        const anchor = editor.selection?.anchor;
-        if (!anchor) {
-          return;
-        }
-
-        switch (event.key) {
-          case "ArrowDown":
-            const atEnd = Point.equals(anchor, Editor.end(editor, []));
-            if (atEnd) {
-              onFocusNextField();
-            }
-            break;
-          case "ArrowUp":
-            const atStart = Point.equals(anchor, Editor.start(editor, []));
-            if (atStart) {
-              onFocusDescription();
-            }
-            break;
-        }
-      },
-      [editor, onFocusNextField, onFocusDescription]
-    );
-
-    const handleBlur = useCallback(() => {
-      const values = value
-        .map((n) => (n.children as any)[0].text.trim())
-        .filter((option) => option !== "");
-      if (!shallowEqualArrays(field.options.values, values)) {
-        if (field.type === "CHECKBOX") {
-          const [min, max] = getMinMaxCheckboxLimit({
-            min: field.options.limit.min || 0,
-            max: field.options.limit.max || 1,
-            valuesLength: values.length || 1,
-            optional: field.optional,
-          });
-          onFieldEdit({
-            options: {
-              ...field.options,
-              limit: {
-                ...field.options.limit,
-                min,
-                max,
+  forwardRef<PetitionFieldOptionsListEditorRef, PetitionFieldOptionsListEditorProps>(
+    function PetitionFieldOptionsListEditor(
+      { field, showError, onFieldEdit, onFocusNextField, onFocusDescription, isReadOnly, ...props },
+      ref
+    ) {
+      const editor = useMemo(() => pipe(createEditor(), withHistory, withReact), []);
+      const [value, onChange] = useState<ParagraphElement[]>(
+        valuesToSlateNodes(field.options.values ?? [])
+      );
+      assignRef(
+        ref,
+        useMemo(
+          () =>
+            ({
+              focus: (position) => {
+                ReactEditor.focus(editor);
+                if (position) {
+                  Transforms.select(
+                    editor,
+                    position === "START" ? Editor.start(editor, []) : Editor.end(editor, [])
+                  );
+                }
               },
-              values,
-            },
-          });
-        } else {
-          onFieldEdit({ options: { ...field.options, values } });
-        }
-      }
-    }, [field.options.values, value, onFieldEdit, onChange]);
+              editor,
+            } as PetitionFieldOptionsListEditorRef),
+          [editor]
+        )
+      );
 
-    return isReadOnly ? (
-      <Box textStyle="muted">
-        {field.options.values.map((value: string, index: number) => {
-          return (
-            <Text
-              key={index}
-              fontSize="sm"
-              marginY={0}
-              _before={{ content: "'-'", marginRight: 1 }}
-            >
-              {value}
-            </Text>
-          );
-        })}
-      </Box>
-    ) : (
-      <Slate editor={editor} value={value} onChange={onChange as any}>
-        <Box maxHeight="200px" overflow="auto" fontSize="sm">
-          <Editable
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            {...props}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-          />
+      const handleKeyDown = useCallback(
+        (event: KeyboardEvent) => {
+          if (editor.selection && isSelectionExpanded(editor)) {
+            return;
+          }
+          const anchor = editor.selection?.anchor;
+          if (!anchor) {
+            return;
+          }
+
+          switch (event.key) {
+            case "ArrowDown":
+              const atEnd = Point.equals(anchor, Editor.end(editor, []));
+              if (atEnd) {
+                onFocusNextField();
+              }
+              break;
+            case "ArrowUp":
+              const atStart = Point.equals(anchor, Editor.start(editor, []));
+              if (atStart) {
+                onFocusDescription();
+              }
+              break;
+          }
+        },
+        [editor, onFocusNextField, onFocusDescription]
+      );
+
+      const handleBlur = useCallback(() => {
+        const values = value
+          .map((n) => (n.children as any)[0].text.trim())
+          .filter((option) => option !== "");
+        if (!shallowEqualArrays(field.options.values, values)) {
+          if (field.type === "CHECKBOX") {
+            const [min, max] = getMinMaxCheckboxLimit({
+              min: field.options.limit.min || 0,
+              max: field.options.limit.max || 1,
+              valuesLength: values.length || 1,
+              optional: field.optional,
+            });
+            onFieldEdit({
+              options: {
+                ...field.options,
+                limit: {
+                  ...field.options.limit,
+                  min,
+                  max,
+                },
+                values,
+              },
+            });
+          } else {
+            onFieldEdit({ options: { ...field.options, values } });
+          }
+        }
+      }, [field.options.values, value, onFieldEdit, onChange]);
+
+      return isReadOnly ? (
+        <Box textStyle="muted">
+          {field.options.values.map((value: string, index: number) => {
+            return (
+              <Text
+                key={index}
+                fontSize="sm"
+                marginY={0}
+                _before={{ content: "'-'", marginRight: 1 }}
+              >
+                {value}
+              </Text>
+            );
+          })}
         </Box>
-      </Slate>
-    );
-  }),
+      ) : (
+        <Slate editor={editor} value={value} onChange={onChange as any}>
+          <Box maxHeight="200px" overflow="auto" fontSize="sm">
+            <Editable
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              {...props}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+            />
+          </Box>
+        </Slate>
+      );
+    }
+  ),
 
   {
     fragments: {

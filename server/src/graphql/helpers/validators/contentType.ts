@@ -20,10 +20,6 @@ export function contentType<TypeName extends string, FieldName extends string>(
         return;
       }
     }
-    throw new ArgValidationError(
-      info,
-      argName,
-      `Expected ${contentType}, got ${upload.mimetype}`
-    );
+    throw new ArgValidationError(info, argName, `Expected ${contentType}, got ${upload.mimetype}`);
   }) as FieldValidateArgsResolver<TypeName, FieldName>;
 }

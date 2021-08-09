@@ -54,9 +54,7 @@ export function PetitionListHeader({
 }: PetitionListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
-  const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [
-    onSearchChange,
-  ]);
+  const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [onSearchChange]);
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
@@ -85,15 +83,8 @@ export function PetitionListHeader({
       <Spacer />
       <Box>
         <Menu>
-          <MenuButton
-            as={Button}
-            rightIcon={<ChevronDownIcon />}
-            isDisabled={!showActions}
-          >
-            <FormattedMessage
-              id="generic.actions-button"
-              defaultMessage="Actions"
-            />
+          <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isDisabled={!showActions}>
+            <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
           </MenuButton>
           <Portal>
             <MenuList minWidth="160px">

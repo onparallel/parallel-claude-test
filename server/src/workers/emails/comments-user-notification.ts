@@ -19,29 +19,20 @@ export async function commentsUserNotification(
 ) {
   const [petition, _comments, user] = await Promise.all([
     context.petitions.loadPetition(payload.petition_id),
-    context.petitions.loadPetitionFieldComment(
-      payload.petition_field_comment_ids
-    ),
+    context.petitions.loadPetitionFieldComment(payload.petition_field_comment_ids),
     context.users.loadUser(payload.user_id),
   ]);
   if (!petition) {
-    throw new Error(
-      `Petition not found for petition_id ${payload.petition_id}`
-    );
+    throw new Error(`Petition not found for petition_id ${payload.petition_id}`);
   }
   if (!user) {
     throw new Error(`User not found for user_id ${payload.user_id}`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(
-    petition.org_id,
-    context
-  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
   const comments = _comments.filter(isDefined);
   const fieldIds = uniq(comments.map((c) => c!.petition_field_id));
-  const _fields = (await context.petitions.loadField(fieldIds)).filter(
-    isDefined
-  );
+  const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);
   const commentsByField = groupBy(comments, (c) => c.petition_field_id);
   const fields = await pMap(
     sortBy(_fields, (f) => f.position),
@@ -66,9 +57,7 @@ export async function commentsUserNotification(
     subject,
     text,
     html,
-    created_from: `PetitionFieldComment:${payload.petition_field_comment_ids.join(
-      ","
-    )}`,
+    created_from: `PetitionFieldComment:${payload.petition_field_comment_ids.join(",")}`,
   });
 
   return email;

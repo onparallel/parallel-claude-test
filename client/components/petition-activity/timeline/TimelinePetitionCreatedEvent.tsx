@@ -19,13 +19,7 @@ export function TimelinePetitionCreatedEvent({
 }: TimelinePetitionCreatedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<ShinyIcon />}
-          color="white"
-          backgroundColor="purple.500"
-        />
-      }
+      icon={<TimelineIcon icon={<ShinyIcon />} color="white" backgroundColor="purple.500" />}
       paddingBottom={0}
     >
       <FormattedMessage
@@ -35,13 +29,7 @@ export function TimelinePetitionCreatedEvent({
           same: userId === user?.id,
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={user} />,
-          timeAgo: (
-            <DateTime
-              value={createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
-          ),
+          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
       />
     </TimelineItem>

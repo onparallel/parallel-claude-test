@@ -1,14 +1,5 @@
 import { gql, useApolloClient } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Circle,
-  Flex,
-  List,
-  ListItem,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Circle, Flex, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import { AddIcon, EditIcon } from "@parallel/chakra/icons";
 import { SmallPopover } from "@parallel/components/common/SmallPopover";
 import { Tag } from "@parallel/components/common/Tag";
@@ -190,12 +181,7 @@ export function PetitionTagListCellContent({
                 },
               }}
             >
-              <Circle
-                border="1px solid"
-                borderColor="gray.400"
-                boxSize="16px"
-                role="presentation"
-              >
+              <Circle border="1px solid" borderColor="gray.400" boxSize="16px" role="presentation">
                 <AddIcon fontSize="8px" color="gray.600" />
               </Circle>
               <Text as="div" whiteSpace="nowrap" fontSize="sm" color="gray.400">
@@ -230,13 +216,7 @@ export function PetitionTagListCellContent({
                       content={
                         <Stack as={List} alignItems="flex-start">
                           {extra.map((tag) => (
-                            <Tag
-                              key={tag.id}
-                              tag={tag}
-                              flex="0 1 auto"
-                              minWidth="0"
-                              as="li"
-                            />
+                            <Tag key={tag.id} tag={tag} flex="0 1 auto" minWidth="0" as="li" />
                           ))}
                         </Stack>
                       }
@@ -295,10 +275,7 @@ PetitionTagListCellContent.queries = {
 
 PetitionTagListCellContent.mutations = [
   gql`
-    mutation PetitionTagListCellContent_tagPetition(
-      $tagId: GID!
-      $petitionId: GID!
-    ) {
+    mutation PetitionTagListCellContent_tagPetition($tagId: GID!, $petitionId: GID!) {
       tagPetition(tagId: $tagId, petitionId: $petitionId) {
         id
         tags {
@@ -309,10 +286,7 @@ PetitionTagListCellContent.mutations = [
     ${PetitionTagListCellContent.fragments.Tag}
   `,
   gql`
-    mutation PetitionTagListCellContent_untagPetition(
-      $tagId: GID!
-      $petitionId: GID!
-    ) {
+    mutation PetitionTagListCellContent_untagPetition($tagId: GID!, $petitionId: GID!) {
       untagPetition(tagId: $tagId, petitionId: $petitionId) {
         id
         tags {
@@ -323,10 +297,7 @@ PetitionTagListCellContent.mutations = [
     ${PetitionTagListCellContent.fragments.Tag}
   `,
   gql`
-    mutation PetitionTagListCellContent_createTag(
-      $name: String!
-      $color: String!
-    ) {
+    mutation PetitionTagListCellContent_createTag($name: String!, $color: String!) {
       createTag(name: $name, color: $color) {
         ...PetitionTagListCellContent_Tag
       }
@@ -337,8 +308,7 @@ PetitionTagListCellContent.mutations = [
 
 type TagSelectInstance = AsyncCreatableSelect<TagSelection, true, never>;
 
-interface TagSelectProps
-  extends AsyncCreatableSelectProps<TagSelection, true, never> {
+interface TagSelectProps extends AsyncCreatableSelectProps<TagSelection, true, never> {
   onAddTag: (tag: TagSelection) => void;
   onRemoveTag: (tag: TagSelection) => void;
   onEditTags: () => void;
@@ -349,201 +319,188 @@ function randomColor() {
   return DEFAULT_COLORS[Math.floor(Math.random() * DEFAULT_COLORS.length)];
 }
 
-const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(
-  function TagSelect(
-    { value, onAddTag, onRemoveTag, onEditTags, onCreateTag, ...props },
-    ref
-  ) {
-    const [newTagColor, setNewTagColor] = useState(randomColor());
-    const innerRef = useRef<TagSelectInstance>();
-    useEffect(() => {
-      // react-select is not updating defaultOptions
-      // https://github.com/JedWatson/react-select/issues/4012
-      innerRef.current?.setState({
-        defaultOptions: props.defaultOptions as any,
-      });
-    }, [innerRef.current, props.defaultOptions]);
-    const _ref = useMergedRef(ref, innerRef);
-    const rsProps = useReactSelectProps<TagSelection, true, never>({
-      components: {
-        IndicatorsContainer: () => <></>,
-        MultiValue: ({ data: tag, innerProps, removeProps }) => {
-          return (
-            <Tag
-              tag={tag as TagSelection}
-              margin="2px"
-              isRemovable
-              onRemove={removeProps.onClick}
-              minWidth="0"
-              {...innerProps}
-            />
-          );
-        },
-        Option: (props) => {
-          return props.data.__isNew__ ? (
-            <components.Option {...props}>
-              <Flex alignItems="baseline">
-                <FormattedMessage
-                  id="components.petition-tag-list-cell-content.tags-create"
-                  defaultMessage="Create {tag}"
-                  values={{
-                    tag: (
-                      <Tag
-                        marginLeft="0.5rem"
-                        flex="0 1 auto"
-                        minWidth="0"
-                        tag={{
-                          name: props.data.value.trim().replace(/\s+/g, " "),
-                          color: newTagColor,
-                        }}
-                      />
-                    ),
-                  }}
-                />
-              </Flex>
-            </components.Option>
-          ) : (
-            <components.Option {...props}>
-              <Tag
-                flex="0 1 auto"
-                minWidth="0"
-                tag={props.data as TagSelection}
+const TagSelect = forwardRef<TagSelectInstance, TagSelectProps>(function TagSelect(
+  { value, onAddTag, onRemoveTag, onEditTags, onCreateTag, ...props },
+  ref
+) {
+  const [newTagColor, setNewTagColor] = useState(randomColor());
+  const innerRef = useRef<TagSelectInstance>();
+  useEffect(() => {
+    // react-select is not updating defaultOptions
+    // https://github.com/JedWatson/react-select/issues/4012
+    innerRef.current?.setState({
+      defaultOptions: props.defaultOptions as any,
+    });
+  }, [innerRef.current, props.defaultOptions]);
+  const _ref = useMergedRef(ref, innerRef);
+  const rsProps = useReactSelectProps<TagSelection, true, never>({
+    components: {
+      IndicatorsContainer: () => <></>,
+      MultiValue: ({ data: tag, innerProps, removeProps }) => {
+        return (
+          <Tag
+            tag={tag as TagSelection}
+            margin="2px"
+            isRemovable
+            onRemove={removeProps.onClick}
+            minWidth="0"
+            {...innerProps}
+          />
+        );
+      },
+      Option: (props) => {
+        return props.data.__isNew__ ? (
+          <components.Option {...props}>
+            <Flex alignItems="baseline">
+              <FormattedMessage
+                id="components.petition-tag-list-cell-content.tags-create"
+                defaultMessage="Create {tag}"
+                values={{
+                  tag: (
+                    <Tag
+                      marginLeft="0.5rem"
+                      flex="0 1 auto"
+                      minWidth="0"
+                      tag={{
+                        name: props.data.value.trim().replace(/\s+/g, " "),
+                        color: newTagColor,
+                      }}
+                    />
+                  ),
+                }}
               />
-            </components.Option>
-          );
-        },
-        NoOptionsMessage: (props) => {
-          return (
-            <Stack
-              direction="column"
-              spacing={1}
-              textStyle="hint"
-              fontSize="sm"
-              paddingX={2}
-              paddingY={4}
-              textAlign="center"
-            >
-              {props.options.length === 0 && !props.selectProps.inputValue ? (
-                <>
-                  <Text>
-                    <FormattedMessage
-                      id="components.petition-tag-list-cell-content.no-options-1"
-                      defaultMessage="Your organization doesn't have any tags yet."
-                    />
-                  </Text>
-                  <Text>
-                    <FormattedMessage
-                      id="components.petition-tag-list-cell-content.no-options-2"
-                      defaultMessage="Write something to create the first one."
-                    />
-                  </Text>
-                </>
-              ) : (
-                <Text as="div">
+            </Flex>
+          </components.Option>
+        ) : (
+          <components.Option {...props}>
+            <Tag flex="0 1 auto" minWidth="0" tag={props.data as TagSelection} />
+          </components.Option>
+        );
+      },
+      NoOptionsMessage: (props) => {
+        return (
+          <Stack
+            direction="column"
+            spacing={1}
+            textStyle="hint"
+            fontSize="sm"
+            paddingX={2}
+            paddingY={4}
+            textAlign="center"
+          >
+            {props.options.length === 0 && !props.selectProps.inputValue ? (
+              <>
+                <Text>
                   <FormattedMessage
-                    id="components.petition-tag-list-cell-content.no-options-3"
-                    defaultMessage="Type to create a new tag"
+                    id="components.petition-tag-list-cell-content.no-options-1"
+                    defaultMessage="Your organization doesn't have any tags yet."
                   />
                 </Text>
-              )}
-            </Stack>
-          );
-        },
-        MenuList: ({ children, ...props }) => (
-          <components.MenuList {...props}>
-            {children}
-            {props.selectProps.defaultOptions?.length > 0 ? (
-              <Box
-                position="sticky"
-                bottom="0"
-                padding={2}
-                backgroundColor="white"
-              >
-                <Button
-                  width="100%"
-                  size="sm"
-                  variant="outline"
-                  fontWeight="normal"
-                  leftIcon={<EditIcon position="relative" top="-1px" />}
-                  onClick={() => onEditTags()}
-                >
+                <Text>
                   <FormattedMessage
-                    id="components.petition-tag-list-cell-content.edit-tags"
-                    defaultMessage="Edit tags"
+                    id="components.petition-tag-list-cell-content.no-options-2"
+                    defaultMessage="Write something to create the first one."
                   />
-                </Button>
-              </Box>
-            ) : null}
-          </components.MenuList>
-        ),
+                </Text>
+              </>
+            ) : (
+              <Text as="div">
+                <FormattedMessage
+                  id="components.petition-tag-list-cell-content.no-options-3"
+                  defaultMessage="Type to create a new tag"
+                />
+              </Text>
+            )}
+          </Stack>
+        );
       },
-      styles: {
-        container: (styles) => ({ ...styles, width: "100%" }),
-        valueContainer: (styles) => ({
-          ...omit(styles as any, ["padding"]),
-          paddingLeft: "0.375rem",
-          paddingRight: "0.375rem",
-          paddingTop: "8.5px",
-          paddingBottom: "8.5px",
-          fontSize: "14px",
-        }),
-        control: (styles, { isFocused, theme }: any) => ({
-          ...styles,
-          minHeight: "45px",
-          borderRadius: 0,
-          border: "none",
-          boxShadow: isFocused
-            ? `inset 0 0 0 2px ${theme.colors.primary}`
-            : undefined,
-        }),
-        option: (styles) => ({
-          ...styles,
-          display: "flex",
-          padding: "0.25rem 1rem",
-          fontSize: "14px",
-        }),
-        menuList: (styles) => ({
-          ...styles,
-          paddingBottom: 0,
-        }),
-      },
-    });
-    const handleChange = function (_: any, action: ActionMeta<TagSelection>) {
-      switch (action.action) {
-        case "select-option":
-          onAddTag(action.option!);
-          break;
-        case "pop-value":
-        case "remove-value":
-          if (action.removedValue) {
-            onRemoveTag(action.removedValue);
-          }
-          break;
-      }
-    };
-    return (
-      <AsyncCreatableSelect
-        ref={_ref}
-        {...rsProps}
-        isMulti
-        isClearable={false}
-        defaultMenuIsOpen
-        closeMenuOnSelect={false}
-        getOptionValue={(o) => o.id}
-        getOptionLabel={(o) => o.name}
-        isValidNewOption={(value, _, options) => {
-          const name = value.trim().replace(/\s+/g, " ");
-          return name.length > 0 && !options.some((o) => o.name === name);
-        }}
-        value={value}
-        onChange={handleChange}
-        onMenuOpen={() => setNewTagColor(randomColor())}
-        onCreateOption={(name) => {
-          onCreateTag({ name, color: newTagColor });
-          setNewTagColor(randomColor());
-        }}
-        {...props}
-      />
-    );
-  }
-);
+      MenuList: ({ children, ...props }) => (
+        <components.MenuList {...props}>
+          {children}
+          {props.selectProps.defaultOptions?.length > 0 ? (
+            <Box position="sticky" bottom="0" padding={2} backgroundColor="white">
+              <Button
+                width="100%"
+                size="sm"
+                variant="outline"
+                fontWeight="normal"
+                leftIcon={<EditIcon position="relative" top="-1px" />}
+                onClick={() => onEditTags()}
+              >
+                <FormattedMessage
+                  id="components.petition-tag-list-cell-content.edit-tags"
+                  defaultMessage="Edit tags"
+                />
+              </Button>
+            </Box>
+          ) : null}
+        </components.MenuList>
+      ),
+    },
+    styles: {
+      container: (styles) => ({ ...styles, width: "100%" }),
+      valueContainer: (styles) => ({
+        ...omit(styles as any, ["padding"]),
+        paddingLeft: "0.375rem",
+        paddingRight: "0.375rem",
+        paddingTop: "8.5px",
+        paddingBottom: "8.5px",
+        fontSize: "14px",
+      }),
+      control: (styles, { isFocused, theme }: any) => ({
+        ...styles,
+        minHeight: "45px",
+        borderRadius: 0,
+        border: "none",
+        boxShadow: isFocused ? `inset 0 0 0 2px ${theme.colors.primary}` : undefined,
+      }),
+      option: (styles) => ({
+        ...styles,
+        display: "flex",
+        padding: "0.25rem 1rem",
+        fontSize: "14px",
+      }),
+      menuList: (styles) => ({
+        ...styles,
+        paddingBottom: 0,
+      }),
+    },
+  });
+  const handleChange = function (_: any, action: ActionMeta<TagSelection>) {
+    switch (action.action) {
+      case "select-option":
+        onAddTag(action.option!);
+        break;
+      case "pop-value":
+      case "remove-value":
+        if (action.removedValue) {
+          onRemoveTag(action.removedValue);
+        }
+        break;
+    }
+  };
+  return (
+    <AsyncCreatableSelect
+      ref={_ref}
+      {...rsProps}
+      isMulti
+      isClearable={false}
+      defaultMenuIsOpen
+      closeMenuOnSelect={false}
+      getOptionValue={(o) => o.id}
+      getOptionLabel={(o) => o.name}
+      isValidNewOption={(value, _, options) => {
+        const name = value.trim().replace(/\s+/g, " ");
+        return name.length > 0 && !options.some((o) => o.name === name);
+      }}
+      value={value}
+      onChange={handleChange}
+      onMenuOpen={() => setNewTagColor(randomColor())}
+      onCreateOption={(name) => {
+        onCreateTag({ name, color: newTagColor });
+        setNewTagColor(randomColor());
+      }}
+      {...props}
+    />
+  );
+});

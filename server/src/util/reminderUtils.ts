@@ -8,10 +8,7 @@ export type PetitionAccessReminderConfig = {
   weekdaysOnly: boolean;
 };
 
-export function calculateNextReminder(
-  fromDate: Date,
-  config: PetitionAccessReminderConfig
-) {
+export function calculateNextReminder(fromDate: Date, config: PetitionAccessReminderConfig) {
   // Calculate next reminder
   const sendDate = fromDate;
   const date = parse(

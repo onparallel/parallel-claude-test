@@ -1,16 +1,6 @@
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -27,17 +17,14 @@ interface CreateGroupDialogData {
   users: UserSelectSelection[];
 }
 
-export function CreateGroupDialog({
-  ...props
-}: DialogProps<{}, CreateGroupDialogData>) {
-  const { handleSubmit, register, formState, control } =
-    useForm<CreateGroupDialogData>({
-      mode: "onChange",
-      defaultValues: {
-        name: "",
-        users: [],
-      },
-    });
+export function CreateGroupDialog({ ...props }: DialogProps<{}, CreateGroupDialogData>) {
+  const { handleSubmit, register, formState, control } = useForm<CreateGroupDialogData>({
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      users: [],
+    },
+  });
 
   const { errors } = formState;
 
@@ -107,10 +94,7 @@ export function CreateGroupDialog({
                   isMulti
                   value={value}
                   onKeyDown={(e: KeyboardEvent) => {
-                    if (
-                      e.key === "Enter" &&
-                      !(e.target as HTMLInputElement).value
-                    ) {
+                    if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
                       e.preventDefault();
                     }
                   }}

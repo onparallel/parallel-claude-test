@@ -7,10 +7,7 @@ import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWit
 import { SearchInput } from "@parallel/components/common/SearchInput";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -23,10 +20,7 @@ import {
   useAdminOrganizationsQuery,
   useAdminOrganizationsUserQuery,
 } from "@parallel/graphql/__types";
-import {
-  assertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/assertQuery";
+import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import {
@@ -74,9 +68,7 @@ function AdminOrganizations() {
         limit: state.items,
         search: state.search,
         status: state.status,
-        sortBy: [
-          `${state.sort.field}_${state.sort.direction}` as QueryOrganizations_OrderBy,
-        ],
+        sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryOrganizations_OrderBy],
       },
     })
   );
@@ -114,15 +106,10 @@ function AdminOrganizations() {
       basePath="/app/admin"
       sections={sections}
       user={me}
-      sectionsHeader={
-        <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
-      }
+      sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage
-            id="admin.organizations"
-            defaultMessage="Organizations"
-          />
+          <FormattedMessage id="admin.organizations" defaultMessage="Organizations" />
         </Heading>
       }
     >
@@ -140,17 +127,12 @@ function AdminOrganizations() {
           totalCount={organizations.totalCount}
           sort={state.sort}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) =>
-            setQueryState((s) => ({ ...s, items, page: 1 }))
-          }
+          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <Stack direction="row" padding={2}>
               <Box flex="0 1 400px">
-                <SearchInput
-                  value={search ?? ""}
-                  onChange={handleSearchChange}
-                />
+                <SearchInput value={search ?? ""} onChange={handleSearchChange} />
               </Box>
               <IconButtonWithTooltip
                 onClick={() => refetch()}
@@ -246,12 +228,7 @@ function useOrganizationColumns() {
           width: "1px",
         },
         CellContent: ({ row: { createdAt } }) => (
-          <DateTime
-            value={createdAt}
-            format={FORMATS.LLL}
-            useRelativeTime
-            whiteSpace="nowrap"
-          />
+          <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
         ),
       },
     ],
@@ -283,10 +260,7 @@ AdminOrganizations.fragments = {
   },
 };
 
-AdminOrganizations.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+AdminOrganizations.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const { page, items, search, status, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     fetchQuery<AdminOrganizationsQuery>(
@@ -318,9 +292,7 @@ AdminOrganizations.getInitialProps = async ({
           offset: items * (page - 1),
           limit: items,
           search,
-          sortBy: [
-            `${sort.field}_${sort.direction}` as QueryOrganizations_OrderBy,
-          ],
+          sortBy: [`${sort.field}_${sort.direction}` as QueryOrganizations_OrderBy],
           status,
         },
       }
@@ -336,8 +308,4 @@ AdminOrganizations.getInitialProps = async ({
   ]);
 };
 
-export default compose(
-  withSuperAdminAccess,
-  withDialogs,
-  withApolloData
-)(AdminOrganizations);
+export default compose(withSuperAdminAccess, withDialogs, withApolloData)(AdminOrganizations);

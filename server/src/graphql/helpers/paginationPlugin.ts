@@ -30,9 +30,7 @@ export function parseSortBy<T extends string>(
 
 export type PaginationPluginConfig = {};
 
-type ObjectOrInterfaceNames =
-  | core.GetGen<"objectNames">
-  | core.GetGen<"interfaceNames">;
+type ObjectOrInterfaceNames = core.GetGen<"objectNames"> | core.GetGen<"interfaceNames">;
 
 type ObjectOrInterfaceTypeDef<TypeName extends string> =
   | core.NexusObjectTypeDef<TypeName>
@@ -139,12 +137,7 @@ export function paginationPlugin() {
             fieldName: FieldName, 
             config: PaginationFieldConfig<TypeName, FieldName, PaginationType>
           ): void`,
-          factory({
-            typeName: parentTypeName,
-            typeDef: t,
-            args: factoryArgs,
-            stage,
-          }) {
+          factory({ typeName: parentTypeName, typeDef: t, args: factoryArgs, stage }) {
             const [fieldName, fieldConfig] = factoryArgs as [
               string,
               PaginationFieldConfig<any, any, any>
@@ -240,9 +233,7 @@ export function paginationPlugin() {
 }
 
 // Extract all of the non-pagination related field config we may want to apply for plugin purposes
-function nonPaginationFieldProps(
-  fieldConfig: PaginationFieldConfig<any, any, any>
-) {
+function nonPaginationFieldProps(fieldConfig: PaginationFieldConfig<any, any, any>) {
   return omit(fieldConfig, [
     "searchable",
     "sortableBy",
@@ -260,9 +251,7 @@ const getTypeNames = (
   fieldConfig: PaginationFieldConfig<any, any, any>
 ) => {
   const targetTypeName =
-    typeof fieldConfig.type === "string"
-      ? fieldConfig.type
-      : (fieldConfig.type.name as string);
+    typeof fieldConfig.type === "string" ? fieldConfig.type : (fieldConfig.type.name as string);
 
   // If we have changed the config specific to this field, on the pagination,
   // then we need a custom type for the pagination.
@@ -278,9 +267,7 @@ const getTypeNames = (
   };
 };
 
-function isPaginationFieldExtended(
-  fieldConfig: PaginationFieldConfig<any, any, any>
-) {
+function isPaginationFieldExtended(fieldConfig: PaginationFieldConfig<any, any, any>) {
   return Boolean(fieldConfig.extendPagination);
 }
 
@@ -288,10 +275,7 @@ const upperFirst = (fieldName: string) => {
   return fieldName.slice(0, 1).toUpperCase().concat(fieldName.slice(1));
 };
 
-function validateArgs(
-  args: Record<string, any> = {},
-  info: GraphQLResolveInfo
-) {
+function validateArgs(args: Record<string, any> = {}, info: GraphQLResolveInfo) {
   if (args.offset < 0) {
     throw new ArgValidationError(info, "offset", "Value can't be negative.");
   }

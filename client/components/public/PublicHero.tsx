@@ -1,13 +1,4 @@
-import {
-  AspectRatio,
-  Box,
-  BoxProps,
-  Button,
-  Center,
-  Flex,
-  Heading,
-  Stack,
-} from "@chakra-ui/react";
+import { AspectRatio, Box, BoxProps, Button, Center, Flex, Heading, Stack } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 
 export interface PublicHeroProps extends BoxProps {
@@ -34,11 +25,7 @@ export function PublicHero({
 }: PublicHeroProps) {
   const breakpoint = "lg";
   return (
-    <Stack
-      spacing={12}
-      direction={{ base: "column-reverse", [breakpoint]: "row" }}
-      {...props}
-    >
+    <Stack spacing={12} direction={{ base: "column-reverse", [breakpoint]: "row" }} {...props}>
       <Center
         flex="1"
         marginLeft={{ base: 8, [breakpoint]: 20 }}
@@ -66,13 +53,7 @@ export function PublicHero({
           >
             {title}
           </Heading>
-          <Heading
-            as="h2"
-            size="md"
-            fontWeight="light"
-            paddingTop={8}
-            lineHeight="150%"
-          >
+          <Heading as="h2" size="md" fontWeight="light" paddingTop={8} lineHeight="150%">
             {subtitle}
           </Heading>
           <Box paddingTop={8}>
@@ -97,10 +78,7 @@ export function PublicHero({
         alignSelf={{ base: "flex-end", [breakpoint]: "flex-start" }}
       >
         <Box as="picture" margin="auto">
-          <source
-            srcSet={`${image}.webp?v=${process.env.BUILD_ID}`}
-            type="image/webp"
-          />
+          <source srcSet={`${image}.webp?v=${process.env.BUILD_ID}`} type="image/webp" />
           <img alt={alt} src={`${image}.png?v=${process.env.BUILD_ID}`} />
         </Box>
       </AspectRatio>

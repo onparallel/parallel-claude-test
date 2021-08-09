@@ -1,10 +1,6 @@
 import { Knex } from "knex";
 
-export async function addFeatureFlag(
-  knex: Knex,
-  featureFlag: string,
-  defaultValue: boolean
-) {
+export async function addFeatureFlag(knex: Knex, featureFlag: string, defaultValue: boolean) {
   // need to commit the transaction before safely using new enum value
   await knex.raw(/* sql */ `
     start transaction;
@@ -19,10 +15,7 @@ export async function addFeatureFlag(
 }
 
 export async function removeFeatureFlag(knex: Knex, featureFlag: string) {
-  await knex
-    .from("feature_flag_override")
-    .where("feature_flag_name", featureFlag)
-    .delete();
+  await knex.from("feature_flag_override").where("feature_flag_name", featureFlag).delete();
 
   await knex.from("feature_flag").where("name", featureFlag).delete();
 

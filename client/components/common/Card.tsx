@@ -1,11 +1,4 @@
-import {
-  Box,
-  CloseButton,
-  Heading,
-  HeadingProps,
-  HTMLChakraProps,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, CloseButton, Heading, HeadingProps, HTMLChakraProps, Stack } from "@chakra-ui/react";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { ReactNode } from "react";
 import { useIntl } from "react-intl";
@@ -14,10 +7,7 @@ import { Divider } from "./Divider";
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface CardProps extends HTMLChakraProps<"section"> {}
 
-export const Card = chakraForwardRef<"section", {}>(function Card(
-  { children, ...props },
-  ref
-) {
+export const Card = chakraForwardRef<"section", {}>(function Card({ children, ...props }, ref) {
   return (
     <Box
       ref={ref as any}
@@ -34,17 +24,12 @@ export const Card = chakraForwardRef<"section", {}>(function Card(
   );
 });
 
-export interface CardHeaderProps
-  extends Omit<GenericCardHeaderProps, "rightAction"> {
+export interface CardHeaderProps extends Omit<GenericCardHeaderProps, "rightAction"> {
   isCloseable?: boolean;
   onClose?: () => void;
 }
 
-export function CardHeader({
-  isCloseable,
-  onClose,
-  ...props
-}: CardHeaderProps) {
+export function CardHeader({ isCloseable, onClose, ...props }: CardHeaderProps) {
   const intl = useIntl();
   return (
     <GenericCardHeader
@@ -82,13 +67,7 @@ export function GenericCardHeader({
 }: GenericCardHeaderProps) {
   return (
     <>
-      <Stack
-        direction="row"
-        as="header"
-        paddingX={4}
-        minHeight="52px"
-        alignItems="center"
-      >
+      <Stack direction="row" as="header" paddingX={4} minHeight="52px" alignItems="center">
         <Heading flex="1" as={as} size={size} overflowWrap="anywhere">
           {children}
         </Heading>

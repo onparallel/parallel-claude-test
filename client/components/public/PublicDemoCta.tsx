@@ -17,10 +17,7 @@ export function PublicDemoCta({ children, ...props }: BoxProps) {
       <Flex marginTop={10} justifyContent="center">
         <NakedLink href="/book-demo">
           <Button as="a" colorScheme="purple" size="lg">
-            <FormattedMessage
-              id="public.book-demo-button"
-              defaultMessage="Book a demo"
-            />
+            <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
           </Button>
         </NakedLink>
       </Flex>

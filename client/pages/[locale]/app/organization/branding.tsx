@@ -1,13 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Heading,
-  Image,
-  Spinner,
-} from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Heading, Image, Spinner } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { Dropzone } from "@parallel/components/common/Dropzone";
@@ -15,10 +7,7 @@ import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { FileSize } from "@parallel/components/common/FileSize";
 import { HelpPopover } from "@parallel/components/common/HelpPopover";
 import { withAdminOrganizationRole } from "@parallel/components/common/withAdminOrganizationRole";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   useOrganizationBrandingQuery,
@@ -44,12 +33,10 @@ function OrganizationBranding() {
   const dropzoneRef = useRef<DropzoneRef>(null);
 
   const [logoSrc, setLogoSrc] = useState<string>(
-    me.organization.logoUrl ??
-      `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`
+    me.organization.logoUrl ?? `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/emails/logo.png`
   );
   const showErrorDialog = useErrorDialog();
-  const [updateLogo, { loading }] =
-    useOrganizationBranding_updateOrgLogoMutation();
+  const [updateLogo, { loading }] = useOrganizationBranding_updateOrgLogoMutation();
   const handleLogoUpload = async (files: File[], rejected: FileRejection[]) => {
     if (rejected.length > 0) {
       await showErrorDialog({
@@ -84,17 +71,11 @@ function OrganizationBranding() {
       sections={sections}
       user={me}
       sectionsHeader={
-        <FormattedMessage
-          id="view.organization.title"
-          defaultMessage="Organization"
-        />
+        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage
-            id="organization.branding.title"
-            defaultMessage="Branding"
-          />
+          <FormattedMessage id="organization.branding.title" defaultMessage="Branding" />
         </Heading>
       }
     >
@@ -152,11 +133,7 @@ function OrganizationBranding() {
           </Dropzone>
 
           <Flex marginTop={4}>
-            <Button
-              flex="1"
-              colorScheme="purple"
-              onClick={() => dropzoneRef.current?.open()}
-            >
+            <Button flex="1" colorScheme="purple" onClick={() => dropzoneRef.current?.open()}>
               <FormattedMessage
                 id="organization.branding.upload-logo"
                 defaultMessage="Upload a new logo"
@@ -180,9 +157,7 @@ OrganizationBranding.mutations = [
   `,
 ];
 
-OrganizationBranding.getInitialProps = async ({
-  fetchQuery,
-}: WithApolloDataContext) => {
+OrganizationBranding.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await fetchQuery(
     gql`
       query OrganizationBranding {

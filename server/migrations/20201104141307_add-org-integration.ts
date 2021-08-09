@@ -12,10 +12,7 @@ export async function up(knex: Knex): Promise<void> {
     t.jsonb("settings");
     t.boolean("is_enabled").notNullable().defaultTo(false);
 
-    t.unique(
-      ["org_id", "type", "provider"],
-      "org_integration__org_id__type__provider"
-    );
+    t.unique(["org_id", "type", "provider"], "org_integration__org_id__type__provider");
   }).raw(/* sql */ `
       alter table org_integration 
       add constraint org_integration__provider_uppercase_check
@@ -24,7 +21,5 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema
-    .dropTable("org_integration")
-    .raw(/* sql */ `drop type integration_type`);
+  await knex.schema.dropTable("org_integration").raw(/* sql */ `drop type integration_type`);
 }

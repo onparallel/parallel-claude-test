@@ -5,16 +5,10 @@ export function ClosingFormal() {
   return (
     <>
       <MjmlText>
-        <FormattedMessage
-          id="closing.formal.thank-you"
-          defaultMessage="Thank you very much."
-        />
+        <FormattedMessage id="closing.formal.thank-you" defaultMessage="Thank you very much." />
       </MjmlText>
       <MjmlText>
-        <FormattedMessage
-          id="closing.formal.regards"
-          defaultMessage="Best regards."
-        />
+        <FormattedMessage id="closing.formal.regards" defaultMessage="Best regards." />
       </MjmlText>
     </>
   );

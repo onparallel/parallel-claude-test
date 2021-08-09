@@ -74,9 +74,7 @@ export function useSelectionState<T>(
                 const lastIndex = rows.findIndex(
                   (r) => (r[rowKeyProp] as any) === previous.lastSelected
                 );
-                const index = rows.findIndex(
-                  (r) => (r[rowKeyProp] as any) === key
-                );
+                const index = rows.findIndex((r) => (r[rowKeyProp] as any) === key);
                 if (lastIndex >= 0 && index >= 0) {
                   for (
                     let i = lastIndex;
@@ -91,9 +89,7 @@ export function useSelectionState<T>(
                 lastSelected: key,
                 selection: {
                   ...previous.selection,
-                  ...Object.fromEntries(
-                    keys.map((k) => [k, !previous.selection[key]])
-                  ),
+                  ...Object.fromEntries(keys.map((k) => [k, !previous.selection[key]])),
                 },
               };
             });
@@ -101,23 +97,17 @@ export function useSelectionState<T>(
         },
         toggleAll: function () {
           setState(({ selection }) => {
-            const _allSelected = rows.every(
-              (r) => selection[r[rowKeyProp] as any]
-            );
+            const _allSelected = rows.every((r) => selection[r[rowKeyProp] as any]);
             return {
               lastSelected: null,
-              selection: Object.fromEntries(
-                rows.map((r) => [r[rowKeyProp], !_allSelected])
-              ),
+              selection: Object.fromEntries(rows.map((r) => [r[rowKeyProp], !_allSelected])),
             };
           });
         },
         toggleBy: function (predicate: (row: T) => boolean) {
           setState({
             lastSelected: null,
-            selection: Object.fromEntries(
-              rows.map((r) => [r[rowKeyProp], predicate(r)])
-            ),
+            selection: Object.fromEntries(rows.map((r) => [r[rowKeyProp], predicate(r)])),
           });
         },
       };

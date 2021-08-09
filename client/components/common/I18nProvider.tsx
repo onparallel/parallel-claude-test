@@ -1,17 +1,8 @@
 import { useRouter } from "next/router";
-import {
-  createContext,
-  ReactNode,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { IntlConfig, IntlProvider } from "react-intl";
 
-const SetLocaleProvider = createContext<((locale: string) => void) | undefined>(
-  undefined
-);
+const SetLocaleProvider = createContext<((locale: string) => void) | undefined>(undefined);
 
 export function useSetLocale() {
   return useContext(SetLocaleProvider)!;
@@ -29,10 +20,7 @@ export interface IntlCache {
   };
 }
 
-export function I18nProvider({
-  children,
-  ...props
-}: I18nProps & { children: ReactNode }) {
+export function I18nProvider({ children, ...props }: I18nProps & { children: ReactNode }) {
   const { locale, messages, setLocale } =
     typeof window !== "undefined"
       ? useTranslations()
@@ -69,9 +57,7 @@ function useTranslations() {
       messages = await res.json();
     } else {
       const { default: data } = await import(`@parallel/lang/${locale}.json`);
-      messages = Object.fromEntries<string>(
-        data.map((t: any) => [t.term, t.definition])
-      );
+      messages = Object.fromEntries<string>(data.map((t: any) => [t.term, t.definition]));
     }
     setState(({ cache }) => ({
       current: locale,

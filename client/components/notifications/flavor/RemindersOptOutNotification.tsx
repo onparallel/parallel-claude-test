@@ -17,50 +17,43 @@ export interface RemindersOptOutNotificationProps {
 }
 
 export const RemindersOptOutNotification = Object.assign(
-  forwardRef<HTMLElement, RemindersOptOutNotificationProps>(
-    function RemindersOptOutNotification({ isFirst, notification }, ref) {
-      const answers = useReminderOptOutReasons();
-      const { other, access } = notification;
-      const reason = notification.reason as ReminderOptOutReason;
+  forwardRef<HTMLElement, RemindersOptOutNotificationProps>(function RemindersOptOutNotification(
+    { isFirst, notification },
+    ref
+  ) {
+    const answers = useReminderOptOutReasons();
+    const { other, access } = notification;
+    const reason = notification.reason as ReminderOptOutReason;
 
-      return (
-        <PetitionUserNotification
-          ref={ref}
-          isFirst={isFirst}
-          notification={notification}
-          icon={
-            <Avatar
-              boxSize="36px"
-              background="red.600"
-              icon={<BellOffIcon color="white" fontSize="1rem" />}
-            />
-          }
-          path={`/activity`}
-        >
-          <Text>
-            <FormattedMessage
-              id="component.notification-reminders-opt-out.body"
-              defaultMessage="{name} has opted out from receiving reminders: "
-              values={{
-                name: (
-                  <ContactLink
-                    draggable="false"
-                    tabIndex={-1}
-                    contact={access.contact}
-                  />
-                ),
-              }}
-            />
-          </Text>
-          <Text as="cite" fontSize="sm">
-            {reason === "OTHER"
-              ? `"${answers[reason]}: ${other}"`
-              : answers[reason]}
-          </Text>
-        </PetitionUserNotification>
-      );
-    }
-  ),
+    return (
+      <PetitionUserNotification
+        ref={ref}
+        isFirst={isFirst}
+        notification={notification}
+        icon={
+          <Avatar
+            boxSize="36px"
+            background="red.600"
+            icon={<BellOffIcon color="white" fontSize="1rem" />}
+          />
+        }
+        path={`/activity`}
+      >
+        <Text>
+          <FormattedMessage
+            id="component.notification-reminders-opt-out.body"
+            defaultMessage="{name} has opted out from receiving reminders: "
+            values={{
+              name: <ContactLink draggable="false" tabIndex={-1} contact={access.contact} />,
+            }}
+          />
+        </Text>
+        <Text as="cite" fontSize="sm">
+          {reason === "OTHER" ? `"${answers[reason]}: ${other}"` : answers[reason]}
+        </Text>
+      </PetitionUserNotification>
+    );
+  }),
   {
     fragments: {
       RemindersOptOutNotification: gql`

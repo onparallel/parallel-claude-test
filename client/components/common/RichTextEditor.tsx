@@ -37,11 +37,7 @@ import {
   PlaceholderMenu,
   usePlaceholderPlugin,
 } from "@parallel/utils/slate/placeholders/PlaceholderPlugin";
-import {
-  CustomEditor,
-  CustomElement,
-  LinkElement,
-} from "@parallel/utils/slate/types";
+import { CustomEditor, CustomElement, LinkElement } from "@parallel/utils/slate/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
 import {
@@ -77,16 +73,8 @@ import {
   PlatePluginOptions,
   withPlate,
 } from "@udecode/plate-core";
-import {
-  createHeadingPlugin,
-  ELEMENT_H1,
-  ELEMENT_H2,
-} from "@udecode/plate-heading";
-import {
-  createLinkPlugin,
-  ELEMENT_LINK,
-  upsertLinkAtSelection,
-} from "@udecode/plate-link";
+import { createHeadingPlugin, ELEMENT_H1, ELEMENT_H2 } from "@udecode/plate-heading";
+import { createLinkPlugin, ELEMENT_LINK, upsertLinkAtSelection } from "@udecode/plate-link";
 import {
   createListPlugin,
   ELEMENT_LI,
@@ -96,10 +84,7 @@ import {
   toggleList,
   unwrapList,
 } from "@udecode/plate-list";
-import {
-  createParagraphPlugin,
-  ELEMENT_PARAGRAPH,
-} from "@udecode/plate-paragraph";
+import { createParagraphPlugin, ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import React, {
   CSSProperties,
   forwardRef,
@@ -123,13 +108,7 @@ import { ConfirmDialog } from "./ConfirmDialog";
 import { DialogProps, useDialog } from "./DialogProvider";
 import { IconButtonWithTooltip } from "./IconButtonWithTooltip";
 
-function RenderElement({
-  attributes,
-  nodeProps,
-  styles,
-  element,
-  ...props
-}: any) {
+function RenderElement({ attributes, nodeProps, styles, element, ...props }: any) {
   return <Text {...attributes} {...props} />;
 }
 
@@ -206,301 +185,282 @@ export interface RichTextEditorInstance {
   focus(): void;
 }
 
-export const RichTextEditor = forwardRef<
-  RichTextEditorInstance,
-  RichTextEditorProps
->(function RichTextEditor(
-  {
-    id,
-    value,
-    onChange,
-    isDisabled,
-    isInvalid,
-    isRequired,
-    isReadOnly,
-    onKeyDown,
-    placeholder,
-    placeholderOptions = [],
-    ...props
-  },
-  ref
-) {
-  const {
-    plugin: placholderPlugin,
-    onAddPlaceholder,
-    onChangePlaceholder,
-    onKeyDownPlaceholder,
-    onHighlightOption,
-    selectedIndex,
-    search,
-    target,
-    values,
-  } = usePlaceholderPlugin(placeholderOptions);
-  const plugins = useMemo(
-    () => [
-      createReactPlugin(),
-      createHistoryPlugin(),
-      createParagraphPlugin(),
-      createBoldPlugin(),
-      createItalicPlugin(),
-      createUnderlinePlugin(),
-      createListPlugin(),
-      createAutoformatPlugin({
-        rules: [
-          {
-            type: "list-item" as any,
-            markup: ["*", "-"],
-            preFormat: (editor: CustomEditor) => unwrapList(editor),
-            format: (editor: CustomEditor) => {
-              if (editor.selection) {
-                const parentEntry = getParent(editor, editor.selection);
-                if (!parentEntry) return;
-                const [node] = parentEntry;
-                if (isElement(node)) {
-                  toggleList(editor, { type: "bulleted-list" });
+export const RichTextEditor = forwardRef<RichTextEditorInstance, RichTextEditorProps>(
+  function RichTextEditor(
+    {
+      id,
+      value,
+      onChange,
+      isDisabled,
+      isInvalid,
+      isRequired,
+      isReadOnly,
+      onKeyDown,
+      placeholder,
+      placeholderOptions = [],
+      ...props
+    },
+    ref
+  ) {
+    const {
+      plugin: placholderPlugin,
+      onAddPlaceholder,
+      onChangePlaceholder,
+      onKeyDownPlaceholder,
+      onHighlightOption,
+      selectedIndex,
+      search,
+      target,
+      values,
+    } = usePlaceholderPlugin(placeholderOptions);
+    const plugins = useMemo(
+      () => [
+        createReactPlugin(),
+        createHistoryPlugin(),
+        createParagraphPlugin(),
+        createBoldPlugin(),
+        createItalicPlugin(),
+        createUnderlinePlugin(),
+        createListPlugin(),
+        createAutoformatPlugin({
+          rules: [
+            {
+              type: "list-item" as any,
+              markup: ["*", "-"],
+              preFormat: (editor: CustomEditor) => unwrapList(editor),
+              format: (editor: CustomEditor) => {
+                if (editor.selection) {
+                  const parentEntry = getParent(editor, editor.selection);
+                  if (!parentEntry) return;
+                  const [node] = parentEntry;
+                  if (isElement(node)) {
+                    toggleList(editor, { type: "bulleted-list" });
+                  }
                 }
-              }
+              },
             },
-          },
-        ],
-      }),
-      placholderPlugin,
-      createHeadingPlugin({ levels: 2 }),
-      createLinkPlugin(),
-      createExitBreakPlugin({
-        rules: [
-          {
-            hotkey: "enter",
-            query: {
-              start: true,
-              end: true,
-              allow: ["heading", "subheading"],
+          ],
+        }),
+        placholderPlugin,
+        createHeadingPlugin({ levels: 2 }),
+        createLinkPlugin(),
+        createExitBreakPlugin({
+          rules: [
+            {
+              hotkey: "enter",
+              query: {
+                start: true,
+                end: true,
+                allow: ["heading", "subheading"],
+              },
             },
-          },
-        ],
-      }),
-    ],
-    [placholderPlugin]
-  );
-  const formControl = useFormControl({
-    id,
-    isDisabled,
-    isInvalid,
-    isRequired,
-    isReadOnly,
-  });
-  const editor = useMemo<CustomEditor>(
-    () => pipe(createEditor(), withPlate({ id, plugins, options, components })),
-    []
-  );
+          ],
+        }),
+      ],
+      [placholderPlugin]
+    );
+    const formControl = useFormControl({
+      id,
+      isDisabled,
+      isInvalid,
+      isRequired,
+      isReadOnly,
+    });
+    const editor = useMemo<CustomEditor>(
+      () => pipe(createEditor(), withPlate({ id, plugins, options, components })),
+      []
+    );
 
-  useImperativeHandle(
-    ref,
-    () => ({
-      focus: () => {
-        ReactEditor.focus(editor);
+    useImperativeHandle(
+      ref,
+      () => ({
+        focus: () => {
+          ReactEditor.focus(editor);
+        },
+      }),
+      [editor]
+    );
+
+    const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
+    const inputStyles = {
+      ...omit(inputStyleConfig as any, [
+        "px",
+        "pl",
+        "pr",
+        "paddingX",
+        "paddingRight",
+        "paddingLeft",
+        "paddingY",
+        "h",
+        "height",
+        "_focus",
+        "_invalid",
+      ]),
+      _focusWithin: (inputStyleConfig as any)._focus,
+      _invalid: (inputStyleConfig as any)._invalid,
+    } as any;
+    const style = useMemo(
+      () =>
+        ({
+          padding: "12px 16px",
+          maxHeight: "250px",
+          overflow: "auto",
+        } as CSSProperties),
+      []
+    );
+
+    const isMenuOpen = Boolean(target && values.length > 0);
+    const selected = isMenuOpen ? values[selectedIndex] : undefined;
+
+    const handleChange = useCallback(
+      (value: CustomElement[]) => {
+        onChangePlaceholder(editor);
+        onChange(value);
       },
-    }),
-    [editor]
-  );
+      [onChange, onChangePlaceholder]
+    );
 
-  const { field: inputStyleConfig } = useMultiStyleConfig("Input", props);
-  const inputStyles = {
-    ...omit(inputStyleConfig as any, [
-      "px",
-      "pl",
-      "pr",
-      "paddingX",
-      "paddingRight",
-      "paddingLeft",
-      "paddingY",
-      "h",
-      "height",
-      "_focus",
-      "_invalid",
-    ]),
-    _focusWithin: (inputStyleConfig as any)._focus,
-    _invalid: (inputStyleConfig as any)._invalid,
-  } as any;
-  const style = useMemo(
-    () =>
-      ({
-        padding: "12px 16px",
-        maxHeight: "250px",
-        overflow: "auto",
-      } as CSSProperties),
-    []
-  );
+    const handleKeyDown = useCallback(
+      (event: KeyboardEvent<HTMLDivElement>) => {
+        onKeyDownPlaceholder(event, editor);
+        onKeyDown?.(event);
+      },
+      [onKeyDown, onKeyDownPlaceholder, editor]
+    );
 
-  const isMenuOpen = Boolean(target && values.length > 0);
-  const selected = isMenuOpen ? values[selectedIndex] : undefined;
+    const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
+    const itemIdPrefix = useId(undefined, "rte-placeholder-menu-item");
 
-  const handleChange = useCallback(
-    (value: CustomElement[]) => {
-      onChangePlaceholder(editor);
-      onChange(value);
-    },
-    [onChange, onChangePlaceholder]
-  );
+    const { referenceRef, popperRef, forceUpdate } = usePopper({
+      placement: "bottom-start",
+      enabled: isMenuOpen,
+    });
+    useEffect(() => {
+      if (isMenuOpen && target) {
+        reposition();
+        document.addEventListener("scroll", reposition, true);
+        return () => document.removeEventListener("scroll", reposition, true);
+      }
+      function reposition() {
+        /**
+         * The main idea of this function is to place the placeholders menu next to the #.
+         * This function gets the node of the piece of text where the anchor is.
+         * This node will always be a span.
+         * We create a "fake" paragraph and we insert the text of the node but:
+         * - We insert a span with all the previous text before and including the #.
+         * - We add a marginLeft to this span to ensure it overlaps the text in the real editor.
+         * - We add an empty span which we will use as the needle to position the menu
+         * We insert this fake paragraph and we compute the boundingClientRect of the second
+         * children which we will use to create a popper virtual element.
+         */
+        const { path, offset } = target!.anchor;
 
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLDivElement>) => {
-      onKeyDownPlaceholder(event, editor);
-      onKeyDown?.(event);
-    },
-    [onKeyDown, onKeyDownPlaceholder, editor]
-  );
+        const node = ReactEditor.toDOMNode(editor, getNode(editor, path)!);
+        const parentRect = (node.parentNode! as HTMLElement).getBoundingClientRect();
+        const fake = document.createElement("div");
+        fake.style.visibility = "hidden";
+        const prefix = document.createElement("span");
+        const style = window.getComputedStyle(node.offsetParent!);
+        prefix.style.marginLeft = `${node.offsetLeft - parseInt(style.paddingLeft)}px`;
+        prefix.innerText = node.textContent!.slice(0, offset + 1);
+        fake.appendChild(prefix);
+        const _target = document.createElement("span");
+        fake.appendChild(_target);
+        fake.style.position = "fixed";
+        fake.style.top = `${parentRect.top}px`;
+        fake.style.left = `${parentRect.left}px`;
+        fake.style.width = `${parentRect.width}px`;
+        node.parentElement!.appendChild(fake);
+        const rect = _target.getBoundingClientRect();
+        node.parentElement!.removeChild(fake);
+        referenceRef({ getBoundingClientRect: () => rect, contextElement: node });
+        forceUpdate?.();
+      }
+    }, [isMenuOpen, target?.anchor.offset]);
 
-  const placeholderMenuId = useId(undefined, "rte-placeholder-menu");
-  const itemIdPrefix = useId(undefined, "rte-placeholder-menu-item");
-
-  const { referenceRef, popperRef, forceUpdate } = usePopper({
-    placement: "bottom-start",
-    enabled: isMenuOpen,
-  });
-  useEffect(() => {
-    if (isMenuOpen && target) {
-      reposition();
-      document.addEventListener("scroll", reposition, true);
-      return () => document.removeEventListener("scroll", reposition, true);
-    }
-    function reposition() {
-      /**
-       * The main idea of this function is to place the placeholders menu next to the #.
-       * This function gets the node of the piece of text where the anchor is.
-       * This node will always be a span.
-       * We create a "fake" paragraph and we insert the text of the node but:
-       * - We insert a span with all the previous text before and including the #.
-       * - We add a marginLeft to this span to ensure it overlaps the text in the real editor.
-       * - We add an empty span which we will use as the needle to position the menu
-       * We insert this fake paragraph and we compute the boundingClientRect of the second
-       * children which we will use to create a popper virtual element.
-       */
-      const { path, offset } = target!.anchor;
-
-      const node = ReactEditor.toDOMNode(editor, getNode(editor, path)!);
-      const parentRect = (
-        node.parentNode! as HTMLElement
-      ).getBoundingClientRect();
-      const fake = document.createElement("div");
-      fake.style.visibility = "hidden";
-      const prefix = document.createElement("span");
-      const style = window.getComputedStyle(node.offsetParent!);
-      prefix.style.marginLeft = `${
-        node.offsetLeft - parseInt(style.paddingLeft)
-      }px`;
-      prefix.innerText = node.textContent!.slice(0, offset + 1);
-      fake.appendChild(prefix);
-      const _target = document.createElement("span");
-      fake.appendChild(_target);
-      fake.style.position = "fixed";
-      fake.style.top = `${parentRect.top}px`;
-      fake.style.left = `${parentRect.left}px`;
-      fake.style.width = `${parentRect.width}px`;
-      node.parentElement!.appendChild(fake);
-      const rect = _target.getBoundingClientRect();
-      node.parentElement!.removeChild(fake);
-      referenceRef({ getBoundingClientRect: () => rect, contextElement: node });
-      forceUpdate?.();
-    }
-  }, [isMenuOpen, target?.anchor.offset]);
-
-  return (
-    <Box
-      role="application"
-      {...pick(formControl, [
-        "id",
-        "aria-invalid",
-        "aria-required",
-        "aria-readonly",
-        "aria-describedby",
-      ])}
-      overflow="hidden"
-      aria-disabled={formControl.disabled}
-      {...inputStyles}
-    >
-      <Plate
-        id={id}
-        editor={editor}
-        plugins={plugins}
-        options={options}
-        components={components}
-        value={value}
-        onChange={handleChange}
-        editableProps={{
-          readOnly: isDisabled,
-          placeholder,
-          style,
-          onKeyDown: handleKeyDown,
-          "aria-controls": placeholderMenuId,
-          "aria-autocomplete": "list",
-          "aria-activedescendant": selected
-            ? `${itemIdPrefix}-${selected.value}`
-            : undefined,
-          ...props,
-        }}
-        renderEditable={(editable) => (
-          <Box
-            sx={{
-              '[contenteditable="false"]': {
-                width: "auto !important",
-              },
-              "> div": {
-                minHeight: "120px !important",
-              },
-            }}
-          >
-            {editable}
-          </Box>
-        )}
+    return (
+      <Box
+        role="application"
+        {...pick(formControl, [
+          "id",
+          "aria-invalid",
+          "aria-required",
+          "aria-readonly",
+          "aria-describedby",
+        ])}
+        overflow="hidden"
+        aria-disabled={formControl.disabled}
+        {...inputStyles}
       >
-        <Toolbar
-          height="40px"
-          isDisabled={formControl.disabled || formControl.readOnly}
-          hasPlaceholders={placeholderOptions.length > 0}
-        />
-      </Plate>
-      <Portal>
-        <PlaceholderMenu
-          ref={popperRef}
-          menuId={placeholderMenuId}
-          itemIdPrefix={itemIdPrefix}
-          search={search}
-          values={values}
-          selectedIndex={selectedIndex}
-          hidden={!isMenuOpen}
-          onAddPlaceholder={(placeholder) =>
-            onAddPlaceholder(editor, placeholder)
-          }
-          onHighlightOption={onHighlightOption}
-          width="fit-content"
-          position="relative"
-          opacity={isMenuOpen ? 1 : 0}
-        />
-      </Portal>
-    </Box>
-  );
-});
+        <Plate
+          id={id}
+          editor={editor}
+          plugins={plugins}
+          options={options}
+          components={components}
+          value={value}
+          onChange={handleChange}
+          editableProps={{
+            readOnly: isDisabled,
+            placeholder,
+            style,
+            onKeyDown: handleKeyDown,
+            "aria-controls": placeholderMenuId,
+            "aria-autocomplete": "list",
+            "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
+            ...props,
+          }}
+          renderEditable={(editable) => (
+            <Box
+              sx={{
+                '[contenteditable="false"]': {
+                  width: "auto !important",
+                },
+                "> div": {
+                  minHeight: "120px !important",
+                },
+              }}
+            >
+              {editable}
+            </Box>
+          )}
+        >
+          <Toolbar
+            height="40px"
+            isDisabled={formControl.disabled || formControl.readOnly}
+            hasPlaceholders={placeholderOptions.length > 0}
+          />
+        </Plate>
+        <Portal>
+          <PlaceholderMenu
+            ref={popperRef}
+            menuId={placeholderMenuId}
+            itemIdPrefix={itemIdPrefix}
+            search={search}
+            values={values}
+            selectedIndex={selectedIndex}
+            hidden={!isMenuOpen}
+            onAddPlaceholder={(placeholder) => onAddPlaceholder(editor, placeholder)}
+            onHighlightOption={onHighlightOption}
+            width="fit-content"
+            position="relative"
+            opacity={isMenuOpen ? 1 : 0}
+          />
+        </Portal>
+      </Box>
+    );
+  }
+);
 
 interface ToolbarProps extends BoxProps {
   isDisabled?: boolean;
   hasPlaceholders?: boolean;
 }
 
-const Toolbar = memo(function _Toolbar({
-  isDisabled,
-  hasPlaceholders,
-  ...props
-}: ToolbarProps) {
+const Toolbar = memo(function _Toolbar({ isDisabled, hasPlaceholders, ...props }: ToolbarProps) {
   const intl = useIntl();
   return (
-    <Stack
-      direction="row"
-      {...props}
-      borderBottom="1px solid"
-      borderColor="gray.200"
-      padding={1}
-    >
+    <Stack direction="row" {...props} borderBottom="1px solid" borderColor="gray.200" padding={1}>
       <HeadingButton />
       <MarkButton
         type="bold"
@@ -600,9 +560,7 @@ function HeadingButton({ ...props }: Pick<ToolbarButtonProps, "isDisabled">) {
   const intl = useIntl();
   const editor = useSlate();
   const type =
-    ["heading", "subheading"].find((type) =>
-      someNode(editor, { match: { type } })
-    ) ?? "paragraph";
+    ["heading", "subheading"].find((type) => someNode(editor, { match: { type } })) ?? "paragraph";
   const selectionRef = useRef<Selection>();
   return (
     <Menu>
@@ -774,10 +732,7 @@ function AddLinkDialog({
   showTextInput,
   defaultValues = {},
   ...props
-}: DialogProps<
-  { showTextInput: boolean; defaultValues?: Partial<RTELink> },
-  RTELink
->) {
+}: DialogProps<{ showTextInput: boolean; defaultValues?: Partial<RTELink> }, RTELink>) {
   const {
     handleSubmit,
     register,

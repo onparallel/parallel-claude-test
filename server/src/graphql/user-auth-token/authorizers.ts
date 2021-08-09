@@ -10,13 +10,8 @@ export function userHasAccessToAuthTokens<
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const userAuthTokenIds = unMaybeArray(
-        args[argName] as unknown as MaybeArray<number>
-      );
-      return await ctx.userAuthentication.userHasAccessToAuthTokens(
-        userAuthTokenIds,
-        ctx.user!.id
-      );
+      const userAuthTokenIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+      return await ctx.userAuthentication.userHasAccessToAuthTokens(userAuthTokenIds, ctx.user!.id);
     } catch {}
     return false;
   };

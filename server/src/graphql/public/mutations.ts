@@ -35,10 +35,7 @@ import {
   replyBelongsToAccess,
   replyIsForFieldOfType,
 } from "./authorizers";
-import {
-  validateCheckboxReplyValues,
-  validateDynamicSelectReplyValues,
-} from "./utils";
+import { validateCheckboxReplyValues, validateDynamicSelectReplyValues } from "./utils";
 
 function anonymizePart(part: string) {
   return part.length > 2
@@ -49,9 +46,7 @@ function anonymizePart(part: string) {
 function anonymizeEmail(email: string) {
   const [, local, domain] = email.match(/^(.+)@(.+)$/)!;
   const match = domain.match(/(^[^\.]*)\.(.*)$/);
-  const _domain = match
-    ? anonymizePart(match[1]) + "." + match[2]
-    : anonymizePart(domain);
+  const _domain = match ? anonymizePart(match[1]) + "." + match[2] : anonymizePart(domain);
   return anonymizePart(local) + "@" + _domain;
 }
 
@@ -67,10 +62,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
       t.nullable.string("orgName");
     },
   }),
-  authorize: chain(
-    checkClientServerToken("token"),
-    fetchPetitionAccess("keycode")
-  ),
+  authorize: chain(checkClientServerToken("token"), fetchPetitionAccess("keycode")),
   args: {
     token: nonNull(idArg()),
     keycode: nonNull(idArg()),
@@ -78,9 +70,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
     userAgent: stringArg(),
   },
   resolve: async (_, args, ctx) => {
-    const petition = (await ctx.petitions.loadPetition(
-      ctx.access!.petition_id
-    ))!;
+    const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
     if (petition.skip_forward_security) {
       await ctx.petitions.createEvent({
         type: "ACCESS_OPENED",
@@ -109,10 +99,7 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
             petition_access_id: ctx.access!.id,
           },
         });
-        await ctx.contacts.addContactAuthenticationLogAccessEntry(
-          authenticationId,
-          logEntry
-        );
+        await ctx.contacts.addContactAuthenticationLogAccessEntry(authenticationId, logEntry);
         return { isAllowed: true };
       } else {
         const [org, logoUrl] = await Promise.all([
@@ -134,12 +121,10 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
           petition_access_id: ctx.access!.id,
         },
       });
-      const { cookieValue, contactAuthentication } =
-        await ctx.contacts.createContactAuthentication(contactId);
-      await ctx.contacts.addContactAuthenticationLogAccessEntry(
-        contactAuthentication.id,
-        logEntry
+      const { cookieValue, contactAuthentication } = await ctx.contacts.createContactAuthentication(
+        contactId
       );
+      await ctx.contacts.addContactAuthenticationLogAccessEntry(contactAuthentication.id, logEntry);
       return {
         isAllowed: true,
         cookieName: `parallel_contact_auth_${toGlobalId("Contact", contactId)}`,
@@ -149,514 +134,449 @@ export const verifyPublicAccess = mutationField("verifyPublicAccess", {
   },
 });
 
-export const publicSendVerificationCode = mutationField(
-  "publicSendVerificationCode",
-  {
-    type: objectType({
-      name: "VerificationCodeRequest",
-      definition(t) {
-        t.id("token");
-        t.datetime("expiresAt");
-        t.int("remainingAttempts");
-      },
-    }),
-    authorize: fetchPetitionAccess("keycode"),
-    args: {
-      keycode: nonNull(idArg()),
+export const publicSendVerificationCode = mutationField("publicSendVerificationCode", {
+  type: objectType({
+    name: "VerificationCodeRequest",
+    definition(t) {
+      t.id("token");
+      t.datetime("expiresAt");
+      t.int("remainingAttempts");
     },
-    resolve: async (_, args, ctx) => {
-      return await stallFor(async function () {
-        const { token, request } =
-          await ctx.contacts.createContactAuthenticationRequest({
-            petition_access_id: ctx.access!.id,
-            user_agent: ctx.req!.headers["user-agent"] ?? null,
-            ip: getClientIp(ctx.req),
-          });
-        await ctx.emails.sendContactAuthenticationRequestEmail(request.id);
-        return {
-          token,
-          expiresAt: request.expires_at,
-          remainingAttempts: request.remaining_attempts,
-        };
-      }, 2000);
-    },
-  }
-);
+  }),
+  authorize: fetchPetitionAccess("keycode"),
+  args: {
+    keycode: nonNull(idArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    return await stallFor(async function () {
+      const { token, request } = await ctx.contacts.createContactAuthenticationRequest({
+        petition_access_id: ctx.access!.id,
+        user_agent: ctx.req!.headers["user-agent"] ?? null,
+        ip: getClientIp(ctx.req),
+      });
+      await ctx.emails.sendContactAuthenticationRequestEmail(request.id);
+      return {
+        token,
+        expiresAt: request.expires_at,
+        remainingAttempts: request.remaining_attempts,
+      };
+    }, 2000);
+  },
+});
 
-export const publicCheckVerificationCode = mutationField(
-  "publicCheckVerificationCode",
-  {
-    type: objectType({
-      name: "VerificationCodeCheck",
-      definition(t) {
-        t.field("result", { type: "Result" });
-        t.nullable.int("remainingAttempts");
-      },
-    }),
-    authorize: fetchPetitionAccess("keycode"),
-    args: {
-      keycode: nonNull(idArg()),
-      token: nonNull(idArg()),
-      code: nonNull(stringArg()),
+export const publicCheckVerificationCode = mutationField("publicCheckVerificationCode", {
+  type: objectType({
+    name: "VerificationCodeCheck",
+    definition(t) {
+      t.field("result", { type: "Result" });
+      t.nullable.int("remainingAttempts");
     },
-    resolve: async (_, args, ctx) => {
-      return await stallFor(async function () {
-        try {
-          const result = await ctx.contacts.verifyContactAuthenticationRequest(
-            ctx.access!.id,
-            args.token,
-            args.code
-          );
-          const { contactAuthentication, cookieValue } =
-            await ctx.contacts.createContactAuthentication(ctx.contact!.id);
-          await ctx.contacts.addContactAuthenticationLogAccessEntry(
-            contactAuthentication.id,
+  }),
+  authorize: fetchPetitionAccess("keycode"),
+  args: {
+    keycode: nonNull(idArg()),
+    token: nonNull(idArg()),
+    code: nonNull(stringArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    return await stallFor(async function () {
+      try {
+        const result = await ctx.contacts.verifyContactAuthenticationRequest(
+          ctx.access!.id,
+          args.token,
+          args.code
+        );
+        const { contactAuthentication, cookieValue } =
+          await ctx.contacts.createContactAuthentication(ctx.contact!.id);
+        await ctx.contacts.addContactAuthenticationLogAccessEntry(contactAuthentication.id, {
+          ip: getClientIp(ctx.req),
+          userAgent: ctx.req.headers["user-agent"] ?? null,
+        });
+        if (result.success) {
+          ctx.req.res?.cookie(
+            `parallel_contact_auth_${toGlobalId("Contact", ctx.contact!.id)}`,
+            cookieValue,
             {
-              ip: getClientIp(ctx.req),
-              userAgent: ctx.req.headers["user-agent"] ?? null,
+              path: "/",
+              httpOnly: true,
+              sameSite: "lax",
+              secure: process.env.NODE_ENV === "production",
+              maxAge: 60 * 60 * 24 * 365 * 10,
             }
           );
-          if (result.success) {
-            ctx.req.res?.cookie(
-              `parallel_contact_auth_${toGlobalId("Contact", ctx.contact!.id)}`,
-              cookieValue,
-              {
-                path: "/",
-                httpOnly: true,
-                sameSite: "lax",
-                secure: process.env.NODE_ENV === "production",
-                maxAge: 60 * 60 * 24 * 365 * 10,
-              }
-            );
-          }
-          return {
-            result: result.success ? RESULT.SUCCESS : RESULT.FAILURE,
-            remainingAttempts: result.remainingAttempts,
-          };
-        } catch (e) {
-          throw new WhitelistedError(
-            "INVALID_TOKEN",
-            "The token is no longer valid"
-          );
         }
-      }, 2000);
-    },
-  }
-);
-
-export const publicDeletePetitionReply = mutationField(
-  "publicDeletePetitionReply",
-  {
-    description: "Deletes a reply to a petition field.",
-    type: "Result",
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      replyBelongsToAccess("replyId")
-    ),
-    args: {
-      keycode: nonNull(idArg()),
-      replyId: nonNull(globalIdArg("PetitionFieldReply")),
-    },
-    resolve: async (_, args, ctx) => {
-      const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
-      if (reply.status === "APPROVED") {
-        throw new WhitelistedError(
-          "Can't delete an approved reply",
-          "INVALID_REPLY_STATUS"
-        );
+        return {
+          result: result.success ? RESULT.SUCCESS : RESULT.FAILURE,
+          remainingAttempts: result.remainingAttempts,
+        };
+      } catch (e) {
+        throw new WhitelistedError("INVALID_TOKEN", "The token is no longer valid");
       }
-      if (reply.type === "FILE_UPLOAD") {
-        const file = await ctx.files.loadFileUpload(
-          reply.content["file_upload_id"]
-        );
-        await Promise.all([
-          ctx.files.deleteFileUpload(file!.id, `Contact:${ctx.contact!.id}`),
-          ctx.aws.fileUploads.deleteFile(file!.path),
-        ]);
-      }
-      await ctx.petitions.deletePetitionFieldReply(
-        args.replyId,
-        `Contact:${ctx.contact!.id}`
-      );
-      return RESULT.SUCCESS;
-    },
-  }
-);
+    }, 2000);
+  },
+});
 
-export const publicFileUploadReplyComplete = mutationField(
-  "publicFileUploadReplyComplete",
-  {
-    description: "Notifies the backend that the upload is complete.",
-    type: "PublicPetitionFieldReply",
-    args: {
-      keycode: nonNull(idArg()),
-      replyId: nonNull(globalIdArg("PetitionFieldReply")),
-    },
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      replyBelongsToAccess("replyId")
-    ),
-    resolve: async (_, args, ctx) => {
-      const reply = await ctx.petitions.loadFieldReply(args.replyId);
-      if (reply?.type !== "FILE_UPLOAD") {
-        throw new Error("Invalid");
-      }
-      const file = await ctx.files.loadFileUpload(
-        reply.content["file_upload_id"]
-      );
-      // Try to get metadata
-      await ctx.aws.fileUploads.getFileMetadata(file!.path);
-      await ctx.files.markFileUploadComplete(file!.id);
-      ctx.files.loadFileUpload.dataloader.clear(file!.id);
-      return reply;
-    },
-  }
-);
+export const publicDeletePetitionReply = mutationField("publicDeletePetitionReply", {
+  description: "Deletes a reply to a petition field.",
+  type: "Result",
+  authorize: chain(authenticatePublicAccess("keycode"), replyBelongsToAccess("replyId")),
+  args: {
+    keycode: nonNull(idArg()),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+  },
+  resolve: async (_, args, ctx) => {
+    const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
+    if (reply.status === "APPROVED") {
+      throw new WhitelistedError("Can't delete an approved reply", "INVALID_REPLY_STATUS");
+    }
+    if (reply.type === "FILE_UPLOAD") {
+      const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
+      await Promise.all([
+        ctx.files.deleteFileUpload(file!.id, `Contact:${ctx.contact!.id}`),
+        ctx.aws.fileUploads.deleteFile(file!.path),
+      ]);
+    }
+    await ctx.petitions.deletePetitionFieldReply(args.replyId, `Contact:${ctx.contact!.id}`);
+    return RESULT.SUCCESS;
+  },
+});
 
-export const publicCreateFileUploadReply = mutationField(
-  "publicCreateFileUploadReply",
-  {
-    description: "Creates a reply to a file upload field.",
-    type: objectType({
-      name: "CreateFileUploadReply",
-      definition(t) {
-        t.field("presignedPostData", {
-          type: "AWSPresignedPostData",
-        });
-        t.field("reply", { type: "PublicPetitionFieldReply" });
+export const publicFileUploadReplyComplete = mutationField("publicFileUploadReplyComplete", {
+  description: "Notifies the backend that the upload is complete.",
+  type: "PublicPetitionFieldReply",
+  args: {
+    keycode: nonNull(idArg()),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+  },
+  authorize: chain(authenticatePublicAccess("keycode"), replyBelongsToAccess("replyId")),
+  resolve: async (_, args, ctx) => {
+    const reply = await ctx.petitions.loadFieldReply(args.replyId);
+    if (reply?.type !== "FILE_UPLOAD") {
+      throw new Error("Invalid");
+    }
+    const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
+    // Try to get metadata
+    await ctx.aws.fileUploads.getFileMetadata(file!.path);
+    await ctx.files.markFileUploadComplete(file!.id);
+    ctx.files.loadFileUpload.dataloader.clear(file!.id);
+    return reply;
+  },
+});
+
+export const publicCreateFileUploadReply = mutationField("publicCreateFileUploadReply", {
+  description: "Creates a reply to a file upload field.",
+  type: objectType({
+    name: "CreateFileUploadReply",
+    definition(t) {
+      t.field("presignedPostData", {
+        type: "AWSPresignedPostData",
+      });
+      t.field("reply", { type: "PublicPetitionFieldReply" });
+    },
+  }),
+  args: {
+    keycode: nonNull(idArg()),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    data: nonNull("FileUploadInput"),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    fieldBelongsToAccess("fieldId"),
+    fieldHasType("fieldId", "FILE_UPLOAD")
+  ),
+  resolve: async (_, args, ctx) => {
+    const key = random(16);
+    const { filename, size, contentType } = args.data;
+    const file = await ctx.files.createFileUpload(
+      {
+        path: key,
+        filename,
+        size: size.toString(),
+        content_type: contentType,
       },
-    }),
-    args: {
-      keycode: nonNull(idArg()),
-      fieldId: nonNull(globalIdArg("PetitionField")),
-      data: nonNull("FileUploadInput"),
-    },
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      fieldBelongsToAccess("fieldId"),
-      fieldHasType("fieldId", "FILE_UPLOAD")
-    ),
-    resolve: async (_, args, ctx) => {
-      const key = random(16);
-      const { filename, size, contentType } = args.data;
-      const file = await ctx.files.createFileUpload(
+      `Contact:${ctx.contact!.id}`
+    );
+    const [presignedPostData, reply] = await Promise.all([
+      ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
+      ctx.petitions.createPetitionFieldReply(
         {
-          path: key,
-          filename,
-          size: size.toString(),
-          content_type: contentType,
+          petition_field_id: args.fieldId,
+          petition_access_id: ctx.access!.id,
+          type: "FILE_UPLOAD",
+          content: { file_upload_id: file.id },
+        },
+        ctx.contact!
+      ),
+    ]);
+    return { presignedPostData, reply };
+  },
+});
+
+export const publicCreateSimpleReply = mutationField("publicCreateSimpleReply", {
+  description: "Creates a reply to a text or select field.",
+  type: "PublicPetitionFieldReply",
+  args: {
+    keycode: nonNull(idArg()),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    value: nonNull(stringArg()),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    fieldBelongsToAccess("fieldId"),
+    fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT"])
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    const field = (await ctx.petitions.loadField(args.fieldId))!;
+    if (field.type === "SELECT") {
+      const options = field.options.values as Maybe<string[]>;
+      if (!options?.includes(args.value)) {
+        throw new ArgValidationError(info, "reply", "Invalid option");
+      }
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    const field = (await ctx.petitions.loadField(args.fieldId))!;
+    return await ctx.petitions.createPetitionFieldReply(
+      {
+        petition_field_id: args.fieldId,
+        petition_access_id: ctx.access!.id,
+        type: field.type,
+        content: { text: args.value },
+      },
+      ctx.contact!
+    );
+  },
+});
+
+export const publicUpdateSimpleReply = mutationField("publicUpdateSimpleReply", {
+  description: "Updates a reply to a text or select field.",
+  type: "PublicPetitionFieldReply",
+  args: {
+    keycode: nonNull(idArg()),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    value: nonNull(stringArg()),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(
+      replyBelongsToAccess("replyId"),
+      replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"])
+    )
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+    if (field.type === "SELECT") {
+      const options = field.options.values as Maybe<string[]>;
+      if (!options?.includes(args.value)) {
+        throw new ArgValidationError(info, "value", "Invalid option");
+      }
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    const petitionId = ctx.access!.petition_id;
+    const [reply, event] = await Promise.all([
+      ctx.petitions.updatePetitionFieldReply(
+        args.replyId,
+        { content: { text: args.value }, status: "PENDING" },
+        `Contact:${ctx.contact!.id}`
+      ),
+      ctx.petitions.getLastEventForPetitionId(petitionId),
+    ]);
+    if (
+      event &&
+      (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
+      event.data.petition_field_reply_id === args.replyId &&
+      differenceInSeconds(new Date(), event.created_at) < 60
+    ) {
+      await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
+    } else {
+      await ctx.petitions.createEvent({
+        type: "REPLY_UPDATED",
+        petition_id: petitionId,
+        data: {
+          petition_access_id: reply.petition_access_id!,
+          petition_field_id: reply.petition_field_id,
+          petition_field_reply_id: reply.id,
+        },
+      });
+    }
+    return reply;
+  },
+});
+
+export const publicCreateCheckboxReply = mutationField("publicCreateCheckboxReply", {
+  description: "Creates a reply to a checkbox field.",
+  type: "PublicPetitionFieldReply",
+  args: {
+    keycode: nonNull(idArg()),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    values: nonNull(list(nonNull(stringArg()))),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    fieldBelongsToAccess("fieldId"),
+    fieldHasType("fieldId", ["CHECKBOX"])
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    try {
+      const field = (await ctx.petitions.loadField(args.fieldId))!;
+      validateCheckboxReplyValues(field, args.values);
+    } catch (error) {
+      throw new ArgValidationError(info, "values", error.message);
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.createPetitionFieldReply(
+      {
+        petition_field_id: args.fieldId,
+        petition_access_id: ctx.access!.id,
+        type: "CHECKBOX",
+        content: { choices: args.values },
+      },
+      ctx.contact!
+    );
+  },
+});
+
+export const publicUpdateCheckboxReply = mutationField("publicUpdateCheckboxReply", {
+  description: "Updates a reply of checkbox field.",
+  type: "PublicPetitionFieldReply",
+  args: {
+    keycode: nonNull(idArg()),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    values: nonNull(list(nonNull(stringArg()))),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(replyBelongsToAccess("replyId"), replyIsForFieldOfType("replyId", ["CHECKBOX"]))
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    try {
+      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+      validateCheckboxReplyValues(field, args.values);
+    } catch (error) {
+      throw new ArgValidationError(info, "values", error.message);
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    const petitionId = ctx.access!.petition_id;
+    const [reply, event] = await Promise.all([
+      ctx.petitions.updatePetitionFieldReply(
+        args.replyId,
+        { content: { choices: args.values }, status: "PENDING" },
+        `Contact:${ctx.contact!.id}`
+      ),
+      ctx.petitions.getLastEventForPetitionId(petitionId),
+    ]);
+    if (
+      event &&
+      (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
+      event.data.petition_field_reply_id === args.replyId &&
+      differenceInSeconds(new Date(), event.created_at) < 60
+    ) {
+      await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
+    } else {
+      await ctx.petitions.createEvent({
+        type: "REPLY_UPDATED",
+        petition_id: petitionId,
+        data: {
+          petition_access_id: reply.petition_access_id!,
+          petition_field_id: reply.petition_field_id,
+          petition_field_reply_id: reply.id,
+        },
+      });
+    }
+    return reply;
+  },
+});
+
+export const publicCreateDynamicSelectReply = mutationField("publicCreateDynamicSelectReply", {
+  description: "Creates a reply for a dynamic select field.",
+  type: "PublicPetitionFieldReply",
+  args: {
+    keycode: nonNull(idArg()),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    value: nonNull(list(nonNull(list(stringArg())))),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(fieldBelongsToAccess("fieldId"), fieldHasType("fieldId", ["DYNAMIC_SELECT"]))
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    try {
+      const field = (await ctx.petitions.loadField(args.fieldId))!;
+      validateDynamicSelectReplyValues(field, args.value);
+    } catch (error) {
+      throw new ArgValidationError(info, "value", error.message);
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.createPetitionFieldReply(
+      {
+        petition_field_id: args.fieldId,
+        petition_access_id: ctx.access!.id,
+        type: "DYNAMIC_SELECT",
+        content: { columns: args.value },
+      },
+      ctx.contact!
+    );
+  },
+});
+
+export const publicUpdateDynamicSelectReply = mutationField("publicUpdateDynamicSelectReply", {
+  description: "Updates a reply for a dynamic select field.",
+  type: "PublicPetitionFieldReply",
+  args: {
+    keycode: nonNull(idArg()),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    value: nonNull(list(nonNull(list(stringArg())))),
+  },
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(replyBelongsToAccess("replyId"), replyIsForFieldOfType("replyId", "DYNAMIC_SELECT"))
+  ),
+  validateArgs: async (_, args, ctx, info) => {
+    try {
+      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
+      validateDynamicSelectReplyValues(field, args.value);
+    } catch (error) {
+      throw new ArgValidationError(info, "reply", error.message);
+    }
+  },
+  resolve: async (_, args, ctx) => {
+    const petitionId = ctx.access!.petition_id;
+    const [reply, event] = await Promise.all([
+      ctx.petitions.updatePetitionFieldReply(
+        args.replyId,
+        {
+          content: { columns: args.value },
+          status: "PENDING",
         },
         `Contact:${ctx.contact!.id}`
-      );
-      const [presignedPostData, reply] = await Promise.all([
-        ctx.aws.fileUploads.getSignedUploadEndpoint(key, contentType, size),
-        ctx.petitions.createPetitionFieldReply(
-          {
-            petition_field_id: args.fieldId,
-            petition_access_id: ctx.access!.id,
-            type: "FILE_UPLOAD",
-            content: { file_upload_id: file.id },
-          },
-          ctx.contact!
-        ),
-      ]);
-      return { presignedPostData, reply };
-    },
-  }
-);
-
-export const publicCreateSimpleReply = mutationField(
-  "publicCreateSimpleReply",
-  {
-    description: "Creates a reply to a text or select field.",
-    type: "PublicPetitionFieldReply",
-    args: {
-      keycode: nonNull(idArg()),
-      fieldId: nonNull(globalIdArg("PetitionField")),
-      value: nonNull(stringArg()),
-    },
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      fieldBelongsToAccess("fieldId"),
-      fieldHasType("fieldId", ["TEXT", "SHORT_TEXT", "SELECT"])
-    ),
-    validateArgs: async (_, args, ctx, info) => {
-      const field = (await ctx.petitions.loadField(args.fieldId))!;
-      if (field.type === "SELECT") {
-        const options = field.options.values as Maybe<string[]>;
-        if (!options?.includes(args.value)) {
-          throw new ArgValidationError(info, "reply", "Invalid option");
-        }
-      }
-    },
-    resolve: async (_, args, ctx) => {
-      const field = (await ctx.petitions.loadField(args.fieldId))!;
-      return await ctx.petitions.createPetitionFieldReply(
-        {
-          petition_field_id: args.fieldId,
-          petition_access_id: ctx.access!.id,
-          type: field.type,
-          content: { text: args.value },
+      ),
+      ctx.petitions.getLastEventForPetitionId(petitionId),
+    ]);
+    if (
+      event &&
+      (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
+      event.data.petition_field_reply_id === args.replyId &&
+      differenceInSeconds(new Date(), event.created_at) < 60
+    ) {
+      await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
+    } else {
+      await ctx.petitions.createEvent({
+        type: "REPLY_UPDATED",
+        petition_id: petitionId,
+        data: {
+          petition_access_id: reply.petition_access_id!,
+          petition_field_id: reply.petition_field_id,
+          petition_field_reply_id: reply.id,
         },
-        ctx.contact!
-      );
-    },
-  }
-);
-
-export const publicUpdateSimpleReply = mutationField(
-  "publicUpdateSimpleReply",
-  {
-    description: "Updates a reply to a text or select field.",
-    type: "PublicPetitionFieldReply",
-    args: {
-      keycode: nonNull(idArg()),
-      replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      value: nonNull(stringArg()),
-    },
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      and(
-        replyBelongsToAccess("replyId"),
-        replyIsForFieldOfType("replyId", ["TEXT", "SHORT_TEXT", "SELECT"])
-      )
-    ),
-    validateArgs: async (_, args, ctx, info) => {
-      const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-      if (field.type === "SELECT") {
-        const options = field.options.values as Maybe<string[]>;
-        if (!options?.includes(args.value)) {
-          throw new ArgValidationError(info, "value", "Invalid option");
-        }
-      }
-    },
-    resolve: async (_, args, ctx) => {
-      const petitionId = ctx.access!.petition_id;
-      const [reply, event] = await Promise.all([
-        ctx.petitions.updatePetitionFieldReply(
-          args.replyId,
-          { content: { text: args.value }, status: "PENDING" },
-          `Contact:${ctx.contact!.id}`
-        ),
-        ctx.petitions.getLastEventForPetitionId(petitionId),
-      ]);
-      if (
-        event &&
-        (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
-        event.data.petition_field_reply_id === args.replyId &&
-        differenceInSeconds(new Date(), event.created_at) < 60
-      ) {
-        await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
-      } else {
-        await ctx.petitions.createEvent({
-          type: "REPLY_UPDATED",
-          petition_id: petitionId,
-          data: {
-            petition_access_id: reply.petition_access_id!,
-            petition_field_id: reply.petition_field_id,
-            petition_field_reply_id: reply.id,
-          },
-        });
-      }
-      return reply;
-    },
-  }
-);
-
-export const publicCreateCheckboxReply = mutationField(
-  "publicCreateCheckboxReply",
-  {
-    description: "Creates a reply to a checkbox field.",
-    type: "PublicPetitionFieldReply",
-    args: {
-      keycode: nonNull(idArg()),
-      fieldId: nonNull(globalIdArg("PetitionField")),
-      values: nonNull(list(nonNull(stringArg()))),
-    },
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      fieldBelongsToAccess("fieldId"),
-      fieldHasType("fieldId", ["CHECKBOX"])
-    ),
-    validateArgs: async (_, args, ctx, info) => {
-      try {
-        const field = (await ctx.petitions.loadField(args.fieldId))!;
-        validateCheckboxReplyValues(field, args.values);
-      } catch (error) {
-        throw new ArgValidationError(info, "values", error.message);
-      }
-    },
-    resolve: async (_, args, ctx) => {
-      return await ctx.petitions.createPetitionFieldReply(
-        {
-          petition_field_id: args.fieldId,
-          petition_access_id: ctx.access!.id,
-          type: "CHECKBOX",
-          content: { choices: args.values },
-        },
-        ctx.contact!
-      );
-    },
-  }
-);
-
-export const publicUpdateCheckboxReply = mutationField(
-  "publicUpdateCheckboxReply",
-  {
-    description: "Updates a reply of checkbox field.",
-    type: "PublicPetitionFieldReply",
-    args: {
-      keycode: nonNull(idArg()),
-      replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      values: nonNull(list(nonNull(stringArg()))),
-    },
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      and(
-        replyBelongsToAccess("replyId"),
-        replyIsForFieldOfType("replyId", ["CHECKBOX"])
-      )
-    ),
-    validateArgs: async (_, args, ctx, info) => {
-      try {
-        const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-        validateCheckboxReplyValues(field, args.values);
-      } catch (error) {
-        throw new ArgValidationError(info, "values", error.message);
-      }
-    },
-    resolve: async (_, args, ctx) => {
-      const petitionId = ctx.access!.petition_id;
-      const [reply, event] = await Promise.all([
-        ctx.petitions.updatePetitionFieldReply(
-          args.replyId,
-          { content: { choices: args.values }, status: "PENDING" },
-          `Contact:${ctx.contact!.id}`
-        ),
-        ctx.petitions.getLastEventForPetitionId(petitionId),
-      ]);
-      if (
-        event &&
-        (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
-        event.data.petition_field_reply_id === args.replyId &&
-        differenceInSeconds(new Date(), event.created_at) < 60
-      ) {
-        await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
-      } else {
-        await ctx.petitions.createEvent({
-          type: "REPLY_UPDATED",
-          petition_id: petitionId,
-          data: {
-            petition_access_id: reply.petition_access_id!,
-            petition_field_id: reply.petition_field_id,
-            petition_field_reply_id: reply.id,
-          },
-        });
-      }
-      return reply;
-    },
-  }
-);
-
-export const publicCreateDynamicSelectReply = mutationField(
-  "publicCreateDynamicSelectReply",
-  {
-    description: "Creates a reply for a dynamic select field.",
-    type: "PublicPetitionFieldReply",
-    args: {
-      keycode: nonNull(idArg()),
-      fieldId: nonNull(globalIdArg("PetitionField")),
-      value: nonNull(list(nonNull(list(stringArg())))),
-    },
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      and(
-        fieldBelongsToAccess("fieldId"),
-        fieldHasType("fieldId", ["DYNAMIC_SELECT"])
-      )
-    ),
-    validateArgs: async (_, args, ctx, info) => {
-      try {
-        const field = (await ctx.petitions.loadField(args.fieldId))!;
-        validateDynamicSelectReplyValues(field, args.value);
-      } catch (error) {
-        throw new ArgValidationError(info, "value", error.message);
-      }
-    },
-    resolve: async (_, args, ctx) => {
-      return await ctx.petitions.createPetitionFieldReply(
-        {
-          petition_field_id: args.fieldId,
-          petition_access_id: ctx.access!.id,
-          type: "DYNAMIC_SELECT",
-          content: { columns: args.value },
-        },
-        ctx.contact!
-      );
-    },
-  }
-);
-
-export const publicUpdateDynamicSelectReply = mutationField(
-  "publicUpdateDynamicSelectReply",
-  {
-    description: "Updates a reply for a dynamic select field.",
-    type: "PublicPetitionFieldReply",
-    args: {
-      keycode: nonNull(idArg()),
-      replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      value: nonNull(list(nonNull(list(stringArg())))),
-    },
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      and(
-        replyBelongsToAccess("replyId"),
-        replyIsForFieldOfType("replyId", "DYNAMIC_SELECT")
-      )
-    ),
-    validateArgs: async (_, args, ctx, info) => {
-      try {
-        const field = (await ctx.petitions.loadFieldForReply(args.replyId))!;
-        validateDynamicSelectReplyValues(field, args.value);
-      } catch (error) {
-        throw new ArgValidationError(info, "reply", error.message);
-      }
-    },
-    resolve: async (_, args, ctx) => {
-      const petitionId = ctx.access!.petition_id;
-      const [reply, event] = await Promise.all([
-        ctx.petitions.updatePetitionFieldReply(
-          args.replyId,
-          {
-            content: { columns: args.value },
-            status: "PENDING",
-          },
-          `Contact:${ctx.contact!.id}`
-        ),
-        ctx.petitions.getLastEventForPetitionId(petitionId),
-      ]);
-      if (
-        event &&
-        (event.type === "REPLY_UPDATED" || event.type === "REPLY_CREATED") &&
-        event.data.petition_field_reply_id === args.replyId &&
-        differenceInSeconds(new Date(), event.created_at) < 60
-      ) {
-        await ctx.petitions.updateEvent(event.id, { created_at: new Date() });
-      } else {
-        await ctx.petitions.createEvent({
-          type: "REPLY_UPDATED",
-          petition_id: petitionId,
-          data: {
-            petition_access_id: reply.petition_access_id!,
-            petition_field_id: reply.petition_field_id,
-            petition_field_reply_id: reply.id,
-          },
-        });
-      }
-      return reply;
-    },
-  }
-);
+      });
+    }
+    return reply;
+  },
+});
 
 export const publicCompletePetition = mutationField("publicCompletePetition", {
   description: `
@@ -677,10 +597,7 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
   },
   authorize: authenticatePublicAccess("keycode"),
   resolve: async (_, args, ctx) => {
-    const petition = await ctx.petitions.completePetition(
-      ctx.access!.petition_id,
-      ctx.access!.id
-    );
+    const petition = await ctx.petitions.completePetition(ctx.access!.petition_id, ctx.access!.id);
 
     const signatureConfig = petition.signature_config as {
       provider: string;
@@ -701,97 +618,79 @@ export const publicCompletePetition = mutationField("publicCompletePetition", {
   },
 });
 
-export const publicCreatePetitionFieldComment = mutationField(
-  "publicCreatePetitionFieldComment",
-  {
-    description: "Create a petition field comment.",
-    type: "PublicPetitionFieldComment",
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      fieldBelongsToAccess("petitionFieldId")
-    ),
-    args: {
-      keycode: nonNull(idArg()),
-      petitionFieldId: nonNull(globalIdArg("PetitionField")),
-      content: nonNull(stringArg()),
-    },
-    resolve: async (_, args, ctx) => {
-      const petitionId = ctx.access!.petition_id;
-      const petition = (await ctx.petitions.loadPetition(petitionId))!;
-      if (!petition.comments_enabled) {
-        throw new WhitelistedError(
-          "Comments are not enabled for this petition",
-          "COMMENTS_NOT_ENABLED"
-        );
-      }
-      return await ctx.petitions.createPetitionFieldCommentFromAccess(
-        {
-          petitionId: petitionId,
-          petitionFieldId: args.petitionFieldId,
-          content: args.content,
-        },
-        ctx.access!
+export const publicCreatePetitionFieldComment = mutationField("publicCreatePetitionFieldComment", {
+  description: "Create a petition field comment.",
+  type: "PublicPetitionFieldComment",
+  authorize: chain(authenticatePublicAccess("keycode"), fieldBelongsToAccess("petitionFieldId")),
+  args: {
+    keycode: nonNull(idArg()),
+    petitionFieldId: nonNull(globalIdArg("PetitionField")),
+    content: nonNull(stringArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    const petitionId = ctx.access!.petition_id;
+    const petition = (await ctx.petitions.loadPetition(petitionId))!;
+    if (!petition.comments_enabled) {
+      throw new WhitelistedError(
+        "Comments are not enabled for this petition",
+        "COMMENTS_NOT_ENABLED"
       );
-    },
-  }
-);
+    }
+    return await ctx.petitions.createPetitionFieldCommentFromAccess(
+      {
+        petitionId: petitionId,
+        petitionFieldId: args.petitionFieldId,
+        content: args.content,
+      },
+      ctx.access!
+    );
+  },
+});
 
-export const publicDeletePetitionFieldComment = mutationField(
-  "publicDeletePetitionFieldComment",
-  {
-    description: "Delete a petition field comment.",
-    type: "Result",
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      and(
-        fieldBelongsToAccess("petitionFieldId"),
-        commentsBelongsToAccess("petitionFieldCommentId")
-      )
-    ),
-    args: {
-      keycode: nonNull(idArg()),
-      petitionFieldId: nonNull(globalIdArg("PetitionField")),
-      petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
-    },
-    resolve: async (_, args, ctx) => {
-      await ctx.petitions.deletePetitionFieldCommentFromAccess(
-        ctx.access!.petition_id,
-        args.petitionFieldId,
-        args.petitionFieldCommentId,
-        ctx.access!
-      );
-      return RESULT.SUCCESS;
-    },
-  }
-);
+export const publicDeletePetitionFieldComment = mutationField("publicDeletePetitionFieldComment", {
+  description: "Delete a petition field comment.",
+  type: "Result",
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId"))
+  ),
+  args: {
+    keycode: nonNull(idArg()),
+    petitionFieldId: nonNull(globalIdArg("PetitionField")),
+    petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
+  },
+  resolve: async (_, args, ctx) => {
+    await ctx.petitions.deletePetitionFieldCommentFromAccess(
+      ctx.access!.petition_id,
+      args.petitionFieldId,
+      args.petitionFieldCommentId,
+      ctx.access!
+    );
+    return RESULT.SUCCESS;
+  },
+});
 
-export const publicUpdatePetitionFieldComment = mutationField(
-  "publicUpdatePetitionFieldComment",
-  {
-    description: "Update a petition field comment.",
-    type: "PublicPetitionFieldComment",
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      and(
-        fieldBelongsToAccess("petitionFieldId"),
-        commentsBelongsToAccess("petitionFieldCommentId")
-      )
-    ),
-    args: {
-      keycode: nonNull(idArg()),
-      petitionFieldId: nonNull(globalIdArg("PetitionField")),
-      petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
-      content: nonNull(stringArg()),
-    },
-    resolve: async (_, args, ctx) => {
-      return await ctx.petitions.updatePetitionFieldCommentFromContact(
-        args.petitionFieldCommentId,
-        args.content,
-        ctx.contact!
-      );
-    },
-  }
-);
+export const publicUpdatePetitionFieldComment = mutationField("publicUpdatePetitionFieldComment", {
+  description: "Update a petition field comment.",
+  type: "PublicPetitionFieldComment",
+  authorize: chain(
+    authenticatePublicAccess("keycode"),
+    and(fieldBelongsToAccess("petitionFieldId"), commentsBelongsToAccess("petitionFieldCommentId"))
+  ),
+  args: {
+    keycode: nonNull(idArg()),
+    petitionFieldId: nonNull(globalIdArg("PetitionField")),
+    petitionFieldCommentId: nonNull(globalIdArg("PetitionFieldComment")),
+    content: nonNull(stringArg()),
+  },
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionFieldCommentFromContact(
+      args.petitionFieldCommentId,
+      args.content,
+      ctx.contact!
+    );
+  },
+});
 
 export const publicMarkPetitionFieldCommentsAsRead = mutationField(
   "publicMarkPetitionFieldCommentsAsRead",
@@ -804,14 +703,9 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
     ),
     args: {
       keycode: nonNull(idArg()),
-      petitionFieldCommentIds: nonNull(
-        list(nonNull(globalIdArg("PetitionFieldComment")))
-      ),
+      petitionFieldCommentIds: nonNull(list(nonNull(globalIdArg("PetitionFieldComment")))),
     },
-    validateArgs: notEmptyArray(
-      prop("petitionFieldCommentIds"),
-      "petitionFieldCommentIds"
-    ),
+    validateArgs: notEmptyArray(prop("petitionFieldCommentIds"), "petitionFieldCommentIds"),
     resolve: async (_, args, ctx) => {
       return await ctx.petitions.markPetitionFieldCommentsAsReadForAccess(
         args.petitionFieldCommentIds,
@@ -824,19 +718,14 @@ export const publicMarkPetitionFieldCommentsAsRead = mutationField(
 export const publicFileUploadReplyDownloadLink = mutationField(
   "publicFileUploadReplyDownloadLink",
   {
-    description:
-      "Generates a download link for a file reply on a public context.",
+    description: "Generates a download link for a file reply on a public context.",
     type: "FileUploadDownloadLinkResult",
-    authorize: chain(
-      authenticatePublicAccess("keycode"),
-      replyBelongsToAccess("replyId")
-    ),
+    authorize: chain(authenticatePublicAccess("keycode"), replyBelongsToAccess("replyId")),
     args: {
       keycode: nonNull(idArg()),
       replyId: nonNull(globalIdArg("PetitionFieldReply")),
       preview: booleanArg({
-        description:
-          "If true will use content-disposition inline instead of attachment",
+        description: "If true will use content-disposition inline instead of attachment",
       }),
     },
     resolve: async (_, args, ctx) => {
@@ -845,13 +734,9 @@ export const publicFileUploadReplyDownloadLink = mutationField(
         if (reply!.type !== "FILE_UPLOAD") {
           throw new Error("Invalid field type");
         }
-        const file = await ctx.files.loadFileUpload(
-          reply!.content["file_upload_id"]
-        );
+        const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);
         if (!file) {
-          throw new Error(
-            `FileUpload not found with id ${reply!.content["file_upload_id"]}`
-          );
+          throw new Error(`FileUpload not found with id ${reply!.content["file_upload_id"]}`);
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);
@@ -877,97 +762,82 @@ export const publicFileUploadReplyDownloadLink = mutationField(
   }
 );
 
-export const publicDelegateAccessToContact = mutationField(
-  "publicDelegateAccessToContact",
-  {
-    description:
-      "Lets a recipient delegate access to the petition to another contact in the same organization",
-    type: nonNull("PublicPetitionAccess"),
-    args: {
-      keycode: nonNull(idArg()),
-      email: nonNull(stringArg()),
-      firstName: nonNull(stringArg()),
-      lastName: nonNull(stringArg()),
-      messageBody: nonNull(jsonArg()),
-    },
-    authorize: authenticatePublicAccess("keycode"),
-    validateArgs: validRichTextContent(
-      (args) => args.messageBody,
-      "messageBody"
-    ),
-    resolve: async (_, args, ctx) => {
-      const access = ctx.access!;
-      const recipient = ctx.contact!;
-      const petitionId = access.petition_id;
+export const publicDelegateAccessToContact = mutationField("publicDelegateAccessToContact", {
+  description:
+    "Lets a recipient delegate access to the petition to another contact in the same organization",
+  type: nonNull("PublicPetitionAccess"),
+  args: {
+    keycode: nonNull(idArg()),
+    email: nonNull(stringArg()),
+    firstName: nonNull(stringArg()),
+    lastName: nonNull(stringArg()),
+    messageBody: nonNull(jsonArg()),
+  },
+  authorize: authenticatePublicAccess("keycode"),
+  validateArgs: validRichTextContent((args) => args.messageBody, "messageBody"),
+  resolve: async (_, args, ctx) => {
+    const access = ctx.access!;
+    const recipient = ctx.contact!;
+    const petitionId = access.petition_id;
 
-      let contactToDelegate = await ctx.contacts.loadContactByEmail({
-        email: args.email,
-        orgId: recipient.org_id,
-      });
+    let contactToDelegate = await ctx.contacts.loadContactByEmail({
+      email: args.email,
+      orgId: recipient.org_id,
+    });
 
-      if (!contactToDelegate) {
-        contactToDelegate = await ctx.contacts.createContact(
-          {
-            email: args.email,
-            first_name: args.firstName,
-            last_name: args.lastName,
+    if (!contactToDelegate) {
+      contactToDelegate = await ctx.contacts.createContact(
+        {
+          email: args.email,
+          first_name: args.firstName,
+          last_name: args.lastName,
+        },
+        recipient,
+        `Contact:${recipient.id}`
+      );
+    }
+    try {
+      const newAccess = await ctx.petitions.createAccessFromRecipient(
+        petitionId,
+        access.granter_id,
+        contactToDelegate.id,
+        recipient
+      );
+
+      await Promise.all([
+        ctx.emails.sendAccessDelegatedEmail(petitionId, access.id, newAccess.id, args.messageBody),
+        ctx.petitions.createEvent({
+          type: "ACCESS_DELEGATED",
+          petition_id: petitionId,
+          data: {
+            petition_access_id: access.id,
+            new_petition_access_id: newAccess.id,
           },
-          recipient,
-          `Contact:${recipient.id}`
-        );
-      }
-      try {
-        const newAccess = await ctx.petitions.createAccessFromRecipient(
+        }),
+      ]);
+
+      return newAccess;
+    } catch (error) {
+      // if the access already exists, just send the email
+      if (error.constraint === "petition_access__petition_id_contact_id") {
+        const petitionAccesses = await ctx.petitions.loadAccessesForPetition(petitionId);
+
+        const contactAccess = petitionAccesses.find((a) => a.contact_id === contactToDelegate!.id)!;
+
+        await ctx.emails.sendAccessDelegatedEmail(
           petitionId,
-          access.granter_id,
-          contactToDelegate.id,
-          recipient
+          access.id,
+          contactAccess.id,
+          args.messageBody
         );
 
-        await Promise.all([
-          ctx.emails.sendAccessDelegatedEmail(
-            petitionId,
-            access.id,
-            newAccess.id,
-            args.messageBody
-          ),
-          ctx.petitions.createEvent({
-            type: "ACCESS_DELEGATED",
-            petition_id: petitionId,
-            data: {
-              petition_access_id: access.id,
-              new_petition_access_id: newAccess.id,
-            },
-          }),
-        ]);
-
-        return newAccess;
-      } catch (error) {
-        // if the access already exists, just send the email
-        if (error.constraint === "petition_access__petition_id_contact_id") {
-          const petitionAccesses = await ctx.petitions.loadAccessesForPetition(
-            petitionId
-          );
-
-          const contactAccess = petitionAccesses.find(
-            (a) => a.contact_id === contactToDelegate!.id
-          )!;
-
-          await ctx.emails.sendAccessDelegatedEmail(
-            petitionId,
-            access.id,
-            contactAccess.id,
-            args.messageBody
-          );
-
-          return contactAccess;
-        } else {
-          throw error;
-        }
+        return contactAccess;
+      } else {
+        throw error;
       }
-    },
-  }
-);
+    }
+  },
+});
 
 async function startSignatureRequest(
   petition: Petition,
@@ -986,28 +856,25 @@ async function startSignatureRequest(
     );
   }
 
-  const signatureRequest = await ctx.petitions.createPetitionSignature(
-    petition.id,
-    {
-      ...petition.signature_config,
-      contactIds: specifiedByUser
-        ? petition.signature_config.contactIds
-        : [
-            (
-              await ctx.contacts.loadOrCreate(
-                {
-                  email: contactSigner!.email,
-                  firstName: contactSigner!.firstName,
-                  lastName: contactSigner!.lastName,
-                  orgId: ctx.contact!.org_id,
-                },
-                `Contact:${ctx.contact!.id}`
-              )
-            ).id,
-          ],
-      message: contactSigner?.message,
-    }
-  );
+  const signatureRequest = await ctx.petitions.createPetitionSignature(petition.id, {
+    ...petition.signature_config,
+    contactIds: specifiedByUser
+      ? petition.signature_config.contactIds
+      : [
+          (
+            await ctx.contacts.loadOrCreate(
+              {
+                email: contactSigner!.email,
+                firstName: contactSigner!.firstName,
+                lastName: contactSigner!.lastName,
+                orgId: ctx.contact!.org_id,
+              },
+              `Contact:${ctx.contact!.id}`
+            )
+          ).id,
+        ],
+    message: contactSigner?.message,
+  });
   await ctx.aws.enqueueMessages("signature-worker", {
     groupId: `signature-${toGlobalId("Petition", petition.id)}`,
     body: {
@@ -1020,42 +887,31 @@ async function startSignatureRequest(
 export const publicPetitionFieldAttachmentDownloadLink = mutationField(
   "publicPetitionFieldAttachmentDownloadLink",
   {
-    description:
-      "Generates a download link for a field attachment on a public context.",
+    description: "Generates a download link for a field attachment on a public context.",
     type: "FileUploadDownloadLinkResult",
     authorize: chain(
       authenticatePublicAccess("keycode"),
-      and(
-        fieldBelongsToAccess("fieldId"),
-        fieldAttachmentBelongsToField("fieldId", "attachmentId")
-      )
+      and(fieldBelongsToAccess("fieldId"), fieldAttachmentBelongsToField("fieldId", "attachmentId"))
     ),
     args: {
       keycode: nonNull(idArg()),
       fieldId: nonNull(globalIdArg("PetitionField")),
       attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
       preview: booleanArg({
-        description:
-          "If true will use content-disposition inline instead of attachment",
+        description: "If true will use content-disposition inline instead of attachment",
       }),
     },
     resolve: async (_, args, ctx) => {
       try {
-        const attachment = await ctx.petitions.loadFieldAttachment(
-          args.attachmentId
-        );
+        const attachment = await ctx.petitions.loadFieldAttachment(args.attachmentId);
 
         if (!attachment) {
-          throw new Error(
-            `Can't load PetitionFieldAttachment with id ${args.attachmentId}`
-          );
+          throw new Error(`Can't load PetitionFieldAttachment with id ${args.attachmentId}`);
         }
 
         const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
         if (!file) {
-          throw new Error(
-            `FileUpload not found with id ${attachment.file_upload_id}`
-          );
+          throw new Error(`FileUpload not found with id ${attachment.file_upload_id}`);
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);

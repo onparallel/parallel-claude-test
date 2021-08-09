@@ -34,9 +34,7 @@ export async function up(knex: Knex) {
 
       t.foreign("org_id").references("organization.id");
     })
-    .raw(
-      `create unique index "user__email" on "user" ("email") where "deleted_at" is null`
-    )
+    .raw(`create unique index "user__email" on "user" ("email") where "deleted_at" is null`)
 
     .createTable("contact", (t) => {
       t.increments("id");
@@ -132,9 +130,7 @@ export async function up(knex: Knex) {
       t.text("text").notNullable();
       t.text("html").notNullable();
       t.boolean("track_opens").notNullable().defaultTo(false);
-      t.timestamp("created_at")
-        .notNullable()
-        .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+      t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
       t.string("created_from").notNullable();
       t.timestamp("sent_at").defaultTo(null);
       t.text("response").defaultTo(null);
@@ -153,11 +149,10 @@ export async function up(knex: Knex) {
       t.text("email_body");
       t.string("locale", 10).notNullable();
       t.timestamp("deadline");
-      t.enum(
-        "status",
-        ["SCHEDULED", "CANCELLED", "PROCESSING", "ACTIVE", "INACTIVE"],
-        { useNative: true, enumName: "petition_sendout_status" }
-      ).notNullable();
+      t.enum("status", ["SCHEDULED", "CANCELLED", "PROCESSING", "ACTIVE", "INACTIVE"], {
+        useNative: true,
+        enumName: "petition_sendout_status",
+      }).notNullable();
       t.timestamp("scheduled_at");
       t.integer("email_log_id");
       t.timestamp("next_reminder_at");
@@ -226,9 +221,7 @@ export async function up(knex: Knex) {
         enumName: "petition_reminder_status",
         useNative: true,
       }).notNullable();
-      t.timestamp("created_at")
-        .notNullable()
-        .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+      t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
       t.string("created_by");
 
       t.foreign("petition_sendout_id").references("petition_sendout.id");
@@ -240,9 +233,7 @@ export async function up(knex: Knex) {
       t.integer("email_log_id").notNullable();
       t.string("event").notNullable();
       t.text("payload").notNullable();
-      t.timestamp("created_at")
-        .notNullable()
-        .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+      t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
 
       t.foreign("email_log_id").references("email_log.id");
       t.index(["email_log_id", "event"], "email_event__email_log_id__event");

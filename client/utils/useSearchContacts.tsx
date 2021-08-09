@@ -15,10 +15,7 @@ export function useSearchContacts() {
         PetitionComposeSearchContactsQueryVariables
       >({
         query: gql`
-          query PetitionComposeSearchContacts(
-            $search: String
-            $exclude: [GID!]
-          ) {
+          query PetitionComposeSearchContacts($search: String, $exclude: [GID!]) {
             contacts(limit: 10, search: $search, exclude: $exclude) {
               items {
                 ...ContactSelect_Contact

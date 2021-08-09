@@ -1,8 +1,4 @@
-import {
-  PetitionFieldType,
-  CreatePetitionField,
-  PetitionField,
-} from "../__types";
+import { PetitionFieldType, CreatePetitionField, PetitionField } from "../__types";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 import { isOptionsCompatible, isSettingsCompatible } from "./utils";

@@ -24,10 +24,7 @@ const config = {
       })
     );
 
-    if (
-      process.env.NODE_ENV === "production" &&
-      process.env.SENTRY_AUTH_TOKEN
-    ) {
+    if (process.env.NODE_ENV === "production" && process.env.SENTRY_AUTH_TOKEN) {
       config.plugins.push(
         new SentryWebpackPlugin({
           authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -71,10 +68,7 @@ const config = {
         headers:
           process.env.NODE_ENV === "production"
             ? createSecureHeaders({
-                forceHTTPSRedirect: [
-                  true,
-                  { maxAge: 60 * 60 * 24 * 30, includeSubDomains: true },
-                ],
+                forceHTTPSRedirect: [true, { maxAge: 60 * 60 * 24 * 30, includeSubDomains: true }],
                 referrerPolicy: "same-origin",
                 frameGuard: "sameorigin",
                 xssProtection: "sanitize",

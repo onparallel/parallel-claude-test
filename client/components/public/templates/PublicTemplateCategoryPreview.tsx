@@ -35,13 +35,7 @@ export function PublicTemplateCategoryPreview({
       </GridItem>
       <GridItem gridArea="actions">
         <NakedLink href={`/templates/categories/${slug}`}>
-          <Button
-            as="a"
-            variant="outline"
-            cursor="pointer"
-            backgroundColor="white"
-            width={"100%"}
-          >
+          <Button as="a" variant="outline" cursor="pointer" backgroundColor="white" width={"100%"}>
             <FormattedMessage
               id="public.template-category-preview.view-all"
               defaultMessage="View all"

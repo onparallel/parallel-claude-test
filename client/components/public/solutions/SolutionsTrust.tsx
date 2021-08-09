@@ -15,17 +15,8 @@ export function SolutionsTrust({ logos, ...props }: SolutionsTrust) {
         ...props,
       }}
     >
-      <Heading
-        as="h2"
-        size="lg"
-        fontWeight="bold"
-        marginBottom={8}
-        textAlign="center"
-      >
-        <FormattedMessage
-          id="public.who-trust-us.title"
-          defaultMessage="Already trust us"
-        />
+      <Heading as="h2" size="lg" fontWeight="bold" marginBottom={8} textAlign="center">
+        <FormattedMessage id="public.who-trust-us.title" defaultMessage="Already trust us" />
       </Heading>
       <Grid
         alignItems="center"

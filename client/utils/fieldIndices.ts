@@ -33,26 +33,17 @@ function* numbers() {
   }
 }
 
-export function getFieldIndices(
-  fields: Pick<PetitionField, "type">[]
-): PetitionFieldIndex[] {
+export function getFieldIndices(fields: Pick<PetitionField, "type">[]): PetitionFieldIndex[] {
   const letter = letters();
   const number = numbers();
   return fields.map((f) =>
-    f.type === "HEADING"
-      ? (letter.next().value as string)
-      : (number.next().value as number)
+    f.type === "HEADING" ? (letter.next().value as string) : (number.next().value as number)
   );
 }
 /**
  * iterates every field and returns an array representing the index of each one in the same order
  * @param fields fields to iterate.
  */
-export function useFieldIndices(
-  fields: Pick<PetitionField, "type">[]
-): PetitionFieldIndex[] {
-  return useMemo(
-    () => getFieldIndices(fields),
-    [fields.map((f) => f.type).join(",")]
-  );
+export function useFieldIndices(fields: Pick<PetitionField, "type">[]): PetitionFieldIndex[] {
+  return useMemo(() => getFieldIndices(fields), [fields.map((f) => f.type).join(",")]);
 }

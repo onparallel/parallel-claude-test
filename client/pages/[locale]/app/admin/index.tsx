@@ -1,8 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -29,9 +26,7 @@ function Admin() {
       basePath="/app/Admin"
       sections={sections}
       user={me}
-      sectionsHeader={
-        <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
-      }
+      sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
     />
   );
 }

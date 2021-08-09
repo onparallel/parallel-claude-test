@@ -65,11 +65,7 @@ const _publicUpdateSimpleReply = gql`
     $replyId: GID!
     $value: String!
   ) {
-    publicUpdateSimpleReply(
-      keycode: $keycode
-      replyId: $replyId
-      value: $value
-    ) {
+    publicUpdateSimpleReply(keycode: $keycode, replyId: $replyId, value: $value) {
       id
       content
       status
@@ -116,11 +112,7 @@ const _publicCreateSimpleReply = gql`
     $fieldId: GID!
     $value: String!
   ) {
-    publicCreateSimpleReply(
-      keycode: $keycode
-      fieldId: $fieldId
-      value: $value
-    ) {
+    publicCreateSimpleReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
   }
@@ -170,11 +162,7 @@ const _publicCreateCheckboxReply = gql`
     $fieldId: GID!
     $values: [String!]!
   ) {
-    publicCreateCheckboxReply(
-      keycode: $keycode
-      fieldId: $fieldId
-      values: $values
-    ) {
+    publicCreateCheckboxReply(keycode: $keycode, fieldId: $fieldId, values: $values) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
   }
@@ -224,11 +212,7 @@ const _publicUpdateCheckboxReply = gql`
     $replyId: GID!
     $values: [String!]!
   ) {
-    publicUpdateCheckboxReply(
-      keycode: $keycode
-      replyId: $replyId
-      values: $values
-    ) {
+    publicUpdateCheckboxReply(keycode: $keycode, replyId: $replyId, values: $values) {
       id
       content
       status
@@ -275,11 +259,7 @@ const _publicCreateDynamicSelectReply = gql`
     $fieldId: GID!
     $value: [[String]!]!
   ) {
-    publicCreateDynamicSelectReply(
-      keycode: $keycode
-      fieldId: $fieldId
-      value: $value
-    ) {
+    publicCreateDynamicSelectReply(keycode: $keycode, fieldId: $fieldId, value: $value) {
       ...RecipientViewPetitionFieldCard_PublicPetitionFieldReply
     }
   }
@@ -329,11 +309,7 @@ const _publicUpdateDynamicSelectReply = gql`
     $replyId: GID!
     $value: [[String]!]!
   ) {
-    publicUpdateDynamicSelectReply(
-      keycode: $keycode
-      replyId: $replyId
-      value: $value
-    ) {
+    publicUpdateDynamicSelectReply(keycode: $keycode, replyId: $replyId, value: $value) {
       id
       content
       status
@@ -380,11 +356,7 @@ const _publicCreateFileUploadReply = gql`
     $fieldId: GID!
     $data: FileUploadInput!
   ) {
-    publicCreateFileUploadReply(
-      keycode: $keycode
-      fieldId: $fieldId
-      data: $data
-    ) {
+    publicCreateFileUploadReply(keycode: $keycode, fieldId: $fieldId, data: $data) {
       presignedPostData {
         ...uploadFile_AWSPresignedPostData
       }

@@ -1,8 +1,4 @@
-import {
-  OptionTypeBase,
-  GroupTypeBase,
-  Props as _SelectProps,
-} from "react-select";
+import { OptionTypeBase, GroupTypeBase, Props as _SelectProps } from "react-select";
 import { Props as _AsyncSelectProps } from "react-select/async";
 import { Props as _AsyncCreatableSelectProps } from "react-select/async-creatable";
 import { If } from "../types";
@@ -13,11 +9,7 @@ export interface OptionType<T extends string = string> {
   label: string;
 }
 
-export type OptionTypeValue<T extends OptionType<any>> = T extends OptionType<
-  infer U
->
-  ? U
-  : never;
+export type OptionTypeValue<T extends OptionType<any>> = T extends OptionType<infer U> ? U : never;
 
 export type ValueType<T, IsMulti extends boolean> = If<IsMulti, T[], T>;
 
@@ -25,10 +17,7 @@ export interface CustomSelectProps<
   T,
   IsMulti extends boolean = false,
   GroupType extends GroupTypeBase<T> = never
-> extends Omit<
-      SelectProps<T, IsMulti, GroupType>,
-      "value" | "onChange" | "options"
-    >,
+> extends Omit<SelectProps<T, IsMulti, GroupType>, "value" | "onChange" | "options">,
     ValueProps<ValueType<T, IsMulti>> {}
 
 export interface SelectProps<
@@ -41,10 +30,7 @@ export interface CustomAsyncSelectProps<
   T,
   IsMulti extends boolean = false,
   GroupType extends GroupTypeBase<T> = never
-> extends Omit<
-      _AsyncSelectProps<T, IsMulti, GroupType>,
-      "value" | "onChange" | "options"
-    >,
+> extends Omit<_AsyncSelectProps<T, IsMulti, GroupType>, "value" | "onChange" | "options">,
     ValueProps<ValueType<T, IsMulti>> {}
 
 export interface AsyncSelectProps<
@@ -57,10 +43,7 @@ export interface CustomAsyncCreatableSelectProps<
   T,
   IsMulti extends boolean = false,
   GroupType extends GroupTypeBase<T> = never
-> extends Omit<
-      _AsyncCreatableSelectProps<T, IsMulti, GroupType>,
-      "value" | "onChange" | "options"
-    >,
+> extends Omit<_AsyncCreatableSelectProps<T, IsMulti, GroupType>, "value" | "onChange" | "options">,
     ValueProps<ValueType<T, IsMulti>> {}
 
 export interface AsyncCreatableSelectProps<

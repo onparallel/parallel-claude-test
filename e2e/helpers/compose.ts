@@ -8,11 +8,7 @@ export interface PetitionFieldData {
   values?: string[];
 }
 
-export async function fillPetitionField(
-  page: Page,
-  element: ElementLike,
-  data: PetitionFieldData
-) {
+export async function fillPetitionField(page: Page, element: ElementLike, data: PetitionFieldData) {
   const el = await getElement(page, element);
   const elementId = await el.getAttribute("id");
   const id = elementId!.replace(/^field-/, "");
@@ -42,9 +38,7 @@ export async function addPetitionField(page: Page, type: PetitionFieldType) {
   await create.scrollIntoViewIfNeeded();
   await create!.click();
   await page.click("body"); // sometimes the menu remains open
-  await page.waitForSelector(
-    `#petition-fields > *:nth-child(${fields.length + 2})`
-  );
+  await page.waitForSelector(`#petition-fields > *:nth-child(${fields.length + 2})`);
 }
 
 export async function getFields(page: Page): Promise<ElementHandle[]> {

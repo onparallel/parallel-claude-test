@@ -15,11 +15,7 @@ export type QueueWorkerOptions<T> = {
 
 export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
   name: Q,
-  handler: (
-    payload: P,
-    context: WorkerContext,
-    config: Config["queueWorkers"][Q]
-  ) => Promise<void>,
+  handler: (payload: P, context: WorkerContext, config: Config["queueWorkers"][Q]) => Promise<void>,
   options?: QueueWorkerOptions<P>
 ) {
   loadEnv(`.${name}.env`);
@@ -65,9 +61,7 @@ export function createQueueWorker<P, Q extends keyof Config["queueWorkers"]>(
           ...config.aws,
           signatureVersion: "v4",
           logger:
-            process.env.NODE_ENV === "production"
-              ? undefined
-              : { log: logger.debug.bind(logger) },
+            process.env.NODE_ENV === "production" ? undefined : { log: logger.debug.bind(logger) },
         });
         const consumer = Consumer.create({
           queueUrl: config.queueWorkers[name].endpoint,

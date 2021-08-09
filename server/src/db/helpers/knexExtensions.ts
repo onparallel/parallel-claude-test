@@ -13,11 +13,7 @@ function likeClause<TRecord = any, TResult = unknown>(operator: string) {
     escape?: string
   ) {
     if (escape) {
-      return this.whereRaw(`?? ${operator} ? escape ?`, [
-        columnName,
-        pattern,
-        escape,
-      ]);
+      return this.whereRaw(`?? ${operator} ? escape ?`, [columnName, pattern, escape]);
     } else {
       return this.whereRaw(`?? ${operator} ?`, [columnName, pattern]);
     }

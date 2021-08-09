@@ -1,10 +1,4 @@
-import {
-  inputObjectType,
-  list,
-  mutationField,
-  nonNull,
-  stringArg,
-} from "@nexus/schema";
+import { inputObjectType, list, mutationField, nonNull, stringArg } from "@nexus/schema";
 import pMap from "p-map";
 import { CreateUserGroup, UserGroup } from "../../db/__types";
 import { authenticateAnd } from "../helpers/authorize";
@@ -39,12 +33,7 @@ export const createUserGroup = mutationField("createUserGroup", {
         `User:${ctx.user!.id}`,
         t
       );
-      await ctx.userGroups.addUsersToGroup(
-        group.id,
-        args.userIds,
-        `User:${ctx.user!.id}`,
-        t
-      );
+      await ctx.userGroups.addUsersToGroup(group.id, args.userIds, `User:${ctx.user!.id}`, t);
       return group;
     });
   },
@@ -53,10 +42,7 @@ export const createUserGroup = mutationField("createUserGroup", {
 export const updateUserGroup = mutationField("updateUserGroup", {
   description: "Updates the name of a given user group",
   type: "UserGroup",
-  authorize: authenticateAnd(
-    contextUserIsAdmin(),
-    userHasAccessToUserGroups("id")
-  ),
+  authorize: authenticateAnd(contextUserIsAdmin(), userHasAccessToUserGroups("id")),
   validateArgs: validateAnd(
     notEmptyString((args) => args.data.name, "data.name"),
     maxLength((args) => args.data.name, "data.name", 100)
@@ -90,10 +76,7 @@ export const updateUserGroup = mutationField("updateUserGroup", {
 export const deleteUserGroup = mutationField("deleteUserGroup", {
   description: "Deletes a group",
   type: "Result",
-  authorize: authenticateAnd(
-    contextUserIsAdmin(),
-    userHasAccessToUserGroups("ids")
-  ),
+  authorize: authenticateAnd(contextUserIsAdmin(), userHasAccessToUserGroups("ids")),
   args: {
     ids: nonNull(list(nonNull(globalIdArg("UserGroup")))),
   },
@@ -120,11 +103,7 @@ export const addUsersToUserGroup = mutationField("addUsersToUserGroup", {
     userHasAccessToUsers("userIds")
   ),
   resolve: async (_, args, ctx) => {
-    await ctx.userGroups.addUsersToGroup(
-      args.userGroupId,
-      args.userIds,
-      `User:${ctx.user!.id}`
-    );
+    await ctx.userGroups.addUsersToGroup(args.userGroupId, args.userIds, `User:${ctx.user!.id}`);
     return (await ctx.userGroups.loadUserGroup(args.userGroupId))!;
   },
 });
@@ -158,14 +137,9 @@ export const cloneUserGroup = mutationField("cloneUserGroup", {
     userGroupIds: nonNull(list(nonNull(globalIdArg("UserGroup")))),
     locale: stringArg(),
   },
-  authorize: authenticateAnd(
-    contextUserIsAdmin(),
-    userHasAccessToUserGroups("userGroupIds")
-  ),
+  authorize: authenticateAnd(contextUserIsAdmin(), userHasAccessToUserGroups("userGroupIds")),
   resolve: async (_, args, ctx) => {
-    const groups = (await ctx.userGroups.loadUserGroup(
-      args.userGroupIds
-    )) as UserGroup[];
+    const groups = (await ctx.userGroups.loadUserGroup(args.userGroupIds)) as UserGroup[];
 
     return await pMap(groups, (group) =>
       ctx.userGroups.cloneUserGroup(

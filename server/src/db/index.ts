@@ -31,9 +31,7 @@ export const dbModule = new ContainerModule((bind) => {
   bind<ReportingRepository>(ReportingRepository).toSelf();
   bind<UserAuthenticationRepository>(UserAuthenticationRepository).toSelf();
   bind<UserGroupRepository>(UserGroupRepository).toSelf();
-  bind<PetitionEventSubscriptionRepository>(
-    PetitionEventSubscriptionRepository
-  ).toSelf();
+  bind<PetitionEventSubscriptionRepository>(PetitionEventSubscriptionRepository).toSelf();
   bind<TagRepository>(TagRepository).toSelf();
   bind<SystemRepository>(SystemRepository).toSelf();
 });

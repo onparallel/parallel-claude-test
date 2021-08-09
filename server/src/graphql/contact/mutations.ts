@@ -46,10 +46,7 @@ export const createContact = mutationField("createContact", {
       );
     } catch (error) {
       if (error?.constraint === "contact__org_id__email") {
-        throw new WhitelistedError(
-          "Contact already exists.",
-          "EXISTING_CONTACT"
-        );
+        throw new WhitelistedError("Contact already exists.", "EXISTING_CONTACT");
       } else {
         throw new Error("INTERNAL_ERROR");
       }
@@ -95,18 +92,14 @@ export const deleteContacts = mutationField("deleteContacts", {
     ids: nonNull(list(nonNull(globalIdArg("Contact")))),
   },
   resolve: async (_, args, ctx) => {
-    throw new WhitelistedError(
-      "Contact deletion is disabled.",
-      "DELETE_CONTACT_ERROR"
-    );
+    throw new WhitelistedError("Contact deletion is disabled.", "DELETE_CONTACT_ERROR");
     // await ctx.contacts.deleteContactById(args.ids, ctx.user!);
     // return RESULT.SUCCESS;
   },
 });
 
 export const bulkCreateContacts = mutationField("bulkCreateContacts", {
-  description:
-    "Load contacts from an excel file, creating the ones not found on database",
+  description: "Load contacts from an excel file, creating the ones not found on database",
   type: list("Contact"),
   authorize: authenticate(),
   args: {
@@ -115,8 +108,7 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
   validateArgs: validateFile(
     (args) => args.file,
     {
-      contentType:
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       maxSize: 1024 * 1024 * 10,
     },
     "file"
@@ -124,24 +116,17 @@ export const bulkCreateContacts = mutationField("bulkCreateContacts", {
   resolve: async (_, args, ctx) => {
     const file = await args.file;
 
-    const [importError, importResult] = await withError(
-      importFromExcel(file.createReadStream())
-    );
+    const [importError, importResult] = await withError(importFromExcel(file.createReadStream()));
     if (importError) {
       throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
     }
-    const [parseError, parsedContacts] = await withError(() =>
-      parseContactList(importResult!)
-    );
+    const [parseError, parsedContacts] = await withError(() => parseContactList(importResult!));
     if (parseError) {
       throw new WhitelistedError(parseError.message, "INVALID_FORMAT_ERROR");
     }
 
     if (!parsedContacts || parsedContacts.length === 0) {
-      throw new WhitelistedError(
-        "No contacts found on file",
-        "NO_CONTACTS_FOUND_ERROR"
-      );
+      throw new WhitelistedError("No contacts found on file", "NO_CONTACTS_FOUND_ERROR");
     }
 
     const contacts = (

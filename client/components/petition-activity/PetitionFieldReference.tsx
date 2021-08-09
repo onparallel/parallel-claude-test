@@ -12,28 +12,17 @@ export function PetitionFieldReference({
 }) {
   return field ? (
     field.title ? (
-      <OverflownText
-        as="strong"
-        display="inline-block"
-        maxWidth="30rem"
-        verticalAlign="bottom"
-      >
+      <OverflownText as="strong" display="inline-block" maxWidth="30rem" verticalAlign="bottom">
         {field.title}
       </OverflownText>
     ) : (
       <Text as="span" textStyle="hint">
-        <FormattedMessage
-          id="generic.untitled-field"
-          defaultMessage="Untitled field"
-        />
+        <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
       </Text>
     )
   ) : (
     <Text as="span" textStyle="hint">
-      <FormattedMessage
-        id="generic.deleted-field"
-        defaultMessage="Deleted field"
-      />
+      <FormattedMessage id="generic.deleted-field" defaultMessage="Deleted field" />
     </Text>
   );
 }

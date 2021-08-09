@@ -55,13 +55,10 @@ export function useFilenamePlaceholdersRename() {
           seen.clear();
         }
         const index = indices[fields.findIndex((f) => f.id === field.id)];
-        const extension =
-          (reply.content.filename as string).match(/\.[a-z0-9]+$/)?.[0] ?? "";
+        const extension = (reply.content.filename as string).match(/\.[a-z0-9]+$/)?.[0] ?? "";
         const parts = pattern.split(
           new RegExp(
-            `(#(?:${placeholders
-              .map((p) => escapeStringRegexp(p.value))
-              .join("|")})#)`,
+            `(#(?:${placeholders.map((p) => escapeStringRegexp(p.value)).join("|")})#)`,
             "g"
           )
         );

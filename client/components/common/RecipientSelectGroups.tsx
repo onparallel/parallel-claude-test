@@ -37,9 +37,7 @@ interface RecipientSelectGroupsProps {
   showErrors?: boolean;
   recipientGroups: ContactSelectSelection[][];
   onChangeRecipientGroups: (groups: ContactSelectSelection[][]) => void;
-  onSearchContactsByEmail: (
-    emails: string[]
-  ) => Promise<(ContactSelectSelection | null)[]>;
+  onSearchContactsByEmail: (emails: string[]) => Promise<(ContactSelectSelection | null)[]>;
   onSearchContacts: ContactSelectProps["onSearchContacts"];
   onCreateContact: ContactSelectProps["onCreateContact"];
   canAddRecipientGroups?: boolean;
@@ -94,9 +92,7 @@ export function RecipientSelectGroups({
                   id="component.recipient-select-groups.unknown-contacts-message-2"
                   defaultMessage="You can import them via Excel on the <a>contacts page</a>. You can also add them here by entering their emails one by one."
                   values={{
-                    a: (chunks: any[]) => (
-                      <Link href="/app/contacts">{chunks}</Link>
-                    ),
+                    a: (chunks: any[]) => <Link href="/app/contacts">{chunks}</Link>,
                   }}
                 />
               </Text>
@@ -110,29 +106,20 @@ export function RecipientSelectGroups({
     if (result === "SEPARATE_GROUPS") {
       onChangeRecipientGroups([
         ...recipientGroups.slice(0, groupNumber),
-        ...recipientGroups
-          .slice(groupNumber, groupNumber + contacts.length)
-          .map((group, index) => {
-            const contact = contacts[index]!;
-            return group.some((c) => c.id === contact.id)
-              ? group
-              : [...group, contact];
-          }),
+        ...recipientGroups.slice(groupNumber, groupNumber + contacts.length).map((group, index) => {
+          const contact = contacts[index]!;
+          return group.some((c) => c.id === contact.id) ? group : [...group, contact];
+        }),
         ...(recipientGroups.length > groupNumber + contacts.length
           ? recipientGroups.slice(groupNumber + contacts.length)
-          : contacts
-              .slice(recipientGroups.length - groupNumber)
-              .map((contact) => [contact!])),
+          : contacts.slice(recipientGroups.length - groupNumber).map((contact) => [contact!])),
       ]);
       focusRecipientGroup(groupNumber + contacts.length - 1);
     } else if (result === "SAME_GROUP") {
       onChangeRecipientGroups(
         recipientGroups.map((group, index) =>
           index === groupNumber
-            ? uniqBy(
-                [...group, ...(contacts as ContactSelectSelection[])],
-                (c) => c.id
-              )
+            ? uniqBy([...group, ...(contacts as ContactSelectSelection[])], (c) => c.id)
             : group
         )
       );
@@ -169,10 +156,7 @@ export function RecipientSelectGroups({
     });
   }
 
-  async function handleCreateContact(
-    groupNumber: number,
-    data: { defaultEmail?: string }
-  ) {
+  async function handleCreateContact(groupNumber: number, data: { defaultEmail?: string }) {
     const contact = await onCreateContact(data);
     setTimeout(() => recipientGroupSelectRef[groupNumber].current?.focus());
     return contact;
@@ -197,8 +181,7 @@ export function RecipientSelectGroups({
             id={`petition-recipients-${index}`}
             ref={recipientGroupFormControlRef[index]}
             isInvalid={
-              showErrors &&
-              (recipients.length === 0 || invalidRecipients(index).length > 0)
+              showErrors && (recipients.length === 0 || invalidRecipients(index).length > 0)
             }
           >
             <FormLabel display="flex" alignItems="center">
@@ -227,9 +210,7 @@ export function RecipientSelectGroups({
                   })}
                   value={recipients}
                   onChange={handleRecipientsChange(index)}
-                  onCreateContact={async (data: any) =>
-                    await handleCreateContact(index, data)
-                  }
+                  onCreateContact={async (data: any) => await handleCreateContact(index, data)}
                   onSearchContacts={onSearchContacts}
                   onPasteEmails={
                     canAddRecipientGroups
@@ -323,11 +304,8 @@ export function RecipientSelectGroups({
 
 type MultipleEmailsPastedAction = "SAME_GROUP" | "SEPARATE_GROUPS";
 
-function MultipleEmailsPastedDialog(
-  props: DialogProps<{}, MultipleEmailsPastedAction>
-) {
-  const [action, setAction] =
-    useState<MultipleEmailsPastedAction>("SEPARATE_GROUPS");
+function MultipleEmailsPastedDialog(props: DialogProps<{}, MultipleEmailsPastedAction>) {
+  const [action, setAction] = useState<MultipleEmailsPastedAction>("SEPARATE_GROUPS");
   const initialFocusRef = useRef<HTMLElement>(null);
   return (
     <ConfirmDialog

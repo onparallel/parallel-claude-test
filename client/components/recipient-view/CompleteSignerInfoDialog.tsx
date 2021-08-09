@@ -36,10 +36,7 @@ type CompleteSignerInfoDialogData = {
   message: string | null;
 };
 
-const messages: Record<
-  PetitionLocale,
-  (organization: string, contactName: string) => string
-> = {
+const messages: Record<PetitionLocale, (organization: string, contactName: string) => string> = {
   en: (organization, contactName) => outdent`
   Hello,
 
@@ -81,10 +78,7 @@ function CompleteSignerInfoDialog({
   } = useForm<CompleteSignerInfoDialogData>({
     mode: "onChange",
     defaultValues: {
-      message: messages[intl.locale as PetitionLocale](
-        organization,
-        contact.firstName ?? ""
-      ),
+      message: messages[intl.locale as PetitionLocale](organization, contact.firstName ?? ""),
     },
     shouldFocusError: true,
   });
@@ -99,12 +93,9 @@ function CompleteSignerInfoDialog({
     }
   }, [signer, showMessage]);
 
-  const messageRegisterProps = useRegisterWithRef(
-    messageRef,
-    register,
-    "message",
-    { required: signer === "other" && showMessage }
-  );
+  const messageRegisterProps = useRegisterWithRef(messageRef, register, "message", {
+    required: signer === "other" && showMessage,
+  });
 
   const emailRef = useRef<HTMLInputElement>(null);
   const emailRegisterProps = useRegisterWithRef(emailRef, register, "email", {
@@ -201,15 +192,9 @@ function CompleteSignerInfoDialog({
 
           <PaddedCollapse in={signer === "other"}>
             <Stack>
-              <FormControl
-                id="contact-email"
-                isInvalid={signer === "other" && !!errors.email}
-              >
+              <FormControl id="contact-email" isInvalid={signer === "other" && !!errors.email}>
                 <FormLabel>
-                  <FormattedMessage
-                    id="generic.forms.email-label"
-                    defaultMessage="Email"
-                  />
+                  <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
                 </FormLabel>
                 <Input
                   {...emailRegisterProps}
@@ -227,19 +212,14 @@ function CompleteSignerInfoDialog({
                 </FormErrorMessage>
               </FormControl>
               <Stack direction={{ base: "column", sm: "row" }}>
-                <FormControl
-                  id="contact-first-name"
-                  isInvalid={!!errors.firstName}
-                >
+                <FormControl id="contact-first-name" isInvalid={!!errors.firstName}>
                   <FormLabel>
                     <FormattedMessage
                       id="generic.forms.first-name-label"
                       defaultMessage="First name"
                     />
                   </FormLabel>
-                  <Input
-                    {...register("firstName", { required: signer === "other" })}
-                  />
+                  <Input {...register("firstName", { required: signer === "other" })} />
                   <FormErrorMessage>
                     <FormattedMessage
                       id="generic.forms.invalid-contact-first-name-error"
@@ -247,19 +227,14 @@ function CompleteSignerInfoDialog({
                     />
                   </FormErrorMessage>
                 </FormControl>
-                <FormControl
-                  id="contact-last-name"
-                  isInvalid={!!errors.lastName}
-                >
+                <FormControl id="contact-last-name" isInvalid={!!errors.lastName}>
                   <FormLabel>
                     <FormattedMessage
                       id="generic.forms.last-name-label"
                       defaultMessage="Last name"
                     />
                   </FormLabel>
-                  <Input
-                    {...register("lastName", { required: signer === "other" })}
-                  />
+                  <Input {...register("lastName", { required: signer === "other" })} />
                   <FormErrorMessage>
                     <FormattedMessage
                       id="generic.forms.invalid-contact-last-name-error"
@@ -275,10 +250,7 @@ function CompleteSignerInfoDialog({
                   isChecked={showMessage}
                   onChange={(e) => setShowMessage(e.target.checked)}
                 >
-                  <FormattedMessage
-                    id="generic.add-message"
-                    defaultMessage="Add message"
-                  />
+                  <FormattedMessage id="generic.add-message" defaultMessage="Add message" />
                 </Checkbox>
               </FormControl>
               <PaddedCollapse in={showMessage}>

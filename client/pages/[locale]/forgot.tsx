@@ -3,10 +3,7 @@ import {
   ForgotPasswordData,
   ForgotPasswordForm,
 } from "@parallel/components/auth/ForgotPasswordForm";
-import {
-  PasswordResetData,
-  PasswordResetForm,
-} from "@parallel/components/auth/PasswordResetForm";
+import { PasswordResetData, PasswordResetForm } from "@parallel/components/auth/PasswordResetForm";
 import { NormalLink } from "@parallel/components/common/Link";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { PublicUserFormContainer } from "@parallel/components/public/PublicUserContainer";
@@ -43,8 +40,7 @@ function Forgot() {
         }),
         description: intl.formatMessage({
           id: "public.forgot-password.toast-description",
-          defaultMessage:
-            "An email is on its way to you with a verification code.",
+          defaultMessage: "An email is on its way to you with a verification code.",
         }),
         status: "success",
         isClosable: true,
@@ -60,10 +56,7 @@ function Forgot() {
     setIsSubmitting(false);
   }
 
-  async function handlePasswordResetSubmit({
-    verificationCode,
-    password,
-  }: PasswordResetData) {
+  async function handlePasswordResetSubmit({ verificationCode, password }: PasswordResetData) {
     setIsSubmitting(true);
     setVerification({
       ...verification,
@@ -111,10 +104,7 @@ function Forgot() {
           <PasswordResetForm
             onSubmit={handlePasswordResetSubmit}
             backLink={
-              <NormalLink
-                role="button"
-                onClick={() => setVerification({ sent: false })}
-              >
+              <NormalLink role="button" onClick={() => setVerification({ sent: false })}>
                 <FormattedMessage
                   id="public.login.back-to-forgot-link"
                   defaultMessage="Go back to forgot password"

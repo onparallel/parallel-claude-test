@@ -1,9 +1,6 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
 function ConfirmRestartSignatureRequestDialog(props: DialogProps) {

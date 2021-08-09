@@ -3,18 +3,13 @@ import { default as nodeFetch } from "node-fetch";
 import { RedocStandalone } from "redoc";
 import Head from "next/head";
 
-function DeveloperApi({
-  spec,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function DeveloperApi({ spec }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <>
       <Head>
         <title>Parallel API | Parallel for developers</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta
-          name="description"
-          content="Integrate Parallel into your workflow"
-        />
+        <meta name="description" content="Integrate Parallel into your workflow" />
         <link rel="stylesheet" href="/static/styles/api.css" />
       </Head>
       <RedocStandalone

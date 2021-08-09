@@ -32,9 +32,7 @@ export const PetitionFieldComment = objectType({
           const user = await ctx.users.loadUser(root.user_id);
           return user && { __type: "User", ...user };
         } else if (root.petition_access_id !== null) {
-          const access = await ctx.petitions.loadAccess(
-            root.petition_access_id
-          );
+          const access = await ctx.petitions.loadAccess(root.petition_access_id);
           return access && { __type: "PetitionAccess", ...access };
         }
         throw new Error(`Both "user_id" and "petition_access_id" are null`);

@@ -16,20 +16,19 @@ export interface PetitionFieldTypeIconProps extends IconProps {
   type: PetitionFieldType;
 }
 
-export const PetitionFieldTypeIcon = chakraForwardRef<
-  "svg",
-  PetitionFieldTypeIconProps
->(function PetitionFieldTypeIcon({ type, ...props }, ref) {
-  const icon = (
-    {
-      FILE_UPLOAD: FieldFileUploadIcon,
-      SHORT_TEXT: FieldShortTextIcon,
-      TEXT: FieldTextIcon,
-      HEADING: FieldHeadingIcon,
-      SELECT: FieldSelectIcon,
-      DYNAMIC_SELECT: FieldDynamicSelectIcon,
-      CHECKBOX: FieldCheckboxIcon,
-    } as Record<PetitionFieldType, ElementType>
-  )[type];
-  return <Icon as={icon} {...props} ref={ref} />;
-});
+export const PetitionFieldTypeIcon = chakraForwardRef<"svg", PetitionFieldTypeIconProps>(
+  function PetitionFieldTypeIcon({ type, ...props }, ref) {
+    const icon = (
+      {
+        FILE_UPLOAD: FieldFileUploadIcon,
+        SHORT_TEXT: FieldShortTextIcon,
+        TEXT: FieldTextIcon,
+        HEADING: FieldHeadingIcon,
+        SELECT: FieldSelectIcon,
+        DYNAMIC_SELECT: FieldDynamicSelectIcon,
+        CHECKBOX: FieldCheckboxIcon,
+      } as Record<PetitionFieldType, ElementType>
+    )[type];
+    return <Icon as={icon} {...props} ref={ref} />;
+  }
+);

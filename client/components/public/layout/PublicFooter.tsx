@@ -68,18 +68,12 @@ export function PublicFooter(props: BoxProps) {
           <List>
             <ListItem>
               <Link href="/security">
-                <FormattedMessage
-                  id="public.security-link"
-                  defaultMessage="Security"
-                />
+                <FormattedMessage id="public.security-link" defaultMessage="Security" />
               </Link>
             </ListItem>
             <ListItem>
               <Link href="/developers/api" omitLocale>
-                <FormattedMessage
-                  id="public.api-docs-link"
-                  defaultMessage="API Documentation"
-                />
+                <FormattedMessage id="public.api-docs-link" defaultMessage="API Documentation" />
               </Link>
             </ListItem>
           </List>
@@ -103,10 +97,7 @@ export function PublicFooter(props: BoxProps) {
               <NormalLink
                 href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
               >
-                <FormattedMessage
-                  id="public.support.faq"
-                  defaultMessage="FAQ"
-                />
+                <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />
               </NormalLink>
             </ListItem>
           </List>
@@ -120,18 +111,12 @@ export function PublicFooter(props: BoxProps) {
           <List>
             <ListItem>
               <Link href="/about">
-                <FormattedMessage
-                  id="public.about-link"
-                  defaultMessage="About"
-                />
+                <FormattedMessage id="public.about-link" defaultMessage="About" />
               </Link>
             </ListItem>
             <ListItem>
               <Link href="/careers">
-                <FormattedMessage
-                  id="public.careers"
-                  defaultMessage="Careers"
-                />
+                <FormattedMessage id="public.careers" defaultMessage="Careers" />
               </Link>
             </ListItem>
             <ListItem>
@@ -141,10 +126,7 @@ export function PublicFooter(props: BoxProps) {
             </ListItem>
             <ListItem>
               <NormalLink href="mailto:hello@onparallel.com">
-                <FormattedMessage
-                  id="public.contact-link"
-                  defaultMessage="Contact"
-                />
+                <FormattedMessage id="public.contact-link" defaultMessage="Contact" />
               </NormalLink>
             </ListItem>
           </List>
@@ -158,26 +140,17 @@ export function PublicFooter(props: BoxProps) {
           <List>
             <ListItem>
               <Link href="/legal/terms">
-                <FormattedMessage
-                  id="public.terms.title"
-                  defaultMessage="Terms & Conditions"
-                />
+                <FormattedMessage id="public.terms.title" defaultMessage="Terms & Conditions" />
               </Link>
             </ListItem>
             <ListItem>
               <Link href="/legal/privacy">
-                <FormattedMessage
-                  id="public.privacy.title"
-                  defaultMessage="Privacy policy"
-                />
+                <FormattedMessage id="public.privacy.title" defaultMessage="Privacy policy" />
               </Link>
             </ListItem>
             <ListItem>
               <Link href="/legal/cookies">
-                <FormattedMessage
-                  id="public.cookies.title"
-                  defaultMessage="Cookie policy"
-                />
+                <FormattedMessage id="public.cookies.title" defaultMessage="Cookie policy" />
               </Link>
             </ListItem>
           </List>
@@ -209,12 +182,7 @@ export function PublicFooter(props: BoxProps) {
           </Box>
           <Spacer display={{ base: "none", md: "block" }} />
         </Flex>
-        <Stack
-          direction="row"
-          alignSelf="top"
-          alignItems="center"
-          justifyContent="space-around"
-        >
+        <Stack direction="row" alignSelf="top" alignItems="center" justifyContent="space-around">
           <NormalLink href="https://acelera.cuatrecasas.com" isExternal>
             <Image
               alt="Cuatrecasas Acelera"

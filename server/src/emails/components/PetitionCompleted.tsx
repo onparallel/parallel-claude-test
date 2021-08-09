@@ -6,10 +6,7 @@ import { Button } from "../common/Button";
 import { Closing } from "../common/Closing";
 import { Greeting } from "../common/Greeting";
 import { Layout, LayoutProps } from "../common/Layout";
-import {
-  PetitionFieldList,
-  PetitionFieldListProps,
-} from "../common/PetitionFieldList";
+import { PetitionFieldList, PetitionFieldListProps } from "../common/PetitionFieldList";
 import { closing, greeting, petitionFieldList } from "../common/texts";
 
 export type PetitionCompletedProps = {
@@ -92,12 +89,7 @@ const email: Email<PetitionCompletedProps> = {
   }: PetitionCompletedProps) {
     const { locale } = useIntl();
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection>
           <MjmlColumn>
             <Greeting name={name} />
@@ -118,9 +110,7 @@ const email: Email<PetitionCompletedProps> = {
             )}
             <MjmlText fontSize="16px">
               {petitionName ? (
-                <span style={{ textDecoration: "underline" }}>
-                  {petitionName}
-                </span>
+                <span style={{ textDecoration: "underline" }}>{petitionName}</span>
               ) : (
                 <span style={{ color: "#A0AEC0", fontStyle: "italic" }}>
                   <FormattedMessage

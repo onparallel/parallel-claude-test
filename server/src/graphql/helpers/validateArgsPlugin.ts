@@ -17,10 +17,7 @@ const fieldDefTypes = core.printedGenTyping({
   ],
 });
 
-export type FieldValidateArgsResolver<
-  TypeName extends string,
-  FieldName extends string
-> = (
+export type FieldValidateArgsResolver<TypeName extends string, FieldName extends string> = (
   root: core.RootValue<TypeName>,
   args: core.ArgsValue<TypeName, FieldName>,
   context: core.GetGen<"context">,
@@ -32,12 +29,10 @@ export type ValidateArgsPluginConfig = {};
 export const validateArgsPlugin = () => {
   return plugin({
     name: "NexusValidateArgs",
-    description:
-      "The authorize plugin provides field-level authorization for a schema.",
+    description: "The authorize plugin provides field-level authorization for a schema.",
     fieldDefTypes: fieldDefTypes,
     onCreateFieldResolver(config) {
-      const validateArgs =
-        config.fieldConfig.extensions?.nexus?.config.validateArgs;
+      const validateArgs = config.fieldConfig.extensions?.nexus?.config.validateArgs;
       if (typeof validateArgs === "function") {
         // The validateArgs wrapping resolver.
         return async function (root, args, ctx, info, next) {

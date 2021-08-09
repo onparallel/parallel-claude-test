@@ -16,10 +16,7 @@ export const accessQuery = queryField("access", {
 
 export const commentsQuery = queryField("petitionFieldComments", {
   type: list(nonNull("PublicPetitionFieldComment")),
-  authorize: chain(
-    authenticatePublicAccess("keycode"),
-    fieldBelongsToAccess("petitionFieldId")
-  ),
+  authorize: chain(authenticatePublicAccess("keycode"), fieldBelongsToAccess("petitionFieldId")),
   args: {
     keycode: nonNull(idArg()),
     petitionFieldId: nonNull(globalIdArg("PetitionField")),

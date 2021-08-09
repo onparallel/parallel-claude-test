@@ -39,42 +39,35 @@ type EmailSenderWorkerPayload = {
   };
 }[EmailType];
 
-createQueueWorker(
-  "email-sender",
-  async (payload: EmailSenderWorkerPayload, context) => {
-    const builder = builders[payload.type];
-    const emails = await builder(payload.payload as any, context);
-    for (const email of unMaybeArray(emails)) {
-      if (email) {
-        const attachments = await context.emailLogs.getEmailAttachments(
-          email.id
-        );
-        const result = await context.smtp.sendEmail({
-          from: email.from,
-          to: email.to,
-          subject: email.subject,
-          html: email.html,
-          text: email.text,
-          replyTo: email.reply_to ?? undefined,
-          headers: {
-            "X-SES-CONFIGURATION-SET":
-              context.config.ses.configurationSet[
-                email.track_opens ? "tracking" : "noTracking"
-              ],
-          },
-          attachments: attachments.map((attachment) => ({
-            filename: attachment.filename,
-            contentType: attachment.content_type,
-            content: context.aws.temporaryFiles.downloadFile(attachment.path),
-          })),
-        });
-        await context.emailLogs.updateWithResponse(email.id, {
-          response: JSON.stringify(result),
-          external_id: result.response.startsWith("250 Ok")
-            ? result.response.replace(/^250 Ok /, "")
-            : null,
-        });
-      }
+createQueueWorker("email-sender", async (payload: EmailSenderWorkerPayload, context) => {
+  const builder = builders[payload.type];
+  const emails = await builder(payload.payload as any, context);
+  for (const email of unMaybeArray(emails)) {
+    if (email) {
+      const attachments = await context.emailLogs.getEmailAttachments(email.id);
+      const result = await context.smtp.sendEmail({
+        from: email.from,
+        to: email.to,
+        subject: email.subject,
+        html: email.html,
+        text: email.text,
+        replyTo: email.reply_to ?? undefined,
+        headers: {
+          "X-SES-CONFIGURATION-SET":
+            context.config.ses.configurationSet[email.track_opens ? "tracking" : "noTracking"],
+        },
+        attachments: attachments.map((attachment) => ({
+          filename: attachment.filename,
+          contentType: attachment.content_type,
+          content: context.aws.temporaryFiles.downloadFile(attachment.path),
+        })),
+      });
+      await context.emailLogs.updateWithResponse(email.id, {
+        response: JSON.stringify(result),
+        external_id: result.response.startsWith("250 Ok")
+          ? result.response.replace(/^250 Ok /, "")
+          : null,
+      });
     }
   }
-);
+});

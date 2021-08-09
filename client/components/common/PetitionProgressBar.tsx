@@ -1,13 +1,4 @@
-import {
-  Box,
-  BoxProps,
-  ChakraProps,
-  Flex,
-  FlexProps,
-  Square,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, BoxProps, ChakraProps, Flex, FlexProps, Square, Stack, Text } from "@chakra-ui/react";
 import { CheckIcon, QuestionIcon } from "@parallel/chakra/icons";
 import { PetitionProgress, PetitionStatus } from "@parallel/graphql/__types";
 import { generateCssStripe } from "@parallel/utils/css";
@@ -144,18 +135,8 @@ export function PetitionProgressBar({
                 backgroundColor="green.400"
                 {...STYLES["VALIDATED"]}
               />
-              <ProgressIndicator
-                min={0}
-                max={total!}
-                value={replied!}
-                {...STYLES["REPLIED"]}
-              />
-              <ProgressIndicator
-                min={0}
-                max={total!}
-                value={optional!}
-                {...STYLES["OPTIONAL"]}
-              />
+              <ProgressIndicator min={0} max={total!} value={replied!} {...STYLES["REPLIED"]} />
+              <ProgressIndicator min={0} max={total!} value={optional!} {...STYLES["OPTIONAL"]} />
             </>
           ) : null}
         </ProgressTrack>
@@ -164,11 +145,7 @@ export function PetitionProgressBar({
   );
 }
 
-function ProgressText({
-  children,
-  type,
-  ...props
-}: FlexProps & { type: keyof typeof STYLES }) {
+function ProgressText({ children, type, ...props }: FlexProps & { type: keyof typeof STYLES }) {
   return (
     <Flex {...props} alignItems="baseline">
       <Square

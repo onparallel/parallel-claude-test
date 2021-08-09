@@ -101,9 +101,7 @@ function Consultancy() {
   const solutions = [
     {
       image: (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_smart_forms.svg`}
-        />
+        <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_smart_forms.svg`} />
       ),
       header: (
         <FormattedMessage
@@ -120,9 +118,7 @@ function Consultancy() {
     },
     {
       image: (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_reminders.svg`}
-        />
+        <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_reminders.svg`} />
       ),
       header: (
         <FormattedMessage
@@ -139,9 +135,7 @@ function Consultancy() {
     },
     {
       image: (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_mailing.svg`}
-        />
+        <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_mailing.svg`} />
       ),
       header: (
         <FormattedMessage
@@ -168,26 +162,13 @@ function Consultancy() {
       <PublicHero {...hero} />
       <SolutionsTrust logos={logos} />
       <SolutionsBenefits image={benefitsImage} benefits={benefits} />
-      <PublicContainer
-        paddingY={8}
-        maxWidth="container.xl"
-        wrapper={{ paddingY: 16 }}
-      >
+      <PublicContainer paddingY={8} maxWidth="container.xl" wrapper={{ paddingY: 16 }}>
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/solutions/consultancy_usecase_${query.locale}.svg`}
           imageSize="330px"
         >
-          <Heading
-            as="h4"
-            size="xs"
-            lineHeight="24px"
-            color="gray.600"
-            textTransform="uppercase"
-          >
-            <FormattedMessage
-              id="public.law-firms.use-case"
-              defaultMessage="Use case"
-            />
+          <Heading as="h4" size="xs" lineHeight="24px" color="gray.600" textTransform="uppercase">
+            <FormattedMessage id="public.law-firms.use-case" defaultMessage="Use case" />
           </Heading>
           <Heading
             as="h3"

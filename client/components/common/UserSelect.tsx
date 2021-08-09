@@ -9,10 +9,7 @@ import {
   useSearchUsers_searchUsersQuery,
   useSearchUsers_searchUsersQueryVariables,
 } from "@parallel/graphql/__types";
-import {
-  useReactSelectProps,
-  UseReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
+import { useReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { If, MaybeArray, unMaybeArray } from "@parallel/utils/types";
 import { useAsyncMemo } from "@parallel/utils/useAsyncMemo";
 import {
@@ -66,10 +63,8 @@ const fragments = {
   },
 };
 
-interface UserSelectProps<
-  IsMulti extends boolean = false,
-  IncludeGroups extends boolean = false
-> extends UseReactSelectProps,
+interface UserSelectProps<IsMulti extends boolean = false, IncludeGroups extends boolean = false>
+  extends UseReactSelectProps,
     Omit<
       AsyncSelectProps<UserSelectSelection<IncludeGroups>, IsMulti, never>,
       "value" | "onChange" | "options"
@@ -100,18 +95,11 @@ export const UserSelect = Object.assign(
     IsMulti extends boolean = false,
     IncludeGroups extends boolean = false
   >(
-    {
-      value,
-      onSearch,
-      onChange,
-      isMulti,
-      ...props
-    }: UserSelectProps<IsMulti, IncludeGroups>,
+    { value, onSearch, onChange, isMulti, ...props }: UserSelectProps<IsMulti, IncludeGroups>,
     ref: ForwardedRef<UserSelectInstance<IsMulti, IncludeGroups>>
   ) {
     const needsLoading =
-      typeof value === "string" ||
-      (Array.isArray(value) && typeof value[0] === "string");
+      typeof value === "string" || (Array.isArray(value) && typeof value[0] === "string");
     const getUsersOrGroups = useGetUsersOrGroups();
     const _value = useAsyncMemo(async () => {
       if (value === null) {
@@ -120,33 +108,21 @@ export const UserSelect = Object.assign(
       if (needsLoading) {
         return await getUsersOrGroups(value as any);
       }
-    }, [
-      needsLoading,
-      needsLoading ? unMaybeArray(value as any).join(",") : null,
-    ]);
+    }, [needsLoading, needsLoading ? unMaybeArray(value as any).join(",") : null]);
 
     const loadOptions = useCallback(
       async (search) => {
-        const items = unMaybeArray(
-          _value ?? []
-        ) as UserSelectSelection<IncludeGroups>[];
+        const items = unMaybeArray(_value ?? []) as UserSelectSelection<IncludeGroups>[];
         return await onSearch(
           search,
-          items
-            .filter((item) => item.__typename === "User")
-            .map((item) => item.id),
-          items
-            .filter((item) => item.__typename === "UserGroup")
-            .map((item) => item.id)
+          items.filter((item) => item.__typename === "User").map((item) => item.id),
+          items.filter((item) => item.__typename === "UserGroup").map((item) => item.id)
         );
       },
       [onSearch, _value]
     );
 
-    const reactSelectProps = useUserSelectReactSelectProps<
-      IsMulti,
-      IncludeGroups
-    >(props);
+    const reactSelectProps = useUserSelectReactSelectProps<IsMulti, IncludeGroups>(props);
 
     return (
       <AsyncSelect<UserSelectSelection<IncludeGroups>, IsMulti, never>
@@ -158,10 +134,7 @@ export const UserSelect = Object.assign(
         {...reactSelectProps}
       />
     );
-  }) as <
-    IsMulti extends boolean = false,
-    IncludeGroups extends boolean = false
-  >(
+  }) as <IsMulti extends boolean = false, IncludeGroups extends boolean = false>(
     props: UserSelectProps<IsMulti, IncludeGroups> &
       RefAttributes<UserSelectInstance<IsMulti, IncludeGroups>>
   ) => ReactElement | null,
@@ -173,19 +146,13 @@ type AsyncUserSelectProps<
   IncludeGroups extends boolean
 > = AsyncSelectProps<UserSelectSelection<IncludeGroups>, IsMulti, never>;
 
-function useUserSelectReactSelectProps<
-  IsMulti extends boolean,
-  IncludeGroups extends boolean
->({
+function useUserSelectReactSelectProps<IsMulti extends boolean, IncludeGroups extends boolean>({
   includeGroups,
   ...props
 }: UseReactSelectProps & {
   includeGroups?: IncludeGroups;
 }): AsyncUserSelectProps<IsMulti, IncludeGroups> {
-  const reactSelectProps = useReactSelectProps<
-    UserSelectSelection<IncludeGroups>,
-    IsMulti
-  >(props);
+  const reactSelectProps = useReactSelectProps<UserSelectSelection<IncludeGroups>, IsMulti>(props);
   return useMemo<AsyncUserSelectProps<IsMulti, IncludeGroups>>(
     () => ({
       ...reactSelectProps,
@@ -214,9 +181,7 @@ function useUserSelectReactSelectProps<
                       defaultMessage="Contact us via email on <a>support@onparallel.com</a> or the support chat and we will create them an account"
                       values={{
                         a: (chunks: any[]) => (
-                          <NormalLink href={`mailto:${chunks[0]}`}>
-                            {chunks}
-                          </NormalLink>
+                          <NormalLink href={`mailto:${chunks[0]}`}>{chunks}</NormalLink>
                         ),
                       }}
                     />
@@ -247,9 +212,7 @@ function useUserSelectReactSelectProps<
             <components.SingleValue {...props}>
               {data.__typename === "User" ? (
                 <Text as="span">
-                  {data.fullName
-                    ? `${data.fullName} <${data.email}>`
-                    : data.email}
+                  {data.fullName ? `${data.fullName} <${data.email}>` : data.email}
                 </Text>
               ) : data.__typename === "UserGroup" ? (
                 <>
@@ -281,14 +244,10 @@ function useUserSelectReactSelectProps<
             <components.MultiValueLabel {...(props as any)}>
               {data.__typename === "User" ? (
                 <Text as="span">
-                  {data.fullName
-                    ? `${data.fullName} <${data.email}>`
-                    : data.email}
+                  {data.fullName ? `${data.fullName} <${data.email}>` : data.email}
                 </Text>
               ) : data.__typename === "UserGroup" ? (
-                <UserListPopover
-                  usersOrGroups={data.members.map((m) => m.user)}
-                >
+                <UserListPopover usersOrGroups={data.members.map((m) => m.user)}>
                   <Box>
                     <UsersIcon
                       marginRight={1}
@@ -354,9 +313,7 @@ function useUserSelectReactSelectProps<
       },
       getOptionLabel: (option) => {
         if (option.__typename === "User") {
-          return option.fullName
-            ? `${option.fullName} <${option.email}>`
-            : option.email;
+          return option.fullName ? `${option.fullName} <${option.email}>` : option.email;
         } else if (option.__typename === "UserGroup") {
           return option.name;
         } else if ((option as any).__isNew__) {
@@ -381,12 +338,7 @@ export function useSearchUsers() {
         includeInactive?: boolean;
       } = {}
     ): Promise<UserSelectSelection<IncludeGroups>[]> => {
-      const {
-        excludeUsers,
-        excludeUserGroups,
-        includeGroups,
-        includeInactive,
-      } = options;
+      const { excludeUsers, excludeUserGroups, includeGroups, includeInactive } = options;
       const { data } = await client.query<
         useSearchUsers_searchUsersQuery,
         useSearchUsers_searchUsersQueryVariables
@@ -457,9 +409,7 @@ function useGetUsersOrGroups() {
         return null;
       })
     );
-    const missing = fromCache
-      .filter(([, value]) => value === null)
-      .map(([id]) => id);
+    const missing = fromCache.filter(([, value]) => value === null).map(([id]) => id);
     if (missing.length) {
       const fromServer = await client.query<
         useGetUsersOrGroupsQuery,
@@ -484,13 +434,8 @@ function useGetUsersOrGroups() {
         },
         fetchPolicy: "network-only",
       });
-      const fromServerById = indexBy(
-        fromServer.data.getUsersOrGroups,
-        (x) => x.id
-      );
-      const result = fromCache.map(
-        ([id, value]) => value ?? fromServerById[id]!
-      );
+      const fromServerById = indexBy(fromServer.data.getUsersOrGroups, (x) => x.id);
+      const result = fromCache.map(([id, value]) => value ?? fromServerById[id]!);
       return Array.isArray(ids) ? result : result[0];
     } else {
       const result = fromCache.map(([, value]) => value!);

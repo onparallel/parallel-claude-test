@@ -37,9 +37,7 @@ function Contact({
   isFull,
   ...props
 }: {
-  contact:
-    | RecipientViewHeader_PublicContactFragment
-    | RecipientViewHeader_PublicUserFragment;
+  contact: RecipientViewHeader_PublicContactFragment | RecipientViewHeader_PublicUserFragment;
   isFull?: boolean;
 }) {
   return (
@@ -122,13 +120,7 @@ export function RecipientViewHeader({
   };
 
   return (
-    <Box
-      position="relative"
-      width="100%"
-      zIndex={3}
-      backgroundColor="white"
-      {...props}
-    >
+    <Box position="relative" width="100%" zIndex={3} backgroundColor="white" {...props}>
       <Flex flexDirection="column" alignItems="center">
         <Flex
           maxWidth="container.lg"
@@ -157,11 +149,7 @@ export function RecipientViewHeader({
               borderRadius={"md"}
               _hover={{ backgroundColor: "gray.75" }}
             >
-              <Flex
-                paddingX={{ base: 0, md: 0 }}
-                width="100%"
-                alignItems="center"
-              >
+              <Flex paddingX={{ base: 0, md: 0 }} width="100%" alignItems="center">
                 <Heading as="h2" flex="1" size="sm" textAlign="left">
                   <FormattedMessage
                     id="recipient-view.request-information"
@@ -183,9 +171,7 @@ export function RecipientViewHeader({
                 direction={{ base: "column", md: "row" }}
                 alignItems="stretch"
                 spacing={4}
-                divider={
-                  <Divider height="auto" orientation={dividerOrientation} />
-                }
+                divider={<Divider height="auto" orientation={dividerOrientation} />}
               >
                 <Stack flex="1">
                   <Box>
@@ -214,11 +200,7 @@ export function RecipientViewHeader({
                 <Stack flex="2">
                   <Box flexWrap="wrap">
                     <Text as="span" whiteSpace="nowrap" marginRight={2}>
-                      <FormattedMessage
-                        id="recipient-view.in-order-to"
-                        defaultMessage="To"
-                      />
-                      :
+                      <FormattedMessage id="recipient-view.in-order-to" defaultMessage="To" />:
                     </Text>
                     <EnumerateList
                       maxItems={7}
@@ -257,11 +239,7 @@ export function RecipientViewHeader({
                         />
                       </Text>
                     </Button>
-                    <HelpPopover
-                      color="gray.300"
-                      _hover={{ color: "gray.400" }}
-                      marginLeft={2}
-                    >
+                    <HelpPopover color="gray.300" _hover={{ color: "gray.400" }} marginLeft={2}>
                       <FormattedMessage
                         id="recipient-view.invite-collaborator.help"
                         defaultMessage="Use this option to request someone else to complete the information for you."

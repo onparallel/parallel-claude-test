@@ -18,10 +18,7 @@ type GroupedField = {
   children: PetitionField[];
 };
 
-function groupByHeading(
-  groups: GroupedField[],
-  field: PetitionField
-): GroupedField[] {
+function groupByHeading(groups: GroupedField[], field: PetitionField): GroupedField[] {
   if (field.type === "HEADING") {
     groups.push({
       heading: field,
@@ -44,19 +41,12 @@ export function PetitionFieldList({ fields }: PetitionFieldListProps) {
           <h3 style={{ margin: 0, fontSize: "1em" }}>{heading?.title}</h3>
           <ul style={{ margin: 0 }}>
             {children.map(({ position, id, title }) => (
-              <li
-                key={`children_${id}`}
-                value={position + 1}
-                style={{ margin: 0, padding: 0 }}
-              >
+              <li key={`children_${id}`} value={position + 1} style={{ margin: 0, padding: 0 }}>
                 {title ? (
                   <span>{title}</span>
                 ) : (
                   <span style={{ fontStyle: "italic" }}>
-                    <FormattedMessage
-                      id="generic.untitled-field"
-                      defaultMessage="Untitled field"
-                    />
+                    <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
                   </span>
                 )}
               </li>

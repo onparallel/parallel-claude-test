@@ -1,10 +1,6 @@
 import { gql } from "@apollo/client";
 import { Circle, Flex, Tooltip } from "@chakra-ui/react";
-import {
-  AlertCircleIcon,
-  SignatureIcon,
-  TimeIcon,
-} from "@parallel/chakra/icons";
+import { AlertCircleIcon, SignatureIcon, TimeIcon } from "@parallel/chakra/icons";
 import {
   PetitionSignatureCellContent_PetitionFragment,
   PetitionSignatureCellContent_UserFragment,
@@ -28,25 +24,11 @@ export function PetitionSignatureCellContent({
         {status === "START" ? (
           <Circle boxSize={2} backgroundColor="purple.500" marginRight="2px" />
         ) : null}
-        <SignatureIcon
-          color={status === "COMPLETED" ? "gray.700" : "gray.400"}
-        />
+        <SignatureIcon color={status === "COMPLETED" ? "gray.700" : "gray.400"} />
         {status === "PROCESSING" ? (
-          <TimeIcon
-            color="yellow.600"
-            fontSize="13px"
-            position="relative"
-            top={-2}
-            right={2}
-          />
+          <TimeIcon color="yellow.600" fontSize="13px" position="relative" top={-2} right={2} />
         ) : status === "CANCELLED" ? (
-          <AlertCircleIcon
-            color="red.500"
-            fontSize="14px"
-            position="relative"
-            top={-2}
-            right={2}
-          />
+          <AlertCircleIcon color="red.500" fontSize="14px" position="relative" top={-2} right={2} />
         ) : null}
       </Flex>
     </Tooltip>
@@ -56,8 +38,7 @@ export function PetitionSignatureCellContent({
 PetitionSignatureCellContent.fragments = {
   Petition: gql`
     fragment PetitionSignatureCellContent_Petition on Petition {
-      ...usePetitionCurrentSignatureStatus_Petition
-        @include(if: $hasPetitionSignature)
+      ...usePetitionCurrentSignatureStatus_Petition @include(if: $hasPetitionSignature)
     }
     ${usePetitionCurrentSignatureStatus.fragments.Petition}
   `,

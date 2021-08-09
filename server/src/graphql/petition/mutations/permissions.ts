@@ -1,23 +1,10 @@
-import {
-  arg,
-  booleanArg,
-  list,
-  mutationField,
-  nonNull,
-  stringArg,
-} from "@nexus/schema";
+import { arg, booleanArg, list, mutationField, nonNull, stringArg } from "@nexus/schema";
 import pMap from "p-map";
 import { groupBy, uniq, zip } from "remeda";
 import { Petition } from "../../../db/__types";
 import { partition } from "../../../util/arrays";
 import { isDefined } from "../../../util/remedaExtensions";
-import {
-  and,
-  authenticate,
-  authenticateAnd,
-  chain,
-  ifArgDefined,
-} from "../../helpers/authorize";
+import { and, authenticate, authenticateAnd, chain, ifArgDefined } from "../../helpers/authorize";
 import { ArgValidationError, WhitelistedError } from "../../helpers/errors";
 import { globalIdArg } from "../../helpers/globalIdPlugin";
 import { validateAnd, validateIf } from "../../helpers/validateArgs";
@@ -29,36 +16,23 @@ import { userHasAccessToUserGroups } from "../../user-group/authorizers";
 import { userHasAccessToPetitions } from "../authorizers";
 import { userHasAccessToUsers } from "./authorizers";
 
-export const transferPetitionOwnership = mutationField(
-  "transferPetitionOwnership",
-  {
-    description:
-      "Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.",
-    type: list(nonNull("Petition")),
-    authorize: chain(
-      authenticate(),
-      and(
-        userHasAccessToPetitions("petitionIds", ["OWNER"]),
-        userHasAccessToUsers("userId")
-      )
-    ),
-    args: {
-      petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
-      userId: nonNull(globalIdArg("User")),
-    },
-    validateArgs: validateAnd(
-      notEmptyArray((args) => args.petitionIds, "petitionIds")
-    ),
-    resolve: async (_, args, ctx) => {
-      return await ctx.petitions.transferOwnership(
-        args.petitionIds,
-        args.userId,
-        true,
-        ctx.user!
-      );
-    },
-  }
-);
+export const transferPetitionOwnership = mutationField("transferPetitionOwnership", {
+  description:
+    "Transfers petition ownership to a given user. The original owner gets a WRITE permission on the petitions.",
+  type: list(nonNull("Petition")),
+  authorize: chain(
+    authenticate(),
+    and(userHasAccessToPetitions("petitionIds", ["OWNER"]), userHasAccessToUsers("userId"))
+  ),
+  args: {
+    petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+    userId: nonNull(globalIdArg("User")),
+  },
+  validateArgs: validateAnd(notEmptyArray((args) => args.petitionIds, "petitionIds")),
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.transferOwnership(args.petitionIds, args.userId, true, ctx.user!);
+  },
+});
 
 export const addPetitionPermission = mutationField("addPetitionPermission", {
   description: "Adds permissions on given petitions and users",
@@ -66,10 +40,7 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
-    ifArgDefined(
-      "userGroupIds",
-      userHasAccessToUserGroups("userGroupIds" as never)
-    )
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -106,51 +77,48 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
     const currentPermissions = (
       await ctx.petitions.loadEffectivePermissions(args.petitionIds)
     ).flat();
-    const { petitions, newPermissions } = await ctx.petitions.withTransaction(
-      async (t) => {
-        const { petitions, newPermissions } =
-          await ctx.petitions.addPetitionPermissions(
-            args.petitionIds,
-            args.userIds ?? [],
-            args.userGroupIds ?? [],
-            args.permissionType,
-            args.subscribe ?? true,
-            ctx.user!,
-            t
-          );
+    const { petitions, newPermissions } = await ctx.petitions.withTransaction(async (t) => {
+      const { petitions, newPermissions } = await ctx.petitions.addPetitionPermissions(
+        args.petitionIds,
+        args.userIds ?? [],
+        args.userGroupIds ?? [],
+        args.permissionType,
+        args.subscribe ?? true,
+        ctx.user!,
+        t
+      );
 
-        const [directlyAssigned, groupAssigned] = partition(
-          newPermissions.filter((p) => p.from_user_group_id === null),
-          (p) => p.user_group_id === null
-        );
+      const [directlyAssigned, groupAssigned] = partition(
+        newPermissions.filter((p) => p.from_user_group_id === null),
+        (p) => p.user_group_id === null
+      );
 
-        await ctx.petitions.createEvent(
-          [
-            ...directlyAssigned.map((p) => ({
-              petition_id: p.petition_id,
-              type: "USER_PERMISSION_ADDED" as const,
-              data: {
-                user_id: ctx.user!.id,
-                permission_type: p.type,
-                permission_user_id: p.user_id!,
-              },
-            })),
-            ...groupAssigned.map((p) => ({
-              petition_id: p.petition_id,
-              type: "GROUP_PERMISSION_ADDED" as const,
-              data: {
-                user_id: ctx.user!.id,
-                permission_type: p.type,
-                user_group_id: p.user_group_id!,
-              },
-            })),
-          ],
-          t
-        );
+      await ctx.petitions.createEvent(
+        [
+          ...directlyAssigned.map((p) => ({
+            petition_id: p.petition_id,
+            type: "USER_PERMISSION_ADDED" as const,
+            data: {
+              user_id: ctx.user!.id,
+              permission_type: p.type,
+              permission_user_id: p.user_id!,
+            },
+          })),
+          ...groupAssigned.map((p) => ({
+            petition_id: p.petition_id,
+            type: "GROUP_PERMISSION_ADDED" as const,
+            data: {
+              user_id: ctx.user!.id,
+              permission_type: p.type,
+              user_group_id: p.user_group_id!,
+            },
+          })),
+        ],
+        t
+      );
 
-        return { petitions, newPermissions };
-      }
-    );
+      return { petitions, newPermissions };
+    });
 
     if (args.notify) {
       /** we have to notify only those users who didn't have any permission before */
@@ -159,16 +127,13 @@ export const addPetitionPermission = mutationField("addPetitionPermission", {
           isDefined(np.user_id) &&
           !currentPermissions.some(
             // make sure the user dont have previous permission on the petition
-            (cp) =>
-              cp.petition_id === np.petition_id && cp.user_id === np.user_id
+            (cp) => cp.petition_id === np.petition_id && cp.user_id === np.user_id
           ) &&
           !newPermissions.some(
             // removes duplicated <user_id,petition_id> entries to send only one email per user/petition
             // this can happen when the petition is shared to the user directly and via a group at the same time
             (np2, index2) =>
-              np.petition_id === np2.petition_id &&
-              np.user_id === np2.user_id &&
-              index > index2
+              np.petition_id === np2.petition_id && np.user_id === np2.user_id && index > index2
           )
       );
 
@@ -190,10 +155,7 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionIds", ["OWNER"]),
     ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
-    ifArgDefined(
-      "userGroupIds",
-      userHasAccessToUserGroups("userGroupIds" as never)
-    )
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -238,90 +200,74 @@ export const editPetitionPermission = mutationField("editPetitionPermission", {
   },
 });
 
-export const removePetitionPermission = mutationField(
-  "removePetitionPermission",
-  {
-    description: "Removes permissions on given petitions and users",
-    type: list(nonNull("Petition")),
-    authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionIds", ["OWNER"]),
-      ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
-      ifArgDefined(
-        "userGroupIds",
-        userHasAccessToUserGroups("userGroupIds" as never)
-      )
+export const removePetitionPermission = mutationField("removePetitionPermission", {
+  description: "Removes permissions on given petitions and users",
+  type: list(nonNull("Petition")),
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionIds", ["OWNER"]),
+    ifArgDefined("userIds", userHasAccessToUsers("userIds" as never)),
+    ifArgDefined("userGroupIds", userHasAccessToUserGroups("userGroupIds" as never))
+  ),
+  args: {
+    petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
+    userIds: list(nonNull(globalIdArg("User"))),
+    userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
+    removeAll: booleanArg({
+      description:
+        "Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds",
+    }),
+  },
+  validateArgs: validateAnd(
+    notEmptyArray((args) => args.petitionIds, "petitionIds"),
+    notEmptyArray((args) => args.userIds, "userIds"),
+    userIdNotIncludedInArray((args) => args.userIds, "userIds"),
+    validateIf(
+      (args) => !isDefined(args.userIds) && !isDefined(args.userGroupIds),
+      validBooleanValue((args) => args.removeAll, "removeAll", true)
     ),
-    args: {
-      petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
-      userIds: list(nonNull(globalIdArg("User"))),
-      userGroupIds: list(nonNull(globalIdArg("UserGroup"))),
-      removeAll: booleanArg({
-        description:
-          "Set to true if you want to remove all permissions on the petitions. This will ignore the provided userIds",
-      }),
-    },
-    validateArgs: validateAnd(
-      notEmptyArray((args) => args.petitionIds, "petitionIds"),
-      notEmptyArray((args) => args.userIds, "userIds"),
-      userIdNotIncludedInArray((args) => args.userIds, "userIds"),
-      validateIf(
-        (args) => !isDefined(args.userIds) && !isDefined(args.userGroupIds),
-        validBooleanValue((args) => args.removeAll, "removeAll", true)
+    notEmptyArray((args) => args.userGroupIds, "userGroupId")
+  ),
+  resolve: async (_, args, ctx) => {
+    const deletedPermissions = await ctx.petitions.removePetitionPermissions(
+      args.petitionIds,
+      args.userIds ?? [],
+      args.userGroupIds ?? [],
+      args.removeAll ?? false,
+      ctx.user!
+    );
+    const deletedPermissionsByPetitionId = groupBy(deletedPermissions, (p) => p.petition_id);
+
+    const petitionIds = uniq(deletedPermissions.map((p) => p.petition_id));
+
+    const effectivePermissions = await ctx.petitions.loadEffectivePermissions(petitionIds);
+
+    // For each petition, delete permissions not present in effectivePermissions
+    await pMap(
+      zip(
+        petitionIds.map((id) => deletedPermissionsByPetitionId[id]),
+        effectivePermissions
       ),
-      notEmptyArray((args) => args.userGroupIds, "userGroupId")
-    ),
-    resolve: async (_, args, ctx) => {
-      const deletedPermissions = await ctx.petitions.removePetitionPermissions(
-        args.petitionIds,
-        args.userIds ?? [],
-        args.userGroupIds ?? [],
-        args.removeAll ?? false,
-        ctx.user!
-      );
-      const deletedPermissionsByPetitionId = groupBy(
-        deletedPermissions,
-        (p) => p.petition_id
-      );
+      async ([deletedPermissions, effectivePermissions]) => {
+        const petitionId = deletedPermissions[0].petition_id;
+        const hasPermissions = new Set(effectivePermissions.map((p) => p.user_id!));
 
-      const petitionIds = uniq(deletedPermissions.map((p) => p.petition_id));
+        // users of deletedPermissions that dont have any effectivePermission lost
+        // access to the petitions, their notifications need to be deleted
+        const userIds = uniq(
+          deletedPermissions
+            .filter((p) => p.user_id !== null)
+            .map((p) => p.user_id!)
+            .filter((userId) => !hasPermissions.has(userId))
+        );
 
-      const effectivePermissions = await ctx.petitions.loadEffectivePermissions(
-        petitionIds
-      );
+        await ctx.petitions.deletePetitionUserNotificationsByPetitionId([petitionId], userIds);
+      },
+      { concurrency: 20 }
+    );
 
-      // For each petition, delete permissions not present in effectivePermissions
-      await pMap(
-        zip(
-          petitionIds.map((id) => deletedPermissionsByPetitionId[id]),
-          effectivePermissions
-        ),
-        async ([deletedPermissions, effectivePermissions]) => {
-          const petitionId = deletedPermissions[0].petition_id;
-          const hasPermissions = new Set(
-            effectivePermissions.map((p) => p.user_id!)
-          );
-
-          // users of deletedPermissions that dont have any effectivePermission lost
-          // access to the petitions, their notifications need to be deleted
-          const userIds = uniq(
-            deletedPermissions
-              .filter((p) => p.user_id !== null)
-              .map((p) => p.user_id!)
-              .filter((userId) => !hasPermissions.has(userId))
-          );
-
-          await ctx.petitions.deletePetitionUserNotificationsByPetitionId(
-            [petitionId],
-            userIds
-          );
-        },
-        { concurrency: 20 }
-      );
-
-      return (await ctx.petitions.loadPetition(args.petitionIds)) as Petition[];
-    },
-  }
-);
+    return (await ctx.petitions.loadPetition(args.petitionIds)) as Petition[];
+  },
+});
 
 export const updatePetitionPermissionSubscription = mutationField(
   "updatePetitionPermissionSubscription",
@@ -334,11 +280,7 @@ export const updatePetitionPermissionSubscription = mutationField(
       isSubscribed: nonNull(booleanArg()),
     },
     resolve: async (_, { petitionId, isSubscribed }, ctx) => {
-      await ctx.petitions.updatePetitionPermissionSubscription(
-        petitionId,
-        isSubscribed,
-        ctx.user!
-      );
+      await ctx.petitions.updatePetitionPermissionSubscription(petitionId, isSubscribed, ctx.user!);
 
       return (await ctx.petitions.loadPetition(petitionId))!;
     },

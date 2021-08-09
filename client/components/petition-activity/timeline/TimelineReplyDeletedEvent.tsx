@@ -20,9 +20,7 @@ export function TimelineReplyDeletedEvent({
 }: TimelineReplyDeletedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon icon={<XCircleIcon />} color="gray.600" size="18px" />
-      }
+      icon={<TimelineIcon icon={<XCircleIcon />} color="gray.600" size="18px" />}
       paddingY={2}
     >
       <FormattedMessage
@@ -37,13 +35,7 @@ export function TimelineReplyDeletedEvent({
               <UserReference user={deletedBy} />
             ) : null,
           field: <PetitionFieldReference field={field} />,
-          timeAgo: (
-            <DateTime
-              value={createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
-          ),
+          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
       />
     </TimelineItem>

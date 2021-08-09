@@ -1,18 +1,7 @@
 import { gql, useApolloClient } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Image,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
   AddPetitionAccessDialog_contactsByEmailQuery,
   AddPetitionAccessDialog_contactsByEmailQueryVariables,
@@ -30,11 +19,7 @@ import { useSearchContacts } from "@parallel/utils/useSearchContacts";
 import { useCallback, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { noop, omit } from "remeda";
-import {
-  ContactSelect,
-  ContactSelectProps,
-  ContactSelectSelection,
-} from "../common/ContactSelect";
+import { ContactSelect, ContactSelectProps, ContactSelectSelection } from "../common/ContactSelect";
 import { HelpPopover } from "../common/HelpPopover";
 import { RecipientSelectGroups } from "../common/RecipientSelectGroups";
 import { RichTextEditorValue } from "../common/RichTextEditor";
@@ -75,20 +60,12 @@ export function AddPetitionAccessDialog({
   ...props
 }: DialogProps<AddPetitionAccessDialogProps, AddPetitionAccessDialogResult>) {
   const [showErrors, setShowErrors] = useState(false);
-  const [recipientGroups, setRecipientGroups] = useState<
-    ContactSelectSelection[][]
-  >([[]]);
+  const [recipientGroups, setRecipientGroups] = useState<ContactSelectSelection[][]>([[]]);
 
   const [subject, setSubject] = useState(petition.emailSubject ?? "");
-  const [body, setBody] = useState<RichTextEditorValue>(
-    petition.emailBody ?? emptyRTEValue()
-  );
-  const [remindersConfig, setRemindersConfig] = useState<
-    Maybe<RemindersConfig>
-  >(
-    petition.remindersConfig
-      ? omit(petition.remindersConfig, ["__typename"])
-      : null
+  const [body, setBody] = useState<RichTextEditorValue>(petition.emailBody ?? emptyRTEValue());
+  const [remindersConfig, setRemindersConfig] = useState<Maybe<RemindersConfig>>(
+    petition.remindersConfig ? omit(petition.remindersConfig, ["__typename"]) : null
   );
 
   const handleSearchContactsByEmail = useSearchContactsByEmail();
@@ -130,9 +107,7 @@ export function AddPetitionAccessDialog({
   const isValid = Boolean(
     subject &&
       !isEmptyRTEValue(body) &&
-      recipientGroups.every(
-        (g) => g.length > 0 && g.every((r) => !r.isInvalid && !r.isDeleted)
-      )
+      recipientGroups.every((g) => g.length > 0 && g.every((r) => !r.isInvalid && !r.isDeleted))
   );
 
   const showScheduleMessageDialog = useScheduleMessageDialog();
@@ -154,17 +129,14 @@ export function AddPetitionAccessDialog({
         recipientGroups.length > 1
       ) {
         const option = await showCopySignatureConfigDialog({
-          signers: petition.signatureConfig
-            .contacts as CopySignatureConfigDialog_ContactFragment[],
+          signers: petition.signatureConfig.contacts as CopySignatureConfigDialog_ContactFragment[],
         });
 
         batchSendSigningMode = option;
       }
 
       props.onResolve({
-        recipientIdGroups: recipientGroups.map((group) =>
-          group.map((g) => g.id)
-        ),
+        recipientIdGroups: recipientGroups.map((group) => group.map((g) => g.id)),
         subject,
         body,
         remindersConfig,

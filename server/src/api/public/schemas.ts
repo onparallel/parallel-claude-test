@@ -139,15 +139,7 @@ const _Contact = {
   title: "Contact",
   type: "object",
   additionalProperties: false,
-  required: [
-    "id",
-    "email",
-    "firstName",
-    "lastName",
-    "fullName",
-    "createdAt",
-    "updatedAt",
-  ],
+  required: ["id", "email", "firstName", "lastName", "fullName", "createdAt", "updatedAt"],
   properties: {
     id: {
       type: "string",
@@ -272,8 +264,7 @@ const _RemindersConfig = {
       minimum: 1,
     },
     time: {
-      description:
-        "The time of the day at which the reminder should be sent (00:00 - 23:59)",
+      description: "The time of the day at which the reminder should be sent (00:00 - 23:59)",
       type: "string",
       format: "time",
     },
@@ -311,8 +302,7 @@ const _MessageBody = {
     content: {
       description: "The content of the message",
       type: "string",
-      example:
-        "Hi Daryl,\nPlease fill the following information\n\nRegards,\nRick",
+      example: "Hi Daryl,\nPlease fill the following information\n\nRegards,\nRick",
     },
   },
 } as const;
@@ -329,8 +319,7 @@ const _Subscription = {
       example: toGlobalId("Subscription", 42),
     },
     endpoint: {
-      description:
-        "The URL on which to receive POST requests with the petition events.",
+      description: "The URL on which to receive POST requests with the petition events.",
       type: "string",
       example: "https://my.endpoint.com/parallel",
     },
@@ -407,14 +396,7 @@ const _PetitionFieldReply = {
     },
     type: {
       type: "string",
-      enum: [
-        "TEXT",
-        "SHORT_TEXT",
-        "FILE_UPLOAD",
-        "SELECT",
-        "DYNAMIC_SELECT",
-        "CHECKBOX",
-      ],
+      enum: ["TEXT", "SHORT_TEXT", "FILE_UPLOAD", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"],
       description: "The type of the field this reply originated from",
       example: "TEXT",
     },
@@ -600,8 +582,7 @@ export const SendPetition = schema({
               email: {
                 type: "string",
                 format: "email",
-                description:
-                  "The email of the contact to send this petition to",
+                description: "The email of the contact to send this petition to",
               },
               firstName: {
                 type: ["string", "null"],
@@ -700,8 +681,7 @@ export const ListOfReplies = ListOf(_PetitionFieldReply);
 export const FieldReplyDownloadContent = schema({
   type: "string",
   example: "Jon Snow",
-  description:
-    "The text-content of the reply, or a download URL for `FILE` replies",
+  description: "The text-content of the reply, or a download URL for `FILE` replies",
 } as const);
 
 function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
@@ -713,8 +693,7 @@ function PaginatedListOf<T extends Exclude<JsonSchema, boolean>>(item: T) {
     required: ["items", "totalCount"],
     properties: {
       items: {
-        description:
-          "The requested slice of items from this paginated resource",
+        description: "The requested slice of items from this paginated resource",
         type: "array",
         items: item,
       },
@@ -774,8 +753,7 @@ export const PetitionEvent = schema({
           type: "string",
         },
         petitionAccessId: {
-          description:
-            "The ID of the original access where the delegation happened",
+          description: "The ID of the original access where the delegation happened",
           type: "string",
         },
       },
@@ -806,8 +784,7 @@ export const PetitionEvent = schema({
           type: ["string", "null"],
         },
         userId: {
-          description:
-            "The ID of the user. If set, the comment was deleted by this user.",
+          description: "The ID of the user. If set, the comment was deleted by this user.",
           type: ["string", "null"],
         },
       },
@@ -857,8 +834,7 @@ export const PetitionEvent = schema({
       },
     },
     OWNERSHIP_TRANSFERRED: {
-      description:
-        "A user transferred the ownership of a petition to another user",
+      description: "A user transferred the ownership of a petition to another user",
       properties: {
         userId: {
           description: "The ID of the user that transferred the petition",
@@ -924,8 +900,7 @@ export const PetitionEvent = schema({
       },
     },
     REMINDER_SENT: {
-      description:
-        "A manual or automatic reminder was sent to the petition recipients",
+      description: "A manual or automatic reminder was sent to the petition recipients",
       properties: {
         petitionReminderId: {
           description: "The ID of the reminder",
@@ -934,8 +909,7 @@ export const PetitionEvent = schema({
       },
     },
     REPLY_CREATED: {
-      description:
-        "A reply on the petition was submitted either by a recipient or an user.",
+      description: "A reply on the petition was submitted either by a recipient or an user.",
       properties: {
         petitionAccessId: {
           description:
@@ -943,8 +917,7 @@ export const PetitionEvent = schema({
           type: ["string", "null"],
         },
         userId: {
-          description:
-            "The ID of the user. If set, the reply was submitted by this user.",
+          description: "The ID of the user. If set, the reply was submitted by this user.",
           type: ["string", "null"],
         },
         petitionFieldId: {
@@ -958,8 +931,7 @@ export const PetitionEvent = schema({
       },
     },
     REPLY_DELETED: {
-      description:
-        "A reply on the petition was deleted either by a recipient or an user.",
+      description: "A reply on the petition was deleted either by a recipient or an user.",
       properties: {
         petitionAccessId: {
           description:
@@ -967,8 +939,7 @@ export const PetitionEvent = schema({
           type: ["string", "null"],
         },
         userId: {
-          description:
-            "The ID of the user. If set, the reply was deleted by this user.",
+          description: "The ID of the user. If set, the reply was deleted by this user.",
           type: ["string", "null"],
         },
         petitionFieldId: {
@@ -982,8 +953,7 @@ export const PetitionEvent = schema({
       },
     },
     REPLY_UPDATED: {
-      description:
-        "A reply on the petition was updated either by a recipient or an user.",
+      description: "A reply on the petition was updated either by a recipient or an user.",
       properties: {
         petitionAccessId: {
           description:
@@ -991,8 +961,7 @@ export const PetitionEvent = schema({
           type: ["string", "null"],
         },
         userId: {
-          description:
-            "The ID of the user. If set, the reply was updated by this user.",
+          description: "The ID of the user. If set, the reply was updated by this user.",
           type: ["string", "null"],
         },
         petitionFieldId: {
@@ -1020,8 +989,7 @@ export const PetitionEvent = schema({
           example: "CANCELLED_BY_USER",
         },
         cancelData: {
-          description:
-            "Information about who and why cancelled the eSignature request",
+          description: "Information about who and why cancelled the eSignature request",
           type: "object",
           properties: {
             userId: {
@@ -1090,8 +1058,7 @@ export const PetitionEvent = schema({
       },
     },
     USER_PERMISSION_EDITED: {
-      description:
-        "The user modified the type of permission on a shared petition",
+      description: "The user modified the type of permission on a shared petition",
       properties: {
         permissionType: {
           description: "The new permission for the user",
@@ -1140,8 +1107,7 @@ export const PetitionEvent = schema({
       },
     },
     GROUP_PERMISSION_EDITED: {
-      description:
-        "The user modified the type of permission on a shared petition",
+      description: "The user modified the type of permission on a shared petition",
       properties: {
         permissionType: {
           description: "The new permission for the group",
@@ -1199,8 +1165,7 @@ export const PetitionEvent = schema({
       },
     },
     REMINDERS_OPT_OUT: {
-      description:
-        "The contact has opted out from receiving reminders for this petition",
+      description: "The contact has opted out from receiving reminders for this petition",
       required: ["petitionAccessId", "reason"],
       properties: {
         petitionAccessId: {
@@ -1210,18 +1175,11 @@ export const PetitionEvent = schema({
         reason: {
           type: "string",
           description: "Code representing the reason for opting out.",
-          enum: [
-            "NOT_INTERESTED",
-            "NOT_REQUESTED",
-            "WRONG_PERSON",
-            "NO_REMINDERS",
-            "OTHER",
-          ],
+          enum: ["NOT_INTERESTED", "NOT_REQUESTED", "WRONG_PERSON", "NO_REMINDERS", "OTHER"],
         },
         other: {
           type: "string",
-          description:
-            "If reason is OTHER, this will be the explanation added by the contact",
+          description: "If reason is OTHER, this will be the explanation added by the contact",
         },
       },
     },

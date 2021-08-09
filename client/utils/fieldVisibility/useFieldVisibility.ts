@@ -30,11 +30,7 @@ function evaluatePredicate<T extends string | number | string[]>(
     return false;
   }
   const a = typeof reply === "string" ? reply.toLowerCase() : reply;
-  const b = Array.isArray(reply)
-    ? value
-    : typeof value === "string"
-    ? value.toLowerCase()
-    : value;
+  const b = Array.isArray(reply) ? value : typeof value === "string" ? value.toLowerCase() : value;
 
   switch (operator) {
     case "LESS_THAN":
@@ -110,18 +106,10 @@ export function useFieldVisibility<T extends VisibilityField>(fields: T[]) {
         const result =
           v.operator === "OR"
             ? v.conditions.some((c) =>
-                conditionIsMet(
-                  c,
-                  fieldsById[c.fieldId],
-                  visibilitiesById[c.fieldId]
-                )
+                conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
               )
             : v.conditions.every((c) =>
-                conditionIsMet(
-                  c,
-                  fieldsById[c.fieldId],
-                  visibilitiesById[c.fieldId]
-                )
+                conditionIsMet(c, fieldsById[c.fieldId], visibilitiesById[c.fieldId])
               );
         visibilitiesById[field.id] = v.type === "SHOW" ? result : !result;
       } else {

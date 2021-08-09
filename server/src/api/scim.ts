@@ -22,16 +22,13 @@ export const scim = Router().use(
       if (!match) {
         throw new Error("Missing authentication");
       }
-      const integration =
-        await req.context.integrations.loadProvisioningIntegrationByAuthKey(
-          match[1]
-        );
+      const integration = await req.context.integrations.loadProvisioningIntegrationByAuthKey(
+        match[1]
+      );
       if (!integration) {
         throw new Error("Invalid authentication");
       }
-      req.context.organization = await req.context.organizations.loadOrg(
-        integration.org_id
-      );
+      req.context.organization = await req.context.organizations.loadOrg(integration.org_id);
       next();
     } catch (error) {
       return res.sendStatus(401);
@@ -97,8 +94,7 @@ scim
       res.json(toScimUser(user));
     } else {
       const orgId = req.context.organization!.id;
-      const integrations =
-        await req.context.integrations.loadEnabledIntegrationsForOrgId(orgId);
+      const integrations = await req.context.integrations.loadEnabledIntegrationsForOrgId(orgId);
       const email = emails.find((e) => e.type === "work")?.value;
       if (integrations.some((i) => i.type === "SSO") && email) {
         const user = await req.context.users.createUser(

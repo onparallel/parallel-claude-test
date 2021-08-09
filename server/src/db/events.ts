@@ -131,10 +131,7 @@ export type PetitionEventPayload<TType extends PetitionEventType> = {
   };
 }[TType];
 
-type GenericPetitionEvent<
-  TType extends PetitionEventType,
-  IsCreate extends boolean = false
-> = Omit<
+type GenericPetitionEvent<TType extends PetitionEventType, IsCreate extends boolean = false> = Omit<
   DbPetitionEvent,
   "type" | "data" | If<IsCreate, "id" | "created_at">
 > & {
@@ -142,72 +139,136 @@ type GenericPetitionEvent<
   data: PetitionEventPayload<TType>;
 };
 
-export type PetitionCreatedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"PETITION_CREATED", IsCreate>;
-export type PetitionCompletedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"PETITION_COMPLETED", IsCreate>;
-export type AccessActivatedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"ACCESS_ACTIVATED", IsCreate>;
-export type AccessDeactivatedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"ACCESS_DEACTIVATED", IsCreate>;
-export type AccessOpenedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"ACCESS_OPENED", IsCreate>;
-export type AccessDelegatedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"ACCESS_DELEGATED", IsCreate>;
-export type MessageScheduledEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"MESSAGE_SCHEDULED", IsCreate>;
-export type MessageCancelledEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"MESSAGE_CANCELLED", IsCreate>;
-export type MessageSentEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"MESSAGE_SENT", IsCreate>;
-export type ReminderSentEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"REMINDER_SENT", IsCreate>;
-export type ReplyCreatedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"REPLY_CREATED", IsCreate>;
-export type ReplyUpdatedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"REPLY_UPDATED", IsCreate>;
-export type ReplyDeletedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"REPLY_DELETED", IsCreate>;
-export type CommentPublishedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"COMMENT_PUBLISHED", IsCreate>;
-export type CommentDeletedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"COMMENT_DELETED", IsCreate>;
-export type UserPermissionAddedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"USER_PERMISSION_ADDED", IsCreate>;
-export type UserPermissionRemovedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"USER_PERMISSION_REMOVED", IsCreate>;
-export type UserPermissionEditedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"USER_PERMISSION_EDITED", IsCreate>;
-export type GroupPermissionAddedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"GROUP_PERMISSION_ADDED", IsCreate>;
-export type GroupPermissionEditedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"GROUP_PERMISSION_EDITED", IsCreate>;
-export type GroupPermissionRemovedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"GROUP_PERMISSION_REMOVED", IsCreate>;
+export type PetitionCreatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_CREATED",
+  IsCreate
+>;
+export type PetitionCompletedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_COMPLETED",
+  IsCreate
+>;
+export type AccessActivatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "ACCESS_ACTIVATED",
+  IsCreate
+>;
+export type AccessDeactivatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "ACCESS_DEACTIVATED",
+  IsCreate
+>;
+export type AccessOpenedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "ACCESS_OPENED",
+  IsCreate
+>;
+export type AccessDelegatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "ACCESS_DELEGATED",
+  IsCreate
+>;
+export type MessageScheduledEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "MESSAGE_SCHEDULED",
+  IsCreate
+>;
+export type MessageCancelledEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "MESSAGE_CANCELLED",
+  IsCreate
+>;
+export type MessageSentEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "MESSAGE_SENT",
+  IsCreate
+>;
+export type ReminderSentEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "REMINDER_SENT",
+  IsCreate
+>;
+export type ReplyCreatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "REPLY_CREATED",
+  IsCreate
+>;
+export type ReplyUpdatedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "REPLY_UPDATED",
+  IsCreate
+>;
+export type ReplyDeletedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "REPLY_DELETED",
+  IsCreate
+>;
+export type CommentPublishedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "COMMENT_PUBLISHED",
+  IsCreate
+>;
+export type CommentDeletedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "COMMENT_DELETED",
+  IsCreate
+>;
+export type UserPermissionAddedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "USER_PERMISSION_ADDED",
+  IsCreate
+>;
+export type UserPermissionRemovedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "USER_PERMISSION_REMOVED",
+  IsCreate
+>;
+export type UserPermissionEditedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "USER_PERMISSION_EDITED",
+  IsCreate
+>;
+export type GroupPermissionAddedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "GROUP_PERMISSION_ADDED",
+  IsCreate
+>;
+export type GroupPermissionEditedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "GROUP_PERMISSION_EDITED",
+  IsCreate
+>;
+export type GroupPermissionRemovedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "GROUP_PERMISSION_REMOVED",
+  IsCreate
+>;
 
-export type OwnershipTransferredEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"OWNERSHIP_TRANSFERRED", IsCreate>;
-export type PetitionClosedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"PETITION_CLOSED", IsCreate>;
-export type PetitionClosedNotifiedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"PETITION_CLOSED_NOTIFIED", IsCreate>;
-export type PetitionReopenedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"PETITION_REOPENED", IsCreate>;
+export type OwnershipTransferredEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "OWNERSHIP_TRANSFERRED",
+  IsCreate
+>;
+export type PetitionClosedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_CLOSED",
+  IsCreate
+>;
+export type PetitionClosedNotifiedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_CLOSED_NOTIFIED",
+  IsCreate
+>;
+export type PetitionReopenedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_REOPENED",
+  IsCreate
+>;
 
-export type SignatureStartedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"SIGNATURE_STARTED", IsCreate>;
-export type SignatureCompletedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"SIGNATURE_COMPLETED", IsCreate>;
-export type SignatureCancelledEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"SIGNATURE_CANCELLED", IsCreate>;
-export type TemplateUsedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"TEMPLATE_USED", IsCreate>;
-export type PetitionClonedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"PETITION_CLONED", IsCreate>;
-export type PetitionDeletedEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"PETITION_DELETED", IsCreate>;
-export type RemindersOptOutEvent<IsCreate extends boolean = false> =
-  GenericPetitionEvent<"REMINDERS_OPT_OUT", IsCreate>;
+export type SignatureStartedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "SIGNATURE_STARTED",
+  IsCreate
+>;
+export type SignatureCompletedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "SIGNATURE_COMPLETED",
+  IsCreate
+>;
+export type SignatureCancelledEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "SIGNATURE_CANCELLED",
+  IsCreate
+>;
+export type TemplateUsedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "TEMPLATE_USED",
+  IsCreate
+>;
+export type PetitionClonedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_CLONED",
+  IsCreate
+>;
+export type PetitionDeletedEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "PETITION_DELETED",
+  IsCreate
+>;
+export type RemindersOptOutEvent<IsCreate extends boolean = false> = GenericPetitionEvent<
+  "REMINDERS_OPT_OUT",
+  IsCreate
+>;
 
 export type PetitionEvent<IsCreate extends boolean = false> =
   | PetitionCreatedEvent<IsCreate>
@@ -261,22 +322,30 @@ export type SystemEventPayload<TType extends SystemEventType> = {
   };
 }[TType];
 
-type GenericSystemEvent<
-  TType extends SystemEventType,
-  IsCreate extends boolean = false
-> = Omit<DbSystemEvent, "type" | "data" | If<IsCreate, "id" | "created_at">> & {
+type GenericSystemEvent<TType extends SystemEventType, IsCreate extends boolean = false> = Omit<
+  DbSystemEvent,
+  "type" | "data" | If<IsCreate, "id" | "created_at">
+> & {
   type: TType;
   data: SystemEventPayload<TType>;
 };
 
-export type UserCreatedEvent<IsCreate extends boolean = false> =
-  GenericSystemEvent<"USER_CREATED", IsCreate>;
-export type UserLoggedInEvent<IsCreate extends boolean = false> =
-  GenericSystemEvent<"USER_LOGGED_IN", IsCreate>;
-export type PetitionMessageBouncedEvent<IsCreate extends boolean = false> =
-  GenericSystemEvent<"PETITION_MESSAGE_BOUNCED", IsCreate>;
-export type PetitionReminderBouncedEvent<IsCreate extends boolean = false> =
-  GenericSystemEvent<"PETITION_REMINDER_BOUNCED", IsCreate>;
+export type UserCreatedEvent<IsCreate extends boolean = false> = GenericSystemEvent<
+  "USER_CREATED",
+  IsCreate
+>;
+export type UserLoggedInEvent<IsCreate extends boolean = false> = GenericSystemEvent<
+  "USER_LOGGED_IN",
+  IsCreate
+>;
+export type PetitionMessageBouncedEvent<IsCreate extends boolean = false> = GenericSystemEvent<
+  "PETITION_MESSAGE_BOUNCED",
+  IsCreate
+>;
+export type PetitionReminderBouncedEvent<IsCreate extends boolean = false> = GenericSystemEvent<
+  "PETITION_REMINDER_BOUNCED",
+  IsCreate
+>;
 
 export type SystemEvent<IsCreate extends boolean = false> =
   | UserLoggedInEvent<IsCreate>

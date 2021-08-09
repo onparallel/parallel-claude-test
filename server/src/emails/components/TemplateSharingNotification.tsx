@@ -54,8 +54,7 @@ const email: Email<TemplateSharingNotificationProps> = {
       ${intl.formatMessage(
         {
           id: "template-sharing-notification.text",
-          defaultMessage:
-            "{ownerName} ({ownerEmail}) has shared the following template with you.",
+          defaultMessage: "{ownerName} ({ownerEmail}) has shared the following template with you.",
         },
         { ownerName, ownerEmail }
       )}
@@ -96,12 +95,7 @@ const email: Email<TemplateSharingNotificationProps> = {
   }: TemplateSharingNotificationProps) {
     const { locale } = useIntl();
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection paddingBottom={0}>
           <MjmlColumn>
             <Greeting name={name} />
@@ -117,9 +111,7 @@ const email: Email<TemplateSharingNotificationProps> = {
             </MjmlText>
             <MjmlText fontSize="16px" align="center">
               {petitionName ? (
-                <span style={{ textDecoration: "underline" }}>
-                  {petitionName}
-                </span>
+                <span style={{ textDecoration: "underline" }}>{petitionName}</span>
               ) : (
                 <span style={{ color: "#A0AEC0", fontStyle: "italic" }}>
                   <FormattedMessage
@@ -133,11 +125,7 @@ const email: Email<TemplateSharingNotificationProps> = {
         </MjmlSection>
         {message ? (
           <MjmlSection padding="10px 20px 0">
-            <MjmlColumn
-              backgroundColor="#f6f6f6"
-              borderRadius="4px"
-              padding="8px 16px"
-            >
+            <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="8px 16px">
               <MjmlText padding="0" lineHeight="24px">
                 <BreakLines>{message}</BreakLines>
               </MjmlText>
@@ -146,9 +134,7 @@ const email: Email<TemplateSharingNotificationProps> = {
         ) : null}
         <MjmlSection padding="10px 0 20px">
           <MjmlColumn>
-            <Button
-              href={`${parallelUrl}/${locale}/app/petitions/${petitionId}`}
-            >
+            <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}`}>
               <FormattedMessage
                 id="template-sharing-notification.access-button"
                 defaultMessage="Access the template here"

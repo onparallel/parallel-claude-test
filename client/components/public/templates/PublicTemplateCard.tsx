@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Center,
-  Grid,
-  Image,
-  LinkBox,
-  LinkOverlay,
-  Stack,
-  Text,
-  Wrap,
-} from "@chakra-ui/react";
+import { Center, Grid, Image, LinkBox, LinkOverlay, Stack, Text, Wrap } from "@chakra-ui/react";
 import { Link, NakedLink } from "@parallel/components/common/Link";
 import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
 import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
@@ -21,21 +12,11 @@ export interface PublicTemplateCardProps {
   template: PublicTemplateCard_LandingTemplateFragment;
 }
 
-export function PublicTemplateCard({
-  showCategories,
-  template,
-}: PublicTemplateCardProps) {
+export function PublicTemplateCard({ showCategories, template }: PublicTemplateCardProps) {
   const intl = useIntl();
 
-  const {
-    name,
-    slug,
-    locale,
-    imageUrl,
-    backgroundColor,
-    ownerFullName,
-    organizationName,
-  } = template;
+  const { name, slug, locale, imageUrl, backgroundColor, ownerFullName, organizationName } =
+    template;
 
   const categoryList = usePublicTemplateCategories();
   const categories = (template.categories ?? [])

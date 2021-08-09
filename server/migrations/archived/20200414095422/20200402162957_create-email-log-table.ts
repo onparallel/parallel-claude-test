@@ -8,9 +8,7 @@ export async function up(knex: Knex): Promise<any> {
     t.text("subject").notNullable();
     t.text("text").notNullable();
     t.text("html").notNullable();
-    t.timestamp("created_at")
-      .notNullable()
-      .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+    t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
     t.string("created_from").notNullable();
     t.timestamp("sent_at").defaultTo(null);
     t.text("response").defaultTo(null);

@@ -777,23 +777,13 @@ export const ChevronUpIcon = createIcon({
 export const ChevronLeftIcon = createIcon({
   displayName: "ChevronLeftIcon",
   viewBox: "0 0 24 24",
-  path: (
-    <path
-      fill="currentColor"
-      d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"
-    ></path>
-  ),
+  path: <path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path>,
 });
 
 export const ChevronRightIcon = createIcon({
   displayName: "ChevronRightIcon",
   viewBox: "0 0 24 24",
-  path: (
-    <path
-      fill="currentColor"
-      d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"
-    ></path>
-  ),
+  path: <path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>,
 });
 
 export const ArrowUpDownIcon = createIcon({
@@ -817,12 +807,7 @@ export const CheckShortIcon = createIcon({
   displayName: "CheckShortIcon",
   viewBox: "0 0 14 14",
   path: (
-    <g
-      stroke=""
-      fill="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <g stroke="" fill="currentColor" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="5.5 12 14 3.5 12.5 2 5.5 9 3.5 7 2 8.5"></polygon>
     </g>
   ),

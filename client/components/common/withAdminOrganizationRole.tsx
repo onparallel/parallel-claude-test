@@ -9,11 +9,9 @@ export function withAdminOrganizationRole<P = {}>(
   Component: NextComponentType<WithApolloDataContext, P, P>
 ): NextComponentType<WithApolloDataContext, P, P> {
   const { getInitialProps, displayName, ...rest } = Component;
-  const WithAdminOrganizationRole: NextComponentType<
-    WithApolloDataContext,
-    P,
-    P
-  > = function (props) {
+  const WithAdminOrganizationRole: NextComponentType<WithApolloDataContext, P, P> = function (
+    props
+  ) {
     return <Component {...props} />;
   };
   return Object.assign(WithAdminOrganizationRole, rest, {
@@ -24,16 +22,15 @@ export function withAdminOrganizationRole<P = {}>(
           `Please, place "withAdminOrganizationRole" before "withApolloData" in the "compose" argument list.`
         );
       }
-      const { data } =
-        await context.apollo.query<WithAdminOrganizationRoleQuery>({
-          query: gql`
-            query WithAdminOrganizationRole {
-              me {
-                role
-              }
+      const { data } = await context.apollo.query<WithAdminOrganizationRoleQuery>({
+        query: gql`
+          query WithAdminOrganizationRole {
+            me {
+              role
             }
-          `,
-        });
+          }
+        `,
+      });
       if (isAdmin(data.me)) {
         return await getInitialProps?.(context);
       } else {

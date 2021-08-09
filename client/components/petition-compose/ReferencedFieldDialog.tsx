@@ -63,10 +63,7 @@ export function ReferencedFieldDialog({
                   field.title
                 ) : (
                   <Text as="span" textStyle="hint">
-                    <FormattedMessage
-                      id="generic.untitled-field"
-                      defaultMessage="Untitled field"
-                    />
+                    <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
                   </Text>
                 )}
               </Box>

@@ -16,19 +16,13 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import Select from "react-select";
-import {
-  PetitionComposeFieldSettingsProps,
-  SettingsRow,
-} from "../PetitionComposeFieldSettings";
+import { PetitionComposeFieldSettingsProps, SettingsRow } from "../PetitionComposeFieldSettings";
 
 export function CheckboxSettings({
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<
-  PetitionComposeFieldSettingsProps,
-  "field" | "onFieldEdit" | "isReadOnly"
->) {
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const intl = useIntl();
 
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 180, [field.id]);
@@ -51,10 +45,7 @@ export function CheckboxSettings({
   const refMax = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (
-      document.activeElement !== refMin?.current &&
-      document.activeElement !== refMax?.current
-    ) {
+    if (document.activeElement !== refMin?.current && document.activeElement !== refMax?.current) {
       setMin(field.options?.limit?.min);
       setMax(field.options?.limit?.max);
     }

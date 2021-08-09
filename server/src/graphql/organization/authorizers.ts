@@ -11,9 +11,10 @@ export function isOwnOrg<FieldName extends string>(): FieldAuthorizeResolver<
   };
 }
 
-export function isOwnOrgOrSuperAdmin<
-  FieldName extends string
->(): FieldAuthorizeResolver<"Organization", FieldName> {
+export function isOwnOrgOrSuperAdmin<FieldName extends string>(): FieldAuthorizeResolver<
+  "Organization",
+  FieldName
+> {
   return or(isOwnOrg(), userIsSuperAdmin());
 }
 
@@ -35,9 +36,7 @@ export function orgDoesNotHaveSsoProvider<
   FieldName extends string
 >(): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
-    const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(
-      ctx.user!.org_id
-    );
+    const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(ctx.user!.org_id);
     if (integrations.find((i) => i.type === "SSO")) {
       throw new WhitelistedError(
         "Can't create users on organizations with a SSO provider",

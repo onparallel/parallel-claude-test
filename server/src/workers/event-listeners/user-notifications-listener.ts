@@ -44,18 +44,14 @@ async function createCommentPublishedUserNotifications(
 
   // Create contact and user notifications
   const [accesses, users] = await Promise.all([
-    comment.is_internal
-      ? []
-      : ctx.petitions.loadAccessesForPetition(event.petition_id),
+    comment.is_internal ? [] : ctx.petitions.loadAccessesForPetition(event.petition_id),
     ctx.petitions.loadUsersOnPetition(event.petition_id),
   ]);
 
   const accessIds = accesses
     .filter((a) => a.status === "ACTIVE" && a.id !== comment.petition_access_id)
     .map((a) => a.id);
-  const userIds = users
-    .filter((u) => u.id !== comment.user_id)
-    .map((u) => u.id);
+  const userIds = users.filter((u) => u.id !== comment.user_id).map((u) => u.id);
 
   await Promise.all([
     ctx.petitions.createPetitionUserNotification(
@@ -89,13 +85,9 @@ async function createPetitionMessageBouncedUserNotifications(
   event: PetitionMessageBouncedEvent,
   ctx: WorkerContext
 ) {
-  const message = await ctx.petitions.loadMessage(
-    event.data.petition_message_id
-  );
+  const message = await ctx.petitions.loadMessage(event.data.petition_message_id);
   if (!message) {
-    throw new Error(
-      `PetitionMessage:${event.data.petition_message_id} not found.`
-    );
+    throw new Error(`PetitionMessage:${event.data.petition_message_id} not found.`);
   }
   const sender = await ctx.users.loadUser(message.sender_id);
   if (!sender) {
@@ -119,13 +111,9 @@ async function createPetitionReminderBouncedUserNotifications(
   event: PetitionReminderBouncedEvent,
   ctx: WorkerContext
 ) {
-  const reminder = await ctx.petitions.loadReminder(
-    event.data.petition_reminder_id
-  );
+  const reminder = await ctx.petitions.loadReminder(event.data.petition_reminder_id);
   if (!reminder) {
-    throw new Error(
-      `PetitionReminder:${event.data.petition_reminder_id} not found.`
-    );
+    throw new Error(`PetitionReminder:${event.data.petition_reminder_id} not found.`);
   }
   const sender = await ctx.users.loadUser(reminder.sender_id!);
   if (!sender) {
@@ -203,9 +191,7 @@ async function createPetitionSharedUserNotifications(
       },
     ]);
   } else if (event.type === "GROUP_PERMISSION_ADDED") {
-    const members = await ctx.userGroups.loadUserGroupMembers(
-      event.data.user_group_id
-    );
+    const members = await ctx.userGroups.loadUserGroupMembers(event.data.user_group_id);
     await ctx.petitions.createPetitionUserNotification(
       members.map((m) => ({
         type: "PETITION_SHARED",
@@ -223,10 +209,7 @@ async function createPetitionSharedUserNotifications(
   }
 }
 
-async function createRemindersOptOutNotifications(
-  event: RemindersOptOutEvent,
-  ctx: WorkerContext
-) {
+async function createRemindersOptOutNotifications(event: RemindersOptOutEvent, ctx: WorkerContext) {
   const users = await ctx.petitions.loadUsersOnPetition(event.petition_id);
   await ctx.petitions.createPetitionUserNotification(
     users.map((user) => ({

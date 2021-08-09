@@ -1,13 +1,6 @@
 import { gql } from "@apollo/client";
 import { Stack, Text } from "@chakra-ui/layout";
-import {
-  AbsoluteCenterProps,
-  Center,
-  Circle,
-  Flex,
-  LinkBox,
-  Spinner,
-} from "@chakra-ui/react";
+import { AbsoluteCenterProps, Center, Circle, Flex, LinkBox, Spinner } from "@chakra-ui/react";
 import { NotificationsDrawer_PetitionUserNotificationFragment } from "@parallel/graphql/__types";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { useUpdatingRef } from "@parallel/utils/useUpdatingRef";
@@ -53,13 +46,9 @@ export function NotificationsList({
       case "ArrowDown":
       case "ArrowUp": {
         event.preventDefault();
-        const parent = (event.target as HTMLElement).closest(
-          "[data-notification-id]"
-        );
+        const parent = (event.target as HTMLElement).closest("[data-notification-id]");
         const notificationId = parent!.getAttribute("data-notification-id");
-        const index = notificationsRef.current.findIndex(
-          (n) => n.id === notificationId
-        );
+        const index = notificationsRef.current.findIndex((n) => n.id === notificationId);
         if (index === -1) {
           return;
         }
@@ -68,9 +57,7 @@ export function NotificationsList({
           return;
         }
         const nextNotification = notificationsRef.current[nextIndex];
-        notificationElementsRefs[nextNotification.id]
-          .current!.querySelector("a")!
-          .focus();
+        notificationElementsRefs[nextNotification.id].current!.querySelector("a")!.focus();
         const element = notificationElementsRefs[nextNotification.id].current!;
         // chrome does weird shit without the requestAnimationFrame
         requestAnimationFrame(() => {
@@ -101,11 +88,7 @@ export function NotificationsList({
           <MotionCenter
             initial={{ transform: "translateY(0px)" }}
             exit={{
-              transform: [
-                "translateY(0px)",
-                "translateY(0px)",
-                "translateY(-60px)",
-              ],
+              transform: ["translateY(0px)", "translateY(0px)", "translateY(-60px)"],
             }}
             transition={{ times: [0, 0.7, 1] }}
             flex="0"
@@ -151,12 +134,7 @@ export function NotificationsList({
         }
         endMessage={
           notifications.length === 0 ? (
-            <Stack
-              height="100%"
-              alignItems="center"
-              justifyContent="center"
-              spacing={10}
-            >
+            <Stack height="100%" alignItems="center" justifyContent="center" spacing={10}>
               <EmptyNotificationsIcon width="300px" height="200px" />
               <Text>
                 <FormattedMessage
@@ -171,12 +149,7 @@ export function NotificationsList({
         pullDownToRefresh
         pullDownToRefreshThreshold={50}
         pullDownToRefreshContent={
-          <Center
-            fontSize="sm"
-            paddingY={2}
-            borderBottom="1px solid"
-            borderColor="gray.200"
-          >
+          <Center fontSize="sm" paddingY={2} borderBottom="1px solid" borderColor="gray.200">
             <FormattedMessage
               id="component.notifications-list.pull-to-refresh"
               defaultMessage="Pull down to refresh"
@@ -184,12 +157,7 @@ export function NotificationsList({
           </Center>
         }
         releaseToRefreshContent={
-          <Center
-            fontSize="sm"
-            paddingY={2}
-            borderBottom="1px solid"
-            borderColor="gray.200"
-          >
+          <Center fontSize="sm" paddingY={2} borderBottom="1px solid" borderColor="gray.200">
             <FormattedMessage
               id="component.notifications-list.release-to-refresh"
               defaultMessage="Release to refresh"
@@ -205,53 +173,22 @@ export function NotificationsList({
           };
           return (
             <LinkBox key={notification.id}>
-              {notification.__typename ===
-              "PetitionCompletedUserNotification" ? (
-                <PetitionCompletedUserNotification
-                  notification={notification}
-                  {...props}
-                />
-              ) : notification.__typename ===
-                "SignatureCompletedUserNotification" ? (
-                <SignatureCompletedUserNotification
-                  notification={notification}
-                  {...props}
-                />
-              ) : notification.__typename ===
-                "SignatureCancelledUserNotification" ? (
-                <SignatureCancelledUserNotification
-                  notification={notification}
-                  {...props}
-                />
-              ) : notification.__typename ===
-                "PetitionSharedUserNotification" ? (
-                <PetitionSharedUserNotification
-                  notification={notification}
-                  {...props}
-                />
-              ) : notification.__typename ===
-                "MessageEmailBouncedUserNotification" ? (
-                <MessageEmailBouncedUserNotification
-                  notification={notification}
-                  {...props}
-                />
-              ) : notification.__typename ===
-                "ReminderEmailBouncedUserNotification" ? (
-                <ReminderEmailBouncedUserNotification
-                  notification={notification}
-                  {...props}
-                />
-              ) : notification.__typename ===
-                "CommentCreatedUserNotification" ? (
-                <CommentCreatedUserNotification
-                  notification={notification}
-                  {...props}
-                />
+              {notification.__typename === "PetitionCompletedUserNotification" ? (
+                <PetitionCompletedUserNotification notification={notification} {...props} />
+              ) : notification.__typename === "SignatureCompletedUserNotification" ? (
+                <SignatureCompletedUserNotification notification={notification} {...props} />
+              ) : notification.__typename === "SignatureCancelledUserNotification" ? (
+                <SignatureCancelledUserNotification notification={notification} {...props} />
+              ) : notification.__typename === "PetitionSharedUserNotification" ? (
+                <PetitionSharedUserNotification notification={notification} {...props} />
+              ) : notification.__typename === "MessageEmailBouncedUserNotification" ? (
+                <MessageEmailBouncedUserNotification notification={notification} {...props} />
+              ) : notification.__typename === "ReminderEmailBouncedUserNotification" ? (
+                <ReminderEmailBouncedUserNotification notification={notification} {...props} />
+              ) : notification.__typename === "CommentCreatedUserNotification" ? (
+                <CommentCreatedUserNotification notification={notification} {...props} />
               ) : notification.__typename === "RemindersOptOutNotification" ? (
-                <RemindersOptOutNotification
-                  notification={notification}
-                  {...props}
-                />
+                <RemindersOptOutNotification notification={notification} {...props} />
               ) : null}
             </LinkBox>
           );
@@ -266,13 +203,7 @@ export function NotificationsList({
           background="whiteAlpha.700"
           zIndex="1"
         >
-          <Spinner
-            thickness="2px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="gray.600"
-            size="xl"
-          />
+          <Spinner thickness="2px" speed="0.65s" emptyColor="gray.200" color="gray.600" size="xl" />
         </Center>
       ) : null}
     </Flex>
@@ -308,17 +239,12 @@ NotificationsList.fragments = {
       }
     }
     ${CommentCreatedUserNotification.fragments.CommentCreatedUserNotification}
-    ${MessageEmailBouncedUserNotification.fragments
-      .MessageEmailBouncedUserNotification}
-    ${ReminderEmailBouncedUserNotification.fragments
-      .ReminderEmailBouncedUserNotification}
-    ${PetitionCompletedUserNotification.fragments
-      .PetitionCompletedUserNotification}
+    ${MessageEmailBouncedUserNotification.fragments.MessageEmailBouncedUserNotification}
+    ${ReminderEmailBouncedUserNotification.fragments.ReminderEmailBouncedUserNotification}
+    ${PetitionCompletedUserNotification.fragments.PetitionCompletedUserNotification}
     ${PetitionSharedUserNotification.fragments.PetitionSharedUserNotification}
-    ${SignatureCancelledUserNotification.fragments
-      .SignatureCancelledUserNotification}
-    ${SignatureCompletedUserNotification.fragments
-      .SignatureCompletedUserNotification}
+    ${SignatureCancelledUserNotification.fragments.SignatureCancelledUserNotification}
+    ${SignatureCompletedUserNotification.fragments.SignatureCompletedUserNotification}
     ${RemindersOptOutNotification.fragments.RemindersOptOutNotification}
   `,
 };

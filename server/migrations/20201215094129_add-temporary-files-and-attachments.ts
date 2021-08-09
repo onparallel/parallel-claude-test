@@ -14,9 +14,7 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("email_attachment", (t) => {
     t.increments("id");
     t.integer("email_log_id").notNullable().references("email_log.id");
-    t.integer("temporary_file_id")
-      .notNullable()
-      .references("temporary_file.id");
+    t.integer("temporary_file_id").notNullable().references("temporary_file.id");
     t.unique(["email_log_id", "temporary_file_id"]);
   });
 }

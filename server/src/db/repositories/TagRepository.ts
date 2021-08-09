@@ -13,14 +13,10 @@ export class TagRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadTag = this.buildLoadBy("tag", "id", (q) =>
-    q.whereNull("deleted_at")
-  );
+  readonly loadTag = this.buildLoadBy("tag", "id", (q) => q.whereNull("deleted_at"));
 
-  readonly loadTagsByOrganizationId = this.buildLoadMultipleBy(
-    "tag",
-    "organization_id",
-    (q) => q.whereNull("deleted_at").orderBy("name", "asc")
+  readonly loadTagsByOrganizationId = this.buildLoadMultipleBy("tag", "organization_id", (q) =>
+    q.whereNull("deleted_at").orderBy("name", "asc")
   );
 
   readonly loadTagsByPetitionId = fromDataLoader(
@@ -56,11 +52,7 @@ export class TagRepository extends BaseRepository {
     return tag;
   }
 
-  async updateTag(
-    tagId: number,
-    data: Partial<Omit<CreateTag, "organization_id">>,
-    user: User
-  ) {
+  async updateTag(tagId: number, data: Partial<Omit<CreateTag, "organization_id">>, user: User) {
     const [tag] = await this.from("tag")
       .where({ id: tagId, deleted_at: null })
       .update(
@@ -92,11 +84,7 @@ export class TagRepository extends BaseRepository {
     });
   }
 
-  async untagPetition(
-    tagId: number,
-    petitionId?: number,
-    t?: Knex.Transaction
-  ) {
+  async untagPetition(tagId: number, petitionId?: number, t?: Knex.Transaction) {
     await this.from("petition_tag", t)
       .where({ tag_id: tagId })
       .mmodify((q) => {

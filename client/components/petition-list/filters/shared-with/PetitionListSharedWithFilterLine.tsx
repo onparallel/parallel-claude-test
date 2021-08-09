@@ -1,8 +1,5 @@
 import { Box, CloseButton } from "@chakra-ui/react";
-import {
-  FilterSharedWithOperator,
-  PetitionSharedWithFilterLine,
-} from "@parallel/graphql/__types";
+import { FilterSharedWithOperator, PetitionSharedWithFilterLine } from "@parallel/graphql/__types";
 import { useInlineReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { OptionType } from "@parallel/utils/react-select/types";
 import { ValueProps } from "@parallel/utils/ValueProps";
@@ -30,11 +27,7 @@ export function PetitionListSharedWithFilterLine({
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
-    async (
-      search: string,
-      excludeUsers: string[],
-      excludeUserGroups: string[]
-    ) => {
+    async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
       return await _handleSearchUsers(search, {
         includeGroups: value.operator !== "IS_OWNER",
         excludeUsers: [...excludeUsers],

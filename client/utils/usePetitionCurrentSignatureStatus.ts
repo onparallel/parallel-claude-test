@@ -7,12 +7,9 @@ export function usePetitionCurrentSignatureStatus(
   return petition.signatureConfig?.review &&
     ["COMPLETED", "CLOSED"].includes(petition.status) &&
     (!petition.currentSignatureRequest ||
-      !["ENQUEUED", "PROCESSING"].includes(
-        petition.currentSignatureRequest.status
-      ))
+      !["ENQUEUED", "PROCESSING"].includes(petition.currentSignatureRequest.status))
     ? "START"
-    : petition.currentSignatureRequest?.status ??
-        (petition.signatureConfig ? "PROCESSING" : null);
+    : petition.currentSignatureRequest?.status ?? (petition.signatureConfig ? "PROCESSING" : null);
 }
 
 usePetitionCurrentSignatureStatus.fragments = {

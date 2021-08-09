@@ -87,8 +87,7 @@ const email: Email<AccessDelegatedEmailProps> = {
       }
       ${intl.formatMessage({
         id: "generic.complete-information-click-link",
-        defaultMessage:
-          "Please click the link below to complete the information.",
+        defaultMessage: "Please click the link below to complete the information.",
       })}
       ${parallelUrl}/${intl.locale}/petition/${keycode}
       
@@ -136,11 +135,7 @@ const email: Email<AccessDelegatedEmailProps> = {
           </MjmlColumn>
         </MjmlSection>
         <MjmlSection padding="0 20px">
-          <MjmlColumn
-            backgroundColor="#f6f6f6"
-            borderRadius="4px"
-            padding="10px 0"
-          >
+          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
             <MjmlText>
               <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
             </MjmlText>
@@ -164,9 +159,7 @@ const email: Email<AccessDelegatedEmailProps> = {
               </MjmlText>
             ) : null}
             <MjmlSpacer height="10px" />
-            <CompleteInfoButton
-              href={`${parallelUrl}/${locale}/petition/${keycode}`}
-            />
+            <CompleteInfoButton href={`${parallelUrl}/${locale}/petition/${keycode}`} />
             <MjmlSpacer height="10px" />
             <Disclaimer email={senderEmail} />
           </MjmlColumn>

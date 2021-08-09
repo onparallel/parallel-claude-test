@@ -29,17 +29,12 @@ export function useClonePetitions() {
     }
   );
 
-  return useCallback(
-    async ({
-      petitionIds,
-    }: useClonePetitions_clonePetitionsMutationVariables) => {
-      const { data } = await clonePetitions({
-        variables: {
-          petitionIds,
-        },
-      });
-      return data!.clonePetitions!.map((p) => p.id);
-    },
-    []
-  );
+  return useCallback(async ({ petitionIds }: useClonePetitions_clonePetitionsMutationVariables) => {
+    const { data } = await clonePetitions({
+      variables: {
+        petitionIds,
+      },
+    });
+    return data!.clonePetitions!.map((p) => p.id);
+  }, []);
 }

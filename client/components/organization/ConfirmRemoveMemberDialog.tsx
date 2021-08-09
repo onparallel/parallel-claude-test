@@ -1,10 +1,7 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { UserXIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { OrganizationGroup_UserGroupMemberFragment } from "@parallel/graphql/__types";
 import { FormattedMessage } from "react-intl";
 import { UserSelectSelection } from "../common/UserSelect";
@@ -12,10 +9,7 @@ import { UserSelectSelection } from "../common/UserSelect";
 function ConfirmRemoveMemberDialog({
   selected,
   ...props
-}: DialogProps<
-  { selected: OrganizationGroup_UserGroupMemberFragment[] },
-  UserSelectSelection
->) {
+}: DialogProps<{ selected: OrganizationGroup_UserGroupMemberFragment[] }, UserSelectSelection>) {
   return (
     <ConfirmDialog
       hasCloseButton

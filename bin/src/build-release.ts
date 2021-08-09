@@ -33,10 +33,10 @@ async function main() {
   const buildDir = `${WORK_DIR}/${buildId}`;
 
   console.log(chalk`Checking out the code for commit {bold ${commit}}`);
-  execSync(
-    `git clone --no-checkout git@github.com:onparallel/parallel.git ${buildDir}`,
-    { cwd: WORK_DIR, encoding: "utf-8" }
-  );
+  execSync(`git clone --no-checkout git@github.com:onparallel/parallel.git ${buildDir}`, {
+    cwd: WORK_DIR,
+    encoding: "utf-8",
+  });
   execSync(`git checkout ${commit}`, { cwd: buildDir, encoding: "utf-8" });
   execSync(`rm -rf .git`, { cwd: buildDir, encoding: "utf-8" });
 
@@ -51,29 +51,23 @@ async function main() {
     }
   );
   // remove unused browsers to keep the artifact small
-  const contents = await fs.readdir(
-    `${buildDir}/node_modules/playwright/.local-browsers`,
-    { withFileTypes: true }
-  );
+  const contents = await fs.readdir(`${buildDir}/node_modules/playwright/.local-browsers`, {
+    withFileTypes: true,
+  });
   for (const content of contents) {
     if (
       content.isDirectory() &&
       ["firefox-", "webkit-"].some((prefix) => content.name.startsWith(prefix))
     ) {
-      rimraf.sync(
-        `${buildDir}/node_modules/playwright/.local-browsers/${content.name}`
-      );
+      rimraf.sync(`${buildDir}/node_modules/playwright/.local-browsers/${content.name}`);
     }
   }
 
   console.log("Getting the secrets 🤫");
-  execSync(
-    "git clone --depth 1 git@github.com:onparallel/secrets.git secrets",
-    {
-      cwd: WORK_DIR,
-      encoding: "utf-8",
-    }
-  );
+  execSync("git clone --depth 1 git@github.com:onparallel/secrets.git secrets", {
+    cwd: WORK_DIR,
+    encoding: "utf-8",
+  });
   for (const dir of ["server", "client"]) {
     execSync(`cp -a secrets/${env}/${dir}/. ${buildDir}/${dir}/`, {
       cwd: WORK_DIR,
@@ -84,14 +78,14 @@ async function main() {
   // Generate tokens
   const CLIENT_SERVER_TOKEN = token(32);
   const SECURITY_SERVICE_JWT_SECRET = token(32);
-  execSync(
-    `echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`,
-    { cwd: WORK_DIR, encoding: "utf-8" }
-  );
-  execSync(
-    `echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`,
-    { cwd: WORK_DIR, encoding: "utf-8" }
-  );
+  execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/client/.env.local`, {
+    cwd: WORK_DIR,
+    encoding: "utf-8",
+  });
+  execSync(`echo "CLIENT_SERVER_TOKEN=${CLIENT_SERVER_TOKEN}" >> ${buildDir}/server/.env`, {
+    cwd: WORK_DIR,
+    encoding: "utf-8",
+  });
   execSync(
     `echo "SECURITY_SERVICE_JWT_SECRET=${SECURITY_SERVICE_JWT_SECRET}" >> ${buildDir}/server/.env`,
     { cwd: WORK_DIR, encoding: "utf-8" }

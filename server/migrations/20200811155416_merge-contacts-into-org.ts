@@ -7,9 +7,7 @@ type Contact = {
   org_id: number;
 };
 
-async function getDuplicatedContacts(
-  t: Knex.Transaction<any, any>
-): Promise<Contact[]> {
+async function getDuplicatedContacts(t: Knex.Transaction<any, any>): Promise<Contact[]> {
   const { rows: duplicatedContacts } = await t.raw<{
     rows: Contact[];
   }>(/* sql */ `

@@ -148,9 +148,7 @@ export function PetitionListTagFilter({
           size="sm"
           aria-controls={id}
           data-index="-1"
-          aria-activedescendant={
-            activeIndex !== null ? `${id}-${activeIndex}` : undefined
-          }
+          aria-activedescendant={activeIndex !== null ? `${id}-${activeIndex}` : undefined}
           placeholder={intl.formatMessage({
             id: "component.petition-list-tag-filter.placeholder",
             defaultMessage: "Search for tags...",

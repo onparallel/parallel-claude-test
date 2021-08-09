@@ -11,9 +11,7 @@ export async function up(knex: Knex): Promise<any> {
         enumName: "petition_reminder_status",
         useNative: true,
       });
-      t.timestamp("created_at")
-        .notNullable()
-        .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+      t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
       t.string("created_by");
     })
     .raw(

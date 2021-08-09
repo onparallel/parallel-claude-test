@@ -40,8 +40,7 @@ const email: Email<PetitionClosedNotificationProps> = {
       ${intl.formatMessage(
         {
           id: "petition-closed-notification.text",
-          defaultMessage:
-            "{senderName} ({senderEmail}) has received the information.",
+          defaultMessage: "{senderName} ({senderEmail}) has received the information.",
         },
         { senderName, senderEmail }
       )}
@@ -85,11 +84,7 @@ const email: Email<PetitionClosedNotificationProps> = {
           </MjmlColumn>
         </MjmlSection>
         <MjmlSection padding="0 20px">
-          <MjmlColumn
-            backgroundColor="#f6f6f6"
-            borderRadius="4px"
-            padding="10px 0"
-          >
+          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
             <MjmlText>
               <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
             </MjmlText>

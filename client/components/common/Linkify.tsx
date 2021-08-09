@@ -20,10 +20,7 @@ export function Linkify({ children }: { children: ReactNode }) {
 function parse(children: ReactNode, key = 0): ReactNode {
   if (typeof children === "string") {
     return parseText(children);
-  } else if (
-    isValidElement(children) &&
-    !["a", "button"].includes(children.type as any)
-  ) {
+  } else if (isValidElement(children) && !["a", "button"].includes(children.type as any)) {
     return cloneElement(children, { key: key }, parse(children.props.children));
   } else if (Array.isArray(children)) {
     return children.map((child, i) => parse(child, i));

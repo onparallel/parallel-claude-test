@@ -19,10 +19,7 @@ export async function up(knex: Knex): Promise<any> {
       t.integer("reminders_left").notNullable().defaultTo(0);
       timestamps(t, { deleted: false });
 
-      t.unique(
-        ["petition_id", "contact_id"],
-        "petition_access__petition_id_contact_id"
-      );
+      t.unique(["petition_id", "contact_id"], "petition_access__petition_id_contact_id");
 
       t.index(["petition_id"], "petition_access__petition_id");
       t.index(["contact_id"], "petition_access__contact_id");
@@ -45,9 +42,7 @@ export async function up(knex: Knex): Promise<any> {
     .createTable("petition_message", (t) => {
       t.increments("id");
       t.integer("petition_id").notNullable().references("petition.id");
-      t.integer("petition_access_id")
-        .notNullable()
-        .references("petition_access.id");
+      t.integer("petition_access_id").notNullable().references("petition_access.id");
       t.integer("sender_id").notNullable().references("user.id");
       t.string("email_subject");
       t.text("email_body");

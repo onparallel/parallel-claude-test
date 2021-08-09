@@ -18,10 +18,7 @@ import {
 import { CheckIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import {
   PublicOptOutQuery,
   PublicOptOutQueryVariables,
@@ -104,10 +101,7 @@ function OptOut({ keycode, access }: OptOutProps) {
                 icon={<CheckIcon color="white" fontSize="2.5rem" />}
               />
               <Heading>
-                <FormattedMessage
-                  id="public.opt-out.done-title"
-                  defaultMessage="Done!"
-                />
+                <FormattedMessage id="public.opt-out.done-title" defaultMessage="Done!" />
               </Heading>
               <Text>
                 <FormattedMessage
@@ -136,12 +130,7 @@ function OptOut({ keycode, access }: OptOutProps) {
                     })}
                   </Stack>
                   {reason === "OTHER" ? (
-                    <FormControl
-                      id="other-reason"
-                      paddingLeft={6}
-                      paddingTop={2}
-                      isRequired
-                    >
+                    <FormControl id="other-reason" paddingLeft={6} paddingTop={2} isRequired>
                       <Input
                         type="text"
                         placeholder={intl.formatMessage({
@@ -169,10 +158,7 @@ function OptOut({ keycode, access }: OptOutProps) {
                   variant="solid"
                   type="submit"
                 >
-                  <FormattedMessage
-                    id="public.opt-out.opt-out-button"
-                    defaultMessage="Opt out"
-                  />
+                  <FormattedMessage id="public.opt-out.opt-out-button" defaultMessage="Opt out" />
                 </Button>
               </Stack>
             </form>
@@ -208,11 +194,7 @@ function OptOut({ keycode, access }: OptOutProps) {
 
 OptOut.mutations = [
   gql`
-    mutation OptOut_publicOptOutReminders(
-      $keycode: ID!
-      $reason: String!
-      $other: String!
-    ) {
+    mutation OptOut_publicOptOutReminders($keycode: ID!, $reason: String!, $other: String!) {
       publicOptOutReminders(keycode: $keycode, reason: $reason, other: $other) {
         petition {
           id
@@ -247,16 +229,10 @@ OptOut.fragments = {
   },
 };
 
-OptOut.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+OptOut.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const keycode = query.keycode as string;
 
-  const result = await fetchQuery<
-    PublicOptOutQuery,
-    PublicOptOutQueryVariables
-  >(
+  const result = await fetchQuery<PublicOptOutQuery, PublicOptOutQueryVariables>(
     gql`
       query PublicOptOut($keycode: ID!) {
         access(keycode: $keycode) {

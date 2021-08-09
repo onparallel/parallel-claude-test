@@ -18,9 +18,7 @@ import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
 import { indexBy } from "remeda";
 
-function Templates({
-  samples,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+function Templates({ samples }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const intl = useIntl();
 
   const categories = usePublicTemplateCategories();
@@ -73,18 +71,12 @@ function Templates({
             defaultMessage="Do you want to know more about our templates?"
           />
           <br />
-          <FormattedMessage
-            id="public.templates.we-show-you"
-            defaultMessage="We show you!"
-          />
+          <FormattedMessage id="public.templates.we-show-you" defaultMessage="We show you!" />
         </Heading>
         <Flex marginTop={10} justifyContent="center">
           <NakedLink href="/book-demo">
             <Button as="a" colorScheme="purple" size="lg">
-              <FormattedMessage
-                id="public.book-demo-button"
-                defaultMessage="Book a demo"
-              />
+              <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
             </Button>
           </NakedLink>
         </Flex>
@@ -93,10 +85,7 @@ function Templates({
   );
 }
 
-export async function getServerSideProps({
-  query: { locale },
-  req,
-}: GetServerSidePropsContext) {
+export async function getServerSideProps({ query: { locale }, req }: GetServerSidePropsContext) {
   const client = createApolloClient({}, { req });
 
   const { data } = await client.query<

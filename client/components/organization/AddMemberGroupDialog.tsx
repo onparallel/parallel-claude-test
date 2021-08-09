@@ -1,10 +1,7 @@
 import { Button, FormControl, FormLabel, Stack, Text } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { useCallback, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -82,10 +79,7 @@ export function AddMemberGroupDialog({
                   isMulti
                   value={value}
                   onKeyDown={(e: KeyboardEvent) => {
-                    if (
-                      e.key === "Enter" &&
-                      !(e.target as HTMLInputElement).value
-                    ) {
+                    if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
                       e.preventDefault();
                     }
                   }}

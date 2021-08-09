@@ -95,9 +95,7 @@ export async function up(knex: Knex) {
       t.integer("petition_access_id").notNullable();
       t.string("event");
       t.json("event_data");
-      t.timestamp("event_date")
-        .notNullable()
-        .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+      t.timestamp("event_date").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
 
       t.foreign("petition_id").references("petition.id");
       t.foreign("petition_access_id").references("petition_access.id");

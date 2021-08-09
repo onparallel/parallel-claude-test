@@ -67,11 +67,7 @@ function Collaborate() {
           </Text>
         </PublicVideoShowcase>
       </PublicContainer>
-      <PublicContainer
-        paddingY={16}
-        maxWidth="container.lg"
-        wrapper={{ background: "purple.50" }}
-      >
+      <PublicContainer paddingY={16} maxWidth="container.lg" wrapper={{ background: "purple.50" }}>
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/team-collaboration/parallel-share-${query.locale}.png`}
           imageSize="350px"
@@ -91,11 +87,7 @@ function Collaborate() {
           </Text>
         </PublicShowcase>
       </PublicContainer>
-      <PublicContainer
-        paddingY={8}
-        maxWidth="container.lg"
-        wrapper={{ paddingY: 16 }}
-      >
+      <PublicContainer paddingY={8} maxWidth="container.lg" wrapper={{ paddingY: 16 }}>
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/team-collaboration/parallel-internal-comments-${query.locale}.svg`}
           imageSize="350px"

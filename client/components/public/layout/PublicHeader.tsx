@@ -140,18 +140,12 @@ function PublicHeaderMenu(props: StackProps) {
       </Menu>
       <Menu placement="bottom" matchWidth={true}>
         <PublicHeaderMenuButton variant="ghost" urlPrefix="/solutions">
-          <FormattedMessage
-            id="public.solutions-link"
-            defaultMessage="Solutions"
-          />
+          <FormattedMessage id="public.solutions-link" defaultMessage="Solutions" />
         </PublicHeaderMenuButton>
         <Portal>
           <MenuList>
             <PublicHeaderMenuItemLink href="/solutions/law-firms">
-              <FormattedMessage
-                id="public.solutions.law-firms-link"
-                defaultMessage="Law firms"
-              />
+              <FormattedMessage id="public.solutions.law-firms-link" defaultMessage="Law firms" />
             </PublicHeaderMenuItemLink>
             <PublicHeaderMenuItemLink href="/solutions/consultancy">
               <FormattedMessage
@@ -169,10 +163,7 @@ function PublicHeaderMenu(props: StackProps) {
         </Portal>
       </Menu>
       <PublicHeaderLink href="/templates" variant="ghost">
-        <FormattedMessage
-          id="public.templates-link"
-          defaultMessage="Templates"
-        />
+        <FormattedMessage id="public.templates-link" defaultMessage="Templates" />
       </PublicHeaderLink>
       <PublicHeaderLink href="/about" variant="ghost">
         <FormattedMessage id="public.about-link" defaultMessage="About" />
@@ -181,10 +172,7 @@ function PublicHeaderMenu(props: StackProps) {
         <FormattedMessage id="public.login-button" defaultMessage="Login" />
       </PublicHeaderLink>
       <PublicHeaderLink href="/book-demo" colorScheme="purple" _activeLink={{}}>
-        <FormattedMessage
-          id="public.book-demo-button"
-          defaultMessage="Book a demo"
-        />
+        <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
       </PublicHeaderLink>
     </Stack>
   );
@@ -194,86 +182,84 @@ interface PublicHeaderLink extends ButtonProps {
   href: string;
 }
 
-export const PublicHeaderLink = chakraForwardRef<"a", PublicHeaderLink>(
-  function PublicHeaderLink({ href, children, ...props }, ref) {
-    const router = useRouter();
-    const current = router.pathname.startsWith("/[locale]")
-      ? router.asPath.replace(/^\/[^\/]+/, "")
-      : router.asPath;
-    const isCurrent = current === href || current.startsWith(`${href}/`);
-    return (
-      <NakedLink href={href}>
-        <Button
-          ref={ref as any}
-          as="a"
-          aria-current={isCurrent ? "page" : undefined}
-          _activeLink={{ color: "purple.500" }}
-          {...props}
-        >
-          {children}
-        </Button>
-      </NakedLink>
-    );
-  }
-);
+export const PublicHeaderLink = chakraForwardRef<"a", PublicHeaderLink>(function PublicHeaderLink(
+  { href, children, ...props },
+  ref
+) {
+  const router = useRouter();
+  const current = router.pathname.startsWith("/[locale]")
+    ? router.asPath.replace(/^\/[^\/]+/, "")
+    : router.asPath;
+  const isCurrent = current === href || current.startsWith(`${href}/`);
+  return (
+    <NakedLink href={href}>
+      <Button
+        ref={ref as any}
+        as="a"
+        aria-current={isCurrent ? "page" : undefined}
+        _activeLink={{ color: "purple.500" }}
+        {...props}
+      >
+        {children}
+      </Button>
+    </NakedLink>
+  );
+});
 
 interface PublicHeaderMenuItemLinkProps extends MenuItemProps {
   href: string;
 }
 
-export const PublicHeaderMenuItemLink = chakraForwardRef<
-  "a",
-  PublicHeaderMenuItemLinkProps
->(function MenuItemLink({ href, ...props }, ref) {
-  const router = useRouter();
-  const current = router.pathname.startsWith("/[locale]")
-    ? router.asPath.replace(/^\/[^\/]+/, "")
-    : router.asPath;
-  return (
-    <NakedLink href={href}>
-      <MenuItem
-        as="a"
-        ref={ref as any}
-        aria-current={current === href ? "page" : undefined}
-        _activeLink={{
-          fontWeight: "bold",
-          color: "purple.600",
-        }}
-        {...props}
-      />
-    </NakedLink>
-  );
-});
+export const PublicHeaderMenuItemLink = chakraForwardRef<"a", PublicHeaderMenuItemLinkProps>(
+  function MenuItemLink({ href, ...props }, ref) {
+    const router = useRouter();
+    const current = router.pathname.startsWith("/[locale]")
+      ? router.asPath.replace(/^\/[^\/]+/, "")
+      : router.asPath;
+    return (
+      <NakedLink href={href}>
+        <MenuItem
+          as="a"
+          ref={ref as any}
+          aria-current={current === href ? "page" : undefined}
+          _activeLink={{
+            fontWeight: "bold",
+            color: "purple.600",
+          }}
+          {...props}
+        />
+      </NakedLink>
+    );
+  }
+);
 interface PublicHeaderMenuButton extends MenuButtonProps, ButtonProps {
   urlPrefix: string;
 }
 
-export const PublicHeaderMenuButton = chakraForwardRef<
-  "button",
-  PublicHeaderMenuButton
->(function MenuButtonHighlight({ urlPrefix, children, ...props }, ref) {
-  const router = useRouter();
-  const current = router.pathname.startsWith("/[locale]")
-    ? router.asPath.replace(/^\/[^\/]+/, "")
-    : router.asPath;
-  const isCurrent =
-    current === urlPrefix || current.startsWith(`${urlPrefix}/`);
-  return (
-    <MenuButton
-      ref={ref as any}
-      as={Button}
-      rightIcon={
-        <ChevronDownIcon
-          sx={{
-            g: { strokeWidth: "3.2" },
-          }}
-        />
-      }
-      aria-current={isCurrent ? "page" : undefined}
-      _activeLink={{ color: "purple.600" }}
-      {...props}
-    >
-      {children}
-    </MenuButton>
-  );
-});
+export const PublicHeaderMenuButton = chakraForwardRef<"button", PublicHeaderMenuButton>(
+  function MenuButtonHighlight({ urlPrefix, children, ...props }, ref) {
+    const router = useRouter();
+    const current = router.pathname.startsWith("/[locale]")
+      ? router.asPath.replace(/^\/[^\/]+/, "")
+      : router.asPath;
+    const isCurrent = current === urlPrefix || current.startsWith(`${urlPrefix}/`);
+    return (
+      <MenuButton
+        ref={ref as any}
+        as={Button}
+        rightIcon={
+          <ChevronDownIcon
+            sx={{
+              g: { strokeWidth: "3.2" },
+            }}
+          />
+        }
+        aria-current={isCurrent ? "page" : undefined}
+        _activeLink={{ color: "purple.600" }}
+        {...props}
+      >
+        {children}
+      </MenuButton>
+    );
+  }
+);

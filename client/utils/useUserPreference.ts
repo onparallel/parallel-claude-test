@@ -14,9 +14,7 @@ export function useUserPreference<S>(
       (dispatch: SetStateAction<S>) => {
         setValue((current) => {
           const next =
-            typeof dispatch === "function"
-              ? ((dispatch as any)(current) as S)
-              : dispatch;
+            typeof dispatch === "function" ? ((dispatch as any)(current) as S) : dispatch;
           localStorageSet(name, next);
           return next;
         });

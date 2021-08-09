@@ -14,10 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
   OrganizationRole,
   CreateUserDialog_emailIsAvailableQuery,
@@ -44,16 +41,15 @@ function CreateOrUpdateUserDialog({
   CreateOrUpdateUserDialogData
 >) {
   const intl = useIntl();
-  const { handleSubmit, register, formState } =
-    useForm<CreateOrUpdateUserDialogData>({
-      mode: "onChange",
-      defaultValues: {
-        firstName: props.user?.firstName ?? undefined,
-        lastName: props.user?.lastName ?? undefined,
-        email: props.user?.email ?? "",
-        role: props.user?.role ?? "NORMAL",
-      },
-    });
+  const { handleSubmit, register, formState } = useForm<CreateOrUpdateUserDialogData>({
+    mode: "onChange",
+    defaultValues: {
+      firstName: props.user?.firstName ?? undefined,
+      lastName: props.user?.lastName ?? undefined,
+      email: props.user?.email ?? "",
+      role: props.user?.role ?? "NORMAL",
+    },
+  });
 
   const { errors } = formState;
 
@@ -108,15 +104,9 @@ function CreateOrUpdateUserDialog({
       initialFocusRef={emailRef}
       header={
         props.type === "update" ? (
-          <FormattedMessage
-            id="organization-users.update-user"
-            defaultMessage="Update user"
-          />
+          <FormattedMessage id="organization-users.update-user" defaultMessage="Update user" />
         ) : (
-          <FormattedMessage
-            id="organization-users.create-user"
-            defaultMessage="Create user"
-          />
+          <FormattedMessage id="organization-users.create-user" defaultMessage="Create user" />
         )
       }
       body={
@@ -127,10 +117,7 @@ function CreateOrUpdateUserDialog({
             isDisabled={props.type === "update"}
           >
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.email-label"
-                defaultMessage="Email"
-              />
+              <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
             </FormLabel>
             <InputGroup>
               <Input
@@ -177,10 +164,7 @@ function CreateOrUpdateUserDialog({
             isDisabled={props.type === "update"}
           >
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.first-name-label"
-                defaultMessage="First name"
-              />
+              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input {...register("firstName", { required: true })} />
             <FormErrorMessage>
@@ -196,10 +180,7 @@ function CreateOrUpdateUserDialog({
             isDisabled={props.type === "update"}
           >
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.last-name-label"
-                defaultMessage="Last name"
-              />
+              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input {...register("lastName", { required: true })} />
             <FormErrorMessage>
@@ -236,15 +217,9 @@ function CreateOrUpdateUserDialog({
       confirm={
         <Button type="submit" colorScheme="purple" variant="solid">
           {props.type === "update" ? (
-            <FormattedMessage
-              id="organization-users.update-user"
-              defaultMessage="Update user"
-            />
+            <FormattedMessage id="organization-users.update-user" defaultMessage="Update user" />
           ) : (
-            <FormattedMessage
-              id="organization-users.create-user"
-              defaultMessage="Create user"
-            />
+            <FormattedMessage id="organization-users.create-user" defaultMessage="Create user" />
           )}
         </Button>
       }

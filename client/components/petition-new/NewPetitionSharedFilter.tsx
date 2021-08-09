@@ -60,12 +60,7 @@ export function NewPetitionSharedFilter({
 
   return (
     <Menu>
-      <MenuButton
-        as={Button}
-        variant="outline"
-        rightIcon={<ChevronDownIcon />}
-        {...props}
-      >
+      <MenuButton as={Button} variant="outline" rightIcon={<ChevronDownIcon />} {...props}>
         {options.find((opt) => opt.key === option)?.label ?? options[0].label}
       </MenuButton>
       <Portal>
@@ -74,9 +69,7 @@ export function NewPetitionSharedFilter({
             value={option ?? "ALL"}
             onChange={(value) =>
               onSharedFilterChange(
-                value === "ALL"
-                  ? null
-                  : (value as NewPetitionSharedFilterValues)
+                value === "ALL" ? null : (value as NewPetitionSharedFilterValues)
               )
             }
           >

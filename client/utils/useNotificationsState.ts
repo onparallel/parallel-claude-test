@@ -1,9 +1,5 @@
 import { PetitionUserNotificationFilter } from "@parallel/graphql/__types";
-import {
-  useQueryState,
-  useQueryStateSlice,
-  values,
-} from "@parallel/utils/queryState";
+import { useQueryState, useQueryStateSlice, values } from "@parallel/utils/queryState";
 import { useMemo } from "react";
 import { localStorageGet, localStorageSet } from "./localStorage";
 

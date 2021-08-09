@@ -1,7 +1,4 @@
-export type DateTimeFormatOptions = Exclude<
-  Intl.DateTimeFormatOptions,
-  "localeMatcher"
->;
+export type DateTimeFormatOptions = Exclude<Intl.DateTimeFormatOptions, "localeMatcher">;
 
 /**
  * Prebuilt DateTimeFormatOptions to use with react-intl

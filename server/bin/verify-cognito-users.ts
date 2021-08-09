@@ -11,12 +11,9 @@ const knex = container.get<Knex>(KNEX);
 const aws = container.get<IAws>(AWS_SERVICE);
 const config = container.get<Config>(CONFIG);
 (async () => {
-  const users: { email: string }[] = await knex
-    .select("email")
-    .from("user")
-    .where({
-      deleted_at: null,
-    });
+  const users: { email: string }[] = await knex.select("email").from("user").where({
+    deleted_at: null,
+  });
 
   await pMap(
     users,

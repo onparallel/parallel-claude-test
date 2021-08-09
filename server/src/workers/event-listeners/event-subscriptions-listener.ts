@@ -8,9 +8,7 @@ export const eventSubscriptionsListener: EventListener<PetitionEvent> = async (
   event: PetitionEvent,
   ctx: WorkerContext
 ) => {
-  const subscriptions = await ctx.subscriptions.loadSubscriptionsByPetitionId(
-    event.petition_id
-  );
+  const subscriptions = await ctx.subscriptions.loadSubscriptionsByPetitionId(event.petition_id);
 
   for (const subscription of subscriptions) {
     const mappedEvent = mapEvent(event);

@@ -9,11 +9,9 @@ export function unMaybeArray<T>(items: MaybeArray<T>) {
   return Array.isArray(items) ? items : [items];
 }
 
-export type If<
-  Condition extends boolean | undefined,
-  Then,
-  Else = never
-> = Condition extends true ? Then : Else;
+export type If<Condition extends boolean | undefined, Then, Else = never> = Condition extends true
+  ? Then
+  : Else;
 
 export interface Focusable {
   focus(options?: FocusOptions): void;

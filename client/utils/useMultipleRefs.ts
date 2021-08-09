@@ -6,9 +6,7 @@ export function useMultipleRefs<T>(): Record<string, RefObject<T>> {
     () =>
       new Proxy(refs.current, {
         get(target, id) {
-          return (
-            target[id as string] ?? (target[id as string] = createRef<T>())
-          );
+          return target[id as string] ?? (target[id as string] = createRef<T>());
         },
       }),
     []

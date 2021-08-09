@@ -11,29 +11,17 @@ export type TimelineSignatureCompletedEventProps = {
   event: TimelineSignatureCompletedEvent_SignatureCompletedEventFragment;
 };
 
-export function TimelineSignatureCompletedEvent({
-  event,
-}: TimelineSignatureCompletedEventProps) {
+export function TimelineSignatureCompletedEvent({ event }: TimelineSignatureCompletedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<SignatureIcon />}
-          color="white"
-          backgroundColor="green.400"
-        />
-      }
+      icon={<TimelineIcon icon={<SignatureIcon />} color="white" backgroundColor="green.400" />}
     >
       <FormattedMessage
         id="timeline.signature-completed-description"
         defaultMessage="The eSignature process on the petition has been completed {timeAgo}"
         values={{
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

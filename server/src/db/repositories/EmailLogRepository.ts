@@ -4,12 +4,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
 import { KNEX } from "../knex";
-import {
-  CreateEmailEvent,
-  CreateEmailLog,
-  EmailLog,
-  TemporaryFile,
-} from "../__types";
+import { CreateEmailEvent, CreateEmailLog, EmailLog, TemporaryFile } from "../__types";
 
 @injectable()
 export class EmailLogRepository extends BaseRepository {
@@ -24,10 +19,7 @@ export class EmailLogRepository extends BaseRepository {
     return rows[0];
   }
 
-  async addEmailAttachments(
-    emailLogId: number,
-    temporaryFileIds: MaybeArray<number>
-  ) {
+  async addEmailAttachments(emailLogId: number, temporaryFileIds: MaybeArray<number>) {
     if (Array.isArray(temporaryFileIds) && temporaryFileIds.length === 0) {
       return;
     }
@@ -65,9 +57,7 @@ export class EmailLogRepository extends BaseRepository {
   }
 
   async findInternalId(externalId: string) {
-    const [entry] = await this.from("email_log")
-      .where("external_id", externalId)
-      .select("id");
+    const [entry] = await this.from("email_log").where("external_id", externalId).select("id");
     return entry ? entry.id : null;
   }
 
@@ -75,9 +65,7 @@ export class EmailLogRepository extends BaseRepository {
     return await this.insert("email_event", data);
   }
 
-  readonly loadEmailEvents = this.buildLoadMultipleBy(
-    "email_event",
-    "email_log_id",
-    (q) => q.orderBy("created_at")
+  readonly loadEmailEvents = this.buildLoadMultipleBy("email_event", "email_log_id", (q) =>
+    q.orderBy("created_at")
   );
 }

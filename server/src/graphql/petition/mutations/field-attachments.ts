@@ -14,8 +14,7 @@ import {
 export const createPetitionFieldAttachmentUploadLink = mutationField(
   "createPetitionFieldAttachmentUploadLink",
   {
-    description:
-      "Generates and returns a signed url to upload a field attachment to AWS S3",
+    description: "Generates and returns a signed url to upload a field attachment to AWS S3",
     type: objectType({
       name: "CreateFileUploadFieldAttachment",
       definition(t) {
@@ -37,17 +36,11 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
     },
     validateArgs: (root, args, ctx, info) => {
       if (args.data.size > 1024 * 1024 * 100) {
-        throw new ArgValidationError(
-          info,
-          "data.size",
-          "Size limit of 100MB exceeded"
-        );
+        throw new ArgValidationError(info, "data.size", "Size limit of 100MB exceeded");
       }
     },
     resolve: async (_, args, ctx) => {
-      const attachments = await ctx.petitions.loadFieldAttachmentsByFieldId(
-        args.fieldId
-      );
+      const attachments = await ctx.petitions.loadFieldAttachmentsByFieldId(args.fieldId);
       if (attachments.length + 1 > 10) {
         throw new WhitelistedError(
           "Maximum number of attachments per field reached",
@@ -84,8 +77,7 @@ export const createPetitionFieldAttachmentUploadLink = mutationField(
 export const petitionFieldAttachmentUploadComplete = mutationField(
   "petitionFieldAttachmentUploadComplete",
   {
-    description:
-      "Tells the backend that the field attachment was correctly uploaded to S3",
+    description: "Tells the backend that the field attachment was correctly uploaded to S3",
     type: "PetitionFieldAttachment",
     args: {
       petitionId: nonNull(globalIdArg("Petition")),
@@ -98,9 +90,7 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
       fieldAttachmentBelongsToField("fieldId", "attachmentId")
     ),
     resolve: async (_, args, ctx) => {
-      const attachment = (await ctx.petitions.loadFieldAttachment(
-        args.attachmentId
-      ))!;
+      const attachment = (await ctx.petitions.loadFieldAttachment(args.attachmentId))!;
       const file = await ctx.files.loadFileUpload(attachment.file_upload_id);
 
       await ctx.aws.fileUploads.getFileMetadata(file!.path);
@@ -112,31 +102,25 @@ export const petitionFieldAttachmentUploadComplete = mutationField(
   }
 );
 
-export const removePetitionFieldAttachment = mutationField(
-  "removePetitionFieldAttachment",
-  {
-    description: "Remove a petition field attachment",
-    type: "Result",
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-      fieldId: nonNull(globalIdArg("PetitionField")),
-      attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
-    },
-    authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "fieldId"),
-      fieldAttachmentBelongsToField("fieldId", "attachmentId"),
-      petitionsAreNotPublicTemplates("petitionId")
-    ),
-    resolve: async (_, args, ctx) => {
-      await ctx.petitions.removePetitionFieldAttachment(
-        args.attachmentId,
-        ctx.user!
-      );
-      return RESULT.SUCCESS;
-    },
-  }
-);
+export const removePetitionFieldAttachment = mutationField("removePetitionFieldAttachment", {
+  description: "Remove a petition field attachment",
+  type: "Result",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    attachmentId: nonNull(globalIdArg("PetitionFieldAttachment")),
+  },
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldAttachmentBelongsToField("fieldId", "attachmentId"),
+    petitionsAreNotPublicTemplates("petitionId")
+  ),
+  resolve: async (_, args, ctx) => {
+    await ctx.petitions.removePetitionFieldAttachment(args.attachmentId, ctx.user!);
+    return RESULT.SUCCESS;
+  },
+});
 
 export const petitionFieldAttachmentDownloadLink = mutationField(
   "petitionFieldAttachmentDownloadLink",
@@ -155,17 +139,11 @@ export const petitionFieldAttachmentDownloadLink = mutationField(
     },
     resolve: async (_, args, ctx) => {
       try {
-        const fieldAttachment = (await ctx.petitions.loadFieldAttachment(
-          args.attachmentId
-        ))!;
+        const fieldAttachment = (await ctx.petitions.loadFieldAttachment(args.attachmentId))!;
 
-        const file = await ctx.files.loadFileUpload(
-          fieldAttachment.file_upload_id
-        );
+        const file = await ctx.files.loadFileUpload(fieldAttachment.file_upload_id);
         if (!file) {
-          throw new Error(
-            `FileUpload not found with id ${fieldAttachment.file_upload_id}`
-          );
+          throw new Error(`FileUpload not found with id ${fieldAttachment.file_upload_id}`);
         }
         if (!file.upload_complete) {
           await ctx.aws.fileUploads.getFileMetadata(file!.path);

@@ -45,13 +45,7 @@ export const PetitionRepliesFieldAttachment = Object.assign(
               fontWeight="500"
               maxWidth="200px"
             />
-            <Text
-              as="span"
-              fontSize="sm"
-              color="gray.500"
-              marginLeft={1}
-              whiteSpace="nowrap"
-            >
+            <Text as="span" fontSize="sm" color="gray.500" marginLeft={1} whiteSpace="nowrap">
               (<FileSize value={attachment.file.size} />)
             </Text>
           </Flex>

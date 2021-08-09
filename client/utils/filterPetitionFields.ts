@@ -11,9 +11,7 @@ export type PetitionFieldFilterType =
 
 export type PetitionFieldFilter = Record<PetitionFieldFilterType, boolean>;
 
-type FilterPetitionFieldResult<
-  T extends filterPetitionFields_PetitionFieldFragment
-> =
+type FilterPetitionFieldResult<T extends filterPetitionFields_PetitionFieldFragment> =
   | {
       type: "FIELD";
       field: T;
@@ -28,9 +26,7 @@ export const defaultFieldsFilter = {
   SHOW_WITH_COMMENTS: false,
 };
 
-export function filterPetitionFields<
-  T extends filterPetitionFields_PetitionFieldFragment
->(
+export function filterPetitionFields<T extends filterPetitionFields_PetitionFieldFragment>(
   fields: T[],
   fieldIndices: PetitionFieldIndex[],
   fieldVisibility: boolean[],

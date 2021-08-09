@@ -14,10 +14,7 @@ export interface MessageEmailBouncedUserNotificationProps {
 
 export const MessageEmailBouncedUserNotification = Object.assign(
   forwardRef<HTMLElement, MessageEmailBouncedUserNotificationProps>(
-    function MessageEmailBouncedUserNotification(
-      { isFirst, notification },
-      ref
-    ) {
+    function MessageEmailBouncedUserNotification({ isFirst, notification }, ref) {
       return (
         <PetitionUserNotification
           ref={ref}

@@ -22,28 +22,13 @@ const email: Email<InvitationProps> = {
   subject({}, intl) {
     return "";
   },
-  text(
-    { email, password, assetsUrl, parallelUrl }: InvitationProps,
-    intl: IntlShape
-  ) {
+  text({ email, password, assetsUrl, parallelUrl }: InvitationProps, intl: IntlShape) {
     return outdent``;
   },
-  html({
-    email,
-    password,
-    assetsUrl,
-    parallelUrl,
-    logoUrl,
-    logoAlt,
-  }: InvitationProps) {
+  html({ email, password, assetsUrl, parallelUrl, logoUrl, logoAlt }: InvitationProps) {
     const { locale } = useIntl();
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection>
           <MjmlColumn>
             <Greeting name={null} />
@@ -64,10 +49,7 @@ const email: Email<InvitationProps> = {
               />
             </MjmlText>
             <Button href={`${parallelUrl}/${locale}/login`}>
-              <FormattedMessage
-                id="invitation.login-button"
-                defaultMessage="Log in"
-              />
+              <FormattedMessage id="invitation.login-button" defaultMessage="Log in" />
             </Button>
             <Closing />
           </MjmlColumn>

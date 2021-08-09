@@ -11,9 +11,7 @@ export function findNamedTypeRef<T extends IntrospectionType>(
   type: IntrospectionNamedTypeRef<T>,
   schemaTypes: readonly IntrospectionType[]
 ): T {
-  return schemaTypes.find(
-    (t) => t.kind === type.kind && t.name === type.name
-  ) as T;
+  return schemaTypes.find((t) => t.kind === type.kind && t.name === type.name) as T;
 }
 
 function getDefaultInputObjectTypeValue(
@@ -23,10 +21,7 @@ function getDefaultInputObjectTypeValue(
   const { inputFields } = findNamedTypeRef(type, schemaTypes);
 
   return Object.fromEntries(
-    inputFields.map((f) => [
-      f.name,
-      getDefaultInputTypeValue(f.type, schemaTypes),
-    ])
+    inputFields.map((f) => [f.name, getDefaultInputTypeValue(f.type, schemaTypes)])
   );
 }
 

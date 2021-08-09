@@ -6,11 +6,7 @@ export interface PublicFooterBoxProps extends BoxProps {
   children?: ReactNode;
 }
 
-export function PublicFooterBox({
-  heading,
-  children,
-  ...rest
-}: PublicFooterBoxProps) {
+export function PublicFooterBox({ heading, children, ...rest }: PublicFooterBoxProps) {
   return (
     <Flex as="section" flexDirection="column" {...rest}>
       {heading && (

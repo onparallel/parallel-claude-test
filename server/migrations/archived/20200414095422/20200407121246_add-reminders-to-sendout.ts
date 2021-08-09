@@ -21,11 +21,10 @@ export async function up(knex: Knex): Promise<any> {
       t.dropForeign(["email_log_id"]);
     })
     .alterTable("petition_sendout", (t) => {
-      t.enum(
-        "status",
-        ["SCHEDULED", "CANCELLED", "PROCESSING", "ACTIVE", "INACTIVE"],
-        { useNative: true, enumName: "petition_sendout_status" }
-      ); //.notNullable();
+      t.enum("status", ["SCHEDULED", "CANCELLED", "PROCESSING", "ACTIVE", "INACTIVE"], {
+        useNative: true,
+        enumName: "petition_sendout_status",
+      }); //.notNullable();
       t.timestamp("scheduled_at");
       t.integer("email_log_id");
       t.timestamp("next_reminder_at");

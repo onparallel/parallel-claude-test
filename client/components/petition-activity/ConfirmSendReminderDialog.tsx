@@ -11,10 +11,7 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { PetitionAccessTable_PetitionAccessFragment } from "@parallel/graphql/__types";
 import { emptyRTEValue } from "@parallel/utils/slate/emptyRTEValue";
 import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
@@ -57,11 +54,7 @@ export function ConfirmSendReminderDialog({
       body={
         <Stack spacing={4}>
           {optedOut.length ? (
-            <Alert
-              status="warning"
-              backgroundColor="orange.100"
-              borderRadius="md"
-            >
+            <Alert status="warning" backgroundColor="orange.100" borderRadius="md">
               <Flex alignItems="center" justifyContent="flex-start">
                 <AlertIcon color="yellow.500" />
                 <AlertDescription>

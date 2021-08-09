@@ -38,9 +38,7 @@ export async function petitionCompleted(
 
   if (!contact) {
     throw new Error(
-      `Contact not found for contact_id ${
-        access?.contact_id ?? payload.signer_contact_id
-      }`
+      `Contact not found for contact_id ${access?.contact_id ?? payload.signer_contact_id}`
     );
   }
   const petitionId = payload.petition_id;
@@ -58,10 +56,7 @@ export async function petitionCompleted(
     return;
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(
-    petition.org_id,
-    context
-  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
   const fieldIds = fields.map((f) => f.id);
   const fieldReplies = await context.petitions.loadRepliesForField(fieldIds);
@@ -73,21 +68,14 @@ export async function petitionCompleted(
     replies: repliesByFieldId[f.id],
   }));
 
-  const visibleFields = zip(
-    fieldsWithReplies,
-    evaluateFieldVisibility(fieldsWithReplies)
-  )
+  const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
     .filter(([, isVisible]) => isVisible)
     .map(([field]) => field);
 
   const emails: EmailLog[] = [];
 
-  const subscribedUserIds = permissions
-    .filter((p) => p.is_subscribed)
-    .map((p) => p.user_id!);
-  const subscribedUsers = (
-    await context.users.loadUser(subscribedUserIds)
-  ).filter(isDefined);
+  const subscribedUserIds = permissions.filter((p) => p.is_subscribed).map((p) => p.user_id!);
+  const subscribedUsers = (await context.users.loadUser(subscribedUserIds)).filter(isDefined);
   for (const user of subscribedUsers) {
     const { html, text, subject, from } = await buildEmail(
       PetitionCompleted,
@@ -96,8 +84,7 @@ export async function petitionCompleted(
         name: user.first_name,
         petitionId: toGlobalId("Petition", petitionId),
         petitionName: petition.name,
-        contactNameOrEmail:
-          fullName(contact.first_name, contact.last_name) || contact.email,
+        contactNameOrEmail: fullName(contact.first_name, contact.last_name) || contact.email,
         fields: visibleFields.map(pick(["id", "title", "position", "type"])),
         ...layoutProps,
       },

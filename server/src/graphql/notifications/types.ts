@@ -1,11 +1,4 @@
-import {
-  core,
-  enumType,
-  interfaceType,
-  nonNull,
-  objectType,
-  unionType,
-} from "@nexus/schema";
+import { core, enumType, interfaceType, nonNull, objectType, unionType } from "@nexus/schema";
 
 export const UserOrContact = unionType({
   name: "UserOrContact",
@@ -90,14 +83,11 @@ export const CommentCreatedUserNotification = createPetitionUserNotification(
     t.field("comment", {
       type: "PetitionFieldComment",
       resolve: async (o, _, ctx) =>
-        (await ctx.petitions.loadPetitionFieldComment(
-          o.data.petition_field_comment_id
-        ))!,
+        (await ctx.petitions.loadPetitionFieldComment(o.data.petition_field_comment_id))!,
     });
     t.field("field", {
       type: "PetitionField",
-      resolve: async (o, _, ctx) =>
-        (await ctx.petitions.loadField(o.data.petition_field_id))!,
+      resolve: async (o, _, ctx) => (await ctx.petitions.loadField(o.data.petition_field_id))!,
     });
   }
 );
@@ -114,25 +104,22 @@ export const PetitionCompletedUserNotification = createPetitionUserNotification(
   }
 );
 
-export const SignatureCompletedUserNotification =
-  createPetitionUserNotification(
-    "SignatureCompletedUserNotification",
-    () => {}
-  );
+export const SignatureCompletedUserNotification = createPetitionUserNotification(
+  "SignatureCompletedUserNotification",
+  () => {}
+);
 
-export const SignatureCancelledUserNotification =
-  createPetitionUserNotification(
-    "SignatureCancelledUserNotification",
-    () => {}
-  );
+export const SignatureCancelledUserNotification = createPetitionUserNotification(
+  "SignatureCancelledUserNotification",
+  () => {}
+);
 
 export const PetitionSharedUserNotification = createPetitionUserNotification(
   "PetitionSharedUserNotification",
   (t) => {
     t.field("owner", {
       type: "User",
-      resolve: async (root, _, ctx) =>
-        (await ctx.users.loadUser(root.data.owner_id))!,
+      resolve: async (root, _, ctx) => (await ctx.users.loadUser(root.data.owner_id))!,
     });
     t.field("permissionType", {
       type: "PetitionPermissionTypeRW",
@@ -148,39 +135,36 @@ export const PetitionSharedUserNotification = createPetitionUserNotification(
             }
           : {
               __type: "UserGroup",
-              ...(await ctx.userGroups.loadUserGroup(
-                root.data.user_group_id!
-              ))!,
+              ...(await ctx.userGroups.loadUserGroup(root.data.user_group_id!))!,
             };
       },
     });
   }
 );
 
-export const MessageEmailBouncedUserNotification =
-  createPetitionUserNotification("MessageEmailBouncedUserNotification", (t) => {
+export const MessageEmailBouncedUserNotification = createPetitionUserNotification(
+  "MessageEmailBouncedUserNotification",
+  (t) => {
     t.field("access", {
       type: "PetitionAccess",
       resolve: async (root, _, ctx) => {
         return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
       },
     });
-  });
+  }
+);
 
-export const ReminderEmailBouncedUserNotification =
-  createPetitionUserNotification(
-    "ReminderEmailBouncedUserNotification",
-    (t) => {
-      t.field("access", {
-        type: "PetitionAccess",
-        resolve: async (root, _, ctx) => {
-          return (await ctx.petitions.loadAccess(
-            root.data.petition_access_id
-          ))!;
-        },
-      });
-    }
-  );
+export const ReminderEmailBouncedUserNotification = createPetitionUserNotification(
+  "ReminderEmailBouncedUserNotification",
+  (t) => {
+    t.field("access", {
+      type: "PetitionAccess",
+      resolve: async (root, _, ctx) => {
+        return (await ctx.petitions.loadAccess(root.data.petition_access_id))!;
+      },
+    });
+  }
+);
 
 export const RemindersOptOutNotification = createPetitionUserNotification(
   "RemindersOptOutNotification",

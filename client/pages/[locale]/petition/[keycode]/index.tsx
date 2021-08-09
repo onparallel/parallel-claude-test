@@ -55,11 +55,7 @@ type RecipientViewVerifyState =
     }
   | { step: "VERIFIED" };
 
-function RecipientViewVerify({
-  email,
-  orgName,
-  orgLogoUrl,
-}: RecipientViewVerifyProps) {
+function RecipientViewVerify({ email, orgName, orgLogoUrl }: RecipientViewVerifyProps) {
   const { query } = useRouter();
   const toast = useToast();
   const intl = useIntl();
@@ -153,12 +149,7 @@ function RecipientViewVerify({
         <title>Parallel</title>
       </Head>
       <Box backgroundColor="gray.50" minHeight="100vh">
-        <Container
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          minHeight="100vh"
-        >
+        <Container display="flex" flexDirection="column" justifyContent="center" minHeight="100vh">
           <Card padding={{ base: 4, sm: 8 }} marginY={4}>
             <Stack spacing={8}>
               <Center>
@@ -231,12 +222,7 @@ function RecipientViewVerify({
                       },
                     }}
                   >
-                    <PinInput
-                      autoFocus
-                      value={code}
-                      onChange={setCode}
-                      isInvalid={state.isInvalid}
-                    >
+                    <PinInput autoFocus value={code} onChange={setCode} isInvalid={state.isInvalid}>
                       <PinInputField ref={firstInputRef} />
                       <PinInputField />
                       <PinInputField />
@@ -270,11 +256,7 @@ function RecipientViewVerify({
               ) : state.step === "VERIFIED" ? (
                 <Center height="96px">
                   <ScaleFade initialScale={0} in={true}>
-                    <Center
-                      backgroundColor="green.500"
-                      borderRadius="full"
-                      boxSize="96px"
-                    >
+                    <Center backgroundColor="green.500" borderRadius="full" boxSize="96px">
                       <CheckIcon color="white" boxSize="64px" />
                     </Center>
                   </ScaleFade>
@@ -292,9 +274,7 @@ export async function getServerSideProps({
   query: { locale, keycode },
   req,
   res,
-}: GetServerSidePropsContext): Promise<
-  GetServerSidePropsResult<RecipientViewVerifyProps>
-> {
+}: GetServerSidePropsContext): Promise<GetServerSidePropsResult<RecipientViewVerifyProps>> {
   if (isInsecureBrowser(req.headers["user-agent"])) {
     return {
       redirect: {
@@ -315,12 +295,7 @@ export async function getServerSideProps({
         $ip: String
         $userAgent: String
       ) {
-        verifyPublicAccess(
-          token: $token
-          keycode: $keycode
-          ip: $ip
-          userAgent: $userAgent
-        ) {
+        verifyPublicAccess(token: $token, keycode: $keycode, ip: $ip, userAgent: $userAgent) {
           isAllowed
           cookieName
           cookieValue
@@ -375,16 +350,8 @@ RecipientViewVerify.mutations = [
     }
   `,
   gql`
-    mutation publicCheckVerificationCode(
-      $keycode: ID!
-      $token: ID!
-      $code: String!
-    ) {
-      publicCheckVerificationCode(
-        keycode: $keycode
-        token: $token
-        code: $code
-      ) {
+    mutation publicCheckVerificationCode($keycode: ID!, $token: ID!, $code: String!) {
+      publicCheckVerificationCode(keycode: $keycode, token: $token, code: $code) {
         result
         remainingAttempts
       }

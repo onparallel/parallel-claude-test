@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
 import {
   ChevronDownIcon,
   RepeatIcon,
@@ -90,10 +81,7 @@ export function OrganizationUsersListTableHeader({
   return (
     <Stack direction="row" padding={2}>
       <Box flex="0 1 400px">
-        <SearchInput
-          value={search ?? ""}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
+        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
       </Box>
       <IconButtonWithTooltip
         onClick={onReload}
@@ -110,22 +98,13 @@ export function OrganizationUsersListTableHeader({
           <Spacer />
           <Box>
             <Menu>
-              <MenuButton
-                as={Button}
-                rightIcon={<ChevronDownIcon />}
-                isDisabled={!showActions}
-              >
-                <FormattedMessage
-                  id="generic.actions-button"
-                  defaultMessage="Actions"
-                />
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isDisabled={!showActions}>
+                <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
               </MenuButton>
               <Portal>
                 <MenuList minWidth="160px">
                   <MenuItem
-                    isDisabled={selectedUsers.every(
-                      (u) => u.status === "ACTIVE"
-                    )}
+                    isDisabled={selectedUsers.every((u) => u.status === "ACTIVE")}
                     onClick={() => handleUpdateSelectedUsersStatus("ACTIVE")}
                     icon={<UserCheckIcon display="block" boxSize={4} />}
                   >
@@ -136,9 +115,7 @@ export function OrganizationUsersListTableHeader({
                     />
                   </MenuItem>
                   <MenuItem
-                    isDisabled={selectedUsers.every(
-                      (u) => u.status === "INACTIVE"
-                    )}
+                    isDisabled={selectedUsers.every((u) => u.status === "INACTIVE")}
                     onClick={() => handleUpdateSelectedUsersStatus("INACTIVE")}
                     icon={<UserXIcon display="block" boxSize={4} />}
                   >
@@ -158,10 +135,7 @@ export function OrganizationUsersListTableHeader({
               leftIcon={<UserPlusIcon fontSize="18px" />}
               onClick={onCreateUser}
             >
-              <FormattedMessage
-                id="organization-users.create-user"
-                defaultMessage="Create user"
-              />
+              <FormattedMessage id="organization-users.create-user" defaultMessage="Create user" />
             </Button>
           )}
         </>

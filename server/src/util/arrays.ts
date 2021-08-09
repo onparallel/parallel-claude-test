@@ -8,10 +8,7 @@ export function partition<T, S extends T>(
   array: T[],
   predicate: (value: T) => value is S
 ): [S[], Exclude<T, S>[]];
-export function partition<T>(
-  array: T[],
-  predicate: (value: T) => unknown
-): [T[], T[]];
+export function partition<T>(array: T[], predicate: (value: T) => unknown): [T[], T[]];
 export function partition<T>(array: T[], predicate: (value: T) => unknown) {
   const match = [];
   const noMatch = [];

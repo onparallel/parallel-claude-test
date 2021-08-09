@@ -29,13 +29,10 @@ export function PaneWithFlyout({
       setFlyoutOffset(0);
       return;
     }
-    const { top: paneTop, height: paneHeight } =
-      paneRef.current!.getBoundingClientRect();
-    const { height: alignWithHeight, top: alignWithTop } =
-      alignWith.getBoundingClientRect();
+    const { top: paneTop, height: paneHeight } = paneRef.current!.getBoundingClientRect();
+    const { height: alignWithHeight, top: alignWithTop } = alignWith.getBoundingClientRect();
     const { height: flyoutHeight } = flyoutRef.current.getBoundingClientRect();
-    const offset =
-      alignWithTop - paneTop + alignWithHeight / 2 - flyoutHeight / 2;
+    const offset = alignWithTop - paneTop + alignWithHeight / 2 - flyoutHeight / 2;
     const maxOffset = paneHeight - flyoutHeight;
     setFlyoutOffset(Math.min(maxOffset, Math.max(0, offset)));
   }
@@ -56,11 +53,7 @@ export function PaneWithFlyout({
 
   return (
     <Flex ref={paneRef} minHeight="100%">
-      <Box
-        flex="2"
-        minWidth={0}
-        display={{ base: isFlyoutActive ? "none" : "block", md: "block" }}
-      >
+      <Box flex="2" minWidth={0} display={{ base: isFlyoutActive ? "none" : "block", md: "block" }}>
         {children}
       </Box>
       <Box

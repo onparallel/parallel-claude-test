@@ -41,8 +41,7 @@ export const PetitionPermission = interfaceType({
       resolve: (o) => o.type,
     });
     t.boolean("isSubscribed", {
-      description:
-        "wether user is subscribed or not to emails and alerts of the petition",
+      description: "wether user is subscribed or not to emails and alerts of the petition",
       resolve: (o) => o.is_subscribed,
     });
   },
@@ -59,8 +58,7 @@ export const EffectivePetitionUserPermission = objectType({
       resolve: (o) => o.type,
     });
     t.boolean("isSubscribed", {
-      description:
-        "wether user is subscribed or not to emails and alerts of the petition",
+      description: "wether user is subscribed or not to emails and alerts of the petition",
       resolve: (o) => o.is_subscribed,
     });
   },

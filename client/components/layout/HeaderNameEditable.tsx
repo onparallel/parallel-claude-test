@@ -8,11 +8,7 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  CloudErrorIcon,
-  CloudOkIcon,
-  CloudUploadIcon,
-} from "@parallel/chakra/icons";
+import { CloudErrorIcon, CloudOkIcon, CloudUploadIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { HeaderNameEditable_PetitionBaseFragment } from "@parallel/graphql/__types";
 import { FORMATS } from "@parallel/utils/dates";
@@ -56,11 +52,7 @@ export const HeaderNameEditable = Object.assign(
           <>
             <Flex flex="1 1 auto" minWidth={0} padding={1}>
               {isReadOnly ? (
-                <Text
-                  color={name ? "default" : "gray.400"}
-                  paddingX={2}
-                  isTruncated
-                >
+                <Text color={name ? "default" : "gray.400"} paddingX={2} isTruncated>
                   {name || props.placeholder}
                 </Text>
               ) : (
@@ -92,12 +84,7 @@ export const HeaderNameEditable = Object.assign(
               )}
             </Flex>
             {!isEditing && (
-              <Flex
-                alignItems="center"
-                fontSize="sm"
-                position="relative"
-                top="3px"
-              >
+              <Flex alignItems="center" fontSize="sm" position="relative" top="3px">
                 <Tooltip
                   label={intl.formatMessage(
                     {
@@ -145,20 +132,11 @@ export const HeaderNameEditable = Object.assign(
                       }}
                     >
                       {state === "SAVING" ? (
-                        <FormattedMessage
-                          id="generic.saving-changes"
-                          defaultMessage="Saving..."
-                        />
+                        <FormattedMessage id="generic.saving-changes" defaultMessage="Saving..." />
                       ) : state === "SAVED" ? (
-                        <FormattedMessage
-                          id="generic.changes-saved"
-                          defaultMessage="Saved"
-                        />
+                        <FormattedMessage id="generic.changes-saved" defaultMessage="Saved" />
                       ) : state === "ERROR" ? (
-                        <FormattedMessage
-                          id="petition.status.error"
-                          defaultMessage="Error"
-                        />
+                        <FormattedMessage id="petition.status.error" defaultMessage="Error" />
                       ) : null}
                     </Text>
                   </Text>

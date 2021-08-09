@@ -27,10 +27,7 @@ async function startSignatureProcess(
   payload: { petitionSignatureRequestId: number },
   ctx: WorkerContext
 ) {
-  const signature = await fetchPetitionSignature(
-    payload.petitionSignatureRequestId,
-    ctx
-  );
+  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
 
   if (signature.status !== "ENQUEUED") {
     throw new Error(
@@ -39,21 +36,14 @@ async function startSignatureProcess(
   }
   const petition = await fetchPetition(signature.petition_id, ctx);
   if (!petition.signature_config) {
-    throw new Error(
-      `Signature is not enabled on petition with id ${signature.petition_id}`
-    );
+    throw new Error(`Signature is not enabled on petition with id ${signature.petition_id}`);
   }
 
   const petitionGID = toGlobalId("Petition", signature.petition_id);
   const settings = signature.signature_config as PetitionSignatureConfig;
 
   let removeGeneratedPdf = true;
-  const tmpPdfPath = resolve(
-    tmpdir(),
-    "print",
-    random(16),
-    sanitize(`${settings.title}.pdf`)
-  );
+  const tmpPdfPath = resolve(tmpdir(), "print", random(16), sanitize(`${settings.title}.pdf`));
 
   try {
     const signatureIntegration = await fetchOrgSignatureIntegration(
@@ -71,9 +61,9 @@ async function startSignatureProcess(
     });
 
     const buffer = await ctx.printer.pdf(
-      `http://localhost:3000/${
-        petition.locale
-      }/print/petition-pdf?${new URLSearchParams({ token })}`,
+      `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
+        token,
+      })}`,
       {
         path: tmpPdfPath,
         height: "297mm",
@@ -87,33 +77,23 @@ async function startSignatureProcess(
       }
     );
 
-    const signatureBoxPositions = await calculateSignatureBoxPositions(
-      buffer,
-      recipients
-    );
+    const signatureBoxPositions = await calculateSignatureBoxPositions(buffer, recipients);
 
     const signatureClient = ctx.signature.getClient(signatureIntegration);
 
     // send request to signature client
-    const data = await signatureClient.startSignatureRequest(
-      petitionGID,
-      tmpPdfPath,
-      recipients,
-      {
-        locale: petition.locale as "en" | "es",
-        templateData: await getLayoutProps(petition.org_id, ctx),
-        signingMode: "parallel",
-        signatureBoxPositions,
-        initialMessage: settings.message,
-      }
-    );
+    const data = await signatureClient.startSignatureRequest(petitionGID, tmpPdfPath, recipients, {
+      locale: petition.locale as "en" | "es",
+      templateData: await getLayoutProps(petition.org_id, ctx),
+      signingMode: "parallel",
+      signatureBoxPositions,
+      initialMessage: settings.message,
+    });
 
     const provider = signatureIntegration.provider.toUpperCase();
 
     // remove events array from data before saving to DB
-    data.documents = data.documents.map((doc) =>
-      removeKeys(doc, ([key]) => key !== "events")
-    );
+    data.documents = data.documents.map((doc) => removeKeys(doc, ([key]) => key !== "events"));
 
     await Promise.all([
       ctx.petitions.updatePetitionSignature(signature.id, {
@@ -159,10 +139,7 @@ async function cancelSignatureProcess(
   payload: { petitionSignatureRequestId: number },
   ctx: WorkerContext
 ) {
-  const signature = await fetchPetitionSignature(
-    payload.petitionSignatureRequestId,
-    ctx
-  );
+  const signature = await fetchPetitionSignature(payload.petitionSignatureRequestId, ctx);
   if (!signature.external_id) {
     throw new Error(
       `Can't find external_id on petition signature request ${payload.petitionSignatureRequestId}`
@@ -178,9 +155,7 @@ async function cancelSignatureProcess(
   );
 
   const signatureClient = ctx.signature.getClient(signatureIntegration);
-  await signatureClient.cancelSignatureRequest(
-    signature.external_id.replace(/^.*?\//, "")
-  );
+  await signatureClient.cancelSignatureRequest(signature.external_id.replace(/^.*?\//, ""));
 }
 
 const handlers = {
@@ -201,20 +176,16 @@ type SignatureWorkerPayload = {
   };
 }[HandlerType];
 
-createQueueWorker(
-  "signature-worker",
-  async (data: SignatureWorkerPayload, ctx) => {
-    await handlers[data.type](data.payload as any, ctx);
-  }
-);
+createQueueWorker("signature-worker", async (data: SignatureWorkerPayload, ctx) => {
+  await handlers[data.type](data.payload as any, ctx);
+});
 
 async function fetchOrgSignatureIntegration(
   orgId: number,
   provider: string,
   ctx: WorkerContext
 ): Promise<OrgIntegration> {
-  const orgIntegrations =
-    await ctx.integrations.loadEnabledIntegrationsForOrgId(orgId);
+  const orgIntegrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(orgId);
 
   const orgSignatureIntegration = orgIntegrations.find(
     (i) => i.type === "SIGNATURE" && i.provider === provider.toUpperCase()
@@ -229,10 +200,7 @@ async function fetchOrgSignatureIntegration(
   return orgSignatureIntegration;
 }
 
-async function fetchPetition(
-  id: number,
-  ctx: WorkerContext
-): Promise<Petition> {
+async function fetchPetition(id: number, ctx: WorkerContext): Promise<Petition> {
   const petition = await ctx.petitions.loadPetition(id);
   if (!petition) {
     throw new Error(`Couldn't find petition with id ${id}`);
@@ -240,18 +208,11 @@ async function fetchPetition(
   return petition;
 }
 
-async function fetchSignatureRecipients(
-  contactIds: number[],
-  ctx: WorkerContext
-) {
-  const contacts = (await ctx.contacts.loadContact(contactIds)).filter(
-    (c) => !!c
-  ) as Contact[];
+async function fetchSignatureRecipients(contactIds: number[], ctx: WorkerContext) {
+  const contacts = (await ctx.contacts.loadContact(contactIds)).filter((c) => !!c) as Contact[];
 
   if (contacts.length !== contactIds.length) {
-    throw new Error(
-      `Couldn't load all required contacts: ${contactIds.toString()}`
-    );
+    throw new Error(`Couldn't load all required contacts: ${contactIds.toString()}`);
   }
 
   return contacts.map((c) => ({
@@ -260,18 +221,12 @@ async function fetchSignatureRecipients(
   }));
 }
 
-async function fetchPetitionSignature(
-  petitionSignatureRequestId: number,
-  ctx: WorkerContext
-) {
-  const signature = await ctx.petitions.loadPetitionSignatureById(
-    petitionSignatureRequestId,
-    { cache: false }
-  );
+async function fetchPetitionSignature(petitionSignatureRequestId: number, ctx: WorkerContext) {
+  const signature = await ctx.petitions.loadPetitionSignatureById(petitionSignatureRequestId, {
+    cache: false,
+  });
   if (!signature) {
-    throw new Error(
-      `Petition Signature Request with id ${petitionSignatureRequestId} not found`
-    );
+    throw new Error(`Petition Signature Request with id ${petitionSignatureRequestId} not found`);
   }
 
   return signature;

@@ -57,18 +57,12 @@ export function ContactListPopover<T extends ContactSelection>({
                   cursor={isClickable ? "pointer" : "unset"}
                 >
                   {c.fullName ? (
-                    <Box
-                      whiteSpace="nowrap"
-                      color={isClickable ? "purple.600" : "gray.800"}
-                    >
+                    <Box whiteSpace="nowrap" color={isClickable ? "purple.600" : "gray.800"}>
                       {c.fullName}
                     </Box>
                   ) : (
                     <Box textStyle="hint">
-                      <FormattedMessage
-                        id="generic.no-name"
-                        defaultMessage="No name"
-                      />
+                      <FormattedMessage id="generic.no-name" defaultMessage="No name" />
                     </Box>
                   )}
                   <Box whiteSpace="nowrap" color="gray.600" fontSize="xs">

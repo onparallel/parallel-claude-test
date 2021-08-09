@@ -13,12 +13,8 @@ export function schema<T>(value: T): JsonSchemaFor<FromSchema<T>> {
   return value;
 }
 
-export function buildValidateSchema<T>(
-  schema: JsonSchemaFor<T>
-): ValidateFunction<T>;
-export function buildValidateSchema<T = any>(
-  schema: JsonSchema
-): ValidateFunction<T>;
+export function buildValidateSchema<T>(schema: JsonSchemaFor<T>): ValidateFunction<T>;
+export function buildValidateSchema<T = any>(schema: JsonSchema): ValidateFunction<T>;
 export function buildValidateSchema<T = any>(schema: JsonSchema) {
   const ajv = new Ajv({ strict: false });
   addFormats(ajv, ["date-time", "email", "uri"]);

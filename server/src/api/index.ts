@@ -33,24 +33,14 @@ export function api(container: Container) {
     .use(
       "/auth",
       Router()
-        .post("/guess-login", (req, res, next) =>
-          req.context.auth.guessLogin(req, res, next)
-        )
-        .get("/callback", (req, res, next) =>
-          req.context.auth.callback(req, res, next)
-        )
-        .post("/login", (req, res, next) =>
-          req.context.auth.login(req, res, next)
-        )
-        .get("/logout", (req, res, next) =>
-          req.context.auth.logout(req, res, next)
-        )
+        .post("/guess-login", (req, res, next) => req.context.auth.guessLogin(req, res, next))
+        .get("/callback", (req, res, next) => req.context.auth.callback(req, res, next))
+        .post("/login", (req, res, next) => req.context.auth.login(req, res, next))
+        .get("/logout", (req, res, next) => req.context.auth.logout(req, res, next))
         .get("/logout/callback", (req, res, next) =>
           req.context.auth.logoutCallback(req, res, next)
         )
-        .post("/new-password", (req, res, next) =>
-          req.context.auth.newPassword(req, res, next)
-        )
+        .post("/new-password", (req, res, next) => req.context.auth.newPassword(req, res, next))
         .post("/forgot-password", (req, res, next) =>
           req.context.auth.forgotPassword(req, res, next)
         )

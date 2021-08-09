@@ -18,16 +18,8 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  ChevronDownIcon,
-  CopyIcon,
-  EditIcon,
-  PaperPlaneIcon,
-} from "@parallel/chakra/icons";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { ChevronDownIcon, CopyIcon, EditIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
   TemplateDetailsDialog_PetitionTemplateFragment,
   useTemplateDetailsDialogPetitionQuery,
@@ -69,8 +61,7 @@ export function useTemplateDetailsDialog() {
           fetchPolicy: "network-only",
           variables: { templateId },
         });
-        const template = data!
-          .petition! as TemplateDetailsDialog_PetitionTemplateFragment;
+        const template = data!.petition! as TemplateDetailsDialog_PetitionTemplateFragment;
 
         const action = await showDialog({ template, userId });
         switch (action) {
@@ -130,10 +121,7 @@ export function TemplateDetailsDialog({
             </Text>
           ) : (
             <Text>
-              <FormattedMessage
-                id="generic.untitled-template"
-                defaultMessage="Untitled template"
-              />
+              <FormattedMessage id="generic.untitled-template" defaultMessage="Untitled template" />
             </Text>
           )}
         </ModalHeader>
@@ -168,11 +156,7 @@ export function TemplateDetailsDialog({
               }}
             />
           </Text>
-          <Stack
-            marginY={4}
-            spacing={4}
-            flexDirection={{ base: "column", md: "row-reverse" }}
-          >
+          <Stack marginY={4} spacing={4} flexDirection={{ base: "column", md: "row-reverse" }}>
             <ButtonGroup isAttached>
               <Button
                 justifyContent="left"
@@ -233,16 +217,11 @@ export function TemplateDetailsDialog({
               </Menu>
             </ButtonGroup>
             <Heading flex="1" size="md">
-              <FormattedMessage
-                id="template-details.about"
-                defaultMessage="About this template"
-              />
+              <FormattedMessage id="template-details.about" defaultMessage="About this template" />
             </Heading>
           </Stack>
           {template.descriptionHtml ? (
-            <Text
-              dangerouslySetInnerHTML={{ __html: template.descriptionHtml }}
-            />
+            <Text dangerouslySetInnerHTML={{ __html: template.descriptionHtml }} />
           ) : (
             <Text textAlign="center" textStyle="hint">
               <FormattedMessage
@@ -252,10 +231,7 @@ export function TemplateDetailsDialog({
             </Text>
           )}
           <Heading size="md" marginTop={8} marginBottom={4}>
-            <FormattedMessage
-              id="template-details.fields-list"
-              defaultMessage="Information list"
-            />
+            <FormattedMessage id="template-details.fields-list" defaultMessage="Information list" />
           </Heading>
           <Box paddingLeft={8}>
             {zip(template.fields, indices).map(([field, index]) => {

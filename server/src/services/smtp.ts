@@ -4,14 +4,7 @@ import { Config, CONFIG } from "../config";
 
 type MailOptions = Pick<
   Parameters<Transporter<SentMessageInfo>["sendMail"]>[0],
-  | "from"
-  | "to"
-  | "subject"
-  | "html"
-  | "text"
-  | "headers"
-  | "attachments"
-  | "replyTo"
+  "from" | "to" | "subject" | "html" | "text" | "headers" | "attachments" | "replyTo"
 >;
 
 @injectable()

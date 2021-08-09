@@ -14,19 +14,10 @@ export type TimelineAccessActivatedEventProps = {
   event: TimelineAccessActivatedEvent_AccessActivatedEventFragment;
 };
 
-export function TimelineAccessActivatedEvent({
-  event,
-  userId,
-}: TimelineAccessActivatedEventProps) {
+export function TimelineAccessActivatedEvent({ event, userId }: TimelineAccessActivatedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<UserPlusIcon />}
-          color="white"
-          backgroundColor="blue.500"
-        />
-      }
+      icon={<TimelineIcon icon={<UserPlusIcon />} color="white" backgroundColor="blue.500" />}
     >
       <FormattedMessage
         id="timeline.access-activated-description"
@@ -37,11 +28,7 @@ export function TimelineAccessActivatedEvent({
           user: <UserReference user={event.user} />,
           contact: <ContactLink contact={event.access.contact} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

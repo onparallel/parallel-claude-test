@@ -6,9 +6,7 @@ import { Readable } from "stream";
 
 export const STORAGE_FACTORY = Symbol.for("FACTORY<STORAGE>");
 
-export type StorageFactory = (
-  ...args: ConstructorParameters<typeof Storage>
-) => IStorage;
+export type StorageFactory = (...args: ConstructorParameters<typeof Storage>) => IStorage;
 
 export interface IStorage {
   getSignedUploadEndpoint(
@@ -24,22 +22,14 @@ export interface IStorage {
   downloadFile(key: string): Readable;
   getFileMetadata(key: string): Promise<HeadObjectOutput>;
   deleteFile(key: string): Promise<void>;
-  uploadFile(
-    key: string,
-    contentType: string,
-    body: Buffer | Readable
-  ): Promise<HeadObjectOutput>;
+  uploadFile(key: string, contentType: string, body: Buffer | Readable): Promise<HeadObjectOutput>;
 }
 const _4GB = 1024 * 1024 * 1024 * 4;
 @injectable()
 export class Storage implements IStorage {
   constructor(private s3: AWS.S3, private bucketName: string) {}
 
-  async getSignedUploadEndpoint(
-    key: string,
-    contentType: string,
-    maxAllowedSize?: number
-  ) {
+  async getSignedUploadEndpoint(key: string, contentType: string, maxAllowedSize?: number) {
     return await new Promise<PresignedPost>((resolve, reject) => {
       this.s3.createPresignedPost(
         {
@@ -62,11 +52,7 @@ export class Storage implements IStorage {
     });
   }
 
-  async getSignedDownloadEndpoint(
-    key: string,
-    filename: string,
-    cdType: "attachment" | "inline"
-  ) {
+  async getSignedDownloadEndpoint(key: string, filename: string, cdType: "attachment" | "inline") {
     return await this.s3.getSignedUrlPromise("getObject", {
       Bucket: this.bucketName,
       Key: key,

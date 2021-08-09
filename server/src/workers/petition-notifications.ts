@@ -3,10 +3,7 @@ import { groupBy, maxBy } from "remeda";
 import { Config } from "../config";
 import { WorkerContext } from "../context";
 import { CommentCreatedUserNotification } from "../db/notifications";
-import {
-  PetitionContactNotification,
-  PetitionUserNotification,
-} from "../db/__types";
+import { PetitionContactNotification, PetitionUserNotification } from "../db/__types";
 import { createCronWorker } from "./helpers/createCronWorker";
 
 function shouldBeProcessed(
@@ -15,10 +12,7 @@ function shouldBeProcessed(
 ) {
   const lastNotification = maxBy(notifications, (n) => n.created_at.getTime())!;
 
-  return (
-    differenceInMinutes(new Date(), lastNotification.created_at) >
-    minutesBeforeNotify
-  );
+  return differenceInMinutes(new Date(), lastNotification.created_at) > minutesBeforeNotify;
 }
 
 /**
@@ -34,10 +28,7 @@ async function processCommentCreatedUserNotification(
   if (shouldBeProcessed(notifications, config.minutesBeforeNotify)) {
     const petitionId = notifications[0].petition_id;
     const userId = notifications[0].user_id;
-    const isSubscribed = await context.petitions.isUserSubscribedToPetition(
-      userId,
-      petitionId
-    );
+    const isSubscribed = await context.petitions.isUserSubscribedToPetition(userId, petitionId);
     if (isSubscribed) {
       await context.emails.sendPetitionCommentsUserNotificationEmail(
         petitionId,
@@ -87,11 +78,10 @@ async function processCommentCreatedContactNotification(
  * For now it only processes COMMENT_CREATED type notifications.
  */
 createCronWorker("petition-notifications", async (context, config) => {
-  const [unprocessedUserNotifications, unprocessedContactNotifications] =
-    await Promise.all([
-      context.petitions.loadUnprocessedCommentCreatedUserNotifications(),
-      context.petitions.loadUnprocessedCommentCreatedContactNotifications(),
-    ]);
+  const [unprocessedUserNotifications, unprocessedContactNotifications] = await Promise.all([
+    context.petitions.loadUnprocessedCommentCreatedUserNotifications(),
+    context.petitions.loadUnprocessedCommentCreatedContactNotifications(),
+  ]);
 
   if (unprocessedUserNotifications.length > 0) {
     const groupedUserNotifications = groupBy(

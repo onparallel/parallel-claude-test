@@ -7,22 +7,18 @@ export interface ClaimsListProps extends ListProps {
   claims: ReactNode[];
 }
 
-export const ClaimsList = chakraForwardRef<"ul", ClaimsListProps>(
-  function ClaimsList({ claims, ...props }, ref) {
-    return (
-      <List ref={ref} listStylePosition="outside" spacing={4} {...props}>
-        {claims.map((claim, index) => (
-          <ListItem display="flex" key={index}>
-            <ListIcon
-              as={CheckIcon}
-              boxSize="20px"
-              color="purple.500"
-              marginTop={1}
-            />
-            {claim}
-          </ListItem>
-        ))}
-      </List>
-    );
-  }
-);
+export const ClaimsList = chakraForwardRef<"ul", ClaimsListProps>(function ClaimsList(
+  { claims, ...props },
+  ref
+) {
+  return (
+    <List ref={ref} listStylePosition="outside" spacing={4} {...props}>
+      {claims.map((claim, index) => (
+        <ListItem display="flex" key={index}>
+          <ListIcon as={CheckIcon} boxSize="20px" color="purple.500" marginTop={1} />
+          {claim}
+        </ListItem>
+      ))}
+    </List>
+  );
+});

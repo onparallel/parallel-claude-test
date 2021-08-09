@@ -13,11 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { Maybe, SupportMethodResponse } from "@parallel/graphql/__types";
 import { unCamelCase } from "@parallel/utils/strings";
-import {
-  IntrospectionField,
-  IntrospectionInputTypeRef,
-  IntrospectionType,
-} from "graphql";
+import { IntrospectionField, IntrospectionInputTypeRef, IntrospectionType } from "graphql";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { SupportMethodArgumentInput } from "./SupportMethodArgumentInput";
 import { getDefaultInputTypeValue } from "./helpers";
@@ -29,29 +25,20 @@ type MethodModalProps = {
   onClose: () => void;
 };
 
-function reset(
-  field: IntrospectionField,
-  schemaTypes: readonly IntrospectionType[]
-) {
+function reset(field: IntrospectionField, schemaTypes: readonly IntrospectionType[]) {
   return () =>
     Object.fromEntries(
       field.args.map((arg) => [
         arg.name,
         {
-          value:
-            arg.defaultValue ?? getDefaultInputTypeValue(arg.type, schemaTypes),
+          value: arg.defaultValue ?? getDefaultInputTypeValue(arg.type, schemaTypes),
           isInvalid: false,
         },
       ])
     );
 }
 
-export function SupportMethodModal({
-  field,
-  queryType,
-  schemaTypes,
-  onClose,
-}: MethodModalProps) {
+export function SupportMethodModal({ field, queryType, schemaTypes, onClose }: MethodModalProps) {
   const apolloClient = useApolloClient();
 
   const [values, setValues] = useState(reset(field, schemaTypes));
@@ -73,12 +60,8 @@ export function SupportMethodModal({
           return type.name;
       }
     };
-    const argsDef = field.args
-      .map((arg) => `$${arg.name}: ${getArgType(arg.type)}`)
-      .join(", ");
-    const argsAssignment = field.args
-      .map((arg) => `${arg.name}: $${arg.name}`)
-      .join(", ");
+    const argsDef = field.args.map((arg) => `$${arg.name}: ${getArgType(arg.type)}`).join(", ");
+    const argsAssignment = field.args.map((arg) => `${arg.name}: $${arg.name}`).join(", ");
 
     const query = `
       ${queryType}(${argsDef}) {
@@ -96,9 +79,7 @@ export function SupportMethodModal({
     const invalidFields = field.args.filter(
       (f) =>
         f.type.kind === "NON_NULL" &&
-        (values[f.name] === null ||
-          values[f.name].value === "" ||
-          values[f.name].value === null)
+        (values[f.name] === null || values[f.name].value === "" || values[f.name].value === null)
     );
     setValues({
       ...Object.fromEntries(
@@ -153,21 +134,14 @@ export function SupportMethodModal({
             <Text fontSize="sm" fontWeight="normal">
               {field.description}
             </Text>
-            <Text
-              fontSize="xs"
-              color={queryType === "mutation" ? "red.500" : ""}
-            >
+            <Text fontSize="xs" color={queryType === "mutation" ? "red.500" : ""}>
               {queryType === "query"
                 ? "This method has no impact on the database."
                 : "This method will write into the database."}
             </Text>
           </ModalHeader>
           <ModalBody>
-            <Grid
-              templateColumns="minmax(100px, auto) 1fr"
-              rowGap={2}
-              columnGap={2}
-            >
+            <Grid templateColumns="minmax(100px, auto) 1fr" rowGap={2} columnGap={2}>
               {field.args.map((arg) => (
                 <SupportMethodArgumentInput
                   key={arg.name}
@@ -185,11 +159,7 @@ export function SupportMethodModal({
               ))}
             </Grid>
           </ModalBody>
-          <ModalFooter
-            as={Stack}
-            direction="row"
-            justifyContent="space-between"
-          >
+          <ModalFooter as={Stack} direction="row" justifyContent="space-between">
             <StatusTag status={status} />
             <Stack direction="row">
               <Button onClick={() => onClose()}>Cancel</Button>

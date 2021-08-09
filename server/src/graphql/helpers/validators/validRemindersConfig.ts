@@ -3,10 +3,7 @@ import { ArgValidationError } from "../errors";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { isValidTime, isValidTimezone } from "../../../util/validators";
 
-export function validRemindersConfig<
-  TypeName extends string,
-  FieldName extends string
->(
+export function validRemindersConfig<TypeName extends string, FieldName extends string>(
   prop: (
     args: core.ArgsValue<TypeName, FieldName>
   ) => core.GetGen2<"inputTypes", "RemindersConfigInput"> | null | undefined,
@@ -31,11 +28,7 @@ export function validRemindersConfig<
         );
       }
       if (offset < 1) {
-        throw new ArgValidationError(
-          info,
-          `${argName}.offset`,
-          `Value must be larger than 0.`
-        );
+        throw new ArgValidationError(info, `${argName}.offset`, `Value must be larger than 0.`);
       }
     }
   }) as FieldValidateArgsResolver<TypeName, FieldName>;

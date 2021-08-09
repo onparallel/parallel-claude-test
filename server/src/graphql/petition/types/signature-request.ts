@@ -41,8 +41,7 @@ export const PetitionSignatureRequest = objectType({
     t.nullable.string("auditTrailFilename", {
       resolve: async (o, _, ctx) => {
         return o.file_upload_audit_trail_id
-          ? (await ctx.files.loadFileUpload(o.file_upload_audit_trail_id))
-              ?.filename ?? null
+          ? (await ctx.files.loadFileUpload(o.file_upload_audit_trail_id))?.filename ?? null
           : null;
       },
     });

@@ -26,32 +26,27 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { SelectLikeButton } from "../common/SelectLikeButton";
 import { PetitionFieldTypeIcon } from "../petition-common/PetitionFieldTypeIcon";
 
-export interface PetitionFieldTypeSelectProps
-  extends Omit<SelectProps, "onChange"> {
+export interface PetitionFieldTypeSelectProps extends Omit<SelectProps, "onChange"> {
   type: PetitionFieldType;
   onChange: (type: PetitionFieldType) => void;
   isReadOnly?: boolean;
 }
 
-export const PetitionFieldTypeSelect = chakraForwardRef<
-  "div",
-  PetitionFieldTypeSelectProps
->(function PetitionFieldTypeSelect({ type, onChange, ...props }, ref) {
-  console.log(props);
-  return (
-    <Menu placement="bottom" gutter={2}>
-      <MenuButton as={SelectLikeButton} ref={ref as any} {...(props as any)}>
-        <PetitionFieldTypeLabel type={type} display="flex" />
-      </MenuButton>
-      <Portal>
-        <PetitionFieldTypeSelectDropdown
-          onSelectFieldType={onChange}
-          role="listbox"
-        />
-      </Portal>
-    </Menu>
-  );
-});
+export const PetitionFieldTypeSelect = chakraForwardRef<"div", PetitionFieldTypeSelectProps>(
+  function PetitionFieldTypeSelect({ type, onChange, ...props }, ref) {
+    console.log(props);
+    return (
+      <Menu placement="bottom" gutter={2}>
+        <MenuButton as={SelectLikeButton} ref={ref as any} {...(props as any)}>
+          <PetitionFieldTypeLabel type={type} display="flex" />
+        </MenuButton>
+        <Portal>
+          <PetitionFieldTypeSelectDropdown onSelectFieldType={onChange} role="listbox" />
+        </Portal>
+      </Menu>
+    );
+  }
+);
 
 export const FIELD_TYPES: PetitionFieldType[] = [
   "FILE_UPLOAD",
@@ -67,38 +62,32 @@ interface PetitionFieldTypeLabelProps {
   type: PetitionFieldType;
 }
 
-const PetitionFieldTypeLabel = chakraForwardRef<
-  "div",
-  PetitionFieldTypeLabelProps
->(function PetitionFieldTypeLabel({ type, ...props }, ref) {
-  const color = usePetitionFieldTypeColor(type);
-  return (
-    <Box ref={ref} display="inline-flex" alignItems="center" {...props}>
-      <Box
-        backgroundColor={color}
-        color="white"
-        borderRadius="md"
-        padding={1}
-        width="28px"
-        height="28px"
-      >
-        <PetitionFieldTypeIcon
+const PetitionFieldTypeLabel = chakraForwardRef<"div", PetitionFieldTypeLabelProps>(
+  function PetitionFieldTypeLabel({ type, ...props }, ref) {
+    const color = usePetitionFieldTypeColor(type);
+    return (
+      <Box ref={ref} display="inline-flex" alignItems="center" {...props}>
+        <Box
+          backgroundColor={color}
+          color="white"
+          borderRadius="md"
+          padding={1}
+          width="28px"
+          height="28px"
+        >
+          <PetitionFieldTypeIcon type={type} display="block" boxSize="20px" role="presentation" />
+        </Box>
+        <PetitionFieldTypeText
+          whiteSpace="nowrap"
           type={type}
-          display="block"
-          boxSize="20px"
-          role="presentation"
+          as={"div" as any}
+          flex="1"
+          marginLeft={2}
         />
       </Box>
-      <PetitionFieldTypeText
-        whiteSpace="nowrap"
-        type={type}
-        as={"div" as any}
-        flex="1"
-        marginLeft={2}
-      />
-    </Box>
-  );
-});
+    );
+  }
+);
 
 interface PetitionFieldTypeTextProps extends TextProps {
   type: PetitionFieldType;
@@ -169,9 +158,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
       paddingY={0}
       minWidth={{
         base: `${fieldListWidth}px`,
-        sm: showDescription
-          ? `${fieldListWidth + descriptionWidth}px`
-          : `${fieldListWidth}px`,
+        sm: showDescription ? `${fieldListWidth + descriptionWidth}px` : `${fieldListWidth}px`,
       }}
       overflow="auto"
       maxHeight="240px"
@@ -195,17 +182,12 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
           </Heading>
         </Box>
         <Box>
-          <Box
-            paddingBottom={2}
-            paddingTop={{ base: 2, sm: showHeader ? 0 : 2 }}
-          >
+          <Box paddingBottom={2} paddingTop={{ base: 2, sm: showHeader ? 0 : 2 }}>
             {FIELD_TYPES.map((type) => (
               <MenuItem
                 key={type}
                 paddingY={2}
-                aria-describedby={
-                  activeType === type ? `field-description-${type}` : undefined
-                }
+                aria-describedby={activeType === type ? `field-description-${type}` : undefined}
                 data-field-type={type}
                 onClick={() => onSelectFieldType(type)}
                 onFocus={() => setActiveType(type)}
@@ -229,12 +211,7 @@ export const PetitionFieldTypeSelectDropdown = chakraForwardRef<
         paddingY={3}
       >
         <Box>
-          <AspectRatio
-            ratio={490 / 212}
-            marginBottom={1}
-            marginX={-2}
-            marginTop={-1}
-          >
+          <AspectRatio ratio={490 / 212} marginBottom={1} marginX={-2} marginTop={-1}>
             <Image
               color="transparent"
               alt={intl.formatMessage(

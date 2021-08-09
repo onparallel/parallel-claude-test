@@ -55,9 +55,7 @@ export const PetitionReminder = objectType({
       type: "User",
       description: "The sender of this petition message.",
       resolve: async (root, _, ctx) => {
-        return root.sender_id
-          ? (await ctx.users.loadUser(root.sender_id))!
-          : null;
+        return root.sender_id ? (await ctx.users.loadUser(root.sender_id))! : null;
       },
     });
   },

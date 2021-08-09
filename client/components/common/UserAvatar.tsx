@@ -8,11 +8,7 @@ interface UserAvatarProps extends AvatarProps {
 
 export function UserAvatar({ user, ...props }: UserAvatarProps) {
   return (
-    <Avatar
-      name={user?.fullName ?? undefined}
-      src={user?.avatarUrl ?? undefined}
-      {...props}
-    />
+    <Avatar name={user?.fullName ?? undefined} src={user?.avatarUrl ?? undefined} {...props} />
   );
 }
 

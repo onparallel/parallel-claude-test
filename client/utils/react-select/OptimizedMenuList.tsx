@@ -1,9 +1,5 @@
 import { forwardRef } from "react";
-import {
-  GroupTypeBase,
-  MenuListComponentProps,
-  OptionTypeBase,
-} from "react-select";
+import { GroupTypeBase, MenuListComponentProps, OptionTypeBase } from "react-select";
 import { FixedSizeList } from "react-window";
 
 const itemSize = 32;
@@ -39,18 +35,19 @@ export function OptimizedMenuList<
   );
 }
 
-const InnerElementType = forwardRef<HTMLDivElement, any>(
-  function InnerElementType({ style, ...props }, ref) {
-    return (
-      <div
-        ref={ref}
-        style={{
-          ...style,
-          overflow: "hidden",
-          height: style.height + padding * 2,
-        }}
-        {...props}
-      />
-    );
-  }
-);
+const InnerElementType = forwardRef<HTMLDivElement, any>(function InnerElementType(
+  { style, ...props },
+  ref
+) {
+  return (
+    <div
+      ref={ref}
+      style={{
+        ...style,
+        overflow: "hidden",
+        height: style.height + padding * 2,
+      }}
+      {...props}
+    />
+  );
+});

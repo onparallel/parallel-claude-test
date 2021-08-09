@@ -30,9 +30,7 @@ export const PublicPetitionAccess = objectType({
     t.nullable.field("message", {
       type: "PublicPetitionMessage",
       resolve: async (root, _, ctx) => {
-        const messages = await ctx.petitions.loadMessagesByPetitionAccessId(
-          root.id
-        );
+        const messages = await ctx.petitions.loadMessagesByPetitionAccessId(root.id);
         return messages?.[0] ?? null;
       },
     });
@@ -89,9 +87,7 @@ export const PublicPetition = objectType({
       description: "The recipients of the petition",
       resolve: async (root, _, ctx) => {
         const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
-        const contactIds = accesses
-          .filter((a) => a.status === "ACTIVE")
-          .map((a) => a.contact_id);
+        const contactIds = accesses.filter((a) => a.status === "ACTIVE").map((a) => a.contact_id);
         return (await ctx.contacts.loadContact(contactIds)) as Contact[];
       },
     });
@@ -122,14 +118,9 @@ export const PublicPetition = objectType({
         members: ["STARTED", "COMPLETED"],
       }),
       resolve: async (root, _, ctx) => {
-        const signature =
-          await ctx.petitions.loadLatestPetitionSignatureByPetitionId(root.id);
+        const signature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(root.id);
 
-        return signature
-          ? signature.status === "COMPLETED"
-            ? "COMPLETED"
-            : "STARTED"
-          : null;
+        return signature ? (signature.status === "COMPLETED" ? "COMPLETED" : "STARTED") : null;
       },
     });
   },
@@ -181,8 +172,7 @@ export const PublicPetitionField = objectType({
       description: "Determines if this field allows multiple replies.",
     });
     t.boolean("validated", {
-      description:
-        "Determines if the content of this field has been validated.",
+      description: "Determines if the content of this field has been validated.",
     });
     t.boolean("isReadOnly", {
       description: "Determines if the field accepts replies",
@@ -217,18 +207,15 @@ export const PublicPetitionField = objectType({
     });
     t.nonNull.int("unreadCommentCount", {
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadPetitionFieldUnreadCommentCountForFieldAndAccess(
-          {
-            accessId: ctx.access!.id,
-            petitionId: root.petition_id,
-            petitionFieldId: root.id,
-          }
-        );
+        return await ctx.petitions.loadPetitionFieldUnreadCommentCountForFieldAndAccess({
+          accessId: ctx.access!.id,
+          petitionId: root.petition_id,
+          petitionFieldId: root.id,
+        });
       },
     });
     t.nullable.jsonObject("visibility", {
-      description:
-        "A JSON object representing the conditions for the field to be visible",
+      description: "A JSON object representing the conditions for the field to be visible",
       resolve: (o) => {
         return (
           o.visibility && {
@@ -335,9 +322,7 @@ export const PublicPetitionFieldReply = objectType({
             return root.content;
           }
           case "FILE_UPLOAD": {
-            const file = await ctx.files.loadFileUpload(
-              root.content["file_upload_id"]
-            );
+            const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
             return file
               ? {
                   filename: file.filename,
@@ -416,11 +401,8 @@ export const PublicPetitionFieldComment = objectType({
           const user = await ctx.users.loadUser(root.user_id);
           return user && { __type: "User", ...user };
         } else if (root.petition_access_id !== null) {
-          const access = await ctx.petitions.loadAccess(
-            root.petition_access_id
-          );
-          const contact =
-            access && (await ctx.contacts.loadContact(access.contact_id));
+          const access = await ctx.petitions.loadAccess(root.petition_access_id);
+          const contact = access && (await ctx.contacts.loadContact(access.contact_id));
           return contact && { __type: "Contact", ...contact };
         }
         throw new Error(`Both "user_id" and "petition_access_id" are null`);

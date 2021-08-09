@@ -66,10 +66,7 @@ export function PasswordResetForm({
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <FormControl
-          id="verification-code"
-          isInvalid={!!errors.verificationCode}
-        >
+        <FormControl id="verification-code" isInvalid={!!errors.verificationCode}>
           <FormLabel>
             <FormattedMessage
               id="generic.forms.verification-code-label"
@@ -92,15 +89,9 @@ export function PasswordResetForm({
             )}
           </FormErrorMessage>
         </FormControl>
-        <FormControl
-          id="password"
-          isInvalid={!!errors.password || isInvalidPassword}
-        >
+        <FormControl id="password" isInvalid={!!errors.password || isInvalidPassword}>
           <FormLabel>
-            <FormattedMessage
-              id="generic.forms.new-password-label"
-              defaultMessage="New password"
-            />
+            <FormattedMessage id="generic.forms.new-password-label" defaultMessage="New password" />
           </FormLabel>
           <PasswordInput
             {...register("password", {
@@ -123,11 +114,7 @@ export function PasswordResetForm({
             ) : null}
           </FormErrorMessage>
         </FormControl>
-        <FormControl
-          id="password-confirm"
-          marginTop={2}
-          isInvalid={!!errors.passwordConfirm}
-        >
+        <FormControl id="password-confirm" marginTop={2} isInvalid={!!errors.passwordConfirm}>
           <FormLabel>
             <FormattedMessage
               id="generic.forms.confirm-password-label"

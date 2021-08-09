@@ -1,11 +1,4 @@
-import {
-  arg,
-  booleanArg,
-  enumType,
-  list,
-  nonNull,
-  objectType,
-} from "@nexus/schema";
+import { arg, booleanArg, enumType, list, nonNull, objectType } from "@nexus/schema";
 import { titleize } from "../../util/strings";
 import { userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -80,39 +73,26 @@ export const Organization = objectType({
     t.boolean("hasSsoProvider", {
       description: "Whether the organization has an SSO provider configured.",
       resolve: async (o, _, ctx) => {
-        const integrations =
-          await ctx.integrations.loadEnabledIntegrationsForOrgId(o.id);
+        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(o.id);
         return integrations.some((i) => i.type === "SSO");
       },
     });
     t.int("userCount", {
       description: "The total number of users",
       authorize: isOwnOrgOrSuperAdmin(),
-      resolve: async (root, _, ctx) =>
-        await ctx.organizations.loadUserCount(root.id),
+      resolve: async (root, _, ctx) => await ctx.organizations.loadUserCount(root.id),
     });
     t.paginationField("users", {
       type: "User",
       description: "The users in the organization.",
       searchable: true,
-      sortableBy: [
-        "firstName",
-        "lastName",
-        "fullName",
-        "email",
-        "createdAt",
-        "lastActiveAt",
-      ],
+      sortableBy: ["firstName", "lastName", "fullName", "email", "createdAt", "lastActiveAt"],
       authorize: isOwnOrgOrSuperAdmin(),
       extendArgs: {
         exclude: list(nonNull(globalIdArg("User"))),
         includeInactive: booleanArg(),
       },
-      resolve: async (
-        root,
-        { offset, limit, search, sortBy, exclude, includeInactive },
-        ctx
-      ) => {
+      resolve: async (root, { offset, limit, search, sortBy, exclude, includeInactive }, ctx) => {
         const columnMap = {
           firstName: "first_name",
           lastName: "last_name",
@@ -144,11 +124,8 @@ export const Organization = objectType({
       },
       authorize: isOwnOrgOrSuperAdmin(),
       resolve: async (root, { type }, ctx) => {
-        const integrations =
-          await ctx.integrations.loadEnabledIntegrationsForOrgId(root.id);
-        return type
-          ? integrations.filter((i) => i.type === type)
-          : integrations;
+        const integrations = await ctx.integrations.loadEnabledIntegrationsForOrgId(root.id);
+        return type ? integrations.filter((i) => i.type === type) : integrations;
       },
     });
   },

@@ -25,21 +25,9 @@ const email: Email<ForgotPasswordProps> = {
   text({ name, parallelUrl, resetUrl }: ForgotPasswordProps, intl: IntlShape) {
     return outdent``;
   },
-  html({
-    name,
-    assetsUrl,
-    parallelUrl,
-    resetUrl,
-    logoUrl,
-    logoAlt,
-  }: ForgotPasswordProps) {
+  html({ name, assetsUrl, parallelUrl, resetUrl, logoUrl, logoAlt }: ForgotPasswordProps) {
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection>
           <MjmlColumn>
             <Greeting name={name} />

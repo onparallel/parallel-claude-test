@@ -112,12 +112,7 @@ export function SettingsLayout({
                 </NakedLink>
                 {header}
               </Flex>
-              <Flex
-                flex="1"
-                minHeight={0}
-                overflow="auto"
-                backgroundColor="gray.50"
-              >
+              <Flex flex="1" minHeight={0} overflow="auto" backgroundColor="gray.50">
                 {children}
               </Flex>
             </>
@@ -142,10 +137,7 @@ interface SettingsLayoutMenuItemProps {
   children: ReactNode;
 }
 
-function SettingsLayoutMenuItem({
-  path,
-  children,
-}: SettingsLayoutMenuItemProps) {
+function SettingsLayoutMenuItem({ path, children }: SettingsLayoutMenuItemProps) {
   const { pathname } = useRouter();
 
   const active = pathname.startsWith(`/[locale]${path}`);

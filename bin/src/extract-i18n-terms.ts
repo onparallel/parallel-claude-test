@@ -51,9 +51,7 @@ async function extractTerms(input: string) {
       ${isWindows ? input : `'${input}'`}`,
       { encoding: "utf-8" }
     );
-    const terms = await readJson<Record<string, MessageDescriptor>>(
-      tmpFileName
-    );
+    const terms = await readJson<Record<string, MessageDescriptor>>(tmpFileName);
     await fs.unlink(tmpFileName);
     return terms;
   } catch (error) {
@@ -99,15 +97,10 @@ function updateLocaleData(
     entry!.context = term.description || term.defaultMessage;
     updated.set(entry!.term, entry);
   }
-  return Array.from(updated.values()).sort((a, b) =>
-    a.term.localeCompare(b.term)
-  );
+  return Array.from(updated.values()).sort((a, b) => a.term.localeCompare(b.term));
 }
 
-function logStats(
-  terms: Record<string, MessageDescriptor>,
-  data: Map<string, Term>
-) {
+function logStats(terms: Record<string, MessageDescriptor>, data: Map<string, Term>) {
   const set = new Set(Object.keys(terms));
   const added = Object.keys(terms).filter((t) => !data.has(t));
   const removed = Array.from(data.values()).filter((t) => !set.has(t.term));
@@ -127,8 +120,7 @@ async function main() {
       required: true,
       array: true,
       type: "string",
-      description:
-        "The locales to extract. First option will be considered the default one",
+      description: "The locales to extract. First option will be considered the default one",
     })
     .option("input", {
       required: true,

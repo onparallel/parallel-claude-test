@@ -1,9 +1,4 @@
-import {
-  ApolloClient,
-  FieldMergeFunction,
-  from,
-  InMemoryCache,
-} from "@apollo/client";
+import { ApolloClient, FieldMergeFunction, from, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import fragmentMatcher from "@parallel/graphql/__fragment-matcher";
@@ -29,18 +24,12 @@ function filterCookies(cookies: string) {
 }
 
 export function mergeArraysBy(path: string[]): FieldMergeFunction {
-  return function merge(
-    existing,
-    incoming,
-    { readField, mergeObjects, fieldName }
-  ) {
+  return function merge(existing, incoming, { readField, mergeObjects, fieldName }) {
     const getKey = (value: any) => {
       return path.reduce((acc, curr) => {
         const next = readField(curr, acc as any);
         if (!next) {
-          throw new Error(
-            `Please include ${path.join(".")} when fetching ${fieldName}`
-          );
+          throw new Error(`Please include ${path.join(".")} when fetching ${fieldName}`);
         }
         return next;
       }, value);
@@ -48,18 +37,13 @@ export function mergeArraysBy(path: string[]): FieldMergeFunction {
     const existingByKey = indexBy(existing || [], getKey);
     return incoming.map((value: any) => {
       const key = getKey(value);
-      return existingByKey[key]
-        ? mergeObjects(existingByKey[key], value)
-        : value;
+      return existingByKey[key] ? mergeObjects(existingByKey[key], value) : value;
     });
   };
 }
 
 let _cached: ApolloClient<any>;
-export function createApolloClient(
-  initialState: any,
-  { req }: CreateApolloClientOptions
-) {
+export function createApolloClient(initialState: any, { req }: CreateApolloClientOptions) {
   // Make sure to create a new client for every server-side request so that data
   // isn't shared between connections
   if (typeof window !== "undefined" && _cached) {
@@ -67,10 +51,7 @@ export function createApolloClient(
   }
 
   const httpLink = createUploadLink({
-    uri:
-      typeof window !== "undefined"
-        ? "/graphql"
-        : "http://localhost:4000/graphql",
+    uri: typeof window !== "undefined" ? "/graphql" : "http://localhost:4000/graphql",
   });
 
   const authLink = setContext((_, { headers, ...re }) => {
@@ -122,28 +103,20 @@ export function createApolloClient(
         Petition: {
           fields: {
             permissions: {
-              merge: function merge(
-                existing,
-                incoming,
-                { readField, mergeObjects }
-              ) {
+              merge: function merge(existing, incoming, { readField, mergeObjects }) {
                 const getKey = (value: any) => {
                   const user = readField("user", value);
                   const group = readField("group", value);
                   if (user) {
                     const id = readField("id", user as any);
                     if (!id) {
-                      throw new Error(
-                        `Please include "user.id" when fetching permissions`
-                      );
+                      throw new Error(`Please include "user.id" when fetching permissions`);
                     }
                     return id as string;
                   } else if (group) {
                     const id = readField("id", group as any);
                     if (!id) {
-                      throw new Error(
-                        `Please include "group.id" when fetching permissions`
-                      );
+                      throw new Error(`Please include "group.id" when fetching permissions`);
                     }
                     return id as string;
                   } else {
@@ -155,9 +128,7 @@ export function createApolloClient(
                 const existingByKey = indexBy(existing || [], getKey);
                 return incoming.map((value: any) => {
                   const key = getKey(value);
-                  return existingByKey[key]
-                    ? mergeObjects(existingByKey[key], value)
-                    : value;
+                  return existingByKey[key] ? mergeObjects(existingByKey[key], value) : value;
                 });
               },
             },
@@ -203,8 +174,7 @@ export function createApolloClient(
                       (arr) => uniqBy(arr, (obj) => readField("id", obj)),
                       (arr) =>
                         sortBy(arr, [
-                          (obj) =>
-                            new Date(readField("createdAt", obj) as string),
+                          (obj) => new Date(readField("createdAt", obj) as string),
                           "desc",
                         ])
                     ),
@@ -217,8 +187,7 @@ export function createApolloClient(
         },
       },
     }).restore(initialState ?? {}),
-    connectToDevTools:
-      typeof window !== "undefined" && process.env.NODE_ENV === "development",
+    connectToDevTools: typeof window !== "undefined" && process.env.NODE_ENV === "development",
   });
   _cached = client;
   return client;

@@ -49,17 +49,11 @@ export function RecipientViewHelpDialog(props: DialogProps<{}, void>) {
               defaultMessage="Is this the first time you use Parallel?"
             />
           </Text>
-          <Stack
-            as={List}
-            listStylePosition="outside"
-            spacing={4}
-            marginTop={4}
-          >
+          <Stack as={List} listStylePosition="outside" spacing={4} marginTop={4}>
             {[
               intl.formatMessage({
                 id: "recipient-view.first-time.claim-1",
-                defaultMessage:
-                  "The information will be saved automatically as you add it.",
+                defaultMessage: "The information will be saved automatically as you add it.",
               }),
               intl.formatMessage({
                 id: "recipient-view.first-time.claim-2",
@@ -73,12 +67,7 @@ export function RecipientViewHelpDialog(props: DialogProps<{}, void>) {
               }),
             ].map((claim, index) => (
               <ListItem display="flex" key={index}>
-                <ListIcon
-                  as={CheckIcon}
-                  boxSize="20px"
-                  color="purple.500"
-                  marginTop={1}
-                />
+                <ListIcon as={CheckIcon} boxSize="20px" color="purple.500" marginTop={1} />
                 {claim}
               </ListItem>
             ))}

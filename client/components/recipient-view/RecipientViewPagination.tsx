@@ -1,17 +1,5 @@
-import {
-  Box,
-  BoxProps,
-  IconButton,
-  IconButtonProps,
-  List,
-  ListItem,
-  Text,
-} from "@chakra-ui/react";
-import {
-  ArrowBackIcon,
-  ArrowForwardIcon,
-  MoreIcon,
-} from "@parallel/chakra/icons";
+import { Box, BoxProps, IconButton, IconButtonProps, List, ListItem, Text } from "@chakra-ui/react";
+import { ArrowBackIcon, ArrowForwardIcon, MoreIcon } from "@parallel/chakra/icons";
 import { useRouter } from "next/router";
 import { useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
@@ -81,10 +69,7 @@ export function RecipientViewPagination({
           )
         )}
         <Spacer />
-        <ListItem
-          paddingLeft={1}
-          display={{ base: pageCount > 5 ? "none" : "block", sm: "block" }}
-        >
+        <ListItem paddingLeft={1} display={{ base: pageCount > 5 ? "none" : "block", sm: "block" }}>
           <PageLink
             page={currentPage + 1}
             icon={<ArrowForwardIcon />}

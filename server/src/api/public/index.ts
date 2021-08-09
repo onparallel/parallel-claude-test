@@ -6,11 +6,7 @@ import { toGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 import { JsonBody } from "../rest/body";
 import { RestApi } from "../rest/core";
-import {
-  BadRequestError,
-  ConflictError,
-  UnauthorizedError,
-} from "../rest/errors";
+import { BadRequestError, ConflictError, UnauthorizedError } from "../rest/errors";
 import { booleanParam, enumParam } from "../rest/params";
 import {
   Created,
@@ -32,12 +28,7 @@ import {
   TemplateFragment,
   UserFragment,
 } from "./fragments";
-import {
-  containsGraphQLError,
-  idParam,
-  paginationParams,
-  sortByParam,
-} from "./helpers";
+import { containsGraphQLError, idParam, paginationParams, sortByParam } from "./helpers";
 import {
   Contact,
   CreateContact,
@@ -171,23 +162,19 @@ export const api = new RestApi({
     },
     {
       name: "Petition Subscription",
-      description:
-        "Subscribe to your petition to receive real-time event updates",
+      description: "Subscribe to your petition to receive real-time event updates",
     },
     {
       name: "Petition Sharing",
-      description:
-        "Share your petitions with members of your organization for collaborative work",
+      description: "Share your petitions with members of your organization for collaborative work",
     },
     {
       name: "Templates",
-      description:
-        "Use templates to quickly create new petitions for repetitive workflows",
+      description: "Use templates to quickly create new petitions for repetitive workflows",
     },
     {
       name: "Contacts",
-      description:
-        "Contacts are the entities that represent the recipients of petitions",
+      description: "Contacts are the entities that represent the recipients of petitions",
     },
 
     {
@@ -294,16 +281,8 @@ api
         CreatePetition_PetitionMutationVariables
       >(
         gql`
-          mutation CreatePetition_Petition(
-            $name: String
-            $templateId: GID
-            $eventsUrl: String
-          ) {
-            createPetition(
-              name: $name
-              petitionId: $templateId
-              eventsUrl: $eventsUrl
-            ) {
+          mutation CreatePetition_Petition($name: String, $templateId: GID, $eventsUrl: String) {
+            createPetition(name: $name, petitionId: $templateId, eventsUrl: $eventsUrl) {
               ...Petition
             }
           }
@@ -368,10 +347,7 @@ api
         UpdatePetition_PetitionMutationVariables
       >(
         gql`
-          mutation UpdatePetition_Petition(
-            $petitionId: GID!
-            $data: UpdatePetitionInput!
-          ) {
+          mutation UpdatePetition_Petition($petitionId: GID!, $data: UpdatePetitionInput!) {
             updatePetition(petitionId: $petitionId, data: $data) {
               ...Petition
             }
@@ -405,8 +381,7 @@ api
       responses: {
         204: SuccessResponse(),
         400: ErrorResponse({
-          description:
-            "The petition is being shared with another user. Set force=true to delete.",
+          description: "The petition is being shared with another user. Set force=true to delete.",
         }),
       },
       tags: ["Petitions"],
@@ -418,10 +393,7 @@ api
           DeletePetition_deletePetitionsMutationVariables
         >(
           gql`
-            mutation DeletePetition_deletePetitions(
-              $petitionId: GID!
-              $force: Boolean!
-            ) {
+            mutation DeletePetition_deletePetitions($petitionId: GID!, $force: Boolean!) {
               deletePetitions(ids: [$petitionId], force: $force)
             }
           `,
@@ -519,8 +491,7 @@ api
       responses: {
         200: SuccessResponse(ListOfPetitionAccesses),
         409: ErrorResponse({
-          description:
-            "The petition was already sent to some of the provided contacts",
+          description: "The petition was already sent to some of the provided contacts",
         }),
       },
       tags: ["Petitions"],
@@ -552,8 +523,7 @@ api
             );
             if (contact) {
               if (
-                (contact.firstName !== data.firstName &&
-                  isDefined(data.firstName)) ||
+                (contact.firstName !== data.firstName && isDefined(data.firstName)) ||
                 (contact.lastName !== data.lastName && isDefined(data.lastName))
               ) {
                 await client.request<
@@ -580,9 +550,7 @@ api
                 CreatePetitionRecipients_createContactMutationVariables
               >(
                 gql`
-                  mutation CreatePetitionRecipients_createContact(
-                    $data: CreateContactInput!
-                  ) {
+                  mutation CreatePetitionRecipients_createContact($data: CreateContactInput!) {
                     createContact(data: $data) {
                       id
                     }
@@ -598,9 +566,7 @@ api
       );
       const message =
         body.message.format === "PLAIN_TEXT"
-          ? body.message.content
-              .split("\n")
-              .map((line) => ({ children: [{ text: line }] }))
+          ? body.message.content.split("\n").map((line) => ({ children: [{ text: line }] }))
           : [{ children: [{ text: "" }] }];
       try {
         const result = await client.request<
@@ -644,9 +610,7 @@ api
           error instanceof ClientError &&
           containsGraphQLError(error, "PETITION_ALREADY_SENT_ERROR")
         ) {
-          throw new ConflictError(
-            "The petition was already sent to some of the provided contacts"
-          );
+          throw new ConflictError("The petition was already sent to some of the provided contacts");
         }
         throw error;
       }
@@ -764,10 +728,7 @@ api
               $petitionId: GID!
               $replyId: GID!
             ) {
-              fileUploadReplyDownloadLink(
-                petitionId: $petitionId
-                replyId: $replyId
-              ) {
+              fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId) {
                 url
               }
             }
@@ -776,13 +737,8 @@ api
         );
         return Redirect(response.fileUploadReplyDownloadLink.url!);
       } catch (error) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "INVALID_FIELD_TYPE")
-        ) {
-          throw new BadRequestError(
-            `Reply "${params.replyId}" is not of "FILE" type`
-          );
+        if (error instanceof ClientError && containsGraphQLError(error, "INVALID_FIELD_TYPE")) {
+          throw new BadRequestError(`Reply "${params.replyId}" is not of "FILE" type`);
         }
         throw error;
       }
@@ -886,10 +842,7 @@ api
       >(
         gql`
           mutation StopSharing_removePetitionPermission($petitionId: GID!) {
-            removePetitionPermission(
-              petitionIds: [$petitionId]
-              removeAll: true
-            ) {
+            removePetitionPermission(petitionIds: [$petitionId], removeAll: true) {
               id
             }
           }
@@ -925,14 +878,8 @@ api
         RemoveUserPermission_removePetitionPermissionMutationVariables
       >(
         gql`
-          mutation RemoveUserPermission_removePetitionPermission(
-            $petitionId: GID!
-            $userId: GID!
-          ) {
-            removePetitionPermission(
-              petitionIds: [$petitionId]
-              userIds: [$userId]
-            ) {
+          mutation RemoveUserPermission_removePetitionPermission($petitionId: GID!, $userId: GID!) {
+            removePetitionPermission(petitionIds: [$petitionId], userIds: [$userId]) {
               id
             }
           }
@@ -975,10 +922,7 @@ api
             $petitionId: GID!
             $userGroupId: GID!
           ) {
-            removePetitionPermission(
-              petitionIds: [$petitionId]
-              userGroupIds: [$userGroupId]
-            ) {
+            removePetitionPermission(petitionIds: [$petitionId], userGroupIds: [$userGroupId]) {
               id
             }
           }
@@ -1017,14 +961,8 @@ api
         TransferPetition_transferPetitionOwnershipMutationVariables
       >(
         gql`
-          mutation TransferPetition_transferPetitionOwnership(
-            $userId: GID!
-            $petitionId: GID!
-          ) {
-            transferPetitionOwnership(
-              petitionIds: [$petitionId]
-              userId: $userId
-            ) {
+          mutation TransferPetition_transferPetitionOwnership($userId: GID!, $petitionId: GID!) {
+            transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
               permissions {
                 ...Permission
               }
@@ -1112,12 +1050,10 @@ api
                   description: "Petition event processed correctly",
                 },
                 "4XX": {
-                  description:
-                    "Request failed, the petition owner will be notified via email",
+                  description: "Request failed, the petition owner will be notified via email",
                 },
                 "5XX": {
-                  description:
-                    "Request failed, the petition owner will be notified via email",
+                  description: "Request failed, the petition owner will be notified via email",
                 },
               },
             },
@@ -1135,10 +1071,7 @@ api
             $petitionId: GID!
             $endpoint: String!
           ) {
-            createPetitionSubscription(
-              petitionId: $petitionId
-              endpoint: $endpoint
-            ) {
+            createPetitionSubscription(petitionId: $petitionId, endpoint: $endpoint) {
               ...Subscription
             }
           }
@@ -1183,9 +1116,7 @@ api
         DeleteSubscription_deletePetitionSubscriptionMutationVariables
       >(
         gql`
-          mutation DeleteSubscription_deletePetitionSubscription(
-            $subscriptionId: GID!
-          ) {
+          mutation DeleteSubscription_deletePetitionSubscription($subscriptionId: GID!) {
             deletePetitionSubscription(subscriptionId: $subscriptionId)
           }
         `,
@@ -1291,8 +1222,7 @@ api
       responses: {
         204: SuccessResponse(),
         400: ErrorResponse({
-          description:
-            "The template is being shared with another user. Set force=true to delete.",
+          description: "The template is being shared with another user. Set force=true to delete.",
         }),
       },
       tags: ["Templates"],
@@ -1304,10 +1234,7 @@ api
           DeleteTemplate_deletePetitionsMutationVariables
         >(
           gql`
-            mutation DeleteTemplate_deletePetitions(
-              $templateId: GID!
-              $force: Boolean!
-            ) {
+            mutation DeleteTemplate_deletePetitions($templateId: GID!, $force: Boolean!) {
               deletePetitions(ids: [$templateId], force: $force)
             }
           `,
@@ -1339,13 +1266,7 @@ api
       `,
       query: {
         ...paginationParams(),
-        ...sortByParam([
-          "firstName",
-          "lastName",
-          "fullName",
-          "email",
-          "createdAt",
-        ]),
+        ...sortByParam(["firstName", "lastName", "fullName", "email", "createdAt"]),
       },
       responses: { 200: SuccessResponse(PaginatedContacts) },
       tags: ["Contacts"],
@@ -1409,10 +1330,7 @@ api
         );
         return Created(result.createContact!);
       } catch (error) {
-        if (
-          error instanceof ClientError &&
-          containsGraphQLError(error, "EXISTING_CONTACT")
-        ) {
+        if (error instanceof ClientError && containsGraphQLError(error, "EXISTING_CONTACT")) {
           throw new ConflictError("A contact with this email already exists");
         }
         throw error;

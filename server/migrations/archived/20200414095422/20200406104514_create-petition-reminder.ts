@@ -9,9 +9,7 @@ export async function up(knex: Knex): Promise<any> {
       useNative: true,
       enumName: "petition_reminder_type",
     }).notNullable();
-    t.timestamp("created_at")
-      .notNullable()
-      .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+    t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
     t.string("created_by");
 
     t.foreign("petition_sendout_id").references("petition_sendout.id");
@@ -20,7 +18,5 @@ export async function up(knex: Knex): Promise<any> {
 }
 
 export async function down(knex: Knex): Promise<any> {
-  return knex.schema
-    .dropTable("petition_reminder")
-    .raw("DROP TYPE petition_reminder_type");
+  return knex.schema.dropTable("petition_reminder").raw("DROP TYPE petition_reminder_type");
 }

@@ -1,15 +1,9 @@
 import { Button, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
-function ConfirmActivateUsersDialog({
-  count,
-  ...props
-}: DialogProps<{ count: number }>) {
+function ConfirmActivateUsersDialog({ count, ...props }: DialogProps<{ count: number }>) {
   return (
     <ConfirmDialog
       header={

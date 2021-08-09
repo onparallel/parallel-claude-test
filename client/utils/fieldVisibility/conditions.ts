@@ -9,33 +9,26 @@ import {
 /**
  * Build an initial condition based on the given field
  */
-export function defaultCondition<
-  T extends Pick<PetitionField, "id" | "type" | "options">
->(value: T | [T, number]): PetitionFieldVisibilityCondition {
+export function defaultCondition<T extends Pick<PetitionField, "id" | "type" | "options">>(
+  value: T | [T, number]
+): PetitionFieldVisibilityCondition {
   const [field, column] = Array.isArray(value) ? value : [value];
   const isOnlyHasReplies =
-    field.type === "FILE_UPLOAD" ||
-    (field.type === "DYNAMIC_SELECT" && column === undefined);
+    field.type === "FILE_UPLOAD" || (field.type === "DYNAMIC_SELECT" && column === undefined);
   return {
     fieldId: field.id,
     modifier: isOnlyHasReplies ? "NUMBER_OF_REPLIES" : "ANY",
-    operator: isOnlyHasReplies
-      ? "GREATER_THAN"
-      : field.type === "CHECKBOX"
-      ? "CONTAIN"
-      : "EQUAL",
+    operator: isOnlyHasReplies ? "GREATER_THAN" : field.type === "CHECKBOX" ? "CONTAIN" : "EQUAL",
     value: defaultConditionFieldValue(field, column),
     column,
   };
 }
 
-function defaultConditionFieldValue<
-  T extends Pick<PetitionField, "id" | "type" | "options">
->(field: T, column?: number): number | string | null {
-  if (
-    field.type === "FILE_UPLOAD" ||
-    (field.type === "DYNAMIC_SELECT" && column === undefined)
-  ) {
+function defaultConditionFieldValue<T extends Pick<PetitionField, "id" | "type" | "options">>(
+  field: T,
+  column?: number
+): number | string | null {
+  if (field.type === "FILE_UPLOAD" || (field.type === "DYNAMIC_SELECT" && column === undefined)) {
     return 0;
   } else if (field.type === "SELECT") {
     return (field.options as FieldOptions["SELECT"]).values[0] ?? null;
@@ -89,13 +82,11 @@ export function updateConditionOperator<
       operator,
       // override existing "has replies/does not have replies"
       modifier:
-        condition.modifier === "NUMBER_OF_REPLIES" ||
-        condition.operator === "NUMBER_OF_SUBREPLIES"
+        condition.modifier === "NUMBER_OF_REPLIES" || condition.operator === "NUMBER_OF_SUBREPLIES"
           ? "ANY"
           : condition.modifier,
       value:
-        condition.modifier === "NUMBER_OF_REPLIES" ||
-        condition.operator === "NUMBER_OF_SUBREPLIES"
+        condition.modifier === "NUMBER_OF_REPLIES" || condition.operator === "NUMBER_OF_SUBREPLIES"
           ? defaultConditionFieldValue(field, condition.column)
           : condition.value,
     };
@@ -109,20 +100,14 @@ export function updateConditionModifier<
   field: T,
   modifier: PetitionFieldVisibilityConditionModifier
 ): PetitionFieldVisibilityCondition {
-  if (
-    modifier === "NUMBER_OF_REPLIES" &&
-    condition.modifier !== "NUMBER_OF_REPLIES"
-  ) {
+  if (modifier === "NUMBER_OF_REPLIES" && condition.modifier !== "NUMBER_OF_REPLIES") {
     return {
       ...condition,
       modifier,
       operator: "GREATER_THAN",
       value: 0,
     };
-  } else if (
-    modifier !== "NUMBER_OF_REPLIES" &&
-    condition.modifier === "NUMBER_OF_REPLIES"
-  ) {
+  } else if (modifier !== "NUMBER_OF_REPLIES" && condition.modifier === "NUMBER_OF_REPLIES") {
     return {
       ...condition,
       modifier,

@@ -1,11 +1,4 @@
-import {
-  arg,
-  enumType,
-  list,
-  nonNull,
-  objectType,
-  unionType,
-} from "@nexus/schema";
+import { arg, enumType, list, nonNull, objectType, unionType } from "@nexus/schema";
 import { omit } from "remeda";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -57,10 +50,7 @@ export const User = objectType({
     t.boolean("isSuperAdmin", {
       resolve: async (o, _, ctx) => {
         const org = await ctx.organizations.loadOrg(o.org_id);
-        return (
-          org?.identifier === "parallel" &&
-          ["OWNER", "ADMIN"].includes(o.organization_role)
-        );
+        return org?.identifier === "parallel" && ["OWNER", "ADMIN"].includes(o.organization_role);
       },
     });
     t.boolean("isSsoUser", {
@@ -120,35 +110,28 @@ export const User = objectType({
           createdAt: "created_at",
           lastUsedAt: "last_used_at",
         } as const;
-        return await ctx.userAuthentication.loadUserAuthenticationTokens(
-          root.id,
-          {
-            offset,
-            limit,
-            search,
-            sortBy: sortBy?.map((value) => {
-              const [field, order] = parseSortBy(value);
-              return { column: columnMap[field], order };
-            }),
-          }
-        );
+        return await ctx.userAuthentication.loadUserAuthenticationTokens(root.id, {
+          offset,
+          limit,
+          search,
+          sortBy: sortBy?.map((value) => {
+            const [field, order] = parseSortBy(value);
+            return { column: columnMap[field], order };
+          }),
+        });
       },
     });
     t.field("unreadNotificationIds", {
       authorize: rootIsContextUser(),
       type: list("ID"),
       resolve: async ({ id }, _, ctx) => {
-        const notifications =
-          await ctx.petitions.loadUnreadPetitionUserNotificationsByUserId(id);
-        return notifications.map((n) =>
-          toGlobalId("PetitionUserNotification", n.id)
-        );
+        const notifications = await ctx.petitions.loadUnreadPetitionUserNotificationsByUserId(id);
+        return notifications.map((n) => toGlobalId("PetitionUserNotification", n.id));
       },
     });
     t.paginationField("notifications", {
       authorize: rootIsContextUser(),
-      description:
-        "Read and unread user notifications about events on their petitions",
+      description: "Read and unread user notifications about events on their petitions",
       type: "PetitionUserNotification",
       hasTotalCount: false,
       extendArgs: (args) => ({
@@ -165,10 +148,11 @@ export const User = objectType({
       },
       resolve: async (_, { limit, filter, before }, ctx) => {
         const _limit = limit ?? 0;
-        const items = await ctx.petitions.loadPetitionUserNotificationsByUserId(
-          ctx.user!.id,
-          { limit: _limit + 1, filter, before }
-        );
+        const items = await ctx.petitions.loadPetitionUserNotificationsByUserId(ctx.user!.id, {
+          limit: _limit + 1,
+          filter,
+          before,
+        });
         return {
           items: items.length > _limit ? items.slice(0, -1) : items,
           hasMore: items.length > _limit,

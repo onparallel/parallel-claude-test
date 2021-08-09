@@ -43,8 +43,7 @@ export function RecipientViewProgressFooter({
       const fieldReplies = completedFieldReplies(field);
       if (isVisible && !field.isReadOnly) {
         replied += fieldReplies.length || field.validated ? 1 : 0;
-        optional +=
-          field.optional && !fieldReplies.length && !field.validated ? 1 : 0;
+        optional += field.optional && !fieldReplies.length && !field.validated ? 1 : 0;
         total += 1;
       }
     }
@@ -66,32 +65,16 @@ export function RecipientViewProgressFooter({
       borderX="none"
       zIndex={1}
     >
-      <Heading
-        display="flex"
-        as="h3"
-        fontSize="md"
-        fontWeight="normal"
-        alignItems="center"
-      >
+      <Heading display="flex" as="h3" fontSize="md" fontWeight="normal" alignItems="center">
         <Text as="span">
-          <FormattedMessage
-            id="recipient-view.progress"
-            defaultMessage="Progress"
-          />
+          <FormattedMessage id="recipient-view.progress" defaultMessage="Progress" />
         </Text>
         <Spacer minWidth={2} />
         <Text as="span">{replied}</Text>
         <Text as="span">/{total}</Text>
       </Heading>
       <Flex flex="1" marginX={4}>
-        <ProgressTrack
-          size="lg"
-          min={0}
-          max={total}
-          value={replied}
-          flex="1"
-          borderRadius="1rem"
-        >
+        <ProgressTrack size="lg" min={0} max={total} value={replied} flex="1" borderRadius="1rem">
           <ProgressIndicator
             min={0}
             max={total}
@@ -126,31 +109,19 @@ export function RecipientViewProgressFooter({
         autoFocus={false}
       >
         <PopoverTrigger>
-          <Button
-            colorScheme="purple"
-            size="sm"
-            isDisabled={isCompleted}
-            onClick={onFinalize}
-          >
+          <Button colorScheme="purple" size="sm" isDisabled={isCompleted} onClick={onFinalize}>
             {petition.signature?.review === false ? (
               <FormattedMessage
                 id="recipient-view.submit-and-sign-button-short"
                 defaultMessage="Finalize and sign"
               />
             ) : (
-              <FormattedMessage
-                id="recipient-view.submit-button-short"
-                defaultMessage="Finalize"
-              />
+              <FormattedMessage id="recipient-view.submit-button-short" defaultMessage="Finalize" />
             )}
           </Button>
         </PopoverTrigger>
 
-        <PopoverContent
-          backgroundColor="blue.500"
-          color="white"
-          marginRight={4}
-        >
+        <PopoverContent backgroundColor="blue.500" color="white" marginRight={4}>
           <PopoverArrow backgroundColor="blue.500" />
           <PopoverCloseButton />
           <PopoverBody>

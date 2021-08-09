@@ -19,10 +19,7 @@ function Career() {
           "Join our team at Parallel on our mission to give professionals their time back",
       })}
     >
-      <PublicContainer
-        textAlign="center"
-        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
-      >
+      <PublicContainer textAlign="center" wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}>
         <Heading as="h1" size="xl" color="purple.600">
           <FormattedMessage
             id="public.careers.hero-title"
@@ -68,10 +65,7 @@ function Career() {
                 rel="noopener noreferrer"
                 href="https://forms.office.com/Pages/ResponsePage.aspx?id=EZYeioEzRUSW-C7eU9f048XajsMdglZKnEBUYUgWpBhURTdWUk03R0xQQk0wQUw5RVk4MDlQRzc4WC4u"
               >
-                <FormattedMessage
-                  id="public.careers.apply-here"
-                  defaultMessage="Apply here"
-                />
+                <FormattedMessage id="public.careers.apply-here" defaultMessage="Apply here" />
               </Button>
             </Flex>
           </Stack>
@@ -116,10 +110,7 @@ function Career() {
                 rel="noopener noreferrer"
                 href="https://forms.office.com/Pages/ResponsePage.aspx?id=EZYeioEzRUSW-C7eU9f048XajsMdglZKnEBUYUgWpBhUMFhaRjZEN083U1k1OVJNUllOR1ZOU1hRQi4u"
               >
-                <FormattedMessage
-                  id="public.careers.apply-here"
-                  defaultMessage="Apply here"
-                />
+                <FormattedMessage id="public.careers.apply-here" defaultMessage="Apply here" />
               </Button>
             </Flex>
           </Stack>

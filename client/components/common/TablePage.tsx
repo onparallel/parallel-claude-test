@@ -1,30 +1,17 @@
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  IconButton,
-  Select,
-  Spinner,
-  Stack,
-} from "@chakra-ui/react";
+import { Box, Button, Center, Flex, IconButton, Select, Spinner, Stack } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@parallel/chakra/icons";
 import { WithChakraProps } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
 import { Spacer } from "@parallel/components/common/Spacer";
-import {
-  Table,
-  TableProps,
-  useTableColors,
-} from "@parallel/components/common/Table";
+import { Table, TableProps, useTableColors } from "@parallel/components/common/Table";
 import { ComponentType, ReactNode, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-export type TablePageProps<
+export type TablePageProps<TRow, TContext = unknown, TImpl extends TRow = TRow> = TableProps<
   TRow,
-  TContext = unknown,
-  TImpl extends TRow = TRow
-> = TableProps<TRow, TContext, TImpl> & {
+  TContext,
+  TImpl
+> & {
   loading: boolean;
   header?: ReactNode;
   body?: ReactNode;
@@ -108,10 +95,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
             }}
           />
         ) : (
-          <FormattedMessage
-            id="component.table.no-results"
-            defaultMessage="No results"
-          />
+          <FormattedMessage id="component.table.no-results" defaultMessage="No results" />
         )}
       </Box>
       <Spacer />
@@ -137,13 +121,7 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                     id: "component.table.prev-page-button",
                     defaultMessage: "Previous",
                   })}
-                  icon={
-                    <ChevronLeftIcon
-                      fontSize="xl"
-                      position="relative"
-                      top="1px"
-                    />
-                  }
+                  icon={<ChevronLeftIcon fontSize="xl" position="relative" top="1px" />}
                 />
               ) : item.type === "NEXT" ? (
                 <IconButton
@@ -155,27 +133,16 @@ export function TablePage<TRow, TContext = unknown, TImpl extends TRow = TRow>({
                     id: "component.table.next-page-button",
                     defaultMessage: "Next",
                   })}
-                  icon={
-                    <ChevronRightIcon
-                      fontSize="xl"
-                      position="relative"
-                      top="1px"
-                    />
-                  }
+                  icon={<ChevronRightIcon fontSize="xl" position="relative" top="1px" />}
                 />
-              ) : item.type === "END_ELLIPSIS" ||
-                item.type === "START_ELLIPSIS" ? (
+              ) : item.type === "END_ELLIPSIS" || item.type === "START_ELLIPSIS" ? (
                 <Center boxSize={8}>...</Center>
               ) : (
                 <Button
                   padding={0}
                   variant={item.isCurrent ? "solid" : "ghost"}
                   size="sm"
-                  onClick={
-                    !item.isCurrent
-                      ? () => onPageChange?.(item.value)
-                      : undefined
-                  }
+                  onClick={!item.isCurrent ? () => onPageChange?.(item.value) : undefined}
                   aria-current={item.isCurrent ? "page" : undefined}
                 >
                   {item.value}
@@ -298,10 +265,7 @@ function usePagination({
         { type: "PAGE", value: 3, isCurrent: true }
       );
     } else if (current > 3) {
-      pages.push(
-        { type: "START_ELLIPSIS" },
-        { type: "PAGE", value: current, isCurrent: true }
-      );
+      pages.push({ type: "START_ELLIPSIS" }, { type: "PAGE", value: current, isCurrent: true });
     }
 
     const total = Math.ceil(totalCount / pageSize);

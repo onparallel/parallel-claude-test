@@ -14,11 +14,7 @@ export interface Email<T> {
   html: ComponentType<T>;
 }
 
-export async function buildEmail<T>(
-  email: Email<T>,
-  props: T,
-  { locale }: EmailOptions
-) {
+export async function buildEmail<T>(email: Email<T>, props: T, { locale }: EmailOptions) {
   const messages = await loadMessages(locale);
   const { html } = render(
     <IntlProvider locale={locale} messages={messages}>

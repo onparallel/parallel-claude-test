@@ -11,9 +11,7 @@ export interface Loader<K, V> {
   dataloader: DataLoader<K, V>;
 }
 
-export function fromDataLoader<K, V, C = K>(
-  dataloader: DataLoader<K, V, C>
-): Loader<K, V> {
+export function fromDataLoader<K, V, C = K>(dataloader: DataLoader<K, V, C>): Loader<K, V> {
   return Object.assign(
     async function (ids: K | K[], opts: FromDataLoaderOptions = {}) {
       const { refresh, cache } = {

@@ -6,9 +6,7 @@ import { useSupportedLocales } from "@parallel/utils/useSupportedLocales";
 export const LocaleBadge = chakraForwardRef<"abbr", { locale: PetitionLocale }>(
   function LocaleBadge({ locale, ...props }, ref) {
     const locales = useSupportedLocales();
-    const localeLabel = locales.find(
-      ({ key }) => key === locale
-    )!.localizedLabel;
+    const localeLabel = locales.find(({ key }) => key === locale)!.localizedLabel;
     return (
       <Tooltip label={localeLabel}>
         <Badge

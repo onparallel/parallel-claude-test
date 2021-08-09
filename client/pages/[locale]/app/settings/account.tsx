@@ -12,10 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   AccountQuery,
@@ -66,9 +63,7 @@ function Account() {
       basePath="/app/settings"
       sections={sections}
       user={me}
-      sectionsHeader={
-        <FormattedMessage id="settings.title" defaultMessage="Settings" />
-      }
+      sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="settings.account" defaultMessage="Account" />
@@ -76,17 +71,9 @@ function Account() {
       }
     >
       <Card margin={4} height="fit-content">
-        <Stack
-          padding={4}
-          alignItems="stretch"
-          flex="1"
-          maxWidth="container.2xs"
-        >
+        <Stack padding={4} alignItems="stretch" flex="1" maxWidth="container.2xs">
           <Heading as="h4" size="md" fontWeight="normal" marginBottom={2}>
-            <FormattedMessage
-              id="settings.account.name-header"
-              defaultMessage="Name"
-            />
+            <FormattedMessage id="settings.account.name-header" defaultMessage="Name" />
           </Heading>
           {me.isSsoUser ? (
             <Alert>
@@ -98,20 +85,11 @@ function Account() {
             </Alert>
           ) : null}
           <Stack as="form" onSubmit={handleSubmit(onSaveName)}>
-            <FormControl
-              id="first-name"
-              isInvalid={!!errors.firstName}
-              isDisabled={me.isSsoUser}
-            >
+            <FormControl id="first-name" isInvalid={!!errors.firstName} isDisabled={me.isSsoUser}>
               <FormLabel>
-                <FormattedMessage
-                  id="generic.forms.first-name-label"
-                  defaultMessage="First name"
-                />
+                <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
               </FormLabel>
-              <Input
-                {...register("firstName", { required: true, maxLength: 255 })}
-              />
+              <Input {...register("firstName", { required: true, maxLength: 255 })} />
               <FormErrorMessage>
                 <FormattedMessage
                   id="generic.forms.required-first-name-error"
@@ -126,14 +104,9 @@ function Account() {
               mb={2}
             >
               <FormLabel>
-                <FormattedMessage
-                  id="generic.forms.last-name-label"
-                  defaultMessage="Last name"
-                />
+                <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
               </FormLabel>
-              <Input
-                {...register("lastName", { required: true, maxLength: 255 })}
-              />
+              <Input {...register("lastName", { required: true, maxLength: 255 })} />
               <FormErrorMessage>
                 <FormattedMessage
                   id="generic.forms.required-last-name-error"
@@ -141,11 +114,7 @@ function Account() {
                 />
               </FormErrorMessage>
             </FormControl>
-            <Button
-              type="submit"
-              colorScheme="purple"
-              isDisabled={me.isSsoUser}
-            >
+            <Button type="submit" colorScheme="purple" isDisabled={me.isSsoUser}>
               <FormattedMessage
                 id="settings.account.update-name-button"
                 defaultMessage="Save changes"
@@ -173,10 +142,7 @@ Account.fragments = {
 };
 
 function useUpdateAccount() {
-  return useMutation<
-    Account_updateAccountMutation,
-    Account_updateAccountMutationVariables
-  >(gql`
+  return useMutation<Account_updateAccountMutation, Account_updateAccountMutationVariables>(gql`
     mutation Account_updateAccount($id: GID!, $data: UpdateUserInput!) {
       updateUser(id: $id, data: $data) {
         id

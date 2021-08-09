@@ -2,10 +2,7 @@ import { gql, useApolloClient, useMutation } from "@apollo/client";
 import { Button, ListItem, Stack, Text, UnorderedList } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import {
   ConfirmDeletePetitionsDialog_PetitionBaseFragment,
@@ -56,12 +53,10 @@ export function useDeletePetitions() {
       try {
         // petition name should always be on cache at this point
         const cachedPetition =
-          cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>(
-            {
-              fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
-              id: petitionIds[0],
-            }
-          );
+          cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>({
+            fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
+            id: petitionIds[0],
+          });
 
         await confirmDelete({
           petitionIds,
@@ -80,17 +75,14 @@ export function useDeletePetitions() {
         const conflictingPetitionIds: string[] =
           error?.graphQLErrors?.[0]?.extensions?.petitionIds ?? [];
 
-        const errorCode: string | undefined =
-          error?.graphQLErrors?.[0]?.extensions?.code;
+        const errorCode: string | undefined = error?.graphQLErrors?.[0]?.extensions?.code;
 
         const cachedPetitions = conflictingPetitionIds.map(
           (id) =>
-            cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>(
-              {
-                fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
-                id: id,
-              }
-            )!
+            cache.readFragment<ConfirmDeletePetitionsDialog_PetitionBaseFragment>({
+              fragment: ConfirmDeletePetitionsDialog.fragments.PetitionBase,
+              id: id,
+            })!
         );
 
         const petitionName =
@@ -100,10 +92,7 @@ export function useDeletePetitions() {
             defaultMessage: "Untitled petition",
           });
 
-        const type =
-          cachedPetitions[0].__typename === "PetitionTemplate"
-            ? "TEMPLATE"
-            : "PETITION";
+        const type = cachedPetitions[0].__typename === "PetitionTemplate" ? "TEMPLATE" : "PETITION";
 
         if (errorCode === "DELETE_SHARED_PETITION_ERROR") {
           const singlePetitionMessage = (
@@ -134,9 +123,7 @@ export function useDeletePetitions() {
           );
 
           const errorMessage =
-            conflictingPetitionIds.length === 1
-              ? singlePetitionMessage
-              : multiplePetitionMessage;
+            conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
 
           await showErrorDialog({
             header: errorHeader,
@@ -160,10 +147,7 @@ export function useDeletePetitions() {
               />
               <UnorderedList paddingLeft={2} pt={2}>
                 {cachedPetitions.map((petition) => (
-                  <ListItem
-                    key={petition!.id}
-                    textStyle={petition!.name ? undefined : "hint"}
-                  >
+                  <ListItem key={petition!.id} textStyle={petition!.name ? undefined : "hint"}>
                     {petition?.name ??
                       intl.formatMessage({
                         id: "generic.untitled-petition",
@@ -176,9 +160,7 @@ export function useDeletePetitions() {
           );
 
           const errorMessage =
-            conflictingPetitionIds.length === 1
-              ? singlePetitionMessage
-              : multiplePetitionMessage;
+            conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
 
           await showErrorDialog({
             header: errorHeader,
@@ -201,10 +183,7 @@ export function useDeletePetitions() {
               />
               <UnorderedList paddingLeft={2} pt={2}>
                 {cachedPetitions.map((petition) => (
-                  <ListItem
-                    key={petition!.id}
-                    textStyle={petition!.name ? undefined : "hint"}
-                  >
+                  <ListItem key={petition!.id} textStyle={petition!.name ? undefined : "hint"}>
                     {petition?.name ??
                       intl.formatMessage({
                         id: "generic.untitled-template",
@@ -217,9 +196,7 @@ export function useDeletePetitions() {
           );
 
           const errorMessage =
-            conflictingPetitionIds.length === 1
-              ? singlePetitionMessage
-              : multiplePetitionMessage;
+            conflictingPetitionIds.length === 1 ? singlePetitionMessage : multiplePetitionMessage;
 
           await showErrorDialog({
             header: errorHeader,
@@ -287,10 +264,7 @@ export function ConfirmDeletePetitionsDialog({
       body={body}
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="generic.confirm-delete-button"
-            defaultMessage="Yes, delete"
-          />
+          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }
       {...props}

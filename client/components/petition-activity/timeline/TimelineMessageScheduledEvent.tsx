@@ -32,13 +32,7 @@ export function TimelineMessageScheduledEvent({
   }
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<TimeIcon />}
-          color="black"
-          backgroundColor="gray.200"
-        />
-      }
+      icon={<TimelineIcon icon={<TimeIcon />} color="black" backgroundColor="gray.200" />}
     >
       <Flex alignItems="center">
         <Box>
@@ -52,32 +46,14 @@ export function TimelineMessageScheduledEvent({
               subject: message.emailSubject,
               contact: <ContactLink contact={message.access.contact} />,
               scheduledAt: (
-                <DateTime
-                  fontWeight="bold"
-                  value={message.scheduledAt!}
-                  format={FORMATS.LLL}
-                />
+                <DateTime fontWeight="bold" value={message.scheduledAt!} format={FORMATS.LLL} />
               ),
-              timeAgo: (
-                <DateTime
-                  value={createdAt}
-                  format={FORMATS.LLL}
-                  useRelativeTime="always"
-                />
-              ),
+              timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
             }}
           />
         </Box>
-        <Button
-          onClick={handleSeeMessageClick}
-          size="sm"
-          variant="outline"
-          marginLeft={4}
-        >
-          <FormattedMessage
-            id="timeline.message-sent-see-message"
-            defaultMessage="See message"
-          />
+        <Button onClick={handleSeeMessageClick} size="sm" variant="outline" marginLeft={4}>
+          <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />
         </Button>
         {message.status === "SCHEDULED" ? (
           <Button
@@ -87,10 +63,7 @@ export function TimelineMessageScheduledEvent({
             marginLeft={4}
             onClick={onCancelScheduledMessage}
           >
-            <FormattedMessage
-              id="timeline.message-scheduled-cancel"
-              defaultMessage="Cancel"
-            />
+            <FormattedMessage id="timeline.message-scheduled-cancel" defaultMessage="Cancel" />
           </Button>
         ) : null}
       </Flex>

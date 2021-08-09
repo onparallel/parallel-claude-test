@@ -8,9 +8,7 @@ export async function up(knex: Knex): Promise<void> {
       enumName: "system_event_type",
     }).notNullable();
     t.jsonb("data");
-    t.timestamp("created_at")
-      .notNullable()
-      .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+    t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
   });
 }
 

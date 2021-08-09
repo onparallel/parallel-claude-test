@@ -91,19 +91,13 @@ export class SignatureService {
       case "SIGNATURIT":
         return this.buildSignaturItClient(integration);
       default:
-        throw new Error(
-          `Couldn't resolve signature client: ${integration.provider}`
-        );
+        throw new Error(`Couldn't resolve signature client: ${integration.provider}`);
     }
   }
 
   private buildSignaturItClient(integration: OrgIntegration): SignaturItClient {
     const settings = integration.settings as SignaturitIntegrationSettings;
-    const client = new SignaturItClient(
-      settings,
-      this.config,
-      integration.org_id
-    );
+    const client = new SignaturItClient(settings, this.config, integration.org_id);
     client.on(
       "branding_updated",
       ({ locale, brandingId }: { locale: string; brandingId: string }) => {
@@ -136,15 +130,10 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
   ) {
     super();
     if (!this.settings.API_KEY) {
-      throw new Error(
-        "Signaturit API KEY not found on org_integration settings"
-      );
+      throw new Error("Signaturit API KEY not found on org_integration settings");
     }
 
-    this.sdk = new SignaturitSDK(
-      this.settings.API_KEY,
-      settings.ENVIRONMENT === "production"
-    );
+    this.sdk = new SignaturitSDK(this.settings.API_KEY, settings.ENVIRONMENT === "production");
   }
 
   public async startSignatureRequest(
@@ -154,10 +143,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
     opts: SignatureOptions
   ) {
     const locale = opts?.locale ?? "en";
-    let brandingId =
-      locale === "en"
-        ? this.settings.EN_BRANDING_ID
-        : this.settings.ES_BRANDING_ID;
+    let brandingId = locale === "en" ? this.settings.EN_BRANDING_ID : this.settings.ES_BRANDING_ID;
 
     if (!brandingId) {
       brandingId = (await this.createOrgBranding(opts)).id;
@@ -182,8 +168,7 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
           email: r.email,
           name: r.name,
           require_signature_in_coordinates: opts?.signatureBoxPositions?.map(
-            (boxPosition) =>
-              boxPosition?.find((bp) => bp.email === r.email)?.box ?? {}
+            (boxPosition) => boxPosition?.find((bp) => bp.email === r.email)?.box ?? {}
           ),
         })),
         expire_time: 0, // disable signaturit reminder emails
@@ -199,29 +184,22 @@ class SignaturItClient extends EventEmitter implements ISignatureClient {
   // returns a binary encoded buffer of the signed document
   public async downloadSignedDocument(externalId: string): Promise<Buffer> {
     const [signatureId, documentId] = externalId.split("/");
-    return Buffer.from(
-      await this.sdk.downloadSignedDocument(signatureId, documentId)
-    );
+    return Buffer.from(await this.sdk.downloadSignedDocument(signatureId, documentId));
   }
 
   public async downloadAuditTrail(externalId: string) {
     const [signatureId, documentId] = externalId.split("/");
-    return Buffer.from(
-      await this.sdk.downloadAuditTrail(signatureId, documentId)
-    );
+    return Buffer.from(await this.sdk.downloadAuditTrail(signatureId, documentId));
   }
 
-  private async createOrgBranding(
-    opts: SignatureOptions
-  ): Promise<BrandingResponse> {
+  private async createOrgBranding(opts: SignatureOptions): Promise<BrandingResponse> {
     return await this.sdk.createBranding({
       show_welcome_page: false,
       layout_color: "#6059F7",
       text_color: "#F6F6F6",
       logo: await downloadImageBase64(opts.templateData.logoUrl),
       application_texts: {
-        open_sign_button:
-          opts.locale === "es" ? "Abrir documento" : "Open document",
+        open_sign_button: opts.locale === "es" ? "Abrir documento" : "Open document",
       },
       templates: await this.buildSignaturItBrandingTemplates(opts),
     });

@@ -1,11 +1,6 @@
 import Excel from "exceljs";
 import { ApiContext } from "../../context";
-import {
-  Contact,
-  PetitionField,
-  PetitionFieldComment,
-  User,
-} from "../../db/__types";
+import { Contact, PetitionField, PetitionFieldComment, User } from "../../db/__types";
 import { fullName } from "../../util/fullName";
 import { Maybe } from "../../util/types";
 import { ExcelWorksheet } from "./ExcelWorksheet";
@@ -35,36 +30,28 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
       { key: "authorEmail", header: "Email" },
       {
         key: "createdAt",
-        header:
-          this.locale === "en"
-            ? "Message sent at"
-            : "Hora de envío del mensaje",
+        header: this.locale === "en" ? "Message sent at" : "Hora de envío del mensaje",
       },
       {
         key: "isInternal",
-        header:
-          this.locale === "en" ? "Internal comment?" : "¿Comentario interno?",
+        header: this.locale === "en" ? "Internal comment?" : "¿Comentario interno?",
       },
     ];
   }
 
   public async addFieldComments(field: PetitionField) {
-    const fieldComments =
-      await this.context.petitions.loadPetitionFieldCommentsForField({
-        petitionFieldId: field.id,
-        petitionId: field.petition_id,
-        loadInternalComments: true,
-      });
+    const fieldComments = await this.context.petitions.loadPetitionFieldCommentsForField({
+      petitionFieldId: field.id,
+      petitionId: field.petition_id,
+      loadInternalComments: true,
+    });
 
     for (const comment of fieldComments) {
       await this.addCommentRow(comment, field.title);
     }
   }
 
-  private async addCommentRow(
-    comment: PetitionFieldComment,
-    fieldTitle: Maybe<string>
-  ) {
+  private async addCommentRow(comment: PetitionFieldComment, fieldTitle: Maybe<string>) {
     const author = await this.loadCommentAuthor(comment);
     this.addRows({
       authorEmail: author.email,
@@ -76,9 +63,7 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     });
   }
 
-  private async loadCommentAuthor(
-    comment: PetitionFieldComment
-  ): Promise<Contact | User> {
+  private async loadCommentAuthor(comment: PetitionFieldComment): Promise<Contact | User> {
     if (comment.user_id) {
       const author = await this.context.users.loadUser(comment.user_id);
       if (!author) {
@@ -88,9 +73,7 @@ export class FieldCommentsExcelWorksheet extends ExcelWorksheet<FieldCommentRow>
     }
 
     if (comment.petition_access_id) {
-      const author = await this.context.contacts.loadContactByAccessId(
-        comment.petition_access_id
-      );
+      const author = await this.context.contacts.loadContactByAccessId(comment.petition_access_id);
 
       if (!author) {
         throw new Error(

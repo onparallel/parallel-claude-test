@@ -1,10 +1,7 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { AlertCircleIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { ReactNode, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
@@ -13,11 +10,7 @@ export type ErrorDialogProps = {
   header?: ReactNode;
 };
 
-export function ErrorDialog({
-  message,
-  header,
-  ...props
-}: DialogProps<ErrorDialogProps>) {
+export function ErrorDialog({ message, header, ...props }: DialogProps<ErrorDialogProps>) {
   const focusRef = useRef(null);
   return (
     <ConfirmDialog
@@ -29,26 +22,15 @@ export function ErrorDialog({
           <Stack direction="row" spacing={2} align="center">
             <AlertCircleIcon role="presentation" />
             <Text>
-              <FormattedMessage
-                id="component.error-dialog.header"
-                defaultMessage="Error"
-              />
+              <FormattedMessage id="component.error-dialog.header" defaultMessage="Error" />
             </Text>
           </Stack>
         )
       }
       body={message}
       confirm={
-        <Button
-          ref={focusRef}
-          colorScheme="purple"
-          minWidth={24}
-          onClick={() => props.onResolve()}
-        >
-          <FormattedMessage
-            id="component.error-dialog.ok-button"
-            defaultMessage="OK"
-          />
+        <Button ref={focusRef} colorScheme="purple" minWidth={24} onClick={() => props.onResolve()}>
+          <FormattedMessage id="component.error-dialog.ok-button" defaultMessage="OK" />
         </Button>
       }
       cancel={<></>}

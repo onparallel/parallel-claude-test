@@ -27,32 +27,20 @@ export async function petitionSharingNotification(
     throw new Error(`User not found for user_id ${payload.user_id}`);
   }
   const [permissionUsers, petitions] = await Promise.all([
-    context.users.loadUser(
-      uniq(permissions.filter(isDefined).map((p) => p.user_id!))
-    ),
-    context.petitions.loadPetition(
-      uniq(permissions.filter(isDefined).map((p) => p.petition_id))
-    ),
+    context.users.loadUser(uniq(permissions.filter(isDefined).map((p) => p.user_id!))),
+    context.petitions.loadPetition(uniq(permissions.filter(isDefined).map((p) => p.petition_id))),
   ]);
-  const permissionUsersById = indexBy(
-    permissionUsers.filter(isDefined),
-    (p) => p.id
-  );
+  const permissionUsersById = indexBy(permissionUsers.filter(isDefined), (p) => p.id);
   const petitionsById = indexBy(petitions.filter(isDefined), (p) => p.id);
   const emails: EmailLog[] = [];
-  const { emailFrom, ...layoutProps } = await getLayoutProps(
-    user.org_id,
-    context
-  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(user.org_id, context);
 
   for (const permission of permissions) {
     if (permission) {
       const permissionUser = permissionUsersById[permission.user_id!];
       const petition = petitionsById[permission.petition_id];
       const { html, text, subject, from } = await buildEmail(
-        petition.is_template
-          ? TemplateSharingNotification
-          : PetitionSharingNotification,
+        petition.is_template ? TemplateSharingNotification : PetitionSharingNotification,
         {
           petitionId: toGlobalId("Petition", petition.id),
           petitionName: petition.name,

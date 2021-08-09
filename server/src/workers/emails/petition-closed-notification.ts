@@ -33,10 +33,7 @@ export async function petitionClosedNotification(
     throw new Error(`User not found for user_id ${payload.user_id}`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(
-    sender.org_id,
-    context
-  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
 
   const emails: EmailLog[] = [];
   for (const accessId of payload.petition_access_ids) {
@@ -74,9 +71,9 @@ export async function petitionClosedNotification(
       });
 
       const buffer = await context.printer.pdf(
-        `http://localhost:3000/${
-          petition.locale
-        }/print/petition-pdf?${new URLSearchParams({ token })}`,
+        `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
+          token,
+        })}`,
         {
           height: "297mm",
           width: "210mm",
@@ -90,11 +87,7 @@ export async function petitionClosedNotification(
       );
 
       const path = random(16);
-      await context.aws.temporaryFiles.uploadFile(
-        path,
-        "application/pdf",
-        buffer
-      );
+      await context.aws.temporaryFiles.uploadFile(path, "application/pdf", buffer);
       const attachment = await context.files.createTemporaryFile(
         {
           path,

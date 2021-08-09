@@ -22,12 +22,7 @@ import {
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
-import {
-  ChevronDownIcon,
-  DeleteIcon,
-  UserArrowIcon,
-  UsersIcon,
-} from "@parallel/chakra/icons";
+import { ChevronDownIcon, DeleteIcon, UserArrowIcon, UsersIcon } from "@parallel/chakra/icons";
 import {
   PetitionActivityDocument,
   PetitionSharingModal_PetitionUserGroupPermissionFragment,
@@ -105,16 +100,15 @@ export function PetitionSharingDialog({
     (p) => p.__typename === "PetitionUserGroupPermission"
   ) ?? []) as PetitionSharingModal_PetitionUserGroupPermissionFragment[];
 
-  const { handleSubmit, register, control, watch } =
-    useForm<PetitionSharingDialogData>({
-      mode: "onChange",
-      defaultValues: {
-        selection: [],
-        notify: true,
-        subscribe: true,
-        message: "",
-      },
-    });
+  const { handleSubmit, register, control, watch } = useForm<PetitionSharingDialogData>({
+    mode: "onChange",
+    defaultValues: {
+      selection: [],
+      notify: true,
+      subscribe: true,
+      message: "",
+    },
+  });
 
   const petitionsOwned =
     petitionsById?.filter((petition) =>
@@ -137,29 +131,17 @@ export function PetitionSharingDialog({
 
   const usersRef = useRef<UserSelectInstance<true, true>>(null);
   const messageRef = useRef<HTMLInputElement>(null);
-  const messageRegisterProps = useRegisterWithRef(
-    messageRef,
-    register,
-    "message"
-  );
+  const messageRegisterProps = useRegisterWithRef(messageRef, register, "message");
 
   const usersToExclude =
-    petitionIds.length === 1
-      ? userPermissions?.map((p) => p.user.id) ?? []
-      : [userId];
+    petitionIds.length === 1 ? userPermissions?.map((p) => p.user.id) ?? [] : [userId];
 
   const groupsToExclude =
-    petitionIds.length === 1
-      ? groupPermissions?.map((p) => p.group.id) ?? []
-      : [];
+    petitionIds.length === 1 ? groupPermissions?.map((p) => p.group.id) ?? [] : [];
 
   const _handleSearchUsers = useSearchUsers();
   const handleSearchUsers = useCallback(
-    async (
-      search: string,
-      excludeUsers: string[],
-      excludeUserGroups: string[]
-    ) => {
+    async (search: string, excludeUsers: string[], excludeUserGroups: string[]) => {
       return await _handleSearchUsers(search, {
         includeGroups: true,
         excludeUsers: [...excludeUsers, ...usersToExclude],
@@ -171,17 +153,12 @@ export function PetitionSharingDialog({
   const handleRemovePetitionPermission = useRemovePetitionPermission();
   const handleTransferPetitionOwnership = useTransferPetitionOwnership();
 
-  const [addPetitionPermission] =
-    usePetitionSharingModal_addPetitionPermissionMutation();
+  const [addPetitionPermission] = usePetitionSharingModal_addPetitionPermissionMutation();
 
   const handleAddPetitionPermissions = handleSubmit(
     async ({ selection, notify, subscribe, message }) => {
-      const users = selection
-        .filter((s) => s.__typename === "User")
-        .map((u) => u.id);
-      const groups = selection
-        .filter((s) => s.__typename === "UserGroup")
-        .map((g) => g.id);
+      const users = selection.filter((s) => s.__typename === "User").map((u) => u.id);
+      const groups = selection.filter((s) => s.__typename === "UserGroup").map((g) => g.id);
 
       try {
         await addPetitionPermission({
@@ -211,8 +188,7 @@ export function PetitionSharingDialog({
     const template = intl.formatMessage(
       {
         id: "template-sharing.success-title",
-        defaultMessage:
-          "{count, plural, =1 {Template} other {Templates}} shared",
+        defaultMessage: "{count, plural, =1 {Template} other {Templates}} shared",
       },
       {
         count: petitionsOwned.length,
@@ -222,8 +198,7 @@ export function PetitionSharingDialog({
     const petition = intl.formatMessage(
       {
         id: "petition-sharing.success-title",
-        defaultMessage:
-          "{count, plural, =1 {Petition} other {Petitions}} shared",
+        defaultMessage: "{count, plural, =1 {Petition} other {Petitions}} shared",
       },
       {
         count: petitionsOwned.length,
@@ -250,12 +225,7 @@ export function PetitionSharingDialog({
       content={{ as: "form", onSubmit: handleAddPetitionPermissions }}
       header={
         <Stack direction="row">
-          <Circle
-            role="presentation"
-            size="32px"
-            backgroundColor="purple.500"
-            color="white"
-          >
+          <Circle role="presentation" size="32px" backgroundColor="purple.500" color="white">
             <UserArrowIcon />
           </Circle>
           <Text as="div" flex="1">
@@ -282,10 +252,7 @@ export function PetitionSharingDialog({
                       ref={usersRef}
                       value={value}
                       onKeyDown={(e: KeyboardEvent) => {
-                        if (
-                          e.key === "Enter" &&
-                          !(e.target as HTMLInputElement).value
-                        ) {
+                        if (e.key === "Enter" && !(e.target as HTMLInputElement).value) {
                           e.preventDefault();
                         }
                       }}
@@ -300,13 +267,11 @@ export function PetitionSharingDialog({
                         petitionsOwned.length
                           ? intl.formatMessage({
                               id: "petition-sharing.input-placeholder",
-                              defaultMessage:
-                                "Add users and teams from your organization",
+                              defaultMessage: "Add users and teams from your organization",
                             })
                           : intl.formatMessage({
                               id: "petition-sharing.input-placeholder-not-owner",
-                              defaultMessage:
-                                "Only the petition owner can share it",
+                              defaultMessage: "Only the petition owner can share it",
                             })
                       }
                     />
@@ -316,11 +281,7 @@ export function PetitionSharingDialog({
               {/* PermissionTypeSelect */}
             </Stack>
             <Stack display={hasUsers ? "flex" : "none"}>
-              <Checkbox
-                {...register("notify")}
-                colorScheme="purple"
-                defaultIsChecked
-              >
+              <Checkbox {...register("notify")} colorScheme="purple" defaultIsChecked>
                 <FormattedMessage
                   id="petition-sharing.notify-checkbox"
                   defaultMessage="Notify users"
@@ -340,11 +301,7 @@ export function PetitionSharingDialog({
                   })}
                 />
               </PaddedCollapse>
-              <Checkbox
-                {...register("subscribe")}
-                colorScheme="purple"
-                defaultIsChecked
-              >
+              <Checkbox {...register("subscribe")} colorScheme="purple" defaultIsChecked>
                 <FormattedMessage
                   id="component.petition-sharing-dialog.subscribe"
                   defaultMessage="Subscribe to notifications"
@@ -357,10 +314,7 @@ export function PetitionSharingDialog({
                 </HelpPopover>
               </Checkbox>
             </Stack>
-            <Stack
-              display={hasUsers || petitionIds.length !== 1 ? "none" : "flex"}
-              paddingTop={2}
-            >
+            <Stack display={hasUsers || petitionIds.length !== 1 ? "none" : "flex"} paddingTop={2}>
               {userPermissions?.map(({ user, permissionType }) => (
                 <Flex key={user.id} alignItems="center">
                   <Avatar role="presentation" name={user.fullName!} size="sm" />
@@ -370,10 +324,7 @@ export function PetitionSharingDialog({
                       {userId === user.id ? (
                         <Text as="span">
                           {"("}
-                          <FormattedMessage
-                            id="generic.you"
-                            defaultMessage="You"
-                          />
+                          <FormattedMessage id="generic.you" defaultMessage="You" />
                           {")"}
                         </Text>
                       ) : null}
@@ -405,9 +356,7 @@ export function PetitionSharingDialog({
                       </MenuButton>
                       <MenuList minWidth={40}>
                         <MenuItem
-                          onClick={() =>
-                            handleTransferPetitionOwnership(petitionId, user)
-                          }
+                          onClick={() => handleTransferPetitionOwnership(petitionId, user)}
                           icon={<UserArrowIcon display="block" boxSize={4} />}
                         >
                           <FormattedMessage
@@ -417,15 +366,10 @@ export function PetitionSharingDialog({
                         </MenuItem>
                         <MenuItem
                           color="red.500"
-                          onClick={() =>
-                            handleRemovePetitionPermission({ petitionId, user })
-                          }
+                          onClick={() => handleRemovePetitionPermission({ petitionId, user })}
                           icon={<DeleteIcon display="block" boxSize={4} />}
                         >
-                          <FormattedMessage
-                            id="generic.remove"
-                            defaultMessage="Remove"
-                          />
+                          <FormattedMessage id="generic.remove" defaultMessage="Remove" />
                         </MenuItem>
                       </MenuList>
                     </Menu>
@@ -447,9 +391,7 @@ export function PetitionSharingDialog({
                         justifyContent="flex-end"
                         alignItems="center"
                       >
-                        <UserListPopover
-                          usersOrGroups={group.members.map((m) => m.user)}
-                        >
+                        <UserListPopover usersOrGroups={group.members.map((m) => m.user)}>
                           <Text color="gray.500" isTruncated>
                             <FormattedMessage
                               id="component.user-select.group-members"
@@ -492,10 +434,7 @@ export function PetitionSharingDialog({
                             }
                             icon={<DeleteIcon display="block" boxSize={4} />}
                           >
-                            <FormattedMessage
-                              id="generic.remove"
-                              defaultMessage="Remove"
-                            />
+                            <FormattedMessage id="generic.remove" defaultMessage="Remove" />
                           </MenuItem>
                         </MenuList>
                       </Menu>
@@ -504,16 +443,8 @@ export function PetitionSharingDialog({
                 );
               })}
             </Stack>
-            <Stack
-              display={
-                petitionsRW.length && petitionIds.length !== 1 ? "flex" : "none"
-              }
-            >
-              <Alert
-                status="warning"
-                backgroundColor="orange.100"
-                borderRadius="md"
-              >
+            <Stack display={petitionsRW.length && petitionIds.length !== 1 ? "flex" : "none"}>
+              <Alert status="warning" backgroundColor="orange.100" borderRadius="md">
                 <Flex alignItems="center" justifyContent="flex-start">
                   <AlertIcon color="yellow.500" />
                   <AlertDescription>
@@ -537,10 +468,7 @@ export function PetitionSharingDialog({
                         <UnorderedList paddingLeft={2}>
                           {petitionsRW.map((petition) => (
                             <ListItem key={petition!.id} s>
-                              <Text
-                                as="span"
-                                textStyle={petition!.name ? undefined : "hint"}
-                              >
+                              <Text as="span" textStyle={petition!.name ? undefined : "hint"}>
                                 {petition?.name ??
                                   intl.formatMessage({
                                     id: "generic.untitled-petition",
@@ -589,11 +517,7 @@ export function PetitionSharingDialog({
             <FormattedMessage id="generic.send" defaultMessage="Send" />
           </Button>
         ) : (
-          <Button
-            colorScheme="purple"
-            variant="solid"
-            onClick={() => props.onReject()}
-          >
+          <Button colorScheme="purple" variant="solid" onClick={() => props.onReject()}>
             <FormattedMessage id="generic.done" defaultMessage="Done" />
           </Button>
         )
@@ -718,10 +642,7 @@ PetitionSharingDialog.mutations = [
     ${PetitionSharingDialog.fragments.Petition}
   `,
   gql`
-    mutation PetitionSharingModal_transferPetitionOwnership(
-      $petitionId: GID!
-      $userId: GID!
-    ) {
+    mutation PetitionSharingModal_transferPetitionOwnership($petitionId: GID!, $userId: GID!) {
       transferPetitionOwnership(petitionIds: [$petitionId], userId: $userId) {
         ...PetitionSharingModal_Petition
       }
@@ -748,11 +669,8 @@ interface RemovePetitionPermissionProps {
 }
 
 function useRemovePetitionPermission() {
-  const confirmRemovePetitionPermission = useDialog(
-    ConfirmRemovePetitionPermissionDialog
-  );
-  const [removePetitionPermission] =
-    usePetitionSharingModal_removePetitionPermissionMutation();
+  const confirmRemovePetitionPermission = useDialog(ConfirmRemovePetitionPermissionDialog);
+  const [removePetitionPermission] = usePetitionSharingModal_removePetitionPermissionMutation();
   return useCallback(
     async ({ petitionId, user, userGroup }: RemovePetitionPermissionProps) => {
       try {
@@ -810,11 +728,8 @@ function ConfirmRemovePetitionPermissionDialog({
 }
 
 function useTransferPetitionOwnership() {
-  const confirmTransferPetitionOwnership = useDialog(
-    ConfirmTransferPetitionOwnershipDialog
-  );
-  const [transferPetitionOwnership] =
-    usePetitionSharingModal_transferPetitionOwnershipMutation();
+  const confirmTransferPetitionOwnership = useDialog(ConfirmTransferPetitionOwnershipDialog);
+  const [transferPetitionOwnership] = usePetitionSharingModal_transferPetitionOwnershipMutation();
   return useCallback(
     async (petitionId: string, user: PetitionSharingModal_UserFragment) => {
       try {

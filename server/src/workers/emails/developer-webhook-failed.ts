@@ -21,27 +21,18 @@ export async function developerWebhookFailed(
     return;
   }
 
-  const petition = await context.petitions.loadPetition(
-    subscription.petition_id
-  );
+  const petition = await context.petitions.loadPetition(subscription.petition_id);
 
   if (!petition) {
-    throw new Error(
-      `Petition not found for subscription.petition_id ${subscription.petition_id}`
-    );
+    throw new Error(`Petition not found for subscription.petition_id ${subscription.petition_id}`);
   }
 
   const user = await context.users.loadUser(subscription.user_id);
   if (!user) {
-    throw new Error(
-      `User not found for subscription.user_id ${subscription.user_id}`
-    );
+    throw new Error(`User not found for subscription.user_id ${subscription.user_id}`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(
-    user.org_id,
-    context
-  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(user.org_id, context);
 
   const { html, text, subject, from } = await buildEmail(
     DeveloperWebhookFailedEmail,

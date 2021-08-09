@@ -1,8 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { SettingsQuery, useSettingsQuery } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
@@ -26,9 +23,7 @@ export function Settings() {
       basePath="/app/settings"
       sections={sections}
       user={me}
-      sectionsHeader={
-        <FormattedMessage id="settings.title" defaultMessage="Settings" />
-      }
+      sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
     />
   );
 }

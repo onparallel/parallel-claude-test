@@ -29,8 +29,7 @@ const email: Email<WelcomeProps> = {
       })}
       ${intl.formatMessage({
         id: "welcome.click-to-verify",
-        defaultMessage:
-          "Please click the link below to verify your email address.",
+        defaultMessage: "Please click the link below to verify your email address.",
       })}
       ${parallelUrl}/${intl.locale}/${verificationUrl}
       
@@ -40,19 +39,11 @@ const email: Email<WelcomeProps> = {
   html({ verificationUrl, parallelUrl, assetsUrl, logoUrl, logoAlt }) {
     const { locale } = useIntl();
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection>
           <MjmlColumn>
             <MjmlText fontSize="16px">
-              <FormattedMessage
-                id="welcome.greeting"
-                defaultMessage="Welcome to Parallel!"
-              />
+              <FormattedMessage id="welcome.greeting" defaultMessage="Welcome to Parallel!" />
             </MjmlText>
             <MjmlText>
               <FormattedMessage
@@ -61,10 +52,7 @@ const email: Email<WelcomeProps> = {
               />
             </MjmlText>
             <Button href={`${parallelUrl}/${locale}/${verificationUrl}`}>
-              <FormattedMessage
-                id="welcome.verify-button"
-                defaultMessage="Verify my email"
-              />
+              <FormattedMessage id="welcome.verify-button" defaultMessage="Verify my email" />
             </Button>
             <Closing />
           </MjmlColumn>

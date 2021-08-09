@@ -1,16 +1,6 @@
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack,
-} from "@chakra-ui/react";
+import { Button, FormControl, FormErrorMessage, FormLabel, Input, Stack } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { useRegisterWithRef } from "@parallel/utils/react-form-hook/useRegisterWithRef";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
 import { useRef } from "react";
@@ -54,11 +44,7 @@ export function AskContactDetailsDialog({
   });
 
   const firstNameRef = useRef<HTMLInputElement>(null);
-  const firstNameRegisterProps = useRegisterWithRef(
-    firstNameRef,
-    register,
-    "firstName"
-  );
+  const firstNameRegisterProps = useRegisterWithRef(firstNameRef, register, "firstName");
   return (
     <ConfirmDialog
       id="pw-add-contact"
@@ -78,10 +64,7 @@ export function AskContactDetailsDialog({
         <Stack>
           <FormControl id="contact-email" isInvalid={!!errors.email}>
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.email-label"
-                defaultMessage="Email"
-              />
+              <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
             </FormLabel>
             <Input
               {...emailRegisterProps}
@@ -102,19 +85,13 @@ export function AskContactDetailsDialog({
           </FormControl>
           <FormControl id="contact-first-name">
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.first-name-label"
-                defaultMessage="First name"
-              />
+              <FormattedMessage id="generic.forms.first-name-label" defaultMessage="First name" />
             </FormLabel>
             <Input {...firstNameRegisterProps} />
           </FormControl>
           <FormControl id="contact-last-name">
             <FormLabel>
-              <FormattedMessage
-                id="generic.forms.last-name-label"
-                defaultMessage="Last name"
-              />
+              <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
             </FormLabel>
             <Input {...register("lastName")} />
           </FormControl>

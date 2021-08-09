@@ -14,10 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
   ExportRepliesDialog_PetitionFieldFragment,
   ExportRepliesDialog_UserFragment,
@@ -30,10 +27,7 @@ import { useUserPreference } from "@parallel/utils/useUserPreference";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { PaddedCollapse } from "../common/PaddedCollapse";
-import {
-  PlaceholderInput,
-  PlaceholderInputRef,
-} from "../common/PlaceholderInput";
+import { PlaceholderInput, PlaceholderInputRef } from "../common/PlaceholderInput";
 
 export type ExportRepliesDialogProps = {
   user: ExportRepliesDialog_UserFragment;
@@ -58,16 +52,13 @@ export function ExportRepliesDialog({
   ...props
 }: DialogProps<ExportRepliesDialogProps, ExportParams>) {
   const intl = useIntl();
-  const [options, setOptions] = useState<
-    { type: ExportType; isEnabled: boolean }[]
-  >([
+  const [options, setOptions] = useState<{ type: ExportType; isEnabled: boolean }[]>([
     { type: "DOWNLOAD_ZIP", isEnabled: true },
     ...(user.hasExportCuatrecasas
       ? [{ type: "EXPORT_CUATRECASAS" as const, isEnabled: false }]
       : []),
   ]);
-  const [selectedOption, setSelectedOption] =
-    useState<ExportType>("DOWNLOAD_ZIP");
+  const [selectedOption, setSelectedOption] = useState<ExportType>("DOWNLOAD_ZIP");
   const messages: Record<ExportType, { title: string; description: string }> = {
     DOWNLOAD_ZIP: {
       title: intl.formatMessage({
@@ -76,8 +67,7 @@ export function ExportRepliesDialog({
       }),
       description: intl.formatMessage({
         id: "component.export-replies-dialog.download-files-and-replies-description",
-        defaultMessage:
-          "Download all files including text replies in Excel format.",
+        defaultMessage: "Download all files including text replies in Excel format.",
       }),
     },
     EXPORT_CUATRECASAS: {
@@ -100,9 +90,7 @@ export function ExportRepliesDialog({
           await fetch("https://localhost:50500/api/v1/echo");
           setOptions((options) =>
             options.map((option) =>
-              option.type === "EXPORT_CUATRECASAS"
-                ? { ...option, isEnabled: true }
-                : option
+              option.type === "EXPORT_CUATRECASAS" ? { ...option, isEnabled: true } : option
             )
           );
         } catch {}
@@ -119,15 +107,10 @@ export function ExportRepliesDialog({
   const clientIdRef = useRef<HTMLInputElement>(null);
   const placeholdersRename = useFilenamePlaceholdersRename();
   const example = useMemo(() => {
-    const field = fields.find(
-      (f) => f.type === "FILE_UPLOAD" && f.replies.length > 0
-    )!;
+    const field = fields.find((f) => f.type === "FILE_UPLOAD" && f.replies.length > 0)!;
     if (!field) return [null];
     const reply = field.replies[0];
-    return [
-      reply.content.filename,
-      placeholdersRename(fields)(field, reply, pattern),
-    ];
+    return [reply.content.filename, placeholdersRename(fields)(field, reply, pattern)];
   }, [fields, placeholdersRename, pattern]);
 
   const inputRef = useRef<PlaceholderInputRef>(null);
@@ -273,11 +256,7 @@ export function ExportRepliesDialog({
         </Stack>
       }
       confirm={
-        <Button
-          colorScheme="purple"
-          onClick={handleConfirmClick}
-          isDisabled={rename && !pattern}
-        >
+        <Button colorScheme="purple" onClick={handleConfirmClick} isDisabled={rename && !pattern}>
           {selectedOption.startsWith("DOWNLOAD") ? (
             <FormattedMessage id="generic.download" defaultMessage="Download" />
           ) : (

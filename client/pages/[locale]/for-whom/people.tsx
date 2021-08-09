@@ -1,13 +1,4 @@
-import {
-  Box,
-  BoxProps,
-  Button,
-  Flex,
-  Heading,
-  Image,
-  Text,
-  useTheme,
-} from "@chakra-ui/react";
+import { Box, BoxProps, Button, Flex, Heading, Image, Text, useTheme } from "@chakra-ui/react";
 import { NakedLink } from "@parallel/components/common/Link";
 import { ClaimsList } from "@parallel/components/public/ClaimsList";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
@@ -25,10 +16,7 @@ function People() {
         defaultMessage: "For whom",
       })}
     >
-      <PublicContainer
-        textAlign="center"
-        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
-      >
+      <PublicContainer textAlign="center" wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}>
         <Heading as="h1" size="xl" fontWeight="bold" color="purple.600">
           <FormattedMessage
             id="public.people.hero-title"
@@ -46,12 +34,7 @@ function People() {
         <Flex display="column">
           <Separator minHeight="60px" />
           <OneColumnTimeline>
-            <Heading
-              as="h4"
-              fontSize="md"
-              fontWeight="light"
-              color="purple.500"
-            >
+            <Heading as="h4" fontSize="md" fontWeight="light" color="purple.500">
               <FormattedMessage
                 id="public.case.laura.without-parallel"
                 defaultMessage="Without Parallel"
@@ -103,12 +86,7 @@ function People() {
             }
           />
           <OneColumnTimeline>
-            <Heading
-              as="h4"
-              fontSize="md"
-              fontWeight="light"
-              color="purple.500"
-            >
+            <Heading as="h4" fontSize="md" fontWeight="light" color="purple.500">
               <FormattedMessage
                 id="public.case.laura.with-parallel"
                 defaultMessage="With Parallel"
@@ -158,10 +136,7 @@ function People() {
           />
           <OneColumnTimeline>
             <Text>
-              <FormattedMessage
-                id="public.case.laura.now-has"
-                defaultMessage="Laura now has:"
-              />
+              <FormattedMessage id="public.case.laura.now-has" defaultMessage="Laura now has:" />
             </Text>
           </OneColumnTimeline>
           <Separator flex="1" minHeight="20px" />
@@ -196,10 +171,7 @@ function People() {
           </Text>
           <NakedLink href="/book-demo">
             <Button as="a" colorScheme="purple" marginTop={8}>
-              <FormattedMessage
-                id="public.book-demo-button"
-                defaultMessage="Book a demo"
-              />
+              <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
             </Button>
           </NakedLink>
         </Box>
@@ -208,10 +180,7 @@ function People() {
   );
 }
 
-function Separator({
-  hasLogo,
-  ...props
-}: { hasLogo?: boolean } & Omit<BoxProps, "children">) {
+function Separator({ hasLogo, ...props }: { hasLogo?: boolean } & Omit<BoxProps, "children">) {
   const { colors } = useTheme();
   return (
     <Flex
@@ -236,24 +205,13 @@ function Separator({
 
 function OneColumnTimeline({ children }: { children?: ReactNode }) {
   return (
-    <Box
-      marginX="auto"
-      textAlign="center"
-      paddingY={4}
-      maxWidth={{ base: "auto", sm: "300px" }}
-    >
+    <Box marginX="auto" textAlign="center" paddingY={4} maxWidth={{ base: "auto", sm: "300px" }}>
       {children}
     </Box>
   );
 }
 
-function TwoColumnsTimeline({
-  left,
-  right,
-}: {
-  left?: ReactNode;
-  right?: ReactNode;
-}) {
+function TwoColumnsTimeline({ left, right }: { left?: ReactNode; right?: ReactNode }) {
   return (
     <Flex direction={{ base: "column", sm: "row" }}>
       <Flex

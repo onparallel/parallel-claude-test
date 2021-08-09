@@ -11,18 +11,10 @@ export type TimelinePetitionCompletedEventProps = {
   event: TimelinePetitionCompletedEvent_PetitionCompletedEventFragment;
 };
 
-export function TimelinePetitionCompletedEvent({
-  event,
-}: TimelinePetitionCompletedEventProps) {
+export function TimelinePetitionCompletedEvent({ event }: TimelinePetitionCompletedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<CheckIcon />}
-          color="white"
-          backgroundColor="green.500"
-        />
-      }
+      icon={<TimelineIcon icon={<CheckIcon />} color="white" backgroundColor="green.500" />}
     >
       <FormattedMessage
         id="timeline.petition-completed-description"
@@ -30,11 +22,7 @@ export function TimelinePetitionCompletedEvent({
         values={{
           contact: <ContactLink contact={event.access.contact} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

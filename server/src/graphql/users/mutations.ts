@@ -28,10 +28,7 @@ import { userIdNotIncludedInArray } from "../helpers/validators/notIncludedInArr
 import { validEmail } from "../helpers/validators/validEmail";
 import { validIsDefined } from "../helpers/validators/validIsDefined";
 import { orgDoesNotHaveSsoProvider } from "../organization/authorizers";
-import {
-  argUserHasActiveStatus,
-  userHasAccessToUsers,
-} from "../petition/mutations/authorizers";
+import { argUserHasActiveStatus, userHasAccessToUsers } from "../petition/mutations/authorizers";
 import {
   contextUserIsAdmin,
   contextUserIsNotSso,
@@ -133,8 +130,7 @@ export const updateOnboardingStatus = mutationField("updateOnboardingStatus", {
 });
 
 export const createOrganizationUser = mutationField("createOrganizationUser", {
-  description:
-    "Creates a new user in the same organization as the context user",
+  description: "Creates a new user in the same organization as the context user",
   type: "User",
   authorize: authenticateAnd(contextUserIsAdmin(), orgDoesNotHaveSsoProvider()),
   args: {
@@ -148,11 +144,7 @@ export const createOrganizationUser = mutationField("createOrganizationUser", {
     emailIsAvailable((args) => args.email, "email"),
     (_, { role }, ctx, info) => {
       if (role === "OWNER") {
-        throw new ArgValidationError(
-          info,
-          "role",
-          "Can't create a new user with OWNER role."
-        );
+        throw new ArgValidationError(info, "role", "Can't create a new user with OWNER role.");
       }
     }
   ),
@@ -215,21 +207,12 @@ export const updateUserStatus = mutationField("updateUserStatus", {
   },
   resolve: async (_, { userIds, status, transferToUserId }, ctx) => {
     if (status === "ACTIVE") {
-      return await ctx.users.updateUserById(
-        userIds,
-        { status },
-        `User:${ctx.user!.id}`
-      );
+      return await ctx.users.updateUserById(userIds, { status }, `User:${ctx.user!.id}`);
     } else {
-      const permissionsByUserId =
-        await ctx.petitions.loadPetitionPermissionsByUserId(userIds);
+      const permissionsByUserId = await ctx.petitions.loadPetitionPermissionsByUserId(userIds);
 
       return await ctx.petitions.withTransaction(async (t) => {
-        await ctx.userGroups.removeUsersFromAllGroups(
-          userIds,
-          `User:${ctx.user!.id}`,
-          t
-        );
+        await ctx.userGroups.removeUsersFromAllGroups(userIds, `User:${ctx.user!.id}`, t);
         return await pMap(
           zip(userIds, permissionsByUserId),
           async ([userId, userPermissions]) => {
@@ -238,12 +221,7 @@ export const updateUserStatus = mutationField("updateUserStatus", {
               (p) => p.type === "OWNER"
             );
             const [[user]] = await Promise.all([
-              ctx.users.updateUserById(
-                userId,
-                { status },
-                `User:${ctx.user!.id}`,
-                t
-              ),
+              ctx.users.updateUserById(userId, { status }, `User:${ctx.user!.id}`, t),
               // delete permissions with type !== OWNER
               notOwnedPermissions.length > 0
                 ? ctx.petitions.deleteUserPermissions(
@@ -288,11 +266,7 @@ export const updateOrganizationUser = mutationField("updateOrganizationUser", {
   },
   validateArgs: (_, { role }, ctx, info) => {
     if (role === "OWNER") {
-      throw new ArgValidationError(
-        info,
-        "role",
-        "Can't update the role of a user to OWNER."
-      );
+      throw new ArgValidationError(info, "role", "Can't update the role of a user to OWNER.");
     }
   },
   resolve: async (_, { userId, role }, ctx) => {

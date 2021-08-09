@@ -47,10 +47,7 @@ export function PetitionComposeFieldSettings({
   return (
     <Card>
       <CardHeader isCloseable onClose={onClose}>
-        <FormattedMessage
-          id="petition.field-settings"
-          defaultMessage="Field settings"
-        />
+        <FormattedMessage id="petition.field-settings" defaultMessage="Field settings" />
       </CardHeader>
       <Stack spacing={4} padding={4} direction="column">
         {!field.isFixed && (
@@ -106,37 +103,19 @@ export function PetitionComposeFieldSettings({
               id="field-multiple"
               color="green"
               isChecked={field.multiple}
-              onChange={(event) =>
-                onFieldEdit(field.id, { multiple: event.target.checked })
-              }
+              onChange={(event) => onFieldEdit(field.id, { multiple: event.target.checked })}
               isDisabled={isReadOnly}
             />
           </SettingsRow>
         )}
         {field.type === "HEADING" ? (
-          <HeadingSettings
-            field={field}
-            onFieldEdit={onFieldEdit}
-            isReadOnly={isReadOnly}
-          />
+          <HeadingSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "FILE_UPLOAD" ? (
-          <FileUploadSettings
-            field={field}
-            onFieldEdit={onFieldEdit}
-            isReadOnly={isReadOnly}
-          />
+          <FileUploadSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "TEXT" || field.type === "SHORT_TEXT" ? (
-          <TextSettings
-            field={field}
-            onFieldEdit={onFieldEdit}
-            isReadOnly={isReadOnly}
-          />
+          <TextSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "SELECT" ? (
-          <SelectOptionSettings
-            field={field}
-            onFieldEdit={onFieldEdit}
-            isReadOnly={isReadOnly}
-          />
+          <SelectOptionSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : field.type === "DYNAMIC_SELECT" ? (
           <DynamicSelectSettings
             petitionId={petitionId}
@@ -145,11 +124,7 @@ export function PetitionComposeFieldSettings({
             isReadOnly={isReadOnly}
           />
         ) : field.type === "CHECKBOX" ? (
-          <CheckboxSettings
-            field={field}
-            onFieldEdit={onFieldEdit}
-            isReadOnly={isReadOnly}
-          />
+          <CheckboxSettings field={field} onFieldEdit={onFieldEdit} isReadOnly={isReadOnly} />
         ) : null}
       </Stack>
     </Card>
@@ -160,10 +135,7 @@ function HeadingSettings({
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<
-  PetitionComposeFieldSettingsProps,
-  "field" | "onFieldEdit" | "isReadOnly"
->) {
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const options = field.options as FieldOptions["HEADING"];
   return (
     // dont show switch for field is the first on the list
@@ -225,10 +197,7 @@ function FileUploadSettings({
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<
-  PetitionComposeFieldSettingsProps,
-  "field" | "onFieldEdit" | "isReadOnly"
->) {
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   // const options = field.options as FieldOptions["FILE_UPLOAD"];
   return <></>;
 }
@@ -237,19 +206,14 @@ function TextSettings({
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<
-  PetitionComposeFieldSettingsProps,
-  "field" | "onFieldEdit" | "isReadOnly"
->) {
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const options =
     field.type === "TEXT"
       ? (field.options as FieldOptions["TEXT"])
       : (field.options as FieldOptions["SHORT_TEXT"]);
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
-  const handlePlaceholderChange = function (
-    event: ChangeEvent<HTMLInputElement>
-  ) {
+  const handlePlaceholderChange = function (event: ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
     setPlaceholder(value);
     debouncedOnUpdate(field.id, {
@@ -275,16 +239,11 @@ function SelectOptionSettings({
   field,
   onFieldEdit,
   isReadOnly,
-}: Pick<
-  PetitionComposeFieldSettingsProps,
-  "field" | "onFieldEdit" | "isReadOnly"
->) {
+}: Pick<PetitionComposeFieldSettingsProps, "field" | "onFieldEdit" | "isReadOnly">) {
   const options = field.options as FieldOptions["SELECT"];
   const [placeholder, setPlaceholder] = useState(options.placeholder ?? "");
   const debouncedOnUpdate = useDebouncedCallback(onFieldEdit, 300, [field.id]);
-  const handlePlaceholderChange = function (
-    event: ChangeEvent<HTMLInputElement>
-  ) {
+  const handlePlaceholderChange = function (event: ChangeEvent<HTMLInputElement>) {
     const value = event.target.value;
     setPlaceholder(value);
     debouncedOnUpdate(field.id, {
@@ -322,12 +281,7 @@ export function SettingsRow({
 }: SettingsRowProps) {
   return (
     <FormControl display="flex" alignItems="center" id={controlId} {...props}>
-      <FormLabel
-        display="flex"
-        alignItems="center"
-        fontWeight="normal"
-        margin={0}
-      >
+      <FormLabel display="flex" alignItems="center" fontWeight="normal" margin={0}>
         {label}
         <HelpPopover marginLeft={2}>{description}</HelpPopover>
       </FormLabel>
@@ -351,10 +305,7 @@ function SettingsRowPlaceholder({
     <SettingsRow
       isDisabled={isReadOnly}
       label={
-        <FormattedMessage
-          id="field-settings.text-placeholder-label"
-          defaultMessage="Placeholder"
-        />
+        <FormattedMessage id="field-settings.text-placeholder-label" defaultMessage="Placeholder" />
       }
       description={
         <>

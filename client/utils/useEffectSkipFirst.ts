@@ -1,9 +1,6 @@
 import { DependencyList, EffectCallback, useEffect, useRef } from "react";
 
-export function useEffectSkipFirst(
-  effect: EffectCallback,
-  deps?: DependencyList
-) {
+export function useEffectSkipFirst(effect: EffectCallback, deps?: DependencyList) {
   const first = useRef(true);
   useEffect(() => {
     if (first.current) {

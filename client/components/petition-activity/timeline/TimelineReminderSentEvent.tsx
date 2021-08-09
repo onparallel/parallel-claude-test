@@ -30,13 +30,7 @@ export function TimelineReminderSentEvent({
   }
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<BellIcon />}
-          color="black"
-          backgroundColor="gray.200"
-        />
-      }
+      icon={<TimelineIcon icon={<BellIcon />} color="black" backgroundColor="gray.200" />}
     >
       <Flex align="center">
         <Box>
@@ -50,11 +44,7 @@ export function TimelineReminderSentEvent({
                 user: <UserReference user={reminder.sender} />,
                 contact: <ContactLink contact={reminder.access.contact} />,
                 timeAgo: (
-                  <DateTime
-                    value={createdAt}
-                    format={FORMATS.LLL}
-                    useRelativeTime="always"
-                  />
+                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
               }}
             />
@@ -65,27 +55,15 @@ export function TimelineReminderSentEvent({
               values={{
                 contact: <ContactLink contact={reminder.access.contact} />,
                 timeAgo: (
-                  <DateTime
-                    value={createdAt}
-                    format={FORMATS.LLL}
-                    useRelativeTime="always"
-                  />
+                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
               }}
             />
           )}
         </Box>
         {reminder.emailBody ? (
-          <Button
-            onClick={handleSeeMessageClick}
-            size="sm"
-            variant="outline"
-            marginLeft={4}
-          >
-            <FormattedMessage
-              id="timeline.message-sent-see-message"
-              defaultMessage="See message"
-            />
+          <Button onClick={handleSeeMessageClick} size="sm" variant="outline" marginLeft={4}>
+            <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />
           </Button>
         ) : null}
       </Flex>

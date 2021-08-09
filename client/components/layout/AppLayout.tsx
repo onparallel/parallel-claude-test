@@ -10,10 +10,7 @@ import { useRehydrated } from "@parallel/utils/useRehydrated";
 import Head from "next/head";
 import Router from "next/router";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import {
-  OnboardingTour,
-  OnboardingTourContext,
-} from "../common/OnboardingTour";
+import { OnboardingTour, OnboardingTourContext } from "../common/OnboardingTour";
 import { NotificationsDrawer } from "../notifications/NotificationsDrawer";
 import { Segment } from "../scripts/Segment";
 import { Zendesk } from "../scripts/Zendesk";
@@ -28,12 +25,8 @@ declare const zE: any;
 
 export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
   /* Onboarding tour callbacks */
-  const [updateOnboardingStatus] =
-    useAppLayout_updateOnboardingStatusMutation();
-  const handleUpdateTour = async function (
-    key: OnboardingKey,
-    status: OnboardingStatus
-  ) {
+  const [updateOnboardingStatus] = useAppLayout_updateOnboardingStatusMutation();
+  const handleUpdateTour = async function (key: OnboardingKey, status: OnboardingStatus) {
     await updateOnboardingStatus({ variables: { key, status } });
   };
   const { isRunning, toggle } = useContext(OnboardingTourContext);
@@ -127,21 +120,8 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
             zIndex="2"
           />
         </Flex>
-        <Flex
-          flex="1"
-          flexDirection="column"
-          minHeight="0"
-          minWidth="0"
-          backgroundColor="gray.50"
-        >
-          <Flex
-            flex="1"
-            as="main"
-            direction="column"
-            minHeight={0}
-            overflow="auto"
-            {...props}
-          >
+        <Flex flex="1" flexDirection="column" minHeight="0" minWidth="0" backgroundColor="gray.50">
+          <Flex flex="1" as="main" direction="column" minHeight={0} overflow="auto" {...props}>
             {rehydrated && !isLoading ? (
               children
             ) : (
@@ -158,10 +138,7 @@ export function AppLayout({ title, user, children, ...props }: AppLayoutProps) {
           </Flex>
         </Flex>
       </Flex>
-      <OnboardingTour
-        onUpdateTour={handleUpdateTour}
-        status={user.onboardingStatus as any}
-      />
+      <OnboardingTour onUpdateTour={handleUpdateTour} status={user.onboardingStatus as any} />
       <NotificationsDrawer />
     </>
   );
@@ -181,10 +158,7 @@ AppLayout.fragments = {
 
 AppLayout.mutations = [
   gql`
-    mutation AppLayout_updateOnboardingStatus(
-      $key: OnboardingKey!
-      $status: OnboardingStatus!
-    ) {
+    mutation AppLayout_updateOnboardingStatus($key: OnboardingKey!, $status: OnboardingStatus!) {
       updateOnboardingStatus(key: $key, status: $status) {
         id
         onboardingStatus

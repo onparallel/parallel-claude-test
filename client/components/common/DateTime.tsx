@@ -3,12 +3,7 @@ import { chakraForwardRef } from "@parallel/chakra/utils";
 import { DateTimeFormatOptions } from "@parallel/utils/dates";
 import { useForceUpdate } from "@parallel/utils/useForceUpdate";
 import { useEffect } from "react";
-import {
-  FormattedDate,
-  FormattedMessage,
-  FormattedRelativeTime,
-  useIntl,
-} from "react-intl";
+import { FormattedDate, FormattedMessage, FormattedRelativeTime, useIntl } from "react-intl";
 
 export interface DateTimeProps extends TextProps {
   value: Date | string | number;
@@ -43,51 +38,41 @@ function selectUnit(from: Date | number, to: Date | number) {
   return { value, unit };
 }
 
-export const DateTime = chakraForwardRef<"time", DateTimeProps>(
-  function DateTime({ value, format, useRelativeTime, ...props }, ref) {
-    const intl = useIntl();
-    const date = new Date(value);
-    const { value: _value, unit } = selectUnit(date, Date.now());
-    const forceUpdate = useForceUpdate();
-    useEffect(() => {
-      if (useRelativeTime && isSmallRelativeTime(unit)) {
-        const intervalId = setInterval(forceUpdate, 60 * 1000);
-        return () => clearInterval(intervalId);
-      }
-    }, [useRelativeTime, unit]);
-    if (
-      useRelativeTime === "always" ||
-      (useRelativeTime && isSmallRelativeTime(unit))
-    ) {
-      return (
-        <Text
-          ref={ref as any}
-          as="time"
-          title={intl.formatDate(date, format)}
-          {...props}
-          {...{ dateTime: date.toISOString() }}
-        >
-          {unit === "second" ? (
-            <FormattedMessage
-              id="component.date-time.a-moment-ago"
-              defaultMessage="a moment ago"
-            />
-          ) : (
-            <FormattedRelativeTime value={_value} unit={unit} />
-          )}
-        </Text>
-      );
-    } else {
-      return (
-        <Text
-          ref={ref as any}
-          as="time"
-          {...props}
-          {...{ dateTime: date.toISOString() }}
-        >
-          <FormattedDate value={date} {...format} />
-        </Text>
-      );
+export const DateTime = chakraForwardRef<"time", DateTimeProps>(function DateTime(
+  { value, format, useRelativeTime, ...props },
+  ref
+) {
+  const intl = useIntl();
+  const date = new Date(value);
+  const { value: _value, unit } = selectUnit(date, Date.now());
+  const forceUpdate = useForceUpdate();
+  useEffect(() => {
+    if (useRelativeTime && isSmallRelativeTime(unit)) {
+      const intervalId = setInterval(forceUpdate, 60 * 1000);
+      return () => clearInterval(intervalId);
     }
+  }, [useRelativeTime, unit]);
+  if (useRelativeTime === "always" || (useRelativeTime && isSmallRelativeTime(unit))) {
+    return (
+      <Text
+        ref={ref as any}
+        as="time"
+        title={intl.formatDate(date, format)}
+        {...props}
+        {...{ dateTime: date.toISOString() }}
+      >
+        {unit === "second" ? (
+          <FormattedMessage id="component.date-time.a-moment-ago" defaultMessage="a moment ago" />
+        ) : (
+          <FormattedRelativeTime value={_value} unit={unit} />
+        )}
+      </Text>
+    );
+  } else {
+    return (
+      <Text ref={ref as any} as="time" {...props} {...{ dateTime: date.toISOString() }}>
+        <FormattedDate value={date} {...format} />
+      </Text>
+    );
   }
-);
+});

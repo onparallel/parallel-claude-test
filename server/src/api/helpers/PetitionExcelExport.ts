@@ -15,18 +15,11 @@ export class PetitionExcelExport {
   constructor(locale: string, context: ApiContext) {
     this.wb = new Excel.Workbook();
     this.textRepliesTab = new TextRepliesExcelWorksheet(locale, this.wb);
-    this.fieldCommentsTab = new FieldCommentsExcelWorksheet(
-      locale,
-      this.wb,
-      context
-    );
+    this.fieldCommentsTab = new FieldCommentsExcelWorksheet(locale, this.wb, context);
     this.locale = locale;
   }
 
-  public addPetitionFieldReply(
-    field: PetitionField,
-    replies: PetitionFieldReply[]
-  ) {
+  public addPetitionFieldReply(field: PetitionField, replies: PetitionFieldReply[]) {
     if (field.type === "DYNAMIC_SELECT") {
       this.textRepliesTab.addDynamicSelectReply(field, replies);
     } else if (["TEXT", "SHORT_TEXT", "SELECT"].includes(field.type)) {
@@ -59,8 +52,6 @@ export class PetitionExcelExport {
   }
 
   public hasRows() {
-    return (
-      this.textRepliesTab.rowCount > 1 || this.fieldCommentsTab.rowCount > 1
-    );
+    return this.textRepliesTab.rowCount > 1 || this.fieldCommentsTab.rowCount > 1;
   }
 }

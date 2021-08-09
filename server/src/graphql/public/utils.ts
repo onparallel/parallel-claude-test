@@ -2,10 +2,7 @@ import { difference } from "remeda";
 import { PetitionField } from "../../db/__types";
 import { DynamicSelectOption } from "../helpers/parseDynamicSelectValues";
 
-export function validateDynamicSelectReplyValues(
-  field: PetitionField,
-  reply: (string | null)[][]
-) {
+export function validateDynamicSelectReplyValues(field: PetitionField, reply: (string | null)[][]) {
   const levels = field.options.labels.length;
   const labels = field.options.labels as string[];
   let values = field.options.values as string[] | DynamicSelectOption[];
@@ -22,25 +19,16 @@ export function validateDynamicSelectReplyValues(
         throw new Error(`Invalid value at level ${level}`);
       }
     } else {
-      if (
-        !(values as DynamicSelectOption[]).some(
-          ([value]) => value === reply[level][1]
-        )
-      ) {
+      if (!(values as DynamicSelectOption[]).some(([value]) => value === reply[level][1])) {
         throw new Error(`Invalid value at level ${level}`);
       }
       values =
-        (values as DynamicSelectOption[]).find(
-          ([value]) => value === reply[level][1]
-        )?.[1] ?? [];
+        (values as DynamicSelectOption[]).find(([value]) => value === reply[level][1])?.[1] ?? [];
     }
   }
 }
 
-export function validateCheckboxReplyValues(
-  field: PetitionField,
-  values: string[]
-) {
+export function validateCheckboxReplyValues(field: PetitionField, values: string[]) {
   if (difference(values, field.options.values).length !== 0) {
     throw new Error(`Invalid values`);
   }

@@ -21,9 +21,7 @@ export interface RecipientViewPetitionFieldProps
   isDisabled: boolean;
 }
 
-export function RecipientViewPetitionField(
-  props: RecipientViewPetitionFieldProps
-) {
+export function RecipientViewPetitionField(props: RecipientViewPetitionFieldProps) {
   const [publicPetitionFieldAttachmentDownloadLink] =
     useRecipientViewPetitionField_publicPetitionFieldAttachmentDownloadLinkMutation();
   const handleDownloadAttachment = function (attachmentId: string) {
@@ -45,15 +43,9 @@ export function RecipientViewPetitionField(
       onDownloadAttachment={handleDownloadAttachment}
     />
   ) : props.field.type === "TEXT" || props.field.type === "SHORT_TEXT" ? (
-    <RecipientViewPetitionFieldText
-      {...props}
-      onDownloadAttachment={handleDownloadAttachment}
-    />
+    <RecipientViewPetitionFieldText {...props} onDownloadAttachment={handleDownloadAttachment} />
   ) : props.field.type === "SELECT" ? (
-    <RecipientViewPetitionFieldSelect
-      {...props}
-      onDownloadAttachment={handleDownloadAttachment}
-    />
+    <RecipientViewPetitionFieldSelect {...props} onDownloadAttachment={handleDownloadAttachment} />
   ) : props.field.type === "FILE_UPLOAD" ? (
     <RecipientViewPetitionFieldFileUpload
       {...props}

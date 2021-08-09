@@ -8,25 +8,15 @@ import { Maybe } from "../../util/types";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
 import { escapeLike, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
-import {
-  CreateOrganization,
-  Organization,
-  OrganizationStatus,
-  User,
-} from "../__types";
+import { CreateOrganization, Organization, OrganizationStatus, User } from "../__types";
 
 @injectable()
 export class OrganizationRepository extends BaseRepository {
-  constructor(
-    @inject(CONFIG) private config: Config,
-    @inject(KNEX) knex: Knex
-  ) {
+  constructor(@inject(CONFIG) private config: Config, @inject(KNEX) knex: Knex) {
     super(knex);
   }
 
-  readonly loadOrg = this.buildLoadBy("organization", "id", (q) =>
-    q.whereNull("deleted_at")
-  );
+  readonly loadOrg = this.buildLoadBy("organization", "id", (q) => q.whereNull("deleted_at"));
 
   async loadOrgUsers(
     orgId: number,
@@ -86,11 +76,7 @@ export class OrganizationRepository extends BaseRepository {
     q.whereNull("deleted_at")
   );
 
-  async updateOrganization(
-    id: number,
-    data: Partial<CreateOrganization>,
-    user: User
-  ) {
+  async updateOrganization(id: number, data: Partial<CreateOrganization>, user: User) {
     const [org] = await this.from("organization")
       .where("id", id)
       .update({
@@ -151,9 +137,7 @@ export class OrganizationRepository extends BaseRepository {
       );
       const resultsById = indexBy(results, (x) => x.id);
       return orgIds.map((id) =>
-        resultsById[id]
-          ? `${this.config.misc.uploadsUrl}/${resultsById[id].path}`
-          : null
+        resultsById[id] ? `${this.config.misc.uploadsUrl}/${resultsById[id].path}` : null
       );
     })
   );

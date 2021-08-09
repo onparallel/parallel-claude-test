@@ -20,9 +20,7 @@ type ValidationResult<T extends PartialField> = {
 /**
  * validates if the petition fields contains every required information before sending to recipients.
  */
-export function validatePetitionFields<T extends PartialField>(
-  fields: T[]
-): ValidationResult<T> {
+export function validatePetitionFields<T extends PartialField>(fields: T[]): ValidationResult<T> {
   if (countBy(fields, (f) => f.type !== "HEADING") === 0) {
     return {
       error: "NO_REPLIABLE_FIELDS",
@@ -51,9 +49,7 @@ export function validatePetitionFields<T extends PartialField>(
   const selectFieldWithoutOptions = fields.find(
     (f) =>
       f.type === "SELECT" &&
-      (!f.options.values ||
-        !Array.isArray(f.options.values) ||
-        f.options.values.length < 2)
+      (!f.options.values || !Array.isArray(f.options.values) || f.options.values.length < 2)
   );
   if (selectFieldWithoutOptions) {
     return {
@@ -71,9 +67,7 @@ export function validatePetitionFields<T extends PartialField>(
   const checkboxFieldWithoutOptions = fields.find(
     (f) =>
       f.type === "CHECKBOX" &&
-      (!f.options.values ||
-        !Array.isArray(f.options.values) ||
-        f.options.values.length < 1)
+      (!f.options.values || !Array.isArray(f.options.values) || f.options.values.length < 1)
   );
   if (checkboxFieldWithoutOptions) {
     return {

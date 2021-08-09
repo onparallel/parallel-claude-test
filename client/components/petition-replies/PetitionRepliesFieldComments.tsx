@@ -15,11 +15,7 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  AlertCircleIcon,
-  CommentIcon,
-  MoreVerticalIcon,
-} from "@parallel/chakra/icons";
+import { AlertCircleIcon, CommentIcon, MoreVerticalIcon } from "@parallel/chakra/icons";
 import { Card, CardHeader } from "@parallel/components/common/Card";
 import {
   PetitionRepliesFieldComments_PetitionFieldCommentFragment,
@@ -31,14 +27,7 @@ import { isMetaReturn } from "@parallel/utils/keys";
 import { setNativeValue } from "@parallel/utils/setNativeValue";
 import { useFocus } from "@parallel/utils/useFocus";
 import { usePreviousValue } from "beautiful-react-hooks";
-import {
-  ChangeEvent,
-  Fragment,
-  KeyboardEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, Fragment, KeyboardEvent, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { ContactLink } from "../common/ContactLink";
@@ -78,9 +67,7 @@ export function PetitionRepliesFieldComments({
   const intl = useIntl();
 
   const [draft, setDraft] = useState("");
-  const [isInternalComment, setInternalComment] = useState(
-    hasCommentsEnabled ? false : true
-  );
+  const [isInternalComment, setInternalComment] = useState(hasCommentsEnabled ? false : true);
   const [inputFocused, inputFocusBind] = useFocus({ onBlurDelay: 300 });
 
   const commentsRef = useRef<HTMLDivElement>(null);
@@ -89,10 +76,7 @@ export function PetitionRepliesFieldComments({
   // Scroll to bottom when a comment is added
   const previousCommentCount = usePreviousValue(field.comments.length);
   useEffect(() => {
-    if (
-      previousCommentCount === undefined ||
-      field.comments.length > previousCommentCount
-    ) {
+    if (previousCommentCount === undefined || field.comments.length > previousCommentCount) {
       commentsRef.current?.scrollTo({ top: 99999, behavior: "smooth" });
     }
   }, [field.comments.length, previousCommentCount]);
@@ -126,10 +110,7 @@ export function PetitionRepliesFieldComments({
       <CardHeader isCloseable onClose={onClose}>
         {field.title || (
           <Text fontWeight="normal" textStyle="hint">
-            <FormattedMessage
-              id="generic.untitled-field"
-              defaultMessage="Untitled field"
-            />
+            <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
           </Text>
         )}
       </CardHeader>
@@ -173,9 +154,7 @@ export function PetitionRepliesFieldComments({
                     defaultMessage="Comments are disabled. Enable them on the petition settings in the <a>Compose</a> tab."
                     values={{
                       a: (chunks: any[]) => (
-                        <Link href={`/app/petitions/${petitionId}/compose`}>
-                          {chunks}
-                        </Link>
+                        <Link href={`/app/petitions/${petitionId}/compose`}>{chunks}</Link>
                       ),
                     }}
                   />
@@ -218,9 +197,7 @@ export function PetitionRepliesFieldComments({
             <Stack
               paddingTop={2}
               direction="row"
-              justifyContent={
-                user.hasInternalComments ? "space-between" : "flex-end"
-              }
+              justifyContent={user.hasInternalComments ? "space-between" : "flex-end"}
             >
               {user.hasInternalComments && (
                 <Stack display="flex" alignItems="center" direction="row">
@@ -246,10 +223,7 @@ export function PetitionRepliesFieldComments({
               )}
               <Stack direction="row">
                 <Button size="sm" onClick={handleCancelClick}>
-                  <FormattedMessage
-                    id="generic.cancel"
-                    defaultMessage="Cancel"
-                  />
+                  <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
                 </Button>
                 <Button
                   marginLeft={2}
@@ -258,10 +232,7 @@ export function PetitionRepliesFieldComments({
                   isDisabled={draft.trim().length === 0}
                   onClick={handleSubmitClick}
                 >
-                  <FormattedMessage
-                    id="generic.submit"
-                    defaultMessage="Submit"
-                  />
+                  <FormattedMessage id="generic.submit" defaultMessage="Submit" />
                 </Button>
               </Stack>
             </Stack>
@@ -273,14 +244,7 @@ export function PetitionRepliesFieldComments({
 }
 
 function FieldComment({
-  comment: {
-    createdAt,
-    author,
-    isUnread,
-    isEdited,
-    content: _content,
-    isInternal,
-  },
+  comment: { createdAt, author, isUnread, isEdited, content: _content, isInternal },
   userId,
   onDelete,
   onEdit,
@@ -331,9 +295,7 @@ function FieldComment({
     <Box
       paddingX={4}
       paddingY={2}
-      backgroundColor={
-        isUnread ? "purple.50" : isInternal ? "gray.50" : "white"
-      }
+      backgroundColor={isUnread ? "purple.50" : isInternal ? "gray.50" : "white"}
     >
       <Box fontSize="sm" display="flex" alignItems="center">
         <Box paddingRight={2}>
@@ -358,12 +320,7 @@ function FieldComment({
               </Text>
             }
           >
-            <Badge
-              colorScheme="gray"
-              variant="outline"
-              cursor="default"
-              marginRight={2}
-            >
+            <Badge colorScheme="gray" variant="outline" cursor="default" marginRight={2}>
               <FormattedMessage
                 id="petition-replies.internal-comment.badge"
                 defaultMessage="Internal"
@@ -371,18 +328,10 @@ function FieldComment({
             </Badge>
           </SmallPopover>
         )}
-        <DateTime
-          color="gray.500"
-          value={createdAt}
-          format={FORMATS["L+LT"]}
-          useRelativeTime
-        />
+        <DateTime color="gray.500" value={createdAt} format={FORMATS["L+LT"]} useRelativeTime />
         {isEdited ? (
           <Text as="span" color="gray.400" marginLeft={2} fontSize="xs">
-            <FormattedMessage
-              id="generic.edited-comment-indicator"
-              defaultMessage="Edited"
-            />
+            <FormattedMessage id="generic.edited-comment-indicator" defaultMessage="Edited" />
           </Text>
         ) : null}
         <Spacer />

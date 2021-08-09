@@ -1,18 +1,6 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Radio,
-  RadioGroup,
-  Stack,
-  Text,
-  useTheme,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Radio, RadioGroup, Stack, Text, useTheme } from "@chakra-ui/react";
 import { CheckIcon, CloseIcon } from "@parallel/chakra/icons";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { ConfirmDialog } from "../common/ConfirmDialog";
@@ -116,11 +104,7 @@ export function SolveUnreviewedRepliesDialog(
         </Box>
       }
       confirm={
-        <Button
-          colorScheme="purple"
-          isDisabled={!value}
-          onClick={() => props.onResolve(value)}
-        >
+        <Button colorScheme="purple" isDisabled={!value} onClick={() => props.onResolve(value)}>
           <FormattedMessage id="generic.continue" defaultMessage="Continue" />
         </Button>
       }

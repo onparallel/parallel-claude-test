@@ -1,8 +1,4 @@
-export function zipX<T1, T2, T3>(
-  array1: T1[],
-  array2: T2[],
-  array3: T3[]
-): [T1, T2, T3][];
+export function zipX<T1, T2, T3>(array1: T1[], array2: T2[], array3: T3[]): [T1, T2, T3][];
 export function zipX<T1, T2, T3, T4>(
   array1: T1[],
   array2: T2[],

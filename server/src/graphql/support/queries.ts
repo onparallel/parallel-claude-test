@@ -1,11 +1,4 @@
-import {
-  arg,
-  enumType,
-  idArg,
-  intArg,
-  nonNull,
-  queryField,
-} from "@nexus/schema";
+import { arg, enumType, idArg, intArg, nonNull, queryField } from "@nexus/schema";
 import { fromGlobalId, toGlobalId } from "../../util/globalId";
 import { RESULT } from "../helpers/result";
 import { supportMethodAccess } from "./authorizers";

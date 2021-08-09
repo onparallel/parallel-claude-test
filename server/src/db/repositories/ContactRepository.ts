@@ -25,9 +25,7 @@ export class ContactRepository extends BaseRepository {
     super(knex);
   }
 
-  readonly loadContact = this.buildLoadBy("contact", "id", (q) =>
-    q.whereNull("deleted_at")
-  );
+  readonly loadContact = this.buildLoadBy("contact", "id", (q) => q.whereNull("deleted_at"));
 
   readonly loadContactByEmail = fromDataLoader(
     new DataLoader<{ orgId: number; email: string }, Contact | null, string>(
@@ -42,15 +40,11 @@ export class ContactRepository extends BaseRepository {
           .whereNull("deleted_at")
           .where((qb) => {
             for (const [orgId, emails] of byOrgId) {
-              qb.orWhere((qb) =>
-                qb.where("org_id", parseInt(orgId)).whereIn("email", emails)
-              );
+              qb.orWhere((qb) => qb.where("org_id", parseInt(orgId)).whereIn("email", emails));
             }
           });
         const results = indexBy(rows, keyBuilder(["org_id", "email"]));
-        return keys
-          .map(keyBuilder(["orgId", "email"]))
-          .map((key) => results[key] ?? null);
+        return keys.map(keyBuilder(["orgId", "email"])).map((key) => results[key] ?? null);
       },
       {
         cacheKeyFn: keyBuilder(["orgId", "email"]),
@@ -70,9 +64,7 @@ export class ContactRepository extends BaseRepository {
       );
 
       const byAccessId = indexBy(contacts, (r) => r.access_id);
-      return ids.map((id) =>
-        byAccessId[id] ? omit(byAccessId[id], ["access_id"]) : null
-      );
+      return ids.map((id) => (byAccessId[id] ? omit(byAccessId[id], ["access_id"]) : null));
     })
   );
 
@@ -112,9 +104,7 @@ export class ContactRepository extends BaseRepository {
   }
 
   async createOrUpdate(
-    contacts: MaybeArray<
-      Pick<CreateContact, "first_name" | "last_name" | "email" | "org_id">
-    >,
+    contacts: MaybeArray<Pick<CreateContact, "first_name" | "last_name" | "email" | "org_id">>,
     updatedBy: string
   ) {
     return await this.raw<Contact>(
@@ -187,11 +177,7 @@ export class ContactRepository extends BaseRepository {
     );
   }
 
-  async loadAccessesForContact(
-    contactId: number,
-    userId: number,
-    opts: PageOpts
-  ) {
+  async loadAccessesForContact(contactId: number, userId: number, opts: PageOpts) {
     return await this.loadPageAndCount(
       this.knex<PetitionAccess>("petition_access as pa")
         .join("petition_permission as pp", "pp.petition_id", "pa.petition_id")
@@ -221,11 +207,7 @@ export class ContactRepository extends BaseRepository {
     return row;
   }
 
-  async updateContact(
-    contactId: number,
-    data: Partial<CreateContact>,
-    user: User
-  ) {
+  async updateContact(contactId: number, data: Partial<CreateContact>, user: User) {
     const [row] = await this.from("contact")
       .where("id", contactId)
       .update(
@@ -294,21 +276,15 @@ export class ContactRepository extends BaseRepository {
 
   async createContactAuthentication(contactId: number) {
     const cookieValue = random(48);
-    const [contactAuthentication] = await this.insert(
-      "contact_authentication",
-      {
-        contact_id: contactId,
-        cookie_value_hash: await hash(cookieValue, contactId.toString()),
-      }
-    );
+    const [contactAuthentication] = await this.insert("contact_authentication", {
+      contact_id: contactId,
+      cookie_value_hash: await hash(cookieValue, contactId.toString()),
+    });
     return { cookieValue, contactAuthentication };
   }
 
   async createContactAuthenticationRequest(
-    data: Pick<
-      CreateContactAuthenticationRequest,
-      "petition_access_id" | "ip" | "user_agent"
-    >
+    data: Pick<CreateContactAuthenticationRequest, "petition_access_id" | "ip" | "user_agent">
   ) {
     const token = random(48);
     const [request] = await this.insert("contact_authentication_request", {
@@ -335,10 +311,7 @@ export class ContactRepository extends BaseRepository {
       })
       .where("remaining_attempts", ">", 0)
       .where("expires_at", ">", this.now())
-      .update(
-        { remaining_attempts: this.knex.raw(`"remaining_attempts" - 1`) },
-        "*"
-      );
+      .update({ remaining_attempts: this.knex.raw(`"remaining_attempts" - 1`) }, "*");
     if (row) {
       if (row.code === code) {
         return { success: true };
@@ -354,10 +327,7 @@ export class ContactRepository extends BaseRepository {
     "id"
   );
 
-  async processContactAuthenticationRequest(
-    requestId: number,
-    emailLogId: number
-  ) {
+  async processContactAuthenticationRequest(requestId: number, emailLogId: number) {
     const [row] = await this.from("contact_authentication_request")
       .where("id", requestId)
       .update({ email_log_id: emailLogId }, "*");

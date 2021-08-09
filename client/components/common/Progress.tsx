@@ -6,16 +6,9 @@ export interface ProgressIndicatorProps extends BoxProps {
   value: number;
 }
 
-export function ProgressIndicator({
-  min,
-  max,
-  value,
-  ...rest
-}: ProgressIndicatorProps) {
+export function ProgressIndicator({ min, max, value, ...rest }: ProgressIndicatorProps) {
   const percent = valueToPercent(value, min, max);
-  return (
-    <Box height="100%" transition="all 300ms" width={percent + "%"} {...rest} />
-  );
+  return <Box height="100%" transition="all 300ms" width={percent + "%"} {...rest} />;
 }
 
 const progressbarSizes = {
@@ -31,13 +24,7 @@ export interface ProgressTrackProps extends Omit<BoxProps, "size"> {
   value: number;
 }
 
-export function ProgressTrack({
-  size,
-  min,
-  max,
-  value,
-  ...rest
-}: ProgressTrackProps) {
+export function ProgressTrack({ size, min, max, value, ...rest }: ProgressTrackProps) {
   return (
     <Flex
       height={progressbarSizes[size]}

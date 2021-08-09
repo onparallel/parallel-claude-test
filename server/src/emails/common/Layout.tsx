@@ -96,10 +96,7 @@ export const Layout: FC<LayoutProps> = function Layout({
         <MjmlSection padding="0">
           <MjmlColumn width="100%">
             <MjmlText color="#2D3748" align="center">
-              <FormattedMessage
-                id="footer.slogan"
-                defaultMessage="Work better with"
-              />
+              <FormattedMessage id="footer.slogan" defaultMessage="Work better with" />
             </MjmlText>
             <MjmlImage
               padding="0"
@@ -144,10 +141,7 @@ export const Layout: FC<LayoutProps> = function Layout({
                 className="link"
                 href={`https://www.onparallel.com/${locale}/legal/privacy?utm_source=parallel&utm_medium=email&utm_campaign=recipients`}
               >
-                <FormattedMessage
-                  id="layout.privacy-link"
-                  defaultMessage="Privacy"
-                />
+                <FormattedMessage id="layout.privacy-link" defaultMessage="Privacy" />
               </a>
             </MjmlText>
             {optOutUrl ? (

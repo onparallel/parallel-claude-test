@@ -4,11 +4,7 @@ import { Card } from "@parallel/components/common/Card";
 import { HighlightText } from "@parallel/components/common/HighlightText";
 import useMergedRef from "@react-hook/merged-ref";
 import { getNodeDeserializer, getText } from "@udecode/plate-common";
-import {
-  getPlatePluginTypes,
-  PlatePlugin,
-  TRenderElementProps,
-} from "@udecode/plate-core";
+import { getPlatePluginTypes, PlatePlugin, TRenderElementProps } from "@udecode/plate-core";
 import {
   KeyboardEvent,
   ReactNode,
@@ -38,10 +34,8 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
     search: string | null;
   };
   const [{ target, index, search }, dispatch] = useReducer(
-    (
-      state: PlaceholderState,
-      action: (prevState: PlaceholderState) => PlaceholderState
-    ) => action(state),
+    (state: PlaceholderState, action: (prevState: PlaceholderState) => PlaceholderState) =>
+      action(state),
     {
       target: null,
       index: 0,
@@ -49,9 +43,7 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
     }
   );
   const values = search
-    ? placeholders.filter((c) =>
-        c.label.toLowerCase().includes(search.toLowerCase())
-      )
+    ? placeholders.filter((c) => c.label.toLowerCase().includes(search.toLowerCase()))
     : placeholders;
 
   const onAddPlaceholder = useCallback(
@@ -156,9 +148,7 @@ export function usePlaceholderPlugin(placeholders: Placeholder[]) {
         renderElement: () => (props: TRenderElementProps) => {
           const { children, attributes } = props;
           const element = props.element as PlaceholderElement;
-          const placeholder = placeholders.find(
-            (p) => p.value === element.placeholder
-          );
+          const placeholder = placeholders.find((p) => p.value === element.placeholder);
           return placeholder ? (
             <PlaceholderToken
               value={element.placeholder}

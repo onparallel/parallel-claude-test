@@ -9,12 +9,8 @@ export function userHasAccessToNotifications<
   TArg extends Arg<TypeName, FieldName, MaybeArray<number>>
 >(argName: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const notificationIds = unMaybeArray(
-      args[argName] as unknown as MaybeArray<number>
-    );
-    const notifications = await ctx.petitions.loadPetitionUserNotifications(
-      notificationIds
-    );
+    const notificationIds = unMaybeArray(args[argName] as unknown as MaybeArray<number>);
+    const notifications = await ctx.petitions.loadPetitionUserNotifications(notificationIds);
 
     return notifications.every((n) => n && n.user_id === ctx.user!.id);
   };

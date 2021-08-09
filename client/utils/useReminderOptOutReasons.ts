@@ -8,10 +8,7 @@ export type ReminderOptOutReason =
   | "NO_REMINDERS"
   | "OTHER";
 
-export function useReminderOptOutReasons(): Record<
-  ReminderOptOutReason,
-  string
-> {
+export function useReminderOptOutReasons(): Record<ReminderOptOutReason, string> {
   const intl = useIntl();
 
   return useMemo(

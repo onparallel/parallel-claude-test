@@ -5,40 +5,25 @@ function mapEventPayload(event: PetitionEvent) {
   switch (event.type) {
     case "ACCESS_ACTIVATED": {
       return {
-        petitionAccessId: toGlobalId(
-          "PetitionAccess",
-          event.data.petition_access_id
-        ),
+        petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
         userId: toGlobalId("User", event.data.user_id),
       };
     }
     case "ACCESS_DEACTIVATED": {
       return {
-        petitionAccessId: toGlobalId(
-          "PetitionAccess",
-          event.data.petition_access_id
-        ),
+        petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
         userId: toGlobalId("User", event.data.user_id),
       };
     }
     case "ACCESS_DELEGATED": {
       return {
-        newPetitionAccessId: toGlobalId(
-          "PetitionAccess",
-          event.data.new_petition_access_id
-        ),
-        petitionAccessId: toGlobalId(
-          "PetitionAccess",
-          event.data.petition_access_id
-        ),
+        newPetitionAccessId: toGlobalId("PetitionAccess", event.data.new_petition_access_id),
+        petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
       };
     }
     case "ACCESS_OPENED": {
       return {
-        petitionAccessId: toGlobalId(
-          "PetitionAccess",
-          event.data.petition_access_id
-        ),
+        petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
       };
     }
     case "COMMENT_DELETED": {
@@ -50,13 +35,8 @@ function mapEventPayload(event: PetitionEvent) {
           "PetitionFieldComment",
           event.data.petition_field_comment_id
         ),
-        petitionFieldId: toGlobalId(
-          "PetitionField",
-          event.data.petition_field_id
-        ),
-        userId: event.data.user_id
-          ? toGlobalId("User", event.data.user_id)
-          : null,
+        petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
+        userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
       };
     }
     case "COMMENT_PUBLISHED": {
@@ -65,35 +45,23 @@ function mapEventPayload(event: PetitionEvent) {
           "PetitionFieldComment",
           event.data.petition_field_comment_id
         ),
-        petitionFieldId: toGlobalId(
-          "PetitionField",
-          event.data.petition_field_id
-        ),
+        petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
       };
     }
     case "MESSAGE_CANCELLED": {
       return {
         userId: toGlobalId("User", event.data.user_id),
-        petitionMessageId: toGlobalId(
-          "PetitionMessage",
-          event.data.petition_message_id
-        ),
+        petitionMessageId: toGlobalId("PetitionMessage", event.data.petition_message_id),
       };
     }
     case "MESSAGE_SCHEDULED": {
       return {
-        petitionMessageId: toGlobalId(
-          "PetitionMessage",
-          event.data.petition_message_id
-        ),
+        petitionMessageId: toGlobalId("PetitionMessage", event.data.petition_message_id),
       };
     }
     case "MESSAGE_SENT": {
       return {
-        petitionMessageId: toGlobalId(
-          "PetitionMessage",
-          event.data.petition_message_id
-        ),
+        petitionMessageId: toGlobalId("PetitionMessage", event.data.petition_message_id),
       };
     }
     case "OWNERSHIP_TRANSFERRED": {
@@ -112,19 +80,13 @@ function mapEventPayload(event: PetitionEvent) {
     }
     case "PETITION_CLOSED_NOTIFIED": {
       return {
-        petitionAccessId: toGlobalId(
-          "PetitionAccess",
-          event.data.petition_access_id
-        ),
+        petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
         userId: toGlobalId("User", event.data.user_id),
       };
     }
     case "PETITION_COMPLETED": {
       return {
-        petitionAccessId: toGlobalId(
-          "PetitionAccess",
-          event.data.petition_access_id
-        ),
+        petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
       };
     }
     case "PETITION_CREATED": {
@@ -139,10 +101,7 @@ function mapEventPayload(event: PetitionEvent) {
     }
     case "REMINDER_SENT": {
       return {
-        petitionReminderId: toGlobalId(
-          "PetitionReminder",
-          event.data.petition_reminder_id
-        ),
+        petitionReminderId: toGlobalId("PetitionReminder", event.data.petition_reminder_id),
       };
     }
     case "REPLY_CREATED": {
@@ -150,17 +109,9 @@ function mapEventPayload(event: PetitionEvent) {
         petitionAccessId: event.data.petition_access_id
           ? toGlobalId("PetitionAccess", event.data.petition_access_id)
           : null,
-        userId: event.data.user_id
-          ? toGlobalId("User", event.data.user_id)
-          : null,
-        petitionFieldId: toGlobalId(
-          "PetitionField",
-          event.data.petition_field_id
-        ),
-        petitionFieldReplyId: toGlobalId(
-          "PetitionFieldReply",
-          event.data.petition_field_reply_id
-        ),
+        userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
+        petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
+        petitionFieldReplyId: toGlobalId("PetitionFieldReply", event.data.petition_field_reply_id),
       };
     }
     case "REPLY_DELETED": {
@@ -168,17 +119,9 @@ function mapEventPayload(event: PetitionEvent) {
         petitionAccessId: event.data.petition_access_id
           ? toGlobalId("PetitionAccess", event.data.petition_access_id)
           : null,
-        userId: event.data.user_id
-          ? toGlobalId("User", event.data.user_id)
-          : null,
-        petitionFieldId: toGlobalId(
-          "PetitionField",
-          event.data.petition_field_id
-        ),
-        petitionFieldReplyId: toGlobalId(
-          "PetitionFieldReply",
-          event.data.petition_field_reply_id
-        ),
+        userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
+        petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
+        petitionFieldReplyId: toGlobalId("PetitionFieldReply", event.data.petition_field_reply_id),
       };
     }
     case "REPLY_UPDATED": {
@@ -186,25 +129,16 @@ function mapEventPayload(event: PetitionEvent) {
         petitionAccessId: event.data.petition_access_id
           ? toGlobalId("PetitionAccess", event.data.petition_access_id)
           : null,
-        userId: event.data.user_id
-          ? toGlobalId("User", event.data.user_id)
-          : null,
-        petitionFieldId: toGlobalId(
-          "PetitionField",
-          event.data.petition_field_id
-        ),
-        petitionFieldReplyId: toGlobalId(
-          "PetitionFieldReply",
-          event.data.petition_field_reply_id
-        ),
+        userId: event.data.user_id ? toGlobalId("User", event.data.user_id) : null,
+        petitionFieldId: toGlobalId("PetitionField", event.data.petition_field_id),
+        petitionFieldReplyId: toGlobalId("PetitionFieldReply", event.data.petition_field_reply_id),
       };
     }
     case "SIGNATURE_CANCELLED": {
       return {
         cancelData: {
           userId:
-            event.data.cancel_data?.canceller_id &&
-            event.data.cancel_reason === "CANCELLED_BY_USER"
+            event.data.cancel_data?.canceller_id && event.data.cancel_reason === "CANCELLED_BY_USER"
               ? toGlobalId("User", event.data.cancel_data.canceller_id)
               : null,
           contactId:
@@ -296,10 +230,7 @@ function mapEventPayload(event: PetitionEvent) {
     }
     case "REMINDERS_OPT_OUT": {
       return {
-        petitionAccessId: toGlobalId(
-          "PetitionAccess",
-          event.data.petition_access_id
-        ),
+        petitionAccessId: toGlobalId("PetitionAccess", event.data.petition_access_id),
         reason: event.data.reason,
         other: event.data.other,
       };

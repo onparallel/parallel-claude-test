@@ -68,11 +68,7 @@ const identifiers = [
         console.log(org.identifier, "uploading logo to S3...");
         const filename = random(16);
         const path = `uploads/${filename}`;
-        const res = await aws.publicFiles.uploadFile(
-          path,
-          "image/png",
-          Readable.from(data.body)
-        );
+        const res = await aws.publicFiles.uploadFile(path, "image/png", Readable.from(data.body));
 
         // 4. Update database
         console.log(org.identifier, "updating database...");

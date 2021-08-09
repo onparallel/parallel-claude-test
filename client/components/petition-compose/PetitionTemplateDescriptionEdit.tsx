@@ -21,12 +21,8 @@ export function PetitionTemplateDescriptionEdit({
   ...props
 }: PetitionTemplateDescriptionEditProps) {
   const intl = useIntl();
-  const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [
-    onUpdatePetition,
-  ]);
-  const [templateDescription, setDescription] = useState(
-    description ?? emptyRTEValue()
-  );
+  const updatePetition = useDebouncedCallback(onUpdatePetition, 500, [onUpdatePetition]);
+  const [templateDescription, setDescription] = useState(description ?? emptyRTEValue());
   const handleUpdateDescription = useCallback(
     (value: RichTextEditorValue) => {
       setDescription(value);

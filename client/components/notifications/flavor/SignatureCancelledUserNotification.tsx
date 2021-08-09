@@ -12,10 +12,7 @@ export interface SignatureCancelledUserNotificationProps {
 
 export const SignatureCancelledUserNotification = Object.assign(
   forwardRef<HTMLElement, SignatureCancelledUserNotificationProps>(
-    function SignatureCancelledUserNotification(
-      { isFirst, notification },
-      ref
-    ) {
+    function SignatureCancelledUserNotification({ isFirst, notification }, ref) {
       return (
         <PetitionUserNotification
           ref={ref}

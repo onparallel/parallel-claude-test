@@ -1,10 +1,7 @@
 import { useTheme } from "@chakra-ui/react";
 import { useEffect } from "react";
 
-export function useOnMediaQueryChange(
-  mediaQuery: string,
-  handler: (match: boolean) => void
-) {
+export function useOnMediaQueryChange(mediaQuery: string, handler: (match: boolean) => void) {
   if (typeof window === "undefined") {
     return;
   }

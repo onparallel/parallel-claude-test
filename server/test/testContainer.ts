@@ -4,11 +4,7 @@ import { AUTH, IAuth } from "../src/services/auth";
 import { AWS_SERVICE, IAws } from "../src/services/aws";
 import { EMAILS, IEmailsService } from "../src/services/emails";
 import { IRedis, REDIS } from "../src/services/redis";
-import {
-  IStorage,
-  StorageFactory,
-  STORAGE_FACTORY,
-} from "../src/services/storage";
+import { IStorage, StorageFactory, STORAGE_FACTORY } from "../src/services/storage";
 import {
   MockAnalyticsService,
   MockAuth,
@@ -23,10 +19,7 @@ export function createTestContainer() {
   container.rebind<IAuth>(AUTH).to(MockAuth).inSingletonScope();
   container.rebind<IRedis>(REDIS).to(MockRedis);
   container.rebind<IAnalyticsService>(ANALYTICS).to(MockAnalyticsService);
-  container
-    .rebind<IEmailsService>(EMAILS)
-    .to(MockEmailsService)
-    .inSingletonScope();
+  container.rebind<IEmailsService>(EMAILS).to(MockEmailsService).inSingletonScope();
   container.rebind<IAws>(AWS_SERVICE).to(MockAwsService).inSingletonScope();
 
   container.rebind<IStorage>(STORAGE_FACTORY).toFactory(() => {

@@ -28,26 +28,20 @@ export function checkClientServerToken<
   TArg extends Arg<TypeName, FieldName, string>
 >(tokenArg: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx) => {
-    return ctx.security.checkClientServerToken(
-      args[tokenArg] as unknown as string
-    );
+    return ctx.security.checkClientServerToken(args[tokenArg] as unknown as string);
   };
 }
 
-export function authenticateAnd<
-  TypeName extends string,
-  FieldName extends string
->(
+export function authenticateAnd<TypeName extends string, FieldName extends string>(
   ...resolvers: FieldAuthorizeResolver<TypeName, FieldName>[]
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return chain(authenticate(), and(...resolvers));
 }
 
-export type Arg<
-  TypeName extends string,
-  FieldName extends string,
-  Type = any
-> = KeysOfType<core.ArgsValue<TypeName, FieldName>, Type>;
+export type Arg<TypeName extends string, FieldName extends string, Type = any> = KeysOfType<
+  core.ArgsValue<TypeName, FieldName>,
+  Type
+>;
 
 export function argIsContextUserId<
   TypeName extends string,
@@ -78,8 +72,7 @@ export function chain<TypeName extends string, FieldName extends string>(
   return async (root, args, ctx, info) => {
     return await pEvery(
       resolvers,
-      async (resolver) =>
-        await (resolver(root, args, ctx, info) as Promise<boolean>),
+      async (resolver) => await (resolver(root, args, ctx, info) as Promise<boolean>),
       { concurrency: 1 }
     );
   };
@@ -91,8 +84,7 @@ export function and<TypeName extends string, FieldName extends string>(
   return async (root, args, ctx, info) => {
     return await pEvery(
       resolvers,
-      async (resolver) =>
-        await (resolver(root, args, ctx, info) as Promise<boolean>)
+      async (resolver) => await (resolver(root, args, ctx, info) as Promise<boolean>)
     );
   };
 }
@@ -120,8 +112,7 @@ export function ifArgDefined<
   elseAuthorizer?: FieldAuthorizeResolver<TypeName, FieldName>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (root, args, ctx, info) => {
-    const value =
-      typeof prop === "string" ? (args as any)[prop] : (prop as any)(args);
+    const value = typeof prop === "string" ? (args as any)[prop] : (prop as any)(args);
     if (isDefined(value)) {
       return await thenAuthorizer(root, args, ctx, info);
     } else if (elseAuthorizer) {
@@ -131,10 +122,7 @@ export function ifArgDefined<
   };
 }
 
-export function ifSomeDefined<
-  TypeName extends string,
-  FieldName extends string
->(
+export function ifSomeDefined<TypeName extends string, FieldName extends string>(
   props: (args: core.ArgsValue<TypeName, FieldName>) => any[],
   thenAuthorizer: FieldAuthorizeResolver<TypeName, FieldName>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
@@ -184,10 +172,7 @@ export function userIsSuperAdmin<
     try {
       const user = ctx.user!;
       const org = await ctx.organizations.loadOrg(user.org_id);
-      return (
-        org!.identifier === "parallel" &&
-        ["OWNER", "ADMIN"].includes(user.organization_role)
-      );
+      return org!.identifier === "parallel" && ["OWNER", "ADMIN"].includes(user.organization_role);
     } catch {}
     return false;
   };

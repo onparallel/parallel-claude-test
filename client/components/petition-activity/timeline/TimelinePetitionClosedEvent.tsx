@@ -14,19 +14,10 @@ export type TimelinePetitionClosedEventProps = {
   event: TimelinePetitionClosedEvent_PetitionClosedEventFragment;
 };
 
-export function TimelinePetitionClosedEvent({
-  event,
-  userId,
-}: TimelinePetitionClosedEventProps) {
+export function TimelinePetitionClosedEvent({ event, userId }: TimelinePetitionClosedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<DoubleCheckIcon />}
-          color="white"
-          backgroundColor="green.500"
-        />
-      }
+      icon={<TimelineIcon icon={<DoubleCheckIcon />} color="white" backgroundColor="green.500" />}
     >
       <FormattedMessage
         id="timeline.petition-closed-description"
@@ -36,11 +27,7 @@ export function TimelinePetitionClosedEvent({
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

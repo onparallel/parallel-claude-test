@@ -1,8 +1,5 @@
 import { Knex } from "knex";
-import {
-  addUserNotificationType,
-  removeUserNotificationType,
-} from "./helpers/notificationTypes";
+import { addUserNotificationType, removeUserNotificationType } from "./helpers/notificationTypes";
 import { addSystemEvent, removeSystemEvent } from "./helpers/systemEvents";
 
 export async function up(knex: Knex): Promise<void> {
@@ -16,15 +13,9 @@ export async function down(knex: Knex): Promise<void> {
   drop index "pun__comment_created__user_id__petition_id__data";
 `);
 
-  await knex
-    .from("system_event")
-    .where({ type: "PETITION_REMINDER_BOUNCED" })
-    .delete();
+  await knex.from("system_event").where({ type: "PETITION_REMINDER_BOUNCED" }).delete();
 
-  await knex
-    .from("petition_user_notification")
-    .where({ type: "REMINDER_EMAIL_BOUNCED" })
-    .delete();
+  await knex.from("petition_user_notification").where({ type: "REMINDER_EMAIL_BOUNCED" }).delete();
 
   await removeSystemEvent(knex, "PETITION_REMINDER_BOUNCED");
   await removeUserNotificationType(knex, "REMINDER_EMAIL_BOUNCED");

@@ -1,44 +1,23 @@
 import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
-import {
-  countBy,
-  groupBy,
-  indexBy,
-  maxBy,
-  omit,
-  sortBy,
-  uniq,
-  zip,
-} from "remeda";
+import { countBy, groupBy, indexBy, maxBy, omit, sortBy, uniq, zip } from "remeda";
 import { Aws, AWS_SERVICE } from "../../services/aws";
 import { partition, unMaybeArray } from "../../util/arrays";
-import {
-  evaluateFieldVisibility,
-  PetitionFieldVisibility,
-} from "../../util/fieldVisibility";
+import { evaluateFieldVisibility, PetitionFieldVisibility } from "../../util/fieldVisibility";
 import { fromDataLoader } from "../../util/fromDataLoader";
 import { fromGlobalId } from "../../util/globalId";
 import { keyBuilder } from "../../util/keyBuilder";
 import { isDefined, removeNotDefined } from "../../util/remedaExtensions";
-import {
-  calculateNextReminder,
-  PetitionAccessReminderConfig,
-} from "../../util/reminderUtils";
+import { calculateNextReminder, PetitionAccessReminderConfig } from "../../util/reminderUtils";
 import { random } from "../../util/token";
 import { Maybe, MaybeArray } from "../../util/types";
 import { CreatePetitionEvent, PetitionEvent } from "../events";
 import { BaseRepository, PageOpts } from "../helpers/BaseRepository";
-import {
-  defaultFieldOptions,
-  validateFieldOptions,
-} from "../helpers/fieldOptions";
+import { defaultFieldOptions, validateFieldOptions } from "../helpers/fieldOptions";
 import { escapeLike, isValueCompatible, SortBy } from "../helpers/utils";
 import { KNEX } from "../knex";
-import {
-  CommentCreatedUserNotification,
-  CreatePetitionUserNotification,
-} from "../notifications";
+import { CommentCreatedUserNotification, CreatePetitionUserNotification } from "../notifications";
 import {
   Contact,
   CreatePetition,
@@ -104,18 +83,12 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadAnyPetitionById = this.buildLoadBy("petition", "id");
 
-  readonly loadPetition = this.buildLoadBy("petition", "id", (q) =>
-    q.whereNull("deleted_at")
-  );
+  readonly loadPetition = this.buildLoadBy("petition", "id", (q) => q.whereNull("deleted_at"));
 
-  readonly loadField = this.buildLoadBy("petition_field", "id", (q) =>
-    q.whereNull("deleted_at")
-  );
+  readonly loadField = this.buildLoadBy("petition_field", "id", (q) => q.whereNull("deleted_at"));
 
-  readonly loadFieldReply = this.buildLoadBy(
-    "petition_field_reply",
-    "id",
-    (q) => q.whereNull("deleted_at")
+  readonly loadFieldReply = this.buildLoadBy("petition_field_reply", "id", (q) =>
+    q.whereNull("deleted_at")
   );
 
   readonly loadFieldForReply = fromDataLoader(
@@ -131,9 +104,7 @@ export class PetitionRepository extends BaseRepository {
         [...ids]
       );
       const byPfrId = indexBy(fields, (f) => f._pfr_id);
-      return ids.map((id) =>
-        byPfrId[id] ? omit(byPfrId[id], ["_pfr_id"]) : null
-      );
+      return ids.map((id) => (byPfrId[id] ? omit(byPfrId[id], ["_pfr_id"]) : null));
     })
   );
 
@@ -156,13 +127,8 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(petitionIds).size;
   }
 
-  async userHasAccessToPetitionFieldComments(
-    userId: number,
-    petitionFieldCommentIds: number[]
-  ) {
-    const comments = await this.loadPetitionFieldComment(
-      petitionFieldCommentIds
-    );
+  async userHasAccessToPetitionFieldComments(userId: number, petitionFieldCommentIds: number[]) {
+    const comments = await this.loadPetitionFieldComment(petitionFieldCommentIds);
     return (
       comments.every((c) => !!c) &&
       (await this.userHasAccessToPetitions(
@@ -183,10 +149,7 @@ export class PetitionRepository extends BaseRepository {
     return count === new Set(fieldIds).size;
   }
 
-  async fieldAttachmentBelongsToField(
-    fieldId: number,
-    attachmentIds: number[]
-  ) {
+  async fieldAttachmentBelongsToField(fieldId: number, attachmentIds: number[]) {
     const [{ count }] = await this.from("petition_field_attachment")
       .where({
         petition_field_id: fieldId,
@@ -307,9 +270,7 @@ export class PetitionRepository extends BaseRepository {
         }
 
         if (filters?.tagIds) {
-          q.joinRaw(
-            /* sql */ `left join petition_tag pt on pt.petition_id = petition.id`
-          );
+          q.joinRaw(/* sql */ `left join petition_tag pt on pt.petition_id = petition.id`);
           if (filters.tagIds.length) {
             q.havingRaw(
               /* sql */ `
@@ -342,15 +303,11 @@ export class PetitionRepository extends BaseRepository {
 
             const column = type === "User" ? "user_id" : "user_group_id";
             if (filter.operator === "SHARED_WITH") {
-              q.havingRaw(
-                `?=any(array_remove(array_agg(distinct pp2.${column}),null))`,
-                [id]
-              );
+              q.havingRaw(`?=any(array_remove(array_agg(distinct pp2.${column}),null))`, [id]);
             } else if (filter.operator === "NOT_SHARED_WITH") {
-              q.havingRaw(
-                `not(?=any(array_remove(array_agg(distinct pp2.${column}), null)))`,
-                [id]
-              );
+              q.havingRaw(`not(?=any(array_remove(array_agg(distinct pp2.${column}), null)))`, [
+                id,
+              ]);
             } else if (filter.operator === "IS_OWNER") {
               q.havingRaw(
                 `sum(case pp2.type when 'OWNER' then (pp2.user_id = ?)::int else 0 end) > 0`,
@@ -417,10 +374,8 @@ export class PetitionRepository extends BaseRepository {
     }
   }
 
-  readonly loadFieldsForPetition = this.buildLoadMultipleBy(
-    "petition_field",
-    "petition_id",
-    (q) => q.whereNull("deleted_at").orderBy("position")
+  readonly loadFieldsForPetition = this.buildLoadMultipleBy("petition_field", "petition_id", (q) =>
+    q.whereNull("deleted_at").orderBy("position")
   );
 
   readonly loadFieldsForPetitionWithNullVisibility = this.buildLoadMultipleBy(
@@ -429,10 +384,8 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.where({ deleted_at: null, visibility: null }).orderBy("position")
   );
 
-  readonly loadFieldCountForPetition = this.buildLoadCountBy(
-    "petition_field",
-    "petition_id",
-    (q) => q.whereNull("deleted_at")
+  readonly loadFieldCountForPetition = this.buildLoadCountBy("petition_field", "petition_id", (q) =>
+    q.whereNull("deleted_at")
   );
 
   readonly loadStatusForPetition = fromDataLoader(
@@ -447,24 +400,11 @@ export class PetitionRepository extends BaseRepository {
     >(async (ids) => {
       const fields: (Pick<
         PetitionField,
-        | "id"
-        | "petition_id"
-        | "validated"
-        | "optional"
-        | "visibility"
-        | "type"
-        | "options"
-      > & { content: string })[] = await this.knex<PetitionField>(
-        "petition_field as pf"
-      )
-        .leftJoin<PetitionFieldReply>(
-          "petition_field_reply as pfr",
-          function () {
-            this.on("pf.id", "pfr.petition_field_id").andOnNull(
-              "pfr.deleted_at"
-            );
-          }
-        )
+        "id" | "petition_id" | "validated" | "optional" | "visibility" | "type" | "options"
+      > & { content: string })[] = await this.knex<PetitionField>("petition_field as pf")
+        .leftJoin<PetitionFieldReply>("petition_field_reply as pfr", function () {
+          this.on("pf.id", "pfr.petition_field_id").andOnNull("pfr.deleted_at");
+        })
         .whereIn("pf.petition_id", ids)
         .whereNull("pf.deleted_at")
         .whereNotIn("pf.type", ["HEADING"])
@@ -499,19 +439,13 @@ export class PetitionRepository extends BaseRepository {
             .filter((r) => r.content !== null),
         }));
 
-        const visibleFields = zip(
-          fieldsWithReplies,
-          evaluateFieldVisibility(fieldsWithReplies)
-        )
+        const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
           .filter(([, isVisible]) => isVisible)
           .map(([field]) => field);
 
         return {
           validated: countBy(visibleFields, (f) => f.validated),
-          replied: countBy(
-            visibleFields,
-            (f) => f.replies.length > 0 && !f.validated
-          ),
+          replied: countBy(visibleFields, (f) => f.replies.length > 0 && !f.validated),
           optional: countBy(
             visibleFields,
             (f) => f.optional && f.replies.length === 0 && !f.validated
@@ -536,11 +470,7 @@ export class PetitionRepository extends BaseRepository {
     petitionId: number,
     data: Pick<
       CreatePetitionAccess,
-      | "contact_id"
-      | "next_reminder_at"
-      | "reminders_active"
-      | "reminders_config"
-      | "reminders_left"
+      "contact_id" | "next_reminder_at" | "reminders_active" | "reminders_config" | "reminders_left"
     >[],
     user: User
   ) {
@@ -596,10 +526,7 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadMessage = this.buildLoadBy("petition_message", "id");
 
-  readonly loadMessageByEmailLogId = this.buildLoadBy(
-    "petition_message",
-    "email_log_id"
-  );
+  readonly loadMessageByEmailLogId = this.buildLoadBy("petition_message", "email_log_id");
 
   readonly loadMessagesByPetitionAccessId = this.buildLoadMultipleBy(
     "petition_message",
@@ -644,20 +571,14 @@ export class PetitionRepository extends BaseRepository {
     return rows;
   }
 
-  async cancelScheduledMessage(
-    petitionId: number,
-    messageId: number,
-    user: User
-  ) {
+  async cancelScheduledMessage(petitionId: number, messageId: number, user: User) {
     const [[row]] = await Promise.all([
-      this.from("petition_message")
-        .where({ id: messageId, status: "SCHEDULED" })
-        .update(
-          {
-            status: "CANCELLED",
-          },
-          "*"
-        ),
+      this.from("petition_message").where({ id: messageId, status: "SCHEDULED" }).update(
+        {
+          status: "CANCELLED",
+        },
+        "*"
+      ),
       this.createEvent({
         type: "MESSAGE_CANCELLED",
         petition_id: petitionId,
@@ -670,11 +591,7 @@ export class PetitionRepository extends BaseRepository {
     return row ?? null;
   }
 
-  async deactivateAccesses(
-    petitionId: number,
-    accessIds: number[],
-    user: User
-  ) {
+  async deactivateAccesses(petitionId: number, accessIds: number[], user: User) {
     const [accesses, messages] = await Promise.all([
       this.from("petition_access")
         .whereIn("id", accessIds)
@@ -722,11 +639,7 @@ export class PetitionRepository extends BaseRepository {
     return accesses;
   }
 
-  async reactivateAccesses(
-    petitionId: number,
-    accessIds: number[],
-    user: User
-  ) {
+  async reactivateAccesses(petitionId: number, accessIds: number[], user: User) {
     const accesses = await this.from("petition_access")
       .whereIn("id", accessIds)
       .where("status", "INACTIVE")
@@ -751,10 +664,7 @@ export class PetitionRepository extends BaseRepository {
     return accesses;
   }
 
-  async updatePetitionAccessNextReminder(
-    accessId: number,
-    nextReminderAt: Date | null
-  ) {
+  async updatePetitionAccessNextReminder(accessId: number, nextReminderAt: Date | null) {
     const [row] = await this.from("petition_access")
       .where("id", accessId)
       .update({ next_reminder_at: nextReminderAt }, "*");
@@ -762,22 +672,17 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async processPetitionMessage(messageId: number, emailLogId: number) {
-    const [row] = await this.from("petition_message")
-      .where("id", messageId)
-      .update(
-        {
-          status: "PROCESSED",
-          email_log_id: emailLogId,
-        },
-        "*"
-      );
+    const [row] = await this.from("petition_message").where("id", messageId).update(
+      {
+        status: "PROCESSED",
+        email_log_id: emailLogId,
+      },
+      "*"
+    );
     return row;
   }
 
-  async createPetition(
-    data: Omit<CreatePetition, "org_id" | "status">,
-    user: User
-  ) {
+  async createPetition(data: Omit<CreatePetition, "org_id" | "status">, user: User) {
     return await this.withTransaction(async (t) => {
       const [petition] = await this.insert(
         "petition",
@@ -804,17 +709,15 @@ export class PetitionRepository extends BaseRepository {
         ),
         this.insert(
           "petition_field",
-          (["HEADING", "SHORT_TEXT"] as PetitionFieldType[]).map(
-            (type, index) => ({
-              ...defaultFieldOptions(type),
-              petition_id: petition.id,
-              type,
-              is_fixed: type === "HEADING",
-              position: index,
-              created_by: `User:${user.id}`,
-              updated_by: `User:${user.id}`,
-            })
-          ),
+          (["HEADING", "SHORT_TEXT"] as PetitionFieldType[]).map((type, index) => ({
+            ...defaultFieldOptions(type),
+            petition_id: petition.id,
+            type,
+            is_fixed: type === "HEADING",
+            position: index,
+            created_by: `User:${user.id}`,
+            updated_by: `User:${user.id}`,
+          })),
           t
         ),
       ]);
@@ -842,11 +745,7 @@ export class PetitionRepository extends BaseRepository {
       .returning("*");
   }
 
-  async deleteAllPermissions(
-    petitionIds: number[],
-    user: User,
-    t?: Knex.Transaction
-  ) {
+  async deleteAllPermissions(petitionIds: number[], user: User, t?: Knex.Transaction) {
     return await this.withTransaction(async (t) => {
       return await this.from("petition_permission", t)
         .whereIn("petition_id", petitionIds)
@@ -864,11 +763,7 @@ export class PetitionRepository extends BaseRepository {
   /**
    * Delete petition, deactivate all accesses and cancel all scheduled messages
    */
-  async deletePetitionById(
-    petitionId: MaybeArray<number>,
-    user: User,
-    t?: Knex.Transaction
-  ) {
+  async deletePetitionById(petitionId: MaybeArray<number>, user: User, t?: Knex.Transaction) {
     const petitionIds = unMaybeArray(petitionId);
     return await this.withTransaction(async (t) => {
       const [accesses, messages] = await Promise.all([
@@ -893,9 +788,7 @@ export class PetitionRepository extends BaseRepository {
             "*"
           ),
       ]);
-      for (const [, _accesses] of Object.entries(
-        groupBy(accesses, (a) => a.petition_id)
-      )) {
+      for (const [, _accesses] of Object.entries(groupBy(accesses, (a) => a.petition_id))) {
         await this.createEvent(
           _accesses.map((access) => ({
             type: "ACCESS_DEACTIVATED",
@@ -908,9 +801,7 @@ export class PetitionRepository extends BaseRepository {
           t
         );
       }
-      for (const [, _messages] of Object.entries(
-        groupBy(messages, (m) => m.petition_id)
-      )) {
+      for (const [, _messages] of Object.entries(groupBy(messages, (m) => m.petition_id))) {
         await this.createEvent(
           _messages.map((message) => ({
             type: "MESSAGE_CANCELLED",
@@ -956,11 +847,7 @@ export class PetitionRepository extends BaseRepository {
       );
   }
 
-  async updateFieldPositions(
-    petitionId: number,
-    fieldIds: number[],
-    user: User
-  ) {
+  async updateFieldPositions(petitionId: number, fieldIds: number[], user: User) {
     return await this.withTransaction(async (t) => {
       const fields = await this.from("petition_field", t)
         .where("petition_id", petitionId)
@@ -983,11 +870,7 @@ export class PetitionRepository extends BaseRepository {
       const fixedPositions = fields
         .map((field, index) => [field, index] as const)
         .filter(([field]) => field.is_fixed);
-      if (
-        fixedPositions.some(
-          ([field, index]) => fieldIds.indexOf(field.id) !== index
-        )
-      ) {
+      if (fixedPositions.some(([field, index]) => fieldIds.indexOf(field.id) !== index)) {
         throw new Error("INVALID_PETITION_FIELD_IDS");
       }
 
@@ -997,11 +880,7 @@ export class PetitionRepository extends BaseRepository {
       );
       for (const field of fields) {
         const visibility = field.visibility as Maybe<PetitionFieldVisibility>;
-        if (
-          visibility?.conditions.some(
-            (c) => positions[c.fieldId] >= positions[field.id]
-          )
-        ) {
+        if (visibility?.conditions.some((c) => positions[c.fieldId] >= positions[field.id])) {
           throw new Error("INVALID_FIELD_CONDITIONS_ORDER");
         }
       }
@@ -1124,9 +1003,7 @@ export class PetitionRepository extends BaseRepository {
       ]);
 
       if (fieldIds.length > 0) {
-        await this.from("petition_field", t)
-          .whereIn("id", fieldIds)
-          .update({ deleted_at: null });
+        await this.from("petition_field", t).whereIn("id", fieldIds).update({ deleted_at: null });
       }
 
       return { field, petition };
@@ -1222,9 +1099,7 @@ export class PetitionRepository extends BaseRepository {
         .update(
           {
             ...data,
-            validated: this.knex.raw(
-              `case type when 'HEADING' then true else false end`
-            ),
+            validated: this.knex.raw(`case type when 'HEADING' then true else false end`),
             updated_at: this.now(),
             updated_by: `User:${user.id}`,
           },
@@ -1270,10 +1145,7 @@ export class PetitionRepository extends BaseRepository {
     }, t);
   }
 
-  async validateFieldData(
-    fieldId: number,
-    data: { options: Maybe<Record<string, any>> }
-  ) {
+  async validateFieldData(fieldId: number, data: { options: Maybe<Record<string, any>> }) {
     const field = await this.loadField(fieldId);
     if (!field) {
       throw new Error("Petition field not found");
@@ -1295,12 +1167,7 @@ export class PetitionRepository extends BaseRepository {
     })
   );
 
-  async validatePetitionFields(
-    petitionId: number,
-    fieldIds: number[],
-    value: boolean,
-    user: User
-  ) {
+  async validatePetitionFields(petitionId: number, fieldIds: number[], value: boolean, user: User) {
     const fields = await this.from("petition_field")
       .whereIn("id", fieldIds)
       .where("petition_id", petitionId)
@@ -1316,17 +1183,13 @@ export class PetitionRepository extends BaseRepository {
     // if every field is validated, update the petition status
     const petitionFields = await this.loadFieldsForPetition(petitionId);
     const petition = await this.loadPetition(petitionId);
-    const newStatus = petitionFields
-      .filter((f) => f.type !== "HEADING")
-      .every((f) => f.validated)
+    const newStatus = petitionFields.filter((f) => f.type !== "HEADING").every((f) => f.validated)
       ? "CLOSED"
       : petition!.status === "CLOSED"
       ? "PENDING"
       : petition!.status;
 
-    await this.from("petition")
-      .where("id", petitionId)
-      .update({ status: newStatus });
+    await this.from("petition").where("id", petitionId).update({ status: newStatus });
 
     if (newStatus === "CLOSED") {
       await this.updateRemindersForPetition(petitionId, null);
@@ -1341,14 +1204,12 @@ export class PetitionRepository extends BaseRepository {
     t?: Knex.Transaction
   ) {
     return this.withTransaction(async (t) => {
-      return await this.from("petition_access", t)
-        .where("petition_id", petitionId)
-        .update(
-          {
-            next_reminder_at: nextReminderAt,
-          },
-          "*"
-        );
+      return await this.from("petition_access", t).where("petition_id", petitionId).update(
+        {
+          next_reminder_at: nextReminderAt,
+        },
+        "*"
+      );
     }, t);
   }
 
@@ -1362,9 +1223,7 @@ export class PetitionRepository extends BaseRepository {
         },
     creator: TCreator
   ) {
-    const createdBy = isDefined((data as any).petition_access_id)
-      ? "Contact"
-      : "User";
+    const createdBy = isDefined((data as any).petition_access_id) ? "Contact" : "User";
 
     const field = await this.loadField(data.petition_field_id);
     if (!field) {
@@ -1477,13 +1336,8 @@ export class PetitionRepository extends BaseRepository {
     ]);
   }
 
-  async updatePetitionFieldRepliesStatus(
-    replyIds: number[],
-    status: PetitionFieldReplyStatus
-  ) {
-    return await this.from("petition_field_reply")
-      .whereIn("id", replyIds)
-      .update({ status }, "*");
+  async updatePetitionFieldRepliesStatus(replyIds: number[], status: PetitionFieldReplyStatus) {
+    return await this.from("petition_field_reply").whereIn("id", replyIds).update({ status }, "*");
   }
 
   async completePetition(petitionId: number, accessId: number) {
@@ -1499,18 +1353,13 @@ export class PetitionRepository extends BaseRepository {
     }
     const fieldsIds = fields.map((f) => f.id);
     const replies = await this.loadRepliesForField(fieldsIds);
-    const repliesByFieldId = Object.fromEntries(
-      fieldsIds.map((id, index) => [id, replies[index]])
-    );
+    const repliesByFieldId = Object.fromEntries(fieldsIds.map((id, index) => [id, replies[index]]));
     const fieldsWithReplies = fields.map((f) => ({
       ...f,
       replies: repliesByFieldId[f.id],
     }));
 
-    const canComplete = zip(
-      fieldsWithReplies,
-      evaluateFieldVisibility(fieldsWithReplies)
-    ).every(
+    const canComplete = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies)).every(
       ([field, isVisible]) =>
         field.type === "HEADING" ||
         field.optional ||
@@ -1588,9 +1437,7 @@ export class PetitionRepository extends BaseRepository {
       } else {
         // when cloning petitions we clone the petition from_template_id
         // if we are cloning templates then from_template_id is null
-        fromTemplateId = sourcePetition!.is_template
-          ? null
-          : sourcePetition!.from_template_id;
+        fromTemplateId = sourcePetition!.is_template ? null : sourcePetition!.from_template_id;
       }
 
       const [cloned] = await this.insert(
@@ -1629,13 +1476,7 @@ export class PetitionRepository extends BaseRepository {
           : this.insert(
               "petition_field",
               fields.map((field) => ({
-                ...omit(field, [
-                  "id",
-                  "petition_id",
-                  "created_at",
-                  "updated_at",
-                  "validated",
-                ]),
+                ...omit(field, ["id", "petition_id", "created_at", "updated_at", "validated"]),
                 petition_id: cloned.id,
                 created_by: `User:${user.id}`,
                 updated_by: `User:${user.id}`,
@@ -1651,8 +1492,7 @@ export class PetitionRepository extends BaseRepository {
                 type: "OWNER",
                 is_subscribed: sourcePetition!.is_template
                   ? true
-                  : userPermissions.find((p) => p.user_id === user.id)
-                      ?.is_subscribed ?? true,
+                  : userPermissions.find((p) => p.user_id === user.id)?.is_subscribed ?? true,
                 created_by: `User:${user.id}`,
                 updated_by: `User:${user.id}`,
               },
@@ -1735,10 +1575,7 @@ export class PetitionRepository extends BaseRepository {
 
   readonly loadReminder = this.buildLoadBy("petition_reminder", "id");
 
-  readonly loadReminderByEmailLogId = this.buildLoadBy(
-    "petition_reminder",
-    "email_log_id"
-  );
+  readonly loadReminderByEmailLogId = this.buildLoadBy("petition_reminder", "email_log_id");
 
   readonly loadReminderCountForAccess = this.buildLoadCountBy(
     "petition_reminder",
@@ -1771,11 +1608,7 @@ export class PetitionRepository extends BaseRepository {
             case when "reminders_left" <= 1 then false else "reminders_active" end
           `),
         });
-      const reminders = await this.insert(
-        "petition_reminder",
-        data,
-        t
-      ).returning("*");
+      const reminders = await this.insert("petition_reminder", data, t).returning("*");
       return reminders;
     });
   }
@@ -1811,10 +1644,7 @@ export class PetitionRepository extends BaseRepository {
       .update({ reminders_active: false, next_reminder_at: null }, "*");
   }
 
-  async startAccessReminders(
-    accessIds: number[],
-    reminderConfig: PetitionAccessReminderConfig
-  ) {
+  async startAccessReminders(accessIds: number[], reminderConfig: PetitionAccessReminderConfig) {
     return await this.from("petition_access")
       .whereIn("id", accessIds)
       .update(
@@ -1866,10 +1696,7 @@ export class PetitionRepository extends BaseRepository {
     return true;
   }
 
-  async createEvent(
-    events: MaybeArray<CreatePetitionEvent>,
-    t?: Knex.Transaction
-  ) {
+  async createEvent(events: MaybeArray<CreatePetitionEvent>, t?: Knex.Transaction) {
     const eventsArray = unMaybeArray(events);
     if (eventsArray.length === 0) {
       return [];
@@ -1895,9 +1722,7 @@ export class PetitionRepository extends BaseRepository {
   }
 
   async updateEvent(eventId: number, data: Partial<PetitionEvent>) {
-    const [event] = await this.from("petition_event")
-      .where("id", eventId)
-      .update(data, "*");
+    const [event] = await this.from("petition_event").where("id", eventId).update(data, "*");
     return event;
   }
 
@@ -1914,11 +1739,7 @@ export class PetitionRepository extends BaseRepository {
       async (ids) => {
         const rows = await this.from("petition_field_comment")
           .where((qb) => {
-            for (const {
-              petitionId,
-              petitionFieldId,
-              loadInternalComments,
-            } of ids) {
+            for (const { petitionId, petitionFieldId, loadInternalComments } of ids) {
               qb = qb.orWhere((qb) => {
                 qb.where({
                   petition_id: petitionId,
@@ -1934,10 +1755,7 @@ export class PetitionRepository extends BaseRepository {
 
           .select("*");
 
-        const byId = groupBy(
-          rows,
-          keyBuilder(["petition_id", "petition_field_id"])
-        );
+        const byId = groupBy(rows, keyBuilder(["petition_id", "petition_field_id"]));
         return ids
           .map(keyBuilder(["petitionId", "petitionFieldId"]))
           .map((key) => this.sortComments(byId[key] ?? []));
@@ -1948,21 +1766,20 @@ export class PetitionRepository extends BaseRepository {
     )
   );
 
-  readonly loadPetitionFieldUnreadCommentCountForFieldAndAccess =
-    fromDataLoader(
-      new DataLoader<
-        { accessId: number; petitionId: number; petitionFieldId: number },
-        number,
-        string
-      >(
-        async (ids) => {
-          const rows = await this.raw<{
-            petition_id: number;
-            petition_field_id: number;
-            petition_access_id: number;
-            unread_count: number;
-          }>(
-            /* sql */ `
+  readonly loadPetitionFieldUnreadCommentCountForFieldAndAccess = fromDataLoader(
+    new DataLoader<
+      { accessId: number; petitionId: number; petitionFieldId: number },
+      number,
+      string
+    >(
+      async (ids) => {
+        const rows = await this.raw<{
+          petition_id: number;
+          petition_field_id: number;
+          petition_access_id: number;
+          unread_count: number;
+        }>(
+          /* sql */ `
           select
             pcn.petition_id,
             (pcn.data ->> 'petition_field_id')::int as petition_field_id,
@@ -1987,46 +1804,30 @@ export class PetitionRepository extends BaseRepository {
             pcn.petition_access_id
 
         `,
-            [
-              ...ids.flatMap((x) => [
-                x.petitionId,
-                x.accessId,
-                x.petitionFieldId,
-              ]),
-            ]
-          );
+          [...ids.flatMap((x) => [x.petitionId, x.accessId, x.petitionFieldId])]
+        );
 
-          const rowsById = indexBy(
-            rows,
-            keyBuilder([
-              "petition_id",
-              "petition_field_id",
-              "petition_access_id",
-            ])
-          );
+        const rowsById = indexBy(
+          rows,
+          keyBuilder(["petition_id", "petition_field_id", "petition_access_id"])
+        );
 
-          return ids
-            .map(keyBuilder(["petitionId", "petitionFieldId", "accessId"]))
-            .map((key) => {
-              return rowsById[key]?.unread_count ?? 0;
-            });
-        },
-        {
-          cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
-        }
-      )
-    );
+        return ids.map(keyBuilder(["petitionId", "petitionFieldId", "accessId"])).map((key) => {
+          return rowsById[key]?.unread_count ?? 0;
+        });
+      },
+      {
+        cacheKeyFn: keyBuilder(["petitionId", "petitionFieldId", "accessId"]),
+      }
+    )
+  );
 
   private sortComments(comments: PetitionFieldComment[]) {
-    return comments.sort(
-      (a, b) => a.created_at.valueOf() - b.created_at.valueOf()
-    );
+    return comments.sort((a, b) => a.created_at.valueOf() - b.created_at.valueOf());
   }
 
-  readonly loadPetitionFieldComment = this.buildLoadBy(
-    "petition_field_comment",
-    "id",
-    (q) => q.whereNull("deleted_at")
+  readonly loadPetitionFieldComment = this.buildLoadBy("petition_field_comment", "id", (q) =>
+    q.whereNull("deleted_at")
   );
 
   async loadUnprocessedCommentCreatedUserNotifications() {
@@ -2049,15 +1850,13 @@ export class PetitionRepository extends BaseRepository {
     `);
   }
 
-  readonly loadPetitionUserNotifications = this.buildLoadBy(
-    "petition_user_notification",
-    "id"
-  );
+  readonly loadPetitionUserNotifications = this.buildLoadBy("petition_user_notification", "id");
 
-  readonly loadUnreadPetitionUserNotificationsByUserId =
-    this.buildLoadMultipleBy("petition_user_notification", "user_id", (q) =>
-      q.where({ is_read: false })
-    );
+  readonly loadUnreadPetitionUserNotificationsByUserId = this.buildLoadMultipleBy(
+    "petition_user_notification",
+    "user_id",
+    (q) => q.where({ is_read: false })
+  );
 
   async loadPetitionUserNotificationsByUserId(
     userId: number,
@@ -2094,9 +1893,7 @@ export class PetitionRepository extends BaseRepository {
       .orderBy("created_at", "desc");
   }
 
-  async updatePetitionUserNotificationsProcessedAt(
-    petitionUserNotificationIds: number[]
-  ) {
+  async updatePetitionUserNotificationsProcessedAt(petitionUserNotificationIds: number[]) {
     return await this.from("petition_user_notification")
       .whereIn("id", petitionUserNotificationIds)
       .update({ processed_at: this.now() }, "*");
@@ -2157,10 +1954,7 @@ export class PetitionRepository extends BaseRepository {
         for (const comment of comments) {
           qb = qb.orWhere((qb) => {
             qb.where({ petition_id: comment.petition_id })
-              .whereRaw(
-                "data ->> 'petition_field_id' = ?",
-                comment.petition_field_id
-              )
+              .whereRaw("data ->> 'petition_field_id' = ?", comment.petition_field_id)
               .whereRaw("data ->> 'petition_field_comment_id' = ?", comment.id);
           });
         }
@@ -2234,9 +2028,7 @@ export class PetitionRepository extends BaseRepository {
       .delete();
   }
 
-  async createPetitionContactNotification(
-    data: CreatePetitionContactNotification[]
-  ) {
+  async createPetitionContactNotification(data: CreatePetitionContactNotification[]) {
     if (data.length === 0) {
       return [];
     }
@@ -2267,19 +2059,13 @@ export class PetitionRepository extends BaseRepository {
         const userIds = uniq(ids.map((x) => x.userId));
         const petitionIds = uniq(ids.map((x) => x.petitionId));
         const petitionFieldIds = uniq(ids.map((x) => x.petitionFieldId));
-        const petitionFieldCommentId = uniq(
-          ids.map((x) => x.petitionFieldCommentId)
-        );
-        const rows = await this.knex<CommentCreatedUserNotification>(
-          "petition_user_notification"
-        )
+        const petitionFieldCommentId = uniq(ids.map((x) => x.petitionFieldCommentId));
+        const rows = await this.knex<CommentCreatedUserNotification>("petition_user_notification")
           .where("type", "COMMENT_CREATED")
           .whereIn("user_id", userIds)
           .whereIn("petition_id", petitionIds)
           .whereRaw(
-            `data ->> 'petition_field_id' in (${petitionFieldIds
-              .map(() => "?")
-              .join(",")})`,
+            `data ->> 'petition_field_id' in (${petitionFieldIds.map(() => "?").join(",")})`,
             petitionFieldIds
           )
           .whereRaw(
@@ -2300,14 +2086,7 @@ export class PetitionRepository extends BaseRepository {
           ])
         );
         return ids
-          .map(
-            keyBuilder([
-              "userId",
-              "petitionId",
-              "petitionFieldId",
-              "petitionFieldCommentId",
-            ])
-          )
+          .map(keyBuilder(["userId", "petitionId", "petitionFieldId", "petitionFieldCommentId"]))
           .map((key) => !(byId[key]?.is_read ?? true));
       },
       {
@@ -2336,17 +2115,13 @@ export class PetitionRepository extends BaseRepository {
         const petitionAccessIds = uniq(ids.map((x) => x.petitionAccessId));
         const petitionIds = uniq(ids.map((x) => x.petitionId));
         const petitionFieldIds = uniq(ids.map((x) => x.petitionFieldId));
-        const petitionFieldCommentId = uniq(
-          ids.map((x) => x.petitionFieldCommentId)
-        );
+        const petitionFieldCommentId = uniq(ids.map((x) => x.petitionFieldCommentId));
         const rows = await this.from("petition_contact_notification")
           .where("type", "COMMENT_CREATED")
           .whereIn("petition_access_id", petitionAccessIds)
           .whereIn("petition_id", petitionIds)
           .whereRaw(
-            `data ->> 'petition_field_id' in (${petitionFieldIds
-              .map(() => "?")
-              .join(",")})`,
+            `data ->> 'petition_field_id' in (${petitionFieldIds.map(() => "?").join(",")})`,
             petitionFieldIds
           )
           .whereRaw(
@@ -2471,10 +2246,7 @@ export class PetitionRepository extends BaseRepository {
     user: User
   ) {
     await Promise.all([
-      this.deletePetitionFieldComment(
-        petitionFieldCommentId,
-        `User:${user.id}`
-      ),
+      this.deletePetitionFieldComment(petitionFieldCommentId, `User:${user.id}`),
       this.createEvent({
         type: "COMMENT_DELETED",
         petition_id: petitionId,
@@ -2494,10 +2266,7 @@ export class PetitionRepository extends BaseRepository {
     access: PetitionAccess
   ) {
     await Promise.all([
-      this.deletePetitionFieldComment(
-        petitionFieldCommentId,
-        `PetitionAccess:${access.id}`
-      ),
+      this.deletePetitionFieldComment(petitionFieldCommentId, `PetitionAccess:${access.id}`),
       this.createEvent({
         type: "COMMENT_DELETED",
         petition_id: petitionId,
@@ -2510,10 +2279,7 @@ export class PetitionRepository extends BaseRepository {
     ]);
   }
 
-  private async deletePetitionFieldComment(
-    petitionFieldCommentId: number,
-    deletedBy: string
-  ) {
+  private async deletePetitionFieldComment(petitionFieldCommentId: number, deletedBy: string) {
     const [comment] = await this.from("petition_field_comment")
       .where("id", petitionFieldCommentId)
       .update(
@@ -2594,10 +2360,7 @@ export class PetitionRepository extends BaseRepository {
         for (const comment of comments) {
           qb = qb.orWhere((qb) => {
             qb.where({ petition_id: comment.petition_id })
-              .whereRaw(
-                "data ->> 'petition_field_id' = ?",
-                comment.petition_field_id
-              )
+              .whereRaw("data ->> 'petition_field_id' = ?", comment.petition_field_id)
               .whereRaw("data ->> 'petition_field_comment_id' = ?", comment.id);
           });
         }
@@ -2623,10 +2386,7 @@ export class PetitionRepository extends BaseRepository {
         for (const comment of comments) {
           qb = qb.orWhere((qb) => {
             qb.where({ petition_id: comment.petition_id })
-              .whereRaw(
-                "data ->> 'petition_field_id' = ?",
-                comment.petition_field_id
-              )
+              .whereRaw("data ->> 'petition_field_id' = ?", comment.petition_field_id)
               .whereRaw("data ->> 'petition_field_comment_id' = ?", comment.id);
           });
         }
@@ -2701,17 +2461,14 @@ export class PetitionRepository extends BaseRepository {
     });
   }
 
-  readonly loadPetitionPermission = this.buildLoadBy(
-    "petition_permission",
-    "id",
-    (q) => q.whereNull("deleted_at")
+  readonly loadPetitionPermission = this.buildLoadBy("petition_permission", "id", (q) =>
+    q.whereNull("deleted_at")
   );
 
   readonly loadEffectivePermissions = fromDataLoader(
-    new DataLoader<number, EffectivePetitionPermission[]>(
-      async (petitionIds) => {
-        const rows = await this.raw<EffectivePetitionPermission>(
-          /* sql */ `
+    new DataLoader<number, EffectivePetitionPermission[]>(async (petitionIds) => {
+      const rows = await this.raw<EffectivePetitionPermission>(
+        /* sql */ `
         select petition_id, user_id, min("type") as type, bool_or(is_subscribed) is_subscribed 
         from petition_permission 
           where deleted_at is null 
@@ -2719,23 +2476,18 @@ export class PetitionRepository extends BaseRepository {
           and petition_id in (${petitionIds.map(() => "?").join(", ")})
           group by user_id, petition_id
       `,
-          petitionIds
-        );
+        petitionIds
+      );
 
-        const byPetitionId = groupBy(rows, (r) => r.petition_id);
-        return petitionIds.map((id) => byPetitionId[id]);
-      }
-    )
+      const byPetitionId = groupBy(rows, (r) => r.petition_id);
+      return petitionIds.map((id) => byPetitionId[id]);
+    })
   );
 
   readonly loadUserPermissionsByPetitionId = this.buildLoadMultipleBy(
     "petition_permission",
     "petition_id",
-    (q) =>
-      q
-        .whereNull("deleted_at")
-        .whereNull("user_group_id")
-        .orderByRaw("type asc, created_at")
+    (q) => q.whereNull("deleted_at").whereNull("user_group_id").orderByRaw("type asc, created_at")
   );
 
   readonly loadPetitionPermissionsByUserId = this.buildLoadMultipleBy(
@@ -2744,22 +2496,26 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at").orderByRaw("type asc, created_at")
   );
 
-  readonly loadUserAndUserGroupPermissionsByPetitionId =
-    this.buildLoadMultipleBy("petition_permission", "petition_id", (q) =>
+  readonly loadUserAndUserGroupPermissionsByPetitionId = this.buildLoadMultipleBy(
+    "petition_permission",
+    "petition_id",
+    (q) =>
       q
         .whereNull("deleted_at")
         .whereNull("from_user_group_id")
         .orderByRaw("type asc, user_group_id nulls first, created_at")
-    );
+  );
 
-  readonly loadDirectlyAssignedUserPetitionPermissionsByUserId =
-    this.buildLoadMultipleBy("petition_permission", "user_id", (q) =>
+  readonly loadDirectlyAssignedUserPetitionPermissionsByUserId = this.buildLoadMultipleBy(
+    "petition_permission",
+    "user_id",
+    (q) =>
       q
         .whereNull("deleted_at")
         .whereNull("user_group_id")
         .whereNull("from_user_group_id")
         .orderByRaw("type asc, created_at")
-    );
+  );
 
   readonly loadPetitionOwner = fromDataLoader(
     new DataLoader<number, User | null>(async (ids) => {
@@ -2775,9 +2531,7 @@ export class PetitionRepository extends BaseRepository {
         .select("petition_permission.petition_id", "user.*");
       const rowsByPetitionId = indexBy(rows, (r) => r.petition_id);
       return ids.map((id) =>
-        rowsByPetitionId[id]
-          ? (omit(rowsByPetitionId[id], ["petition_id"]) as User)
-          : null
+        rowsByPetitionId[id] ? (omit(rowsByPetitionId[id], ["petition_id"]) as User) : null
       );
     })
   );
@@ -2881,13 +2635,7 @@ export class PetitionRepository extends BaseRepository {
               select p.petition_id, gm.user_id, gm.user_group_id, ?, ?, ? from gm cross join p
               on conflict do nothing returning *;
             `,
-              [
-                ...userGroupIds,
-                ...petitionIds,
-                subscribe,
-                permissionType,
-                `User:${user.id}`,
-              ],
+              [...userGroupIds, ...petitionIds, subscribe, permissionType, `User:${user.id}`],
               t
             )
           : [],
@@ -2932,15 +2680,9 @@ export class PetitionRepository extends BaseRepository {
                 .whereNull("from_user_group_id")
                 .whereNull("user_group_id")
             )
+            .orWhere((q) => q.whereIn("user_group_id", userGroupIds).whereNotNull("user_group_id"))
             .orWhere((q) =>
-              q
-                .whereIn("user_group_id", userGroupIds)
-                .whereNotNull("user_group_id")
-            )
-            .orWhere((q) =>
-              q
-                .whereIn("from_user_group_id", userGroupIds)
-                .whereNotNull("from_user_group_id")
+              q.whereIn("from_user_group_id", userGroupIds).whereNotNull("from_user_group_id")
             )
         )
         .update(
@@ -3016,14 +2758,10 @@ export class PetitionRepository extends BaseRepository {
                     .whereNull("user_group_id")
                 )
                 .orWhere((q) =>
-                  q
-                    .whereIn("user_group_id", userGroupIds)
-                    .whereNotNull("user_group_id")
+                  q.whereIn("user_group_id", userGroupIds).whereNotNull("user_group_id")
                 )
                 .orWhere((q) =>
-                  q
-                    .whereIn("from_user_group_id", userGroupIds)
-                    .whereNotNull("from_user_group_id")
+                  q.whereIn("from_user_group_id", userGroupIds).whereNotNull("from_user_group_id")
                 )
             );
           }
@@ -3254,10 +2992,9 @@ export class PetitionRepository extends BaseRepository {
             const placeholders = categories.map((_) => "?").join(",");
             /* array overlap operator.
               selects every template with any of the passed categories */
-            q.whereRaw(
-              /* sql */ `public_metadata->'categories' \\?| array[${placeholders}]`,
-              [...categories]
-            );
+            q.whereRaw(/* sql */ `public_metadata->'categories' \\?| array[${placeholders}]`, [
+              ...categories,
+            ]);
           }
           if (userId !== undefined) {
             q.leftJoin(
@@ -3325,10 +3062,7 @@ export class PetitionRepository extends BaseRepository {
     "external_id"
   );
 
-  readonly loadPetitionSignatureById = this.buildLoadBy(
-    "petition_signature_request",
-    "id"
-  );
+  readonly loadPetitionSignatureById = this.buildLoadBy("petition_signature_request", "id");
 
   readonly loadPetitionSignaturesByPetitionId = this.buildLoadMultipleBy(
     "petition_signature_request",
@@ -3351,9 +3085,7 @@ export class PetitionRepository extends BaseRepository {
         [...keys]
       );
       const byPetitionId = indexBy(rows, (r) => r.petition_id);
-      return keys.map((key) =>
-        byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null
-      );
+      return keys.map((key) => (byPetitionId[key] ? omit(byPetitionId[key], ["_rank"]) : null));
     })
   );
 
@@ -3405,16 +3137,11 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  async appendPetitionSignatureEventLogs(
-    prefixedExternalId: string,
-    logs: any[]
-  ) {
+  async appendPetitionSignatureEventLogs(prefixedExternalId: string, logs: any[]) {
     return await this.knex.raw(
       /* sql */ `
         UPDATE petition_signature_request
-        SET event_logs = event_logs || ${logs
-          .map(() => "?::jsonb")
-          .join(" || ")}
+        SET event_logs = event_logs || ${logs.map(() => "?::jsonb").join(" || ")}
         WHERE external_id = ?
       `,
       [...logs, prefixedExternalId]
@@ -3492,10 +3219,8 @@ export class PetitionRepository extends BaseRepository {
     return row;
   }
 
-  readonly loadFieldAttachment = this.buildLoadBy(
-    "petition_field_attachment",
-    "id",
-    (q) => q.whereNull("deleted_at")
+  readonly loadFieldAttachment = this.buildLoadBy("petition_field_attachment", "id", (q) =>
+    q.whereNull("deleted_at")
   );
 
   readonly loadFieldAttachmentsByFieldId = this.buildLoadMultipleBy(
@@ -3504,10 +3229,7 @@ export class PetitionRepository extends BaseRepository {
     (q) => q.whereNull("deleted_at")
   );
 
-  async createPetitionFieldAttachment(
-    data: CreatePetitionFieldAttachment,
-    user: User
-  ) {
+  async createPetitionFieldAttachment(data: CreatePetitionFieldAttachment, user: User) {
     const [row] = await this.insert("petition_field_attachment", {
       ...data,
       created_by: `User:${user.id}`,

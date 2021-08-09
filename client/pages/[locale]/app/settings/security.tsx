@@ -13,10 +13,7 @@ import {
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { PasswordInput } from "@parallel/components/common/PasswordInput";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import {
   SecurityQuery,
@@ -60,10 +57,7 @@ function Security() {
     },
   });
 
-  async function onChangePassword({
-    password,
-    newPassword,
-  }: PasswordChangeFormData) {
+  async function onChangePassword({ password, newPassword }: PasswordChangeFormData) {
     const { data } = await updatePassword({
       variables: { password, newPassword },
     });
@@ -102,9 +96,7 @@ function Security() {
       basePath="/app/settings"
       sections={sections}
       user={me}
-      sectionsHeader={
-        <FormattedMessage id="settings.title" defaultMessage="Settings" />
-      }
+      sectionsHeader={<FormattedMessage id="settings.title" defaultMessage="Settings" />}
       header={
         <Heading as="h3" size="md">
           <FormattedMessage id="settings.security" defaultMessage="Security" />
@@ -112,13 +104,7 @@ function Security() {
       }
     >
       <Card margin={4} height="fit-content">
-        <Stack
-          padding={4}
-          alignItems="stretch"
-          flex="1"
-          maxWidth="container.2xs"
-          spacing={4}
-        >
+        <Stack padding={4} alignItems="stretch" flex="1" maxWidth="container.2xs" spacing={4}>
           <Heading as="h4" size="md" fontWeight="normal">
             <FormattedMessage
               id="settings.security.password-header"
@@ -135,11 +121,7 @@ function Security() {
             </Alert>
           ) : null}
           <Stack as="form" onSubmit={handleSubmit(onChangePassword)}>
-            <FormControl
-              id="password"
-              isInvalid={!!errors.password}
-              isDisabled={me.isSsoUser}
-            >
+            <FormControl id="password" isInvalid={!!errors.password} isDisabled={me.isSsoUser}>
               <FormLabel>
                 <FormattedMessage
                   id="generic.forms.old-password-label"
@@ -217,11 +199,7 @@ function Security() {
                 />
               </FormErrorMessage>
             </FormControl>
-            <Button
-              type="submit"
-              colorScheme="purple"
-              isDisabled={me.isSsoUser}
-            >
+            <Button type="submit" colorScheme="purple" isDisabled={me.isSsoUser}>
               <FormattedMessage
                 id="settings.account.change-password-button"
                 defaultMessage="Change password"
@@ -235,14 +213,8 @@ function Security() {
 }
 
 function useUpdatePassword() {
-  return useMutation<
-    Security_updatePasswordMutation,
-    Security_updatePasswordMutationVariables
-  >(gql`
-    mutation Security_updatePassword(
-      $password: String!
-      $newPassword: String!
-    ) {
+  return useMutation<Security_updatePasswordMutation, Security_updatePasswordMutationVariables>(gql`
+    mutation Security_updatePassword($password: String!, $newPassword: String!) {
       changePassword(password: $password, newPassword: $newPassword)
     }
   `);

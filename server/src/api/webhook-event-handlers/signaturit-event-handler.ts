@@ -11,10 +11,9 @@ export async function validateSignaturitRequest(
   next: NextFunction
 ) {
   const body = req.body as SignaturItEventBody;
-  const signature =
-    await req.context.petitions.loadPetitionSignatureByExternalId(
-      `SIGNATURIT/${body.document.signature.id}`
-    );
+  const signature = await req.context.petitions.loadPetitionSignatureByExternalId(
+    `SIGNATURIT/${body.document.signature.id}`
+  );
 
   if (signature && signature.status !== "CANCELLED") {
     next();
@@ -58,11 +57,7 @@ export function signaturItEventHandler(type: SignatureEvents) {
 }
 
 /** signer declined the document. Whole signature process will be cancelled */
-async function documentDeclined(
-  ctx: ApiContext,
-  data: SignaturItEventBody,
-  petitionId: number
-) {
+async function documentDeclined(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const petition = await ctx.petitions.loadPetition(petitionId);
   if (!petition) {
     throw new Error(`Can't find petition with id ${petitionId}`);
@@ -74,17 +69,14 @@ async function documentDeclined(
   });
 
   const [signatureRequest] = await Promise.all([
-    ctx.petitions.updatePetitionSignatureByExternalId(
-      `SIGNATURIT/${data.document.signature.id}`,
-      {
-        status: "CANCELLED",
-        cancel_reason: "DECLINED_BY_SIGNER",
-        cancel_data: {
-          contact_id: contact?.id,
-          decline_reason: data.document.decline_reason,
-        },
-      }
-    ),
+    ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${data.document.signature.id}`, {
+      status: "CANCELLED",
+      cancel_reason: "DECLINED_BY_SIGNER",
+      cancel_data: {
+        contact_id: contact?.id,
+        decline_reason: data.document.decline_reason,
+      },
+    }),
     appendEventLogs(ctx, data),
   ]);
 
@@ -102,20 +94,14 @@ async function documentDeclined(
   });
 }
 /** signed document has been completed and is ready to be downloaded */
-async function documentCompleted(
-  ctx: ApiContext,
-  data: SignaturItEventBody,
-  petitionId: number
-) {
+async function documentCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const petition = await ctx.petitions.loadPetition(petitionId);
 
   if (!petition) {
     throw new Error(`petition with id ${petitionId} not found.`);
   }
 
-  const orgIntegration = await ctx.integrations.loadEnabledIntegrationsForOrgId(
-    petition.org_id
-  );
+  const orgIntegration = await ctx.integrations.loadEnabledIntegrationsForOrgId(petition.org_id);
 
   const contact = await ctx.contacts.loadContactByEmail({
     orgId: petition.org_id,
@@ -133,9 +119,7 @@ async function documentCompleted(
   );
 
   if (!signaturitIntegration) {
-    throw new Error(
-      `Can't load SignaturIt integration for org with id ${petition.org_id}`
-    );
+    throw new Error(`Can't load SignaturIt integration for org with id ${petition.org_id}`);
   }
   const client = ctx.signature.getClient(signaturitIntegration);
 
@@ -155,21 +139,18 @@ async function documentCompleted(
 
   const signedDoc = await storeDocument(
     await client.downloadSignedDocument(`${signatureId}/${documentId}`),
-    sanitize(
-      `${config.title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`
-    ),
+    sanitize(`${config.title}_${petition.locale === "es" ? "firmado" : "signed"}.pdf`),
     signaturitIntegration.id,
     ctx
   );
 
-  const signatureRequest =
-    await ctx.petitions.updatePetitionSignatureByExternalId(
-      `SIGNATURIT/${signatureId}`,
-      {
-        status: "COMPLETED",
-        file_upload_id: signedDoc.id,
-      }
-    );
+  const signatureRequest = await ctx.petitions.updatePetitionSignatureByExternalId(
+    `SIGNATURIT/${signatureId}`,
+    {
+      status: "COMPLETED",
+      file_upload_id: signedDoc.id,
+    }
+  );
 
   await Promise.all([
     ctx.emails.sendPetitionCompletedEmail(petition.id, {
@@ -193,29 +174,21 @@ async function documentCompleted(
 }
 
 /** audit trail has been completed and is ready to be downloaded */
-async function auditTrailCompleted(
-  ctx: ApiContext,
-  data: SignaturItEventBody,
-  petitionId: number
-) {
+async function auditTrailCompleted(ctx: ApiContext, data: SignaturItEventBody, petitionId: number) {
   const petition = await ctx.petitions.loadPetition(petitionId);
 
   if (!petition) {
     throw new Error(`petition with id ${petitionId} not found.`);
   }
 
-  const orgIntegration = await ctx.integrations.loadEnabledIntegrationsForOrgId(
-    petition.org_id
-  );
+  const orgIntegration = await ctx.integrations.loadEnabledIntegrationsForOrgId(petition.org_id);
 
   const signaturitIntegration = orgIntegration.find(
     (i) => i.type === "SIGNATURE" && i.provider === "SIGNATURIT"
   );
 
   if (!signaturitIntegration) {
-    throw new Error(
-      `Can't load SignaturIt integration for org with id ${petition.org_id}`
-    );
+    throw new Error(`Can't load SignaturIt integration for org with id ${petition.org_id}`);
   }
   const client = ctx.signature.getClient(signaturitIntegration);
 
@@ -240,10 +213,9 @@ async function auditTrailCompleted(
     ctx
   );
 
-  await ctx.petitions.updatePetitionSignatureByExternalId(
-    `SIGNATURIT/${signatureId}`,
-    { file_upload_audit_trail_id: auditTrail.id }
-  );
+  await ctx.petitions.updatePetitionSignatureByExternalId(`SIGNATURIT/${signatureId}`, {
+    file_upload_audit_trail_id: auditTrail.id,
+  });
 
   await appendEventLogs(ctx, data);
 }
@@ -253,26 +225,18 @@ async function fetchPetitionSignature(
   ctx: ApiContext
 ): Promise<PetitionSignatureRequest> {
   const externalId = `SIGNATURIT/${signatureId}`;
-  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(
-    externalId
-  );
+  const signature = await ctx.petitions.loadPetitionSignatureByExternalId(externalId);
   if (!signature) {
-    throw new Error(
-      `Petition signature request with externalId: ${externalId} not found.`
-    );
+    throw new Error(`Petition signature request with externalId: ${externalId} not found.`);
   }
 
   return signature;
 }
 
-async function appendEventLogs(
-  ctx: ApiContext,
-  data: SignaturItEventBody
-): Promise<void> {
-  await ctx.petitions.appendPetitionSignatureEventLogs(
-    `SIGNATURIT/${data.document.signature.id}`,
-    [data]
-  );
+async function appendEventLogs(ctx: ApiContext, data: SignaturItEventBody): Promise<void> {
+  await ctx.petitions.appendPetitionSignatureEventLogs(`SIGNATURIT/${data.document.signature.id}`, [
+    data,
+  ]);
 }
 
 async function storeDocument(
@@ -282,11 +246,7 @@ async function storeDocument(
   ctx: ApiContext
 ) {
   const path = random(16);
-  const s3Response = await ctx.aws.fileUploads.uploadFile(
-    path,
-    "application/pdf",
-    buffer
-  );
+  const s3Response = await ctx.aws.fileUploads.uploadFile(path, "application/pdf", buffer);
 
   return await ctx.files.createFileUpload(
     {

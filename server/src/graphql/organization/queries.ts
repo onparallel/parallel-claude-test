@@ -1,10 +1,5 @@
 import { arg, nonNull, nullable, queryField } from "@nexus/schema";
-import {
-  authenticate,
-  chain,
-  or,
-  userIsSuperAdmin,
-} from "../helpers/authorize";
+import { authenticate, chain, or, userIsSuperAdmin } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
 import { contextUserBelongsToOrg } from "./authorizers";
@@ -15,10 +10,7 @@ export const organizationQueries = queryField((t) => {
     args: {
       id: nonNull(globalIdArg()),
     },
-    authorize: chain(
-      authenticate(),
-      or(contextUserBelongsToOrg("id"), userIsSuperAdmin())
-    ),
+    authorize: chain(authenticate(), or(contextUserBelongsToOrg("id"), userIsSuperAdmin())),
     resolve: async (_, args, ctx) => {
       return await ctx.organizations.loadOrg(args.id);
     },

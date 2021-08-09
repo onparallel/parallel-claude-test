@@ -36,15 +36,8 @@ export function SentReminderMessageDialog({
               id="component.sent-petition-reminder-dialog.message-sent"
               defaultMessage="Reminder sent to {recipient} on {date}"
               values={{
-                recipient: (
-                  <ContactLink isFull contact={reminder.access.contact} />
-                ),
-                date: (
-                  <DateTime
-                    value={reminder.createdAt}
-                    format={FORMATS["LLL"]}
-                  />
-                ),
+                recipient: <ContactLink isFull contact={reminder.access.contact} />,
+                date: <DateTime value={reminder.createdAt} format={FORMATS["LLL"]} />,
               }}
             />
           </Text>

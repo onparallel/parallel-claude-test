@@ -1,9 +1,5 @@
 import { JSDOM } from "jsdom";
-import {
-  addPetitionField,
-  fillPetitionField,
-  getFields,
-} from "../helpers/compose";
+import { addPetitionField, fillPetitionField, getFields } from "../helpers/compose";
 import { createRandomContact } from "../helpers/contacts";
 import { createContact } from "../helpers/contactSelect";
 import { createPetition } from "../helpers/createPetition";
@@ -71,10 +67,7 @@ createTestSession("petitions", (context) => {
       "Please, fill this information about yourself.\nKind Regards."
     );
 
-    await waitForGraphQL(
-      page,
-      (o) => o.operationName === "PetitionCompose_updatePetition"
-    );
+    await waitForGraphQL(page, (o) => o.operationName === "PetitionCompose_updatePetition");
     await page.click("#send-button");
     await page.waitForNavigation();
     expect(page.url()).toMatch(/\/app\/petitions$/);

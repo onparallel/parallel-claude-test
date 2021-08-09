@@ -14,10 +14,7 @@ export function PublicFigures(props: BoxProps) {
       }}
     >
       <Heading as="h2" size="xl" fontWeight="bold">
-        <FormattedMessage
-          id="public.figures.title"
-          defaultMessage="Figures that support us"
-        />
+        <FormattedMessage id="public.figures.title" defaultMessage="Figures that support us" />
       </Heading>
       <Center>
         <Grid
@@ -76,12 +73,7 @@ function FeatureStrong({ children }: PropsWithChildren<{}>) {
 
 function Feature({ children }: PropsWithChildren<{}>) {
   return (
-    <Box
-      padding={5}
-      textAlign="left"
-      borderRadius="lg"
-      backgroundColor="gray.75"
-    >
+    <Box padding={5} textAlign="left" borderRadius="lg" backgroundColor="gray.75">
       {children}
     </Box>
   );

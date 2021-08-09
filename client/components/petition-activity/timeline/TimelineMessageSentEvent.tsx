@@ -31,13 +31,7 @@ export function TimelineMessageSentEvent({
   }
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<EmailSentIcon />}
-          color="black"
-          backgroundColor="gray.200"
-        />
-      }
+      icon={<TimelineIcon icon={<EmailSentIcon />} color="black" backgroundColor="gray.200" />}
     >
       <Flex alignItems="center">
         <Box>
@@ -52,11 +46,7 @@ export function TimelineMessageSentEvent({
                 subject: message.emailSubject,
                 contact: <ContactLink contact={message.access.contact} />,
                 timeAgo: (
-                  <DateTime
-                    value={createdAt}
-                    format={FORMATS.LLL}
-                    useRelativeTime="always"
-                  />
+                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
               }}
             />
@@ -71,27 +61,15 @@ export function TimelineMessageSentEvent({
                 subject: message.emailSubject,
                 contact: <ContactLink contact={message.access.contact} />,
                 timeAgo: (
-                  <DateTime
-                    value={createdAt}
-                    format={FORMATS.LLL}
-                    useRelativeTime="always"
-                  />
+                  <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
               }}
             />
           )}
           <MessageEventsIndicator message={message} marginLeft={2} />
         </Box>
-        <Button
-          onClick={handleSeeMessageClick}
-          size="sm"
-          variant="outline"
-          marginLeft={4}
-        >
-          <FormattedMessage
-            id="timeline.message-sent-see-message"
-            defaultMessage="See message"
-          />
+        <Button onClick={handleSeeMessageClick} size="sm" variant="outline" marginLeft={4}>
+          <FormattedMessage id="timeline.message-sent-see-message" defaultMessage="See message" />
         </Button>
       </Flex>
     </TimelineItem>

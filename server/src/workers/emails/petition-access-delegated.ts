@@ -24,14 +24,10 @@ export async function petitionAccessDelegated(
     throw new Error(`Petition with id ${payload.petition_id} not found`);
   }
   if (!newAccess) {
-    throw new Error(
-      `Petition access with id ${payload.new_access_id} not found`
-    );
+    throw new Error(`Petition access with id ${payload.new_access_id} not found`);
   }
   if (!originalAccess) {
-    throw new Error(
-      `Petition access with id ${payload.original_access_id} not found`
-    );
+    throw new Error(`Petition access with id ${payload.original_access_id} not found`);
   }
 
   const [contact, delegator, petitionOwner] = await Promise.all([
@@ -54,10 +50,7 @@ export async function petitionAccessDelegated(
     throw new Error(`User with id ${originalAccess.granter_id} not found`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(
-    petition.org_id,
-    context
-  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
   const { html, text, subject, from } = await buildEmail(
     AccessDelegatedEmail,
@@ -65,10 +58,7 @@ export async function petitionAccessDelegated(
       fullName: fullName(contact.first_name, contact.last_name),
       senderName: fullName(delegator.first_name, delegator.last_name)!,
       senderEmail: delegator.email,
-      petitionOwnerFullName: fullName(
-        petitionOwner.first_name,
-        petitionOwner.last_name
-      )!,
+      petitionOwnerFullName: fullName(petitionOwner.first_name, petitionOwner.last_name)!,
       petitionOwnerEmail: petitionOwner.email,
       deadline: petition.deadline,
       bodyHtml: toHtml(payload.message_body),

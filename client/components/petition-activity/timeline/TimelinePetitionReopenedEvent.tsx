@@ -20,13 +20,7 @@ export function TimelinePetitionReopenedEvent({
 }: TimelinePetitionReopenedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<EditIcon />}
-          color="black"
-          backgroundColor="gray.200"
-        />
-      }
+      icon={<TimelineIcon icon={<EditIcon />} color="black" backgroundColor="gray.200" />}
     >
       <FormattedMessage
         id="timeline.petition-reopened-description"
@@ -36,11 +30,7 @@ export function TimelinePetitionReopenedEvent({
           b: (chunks: any[]) => <Text as="strong">{chunks}</Text>,
           user: <UserReference user={event.user} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

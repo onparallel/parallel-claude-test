@@ -31,12 +31,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
     });
   },
   text(
-    {
-      fields,
-      contactFullName,
-      keycode,
-      parallelUrl,
-    }: PetitionCommentsContactNotificationProps,
+    { fields, contactFullName, keycode, parallelUrl }: PetitionCommentsContactNotificationProps,
     intl: IntlShape
   ) {
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
@@ -53,8 +48,7 @@ const email: Email<PetitionCommentsContactNotificationProps> = {
 
       ${intl.formatMessage({
         id: "petition-comments-contact-notification.access-click-link",
-        defaultMessage:
-          "Follow the link below link to read and reply to the comments.",
+        defaultMessage: "Follow the link below link to read and reply to the comments.",
       })}
       ${parallelUrl}/${intl.locale}/petition/${keycode}
 

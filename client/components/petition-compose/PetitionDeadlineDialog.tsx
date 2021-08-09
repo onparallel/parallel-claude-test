@@ -1,17 +1,7 @@
 import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
-import {
-  addDays,
-  addWeeks,
-  isFuture,
-  isPast,
-  parse,
-  startOfWeek,
-} from "date-fns";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
+import { addDays, addWeeks, isFuture, isPast, parse, startOfWeek } from "date-fns";
 import { useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTimePicker } from "../common/DateTimePicker";
@@ -54,23 +44,14 @@ export function PetitionDeadlineDialog({ ...props }: DialogProps<{}, Date>) {
           defaultMessage="Select date and time"
         />
       }
-      body={
-        <DateTimePicker
-          value={date}
-          onChange={setDate}
-          suggestions={suggestions}
-        />
-      }
+      body={<DateTimePicker value={date} onChange={setDate} suggestions={suggestions} />}
       confirm={
         <Button
           colorScheme="purple"
           isDisabled={!date || isPast(date)}
           onClick={() => props.onResolve(date)}
         >
-          <FormattedMessage
-            id="petition.set-deadline"
-            defaultMessage="Set deadline"
-          />
+          <FormattedMessage id="petition.set-deadline" defaultMessage="Set deadline" />
         </Button>
       }
       {...props}

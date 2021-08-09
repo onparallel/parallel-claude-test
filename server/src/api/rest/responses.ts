@@ -28,10 +28,7 @@ interface Redirect {
   __type?: "REDIRECT";
 }
 export class RedirectResponseWrapper implements ResponseWrapper<Redirect> {
-  constructor(
-    public readonly status: number,
-    public readonly location: string
-  ) {}
+  constructor(public readonly status: number, public readonly location: string) {}
   apply(res: Response) {
     res.redirect(this.status, this.location);
   }
@@ -76,9 +73,7 @@ export interface ErrorResponseOptions {
   description: string;
 }
 
-export function ErrorResponse({
-  description,
-}: ErrorResponseOptions): JsonResponseOptions<never> {
+export function ErrorResponse({ description }: ErrorResponseOptions): JsonResponseOptions<never> {
   return {
     description,
   };
@@ -88,17 +83,13 @@ export interface NoContentResponseOptions {
   description: string;
 }
 
-export function NoContentResponse({
-  description,
-}: NoContentResponseOptions): RestResponse<void> {
+export function NoContentResponse({ description }: NoContentResponseOptions): RestResponse<void> {
   return {
     description,
   };
 }
 
-export function SuccessResponse<T = void>(
-  schema?: JsonSchemaFor<T>
-): RestResponse<T> {
+export function SuccessResponse<T = void>(schema?: JsonSchemaFor<T>): RestResponse<T> {
   return schema
     ? JsonResponse({
         description: "Successful operation",

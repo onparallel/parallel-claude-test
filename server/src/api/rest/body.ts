@@ -8,10 +8,7 @@ export interface JsonBodyOptions {
   required?: boolean;
 }
 
-export function JsonBody<T>(
-  schema: JsonSchemaFor<T>,
-  options?: JsonBodyOptions
-): RestBody<T> {
+export function JsonBody<T>(schema: JsonSchemaFor<T>, options?: JsonBodyOptions): RestBody<T> {
   const { description, required = true } = options ?? {};
   const validate = buildValidateSchema(schema);
   return {
@@ -25,17 +22,13 @@ export function JsonBody<T>(
     validate: (value: any) => {
       if (!isDefined(value)) {
         if (required) {
-          throw new InvalidRequestBodyError(
-            "Body is missing but it is required"
-          );
+          throw new InvalidRequestBodyError("Body is missing but it is required");
         }
       } else {
         const valid = validate(value);
         if (!valid) {
           const error = validate.errors![0];
-          throw new InvalidRequestBodyError(
-            `Property at ${error.instancePath} ${error.message}`
-          );
+          throw new InvalidRequestBodyError(`Property at ${error.instancePath} ${error.message}`);
         }
       }
     },

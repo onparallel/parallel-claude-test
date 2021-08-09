@@ -1,11 +1,4 @@
-import {
-  arg,
-  nonNull,
-  list,
-  objectType,
-  queryField,
-  stringArg,
-} from "@nexus/schema";
+import { arg, nonNull, list, objectType, queryField, stringArg } from "@nexus/schema";
 import { PetitionLocale } from "../../api/public/__types";
 import { fullName } from "../../util/fullName";
 import { toGlobalId } from "../../util/globalId";
@@ -22,9 +15,7 @@ export const LandingTemplate = objectType({
     t.nullable.string("name", { resolve: (o) => o.name });
     t.nullable.string("descriptionHtml", {
       resolve: (o) => {
-        return o.template_description
-          ? toHtml(safeJsonParse(o.template_description))
-          : null;
+        return o.template_description ? toHtml(safeJsonParse(o.template_description)) : null;
       },
     });
     t.string("slug", {
@@ -76,9 +67,7 @@ export const LandingTemplate = objectType({
     t.nullable.string("imageUrl", {
       resolve: async (o, _, ctx) => {
         if (o.public_metadata.image_public_file_id) {
-          const file = await ctx.files.loadPublicFile(
-            o.public_metadata.image_public_file_id
-          );
+          const file = await ctx.files.loadPublicFile(o.public_metadata.image_public_file_id);
           return `${ctx.config.misc.uploadsUrl}/${file!.path}`;
         }
         return null;

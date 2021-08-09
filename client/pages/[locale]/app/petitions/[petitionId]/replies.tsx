@@ -10,20 +10,13 @@ import {
 } from "@parallel/chakra/icons";
 import { Card, GenericCardHeader } from "@parallel/components/common/Card";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-  withDialogs,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
 import { Divider } from "@parallel/components/common/Divider";
 import { IconButtonWithTooltip } from "@parallel/components/common/IconButtonWithTooltip";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { RichTextEditorValue } from "@parallel/components/common/RichTextEditor";
 import { ShareButton } from "@parallel/components/common/ShareButton";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import { PetitionContents } from "@parallel/components/petition-common/PetitionContents";
@@ -81,11 +74,7 @@ import {
 import { useUpdateIsReadNotification } from "@parallel/utils/mutations/useUpdateIsReadNotification";
 import { openNewWindow } from "@parallel/utils/openNewWindow";
 import { withError } from "@parallel/utils/promises/withError";
-import {
-  string,
-  useQueryState,
-  useQueryStateSlice,
-} from "@parallel/utils/queryState";
+import { string, useQueryState, useQueryStateSlice } from "@parallel/utils/queryState";
 import { Maybe, unMaybeArray, UnwrapPromise } from "@parallel/utils/types";
 import { useHighlightElement } from "@parallel/utils/useHighlightElement";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
@@ -96,9 +85,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { pick } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
-type PetitionRepliesProps = UnwrapPromise<
-  ReturnType<typeof PetitionReplies.getInitialProps>
->;
+type PetitionRepliesProps = UnwrapPromise<ReturnType<typeof PetitionReplies.getInitialProps>>;
 
 const QUERY_STATE = {
   comments: string(),
@@ -135,9 +122,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     setQueryState,
     "comments"
   );
-  const activeField = activeFieldId
-    ? petition.fields.find((f) => f.id === activeFieldId)
-    : null;
+  const activeField = activeFieldId ? petition.fields.find((f) => f.id === activeFieldId) : null;
   const fieldRefs = useMultipleRefs<HTMLElement>();
   const signaturesRef = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -175,16 +160,11 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const [state, wrapper] = usePetitionState();
   const [updatePetition] = usePetitionReplies_updatePetitionMutation();
-  const [validatePetitionFields] =
-    usePetitionReplies_validatePetitionFieldsMutation();
+  const [validatePetitionFields] = usePetitionReplies_validatePetitionFieldsMutation();
   const downloadReplyFile = useDownloadReplyFile();
 
   const handleValidateToggle = useCallback(
-    async (
-      fieldIds: string[],
-      value: boolean,
-      validateRepliesWith?: PetitionFieldReplyStatus
-    ) => {
+    async (fieldIds: string[], value: boolean, validateRepliesWith?: PetitionFieldReplyStatus) => {
       await validatePetitionFields({
         variables: {
           petitionId: petition.id,
@@ -209,9 +189,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                 replies: field.replies.map((reply) => ({
                   ...pick(reply, ["__typename", "id"]),
                   status:
-                    reply.status === "PENDING"
-                      ? validateRepliesWith ?? reply.status
-                      : reply.status,
+                    reply.status === "PENDING" ? validateRepliesWith ?? reply.status : reply.status,
                 })),
               };
             }),
@@ -222,8 +200,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     [petition]
   );
 
-  const updatePetitionFieldRepliesStatus =
-    useUpdatePetitionFieldRepliesStatus();
+  const updatePetitionFieldRepliesStatus = useUpdatePetitionFieldRepliesStatus();
   async function handleUpdateRepliesStatus(
     petitionFieldId: string,
     petitionFieldReplyIds: string[],
@@ -252,8 +229,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       status === "APPROVED"
         ? field.validated ||
             field.replies.every(
-              (r) =>
-                petitionFieldReplyIds.includes(r.id) || r.status !== "PENDING"
+              (r) => petitionFieldReplyIds.includes(r.id) || r.status !== "PENDING"
             )
         : field.validated
     );
@@ -266,10 +242,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     [petitionId]
   );
 
-  const handleAction: PetitionRepliesFieldProps["onAction"] = async function (
-    action,
-    reply
-  ) {
+  const handleAction: PetitionRepliesFieldProps["onAction"] = async function (action, reply) {
     switch (action) {
       case "DOWNLOAD_FILE":
       case "PREVIEW_FILE":
@@ -283,9 +256,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const showExportRepliesProgressDialog = useExportRepliesProgressDialog();
   const handleDownloadAllClick = useCallback(async () => {
     const hasFiles =
-      petition.fields.some(
-        (field) => field.type === "FILE_UPLOAD" && field.replies.length > 0
-      ) || petition.currentSignatureRequest?.status === "COMPLETED";
+      petition.fields.some((field) => field.type === "FILE_UPLOAD" && field.replies.length > 0) ||
+      petition.currentSignatureRequest?.status === "COMPLETED";
     try {
       if (hasFiles) {
         const res = await showExportRepliesDialog({
@@ -317,8 +289,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     (f) => (!f.isReadOnly && f.replies.length > 0) || f.comments.length > 0
   );
 
-  const [createPetitionFieldComment] =
-    usePetitionReplies_createPetitionFieldCommentMutation();
+  const [createPetitionFieldComment] = usePetitionReplies_createPetitionFieldCommentMutation();
   async function handleAddComment(content: string, isInternal?: boolean) {
     await createPetitionFieldComment({
       variables: {
@@ -331,12 +302,8 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     });
   }
 
-  const [updatePetitionFieldComment] =
-    usePetitionReplies_updatePetitionFieldCommentMutation();
-  async function handleUpdateComment(
-    petitionFieldCommentId: string,
-    content: string
-  ) {
+  const [updatePetitionFieldComment] = usePetitionReplies_updatePetitionFieldCommentMutation();
+  async function handleUpdateComment(petitionFieldCommentId: string, content: string) {
     await updatePetitionFieldComment({
       variables: {
         petitionId,
@@ -348,8 +315,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     });
   }
 
-  const [deletePetitionFieldComment] =
-    usePetitionReplies_deletePetitionFieldCommentMutation();
+  const [deletePetitionFieldComment] = usePetitionReplies_deletePetitionFieldCommentMutation();
   async function handleDeleteComment(petitionFieldCommentId: string) {
     await deletePetitionFieldComment({
       variables: {
@@ -381,8 +347,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
   const showClosePetitionDialog = useClosePetitionDialog();
   const [sendPetitionClosedNotification] =
     usePetitionReplies_sendPetitionClosedNotificationMutation();
-  const petitionAlreadyNotifiedDialog =
-    useConfirmResendCompletedNotificationDialog();
+  const petitionAlreadyNotifiedDialog = useConfirmResendCompletedNotificationDialog();
   const handleFinishPetition = useCallback(
     async ({ requiredMessage }: { requiredMessage: boolean }) => {
       const petitionClosedNotificationToast = {
@@ -427,8 +392,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
           throw error;
         }
         if (
-          error?.graphQLErrors?.[0]?.extensions.code ===
-          "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
+          error?.graphQLErrors?.[0]?.extensions.code === "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
         ) {
           await petitionAlreadyNotifiedDialog({});
           await sendPetitionClosedNotification({
@@ -449,20 +413,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
 
   const showSolveUnreviewedRepliesDialog = useSolveUnreviewedRepliesDialog();
 
-  const showConfirmCancelOngoingSignature = useDialog(
-    ConfirmCancelOngoingSignature
-  );
+  const showConfirmCancelOngoingSignature = useDialog(ConfirmCancelOngoingSignature);
 
-  const [cancelSignatureRequest] =
-    usePetitionSettings_cancelPetitionSignatureRequestMutation();
+  const [cancelSignatureRequest] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
 
   const handleClosePetition = useCallback(async () => {
     try {
       const hasPendingSignature =
         (petition.currentSignatureRequest &&
-          ["ENQUEUED", "PROCESSING"].includes(
-            petition.currentSignatureRequest.status
-          )) ??
+          ["ENQUEUED", "PROCESSING"].includes(petition.currentSignatureRequest.status)) ??
         false;
       if (hasPendingSignature || petition.signatureConfig) {
         await showConfirmCancelOngoingSignature({});
@@ -485,9 +444,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       const hasUnreviewedReplies = petition.fields.some((f) =>
         f.replies.some((r) => r.status === "PENDING")
       );
-      const option = hasUnreviewedReplies
-        ? await showSolveUnreviewedRepliesDialog({})
-        : "APPROVE";
+      const option = hasUnreviewedReplies ? await showSolveUnreviewedRepliesDialog({}) : "APPROVE";
 
       await handleFinishPetition({ requiredMessage: false });
 
@@ -497,12 +454,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         option === "APPROVE" ? "APPROVED" : "REJECTED"
       );
     } catch {}
-  }, [
-    petition,
-    handleValidateToggle,
-    handleFinishPetition,
-    cancelSignatureRequest,
-  ]);
+  }, [petition, handleValidateToggle, handleFinishPetition, cancelSignatureRequest]);
 
   const showPetitionSharingDialog = usePetitionSharingDialog();
   const handlePetitionSharingClick = async function () {
@@ -514,8 +466,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
     } catch {}
   };
 
-  const [filter, setFilter] =
-    useState<PetitionFieldFilter>(defaultFieldsFilter);
+  const [filter, setFilter] = useState<PetitionFieldFilter>(defaultFieldsFilter);
 
   const petitionSignatureStatus = usePetitionCurrentSignatureStatus(petition);
 
@@ -534,11 +485,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
       overflow="visible"
       headerActions={
         <Box display={{ base: "none", lg: "block" }}>
-          <ShareButton
-            petition={petition}
-            userId={me.id}
-            onClick={handlePetitionSharingClick}
-          />
+          <ShareButton petition={petition} userId={me.id} onClick={handlePetitionSharingClick} />
         </Box>
       }
     >
@@ -615,25 +562,15 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                   onMarkAsUnread={handleMarkAsUnread}
                 />
               ) : (
-                <Card
-                  display="flex"
-                  flexDirection="column"
-                  maxHeight={`calc(100vh - 153px)`}
-                >
+                <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 153px)`}>
                   <GenericCardHeader
                     rightAction={
-                      <PetitionRepliesFilterButton
-                        value={filter}
-                        onChange={setFilter}
-                      />
+                      <PetitionRepliesFilterButton value={filter} onChange={setFilter} />
                     }
                   >
                     <Text as="span" display="flex" alignItems="center">
                       <ListIcon fontSize="18px" marginRight={2} />
-                      <FormattedMessage
-                        id="petition.contents"
-                        defaultMessage="Contents"
-                      />
+                      <FormattedMessage id="petition.contents" defaultMessage="Contents" />
                     </Text>
                   </GenericCardHeader>
                   <Box overflow="auto">
@@ -645,9 +582,7 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
                       onFieldClick={handlePetitionContentsFieldClick}
                       fieldIndicators={PetitionContentsIndicators}
                       signatureStatus={petitionSignatureStatus}
-                      onSignatureStatusClick={
-                        handlePetitionContentsSignatureClick
-                      }
+                      onSignatureStatusClick={handlePetitionContentsSignatureClick}
                     />
                   </Box>
                 </Card>
@@ -657,38 +592,32 @@ function PetitionReplies({ petitionId }: PetitionRepliesProps) {
         >
           <Box padding={4}>
             <Stack flex="2" spacing={4} id="petition-replies">
-              {filterPetitionFields(
-                petition.fields,
-                indices,
-                fieldVisibility ?? [],
-                filter
-              ).map((x, index) =>
-                x.type === "FIELD" ? (
-                  <PetitionRepliesField
-                    ref={fieldRefs[x.field.id]}
-                    id={`field-${x.field.id}`}
-                    key={x.field.id}
-                    petitionId={petition.id}
-                    field={x.field}
-                    isVisible={true}
-                    fieldIndex={x.fieldIndex}
-                    onValidateToggle={() =>
-                      handleValidateToggle([x.field.id], !x.field.validated)
-                    }
-                    onAction={handleAction}
-                    isActive={activeFieldId === x.field.id}
-                    onToggleComments={() =>
-                      setActiveFieldId(
-                        activeFieldId === x.field.id ? null : x.field.id
-                      )
-                    }
-                    onUpdateReplyStatus={(replyId, status) =>
-                      handleUpdateRepliesStatus(x.field.id, [replyId], status)
-                    }
-                  />
-                ) : (
-                  <PetitionRepliesFilteredFields key={index} count={x.count} />
-                )
+              {filterPetitionFields(petition.fields, indices, fieldVisibility ?? [], filter).map(
+                (x, index) =>
+                  x.type === "FIELD" ? (
+                    <PetitionRepliesField
+                      ref={fieldRefs[x.field.id]}
+                      id={`field-${x.field.id}`}
+                      key={x.field.id}
+                      petitionId={petition.id}
+                      field={x.field}
+                      isVisible={true}
+                      fieldIndex={x.fieldIndex}
+                      onValidateToggle={() =>
+                        handleValidateToggle([x.field.id], !x.field.validated)
+                      }
+                      onAction={handleAction}
+                      isActive={activeFieldId === x.field.id}
+                      onToggleComments={() =>
+                        setActiveFieldId(activeFieldId === x.field.id ? null : x.field.id)
+                      }
+                      onUpdateReplyStatus={(replyId, status) =>
+                        handleUpdateRepliesStatus(x.field.id, [replyId], status)
+                      }
+                    />
+                  ) : (
+                    <PetitionRepliesFilteredFields key={index} count={x.count} />
+                  )
               )}
             </Stack>
             {me.hasPetitionSignature ? (
@@ -725,8 +654,7 @@ PetitionReplies.fragments = {
           status
         }
         ...PetitionSignaturesCard_Petition @include(if: $hasPetitionSignature)
-        ...usePetitionCurrentSignatureStatus_Petition
-          @include(if: $hasPetitionSignature)
+        ...usePetitionCurrentSignatureStatus_Petition @include(if: $hasPetitionSignature)
       }
       ${PetitionLayout.fragments.PetitionBase}
       ${this.PetitionField}
@@ -774,10 +702,7 @@ PetitionReplies.fragments = {
 
 PetitionReplies.mutations = [
   gql`
-    mutation PetitionReplies_updatePetition(
-      $petitionId: GID!
-      $data: UpdatePetitionInput!
-    ) {
+    mutation PetitionReplies_updatePetition($petitionId: GID!, $data: UpdatePetitionInput!) {
       updatePetition(petitionId: $petitionId, data: $data) {
         ...PetitionLayout_PetitionBase
       }
@@ -818,11 +743,7 @@ PetitionReplies.mutations = [
       $replyId: GID!
       $preview: Boolean
     ) {
-      fileUploadReplyDownloadLink(
-        petitionId: $petitionId
-        replyId: $replyId
-        preview: $preview
-      ) {
+      fileUploadReplyDownloadLink(petitionId: $petitionId, replyId: $replyId, preview: $preview) {
         result
         url
       }
@@ -1025,21 +946,12 @@ function ConfirmCancelOngoingSignature(props: DialogProps<{}, void>) {
   );
 }
 
-function PetitionContentsIndicators({
-  field,
-}: {
-  field: PetitionReplies_PetitionFieldFragment;
-}) {
+function PetitionContentsIndicators({ field }: { field: PetitionReplies_PetitionFieldFragment }) {
   const intl = useIntl();
   return (
     <>
       {field.comments.length ? (
-        <Stack
-          as="span"
-          direction="row-reverse"
-          display="inline-flex"
-          alignItems="center"
-        >
+        <Stack as="span" direction="row-reverse" display="inline-flex" alignItems="center">
           <Stack
             as="span"
             direction="row-reverse"
@@ -1065,18 +977,13 @@ function PetitionContentsIndicators({
               {intl.formatNumber(field.comments.length)}
             </Text>
           </Stack>
-          <RecipientViewCommentsBadge
-            hasUnreadComments={field.comments.some((c) => c.isUnread)}
-          />
+          <RecipientViewCommentsBadge hasUnreadComments={field.comments.some((c) => c.isUnread)} />
         </Stack>
       ) : null}
     </>
   );
 }
-PetitionReplies.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+PetitionReplies.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const {
     data: { me },
   } = await fetchQuery<PetitionRepliesUserQuery>(

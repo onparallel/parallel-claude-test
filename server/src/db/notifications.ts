@@ -4,9 +4,7 @@ import {
   PetitionUserNotificationType,
 } from "./__types";
 
-export type PetitionUserNotificationPayload<
-  TType extends PetitionUserNotificationType
-> = {
+export type PetitionUserNotificationPayload<TType extends PetitionUserNotificationType> = {
   COMMENT_CREATED: {
     petition_field_id: number;
     petition_field_comment_id: number;
@@ -42,33 +40,25 @@ export type PetitionUserNotificationPayload<
 type GenericPetitionUserNotification<
   TType extends PetitionUserNotificationType,
   IsCreate extends boolean = false
-> = Omit<
-  DbPetitionUserNotification,
-  "type" | "data" | If<IsCreate, "id" | "created_at">
-> & {
+> = Omit<DbPetitionUserNotification, "type" | "data" | If<IsCreate, "id" | "created_at">> & {
   type: TType;
   data: PetitionUserNotificationPayload<TType>;
 };
 
 export type CommentCreatedUserNotification<IsCreate extends boolean = false> =
   GenericPetitionUserNotification<"COMMENT_CREATED", IsCreate>;
-export type MessageEmailBouncedUserNotification<
-  IsCreate extends boolean = false
-> = GenericPetitionUserNotification<"MESSAGE_EMAIL_BOUNCED", IsCreate>;
-export type ReminderEmailBouncedUserNotification<
-  IsCreate extends boolean = false
-> = GenericPetitionUserNotification<"REMINDER_EMAIL_BOUNCED", IsCreate>;
-export type PetitionCompletedUserNotification<
-  IsCreate extends boolean = false
-> = GenericPetitionUserNotification<"PETITION_COMPLETED", IsCreate>;
+export type MessageEmailBouncedUserNotification<IsCreate extends boolean = false> =
+  GenericPetitionUserNotification<"MESSAGE_EMAIL_BOUNCED", IsCreate>;
+export type ReminderEmailBouncedUserNotification<IsCreate extends boolean = false> =
+  GenericPetitionUserNotification<"REMINDER_EMAIL_BOUNCED", IsCreate>;
+export type PetitionCompletedUserNotification<IsCreate extends boolean = false> =
+  GenericPetitionUserNotification<"PETITION_COMPLETED", IsCreate>;
 export type PetitionSharedUserNotification<IsCreate extends boolean = false> =
   GenericPetitionUserNotification<"PETITION_SHARED", IsCreate>;
-export type SignatureCancelledUserNotification<
-  IsCreate extends boolean = false
-> = GenericPetitionUserNotification<"SIGNATURE_CANCELLED", IsCreate>;
-export type SignatureCompletedUserNotification<
-  IsCreate extends boolean = false
-> = GenericPetitionUserNotification<"SIGNATURE_COMPLETED", IsCreate>;
+export type SignatureCancelledUserNotification<IsCreate extends boolean = false> =
+  GenericPetitionUserNotification<"SIGNATURE_CANCELLED", IsCreate>;
+export type SignatureCompletedUserNotification<IsCreate extends boolean = false> =
+  GenericPetitionUserNotification<"SIGNATURE_COMPLETED", IsCreate>;
 export type RemindersOptOutNotification<IsCreate extends boolean = false> =
   GenericPetitionUserNotification<"REMINDERS_OPT_OUT", IsCreate>;
 

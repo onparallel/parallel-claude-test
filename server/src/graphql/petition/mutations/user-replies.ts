@@ -126,11 +126,7 @@ export const createFileUploadReply = mutationField("createFileUploadReply", {
     const { createReadStream, filename, mimetype } = await args.file;
     const key = random(16);
 
-    const res = await ctx.aws.fileUploads.uploadFile(
-      key,
-      mimetype,
-      createReadStream()
-    );
+    const res = await ctx.aws.fileUploads.uploadFile(key, mimetype, createReadStream());
 
     const file = await ctx.files.createFileUpload(
       {
@@ -170,18 +166,13 @@ export const deletePetitionReply = mutationField("deletePetitionReply", {
     const reply = (await ctx.petitions.loadFieldReply(args.replyId))!;
 
     if (reply.type === "FILE_UPLOAD") {
-      const file = await ctx.files.loadFileUpload(
-        reply.content["file_upload_id"]
-      );
+      const file = await ctx.files.loadFileUpload(reply.content["file_upload_id"]);
       await Promise.all([
         ctx.files.deleteFileUpload(file!.id, `User:${ctx.user!.id}`),
         ctx.aws.fileUploads.deleteFile(file!.path),
       ]);
     }
-    await ctx.petitions.deletePetitionFieldReply(
-      args.replyId,
-      `User:${ctx.user!.id}`
-    );
+    await ctx.petitions.deletePetitionFieldReply(args.replyId, `User:${ctx.user!.id}`);
     return RESULT.SUCCESS;
   },
 });

@@ -135,10 +135,7 @@ export function getFirstDynamicSelectValue(
     if (!Array.isArray(values[0])) {
       throw new Error("Invalid level");
     }
-    return getFirstDynamicSelectValue(
-      (values as DynamicSelectOption[])[0][1],
-      level - 1
-    );
+    return getFirstDynamicSelectValue((values as DynamicSelectOption[])[0][1], level - 1);
   }
 }
 
@@ -159,12 +156,7 @@ export function getMinMaxCheckboxLimit({
     max = valuesLength;
   }
 
-  min =
-    min >= max
-      ? max >= 2 - Number(optional)
-        ? max - 1
-        : Number(!optional)
-      : min;
+  min = min >= max ? (max >= 2 - Number(optional) ? max - 1 : Number(!optional)) : min;
 
   return [min, max];
 }

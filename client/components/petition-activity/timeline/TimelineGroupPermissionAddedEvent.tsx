@@ -21,11 +21,7 @@ export function TimelineGroupPermissionAddedEvent({
   return (
     <TimelineItem
       icon={
-        <TimelineIcon
-          icon={<UserGroupArrowIcon />}
-          color="white"
-          backgroundColor="purple.500"
-        />
+        <TimelineIcon icon={<UserGroupArrowIcon />} color="white" backgroundColor="purple.500" />
       }
     >
       <FormattedMessage
@@ -43,11 +39,7 @@ export function TimelineGroupPermissionAddedEvent({
             />
           ),
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

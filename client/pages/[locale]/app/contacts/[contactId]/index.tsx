@@ -22,10 +22,7 @@ import { Spacer } from "@parallel/components/common/Spacer";
 import { Table, TableColumn } from "@parallel/components/common/Table";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import {
   ContactQuery,
@@ -134,26 +131,15 @@ function Contact({ contactId }: ContactProps) {
                     defaultMessage="First name"
                   />
                 </FormLabel>
-                <ToggleInput
-                  {...register("firstName")}
-                  isEditing={isEditing}
-                  isDisabled={loading}
-                >
+                <ToggleInput {...register("firstName")} isEditing={isEditing} isDisabled={loading}>
                   {contact!.firstName}
                 </ToggleInput>
               </FormControl>
               <FormControl id="contact-last-name">
                 <FormLabel fontWeight="bold">
-                  <FormattedMessage
-                    id="generic.forms.last-name-label"
-                    defaultMessage="Last name"
-                  />
+                  <FormattedMessage id="generic.forms.last-name-label" defaultMessage="Last name" />
                 </FormLabel>
-                <ToggleInput
-                  {...register("lastName")}
-                  isEditing={isEditing}
-                  isDisabled={loading}
-                >
+                <ToggleInput {...register("lastName")} isEditing={isEditing} isDisabled={loading}>
                   {contact!.lastName}
                 </ToggleInput>
               </FormControl>
@@ -172,10 +158,7 @@ function Contact({ contactId }: ContactProps) {
                     marginRight={{ base: 0, sm: 2 }}
                     marginBottom={{ base: 2, sm: 0 }}
                   >
-                    <FormattedMessage
-                      id="generic.cancel-save-changes"
-                      defaultMessage="Cancel"
-                    />
+                    <FormattedMessage id="generic.cancel-save-changes" defaultMessage="Cancel" />
                   </Button>
                   <Button
                     colorScheme="purple"
@@ -186,10 +169,7 @@ function Contact({ contactId }: ContactProps) {
                       defaultMessage: "Saving...",
                     })}
                   >
-                    <FormattedMessage
-                      id="generic.save-changes"
-                      defaultMessage="Save"
-                    />
+                    <FormattedMessage id="generic.save-changes" defaultMessage="Save" />
                   </Button>
                 </>
               ) : (
@@ -198,10 +178,7 @@ function Contact({ contactId }: ContactProps) {
                   colorScheme="gray"
                   onClick={() => setIsEditing(true)}
                 >
-                  <FormattedMessage
-                    id="contact.edit-details-button"
-                    defaultMessage="Edit"
-                  />
+                  <FormattedMessage id="contact.edit-details-button" defaultMessage="Edit" />
                 </Button>
               )}
             </Flex>
@@ -292,10 +269,7 @@ function useContactPetitionAccessesColumns() {
           cellProps: { padding: 0 },
           CellContent: ({ row: { petition }, context }) => (
             <Flex alignItems="center" paddingRight="2">
-              <PetitionSignatureCellContent
-                petition={petition!}
-                user={context!.user}
-              />
+              <PetitionSignatureCellContent petition={petition!} user={context!.user} />
             </Flex>
           ),
         },
@@ -338,10 +312,7 @@ function useContactPetitionAccessesColumns() {
             />
           ),
         },
-      ] as TableColumn<
-        PetitionAccessSelection,
-        { user: Contact_UserFragment }
-      >[],
+      ] as TableColumn<PetitionAccessSelection, { user: Contact_UserFragment }>[],
     [intl.locale]
   );
 }
@@ -435,35 +406,30 @@ interface ToggleInputProps extends InputProps {
   isEditing: boolean;
 }
 
-const ToggleInput = chakraForwardRef<"input", ToggleInputProps>(
-  function ToggleInput({ isEditing, children, ...props }, ref) {
-    return isEditing ? (
-      <Input ref={ref} {...props} />
-    ) : children === null ? (
-      <Text paddingLeft={4} height="40px" lineHeight="40px" textStyle="hint">
-        <FormattedMessage
-          id="generic.not-specified"
-          defaultMessage="Not specified"
-        />
-      </Text>
-    ) : (
-      <Box
-        height="40px"
-        display="flex"
-        borderLeft="1px solid transparent"
-        paddingLeft={4}
-        alignItems="center"
-      >
-        {children}
-      </Box>
-    );
-  }
-);
+const ToggleInput = chakraForwardRef<"input", ToggleInputProps>(function ToggleInput(
+  { isEditing, children, ...props },
+  ref
+) {
+  return isEditing ? (
+    <Input ref={ref} {...props} />
+  ) : children === null ? (
+    <Text paddingLeft={4} height="40px" lineHeight="40px" textStyle="hint">
+      <FormattedMessage id="generic.not-specified" defaultMessage="Not specified" />
+    </Text>
+  ) : (
+    <Box
+      height="40px"
+      display="flex"
+      borderLeft="1px solid transparent"
+      paddingLeft={4}
+      alignItems="center"
+    >
+      {children}
+    </Box>
+  );
+});
 
-Contact.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+Contact.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const {
     data: { me },
   } = await fetchQuery<ContactUserQuery>(gql`

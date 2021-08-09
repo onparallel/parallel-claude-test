@@ -11,12 +11,7 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  CheckIcon,
-  CloseIcon,
-  DeleteIcon,
-  DownloadIcon,
-} from "@parallel/chakra/icons";
+import { CheckIcon, CloseIcon, DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import { DateTime } from "@parallel/components/common/DateTime";
 import { Dropzone } from "@parallel/components/common/Dropzone";
 import { FileIcon } from "@parallel/components/common/FileIcon";
@@ -63,9 +58,7 @@ export function RecipientViewPetitionFieldFileUpload({
 }: RecipientViewPetitionFieldFileUploadProps) {
   const uploads = useRef<Record<string, XMLHttpRequest>>({});
 
-  const [isDeletingReply, setIsDeletingReply] = useState<
-    Record<string, boolean>
-  >({});
+  const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
   const deletePetitionReply = useDeletePetitionReply();
   const handleDeletePetitionReply = useCallback(
@@ -225,11 +218,7 @@ export function RecipientViewPetitionFieldReplyFileUpload({
           </Center>
         ) : (
           <Text fontSize="xs">
-            <DateTime
-              value={reply.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime
-            />
+            <DateTime value={reply.createdAt} format={FORMATS.LLL} useRelativeTime />
           </Text>
         )}
       </Box>
@@ -316,8 +305,7 @@ function PetitionFieldFileUploadDropzone({
         }
       })
     : undefined;
-  const _isDisabled =
-    isDisabled || (!field.multiple && field.replies.length > 0);
+  const _isDisabled = isDisabled || (!field.multiple && field.replies.length > 0);
   return (
     <Dropzone
       as={Center}
@@ -383,11 +371,7 @@ const _publicFileUploadReplyDownloadLink = gql`
     $replyId: GID!
     $preview: Boolean
   ) {
-    publicFileUploadReplyDownloadLink(
-      keycode: $keycode
-      replyId: $replyId
-      preview: $preview
-    ) {
+    publicFileUploadReplyDownloadLink(keycode: $keycode, replyId: $replyId, preview: $preview) {
       result
       url
     }

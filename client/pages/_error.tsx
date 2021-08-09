@@ -17,11 +17,7 @@ export default function CustomError({
   errorCode,
   hasGetInitialPropsRun,
 }: UnwrapPromise<ReturnType<typeof CustomError.getInitialProps>>) {
-  if (
-    !hasGetInitialPropsRun &&
-    err &&
-    !SENTRY_WHITELISTED_ERRORS.includes(errorCode)
-  ) {
+  if (!hasGetInitialPropsRun && err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode)) {
     Sentry.captureException(err);
   }
   return errorCode === "PUBLIC_PETITION_NOT_AVAILABLE" ? (
@@ -44,10 +40,7 @@ export default function CustomError({
   ) : errorCode === "FORBIDDEN" ? (
     <ErrorPage
       header={
-        <FormattedMessage
-          id="error.forbidden-access.header"
-          defaultMessage="Access forbidden"
-        />
+        <FormattedMessage id="error.forbidden-access.header" defaultMessage="Access forbidden" />
       }
       imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/undraw_cancel.svg`}
     >
@@ -74,9 +67,7 @@ export default function CustomError({
           defaultMessage="Please try again later and if the error persists <a>reach out to support</a> for help."
           values={{
             a: (chunks: any[]) => (
-              <NormalLink href={`mailto:support@onparallel.com`}>
-                {chunks}
-              </NormalLink>
+              <NormalLink href={`mailto:support@onparallel.com`}>{chunks}</NormalLink>
             ),
           }}
         />
@@ -86,13 +77,10 @@ export default function CustomError({
 }
 
 CustomError.getInitialProps = async ({ res, err, asPath }: NextPageContext) => {
-  const errorCode =
-    (err as any)?.graphQLErrors?.[0]?.extensions.code ?? (err as any)?.message;
+  const errorCode = (err as any)?.graphQLErrors?.[0]?.extensions.code ?? (err as any)?.message;
 
   if (!err || (err && !SENTRY_WHITELISTED_ERRORS.includes(errorCode))) {
-    Sentry.captureException(
-      err ?? `_error.js getInitialProps missing data at path: ${asPath}`
-    );
+    Sentry.captureException(err ?? `_error.js getInitialProps missing data at path: ${asPath}`);
     await Sentry.flush(2000);
   }
 

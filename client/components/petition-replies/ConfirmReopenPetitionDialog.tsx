@@ -1,9 +1,6 @@
 import { Button, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { FormattedMessage } from "react-intl";
 
 export function ConfirmReopenPetitionDialog(props: DialogProps) {
@@ -11,10 +8,7 @@ export function ConfirmReopenPetitionDialog(props: DialogProps) {
     <ConfirmDialog
       header={
         <Text>
-          <FormattedMessage
-            id="petition.reopen.dialog-heading"
-            defaultMessage="Reopen petition?"
-          />
+          <FormattedMessage id="petition.reopen.dialog-heading" defaultMessage="Reopen petition?" />
         </Text>
       }
       body={
@@ -29,10 +23,7 @@ export function ConfirmReopenPetitionDialog(props: DialogProps) {
       }
       confirm={
         <Button colorScheme="purple" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="petition.reopen.confirm"
-            defaultMessage="Yes, reopen"
-          />
+          <FormattedMessage id="petition.reopen.confirm" defaultMessage="Yes, reopen" />
         </Button>
       }
       {...props}

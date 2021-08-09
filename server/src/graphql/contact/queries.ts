@@ -43,9 +43,7 @@ export const contactQueries = queryField((t) => {
             case "createdAt":
               return [{ column: "created_at", order }];
             default:
-              throw new Error(
-                `Unhandled sorting field ${field} for Query.contacts`
-              );
+              throw new Error(`Unhandled sorting field ${field} for Query.contacts`);
           }
         }),
       });

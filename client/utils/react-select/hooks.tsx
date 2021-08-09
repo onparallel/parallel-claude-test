@@ -1,11 +1,4 @@
-import {
-  Box,
-  CloseButton,
-  Flex,
-  Text,
-  useFormControl,
-  useTheme,
-} from "@chakra-ui/react";
+import { Box, CloseButton, Flex, Text, useFormControl, useTheme } from "@chakra-ui/react";
 import { ChevronDownIcon, CloseIcon } from "@parallel/chakra/icons";
 import { useRehydrated } from "@parallel/utils/useRehydrated";
 import { DependencyList, useMemo } from "react";
@@ -102,11 +95,7 @@ export function useReactSelectProps<
   const intl = useIntl();
   const { colors, radii, sizes, fontSizes } = useTheme();
 
-  const {
-    id: inputId,
-    "aria-invalid": isInvalid,
-    disabled: isDisabled,
-  } = useFormControl(props);
+  const { id: inputId, "aria-invalid": isInvalid, disabled: isDisabled } = useFormControl(props);
 
   const labels = useMemo(
     () => ({
@@ -169,10 +158,7 @@ export function useReactSelectProps<
         ),
         NoOptionsMessage: () => (
           <Text as="div" textStyle="hint" textAlign="center" paddingY={2}>
-            <FormattedMessage
-              id="component.react-select.no-options"
-              defaultMessage="No options"
-            />
+            <FormattedMessage id="component.react-select.no-options" defaultMessage="No options" />
           </Text>
         ),
         MultiValueRemove: ({ innerProps, ...props }) => {
@@ -195,10 +181,7 @@ export function useReactSelectProps<
         },
         LoadingMessage: () => (
           <Text as="div" color="gray.400" textAlign="center" paddingY={2}>
-            <FormattedMessage
-              id="component.react-select.loading"
-              defaultMessage="Loading..."
-            />
+            <FormattedMessage id="component.react-select.loading" defaultMessage="Loading..." />
           </Text>
         ),
         Option: ({ children, ...props }) => (
@@ -229,11 +212,7 @@ export function useReactSelectProps<
             ...styles,
             alignItems: "stretch",
             opacity: isDisabled ? 0.4 : 1,
-            borderColor: isInvalid
-              ? colors.red[500]
-              : isFocused
-              ? colors.blue[500]
-              : "inherit",
+            borderColor: isInvalid ? colors.red[500] : isFocused ? colors.blue[500] : "inherit",
             boxShadow: isInvalid
               ? `0 0 0 1px ${colors.red[500]}`
               : isFocused
@@ -290,9 +269,7 @@ export function useReactSelectProps<
             ...styles,
             borderRadius: `0 ${radius} ${radius} 0`,
             ":hover": {
-              backgroundColor: data.isInvalid
-                ? colors.red[300]
-                : colors.gray[300],
+              backgroundColor: data.isInvalid ? colors.red[300] : colors.gray[300],
               color: colors.gray[900],
             },
           };
@@ -305,16 +282,7 @@ export function useReactSelectProps<
         ...styles,
       },
     }),
-    [
-      rehydrated,
-      size,
-      placeholder,
-      inputId,
-      isInvalid,
-      isDisabled,
-      components,
-      styles,
-    ]
+    [rehydrated, size, placeholder, inputId, isInvalid, isDisabled, components, styles]
   );
 }
 
@@ -333,9 +301,7 @@ export function useInlineReactSelectProps<
         control: (styles, data) =>
           omit(rsProps.styles?.control?.(styles, data) ?? styles, ["flexWrap"]),
         valueContainer: (styles, data) =>
-          omit(rsProps.styles?.valueContainer?.(styles, data) ?? styles, [
-            "flexWrap",
-          ]),
+          omit(rsProps.styles?.valueContainer?.(styles, data) ?? styles, ["flexWrap"]),
         singleValue: (styles, data) =>
           omit(rsProps.styles?.singleValue?.(styles, data) ?? styles, [
             "position",

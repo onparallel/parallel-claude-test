@@ -1,12 +1,4 @@
-import {
-  Box,
-  Heading,
-  Image,
-  List,
-  ListItem,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Heading, Image, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import { Card } from "@parallel/components/common/Card";
 import { Link } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
@@ -140,9 +132,7 @@ function BookDemo() {
                 id="public.invite.review-privacy"
                 defaultMessage="For more information, please review our <a>Privacy Policy</a>."
                 values={{
-                  a: (chunks: any[]) => (
-                    <Link href="/legal/privacy">{chunks}</Link>
-                  ),
+                  a: (chunks: any[]) => <Link href="/legal/privacy">{chunks}</Link>,
                 }}
               />
             </Text>

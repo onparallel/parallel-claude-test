@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, BoxProps, Flex, Heading, Image, Text } from "@chakra-ui/react";
 import { Logo } from "@parallel/components/common/Logo";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PdfFieldWithReplies } from "@parallel/components/print/PdfFieldWithReplies";
 import { PdfPage } from "@parallel/components/print/PdfPage";
 import { SignatureBox } from "@parallel/components/print/SignatureBox";
@@ -48,11 +45,7 @@ function PetitionPdf({ token }: { token: string }) {
 
   const fieldVisibility = useFieldVisibility(petition.fields);
   const pages = useMemo(
-    () =>
-      groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(
-        petition.fields,
-        fieldVisibility
-      ),
+    () => groupFieldsByPages<PetitionPdf_PetitionFieldFragment>(petition.fields, fieldVisibility),
     [petition.fields, fieldVisibility]
   );
 
@@ -63,19 +56,9 @@ function PetitionPdf({ token }: { token: string }) {
           {pageNum === 0 ? (
             <>
               {orgLogo ? (
-                <Image
-                  margin="5mm auto"
-                  src={orgLogo}
-                  alt={orgName}
-                  width="40%"
-                />
+                <Image margin="5mm auto" src={orgLogo} alt={orgName} width="40%" />
               ) : (
-                <Logo
-                  width="50mm"
-                  justifyContent="center"
-                  display="flex"
-                  margin="5mm auto"
-                />
+                <Logo width="50mm" justifyContent="center" display="flex" margin="5mm auto" />
               )}
               <Heading justifyContent="center" display="flex">
                 {tokenPayload.documentTitle ?? petition.name}
@@ -181,10 +164,7 @@ PetitionPdf.fragments = {
   },
 };
 
-PetitionPdf.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+PetitionPdf.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const token = decodeURIComponent(query.token as string);
   await fetchQuery<PdfViewPetitionQuery>(
     gql`

@@ -31,13 +31,7 @@ export function TimelineSignatureCancelledEvent({
 
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<SignatureIcon />}
-          color="white"
-          backgroundColor="red.400"
-        />
-      }
+      icon={<TimelineIcon icon={<SignatureIcon />} color="white" backgroundColor="red.400" />}
     >
       <Flex alignItems="center">
         <Box>
@@ -49,11 +43,7 @@ export function TimelineSignatureCancelledEvent({
                 same: userId === event.user?.id,
                 user: <UserReference user={event.user} />,
                 timeAgo: (
-                  <DateTime
-                    value={event.createdAt}
-                    format={FORMATS.LLL}
-                    useRelativeTime="always"
-                  />
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
               }}
             />
@@ -65,23 +55,14 @@ export function TimelineSignatureCancelledEvent({
               values={{
                 contact: <ContactLink contact={event.contact} />,
                 timeAgo: (
-                  <DateTime
-                    value={event.createdAt}
-                    format={FORMATS.LLL}
-                    useRelativeTime="always"
-                  />
+                  <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
                 ),
               }}
             />
           )}
         </Box>
         {event.cancelType === "DECLINED_BY_SIGNER" && event.cancellerReason && (
-          <Button
-            onClick={handleSeeMessageClick}
-            size="sm"
-            variant="outline"
-            marginLeft={4}
-          >
+          <Button onClick={handleSeeMessageClick} size="sm" variant="outline" marginLeft={4}>
             <FormattedMessage
               id="timeline.signature-declined.see-reason"
               defaultMessage="See reason"

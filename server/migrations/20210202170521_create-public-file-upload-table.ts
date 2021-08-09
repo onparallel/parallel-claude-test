@@ -12,9 +12,7 @@ export async function up(knex: Knex): Promise<any> {
       timestamps(t);
     })
     .alterTable("organization", (t) => {
-      t.integer("public_file_logo_id")
-        .nullable()
-        .references("public_file_upload.id");
+      t.integer("public_file_logo_id").nullable().references("public_file_upload.id");
     });
 }
 

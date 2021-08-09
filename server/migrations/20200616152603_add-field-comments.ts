@@ -5,9 +5,7 @@ export async function up(knex: Knex): Promise<any> {
   await knex.schema.createTable("petition_field_comment", (t) => {
     t.increments("id");
     t.integer("petition_id").notNullable().references("petition.id");
-    t.integer("petition_field_id")
-      .notNullable()
-      .references("petition_field.id");
+    t.integer("petition_field_id").notNullable().references("petition_field.id");
     t.integer("petition_field_reply_id").references("petition_field_reply.id");
     t.text("content").notNullable();
     t.integer("user_id").references("user.id");
@@ -42,16 +40,12 @@ export async function up(knex: Knex): Promise<any> {
     }).notNullable();
     t.jsonb("data");
     t.boolean("is_read").notNullable().defaultTo(false);
-    t.timestamp("created_at")
-      .notNullable()
-      .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+    t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
   });
 
   await knex.schema.createTable("petition_contact_notification", (t) => {
     t.increments("id");
-    t.integer("petition_access_id")
-      .notNullable()
-      .references("petition_access.id");
+    t.integer("petition_access_id").notNullable().references("petition_access.id");
     t.integer("petition_id").notNullable().references("petition.id");
     t.enum("type", ["COMMENT_CREATED"], {
       useNative: true,
@@ -59,9 +53,7 @@ export async function up(knex: Knex): Promise<any> {
     }).notNullable();
     t.jsonb("data");
     t.boolean("is_read").notNullable().defaultTo(false);
-    t.timestamp("created_at")
-      .notNullable()
-      .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+    t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
   });
 
   await knex.raw(/* sql */ `

@@ -1,12 +1,6 @@
 import { Knex } from "knex";
-import {
-  addUserNotificationType,
-  removeUserNotificationType,
-} from "./helpers/notificationTypes";
-import {
-  addPetitionEvent,
-  removePetitionEvent,
-} from "./helpers/petitionEvents";
+import { addUserNotificationType, removeUserNotificationType } from "./helpers/notificationTypes";
+import { addPetitionEvent, removePetitionEvent } from "./helpers/petitionEvents";
 
 export async function up(knex: Knex): Promise<void> {
   await addPetitionEvent(knex, "REMINDERS_OPT_OUT");
@@ -19,15 +13,9 @@ export async function down(knex: Knex): Promise<void> {
   drop index "pun__comment_created__user_id__petition_id__data";
 `);
 
-  await knex
-    .from("petition_event")
-    .where({ type: "REMINDERS_OPT_OUT" })
-    .delete();
+  await knex.from("petition_event").where({ type: "REMINDERS_OPT_OUT" }).delete();
 
-  await knex
-    .from("petition_user_notification")
-    .where({ type: "REMINDERS_OPT_OUT" })
-    .delete();
+  await knex.from("petition_user_notification").where({ type: "REMINDERS_OPT_OUT" }).delete();
 
   await removePetitionEvent(knex, "REMINDERS_OPT_OUT");
   await removeUserNotificationType(knex, "REMINDERS_OPT_OUT");

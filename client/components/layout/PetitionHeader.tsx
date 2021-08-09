@@ -108,9 +108,7 @@ export function PetitionHeader({
 
   const [updatePetitionPermissionSubscription] =
     usePetitionHeader_updatePetitionPermissionSubscriptionMutation();
-  const handleUpdatePetitionPermissionSubscription = async function (
-    isSubscribed: boolean
-  ) {
+  const handleUpdatePetitionPermissionSubscription = async function (isSubscribed: boolean) {
     await updatePetitionPermissionSubscription({
       variables: {
         petitionId: petition.id,
@@ -246,8 +244,7 @@ export function PetitionHeader({
                 40 /* more options button width */
               }px)`,
               md: `calc((100vw - ${
-                96 /* left navbar width */ +
-                350 /* petition navigation tabs width */
+                96 /* left navbar width */ + 350 /* petition navigation tabs width */
               }px)/2 - ${
                 32 /* heading padding l+r */ +
                 24 /* petition status icon width */ +
@@ -350,19 +347,14 @@ export function PetitionHeader({
                       defaultMessage: "Notifications",
                     })}
                     onChange={(value) => {
-                      handleUpdatePetitionPermissionSubscription(
-                        value === "FOLLOW"
-                      );
+                      handleUpdatePetitionPermissionSubscription(value === "FOLLOW");
                     }}
                     value={isSubscribed ? "FOLLOW" : "IGNORE"}
                   >
                     <MenuItemOption value="FOLLOW">
                       <Box flex="1">
                         <Text fontWeight="bold">
-                          <FormattedMessage
-                            id="generic.subscribed"
-                            defaultMessage="Subscribed"
-                          />
+                          <FormattedMessage id="generic.subscribed" defaultMessage="Subscribed" />
                         </Text>
                         <Text fontSize="sm" color="gray.500">
                           <FormattedMessage
@@ -417,33 +409,25 @@ export function PetitionHeader({
         marginBottom={{ base: "10px", md: 0 }}
         direction="row"
       >
-        {sections.map(
-          ({ section, label, isDisabled, popoverContent, rightIcon }) => {
-            return isDisabled ? (
-              <PetitionHeaderTab
-                key={section}
-                isActive={current === section}
-                isDisabled
-                popoverContent={popoverContent}
-                rightIcon={rightIcon}
-              >
+        {sections.map(({ section, label, isDisabled, popoverContent, rightIcon }) => {
+          return isDisabled ? (
+            <PetitionHeaderTab
+              key={section}
+              isActive={current === section}
+              isDisabled
+              popoverContent={popoverContent}
+              rightIcon={rightIcon}
+            >
+              {label}
+            </PetitionHeaderTab>
+          ) : (
+            <NakedLink key={section} href={`/app/petitions/${petition.id}/${section}`}>
+              <PetitionHeaderTab isActive={current === section} rightIcon={rightIcon}>
                 {label}
               </PetitionHeaderTab>
-            ) : (
-              <NakedLink
-                key={section}
-                href={`/app/petitions/${petition.id}/${section}`}
-              >
-                <PetitionHeaderTab
-                  isActive={current === section}
-                  rightIcon={rightIcon}
-                >
-                  {label}
-                </PetitionHeaderTab>
-              </NakedLink>
-            );
-          }
-        )}
+            </NakedLink>
+          );
+        })}
       </Stack>
     </Box>
   );
@@ -525,10 +509,7 @@ PetitionHeader.mutations = [
       $petitionId: GID!
       $isSubscribed: Boolean!
     ) {
-      updatePetitionPermissionSubscription(
-        petitionId: $petitionId
-        isSubscribed: $isSubscribed
-      ) {
+      updatePetitionPermissionSubscription(petitionId: $petitionId, isSubscribed: $isSubscribed) {
         id
         myEffectivePermission {
           isSubscribed

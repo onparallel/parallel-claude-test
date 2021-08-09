@@ -1,10 +1,4 @@
-import {
-  list,
-  mutationField,
-  nonNull,
-  objectType,
-  stringArg,
-} from "@nexus/schema";
+import { list, mutationField, nonNull, objectType, stringArg } from "@nexus/schema";
 import { authenticateAnd } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
@@ -29,16 +23,10 @@ export const generateUserAuthToken = mutationField("generateUserAuthToken", {
   },
   resolve: async (_, { tokenName }, ctx) => {
     try {
-      return await ctx.userAuthentication.createUserAuthenticationToken(
-        tokenName,
-        ctx.user!
-      );
+      return await ctx.userAuthentication.createUserAuthenticationToken(tokenName, ctx.user!);
     } catch (e) {
       if (e.constraint === "user_authentication_token__token_name_user_id") {
-        throw new WhitelistedError(
-          "Token name must be unique",
-          "UNIQUE_TOKEN_NAME_ERROR"
-        );
+        throw new WhitelistedError("Token name must be unique", "UNIQUE_TOKEN_NAME_ERROR");
       } else {
         throw e;
       }
@@ -47,24 +35,18 @@ export const generateUserAuthToken = mutationField("generateUserAuthToken", {
 });
 
 export const revokeUserAuthToken = mutationField("revokeUserAuthToken", {
-  description:
-    "Soft-deletes a given auth token, making it permanently unusable.",
+  description: "Soft-deletes a given auth token, making it permanently unusable.",
   type: "Result",
   authorize: authenticateAnd(
     userHasFeatureFlag("API_TOKENS"),
     userHasAccessToAuthTokens("authTokenIds")
   ),
   args: {
-    authTokenIds: nonNull(
-      list(nonNull(globalIdArg("UserAuthenticationToken")))
-    ),
+    authTokenIds: nonNull(list(nonNull(globalIdArg("UserAuthenticationToken")))),
   },
   resolve: async (_, { authTokenIds }, ctx) => {
     try {
-      await ctx.userAuthentication.deleteUserAuthenticationTokens(
-        authTokenIds,
-        ctx.user!
-      );
+      await ctx.userAuthentication.deleteUserAuthenticationTokens(authTokenIds, ctx.user!);
       return RESULT.SUCCESS;
     } catch {}
     return RESULT.FAILURE;

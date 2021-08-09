@@ -3,10 +3,11 @@ import { DependencyList, useCallback, useEffect, useRef } from "react";
 /**
  * Similar to useDebouncedCallback but for functions returning promises
  */
-export function useDebouncedAsync<
-  TReturn,
-  T extends (...args: any[]) => Promise<TReturn>
->(callback: T, ms: number, deps: DependencyList | undefined): T {
+export function useDebouncedAsync<TReturn, T extends (...args: any[]) => Promise<TReturn>>(
+  callback: T,
+  ms: number,
+  deps: DependencyList | undefined
+): T {
   const timeout = useRef<any>(null);
   const promise = useRef<any>(null);
   useEffect(() => {

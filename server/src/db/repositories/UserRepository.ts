@@ -36,13 +36,9 @@ export class UserRepository extends BaseRepository {
     })
   );
 
-  readonly loadUser = this.buildLoadBy("user", "id", (q) =>
-    q.whereNull("deleted_at")
-  );
+  readonly loadUser = this.buildLoadBy("user", "id", (q) => q.whereNull("deleted_at"));
 
-  readonly loadUserByEmail = this.buildLoadBy("user", "email", (q) =>
-    q.whereNull("deleted_at")
-  );
+  readonly loadUserByEmail = this.buildLoadBy("user", "email", (q) => q.whereNull("deleted_at"));
 
   async loadUserByExternalId({
     orgId,
@@ -100,11 +96,7 @@ export class UserRepository extends BaseRepository {
       .returning("*");
   }
 
-  async updateUserOnboardingStatus(
-    key: string,
-    value: "FINISHED" | "SKIPPED",
-    user: User
-  ) {
+  async updateUserOnboardingStatus(key: string, value: "FINISHED" | "SKIPPED", user: User) {
     if (!/^\w+$/.test(key)) {
       throw new Error("Invalid onboarding key");
     }
@@ -167,10 +159,7 @@ export class UserRepository extends BaseRepository {
             ).or.whereIlike("email", `%${escapeLike(search, "\\")}%`, "\\");
           });
         })
-        .select<({ __type: "User" } & User)[]>(
-          "*",
-          this.knex.raw(`'User' as __type`)
-        ),
+        .select<({ __type: "User" } & User)[]>("*", this.knex.raw(`'User' as __type`)),
       opts.includeGroups
         ? this.from("user_group")
             .where({
@@ -204,9 +193,7 @@ export class UserRepository extends BaseRepository {
       );
       const resultsById = indexBy(results, (x) => x.id);
       return userIds.map((id) =>
-        resultsById[id]
-          ? `${this.config.misc.uploadsUrl}/${resultsById[id].path}`
-          : null
+        resultsById[id] ? `${this.config.misc.uploadsUrl}/${resultsById[id].path}` : null
       );
     })
   );

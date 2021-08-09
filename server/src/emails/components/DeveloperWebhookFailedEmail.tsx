@@ -28,12 +28,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
     });
   },
   text(
-    {
-      userName,
-      subscriptionId,
-      errorMessage,
-      postBody,
-    }: DeveloperWebhookFailedEmailProps,
+    { userName, subscriptionId, errorMessage, postBody }: DeveloperWebhookFailedEmailProps,
     intl: IntlShape
   ) {
     return outdent`
@@ -42,8 +37,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
     ${intl.formatMessage(
       {
         id: "developer.webhook-error-email.text",
-        defaultMessage:
-          "We found an error regarding your event subscription {subscriptionId}.",
+        defaultMessage: "We found an error regarding your event subscription {subscriptionId}.",
       },
       {
         subscriptionId,
@@ -74,12 +68,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
     logoAlt,
   }: DeveloperWebhookFailedEmailProps) {
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
             <Greeting name={userName} />
@@ -94,11 +83,7 @@ const email: Email<DeveloperWebhookFailedEmailProps> = {
         </MjmlSection>
 
         <MjmlSection padding="0 20px">
-          <MjmlColumn
-            backgroundColor="#f6f6f6"
-            borderRadius="4px"
-            padding="10px 0"
-          >
+          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
             <MjmlText fontWeight={600}>{errorMessage}</MjmlText>
             <MjmlText>
               <pre>{JSON.stringify(postBody, null, 2)}</pre>

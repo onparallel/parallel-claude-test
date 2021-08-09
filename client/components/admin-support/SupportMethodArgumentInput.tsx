@@ -1,11 +1,4 @@
-import {
-  Grid,
-  Input,
-  NumberInput,
-  NumberInputField,
-  Select,
-  Text,
-} from "@chakra-ui/react";
+import { Grid, Input, NumberInput, NumberInputField, Select, Text } from "@chakra-ui/react";
 import { unCamelCase } from "@parallel/utils/strings";
 import {
   IntrospectionEnumType,
@@ -24,11 +17,8 @@ type SupportMethodArgumentInputProps = {
   onValue: (value: any) => void;
 };
 
-export function SupportMethodArgumentInput(
-  props: SupportMethodArgumentInputProps
-) {
-  const type =
-    props.arg.type.kind === "NON_NULL" ? props.arg.type.ofType : props.arg.type;
+export function SupportMethodArgumentInput(props: SupportMethodArgumentInputProps) {
+  const type = props.arg.type.kind === "NON_NULL" ? props.arg.type.ofType : props.arg.type;
   switch (type.kind) {
     case "SCALAR":
       return (
@@ -36,11 +26,7 @@ export function SupportMethodArgumentInput(
           <Text as="label" lineHeight={10}>
             {unCamelCase(props.arg.name)}
           </Text>
-          {type.name === "Upload" ? (
-            <FileUploadInput {...props} />
-          ) : (
-            <ScalarInput {...props} />
-          )}
+          {type.name === "Upload" ? <FileUploadInput {...props} /> : <ScalarInput {...props} />}
         </>
       );
     case "ENUM":
@@ -67,12 +53,7 @@ export function SupportMethodArgumentInput(
   }
 }
 
-function FileUploadInput({
-  arg,
-  value,
-  isInvalid,
-  onValue,
-}: SupportMethodArgumentInputProps) {
+function FileUploadInput({ arg, value, isInvalid, onValue }: SupportMethodArgumentInputProps) {
   return (
     <Input
       width="100%"
@@ -83,12 +64,7 @@ function FileUploadInput({
   );
 }
 
-function ScalarInput({
-  arg,
-  value,
-  isInvalid,
-  onValue,
-}: SupportMethodArgumentInputProps) {
+function ScalarInput({ arg, value, isInvalid, onValue }: SupportMethodArgumentInputProps) {
   const type =
     arg.type.kind === "NON_NULL"
       ? (arg.type.ofType as IntrospectionNamedTypeRef)
@@ -129,11 +105,7 @@ function EnumInput({
   );
 
   return (
-    <Select
-      isInvalid={isInvalid}
-      value={value}
-      onChange={(e) => onValue(e.currentTarget.value)}
-    >
+    <Select isInvalid={isInvalid} value={value} onChange={(e) => onValue(e.currentTarget.value)}>
       {enumValues.map(({ name }) => (
         <option key={name} value={name}>
           {name}
@@ -152,19 +124,12 @@ function ObjectInput({
 }: SupportMethodArgumentInputProps) {
   const { inputFields } = findNamedTypeRef(
     arg.type.kind === "NON_NULL"
-      ? (arg.type
-          .ofType as IntrospectionNamedTypeRef<IntrospectionInputObjectType>)
+      ? (arg.type.ofType as IntrospectionNamedTypeRef<IntrospectionInputObjectType>)
       : (arg.type as IntrospectionNamedTypeRef<IntrospectionInputObjectType>),
     schemaTypes
   );
   return (
-    <Grid
-      templateColumns="84px 1fr"
-      gridColumn="1/3"
-      rowGap={2}
-      columnGap={2}
-      marginLeft={4}
-    >
+    <Grid templateColumns="84px 1fr" gridColumn="1/3" rowGap={2} columnGap={2} marginLeft={4}>
       {inputFields.map((field) => (
         <SupportMethodArgumentInput
           key={field.name}

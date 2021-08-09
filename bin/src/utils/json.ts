@@ -9,16 +9,11 @@ interface WriteJsonOpts {
   pretty?: boolean;
 }
 
-export async function writeJson(
-  path: string,
-  contents: any,
-  opts?: WriteJsonOpts
-) {
+export async function writeJson(path: string, contents: any, opts?: WriteJsonOpts) {
   const { pretty } = { pretty: false, ...opts };
   await fs.writeFile(
     path,
-    (pretty ? JSON.stringify(contents, null, "  ") : JSON.stringify(contents)) +
-      "\n",
+    (pretty ? JSON.stringify(contents, null, "  ") : JSON.stringify(contents)) + "\n",
     "utf-8"
   );
 }

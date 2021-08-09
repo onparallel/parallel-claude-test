@@ -40,10 +40,7 @@ export function TemplateCard({ template, onPress }: TemplateCardProps) {
         </Heading>
       ) : (
         <Heading size="xs" noOfLines={2} fontWeight="normal" fontStyle="italic">
-          <FormattedMessage
-            id="generic.untitled-template"
-            defaultMessage="Untitled template"
-          />
+          <FormattedMessage id="generic.untitled-template" defaultMessage="Untitled template" />
         </Heading>
       )}
       {template.descriptionExcerpt ? (

@@ -38,9 +38,7 @@ export class UserAuthenticationRepository extends BaseRepository {
 
       if (!userId) return null;
 
-      const [user] = await this.from("user")
-        .where({ deleted_at: null, id: userId })
-        .select();
+      const [user] = await this.from("user").where({ deleted_at: null, id: userId }).select();
 
       if (!user) {
         await t.rollback();
@@ -87,9 +85,7 @@ export class UserAuthenticationRepository extends BaseRepository {
                 .map((s) => {
                   // nullable column
                   if (["last_used_at"].includes(s.column)) {
-                    return `${s.column} ${s.order} NULLS ${
-                      s.order === "asc" ? "FIRST" : "LAST"
-                    }`;
+                    return `${s.column} ${s.order} NULLS ${s.order === "asc" ? "FIRST" : "LAST"}`;
                   } else {
                     return `${s.column} ${s.order}`;
                   }

@@ -3,9 +3,7 @@ import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { ArgValidationError } from "../errors";
 
 export function maxLength<TypeName extends string, FieldName extends string>(
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>
-  ) => string | null | undefined,
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => string | null | undefined,
   argName: string,
   limit: number
 ) {

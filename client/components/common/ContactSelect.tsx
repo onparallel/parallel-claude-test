@@ -2,10 +2,7 @@ import { gql } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
 import { UserPlusIcon } from "@parallel/chakra/icons";
 import { ContactSelect_ContactFragment } from "@parallel/graphql/__types";
-import {
-  useMemoReactSelectProps,
-  UseReactSelectProps,
-} from "@parallel/utils/react-select/hooks";
+import { useMemoReactSelectProps, UseReactSelectProps } from "@parallel/utils/react-select/hooks";
 import { CustomAsyncCreatableSelectProps } from "@parallel/utils/react-select/types";
 import { useExistingContactToast } from "@parallel/utils/useExistingContactToast";
 import { EMAIL_REGEX } from "@parallel/utils/validation";
@@ -36,31 +33,16 @@ export interface ContactSelectProps
   extends UseReactSelectProps,
     CustomAsyncCreatableSelectProps<ContactSelectSelection, true> {
   placeholder?: string;
-  onCreateContact: (data: {
-    defaultEmail?: string;
-  }) => Promise<ContactSelectSelection>;
-  onSearchContacts: (
-    search: string,
-    exclude: string[]
-  ) => Promise<ContactSelectSelection[]>;
+  onCreateContact: (data: { defaultEmail?: string }) => Promise<ContactSelectSelection>;
+  onSearchContacts: (search: string, exclude: string[]) => Promise<ContactSelectSelection[]>;
   onPasteEmails?: (emails: string[]) => void;
 }
 
-export type ContactSelectInstance = AsyncCreatableSelect<
-  ContactSelectSelection,
-  true
->;
+export type ContactSelectInstance = AsyncCreatableSelect<ContactSelectSelection, true>;
 
 export const ContactSelect = Object.assign(
   forwardRef<ContactSelectInstance, ContactSelectProps>(function (
-    {
-      value,
-      onSearchContacts,
-      onCreateContact,
-      onPasteEmails,
-      onChange,
-      ...props
-    },
+    { value, onSearchContacts, onCreateContact, onPasteEmails, onChange, ...props },
     ref
   ) {
     const errorToast = useExistingContactToast();
@@ -195,11 +177,7 @@ export const ContactSelect = Object.assign(
 function useContactSelectReactSelectProps(
   props: UseReactSelectProps
 ): AsyncCreatableSelectProps<ContactSelectSelection, true, never> {
-  const reactSelectProps = useMemoReactSelectProps<
-    ContactSelectSelection,
-    true,
-    never
-  >(
+  const reactSelectProps = useMemoReactSelectProps<ContactSelectSelection, true, never>(
     () => ({
       ...props,
       components: {
@@ -209,9 +187,7 @@ function useContactSelectReactSelectProps(
     }),
     [props]
   );
-  return useMemo<
-    AsyncCreatableSelectProps<ContactSelectSelection, true, never>
-  >(
+  return useMemo<AsyncCreatableSelectProps<ContactSelectSelection, true, never>>(
     () => ({
       ...reactSelectProps,
       getOptionLabel: (option) => {
@@ -246,11 +222,7 @@ function useContactSelectReactSelectProps(
   );
 }
 
-const _components: AsyncCreatableSelectProps<
-  ContactSelectSelection,
-  true,
-  never
->["components"] = {
+const _components: AsyncCreatableSelectProps<ContactSelectSelection, true, never>["components"] = {
   NoOptionsMessage: ({ selectProps }) => {
     const search = selectProps.inputValue;
     return (
@@ -346,9 +318,7 @@ const _components: AsyncCreatableSelectProps<
             ((e: ClipboardEvent<HTMLInputElement>) => {
               if (e.clipboardData.types.includes("text/plain")) {
                 const text = e.clipboardData.getData("text/plain");
-                const emails = text
-                  .split(/\s+/g)
-                  .filter((part) => part.match(EMAIL_REGEX));
+                const emails = text.split(/\s+/g).filter((part) => part.match(EMAIL_REGEX));
                 if (emails.length > 1) {
                   e.preventDefault();
                   onPasteEmails(emails);

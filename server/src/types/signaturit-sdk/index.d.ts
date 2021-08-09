@@ -16,15 +16,9 @@ declare module "signaturit-sdk" {
     /** Cancel a signature request. The signer will not be able to sign the document. */
     cancelSignature: (signatureId: string) => Promise<SignatureResponse>;
     /** Download the signed PDF file. */
-    downloadSignedDocument: (
-      signatureId: string,
-      documentId: string
-    ) => Promise<string>;
+    downloadSignedDocument: (signatureId: string, documentId: string) => Promise<string>;
     /** Download the binary content of the audit trail PDF. */
-    downloadAuditTrail: (
-      signatureId: string,
-      documentId: string
-    ) => Promise<string>;
+    downloadAuditTrail: (signatureId: string, documentId: string) => Promise<string>;
 
     /** Get all brandings from your account. */
     getBrandings: () => Promise<BrandingResponse[]>;
@@ -33,10 +27,7 @@ declare module "signaturit-sdk" {
     /** Create a single branding. */
     createBranding: (params: BrandingParams) => Promise<BrandingResponse>;
     /** Update a single branding. */
-    updateBranding: (
-      brandingId: string,
-      params: BrandingParams
-    ) => Promise<BrandingResponse>;
+    updateBranding: (brandingId: string, params: BrandingParams) => Promise<BrandingResponse>;
     /** Get a subscription. */
     getSubscription: (subscriptionId: string) => Promise<SubscriptionResponse>;
     /** Get all subscriptions. */
@@ -46,10 +37,7 @@ declare module "signaturit-sdk" {
       conditions: any
     ) => Promise<SubscriptionResponse>;
     /** Create a new subscription. */
-    createSubscription: (
-      url: string,
-      events: AnyEvent[]
-    ) => Promise<SubscriptionResponse>;
+    createSubscription: (url: string, events: AnyEvent[]) => Promise<SubscriptionResponse>;
     /** Updates a subscription. */
     updateSubscription: (
       subscriptionId: string,
@@ -176,14 +164,7 @@ declare module "signaturit-sdk" {
     width?: number;
     top?: number;
     left?: number;
-    type:
-      | "date"
-      | "image"
-      | "check"
-      | "radio"
-      | "select"
-      | "text"
-      | "signature";
+    type: "date" | "image" | "check" | "radio" | "select" | "text" | "signature";
     default?: any;
     word_anchor?: string;
     options?: any;

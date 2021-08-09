@@ -2,10 +2,7 @@ import DataLoader from "dataloader";
 import { inject, injectable } from "inversify";
 import { Knex } from "knex";
 import { indexBy, uniq } from "remeda";
-import {
-  fromDataLoader,
-  FromDataLoaderOptions,
-} from "../../util/fromDataLoader";
+import { fromDataLoader, FromDataLoaderOptions } from "../../util/fromDataLoader";
 import { keyBuilder } from "../../util/keyBuilder";
 import { MaybeArray } from "../../util/types";
 import { BaseRepository } from "../helpers/BaseRepository";
@@ -42,11 +39,7 @@ export class FeatureFlagRepository extends BaseRepository {
   }
 
   private readonly _userHasFeatureFlag = fromDataLoader(
-    new DataLoader<
-      { userId: number; featureFlag: FeatureFlagName },
-      boolean,
-      string
-    >(
+    new DataLoader<{ userId: number; featureFlag: FeatureFlagName }, boolean, string>(
       async (keys) => {
         const userIds = uniq(keys.map((k) => k.userId));
         const featureFlags = uniq(keys.map((k) => k.featureFlag));

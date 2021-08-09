@@ -58,9 +58,7 @@ export async function down(knex: Knex): Promise<void> {
     /* sql */ `UPDATE petition SET owner_id = REGEXP_REPLACE(created_by, 'User:(\\d+)$', '\\1')::int WHERE id > 0`
   );
 
-  await knex.raw(
-    /* sql */ `ALTER TABLE petition ALTER COLUMN owner_id SET NOT NULL`
-  );
+  await knex.raw(/* sql */ `ALTER TABLE petition ALTER COLUMN owner_id SET NOT NULL`);
 
   await knex.schema.dropTable("petition_user");
   await knex.raw("DROP type petition_user_permission_type");

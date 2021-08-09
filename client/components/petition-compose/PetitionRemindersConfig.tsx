@@ -16,14 +16,7 @@ import { assignRef } from "@parallel/utils/assignRef";
 import { FORMATS } from "@parallel/utils/dates";
 import { Maybe } from "@parallel/utils/types";
 import { useTimeInput } from "@parallel/utils/useTimeInput";
-import {
-  addDays,
-  addWeeks,
-  isWeekend,
-  parse,
-  startOfToday,
-  startOfWeek,
-} from "date-fns";
+import { addDays, addWeeks, isWeekend, parse, startOfToday, startOfWeek } from "date-fns";
 import { ChangeEvent, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 import { DateTime } from "../common/DateTime";

@@ -1,9 +1,10 @@
 import { PublicPetitionField } from "@parallel/graphql/__types";
 import { zip } from "remeda";
 
-export function groupFieldsByPages<
-  T extends Pick<PublicPetitionField, "type" | "options">
->(fields: T[], visibility: boolean[]): T[][] {
+export function groupFieldsByPages<T extends Pick<PublicPetitionField, "type" | "options">>(
+  fields: T[],
+  visibility: boolean[]
+): T[][] {
   const pages: T[][] = [];
   let page: T[] = [];
   for (const [field, isVisible] of zip(fields, visibility)) {

@@ -23,10 +23,7 @@ export async function calculateSignatureBoxPositions(
   });
   const pageWidth = metadata.formImage.Width as number;
   const positions: PageSignatureMetadata[] = metadata.formImage.Pages.map(
-    (page: {
-      Texts: { R: { T: string }[]; x: number; y: number }[];
-      Height: number;
-    }) => {
+    (page: { Texts: { R: { T: string }[]; x: number; y: number }[]; Height: number }) => {
       /**
        * pdf parser can't guarantee that the extracted texts will be complete words.
        * So we need to:
@@ -46,9 +43,7 @@ export async function calculateSignatureBoxPositions(
 
       // split each line into an Array of dimension 3, each value being the texts inside a column
       const lineColumns = Object.values(pageLines).map((line) =>
-        columns.map((col) =>
-          line.filter((l) => l.x >= col.minX && l.x <= col.maxX)
-        )
+        columns.map((col) => line.filter((l) => l.x >= col.minX && l.x <= col.maxX))
       );
 
       const pageTexts = lineColumns.flatMap((lineArray) => {

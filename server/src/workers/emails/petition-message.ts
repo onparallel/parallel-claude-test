@@ -10,13 +10,9 @@ export async function petitionMessage(
   payload: { petition_message_id: number },
   context: WorkerContext
 ) {
-  const message = await context.petitions.loadMessage(
-    payload.petition_message_id
-  );
+  const message = await context.petitions.loadMessage(payload.petition_message_id);
   if (!message) {
-    throw new Error(
-      `Petition message not found for id ${payload.petition_message_id}`
-    );
+    throw new Error(`Petition message not found for id ${payload.petition_message_id}`);
   }
   const [petition, sender, access] = await Promise.all([
     context.petitions.loadPetition(message.petition_id),
@@ -24,14 +20,10 @@ export async function petitionMessage(
     context.petitions.loadAccess(message.petition_access_id),
   ]);
   if (!petition) {
-    throw new Error(
-      `Petition not found for petition_message.petition_id ${message.petition_id}`
-    );
+    throw new Error(`Petition not found for petition_message.petition_id ${message.petition_id}`);
   }
   if (!sender) {
-    throw new Error(
-      `User not found for petition_message.sender_id ${message.sender_id}`
-    );
+    throw new Error(`User not found for petition_message.sender_id ${message.sender_id}`);
   }
   if (!access) {
     throw new Error(
@@ -40,15 +32,10 @@ export async function petitionMessage(
   }
   const contact = await context.contacts.loadContact(access.contact_id);
   if (!contact) {
-    throw new Error(
-      `Contact not found for petition_access.contact_id ${access.contact_id}`
-    );
+    throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
   }
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(
-    sender.org_id,
-    context
-  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(sender.org_id, context);
   const bodyJson = message.email_body ? JSON.parse(message.email_body) : [];
   const renderContext = { contact, user: sender, petition };
   const { html, text, subject, from } = await buildEmail(
@@ -77,10 +64,7 @@ export async function petitionMessage(
     created_from: `PetitionMessage:${payload.petition_message_id}`,
   });
 
-  await context.petitions.processPetitionMessage(
-    payload.petition_message_id,
-    email.id
-  );
+  await context.petitions.processPetitionMessage(payload.petition_message_id, email.id);
 
   return email;
 }

@@ -16,17 +16,9 @@ import {
   TabPanels,
   Tabs,
 } from "@chakra-ui/react";
-import {
-  AddIcon,
-  ChevronDownIcon,
-  FileNewIcon,
-  PaperPlaneIcon,
-} from "@parallel/chakra/icons";
+import { AddIcon, ChevronDownIcon, FileNewIcon, PaperPlaneIcon } from "@parallel/chakra/icons";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { useTemplateDetailsDialog } from "@parallel/components/petition-common/TemplateDetailsDialog";
 import { NewPetitionEmptySearch } from "@parallel/components/petition-new/NewPetitionEmptySearch";
@@ -105,22 +97,17 @@ function NewPetition() {
       },
     })
   );
-  const templates = templatesData.templates
-    .items as NewPetition_PetitionTemplateFragment[];
+  const templates = templatesData.templates.items as NewPetition_PetitionTemplateFragment[];
   const allTemplatesLoaded =
     templatesData.templates.items.length === templatesData.templates.totalCount;
   const hasTemplates = templatesData.hasTemplates.totalCount > 0;
 
   const [search, setSearch] = useState("");
   const [locale, setLocale] = useState(null as Maybe<PetitionLocale>);
-  const [sharedFilter, setSharedFilter] = useState(
-    null as Maybe<NewPetitionSharedFilterValues>
-  );
+  const [sharedFilter, setSharedFilter] = useState(null as Maybe<NewPetitionSharedFilterValues>);
 
   const [publicSearch, setPublicSearch] = useState("");
-  const [publicLocale, setPublicLocale] = useState(
-    null as Maybe<PetitionLocale>
-  );
+  const [publicLocale, setPublicLocale] = useState(null as Maybe<PetitionLocale>);
 
   const [headerTop, setHeaderTop] = useState(74);
 
@@ -130,16 +117,10 @@ function NewPetition() {
     setHeaderTop(rect.height);
   }, []);
 
-  const debouncedPublicTemplatesRefetch = useDebouncedCallback(
+  const debouncedPublicTemplatesRefetch = useDebouncedCallback(publicTemplatesRefetch, 300, [
     publicTemplatesRefetch,
-    300,
-    [publicTemplatesRefetch]
-  );
-  const debouncedTemplatesRefetch = useDebouncedCallback(
-    templatesRefetch,
-    300,
-    [templatesRefetch]
-  );
+  ]);
+  const debouncedTemplatesRefetch = useDebouncedCallback(templatesRefetch, 300, [templatesRefetch]);
 
   const handleSearchChange = useCallback(
     (search: string) => {
@@ -226,10 +207,7 @@ function NewPetition() {
         return {
           publicTemplates: {
             ...fetchMoreResult!.publicTemplates,
-            items: [
-              ...prev.publicTemplates.items,
-              ...fetchMoreResult!.publicTemplates.items,
-            ],
+            items: [...prev.publicTemplates.items, ...fetchMoreResult!.publicTemplates.items],
           },
         };
       },
@@ -247,10 +225,7 @@ function NewPetition() {
           ...fetchMoreResult!,
           templates: {
             ...fetchMoreResult!.templates,
-            items: [
-              ...prev.templates.items,
-              ...fetchMoreResult!.templates.items,
-            ],
+            items: [...prev.templates.items, ...fetchMoreResult!.templates.items],
           },
         };
       },
@@ -301,10 +276,7 @@ function NewPetition() {
       user={me}
     >
       <Container maxWidth="container.xl">
-        <Tabs
-          defaultIndex={templates.length === 0 && !hasTemplates ? 1 : 0}
-          paddingY={4}
-        >
+        <Tabs defaultIndex={templates.length === 0 && !hasTemplates ? 1 : 0} paddingY={4}>
           <Box
             position="sticky"
             top="0px"
@@ -314,15 +286,8 @@ function NewPetition() {
             paddingX={2}
           >
             <TabList flexWrap="wrap-reverse" marginX={4}>
-              <Tab
-                borderTopLeftRadius="md"
-                borderTopRightRadius="md"
-                _selected={selectTabStyles}
-              >
-                <FormattedMessage
-                  id="new-petition.my-templates"
-                  defaultMessage="My templates"
-                />
+              <Tab borderTopLeftRadius="md" borderTopRightRadius="md" _selected={selectTabStyles}>
+                <FormattedMessage id="new-petition.my-templates" defaultMessage="My templates" />
               </Tab>
               <Tab
                 borderTopLeftRadius="md"
@@ -344,17 +309,10 @@ function NewPetition() {
                     rightIcon={<ChevronDownIcon />}
                     colorScheme="purple"
                   >
-                    <FormattedMessage
-                      id="new-petition.create"
-                      defaultMessage="Create"
-                    />
+                    <FormattedMessage id="new-petition.create" defaultMessage="Create" />
                   </MenuButton>
                   <Portal>
-                    <MenuList
-                      width="min-content"
-                      minWidth="154px"
-                      whiteSpace="nowrap"
-                    >
+                    <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
                       <MenuItem
                         onClick={() => handleCreatePetitionTemplate("TEMPLATE")}
                         icon={<FileNewIcon display="block" boxSize={4} />}
@@ -412,21 +370,13 @@ function NewPetition() {
               {templates.length === 0 ? (
                 hasTemplates ? (
                   <NewPetitionEmptySearch
-                    onClickNewTemplate={() =>
-                      handleCreatePetitionTemplate("TEMPLATE")
-                    }
-                    onClickPublicTemplates={() =>
-                      publicTemplatesTabRef?.current?.click()
-                    }
+                    onClickNewTemplate={() => handleCreatePetitionTemplate("TEMPLATE")}
+                    onClickPublicTemplates={() => publicTemplatesTabRef?.current?.click()}
                   />
                 ) : (
                   <NewPetitionEmptyTempaltes
-                    onClickNewTemplate={() =>
-                      handleCreatePetitionTemplate("TEMPLATE")
-                    }
-                    onClickPublicTemplates={() =>
-                      publicTemplatesTabRef?.current?.click()
-                    }
+                    onClickNewTemplate={() => handleCreatePetitionTemplate("TEMPLATE")}
+                    onClickPublicTemplates={() => publicTemplatesTabRef?.current?.click()}
                   />
                 )
               ) : (
@@ -455,9 +405,7 @@ function NewPetition() {
               />
               {publicTemplates.length === 0 ? (
                 <NewPetitionEmptySearch
-                  onClickNewTemplate={() =>
-                    handleCreatePetitionTemplate("TEMPLATE")
-                  }
+                  onClickNewTemplate={() => handleCreatePetitionTemplate("TEMPLATE")}
                 />
               ) : (
                 <NewPetitionTemplatesList
@@ -490,15 +438,9 @@ NewPetition.fragments = {
   `,
 };
 
-NewPetition.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+NewPetition.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   await Promise.all([
-    fetchQuery<
-      NewPetitionPublicTemplatesQuery,
-      NewPetitionPublicTemplatesQueryVariables
-    >(
+    fetchQuery<NewPetitionPublicTemplatesQuery, NewPetitionPublicTemplatesQueryVariables>(
       gql`
         query NewPetitionPublicTemplates(
           $offset: Int!
@@ -506,12 +448,7 @@ NewPetition.getInitialProps = async ({
           $search: String
           $locale: PetitionLocale
         ) {
-          publicTemplates(
-            offset: $offset
-            limit: $limit
-            search: $search
-            locale: $locale
-          ) {
+          publicTemplates(offset: $offset, limit: $limit, search: $search, locale: $locale) {
             items {
               ...NewPetition_PetitionTemplate
             }

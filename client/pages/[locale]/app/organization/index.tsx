@@ -1,13 +1,7 @@
 import { gql } from "@apollo/client";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
-import {
-  OrganizationSettingsQuery,
-  useOrganizationSettingsQuery,
-} from "@parallel/graphql/__types";
+import { OrganizationSettingsQuery, useOrganizationSettingsQuery } from "@parallel/graphql/__types";
 import { assertQuery } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { useOrganizationSections } from "@parallel/utils/useOrganizationSections";
@@ -31,10 +25,7 @@ function OrganizationSettings() {
       sections={sections}
       user={me}
       sectionsHeader={
-        <FormattedMessage
-          id="view.organization.title"
-          defaultMessage="Organization"
-        />
+        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
     />
   );

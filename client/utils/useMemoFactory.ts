@@ -15,11 +15,8 @@ export function useMemoFactory<T extends (...args: any[]) => any>(
   maybeDeps?: DependencyList
 ): T {
   const resolve =
-    typeof depsOrResolver === "function"
-      ? depsOrResolver
-      : (...args: Parameters<T>) => `${args}`;
-  const deps =
-    typeof depsOrResolver === "function" ? maybeDeps! : depsOrResolver;
+    typeof depsOrResolver === "function" ? depsOrResolver : (...args: Parameters<T>) => `${args}`;
+  const deps = typeof depsOrResolver === "function" ? maybeDeps! : depsOrResolver;
   const cache = useRef(new Map<string, ReturnType<T>>());
   return useMemo(() => {
     cache.current.clear();

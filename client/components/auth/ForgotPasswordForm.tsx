@@ -35,10 +35,7 @@ export function ForgotPasswordForm({
     <>
       <Box marginBottom={6} textAlign="center">
         <Heading marginTop={4} marginBottom={2} size="md">
-          <FormattedMessage
-            id="public.forgot-password.header"
-            defaultMessage="Forgot password"
-          />
+          <FormattedMessage id="public.forgot-password.header" defaultMessage="Forgot password" />
         </Heading>
         <Text>
           <FormattedMessage
@@ -48,15 +45,9 @@ export function ForgotPasswordForm({
         </Text>
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <FormControl
-          id="email"
-          isInvalid={!!errors.email || isExternalUserError}
-        >
+        <FormControl id="email" isInvalid={!!errors.email || isExternalUserError}>
           <FormLabel>
-            <FormattedMessage
-              id="generic.forms.email-label"
-              defaultMessage="Email"
-            />
+            <FormattedMessage id="generic.forms.email-label" defaultMessage="Email" />
           </FormLabel>
           <Input
             type="email"

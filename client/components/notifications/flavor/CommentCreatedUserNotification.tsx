@@ -19,11 +19,7 @@ export const CommentCreatedUserNotification = Object.assign(
       const { author, isInternal } = notification.comment;
       const name =
         author?.__typename === "PetitionAccess" ? (
-          <ContactLink
-            draggable="false"
-            tabIndex={-1}
-            contact={author.contact}
-          />
+          <ContactLink draggable="false" tabIndex={-1} contact={author.contact} />
         ) : (
           <UserReference user={author as any} />
         );
@@ -35,10 +31,7 @@ export const CommentCreatedUserNotification = Object.assign(
         </Text>
       ) : (
         <Text as="span" textStyle="hint">
-          <FormattedMessage
-            id="generic.untitled-field"
-            defaultMessage="Untitled field"
-          />
+          <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
         </Text>
       );
       return (
@@ -47,11 +40,7 @@ export const CommentCreatedUserNotification = Object.assign(
           isFirst={isFirst}
           notification={notification}
           icon={
-            <Avatar
-              boxSize="36px"
-              background="gray.200"
-              icon={<CommentIcon fontSize="16px" />}
-            />
+            <Avatar boxSize="36px" background="gray.200" icon={<CommentIcon fontSize="16px" />} />
           }
           path={`/replies?comments=${notification.field.id}`}
         >

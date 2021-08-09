@@ -14,11 +14,7 @@ export async function importFromExcel(file: Stream) {
     row.eachCell({ includeEmpty: true }, (cell) => {
       if (typeof cell.text !== "string") {
         if ("richText" in cell.text) {
-          cells.push(
-            (cell.text as CellRichTextValue).richText
-              .map((p) => p.text)
-              .join("")
-          );
+          cells.push((cell.text as CellRichTextValue).richText.map((p) => p.text).join(""));
         } else {
           cells.push("");
         }

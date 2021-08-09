@@ -11,18 +11,10 @@ export type TimelineAccessOpenedEventProps = {
   event: TimelineAccessOpenedEvent_AccessOpenedEventFragment;
 };
 
-export function TimelineAccessOpenedEvent({
-  event,
-}: TimelineAccessOpenedEventProps) {
+export function TimelineAccessOpenedEvent({ event }: TimelineAccessOpenedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<EyeIcon />}
-          color="white"
-          backgroundColor="blue.500"
-        />
-      }
+      icon={<TimelineIcon icon={<EyeIcon />} color="white" backgroundColor="blue.500" />}
     >
       <FormattedMessage
         id="timeline.access-opened-description"
@@ -30,11 +22,7 @@ export function TimelineAccessOpenedEvent({
         values={{
           contact: <ContactLink contact={event.access.contact} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

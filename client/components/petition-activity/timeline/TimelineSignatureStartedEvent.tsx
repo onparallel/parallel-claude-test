@@ -10,29 +10,17 @@ export type TimelineSignatureStartedEventProps = {
   event: TimelineSignatureStartedEvent_SignatureStartedEventFragment;
 };
 
-export function TimelineSignatureStartedEvent({
-  event,
-}: TimelineSignatureStartedEventProps) {
+export function TimelineSignatureStartedEvent({ event }: TimelineSignatureStartedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<SignatureIcon />}
-          color="black"
-          backgroundColor="gray.200"
-        />
-      }
+      icon={<TimelineIcon icon={<SignatureIcon />} color="black" backgroundColor="gray.200" />}
     >
       <FormattedMessage
         id="timeline.signature-started-description"
         defaultMessage="We started an eSignature process on the petition {timeAgo}"
         values={{
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

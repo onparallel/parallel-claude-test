@@ -20,13 +20,7 @@ export function TimelineMessageCancelledEvent({
 }: TimelineMessageCancelledEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<ForbiddenIcon />}
-          color="white"
-          backgroundColor="red.500"
-        />
-      }
+      icon={<TimelineIcon icon={<ForbiddenIcon />} color="white" backgroundColor="red.500" />}
     >
       <FormattedMessage
         id="timeline.message-cancelled-description"
@@ -37,13 +31,7 @@ export function TimelineMessageCancelledEvent({
           user: <UserReference user={user} />,
           subject: message.emailSubject,
           contact: <ContactLink contact={message.access.contact} />,
-          timeAgo: (
-            <DateTime
-              value={createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
-          ),
+          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
       />
     </TimelineItem>

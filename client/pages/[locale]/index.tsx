@@ -18,8 +18,7 @@ function Home() {
     image: `${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/hero/showcase_hero_${query.locale}`,
     alt: intl.formatMessage({
       id: "public.showcase-hero-alt",
-      defaultMessage:
-        "A screenshot of the app showcasing the information received using Parallel",
+      defaultMessage: "A screenshot of the app showcasing the information received using Parallel",
     }),
     ratio: 1426 / 1140,
     title: intl.formatMessage({

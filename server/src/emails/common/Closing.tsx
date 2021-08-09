@@ -8,10 +8,7 @@ export function Closing() {
         <FormattedMessage id="closing.text" defaultMessage="Regards," />
       </MjmlText>
       <MjmlText paddingTop="0">
-        <FormattedMessage
-          id="closing.sender"
-          defaultMessage="The Parallel team"
-        />
+        <FormattedMessage id="closing.sender" defaultMessage="The Parallel team" />
       </MjmlText>
     </>
   );

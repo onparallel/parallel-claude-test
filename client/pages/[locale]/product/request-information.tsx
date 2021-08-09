@@ -19,8 +19,7 @@ function Request() {
       })}
       description={intl.formatMessage({
         id: "public.product.request-information.meta-description",
-        defaultMessage:
-          "Request professionally and efficiently documents and information.",
+        defaultMessage: "Request professionally and efficiently documents and information.",
       })}
     >
       <PublicContainer textAlign="center" wrapper={{ paddingY: 16 }}>
@@ -61,11 +60,7 @@ function Request() {
           </Text>
         </PublicVideoShowcase>
       </PublicContainer>
-      <PublicContainer
-        paddingY={8}
-        maxWidth="container.lg"
-        wrapper={{ paddingY: 16 }}
-      >
+      <PublicContainer paddingY={8} maxWidth="container.lg" wrapper={{ paddingY: 16 }}>
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/request-information/parallel_template_${query.locale}.png`}
           imageSize="300px"
@@ -85,11 +80,7 @@ function Request() {
           </Text>
         </PublicShowcase>
       </PublicContainer>
-      <PublicContainer
-        paddingY={8}
-        maxWidth="container.lg"
-        wrapper={{ paddingY: 16 }}
-      >
+      <PublicContainer paddingY={8} maxWidth="container.lg" wrapper={{ paddingY: 16 }}>
         <PublicShowcase
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/request-information/parallel_conditions_${query.locale}.png`}
           imageSize="300px"
@@ -108,11 +99,7 @@ function Request() {
           </Text>
         </PublicShowcase>
       </PublicContainer>
-      <PublicContainer
-        paddingY={8}
-        maxWidth="container.lg"
-        wrapper={{ paddingY: 16 }}
-      >
+      <PublicContainer paddingY={8} maxWidth="container.lg" wrapper={{ paddingY: 16 }}>
         <PublicShowcase
           isReversed
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/product/request-information/parallel-branding.png`}

@@ -1,8 +1,6 @@
 import { purry } from "remeda";
 
-type ObjectPredicate<K extends string | number | symbol, V> = (
-  entry: [K, V]
-) => boolean;
+type ObjectPredicate<K extends string | number | symbol, V> = (entry: [K, V]) => boolean;
 
 function _removeKeys<K extends string | number | symbol, V>(
   object: Record<K, V>,
@@ -17,16 +15,13 @@ function _removeKeys<K extends string | number | symbol, V>(
   return result;
 }
 
-export function removeKeys<
-  K extends string | number | symbol,
-  V,
-  R = Record<K, V>
->(object: Record<K, V>, predicate: ObjectPredicate<K, V>): R;
-export function removeKeys<
-  K extends string | number | symbol,
-  V,
-  R = Record<K, V>
->(predicate: ObjectPredicate<K, V>): (object: Record<K, V>) => R;
+export function removeKeys<K extends string | number | symbol, V, R = Record<K, V>>(
+  object: Record<K, V>,
+  predicate: ObjectPredicate<K, V>
+): R;
+export function removeKeys<K extends string | number | symbol, V, R = Record<K, V>>(
+  predicate: ObjectPredicate<K, V>
+): (object: Record<K, V>) => R;
 export function removeKeys() {
   // eslint-disable-next-line prefer-rest-params
   return purry(_removeKeys, arguments);
@@ -44,10 +39,5 @@ export function removeNotDefined<T extends {}>(
 
 /** returns true if only one of the provided elements is defined */
 export function xorDefined(...elements: any[]) {
-  return (
-    elements.reduce(
-      (result, element) => (isDefined(element) ? result + 1 : result),
-      0
-    ) === 1
-  );
+  return elements.reduce((result, element) => (isDefined(element) ? result + 1 : result), 0) === 1;
 }

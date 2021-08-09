@@ -6,10 +6,7 @@ export interface EnumerateListProps<TValue> extends IntlListFormatOptions {
   values: TValue[];
   maxItems: number;
   renderItem: (props: { value: TValue }, index: number) => ReactNode;
-  renderOther?: (props: {
-    children: ReactNode;
-    remaining: TValue[];
-  }) => ReactNode;
+  renderOther?: (props: { children: ReactNode; remaining: TValue[] }) => ReactNode;
 }
 
 /**

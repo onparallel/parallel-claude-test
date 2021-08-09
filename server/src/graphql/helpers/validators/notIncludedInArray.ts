@@ -2,10 +2,7 @@ import { core } from "@nexus/schema";
 import { FieldValidateArgsResolver } from "../validateArgsPlugin";
 import { ArgValidationError } from "../errors";
 
-export function userIdNotIncludedInArray<
-  TypeName extends string,
-  FieldName extends string
->(
+export function userIdNotIncludedInArray<TypeName extends string, FieldName extends string>(
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any[] | null | undefined,
   argName: string
 ) {

@@ -1,12 +1,4 @@
-import {
-  arg,
-  idArg,
-  intArg,
-  mutationField,
-  nonNull,
-  nullable,
-  stringArg,
-} from "@nexus/schema";
+import { arg, idArg, intArg, mutationField, nonNull, nullable, stringArg } from "@nexus/schema";
 import { uniq } from "remeda";
 import { fromGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
@@ -22,8 +14,7 @@ import { validateHexColor } from "../tag/validators";
 import { supportMethodAccess } from "./authorizers";
 
 export const assignPetitionToUser = mutationField("assignPetitionToUser", {
-  description:
-    "Clones the petition and assigns the given user as owner and creator.",
+  description: "Clones the petition and assigns the given user as owner and creator.",
   type: "SupportMethodResponse",
   args: {
     petitionId: nonNull(idArg({ description: "Global ID of the petition" })),
@@ -70,11 +61,7 @@ export const deletePetition = mutationField("deletePetition", {
 
       await ctx.petitions.withTransaction(async (t) => {
         await ctx.petitions.deleteAllPermissions([petitionId], ctx.user!, t);
-        await ctx.petitions.deletePetitionUserNotificationsByPetitionId(
-          [petitionId],
-          undefined,
-          t
-        );
+        await ctx.petitions.deletePetitionUserNotificationsByPetitionId([petitionId], undefined, t);
         await ctx.petitions.deletePetitionById(petitionId, ctx.user!, t);
       });
       return {
@@ -92,9 +79,7 @@ export const createOrganization = mutationField("createOrganization", {
   type: "SupportMethodResponse",
   args: {
     name: nonNull(stringArg({ description: "Name of the organization" })),
-    identifier: nonNull(
-      stringArg({ description: "Identifier of the organization" })
-    ),
+    identifier: nonNull(stringArg({ description: "Identifier of the organization" })),
     status: nonNull(arg({ type: "OrganizationStatus" })),
   },
   authorize: supportMethodAccess(),
@@ -128,14 +113,10 @@ export const createUser = mutationField("createUser", {
   type: "SupportMethodResponse",
   args: {
     email: nonNull(stringArg({ description: "Email of the user" })),
-    password: nonNull(
-      stringArg({ description: "Temporary password of the user" })
-    ),
+    password: nonNull(stringArg({ description: "Temporary password of the user" })),
     firstName: nonNull(stringArg({ description: "First name of the user" })),
     lastName: nonNull(stringArg({ description: "Last name of the user" })),
-    role: nonNull(
-      arg({ type: "OrganizationRole", description: "Role of the user" })
-    ),
+    role: nonNull(arg({ type: "OrganizationRole", description: "Role of the user" })),
     organizationId: nonNull(intArg({ description: "ID of the organization" })),
   },
   validateArgs: validateAnd(
@@ -148,9 +129,7 @@ export const createUser = mutationField("createUser", {
       const email = args.email.trim().toLowerCase();
       const org = await ctx.organizations.loadOrg(args.organizationId);
       if (!org) {
-        throw new Error(
-          `Organization with id ${args.organizationId} does not exist.`
-        );
+        throw new Error(`Organization with id ${args.organizationId} does not exist.`);
       }
       const cognitoId = await ctx.aws.createCognitoUser(email, args.password);
       const user = await ctx.users.createUser(
@@ -177,8 +156,7 @@ export const createUser = mutationField("createUser", {
 export const resetSignaturitOrganizationBranding = mutationField(
   "resetSignaturitOrganizationBranding",
   {
-    description:
-      "Removes the Signaturit Branding Ids of selected organization.",
+    description: "Removes the Signaturit Branding Ids of selected organization.",
     type: "SupportMethodResponse",
     args: {
       orgId: nonNull(intArg()),
@@ -230,174 +208,151 @@ export const resetUserPassword = mutationField("resetUserPassword", {
   },
 });
 
-export const transferOrganizationOwnership = mutationField(
-  "transferOrganizationOwnership",
-  {
-    description:
-      "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",
-    type: "SupportMethodResponse",
-    args: {
-      organizationId: nonNull(
-        intArg({ description: "Numeric ID of the organization" })
-      ),
-      userId: nonNull(intArg({ description: "Numeric ID of the new owner" })),
-    },
-    authorize: supportMethodAccess(),
-    resolve: async (_, { organizationId, userId }, ctx) => {
-      const newOwner = await ctx.users.loadUser(userId);
-      if (!newOwner) {
-        return {
-          result: RESULT.FAILURE,
-          message: `Can't find user with id ${userId}`,
-        };
-      }
-      if (newOwner.org_id !== organizationId) {
-        return {
-          result: RESULT.FAILURE,
-          message: `User ${userId} does not belong to organization ${organizationId}.`,
-        };
-      }
-
-      const currentOwner = await ctx.organizations.getOrganizationOwner(
-        organizationId
-      );
-
-      await ctx.users.withTransaction(async (t) => {
-        await ctx.users.updateUserById(
-          currentOwner.id,
-          { organization_role: "ADMIN" },
-          `User:${ctx.user!.id}`,
-          t
-        );
-        await ctx.users.updateUserById(
-          userId,
-          { organization_role: "OWNER" },
-          `User:${ctx.user!.id}`,
-          t
-        );
-      });
-
+export const transferOrganizationOwnership = mutationField("transferOrganizationOwnership", {
+  description:
+    "Transfers the ownership of an organization to a given user. Old owner will get ADMIN role",
+  type: "SupportMethodResponse",
+  args: {
+    organizationId: nonNull(intArg({ description: "Numeric ID of the organization" })),
+    userId: nonNull(intArg({ description: "Numeric ID of the new owner" })),
+  },
+  authorize: supportMethodAccess(),
+  resolve: async (_, { organizationId, userId }, ctx) => {
+    const newOwner = await ctx.users.loadUser(userId);
+    if (!newOwner) {
       return {
-        result: RESULT.SUCCESS,
-        message: "Ownership transferred successfully",
+        result: RESULT.FAILURE,
+        message: `Can't find user with id ${userId}`,
       };
-    },
-  }
-);
+    }
+    if (newOwner.org_id !== organizationId) {
+      return {
+        result: RESULT.FAILURE,
+        message: `User ${userId} does not belong to organization ${organizationId}.`,
+      };
+    }
 
-export const updateLandingTemplateMetadata = mutationField(
-  "updateLandingTemplateMetadata",
-  {
-    description: "Updates the metadata of a public landing template.",
-    type: "SupportMethodResponse",
-    args: {
-      templateId: nonNull(idArg({ description: "global ID of the template" })),
-      backgroundColor: nullable(
-        stringArg({
-          description: "for example: #A0FFCE",
-        })
-      ),
-      categories: nullable(
-        stringArg({ description: "comma-separated list of categories" })
-      ),
-      description: nullable(
-        stringArg({ description: "short description for the template" })
-      ),
-      slug: nullable(stringArg({ description: "must be URL-friendly" })),
-      image: nullable(uploadArg()),
-    },
-    validateArgs: validateAnd(
-      validateHexColor((args) => args.backgroundColor, "backgroundColor"),
-      validateIf(
-        (args) => isDefined(args.image),
-        validateFile(
-          (args) => args.image!,
-          { contentType: "image/*", maxSize: 1024 * 1024 * 10 },
-          "image"
-        )
-      )
+    const currentOwner = await ctx.organizations.getOrganizationOwner(organizationId);
+
+    await ctx.users.withTransaction(async (t) => {
+      await ctx.users.updateUserById(
+        currentOwner.id,
+        { organization_role: "ADMIN" },
+        `User:${ctx.user!.id}`,
+        t
+      );
+      await ctx.users.updateUserById(
+        userId,
+        { organization_role: "OWNER" },
+        `User:${ctx.user!.id}`,
+        t
+      );
+    });
+
+    return {
+      result: RESULT.SUCCESS,
+      message: "Ownership transferred successfully",
+    };
+  },
+});
+
+export const updateLandingTemplateMetadata = mutationField("updateLandingTemplateMetadata", {
+  description: "Updates the metadata of a public landing template.",
+  type: "SupportMethodResponse",
+  args: {
+    templateId: nonNull(idArg({ description: "global ID of the template" })),
+    backgroundColor: nullable(
+      stringArg({
+        description: "for example: #A0FFCE",
+      })
     ),
-    authorize: supportMethodAccess(),
-    resolve: async (_, args, ctx, info) => {
-      try {
-        const { id } = fromGlobalId(args.templateId, "Petition");
-        const template = await ctx.petitions.loadPetition(id);
-        if (!template || !template.is_template) {
-          throw new ArgValidationError(
-            info,
-            "templateId",
-            "Id does not correspond to a template"
-          );
-        }
+    categories: nullable(stringArg({ description: "comma-separated list of categories" })),
+    description: nullable(stringArg({ description: "short description for the template" })),
+    slug: nullable(stringArg({ description: "must be URL-friendly" })),
+    image: nullable(uploadArg()),
+  },
+  validateArgs: validateAnd(
+    validateHexColor((args) => args.backgroundColor, "backgroundColor"),
+    validateIf(
+      (args) => isDefined(args.image),
+      validateFile(
+        (args) => args.image!,
+        { contentType: "image/*", maxSize: 1024 * 1024 * 10 },
+        "image"
+      )
+    )
+  ),
+  authorize: supportMethodAccess(),
+  resolve: async (_, args, ctx, info) => {
+    try {
+      const { id } = fromGlobalId(args.templateId, "Petition");
+      const template = await ctx.petitions.loadPetition(id);
+      if (!template || !template.is_template) {
+        throw new ArgValidationError(info, "templateId", "Id does not correspond to a template");
+      }
 
-        const templateMd = template!.public_metadata || {};
+      const templateMd = template!.public_metadata || {};
 
-        const newMetadata: any = {};
+      const newMetadata: any = {};
 
-        newMetadata.background_color =
-          isDefined(args.backgroundColor) && args.backgroundColor.trim() !== ""
-            ? args.backgroundColor
-            : templateMd.background_color || null;
+      newMetadata.background_color =
+        isDefined(args.backgroundColor) && args.backgroundColor.trim() !== ""
+          ? args.backgroundColor
+          : templateMd.background_color || null;
 
-        newMetadata.categories =
-          isDefined(args.categories) && args.categories.trim() !== ""
-            ? uniq(args.categories.split(",").map((w) => w.trim()))
-            : templateMd.categories || null;
+      newMetadata.categories =
+        isDefined(args.categories) && args.categories.trim() !== ""
+          ? uniq(args.categories.split(",").map((w) => w.trim()))
+          : templateMd.categories || null;
 
-        newMetadata.description =
-          isDefined(args.description) && args.description.trim() !== ""
-            ? args.description.trim()
-            : templateMd.description || null;
+      newMetadata.description =
+        isDefined(args.description) && args.description.trim() !== ""
+          ? args.description.trim()
+          : templateMd.description || null;
 
-        newMetadata.slug =
-          isDefined(args.slug) && args.slug.trim() !== ""
-            ? args.slug.trim()
-            : templateMd.slug || null;
+      newMetadata.slug =
+        isDefined(args.slug) && args.slug.trim() !== ""
+          ? args.slug.trim()
+          : templateMd.slug || null;
 
-        if (args.image) {
-          const { createReadStream, mimetype } = await args.image;
-          const filename = random(16);
-          const path = `uploads/${filename}`;
-          const res = await ctx.aws.publicFiles.uploadFile(
+      if (args.image) {
+        const { createReadStream, mimetype } = await args.image;
+        const filename = random(16);
+        const path = `uploads/${filename}`;
+        const res = await ctx.aws.publicFiles.uploadFile(path, mimetype, createReadStream());
+        const file = await ctx.files.createPublicFile(
+          {
             path,
-            mimetype,
-            createReadStream()
-          );
-          const file = await ctx.files.createPublicFile(
-            {
-              path,
-              filename,
-              content_type: mimetype,
-              size: res["ContentLength"]!.toString(),
-            },
-            `User:${ctx.user!.id}`
-          );
-
-          newMetadata.image_public_file_id = file.id;
-        } else {
-          newMetadata.image_public_file_id =
-            templateMd.image_public_file_id || null;
-        }
-
-        await ctx.petitions.updatePetition(
-          id,
-          { public_metadata: newMetadata },
+            filename,
+            content_type: mimetype,
+            size: res["ContentLength"]!.toString(),
+          },
           `User:${ctx.user!.id}`
         );
 
-        return {
-          result: RESULT.SUCCESS,
-          message: "Metadata successfully updated.",
-        };
-      } catch (error) {
-        return {
-          result: RESULT.FAILURE,
-          message: error.message,
-        };
+        newMetadata.image_public_file_id = file.id;
+      } else {
+        newMetadata.image_public_file_id = templateMd.image_public_file_id || null;
       }
-    },
-  }
-);
+
+      await ctx.petitions.updatePetition(
+        id,
+        { public_metadata: newMetadata },
+        `User:${ctx.user!.id}`
+      );
+
+      return {
+        result: RESULT.SUCCESS,
+        message: "Metadata successfully updated.",
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error.message,
+      };
+    }
+  },
+});
 export const uploadUserAvatar = mutationField("uploadUserAvatar", {
   description: "Uploads a user avatar image",
   type: "SupportMethodResponse",
@@ -417,11 +372,7 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
 
       const filename = random(16);
       const path = `uploads/${filename}`;
-      const res = await ctx.aws.publicFiles.uploadFile(
-        path,
-        mimetype,
-        createReadStream()
-      );
+      const res = await ctx.aws.publicFiles.uploadFile(path, mimetype, createReadStream());
       const file = await ctx.files.createPublicFile(
         {
           path,

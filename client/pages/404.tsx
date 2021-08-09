@@ -9,17 +9,11 @@ import { FormattedMessage } from "react-intl";
 
 export default function Custom404() {
   const setLocale = useSetLocale();
-  const [supportUrl, setSupportUrl] = useState(
-    "https://support.onparallel.com/hc"
-  );
+  const [supportUrl, setSupportUrl] = useState("https://support.onparallel.com/hc");
   useEffect(() => {
     const match = document.location.pathname.match(/^\/([a-z-]*)\//i);
     const locale = match?.[1]?.toLowerCase();
-    if (
-      locale &&
-      languages.some((l) => l.locale === locale) &&
-      locale !== "en"
-    ) {
+    if (locale && languages.some((l) => l.locale === locale) && locale !== "en") {
       setLocale(locale);
       setSupportUrl(
         (
@@ -57,16 +51,11 @@ export default function Custom404() {
         </ListItem>
         <ListItem>
           <NormalLink href={supportUrl}>
-            <FormattedMessage
-              id="public.support.support-center"
-              defaultMessage="Support center"
-            />
+            <FormattedMessage id="public.support.support-center" defaultMessage="Support center" />
           </NormalLink>
         </ListItem>
         <ListItem>
-          <NormalLink
-            href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}
-          >
+          <NormalLink href={`${supportUrl}/categories/360001331677-FAQ-Frequently-asked-questions`}>
             <FormattedMessage id="public.support.faq" defaultMessage="FAQ" />
           </NormalLink>
         </ListItem>

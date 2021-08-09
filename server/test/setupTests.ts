@@ -11,10 +11,7 @@ declare global {
 }
 
 expect.extend({
-  toContainGraphQLError(
-    errors: GraphQLFormattedError[] | undefined,
-    expectedErrorCode?: string
-  ) {
+  toContainGraphQLError(errors: GraphQLFormattedError[] | undefined, expectedErrorCode?: string) {
     const options = {
       isNot: this.isNot,
       promise: this.promise,
@@ -23,24 +20,14 @@ expect.extend({
       const errorCode = errors?.[0]?.extensions?.code;
       return {
         message: () => outdent`
-          ${this.utils.matcherHint(
-            `.toContainGraphQLError`,
-            errorCode,
-            expectedErrorCode,
-            options
-          )}
+          ${this.utils.matcherHint(`.toContainGraphQLError`, errorCode, expectedErrorCode, options)}
         `,
         pass: expectedErrorCode ? errorCode === expectedErrorCode : true,
       };
     } else {
       return {
         message: () => outdent`
-          ${this.utils.matcherHint(
-            `.toContainGraphQLError`,
-            undefined,
-            undefined,
-            options
-          )}
+          ${this.utils.matcherHint(`.toContainGraphQLError`, undefined, undefined, options)}
           
           Expected GraphQL response to have errors.
         `,

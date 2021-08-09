@@ -11,15 +11,8 @@ interface ErrorBody {
   };
 }
 
-export abstract class HttpError
-  extends Error
-  implements ResponseWrapper<ErrorBody>
-{
-  constructor(
-    public status: number,
-    public code: string,
-    public message: string
-  ) {
+export abstract class HttpError extends Error implements ResponseWrapper<ErrorBody> {
+  constructor(public status: number, public code: string, public message: string) {
     super(message);
   }
   apply(res: Response<ErrorBody>) {
@@ -57,9 +50,7 @@ export class UnknownError extends HttpError {
     super(
       500,
       UnknownError.code,
-      process.env.NODE_ENV === "development"
-        ? originalError.message
-        : "An unknown error happened"
+      process.env.NODE_ENV === "development" ? originalError.message : "An unknown error happened"
     );
   }
   apply(res: Response<ErrorBody>) {

@@ -10,10 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { PaperPlaneIcon, ThumbUpIcon } from "@parallel/chakra/icons";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { PetitionLocale } from "@parallel/graphql/__types";
 import { isEmptyRTEValue } from "@parallel/utils/slate/isEmptyRTEValue";
 import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
@@ -73,10 +70,7 @@ export function ClosePetitionDialog({
   const intl = useIntl();
   const placeholders = usePetitionMessagePlaceholderOptions();
   const [message, setMessage] = useState<RichTextEditorValue>(
-    textWithPlaceholderToSlateNodes(
-      messages[intl.locale as PetitionLocale],
-      placeholders
-    )
+    textWithPlaceholderToSlateNodes(messages[intl.locale as PetitionLocale], placeholders)
   );
   const [sendMessage, setSendMessage] = useState(requiredMessage);
   const messageRef = useRef<RichTextEditorInstance>(null);
@@ -86,8 +80,7 @@ export function ClosePetitionDialog({
   const [pdfExportTitle, setPdfExportTitle] = useState(petitionName ?? "");
 
   const isInvalid =
-    (sendMessage && isEmptyRTEValue(message)) ||
-    (attachPdfExport && !pdfExportTitle);
+    (sendMessage && isEmptyRTEValue(message)) || (attachPdfExport && !pdfExportTitle);
 
   const placeholderOptions = usePetitionMessagePlaceholderOptions();
 

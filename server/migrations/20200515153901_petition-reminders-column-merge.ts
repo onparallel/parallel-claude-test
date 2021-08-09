@@ -15,9 +15,7 @@ export async function up(knex: Knex): Promise<any> {
         )
       where reminders_active
   `);
-  await knex.raw(
-    /* sql */ `alter table petition drop constraint petition__reminders_check`
-  );
+  await knex.raw(/* sql */ `alter table petition drop constraint petition__reminders_check`);
   await knex.raw(/* sql */ `
       alter table petition add constraint petition__reminders_check check (
         (reminders_active and reminders_config is not null)

@@ -20,13 +20,7 @@ export function TimelineCommentDeletedEvent({
 }: TimelineCommentDeletedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<CommentXIcon />}
-          color="gray.700"
-          backgroundColor="gray.200"
-        />
-      }
+      icon={<TimelineIcon icon={<CommentXIcon />} color="gray.700" backgroundColor="gray.200" />}
       paddingY={2}
     >
       <FormattedMessage
@@ -41,13 +35,7 @@ export function TimelineCommentDeletedEvent({
               <UserReference user={deletedBy} />
             ) : null,
           field: <PetitionFieldReference field={field} />,
-          timeAgo: (
-            <DateTime
-              value={createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
-          ),
+          timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
         }}
       />
     </TimelineItem>

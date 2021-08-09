@@ -4,21 +4,14 @@ import {
   withApolloData,
   WithApolloDataContext,
 } from "@parallel/components/common/withApolloData";
-import {
-  PetitionQuery,
-  PetitionQueryVariables,
-} from "@parallel/graphql/__types";
+import { PetitionQuery, PetitionQueryVariables } from "@parallel/graphql/__types";
 import { compose } from "@parallel/utils/compose";
 
 function Petition() {
   return <></>;
 }
 
-Petition.getInitialProps = async ({
-  query,
-  apollo,
-  res,
-}: WithApolloDataContext) => {
+Petition.getInitialProps = async ({ query, apollo, res }: WithApolloDataContext) => {
   const { data } = await apollo.query<PetitionQuery, PetitionQueryVariables>({
     query: gql`
       query Petition($id: GID!) {
@@ -33,8 +26,7 @@ Petition.getInitialProps = async ({
     variables: { id: query.petitionId as string },
   });
   const section =
-    data?.petition?.__typename === "Petition" &&
-    data.petition.status !== "DRAFT"
+    data?.petition?.__typename === "Petition" && data.petition.status !== "DRAFT"
       ? "replies"
       : "compose";
   const { locale, petitionId } = query;

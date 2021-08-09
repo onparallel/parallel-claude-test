@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Center,
-  Flex,
-  List,
-  ListItem,
-  Progress,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Center, Flex, List, ListItem, Progress, Stack, Text } from "@chakra-ui/react";
 import { DeleteIcon, DownloadIcon } from "@parallel/chakra/icons";
 import {
   useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation,
@@ -27,10 +18,7 @@ import { FileName } from "../common/FileName";
 import { FileSize } from "../common/FileSize";
 import { IconButtonWithTooltip } from "../common/IconButtonWithTooltip";
 import { NormalLink } from "../common/Link";
-import {
-  PetitionComposeFieldSettingsProps,
-  SettingsRow,
-} from "./PetitionComposeFieldSettings";
+import { PetitionComposeFieldSettingsProps, SettingsRow } from "./PetitionComposeFieldSettings";
 
 export function DynamicSelectSettings({
   petitionId,
@@ -48,8 +36,7 @@ export function DynamicSelectSettings({
     onFieldEdit(field.id, { options: { labels: [], values: [], file: null } });
   }
 
-  const [downloadLink] =
-    useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation();
+  const [downloadLink] = useDynamicSelectSettings_dynamicSelectFieldFileDownloadLinkMutation();
 
   function handleDownloadListingsFile() {
     openNewWindow(async () => {
@@ -105,9 +92,9 @@ export function DynamicSelectSettings({
           )}
           <NormalLink
             fontWeight="bold"
-            href={`${
-              process.env.NEXT_PUBLIC_ASSETS_URL
-            }/static/documents/import_model_${intl.locale ?? "en"}.xlsx`}
+            href={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/documents/import_model_${
+              intl.locale ?? "en"
+            }.xlsx`}
           >
             <FormattedMessage
               id="field-settings.dynamic-select.import-from-excel.download-model"
@@ -171,11 +158,7 @@ function UploadedFileData({
         )}
         {file && (
           <Text fontSize="xs">
-            <DateTime
-              value={file.updatedAt}
-              format={FORMATS.LLL}
-              useRelativeTime
-            />
+            <DateTime value={file.updatedAt} format={FORMATS.LLL} useRelativeTime />
           </Text>
         )}
       </Box>
@@ -217,10 +200,7 @@ function DynamicSelectLoadedOptions({
   onDownloadOptions,
   isReadOnly,
 }: DynamicSelectLoadedOptionsProps) {
-  const firstRowFlattened = useMemo(
-    () => options.values[0].flat(options.labels.length),
-    [options]
-  );
+  const firstRowFlattened = useMemo(() => options.values[0].flat(options.labels.length), [options]);
 
   return (
     <>
@@ -261,8 +241,7 @@ function DynamicSelectOptionsDropzone({
 
   const [fileDropError, setFileDropError] = useState<string | null>(null);
 
-  const [uploadFile, { loading }] =
-    useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation();
+  const [uploadFile, { loading }] = useDynamicSelectSettings_uploadDynamicSelectFieldFileMutation();
 
   const showErrorDialog = useErrorDialog();
   async function handleFileDrop([file]: File[], rejected: FileRejection[]) {
@@ -343,11 +322,7 @@ DynamicSelectSettings.mutations = [
       $fieldId: GID!
       $file: Upload!
     ) {
-      uploadDynamicSelectFieldFile(
-        petitionId: $petitionId
-        fieldId: $fieldId
-        file: $file
-      ) {
+      uploadDynamicSelectFieldFile(petitionId: $petitionId, fieldId: $fieldId, file: $file) {
         id
         options
       }
@@ -358,10 +333,7 @@ DynamicSelectSettings.mutations = [
       $petitionId: GID!
       $fieldId: GID!
     ) {
-      dynamicSelectFieldFileDownloadLink(
-        petitionId: $petitionId
-        fieldId: $fieldId
-      ) {
+      dynamicSelectFieldFileDownloadLink(petitionId: $petitionId, fieldId: $fieldId) {
         result
         url
       }

@@ -7,11 +7,7 @@ interface SolutionsBenefitsProps extends BoxProps {
   benefits: BenefitProps[];
 }
 
-export const SolutionsBenefits = ({
-  image,
-  benefits,
-  ...props
-}: SolutionsBenefitsProps) => {
+export const SolutionsBenefits = ({ image, benefits, ...props }: SolutionsBenefitsProps) => {
   return (
     <PublicContainer
       paddingY={8}
@@ -20,11 +16,7 @@ export const SolutionsBenefits = ({
       {...props}
     >
       <PublicShowcase imageUrl={image} imageSize="350px" isReversed>
-        <Stack
-          direction="column"
-          spacing={12}
-          paddingX={{ base: 4, sm: 8, md: 12 }}
-        >
+        <Stack direction="column" spacing={12} paddingX={{ base: 4, sm: 8, md: 12 }}>
           {benefits.map((benefit, index) => (
             <Benefit key={index} {...benefit} />
           ))}
@@ -44,13 +36,7 @@ function Benefit({ image, heading, text }: BenefitProps) {
   return (
     <Stack direction="row" spacing={4}>
       <Box>
-        <Image
-          src={image}
-          loading="lazy"
-          minWidth="52px"
-          role="presentation"
-          objectFit="contain"
-        />
+        <Image src={image} loading="lazy" minWidth="52px" role="presentation" objectFit="contain" />
       </Box>
       <Box>
         <Heading as="h3" size="md" color="gray.800" marginBottom={2}>

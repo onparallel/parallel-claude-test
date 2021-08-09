@@ -16,21 +16,10 @@ import {
 import { slateNodesToTextWithPlaceholders } from "@parallel/utils/slate/placeholders/slateNodesToTextWithPlaceholders";
 import { textWithPlaceholderToSlateNodes } from "@parallel/utils/slate/placeholders/textWithPlaceholderToSlateNodes";
 import { useFixDeleteAll } from "@parallel/utils/slate/placeholders/useFixDeleteAll";
-import {
-  createSingleLinePlugin,
-  useSingleLine,
-} from "@parallel/utils/slate/SingleLinePlugin";
+import { createSingleLinePlugin, useSingleLine } from "@parallel/utils/slate/SingleLinePlugin";
 import { CustomEditor, CustomElement } from "@parallel/utils/slate/types";
-import {
-  createReactPlugin,
-  createHistoryPlugin,
-  withPlate,
-  Plate,
-} from "@udecode/plate-core";
-import {
-  ELEMENT_PARAGRAPH,
-  createParagraphPlugin,
-} from "@udecode/plate-paragraph";
+import { createReactPlugin, createHistoryPlugin, withPlate, Plate } from "@udecode/plate-core";
+import { ELEMENT_PARAGRAPH, createParagraphPlugin } from "@udecode/plate-paragraph";
 import React, {
   CSSProperties,
   KeyboardEvent,
@@ -55,13 +44,7 @@ export type PlaceholderInputRef = {
   focus: () => void;
 };
 
-function RenderElement({
-  attributes,
-  nodeProps,
-  styles,
-  element,
-  ...props
-}: any) {
+function RenderElement({ attributes, nodeProps, styles, element, ...props }: any) {
   return <Text {...attributes} {...props} />;
 }
 
@@ -73,24 +56,8 @@ const options = {
   [ELEMENT_PARAGRAPH]: { type: "paragraph" },
 };
 
-export const PlaceholderInput = chakraForwardRef<
-  "div",
-  PlaceholderInputProps,
-  PlaceholderInputRef
->(
-  (
-    {
-      id,
-      placeholder,
-      placeholders,
-      value,
-      isDisabled,
-      onChange,
-      onKeyDown,
-      ...props
-    },
-    ref
-  ) => {
+export const PlaceholderInput = chakraForwardRef<"div", PlaceholderInputProps, PlaceholderInputRef>(
+  ({ id, placeholder, placeholders, value, isDisabled, onChange, onKeyDown, ...props }, ref) => {
     const intl = useIntl();
     const {
       plugin,
@@ -114,8 +81,7 @@ export const PlaceholderInput = chakraForwardRef<
       [plugin]
     );
     const editor = useMemo<CustomEditor>(
-      () =>
-        pipe(createEditor(), withPlate({ id, plugins, options, components })),
+      () => pipe(createEditor(), withPlate({ id, plugins, options, components })),
       []
     );
 
@@ -162,10 +128,7 @@ export const PlaceholderInput = chakraForwardRef<
       _focusWithin: (inputStyleConfig as any)._focus,
     } as any;
 
-    const slateValue = useMemo(
-      () => textWithPlaceholderToSlateNodes(value, placeholders),
-      [value]
-    );
+    const slateValue = useMemo(() => textWithPlaceholderToSlateNodes(value, placeholders), [value]);
     const selected = isOpen ? values[selectedIndex] : undefined;
 
     function onPlaceholderButtonClick(event: MouseEvent) {
@@ -221,9 +184,7 @@ export const PlaceholderInput = chakraForwardRef<
               onKeyDown: handleKeyDown,
               "aria-controls": placeholderMenuId,
               "aria-autocomplete": "list",
-              "aria-activedescendant": selected
-                ? `${itemIdPrefix}-${selected.value}`
-                : undefined,
+              "aria-activedescendant": selected ? `${itemIdPrefix}-${selected.value}` : undefined,
             }}
           />
           <Tooltip
@@ -271,9 +232,7 @@ export const PlaceholderInput = chakraForwardRef<
             values={values}
             selectedIndex={selectedIndex}
             visibility={isOpen ? "visible" : "hidden"}
-            onAddPlaceholder={(placeholder) =>
-              onAddPlaceholder(editor, placeholder)
-            }
+            onAddPlaceholder={(placeholder) => onAddPlaceholder(editor, placeholder)}
             onHighlightOption={onHighlightOption}
           />
         </Portal>

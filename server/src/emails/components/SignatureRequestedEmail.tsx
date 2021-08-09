@@ -29,20 +29,14 @@ const email: Email<SignatureRequestedProps> = {
     });
   },
   text(
-    {
-      signerName: fullName,
-      documentName,
-      signButton,
-      emailBody,
-    }: SignatureRequestedProps,
+    { signerName: fullName, documentName, signButton, emailBody }: SignatureRequestedProps,
     intl: IntlShape
   ) {
     return outdent`
       ${greetingFormal({ fullName }, intl)}
       ${intl.formatMessage({
         id: "signature-requested.text",
-        defaultMessage:
-          "You have received a signature request to sign a document.",
+        defaultMessage: "You have received a signature request to sign a document.",
       })}
 
       ${intl.formatMessage(
@@ -101,11 +95,7 @@ const email: Email<SignatureRequestedProps> = {
             </MjmlText>
 
             <MjmlSection padding="0 20px">
-              <MjmlColumn
-                backgroundColor="#f6f6f6"
-                borderRadius="4px"
-                padding="10px 0"
-              >
+              <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
                 <MjmlText>
                   <FormattedMessage
                     id="signature-requested.document-name"

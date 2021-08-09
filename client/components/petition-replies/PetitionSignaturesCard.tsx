@@ -1,13 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Center,
-  Flex,
-  Heading,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Center, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import {
   AlertCircleIcon,
   CheckIcon,
@@ -98,10 +90,7 @@ const mutations = [
       $petitionId: GID!
       $signatureConfig: SignatureConfigInput
     ) {
-      updatePetition(
-        petitionId: $petitionId
-        data: { signatureConfig: $signatureConfig }
-      ) {
+      updatePetition(petitionId: $petitionId, data: { signatureConfig: $signatureConfig }) {
         ... on Petition {
           ...PetitionSignaturesCard_Petition
         }
@@ -110,12 +99,8 @@ const mutations = [
     ${fragments.Petition}
   `,
   gql`
-    mutation PetitionSignaturesCard_cancelSignatureRequest(
-      $petitionSignatureRequestId: GID!
-    ) {
-      cancelSignatureRequest(
-        petitionSignatureRequestId: $petitionSignatureRequestId
-      ) {
+    mutation PetitionSignaturesCard_cancelSignatureRequest($petitionSignatureRequestId: GID!) {
+      cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
         id
         status
       }
@@ -146,192 +131,171 @@ const mutations = [
 ];
 
 export const PetitionSignaturesCard = Object.assign(
-  chakraForwardRef<"section", PetitionSignaturesCardProps>(
-    function PetitionSignaturesCard(
-      { petition, user, onRefetchPetition, ...props },
-      ref
+  chakraForwardRef<"section", PetitionSignaturesCardProps>(function PetitionSignaturesCard(
+    { petition, user, onRefetchPetition, ...props },
+    ref
+  ) {
+    let current: Maybe<UnwrapArray<PetitionSignaturesCard_PetitionFragment["signatureRequests"]>> =
+      petition.signatureRequests![0];
+    const older = petition.signatureRequests!.slice(1);
+    /**
+     * If the signature config is defined on the petition and the last request is finished,
+     * we consider that a new signature will be needed.
+     * So we move the current to the older requests to give space in the Card for a new request
+     */
+    if (
+      petition.signatureConfig &&
+      (current?.status === "COMPLETED" || current?.status === "CANCELLED")
     ) {
-      let current: Maybe<
-        UnwrapArray<
-          PetitionSignaturesCard_PetitionFragment["signatureRequests"]
-        >
-      > = petition.signatureRequests![0];
-      const older = petition.signatureRequests!.slice(1);
-      /**
-       * If the signature config is defined on the petition and the last request is finished,
-       * we consider that a new signature will be needed.
-       * So we move the current to the older requests to give space in the Card for a new request
-       */
-      if (
-        petition.signatureConfig &&
-        (current?.status === "COMPLETED" || current?.status === "CANCELLED")
-      ) {
-        older.unshift(current);
-        current = null;
-      }
+      older.unshift(current);
+      current = null;
+    }
 
-      const [cancelSignatureRequest] =
-        usePetitionSignaturesCard_cancelSignatureRequestMutation();
-      const [startSignatureRequest] =
-        usePetitionSignaturesCard_startSignatureRequestMutation();
+    const [cancelSignatureRequest] = usePetitionSignaturesCard_cancelSignatureRequestMutation();
+    const [startSignatureRequest] = usePetitionSignaturesCard_startSignatureRequestMutation();
 
-      const [updateSignatureConfig] =
-        usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
+    const [updateSignatureConfig] =
+      usePetitionSignaturesCard_updatePetitionSignatureConfigMutation();
 
-      const [downloadSignedDoc] =
-        usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
+    const [downloadSignedDoc] = usePetitionSignaturesCard_signedPetitionDownloadLinkMutation();
 
-      const handleCancelSignatureProcess = useCallback(
-        async (petitionSignatureRequestId: string) => {
-          await updateSignatureConfig({
-            variables: { petitionId: petition.id, signatureConfig: null },
-          });
-          await cancelSignatureRequest({
-            variables: { petitionSignatureRequestId },
-          });
-        },
-        [updateSignatureConfig, cancelSignatureRequest]
-      );
-
-      const handleStartSignatureProcess = useCallback(async () => {
-        await startSignatureRequest({
-          variables: { petitionId: petition.id },
+    const handleCancelSignatureProcess = useCallback(
+      async (petitionSignatureRequestId: string) => {
+        await updateSignatureConfig({
+          variables: { petitionId: petition.id, signatureConfig: null },
         });
-        await onRefetchPetition();
-      }, [startSignatureRequest, petition]);
+        await cancelSignatureRequest({
+          variables: { petitionSignatureRequestId },
+        });
+      },
+      [updateSignatureConfig, cancelSignatureRequest]
+    );
 
-      const handleDownloadSignedDoc = useCallback(
-        (petitionSignatureRequestId: string) => {
-          openNewWindow(async () => {
-            const { data } = await downloadSignedDoc({
-              variables: { petitionSignatureRequestId, preview: true },
-            });
-            const { url, result } = data!.signedPetitionDownloadLink;
-            if (result !== "SUCCESS") {
-              throw new Error();
-            }
-            return url!;
+    const handleStartSignatureProcess = useCallback(async () => {
+      await startSignatureRequest({
+        variables: { petitionId: petition.id },
+      });
+      await onRefetchPetition();
+    }, [startSignatureRequest, petition]);
+
+    const handleDownloadSignedDoc = useCallback(
+      (petitionSignatureRequestId: string) => {
+        openNewWindow(async () => {
+          const { data } = await downloadSignedDoc({
+            variables: { petitionSignatureRequestId, preview: true },
           });
-        },
-        [downloadSignedDoc]
-      );
-      const showSignatureConfigDialog = useSignatureConfigDialog();
-
-      const showConfirmRestartSignature =
-        useConfirmRestartSignatureRequestDialog();
-      async function handleAddNewSignature() {
-        try {
-          if (current?.status === "COMPLETED") {
-            await showConfirmRestartSignature({});
+          const { url, result } = data!.signedPetitionDownloadLink;
+          if (result !== "SUCCESS") {
+            throw new Error();
           }
-          const signatureConfig = await showSignatureConfigDialog({
-            petition,
-            providers: user.organization.signatureIntegrations,
-          });
-          await updateSignatureConfig({
-            variables: { petitionId: petition.id, signatureConfig },
-          });
+          return url!;
+        });
+      },
+      [downloadSignedDoc]
+    );
+    const showSignatureConfigDialog = useSignatureConfigDialog();
 
-          if (["COMPLETED", "CLOSED"].includes(petition.status)) {
-            await handleStartSignatureProcess();
-          }
-        } catch {}
-      }
-
-      async function handleUpdateSignatureConfig(
-        signatureConfig: SignatureConfigInput | null
-      ) {
+    const showConfirmRestartSignature = useConfirmRestartSignatureRequestDialog();
+    async function handleAddNewSignature() {
+      try {
+        if (current?.status === "COMPLETED") {
+          await showConfirmRestartSignature({});
+        }
+        const signatureConfig = await showSignatureConfigDialog({
+          petition,
+          providers: user.organization.signatureIntegrations,
+        });
         await updateSignatureConfig({
           variables: { petitionId: petition.id, signatureConfig },
         });
-      }
 
-      const intl = useIntl();
-
-      return (
-        <Card ref={ref} {...props}>
-          <GenericCardHeader
-            rightAction={
-              !petition.signatureConfig ||
-              current?.status === "COMPLETED" ||
-              current?.status === "CANCELLED" ? (
-                <IconButtonWithTooltip
-                  label={intl.formatMessage({
-                    id: "component.petition-signatures-card.add-signature.label",
-                    defaultMessage: "Add signature",
-                  })}
-                  size="sm"
-                  icon={<SignaturePlusIcon fontSize="20px" />}
-                  onClick={handleAddNewSignature}
-                  borderColor="gray.300"
-                  borderWidth="1px"
-                  backgroundColor="white"
-                />
-              ) : null
-            }
-          >
-            <Box as="span" display="flex">
-              <SignatureIcon fontSize="20px" marginRight={2} lineHeight={5} />
-              <FormattedMessage
-                id="component.petition-signatures-card.header"
-                defaultMessage="Petition eSignature"
-              />
-            </Box>
-          </GenericCardHeader>
-          {current || older.length > 0 || petition.signatureConfig ? (
-            <>
-              {petition.signatureConfig && !current ? (
-                <NewSignatureRequestRow
-                  petition={petition}
-                  onStart={handleStartSignatureProcess}
-                  onUpdateConfig={handleUpdateSignatureConfig}
-                />
-              ) : current ? (
-                <CurrentSignatureRequestRow
-                  signatureRequest={current}
-                  onCancel={handleCancelSignatureProcess}
-                  onDownload={handleDownloadSignedDoc}
-                />
-              ) : null}
-              {older.length ? (
-                <OlderSignatureRequests
-                  signatures={older}
-                  onDownload={handleDownloadSignedDoc}
-                />
-              ) : null}
-            </>
-          ) : (
-            <Center
-              flexDirection="column"
-              minHeight={24}
-              textStyle="hint"
-              textAlign="center"
-            >
-              <Text>
-                <FormattedMessage
-                  id="component.petition-signatures-card.no-signature-configured"
-                  defaultMessage="No signature has been configured for this petition."
-                />
-              </Text>
-              <Text>
-                <FormattedMessage
-                  id="component.petition-signatures-card.no-signature-configured-2"
-                  defaultMessage="If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
-                  values={{
-                    a: (chunks: any[]) => (
-                      <Link href={`/app/petitions/${petition.id}/compose`}>
-                        {chunks}
-                      </Link>
-                    ),
-                  }}
-                />
-              </Text>
-            </Center>
-          )}
-        </Card>
-      );
+        if (["COMPLETED", "CLOSED"].includes(petition.status)) {
+          await handleStartSignatureProcess();
+        }
+      } catch {}
     }
-  ),
+
+    async function handleUpdateSignatureConfig(signatureConfig: SignatureConfigInput | null) {
+      await updateSignatureConfig({
+        variables: { petitionId: petition.id, signatureConfig },
+      });
+    }
+
+    const intl = useIntl();
+
+    return (
+      <Card ref={ref} {...props}>
+        <GenericCardHeader
+          rightAction={
+            !petition.signatureConfig ||
+            current?.status === "COMPLETED" ||
+            current?.status === "CANCELLED" ? (
+              <IconButtonWithTooltip
+                label={intl.formatMessage({
+                  id: "component.petition-signatures-card.add-signature.label",
+                  defaultMessage: "Add signature",
+                })}
+                size="sm"
+                icon={<SignaturePlusIcon fontSize="20px" />}
+                onClick={handleAddNewSignature}
+                borderColor="gray.300"
+                borderWidth="1px"
+                backgroundColor="white"
+              />
+            ) : null
+          }
+        >
+          <Box as="span" display="flex">
+            <SignatureIcon fontSize="20px" marginRight={2} lineHeight={5} />
+            <FormattedMessage
+              id="component.petition-signatures-card.header"
+              defaultMessage="Petition eSignature"
+            />
+          </Box>
+        </GenericCardHeader>
+        {current || older.length > 0 || petition.signatureConfig ? (
+          <>
+            {petition.signatureConfig && !current ? (
+              <NewSignatureRequestRow
+                petition={petition}
+                onStart={handleStartSignatureProcess}
+                onUpdateConfig={handleUpdateSignatureConfig}
+              />
+            ) : current ? (
+              <CurrentSignatureRequestRow
+                signatureRequest={current}
+                onCancel={handleCancelSignatureProcess}
+                onDownload={handleDownloadSignedDoc}
+              />
+            ) : null}
+            {older.length ? (
+              <OlderSignatureRequests signatures={older} onDownload={handleDownloadSignedDoc} />
+            ) : null}
+          </>
+        ) : (
+          <Center flexDirection="column" minHeight={24} textStyle="hint" textAlign="center">
+            <Text>
+              <FormattedMessage
+                id="component.petition-signatures-card.no-signature-configured"
+                defaultMessage="No signature has been configured for this petition."
+              />
+            </Text>
+            <Text>
+              <FormattedMessage
+                id="component.petition-signatures-card.no-signature-configured-2"
+                defaultMessage="If you need it, you can configure it from the petition settings in the <a>Compose</a> tab."
+                values={{
+                  a: (chunks: any[]) => (
+                    <Link href={`/app/petitions/${petition.id}/compose`}>{chunks}</Link>
+                  ),
+                }}
+              />
+            </Text>
+          </Center>
+        )}
+      </Card>
+    );
+  }),
   { fragments, mutations }
 );
 
@@ -377,12 +341,7 @@ function NewSignatureRequestRow({
               defaultMessage="Status"
             />
           </Heading>
-          <Stack
-            direction="row"
-            display="inline-flex"
-            alignItems="center"
-            color="gray.600"
-          >
+          <Stack direction="row" display="inline-flex" alignItems="center" color="gray.600">
             <TimeIcon />
             <Text>
               <FormattedMessage
@@ -401,24 +360,15 @@ function NewSignatureRequestRow({
           </Heading>
           {signers.length > 0 ? (
             <FormattedList
-              value={signers.map((contact, i) => [
-                <ContactLink contact={contact} key={i} />,
-              ])}
+              value={signers.map((contact, i) => [<ContactLink contact={contact} key={i} />])}
             />
           ) : (
-            <FormattedMessage
-              id="generic.not-specified"
-              defaultMessage="Not specified"
-            />
+            <FormattedMessage id="generic.not-specified" defaultMessage="Not specified" />
           )}
         </Box>
         <Stack flex="1" direction="row" justifyContent="flex-end">
           {petition.status === "PENDING" ? (
-            <Button
-              width="24"
-              colorScheme="red"
-              onClick={() => onUpdateConfig(null)}
-            >
+            <Button width="24" colorScheme="red" onClick={() => onUpdateConfig(null)}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
           ) : (
@@ -426,12 +376,7 @@ function NewSignatureRequestRow({
               <Button width="24" onClick={() => onUpdateConfig(null)}>
                 <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
               </Button>
-              <Button
-                width="24"
-                colorScheme="purple"
-                marginLeft={2}
-                onClick={handleStartSignature}
-              >
+              <Button width="24" colorScheme="purple" marginLeft={2} onClick={handleStartSignature}>
                 {signers.length === 0 ? (
                   <FormattedMessage
                     id="component.petition-signatures-card.start"
@@ -492,30 +437,17 @@ function CurrentSignatureRequestRow({
             />
           </Heading>
           <FormattedList
-            value={signers.map((contact, i) => [
-              <ContactLink contact={contact} key={i} />,
-            ])}
+            value={signers.map((contact, i) => [<ContactLink contact={contact} key={i} />])}
           />
         </Box>
         <Stack flex="1" direction="row" justifyContent="flex-end">
           {isAwaitingSignature ? (
-            <Button
-              width="24"
-              colorScheme="red"
-              onClick={() => onCancel(signatureRequest.id)}
-            >
+            <Button width="24" colorScheme="red" onClick={() => onCancel(signatureRequest.id)}>
               <FormattedMessage id="generic.cancel" defaultMessage="Cancel" />
             </Button>
           ) : isSigned ? (
-            <Button
-              width="24"
-              colorScheme="purple"
-              onClick={() => onDownload(signatureRequest.id)}
-            >
-              <FormattedMessage
-                id="generic.download"
-                defaultMessage="Download"
-              />
+            <Button width="24" colorScheme="purple" onClick={() => onDownload(signatureRequest.id)}>
+              <FormattedMessage id="generic.download" defaultMessage="Download" />
             </Button>
           ) : null}
         </Stack>
@@ -545,12 +477,7 @@ function OlderSignatureRequests({
       <Divider />
       <Stack as="ul" paddingX={4} paddingY={2}>
         {signatures.map((signature) => (
-          <Flex
-            as="li"
-            key={signature.id}
-            listStyleType="none"
-            alignItems="center"
-          >
+          <Flex as="li" key={signature.id} listStyleType="none" alignItems="center">
             <PetitionSignatureRequestStatusText status={signature.status} />
             <Text as="span" marginX={2}>
               -
@@ -564,16 +491,8 @@ function OlderSignatureRequests({
             </Text>
             <Spacer />
             {signature.status === "COMPLETED" ? (
-              <Button
-                width="24"
-                fontSize="sm"
-                height={8}
-                onClick={() => onDownload(signature.id)}
-              >
-                <FormattedMessage
-                  id="generic.download"
-                  defaultMessage="Download"
-                />
+              <Button width="24" fontSize="sm" height={8} onClick={() => onDownload(signature.id)}>
+                <FormattedMessage id="generic.download" defaultMessage="Download" />
               </Button>
             ) : null}
           </Flex>
@@ -591,12 +510,7 @@ function PetitionSignatureRequestStatusText({
   switch (status) {
     case "ENQUEUED":
       return (
-        <Stack
-          direction="row"
-          display="inline-flex"
-          alignItems="center"
-          color="gray.600"
-        >
+        <Stack direction="row" display="inline-flex" alignItems="center" color="gray.600">
           <PaperPlaneIcon />
           <Text>
             <FormattedMessage
@@ -608,12 +522,7 @@ function PetitionSignatureRequestStatusText({
       );
     case "PROCESSING":
       return (
-        <Stack
-          direction="row"
-          display="inline-flex"
-          alignItems="center"
-          color="yellow.600"
-        >
+        <Stack direction="row" display="inline-flex" alignItems="center" color="yellow.600">
           <TimeIcon />
           <Text>
             <FormattedMessage
@@ -625,12 +534,7 @@ function PetitionSignatureRequestStatusText({
       );
     case "CANCELLED":
       return (
-        <Stack
-          direction="row"
-          display="inline-flex"
-          alignItems="center"
-          color="red.500"
-        >
+        <Stack direction="row" display="inline-flex" alignItems="center" color="red.500">
           <AlertCircleIcon />
           <Text>
             <FormattedMessage
@@ -642,12 +546,7 @@ function PetitionSignatureRequestStatusText({
       );
     case "COMPLETED":
       return (
-        <Stack
-          direction="row"
-          display="inline-flex"
-          alignItems="center"
-          color="green.500"
-        >
+        <Stack direction="row" display="inline-flex" alignItems="center" color="green.500">
           <CheckIcon />
           <Text>
             <FormattedMessage

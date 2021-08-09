@@ -12,19 +12,10 @@ export type TimelinePetitionClonedEventProps = {
   event: TimelinePetitionClonedEvent_PetitionClonedEventFragment;
 };
 
-export function TimelinePetitionClonedEvent({
-  event,
-  userId,
-}: TimelinePetitionClonedEventProps) {
+export function TimelinePetitionClonedEvent({ event, userId }: TimelinePetitionClonedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<PlusCircleIcon />}
-          color="white"
-          backgroundColor="purple.500"
-        />
-      }
+      icon={<TimelineIcon icon={<PlusCircleIcon />} color="white" backgroundColor="purple.500" />}
     >
       <FormattedMessage
         id="timeline.petition-cloned-description"
@@ -33,11 +24,7 @@ export function TimelinePetitionClonedEvent({
           same: userId === event.user?.id,
           user: <UserReference user={event.user} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

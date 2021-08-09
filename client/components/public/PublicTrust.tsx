@@ -1,12 +1,4 @@
-import {
-  Box,
-  Center,
-  BoxProps,
-  Grid,
-  Heading,
-  Image,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Center, BoxProps, Grid, Heading, Image, Text } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NormalLink } from "../common/Link";
@@ -22,17 +14,8 @@ export function PublicTrust(props: BoxProps) {
         ...props,
       }}
     >
-      <Heading
-        as="h2"
-        size="xl"
-        fontWeight="bold"
-        marginBottom={8}
-        textAlign="center"
-      >
-        <FormattedMessage
-          id="public.who-trust-us.title"
-          defaultMessage="Already trust us"
-        />
+      <Heading as="h2" size="xl" fontWeight="bold" marginBottom={8} textAlign="center">
+        <FormattedMessage id="public.who-trust-us.title" defaultMessage="Already trust us" />
       </Heading>
       <Grid
         alignItems="flex-end"
@@ -54,11 +37,7 @@ export function PublicTrust(props: BoxProps) {
           </NormalLink>
         </Center>
         <Center>
-          <NormalLink
-            href="https://es.andersen.com/"
-            isExternal
-            marginBottom={{ md: "8px" }}
-          >
+          <NormalLink href="https://es.andersen.com/" isExternal marginBottom={{ md: "8px" }}>
             <Image
               alt="Andersen"
               width="180px"

@@ -1,8 +1,5 @@
 import { Knex } from "knex";
-import {
-  addUserNotificationType,
-  removeUserNotificationType,
-} from "./helpers/notificationTypes";
+import { addUserNotificationType, removeUserNotificationType } from "./helpers/notificationTypes";
 
 export async function up(knex: Knex): Promise<void> {
   await addUserNotificationType(knex, "PETITION_COMPLETED");

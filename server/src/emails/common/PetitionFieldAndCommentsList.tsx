@@ -23,9 +23,7 @@ export type PetitionFieldAndCommentsProps = {
   fields: PetitionFieldAndComments[];
 };
 
-export function PetitionFieldAndComments({
-  fields,
-}: PetitionFieldAndCommentsProps) {
+export function PetitionFieldAndComments({ fields }: PetitionFieldAndCommentsProps) {
   /** group together consecutive comments of the same author */
   function groupCommentsByAuthor(comments: FieldComment[]) {
     const groups: FieldComment[][] = [];
@@ -74,11 +72,7 @@ export function PetitionFieldAndComments({
             <MjmlSection key={i} padding="8px 50px">
               {commentGroup.map(({ id, content, author }, commentNumber) => (
                 <MjmlSection key={id} padding="2px 0">
-                  <MjmlColumn
-                    backgroundColor="#f6f6f6"
-                    borderRadius="4px"
-                    padding="8px 16px"
-                  >
+                  <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="8px 16px">
                     {commentNumber === 0 && (
                       <MjmlText fontSize="12px" padding="0">
                         <b>{author.name}</b>

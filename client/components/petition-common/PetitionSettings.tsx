@@ -42,10 +42,7 @@ import { DialogProps, useDialog } from "../common/DialogProvider";
 import { HelpPopover } from "../common/HelpPopover";
 import { Spacer } from "../common/Spacer";
 import { usePetitionDeadlineDialog } from "../petition-compose/PetitionDeadlineDialog";
-import {
-  SignatureConfigDialog,
-  useSignatureConfigDialog,
-} from "./SignatureConfigDialog";
+import { SignatureConfigDialog, useSignatureConfigDialog } from "./SignatureConfigDialog";
 
 export type PetitionSettingsProps = {
   user: PetitionSettings_UserFragment;
@@ -53,11 +50,7 @@ export type PetitionSettingsProps = {
   onUpdatePetition: (value: UpdatePetitionInput) => void;
 };
 
-function _PetitionSettings({
-  user,
-  petition,
-  onUpdatePetition,
-}: PetitionSettingsProps) {
+function _PetitionSettings({ user, petition, onUpdatePetition }: PetitionSettingsProps) {
   const locales = useSupportedLocales();
   const hasSignature =
     petition.__typename === "Petition" &&
@@ -75,16 +68,10 @@ function _PetitionSettings({
 
   const showSignatureConfigDialog = useSignatureConfigDialog();
 
-  const showConfirmConfigureOngoingSignature = useDialog(
-    ConfirmConfigureOngoingSignature
-  );
-  const showConfirmSignatureConfigChanged = useDialog(
-    ConfirmSignatureConfigChanged
-  );
-  const [cancelSignatureRequest] =
-    usePetitionSettings_cancelPetitionSignatureRequestMutation();
-  const [startSignatureRequest] =
-    usePetitionSettings_startPetitionSignatureRequestMutation();
+  const showConfirmConfigureOngoingSignature = useDialog(ConfirmConfigureOngoingSignature);
+  const showConfirmSignatureConfigChanged = useDialog(ConfirmSignatureConfigChanged);
+  const [cancelSignatureRequest] = usePetitionSettings_cancelPetitionSignatureRequestMutation();
+  const [startSignatureRequest] = usePetitionSettings_startPetitionSignatureRequestMutation();
 
   async function handleConfigureSignatureClick() {
     if (petition.__typename !== "Petition") {
@@ -121,9 +108,7 @@ function _PetitionSettings({
     } catch {}
   }
 
-  const showConfirmDisableOngoingSignature = useDialog(
-    ConfirmDisableOngoingSignature
-  );
+  const showConfirmDisableOngoingSignature = useDialog(ConfirmDisableOngoingSignature);
   async function handleSignatureChange(value: boolean) {
     if (value) {
       await handleConfigureSignatureClick();
@@ -171,9 +156,7 @@ function _PetitionSettings({
         <Select
           name="petition-locale"
           value={petition.locale}
-          onChange={(event) =>
-            onUpdatePetition({ locale: event.target.value as any })
-          }
+          onChange={(event) => onUpdatePetition({ locale: event.target.value as any })}
           isDisabled={isReadOnly}
         >
           {locales.map((locale) => (
@@ -186,10 +169,7 @@ function _PetitionSettings({
       {petition.__typename === "Petition" ? (
         <FormControl id="petition-deadline">
           <FormLabel display="flex" alignItems="center">
-            <FormattedMessage
-              id="petition.deadline-label"
-              defaultMessage="Deadline"
-            />
+            <FormattedMessage id="petition.deadline-label" defaultMessage="Deadline" />
             <HelpPopover marginLeft={2}>
               <Text fontSize="sm">
                 <FormattedMessage
@@ -201,9 +181,7 @@ function _PetitionSettings({
           </FormLabel>
           <DeadlineInput
             value={petition.deadline ? new Date(petition.deadline) : null}
-            onChange={(value) =>
-              onUpdatePetition({ deadline: value?.toISOString() ?? null })
-            }
+            onChange={(value) => onUpdatePetition({ deadline: value?.toISOString() ?? null })}
           />
         </FormControl>
       ) : null}
@@ -216,13 +194,10 @@ function _PetitionSettings({
           />
         }
         isChecked={petition.hasCommentsEnabled}
-        onChange={async (value) =>
-          await onUpdatePetition({ hasCommentsEnabled: value })
-        }
+        onChange={async (value) => await onUpdatePetition({ hasCommentsEnabled: value })}
         isDisabled={isReadOnly}
       />
-      {petition.__typename === "Petition" &&
-      (petition.signatureConfig || hasSignature) ? (
+      {petition.__typename === "Petition" && (petition.signatureConfig || hasSignature) ? (
         <Box>
           <SwitchSetting
             icon={<SignatureIcon />}
@@ -238,10 +213,7 @@ function _PetitionSettings({
           />
           <Collapse in={Boolean(petition.signatureConfig)}>
             <Flex justifyContent="center" marginTop={2}>
-              <Button
-                onClick={handleConfigureSignatureClick}
-                isDisabled={!hasSignature}
-              >
+              <Button onClick={handleConfigureSignatureClick} isDisabled={!hasSignature}>
                 <Text as="span">
                   <FormattedMessage
                     id="component.petition-settings.petition-signature-configure"
@@ -254,9 +226,7 @@ function _PetitionSettings({
         </Box>
       ) : null}
       <SwitchSetting
-        isDisabled={
-          petition.__typename === "PetitionTemplate" && petition.isPublic
-        }
+        isDisabled={petition.__typename === "PetitionTemplate" && petition.isPublic}
         icon={petition.isReadOnly ? <LockClosedIcon /> : <LockOpenIcon />}
         title={
           <FormattedMessage
@@ -277,9 +247,7 @@ function _PetitionSettings({
       />
       {user.hasSkipForwardSecurity ? (
         <SwitchSetting
-          isDisabled={
-            petition.__typename === "PetitionTemplate" && petition.isPublic
-          }
+          isDisabled={petition.__typename === "PetitionTemplate" && petition.isPublic}
           icon={<ShieldIcon />}
           title={
             <FormattedMessage
@@ -299,9 +267,7 @@ function _PetitionSettings({
       ) : null}
       {user.hasHideRecipientViewContents ? (
         <SwitchSetting
-          isDisabled={
-            petition.__typename === "PetitionTemplate" && petition.isPublic
-          }
+          isDisabled={petition.__typename === "PetitionTemplate" && petition.isPublic}
           icon={<ListIcon />}
           title={
             <FormattedMessage
@@ -330,9 +296,7 @@ const fragments = {
     fragment PetitionSettings_User on User {
       hasPetitionSignature: hasFeatureFlag(featureFlag: PETITION_SIGNATURE)
       hasSkipForwardSecurity: hasFeatureFlag(featureFlag: SKIP_FORWARD_SECURITY)
-      hasHideRecipientViewContents: hasFeatureFlag(
-        featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS
-      )
+      hasHideRecipientViewContents: hasFeatureFlag(featureFlag: HIDE_RECIPIENT_VIEW_CONTENTS)
       organization {
         id
         signatureIntegrations: integrations(type: SIGNATURE) {
@@ -368,12 +332,8 @@ const fragments = {
 };
 const mutations = [
   gql`
-    mutation PetitionSettings_cancelPetitionSignatureRequest(
-      $petitionSignatureRequestId: GID!
-    ) {
-      cancelSignatureRequest(
-        petitionSignatureRequestId: $petitionSignatureRequestId
-      ) {
+    mutation PetitionSettings_cancelPetitionSignatureRequest($petitionSignatureRequestId: GID!) {
+      cancelSignatureRequest(petitionSignatureRequestId: $petitionSignatureRequestId) {
         id
         status
       }
@@ -592,10 +552,7 @@ function ConfirmConfigureOngoingSignature(props: DialogProps<{}, void>) {
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="generic.i-understand"
-            defaultMessage="I understand"
-          />
+          <FormattedMessage id="generic.i-understand" defaultMessage="I understand" />
         </Button>
       }
       {...props}
@@ -620,10 +577,7 @@ function ConfirmSignatureConfigChanged(props: DialogProps<{}, void>) {
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="generic.i-understand"
-            defaultMessage="I understand"
-          />
+          <FormattedMessage id="generic.i-understand" defaultMessage="I understand" />
         </Button>
       }
       {...props}

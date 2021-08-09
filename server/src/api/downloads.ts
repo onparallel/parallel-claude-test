@@ -22,13 +22,8 @@ export const downloads = Router()
     try {
       const ctx = req.context;
       const user = ctx.user!;
-      const { id: petitionId } = fromGlobalId(
-        req.params.petitionId,
-        "Petition"
-      );
-      const hasAccess = await ctx.petitions.userHasAccessToPetitions(user.id, [
-        petitionId,
-      ]);
+      const { id: petitionId } = fromGlobalId(req.params.petitionId, "Petition");
+      const hasAccess = await ctx.petitions.userHasAccessToPetitions(user.id, [petitionId]);
       if (!hasAccess) {
         throw new Error("No access");
       }
@@ -40,9 +35,7 @@ export const downloads = Router()
         "content-disposition",
         contentDisposition(sanitize(`${name}.zip`), { type: "attachment" })
       );
-      const zipFile = createZipFile(
-        getPetitionFiles(ctx, petitionId, pattern, petition?.locale)
-      );
+      const zipFile = createZipFile(getPetitionFiles(ctx, petitionId, pattern, petition?.locale));
       zipFile.pipe(res);
     } catch (error) {
       next(error);
@@ -52,14 +45,9 @@ export const downloads = Router()
     try {
       const ctx = req.context;
       const user = ctx.user!;
-      const { id: petitionId } = fromGlobalId(
-        req.params.petitionId,
-        "Petition"
-      );
+      const { id: petitionId } = fromGlobalId(req.params.petitionId, "Petition");
 
-      const hasAccess = await ctx.petitions.userHasAccessToPetitions(user.id, [
-        petitionId,
-      ]);
+      const hasAccess = await ctx.petitions.userHasAccessToPetitions(user.id, [petitionId]);
       if (!hasAccess) {
         throw new Error("No access");
       }
@@ -82,9 +70,9 @@ export const downloads = Router()
       });
 
       const buffer = await ctx.printer.pdf(
-        `http://localhost:3000/${
-          petition.locale
-        }/print/petition-pdf?${new URLSearchParams({ token })}`,
+        `http://localhost:3000/${petition.locale}/print/petition-pdf?${new URLSearchParams({
+          token,
+        })}`,
         {
           height: "297mm",
           width: "210mm",
@@ -131,10 +119,7 @@ async function* getPetitionFiles(
     replies: repliesByFieldId[f.id],
   }));
 
-  const visibleFields = zip(
-    fieldsWithReplies,
-    evaluateFieldVisibility(fieldsWithReplies)
-  )
+  const visibleFields = zip(fieldsWithReplies, evaluateFieldVisibility(fieldsWithReplies))
     .filter(([, isVisible]) => isVisible)
     .map(([field]) => field);
 
@@ -174,9 +159,7 @@ async function* getPetitionFiles(
           let filename = sanitize(`${name}${extension.toLowerCase()}`);
           let counter = 1;
           while (seen.has(filename)) {
-            filename = sanitize(
-              `${name} ${++counter}${extension.toLowerCase()}`
-            );
+            filename = sanitize(`${name} ${++counter}${extension.toLowerCase()}`);
           }
           seen.add(filename);
           yield {
@@ -186,9 +169,7 @@ async function* getPetitionFiles(
         }
       }
     } else if (
-      ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(
-        field.type
-      )
+      ["TEXT", "SHORT_TEXT", "SELECT", "DYNAMIC_SELECT", "CHECKBOX"].includes(field.type)
     ) {
       excelWorkbook.addPetitionFieldReply(field, field.replies);
     }
@@ -200,14 +181,13 @@ async function* getPetitionFiles(
     yield await excelWorkbook.export();
   }
 
-  const latestPetitionSignature =
-    await ctx.petitions.loadLatestPetitionSignatureByPetitionId(petitionId);
+  const latestPetitionSignature = await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
+    petitionId
+  );
 
   if (latestPetitionSignature?.status === "COMPLETED") {
     if (isDefined(latestPetitionSignature.file_upload_id)) {
-      const signedPetition = await ctx.files.loadFileUpload(
-        latestPetitionSignature.file_upload_id
-      );
+      const signedPetition = await ctx.files.loadFileUpload(latestPetitionSignature.file_upload_id);
       if (signedPetition) {
         yield {
           filename: signedPetition.filename,
@@ -235,10 +215,7 @@ function rename<T extends string>(
   replacer: (value: T) => string
 ) {
   const parts = pattern.split(
-    new RegExp(
-      `(#(?:${placeholders.map((p) => escapeStringRegexp(p)).join("|")})#)`,
-      "g"
-    )
+    new RegExp(`(#(?:${placeholders.map((p) => escapeStringRegexp(p)).join("|")})#)`, "g")
   );
   return parts
     .map((part) => {

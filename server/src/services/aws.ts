@@ -16,9 +16,7 @@ export interface IAws {
   fileUploads: IStorage;
   enqueueMessages(
     queue: keyof Config["queueWorkers"],
-    messages:
-      | { id: string; body: any; groupId: string }[]
-      | { body: any; groupId: string }
+    messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string }
   ): Promise<void>;
   enqueueEvents(events: MaybeArray<PetitionEvent | SystemEvent>): void;
   createCognitoUser(
@@ -53,24 +51,15 @@ export class Aws implements IAws {
   }
 
   @Memoize() public get fileUploads() {
-    return this.storageFactory(
-      this.s3,
-      this.config.s3.fileUploadsBucketName
-    ) as Storage;
+    return this.storageFactory(this.s3, this.config.s3.fileUploadsBucketName) as Storage;
   }
 
   @Memoize() public get temporaryFiles() {
-    return this.storageFactory(
-      this.s3,
-      this.config.s3.temporaryFilesBucketName
-    ) as Storage;
+    return this.storageFactory(this.s3, this.config.s3.temporaryFilesBucketName) as Storage;
   }
 
   @Memoize() public get publicFiles() {
-    return this.storageFactory(
-      this.s3,
-      this.config.s3.publicFilesBucketName
-    ) as Storage;
+    return this.storageFactory(this.s3, this.config.s3.publicFilesBucketName) as Storage;
   }
 
   constructor(
@@ -83,9 +72,7 @@ export class Aws implements IAws {
       ...config.aws,
       signatureVersion: "v4",
       logger:
-        process.env.NODE_ENV === "production"
-          ? undefined
-          : { log: logger.debug.bind(logger) },
+        process.env.NODE_ENV === "production" ? undefined : { log: logger.debug.bind(logger) },
     });
   }
 
@@ -95,9 +82,7 @@ export class Aws implements IAws {
 
   async enqueueMessages(
     queue: keyof Config["queueWorkers"],
-    messages:
-      | { id: string; body: any; groupId: string }[]
-      | { body: any; groupId: string }
+    messages: { id: string; body: any; groupId: string }[] | { body: any; groupId: string }
   ) {
     const queueUrl = this.config.queueWorkers[queue].endpoint;
     if (Array.isArray(messages)) {
@@ -141,11 +126,7 @@ export class Aws implements IAws {
   /**
    * Creates a user in Cognito and returns the cognito Id
    */
-  async createCognitoUser(
-    email: string,
-    password?: string,
-    sendEmail?: boolean
-  ) {
+  async createCognitoUser(email: string, password?: string, sendEmail?: boolean) {
     const res = await this.cognitoIdP
       .adminCreateUser({
         UserPoolId: this.config.cognito.defaultPoolId,

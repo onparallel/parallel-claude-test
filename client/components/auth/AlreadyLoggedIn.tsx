@@ -8,11 +8,7 @@ interface AlreadyLoggedInProps {
   onRelogin: () => void;
   onContinueAs: () => void;
 }
-export function AlreadyLoggedIn({
-  me,
-  onRelogin,
-  onContinueAs,
-}: AlreadyLoggedInProps) {
+export function AlreadyLoggedIn({ me, onRelogin, onContinueAs }: AlreadyLoggedInProps) {
   return (
     <>
       <Box marginTop={4} textAlign="center">
@@ -26,13 +22,7 @@ export function AlreadyLoggedIn({
         </Text>
         {me.fullName ? <Text>({me.email})</Text> : null}
       </Box>
-      <Button
-        marginTop={6}
-        width="100%"
-        colorScheme="purple"
-        type="submit"
-        onClick={onContinueAs}
-      >
+      <Button marginTop={6} width="100%" colorScheme="purple" type="submit" onClick={onContinueAs}>
         <FormattedMessage
           id="public.login.already-logged-in.continue-button"
           defaultMessage="Continue as {name}"

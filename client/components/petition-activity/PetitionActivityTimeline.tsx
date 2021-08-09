@@ -68,9 +68,7 @@ export function PetitionActivityTimeline({
               <TimelineMessageScheduledEvent
                 event={event}
                 userId={userId}
-                onCancelScheduledMessage={handleCancelScheduledMessage(
-                  event.message.id
-                )}
+                onCancelScheduledMessage={handleCancelScheduledMessage(event.message.id)}
               />
             ) : event.__typename === "MessageCancelledEvent" ? (
               <TimelineMessageCancelledEvent event={event} userId={userId} />
@@ -91,27 +89,15 @@ export function PetitionActivityTimeline({
             ) : event.__typename === "UserPermissionAddedEvent" ? (
               <TimelineUserPermissionAddedEvent event={event} userId={userId} />
             ) : event.__typename === "UserPermissionRemovedEvent" ? (
-              <TimelineUserPermissionRemovedEvent
-                event={event}
-                userId={userId}
-              />
+              <TimelineUserPermissionRemovedEvent event={event} userId={userId} />
             ) : event.__typename === "UserPermissionEditedEvent" ? (
-              <TimelineUserPermissionEditedEvent
-                event={event}
-                userId={userId}
-              />
+              <TimelineUserPermissionEditedEvent event={event} userId={userId} />
             ) : event.__typename === "OwnershipTransferredEvent" ? (
-              <TimelineOwnershipTransferredEvent
-                event={event}
-                userId={userId}
-              />
+              <TimelineOwnershipTransferredEvent event={event} userId={userId} />
             ) : event.__typename === "PetitionClosedEvent" ? (
               <TimelinePetitionClosedEvent event={event} userId={userId} />
             ) : event.__typename === "PetitionClosedNotifiedEvent" ? (
-              <TimelinePetitionClosedNotifiedEvent
-                event={event}
-                userId={userId}
-              />
+              <TimelinePetitionClosedNotifiedEvent event={event} userId={userId} />
             ) : event.__typename === "PetitionReopenedEvent" ? (
               <TimelinePetitionReopenedEvent event={event} userId={userId} />
             ) : event.__typename === "SignatureStartedEvent" ? (
@@ -123,20 +109,11 @@ export function PetitionActivityTimeline({
             ) : event.__typename === "AccessDelegatedEvent" ? (
               <TimelineAccessDelegatedEvent event={event} />
             ) : event.__typename === "GroupPermissionAddedEvent" ? (
-              <TimelineGroupPermissionAddedEvent
-                event={event}
-                userId={userId}
-              />
+              <TimelineGroupPermissionAddedEvent event={event} userId={userId} />
             ) : event.__typename === "GroupPermissionEditedEvent" ? (
-              <TimelineGroupPermissionEditedEvent
-                event={event}
-                userId={userId}
-              />
+              <TimelineGroupPermissionEditedEvent event={event} userId={userId} />
             ) : event.__typename === "GroupPermissionRemovedEvent" ? (
-              <TimelineGroupPermissionRemovedEvent
-                event={event}
-                userId={userId}
-              />
+              <TimelineGroupPermissionRemovedEvent event={event} userId={userId} />
             ) : event.__typename === "PetitionClonedEvent" ? (
               <TimelinePetitionClonedEvent event={event} userId={userId} />
             ) : event.__typename === "RemindersOptOutEvent" ? (

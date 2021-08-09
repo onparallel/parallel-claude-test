@@ -21,34 +21,21 @@ export async function commentsContactNotification(
     context.petitions.loadPetition(payload.petition_id),
     context.contacts.loadContactByAccessId(payload.petition_access_id),
     context.petitions.loadAccess(payload.petition_access_id),
-    context.petitions.loadPetitionFieldComment(
-      payload.petition_field_comment_ids
-    ),
+    context.petitions.loadPetitionFieldComment(payload.petition_field_comment_ids),
   ]);
   if (!petition) {
-    throw new Error(
-      `Petition not found for petition_id ${payload.petition_id}`
-    );
+    throw new Error(`Petition not found for petition_id ${payload.petition_id}`);
   }
   if (!contact) {
-    throw new Error(
-      `Contact not found for petition_access_id ${payload.petition_access_id}`
-    );
+    throw new Error(`Contact not found for petition_access_id ${payload.petition_access_id}`);
   }
   if (!access) {
-    throw new Error(
-      `Access not found for petition_access_id ${payload.petition_access_id}`
-    );
+    throw new Error(`Access not found for petition_access_id ${payload.petition_access_id}`);
   }
-  const { emailFrom, ...layoutProps } = await getLayoutProps(
-    petition.org_id,
-    context
-  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
   const comments = _comments.filter(isDefined);
   const fieldIds = uniq(comments.map((c) => c!.petition_field_id));
-  const _fields = (await context.petitions.loadField(fieldIds)).filter(
-    isDefined
-  );
+  const _fields = (await context.petitions.loadField(fieldIds)).filter(isDefined);
   const commentsByField = groupBy(comments, (c) => c.petition_field_id);
   const fields = await pMap(
     sortBy(_fields, (f) => f.position),
@@ -71,9 +58,7 @@ export async function commentsContactNotification(
     subject,
     text,
     html,
-    created_from: `PetitionFieldComment:${payload.petition_field_comment_ids.join(
-      ","
-    )}`,
+    created_from: `PetitionFieldComment:${payload.petition_field_comment_ids.join(",")}`,
   });
 
   return email;

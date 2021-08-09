@@ -4,11 +4,7 @@ import { FormattedMessage } from "react-intl";
 import { BreakLines } from "../common/BreakLines";
 import { FileSize } from "../common/FileSize";
 
-export function PdfFieldWithReplies({
-  field,
-}: {
-  field: PetitionPdf_PetitionFieldFragment;
-}) {
+export function PdfFieldWithReplies({ field }: { field: PetitionPdf_PetitionFieldFragment }) {
   return (
     <Box sx={{ pageBreakInside: "avoid" }} marginY="4mm">
       {field.type === "HEADING" ? (
@@ -21,12 +17,7 @@ export function PdfFieldWithReplies({
           ) : null}
         </Stack>
       ) : (
-        <Stack
-          borderRadius="md"
-          border="1px solid"
-          borderColor="gray.400"
-          padding="4mm"
-        >
+        <Stack borderRadius="md" border="1px solid" borderColor="gray.400" padding="4mm">
           <Text fontWeight="bold">{field.title ?? "-"}</Text>
           {field.description ? (
             <Text paddingLeft="2mm" fontStyle="italic">
@@ -52,21 +43,19 @@ export function PdfFieldWithReplies({
               </Text>
             ) : field.type === "DYNAMIC_SELECT" ? (
               <Stack spacing={0} key={reply.id}>
-                {(reply.content.columns as [string, string | null][]).map(
-                  ([label, value], i) => (
-                    <Text key={i}>
-                      {label}:{" "}
-                      {value ?? (
-                        <Text fontStyle="italic">
-                          <FormattedMessage
-                            id="petition-signature.no-reply-submitted"
-                            defaultMessage="No replies have been submitted."
-                          />
-                        </Text>
-                      )}
-                    </Text>
-                  )
-                )}
+                {(reply.content.columns as [string, string | null][]).map(([label, value], i) => (
+                  <Text key={i}>
+                    {label}:{" "}
+                    {value ?? (
+                      <Text fontStyle="italic">
+                        <FormattedMessage
+                          id="petition-signature.no-reply-submitted"
+                          defaultMessage="No replies have been submitted."
+                        />
+                      </Text>
+                    )}
+                  </Text>
+                ))}
               </Stack>
             ) : field.type === "CHECKBOX" ? (
               <Stack spacing={0} key={reply.id}>

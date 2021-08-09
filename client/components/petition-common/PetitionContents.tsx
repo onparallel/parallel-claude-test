@@ -10,39 +10,27 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  AlertCircleIcon,
-  EyeOffIcon,
-  SignatureIcon,
-  TimeIcon,
-} from "@parallel/chakra/icons";
+import { AlertCircleIcon, EyeOffIcon, SignatureIcon, TimeIcon } from "@parallel/chakra/icons";
 import {
   PetitionContents_PetitionFieldFragment,
   PetitionSignatureRequestStatus,
 } from "@parallel/graphql/__types";
 import { compareWithFragments } from "@parallel/utils/compareWithFragments";
 import { PetitionFieldIndex } from "@parallel/utils/fieldIndices";
-import {
-  filterPetitionFields,
-  PetitionFieldFilter,
-} from "@parallel/utils/filterPetitionFields";
+import { filterPetitionFields, PetitionFieldFilter } from "@parallel/utils/filterPetitionFields";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { usePetitionSignatureStatusLabels } from "@parallel/utils/usePetitionSignatureStatusLabels";
 import { ComponentType, createElement, memo, ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 import { Divider } from "../common/Divider";
 
-interface PetitionContentsFieldIndicatorsProps<
-  T extends PetitionContents_PetitionFieldFragment
-> {
+interface PetitionContentsFieldIndicatorsProps<T extends PetitionContents_PetitionFieldFragment> {
   field: T;
 }
 
 type PetitionContentsSignatureStatus = "START" | PetitionSignatureRequestStatus;
 
-export interface PetitionContentsProps<
-  T extends PetitionContents_PetitionFieldFragment
-> {
+export interface PetitionContentsProps<T extends PetitionContents_PetitionFieldFragment> {
   fields: T[];
   fieldIndices: PetitionFieldIndex[];
   fieldVisibility?: boolean[];
@@ -53,9 +41,7 @@ export interface PetitionContentsProps<
   onSignatureStatusClick?: () => void;
 }
 
-export function PetitionContents<
-  T extends PetitionContents_PetitionFieldFragment
->({
+export function PetitionContents<T extends PetitionContents_PetitionFieldFragment>({
   fields,
   filter,
   fieldIndices,
@@ -71,12 +57,7 @@ export function PetitionContents<
   );
   return (
     <Stack as="ol" spacing={1} padding={4}>
-      {filterPetitionFields(
-        fields,
-        fieldIndices,
-        fieldVisibility ?? [],
-        filter
-      ).map((x, index) =>
+      {filterPetitionFields(fields, fieldIndices, fieldVisibility ?? [], filter).map((x, index) =>
         x.type === "FIELD" ? (
           <PetitionContentsItem
             key={x.field.id}
@@ -100,10 +81,7 @@ export function PetitionContents<
         )
       )}
       {signatureStatus ? (
-        <SignatureStatusInfo
-          status={signatureStatus}
-          onClick={onSignatureStatusClick}
-        />
+        <SignatureStatusInfo status={signatureStatus} onClick={onSignatureStatusClick} />
       ) : null}
     </Stack>
   );
@@ -136,15 +114,9 @@ function SignatureStatusInfo({
         <Tooltip label={labels[status]}>
           <Flex alignItems="center">
             {status === "START" ? (
-              <Circle
-                boxSize={2}
-                backgroundColor="purple.500"
-                marginRight="2px"
-              />
+              <Circle boxSize={2} backgroundColor="purple.500" marginRight="2px" />
             ) : null}
-            <SignatureIcon
-              color={status === "COMPLETED" ? "gray.700" : "gray.400"}
-            />
+            <SignatureIcon color={status === "COMPLETED" ? "gray.700" : "gray.400"} />
             {status === "PROCESSING" ? (
               <TimeIcon
                 color="yellow.600"
@@ -184,9 +156,7 @@ PetitionContents.fragments = {
   `,
 };
 
-interface PetitionContentsItemProps<
-  T extends PetitionContents_PetitionFieldFragment
-> {
+interface PetitionContentsItemProps<T extends PetitionContents_PetitionFieldFragment> {
   field: T;
   fieldIndex: PetitionFieldIndex;
   isVisible: boolean;
@@ -194,9 +164,7 @@ interface PetitionContentsItemProps<
   fieldIndicators?: ComponentType<PetitionContentsFieldIndicatorsProps<T>>;
 }
 
-function _PetitionContentsItem<
-  T extends PetitionContents_PetitionFieldFragment
->({
+function _PetitionContentsItem<T extends PetitionContents_PetitionFieldFragment>({
   field,
   isVisible,
   fieldIndex,
@@ -207,10 +175,7 @@ function _PetitionContentsItem<
     <>
       {field.type === "HEADING" && field.options.hasPageBreak ? (
         <PetitionContentsDivider>
-          <FormattedMessage
-            id="generic.page-break"
-            defaultMessage="Page break"
-          />
+          <FormattedMessage id="generic.page-break" defaultMessage="Page break" />
         </PetitionContentsDivider>
       ) : null}
       <Box as="li" listStyleType="none" display="flex" flex="none">
@@ -227,28 +192,16 @@ function _PetitionContentsItem<
           textAlign="left"
           onClick={onFieldClick}
         >
-          <Text
-            as="div"
-            flex="1"
-            minWidth={0}
-            isTruncated
-            opacity={isVisible ? 1 : 0.6}
-          >
+          <Text as="div" flex="1" minWidth={0} isTruncated opacity={isVisible ? 1 : 0.6}>
             <Text as="span">{fieldIndex}. </Text>
             {field.title ? (
               field.title
             ) : (
               <Text as="span" flex="1" textStyle="hint">
                 {field.type === "HEADING" ? (
-                  <FormattedMessage
-                    id="generic.empty-heading"
-                    defaultMessage="Untitled heading"
-                  />
+                  <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
                 ) : (
-                  <FormattedMessage
-                    id="generic.untitled-field"
-                    defaultMessage="Untitled field"
-                  />
+                  <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
                 )}
               </Text>
             )}
@@ -262,9 +215,7 @@ function _PetitionContentsItem<
 
 const PetitionContentsItem = memo(
   _PetitionContentsItem,
-  compareWithFragments<
-    PetitionContentsItemProps<PetitionContents_PetitionFieldFragment>
-  >({
+  compareWithFragments<PetitionContentsItemProps<PetitionContents_PetitionFieldFragment>>({
     field: PetitionContents.fragments.PetitionField,
   })
 ) as typeof _PetitionContentsItem;
@@ -284,14 +235,7 @@ function PetitionContentsDivider({
         width="100%"
         borderStyle={isDashed ? "dashed" : "solid"}
       />
-      <Text
-        as="div"
-        backgroundColor="white"
-        paddingX={1}
-        fontSize="xs"
-        color="gray.500"
-        zIndex="1"
-      >
+      <Text as="div" backgroundColor="white" paddingX={1} fontSize="xs" color="gray.500" zIndex="1">
         {children}
       </Text>
     </Center>

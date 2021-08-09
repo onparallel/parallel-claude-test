@@ -1,13 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Avatar,
-  Box,
-  Flex,
-  Stack,
-  Text,
-  Tooltip,
-  useMultiStyleConfig,
-} from "@chakra-ui/react";
+import { Avatar, Box, Flex, Stack, Text, Tooltip, useMultiStyleConfig } from "@chakra-ui/react";
 import { UsersIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import {
@@ -17,10 +9,7 @@ import {
 import { UserListPopover } from "./UserListPopover";
 
 interface UserAvatarListProps {
-  usersOrGroups: (
-    | UserAvatarList_UserFragment
-    | UserAvatarList_UserGroupFragment
-  )[];
+  usersOrGroups: (UserAvatarList_UserFragment | UserAvatarList_UserGroupFragment)[];
   size?: string;
   max?: number;
 }
@@ -32,14 +21,9 @@ export const UserAvatarList = Object.assign(
   ) {
     const styles = useMultiStyleConfig("Avatar", { size });
     const slice =
-      usersOrGroups.length === max + 1
-        ? [...usersOrGroups]
-        : usersOrGroups.slice(0, max);
+      usersOrGroups.length === max + 1 ? [...usersOrGroups] : usersOrGroups.slice(0, max);
     slice.reverse();
-    const excess =
-      usersOrGroups.length > slice.length
-        ? usersOrGroups.length - slice.length
-        : null;
+    const excess = usersOrGroups.length > slice.length ? usersOrGroups.length - slice.length : null;
 
     return (
       <Flex
@@ -64,11 +48,7 @@ export const UserAvatarList = Object.assign(
         )}
         {slice.map((u) => {
           const name =
-            u.__typename === "User"
-              ? u.fullName
-              : u.__typename === "UserGroup"
-              ? u.name
-              : "";
+            u.__typename === "User" ? u.fullName : u.__typename === "UserGroup" ? u.name : "";
 
           const label =
             u.__typename === "User" ? (

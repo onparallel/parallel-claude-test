@@ -9,20 +9,10 @@ import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { useMemoFactory } from "@parallel/utils/useMemoFactory";
 import { useMultipleRefs } from "@parallel/utils/useMultipleRefs";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ChangeEvent,
-  forwardRef,
-  KeyboardEvent,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, forwardRef, KeyboardEvent, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { pick } from "remeda";
-import {
-  useCreateSimpleReply,
-  useDeletePetitionReply,
-  useUpdateSimpleReply,
-} from "./mutations";
+import { useCreateSimpleReply, useDeletePetitionReply, useUpdateSimpleReply } from "./mutations";
 import {
   RecipientViewPetitionFieldCard,
   RecipientViewPetitionFieldCardProps,
@@ -56,9 +46,7 @@ export function RecipientViewPetitionFieldText({
   const [value, setValue] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const isDeletingReplyRef = useRef<Record<string, boolean>>({});
-  const [isDeletingReply, setIsDeletingReply] = useState<
-    Record<string, boolean>
-  >({});
+  const [isDeletingReply, setIsDeletingReply] = useState<Record<string, boolean>>({});
 
   const newReplyRef = useRef<AnyInputElement>(null);
   const replyRefs = useMultipleRefs<AnyInputElement>();
@@ -89,8 +77,7 @@ export function RecipientViewPetitionFieldText({
         const index = field.replies.findIndex((r) => r.id === replyId);
         if (index > 0) {
           const prevId = field.replies[index - 1].id;
-          replyRefs[prevId].current!.selectionStart =
-            replyRefs[prevId].current!.value.length;
+          replyRefs[prevId].current!.selectionStart = replyRefs[prevId].current!.value.length;
           replyRefs[prevId].current!.focus();
         }
       }
@@ -119,10 +106,7 @@ export function RecipientViewPetitionFieldText({
           value,
         });
         if (reply) {
-          const selection = pick(newReplyRef.current!, [
-            "selectionStart",
-            "selectionEnd",
-          ]);
+          const selection = pick(newReplyRef.current!, ["selectionStart", "selectionEnd"]);
           setValue("");
           if (focusCreatedReply) {
             setShowNewReply(false);
@@ -228,15 +212,9 @@ export function RecipientViewPetitionFieldText({
       ) : null}
       {(field.multiple && showNewReply) || field.replies.length === 0 ? (
         <Flex flex="1" position="relative" marginTop={2}>
-          {field.type === "TEXT" ? (
-            <GrowingTextarea {...inputProps} />
-          ) : (
-            <Input {...inputProps} />
-          )}
+          {field.type === "TEXT" ? <GrowingTextarea {...inputProps} /> : <Input {...inputProps} />}
           <Center boxSize={10} position="absolute" right={0} bottom={0}>
-            <RecipientViewPetitionFieldReplyStatusIndicator
-              isSaving={isSaving}
-            />
+            <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} />
           </Center>
         </Flex>
       ) : null}
@@ -319,16 +297,9 @@ export const RecipientViewPetitionFieldReplyText = forwardRef<
   return (
     <Stack direction="row">
       <Flex flex="1" position="relative">
-        {field.type === "TEXT" ? (
-          <GrowingTextarea {...props} />
-        ) : (
-          <Input {...props} />
-        )}
+        {field.type === "TEXT" ? <GrowingTextarea {...props} /> : <Input {...props} />}
         <Center boxSize={10} position="absolute" right={0} bottom={0}>
-          <RecipientViewPetitionFieldReplyStatusIndicator
-            isSaving={isSaving}
-            reply={reply}
-          />
+          <RecipientViewPetitionFieldReplyStatusIndicator isSaving={isSaving} reply={reply} />
         </Center>
       </Flex>
       <IconButtonWithTooltip

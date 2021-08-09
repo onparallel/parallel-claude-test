@@ -19,13 +19,7 @@ export function TimelineOwnershipTransferredEvent({
 }: TimelineOwnershipTransferredEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<UserArrowIcon />}
-          color="white"
-          backgroundColor="purple.500"
-        />
-      }
+      icon={<TimelineIcon icon={<UserArrowIcon />} color="white" backgroundColor="purple.500" />}
     >
       <FormattedMessage
         id="timeline.ownership-transferred-description"
@@ -40,11 +34,7 @@ export function TimelineOwnershipTransferredEvent({
           user: <UserReference user={event.user} />,
           owner: <UserReference user={event.owner} />,
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

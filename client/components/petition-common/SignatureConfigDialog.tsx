@@ -1,17 +1,7 @@
 import { gql } from "@apollo/client";
-import {
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Button, FormControl, FormLabel, Input, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
   SignatureConfigDialog_OrgIntegrationFragment,
   SignatureConfigDialog_PetitionFragment,
@@ -94,8 +84,7 @@ export function SignatureConfigDialog({
         value: "NO",
         label: intl.formatMessage({
           id: "component.signature-config-dialog.review-before-send.option-no",
-          defaultMessage:
-            "No, start automatically when completing the petition",
+          defaultMessage: "No, start automatically when completing the petition",
         }),
       },
     ],
@@ -110,9 +99,7 @@ export function SignatureConfigDialog({
         placeholder: (styles, { theme }) => {
           return {
             ...styles,
-            color: petitionIsCompleted
-              ? theme.colors.neutral40
-              : theme.colors.neutral90,
+            color: petitionIsCompleted ? theme.colors.neutral40 : theme.colors.neutral90,
             whiteSpace: "nowrap",
           };
         },
@@ -229,10 +216,7 @@ export function SignatureConfigDialog({
               )}
             />
           </FormControl>
-          <FormControl
-            hidden={review && !petitionIsCompleted}
-            isInvalid={!!errors.contacts}
-          >
+          <FormControl hidden={review && !petitionIsCompleted} isInvalid={!!errors.contacts}>
             <FormLabel>
               <FormattedMessage
                 id="component.signature-config-dialog.contact-select.label"
@@ -245,8 +229,7 @@ export function SignatureConfigDialog({
               rules={{
                 validate: (contacts: ContactSelectSelection[]) =>
                   !petitionIsCompleted ||
-                  (contacts.length > 0 &&
-                    contacts.every((c) => !c.isInvalid && !c.isDeleted)),
+                  (contacts.length > 0 && contacts.every((c) => !c.isInvalid && !c.isDeleted)),
               }}
               render={({ field: { onChange, value } }) => (
                 <ContactSelect

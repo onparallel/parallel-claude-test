@@ -4,19 +4,12 @@ import { Text } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
-import {
-  DialogProps,
-  useDialog,
-  withDialogs,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
 import { OverflownText } from "@parallel/components/common/OverflownText";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
 import { UserAvatarList } from "@parallel/components/common/UserAvatarList";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
 import { useCreateGroupDialog } from "@parallel/components/organization/CreateGroupDialog";
 import { OrganizationGroupsListTableHeader } from "@parallel/components/organization/OrganizationGroupsListTableHeader";
@@ -32,10 +25,7 @@ import {
   useOrganizationGroups_createUserGroupMutation,
   useOrganizationGroups_deleteUserGroupMutation,
 } from "@parallel/graphql/__types";
-import {
-  assertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/assertQuery";
+import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
 import { useHandleNavigation } from "@parallel/utils/navigation";
@@ -87,9 +77,7 @@ function OrganizationGroups() {
         offset: state.items * (state.page - 1),
         limit: state.items,
         search: state.search,
-        sortBy: [
-          `${state.sort.field}_${state.sort.direction}` as QueryUserGroups_OrderBy,
-        ],
+        sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryUserGroups_OrderBy],
       },
     })
   );
@@ -152,8 +140,7 @@ function OrganizationGroups() {
         title: intl.formatMessage(
           {
             id: "view.groups.clone-success-title",
-            defaultMessage:
-              "{count, plural, =1{Group} other{Groups}} cloned successfully.",
+            defaultMessage: "{count, plural, =1{Group} other{Groups}} cloned successfully.",
           },
           { count: selected.length }
         ),
@@ -193,8 +180,7 @@ function OrganizationGroups() {
         title: intl.formatMessage(
           {
             id: "view.groups.delete-success-title",
-            defaultMessage:
-              "{count, plural, =1{Group} other{Groups}} deleted successfully.",
+            defaultMessage: "{count, plural, =1{Group} other{Groups}} deleted successfully.",
           },
           { count: selected.length }
         ),
@@ -258,17 +244,11 @@ function OrganizationGroups() {
       sections={sections}
       user={me}
       sectionsHeader={
-        <FormattedMessage
-          id="view.organization.title"
-          defaultMessage="Organization"
-        />
+        <FormattedMessage id="view.organization.title" defaultMessage="Organization" />
       }
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage
-            id="view.groups.title"
-            defaultMessage="User groups"
-          />
+          <FormattedMessage id="view.groups.title" defaultMessage="User groups" />
         </Heading>
       }
     >
@@ -289,9 +269,7 @@ function OrganizationGroups() {
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) =>
-            setQueryState((s) => ({ ...s, items, page: 1 }))
-          }
+          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <OrganizationGroupsListTableHeader
@@ -441,10 +419,7 @@ function ConfirmDeleteGroupsDialog({
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="view.groups.confirm-delete-button"
-            defaultMessage="Yes, delete"
-          />
+          <FormattedMessage id="view.groups.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }
       {...props}
@@ -491,10 +466,7 @@ OrganizationGroups.fragments = {
 
 OrganizationGroups.mutations = [
   gql`
-    mutation OrganizationGroups_createUserGroup(
-      $name: String!
-      $userIds: [GID!]!
-    ) {
+    mutation OrganizationGroups_createUserGroup($name: String!, $userIds: [GID!]!) {
       createUserGroup(name: $name, userIds: $userIds) {
         ...OrganizationGroups_UserGroup
       }
@@ -507,10 +479,7 @@ OrganizationGroups.mutations = [
     }
   `,
   gql`
-    mutation OrganizationGroups_cloneUserGroup(
-      $ids: [GID!]!
-      $locale: String!
-    ) {
+    mutation OrganizationGroups_cloneUserGroup($ids: [GID!]!, $locale: String!) {
       cloneUserGroup(userGroupIds: $ids, locale: $locale) {
         ...OrganizationGroups_UserGroup
       }
@@ -519,10 +488,7 @@ OrganizationGroups.mutations = [
   `,
 ];
 
-OrganizationGroups.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+OrganizationGroups.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const { page, items, search, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     fetchQuery<OrganizationGroupsQuery, OrganizationGroupsQueryVariables>(
@@ -533,12 +499,7 @@ OrganizationGroups.getInitialProps = async ({
           $search: String
           $sortBy: [QueryUserGroups_OrderBy!]
         ) {
-          userGroups(
-            offset: $offset
-            limit: $limit
-            search: $search
-            sortBy: $sortBy
-          ) {
+          userGroups(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
             ...OrganizationGroups_UserGroupPagination
           }
         }
@@ -549,9 +510,7 @@ OrganizationGroups.getInitialProps = async ({
           offset: items * (page - 1),
           limit: items,
           search,
-          sortBy: [
-            `${sort.field}_${sort.direction}` as QueryUserGroups_OrderBy,
-          ],
+          sortBy: [`${sort.field}_${sort.direction}` as QueryUserGroups_OrderBy],
         },
       }
     ),

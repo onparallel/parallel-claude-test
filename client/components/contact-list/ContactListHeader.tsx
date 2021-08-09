@@ -1,18 +1,5 @@
-import {
-  Box,
-  Button,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-} from "@chakra-ui/react";
-import {
-  ChevronDownIcon,
-  DeleteIcon,
-  RepeatIcon,
-} from "@parallel/chakra/icons";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
+import { ChevronDownIcon, DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { useDebouncedCallback } from "@parallel/utils/useDebouncedCallback";
 import { ChangeEvent, useCallback, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -41,9 +28,7 @@ export function ContactListHeader({
 }: ContactListHeaderProps) {
   const intl = useIntl();
   const [search, setSearch] = useState(_search ?? "");
-  const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [
-    onSearchChange,
-  ]);
+  const debouncedOnSearchChange = useDebouncedCallback(onSearchChange, 300, [onSearchChange]);
   const handleSearchChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
@@ -55,11 +40,7 @@ export function ContactListHeader({
   return (
     <Stack direction="row" padding={2}>
       <Box flex="0 1 400px">
-        <SearchInput
-          id="contacts-search"
-          value={search ?? ""}
-          onChange={handleSearchChange}
-        />
+        <SearchInput id="contacts-search" value={search ?? ""} onChange={handleSearchChange} />
       </Box>
       <IconButtonWithTooltip
         id="contacts-reload"
@@ -84,10 +65,7 @@ export function ContactListHeader({
             </MenuButton>
             <Portal>
               <MenuList minWidth="160px">
-                <MenuItem
-                  onClick={onDeleteClick}
-                  icon={<DeleteIcon display="block" boxSize={4} />}
-                >
+                <MenuItem onClick={onDeleteClick} icon={<DeleteIcon display="block" boxSize={4} />}>
                   <FormattedMessage
                     id="component.contact-list-header.delete-label"
                     defaultMessage="Delete selected"

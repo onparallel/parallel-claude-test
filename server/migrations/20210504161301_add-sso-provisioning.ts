@@ -1,8 +1,5 @@
 import { Knex } from "knex";
-import {
-  addIntegrationType,
-  removeIntegrationType,
-} from "./helpers/integrationTypes";
+import { addIntegrationType, removeIntegrationType } from "./helpers/integrationTypes";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.alterTable("user", (t) => {

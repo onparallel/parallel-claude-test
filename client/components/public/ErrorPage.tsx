@@ -36,13 +36,7 @@ export function ErrorPage({
           <Heading as="h1" fontSize="6xl">
             <FormattedMessage id="error.main-header" defaultMessage="Oops!" />
           </Heading>
-          <Heading
-            as="h2"
-            fontSize="4xl"
-            fontWeight="normal"
-            marginTop={4}
-            marginBottom={8}
-          >
+          <Heading as="h2" fontSize="4xl" fontWeight="normal" marginTop={4} marginBottom={8}>
             {header}
           </Heading>
           {children}

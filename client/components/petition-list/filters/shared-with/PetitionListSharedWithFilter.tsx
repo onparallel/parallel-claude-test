@@ -18,9 +18,7 @@ export function PetitionListSharedWithFilter({
 }: TableColumnFilterProps<PetitionSharedWithFilter>) {
   const intl = useIntl();
 
-  const logicalOperators = useMemo<
-    OptionType<FilterSharedWithLogicalOperator>[]
-  >(() => {
+  const logicalOperators = useMemo<OptionType<FilterSharedWithLogicalOperator>[]>(() => {
     return [
       {
         label: intl.formatMessage({
@@ -77,9 +75,7 @@ export function PetitionListSharedWithFilter({
                 onChange={(line) =>
                   onChange({
                     ...value,
-                    filters: value.filters.map((f, i) =>
-                      i === index ? line : f
-                    ),
+                    filters: value.filters.map((f, i) => (i === index ? line : f)),
                   })
                 }
                 onRemove={() =>
@@ -108,13 +104,7 @@ export function PetitionListSharedWithFilter({
         <Button
           variant="ghost"
           size="sm"
-          leftIcon={
-            <PlusCircleFilledIcon
-              color="purple.500"
-              position="relative"
-              fontSize="18px"
-            />
-          }
+          leftIcon={<PlusCircleFilledIcon color="purple.500" position="relative" fontSize="18px" />}
           onClick={handleAddFilter}
           isDisabled={value?.filters && value.filters.length > 4}
         >
@@ -129,9 +119,7 @@ export function PetitionListSharedWithFilter({
             isSearchable={false}
             options={logicalOperators}
             value={logicalOperators.find((o) => value!.operator === o.value)}
-            onChange={(option) =>
-              onChange({ ...value!, operator: option!.value })
-            }
+            onChange={(option) => onChange({ ...value!, operator: option!.value })}
           />
         ) : null}
       </HStack>
@@ -140,9 +128,7 @@ export function PetitionListSharedWithFilter({
 }
 
 export function flatShared(data: PetitionSharedWithFilter) {
-  return ([data.operator] as any[]).concat(
-    data.filters.flatMap((f) => [f.operator, f.value])
-  );
+  return ([data.operator] as any[]).concat(data.filters.flatMap((f) => [f.operator, f.value]));
 }
 
 export function unflatShared(data: any[]): PetitionSharedWithFilter {

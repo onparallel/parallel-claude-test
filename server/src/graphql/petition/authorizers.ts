@@ -40,9 +40,7 @@ export function userHasAccessToSignatureRequest<
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const signatureRequestIds = unMaybeArray(
-        args[argName] as MaybeArray<number>
-      );
+      const signatureRequestIds = unMaybeArray(args[argName] as MaybeArray<number>);
       if (signatureRequestIds.length === 0) {
         return true;
       }
@@ -68,10 +66,7 @@ export function userHasAccessToSubscriptions<
       if (subscriptionIds.length === 0) {
         return true;
       }
-      return await ctx.subscriptions.userHasAccessToSubscriptions(
-        ctx.user!.id,
-        subscriptionIds
-      );
+      return await ctx.subscriptions.userHasAccessToSubscriptions(ctx.user!.id, subscriptionIds);
     } catch {}
     return false;
   };
@@ -88,10 +83,7 @@ export function userHasAccessToPetitionFieldComments<
       if (commentIds.length === 0) {
         return true;
       }
-      return await ctx.petitions.userHasAccessToPetitionFieldComments(
-        ctx.user!.id,
-        commentIds
-      );
+      return await ctx.petitions.userHasAccessToPetitionFieldComments(ctx.user!.id, commentIds);
     } catch {}
     return false;
   };
@@ -133,9 +125,7 @@ export function fieldIsNotFixed<
 >(argNameFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      const field = await ctx.petitions.loadField(
-        args[argNameFieldId] as unknown as number
-      );
+      const field = await ctx.petitions.loadField(args[argNameFieldId] as unknown as number);
       return !field!.is_fixed;
     } catch {}
     return false;
@@ -147,10 +137,7 @@ export function fieldsBelongsToPetition<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
->(
-  argNamePetitionId: TArg1,
-  argNameFieldIds: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNamePetitionId: TArg1, argNameFieldIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.fieldsBelongToPetition(
@@ -167,10 +154,7 @@ export function fieldAttachmentBelongsToField<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
->(
-  argNameFieldId: TArg1,
-  argNameAttachmentId: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNameFieldId: TArg1, argNameAttachmentId: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.fieldAttachmentBelongsToField(
@@ -187,10 +171,7 @@ export function repliesBelongsToPetition<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
->(
-  argNamePetitionId: TArg1,
-  argNameReplyIds: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNamePetitionId: TArg1, argNameReplyIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.repliesBelongsToPetition(
@@ -207,10 +188,7 @@ export function repliesBelongsToField<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
->(
-  argNameFieldId: TArg1,
-  argNameReplyIds: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNameFieldId: TArg1, argNameReplyIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.repliesBelongsToField(
@@ -227,10 +205,7 @@ export function accessesBelongToPetition<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
->(
-  argNamePetitionId: TArg1,
-  argNameAccessIds: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNamePetitionId: TArg1, argNameAccessIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.accessesBelongToPetition(
@@ -247,10 +222,7 @@ export function messageBelongToPetition<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, number>
->(
-  argNamePetitionId: TArg1,
-  argNameMessageId: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNamePetitionId: TArg1, argNameMessageId: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.messagesBelongToPetition(
@@ -267,10 +239,7 @@ export function commentsBelongsToPetition<
   FieldName extends string,
   TArg1 extends Arg<TypeName, FieldName, number>,
   TArg2 extends Arg<TypeName, FieldName, MaybeArray<number>>
->(
-  argNamePetitionId: TArg1,
-  argNameCommentIds: TArg2
-): FieldAuthorizeResolver<TypeName, FieldName> {
+>(argNamePetitionId: TArg1, argNameCommentIds: TArg2): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.petitions.commentsBelongToPetition(
@@ -297,10 +266,9 @@ export function accessesBelongToValidContacts<
   };
 }
 
-export function userHasFeatureFlag<
-  TypeName extends string,
-  FieldName extends string
->(feature: FeatureFlagName): FieldAuthorizeResolver<TypeName, FieldName> {
+export function userHasFeatureFlag<TypeName extends string, FieldName extends string>(
+  feature: FeatureFlagName
+): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
       return await ctx.featureFlags.userHasFeatureFlag(ctx.user!.id, feature);

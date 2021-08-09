@@ -10,10 +10,7 @@ export const init = () => {
     integrations.push(
       new RewriteFrames({
         iteratee: (frame) => {
-          frame.filename = frame.filename!.replace(
-            process.env.ROOT!,
-            "app:///"
-          );
+          frame.filename = frame.filename!.replace(process.env.ROOT!, "app:///");
           frame.filename = frame.filename.replace(".next", "_next");
           return frame;
         },

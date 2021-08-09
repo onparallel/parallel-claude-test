@@ -1,9 +1,6 @@
 import { Button } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
   addHours,
   addWeeks,
@@ -30,9 +27,7 @@ export function ScheduleMessageDialog({ ...props }: DialogProps<{}, Date>) {
       ["08:00", "09:00", "18:00"].map((hours) => {
         const today = startOfToday();
         const nextMonday = startOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
-        const tomorrowOrNextMonday = isWeekend(startOfTomorrow())
-          ? nextMonday
-          : startOfTomorrow();
+        const tomorrowOrNextMonday = isWeekend(startOfTomorrow()) ? nextMonday : startOfTomorrow();
         return isWeekend(today)
           ? parse(hours, "HH:mm", nextMonday)
           : isFuture(parse(hours, "HH:mm", today))
@@ -55,23 +50,14 @@ export function ScheduleMessageDialog({ ...props }: DialogProps<{}, Date>) {
           defaultMessage="Select date and time"
         />
       }
-      body={
-        <DateTimePicker
-          value={date}
-          onChange={setDate}
-          suggestions={suggestions}
-        />
-      }
+      body={<DateTimePicker value={date} onChange={setDate} suggestions={suggestions} />}
       confirm={
         <Button
           colorScheme="purple"
           isDisabled={!date || isPast(date)}
           onClick={() => props.onResolve(date)}
         >
-          <FormattedMessage
-            id="petition.schedule-send-button"
-            defaultMessage="Schedule send"
-          />
+          <FormattedMessage id="petition.schedule-send-button" defaultMessage="Schedule send" />
         </Button>
       }
       {...props}

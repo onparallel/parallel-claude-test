@@ -33,26 +33,16 @@ const server = new ApolloServer({
       async requestDidStart() {
         const time = process.hrtime();
         return {
-          async willSendResponse({
-            request: { operationName, variables },
-            response,
-            context,
-          }) {
+          async willSendResponse({ request: { operationName, variables }, response, context }) {
             if (response.errors) {
               response.errors = response.errors.map((error) => {
                 switch (error.extensions?.code) {
                   case "INTERNAL_SERVER_ERROR": {
-                    context.logger.error(
-                      error.message,
-                      error.extensions?.exception
-                    );
+                    context.logger.error(error.message, error.extensions?.exception);
                     return new UnknownError("Internal server error");
                   }
                   case "GRAPHQL_VALIDATION_FAILED": {
-                    context.logger.error(
-                      error.message,
-                      error.extensions?.exception
-                    );
+                    context.logger.error(error.message, error.extensions?.exception);
                     return error;
                   }
                   default:
@@ -61,10 +51,10 @@ const server = new ApolloServer({
               });
             }
             const duration = stopwatchEnd(time);
-            context.logger.info(
-              `GraphQL operation "${operationName}" - ${duration}ms`,
-              { operation: { name: operationName, variables }, duration }
-            );
+            context.logger.info(`GraphQL operation "${operationName}" - ${duration}ms`, {
+              operation: { name: operationName, variables },
+              duration,
+            });
           },
         };
       },
@@ -87,9 +77,7 @@ server.start().then(() => {
     const logger = container.get<Logger>(LOGGER);
     logger.info(`Ready on ${host}`);
     if (process.env.NODE_ENV !== "production") {
-      logger.info(
-        `GraphQL playground available on ${host}${server.graphqlPath}`
-      );
+      logger.info(`GraphQL playground available on ${host}${server.graphqlPath}`);
     }
   });
 });

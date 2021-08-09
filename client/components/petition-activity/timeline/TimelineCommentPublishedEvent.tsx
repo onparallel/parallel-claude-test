@@ -24,13 +24,7 @@ export function TimelineCommentPublishedEvent({
   const { colors } = useTheme();
   const values = {
     field: <PetitionFieldReference field={field} />,
-    timeAgo: (
-      <DateTime
-        value={createdAt}
-        format={FORMATS.LLL}
-        useRelativeTime="always"
-      />
-    ),
+    timeAgo: <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime="always" />,
   };
   if (comment) {
     const { author, content, isEdited } = comment;
@@ -59,10 +53,7 @@ export function TimelineCommentPublishedEvent({
             />
             {isEdited ? (
               <Text as="span" textStyle="hint" marginLeft={2} fontSize="sm">
-                <FormattedMessage
-                  id="generic.edited-comment-indicator"
-                  defaultMessage="Edited"
-                />
+                <FormattedMessage id="generic.edited-comment-indicator" defaultMessage="Edited" />
               </Text>
             ) : null}
           </Box>
@@ -74,13 +65,7 @@ export function TimelineCommentPublishedEvent({
   } else {
     return (
       <TimelineItem
-        icon={
-          <TimelineIcon
-            icon={<CommentIcon />}
-            color="black"
-            backgroundColor="gray.200"
-          />
-        }
+        icon={<TimelineIcon icon={<CommentIcon />} color="black" backgroundColor="gray.200" />}
         paddingY={2}
       >
         <FormattedMessage

@@ -73,11 +73,7 @@ function renderSlate(
       case undefined: {
         return (
           <p style={{ margin: 0 }}>
-            {paragraphIsEmpty(node) ? (
-              <br />
-            ) : (
-              renderSlate(node.children, opts, ctx)
-            )}
+            {paragraphIsEmpty(node) ? <br /> : renderSlate(node.children, opts, ctx)}
           </p>
         );
       }
@@ -91,11 +87,7 @@ function renderSlate(
         return createElement(
           type,
           { style: { margin: 0, fontSize, fontWeight: "bold" } },
-          paragraphIsEmpty(node) ? (
-            <br />
-          ) : (
-            renderSlate(node.children, opts, ctx)
-          )
+          paragraphIsEmpty(node) ? <br /> : renderSlate(node.children, opts, ctx)
         );
       case "bulleted-list":
       case "numbered-list":
@@ -105,16 +97,10 @@ function renderSlate(
           renderSlate(node.children, opts, ctx)
         );
       case "list-item": {
-        return (
-          <li style={{ marginLeft: 0 }}>
-            {renderSlate(node.children, opts, ctx)}
-          </li>
-        );
+        return <li style={{ marginLeft: 0 }}>{renderSlate(node.children, opts, ctx)}</li>;
       }
       case "placeholder":
-        return (
-          <span>{renderWhiteSpace(getPlaceholder(node.placeholder, ctx))}</span>
-        );
+        return <span>{renderWhiteSpace(getPlaceholder(node.placeholder, ctx))}</span>;
       case "link": {
         return (
           <a href={node.url} target="_blank" rel="noopener noreferrer">
@@ -189,9 +175,7 @@ export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
           return `${node.children.map(serialize).join("")}`;
         case "bulleted-list":
         case "numbered-list":
-          return node.children
-            .map((child) => serialize(child).replace(/^/gm, "  "))
-            .join("\n");
+          return node.children.map((child) => serialize(child).replace(/^/gm, "  ")).join("\n");
         case "list-item":
           return node.children
             .map((child, i: number) => {
@@ -217,7 +201,5 @@ export function toPlainText(body: SlateNode[], ctx?: SlateContext) {
 }
 
 export function fromPlainText(value: string): SlateNode[] {
-  return value
-    .split("\n")
-    .map((line) => ({ type: "paragraph", children: [{ text: line }] }));
+  return value.split("\n").map((line) => ({ type: "paragraph", children: [{ text: line }] }));
 }

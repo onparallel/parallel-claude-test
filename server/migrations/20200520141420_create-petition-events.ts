@@ -127,9 +127,7 @@ export async function up(knex: Knex): Promise<any> {
       }
     ).notNullable();
     t.jsonb("data");
-    t.timestamp("created_at")
-      .notNullable()
-      .defaultTo(knex.raw("CURRENT_TIMESTAMP"));
+    t.timestamp("created_at").notNullable().defaultTo(knex.raw("CURRENT_TIMESTAMP"));
 
     t.index(["petition_id", "type"], "petition_event__petition_id__type");
   });

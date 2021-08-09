@@ -93,9 +93,7 @@ function getValues(elements: MessageFormatElement[]): string[] {
         case TYPE.plural:
           return [
             element.value,
-            ...Object.values(element.options).flatMap((option) =>
-              getValues(option.value)
-            ),
+            ...Object.values(element.options).flatMap((option) => getValues(option.value)),
           ];
         case TYPE.pound:
           return [];
@@ -112,8 +110,7 @@ async function main() {
       required: true,
       array: true,
       type: "string",
-      description:
-        "The locales to extract. First option will be considered the default one",
+      description: "The locales to extract. First option will be considered the default one",
     })
     .option("input", {
       required: true,

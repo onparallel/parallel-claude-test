@@ -41,22 +41,14 @@ export function NewPetitionLanguageFilter({
 
   return (
     <Menu>
-      <MenuButton
-        as={Button}
-        variant="outline"
-        rightIcon={<ChevronDownIcon />}
-        {...props}
-      >
-        {locales.find((l) => l.key === locale)?.localizedLabel ??
-          locales[0].localizedLabel}
+      <MenuButton as={Button} variant="outline" rightIcon={<ChevronDownIcon />} {...props}>
+        {locales.find((l) => l.key === locale)?.localizedLabel ?? locales[0].localizedLabel}
       </MenuButton>
       <Portal>
         <MenuList width="min-content" minWidth="154px" whiteSpace="nowrap">
           <MenuOptionGroup
             value={locale ?? "all"}
-            onChange={(value) =>
-              onLocaleChange(value === "all" ? null : (value as PetitionLocale))
-            }
+            onChange={(value) => onLocaleChange(value === "all" ? null : (value as PetitionLocale))}
           >
             {locales.map((locale) => (
               <MenuItemOption key={locale.key} value={locale.key}>

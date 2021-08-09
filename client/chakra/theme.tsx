@@ -1,11 +1,4 @@
-import {
-  extendTheme,
-  keyframes,
-  Menu,
-  Popover,
-  Select,
-  Tooltip,
-} from "@chakra-ui/react";
+import { extendTheme, keyframes, Menu, Popover, Select, Tooltip } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
 import { ChevronDownIcon } from "./icons";
 import { styles } from "./styles";

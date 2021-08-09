@@ -11,18 +11,15 @@ import { CheckboxMenuItemOption } from "@parallel/components/common/CheckboxMenu
 
 type PetitionRepliesFilterButtonProps = ValueProps<PetitionFieldFilter, false>;
 
-export function PetitionRepliesFilterButton({
-  value,
-  onChange,
-}: PetitionRepliesFilterButtonProps) {
+export function PetitionRepliesFilterButton({ value, onChange }: PetitionRepliesFilterButtonProps) {
   const handleChange = function (filter: PetitionFieldFilterType) {
     return (isChecked: boolean) => {
       onChange({ ...value, [filter]: isChecked });
     };
   };
-  const isActive = (
-    Object.keys(defaultFieldsFilter) as PetitionFieldFilterType[]
-  ).some((t) => value[t]);
+  const isActive = (Object.keys(defaultFieldsFilter) as PetitionFieldFilterType[]).some(
+    (t) => value[t]
+  );
   return (
     <Menu closeOnSelect={false}>
       <MenuButton

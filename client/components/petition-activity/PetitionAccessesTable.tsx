@@ -40,14 +40,10 @@ import { Table, TableColumn } from "../common/Table";
 export interface PetitionAccessesTable extends BoxProps {
   petition: PetitionAccessTable_PetitionFragment;
   onAddPetitionAccess: () => void;
-  onSendReminders: (
-    selected: PetitionAccessTable_PetitionAccessFragment[]
-  ) => void;
+  onSendReminders: (selected: PetitionAccessTable_PetitionAccessFragment[]) => void;
   onReactivateAccess: (accessId: string) => void;
   onDeactivateAccess: (accessId: string) => void;
-  onConfigureReminders: (
-    selected: PetitionAccessTable_PetitionAccessFragment[]
-  ) => void;
+  onConfigureReminders: (selected: PetitionAccessTable_PetitionAccessFragment[]) => void;
 }
 
 export function PetitionAccessesTable({
@@ -73,8 +69,7 @@ export function PetitionAccessesTable({
     onConfigureReminders(selected);
   }, [selected]);
 
-  const showActions =
-    selection.length > 0 && selected.every((a) => a.status === "ACTIVE");
+  const showActions = selection.length > 0 && selected.every((a) => a.status === "ACTIVE");
 
   const columns = usePetitionAccessesColumns();
   const context = useMemo(
@@ -99,10 +94,7 @@ export function PetitionAccessesTable({
             {showActions ? (
               <Menu>
                 <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                  <FormattedMessage
-                    id="generic.actions-button"
-                    defaultMessage="Actions"
-                  />
+                  <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
                 </MenuButton>
                 <Portal>
                   <MenuList minWidth="160px">
@@ -137,10 +129,7 @@ export function PetitionAccessesTable({
                 </Portal>
               </Menu>
             ) : null}
-            <Button
-              leftIcon={<UserPlusIcon fontSize="18px" />}
-              onClick={onAddPetitionAccess}
-            >
+            <Button leftIcon={<UserPlusIcon fontSize="18px" />} onClick={onAddPetitionAccess}>
               {intl.formatMessage({
                 id: "petition.add-contact-button",
                 defaultMessage: "Add access",
@@ -149,10 +138,7 @@ export function PetitionAccessesTable({
           </Stack>
         }
       >
-        <FormattedMessage
-          id="petition-access.header"
-          defaultMessage="Petition access control"
-        />
+        <FormattedMessage id="petition-access.header" defaultMessage="Petition access control" />
       </GenericCardHeader>
       <Box overflowX="auto">
         <Table
@@ -175,12 +161,8 @@ function usePetitionAccessesColumns(): TableColumn<
     petition: PetitionAccessTable_PetitionFragment;
     onReactivateAccess: (accessId: string) => void;
     onDeactivateAccess: (accessId: string) => void;
-    onSendReminders: (
-      selected: PetitionAccessTable_PetitionAccessFragment[]
-    ) => void;
-    onConfigureReminders: (
-      selected: PetitionAccessTable_PetitionAccessFragment[]
-    ) => void;
+    onSendReminders: (selected: PetitionAccessTable_PetitionAccessFragment[]) => void;
+    onConfigureReminders: (selected: PetitionAccessTable_PetitionAccessFragment[]) => void;
   }
 >[] {
   const intl = useIntl();
@@ -227,17 +209,11 @@ function usePetitionAccessesColumns(): TableColumn<
         CellContent: ({ row: { status } }) => {
           return status === "ACTIVE" ? (
             <Text color="green.500">
-              <FormattedMessage
-                id="petition-access.status-active"
-                defaultMessage="Active"
-              />
+              <FormattedMessage id="petition-access.status-active" defaultMessage="Active" />
             </Text>
           ) : status === "INACTIVE" ? (
             <Flex alignItems="center" color="red.500">
-              <FormattedMessage
-                id="petition-access.status-inactive"
-                defaultMessage="Inactive"
-              />
+              <FormattedMessage id="petition-access.status-inactive" defaultMessage="Inactive" />
             </Flex>
           ) : null;
         },
@@ -248,22 +224,13 @@ function usePetitionAccessesColumns(): TableColumn<
           id: "petition-accesses.next-reminder-header",
           defaultMessage: "Next reminder",
         }),
-        CellContent: ({
-          row: { nextReminderAt, remindersLeft, remindersActive },
-        }) => {
+        CellContent: ({ row: { nextReminderAt, remindersLeft, remindersActive } }) => {
           return remindersActive && nextReminderAt ? (
-            <DateTime
-              value={nextReminderAt}
-              format={FORMATS.LLL}
-              whiteSpace="nowrap"
-            />
+            <DateTime value={nextReminderAt} format={FORMATS.LLL} whiteSpace="nowrap" />
           ) : (
             <Text textStyle="hint" whiteSpace="nowrap">
               {remindersLeft ? (
-                <FormattedMessage
-                  id="petitions.reminders-not-set"
-                  defaultMessage="Not set"
-                />
+                <FormattedMessage id="petitions.reminders-not-set" defaultMessage="Not set" />
               ) : (
                 <FormattedMessage
                   id="petitions.no-reminders-left"
@@ -300,11 +267,7 @@ function usePetitionAccessesColumns(): TableColumn<
           defaultMessage: "Created at",
         }),
         CellContent: ({ row: { createdAt } }) => (
-          <DateTime
-            value={createdAt}
-            format={FORMATS.LLL}
-            whiteSpace="nowrap"
-          />
+          <DateTime value={createdAt} format={FORMATS.LLL} whiteSpace="nowrap" />
         ),
       },
       {
@@ -341,9 +304,7 @@ function usePetitionAccessesColumns(): TableColumn<
                     size="sm"
                   />
                   <IconButtonWithTooltip
-                    isDisabled={
-                      petition.status !== "PENDING" || remindersOptOut
-                    }
+                    isDisabled={petition.status !== "PENDING" || remindersOptOut}
                     label={intl.formatMessage({
                       id: "petition-accesses.reminder-settings",
                       defaultMessage: "Reminder settings",

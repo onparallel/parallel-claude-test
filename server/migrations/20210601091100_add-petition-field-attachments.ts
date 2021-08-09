@@ -4,9 +4,7 @@ import { timestamps } from "./helpers/timestamps";
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("petition_field_attachment", (t) => {
     t.increments("id");
-    t.integer("petition_field_id")
-      .notNullable()
-      .references("petition_field.id");
+    t.integer("petition_field_id").notNullable().references("petition_field.id");
     t.integer("file_upload_id").notNullable().references("file_upload.id");
     timestamps(t, { updated: false });
 

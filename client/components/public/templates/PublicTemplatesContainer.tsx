@@ -9,11 +9,7 @@ import {
   Portal,
   Stack,
 } from "@chakra-ui/react";
-import {
-  ChevronDownIcon,
-  ChevronRightIcon,
-  ChevronUpIcon,
-} from "@parallel/chakra/icons";
+import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon } from "@parallel/chakra/icons";
 import { NakedLink } from "@parallel/components/common/Link";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { useRouter } from "next/router";
@@ -30,9 +26,7 @@ export function PublicTemplatesContainer({
 }) {
   const router = useRouter();
 
-  const currentCategory = categories.find(
-    (c) => c.slug === router.query.category
-  );
+  const currentCategory = categories.find((c) => c.slug === router.query.category);
 
   return (
     <PublicContainer
@@ -66,9 +60,7 @@ export function PublicTemplatesContainer({
               borderRadius="none"
               fontWeight="bold"
               rightIcon={
-                currentCategory === undefined ? (
-                  <ChevronRightIcon fontSize="2xl" />
-                ) : undefined
+                currentCategory === undefined ? <ChevronRightIcon fontSize="2xl" /> : undefined
               }
               backgroundColor="transparent"
               _hover={{
@@ -100,16 +92,12 @@ export function PublicTemplatesContainer({
                   justifyContent="space-between"
                   borderRadius="none"
                   fontWeight="normal"
-                  aria-current={
-                    currentCategory?.slug === c.slug ? "page" : undefined
-                  }
+                  aria-current={currentCategory?.slug === c.slug ? "page" : undefined}
                   _activeLink={{
                     bgColor: "gray.200",
                     fontWeight: "bold",
                   }}
-                  rightIcon={
-                    isActive ? <ChevronRightIcon fontSize="2xl" /> : undefined
-                  }
+                  rightIcon={isActive ? <ChevronRightIcon fontSize="2xl" /> : undefined}
                   backgroundColor="transparent"
                   _hover={{
                     bgColor: "gray.100",
@@ -152,9 +140,7 @@ export function PublicTemplatesContainer({
                     <NakedLink href="/templates">
                       <MenuItem
                         as="a"
-                        aria-current={
-                          currentCategory === undefined ? "page" : undefined
-                        }
+                        aria-current={currentCategory === undefined ? "page" : undefined}
                         _activeLink={{
                           fontWeight: "bold",
                           color: "purple.600",
@@ -168,17 +154,10 @@ export function PublicTemplatesContainer({
                     </NakedLink>
                     {categories.map((c) => {
                       return (
-                        <NakedLink
-                          key={c.slug}
-                          href={`/templates/categories/${c.slug}`}
-                        >
+                        <NakedLink key={c.slug} href={`/templates/categories/${c.slug}`}>
                           <MenuItem
                             as="a"
-                            aria-current={
-                              currentCategory?.slug === c.slug
-                                ? "page"
-                                : undefined
-                            }
+                            aria-current={currentCategory?.slug === c.slug ? "page" : undefined}
                             _activeLink={{
                               fontWeight: "bold",
                               color: "purple.600",
@@ -195,11 +174,7 @@ export function PublicTemplatesContainer({
             )}
           </Menu>
         </Box>
-        <Stack
-          paddingY={{ base: 6, md: 16 }}
-          spacing={10}
-          paddingBottom={{ base: 6, md: 28 }}
-        >
+        <Stack paddingY={{ base: 6, md: 16 }} spacing={10} paddingBottom={{ base: 6, md: 28 }}>
           {children}
         </Stack>
       </Grid>

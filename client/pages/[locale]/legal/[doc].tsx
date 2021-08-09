@@ -97,20 +97,14 @@ interface LegalDocParams {
   doc: string;
 }
 
-export async function getStaticProps({
-  params: { locale, doc },
-}: {
-  params: LegalDocParams;
-}) {
+export async function getStaticProps({ params: { locale, doc } }: { params: LegalDocParams }) {
   const content = await loadDoc(doc, locale);
   return { props: { content, doc } };
 }
 
 export function getStaticPaths() {
   return {
-    paths: languages.flatMap(({ locale }) =>
-      DOCS.map((doc) => ({ params: { locale, doc } }))
-    ),
+    paths: languages.flatMap(({ locale }) => DOCS.map((doc) => ({ params: { locale, doc } }))),
     fallback: false,
   };
 }

@@ -26,11 +26,7 @@ export function useCreateContact() {
 
   const askContactDetails = useAskContactDetailsDialog();
 
-  return useCallback(async function ({
-    defaultEmail,
-  }: {
-    defaultEmail?: string;
-  }) {
+  return useCallback(async function ({ defaultEmail }: { defaultEmail?: string }) {
     const details = await askContactDetails({ defaultEmail });
     const { data, errors } = await createContact({
       variables: { data: details },
@@ -39,6 +35,5 @@ export function useCreateContact() {
       throw errors;
     }
     return data!.createContact;
-  },
-  []);
+  }, []);
 }

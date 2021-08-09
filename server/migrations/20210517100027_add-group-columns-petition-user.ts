@@ -1,8 +1,5 @@
 import { Knex } from "knex";
-import {
-  addPetitionEvent,
-  removePetitionEvent,
-} from "./helpers/petitionEvents";
+import { addPetitionEvent, removePetitionEvent } from "./helpers/petitionEvents";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.alterTable("petition_user", (t) => {

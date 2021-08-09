@@ -155,9 +155,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                   minWidth: "180px",
                 },
                 align: "center",
-                CellContent: ({ row }) => (
-                  <PetitionStatusCellContent petition={row} />
-                ),
+                CellContent: ({ row }) => <PetitionStatusCellContent petition={row} />,
               },
               {
                 key: "signature",
@@ -166,10 +164,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                 cellProps: { padding: 0 },
                 CellContent: ({ row, context }) => (
                   <Flex alignItems="center" paddingRight="2">
-                    <PetitionSignatureCellContent
-                      petition={row}
-                      user={context!.user}
-                    />
+                    <PetitionSignatureCellContent petition={row} user={context!.user} />
                   </Flex>
                 ),
               },
@@ -235,10 +230,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                     />
                   ) : (
                     <Text as="span" textStyle="hint">
-                      <FormattedMessage
-                        id="generic.not-sent"
-                        defaultMessage="Not sent"
-                      />
+                      <FormattedMessage id="generic.not-sent" defaultMessage="Not sent" />
                     </Text>
                   ),
               },
@@ -268,10 +260,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                       alignItems="center"
                       onClick={(e) => {
                         e.stopPropagation();
-                        redirect(
-                          row.id,
-                          row.status === "DRAFT" ? "compose" : "activity"
-                        );
+                        redirect(row.id, row.status === "DRAFT" ? "compose" : "activity");
                       }}
                     >
                       {lastReminderDate ? (
@@ -296,18 +285,8 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                                 id="petitions.header.reminders-next-reminder-at.popover"
                                 defaultMessage="Next reminder configured for {date} at {hours}"
                                 values={{
-                                  date: (
-                                    <DateTime
-                                      format={FORMATS.MMMdd}
-                                      value={nextReminderAt}
-                                    />
-                                  ),
-                                  hours: (
-                                    <DateTime
-                                      format={FORMATS.HHmm}
-                                      value={nextReminderAt}
-                                    />
-                                  ),
+                                  date: <DateTime format={FORMATS.MMMdd} value={nextReminderAt} />,
+                                  hours: <DateTime format={FORMATS.HHmm} value={nextReminderAt} />,
                                 }}
                               />
                             </Text>
@@ -322,12 +301,7 @@ export function usePetitionsTableColumns(type: PetitionBaseType) {
                               defaultMessage: "Next reminder configured",
                             })}
                             size="xs"
-                            icon={
-                              <BellSettingsIcon
-                                fontSize="16px"
-                                color="gray.500"
-                              />
-                            }
+                            icon={<BellSettingsIcon fontSize="16px" color="gray.500" />}
                           />
                         </SmallPopover>
                       ) : null}

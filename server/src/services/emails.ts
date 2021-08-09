@@ -118,11 +118,7 @@ export class EmailsService implements IEmailsService {
     commentIds: number[]
   ) {
     return await this.enqueueEmail("comments-contact-notification", {
-      id: this.buildQueueId("PetitionFieldCommentContact", [
-        petitionId,
-        accessId,
-        ...commentIds,
-      ]),
+      id: this.buildQueueId("PetitionFieldCommentContact", [petitionId, accessId, ...commentIds]),
       petition_id: petitionId,
       petition_field_comment_ids: commentIds,
       petition_access_id: accessId,
@@ -135,11 +131,7 @@ export class EmailsService implements IEmailsService {
     commentIds: number[]
   ) {
     return await this.enqueueEmail("comments-user-notification", {
-      id: this.buildQueueId("PetitionFieldCommentUser", [
-        petitionId,
-        userId,
-        ...commentIds,
-      ]),
+      id: this.buildQueueId("PetitionFieldCommentUser", [petitionId, userId, ...commentIds]),
       user_id: userId,
       petition_id: petitionId,
       petition_field_comment_ids: commentIds,
@@ -199,10 +191,7 @@ export class EmailsService implements IEmailsService {
     messageBody: any
   ) {
     return await this.enqueueEmail("petition-access-delegated", {
-      id: this.buildQueueId("PetitionAccessDelegated", [
-        originalAccessId,
-        newAccessId,
-      ]),
+      id: this.buildQueueId("PetitionAccessDelegated", [originalAccessId, newAccessId]),
       petition_id: petitionId,
       original_access_id: originalAccessId,
       new_access_id: newAccessId,

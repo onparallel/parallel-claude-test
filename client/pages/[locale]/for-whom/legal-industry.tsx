@@ -20,10 +20,7 @@ function LegalIndustry() {
           "Manage documents and information checklists efficiently and improve collaboration with your clients and colleagues.",
       })}
     >
-      <PublicContainer
-        textAlign="center"
-        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
-      >
+      <PublicContainer textAlign="center" wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}>
         <Heading as="h1" size="xl" fontWeight="bold" color="purple.600">
           <FormattedMessage
             id="public.for-legal.hero-title"
@@ -64,13 +61,11 @@ function LegalIndustry() {
                 }),
                 intl.formatMessage({
                   id: "public.services.automation.control",
-                  defaultMessage:
-                    "Review the uploaded information automatically.",
+                  defaultMessage: "Review the uploaded information automatically.",
                 }),
                 intl.formatMessage({
                   id: "public.services.automation.reminders",
-                  defaultMessage:
-                    "Set up reminders or send them manually with one click.",
+                  defaultMessage: "Set up reminders or send them manually with one click.",
                 }),
                 intl.formatMessage({
                   id: "public.services.automation.activity",
@@ -112,13 +107,11 @@ function LegalIndustry() {
                 claims={[
                   intl.formatMessage({
                     id: "public.services.collaboration.avoid-repeated",
-                    defaultMessage:
-                      "Avoid requesting the same information more than once.",
+                    defaultMessage: "Avoid requesting the same information more than once.",
                   }),
                   intl.formatMessage({
                     id: "public.services.collaboration.see-reviewed",
-                    defaultMessage:
-                      "Track what documents have already been reviewed.",
+                    defaultMessage: "Track what documents have already been reviewed.",
                   }),
                 ]}
               />
@@ -132,13 +125,11 @@ function LegalIndustry() {
                 claims={[
                   intl.formatMessage({
                     id: "public.services.collaboration.no-install",
-                    defaultMessage:
-                      "Always accessible, no downloads or installs needed.",
+                    defaultMessage: "Always accessible, no downloads or installs needed.",
                   }),
                   intl.formatMessage({
                     id: "public.services.collaboration.centralize-conversations",
-                    defaultMessage:
-                      "Centralize conversations in a single place.",
+                    defaultMessage: "Centralize conversations in a single place.",
                   }),
                   intl.formatMessage({
                     id: "public.services.collaboration.anywhere",

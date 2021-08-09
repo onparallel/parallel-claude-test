@@ -92,9 +92,7 @@ export const PetitionBase = interfaceType({
       type: "PetitionPermission",
       description: "The permissions linked to the petition",
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadUserAndUserGroupPermissionsByPetitionId(
-          root.id
-        );
+        return await ctx.petitions.loadUserAndUserGroupPermissionsByPetitionId(root.id);
       },
     });
     t.nullable.field("myEffectivePermission", {
@@ -102,9 +100,7 @@ export const PetitionBase = interfaceType({
       description:
         "The effective permission of the logged user. Will return Null if the user doesn't have access to the petition (e.g. on public templates).",
       resolve: async (root, _, ctx) => {
-        const permissions = await ctx.petitions.loadEffectivePermissions(
-          root.id
-        );
+        const permissions = await ctx.petitions.loadEffectivePermissions(root.id);
         return permissions.find((p) => p.user_id === ctx.user!.id) ?? null;
       },
     });
@@ -134,8 +130,7 @@ export const PetitionBase = interfaceType({
       resolve: (o) => o.comments_enabled,
     });
     t.boolean("skipForwardSecurity", {
-      description:
-        "Whether to skip the forward security check on the recipient view.",
+      description: "Whether to skip the forward security check on the recipient view.",
       resolve: (o) => o.skip_forward_security,
     });
     t.boolean("isRecipientViewContentsHidden", {
@@ -192,9 +187,7 @@ export const Petition = objectType({
       description: "Date when the petition was first sent",
       resolve: async (root, _, ctx) => {
         const accesses = await ctx.petitions.loadAccessesForPetition(root.id);
-        return (
-          minBy(accesses, (a) => a.created_at.valueOf())?.created_at ?? null
-        );
+        return minBy(accesses, (a) => a.created_at.valueOf())?.created_at ?? null;
       },
     });
     t.list.nonNull.field("accesses", {
@@ -226,13 +219,10 @@ export const Petition = objectType({
       },
       authorize: or(
         userHasFeatureFlag("PETITION_SIGNATURE"),
-        (_, { token }, ctx) =>
-          isDefined(token) && ctx.security.verifyAuthToken(token)
+        (_, { token }, ctx) => isDefined(token) && ctx.security.verifyAuthToken(token)
       ),
       resolve: async (root, _, ctx) => {
-        return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(
-          root.id
-        );
+        return await ctx.petitions.loadLatestPetitionSignatureByPetitionId(root.id);
       },
     });
     t.nullable.list.nonNull.field("signatureRequests", {
@@ -280,11 +270,7 @@ export const PetitionTemplate = objectType({
       description: "HTML description of the template.",
       resolve: (o) => {
         return o.template_description
-          ? toHtml(
-              safeJsonParse(o.template_description),
-              {},
-              { startingHeadingLevel: 3 }
-            )
+          ? toHtml(safeJsonParse(o.template_description), {}, { startingHeadingLevel: 3 })
           : null;
       },
     });
@@ -322,8 +308,7 @@ export const PetitionBaseAndField = interfaceType({
     t.field("petition", { type: "PetitionBase" });
     t.field("field", { type: "PetitionField" });
   },
-  resolveType: (o) =>
-    o.petition.is_template ? "PetitionTemplateAndField" : "PetitionAndField",
+  resolveType: (o) => (o.petition.is_template ? "PetitionTemplateAndField" : "PetitionAndField"),
   rootTyping: `{
     petition: db.Petition;
     field: db.PetitionField;
@@ -386,8 +371,7 @@ export const PetitionField = objectType({
       resolve: ({ type }) => ["HEADING"].includes(type),
     });
     t.boolean("validated", {
-      description:
-        "Determines if the content of this field has been validated.",
+      description: "Determines if the content of this field has been validated.",
     });
     t.list.nonNull.field("replies", {
       type: "PetitionFieldReply",
@@ -413,8 +397,7 @@ export const PetitionField = objectType({
     });
     t.int("position");
     t.nullable.jsonObject("visibility", {
-      description:
-        "A JSON object representing the conditions for the field to be visible",
+      description: "A JSON object representing the conditions for the field to be visible",
       resolve: (o) =>
         o.visibility && {
           ...o.visibility,
@@ -554,8 +537,7 @@ export const PetitionAccess = objectType({
     });
     t.nullable.datetime("nextReminderAt", {
       description: "When the next reminder will be sent.",
-      resolve: (o) =>
-        o.status === "ACTIVE" && o.reminders_active ? o.next_reminder_at : null,
+      resolve: (o) => (o.status === "ACTIVE" && o.reminders_active ? o.next_reminder_at : null),
     });
     t.int("remindersLeft", {
       description: "Number of reminders left.",
@@ -575,23 +557,20 @@ export const PetitionAccess = objectType({
       },
     });
     t.boolean("remindersActive", {
-      description:
-        "Whether automatic reminders are active or not for this petition access",
+      description: "Whether automatic reminders are active or not for this petition access",
       resolve: (root) => {
         return root.reminders_active;
       },
     });
     t.boolean("remindersOptOut", {
-      description:
-        "Whether contact has opted out from receiving reminders for this petition",
+      description: "Whether contact has opted out from receiving reminders for this petition",
       resolve: (root) => {
         return root.reminders_opt_out;
       },
     });
     t.nonNull.list.nonNull.field("reminders", {
       type: "PetitionReminder",
-      resolve: async (root, _, ctx) =>
-        ctx.petitions.loadRemindersByAccessId(root.id),
+      resolve: async (root, _, ctx) => ctx.petitions.loadRemindersByAccessId(root.id),
     });
   },
 });
@@ -633,9 +612,7 @@ export const PetitionFieldReply = objectType({
             return root.content;
           }
           case "FILE_UPLOAD": {
-            const file = await ctx.files.loadFileUpload(
-              root.content["file_upload_id"]
-            );
+            const file = await ctx.files.loadFileUpload(root.content["file_upload_id"]);
             return file
               ? {
                   filename: file.filename,
@@ -709,8 +686,7 @@ export const FileUploadInput = inputObjectType({
 
 export const AWSPresignedPostData = objectType({
   name: "AWSPresignedPostData",
-  description:
-    "JSON with AWS S3 url and required form data to make a POST request",
+  description: "JSON with AWS S3 url and required form data to make a POST request",
   definition(t) {
     t.string("url");
     t.jsonObject("fields");

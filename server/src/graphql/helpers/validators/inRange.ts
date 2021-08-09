@@ -4,9 +4,7 @@ import { ArgValidationError } from "../errors";
 import { isDefined } from "../../../util/remedaExtensions";
 
 export function inRange<TypeName extends string, FieldName extends string>(
-  prop: (
-    args: core.ArgsValue<TypeName, FieldName>
-  ) => number | null | undefined,
+  prop: (args: core.ArgsValue<TypeName, FieldName>) => number | null | undefined,
   argName: string,
   lowerLimit = -Infinity,
   upperLimit = Infinity

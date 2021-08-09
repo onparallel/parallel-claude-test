@@ -36,24 +36,15 @@ export class TextRepliesExcelWorksheet extends ExcelWorksheet<TextReplyRow> {
     }
   }
 
-  public addDynamicSelectReply(
-    field: PetitionField,
-    replies: PetitionFieldReply[]
-  ) {
+  public addDynamicSelectReply(field: PetitionField, replies: PetitionFieldReply[]) {
     if (replies.length > 0) {
       this.addRows(
         replies.flatMap((r, i) =>
-          (r.content.columns as [string, string | null][]).map(
-            ([label, value]) => ({
-              title:
-                field.title?.concat(
-                  ` (${label})`,
-                  field.multiple ? ` [${i + 1}]` : ""
-                ) || "",
-              description: field.description?.slice(0, 200) || "",
-              answer: value ?? this.noAnswerLabel,
-            })
-          )
+          (r.content.columns as [string, string | null][]).map(([label, value]) => ({
+            title: field.title?.concat(` (${label})`, field.multiple ? ` [${i + 1}]` : "") || "",
+            description: field.description?.slice(0, 200) || "",
+            answer: value ?? this.noAnswerLabel,
+          }))
         )
       );
     } else {

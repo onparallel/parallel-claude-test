@@ -13,10 +13,7 @@ export interface TagProps {
 }
 
 export const Tag = Object.assign(
-  chakraForwardRef<"div", TagProps>(function (
-    { tag, isRemovable, onRemove, ...props },
-    ref
-  ) {
+  chakraForwardRef<"div", TagProps>(function ({ tag, isRemovable, onRemove, ...props }, ref) {
     const intl = useIntl();
     return (
       <Box

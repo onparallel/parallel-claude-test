@@ -27,10 +27,7 @@ const email: Email<SignatureCancelledProps> = {
       defaultMessage: "Cancelled signature request",
     });
   },
-  text(
-    { signerName, signatureProvider, documentName }: SignatureCancelledProps,
-    intl: IntlShape
-  ) {
+  text({ signerName, signatureProvider, documentName }: SignatureCancelledProps, intl: IntlShape) {
     return outdent`
       ${greetingFormal({ fullName: signerName }, intl)}
       ${intl.formatMessage(

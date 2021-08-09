@@ -36,9 +36,7 @@ export function DatePicker({
   isDisabledDate?: (date: Date) => boolean;
 }) {
   const intl = useIntl();
-  const [currentMonth, setCurrentMonth] = useState(
-    startOfMonth(value || new Date())
-  );
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(value || new Date()));
   const selectedDate = value ? startOfDay(value) : undefined;
   const month = getMonth(currentMonth);
   const year = getYear(currentMonth);
@@ -77,12 +75,7 @@ export function DatePicker({
           })}
           onClick={() => setCurrentMonth((m) => subMonths(m, 1))}
         />
-        <Flex
-          flex="1"
-          alignItems="center"
-          justifyContent="center"
-          fontWeight="bold"
-        >
+        <Flex flex="1" alignItems="center" justifyContent="center" fontWeight="bold">
           <FormattedDate value={currentMonth} month="long" year="numeric" />
         </Flex>
         <IconButtonWithTooltip
@@ -131,11 +124,7 @@ const Month = memo(function Month({
     <Box as="table" width="100%">
       <Box as="colgroup">
         {weekDays.map((day, index) => (
-          <Box
-            as="col"
-            key={index}
-            backgroundColor={isWeekend(day) ? "gray.50" : undefined}
-          />
+          <Box as="col" key={index} backgroundColor={isWeekend(day) ? "gray.50" : undefined} />
         ))}
       </Box>
       <Box as="thead">

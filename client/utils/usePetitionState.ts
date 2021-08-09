@@ -10,9 +10,7 @@ export function usePetitionState() {
   const intl = useIntl();
   return [
     state,
-    useCallback(function <T extends (...args: any[]) => Promise<any>>(
-      updater: T
-    ) {
+    useCallback(function <T extends (...args: any[]) => Promise<any>>(updater: T) {
       return async function (...args: any[]) {
         setState("SAVING");
         try {
@@ -33,7 +31,6 @@ export function usePetitionState() {
           } catch {}
         }
       } as T;
-    },
-    []),
+    }, []),
   ] as const;
 }

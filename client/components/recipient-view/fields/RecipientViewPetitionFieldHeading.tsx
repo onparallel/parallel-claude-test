@@ -15,26 +15,12 @@ export function RecipientViewPetitionFieldHeading({
   onDownloadAttachment,
 }: RecipientViewPetitionFieldHeadingProps) {
   return (
-    <Stack
-      as="header"
-      id={`field-${field.id}`}
-      spacing={1}
-      paddingX={2}
-      paddingY={2}
-    >
+    <Stack as="header" id={`field-${field.id}`} spacing={1} paddingX={2} paddingY={2}>
       {field.title ? (
         <Heading size="md">{field.title}</Heading>
       ) : (
-        <Heading
-          size="md"
-          color="gray.500"
-          fontWeight="normal"
-          fontStyle="italic"
-        >
-          <FormattedMessage
-            id="generic.empty-heading"
-            defaultMessage="Untitled heading"
-          />
+        <Heading size="md" color="gray.500" fontWeight="normal" fontStyle="italic">
+          <FormattedMessage id="generic.empty-heading" defaultMessage="Untitled heading" />
         </Heading>
       )}
       {field.description ? (

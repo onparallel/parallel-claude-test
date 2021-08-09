@@ -23,19 +23,12 @@ import {
   PetitionPermission,
 } from "../../../db/__types";
 import { unMaybeArray } from "../../../util/arrays";
-import {
-  fromGlobalId,
-  fromGlobalIds,
-  toGlobalId,
-} from "../../../util/globalId";
+import { fromGlobalId, fromGlobalIds, toGlobalId } from "../../../util/globalId";
 import { withError } from "../../../util/promises/withError";
 import { isDefined } from "../../../util/remedaExtensions";
 import { calculateNextReminder } from "../../../util/reminderUtils";
 import { random } from "../../../util/token";
-import {
-  userHasAccessToContactGroups,
-  userHasAccessToContacts,
-} from "../../contact/authorizers";
+import { userHasAccessToContactGroups, userHasAccessToContacts } from "../../contact/authorizers";
 import {
   and,
   argIsDefined,
@@ -53,11 +46,7 @@ import { jsonArg, jsonObjectArg } from "../../helpers/json";
 import { parseDynamicSelectValues } from "../../helpers/parseDynamicSelectValues";
 import { RESULT } from "../../helpers/result";
 import { uploadArg } from "../../helpers/upload";
-import {
-  validateAnd,
-  validateIf,
-  validateOr,
-} from "../../helpers/validateArgs";
+import { validateAnd, validateIf, validateOr } from "../../helpers/validateArgs";
 import { inRange } from "../../helpers/validators/inRange";
 import { jsonSchema } from "../../helpers/validators/jsonSchema";
 import { maxLength } from "../../helpers/validators/maxLength";
@@ -170,11 +159,7 @@ export const createPetition = mutationField("createPetition", {
     }
 
     if (eventsUrl) {
-      await ctx.subscriptions.createSubscription(
-        petition.id,
-        eventsUrl,
-        ctx.user!
-      );
+      await ctx.subscriptions.createSubscription(petition.id, eventsUrl, ctx.user!);
     }
     await ctx.petitions.createEvent({
       type: "PETITION_CREATED",
@@ -192,10 +177,7 @@ export const clonePetitions = mutationField("clonePetitions", {
   type: list(nonNull("PetitionBase")),
   authorize: chain(
     authenticate(),
-    or(
-      userHasAccessToPetitions("petitionIds"),
-      petitionsArePublicTemplates("petitionIds")
-    )
+    or(userHasAccessToPetitions("petitionIds"), petitionsArePublicTemplates("petitionIds"))
   ),
   args: {
     petitionIds: nonNull(list(nonNull(globalIdArg("Petition")))),
@@ -205,18 +187,12 @@ export const clonePetitions = mutationField("clonePetitions", {
     return await pMap(
       unMaybeArray(args.petitionIds),
       async (petitionId) => {
-        const { name, locale } = (await ctx.petitions.loadPetition(
-          petitionId
-        ))!;
+        const { name, locale } = (await ctx.petitions.loadPetition(petitionId))!;
         const mark = `(${locale === "es" ? "copia" : "copy"})`;
 
-        const cloned = await ctx.petitions.clonePetition(
-          petitionId,
-          ctx.user!,
-          {
-            name: `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
-          }
-        );
+        const cloned = await ctx.petitions.clonePetition(petitionId, ctx.user!, {
+          name: `${name ? `${name} ` : ""}${mark}`.slice(0, 255),
+        });
 
         await ctx.petitions.createEvent([
           {
@@ -275,9 +251,7 @@ export const deletePetitions = mutationField("deletePetitions", {
     }
 
     // user permissions grouped by permission_id
-    const userPermissions = await ctx.petitions.loadUserPermissionsByPetitionId(
-      args.ids
-    );
+    const userPermissions = await ctx.petitions.loadUserPermissionsByPetitionId(args.ids);
 
     if (userPermissions.some(userHasAccessViaGroup)) {
       throw new WhitelistedError(
@@ -304,19 +278,11 @@ export const deletePetitions = mutationField("deletePetitions", {
     }
 
     const petitions = await ctx.petitions.loadPetition(args.ids);
-    const publicTemplates = petitions.filter(
-      (p) => p && p.is_template && p.template_public
-    );
+    const publicTemplates = petitions.filter((p) => p && p.is_template && p.template_public);
     if (publicTemplates.length > 0) {
-      throw new WhitelistedError(
-        "Can't delete a public template",
-        "DELETE_PUBLIC_TEMPLATE_ERROR",
-        {
-          petitionIds: publicTemplates.map((p) =>
-            toGlobalId("Petition", p!.id)
-          ),
-        }
-      );
+      throw new WhitelistedError("Can't delete a public template", "DELETE_PUBLIC_TEMPLATE_ERROR", {
+        petitionIds: publicTemplates.map((p) => toGlobalId("Petition", p!.id)),
+      });
     }
 
     await ctx.petitions.withTransaction(async (t) => {
@@ -328,9 +294,7 @@ export const deletePetitions = mutationField("deletePetitions", {
         t
       );
 
-      const ownerPermissions = deletedPermissions.filter(
-        (p) => p.type === "OWNER"
-      );
+      const ownerPermissions = deletedPermissions.filter((p) => p.type === "OWNER");
 
       const [, deletedPetitions] = await Promise.all([
         // make sure to also remove every remaining permission on deleted owned petitions
@@ -383,17 +347,10 @@ export const updateFieldPositions = mutationField("updateFieldPositions", {
   },
   resolve: async (_, args, ctx) => {
     try {
-      return await ctx.petitions.updateFieldPositions(
-        args.petitionId,
-        args.fieldIds,
-        ctx.user!
-      );
+      return await ctx.petitions.updateFieldPositions(args.petitionId, args.fieldIds, ctx.user!);
     } catch (e) {
       if (e.message === "INVALID_PETITION_FIELD_IDS") {
-        throw new WhitelistedError(
-          "Invalid petition field ids",
-          "INVALID_PETITION_FIELD_IDS"
-        );
+        throw new WhitelistedError("Invalid petition field ids", "INVALID_PETITION_FIELD_IDS");
       } else if (e.message === "INVALID_FIELD_CONDITIONS_ORDER") {
         throw new WhitelistedError(
           "Invalid field conditions order",
@@ -465,10 +422,7 @@ export const updatePetition = mutationField("updatePetition", {
     ),
     ifSomeDefined(
       (args) => [args.data.emailBody, args.data.emailSubject],
-      or(
-        petitionsAreEditable("petitionId"),
-        petitionsAreOfTypePetition("petitionId")
-      )
+      or(petitionsAreEditable("petitionId"), petitionsAreOfTypePetition("petitionId"))
     )
   ),
   args: {
@@ -504,14 +458,8 @@ export const updatePetition = mutationField("updatePetition", {
     maxLength((args) => args.data.description, "data.description", 1000),
     validRichTextContent((args) => args.data.emailBody, "data.emailBody"),
     validRichTextContent((args) => args.data.description, "data.description"),
-    validRemindersConfig(
-      (args) => args.data.remindersConfig,
-      "data.remindersConfig"
-    ),
-    validSignatureConfig(
-      (args) => args.data.signatureConfig,
-      "data.signatureConfig"
-    )
+    validRemindersConfig((args) => args.data.remindersConfig, "data.remindersConfig"),
+    validSignatureConfig((args) => args.data.signatureConfig, "data.signatureConfig")
   ),
   resolve: async (_, args, ctx) => {
     const {
@@ -569,8 +517,7 @@ export const updatePetition = mutationField("updatePetition", {
       };
     }
     if (description !== undefined) {
-      data.template_description =
-        description === null ? null : JSON.stringify(description);
+      data.template_description = description === null ? null : JSON.stringify(description);
     }
 
     if (isDefined(isReadOnly)) {
@@ -627,11 +574,7 @@ export const clonePetitionField = mutationField("clonePetitionField", {
     fieldId: nonNull(globalIdArg("PetitionField")),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.clonePetitionField(
-      args.petitionId,
-      args.fieldId,
-      ctx.user!
-    );
+    return await ctx.petitions.clonePetitionField(args.petitionId, args.fieldId, ctx.user!);
   },
 });
 
@@ -653,16 +596,12 @@ export const deletePetitionField = mutationField("deletePetitionField", {
   resolve: async (_, args, ctx) => {
     const replies = await ctx.petitions.loadRepliesForField(args.fieldId);
     if (!args.force && replies.length > 0) {
-      throw new WhitelistedError(
-        "The petition field has replies.",
-        "FIELD_HAS_REPLIES_ERROR"
-      );
+      throw new WhitelistedError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
     }
 
-    const petitionFields = await ctx.petitions.loadFieldsForPetition(
-      args.petitionId,
-      { cache: false }
-    );
+    const petitionFields = await ctx.petitions.loadFieldsForPetition(args.petitionId, {
+      cache: false,
+    });
     if (
       petitionFields.some((f) =>
         f.visibility?.conditions.some((c: any) => c.fieldId === args.fieldId)
@@ -674,11 +613,7 @@ export const deletePetitionField = mutationField("deletePetitionField", {
       );
     }
 
-    return await ctx.petitions.deletePetitionField(
-      args.petitionId,
-      args.fieldId,
-      ctx.user!
-    );
+    return await ctx.petitions.deletePetitionField(args.petitionId, args.fieldId, ctx.user!);
   },
 });
 
@@ -722,8 +657,7 @@ export const updatePetitionField = mutationField("updatePetitionField", {
     )
   ),
   resolve: async (_, args, ctx, info) => {
-    const { title, description, optional, multiple, options, visibility } =
-      args.data;
+    const { title, description, optional, multiple, options, visibility } = args.data;
     const data: Partial<CreatePetitionField> = {};
     if (title !== undefined) {
       data.title = title?.trim() || null;
@@ -761,98 +695,83 @@ export const updatePetitionField = mutationField("updatePetitionField", {
             };
     }
 
-    return await ctx.petitions.updatePetitionField(
-      args.petitionId,
-      args.fieldId,
-      data,
-      ctx.user!
-    );
+    return await ctx.petitions.updatePetitionField(args.petitionId, args.fieldId, data, ctx.user!);
   },
 });
 
-export const uploadDynamicSelectFile = mutationField(
-  "uploadDynamicSelectFieldFile",
-  {
-    description:
-      "Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options",
-    type: "PetitionField",
-    authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "fieldId"),
-      fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
-      petitionsAreNotPublicTemplates("petitionId")
-    ),
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-      fieldId: nonNull(globalIdArg("PetitionField")),
-      file: nonNull(uploadArg()),
+export const uploadDynamicSelectFile = mutationField("uploadDynamicSelectFieldFile", {
+  description:
+    "Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options",
+  type: "PetitionField",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    fieldHasType("fieldId", ["DYNAMIC_SELECT"]),
+    petitionsAreNotPublicTemplates("petitionId")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    file: nonNull(uploadArg()),
+  },
+  validateArgs: validateFile(
+    (args) => args.file,
+    {
+      contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      maxSize: 1024 * 1024 * 10,
     },
-    validateArgs: validateFile(
-      (args) => args.file,
+    "file"
+  ),
+  resolve: async (_, args, ctx) => {
+    const file = await args.file;
+
+    const [importError, importResult] = await withError(importFromExcel(file.createReadStream()));
+    if (importError) {
+      throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
+    }
+    const [parseError, parseResult] = await withError(() =>
+      parseDynamicSelectValues(importResult!)
+    );
+    if (parseError) {
+      throw new WhitelistedError(parseError.message, "INVALID_FORMAT_ERROR");
+    }
+    const { labels, values } = parseResult!;
+
+    const key = random(16);
+    const res = await ctx.aws.fileUploads.uploadFile(key, file.mimetype, file.createReadStream());
+
+    const fileUpload = await ctx.files.createFileUpload(
       {
-        contentType:
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        maxSize: 1024 * 1024 * 10,
+        content_type: file.mimetype,
+        filename: file.filename,
+        path: key,
+        size: res["ContentLength"]!.toString(),
+        upload_complete: true,
       },
-      "file"
-    ),
-    resolve: async (_, args, ctx) => {
-      const file = await args.file;
+      `User:${ctx.user!.id}`
+    );
 
-      const [importError, importResult] = await withError(
-        importFromExcel(file.createReadStream())
-      );
-      if (importError) {
-        throw new WhitelistedError("Invalid file", "INVALID_FORMAT_ERROR");
-      }
-      const [parseError, parseResult] = await withError(() =>
-        parseDynamicSelectValues(importResult!)
-      );
-      if (parseError) {
-        throw new WhitelistedError(parseError.message, "INVALID_FORMAT_ERROR");
-      }
-      const { labels, values } = parseResult!;
+    const options = {
+      values,
+      labels,
+      file: {
+        id: toGlobalId("FileUpload", fileUpload.id),
+        name: fileUpload.filename,
+        size: res["ContentLength"],
+        updatedAt: fileUpload.updated_at.toISOString(),
+      },
+    };
+    await ctx.petitions.validateFieldData(args.fieldId, { options });
+    const { field } = await ctx.petitions.updatePetitionField(
+      args.petitionId,
+      args.fieldId,
+      { options },
+      ctx.user!
+    );
 
-      const key = random(16);
-      const res = await ctx.aws.fileUploads.uploadFile(
-        key,
-        file.mimetype,
-        file.createReadStream()
-      );
-
-      const fileUpload = await ctx.files.createFileUpload(
-        {
-          content_type: file.mimetype,
-          filename: file.filename,
-          path: key,
-          size: res["ContentLength"]!.toString(),
-          upload_complete: true,
-        },
-        `User:${ctx.user!.id}`
-      );
-
-      const options = {
-        values,
-        labels,
-        file: {
-          id: toGlobalId("FileUpload", fileUpload.id),
-          name: fileUpload.filename,
-          size: res["ContentLength"],
-          updatedAt: fileUpload.updated_at.toISOString(),
-        },
-      };
-      await ctx.petitions.validateFieldData(args.fieldId, { options });
-      const { field } = await ctx.petitions.updatePetitionField(
-        args.petitionId,
-        args.fieldId,
-        { options },
-        ctx.user!
-      );
-
-      return field;
-    },
-  }
-);
+    return field;
+  },
+});
 
 export const dynamicSelectFieldFileDownloadLink = mutationField(
   "dynamicSelectFieldFileDownloadLink",
@@ -898,10 +817,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
   type: "PetitionAndPartialFields",
   authorize: chain(
     authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "fieldIds")
-    )
+    and(userHasAccessToPetitions("petitionId"), fieldsBelongsToPetition("petitionId", "fieldIds"))
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -922,9 +838,7 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
         cache: false,
       });
       await ctx.petitions.updatePetitionFieldRepliesStatus(
-        replies.flatMap((r) =>
-          r.filter((r) => r.status === "PENDING").map((r) => r.id)
-        ),
+        replies.flatMap((r) => r.filter((r) => r.status === "PENDING").map((r) => r.id)),
         args.validateRepliesWith || "APPROVED"
       );
     }
@@ -950,140 +864,117 @@ export const validatePetitionFields = mutationField("validatePetitionFields", {
   },
 });
 
-export const updatePetitionFieldRepliesStatus = mutationField(
-  "updatePetitionFieldRepliesStatus",
-  {
-    description:
-      "Updates the status of a petition field reply and sets the petition as closed if all fields are validated.",
-    type: objectType({
-      name: "PetitionWithFieldAndReplies",
-      definition(t) {
-        t.field("petition", { type: "Petition" });
-        t.field("field", { type: "PetitionField" });
-        t.list.nonNull.field("replies", { type: "PetitionFieldReply" });
-      },
-    }),
-    authorize: chain(
-      authenticate(),
-      and(
-        userHasAccessToPetitions("petitionId"),
-        fieldsBelongsToPetition("petitionId", "petitionFieldId"),
-        repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds")
-      )
-    ),
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-      petitionFieldId: nonNull(globalIdArg("PetitionField")),
-      petitionFieldReplyIds: nonNull(
-        list(nonNull(globalIdArg("PetitionFieldReply")))
-      ),
-      status: nonNull(arg({ type: "PetitionFieldReplyStatus" })),
+export const updatePetitionFieldRepliesStatus = mutationField("updatePetitionFieldRepliesStatus", {
+  description:
+    "Updates the status of a petition field reply and sets the petition as closed if all fields are validated.",
+  type: objectType({
+    name: "PetitionWithFieldAndReplies",
+    definition(t) {
+      t.field("petition", { type: "Petition" });
+      t.field("field", { type: "PetitionField" });
+      t.list.nonNull.field("replies", { type: "PetitionFieldReply" });
     },
-    validateArgs: notEmptyArray(
-      (args) => args.petitionFieldReplyIds,
-      "petitionFieldReplyIds"
-    ),
-    resolve: async (_, args, ctx) => {
-      const replies = await ctx.petitions.updatePetitionFieldRepliesStatus(
-        args.petitionFieldReplyIds,
-        args.status
-      );
-      if (args.status === "APPROVED") {
-        const allReplies = await ctx.petitions.loadRepliesForField(
-          args.petitionFieldId
+  }),
+  authorize: chain(
+    authenticate(),
+    and(
+      userHasAccessToPetitions("petitionId"),
+      fieldsBelongsToPetition("petitionId", "petitionFieldId"),
+      repliesBelongsToField("petitionFieldId", "petitionFieldReplyIds")
+    )
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    petitionFieldId: nonNull(globalIdArg("PetitionField")),
+    petitionFieldReplyIds: nonNull(list(nonNull(globalIdArg("PetitionFieldReply")))),
+    status: nonNull(arg({ type: "PetitionFieldReplyStatus" })),
+  },
+  validateArgs: notEmptyArray((args) => args.petitionFieldReplyIds, "petitionFieldReplyIds"),
+  resolve: async (_, args, ctx) => {
+    const replies = await ctx.petitions.updatePetitionFieldRepliesStatus(
+      args.petitionFieldReplyIds,
+      args.status
+    );
+    if (args.status === "APPROVED") {
+      const allReplies = await ctx.petitions.loadRepliesForField(args.petitionFieldId);
+      if (allReplies.every((r) => ["APPROVED", "REJECTED"].includes(r.status))) {
+        const field = (
+          await ctx.petitions.validatePetitionFields(
+            args.petitionId,
+            [args.petitionFieldId],
+            true,
+            ctx.user!
+          )
+        )[0];
+        return {
+          petition: (await ctx.petitions.loadPetition(args.petitionId, {
+            cache: false,
+          }))!,
+          replies,
+          field,
+        };
+      }
+    }
+    return {
+      petition: (await ctx.petitions.loadPetition(args.petitionId))!,
+      replies,
+      field: (await ctx.petitions.loadField(args.petitionFieldId))!,
+    };
+  },
+});
+
+export const fileUploadReplyDownloadLink = mutationField("fileUploadReplyDownloadLink", {
+  description: "Generates a download link for a file reply.",
+  type: "FileUploadDownloadLinkResult",
+  authorize: chain(
+    authenticate(),
+    and(userHasAccessToPetitions("petitionId"), repliesBelongsToPetition("petitionId", "replyId"))
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    preview: booleanArg({
+      description: "If true will use content-disposition inline instead of attachment",
+    }),
+  },
+  resolve: async (_, args, ctx) => {
+    try {
+      const reply = await ctx.petitions.loadFieldReply(args.replyId);
+      if (reply!.type !== "FILE_UPLOAD") {
+        throw new WhitelistedError(
+          "Only FILE_UPLOAD replies can be downloaded",
+          "INVALID_FIELD_TYPE"
         );
-        if (
-          allReplies.every((r) => ["APPROVED", "REJECTED"].includes(r.status))
-        ) {
-          const field = (
-            await ctx.petitions.validatePetitionFields(
-              args.petitionId,
-              [args.petitionFieldId],
-              true,
-              ctx.user!
-            )
-          )[0];
-          return {
-            petition: (await ctx.petitions.loadPetition(args.petitionId, {
-              cache: false,
-            }))!,
-            replies,
-            field,
-          };
-        }
+      }
+      const file = await ctx.files.loadFileUpload(reply!.content["file_upload_id"]);
+      if (!file) {
+        throw new Error(`FileUpload not found with id ${reply!.content["file_upload_id"]}`);
+      }
+      if (!file.upload_complete) {
+        await ctx.aws.fileUploads.getFileMetadata(file!.path);
+        await ctx.files.markFileUploadComplete(file.id);
       }
       return {
-        petition: (await ctx.petitions.loadPetition(args.petitionId))!,
-        replies,
-        field: (await ctx.petitions.loadField(args.petitionFieldId))!,
+        result: RESULT.SUCCESS,
+        file: file.upload_complete
+          ? file
+          : await ctx.files.loadFileUpload(file.id, { refresh: true }),
+        url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
+          file!.path,
+          file!.filename,
+          args.preview ? "inline" : "attachment"
+        ),
       };
-    },
-  }
-);
-
-export const fileUploadReplyDownloadLink = mutationField(
-  "fileUploadReplyDownloadLink",
-  {
-    description: "Generates a download link for a file reply.",
-    type: "FileUploadDownloadLinkResult",
-    authorize: chain(
-      authenticate(),
-      and(
-        userHasAccessToPetitions("petitionId"),
-        repliesBelongsToPetition("petitionId", "replyId")
-      )
-    ),
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-      replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      preview: booleanArg({
-        description:
-          "If true will use content-disposition inline instead of attachment",
-      }),
-    },
-    resolve: async (_, args, ctx) => {
-      try {
-        const reply = await ctx.petitions.loadFieldReply(args.replyId);
-        if (reply!.type !== "FILE_UPLOAD") {
-          throw new WhitelistedError(
-            "Only FILE_UPLOAD replies can be downloaded",
-            "INVALID_FIELD_TYPE"
-          );
-        }
-        const file = await ctx.files.loadFileUpload(
-          reply!.content["file_upload_id"]
-        );
-        if (!file) {
-          throw new Error(
-            `FileUpload not found with id ${reply!.content["file_upload_id"]}`
-          );
-        }
-        if (!file.upload_complete) {
-          await ctx.aws.fileUploads.getFileMetadata(file!.path);
-          await ctx.files.markFileUploadComplete(file.id);
-        }
-        return {
-          result: RESULT.SUCCESS,
-          file: file.upload_complete
-            ? file
-            : await ctx.files.loadFileUpload(file.id, { refresh: true }),
-          url: await ctx.aws.fileUploads.getSignedDownloadEndpoint(
-            file!.path,
-            file!.filename,
-            args.preview ? "inline" : "attachment"
-          ),
-        };
-      } catch (error) {
-        if (error instanceof WhitelistedError) {
-          throw error;
-        }
-        return {
-          result: RESULT.FAILURE,
-        };
+    } catch (error) {
+      if (error instanceof WhitelistedError) {
+        throw error;
       }
-    },
-  }
-);
+      return {
+        result: RESULT.FAILURE,
+      };
+    }
+  },
+});
 
 /**
  * creates the required accesses and messages to send a petition to a group of contacts
@@ -1109,10 +1000,7 @@ async function presendPetition(
         reminders_active: Boolean(args.remindersConfig),
         reminders_config: args.remindersConfig,
         next_reminder_at: args.remindersConfig
-          ? calculateNextReminder(
-              args.scheduledAt ?? new Date(),
-              args.remindersConfig
-            )
+          ? calculateNextReminder(args.scheduledAt ?? new Date(), args.remindersConfig)
           : null,
       })),
       ctx.user!
@@ -1159,9 +1047,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
-    contactIdGroups: nonNull(
-      list(nonNull(list(nonNull(globalIdArg("Contact")))))
-    ),
+    contactIdGroups: nonNull(list(nonNull(list(nonNull(globalIdArg("Contact")))))),
     subject: nonNull(stringArg()),
     body: nonNull(jsonArg()),
     scheduledAt: datetimeArg(),
@@ -1172,13 +1058,11 @@ export const batchSendPetition = mutationField("batchSendPetition", {
         members: [
           {
             name: "COPY_SIGNATURE_SETTINGS",
-            description:
-              "Allow configured signer(s) to sign every petition on the batch",
+            description: "Allow configured signer(s) to sign every petition on the batch",
           },
           {
             name: "LET_RECIPIENT_CHOOSE",
-            description:
-              "Let recipients of each group to choose who will sign the petitions.",
+            description: "Let recipients of each group to choose who will sign the petitions.",
           },
           {
             name: "DISABLE_SIGNATURE",
@@ -1212,14 +1096,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
       args.contactIdGroups
         .slice(1)
         // set the owner of the original petition as owner of the cloned ones
-        .map(() =>
-          ctx.petitions.clonePetition(
-            args.petitionId,
-            ctx.user!,
-            undefined,
-            false
-          )
-        )
+        .map(() => ctx.petitions.clonePetition(args.petitionId, ctx.user!, undefined, false))
     );
 
     if (
@@ -1264,8 +1141,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
 
     const results = await pMap(
       zip([petition, ...clonedPetitions], args.contactIdGroups),
-      async ([petition, contactIds]) =>
-        await presendPetition(petition, contactIds, args, ctx),
+      async ([petition, contactIds]) => await presendPetition(petition, contactIds, args, ctx),
       { concurrency: 5 }
     );
 
@@ -1290,8 +1166,7 @@ export const batchSendPetition = mutationField("batchSendPetition", {
 });
 
 export const sendPetition = mutationField("sendPetition", {
-  description:
-    "Sends the petition and creates the corresponding accesses and messages.",
+  description: "Sends the petition and creates the corresponding accesses and messages.",
   type: "SendPetitionResult",
   authorize: authenticateAnd(
     userHasAccessToPetitions("petitionId"),
@@ -1326,10 +1201,7 @@ export const sendPetition = mutationField("sendPetition", {
       petition: updatedPetition,
     } = await presendPetition(petition, args.contactIds, args, ctx);
 
-    if (
-      result === "FAILURE" &&
-      error.constraint === "petition_access__petition_id_contact_id"
-    ) {
+    if (result === "FAILURE" && error.constraint === "petition_access__petition_id_contact_id") {
       throw new WhitelistedError(
         "This petition was already sent to some of the contacts",
         "PETITION_ALREADY_SENT_ERROR"
@@ -1364,10 +1236,7 @@ export const sendReminders = mutationField("sendReminders", {
   type: "Result",
   authorize: chain(
     authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      accessesBelongToPetition("petitionId", "accessIds")
-    )
+    and(userHasAccessToPetitions("petitionId"), accessesBelongToPetition("petitionId", "accessIds"))
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
@@ -1416,79 +1285,60 @@ export const sendReminders = mutationField("sendReminders", {
   },
 });
 
-export const switchAutomaticReminders = mutationField(
-  "switchAutomaticReminders",
-  {
-    description:
-      "Switches automatic reminders for the specified petition accesses.",
-    type: list(nonNull("PetitionAccess")),
-    authorize: chain(
-      authenticate(),
-      and(
-        userHasAccessToPetitions("petitionId"),
-        accessesBelongToPetition("petitionId", "accessIds")
-      )
-    ),
-    args: {
-      start: nonNull(booleanArg()),
-      petitionId: nonNull(globalIdArg("Petition")),
-      accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
-      remindersConfig: arg({ type: "RemindersConfigInput" }),
-    },
-    validateArgs: validateOr(
-      validBooleanValue((args) => args.start, "start", false),
-      validateAnd(
-        validIsDefined((args) => args.remindersConfig, "remindersConfig"),
-        validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
-      )
-    ),
-    resolve: async (_, args, ctx, info) => {
-      const [petition, accesses] = await Promise.all([
-        ctx.petitions.loadPetition(args.petitionId),
-        ctx.petitions.loadAccess(args.accessIds),
-      ]);
+export const switchAutomaticReminders = mutationField("switchAutomaticReminders", {
+  description: "Switches automatic reminders for the specified petition accesses.",
+  type: list(nonNull("PetitionAccess")),
+  authorize: chain(
+    authenticate(),
+    and(userHasAccessToPetitions("petitionId"), accessesBelongToPetition("petitionId", "accessIds"))
+  ),
+  args: {
+    start: nonNull(booleanArg()),
+    petitionId: nonNull(globalIdArg("Petition")),
+    accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
+    remindersConfig: arg({ type: "RemindersConfigInput" }),
+  },
+  validateArgs: validateOr(
+    validBooleanValue((args) => args.start, "start", false),
+    validateAnd(
+      validIsDefined((args) => args.remindersConfig, "remindersConfig"),
+      validRemindersConfig((args) => args.remindersConfig, "remindersConfig")
+    )
+  ),
+  resolve: async (_, args, ctx, info) => {
+    const [petition, accesses] = await Promise.all([
+      ctx.petitions.loadPetition(args.petitionId),
+      ctx.petitions.loadAccess(args.accessIds),
+    ]);
 
-      validatePetitionStatus(petition, "PENDING", info);
-      validateAccessesStatus(accesses, "ACTIVE", info);
-      petitionAccessesNotOptedOut(accesses, info);
+    validatePetitionStatus(petition, "PENDING", info);
+    validateAccessesStatus(accesses, "ACTIVE", info);
+    petitionAccessesNotOptedOut(accesses, info);
 
-      if (args.start) {
-        validateAccessesRemindersLeft(accesses, info);
-        const validAccessIds: number[] = accesses
-          .filter((a) => a !== null)
-          .map((a) => a!.id);
+    if (args.start) {
+      validateAccessesRemindersLeft(accesses, info);
+      const validAccessIds: number[] = accesses.filter((a) => a !== null).map((a) => a!.id);
 
-        return await ctx.petitions.startAccessReminders(
-          validAccessIds,
-          args.remindersConfig!
-        );
-      } else {
-        return await ctx.petitions.stopAccessReminders(args.accessIds);
-      }
-    },
-  }
-);
+      return await ctx.petitions.startAccessReminders(validAccessIds, args.remindersConfig!);
+    } else {
+      return await ctx.petitions.stopAccessReminders(args.accessIds);
+    }
+  },
+});
 
 export const deactivateAccesses = mutationField("deactivateAccesses", {
   description: "Deactivates the specified active petition accesses.",
   type: list(nonNull("PetitionAccess")),
   authorize: chain(
     authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      accessesBelongToPetition("petitionId", "accessIds")
-    )
+    and(userHasAccessToPetitions("petitionId"), accessesBelongToPetition("petitionId", "accessIds"))
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.deactivateAccesses(
-      args.petitionId,
-      args.accessIds,
-      ctx.user!
-    );
+    return await ctx.petitions.deactivateAccesses(args.petitionId, args.accessIds, ctx.user!);
   },
 });
 
@@ -1508,11 +1358,7 @@ export const reactivateAccesses = mutationField("reactivateAccesses", {
     accessIds: nonNull(list(nonNull(globalIdArg("PetitionAccess")))),
   },
   resolve: async (_, args, ctx, info) => {
-    return await ctx.petitions.reactivateAccesses(
-      args.petitionId,
-      args.accessIds,
-      ctx.user!
-    );
+    return await ctx.petitions.reactivateAccesses(args.petitionId, args.accessIds, ctx.user!);
   },
 });
 
@@ -1521,136 +1367,111 @@ export const cancelScheduledMessage = mutationField("cancelScheduledMessage", {
   type: nullable("PetitionMessage"),
   authorize: chain(
     authenticate(),
-    and(
-      userHasAccessToPetitions("petitionId"),
-      messageBelongToPetition("petitionId", "messageId")
-    )
+    and(userHasAccessToPetitions("petitionId"), messageBelongToPetition("petitionId", "messageId"))
   ),
   args: {
     petitionId: nonNull(globalIdArg("Petition")),
     messageId: nonNull(globalIdArg("PetitionMessage")),
   },
   resolve: async (_, args, ctx) => {
-    return await ctx.petitions.cancelScheduledMessage(
-      args.petitionId,
-      args.messageId,
-      ctx.user!
-    );
+    return await ctx.petitions.cancelScheduledMessage(args.petitionId, args.messageId, ctx.user!);
   },
 });
 
-export const changePetitionFieldType = mutationField(
-  "changePetitionFieldType",
-  {
-    description: "Changes the type of a petition Field",
-    type: "PetitionBaseAndField",
-    authorize: authenticateAnd(
-      userHasAccessToPetitions("petitionId"),
-      fieldsBelongsToPetition("petitionId", "fieldId"),
-      petitionsAreEditable("petitionId"),
-      petitionsAreNotPublicTemplates("petitionId")
-    ),
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-      fieldId: nonNull(globalIdArg("PetitionField")),
-      type: nonNull(arg({ type: "PetitionFieldType" })),
-      force: booleanArg({ default: false }),
-    },
-    resolve: async (_, args, ctx) => {
-      const replies = await ctx.petitions.loadRepliesForField(args.fieldId, {
-        cache: false,
-      });
+export const changePetitionFieldType = mutationField("changePetitionFieldType", {
+  description: "Changes the type of a petition Field",
+  type: "PetitionBaseAndField",
+  authorize: authenticateAnd(
+    userHasAccessToPetitions("petitionId"),
+    fieldsBelongsToPetition("petitionId", "fieldId"),
+    petitionsAreEditable("petitionId"),
+    petitionsAreNotPublicTemplates("petitionId")
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    fieldId: nonNull(globalIdArg("PetitionField")),
+    type: nonNull(arg({ type: "PetitionFieldType" })),
+    force: booleanArg({ default: false }),
+  },
+  resolve: async (_, args, ctx) => {
+    const replies = await ctx.petitions.loadRepliesForField(args.fieldId, {
+      cache: false,
+    });
 
-      const field = await ctx.petitions.loadField(args.fieldId);
+    const field = await ctx.petitions.loadField(args.fieldId);
 
-      if (
-        field &&
-        !args.force &&
-        replies.length > 0 &&
-        !isValueCompatible(field.type, args.type)
-      ) {
-        throw new WhitelistedError(
-          "The petition field has replies.",
-          "FIELD_HAS_REPLIES_ERROR"
-        );
-      }
-      try {
-        return await ctx.petitions.changePetitionFieldType(
-          args.petitionId,
-          args.fieldId,
-          args.type,
-          ctx.user!
-        );
-      } catch (e) {
-        if (e.message === "UPDATE_FIXED_FIELD_ERROR") {
-          throw new WhitelistedError(
-            "Can't change type of a fixed field",
-            "UPDATE_FIXED_FIELD_ERROR"
-          );
-        } else {
-          throw e;
-        }
-      }
-    },
-  }
-);
-
-export const sendPetitionClosedNotification = mutationField(
-  "sendPetitionClosedNotification",
-  {
-    description:
-      "Sends an email to all contacts of the petition confirming the replies are ok",
-    type: "Petition",
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-      emailBody: nonNull(jsonArg()),
-      attachPdfExport: nonNull(booleanArg()),
-      pdfExportTitle: stringArg(),
-      force: booleanArg({ default: false }),
-    },
-    authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
-    validateArgs: validRichTextContent((args) => args.emailBody, "emailBody"),
-    resolve: async (_, args, ctx) => {
-      const shouldSendNotification =
-        await ctx.petitions.shouldNotifyPetitionClosed(args.petitionId);
-      if (!shouldSendNotification && !args.force) {
-        throw new WhitelistedError(
-          "You already notified the contacts",
-          "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
-        );
-      }
-
-      const accesses = await ctx.petitions.loadAccessesForPetition(
-        args.petitionId
+    if (field && !args.force && replies.length > 0 && !isValueCompatible(field.type, args.type)) {
+      throw new WhitelistedError("The petition field has replies.", "FIELD_HAS_REPLIES_ERROR");
+    }
+    try {
+      return await ctx.petitions.changePetitionFieldType(
+        args.petitionId,
+        args.fieldId,
+        args.type,
+        ctx.user!
       );
+    } catch (e) {
+      if (e.message === "UPDATE_FIXED_FIELD_ERROR") {
+        throw new WhitelistedError(
+          "Can't change type of a fixed field",
+          "UPDATE_FIXED_FIELD_ERROR"
+        );
+      } else {
+        throw e;
+      }
+    }
+  },
+});
 
-      const activeAccesses = accesses.filter((a) => a.status === "ACTIVE");
+export const sendPetitionClosedNotification = mutationField("sendPetitionClosedNotification", {
+  description: "Sends an email to all contacts of the petition confirming the replies are ok",
+  type: "Petition",
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    emailBody: nonNull(jsonArg()),
+    attachPdfExport: nonNull(booleanArg()),
+    pdfExportTitle: stringArg(),
+    force: booleanArg({ default: false }),
+  },
+  authorize: chain(authenticate(), userHasAccessToPetitions("petitionId")),
+  validateArgs: validRichTextContent((args) => args.emailBody, "emailBody"),
+  resolve: async (_, args, ctx) => {
+    const shouldSendNotification = await ctx.petitions.shouldNotifyPetitionClosed(args.petitionId);
+    if (!shouldSendNotification && !args.force) {
+      throw new WhitelistedError(
+        "You already notified the contacts",
+        "ALREADY_NOTIFIED_PETITION_CLOSED_ERROR"
+      );
+    }
 
-      await Promise.all([
-        ctx.emails.sendPetitionClosedEmail(
-          args.petitionId,
-          ctx.user!.id,
-          activeAccesses.map((a) => a.id),
-          args.emailBody,
-          args.attachPdfExport,
-          args.pdfExportTitle ?? null
-        ),
-        ctx.petitions.createEvent(
-          activeAccesses.map((access) => ({
-            type: "PETITION_CLOSED_NOTIFIED",
-            petition_id: args.petitionId,
-            data: {
-              user_id: ctx.user!.id,
-              petition_access_id: access.id,
-            },
-          }))
-        ),
-      ]);
+    const accesses = await ctx.petitions.loadAccessesForPetition(args.petitionId);
 
-      return (await ctx.petitions.loadPetition(args.petitionId))!;
-    },
-  }
-);
+    const activeAccesses = accesses.filter((a) => a.status === "ACTIVE");
+
+    await Promise.all([
+      ctx.emails.sendPetitionClosedEmail(
+        args.petitionId,
+        ctx.user!.id,
+        activeAccesses.map((a) => a.id),
+        args.emailBody,
+        args.attachPdfExport,
+        args.pdfExportTitle ?? null
+      ),
+      ctx.petitions.createEvent(
+        activeAccesses.map((access) => ({
+          type: "PETITION_CLOSED_NOTIFIED",
+          petition_id: args.petitionId,
+          data: {
+            user_id: ctx.user!.id,
+            petition_access_id: access.id,
+          },
+        }))
+      ),
+    ]);
+
+    return (await ctx.petitions.loadPetition(args.petitionId))!;
+  },
+});
 
 export const reopenPetition = mutationField("reopenPetition", {
   description: "Reopens the petition",
@@ -1683,32 +1504,23 @@ export const reopenPetition = mutationField("reopenPetition", {
   },
 });
 
-export const updatePetitionFieldReplyMetadata = mutationField(
-  "updatePetitionFieldReplyMetadata",
-  {
-    description: "Updates the metada of the specified petition field reply",
-    type: "PetitionFieldReply",
-    authorize: chain(
-      authenticate(),
-      and(
-        userHasAccessToPetitions("petitionId"),
-        repliesBelongsToPetition("petitionId", "replyId")
-      )
-    ),
-    args: {
-      petitionId: nonNull(globalIdArg("Petition")),
-      replyId: nonNull(globalIdArg("PetitionFieldReply")),
-      metadata: nonNull(jsonObjectArg()),
-    },
-    validateArgs: jsonSchema({
-      type: "object",
-      additionalProperties: { type: ["string", "boolean", "number"] },
-    })((args) => args.metadata, "metadata"),
-    resolve: async (_, args, ctx) => {
-      return await ctx.petitions.updatePetitionFieldReplyMetadata(
-        args.replyId,
-        args.metadata
-      );
-    },
-  }
-);
+export const updatePetitionFieldReplyMetadata = mutationField("updatePetitionFieldReplyMetadata", {
+  description: "Updates the metada of the specified petition field reply",
+  type: "PetitionFieldReply",
+  authorize: chain(
+    authenticate(),
+    and(userHasAccessToPetitions("petitionId"), repliesBelongsToPetition("petitionId", "replyId"))
+  ),
+  args: {
+    petitionId: nonNull(globalIdArg("Petition")),
+    replyId: nonNull(globalIdArg("PetitionFieldReply")),
+    metadata: nonNull(jsonObjectArg()),
+  },
+  validateArgs: jsonSchema({
+    type: "object",
+    additionalProperties: { type: ["string", "boolean", "number"] },
+  })((args) => args.metadata, "metadata"),
+  resolve: async (_, args, ctx) => {
+    return await ctx.petitions.updatePetitionFieldReplyMetadata(args.replyId, args.metadata);
+  },
+});

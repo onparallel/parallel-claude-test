@@ -16,12 +16,7 @@ export const HelpPopover = chakraForwardRef<"svg", HelpPopoverProps>(function (
 ) {
   return (
     <SmallPopover content={children} placement={placement} width={popoverWidth}>
-      <QuestionIcon
-        ref={ref}
-        color="gray.400"
-        _hover={{ color: "gray.500" }}
-        {...(props as any)}
-      />
+      <QuestionIcon ref={ref} color="gray.400" _hover={{ color: "gray.500" }} {...(props as any)} />
     </SmallPopover>
   );
 });

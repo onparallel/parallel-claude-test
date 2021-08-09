@@ -5,9 +5,7 @@ import { createCronWorker } from "./helpers/createCronWorker";
 
 createCronWorker("reminder-trigger", async (context) => {
   const accesses = await context.petitions.getRemindableAccesses();
-  for (const [, batch] of Object.entries(
-    groupBy(accesses, (a) => a.petition_id)
-  )) {
+  for (const [, batch] of Object.entries(groupBy(accesses, (a) => a.petition_id))) {
     // Update next reminders
     await pMap(
       batch,

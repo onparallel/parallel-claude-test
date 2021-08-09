@@ -1,9 +1,6 @@
 import { Button, Input, Stack, Text } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
@@ -74,15 +71,8 @@ export function DeleteAccessTokenDialog({
         </Stack>
       }
       confirm={
-        <Button
-          colorScheme="red"
-          isDisabled={confirmation !== value}
-          type="submit"
-        >
-          <FormattedMessage
-            id="generic.confirm-delete-button"
-            defaultMessage="Yes, delete"
-          />
+        <Button colorScheme="red" isDisabled={confirmation !== value} type="submit">
+          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }
       {...props}

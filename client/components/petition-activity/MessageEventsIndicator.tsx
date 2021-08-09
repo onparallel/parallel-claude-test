@@ -32,12 +32,7 @@ export function MessageEventsIndicator({
         {...props}
       >
         <CheckIcon color="red.500" position="relative" top="-1px" />
-        <CheckShortIcon
-          marginLeft="-7px"
-          color="red.500"
-          position="relative"
-          top="-1px"
-        />
+        <CheckShortIcon marginLeft="-7px" color="red.500" position="relative" top="-1px" />
       </Box>
     );
   } else {
@@ -52,16 +47,12 @@ export function MessageEventsIndicator({
                     defaultMessage: "The email was delivered on {date}",
                   },
                   {
-                    date: intl.formatDate(
-                      rountToNearestSecond(deliveredAt),
-                      FORMATS.FULL
-                    ),
+                    date: intl.formatDate(rountToNearestSecond(deliveredAt), FORMATS.FULL),
                   }
                 )
               : intl.formatMessage({
                   id: "component.message-events-indicator.not-delivered-explanation",
-                  defaultMessage:
-                    "We haven't confirmed the delivery of the email.",
+                  defaultMessage: "We haven't confirmed the delivery of the email.",
                 })
           }
         >
@@ -81,16 +72,12 @@ export function MessageEventsIndicator({
                     defaultMessage: "The email was opened on {date}",
                   },
                   {
-                    date: intl.formatDate(
-                      rountToNearestSecond(openedAt),
-                      FORMATS.FULL
-                    ),
+                    date: intl.formatDate(rountToNearestSecond(openedAt), FORMATS.FULL),
                   }
                 )
               : intl.formatMessage({
                   id: "component.message-events-indicator.not-opened-explanation",
-                  defaultMessage:
-                    "We haven't confirmed that the email has been opened yet.",
+                  defaultMessage: "We haven't confirmed that the email has been opened yet.",
                 })
           }
         >

@@ -18,22 +18,13 @@ export function SolutionsDemoCta({ children, ...props }: BoxProps) {
         ...props,
       }}
     >
-      <Heading
-        as="h2"
-        color="white"
-        size="lg"
-        fontFamily="hero"
-        fontWeight="600"
-      >
+      <Heading as="h2" color="white" size="lg" fontFamily="hero" fontWeight="600">
         {children}
       </Heading>
       <Flex marginTop={10} justifyContent="center">
         <NakedLink href="/book-demo">
           <Button as="a" color="gray.800" backgroundColor="white" size="lg">
-            <FormattedMessage
-              id="public.book-demo-button"
-              defaultMessage="Book a demo"
-            />
+            <FormattedMessage id="public.book-demo-button" defaultMessage="Book a demo" />
           </Button>
         </NakedLink>
       </Flex>

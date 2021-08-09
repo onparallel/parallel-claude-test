@@ -75,8 +75,7 @@ const email: Email<MessageBouncedEmailProps> = {
       ${intl.formatMessage(
         {
           id: "petition-message-bounced.intro-text-2",
-          defaultMessage:
-            "Please, verify that the email {contactEmail} is correct and try again.",
+          defaultMessage: "Please, verify that the email {contactEmail} is correct and try again.",
         },
         { contactEmail }
       )}
@@ -111,16 +110,8 @@ const email: Email<MessageBouncedEmailProps> = {
         logoAlt={logoAlt}
         contentHeading={
           <MjmlWrapper backgroundColor="#6059f7" borderRadius="3px 3px 0 0">
-            <MjmlText
-              align="center"
-              color="white"
-              fontWeight={600}
-              textTransform="uppercase"
-            >
-              <FormattedMessage
-                id="generic.action-required"
-                defaultMessage="Action required"
-              />
+            <MjmlText align="center" color="white" fontWeight={600} textTransform="uppercase">
+              <FormattedMessage id="generic.action-required" defaultMessage="Action required" />
             </MjmlText>
           </MjmlWrapper>
         }
@@ -152,11 +143,7 @@ const email: Email<MessageBouncedEmailProps> = {
         </MjmlSection>
 
         <MjmlSection padding="0 20px">
-          <MjmlColumn
-            backgroundColor="#f6f6f6"
-            borderRadius="4px"
-            padding="10px 0"
-          >
+          <MjmlColumn backgroundColor="#f6f6f6" borderRadius="4px" padding="10px 0">
             <MjmlText>
               <div dangerouslySetInnerHTML={{ __html: bodyHtml }}></div>
             </MjmlText>
@@ -177,9 +164,7 @@ const email: Email<MessageBouncedEmailProps> = {
 
         <MjmlSection paddingTop="0px">
           <MjmlColumn>
-            <Button
-              href={`${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/activity`}
-            >
+            <Button href={`${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/activity`}>
               <FormattedMessage
                 id="petition-sharing-notification.access-button"
                 defaultMessage="Access the petition here"

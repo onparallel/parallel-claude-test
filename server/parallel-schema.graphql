@@ -281,17 +281,13 @@ enum IntegrationType {
 The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
-  @specifiedBy(
-    url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf"
-  )
+  @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 """
 The `JSONObject` scalar type represents JSON objects as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSONObject
-  @specifiedBy(
-    url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf"
-  )
+  @specifiedBy(url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf")
 
 """
 A public template on landing page
@@ -433,9 +429,7 @@ type Mutation {
   Cancels a scheduled petition message.
   """
   cancelScheduledMessage(messageId: GID!, petitionId: GID!): PetitionMessage
-  cancelSignatureRequest(
-    petitionSignatureRequestId: GID!
-  ): PetitionSignatureRequest!
+  cancelSignatureRequest(petitionSignatureRequestId: GID!): PetitionSignatureRequest!
 
   """
   Changes the password for the current logged in user.
@@ -475,11 +469,7 @@ type Mutation {
   """
   Creates a reply to a file upload field.
   """
-  createFileUploadReply(
-    fieldId: GID!
-    file: Upload!
-    petitionId: GID!
-  ): PetitionFieldReply!
+  createFileUploadReply(fieldId: GID!, file: Upload!, petitionId: GID!): PetitionFieldReply!
 
   """
   Creates a new organization.
@@ -571,11 +561,7 @@ type Mutation {
   """
   Creates a reply to a text or select field.
   """
-  createSimpleReply(
-    fieldId: GID!
-    petitionId: GID!
-    reply: String!
-  ): PetitionFieldReply!
+  createSimpleReply(fieldId: GID!, petitionId: GID!, reply: String!): PetitionFieldReply!
 
   """
   Creates a tag in the user's organization
@@ -645,11 +631,7 @@ type Mutation {
   """
   Deletes a petition field.
   """
-  deletePetitionField(
-    fieldId: GID!
-    force: Boolean = false
-    petitionId: GID!
-  ): PetitionBase!
+  deletePetitionField(fieldId: GID!, force: Boolean = false, petitionId: GID!): PetitionBase!
 
   """
   Delete a petition field comment.
@@ -684,10 +666,7 @@ type Mutation {
   """
   generates a signed download link for the xlsx file containing the listings of a dynamic select field
   """
-  dynamicSelectFieldFileDownloadLink(
-    fieldId: GID!
-    petitionId: GID!
-  ): FileUploadDownloadLinkResult!
+  dynamicSelectFieldFileDownloadLink(fieldId: GID!, petitionId: GID!): FileUploadDownloadLinkResult!
 
   """
   Edits permissions on given petitions and users
@@ -734,20 +713,13 @@ type Mutation {
     fieldId: GID!
     petitionId: GID!
   ): PetitionFieldAttachment!
-  publicCheckVerificationCode(
-    code: String!
-    keycode: ID!
-    token: ID!
-  ): VerificationCodeCheck!
+  publicCheckVerificationCode(code: String!, keycode: ID!, token: ID!): VerificationCodeCheck!
 
   """
   Marks a filled petition as COMPLETED.
   If the petition does not require a review, starts the signing process. Otherwise sends email to user.
   """
-  publicCompletePetition(
-    keycode: ID!
-    signer: PublicPetitionSignerData
-  ): PublicPetition!
+  publicCompletePetition(keycode: ID!, signer: PublicPetitionSignerData): PublicPetition!
 
   """
   Creates a reply to a checkbox field.
@@ -788,11 +760,7 @@ type Mutation {
   """
   Creates a reply to a text or select field.
   """
-  publicCreateSimpleReply(
-    fieldId: GID!
-    keycode: ID!
-    value: String!
-  ): PublicPetitionFieldReply!
+  publicCreateSimpleReply(fieldId: GID!, keycode: ID!, value: String!): PublicPetitionFieldReply!
 
   """
   Lets a recipient delegate access to the petition to another contact in the same organization
@@ -822,10 +790,7 @@ type Mutation {
   """
   Notifies the backend that the upload is complete.
   """
-  publicFileUploadReplyComplete(
-    keycode: ID!
-    replyId: GID!
-  ): PublicPetitionFieldReply!
+  publicFileUploadReplyComplete(keycode: ID!, replyId: GID!): PublicPetitionFieldReply!
 
   """
   Generates a download link for a file reply on a public context.
@@ -851,11 +816,7 @@ type Mutation {
   """
   Cancel a reminder for a contact.
   """
-  publicOptOutReminders(
-    keycode: ID!
-    other: String!
-    reason: String!
-  ): PublicPetitionAccess!
+  publicOptOutReminders(keycode: ID!, other: String!, reason: String!): PublicPetitionAccess!
 
   """
   Generates a download link for a field attachment on a public context.
@@ -903,11 +864,7 @@ type Mutation {
   """
   Updates a reply to a text or select field.
   """
-  publicUpdateSimpleReply(
-    keycode: ID!
-    replyId: GID!
-    value: String!
-  ): PublicPetitionFieldReply!
+  publicUpdateSimpleReply(keycode: ID!, replyId: GID!, value: String!): PublicPetitionFieldReply!
 
   """
   Reactivates the specified inactive petition accesses.
@@ -917,11 +874,7 @@ type Mutation {
   """
   Remove a petition field attachment
   """
-  removePetitionFieldAttachment(
-    attachmentId: GID!
-    fieldId: GID!
-    petitionId: GID!
-  ): Result!
+  removePetitionFieldAttachment(attachmentId: GID!, fieldId: GID!, petitionId: GID!): Result!
 
   """
   Removes permissions on given petitions and users
@@ -1135,9 +1088,7 @@ type Mutation {
     petitionFieldCommentIds: [GID!]!
     petitionId: GID!
   ): [PetitionFieldComment!]!
-    @deprecated(
-      reason: "Use `updatePetitionUserNotificationReadStatus` instead."
-    )
+    @deprecated(reason: "Use `updatePetitionUserNotificationReadStatus` instead.")
 
   """
   Updates the status of a petition field reply and sets the petition as closed if all fields are validated.
@@ -1161,10 +1112,7 @@ type Mutation {
   """
   Updates the subscription flag on a PetitionPermission
   """
-  updatePetitionPermissionSubscription(
-    isSubscribed: Boolean!
-    petitionId: GID!
-  ): Petition!
+  updatePetitionPermissionSubscription(isSubscribed: Boolean!, petitionId: GID!): Petition!
 
   """
   Updates the read status of a user's notification.
@@ -1189,11 +1137,7 @@ type Mutation {
   """
   Updates a reply to a text or select field.
   """
-  updateSimpleReply(
-    petitionId: GID!
-    reply: String!
-    replyId: GID!
-  ): PetitionFieldReply!
+  updateSimpleReply(petitionId: GID!, reply: String!, replyId: GID!): PetitionFieldReply!
 
   """
   Updates the name and color of a given tag
@@ -1213,20 +1157,12 @@ type Mutation {
   """
   Updates user status and, if new status is INACTIVE, transfers their owned petitions to another user in the org.
   """
-  updateUserStatus(
-    status: UserStatus!
-    transferToUserId: GID
-    userIds: [GID!]!
-  ): [User!]!
+  updateUserStatus(status: UserStatus!, transferToUserId: GID, userIds: [GID!]!): [User!]!
 
   """
   Uploads the xlsx file used to parse the options of a dynamic select field, and sets the field options
   """
-  uploadDynamicSelectFieldFile(
-    fieldId: GID!
-    file: Upload!
-    petitionId: GID!
-  ): PetitionField!
+  uploadDynamicSelectFieldFile(fieldId: GID!, file: Upload!, petitionId: GID!): PetitionField!
 
   """
   Uploads a user avatar image
@@ -1292,8 +1228,7 @@ type OrgIntegration {
 An organization in the system.
 """
 type Organization implements Timestamps {
-  _id: Int!
-    @deprecated(reason: "Temporal solution for support methods, don't use")
+  _id: Int! @deprecated(reason: "Temporal solution for support methods, don't use")
 
   """
   Time when the resource was created.
@@ -3092,10 +3027,7 @@ type Query {
   """
   The comments for this field.
   """
-  petitionFieldComments(
-    keycode: ID!
-    petitionFieldId: GID!
-  ): [PublicPetitionFieldComment!]!
+  petitionFieldComments(keycode: ID!, petitionFieldId: GID!): [PublicPetitionFieldComment!]!
 
   """
   The petitions of the user

@@ -1,7 +1,4 @@
-import {
-  TableSorting,
-  TableSortingDirection,
-} from "@parallel/components/common/Table";
+import { TableSorting, TableSortingDirection } from "@parallel/components/common/Table";
 import { NextRouter, useRouter } from "next/router";
 import * as qs from "querystring";
 import { ParsedUrlQuery } from "querystring";
@@ -50,11 +47,7 @@ export function integer({ max, min }: { max?: number; min?: number } = {}) {
   return new QueryItem<number | null>((value) => {
     if (typeof value === "string") {
       const parsed = parseInt(value);
-      if (
-        !isNaN(parsed) &&
-        parsed >= (min ?? -Infinity) &&
-        parsed <= (max ?? Infinity)
-      ) {
+      if (!isNaN(parsed) && parsed >= (min ?? -Infinity) && parsed <= (max ?? Infinity)) {
         return parsed;
       }
     }
@@ -83,9 +76,7 @@ export function list(values: any[]): QueryItem<any> {
   return new QueryItem<any>(
     (value) => {
       if (value) {
-        const parsed = (value as string)
-          .split(",")
-          .map((v) => (values.includes(v) ? v : null));
+        const parsed = (value as string).split(",").map((v) => (values.includes(v) ? v : null));
         return parsed.includes(null) ? null : parsed;
       } else {
         return null;
@@ -100,10 +91,7 @@ export function sorting<T extends string>(fields: readonly T[]) {
     (value) => {
       if (value) {
         const [field, direction] = (value as string).split("_");
-        if (
-          fields.includes(field as any) &&
-          ["ASC", "DESC"].includes(direction)
-        ) {
+        if (fields.includes(field as any) && ["ASC", "DESC"].includes(direction)) {
           return {
             field: field as T,
             direction: direction as TableSortingDirection,
@@ -127,9 +115,7 @@ export function object<T>({
     (value) => {
       if (value && typeof value === "string") {
         const decoded = JSON.parse(
-          fromBase64(
-            value.replaceAll("-", "+").replaceAll("_", "/").replaceAll(".", "=")
-          )
+          fromBase64(value.replaceAll("-", "+").replaceAll("_", "/").replaceAll(".", "="))
         );
         return unflatten ? unflatten(decoded) : decoded;
       }
@@ -154,12 +140,7 @@ export function parseQuery<T extends {}>(
 ): T {
   return Object.fromEntries(
     Object.entries(shape).map(([key, component]) => {
-      return [
-        key,
-        (component as QueryItem<any>).parseValue(
-          query[prefix ? prefix + key : key]
-        ),
-      ];
+      return [key, (component as QueryItem<any>).parseValue(query[prefix ? prefix + key : key])];
     })
   ) as any;
 }
@@ -184,13 +165,9 @@ export function useQueryState<T extends {}>(
     useCallback(async function (state) {
       const { query, pathname } = ref.current;
       const newState =
-        typeof state === "function"
-          ? state(parseQuery(query, shape, { prefix }))
-          : state;
+        typeof state === "function" ? state(parseQuery(query, shape, { prefix })) : state;
       const fromPath = pathParams(pathname);
-      const fromState = Object.keys(shape).map((key) =>
-        prefix ? prefix + key : key
-      );
+      const fromState = Object.keys(shape).map((key) => (prefix ? prefix + key : key));
       const newQuery = qs.stringify(
         Object.fromEntries([
           ...Object.entries(newState)
@@ -231,10 +208,7 @@ export function useQueryStateSlice<T extends {}, K extends keyof T>(
       function (value) {
         setState((prevState) => ({
           ...prevState,
-          [slice]:
-            typeof value === "function"
-              ? (value as any)(prevState[slice])
-              : value,
+          [slice]: typeof value === "function" ? (value as any)(prevState[slice]) : value,
         }));
       },
       [setState]

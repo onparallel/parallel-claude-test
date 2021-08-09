@@ -24,10 +24,7 @@ export function UserListPopover({
   usersOrGroups,
   children,
 }: {
-  usersOrGroups: (
-    | UserListPopover_UserFragment
-    | UserListPopover_UserGroupFragment
-  )[];
+  usersOrGroups: (UserListPopover_UserFragment | UserListPopover_UserGroupFragment)[];
   children: ReactNode;
 }) {
   if (usersOrGroups.length === 0) {
@@ -40,12 +37,7 @@ export function UserListPopover({
       <Portal>
         <PopoverContent width="fit-content">
           <PopoverArrow />
-          <PopoverBody
-            paddingX={0}
-            paddingY={2}
-            overflow="auto"
-            maxHeight="300px"
-          >
+          <PopoverBody paddingX={0} paddingY={2} overflow="auto" maxHeight="300px">
             <Stack as={List}>
               {usersOrGroups.map((u) => (
                 <Flex key={u.id} as={ListItem} alignItems="center" paddingX={4}>

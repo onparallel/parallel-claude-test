@@ -11,9 +11,7 @@ createQueueWorker(
     if (!payload?.mail?.messageId) {
       return;
     }
-    const emailLogId = await context.emailLogs.findInternalId(
-      payload.mail.messageId
-    );
+    const emailLogId = await context.emailLogs.findInternalId(payload.mail.messageId);
     if (!emailLogId) {
       return;
     }
@@ -41,25 +39,17 @@ createQueueWorker(
       if (message) {
         await Promise.all([
           context.emails.sendPetitionMessageBouncedEmail(message.id),
-          context.petitions.updateRemindersForPetition(
-            message.petition_id,
-            null
-          ),
+          context.petitions.updateRemindersForPetition(message.petition_id, null),
           context.system.createEvent({
             type: "PETITION_MESSAGE_BOUNCED",
             data: { petition_message_id: message.id },
           }),
         ]);
       } else if (reminder) {
-        const access = (await context.petitions.loadAccess(
-          reminder.petition_access_id
-        ))!;
+        const access = (await context.petitions.loadAccess(reminder.petition_access_id))!;
 
         await Promise.all([
-          context.petitions.updateRemindersForPetition(
-            access.petition_id,
-            null
-          ),
+          context.petitions.updateRemindersForPetition(access.petition_id, null),
           context.system.createEvent({
             type: "PETITION_REMINDER_BOUNCED",
             data: {

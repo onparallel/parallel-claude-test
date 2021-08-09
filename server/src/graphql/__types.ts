@@ -63,9 +63,7 @@ declare global {
 
     paginationField<
       FieldName extends string,
-      PaginationType extends
-        | core.GetGen<"allOutputTypes", string>
-        | core.AllNexusOutputTypeDefs
+      PaginationType extends core.GetGen<"allOutputTypes", string> | core.AllNexusOutputTypeDefs
     >(
       fieldName: FieldName,
       config: PaginationFieldConfig<TypeName, FieldName, PaginationType>
@@ -177,22 +175,12 @@ export interface NexusGenInputs {
 }
 
 export interface NexusGenEnums {
-  BatchSendSigningMode:
-    | "COPY_SIGNATURE_SETTINGS"
-    | "DISABLE_SIGNATURE"
-    | "LET_RECIPIENT_CHOOSE";
-  ChangePasswordResult:
-    | "INCORRECT_PASSWORD"
-    | "INVALID_NEW_PASSWORD"
-    | "SUCCESS";
+  BatchSendSigningMode: "COPY_SIGNATURE_SETTINGS" | "DISABLE_SIGNATURE" | "LET_RECIPIENT_CHOOSE";
+  ChangePasswordResult: "INCORRECT_PASSWORD" | "INVALID_NEW_PASSWORD" | "SUCCESS";
   EntityType: "Contact" | "Organization" | "Petition" | "User";
   FeatureFlag: db.FeatureFlagName;
   FilterSharedWithLogicalOperator: "AND" | "OR";
-  FilterSharedWithOperator:
-    | "IS_OWNER"
-    | "NOT_IS_OWNER"
-    | "NOT_SHARED_WITH"
-    | "SHARED_WITH";
+  FilterSharedWithOperator: "IS_OWNER" | "NOT_IS_OWNER" | "NOT_SHARED_WITH" | "SHARED_WITH";
   IntegrationType: db.IntegrationType;
   OnboardingKey:
     | "CONTACT_DETAILS"
@@ -227,19 +215,9 @@ export interface NexusGenEnums {
   PetitionPermissionTypeRW: "READ" | "WRITE";
   PetitionReminderType: db.PetitionReminderType;
   PetitionSignatureCancelReason: db.PetitionSignatureCancelReason;
-  PetitionSignatureRequestStatus:
-    | "CANCELLED"
-    | "COMPLETED"
-    | "ENQUEUED"
-    | "PROCESSING";
+  PetitionSignatureRequestStatus: "CANCELLED" | "COMPLETED" | "ENQUEUED" | "PROCESSING";
   PetitionStatus: db.PetitionStatus;
-  PetitionUserNotificationFilter:
-    | "ALL"
-    | "COMMENTS"
-    | "COMPLETED"
-    | "OTHER"
-    | "SHARED"
-    | "UNREAD";
+  PetitionUserNotificationFilter: "ALL" | "COMMENTS" | "COMPLETED" | "OTHER" | "SHARED" | "UNREAD";
   PublicSignatureStatus: "COMPLETED" | "STARTED";
   QueryContacts_OrderBy:
     | "createdAt_ASC"
@@ -252,11 +230,7 @@ export interface NexusGenEnums {
     | "fullName_DESC"
     | "lastName_ASC"
     | "lastName_DESC";
-  QueryOrganizations_OrderBy:
-    | "createdAt_ASC"
-    | "createdAt_DESC"
-    | "name_ASC"
-    | "name_DESC";
+  QueryOrganizations_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   QueryPetitions_OrderBy:
     | "createdAt_ASC"
     | "createdAt_DESC"
@@ -266,11 +240,7 @@ export interface NexusGenEnums {
     | "name_DESC"
     | "sentAt_ASC"
     | "sentAt_DESC";
-  QueryUserGroups_OrderBy:
-    | "createdAt_ASC"
-    | "createdAt_DESC"
-    | "name_ASC"
-    | "name_DESC";
+  QueryUserGroups_OrderBy: "createdAt_ASC" | "createdAt_DESC" | "name_ASC" | "name_DESC";
   Result: "FAILURE" | "SUCCESS";
   UserAuthenticationTokens_OrderBy:
     | "createdAt_ASC"
@@ -572,13 +542,9 @@ export interface NexusGenUnions {
     | ({ __type: "UserGroup" } & NexusGenRootTypes["UserGroup"]);
 }
 
-export type NexusGenRootTypes = NexusGenInterfaces &
-  NexusGenObjects &
-  NexusGenUnions;
+export type NexusGenRootTypes = NexusGenInterfaces & NexusGenObjects & NexusGenUnions;
 
-export type NexusGenAllTypes = NexusGenRootTypes &
-  NexusGenScalars &
-  NexusGenEnums;
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars & NexusGenEnums;
 
 export interface NexusGenFieldTypes {
   AWSPresignedPostData: {
@@ -907,9 +873,7 @@ export interface NexusGenFieldTypes {
     // field return type
     accesses: NexusGenRootTypes["PetitionAccess"][]; // [PetitionAccess!]!
     createdAt: NexusGenScalars["DateTime"]; // DateTime!
-    currentSignatureRequest:
-      | NexusGenRootTypes["PetitionSignatureRequest"]
-      | null; // PetitionSignatureRequest
+    currentSignatureRequest: NexusGenRootTypes["PetitionSignatureRequest"] | null; // PetitionSignatureRequest
     deadline: NexusGenScalars["DateTime"] | null; // DateTime
     emailBody: NexusGenScalars["JSON"] | null; // JSON
     emailSubject: string | null; // String
@@ -921,9 +885,7 @@ export interface NexusGenFieldTypes {
     isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    myEffectivePermission:
-      | NexusGenRootTypes["EffectivePetitionUserPermission"]
-      | null; // EffectivePetitionUserPermission
+    myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
@@ -1144,9 +1106,7 @@ export interface NexusGenFieldTypes {
     isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    myEffectivePermission:
-      | NexusGenRootTypes["EffectivePetitionUserPermission"]
-      | null; // EffectivePetitionUserPermission
+    myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
@@ -1568,9 +1528,7 @@ export interface NexusGenFieldTypes {
     isReadOnly: boolean; // Boolean!
     isRecipientViewContentsHidden: boolean; // Boolean!
     locale: NexusGenEnums["PetitionLocale"]; // PetitionLocale!
-    myEffectivePermission:
-      | NexusGenRootTypes["EffectivePetitionUserPermission"]
-      | null; // EffectivePetitionUserPermission
+    myEffectivePermission: NexusGenRootTypes["EffectivePetitionUserPermission"] | null; // EffectivePetitionUserPermission
     name: string | null; // String
     organization: NexusGenRootTypes["Organization"]; // Organization!
     owner: NexusGenRootTypes["User"]; // User!
@@ -3604,9 +3562,7 @@ export interface NexusGenTypes {
     | NexusGenTypes["unionNames"]
     | NexusGenTypes["interfaceNames"]
     | NexusGenTypes["scalarNames"];
-  allNamedTypes:
-    | NexusGenTypes["allInputTypes"]
-    | NexusGenTypes["allOutputTypes"];
+  allNamedTypes: NexusGenTypes["allInputTypes"] | NexusGenTypes["allOutputTypes"];
   abstractTypes: NexusGenTypes["interfaceNames"] | NexusGenTypes["unionNames"];
   abstractTypeMembers: NexusGenAbstractTypeMembers;
   objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf;
@@ -3616,10 +3572,7 @@ export interface NexusGenTypes {
 
 declare global {
   interface NexusGenPluginTypeConfig<TypeName extends string> {}
-  interface NexusGenPluginFieldConfig<
-    TypeName extends string,
-    FieldName extends string
-  > {
+  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
     /**
      * Authorization for an individual field. Returning "true"
      * or "Promise<true>" means the field can be accessed.
@@ -3656,10 +3609,7 @@ declare global {
      */
     required?: boolean;
   }
-  interface NexusGenPluginInputFieldConfig<
-    TypeName extends string,
-    FieldName extends string
-  > {
+  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {
     /**
      * Whether the type can be null
      * @default (depends on whether nullability is configured in type or schema)

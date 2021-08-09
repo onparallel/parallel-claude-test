@@ -40,17 +40,13 @@ export function TagEditDialog({ ...props }: DialogProps) {
   const [updateTag] = useTagEditDialog_updateTagMutation();
   useEffect(() => {
     if (data && data.tags.items.length > 0 && tag === null) {
-      const selected = maxBy(data.tags.items, (t) =>
-        new Date(t.createdAt).valueOf()
-      );
+      const selected = maxBy(data.tags.items, (t) => new Date(t.createdAt).valueOf());
       setTag({ ...selected! });
     }
   }, [data]);
   useEffect(() => {
     if (data) {
-      const selected = maxBy(data.tags.items, (t) =>
-        new Date(t.createdAt).valueOf()
-      );
+      const selected = maxBy(data.tags.items, (t) => new Date(t.createdAt).valueOf());
       setTag({ ...selected! });
     }
   }, []);
@@ -77,10 +73,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
         <Stack direction="row" alignItems="center">
           <EditIcon position="relative" />
           <Text as="div" flex="1">
-            <FormattedMessage
-              id="components.tag-edit-dialog.header"
-              defaultMessage="Edit tags"
-            />
+            <FormattedMessage id="components.tag-edit-dialog.header" defaultMessage="Edit tags" />
           </Text>
         </Stack>
       }
@@ -88,10 +81,7 @@ export function TagEditDialog({ ...props }: DialogProps) {
         <Box>
           <FormControl isDisabled={isDisabled}>
             <FormLabel>
-              <FormattedMessage
-                id="components.tag-edit-dialog.tag-label"
-                defaultMessage="Tag"
-              />
+              <FormattedMessage id="components.tag-edit-dialog.tag-label" defaultMessage="Tag" />
             </FormLabel>
             <TagSelect
               value={tag}
@@ -99,17 +89,8 @@ export function TagEditDialog({ ...props }: DialogProps) {
               onChange={(tag) => setTag({ ...tag! })}
             />
           </FormControl>
-          <Grid
-            gridTemplateColumns="auto 1fr"
-            alignItems="center"
-            gridRowGap={2}
-            marginTop={4}
-          >
-            <FormControl
-              as={NoElement}
-              isDisabled={isDisabled}
-              isInvalid={!!error}
-            >
+          <Grid gridTemplateColumns="auto 1fr" alignItems="center" gridRowGap={2} marginTop={4}>
+            <FormControl as={NoElement} isDisabled={isDisabled} isInvalid={!!error}>
               <FormLabel marginBottom="0">
                 <FormattedMessage
                   id="components.tag-edit-dialog.name-label"
@@ -207,11 +188,7 @@ export function useTagEditDialog() {
   return useDialog(TagEditDialog);
 }
 
-function TagSelect({
-  value,
-  onChange,
-  ...props
-}: SelectProps<TagSelection, false, never>) {
+function TagSelect({ value, onChange, ...props }: SelectProps<TagSelection, false, never>) {
   const rsProps = useReactSelectProps<TagSelection, false, never>({
     components: {
       SingleValue: ({ data: tag, innerProps }) => {

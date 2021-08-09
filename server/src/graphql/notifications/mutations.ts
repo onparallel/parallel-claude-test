@@ -27,24 +27,17 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
         "petitionUserNotificationIds",
         userHasAccessToNotifications("petitionUserNotificationIds" as never)
       ),
-      ifArgDefined(
-        "petitionIds",
-        userHasAccessToPetitions("petitionIds" as never)
-      ),
+      ifArgDefined("petitionIds", userHasAccessToPetitions("petitionIds" as never)),
       ifArgDefined(
         "petitionFieldCommentIds",
         userHasAccessToPetitionFieldComments("petitionFieldCommentIds" as never)
       )
     ),
     args: {
-      petitionUserNotificationIds: list(
-        nonNull(globalIdArg("PetitionUserNotification"))
-      ),
+      petitionUserNotificationIds: list(nonNull(globalIdArg("PetitionUserNotification"))),
       filter: "PetitionUserNotificationFilter",
       petitionIds: list(nonNull(globalIdArg("Petition"))),
-      petitionFieldCommentIds: list(
-        nonNull(globalIdArg("PetitionFieldComment"))
-      ),
+      petitionFieldCommentIds: list(nonNull(globalIdArg("PetitionFieldComment"))),
       isRead: nonNull(booleanArg()),
     },
     validateArgs: async (root, args, ctx, info) => {
@@ -65,13 +58,7 @@ export const updatePetitionUserNotificationReadStatus = mutationField(
     },
     resolve: async (
       _,
-      {
-        petitionUserNotificationIds,
-        petitionIds,
-        petitionFieldCommentIds,
-        filter,
-        isRead,
-      },
+      { petitionUserNotificationIds, petitionIds, petitionFieldCommentIds, filter, isRead },
       ctx
     ) => {
       if (petitionUserNotificationIds) {

@@ -38,11 +38,7 @@ export interface AppLayoutNavbarProps extends BoxProps {
 declare const zE: any;
 
 export const AppLayoutNavbar = Object.assign(
-  memo(function AppLayoutNavbar({
-    user,
-    onOnboardingClick,
-    ...props
-  }: AppLayoutNavbarProps) {
+  memo(function AppLayoutNavbar({ user, onOnboardingClick, ...props }: AppLayoutNavbarProps) {
     const intl = useIntl();
     const router = useRouter();
     const { pathname, query } = router;
@@ -111,11 +107,7 @@ export const AppLayoutNavbar = Object.assign(
         height={{ base: 16, sm: "auto" }}
         {...props}
       >
-        <Center
-          display={{ base: "none", sm: "flex" }}
-          marginBottom={6}
-          marginTop={2}
-        >
+        <Center display={{ base: "none", sm: "flex" }} marginBottom={6} marginTop={2}>
           <NakedLink href="/app">
             <Box as="a" width="40px" height="40px" position="relative">
               <Box
@@ -147,9 +139,7 @@ export const AppLayoutNavbar = Object.assign(
               icon={<AddIcon />}
               size="lg"
               isRound
-              onClick={() =>
-                router.push(`/${router.query.locale}/app/petitions/new`)
-              }
+              onClick={() => router.push(`/${router.query.locale}/app/petitions/new`)}
               aria-label={intl.formatMessage({
                 id: "new-petition.title",
                 defaultMessage: "New petition",

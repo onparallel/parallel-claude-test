@@ -29,21 +29,14 @@ export async function contactAuthenticationRequest(
     context.petitions.loadPetition(access.petition_id),
   ]);
   if (!contact) {
-    throw new Error(
-      `Contact not found for petition_access.contact_id ${access.contact_id}`
-    );
+    throw new Error(`Contact not found for petition_access.contact_id ${access.contact_id}`);
   }
   if (!petition) {
-    throw new Error(
-      `Petition not found for petition_access.petition_id ${access.petition_id}`
-    );
+    throw new Error(`Petition not found for petition_access.petition_id ${access.petition_id}`);
   }
   const ua = request.user_agent ? new UAParser(request.user_agent) : null;
 
-  const { emailFrom, ...layoutProps } = await getLayoutProps(
-    petition.org_id,
-    context
-  );
+  const { emailFrom, ...layoutProps } = await getLayoutProps(petition.org_id, context);
 
   const { html, text, subject, from } = await buildEmail(
     ContactAuthenticationRequest,

@@ -84,11 +84,7 @@ export type TagColorSelectProps = Omit<
 > &
   ValueProps<string>;
 
-export function TagColorSelect({
-  value,
-  onChange,
-  ...props
-}: TagColorSelectProps) {
+export function TagColorSelect({ value, onChange, ...props }: TagColorSelectProps) {
   const options = useTagColors();
   const _value = options.find((o) => o.value === value) ?? null;
   const rsProps = useReactSelectProps<TagColor, false, never>({

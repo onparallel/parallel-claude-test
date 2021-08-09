@@ -21,13 +21,7 @@ export function TimelineUserPermissionAddedEvent({
 }: TimelineUserPermissionAddedEventProps) {
   return (
     <TimelineItem
-      icon={
-        <TimelineIcon
-          icon={<UserArrowIcon />}
-          color="white"
-          backgroundColor="purple.500"
-        />
-      }
+      icon={<TimelineIcon icon={<UserArrowIcon />} color="white" backgroundColor="purple.500" />}
     >
       <FormattedMessage
         id="timeline.add-user-permission-description"
@@ -45,11 +39,7 @@ export function TimelineUserPermissionAddedEvent({
             />
           ),
           timeAgo: (
-            <DateTime
-              value={event.createdAt}
-              format={FORMATS.LLL}
-              useRelativeTime="always"
-            />
+            <DateTime value={event.createdAt} format={FORMATS.LLL} useRelativeTime="always" />
           ),
         }}
       />

@@ -13,11 +13,7 @@ import {
   UnorderedList,
   useToast,
 } from "@chakra-ui/react";
-import {
-  ArrowForwardIcon,
-  ListIcon,
-  SettingsIcon,
-} from "@parallel/chakra/icons";
+import { ArrowForwardIcon, ListIcon, SettingsIcon } from "@parallel/chakra/icons";
 import { useBlockingDialog } from "@parallel/components/common/BlockingDialog";
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
@@ -25,10 +21,7 @@ import { useErrorDialog } from "@parallel/components/common/ErrorDialog";
 import { Link } from "@parallel/components/common/Link";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { ResponsiveButtonIcon } from "@parallel/components/common/ResponsiveButtonIcon";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PaneWithFlyout } from "@parallel/components/layout/PaneWithFlyout";
 import { PetitionLayout } from "@parallel/components/layout/PetitionLayout";
 import {
@@ -86,9 +79,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { zip } from "remeda";
 import scrollIntoView from "smooth-scroll-into-view-if-needed";
 
-type PetitionComposeProps = UnwrapPromise<
-  ReturnType<typeof PetitionCompose.getInitialProps>
->;
+type PetitionComposeProps = UnwrapPromise<ReturnType<typeof PetitionCompose.getInitialProps>>;
 
 type FieldSelection = PetitionCompose_PetitionFieldFragment;
 
@@ -116,8 +107,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
   }, []);
 
   const isReadOnly = petition!.isReadOnly;
-  const isPublicTemplate =
-    petition?.__typename === "PetitionTemplate" && petition.isPublic;
+  const isPublicTemplate = petition?.__typename === "PetitionTemplate" && petition.isPublic;
 
   const indices = useFieldIndices(petition!.fields);
   const petitionDataRef = useUpdatingRef({ fields: petition!.fields, indices });
@@ -127,24 +117,17 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const [showErrors, setShowErrors] = useState(false);
   const activeField: Maybe<FieldSelection> = useMemo(() => {
-    return activeFieldId
-      ? petition!.fields?.find((f) => f.id === activeFieldId) ?? null
-      : null;
+    return activeFieldId ? petition!.fields?.find((f) => f.id === activeFieldId) ?? null : null;
   }, [activeFieldId, petition!.fields]);
   const activeFieldElement = useMemo(() => {
-    return activeFieldId
-      ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)!
-      : null;
+    return activeFieldId ? document.querySelector<HTMLElement>(`#field-${activeFieldId}`)! : null;
   }, [activeFieldId]);
 
   const showPublicTemplateDialog = usePublicTemplateDialog();
   // When the petition is completed show a dialog to avoid unintended changes
   const completedDialog = useCompletedPetitionDialog();
   useEffect(() => {
-    if (
-      petition?.__typename === "Petition" &&
-      ["COMPLETED", "CLOSED"].includes(petition.status)
-    ) {
+    if (petition?.__typename === "Petition" && ["COMPLETED", "CLOSED"].includes(petition.status)) {
       completedDialog({});
     }
 
@@ -167,8 +150,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [updateFieldPositions] =
-    usePetitionCompose_updateFieldPositionsMutation();
+  const [updateFieldPositions] = usePetitionCompose_updateFieldPositionsMutation();
   const handleUpdateFieldPositions = useCallback(
     wrapper(async function (fieldIds: string[]) {
       await updateFieldPositions({ variables: { petitionId, fieldIds } });
@@ -188,14 +170,11 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [deletePetitionField] =
-    usePetitionCompose_deletePetitionFieldMutation();
+  const [deletePetitionField] = usePetitionCompose_deletePetitionFieldMutation();
   const confirmDelete = useConfirmDeleteFieldDialog();
   const handleDeleteField = useCallback(
     wrapper(async function (fieldId: string) {
-      setActiveFieldId((activeFieldId) =>
-        activeFieldId === fieldId ? null : activeFieldId
-      );
+      setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : activeFieldId));
       try {
         await deletePetitionField({
           variables: { petitionId, fieldId },
@@ -214,9 +193,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   const handleFieldSettingsClick = useCallback(
     function (fieldId: string) {
-      setActiveFieldId((activeFieldId) =>
-        activeFieldId === fieldId ? null : fieldId
-      );
+      setActiveFieldId((activeFieldId) => (activeFieldId === fieldId ? null : fieldId));
     },
     [petitionId]
   );
@@ -228,8 +205,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [updatePetitionField] =
-    usePetitionCompose_updatePetitionFieldMutation();
+  const [updatePetitionField] = usePetitionCompose_updatePetitionFieldMutation();
   const _handleFieldEdit = useCallback(
     async function (fieldId: string, data: UpdatePetitionFieldInput) {
       const { fields } = petitionDataRef.current!;
@@ -239,10 +215,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
         const validCondition = (c: PetitionFieldVisibilityCondition) => {
           if (c.fieldId === fieldId) {
             if (c.modifier === "NUMBER_OF_REPLIES") {
-              return (
-                c.value === 0 &&
-                (c.operator === "EQUAL" || c.operator === "GREATER_THAN")
-              );
+              return c.value === 0 && (c.operator === "EQUAL" || c.operator === "GREATER_THAN");
             } else if (c.modifier === "ALL" || c.modifier === "NONE") {
               return false;
             }
@@ -250,9 +223,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           return true;
         };
         const referencing = zip(fields, indices).filter(([f]) =>
-          (f.visibility as PetitionFieldVisibility)?.conditions.some(
-            (c) => !validCondition(c)
-          )
+          (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => !validCondition(c))
         );
         if (referencing.length) {
           try {
@@ -268,10 +239,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 const visibility = field.visibility! as PetitionFieldVisibility;
                 const conditions = visibility.conditions.filter(validCondition);
                 await _handleFieldEdit(field.id, {
-                  visibility:
-                    conditions.length > 0
-                      ? { ...visibility, conditions }
-                      : null,
+                  visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
                 });
               })
             );
@@ -302,23 +270,17 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     },
     [petitionId]
   );
-  const handleFieldEdit = useCallback(wrapper(_handleFieldEdit), [
-    petitionId,
-    _handleFieldEdit,
-  ]);
+  const handleFieldEdit = useCallback(wrapper(_handleFieldEdit), [petitionId, _handleFieldEdit]);
 
   const showReferencedFieldDialog = useReferencedFieldDialog();
   const confirmChangeFieldType = useConfirmChangeFieldTypeDialog();
-  const [changePetitionFieldType] =
-    usePetitionCompose_changePetitionFieldTypeMutation();
+  const [changePetitionFieldType] = usePetitionCompose_changePetitionFieldTypeMutation();
   const handleFieldTypeChange = useCallback(
     wrapper(async function (fieldId: string, type: PetitionFieldType) {
       const { fields, indices } = petitionDataRef.current!;
       const field = fields.find((f) => f.id === fieldId)!;
       const referencing = zip(fields, indices).filter(([f]) =>
-        (f.visibility as PetitionFieldVisibility)?.conditions.some(
-          (c) => c.fieldId === fieldId
-        )
+        (f.visibility as PetitionFieldVisibility)?.conditions.some((c) => c.fieldId === fieldId)
       );
       if (referencing.length) {
         // valid field types changes
@@ -335,12 +297,9 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
             });
             for (const [field] of referencing) {
               const visibility = field.visibility! as PetitionFieldVisibility;
-              const conditions = visibility.conditions.filter(
-                (c) => c.fieldId !== fieldId
-              );
+              const conditions = visibility.conditions.filter((c) => c.fieldId !== fieldId);
               await _handleFieldEdit(field.id, {
-                visibility:
-                  conditions.length > 0 ? { ...visibility, conditions } : null,
+                visibility: conditions.length > 0 ? { ...visibility, conditions } : null,
               });
             }
           } catch {
@@ -364,8 +323,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
     [petitionId]
   );
 
-  const [createPetitionField] =
-    usePetitionCompose_createPetitionFieldMutation();
+  const [createPetitionField] = usePetitionCompose_createPetitionFieldMutation();
   const handleAddField = useCallback(
     wrapper(async function (type: PetitionFieldType, position?: number) {
       const { data } = await createPetitionField({
@@ -386,16 +344,12 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
       throw new Error("Can't send a template");
     }
 
-    const { error, errorMessage, field } = validatePetitionFields(
-      petition.fields
-    );
+    const { error, errorMessage, field } = validatePetitionFields(petition.fields);
     if (error) {
       setShowErrors(true);
       await withError(showErrorDialog({ message: errorMessage }));
       if (error === "NO_REPLIABLE_FIELDS") {
-        document
-          .querySelector<HTMLButtonElement>("#menu-button-big-add-field-button")
-          ?.click();
+        document.querySelector<HTMLButtonElement>("#menu-button-big-add-field-button")?.click();
       } else if (field) {
         const node = document.querySelector(`#field-${field.id}`);
         await scrollIntoView(node!, { block: "center", behavior: "smooth" });
@@ -475,8 +429,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           title: intl.formatMessage(
             {
               id: "petition.petition-scheduled-toast.title",
-              defaultMessage:
-                "{count, plural, =1{Petition} other{Petitions}} scheduled",
+              defaultMessage: "{count, plural, =1{Petition} other{Petitions}} scheduled",
             },
             { count: recipientIdGroups.length }
           ),
@@ -499,8 +452,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           title: intl.formatMessage(
             {
               id: "petition.petition-sent-toast.title",
-              defaultMessage:
-                "{count, plural, =1{Petition} other{Petitions}} sent",
+              defaultMessage: "{count, plural, =1{Petition} other{Petitions}} sent",
             },
             { count: recipientIdGroups.length }
           ),
@@ -531,9 +483,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
 
   function focusFieldTitle(fieldId: string) {
     setTimeout(() => {
-      const title = document.querySelector<HTMLElement>(
-        `#field-title-${fieldId}`
-      );
+      const title = document.querySelector<HTMLElement>(`#field-title-${fieldId}`);
       title?.focus();
     });
   }
@@ -585,31 +535,16 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                 isReadOnly={isReadOnly}
               />
             ) : (
-              <Card
-                display="flex"
-                flexDirection="column"
-                maxHeight={`calc(100vh - 6rem)`}
-              >
+              <Card display="flex" flexDirection="column" maxHeight={`calc(100vh - 6rem)`}>
                 <Tabs variant="enclosed" {...extendFlexColumn}>
                   <TabList marginX="-1px" marginTop="-1px" flex="none">
                     <Tab padding={4} lineHeight={5} fontWeight="bold">
                       <ListIcon fontSize="18px" marginRight={2} />
-                      <FormattedMessage
-                        id="petition.contents"
-                        defaultMessage="Contents"
-                      />
+                      <FormattedMessage id="petition.contents" defaultMessage="Contents" />
                     </Tab>
-                    <Tab
-                      className="petition-settings"
-                      padding={4}
-                      lineHeight={5}
-                      fontWeight="bold"
-                    >
+                    <Tab className="petition-settings" padding={4} lineHeight={5} fontWeight="bold">
                       <SettingsIcon fontSize="16px" marginRight={2} />
-                      <FormattedMessage
-                        id="petition-compose.settings"
-                        defaultMessage="Settings"
-                      />
+                      <FormattedMessage id="petition-compose.settings" defaultMessage="Settings" />
                     </Tab>
                   </TabList>
                   <TabPanels {...extendFlexColumn}>
@@ -659,12 +594,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
           ) : null}
           {petition && petition.__typename === "Petition" ? (
             petition!.status !== "DRAFT" ? (
-              <Box
-                color="gray.500"
-                marginTop={12}
-                paddingX={4}
-                textAlign="center"
-              >
+              <Box color="gray.500" marginTop={12} paddingX={4} textAlign="center">
                 <Text>
                   <FormattedMessage
                     id="petition.already-sent"
@@ -677,9 +607,7 @@ function PetitionCompose({ petitionId }: PetitionComposeProps) {
                     defaultMessage="If you want to send it to someone else you can do it from the <a>Activity</a> tab."
                     values={{
                       a: (chunks: any[]) => (
-                        <Link href={`/app/petitions/${petitionId}/activity`}>
-                          {chunks}
-                        </Link>
+                        <Link href={`/app/petitions/${petitionId}/activity`}>{chunks}</Link>
                       ),
                     }}
                   />
@@ -771,10 +699,7 @@ PetitionCompose.mutations = [
     ${PetitionTemplateComposeMessageEditor.fragments.Petition}
   `,
   gql`
-    mutation PetitionCompose_updateFieldPositions(
-      $petitionId: GID!
-      $fieldIds: [GID!]!
-    ) {
+    mutation PetitionCompose_updateFieldPositions($petitionId: GID!, $fieldIds: [GID!]!) {
       updateFieldPositions(petitionId: $petitionId, fieldIds: $fieldIds) {
         id
         ...PetitionLayout_PetitionBase
@@ -791,11 +716,7 @@ PetitionCompose.mutations = [
       $type: PetitionFieldType!
       $position: Int
     ) {
-      createPetitionField(
-        petitionId: $petitionId
-        type: $type
-        position: $position
-      ) {
+      createPetitionField(petitionId: $petitionId, type: $type, position: $position) {
         field {
           id
           ...PetitionCompose_PetitionField
@@ -812,10 +733,7 @@ PetitionCompose.mutations = [
     ${PetitionCompose.fragments.PetitionField}
   `,
   gql`
-    mutation PetitionCompose_clonePetitionField(
-      $petitionId: GID!
-      $fieldId: GID!
-    ) {
+    mutation PetitionCompose_clonePetitionField($petitionId: GID!, $fieldId: GID!) {
       clonePetitionField(petitionId: $petitionId, fieldId: $fieldId) {
         field {
           id
@@ -838,11 +756,7 @@ PetitionCompose.mutations = [
       $fieldId: GID!
       $force: Boolean
     ) {
-      deletePetitionField(
-        petitionId: $petitionId
-        fieldId: $fieldId
-        force: $force
-      ) {
+      deletePetitionField(petitionId: $petitionId, fieldId: $fieldId, force: $force) {
         id
         ...PetitionLayout_PetitionBase
         fields {
@@ -858,11 +772,7 @@ PetitionCompose.mutations = [
       $fieldId: GID!
       $data: UpdatePetitionFieldInput!
     ) {
-      updatePetitionField(
-        petitionId: $petitionId
-        fieldId: $fieldId
-        data: $data
-      ) {
+      updatePetitionField(petitionId: $petitionId, fieldId: $fieldId, data: $data) {
         field {
           id
           ...PetitionCompose_PetitionField
@@ -935,10 +845,7 @@ PetitionCompose.mutations = [
   `,
 ];
 
-PetitionCompose.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+PetitionCompose.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const {
     data: { me },
   } = await fetchQuery<PetitionComposeUserQuery>(
@@ -1031,9 +938,7 @@ export default compose(
               defaultMessage="Once you have added all the fields that you need, click <b>{next}</b> to customize the email message."
               values={{
                 b: (chunks: any[]) => <strong>{chunks}</strong>,
-                next: (
-                  <FormattedMessage id="generic.next" defaultMessage="Next" />
-                ),
+                next: <FormattedMessage id="generic.next" defaultMessage="Next" />,
               }}
             />
           </Text>

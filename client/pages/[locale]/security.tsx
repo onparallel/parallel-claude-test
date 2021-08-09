@@ -19,10 +19,7 @@ function Security() {
         defaultMessage: "Learn more about security at Parallel",
       })}
     >
-      <PublicContainer
-        textAlign="center"
-        wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}
-      >
+      <PublicContainer textAlign="center" wrapper={{ paddingY: 16, backgroundColor: "gray.50" }}>
         <Heading as="h1" size="xl" fontWeight="bold" color="purple.600">
           <FormattedMessage
             id="public.security.hero-title"

@@ -73,11 +73,7 @@ function assertOneOf<T>(value: T, options: T[], errorMessage: string) {
   assert(options.includes(value), errorMessage);
 }
 
-function validateCondition(
-  ctx: ApiContext,
-  petitionId: number,
-  field: PetitionField
-) {
+function validateCondition(ctx: ApiContext, petitionId: number, field: PetitionField) {
   assert(
     field.type !== "HEADING" || !field.options.hasPageBreak,
     `Can't add visibility conditions on a heading with page break`
@@ -90,19 +86,10 @@ function validateCondition(
       return;
     }
 
-    assert(
-      referencedField.position < field.position,
-      "Can't reference fields that come next"
-    );
+    assert(referencedField.position < field.position, "Can't reference fields that come next");
 
-    assert(
-      referencedField.type !== "HEADING",
-      `Conditions can't reference HEADING fields`
-    );
-    assert(
-      referencedField.id !== field.id,
-      `Can't add a reference to field itself`
-    );
+    assert(referencedField.type !== "HEADING", `Conditions can't reference HEADING fields`);
+    assert(referencedField.id !== field.id, `Can't add a reference to field itself`);
     assert(
       referencedField.petition_id === petitionId,
       `Field with id ${referencedField.id} is not linked to petition with id ${petitionId}`
@@ -127,33 +114,19 @@ function validateCondition(
         `Invalid value type ${typeof c.value} for modifier ${c.modifier}`
       );
     } else {
-      if (
-        referencedField.type === "TEXT" ||
-        referencedField.type === "SHORT_TEXT"
-      ) {
+      if (referencedField.type === "TEXT" || referencedField.type === "SHORT_TEXT") {
         assertOneOf(
           c.operator,
-          [
-            "EQUAL",
-            "NOT_EQUAL",
-            "START_WITH",
-            "END_WITH",
-            "CONTAIN",
-            "NOT_CONTAIN",
-          ],
+          ["EQUAL", "NOT_EQUAL", "START_WITH", "END_WITH", "CONTAIN", "NOT_CONTAIN"],
           `Invalid operator ${c.operator} for field of type ${referencedField.type}`
         );
 
         assert(
           c.value === null || typeof c.value === "string",
-          `Invalid value type ${typeof c.value} for field of type ${
-            referencedField.type
-          }`
+          `Invalid value type ${typeof c.value} for field of type ${referencedField.type}`
         );
       } else if (referencedField.type === "FILE_UPLOAD") {
-        throw new Error(
-          `Invalid modifier ${c.modifier} for field of type ${referencedField.type}`
-        );
+        throw new Error(`Invalid modifier ${c.modifier} for field of type ${referencedField.type}`);
       } else if (referencedField.type === "SELECT") {
         assertOneOf(
           c.operator,
@@ -187,15 +160,10 @@ export async function validateFieldVisibilityConditions(
 
   const field = (await ctx.petitions.loadField(fieldId))!;
 
-  await Promise.all(
-    json.conditions.map(validateCondition(ctx, petitionId, field))
-  );
+  await Promise.all(json.conditions.map(validateCondition(ctx, petitionId, field)));
 }
 
-export function validFieldVisibilityJson<
-  TypeName extends string,
-  FieldName extends string
->(
+export function validFieldVisibilityJson<TypeName extends string, FieldName extends string>(
   petitionIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
   fieldIdProp: (args: core.ArgsValue<TypeName, FieldName>) => number,
   prop: (args: core.ArgsValue<TypeName, FieldName>) => any,

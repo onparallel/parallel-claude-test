@@ -61,8 +61,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
 
       ${intl.formatMessage({
         id: "petition-comments-user-notification.access-click-link",
-        defaultMessage:
-          "Follow the link below link to read and reply to the comments.",
+        defaultMessage: "Follow the link below link to read and reply to the comments.",
       })}
       ${parallelUrl}/${intl.locale}/app/petitions/${petitionId}/replies
 
@@ -82,12 +81,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
     const { locale } = useIntl();
     const commentCount = fields.reduce((acc, f) => acc + f.comments.length, 0);
     return (
-      <Layout
-        assetsUrl={assetsUrl}
-        parallelUrl={parallelUrl}
-        logoUrl={logoUrl}
-        logoAlt={logoAlt}
-      >
+      <Layout assetsUrl={assetsUrl} parallelUrl={parallelUrl} logoUrl={logoUrl} logoAlt={logoAlt}>
         <MjmlSection paddingBottom="10px">
           <MjmlColumn>
             <Greeting name={userName} />
@@ -107,9 +101,7 @@ const email: Email<PetitionCommentsUserNotificationProps> = {
         <MjmlSection paddingTop="0px">
           <MjmlColumn>
             <MjmlSpacer height="10px" />
-            <Button
-              href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}
-            >
+            <Button href={`${parallelUrl}/${locale}/app/petitions/${petitionId}/replies`}>
               <FormattedMessage
                 id="petition-comments-user-notification.access-button"
                 defaultMessage="Reply to the comments here"

@@ -71,34 +71,32 @@ export function withApolloData<P = {}>(
                     ignoreCache?: boolean;
                   }
                 ) {
-                  return await new Promise<ApolloQueryResult<T>>(
-                    (resolve, reject) => {
-                      let resolved = false;
-                      // On the browser we fetch from cache and fire a request
-                      // that will update the cache when it arrives
-                      const fetchPolicy =
-                        typeof window !== "undefined" && !options?.ignoreCache
-                          ? "cache-and-network"
-                          : "network-only";
-                      const subscription = apollo
-                        .watchQuery<T, TVariables>({
-                          query,
-                          variables: options?.variables,
-                          fetchPolicy,
-                        })
-                        .subscribe((result) => {
-                          if (!resolved) {
-                            resolve(result);
-                            resolved = true;
-                          }
-                          // if it's loading means we used cache-and-network and we
-                          // are waiting for the network response
-                          if (!result.loading) {
-                            subscription.unsubscribe();
-                          }
-                        }, reject);
-                    }
-                  );
+                  return await new Promise<ApolloQueryResult<T>>((resolve, reject) => {
+                    let resolved = false;
+                    // On the browser we fetch from cache and fire a request
+                    // that will update the cache when it arrives
+                    const fetchPolicy =
+                      typeof window !== "undefined" && !options?.ignoreCache
+                        ? "cache-and-network"
+                        : "network-only";
+                    const subscription = apollo
+                      .watchQuery<T, TVariables>({
+                        query,
+                        variables: options?.variables,
+                        fetchPolicy,
+                      })
+                      .subscribe((result) => {
+                        if (!resolved) {
+                          resolve(result);
+                          resolved = true;
+                        }
+                        // if it's loading means we used cache-and-network and we
+                        // are waiting for the network response
+                        if (!result.loading) {
+                          subscription.unsubscribe();
+                        }
+                      }, reject);
+                  });
                 },
               })) ?? ({} as P);
 
@@ -131,15 +129,9 @@ export function withApolloData<P = {}>(
               code === "CONTACT_NOT_VERIFIED" &&
               context.pathname.startsWith("/[locale]/petition/[keycode]")
             ) {
-              return redirect(
-                context,
-                `/${query.locale}/petition/${query.keycode}`
-              );
+              return redirect(context, `/${query.locale}/petition/${query.keycode}`);
             } else {
-              if (
-                process.env.NODE_ENV === "development" &&
-                error?.graphQLErrors?.[0]?.extensions
-              ) {
+              if (process.env.NODE_ENV === "development" && error?.graphQLErrors?.[0]?.extensions) {
                 console.error(error?.graphQLErrors?.[0]?.extensions);
               }
               throw error;

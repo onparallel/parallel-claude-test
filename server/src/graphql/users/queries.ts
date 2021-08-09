@@ -1,18 +1,7 @@
-import {
-  booleanArg,
-  idArg,
-  list,
-  nonNull,
-  queryField,
-  stringArg,
-} from "@nexus/schema";
+import { booleanArg, idArg, list, nonNull, queryField, stringArg } from "@nexus/schema";
 import { ForbiddenError } from "apollo-server-express";
 import { fromGlobalId } from "../../util/globalId";
-import {
-  authenticate,
-  authenticateAnd,
-  ifArgDefined,
-} from "../helpers/authorize";
+import { authenticate, authenticateAnd, ifArgDefined } from "../helpers/authorize";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { validEmail } from "../helpers/validators/validEmail";
 import { userHasAccessToUsers } from "../petition/mutations/authorizers";
@@ -29,8 +18,7 @@ export const userQueries = queryField((t) => {
   });
 
   t.field("emailIsAvailable", {
-    description:
-      "Checks if the provided email is available to be registered as a user on Parallel",
+    description: "Checks if the provided email is available to be registered as a user on Parallel",
     type: "Boolean",
     args: {
       email: nonNull(stringArg()),
@@ -48,10 +36,7 @@ export const searchUsers = queryField("searchUsers", {
   description: "Search users and user groups",
   authorize: authenticateAnd(
     ifArgDefined("excludeUsers", userHasAccessToUsers("excludeUsers" as never)),
-    ifArgDefined(
-      "excludeUserGroups",
-      userHasAccessToUserGroups("excludeUserGroups" as never)
-    )
+    ifArgDefined("excludeUserGroups", userHasAccessToUserGroups("excludeUserGroups" as never))
   ),
   args: {
     search: nonNull(stringArg()),

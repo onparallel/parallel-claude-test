@@ -1,12 +1,4 @@
-import {
-  Center,
-  Heading,
-  Image,
-  List,
-  ListIcon,
-  ListItem,
-  Text,
-} from "@chakra-ui/react";
+import { Center, Heading, Image, List, ListIcon, ListItem, Text } from "@chakra-ui/react";
 import { CircleCheckIcon } from "@parallel/chakra/icons";
 import { PublicContainer } from "@parallel/components/public/layout/PublicContainer";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
@@ -34,8 +26,7 @@ function Accounting() {
     ratio: 1394 / 976,
     title: intl.formatMessage({
       id: "public.accounting.hero-title",
-      defaultMessage:
-        "Accelerate processes by automating services with your clients ",
+      defaultMessage: "Accelerate processes by automating services with your clients ",
     }),
     subtitle: intl.formatMessage({
       id: "public.accounting.hero-subtitle",
@@ -63,8 +54,7 @@ function Accounting() {
       }),
       text: intl.formatMessage({
         id: "public.accounting.benefits-efficiency-message",
-        defaultMessage:
-          "A platform designed to send and manage multiple processes without effort.",
+        defaultMessage: "A platform designed to send and manage multiple processes without effort.",
       }),
     },
     {
@@ -87,8 +77,7 @@ function Accounting() {
       }),
       text: intl.formatMessage({
         id: "public.accounting.benefits-collaborate-message",
-        defaultMessage:
-          "Assign work to your team and keep track of their progress.",
+        defaultMessage: "Assign work to your team and keep track of their progress.",
       }),
     },
   ];
@@ -116,9 +105,7 @@ function Accounting() {
   const solutions = [
     {
       image: (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_mailing.svg`}
-        />
+        <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_mailing.svg`} />
       ),
       header: (
         <FormattedMessage
@@ -135,9 +122,7 @@ function Accounting() {
     },
     {
       image: (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_control.svg`}
-        />
+        <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_control.svg`} />
       ),
       header: (
         <FormattedMessage
@@ -154,9 +139,7 @@ function Accounting() {
     },
     {
       image: (
-        <Image
-          src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_reminders.svg`}
-        />
+        <Image src={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/ic/ic_reminders.svg`} />
       ),
       header: (
         <FormattedMessage
@@ -177,8 +160,7 @@ function Accounting() {
     <PublicLayout
       title={intl.formatMessage({
         id: "public.accounting.title",
-        defaultMessage:
-          "Software for BPO (business process outsourcing) and Accounting",
+        defaultMessage: "Software for BPO (business process outsourcing) and Accounting",
       })}
     >
       <PublicHero {...hero} />
@@ -193,17 +175,8 @@ function Accounting() {
           imageUrl={`${process.env.NEXT_PUBLIC_ASSETS_URL}/static/images/security.svg`}
           imageSize="300px"
         >
-          <Heading
-            as="h4"
-            size="xs"
-            lineHeight="24px"
-            color="gray.600"
-            textTransform="uppercase"
-          >
-            <FormattedMessage
-              id="public.solutions.security"
-              defaultMessage="Security"
-            />
+          <Heading as="h4" size="xs" lineHeight="24px" color="gray.600" textTransform="uppercase">
+            <FormattedMessage id="public.solutions.security" defaultMessage="Security" />
           </Heading>
           <Heading as="h3" size="lg" color="gray.800" marginBottom={4}>
             <FormattedMessage

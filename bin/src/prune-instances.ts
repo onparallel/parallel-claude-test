@@ -44,8 +44,8 @@ async function main() {
       LoadBalancerArn: result2.LoadBalancers![0].LoadBalancerArn,
     })
     .promise();
-  const tgArn = result3.Listeners?.find((l) => l.Protocol === "HTTPS")!
-    .DefaultActions![0].TargetGroupArn as string;
+  const tgArn = result3.Listeners?.find((l) => l.Protocol === "HTTPS")!.DefaultActions![0]
+    .TargetGroupArn as string;
   const result4 = await elbv2
     .describeTargetHealth({
       TargetGroupArn: tgArn,
@@ -58,16 +58,12 @@ async function main() {
       const name = instance.Tags!.find((t) => t.Key === "Name")?.Value;
       const state = instance.State!.Name;
       if (state === "running") {
-        console.log(
-          chalk`Stopping instance {bold ${id}} {yellow {bold ${name}}}`
-        );
+        console.log(chalk`Stopping instance {bold ${id}} {yellow {bold ${name}}}`);
         if (!dryRun) {
           await ec2.stopInstances({ InstanceIds: [id] }).promise();
         }
       } else if (state === "stopped" || state === "stopping") {
-        console.log(
-          chalk`Terminating instance {bold ${id}} {red {bold ${name}}}`
-        );
+        console.log(chalk`Terminating instance {bold ${id}} {red {bold ${name}}}`);
         if (!dryRun) {
           await ec2.terminateInstances({ InstanceIds: [id] }).promise();
         }
@@ -76,17 +72,10 @@ async function main() {
   }
   const result5 = await elbv2.describeTargetGroups().promise();
   for (const tg of result5.TargetGroups!) {
-    if (
-      tg.TargetGroupName!.endsWith(`-${env}`) &&
-      tg.TargetGroupArn !== tgArn
-    ) {
-      console.log(
-        chalk`Deleting target group {red {bold ${tg.TargetGroupName!}}}`
-      );
+    if (tg.TargetGroupName!.endsWith(`-${env}`) && tg.TargetGroupArn !== tgArn) {
+      console.log(chalk`Deleting target group {red {bold ${tg.TargetGroupName!}}}`);
       if (!dryRun) {
-        await elbv2
-          .deleteTargetGroup({ TargetGroupArn: tg.TargetGroupArn! })
-          .promise();
+        await elbv2.deleteTargetGroup({ TargetGroupArn: tg.TargetGroupArn! }).promise();
       }
     }
   }

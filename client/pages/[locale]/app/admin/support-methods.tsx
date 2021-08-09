@@ -5,10 +5,7 @@ import { SupportMethodModal } from "@parallel/components/admin-support/SupportMe
 import { Card } from "@parallel/components/common/Card";
 import { withDialogs } from "@parallel/components/common/DialogProvider";
 import { SearchInput } from "@parallel/components/common/SearchInput";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { withSuperAdminAccess } from "@parallel/components/common/withSuperAdminAccess";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
 import { SettingsLayout } from "@parallel/components/layout/SettingsLayout";
@@ -29,10 +26,7 @@ type AdminSupportMethodsProps = Exclude<
   undefined
 >;
 
-function AdminSupportMethods({
-  supportMethods,
-  schemaTypes,
-}: AdminSupportMethodsProps) {
+function AdminSupportMethods({ supportMethods, schemaTypes }: AdminSupportMethodsProps) {
   const intl = useIntl();
   const {
     data: { me },
@@ -50,8 +44,7 @@ function AdminSupportMethods({
     });
   }, [supportMethods, search]);
 
-  const [selected, setSelected] =
-    useState<Maybe<UnwrapArray<typeof supportMethods>>>(null);
+  const [selected, setSelected] = useState<Maybe<UnwrapArray<typeof supportMethods>>>(null);
 
   return (
     <SettingsLayout
@@ -62,24 +55,16 @@ function AdminSupportMethods({
       basePath="/app/admin"
       sections={sections}
       user={me}
-      sectionsHeader={
-        <FormattedMessage id="admin.title" defaultMessage="Admin panel" />
-      }
+      sectionsHeader={<FormattedMessage id="admin.title" defaultMessage="Admin panel" />}
       header={
         <Heading as="h3" size="md">
-          <FormattedMessage
-            id="admin.support-methods"
-            defaultMessage="Support methods"
-          />
+          <FormattedMessage id="admin.support-methods" defaultMessage="Support methods" />
         </Heading>
       }
     >
       <Box marginX="auto" width="100%" maxWidth="container.md" paddingX={4}>
         <Box paddingY={4}>
-          <SearchInput
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <SearchInput value={search} onChange={(e) => setSearch(e.target.value)} />
         </Box>
         <Stack>
           {filteredAdminSupportMethods.map((method) => (
@@ -141,9 +126,7 @@ AdminSupportMethods.fragments = {
   },
 };
 
-AdminSupportMethods.getInitialProps = async ({
-  fetchQuery,
-}: WithApolloDataContext) => {
+AdminSupportMethods.getInitialProps = async ({ fetchQuery }: WithApolloDataContext) => {
   await Promise.all([
     fetchQuery<AdminSupportMethodsUserQuery>(gql`
       query AdminSupportMethodsUser {
@@ -154,14 +137,8 @@ AdminSupportMethods.getInitialProps = async ({
       ${AdminSupportMethods.fragments.User}
     `),
   ]);
-  const { supportMethods, schemaTypes } = await import(
-    "@parallel/graphql/__support-methods"
-  );
+  const { supportMethods, schemaTypes } = await import("@parallel/graphql/__support-methods");
   return { supportMethods, schemaTypes };
 };
 
-export default compose(
-  withSuperAdminAccess,
-  withDialogs,
-  withApolloData
-)(AdminSupportMethods);
+export default compose(withSuperAdminAccess, withDialogs, withApolloData)(AdminSupportMethods);

@@ -62,9 +62,7 @@ export function AppLayoutNavbarLink({
       }}
       {...(isActive ? { "aria-current": "page" } : {})}
     >
-      <AppLayoutNavbarLinkContent icon={icon}>
-        {children}
-      </AppLayoutNavbarLinkContent>
+      <AppLayoutNavbarLinkContent icon={icon}>{children}</AppLayoutNavbarLinkContent>
     </Link>
   ) : (
     <Tooltip

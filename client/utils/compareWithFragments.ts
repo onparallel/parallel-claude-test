@@ -4,12 +4,7 @@ import {
   isField,
   isInlineFragment,
 } from "@apollo/client/utilities";
-import {
-  DocumentNode,
-  SelectionSetNode,
-  FragmentDefinitionNode,
-  FieldNode,
-} from "graphql";
+import { DocumentNode, SelectionSetNode, FragmentDefinitionNode, FieldNode } from "graphql";
 
 /**
  * Creates a comparer function meant to be used with React.memo.
@@ -20,9 +15,7 @@ import {
  * @param fragments A dictionary where the key is the name of the prop and the
  * value is the fragment document to use for it
  */
-export function compareWithFragments<T>(
-  fragments: Partial<{ [K in keyof T]: DocumentNode }>
-) {
+export function compareWithFragments<T>(fragments: Partial<{ [K in keyof T]: DocumentNode }>) {
   return (prev: Readonly<T>, next: Readonly<T>) => {
     const prevKeys = Object.keys(prev) as (keyof T)[];
     const nextKeys = Object.keys(prev);
@@ -92,12 +85,7 @@ function checkSelectionSet(
   return true;
 }
 
-function checkField(
-  a: any,
-  b: any,
-  field: FieldNode,
-  fragmentMap: FragmentMap
-) {
+function checkField(a: any, b: any, field: FieldNode, fragmentMap: FragmentMap) {
   const key = field.alias?.value ?? field.name.value;
   if (!field.selectionSet) {
     return a?.[key] === b?.[key];

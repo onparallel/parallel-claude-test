@@ -42,46 +42,39 @@ export function useUpdateIsReadNotification() {
     `
   );
 
-  return useCallback(
-    async (variables: useUpdateIsReadNotificationMutationVariables) => {
-      await updateIsReadNotification({
-        variables,
-        update(cache, { data }) {
-          const notifications = data!.updatePetitionUserNotificationReadStatus;
+  return useCallback(async (variables: useUpdateIsReadNotificationMutationVariables) => {
+    await updateIsReadNotification({
+      variables,
+      update(cache, { data }) {
+        const notifications = data!.updatePetitionUserNotificationReadStatus;
 
-          const notificationIds = notifications.map((n) => n.id);
-          updateFragment<useUpdateIsReadNotification_UserFragment>(cache, {
-            fragment: useUpdateIsReadNotification.fragments.User,
-            id: getMyId(cache),
-            data: (user) => ({
-              ...user!,
-              unreadNotificationIds: variables.isRead
-                ? difference(user!.unreadNotificationIds, notificationIds)
-                : uniq([...user!.unreadNotificationIds, ...notificationIds]),
-            }),
-          });
+        const notificationIds = notifications.map((n) => n.id);
+        updateFragment<useUpdateIsReadNotification_UserFragment>(cache, {
+          fragment: useUpdateIsReadNotification.fragments.User,
+          id: getMyId(cache),
+          data: (user) => ({
+            ...user!,
+            unreadNotificationIds: variables.isRead
+              ? difference(user!.unreadNotificationIds, notificationIds)
+              : uniq([...user!.unreadNotificationIds, ...notificationIds]),
+          }),
+        });
 
-          for (const notification of notifications) {
-            if (notification.__typename === "CommentCreatedUserNotification") {
-              updateFragment<useUpdateIsReadNotification_PetitionFieldCommentFragment>(
-                cache,
-                {
-                  fragment:
-                    useUpdateIsReadNotification.fragments.PetitionFieldComment,
-                  id: notification.comment.id,
-                  data: (comment) => ({
-                    ...comment!,
-                    isUnread: !notification.isRead,
-                  }),
-                }
-              );
-            }
+        for (const notification of notifications) {
+          if (notification.__typename === "CommentCreatedUserNotification") {
+            updateFragment<useUpdateIsReadNotification_PetitionFieldCommentFragment>(cache, {
+              fragment: useUpdateIsReadNotification.fragments.PetitionFieldComment,
+              id: notification.comment.id,
+              data: (comment) => ({
+                ...comment!,
+                isUnread: !notification.isRead,
+              }),
+            });
           }
-        },
-      });
-    },
-    []
-  );
+        }
+      },
+    });
+  }, []);
 }
 
 useUpdateIsReadNotification.fragments = {

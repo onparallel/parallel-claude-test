@@ -15,11 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { ContactListPopover } from "@parallel/components/common/ContactListPopover";
-import {
-  DialogProps,
-  useDialog,
-  withDialogs,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
 import { Spacer } from "@parallel/components/common/Spacer";
 import {
   RedirectError,
@@ -58,15 +54,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import ResizeObserver, { DOMRect } from "react-resize-observer";
 
-type RecipientViewProps = UnwrapPromise<
-  ReturnType<typeof RecipientView.getInitialProps>
->;
+type RecipientViewProps = UnwrapPromise<ReturnType<typeof RecipientView.getInitialProps>>;
 
-function RecipientView({
-  keycode,
-  currentPage,
-  pageCount,
-}: RecipientViewProps) {
+function RecipientView({ keycode, currentPage, pageCount }: RecipientViewProps) {
   const intl = useIntl();
   const router = useRouter();
   const toast = useToast();
@@ -80,16 +70,11 @@ function RecipientView({
   const recipients = petition!.recipients;
   const message = access!.message;
 
-  const { fields, pages, visibility } = useGetPageFields(
-    petition.fields,
-    currentPage
-  );
+  const { fields, pages, visibility } = useGetPageFields(petition.fields, currentPage);
   const [showAlert, setShowAlert] = useState(true);
 
   const [finalized, setFinalized] = useState(false);
-  const confirmStartSignatureProcessDialog = useDialog(
-    ConfirmStartSignatureProcess
-  );
+  const confirmStartSignatureProcessDialog = useDialog(ConfirmStartSignatureProcess);
   const [completePetition] = useRecipientView_publicCompletePetitionMutation();
   const showCompleteSignerInfoDialog = useCompleteSignerInfoDialog();
   const showReviewBeforeSigningDialog = useDialog(ReviewBeforeSignDialog);
@@ -158,9 +143,7 @@ function RecipientView({
             );
           })!;
           const { keycode, locale } = router.query;
-          router.push(
-            `/${locale}/petition/${keycode}/${page}#field-${field.id}`
-          );
+          router.push(`/${locale}/petition/${keycode}/${page}#field-${field.id}`);
         }
       } catch {}
     },
@@ -197,9 +180,7 @@ function RecipientView({
           message={message}
           recipients={recipients}
           keycode={keycode}
-          isClosed={
-            showAlert && ["COMPLETED", "CLOSED"].includes(petition.status)
-          }
+          isClosed={showAlert && ["COMPLETED", "CLOSED"].includes(petition.status)}
         ></RecipientViewHeader>
         <Box position="sticky" top={0} width="100%" zIndex={2} marginBottom={4}>
           {showAlert && ["COMPLETED", "CLOSED"].includes(petition.status) ? (
@@ -300,9 +281,7 @@ function RecipientView({
                               b: (chunks: any[]) => <b>{chunks}</b>,
                               a: (chunks: any[]) => (
                                 <ContactListPopover
-                                  contacts={petition
-                                    .signature!.signers.map((c) => c!)
-                                    .slice(1)}
+                                  contacts={petition.signature!.signers.map((c) => c!).slice(1)}
                                 >
                                   <Text
                                     display="initial"
@@ -378,10 +357,7 @@ function RecipientView({
                 />
               )}
               <Button variant="outline" onClick={handleHelpClick}>
-                <FormattedMessage
-                  id="recipient-view.need-help"
-                  defaultMessage="Help"
-                />
+                <FormattedMessage id="recipient-view.need-help" defaultMessage="Help" />
               </Button>
             </Stack>
           </Box>
@@ -396,9 +372,7 @@ function RecipientView({
                       keycode={keycode}
                       access={access!}
                       field={field}
-                      isDisabled={
-                        field.validated || petition.status === "CLOSED"
-                      }
+                      isDisabled={field.validated || petition.status === "CLOSED"}
                       isInvalid={
                         finalized &&
                         !field.validated &&
@@ -424,10 +398,7 @@ function RecipientView({
         </Flex>
 
         {petition.status !== "CLOSED" && (
-          <RecipientViewProgressFooter
-            petition={petition}
-            onFinalize={handleFinalize}
-          />
+          <RecipientViewProgressFooter petition={petition} onFinalize={handleFinalize} />
         )}
       </Flex>
     </>
@@ -651,10 +622,7 @@ RecipientView.mutations = [
   `,
 ];
 
-function useGetPageFields(
-  fields: RecipientView_PublicPetitionFieldFragment[],
-  page: number
-) {
+function useGetPageFields(fields: RecipientView_PublicPetitionFieldFragment[], page: number) {
   const visibility = useFieldVisibility(fields);
   return useMemo(() => {
     const pages = groupFieldsByPages(fields, visibility);
@@ -693,21 +661,14 @@ function isLocalStorageAvailable() {
   }
 }
 
-RecipientView.getInitialProps = async ({
-  query,
-  pathname,
-  fetchQuery,
-}: WithApolloDataContext) => {
+RecipientView.getInitialProps = async ({ query, pathname, fetchQuery }: WithApolloDataContext) => {
   const keycode = query.keycode as string;
   const page = parseInt(query.page as string);
   if (!Number.isInteger(page) || page <= 0) {
     throw new RedirectError(resolveUrl(pathname, { ...query, page: "1" }));
   }
 
-  const result = await fetchQuery<
-    PublicPetitionQuery,
-    PublicPetitionQueryVariables
-  >(
+  const result = await fetchQuery<PublicPetitionQuery, PublicPetitionQueryVariables>(
     gql`
       query PublicPetition($keycode: ID!) {
         access(keycode: $keycode) {

@@ -32,9 +32,7 @@ const haveChanges = ({
   choices: string[];
   max: number;
 }) => {
-  return max === 1
-    ? checked[0] !== choices[0]
-    : checked.length !== choices.length;
+  return max === 1 ? checked[0] !== choices[0] : checked.length !== choices.length;
 };
 
 function CustomIcon() {
@@ -144,18 +142,10 @@ export function RecipientViewPetitionFieldCheckbox({
       <Stack>
         <Flex flexWrap="wrap" alignItems="center">
           {field.type === "CHECKBOX" ? (
-            <CheckboxTypeLabel
-              fontSize="sm"
-              marginRight={2}
-              options={field.options}
-            />
+            <CheckboxTypeLabel fontSize="sm" marginRight={2} options={field.options} />
           ) : null}
           {!isSaving ? (
-            <Text
-              fontSize="sm"
-              mr={2}
-              color={isInvalid ? "red.600" : "gray.500"}
-            >
+            <Text fontSize="sm" mr={2} color={isInvalid ? "red.600" : "gray.500"}>
               {checkedItems.length ? (
                 <>
                   {showRadio ? null : "("}

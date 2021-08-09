@@ -1,13 +1,7 @@
 import { I18nProps } from "@parallel/components/common/I18nProvider";
 import languages from "@parallel/lang/languages.json";
 import { promises as fs } from "fs";
-import Document, {
-  DocumentContext,
-  Head,
-  Html,
-  Main,
-  NextScript,
-} from "next/document";
+import Document, { DocumentContext, Head, Html, Main, NextScript } from "next/document";
 import { outdent } from "outdent";
 import { IntlConfig } from "react-intl";
 
@@ -17,20 +11,16 @@ const messagesCache: Record<string, IntlConfig["messages"]> = {};
 async function loadMessages(locale: string): Promise<IntlConfig["messages"]> {
   if (process.env.NODE_ENV !== "production") {
     // on development load /lang files
-    const messages = await fs.readFile(
-      process.env.ROOT + `/lang/${locale}.json`,
-      { encoding: "utf-8" }
-    );
-    return Object.fromEntries<string>(
-      JSON.parse(messages).map((t: any) => [t.term, t.definition])
-    );
+    const messages = await fs.readFile(process.env.ROOT + `/lang/${locale}.json`, {
+      encoding: "utf-8",
+    });
+    return Object.fromEntries<string>(JSON.parse(messages).map((t: any) => [t.term, t.definition]));
   } else {
     if (!(locale in messagesCache)) {
       // on production load compiled files
-      const messages = await fs.readFile(
-        LANG_DIR + `/compiled/${locale}.json`,
-        { encoding: "utf-8" }
-      );
+      const messages = await fs.readFile(LANG_DIR + `/compiled/${locale}.json`, {
+        encoding: "utf-8",
+      });
       messagesCache[locale] = JSON.parse(messages);
     }
     return messagesCache[locale];
@@ -51,8 +41,7 @@ class MyDocument extends Document<MyDocumentProps> {
     ctx.renderPage = () =>
       renderPage({
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        enhanceApp: (App) => (props) =>
-          <App {...props} {...{ locale, messages }} />,
+        enhanceApp: (App) => (props) => <App {...props} {...{ locale, messages }} />,
       });
     const initialProps = await Document.getInitialProps(ctx);
     return { ...initialProps, locale, messages };
@@ -89,9 +78,7 @@ class MyDocument extends Document<MyDocumentProps> {
                   "Intl.RelativeTimeFormat",
                 ].flatMap((polyfill) => [
                   polyfill,
-                  ...languages.map(
-                    (lang) => `${polyfill}.~locale.${lang.locale}`
-                  ),
+                  ...languages.map((lang) => `${polyfill}.~locale.${lang.locale}`),
                 ]),
               ].join(",")
             )}`}

@@ -1,12 +1,4 @@
-import {
-  Box,
-  BoxProps,
-  Flex,
-  List,
-  ListItem,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, BoxProps, Flex, List, ListItem, Stack, Text } from "@chakra-ui/react";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
 import { useRouter } from "next/router";
@@ -23,13 +15,7 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
     } as any
   )[router.query.locale as any];
   return (
-    <Flex
-      flexDirection="column"
-      marginTop={12}
-      as="footer"
-      alignItems="center"
-      {...props}
-    >
+    <Flex flexDirection="column" marginTop={12} as="footer" alignItems="center" {...props}>
       <Text as="div" fontSize="sm">
         <FormattedMessage
           id="recipient-view.powered-by"
@@ -69,10 +55,7 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
             href="/security?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
             target="_blank"
           >
-            <FormattedMessage
-              id="recipient-view.security-link"
-              defaultMessage="About security"
-            />
+            <FormattedMessage id="recipient-view.security-link" defaultMessage="About security" />
           </Link>
         </ListItem>
         <ListItem>
@@ -80,10 +63,7 @@ export function RecipientViewFooter(props: RecipientViewFooterProps) {
             href="/legal/terms?utm_source=parallel&utm_medium=recipient_view&utm_campaign=recipients"
             target="_blank"
           >
-            <FormattedMessage
-              id="public.terms.title"
-              defaultMessage="Terms & Conditions"
-            />
+            <FormattedMessage id="public.terms.title" defaultMessage="Terms & Conditions" />
           </Link>
         </ListItem>
       </Stack>

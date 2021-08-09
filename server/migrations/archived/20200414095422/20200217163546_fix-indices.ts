@@ -11,9 +11,7 @@ export async function up(knex: Knex) {
     .raw(
       `create unique index "organization_identifier_unique" on "organization" ("identifier") where "deleted_at" is null`
     )
-    .raw(
-      `create unique index "user_email_unique" on "user" ("email") where "deleted_at" is null`
-    );
+    .raw(`create unique index "user_email_unique" on "user" ("email") where "deleted_at" is null`);
 }
 
 export async function down(knex: Knex) {

@@ -9,14 +9,10 @@ module.exports = {
     });
 
     const mutationTypeName = introspection.__schema.mutationType.name;
-    const mutation = introspection.__schema.types.find(
-      (t) => t.name === mutationTypeName
-    );
+    const mutation = introspection.__schema.types.find((t) => t.name === mutationTypeName);
 
     const queryTypeName = introspection.__schema.queryType.name;
-    const query = introspection.__schema.types.find(
-      (t) => t.name === queryTypeName
-    );
+    const query = introspection.__schema.types.find((t) => t.name === queryTypeName);
 
     const supportMethods = [
       ...mutation.fields.map((field) => ({
@@ -30,14 +26,11 @@ module.exports = {
     ]
       .filter(
         ({ field }) =>
-          field.type.kind === "NON_NULL" &&
-          field.type.ofType.name === "SupportMethodResponse"
+          field.type.kind === "NON_NULL" && field.type.ofType.name === "SupportMethodResponse"
       )
       .sort((a, b) => a.field.name.localeCompare(b.field.name));
 
-    const types = Object.fromEntries(
-      introspection.__schema.types.map((t) => [t.name, t])
-    );
+    const types = Object.fromEntries(introspection.__schema.types.map((t) => [t.name, t]));
 
     const usedTypes = new Set();
     function walkTypes(type) {

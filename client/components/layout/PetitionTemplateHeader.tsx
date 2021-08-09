@@ -14,12 +14,7 @@ import {
   Portal,
   Tooltip,
 } from "@chakra-ui/react";
-import {
-  CopyIcon,
-  DeleteIcon,
-  MoreVerticalIcon,
-  UserArrowIcon,
-} from "@parallel/chakra/icons";
+import { CopyIcon, DeleteIcon, MoreVerticalIcon, UserArrowIcon } from "@parallel/chakra/icons";
 import {
   PetitionTemplateHeader_PetitionTemplateFragment,
   PetitionTemplateHeader_UserFragment,
@@ -185,10 +180,7 @@ export function PetitionTemplateHeader({
                   defaultMessage="Share template"
                 />
               </MenuItem>
-              <MenuItem
-                onClick={handleCloneClick}
-                icon={<CopyIcon display="block" boxSize={4} />}
-              >
+              <MenuItem onClick={handleCloneClick} icon={<CopyIcon display="block" boxSize={4} />}>
                 <FormattedMessage
                   id="component.template-header.clone-label"
                   defaultMessage="Clone template"

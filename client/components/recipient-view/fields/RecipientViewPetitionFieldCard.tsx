@@ -1,14 +1,5 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  ButtonProps,
-  Center,
-  Flex,
-  Heading,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, Button, ButtonProps, Center, Flex, Heading, Text, Tooltip } from "@chakra-ui/react";
 import { AddIcon, CommentIcon } from "@parallel/chakra/icons";
 import { chakraForwardRef } from "@parallel/chakra/utils";
 import { Card } from "@parallel/components/common/Card";
@@ -84,30 +75,13 @@ export function RecipientViewPetitionFieldCard({
         <Box flex="1" marginRight={2}>
           <Heading flex="1" as="h2" fontSize="md" overflowWrap="anywhere">
             {field.title || (
-              <Text
-                as="span"
-                color="gray.500"
-                fontWeight="normal"
-                fontStyle="italic"
-              >
-                <FormattedMessage
-                  id="generic.untitled-field"
-                  defaultMessage="Untitled field"
-                />
+              <Text as="span" color="gray.500" fontWeight="normal" fontStyle="italic">
+                <FormattedMessage id="generic.untitled-field" defaultMessage="Untitled field" />
               </Text>
             )}
             {field.optional ? (
-              <Text
-                as="span"
-                marginLeft={2}
-                color="gray.400"
-                fontSize="sm"
-                fontWeight="normal"
-              >
-                <FormattedMessage
-                  id="generic.optional-field"
-                  defaultMessage="Optional"
-                />
+              <Text as="span" marginLeft={2} color="gray.400" fontSize="sm" fontWeight="normal">
+                <FormattedMessage id="generic.optional-field" defaultMessage="Optional" />
               </Text>
             ) : (
               <Tooltip
@@ -133,12 +107,7 @@ export function RecipientViewPetitionFieldCard({
         ) : null}
       </Flex>
       {field.description ? (
-        <Text
-          fontSize="sm"
-          color="gray.600"
-          overflowWrap="anywhere"
-          marginBottom={2}
-        >
+        <Text fontSize="sm" color="gray.600" overflowWrap="anywhere" marginBottom={2}>
           <Linkify>
             <BreakLines>{field.description}</BreakLines>
           </Linkify>
@@ -247,43 +216,41 @@ interface CommentsButtonProps extends ButtonProps {
   hasUnreadComments: boolean;
 }
 
-const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(
-  function CommentsButton({ commentCount, hasUnreadComments, ...props }, ref) {
-    const intl = useIntl();
-    const common = {
-      size: "sm",
-      fontWeight: "normal",
-      "aria-label": intl.formatMessage(
-        {
-          id: "generic.comments-button-label",
-          defaultMessage:
-            "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
-        },
-        { commentCount }
-      ),
-      ...props,
-    } as const;
+const CommentsButton = chakraForwardRef<"button", CommentsButtonProps>(function CommentsButton(
+  { commentCount, hasUnreadComments, ...props },
+  ref
+) {
+  const intl = useIntl();
+  const common = {
+    size: "sm",
+    fontWeight: "normal",
+    "aria-label": intl.formatMessage(
+      {
+        id: "generic.comments-button-label",
+        defaultMessage:
+          "{commentCount, plural, =0 {No comments} =1 {# comment} other {# comments}}",
+      },
+      { commentCount }
+    ),
+    ...props,
+  } as const;
 
-    return commentCount > 0 ? (
-      <Button ref={ref} rightIcon={<CommentIcon fontSize="16px" />} {...common}>
-        <RecipientViewCommentsBadge
-          hasUnreadComments={hasUnreadComments}
-          marginRight={2}
-        />
-        {intl.formatNumber(commentCount)}
-      </Button>
-    ) : (
-      <ResponsiveButtonIcon
-        icon={<CommentIcon fontSize="16px" />}
-        ref={ref}
-        breakpoint="sm"
-        hideIconOnDesktop={true}
-        label={intl.formatMessage({
-          id: "recipient-view.questions-button",
-          defaultMessage: "Questions?",
-        })}
-        {...common}
-      />
-    );
-  }
-);
+  return commentCount > 0 ? (
+    <Button ref={ref} rightIcon={<CommentIcon fontSize="16px" />} {...common}>
+      <RecipientViewCommentsBadge hasUnreadComments={hasUnreadComments} marginRight={2} />
+      {intl.formatNumber(commentCount)}
+    </Button>
+  ) : (
+    <ResponsiveButtonIcon
+      icon={<CommentIcon fontSize="16px" />}
+      ref={ref}
+      breakpoint="sm"
+      hideIconOnDesktop={true}
+      label={intl.formatMessage({
+        id: "recipient-view.questions-button",
+        defaultMessage: "Questions?",
+      })}
+      {...common}
+    />
+  );
+});

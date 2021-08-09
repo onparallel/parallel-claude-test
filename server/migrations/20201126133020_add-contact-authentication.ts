@@ -13,9 +13,7 @@ export async function up(knex: Knex): Promise<void> {
   });
   await knex.schema.createTable("contact_authentication_request", (t) => {
     t.increments("id");
-    t.integer("petition_access_id")
-      .notNullable()
-      .references("petition_access.id");
+    t.integer("petition_access_id").notNullable().references("petition_access.id");
     t.string("token_hash").notNullable();
     t.string("code", 6).notNullable();
     t.integer("remaining_attempts").notNullable();

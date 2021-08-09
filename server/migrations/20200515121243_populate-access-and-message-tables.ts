@@ -73,9 +73,7 @@ interface PetitionReminder {
 }
 
 export async function up(knex: Knex): Promise<any> {
-  const sendouts = await knex<PetitionSendout>("petition_sendout").orderBy(
-    "id"
-  );
+  const sendouts = await knex<PetitionSendout>("petition_sendout").orderBy("id");
   if (sendouts.length > 0) {
     const groups = groupBy(sendouts, (s) => `${s.petition_id},${s.contact_id}`);
     // create accesses
@@ -93,25 +91,14 @@ export async function up(knex: Knex): Promise<any> {
           reminders_active: false,
           reminders_config: null,
           next_reminder_at: null,
-          ...pick(first, [
-            "created_at",
-            "created_by",
-            "updated_at",
-            "updated_by",
-          ]),
+          ...pick(first, ["created_at", "created_by", "updated_at", "updated_by"]),
           ...pick(last, ["keycode"]),
         };
       });
 
-    const accesses = await knex<PetitionAccess>("petition_access").insert(
-      _accesses,
-      "*"
-    );
+    const accesses = await knex<PetitionAccess>("petition_access").insert(_accesses, "*");
 
-    const indexed = indexBy(
-      accesses,
-      (a) => `${a.petition_id},${a.contact_id}`
-    );
+    const indexed = indexBy(accesses, (a) => `${a.petition_id},${a.contact_id}`);
 
     const _messages: Omit<PetitionMessage, "id">[] = sendouts.map((s) => {
       const access = indexed[`${s.petition_id},${s.contact_id}`];
@@ -197,14 +184,8 @@ export async function down(knex: Knex): Promise<any> {
         created_by = concat('PetitionSendout:', petition_sendout_id)
       where type = 'AUTOMATIC'
   `);
-  await knex<PetitionReminder>("petition_reminder").update(
-    "petition_access_id",
-    null
-  );
-  await knex<PetitionReminder>("petition_field_reply").update(
-    "petition_access_id",
-    null
-  );
+  await knex<PetitionReminder>("petition_reminder").update("petition_access_id", null);
+  await knex<PetitionReminder>("petition_field_reply").update("petition_access_id", null);
   await knex("petition_message").delete();
   await knex("petition_access").delete();
 }

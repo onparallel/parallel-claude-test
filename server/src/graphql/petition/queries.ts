@@ -14,10 +14,7 @@ import { authenticate, authenticateAnd, or } from "../helpers/authorize";
 import { WhitelistedError } from "../helpers/errors";
 import { globalIdArg } from "../helpers/globalIdPlugin";
 import { parseSortBy } from "../helpers/paginationPlugin";
-import {
-  petitionsArePublicTemplates,
-  userHasAccessToPetitions,
-} from "./authorizers";
+import { petitionsArePublicTemplates, userHasAccessToPetitions } from "./authorizers";
 import { validateAuthTokenPayload } from "./validations";
 
 export const petitionsQuery = queryField((t) => {
@@ -57,12 +54,7 @@ export const petitionsQuery = queryField((t) => {
                       t.nonNull.field("operator", {
                         type: enumType({
                           name: "FilterSharedWithOperator",
-                          members: [
-                            "SHARED_WITH",
-                            "NOT_SHARED_WITH",
-                            "IS_OWNER",
-                            "NOT_IS_OWNER",
-                          ],
+                          members: ["SHARED_WITH", "NOT_SHARED_WITH", "IS_OWNER", "NOT_IS_OWNER"],
                         }),
                       });
                     },
@@ -82,9 +74,7 @@ export const petitionsQuery = queryField((t) => {
         if (filters.tagIds.length > 10) {
           throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
         }
-        const tags = await ctx.tags.loadTag(
-          fromGlobalIds(filters?.tagIds, "Tag").ids
-        );
+        const tags = await ctx.tags.loadTag(fromGlobalIds(filters?.tagIds, "Tag").ids);
         if (!tags.every((tag) => tag?.organization_id === ctx.user!.org_id)) {
           throw new WhitelistedError("Invalid filter", "INVALID_FILTER");
         }
@@ -125,9 +115,7 @@ export const petitionQuery = queryField("petition", {
   args: {
     id: nonNull(globalIdArg("Petition")),
   },
-  authorize: authenticateAnd(
-    or(userHasAccessToPetitions("id"), petitionsArePublicTemplates("id"))
-  ),
+  authorize: authenticateAnd(or(userHasAccessToPetitions("id"), petitionsArePublicTemplates("id"))),
   resolve: async (_, args, ctx) => {
     return await ctx.petitions.loadPetition(args.id);
   },
@@ -176,11 +164,7 @@ export const petitionAuthToken = queryField("petitionAuthToken", {
     token: nonNull(stringArg()),
   },
   authorize: (_, { token }, ctx) => ctx.security.verifyAuthToken(token),
-  validateArgs: validateAuthTokenPayload(
-    (args) => args.token,
-    "petitionId",
-    "token"
-  ),
+  validateArgs: validateAuthTokenPayload((args) => args.token, "petitionId", "token"),
   resolve: async (_, { token }, ctx) => {
     const payload: any = decode(token);
     return await ctx.petitions.loadPetition(payload.petitionId);

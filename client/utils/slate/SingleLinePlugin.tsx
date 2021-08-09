@@ -38,8 +38,7 @@ export function useSingleLine<T extends ReactEditor>(editor: T) {
     const caretTextDom = ReactEditor.toDOMRange(editor, selection);
     const caretTextRects = caretTextDom.getClientRects();
     if (caretTextRects.length > 0 && editorRects.length > 0) {
-      const caretX =
-        caretTextRects[0].left - editorRects[0].left + editorDOM.scrollLeft;
+      const caretX = caretTextRects[0].left - editorRects[0].left + editorDOM.scrollLeft;
       if (caretX - editorDOM.clientWidth + padding > editorDOM.scrollLeft) {
         editorDOM.scrollTo(caretX - editorDOM.clientWidth + padding, 0);
       } else if (caretX - padding < editorDOM.scrollLeft) {

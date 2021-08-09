@@ -69,11 +69,8 @@ export class Auth implements IAuth {
       const sso = await this.integrations.loadSSOIntegrationByDomain(domain);
       if (sso) {
         const org = (await this.orgs.loadOrg(sso.org_id))!;
-        const url = new URL(
-          `https://${this.config.cognito.domain}/oauth2/authorize`
-        );
-        const provider = (sso.settings as IntegrationSettings<"SSO">)
-          .COGNITO_PROVIDER;
+        const url = new URL(`https://${this.config.cognito.domain}/oauth2/authorize`);
+        const provider = (sso.settings as IntegrationSettings<"SSO">).COGNITO_PROVIDER;
         for (const [name, value] of Object.entries({
           identity_provider: provider,
           redirect_uri: `${this.config.misc.parallelUrl}/api/auth/callback`,
@@ -113,9 +110,7 @@ export class Auth implements IAuth {
         }
         res.redirect(
           302,
-          `https://${
-            org.custom_host
-          }/api/auth/callback?code=${encodeURIComponent(
+          `https://${org.custom_host}/api/auth/callback?code=${encodeURIComponent(
             req.query.code as string
           )}`
         );
@@ -206,9 +201,7 @@ export class Auth implements IAuth {
       const auth = await this.initiateAuth(email, password, req);
       if (auth.AuthenticationResult) {
         const token = await this.storeSession(auth.AuthenticationResult as any);
-        const user = await this.getUserFromAuthenticationResult(
-          auth.AuthenticationResult
-        );
+        const user = await this.getUserFromAuthenticationResult(auth.AuthenticationResult);
         await this.trackSessionLogin(user);
         this.setSession(res, token);
         res.status(201).send({});
@@ -245,13 +238,9 @@ export class Auth implements IAuth {
         req
       );
       if (challenge.AuthenticationResult) {
-        const user = await this.getUserFromAuthenticationResult(
-          challenge.AuthenticationResult
-        );
+        const user = await this.getUserFromAuthenticationResult(challenge.AuthenticationResult);
         await this.trackSessionLogin(user);
-        const token = await this.storeSession(
-          challenge.AuthenticationResult as any
-        );
+        const token = await this.storeSession(challenge.AuthenticationResult as any);
         this.setSession(res, token);
         res.status(201).send({});
       } else {
@@ -331,9 +320,7 @@ export class Auth implements IAuth {
     res.redirect(302, url.href);
   }
 
-  private async getUserFromAuthenticationResult(
-    result: AuthenticationResultType
-  ) {
+  private async getUserFromAuthenticationResult(result: AuthenticationResultType) {
     const payload = decode(result.IdToken!) as any;
     const cognitoId = payload["cognito:username"] as string;
     return await this.users.loadUserByCognitoId(cognitoId);
@@ -403,11 +390,7 @@ export class Auth implements IAuth {
     };
   }
 
-  private async initiateAuth(
-    email: string,
-    password: string,
-    req: IncomingMessage
-  ) {
+  private async initiateAuth(email: string, password: string, req: IncomingMessage) {
     return await this.cognito
       .adminInitiateAuth({
         AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
@@ -476,9 +459,7 @@ export class Auth implements IAuth {
       const expiresAt = payload["exp"] as number;
       const cognitoId = payload["cognito:username"] as string;
       if (Date.now() > expiresAt * 1000) {
-        const refreshToken = await this.redis.get(
-          `session:${token}:refreshToken`
-        );
+        const refreshToken = await this.redis.get(`session:${token}:refreshToken`);
         if (refreshToken === null) {
           return null;
         }
@@ -495,11 +476,7 @@ export class Auth implements IAuth {
     }
   }
 
-  async changePassword(
-    req: IncomingMessage,
-    password: string,
-    newPassword: string
-  ) {
+  async changePassword(req: IncomingMessage, password: string, newPassword: string) {
     const token = this.getTokenFromRequest(req);
     const accessToken = await this.redis.get(`session:${token}:accessToken`);
     await this.cognito

@@ -1,10 +1,7 @@
 import { gql } from "@apollo/client";
 import { Box, BoxProps } from "@chakra-ui/react";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
-import {
-  PetitionHeader,
-  PetitionHeaderProps,
-} from "@parallel/components/layout/PetitionHeader";
+import { PetitionHeader, PetitionHeaderProps } from "@parallel/components/layout/PetitionHeader";
 import {
   PetitionLayout_PetitionBaseFragment,
   PetitionLayout_UserFragment,

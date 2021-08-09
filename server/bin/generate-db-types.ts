@@ -92,9 +92,7 @@ export interface ${table.name} {
   ${table.columns
     .sort((a, b) => a.position - b.position)
     .map((c) => {
-      return `${c.name}: ${c.isNullable ? `Maybe<${c.type}>` : c.type}; // ${
-        c.realType
-      }`;
+      return `${c.name}: ${c.isNullable ? `Maybe<${c.type}>` : c.type}; // ${c.realType}`;
     })
     .join("\n  ")}
 }
@@ -102,9 +100,7 @@ export interface ${table.name} {
 export type Create${table.name} = PartialProps<
   Omit<${table.name}, "${table.primaryKey}">,
   ${table.columns
-    .filter(
-      (c) => c.name !== table.primaryKey && (c.hasDefault || c.isNullable)
-    )
+    .filter((c) => c.name !== table.primaryKey && (c.hasDefault || c.isNullable))
     .map((c) => `"${c.name}"`)
     .join("|")}
 >;`

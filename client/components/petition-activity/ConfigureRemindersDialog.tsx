@@ -10,10 +10,7 @@ import {
   UnorderedList,
 } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
-import {
-  DialogProps,
-  useDialog,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog } from "@parallel/components/common/DialogProvider";
 import {
   PetitionAccessTable_PetitionAccessFragment,
   RemindersConfig,
@@ -36,9 +33,8 @@ export function ConfigureRemindersDialog({
   remindersActive,
   ...props
 }: DialogProps<ConfigureRemindersDialogProps, Maybe<RemindersConfig>>) {
-  const [remindersConfig, setRemindersConfig] = useState<
-    Maybe<RemindersConfig>
-  >(defaultRemindersConfig);
+  const [remindersConfig, setRemindersConfig] =
+    useState<Maybe<RemindersConfig>>(defaultRemindersConfig);
 
   const optedOut = accesses.filter((access) => access.remindersOptOut);
 
@@ -54,11 +50,7 @@ export function ConfigureRemindersDialog({
       body={
         <Stack spacing={4}>
           {optedOut.length ? (
-            <Alert
-              status="warning"
-              backgroundColor="orange.100"
-              borderRadius="md"
-            >
+            <Alert status="warning" backgroundColor="orange.100" borderRadius="md">
               <Flex alignItems="center" justifyContent="flex-start">
                 <AlertIcon color="yellow.500" />
                 <AlertDescription>
@@ -89,10 +81,7 @@ export function ConfigureRemindersDialog({
         </Stack>
       }
       confirm={
-        <Button
-          colorScheme="purple"
-          onClick={() => props.onResolve(remindersConfig)}
-        >
+        <Button colorScheme="purple" onClick={() => props.onResolve(remindersConfig)}>
           <FormattedMessage
             id="component.configure-reminder-settings-dialog.confirm"
             defaultMessage="Apply changes"

@@ -4,10 +4,7 @@ import { useState, ChangeEvent, useEffect, useCallback } from "react";
  * Make sure input[type="time"] works in all browsers.
  * Currently not supported on Safari
  */
-export function useTimeInput(
-  time: string,
-  options: { onChange?: (value: string) => void } = {}
-) {
+export function useTimeInput(time: string, options: { onChange?: (value: string) => void } = {}) {
   const [value, setValue] = useState(time);
 
   useEffect(() => setValue(time), [time]);

@@ -2,18 +2,11 @@ import { gql } from "@apollo/client";
 import { Button, Flex, Text, useToast } from "@chakra-ui/react";
 import { ConfirmDialog } from "@parallel/components/common/ConfirmDialog";
 import { DateTime } from "@parallel/components/common/DateTime";
-import {
-  DialogProps,
-  useDialog,
-  withDialogs,
-} from "@parallel/components/common/DialogProvider";
+import { DialogProps, useDialog, withDialogs } from "@parallel/components/common/DialogProvider";
 import { withOnboarding } from "@parallel/components/common/OnboardingTour";
 import { TableColumn } from "@parallel/components/common/Table";
 import { TablePage } from "@parallel/components/common/TablePage";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { ContactListHeader } from "@parallel/components/contact-list/ContactListHeader";
 import { ImportContactsDialog } from "@parallel/components/contact-list/ImportContactsDialog";
 import { AppLayout } from "@parallel/components/layout/AppLayout";
@@ -27,10 +20,7 @@ import {
   useContactsUserQuery,
   useContacts_deleteContactsMutation,
 } from "@parallel/graphql/__types";
-import {
-  assertQuery,
-  useAssertQueryOrPreviousData,
-} from "@parallel/utils/apollo/assertQuery";
+import { assertQuery, useAssertQueryOrPreviousData } from "@parallel/utils/apollo/assertQuery";
 import { clearCache } from "@parallel/utils/apollo/clearCache";
 import { compose } from "@parallel/utils/compose";
 import { FORMATS } from "@parallel/utils/dates";
@@ -50,13 +40,7 @@ import { useExistingContactToast } from "@parallel/utils/useExistingContactToast
 import { MouseEvent, useMemo, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-const SORTING = [
-  "firstName",
-  "lastName",
-  "fullName",
-  "email",
-  "createdAt",
-] as const;
+const SORTING = ["firstName", "lastName", "fullName", "email", "createdAt"] as const;
 
 const QUERY_STATE = {
   page: integer({ min: 1 }).orDefault(1),
@@ -85,9 +69,7 @@ function Contacts() {
         offset: state.items * (state.page - 1),
         limit: state.items,
         search: state.search,
-        sortBy: [
-          `${state.sort.field}_${state.sort.direction}` as QueryContacts_OrderBy,
-        ],
+        sortBy: [`${state.sort.field}_${state.sort.direction}` as QueryContacts_OrderBy],
       },
     })
   );
@@ -185,9 +167,7 @@ function Contacts() {
           sort={state.sort}
           onSelectionChange={setSelected}
           onPageChange={(page) => setQueryState((s) => ({ ...s, page }))}
-          onPageSizeChange={(items) =>
-            setQueryState((s) => ({ ...s, items, page: 1 }))
-          }
+          onPageSizeChange={(items) => setQueryState((s) => ({ ...s, items, page: 1 }))}
           onSortChange={(sort) => setQueryState((s) => ({ ...s, sort }))}
           header={
             <ContactListHeader
@@ -203,12 +183,7 @@ function Contacts() {
           body={
             contacts.totalCount === 0 && !loading ? (
               state.search ? (
-                <Flex
-                  flex="1"
-                  alignItems="center"
-                  justifyContent="center"
-                  height="300px"
-                >
+                <Flex flex="1" alignItems="center" justifyContent="center" height="300px">
                   <Text color="gray.300" fontSize="lg">
                     <FormattedMessage
                       id="contacts.no-results"
@@ -217,12 +192,7 @@ function Contacts() {
                   </Text>
                 </Flex>
               ) : (
-                <Flex
-                  flex="1"
-                  alignItems="center"
-                  justifyContent="center"
-                  height="300px"
-                >
+                <Flex flex="1" alignItems="center" justifyContent="center" height="300px">
                   <Text fontSize="lg">
                     <FormattedMessage
                       id="contacts.no-contacts"
@@ -256,10 +226,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           <>
             {row.firstName || (
               <Text as="span" textStyle="hint">
-                <FormattedMessage
-                  id="generic.not-specified"
-                  defaultMessage="Not specified"
-                />
+                <FormattedMessage id="generic.not-specified" defaultMessage="Not specified" />
               </Text>
             )}
           </>
@@ -276,10 +243,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           <>
             {row.lastName || (
               <Text as="span" textStyle="hint">
-                <FormattedMessage
-                  id="generic.not-specified"
-                  defaultMessage="Not specified"
-                />
+                <FormattedMessage id="generic.not-specified" defaultMessage="Not specified" />
               </Text>
             )}
           </>
@@ -302,12 +266,7 @@ function useContactsColumns(): TableColumn<ContactSelection>[] {
           defaultMessage: "Created at",
         }),
         CellContent: ({ row: { createdAt } }) => (
-          <DateTime
-            value={createdAt}
-            format={FORMATS.LLL}
-            useRelativeTime
-            whiteSpace="nowrap"
-          />
+          <DateTime value={createdAt} format={FORMATS.LLL} useRelativeTime whiteSpace="nowrap" />
         ),
       },
     ],
@@ -326,10 +285,7 @@ function ConfirmDeleteContacts({
   return (
     <ConfirmDialog
       header={
-        <FormattedMessage
-          id="contacts.confirm-delete.header"
-          defaultMessage="Delete contacts"
-        />
+        <FormattedMessage id="contacts.confirm-delete.header" defaultMessage="Delete contacts" />
       }
       body={
         <FormattedMessage
@@ -344,10 +300,7 @@ function ConfirmDeleteContacts({
       }
       confirm={
         <Button colorScheme="red" onClick={() => props.onResolve()}>
-          <FormattedMessage
-            id="generic.confirm-delete-button"
-            defaultMessage="Yes, delete"
-          />
+          <FormattedMessage id="generic.confirm-delete-button" defaultMessage="Yes, delete" />
         </Button>
       }
       {...props}
@@ -385,10 +338,7 @@ Contacts.mutations = [
   `,
 ];
 
-Contacts.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+Contacts.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   const { page, items, search, sort } = parseQuery(query, QUERY_STATE);
   await Promise.all([
     fetchQuery<ContactsQuery, ContactsQueryVariables>(
@@ -399,12 +349,7 @@ Contacts.getInitialProps = async ({
           $search: String
           $sortBy: [QueryContacts_OrderBy!]
         ) {
-          contacts(
-            offset: $offset
-            limit: $limit
-            search: $search
-            sortBy: $sortBy
-          ) {
+          contacts(offset: $offset, limit: $limit, search: $search, sortBy: $sortBy) {
             ...Contacts_ContactsList
           }
         }
@@ -437,12 +382,7 @@ export default compose(
     key: "CONTACT_LIST",
     steps: [
       {
-        title: (
-          <FormattedMessage
-            id="tour.contacts.page-title"
-            defaultMessage="Contacts"
-          />
-        ),
+        title: <FormattedMessage id="tour.contacts.page-title" defaultMessage="Contacts" />,
         content: (
           <FormattedMessage
             id="tour.contacts.page-content"
@@ -454,10 +394,7 @@ export default compose(
       },
       {
         title: (
-          <FormattedMessage
-            id="tour.contacts.add-contact-title"
-            defaultMessage="Add contact"
-          />
+          <FormattedMessage id="tour.contacts.add-contact-title" defaultMessage="Add contact" />
         ),
         content: (
           <FormattedMessage

@@ -6,10 +6,7 @@ import { unMaybeArray } from "../../util/arrays";
 import { toGlobalId } from "../../util/globalId";
 import { MaybeArray } from "../../util/types";
 import { Arg, chain } from "../helpers/authorize";
-import {
-  PublicPetitionNotAvailableError,
-  WhitelistedError,
-} from "../helpers/errors";
+import { PublicPetitionNotAvailableError, WhitelistedError } from "../helpers/errors";
 
 export function authenticatePublicAccess<
   TypeName extends string,
@@ -17,24 +14,16 @@ export function authenticatePublicAccess<
   TArg extends Arg<TypeName, FieldName, string>
 >(argKeycode: TArg): FieldAuthorizeResolver<TypeName, FieldName> {
   return chain(fetchPetitionAccess(argKeycode), async function (_, args, ctx) {
-    const petition = (await ctx.petitions.loadPetition(
-      ctx.access!.petition_id
-    ))!;
+    const petition = (await ctx.petitions.loadPetition(ctx.access!.petition_id))!;
     if (petition.skip_forward_security) {
       return true;
     }
     const contactId = ctx.contact!.id;
     const cookieValue = getContactAuthCookieValue(ctx.req, contactId);
-    if (
-      cookieValue &&
-      (await ctx.contacts.verifyContact(contactId, cookieValue))
-    ) {
+    if (cookieValue && (await ctx.contacts.verifyContact(contactId, cookieValue))) {
       return true;
     } else {
-      throw new WhitelistedError(
-        "Contact is not verified",
-        "CONTACT_NOT_VERIFIED"
-      );
+      throw new WhitelistedError("Contact is not verified", "CONTACT_NOT_VERIFIED");
     }
   });
 }
@@ -44,10 +33,7 @@ export function getContactAuthCookieValue(
   contactId: number
 ): string | undefined {
   const cookies = parseCookie(req.headers["cookie"] ?? "");
-  const cookieName = `parallel_contact_auth_${toGlobalId(
-    "Contact",
-    contactId
-  )}`;
+  const cookieName = `parallel_contact_auth_${toGlobalId("Contact", contactId)}`;
   return cookies[cookieName];
 }
 
@@ -117,9 +103,7 @@ export function replyIsForFieldOfType<
   fieldType: MaybeArray<PetitionFieldType>
 ): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
-    const field = (await ctx.petitions.loadFieldForReply(
-      args[argReplyId] as unknown as number
-    ))!;
+    const field = (await ctx.petitions.loadFieldForReply(args[argReplyId] as unknown as number))!;
     return unMaybeArray(fieldType).includes(field.type);
   };
 }
@@ -131,10 +115,9 @@ export function fieldBelongsToAccess<
 >(argFieldId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      return await ctx.petitions.fieldsBelongToPetition(
-        ctx.access!.petition_id,
-        [args[argFieldId] as unknown as number]
-      );
+      return await ctx.petitions.fieldsBelongToPetition(ctx.access!.petition_id, [
+        args[argFieldId] as unknown as number,
+      ]);
     } catch {}
     return false;
   };
@@ -147,10 +130,9 @@ export function replyBelongsToAccess<
 >(argReplyId: TArg1): FieldAuthorizeResolver<TypeName, FieldName> {
   return async (_, args, ctx) => {
     try {
-      return await ctx.petitions.repliesBelongsToPetition(
-        ctx.access!.petition_id,
-        [args[argReplyId] as unknown as number]
-      );
+      return await ctx.petitions.repliesBelongsToPetition(ctx.access!.petition_id, [
+        args[argReplyId] as unknown as number,
+      ]);
     } catch {}
     return false;
   };

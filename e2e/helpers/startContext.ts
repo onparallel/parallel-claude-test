@@ -1,9 +1,6 @@
 import { Browser, BrowserContextOptions } from "playwright";
 
-export async function startContext(
-  browser: Browser,
-  options?: BrowserContextOptions
-) {
+export async function startContext(browser: Browser, options?: BrowserContextOptions) {
   return await browser.newContext({
     locale: "es-ES",
     ...(options ?? {}),

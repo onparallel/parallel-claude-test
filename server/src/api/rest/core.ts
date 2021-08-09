@@ -8,15 +8,7 @@ import { HttpError, InvalidParameterError, UnknownError } from "./errors";
 import { ParseError } from "./params";
 import pProps from "p-props";
 
-export type RestMethod =
-  | "get"
-  | "put"
-  | "post"
-  | "delete"
-  | "options"
-  | "head"
-  | "patch"
-  | "trace";
+export type RestMethod = "get" | "put" | "post" | "delete" | "options" | "head" | "patch" | "trace";
 
 export type RestParameters<T> = {
   [K in keyof T]: RestParameter<T[K]>;
@@ -50,11 +42,7 @@ export interface RestPathOptionsWithParams<
   params: RestParameters<TParams>;
 }
 
-export interface RestOperationOptions<
-  TQuery,
-  TBody,
-  TResponses extends RestResponses<any>
-> {
+export interface RestOperationOptions<TQuery, TBody, TResponses extends RestResponses<any>> {
   summary?: string;
   description?: string;
   operationId?: string;
@@ -86,11 +74,7 @@ export interface OperationHandler<TContext, TParams, TQuery, TReturn, TBody> {
   >;
 }
 
-export type PathResolver<
-  TContext,
-  TPath extends string,
-  TParams extends PathParameters<TPath>
-> = {
+export type PathResolver<TContext, TPath extends string, TParams extends PathParameters<TPath>> = {
   [Method in RestMethod]: OperationResolver<TContext, TPath, TParams>;
 } & {
   path: string;
@@ -118,34 +102,17 @@ export interface OperationResolver<
 type RestResponseReturnType<TResponses extends RestResponses<any>> =
   TResponses[keyof TResponses] extends RestResponse<infer U> ? U : never;
 
-const methods: RestMethod[] = [
-  "get",
-  "put",
-  "post",
-  "delete",
-  "options",
-  "head",
-  "patch",
-  "trace",
-];
+const methods: RestMethod[] = ["get", "put", "post", "delete", "options", "head", "patch", "trace"];
 
 const _PathResolver: any = (function () {
-  type PathResolver<
-    TContext,
-    TPath extends string,
-    TParams extends PathParameters<TPath>
-  > = {
+  type PathResolver<TContext, TPath extends string, TParams extends PathParameters<TPath>> = {
     router: Router;
     apiOptions: RestApiOptions<TContext>;
     path: TPath;
     pathOptions: _RestPathOptions<TPath, TParams>;
     spec: OpenAPIV3.PathItemObject;
   };
-  function PathResolver<
-    TContext,
-    TPath extends string,
-    TParams extends PathParameters<TPath>
-  >(
+  function PathResolver<TContext, TPath extends string, TParams extends PathParameters<TPath>>(
     this: PathResolver<TContext, TPath, TParams>,
     router: Router,
     apiOptions: RestApiOptions<TContext>,
@@ -157,13 +124,13 @@ const _PathResolver: any = (function () {
     if (this.pathOptions) {
       const { description, summary, params } = this.pathOptions;
       this.spec = { description, summary };
-      this.spec.parameters = Object.entries<RestParameter<any>>(
-        params ?? {}
-      ).map(([name, parameter]) => ({
-        name,
-        in: "path",
-        ...parameter.spec,
-      }));
+      this.spec.parameters = Object.entries<RestParameter<any>>(params ?? {}).map(
+        ([name, parameter]) => ({
+          name,
+          in: "path",
+          ...parameter.spec,
+        })
+      );
     } else {
       this.spec = {};
     }
@@ -187,20 +154,19 @@ const _PathResolver: any = (function () {
         TBody
       >
     ) {
-      const { body, query, responses, excludeFromSpec, ...spec } =
-        operationOptions;
+      const { body, query, responses, excludeFromSpec, ...spec } = operationOptions;
       if (!excludeFromSpec) {
         this.spec[method] = spec;
         if (body?.spec) {
           this.spec[method]!.requestBody = body?.spec;
         }
-        this.spec[method]!.parameters = Object.entries<RestParameter<any>>(
-          query ?? {}
-        ).map(([name, parameter]) => ({
-          name,
-          in: "query",
-          ...parameter.spec,
-        }));
+        this.spec[method]!.parameters = Object.entries<RestParameter<any>>(query ?? {}).map(
+          ([name, parameter]) => ({
+            name,
+            in: "query",
+            ...parameter.spec,
+          })
+        );
         if (responses) {
           this.spec[method]!.responses = responses;
         }
@@ -208,8 +174,10 @@ const _PathResolver: any = (function () {
       this.router[method](this.path, async (req, res, next) => {
         const response: ResponseWrapper<any> = await (async () => {
           try {
-            const context: RestApiContext<TContext> =
-              ((await this.apiOptions.context?.({ req, res })) ?? {}) as any;
+            const context: RestApiContext<TContext> = ((await this.apiOptions.context?.({
+              req,
+              res,
+            })) ?? {}) as any;
             context.params = await pProps(
               this.pathOptions?.params ?? ({} as RestParameters<any>),
               async (param, name) => {
@@ -218,12 +186,7 @@ const _PathResolver: any = (function () {
                   return await param.parse(value);
                 } catch (e) {
                   if (e instanceof ParseError) {
-                    throw new InvalidParameterError(
-                      name as string,
-                      value,
-                      "path",
-                      e.message
-                    );
+                    throw new InvalidParameterError(name as string, value, "path", e.message);
                   }
                   throw e;
                 }
@@ -245,12 +208,7 @@ const _PathResolver: any = (function () {
                   return await param.parse(value);
                 } catch (e) {
                   if (e instanceof ParseError) {
-                    throw new InvalidParameterError(
-                      name as string,
-                      value,
-                      "query",
-                      e.message
-                    );
+                    throw new InvalidParameterError(name as string, value, "query", e.message);
                   }
                   throw e;
                 }
@@ -286,9 +244,7 @@ const _PathResolver: any = (function () {
   return PathResolver;
 })();
 
-type ContextFunction<TContext> = (
-  express: ExpressContext
-) => MaybePromise<TContext>;
+type ContextFunction<TContext> = (express: ExpressContext) => MaybePromise<TContext>;
 interface ExpressContext {
   req: Request;
   res: Response;
@@ -330,12 +286,7 @@ export interface RestApiOptions<TContext = {}> {
   errorHandler?: ErrorHandler;
 }
 
-export type RestApiContext<
-  TContext = {},
-  TParams = any,
-  TQuery = any,
-  TBody = any
-> = TContext & {
+export type RestApiContext<TContext = {}, TParams = any, TQuery = any, TBody = any> = TContext & {
   params: TParams;
   query: TQuery;
   body: TBody;

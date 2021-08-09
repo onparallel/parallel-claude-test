@@ -1,26 +1,10 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Center,
-  Divider,
-  Flex,
-  Heading,
-  Image,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
-import {
-  CheckIcon,
-  LinkedInSimpleIcon,
-  TwitterIcon,
-} from "@parallel/chakra/icons";
+import { Box, Center, Divider, Flex, Heading, Image, Stack, Text } from "@chakra-ui/react";
+import { CheckIcon, LinkedInSimpleIcon, TwitterIcon } from "@parallel/chakra/icons";
 import { Card } from "@parallel/components/common/Card";
 import { Link, NakedLink, NormalLink } from "@parallel/components/common/Link";
 import { Logo } from "@parallel/components/common/Logo";
-import {
-  withApolloData,
-  WithApolloDataContext,
-} from "@parallel/components/common/withApolloData";
+import { withApolloData, WithApolloDataContext } from "@parallel/components/common/withApolloData";
 import { PublicLayout } from "@parallel/components/public/layout/PublicLayout";
 import { useThanks_PetitionLogoQuery } from "@parallel/graphql/__types";
 import { useRouter } from "next/router";
@@ -57,20 +41,11 @@ function ThanksForSigning() {
           justifyContent="center"
         >
           <Center>
-            {logoUrl ? (
-              <Image src={logoUrl} width="200px" />
-            ) : (
-              <Logo width="200px" />
-            )}
+            {logoUrl ? <Image src={logoUrl} width="200px" /> : <Logo width="200px" />}
           </Center>
           <Card paddingY={8} paddingX={4} textAlign="center">
             <Stack spacing={4}>
-              <Center
-                margin="auto"
-                borderRadius="full"
-                background="purple.500"
-                boxSize={8}
-              >
+              <Center margin="auto" borderRadius="full" background="purple.500" boxSize={8}>
                 <CheckIcon color="white" role="presentation" />
               </Center>
               <Heading size="md">
@@ -99,10 +74,7 @@ function ThanksFooter() {
     <Flex flexDirection="column" alignItems="center">
       <Divider borderColor="#A0AEC0" />
       <Text align="center" marginTop={5}>
-        <FormattedMessage
-          id="footer.slogan"
-          defaultMessage="Work better with"
-        />
+        <FormattedMessage id="footer.slogan" defaultMessage="Work better with" />
       </Text>
       <NakedLink href="/">
         <Box as="a">
@@ -119,11 +91,7 @@ function ThanksFooter() {
             <LinkedInSimpleIcon color="white" role="presentation" />
           </Center>
         </NormalLink>
-        <NormalLink
-          href="https://twitter.com/Parallel_SO"
-          aria-label="Twitter"
-          isExternal
-        >
+        <NormalLink href="https://twitter.com/Parallel_SO" aria-label="Twitter" isExternal>
           <Center boxSize="24px" backgroundColor="purple.500" borderRadius="md">
             <TwitterIcon color="white" role="presentation" />
           </Center>
@@ -144,10 +112,7 @@ function ThanksFooter() {
         <span>&nbsp;|&nbsp;</span>
         <Link href={`/legal/privacy`}>
           <Text align="center" fontSize="12px">
-            <FormattedMessage
-              id="layout.privacy-link"
-              defaultMessage="Privacy"
-            />
+            <FormattedMessage id="layout.privacy-link" defaultMessage="Privacy" />
           </Text>
         </Link>
       </Flex>
@@ -155,10 +120,7 @@ function ThanksFooter() {
   );
 }
 
-ThanksForSigning.getInitialProps = async ({
-  query,
-  fetchQuery,
-}: WithApolloDataContext) => {
+ThanksForSigning.getInitialProps = async ({ query, fetchQuery }: WithApolloDataContext) => {
   try {
     if (query.o) {
       await fetchQuery(

@@ -1,20 +1,6 @@
 import { gql } from "@apollo/client";
-import {
-  Box,
-  Button,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Portal,
-  Stack,
-} from "@chakra-ui/react";
-import {
-  ChevronDownIcon,
-  CopyIcon,
-  DeleteIcon,
-  RepeatIcon,
-} from "@parallel/chakra/icons";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Portal, Stack } from "@chakra-ui/react";
+import { ChevronDownIcon, CopyIcon, DeleteIcon, RepeatIcon } from "@parallel/chakra/icons";
 import { OrganizationGroupsListTableHeader_UserFragment } from "@parallel/graphql/__types";
 import { isAdmin } from "@parallel/utils/roles";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -50,10 +36,7 @@ export function OrganizationGroupsListTableHeader({
   return (
     <Stack direction="row" padding={2}>
       <Box flex="0 1 400px">
-        <SearchInput
-          value={search ?? ""}
-          onChange={(e) => onSearchChange(e.target.value)}
-        />
+        <SearchInput value={search ?? ""} onChange={(e) => onSearchChange(e.target.value)} />
       </Box>
       <IconButtonWithTooltip
         onClick={onReload}
@@ -70,15 +53,8 @@ export function OrganizationGroupsListTableHeader({
           <Spacer />
           <Box>
             <Menu>
-              <MenuButton
-                as={Button}
-                rightIcon={<ChevronDownIcon />}
-                isDisabled={!showActions}
-              >
-                <FormattedMessage
-                  id="generic.actions-button"
-                  defaultMessage="Actions"
-                />
+              <MenuButton as={Button} rightIcon={<ChevronDownIcon />} isDisabled={!showActions}>
+                <FormattedMessage id="generic.actions-button" defaultMessage="Actions" />
               </MenuButton>
               <Portal>
                 <MenuList minWidth="160px">
@@ -108,10 +84,7 @@ export function OrganizationGroupsListTableHeader({
             </Menu>
           </Box>
           <Button colorScheme="purple" onClick={onCreateGroup}>
-            <FormattedMessage
-              id="organization-groups.create-group"
-              defaultMessage="Create group"
-            />
+            <FormattedMessage id="organization-groups.create-group" defaultMessage="Create group" />
           </Button>
         </>
       ) : null}
