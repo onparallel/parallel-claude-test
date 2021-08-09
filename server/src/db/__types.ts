@@ -392,6 +392,7 @@ export interface Organization {
   public_file_logo_id: Maybe<number>; // int4
   custom_host: Maybe<string>; // varchar
   custom_email_from: Maybe<string>; // varchar
+  logo_public_file_id: Maybe<number>; // int4
 }
 
 export type CreateOrganization = PartialProps<
@@ -405,6 +406,7 @@ export type CreateOrganization = PartialProps<
   | "public_file_logo_id"
   | "custom_host"
   | "custom_email_from"
+  | "logo_public_file_id"
 >;
 
 export interface OrgIntegration {
@@ -902,7 +904,7 @@ export interface User {
   status: UserStatus; // user_status
   is_sso_user: boolean; // bool
   external_id: Maybe<string>; // varchar
-  public_file_avatar_id: Maybe<number>; // int4
+  avatar_public_file_id: Maybe<number>; // int4
 }
 
 export type CreateUser = PartialProps<
@@ -921,7 +923,7 @@ export type CreateUser = PartialProps<
   | "status"
   | "is_sso_user"
   | "external_id"
-  | "public_file_avatar_id"
+  | "avatar_public_file_id"
 >;
 
 export interface UserAuthenticationToken {

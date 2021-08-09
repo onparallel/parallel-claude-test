@@ -144,7 +144,7 @@ export class OrganizationRepository extends BaseRepository {
       const results = await this.raw<{ id: number; path: string }>(
         /* sql */ `
         select o.id, pfu.path from organization o
-          join public_file_upload pfu on o.public_file_logo_id = pfu.id
+          join public_file_upload pfu on o.logo_public_file_id = pfu.id
           where o.id in (${orgIds.map(() => "?").join(",")})
       `,
         [...orgIds]

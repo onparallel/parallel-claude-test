@@ -89,7 +89,7 @@ const identifiers = [
         await orgs.updateOrganization(
           org.id,
           {
-            public_file_logo_id: file.id,
+            logo_public_file_id: file.id,
           },
           user
         );

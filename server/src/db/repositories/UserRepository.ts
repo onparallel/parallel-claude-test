@@ -197,7 +197,7 @@ export class UserRepository extends BaseRepository {
       const results = await this.raw<{ id: number; path: string }>(
         /* sql */ `
         select u.id, pfu.path from "user" u
-          join public_file_upload pfu on u.public_file_avatar_id = pfu.id
+          join public_file_upload pfu on u.avatar_public_file_id = pfu.id
           where u.id in (${userIds.map(() => "?").join(",")})
       `,
         [...userIds]

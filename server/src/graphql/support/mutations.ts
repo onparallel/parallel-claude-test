@@ -429,7 +429,7 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
 
     await ctx.users.updateUserById(
       userId,
-      { public_file_avatar_id: file.id },
+      { avatar_public_file_id: file.id },
       `User:${ctx.user!.id}`
     );
     return {
