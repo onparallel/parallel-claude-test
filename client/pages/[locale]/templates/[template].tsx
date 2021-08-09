@@ -27,12 +27,10 @@ import { createApolloClient } from "@parallel/utils/apollo/client";
 import { FORMATS } from "@parallel/utils/dates";
 import { EnumerateList } from "@parallel/utils/EnumerateList";
 import { Assert } from "@parallel/utils/types";
-import {
-  PublicTemplateCategory,
-  usePublicTemplateCategories,
-} from "@parallel/utils/usePublicTemplateCategories";
+import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 
 function LandingTemplateDetails({
   template,
@@ -58,7 +56,7 @@ function LandingTemplateDetails({
   const categoryList = usePublicTemplateCategories();
   const categories = (template.categories ?? [])
     .map((c) => categoryList.find((category) => category.slug === c))
-    .filter((c) => c !== undefined) as PublicTemplateCategory[];
+    .filter(isDefined);
 
   const owner = { fullName: ownerFullName, avatarUrl: ownerAvatarUrl };
   return (

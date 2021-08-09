@@ -11,11 +11,9 @@ import {
 } from "@chakra-ui/react";
 import { Link, NakedLink } from "@parallel/components/common/Link";
 import { PublicTemplateCard_LandingTemplateFragment } from "@parallel/graphql/__types";
-import {
-  PublicTemplateCategory,
-  usePublicTemplateCategories,
-} from "@parallel/utils/usePublicTemplateCategories";
+import { usePublicTemplateCategories } from "@parallel/utils/usePublicTemplateCategories";
 import { FormattedMessage, useIntl } from "react-intl";
+import { isDefined } from "remeda";
 import { Card } from "../../common/Card";
 
 export interface PublicTemplateCardProps {
@@ -42,7 +40,7 @@ export function PublicTemplateCard({
   const categoryList = usePublicTemplateCategories();
   const categories = (template.categories ?? [])
     .map((c) => categoryList.find((category) => category.slug === c))
-    .filter((c) => c !== undefined) as PublicTemplateCategory[];
+    .filter(isDefined);
 
   return (
     <LinkBox
