@@ -8,7 +8,7 @@ import {
   stringArg,
 } from "@nexus/schema";
 import { uniq } from "remeda";
-import { fromGlobalId, toGlobalId } from "../../util/globalId";
+import { fromGlobalId } from "../../util/globalId";
 import { isDefined } from "../../util/remedaExtensions";
 import { random } from "../../util/token";
 import { ArgValidationError } from "../helpers/errors";
@@ -312,7 +312,7 @@ export const updateLandingTemplateMetadata = mutationField(
         (args) => isDefined(args.image),
         validateFile(
           (args) => args.image!,
-          { contentType: "image/png", maxSize: 1024 * 1024 * 10 },
+          { contentType: "image/*", maxSize: 1024 * 1024 * 10 },
           "image"
         )
       )
@@ -330,41 +330,44 @@ export const updateLandingTemplateMetadata = mutationField(
           );
         }
 
-        const templateMd = template!.public_metadata;
+        const templateMd = template!.public_metadata || {};
 
         const newMetadata: any = {};
 
-        newMetadata.background_color = isDefined(args.backgroundColor)
-          ? args.backgroundColor
-          : templateMd.backgroundColor || null;
+        newMetadata.background_color =
+          isDefined(args.backgroundColor) && args.backgroundColor.trim() !== ""
+            ? args.backgroundColor
+            : templateMd.background_color || null;
 
         newMetadata.categories =
-          isDefined(args.categories) && args.categories !== ""
+          isDefined(args.categories) && args.categories.trim() !== ""
             ? uniq(args.categories.split(",").map((w) => w.trim()))
             : templateMd.categories || null;
 
-        newMetadata.description = isDefined(args.description)
-          ? args.description
-          : templateMd.description || null;
+        newMetadata.description =
+          isDefined(args.description) && args.description.trim() !== ""
+            ? args.description.trim()
+            : templateMd.description || null;
 
-        newMetadata.slug = isDefined(args.slug)
-          ? args.slug
-          : templateMd.slug || null;
+        newMetadata.slug =
+          isDefined(args.slug) && args.slug.trim() !== ""
+            ? args.slug.trim()
+            : templateMd.slug || null;
 
         if (args.image) {
-          const { createReadStream } = await args.image;
+          const { createReadStream, mimetype } = await args.image;
           const filename = random(16);
-          const path = `templates/${filename}`;
+          const path = `uploads/${filename}`;
           const res = await ctx.aws.publicFiles.uploadFile(
             path,
-            "image/png",
+            mimetype,
             createReadStream()
           );
           const file = await ctx.files.createPublicFile(
             {
               path,
               filename,
-              content_type: "image/png",
+              content_type: mimetype,
               size: res["ContentLength"]!.toString(),
             },
             `User:${ctx.user!.id}`
@@ -372,7 +375,8 @@ export const updateLandingTemplateMetadata = mutationField(
 
           newMetadata.image_public_file_id = file.id;
         } else {
-          newMetadata.image = templateMd.image || null;
+          newMetadata.image_public_file_id =
+            templateMd.image_public_file_id || null;
         }
 
         await ctx.petitions.updatePetition(
@@ -408,33 +412,40 @@ export const uploadUserAvatar = mutationField("uploadUserAvatar", {
     "image"
   ),
   resolve: async (_, { userId, image }, ctx) => {
-    const { createReadStream, mimetype } = await image;
+    try {
+      const { createReadStream, mimetype } = await image;
 
-    const filename = toGlobalId("User", userId);
-    const path = `avatars/${filename}`;
-    const res = await ctx.aws.publicFiles.uploadFile(
-      path,
-      "image/png",
-      createReadStream()
-    );
-    const file = await ctx.files.createPublicFile(
-      {
+      const filename = random(16);
+      const path = `uploads/${filename}`;
+      const res = await ctx.aws.publicFiles.uploadFile(
         path,
-        filename,
-        content_type: mimetype,
-        size: res["ContentLength"]!.toString(),
-      },
-      `User:${ctx.user!.id}`
-    );
+        mimetype,
+        createReadStream()
+      );
+      const file = await ctx.files.createPublicFile(
+        {
+          path,
+          filename,
+          content_type: mimetype,
+          size: res["ContentLength"]!.toString(),
+        },
+        `User:${ctx.user!.id}`
+      );
 
-    await ctx.users.updateUserById(
-      userId,
-      { avatar_public_file_id: file.id },
-      `User:${ctx.user!.id}`
-    );
-    return {
-      result: RESULT.SUCCESS,
-      message: "User avatar updated successfully",
-    };
+      await ctx.users.updateUserById(
+        userId,
+        { avatar_public_file_id: file.id },
+        `User:${ctx.user!.id}`
+      );
+      return {
+        result: RESULT.SUCCESS,
+        message: "User avatar updated successfully",
+      };
+    } catch (error) {
+      return {
+        result: RESULT.FAILURE,
+        message: error.message,
+      };
+    }
   },
 });
