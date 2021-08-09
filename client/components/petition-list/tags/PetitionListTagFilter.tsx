@@ -176,7 +176,7 @@ export function PetitionListTagFilter({
           data-active={activeIndex === 0 ? "true" : undefined}
           id={`${id}-0`}
         >
-          <Center boxSize={4} marginRight={2}>
+          <Center boxSize={4} marginRight={2} pointerEvents="none">
             <CloseIcon fontSize="xs" role="presentation" />
           </Center>
           <FormattedMessage
